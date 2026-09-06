@@ -95,6 +95,27 @@ const EC_PLAIN_SWAPS = [
         'exempt'  => [],
     ],
     [
+        // **THE NAMED ANALYSIS, NOT A DESCRIPTION OF IT.** Tom, 2026-09-06, for at least the third
+        // time: *"I have been trying to teach you away from that Simple English reformation of the
+        // standard term Extended Period Simulation."* And, giving the reason rather than only the
+        // ruling: *"'Simulation over time' is arguably better. But for an engineering software,
+        // let's do what you said: Use the EPANET language."* So this row is not about register at
+        // all. EPS is EPANET's own name for its own analysis, printed in its manual, its toolkit
+        // and its `[TIMES]` documentation; a reader who knows the term does not recognise
+        // "a run over time", and a reader who does not is being taught a name that exists nowhere
+        // else.
+        //
+        // **NARROW ON PURPOSE, because "over time" is also correct engineering English.** Energy is
+        // power integrated over time, and water quality is transported along the flows over time --
+        // both true, both keeping the phrase. What is caught is the phrase used as the NAME of the
+        // analysis: something running, calculating or working a network out over time or through
+        // time. Five shipped strings said it the day this row was written.
+        'pattern' => '/\b(?:runs?|running|ran|calculate[sd]?|calculating|works?|worked|working)\b[^.;]{0,40}?\b(?:over|through)\s+time\b/iu',
+        'term'    => 'extended period simulation (EPANET\'s own name for it)',
+        'why'     => "Tom, 2026-09-06: \"I have been trying to teach you away from that Simple English reformation of the standard term Extended Period Simulation.\" EPS is the name EPANET prints; a description is not a name. \"Over time\" on its own is fine and is deliberately not matched -- energy IS power integrated over time.",
+        'exempt'  => [],
+    ],
+    [
         'pattern' => '/\brest\s+pressure\b/iu',
         'term'    => 'static pressure',
         'why'     => 'Tom, 2026-09-01. "Static pressure" is the profession\'s term and is what a hydrant test reports.',

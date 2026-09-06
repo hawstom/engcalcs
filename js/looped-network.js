@@ -4054,7 +4054,12 @@ var EngCalcs = EngCalcs || {};
 	//   * "Equal intervals" and "Equal counts" are ONE-SHOT BUTTONS that read the values on screen
 	//     now and WRITE fixed numbers into those boxes. They are how the absolute numbers get
 	//     chosen; they are not a live mode.
-	//   * The default ramp is EPANET's own blue-cyan-green-yellow-red, and it is reversible.
+	//   * EPANET's own blue-cyan-green-yellow-red is in the catalogue, unsoftened, and is what an
+	//     unknown ramp key falls back to. **It is NOT the shipped default**, which is `viridis`
+	//     (`colorRampNode` and `colorRampLink`, defaultSettings) -- a correction made 2026-09-06
+	//     when this comment's own claim reached a public page and Tom caught it. Viridis is
+	//     perceptually uniform and readable to colour-blind viewers, which is why it was chosen;
+	//     say that, or say nothing, but do not say EPANET's is the default.
 	// Our one addition: leaving every box blank means AUTOMATIC -- equal intervals over the values
 	// presently on the map, recomputed each solve. EPANET has no such state; it exists here because
 	// a break value is in the DISPLAY unit, so no shipped default could be right under both presets
@@ -16358,7 +16363,7 @@ var EngCalcs = EngCalcs || {};
 			// The fallback is kept in step with the key on purpose: it is what a page whose
 			// pageConfig failed to load shows, and a stale one here would state the OPPOSITE of
 			// what the page now does (Task 587 -- the curve is used, not simplified away).
-			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and a run over time fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets.';
+			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets.';
 			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve, so there
 			// is no substitution to report. The remaining three say which outcome a valve met -- kept
 			// and solvable here, kept but needing the EPANET engine, or turned back into a pipe.
@@ -24924,7 +24929,7 @@ var EngCalcs = EngCalcs || {};
 		// The native solver has no time dimension and is not being given one.
 		if (noteFn && qualitySetting().mode !== 'none') {
 			noteFn(host, pc.lpn_quality_needs_run
-				|| 'Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press Run.');
+				|| 'Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press Run.');
 		}
 	}
 	/**

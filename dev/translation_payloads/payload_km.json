@@ -529,7 +529,7 @@
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_curve_none": "No curve",
         "lpn_curve_library_link": "Curves library",
-        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.",
+        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
         "lpn_curve_kind_volume": "Tank volume",
@@ -559,7 +559,7 @@
         "lpn_source_quality": "Source quality",
         "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
         "lpn_source_pattern": "Source pattern",
-        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.",
+        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.",
         "lpn_mixing_model": "Mixing model",
         "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
         "lpn_mixing_mixed": "Complete mixing",
@@ -602,7 +602,7 @@
         "lpn_energy_kwh": "kWh",
         "lpn_energy_kw": "kW",
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
+        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_scncmp_title": "Scenario comparison",
         "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
@@ -675,7 +675,7 @@
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_curve_none": "No curve",
         "lpn_curve_library_link": "Curves library",
-        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.",
+        "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
         "lpn_curve_kind_volume": "Tank volume",
@@ -705,7 +705,7 @@
         "lpn_source_quality": "Source quality",
         "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
         "lpn_source_pattern": "Source pattern",
-        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.",
+        "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.",
         "lpn_mixing_model": "Mixing model",
         "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
         "lpn_mixing_mixed": "Complete mixing",
@@ -748,7 +748,7 @@
         "lpn_energy_kwh": "kWh",
         "lpn_energy_kw": "kW",
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
+        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_scncmp_title": "Scenario comparison",
         "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
@@ -1353,7 +1353,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1369,7 +1369,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1385,7 +1385,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1401,7 +1401,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1417,7 +1417,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1433,7 +1433,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1449,7 +1449,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1465,7 +1465,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1481,7 +1481,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1497,7 +1497,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1513,7 +1513,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1529,7 +1529,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1545,7 +1545,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1561,7 +1561,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1577,7 +1577,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1593,7 +1593,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1609,7 +1609,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1625,7 +1625,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1641,7 +1641,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1657,7 +1657,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1673,7 +1673,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1689,7 +1689,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1705,7 +1705,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1721,7 +1721,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1737,7 +1737,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1753,7 +1753,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1769,7 +1769,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1785,7 +1785,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1801,7 +1801,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1817,7 +1817,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1833,7 +1833,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1849,7 +1849,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1865,7 +1865,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1881,7 +1881,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1897,7 +1897,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1913,7 +1913,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1929,7 +1929,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1945,7 +1945,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1961,7 +1961,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1977,7 +1977,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -1993,7 +1993,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2009,7 +2009,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2025,7 +2025,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2041,7 +2041,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2057,7 +2057,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2073,7 +2073,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2089,7 +2089,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2105,7 +2105,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2121,7 +2121,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2137,7 +2137,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2153,7 +2153,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2169,7 +2169,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2185,7 +2185,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2201,7 +2201,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2217,7 +2217,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2233,7 +2233,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2249,7 +2249,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2265,7 +2265,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2281,7 +2281,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2297,7 +2297,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2313,7 +2313,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2329,7 +2329,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2345,7 +2345,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2361,7 +2361,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2377,7 +2377,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2393,7 +2393,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2409,7 +2409,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2425,7 +2425,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2441,7 +2441,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2457,7 +2457,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2473,7 +2473,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2489,7 +2489,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2505,7 +2505,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2521,7 +2521,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2537,7 +2537,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2553,7 +2553,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2569,7 +2569,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2585,7 +2585,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2601,7 +2601,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2617,7 +2617,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2633,7 +2633,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2649,7 +2649,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2665,7 +2665,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2681,7 +2681,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",
@@ -2697,7 +2697,7 @@
                 "previous_translated": {
                     "key": "lpn_quality_needs_run",
                     "value": "គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ឆ្លងកាត់ពេលវេលា ដូច្នេះវាត្រូវការឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។",
-                    "english": "Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
                 },
                 "next_translated": {
                     "key": "lpn_labels_col_rank",

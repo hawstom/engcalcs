@@ -59,6 +59,18 @@ $bad = [
         'the flow still changing from one try to the next', ['trial (a setting) or iteration (a reported count)']],
     ['two swaps in one string are both reported',
         'Zero, the usual value, means the network never settles.', ['converge', 'default']],
+    // **THE FIVE SHAPES THAT SHIPPED**, each one a real string or a near-copy of one, and each one
+    // a description standing where EPANET's own name for the analysis belongs.
+    ['"a run over time", the phrase Tom struck by name',
+        'a run over time fills and empties the tank.', ['extended period simulation (EPANET\'s own name for it)']],
+    ['"calculate the network over time"',
+        'Set a Total run time in Settings to calculate the network over time.', ['extended period simulation (EPANET\'s own name for it)']],
+    ['"runs a network through time"',
+        'the part of this page that runs a network through time did not load', ['extended period simulation (EPANET\'s own name for it)']],
+    ['"work the network out over time", which is the same thing again',
+        'Set a Total run time in Settings to work the network out over time.', ['extended period simulation (EPANET\'s own name for it)']],
+    ['the gerund form',
+        'This page is calculating the network over time.', ['extended period simulation (EPANET\'s own name for it)']],
 ];
 foreach ($bad as [$name, $value, $want]) { ecSwapAssert($name, ecSwapHit($value), $want); }
 
@@ -78,6 +90,20 @@ $good = [
     ['a word that merely contains the letters', 'The settlement of the tank foundation is not modelled.'],
     ['"static pressure", the term itself', 'Static pressure at the junction.'],
     ['"drawdown", the term itself', 'Drawdown at the tank.'],
+    // **"OVER TIME" ON ITS OWN IS CORRECT ENGINEERING ENGLISH AND MUST SURVIVE.** Energy really is
+    // power integrated over time and a chemical really is transported over time; a pattern on the
+    // bare phrase would fire on both, and this row would be switched off within a week. What the
+    // row catches is a VERB OF RUNNING joined to it, which is the phrase used as a NAME.
+    ['energy defined, which is what integration over time means',
+        'Pump energy is power integrated over the run.'],
+    ['the physics of transport, not the name of an analysis',
+        'Water quality is carried along the pipes over time.'],
+    ['a level that moves, stated plainly',
+        'The water level in the tank would move over time.'],
+    ['the term itself, which is the whole point',
+        'This file describes an extended period simulation.'],
+    ['and the term in an instruction',
+        'Set a Total run time in Settings to run an extended period simulation.'],
     // **THE EIGHT THAT WOULD HAVE KILLED THE "try" ROW.** Every one of these is a real shipped
     // string. "try again" is ordinary English and the whole reason that row is anchored to an
     // article rather than written on the bare word.

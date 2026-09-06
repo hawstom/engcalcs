@@ -385,6 +385,13 @@ function ecFrictionSection(string $root, int $langCount): string
             if (!is_array($e) || !isset($e['key'])) { continue; }
             $d = isset($e['disposition']) ? (string)$e['disposition'] : 'open';
             if ($d !== 'open' && $d !== 'refer-to-human') { continue; }
+            // **A QUESTION ABOUT A KEY THAT NO LONGER EXISTS IS NOT A QUESTION.** Tom was asked to
+            // rule on `wi_save_and_calculate` on 2026-09-06 and answered *"Obsolete. There is no
+            // such button. I have said this before. Remove the key."* -- and the key had already
+            // been removed from all 27 files. The finding outlived the string it was about, which
+            // is the friction log's own version of a stale claim. Dropped here rather than pruned
+            // by hand, because the next one will happen the same way.
+            if (ecLangValueOf($root, (string)$e['key']) === null) { continue; }
             $e['_sprint'] = $sprint;
             $open[] = $e;
         }

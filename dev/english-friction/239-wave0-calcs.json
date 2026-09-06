@@ -87,8 +87,8 @@
     "the seepage loss as a percentage of inflow",
     "the portion of the reach where loss occurs"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: this is a wording choice on a visible label. Candidates offered to Tom: 'Loss, share of inflow' or 'Loss / inflow'. Not written."
+   "disposition": "dismissed",
+   "resolution": "Tom, 2026-09-06: \"OK as is. Fraction and percent are not the same, but they are so interchangeable as to be functionally equivalent and understood as simply different views of the same thing.\" English unchanged."
   },
   {
    "key": "rc_sketch_filter",
@@ -100,8 +100,8 @@
     "a UI filter control",
     "the verb: to filter"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: sketch labels are Tom's call (sketch standards, minimal labels). Candidate: 'Filter layer'. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06: \"Add _syn per 1.\" Written: 'the filter (bedding) layer beneath the rock lining'."
   },
   {
    "key": "odt_sketch_start",
@@ -113,8 +113,8 @@
     "Start: begin the calculation",
     "the beginning of the time axis"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: either a sketch-label rewording ('Start level' / 'End level') or an $ec_lang_syn entry, both Tom's call. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06: \"Add a _syn per 1.\" Written: 'the starting water surface level'."
   },
   {
    "key": "odt_sketch_end",
@@ -126,8 +126,8 @@
     "End: stop the run",
     "the end of the pond/basin"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred with odt_sketch_start; the two must be answered together. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06: \"Add a _syn per 1.\" Written: 'the ending water surface level'."
   },
   {
    "key": "mtc_n_strickler",
@@ -138,8 +138,8 @@
     "roughness computed from the design rock size by this method (intended)",
     "the roughness to use for the purpose of sizing rock"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: changing four visible labels is a wording decision. Candidate: 'n from design rock size (Strickler method)' across all four. Not written."
+   "disposition": "english",
+   "resolution": "Tom, 2026-09-06: \"Revise to 'n from design rock size (Strickler method)'\". FROM, not FOR, which settles the preposition that pointed both ways. Applied to all four siblings (strickler, blodgett, bathurst, pi), which share the pattern the finding names and which CLAUDE.md requires to stay parallel. 4 x 26 retranslations owed."
   },
   {
    "key": "mtc_blodgett_v_bathurst",
@@ -151,8 +151,8 @@
     "the numerical difference between the Blodgett and Bathurst results",
     "a side-by-side of both values"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: a label rewrite here is Tom's call and the column is width-constrained. Candidate: 'Method selected (Blodgett or Bathurst)'. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06, approved this $ec_lang_syn text verbatim: 'which of the two roughness methods applies at this relative submergence'. Written. The cell reports WHICH method applies, not a difference."
   },
   {
    "key": "bpn_topology_warn_short",
@@ -176,8 +176,8 @@
     "maximum allowable pipe pressure (intended)",
     "maximum pressure allowance"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: expanding to 'Max. allowable pipe pressure' costs label width, which is Tom's call. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06, approved this $ec_lang_syn text verbatim: 'maximum allowable pipe pressure'. Written."
   },
   {
    "key": "mhp_notes_3_def",
@@ -189,8 +189,8 @@
     "in the situation where electricity has the greatest value",
     "at the point on the curve where the power is worth most"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred: a one-word wording change in a notes paragraph. Candidate: 'where electricity has a high value'. Not written."
+   "disposition": "english",
+   "resolution": "Tom, 2026-09-06, rewrote the clause: '4-6% assuming 2026 high-end electricity costs.' That REPLACES the ambiguous 'where', so the locative-vs-conditional choice a translator had to make is gone. Applied; 26 retranslations owed."
   },
   {
    "key": "ip_press",
@@ -201,8 +201,8 @@
     "pressure at this node, abbreviated for column width (intended)",
     "the imperative verb: press this"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom (AI may not write it): 'Pressure (head) at this reach's downstream node -- an abbreviation of the noun Pressure, never the verb | layout: column heading; avoid: the imperative verb \"press\"'. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06, approved this $ec_lang_syn text verbatim: 'Pressure'. Written."
   },
   {
    "key": "ip_t_run",
@@ -214,8 +214,8 @@
     "runtime in the software sense",
     "elapsed time of the calculation"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom: 'How long the zone must run (irrigation time, operating time, watering duration) to apply the target depth. | avoid: the computing sense of \"runtime\"'. An English change to 'Run time (hours)' is the alternative and is also his call. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06: \"Create $ec_lang_syn['ip_t_run'] = 'how long the zone must run to apply the target depth'\". THE FINDING WAS STALE: the entry already existed and already said that, in more words. Left as it was rather than shortened, and the finding closed."
   },
   {
    "key": "mi_n617",
@@ -228,8 +228,8 @@
     "comparison n",
     "component n"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom: prepend a payload to the existing entry -- 'Composite (combined, weighted) Manning n for the whole region, from the segment n values | layout: column heading; symbol'. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06, approved this $ec_lang_syn text verbatim: 'composite n for the region, by Chow 6-17'. Written, left of the existing layout commentary. So 'Comp.' is composite."
   },
   {
    "key": "dw_friction_factor_method",
@@ -240,8 +240,8 @@
     "which equation is used to compute the friction factor f (intended)",
     "a design method known as the friction factor method"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom: 'Which equation is used to compute the friction factor f (equation for f, f formula, method for the friction factor).' Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06, approved this $ec_lang_syn text verbatim: 'Method used to compute friction factor from roughness'. Written."
   },
   {
    "key": "wi_save_and_calculate",
@@ -253,8 +253,8 @@
     "save a file to disk, then calculate",
     "save the results"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom: 'Store (keep, remember) the values entered on this page and calculate again. | layout: button; avoid: saving a file to disk'. Not written."
+   "disposition": "dismissed",
+   "resolution": "Tom, 2026-09-06: \"Obsolete. There is no such button. I have said this before. Remove the key.\" THE KEY WAS ALREADY GONE from every lib/lang.ec.*.php when he said it, so nothing was there to remove and he was being asked about a string that does not exist. That is a defect in the QUESTION, not in the answer: new_english_keys.php now drops any friction entry whose key is no longer defined."
   },
   {
    "key": "mhp_vel_ok_short",
@@ -266,8 +266,8 @@
     "a quality or priority rating",
     "a position: upper / lower"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "$ec_lang_syn proposal for Tom, on all three (mhp_vel_ok_short / mhp_vel_high_short / mhp_vel_low_short): 'Verdict on the flow velocity: acceptable / too high / too low. | layout: column heading'. Note the same three words are shared by ip_pressure_*_short and bpn_pressure_warn_short, where the subject is pressure, so the entries must be per key. Not written."
+   "disposition": "intent",
+   "resolution": "Tom, 2026-09-06: \"Add a _syn 'the velocity is high / low / acceptable'\". Written on mhp_vel_ok_short. ITS TWO SIBLINGS, mhp_vel_high_short and mhp_vel_low_short, still carry an empty entry: he named one key and $ec_lang_syn takes no AI writing beyond what he named."
   },
   {
    "key": "mhp_annual_kwh",

@@ -219,7 +219,7 @@ $ec_lang_syn['dw_regime_transitional']='';
 $ec_lang['dw_regime_turbulent']='turbulent';
 $ec_lang_syn['dw_regime_turbulent']='';
 $ec_lang['dw_friction_factor_method']='Friction factor method';
-$ec_lang_syn['dw_friction_factor_method']='';
+$ec_lang_syn['dw_friction_factor_method']='Method used to compute friction factor from roughness';
 $ec_lang['dw_friction_factor']='Friction factor, f';
 $ec_lang_syn['dw_friction_factor']='';
 // Hazen-Williams. See mphl_ for missing text.
@@ -295,7 +295,7 @@ $ec_lang_syn['mi_a']='| layout: column heading; symbol';
 $ec_lang['mi_rh']='R<sub>h</sub>';
 $ec_lang_syn['mi_rh']='| layout: column heading; symbol';
 $ec_lang['mi_n617']='Comp.<br />n';
-$ec_lang_syn['mi_n617']='| layout: column heading; symbol';
+$ec_lang_syn['mi_n617']='composite n for the region, by Chow 6-17 | layout: column heading; symbol';
 $ec_lang['mi_v617']='v';
 $ec_lang_syn['mi_v617']='| layout: column heading; symbol';
 $ec_lang['mi_fr617']='Fr';
@@ -421,16 +421,16 @@ $ec_lang['mtc_sgrock']='<span class="ec-help" title="Density relative to water. 
 $ec_lang_syn['mtc_sgrock']='| gloss: specific gravity';
 $ec_lang['mtc_d50_in']='Design rock size, D<sub>50</sub>';
 $ec_lang_syn['mtc_d50_in']='';
-$ec_lang['mtc_n_strickler']='n for design rock size (Strickler method)';
+$ec_lang['mtc_n_strickler']='n from design rock size (Strickler method)';
 $ec_lang_syn['mtc_n_strickler']='';
-$ec_lang['mtc_n_blodgett']='n for design rock size (Blodgett method)';
+$ec_lang['mtc_n_blodgett']='n from design rock size (Blodgett method)';
 $ec_lang_syn['mtc_n_blodgett']='';
-$ec_lang['mtc_n_bathurst']='n for design rock size (Bathurst method)';
+$ec_lang['mtc_n_bathurst']='n from design rock size (Bathurst method)';
 $ec_lang_syn['mtc_n_bathurst']='';
-$ec_lang['mtc_n_pi']='n for design rock size (Phillips & Ingersoll method)';
+$ec_lang['mtc_n_pi']='n from design rock size (Phillips & Ingersoll method)';
 $ec_lang_syn['mtc_n_pi']='';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett vs. Bathurst';
-$ec_lang_syn['mtc_blodgett_v_bathurst']='';
+$ec_lang_syn['mtc_blodgett_v_bathurst']='which of the two roughness methods applies at this relative submergence';
 $ec_lang['mtc_pi_range_check']='P&I range check';
 $ec_lang_syn['mtc_pi_range_check']='';
 $ec_lang['mtc_pi_ok']='d50 in P&I range';
@@ -591,7 +591,7 @@ $ec_lang_syn['mhp_vel_low']='';
 $ec_lang['mhp_vel_high']='Velocity is high and may not be realistic; check transition losses, available energy, and water hammer.';
 $ec_lang_syn['mhp_vel_high']='';
 $ec_lang['mhp_vel_ok_short']='OK';
-$ec_lang_syn['mhp_vel_ok_short']='';
+$ec_lang_syn['mhp_vel_ok_short']='the velocity is high / low / acceptable';
 $ec_lang['mhp_vel_high_short']='High';
 $ec_lang_syn['mhp_vel_high_short']='';
 $ec_lang['mhp_vel_low_short']='Low';
@@ -610,7 +610,7 @@ $ec_lang['mhp_notes_2_def']='Check that velocity is reasonable for the available
 $ec_lang_syn['mhp_notes_2_def']='';
 $ec_lang['mhp_notes_3_term']='Head Loss Target';
 $ec_lang_syn['mhp_notes_3_term']='| gloss: head loss';
-$ec_lang['mhp_notes_3_def']='Penstock (supply pipe) losses below 10% of gross head are generally economical. The optimal trade-off between pipe cost and lost power often falls around 4–6% where electricity is most valuable.';
+$ec_lang['mhp_notes_3_def']='Penstock (supply pipe) losses below 10% of gross head are generally economical. The optimal trade-off between pipe cost and lost power often falls around 4–6% assuming 2026 high-end electricity costs.';
 $ec_lang_syn['mhp_notes_3_def']='';
 $ec_lang['mhp_notes_6_term']='Efficiency';
 $ec_lang_syn['mhp_notes_6_term']='';
@@ -673,9 +673,9 @@ $ec_lang_syn['odt_q_max']='';
 $ec_lang['odt_vol']='Drained volume';
 $ec_lang_syn['odt_vol']='';
 $ec_lang['odt_sketch_start']='Start';
-$ec_lang_syn['odt_sketch_start']='';
+$ec_lang_syn['odt_sketch_start']='the starting water surface level';
 $ec_lang['odt_sketch_end']='End';
-$ec_lang_syn['odt_sketch_end']='';
+$ec_lang_syn['odt_sketch_end']='the ending water surface level';
 // Contact us.
 
 // Irrigation
@@ -950,7 +950,7 @@ $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998).
 $ec_lang_syn['rc_notes_4_def']='';
 // Sketch labels
 $ec_lang['rc_sketch_filter']          = 'Filter';
-$ec_lang_syn['rc_sketch_filter']='';
+$ec_lang_syn['rc_sketch_filter']='the filter (bedding) layer beneath the rock lining';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Top Crest Curve';
 $ec_lang_syn['rc_sketch_top_crest_curve']='';
 $ec_lang['rc_sketch_outlet_apron']    = 'Outlet Apron';
@@ -1001,7 +1001,7 @@ $ec_lang_syn['ip_elev_ds_missing_warn']='';
 $ec_lang['ip_flow']='Flow';
 $ec_lang_syn['ip_flow']='';
 $ec_lang['ip_press']='Press.';
-$ec_lang_syn['ip_press']='';
+$ec_lang_syn['ip_press']='Pressure';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang_syn['ip_hf']='Friction head loss. | symbol';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -1015,6 +1015,7 @@ $ec_lang_syn['ip_pressure_warn_short']='';
 $ec_lang['ip_pressure_high']='High pressure locations need pressure reduction';
 $ec_lang['ip_pressure_high_short']='High';
 $ec_lang['ip_max_head']='Max. allow. pipe pressure';
+$ec_lang_syn['ip_max_head']='maximum allowable pipe pressure';
 $ec_lang['ip_max_head_tip']='Lines whose pressure exceeds this value are flagged. Leave blank to skip the high-pressure check.';
 $ec_lang['ip_h_far']='Last emitter pressure';
 $ec_lang_syn['ip_h_far']='';
@@ -1859,7 +1860,7 @@ $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing wa
 $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places them, from their top left corner.';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
-$ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and a run over time fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
+$ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know which engine is now
 // working out their network, not because anything was thrown away.
@@ -1868,7 +1869,7 @@ $ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, an
 $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They came in as open pipes, so the network is still joined up, but nothing controls pressure or flow there any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
-$ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out, because the part of this page that runs a network through time did not load. Every demand is the number written in the file.';
+$ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out, because the part of this page that runs an extended period simulation did not load. Every demand is the number written in the file.';
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the run. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
@@ -1879,7 +1880,7 @@ $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the o
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
 $ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept as you wrote them, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
+$ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs an extended period simulation did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sources_mixing']='This file says where more of the substance is added to the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both require the EPANET engine here.';
 $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
@@ -2225,7 +2226,7 @@ $ec_lang['lpn_curve_none']='No curve';
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
 $ec_lang['lpn_curve_library_link']='Curves library';
-$ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.';
+$ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
@@ -2714,7 +2715,7 @@ $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
 $ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs an extended period simulation.';
 $ec_lang['lpn_time_slider']='Time';
-$ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings to calculate the network over time.';
+$ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings to run an extended period simulation.';
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';
@@ -2795,7 +2796,7 @@ $ec_lang['lpn_quality_none']='Nothing';
 $ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';
 $ec_lang['lpn_quality_chemical']='A chemical that reacts';
-$ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.';
+$ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
 // throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a
 // concentration is TEXT the document states beside the chemical name and is never converted, which
@@ -2820,7 +2821,7 @@ $ec_lang['lpn_source_type_flowpaced']='Flow paced booster';
 $ec_lang['lpn_source_quality']='Source quality';
 $ec_lang['lpn_source_quality_tip']='How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.';
 $ec_lang['lpn_source_pattern']='Source pattern';
-$ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the run, for a feed that is not going flat out around the clock. No pattern means that the dose is the same at every step.';
+$ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.';
 $ec_lang['lpn_mixing_model']='Mixing model';
 $ec_lang['lpn_mixing_model_tip']='How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.';
 $ec_lang['lpn_mixing_mixed']='Complete mixing';
@@ -2876,7 +2877,7 @@ $ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside e
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 $ec_lang['lpn_energy_price_note']='This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.';
-$ec_lang['lpn_energy_needs_run']='Pump energy is power added up over time, so it needs the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.';
+$ec_lang['lpn_energy_needs_run']='Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.';
 $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing drawing power.';
 
 // ---- The scenario comparison (the planning engineer's wish-list row 2) ------------------------

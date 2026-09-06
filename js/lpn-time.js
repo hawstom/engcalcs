@@ -395,7 +395,7 @@
 			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET engine.',
 			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver works out one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs an extended period simulation.',
 			slider: pageConfig.lpn_time_slider || 'Time',
-			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is one moment to show. Set a Total run time in Settings to work the network out over time.',
+			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is one moment to show. Set a Total run time in Settings to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
 			prev: pageConfig.lpn_time_prev || 'Step back',
 			play: pageConfig.lpn_time_play || 'Play',
