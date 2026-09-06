@@ -205,10 +205,20 @@ function ecRulingLine(string $key, string $value): string
      * what he wrote was kept, which is the whole of the complaint that produced the harvester. */
     $date = isset($r['ruled']) ? $r['ruled'] : '';
     $answer = isset($r['answer']) ? trim((string) $r['answer']) : '';
+    /* **AND A QUESTION HE ASKED GETS ITS ANSWER BACK ON THE SAME LINE.** Several of his marks are
+     * questions -- "isn't this impossible?", "where is this used?" -- and an answer given only in a
+     * session report is an answer he never sees, which is the same failure as a ruling stored only
+     * in a session report. `reply` is written by whoever answers it and printed here, so the loop
+     * closes in the one file he actually opens. */
+    $reply = isset($r['reply']) ? trim((string) $r['reply']) : '';
+    $out = '';
     if ($answer !== '' && !preg_match('/^(ok|ok\.|okay|okay\.|edited|edited\.|fine|fine\.)$/i', $answer)) {
-        return "  _Ruled " . $date . ": " . str_replace("\n", ' ', $answer) . "_\n";
+        $out = "  _Ruled " . $date . ": " . str_replace("\n", ' ', $answer) . "_\n";
+    } else {
+        $out = "  _Ruled OK " . $date . "._\n";
     }
-    return "  _Ruled OK " . $date . "._\n";
+    if ($reply !== '') { $out .= "  _Answer: " . str_replace("\n", ' ', $reply) . "_\n"; }
+    return $out;
 }
 
 // **LEAD WITH THE NUMBER THAT NEEDS A HUMAN, NOT THE ONE THAT NEEDS A SPRINT.** These two counts

@@ -99,3 +99,22 @@ be." I am recording it here so it is not lost, ranked below my existing CSV/GPX 
 because I have no evidence anyone in this suite's actual population (small/rural
 utilities, EWB, Peace Corps — journal 2026-09-04) has ever hit this as a blocker, versus
 CSV/GPX import which has a documented forum trail of people stuck on it.
+
+## 6. Do not credit epanet-js.com on the Not EPANET gratitude page — keep the internal record
+
+Tom asked 2026-09-06 whether the Not EPANET gratitude section should also thank epanet-js.com for
+"pioneering some of our design decisions." Two outside precedents converge against it: The
+Document Foundation's 2020 open letter to Apache OpenOffice, which read externally as "comparison
+dressed in gratitude" even with real shared code ancestry behind it (blog.documentfoundation.org),
+and Slack's 2016 NYT ad "welcoming" Microsoft Teams, which critics read as revealing anxiety rather
+than confidence because Slack was the smaller party addressing the one it feared
+(linkedin.com/pulse/why-slacks-full-page-ad-new-york-times-epic-fail-justin-bariso). This suite is
+in Slack's position relative to epanet-js (smaller, unfunded, newer), which is the wrong position
+for the gesture to land as generous. Task 591/544 already scoped the one competitor-naming
+exception to EPANET alone and said explicitly it "does not travel" — this is that travel. Recorded
+as a **stop**, not a build: keep crediting epanet-js internally (already done, positioning.md
+§7/§8, ROADMAP 283/384/409/451/498), and do not put it on a public page. Zero cost to leave alone.
+Separately, checked and clean: MIT attribution for the vendored `epanet-js` npm toolkit (Luke
+Butler) is fully discharged today — `js/vendor/README.md`, `js/vendor/epanet-js.LICENSE`, and the
+on-page Notes entry (`lpn_notes_engine_def`) all name it. No licence gap exists on this question
+either way.

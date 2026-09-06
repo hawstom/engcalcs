@@ -273,3 +273,117 @@ SPECULATION, flagged for re-derivation: I did not find a citable source explicit
 warning against double-counting C-factor and a blanket k together for a distribution
 main; I inferred it from the general Hazen-Williams calibration principle. A later
 invocation should not quote this as a proven fact.
+
+## 2026-09-06 — Should the Not EPANET gratitude page also credit epanet-js.com?
+
+Tom's question, verbatim: *"Not EPANET: We should give credit to epanetjs.com for pioneering some
+of our design decisions, I think. ???"*
+
+### 1. Precedent for publicly crediting a direct competitor for design influence
+
+- **The Document Foundation's "Open Letter to Apache OpenOffice" (2020-10-12), on the 20th
+  anniversary of OpenOffice's source release.** It opens with real credit — calling OpenOffice
+  "the father project," which "changed the world" — then pivots in the same document to a release-
+  count comparison (13 LibreOffice majors since 2014 against zero for Apache OpenOffice) arguing
+  users should switch. CITED: blog.documentfoundation.org/blog/2020/10/12/open-letter-to-apache-
+  openoffice/. **The read-back, from an outside analysis of the letter's own structure: "comparison
+  dressed in gratitude rather than genuine appreciation... positions itself as the responsible
+  successor rather than as a respectful peer."** This is the closest real-world structural analog
+  to a "Not EPANET" page thanking epanet-js: gratitude toward a rival, on a page whose actual job is
+  to argue the reader should be using the grateful party instead. Even here, where LibreOffice and
+  OpenOffice share literal code ancestry (a much stronger claim to owe thanks than "we looked at
+  your UI"), the gesture reads to a neutral observer as the comparison it was trying not to be.
+- **Slack's 2016-11-02 full-page New York Times ad "welcoming" Microsoft Teams to market.** Framed
+  as generous ("we're genuinely excited to have some competition"), written by Slack's own CEO.
+  CITED: thedrum.com/news/2016/11/02/slack-warns-microsoft-off-workplace-comms-with-nyt-ad-harder-
+  it-looks ; mspoweruser.com/slack-runs-full-page-new-york-times-ad-welcoming-microsoft-teams/.
+  **Reception was split and the negative half is the informative half: critics read the "welcome"
+  as revealing Slack was rattled by Microsoft's entry**, not as confidence — the gesture undercut
+  itself precisely because Slack was the smaller party addressing the bigger one it had reason to
+  fear. CITED: linkedin.com/pulse/why-slacks-full-page-ad-new-york-times-epic-fail-justin-bariso ;
+  inc.com/justin-bariso/theres-a-major-problem-with-slacks-full-page-ad-in-the-new-york-times.html.
+
+### 2. The "Not X" frame, and whether gratitude toward a competitor reads as generous
+
+Both precedents above say the same thing from different directions: **a gesture of warmth toward a
+rival, made on a page whose job is to win the reader over, is read by outside observers as strategy
+first and sincerity second — regardless of the author's actual sincerity.** `dev/positioning.md`
+§1's own rule (*"lead with the invitation, not the comparison"*) anticipates exactly this failure
+mode. Naming epanet-js in the Not EPANET gratitude section does not merely risk this reading, it
+GUARANTEES the comparison is present in the reader's mind, because the only way a reader who has
+never heard of epanet-js learns what it is, in this context, is by learning it is a rival product we
+studied — which makes "gratitude" impossible to receive as anything but "look how magnanimous we are
+toward the company we compete with," to a reader with zero other context to weigh it against.
+
+### 3. The asymmetry: crediting a party Tom has privately called dishonest
+
+**This makes it worse, not better, and the Slack case is the evidence for why.** Slack's ad read as
+anxious BECAUSE Slack was the smaller, newer party publicly addressing the larger, more established
+one it had reason to fear — the warmth read as compensating for the fear rather than expressing
+confidence. This suite is exactly that shape relative to epanet-js: smaller, unfunded, newer, and
+the party who has recorded ($150,000 raised, per `dev/positioning.md` §7) that the other side is
+professionally staffed and better resourced. Crediting epanet-js for "pioneering our design
+decisions" on our own gratitude page, addressed to a stranger who has never heard of either
+product, reads as the underdog complimenting the incumbent — not as the incumbent's confident nod
+to a scrappy newcomer, which is the only shape in which this kind of gesture has ever landed well in
+the cases I found (none of which I found — I looked for a small-project-credits-big-incumbent case
+and found none; only father-project and peer-rival cases). **This is a judgement grounded in the two
+citations above, not from taste: it is the least credible thing on the page, not the most, because
+the position from which it would be said is the wrong one for the gesture to work.**
+
+### 4. The one part that is not a judgement call: MIT attribution, checked directly
+
+**Fully discharged, and there is no gap.** OBSERVED:
+- `js/vendor/README.md` (`~/webdev/hawsedc.subset/engcalcs/js/vendor/README.md`): names "epanet-js
+  0.9.0 (MIT)," states "© Luke Butler," points to the full licence text, and states "the licence
+  file must ship with any redistribution."
+- `js/vendor/epanet-js.LICENSE`: the complete MIT licence text, present and shipped as its own file
+  alongside the vendored code — satisfies MIT's one substantive condition (the copyright/permission
+  notice travels with the software).
+- `lib/lang.ec.en.php:2100` (`lpn_notes_engine_def`, shown to every visitor via Help > Notes on the
+  `lpn_` page): names the dependency in full — "It reaches this page through epanet-js 0.9.0 by
+  Luke Butler, under the MIT licence" — publicly, in the product itself, not just in a source
+  comment.
+- `dev/vendor-manifest.json` and `vendor_integrity_check.php` (blocking, `check_all.sh`) verify the
+  vendored file matches what is declared.
+
+**One important distinction the README itself flags and that this question must not blur:** the
+vendored **npm package** `epanet-js` (Luke Butler, MIT, a toolkit) and the **web application**
+epanetjs.com (the FSL-1.1-MIT product with paid tiers, whose UI Tasks 283/384/409/498 studied) are
+legally and factually two different things sharing one name — `js/vendor/README.md`'s own words:
+*"We use the toolkit and have never read the app's source."* MIT attribution is owed, and fully
+paid, for the TOOLKIT. Nothing is owed for the WEB APP's UI patterns, because UI/UX ideas are not
+copyrightable subject matter and Task 384 already recorded the correct boundary for that case
+(FSL-1.1-MIT means the idea only was taken, not code). **So there is no licence deficiency driving
+this decision either way — it is entirely a question of what §1's "lead with the invitation, not the
+comparison" and Task 591's own scoping ("scoped to EPANET... does not travel") should do here.**
+
+### 5. Recommendation
+
+**Do not add epanet-js.com to the Not EPANET gratitude section, or to any public page.** The
+rejected alternative is a single factual, unadorned sentence of credit placed IN the gratitude
+section beside EPA and Cynthia Brewer. It fails for three converging reasons, each backed above
+rather than asserted: (a) Task 591/544 explicitly scoped the one competitor-naming exception to
+EPANET and said in the same breath that the exception "does not travel" — extending it to epanet-js
+the same month it was granted is the travel the ruling anticipated and declined; (b) the closest
+real precedent found (LibreOffice's open letter to OpenOffice) shows that even sincere,
+code-ancestry-backed gratitude toward a rival reads externally as comparison dressed as gratitude,
+and this suite's claim on epanet-js is weaker (UI observation, not shared code) than LibreOffice's
+was on OpenOffice; (c) the Slack precedent shows the asymmetry runs the wrong way for us
+specifically — we are the smaller, unfunded party, and a compliment upward from that position reads
+as anxious rather than generous, which is the opposite of what a "deep honesty and deep gratitude"
+page is for. The internal credit already on file (`dev/positioning.md` §7/§8, ROADMAP Tasks
+283/384/409/451/498, `js/looped-network.js:4069`) is the correct and sufficient place for this —
+it is honest, dated, specific, and carries no audience to perform for.
+
+**If Tom still wants something public**, the safer venue is not the gratitude section but a
+neutral, separately labelled disclosure — arm's length, not warm — closer to a build note than a
+thank-you. Three sentences, in the site's own factual register, for that alternative and that
+alternative only (I do not recommend shipping this on the gratitude page itself):
+
+> Several interface choices here were shaped by studying epanet-js.com, a separate commercial
+> EPANET-compatible product, including how it presents a colour legend and runs a public roadmap
+> board. Its licence permits learning from its behaviour without permitting us to copy its code, and
+> we have not copied any. This is a factual note, not an endorsement, and epanet-js has not reviewed
+> or sponsored this project.
+

@@ -109,6 +109,7 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_energy_curve_note`**
   > These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.
   _Ruled 2026-09-06: OK. But isn't this impossible? Doesn't the software reject such a curve?_
+  _Answer: Not impossible, and it is reachable two ways. (1) An imported .inp whose [ENERGY] row names an efficiency curve that no [CURVES] section defines: we never reject a file, we take the supported subset and report every difference, so the pump keeps the reference and falls back to the global efficiency. (2) The Library's own Add a curve button, which deliberately mints a pump head curve with NO points -- invented points would be head nobody typed. js/looped-network.js:31586 fires on both, and the sibling string lpn_pump_effic_unstated covers case (1) on the pump's own popup._
 - **`lpn_energy_demand_charge`**
   > Peak demand charge
   _Ruled OK 2026-09-04._
@@ -214,6 +215,7 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_library_curve_copy`**
   > Copy points
   _Ruled OK 2026-09-05._
+  _Answer: There IS one button, and you are seeing the whole of it. js/looped-network.js:25580 is the Copy points button; :25710 is the TITLE of a window.prompt, which libCopyOut() reaches only when navigator.clipboard is missing or refused -- plain http, or an untrusted gesture. Your browser has the clipboard API, so you never see the prompt. Two strings, one button and one fallback._
 - **`lpn_library_curve_copy_manual`**
   > Copy these points
   _Ruled OK 2026-09-05._
