@@ -259,8 +259,18 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   own rows: PUMP, EFFICIENCY, VOLUME, HEADLOSS (Tom, 2026-09-05). Read it, keep it, write it back —
   it is the only thing that can type a curve nothing references, which is what the Library's own
   Add button makes. `generic` is not a fifth kind, it is EPANET's `G_CURVE`, and no control offers
-  it. **A VOLUME curve is carried in full and USED BY NOTHING** — a tank names it and still solves
-  as a cylinder, which is exact at one instant and wrong over a run (Task 587).
+  it. **A VOLUME curve is USED, and only by a run** (Task 587, closed 2026-09-05): a tank states
+  which curve it uses, `EngCalcs.lpnTankVolumeAttach()` hangs the converted points on the model
+  beside the clock, and `js/lpn-epanet.js` writes the eighth `[TANKS]` column so the engine
+  integrates the real shape. We have no level-to-volume arithmetic of our own and grew none — the
+  whole defect was delivery. **`EngCalcs.lpnIsFixedHead` is untouched and stays so:** a water
+  surface is the level the document states whatever the vessel's shape, so a single instant is
+  identical either way and only `dLevel/dt = Q / (dVolume/dLevel)` sees a curve. A curve EPANET
+  would refuse (under two points, x not strictly increasing, y not rising) is LEFT OFF rather than
+  repaired. Abscissa is level in the elevation unit; ordinate is that unit CUBED, because EPANET
+  pairs volume with length and this page has no volume selector at all.
+  `dev/lpn-spike/tank-volume-curve-harness.js` anchors it on 216 m³ into one tank: 3.7502 m as a
+  10 m cylinder against 6.1200 m on a stepped curve, both hand-computed.
   `dev/lpn-spike/curve-library-harness.js`; `dev/pump-energy.md` for the efficiency side.
 - **A tank is a fixed head at its water surface** — what EPANET itself solves at t=0.
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the

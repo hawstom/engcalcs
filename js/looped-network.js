@@ -16356,7 +16356,10 @@ var EngCalcs = EngCalcs || {};
 			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written but the results here will not match the results in EPANET.';
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
-			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks have a volume curve, so they are not straight-sided. They were brought in as round tanks of the stated diameter. The water level in them is the level the file gives, so the results match; only the shape is simplified.';
+			// The fallback is kept in step with the key on purpose: it is what a page whose
+			// pageConfig failed to load shows, and a stale one here would state the OPPOSITE of
+			// what the page now does (Task 587 -- the curve is used, not simplified away).
+			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and a run over time fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets.';
 			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve, so there
 			// is no substitution to report. The remaining three say which outcome a valve met -- kept
 			// and solvable here, kept but needing the EPANET engine, or turned back into a pipe.

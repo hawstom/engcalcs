@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**58 open tasks.** Next (100): 7 · Soon (75): 12 · Someday (50): 14 · Maybe (25): 8 · Parked (5): 17
+**56 open tasks.** Next (100): 6 · Soon (75): 12 · Someday (50): 14 · Maybe (25): 7 · Parked (5): 17
 
-## 100 — Next (7)
+## 100 — Next (6)
 
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
@@ -17,7 +17,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 579 — The EPANET sections still carried and not understood, extracted from 566.
 - ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
 - Task 583 — Two EPS sentences left, and one states an unmeasured cause.
-- Task 587 — A tank with a volume curve fills on the wrong schedule.
 
 ## 75 — Soon (12)
 
@@ -51,7 +50,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 575 — The six element symbols, redrawn from Tom's sketch.
 - Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 
-## 25 — Maybe (8)
+## 25 — Maybe (7)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
@@ -60,7 +59,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 348 — Sub-categories and paging in the examples gallery.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
 - Task 574 — What is left of the `.net` slot map: nine slots nothing identifies.
-- Task 589 — Do Delete and Vertices want the same two ways out?
 
 ## 5 — Parked (17)
 
@@ -84,5 +82,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-51 of 58 titles are within 4–12 words. `!` marks the rest;
+49 of 56 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
