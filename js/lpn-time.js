@@ -393,9 +393,9 @@
 			// (lpn_time_no_engine is a DIFFERENT thing and stays: "the engine is unreachable, so you
 			// are seeing one instant" is a fact about this session that the user acts on.)
 			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET solver.',
-			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs an extended period simulation.',
+			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.',
 			slider: pageConfig.lpn_time_slider || 'Time',
-			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings to run an extended period simulation.',
+			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
 			prev: pageConfig.lpn_time_prev || 'Step back',
 			play: pageConfig.lpn_time_play || 'Play',
@@ -412,7 +412,7 @@
 			// this literal is the button's name and not a synonym for it.
 			run: pageConfig.lpn_time_run || 'Calculate',
 			runTip: pageConfig.lpn_time_run_tip || 'Solve this network at every hydraulic time step, from the start of the run to the end of it.',
-			runNote: pageConfig.lpn_time_run_note || 'You are seeing the network at the first reporting time. This project is set not to recalculate automatically, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.',
+			runNote: pageConfig.lpn_time_run_note || 'You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.',
 			// ---- the run box (Task 450) ----
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
 			// already the sentence the status bar uses for exactly this moment.

@@ -448,14 +448,22 @@ const SRC = sectionLines(FIXTURE);
 	ok('and for a pattern to run it on', junctionPopup.indexOf('Source pattern') >= 0);
 	// EPANET's own four types, by EPANET's own names. An engineer choosing between them is choosing
 	// between four real pieces of equipment.
+	//
+	// **HYPHENATED SINCE 2026-09-06, and the TERM is unchanged.** EPANET writes 'Flow Paced Booster';
+	// this writes 'Flow-paced booster'. That is a punctuation decision, not a vocabulary one -- New
+	// Hart's Rules is this project's reference for mechanics and hyphenates an attributive compound,
+	// and without it 'flow' reads as the noun the booster boosts. The rule about using EPANET's
+	// terminology is about which WORDS are used, and these are the same words.
 	ok('all four EPANET source types are offered',
 		junctionPopup.indexOf('Mass booster') >= 0 && junctionPopup.indexOf('Setpoint booster') >= 0
-		&& junctionPopup.indexOf('Flow paced booster') >= 0
+		&& junctionPopup.indexOf('Flow-paced booster') >= 0
 		&& junctionPopup.indexOf('Concentration') >= 0);
 	const tankPopup = textOf(L.popupNode('T2'));
 	ok('the tank popup asks how the tank mixes', tankPopup.indexOf('Mixing model') >= 0);
+	// 'Two-compartment mixing' since 2026-09-06, for the reason above: EPANET's own interface writes
+	// 'Two-Compartment', so the hyphen is EPANET's too.
 	ok('with EPANET\'s own four models', tankPopup.indexOf('Complete mixing') >= 0
-		&& tankPopup.indexOf('Two compartment mixing') >= 0
+		&& tankPopup.indexOf('Two-compartment mixing') >= 0
 		&& tankPopup.indexOf('FIFO plug flow') >= 0 && tankPopup.indexOf('LIFO plug flow') >= 0);
 	ok('and, this tank being two-compartment, for the fraction that only that model uses',
 		tankPopup.indexOf('Mixing fraction') >= 0);

@@ -97,8 +97,18 @@ ecFbCase('a key with no underscore is not a lang key (pageConfig.length, pc.x)',
     ['length'], []);
 
 // ---- 3. The corpus itself, so a silently-narrowed scan cannot pass ------------------------------
-// A ratchet that finds nothing prints a number BELOW its baseline and reads as progress. These two
-// assertions are the only thing standing between that and a green run forever.
+// A ratchet that finds nothing prints a number BELOW its baseline and reads as progress, so this
+// section is the only thing standing between a blinded scan and a green run forever.
+//
+// **IT USED TO ASSERT "at least one drifted fallback exists", AND THAT ASSERTION DIED OF SUCCESS
+// on the day it was written**: the 199 were measured in the morning and corrected in the afternoon,
+// the count went to 0, and the guard failed on a tree that had just been FIXED. A selftest that
+// only works while the defect is present guards nothing the moment it matters. What replaced it is
+// a live mutation of the real corpus: a temporary file is written into `js/`, the real check is run
+// over the real directory, and it must find exactly that file's drift. That proves the same thing
+// the count did -- the scan reaches js/*.js and compares against lib/lang.ec.en.php -- and it goes
+// on proving it at zero. The file is removed on shutdown as well as inline, because a selftest that
+// can leave a stray file in `js/` has invented a new failure mode to guard against.
 $out = [];
 $code = 0;
 exec('php ' . escapeshellarg(__DIR__ . '/js_fallback_string_check.php') . ' 2>&1', $out, $code);
@@ -112,11 +122,26 @@ if (!preg_match('/(\d+) of (\d+) drifted/', $line, $m)) {
             . '2026-09-06; a collapse this large means the scan went blind, not that they were '
             . 'deleted.', (int) $m[2]);
     }
-    if ((int) $m[1] < 1) {
-        $fails[] = 'corpus: 0 drifted fallbacks. 199 were measured on 2026-09-06 and correcting '
-            . 'them is 199 edits inside js/; if that genuinely happened, lower the baseline and '
-            . 'relax this assertion deliberately.';
-    }
+}
+
+// The live mutation. `ec_selftest_fallback.js` is not a shipped module and no page loads it; it
+// exists for the length of this exec and names a key the language file really defines, with a
+// literal that is really wrong.
+$probe = dirname(__DIR__, 2) . '/js/ec_selftest_fallback.js';
+register_shutdown_function(function () use ($probe) { @unlink($probe); });
+file_put_contents($probe, "// TEMPORARY: written by dev/scripts/js_fallback_string_selftest.php.\n"
+    . "var pc = EngCalcs.pageConfig;\n"
+    . "var t = pc.mpf_flow || 'this is deliberately not what lang.ec.en.php says';\n");
+$out2 = [];
+$code2 = 0;
+exec('php ' . escapeshellarg(__DIR__ . '/js_fallback_string_check.php') . ' --list 2>&1', $out2, $code2);
+@unlink($probe);
+$probeLine = implode("\n", $out2);
+$n++;
+if (strpos($probeLine, 'ec_selftest_fallback.js') === false) {
+    $fails[] = "corpus mutation: a file with one deliberately drifted fallback was written into "
+        . "js/ and the check did not report it. The scan is not reaching the directory it claims "
+        . "to guard. Its output was:\n      " . $probeLine;
 }
 $n++;
 if ($code !== 0) {

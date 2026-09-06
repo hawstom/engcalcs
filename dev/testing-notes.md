@@ -145,3 +145,28 @@ oversubscribed and the harness was measuring the load rather than the algorithm.
 `closed-link-harness.js` that had been spinning at 99% CPU for **fifty hours**, left behind by an
 earlier session — one whole core gone, silently, making every measurement on that machine worse.
 `ps -eo pid,etimes,pcpu,args --sort=-etimes | grep lpn-spike` finds one in a second.
+
+## A HARNESS THAT ASSERTS A WORD FAILS WHEN THE STRING IS IMPROVED
+
+Measured 2026-09-06, when a Wave 0 English pass rewrote 44 shipped strings and five harness
+assertions went red. **Four of the five were the harness's fault and one was the pass's**, and
+telling them apart is the whole of the lesson.
+
+- **`pump-effic-curve-harness.js` required the literal word `undefined`** to prove that a pump
+  naming a curve nothing defines is disclosed by name. The rewrite said the same thing without that
+  word, and the check failed on a string that had just got better. **The property is that the ghost
+  NAME reaches the reader and that the sentence shown is the unstated one rather than its sibling
+  about a pump naming no curve at all** — asserted now by requiring the name AND the absence of the
+  sibling's own phrase, which no rewording of either string can satisfy wrongly.
+- **`grievance-link-harness.js` and `curve-library-harness.js` matched a label to FIND a control.**
+  That is legitimate and the fix is to move the literal, not to remove it — but say in the harness
+  which key the literal belongs to, so the next reader knows where to look.
+- **`reaction-controls-harness.js` was RIGHT and the rewrite was wrong.** It asserts that the Tanks
+  table's coefficient column is headed *Reaction* and does not repeat the tab's own noun; the pass
+  had proposed *Tank reaction* for parallelism with two siblings that are not in that table, having
+  never opened the render site. Reverted within the hour.
+
+**So the rule is: assert the PROPERTY the string carries, never the words it happens to use — and
+when a harness does hold a word, it is usually holding a LAYOUT rule, which is a real property and
+must not be relaxed to make a rewrite pass.** The cheapest way to tell which you are looking at:
+ask what a reader would lose. Losing *undefined* costs nothing; gaining *Tank* costs a column.

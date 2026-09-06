@@ -2550,7 +2550,7 @@ var EngCalcs = EngCalcs || {};
 		// scenario switch and on every override, and a plain textContent assignment would wipe it.
 		setLabel(btn, 'scenarios',
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
-			+ ' | ' + (pc.lpn_scenario_overrides || 'Overrides') + ': ' + overrideCount(scn));
+			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of custom values') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
 		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
 		// in advance -- a bottom legend re-dodges around whatever it now measures.
@@ -2562,7 +2562,7 @@ var EngCalcs = EngCalcs || {};
 	// sentence appears only when the count is above zero -- with no overrides there are no rings to
 	// explain, and a permanent sentence about a mark that is not on screen is noise.
 	function refreshScenarioTip(btn) {
-		var pc = EngCalcs.pageConfig || {}, tip = pc.lpn_scenario_tip || '';
+		var pc = EngCalcs.pageConfig || {}, tip = pc.lpn_scenario_tip || 'The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
 		if (!btn || !tip) { return; }
 		if (overrideCount(activeScenario()) > 0 && pc.lpn_scenario_overrides_tip) {
 			// The base scenario's NAME comes from its own key, never spelled again here: embedded
@@ -2733,7 +2733,7 @@ var EngCalcs = EngCalcs || {};
 			fn: function () {
 				// The count is the whole of the warning: a scenario holding nothing is worth no
 				// question, and one holding forty values is worth a specific one.
-				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and the {n} values it holds? The drawing itself is not changed.')
+				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.')
 					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
 				if (!window.confirm(msg)) { return; }
 				saveUndoSnapshot();
@@ -2859,7 +2859,7 @@ var EngCalcs = EngCalcs || {};
 			return s.prop && pushFieldShown(s) && (!group || s.group === group);
 		});
 		if (!active.length) {
-			alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+			alert(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 			return;
 		}
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
@@ -2881,14 +2881,14 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (any) { touched++; }
 		});
-		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has its own value for any of these properties, so nothing would change.'); return; }
+		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
-		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values those scenarios hold of their own are discarded. You can undo this.')
+		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values that belong to those scenarios alone are thrown away. You can undo this.')
 			+ (only ? '\n\n' + (pc.lpn_field_id || 'ID') + ': ' + only.id : '')
 			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
-			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios:') + ' ' + touched
-			+ '\n' + (pc.lpn_scenario_push_values || 'Values discarded:') + ' ' + hits;
+			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios affected:') + ' ' + touched
+			+ '\n' + (pc.lpn_scenario_push_values || 'Values thrown away:') + ' ' + hits;
 		if (!window.confirm(msg)) { return; }
 		saveUndoSnapshot();
 		scenarios.forEach(function (s) {
@@ -6699,11 +6699,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_position_prompt1 || 'Click any point on the background image. This is the point you will move.');
+		alert(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			alert(pc.lpn_backdrop_position_prompt2 || 'Choose where that point should go, then click Continue.');
+			alert(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -7358,10 +7358,10 @@ var EngCalcs = EngCalcs || {};
 		// **THE STEP IS NAMED AND THE MODE IS NAMED.** Four keys here are English literals until the
 		georefBarEl('lpn_georef_step').textContent = detached
 			? (pc.lpn_georef_step1 || 'Step 1 of 2 — quick')
-			: (pc.lpn_georef_step2 || 'Step 2 of 2 — fine');
+			: (pc.lpn_georef_step2 || 'Step 2 of 2 — precise');
 		georefBarEl('lpn_georef_hint').textContent = detached
-			? (pc.lpn_georef_step1_hint || 'Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is the right place and the right size, then press Drop it here.')
-			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, a corner to resize it, the top handle to turn it.');
+			? (pc.lpn_georef_step1_hint || 'Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press the Put the model here button.')
+			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
 		georefBarEl('lpn_georef_drop').style.display = detached ? '' : 'none';
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
@@ -7468,7 +7468,7 @@ var EngCalcs = EngCalcs || {};
 	function goToLatLon() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!isGeoProject()) { return; }
-		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude, longitude', '');
+		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
 		if (!ll) {
@@ -7749,7 +7749,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!georef) { return; }
 		georef.pick = null;
-		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, a corner to resize it, the top handle to turn it.');
+		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
 	}
 	// The nearest NODE, in the model's own source coordinates. eachStoredPoint() visits every node
 	// first, in doc.nodes order, so georef.src[i] is doc.nodes[i] for i below that length -- the one
@@ -7805,7 +7805,7 @@ var EngCalcs = EngCalcs || {};
 		// Redrawn after the fit, because every handle is CLAMPED into the visible canvas and the
 		// canvas it must be clamped into is the one the fit just chose.
 		georefDrawFrame();
-		setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press Keep this placement.');
+		setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press the Keep this placement button.');
 	}
 
 	function georefStart() {
@@ -7904,7 +7904,7 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Press Put the model here when step 1 looks right.');
+		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no rotation yet. Step 2 is the precise one: you drag, resize and rotate the model itself. Your project is on a map of the whole world to start with, so find your location first, then press the Put the model here button.');
 	}
 	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
 	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.
@@ -7981,7 +7981,7 @@ var EngCalcs = EngCalcs || {};
 		georefApplyCompensation();
 		georefDrawFrame();
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_asdegrees || 'The X and Y in this file were read as a longitude and a latitude, so the network is already on the map. Check that it is in the right place, then press Keep this placement.');
+		setNotice(pc.lpn_georef_asdegrees || 'The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press the Keep this placement button.');
 	}
 	// Whole-world framing puts a little more land on the screen than the equator does, and the
 	// clamp in applyView() takes care of the rest.
@@ -8033,7 +8033,7 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here for good?')) { return; }
+		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		var unrotated = georefBackdropRotated(georef.t);
 		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
@@ -8067,9 +8067,9 @@ var EngCalcs = EngCalcs || {};
 		// an image to turn, and saying nothing would leave a site plan silently off its own network.
 		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
 		// the local both follow the word a user will read.
-		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any element to fine-tune it.')
+		setNotice((pc.lpn_georef_done || 'This is a lat/lon project now. Drag any asset to move it closer to where it really is.')
 			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
-				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.') : ''));
+				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -8343,7 +8343,7 @@ var EngCalcs = EngCalcs || {};
 			// `en` is the English spelling, and it is here for the PARSER rather than for the
 			// pull-down: a query pasted from a colleague or from our own documentation must not
 			// fail because the reader's interface is in Portuguese. See findAlts().
-			{ key: 'all', label: pc.lpn_find_scope_all || 'All elements', en: 'Everything' },
+			{ key: 'all', label: pc.lpn_find_scope_all || 'Everything', en: 'Everything' },
 			{ key: 'junction', label: pc.lpn_tool_add_junction || 'Junction', group: 'node', type: 'junction', en: 'Junction' },
 			{ key: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', group: 'node', type: 'reservoir', en: 'Reservoir' },
 			{ key: 'tank', label: pc.lpn_tool_add_tank || 'Tank', group: 'node', type: 'tank', en: 'Tank' },
@@ -8516,7 +8516,7 @@ var EngCalcs = EngCalcs || {};
 		// element, so restricting it to the node scopes would mean running the same report three
 		// times. Band 4, and alone in it.
 		if (d.key === 'all' || d.group === 'node') {
-			out.push(['connection', pc.lpn_find_prop_connection || 'Connection', 'Connection']);
+			out.push(['connection', pc.lpn_find_prop_connection || 'Connectivity', 'Connection']);
 		}
 		return out;
 	}
@@ -9494,7 +9494,7 @@ var EngCalcs = EngCalcs || {};
 			note = document.createElement('div');
 			note.className = 'lpn-find-aside';
 			note.textContent = pc.lpn_find_q_aside ||
-				'These controls cannot write the query below, so they are set aside rather than saying something untrue.';
+				'The controls cannot express the query below, so they are hidden.';
 			box.appendChild(note);
 			back = document.createElement('button');
 			back.type = 'button';
@@ -9508,7 +9508,7 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(back);
 			return;
 		}
-		findSelect(box, pc.lpn_find_scope || 'Elements to search', findScopeDefs().map(function (d) {
+		findSelect(box, pc.lpn_find_scope || 'What to search', findScopeDefs().map(function (d) {
 			return [d.key, d.label];
 		}), findState.scope, function (v) {
 			findState.scope = v;
@@ -9592,7 +9592,7 @@ var EngCalcs = EngCalcs || {};
 		// title and wrapping BOTH the label text and the glyph, so the tap target is the whole
 		// label rather than one character. CLAUDE.md's rule for a label with no link.
 		qLab.appendChild(findHelpLabel(pc.lpn_find_query_label || 'Query',
-			pc.lpn_find_query_tip || 'The same search written as one line.'));
+			pc.lpn_find_query_tip || 'The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.'));
 		findQueryInput = document.createElement('input');
 		findQueryInput.type = 'text';
 		findQueryInput.className = 'lpn-find-query';
@@ -9605,7 +9605,7 @@ var EngCalcs = EngCalcs || {};
 		// Tom's own line, and "expandable" is his word: it says the grammar will grow.
 		hint = document.createElement('div');
 		hint.className = 'lpn-find-hint';
-		hint.textContent = pc.lpn_find_query_hint || 'Expandable with AND, OR, and ()';
+		hint.textContent = pc.lpn_find_query_hint || 'Combine conditions with AND, OR and ()';
 		box.appendChild(hint);
 		findQueryMsgEl = document.createElement('div');
 		findQueryMsgEl.className = 'lpn-find-msg';
@@ -9664,7 +9664,7 @@ var EngCalcs = EngCalcs || {};
 			findResults = run.list;
 			if (findAstNeedsSource(findQueryAst) && !findConnectionMap().hasSource) {
 				findConnNote = pc.lpn_find_conn_no_fixed ||
-					'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be searched.';
+					'This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.';
 			}
 			renderFindResults(null);
 			if (findResults.length === 1) { findGoTo(findResults[0].group, findResults[0].el.id); }
@@ -9688,7 +9688,7 @@ var EngCalcs = EngCalcs || {};
 		if (findPropIsConnection(findState.prop) && findConnOpNeedsSource(findState.op)
 				&& !findConnectionMap().hasSource) {
 			findConnNote = pc.lpn_find_conn_no_fixed ||
-				'This network has no reservoir or tank, so it has no source to reach. Only "no links" and "no open links" can be searched.';
+				'This network has no reservoir or tank, so there is no source to reach. Only no links at node and no open links at node can be searched.';
 		}
 		renderFindResults(null);
 		// ONE HIT GOES STRAIGHT THERE. Typing a node's ID and being shown a list of one, to click,
@@ -10064,13 +10064,13 @@ var EngCalcs = EngCalcs || {};
 		if (findQueryError) {
 			replacePending = null;
 			renderReplace(pc.lpn_replace_q_bad ||
-				'This query cannot be read, so there is nothing to change. Fix it above first.');
+				'This query cannot be understood, so nothing can be changed. Fix it above first.');
 			return;
 		}
 		replaceNormalize();
 		if (!replaceState.prop) {
 			replacePending = null;
-			renderReplace(pc.lpn_replace_scope || 'Choose one kind of element to change.');
+			renderReplace(pc.lpn_replace_scope || 'Choose one kind of asset above to change values on.');
 			return;
 		}
 		// **THE DEM PATH HAS NO TYPED VALUE TO CHECK**, which is the whole of what it is (Task 542).
@@ -10115,7 +10115,7 @@ var EngCalcs = EngCalcs || {};
 			var demIds = replacePending.refs.map(function (r) { return r.id; });
 			replacePending = null;
 			EngCalcs.lpnTerrainFillFor(terrainPointsForIds(demIds), { replaceAny: true });
-			renderReplace(String(pc.lpn_replace_asked || 'Asked for {n}.').replace('{n}', String(demIds.length)));
+			renderReplace(String(pc.lpn_replace_asked || 'Elevations requested for {n} nodes. The results are on their way.').replace('{n}', String(demIds.length)));
 			return demIds.length;
 		}
 		// **ONE SNAPSHOT FOR THE WHOLE SET, so it is ONE undo step.** Snapshotting per element would
@@ -10141,7 +10141,7 @@ var EngCalcs = EngCalcs || {};
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
 		renderFindResults(null);
-		renderReplace(String(pc.lpn_replace_done || '{n} changed.').replace('{n}', String(n)));
+		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. You can undo this in one step.').replace('{n}', String(n)));
 		return n;
 	}
 	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
@@ -10160,7 +10160,7 @@ var EngCalcs = EngCalcs || {};
 		if (!replacePending) { return; }
 		head = document.createElement('div');
 		head.style.margin = '6px 0 2px';
-		head.textContent = String(pc.lpn_replace_preview || 'Change {n} elements?')
+		head.textContent = String(pc.lpn_replace_preview || 'Change {n} assets?')
 			.replace('{n}', String(replacePending.refs.length));
 		box.appendChild(head);
 		apply = document.createElement('button');
@@ -10197,7 +10197,7 @@ var EngCalcs = EngCalcs || {};
 		// hidden -- a Replace section that vanished under "Everything" would read as a feature that
 		// comes and goes, and the heading with its "?" is the section still being there.
 		setFieldLabel(head, pc.lpn_replace_title || 'Change what was found',
-			specs.length ? '' : (pc.lpn_replace_scope || 'Choose one kind of element to change.'));
+			specs.length ? '' : (pc.lpn_replace_scope || 'Choose one kind of asset above to change values on.'));
 		box.appendChild(head);
 		tipsIn(head);
 		msg = document.createElement('div');
@@ -10207,7 +10207,7 @@ var EngCalcs = EngCalcs || {};
 			renderReplace(null);
 			return;
 		}
-		findSelect(box, pc.lpn_replace_prop || 'Set', specs.map(function (s) { return [s.field, s.label]; }),
+		findSelect(box, pc.lpn_replace_prop || 'Property to change', specs.map(function (s) { return [s.field, s.label]; }),
 			replaceState.prop, function (v) {
 				replaceState.prop = v; replacePending = null;
 				// Rebuilt, not just re-messaged: choosing Elevation is what makes the source select
@@ -10221,7 +10221,7 @@ var EngCalcs = EngCalcs || {};
 		// rather than being a permanent row: a source select over Diameter would be nonsense.
 		if (replaceState.prop === 'elev' && isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			findSelect(box, pc.lpn_replace_source || 'New value source',
-				[['value', pc.lpn_settings_elev_source_typed || 'The number above'],
+				[['value', pc.lpn_settings_elev_source_typed || 'The elevation typed above'],
 					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
 				replaceState.source, function (v) {
 					replaceState.source = (v === 'dem') ? 'dem' : 'value';
@@ -10244,7 +10244,7 @@ var EngCalcs = EngCalcs || {};
 		valWrap = document.createElement('div');
 		valWrap.style.margin = '4px 0';
 		valLab = document.createElement('label');
-		valLab.textContent = pc.lpn_replace_value || 'To';
+		valLab.textContent = pc.lpn_replace_value || 'New value';
 		valLab.style.display = 'block';
 		input = document.createElement('input');
 		input.type = 'text';
@@ -11226,7 +11226,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (reason === 'count') {
 			return pc.lpn_color_break_count ||
-				'There must be one limit fewer than the number of ranges. The map is unchanged.';
+				'There must be one boundary fewer than the number of colors. The map is unchanged.';
 		}
 		return pc.lpn_color_break_number ||
 			'A boundary must be a number. The map is unchanged.';
@@ -11411,7 +11411,7 @@ var EngCalcs = EngCalcs || {};
 			rowIn(target, pc.lpn_color_mode || 'Data classification method', modeSel);
 			if (crit) {
 				noteIn(target, pc.lpn_color_criterion_note ||
-					'The limits come from a design standard, so the number of colors is fixed while that method is chosen.');
+					'This method takes its boundaries from a design standard, so the number of colors is fixed while this method is selected.');
 			}
 			var rev = document.createElement('input');
 			rev.type = 'checkbox'; rev.checked = colorReverseOf(group);
@@ -11438,7 +11438,7 @@ var EngCalcs = EngCalcs || {};
 			head.textContent = (pc.lpn_settings_color_breaks || 'Color band boundaries') + ': ' + colorFieldLabel(group, field);
 			target.appendChild(head);
 			noteIn(target, pc.lpn_color_ranges_note ||
-				'The boundaries shown below are static for this project. Choosing a data classification method above sets the boundaries based on the current state of the system. If you change any value manually, the method above changes to Manual.');
+				'The boundaries below are fixed once set; they do not follow the results as they change. Choosing a data classification method above sets the boundaries from the current state of the system. If you change any value by hand, the method above becomes Manual.');
 			// A STORED LIMIT PRINTS EXACTLY AS IT IS STORED -- typed or filled in by a method, it
 			// is the project's number now and the box is where it lives. The only value printed
 			// short is one that was never stored: a criterion method's converted threshold, where
@@ -11539,7 +11539,7 @@ var EngCalcs = EngCalcs || {};
 			settings.colorThematic = them.checked; refreshValueColors(); renderLabelsLegend();
 			saveToStorage(); syncColorControls();
 		});
-		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map', them,
+		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map (colors only)', them,
 			pc.lpn_settings_color_thematic_tip);
 
 		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
@@ -12844,7 +12844,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function profileMissingText(p, missing) {
 		var pc = EngCalcs.pageConfig || {};
-		return (pc.lpn_profile_missing || '{name} names nodes that are not in this project: {ids}')
+		return (pc.lpn_profile_missing || 'The saved path {name} uses nodes that are not in this project: {ids}')
 			.replace('{name}', p.name || '').replace('{ids}', missing.join(', '));
 	}
 	// **APPLYING ONE DRAWS WHAT IT CAN AND SAYS WHAT IT CANNOT.** The unknown ids are left out of
@@ -13370,7 +13370,7 @@ var EngCalcs = EngCalcs || {};
 			// than the one it was shown in, and preserveAspectRatio scaled the difference out of
 			// every label. The chart is measured against the panel it will actually be shown in now.
 			note.textContent = series.hgl.length
-				? String(pc.lpn_profile_summary || '{n} nodes, {len} {u}')
+				? String(pc.lpn_profile_summary || 'Nodes: {n}, length: {len} {u}')
 					.replace('{n}', String(series.nodes.length))
 					.replace('{len}', String(plainRound(series.length, 1)))
 					.replace('{u}', unitLabel('lpn_u_length'))
@@ -13461,7 +13461,7 @@ var EngCalcs = EngCalcs || {};
 		// room for it under the axis -- see profileLayout() for why that is the one that goes.
 		if (lay.stationTitle) {
 			profileText(svg, box.left + box.width / 2, lay.titleY,
-				String(pc.lpn_profile_axis_station || 'Distance along the path ({u})').replace('{u}', unitLabel('lpn_u_length')),
+				String(pc.lpn_profile_axis_station || 'Distance along the route ({u})').replace('{u}', unitLabel('lpn_u_length')),
 				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
 		}
 		profileText(svg, 0, 0,
@@ -13748,7 +13748,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			afterPropertyEdit(el);
 			if (kind === 'node') { buildDom(); }
-			setNotice((pc.lpn_scenario_deactivated || '{id} is switched off in {scenario}. It is still in the drawing, and in your other scenarios.')
+			setNotice((pc.lpn_scenario_deactivated || '{id} is out of the network in {scenario}. It is still in the drawing, and in your other scenarios.')
 				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
 			return;
 		}
@@ -13760,7 +13760,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
-		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this also throws away {n} values your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
+		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
 		saveUndoSnapshot();
 		if (kind === 'node') { deleteNode(id); }
 		else if (kind === 'label') { deleteLabelById(id); }
@@ -13808,19 +13808,19 @@ var EngCalcs = EngCalcs || {};
 			// The old placeholder sentence, kept for exactly this: the gallery is the shop window,
 			// but a visitor whose network dropped the manifest still needs to be told how to start.
 			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' },
-				pc.lpn_examples_failed || pc.lpn_empty_hint || ''));
+				pc.lpn_examples_failed || pc.lpn_empty_hint || 'Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.'));
 			return;
 		}
 		if (examplesState === 'loading' || !examplesManifest) {
-			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' }, pc.lpn_examples_loading || ''));
+			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' }, pc.lpn_examples_loading || 'Loading examples…'));
 			return;
 		}
 		// The welcome line sits ABOVE the heading and is the one place this page says what engine it
 		// runs (Task 222). A <p>, not a second <h2>: there is one heading on this pane and it is the
 		// instruction, not the greeting.
-		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || ''));
-		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || ''));
-		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || ''));
+		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || 'Welcome to water supply network modelling, with the EPANET solver'));
+		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || 'Open an example'));
+		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || 'Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.'));
 		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT.** Nothing guarantees the cards fit the map's
 		// height -- the count grows and the map height is a user setting -- so anything after the
 		// grid is the first thing to fall off the bottom, and a visitor who wants to draw their own
@@ -13855,7 +13855,7 @@ var EngCalcs = EngCalcs || {};
 			card.appendChild(elh('span', { 'class': 'lpn-example-desc' },
 				(ex.descKey && pc[ex.descKey]) || ex.description || ''));
 			card.appendChild(elh('span', { 'class': 'lpn-example-meta' },
-				(pc.lpn_examples_size || '{nodes} / {links}')
+				(pc.lpn_examples_size || 'Nodes: {nodes}, links: {links}')
 					.replace('{nodes}', ex.nodes).replace('{links}', ex.links)));
 			card.addEventListener('click', function () { openExample(ex); });
 			grid.appendChild(card);
@@ -13950,7 +13950,7 @@ var EngCalcs = EngCalcs || {};
 				galleryForced = false; // the wall has done its job; get out of the way of the drawing
 				updateEmptyHint();
 				renderTabs();
-				setNotice((pc.lpn_status_example_opened || '')
+				setNotice((pc.lpn_status_example_opened || 'Opened {name}. It is your copy: save it with File, Save as.')
 					.replace('{name}', projectDisplayName(project)));
 			})
 			.catch(function () {
@@ -15466,7 +15466,7 @@ var EngCalcs = EngCalcs || {};
 		openDialog(function (body) {
 			var p1 = document.createElement('p');
 			p1.style.margin = '0 0 8px';
-			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:');
+			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:');
 			body.appendChild(p1);
 			var p2 = document.createElement('p');
 			p2.style.cssText = 'margin:0;font-weight:bold';
@@ -15696,7 +15696,7 @@ var EngCalcs = EngCalcs || {};
 		// exported still has unsaved changes and must keep saying so.
 		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) +
 			(out.differences && out.differences.length
-				? ' ' + (pcX.lpn_inp_export_differences || '{n} things could not be written in EPANET\'s language.')
+				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
 					.replace('{n}', String(out.differences.length))
 				: ''));
 	}
@@ -15793,7 +15793,7 @@ var EngCalcs = EngCalcs || {};
 		if (upId) { stampProjectSaved(upId); }
 		// Every time, not just the first: this is the fact that explains why the tab is named
 		// after the project rather than the file, and why Save cannot go back where this came from.
-		setNotice(pc.lpn_status_uploaded || '');
+		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
 		if (asGeo && upId) { georefStart(); }
 	}
@@ -16357,46 +16357,46 @@ var EngCalcs = EngCalcs || {};
 	function inpDropText(code) {
 		var pc = EngCalcs.pageConfig || {};
 		switch (code) {
-			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written but the results here will not match the results in EPANET.';
+			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
 			// The fallback is kept in step with the key on purpose: it is what a page whose
 			// pageConfig failed to load shows, and a stale one here would state the OPPOSITE of
 			// what the page now does (Task 587 -- the curve is used, not simplified away).
-			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets.';
+			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
 			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve, so there
 			// is no substitution to report. The remaining three say which outcome a valve met -- kept
 			// and solvable here, kept but needing the EPANET engine, or turned back into a pipe.
-			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, with the same loss the file gives them. Either solver can compute them.';
-			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water moves. They came in whole, and this page solves them with the EPANET engine, which it switches to on its own for this network.';
+			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out.';
+			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.';
 			// 'valve-dropped' IS NO LONGER EMITTED (Task 248): PBV and GPV are real elements and
 			// arrive as themselves. The case is kept so an older saved report still renders a
 			// sentence rather than a blank; delete the key once nothing can produce it.
-			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
-			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
-			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
+			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They came in as open pipes, so the network is still joined up, but nothing controls pressure or flow there any more.';
+			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve came in with no curve, so it stays fully open until you give it one.';
+			case 'check-valve': return pc.lpn_inp_drop_cv || 'In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 			// 'demand-categories' IS NO LONGER EMITTED (Task 468): a junction holds its demands as a
 			// LIST, so nothing is added together and there is no difference to report. Kept, like
 			// 'valve-dropped' above, so a project imported before that still renders the sentence
 			// its own note records rather than a blank.
-			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the one demand this page holds.';
+			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 			// A DEMAND PATTERN IS NOW APPLIED at the one moment this page solves (Task 423), so it
 			// is no longer the same report as a head pattern, which still is not. It stays in the
 			// report because the rest of the day still does not run.
-			case 'demand-pattern': return pc.lpn_inp_drop_demand_pattern || 'These junctions change their demand through the run. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
+			case 'demand-pattern': return pc.lpn_inp_drop_demand_pattern || 'These junctions change their demand through the run. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
 			// A HEAD PATTERN IS NOW APPLIED (Task 248.02), exactly as a demand pattern is, so it is
 			// no longer the same report as a whole clock that failed to load.
 			case 'head-pattern': return pc.lpn_inp_drop_head_pattern || 'These reservoirs rise and fall through the run. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
-			case 'patterns': return pc.lpn_inp_drop_patterns || 'Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
-			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see or change it yet.';
-			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page fits a curve from.';
-			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump refers to a curve that is not in the file. It came in with no curve, so it adds no head.';
+			case 'patterns': return pc.lpn_inp_drop_patterns || 'This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.';
+			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
+			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
+			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump refers to a curve that is not in the file. The pump came in with no curve, so it adds no head.';
 			// A SPEED AND A SCHEDULE ARE KEPT AND SOLVED (Task 248.02). Only constant POWER is still
 			// a pump this page cannot describe, so it keeps the old sentence by itself.
-			case 'pump-constant-power': return pc.lpn_inp_drop_pump_other || 'This pump is described by power, speed or a schedule rather than by a curve. It came in with no curve, so it adds no head.';
+			case 'pump-constant-power': return pc.lpn_inp_drop_pump_other || 'This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head.';
 			case 'pump-speed':
-			case 'pump-pattern': return pc.lpn_inp_drop_pump_speed || 'This pump runs at a speed other than the one its curve was measured at, or changes speed through the day. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
-			case 'link-setting': return pc.lpn_inp_drop_setting || 'These links carry a setting this page cannot hold. They came in open.';
+			case 'pump-pattern': return pc.lpn_inp_drop_pump_speed || 'These pumps run at a speed other than the one their curve was measured at, or change speed through the run. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
+			case 'link-setting': return pc.lpn_inp_drop_setting || 'These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 			case 'controls':
 			// **A RULE IS NO LONGER "LEFT OUT", AND SAYING SO WOULD NOW BE FALSE** (Task 248.03).
 			// It shares nothing with the simple-control message any more: a control that cannot be
@@ -16405,8 +16405,8 @@ var EngCalcs = EngCalcs || {};
 			// The fallback is kept in step with the key, as the tank volume curve's is: this is what
 			// a page whose pageConfig failed to load shows, and it stated the OPPOSITE of what the
 			// page does once Task 248.03 shipped.
-			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept as you wrote them, and they are written back if you save an EPANET file.';
-			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file describes an extended period simulation. This page solves one moment, so only the starting conditions came in.';
+			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
+			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file describes an extended period simulation. The part of this page that runs an extended period simulation did not load, so only the starting conditions came in.';
 			// **NOTHING IS DISCARDED ANY MORE, AND THE SENTENCES SAY SO** (Tom, 2026-08-29, reading
 			// the old one: *"It seems to be saying that quality and pump energy cost info is
 			// discarded"*). Every section this page does not read is carried verbatim and written
@@ -16428,36 +16428,36 @@ var EngCalcs = EngCalcs || {};
 			// one sentence covering all four would claim a chemical is modelled for a file whose
 			// only water-quality section is [MIXING]. One name doing two jobs gets split.
 			case 'quality':
-			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'sources':
-			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.';
-			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
-			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
+			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.';
+			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset\'s properties, where you can read it or change it.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for how it formats the report it prints. You can read the engine\'s report here, under Reports, EPANET run, but it comes out in the engine\'s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
-			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a part that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
+			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used: water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run one. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run a chemical. All of them are written back if you save an EPANET file.';
 			// **A DIFFERENCE IN THE ANSWERS, NOT IN WHAT THE FILE HOLDS**, which is why it is not on
 			// the kept-but-unused limb below it. EPANET 2.2's pressure-driven analysis gives a
 			// junction less water when the pressure is low; this page solves demand-driven, so the
 			// same file answers differently here and the user is entitled to know before reading a
 			// pressure off the map.
-			case 'demand-model': return pc.lpn_inp_drop_demand_model || 'This file asks for a pressure-driven analysis, where a junction is given less water when the pressure there is low. This page solves demand-driven, so every junction here is given the demand the file states whatever the pressure comes out at. The line is kept, and it is written back if you save an EPANET file.';
-			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states settings this page does not read. Nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
+			case 'demand-model': return pc.lpn_inp_drop_demand_model || 'This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.';
+			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
 			// `.net` stores its options as an indexed array with no keywords, so a slot this page
 			// has no name for has nothing it could be called in the file we convert to.
-			case 'net-options': return pc.lpn_inp_drop_net_options || 'This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
-			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file points at another file beside it, for the map or for hydraulics already worked out. This page cannot open those, so the lines are kept as they are and written back if you save an EPANET file.';
-			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
+			case 'net-options': return pc.lpn_inp_drop_net_options || 'This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
+			case 'file-options': return pc.lpn_inp_drop_file_options || 'This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
+			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
 			// OUR VOCABULARY, NOT EPANET'S: what EPANET calls a Label is our Text object, so the
 			// sentence names the Text and never the other word.
 			case 'label-anchor-missing': return pc.lpn_inp_drop_anchor_missing || 'This text was attached to a junction, reservoir or tank that is not in the file. It came in as free text at the place the file put it, and it follows nothing now.';
-			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'This file names a flow unit that EPANET does not have. All ten of the flow units EPANET uses are read exactly as the file writes them; this one could not be, so the file was read as gallons per minute. Check every number before you use the answers.';
+			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
 			default: return code;
 		}
 	}
@@ -16491,12 +16491,12 @@ var EngCalcs = EngCalcs || {};
 				netNote.style.margin = '0 0 8px';
 				netNote.style.fontWeight = 'bold';
 				netNote.textContent = pc.lpn_net_emergency
-					|| 'This was an EPANET .net file. That is EPANET\'s own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
+					|| 'This was an EPANET .net file. That is EPANET\'s own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
 				body.appendChild(netNote);
 			}
 			var sum = document.createElement('p');
 			sum.style.margin = '0 0 8px';
-			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.')
+			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.')
 				.replace('{nodes}', parsed.nodes.length)
 				.replace('{links}', parsed.links.length)
 				.replace('{units}', parsed.flowUnits);
@@ -16521,7 +16521,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			var lead = document.createElement('p');
 			lead.style.margin = '0 0 6px';
-			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use everything EPANET does, but nothing in your file is thrown away. Here is what it holds that this page keeps without using, and what changed on the way in:';
+			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 			body.appendChild(lead);
 			var ul = document.createElement('ul');
 			ul.style.margin = '0';
@@ -16578,7 +16578,7 @@ var EngCalcs = EngCalcs || {};
 		if (conv.ok) { lastNetUnnamed = conv.unnamedOptions || []; return conv.inp; }
 		// A `.net` we cannot read is refused outright, never half-read -- see the integrity check in
 		// js/lpn-net.js. The way out is always available and always works, so the message names it.
-		alert((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.') +
+		alert((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.') +
 			(conv.detail ? ' (' + conv.detail + ')' : ''));
 		return null;
 	}
@@ -17684,7 +17684,7 @@ var EngCalcs = EngCalcs || {};
 	function ensureIdentity() {
 		if (loadIdentity()) { return identity; }
 		var pc = EngCalcs.pageConfig || {};
-		var name = window.prompt(pc.lpn_lock_prompt_name || 'What should colleagues see when you have a project open? A first name or initials is plenty.', '');
+		var name = window.prompt(pc.lpn_lock_prompt_name || 'What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.', '');
 		if (name === null) { return null; } // declined -- no locking, and we will not ask again this action
 		identity = { holder: randomToken(24), name: name.trim().slice(0, 60) };
 		writeJSON(LPN_IDENTITY_KEY, identity);
@@ -17825,13 +17825,13 @@ var EngCalcs = EngCalcs || {};
 			// THIS project and THIS fault only, so a different fault, a different project, or
 			// locking starting to work all bring the banner back on their own.
 			if (bannerWarn.kind === 'lock') {
-				action(pc.lpn_lock_dismiss || 'Dismiss', function () {
+				action(pc.lpn_lock_dismiss || 'Hide this message', function () {
 					lockWarnDismissed = lockWarnKey();
 					bannerWarn = null;
 					renderBanner();
 				});
 			} else if (bannerWarn.dismissable) {
-				action(pc.lpn_lock_dismiss || 'Dismiss', function () { bannerWarn = null; renderBanner(); });
+				action(pc.lpn_lock_dismiss || 'Hide this message', function () { bannerWarn = null; renderBanner(); });
 			}
 		}
 		banner.style.display = 'block';
@@ -17847,7 +17847,7 @@ var EngCalcs = EngCalcs || {};
 		readOnly = roProjects.has(id);
 		if (readOnly) {
 			bannerRO = {
-				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. You can change anything you like here, but you cannot save it over their file. Use File, Save as to keep your own copy.')
+				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.')
 					.replace('{name}', lockedByName.get(id) || (pc.lpn_lock_somebody || 'Somebody else'))
 			};
 		} else {
@@ -17940,7 +17940,7 @@ var EngCalcs = EngCalcs || {};
 		if (!on) { clearWarn('missing'); return; }
 		bannerWarn = {
 			kind: 'missing',
-			message: pc.lpn_file_write_failed || 'Could not write to the file. It may have been moved, renamed, or deleted, or permission may have been withdrawn. Your work is still saved in this browser.',
+			message: pc.lpn_file_write_failed || 'Could not write to the file. It may have been moved or renamed, or permission may have been withdrawn. Your work is still saved in this browser.',
 			actionLabel: pc.lpn_file_relink || 'Choose the file again',
 			action: relinkFile,
 			dismissable: true
@@ -17949,7 +17949,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function lockHolderName(r) {
 		var pc = EngCalcs.pageConfig || {};
-		return (r && r.lockedBy) ? r.lockedBy : (pc.lpn_lock_somebody || 'the other person');
+		return (r && r.lockedBy) ? r.lockedBy : (pc.lpn_lock_somebody || 'Somebody else');
 	}
 	// Called once a file has just been attached to the open project, by either route. Fails OPEN on
 	// every path that is not an explicit "someone else holds this": an unreachable broker leaves the
@@ -18878,7 +18878,7 @@ var EngCalcs = EngCalcs || {};
 					// The file NAME, not the project name: this list is about files on the disk, and
 					// the project inside one may since have been renamed or may not exist here at all.
 					label: rec.name,
-					tip: (pc.lpn_recent_tip || 'Open {file} again, without looking for it.').replace('{file}', rec.name),
+					tip: (pc.lpn_recent_tip || 'Open {file} again without having to find it on your computer.').replace('{file}', rec.name),
 					fn: function () { openRecentFile(rec); }
 				});
 			});
@@ -18904,7 +18904,7 @@ var EngCalcs = EngCalcs || {};
 			// our own documents, with everything that comes with it -- a lock, a live file handle, a
 			// Save that writes back. An .inp has none of that and never will, so hiding it behind
 			// the same word would promise a round trip we cannot make. Import says what it is.
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
 			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
@@ -18930,7 +18930,7 @@ var EngCalcs = EngCalcs || {};
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
-			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file (.inp)…',
+			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
 		].concat([
 			{ separator: true },
@@ -19188,7 +19188,7 @@ var EngCalcs = EngCalcs || {};
 			// itself: how it is framed, how much furniture is over it, and where on Earth it is.
 			// The label states what the row will DO, because this menu has no checkmark column --
 			// the same convention the street-map row below follows.
-			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Reduce map clutter'),
+			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Hide map readouts'),
 				tip: pc.lpn_clean_map_tip,
 				fn: function () { setCleanMap(!cleanMapOn()); } },
 			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas
@@ -19199,7 +19199,7 @@ var EngCalcs = EngCalcs || {};
 			},
 			{
 				hidden: !isGeoProject(), icon: 'globe',
-				label: pc.lpn_goto_menu || 'Go to latitude, longitude…',
+				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
 				tip: pc.lpn_goto_tip, fn: goToLatLon
 			},
 			{
@@ -19358,7 +19358,7 @@ var EngCalcs = EngCalcs || {};
 				submenu: scenarioMenuRows
 			},
 			{
-				icon: 'run', label: pc.lpn_time_run || 'Run', tip: pc.lpn_run_menu_tip,
+				icon: 'run', label: pc.lpn_time_run || 'Calculate', tip: pc.lpn_run_menu_tip,
 				fn: function () {
 					closeMenu();
 					// runSolve(), not solveNow(): solveNow is only the NAME this is exported
@@ -19371,7 +19371,7 @@ var EngCalcs = EngCalcs || {};
 			// hydrant glyph (lib/Icons.lib.php). It is a kind of run: it names the criteria and
 			// solves the network, many times over. ROADMAP Task 530.
 			{
-				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow\u2026',
+				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow analysis…',
 				tip: pc.lpn_ff_menu_tip,
 				fn: function () { closeMenu(); openFireFlowBox(); }
 			},
@@ -21222,7 +21222,7 @@ var EngCalcs = EngCalcs || {};
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
-				pc.lpn_field_tank_level || 'Water level', pc.lpn_field_tank_diameter || 'Tank diameter',
+				pc.lpn_field_tank_level || 'Water depth', pc.lpn_field_tank_diameter || 'Tank diameter',
 				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
 		}
 		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
@@ -21386,7 +21386,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		body.appendChild(list);
 		oh.style.fontWeight = 'bold';
-		oh.textContent = pc.lpn_units_options_head || 'Options for units change:';
+		oh.textContent = pc.lpn_units_options_head || 'When you change a unit:';
 		body.appendChild(oh);
 		[pc.lpn_units_nondestructive_desc, pc.lpn_units_destructive_desc].forEach(function (t) {
 			var d = document.createElement('div');
@@ -21950,7 +21950,7 @@ var EngCalcs = EngCalcs || {};
 				prefix: {
 					value: labelPrefixFor(group, key),
 					title: pc.lpn_labels_prefix_tip ||
-						'Text shown before this value on the map',
+						'Text added before this property on map labels',
 					onChange: function (v) { setLabelAffix('prefix', group, key, v); }
 				},
 				suffix: {
@@ -22056,7 +22056,7 @@ var EngCalcs = EngCalcs || {};
 			sepRow.appendChild(sepLabel);
 			sepRow.appendChild(affixBox({
 				value: labelSeparator(),
-				title: pc.lpn_labels_separator_tip || 'Text between one value and the next on a label. A space by default.',
+				title: pc.lpn_labels_separator_tip || 'Text between one property and the next on a label. A space by default.',
 				// Stored EXACTLY as typed, spaces included -- a space is the default value of this
 				// very box, and ", " and " | " carry their own, so trimming would rewrite two of the
 				// three forms Tom named.
@@ -22148,7 +22148,7 @@ var EngCalcs = EngCalcs || {};
 	// added in two places, which is the shape of the next drift.
 	function legendPositionOptions(pc) {
 		return [
-			['off', pc.lpn_settings_legend_off || 'Off'],
+			['off', pc.lpn_settings_legend_off || 'None'],
 			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
 			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
 			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
@@ -22923,7 +22923,7 @@ var EngCalcs = EngCalcs || {};
 		// used to be the one section that opened expanded. Nothing opens or closes now.
 		// Stated ONCE for the whole section rather than implied per row -- the "future, not
 		// retroactive" rule used to govern two controls and now governs five.
-		note(defBody, pc.lpn_settings_defaults_note || 'Used for elements you create from now on. Existing elements are not changed.');
+		note(defBody, pc.lpn_settings_defaults_note || 'Used for assets you create from now on. Existing assets are not changed.');
 		// One elevation for BOTH junctions and reservoirs (Tom, 2026-07-30). A reservoir's head is
 		// absent by design and follows this elevation -- see reservoirHead() and addNode().
 		var elevInput = defaultRow(defBody, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead', 'nodeElev', any);
@@ -22938,7 +22938,7 @@ var EngCalcs = EngCalcs || {};
 		// runs on a project switch, so the row appears and disappears with the project it is about.
 		if (isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			var elevSrc = document.createElement('select');
-			[['value', pc.lpn_settings_elev_source_typed || 'The number above'],
+			[['value', pc.lpn_settings_elev_source_typed || 'The elevation typed above'],
 				['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']].forEach(function (o) {
 				var opt = document.createElement('option');
 				opt.value = o[0]; opt.textContent = o[1];
@@ -22966,7 +22966,7 @@ var EngCalcs = EngCalcs || {};
 				saveToStorage();
 				syncElevSource();
 			});
-			row(defBody, pc.lpn_settings_elev_source || 'Elevation from', elevSrc,
+			row(defBody, pc.lpn_settings_elev_source || 'Elevation source', elevSrc,
 				pc.lpn_settings_elev_source_tip);
 			syncElevSource();   // the box opens in the state the setting already says
 		}
@@ -23000,14 +23000,14 @@ var EngCalcs = EngCalcs || {};
 		note(defBody, pc.lpn_settings_push_note || 'Only the properties whose labels are showing right now are applied.');
 		var pushBtn = document.createElement('button');
 		pushBtn.type = 'button';
-		pushBtn.textContent = pc.lpn_settings_push_btn || 'Apply starting values to all elements';
+		pushBtn.textContent = pc.lpn_settings_push_btn || 'Apply these new-asset values to every existing asset';
 		pushBtn.addEventListener('click', function () {
 			// Base-level, and it SAYS SO rather than doing something defensible-looking. Inside a
 			// scenario this would write an override onto every element in one click -- the single
 			// most expensive thing this page can do to a document, from a button whose label says
 			// nothing about scenarios.
 			if (!inBaseScenario()) {
-				alert((pc.lpn_push_base_only || 'This applies your starting values to the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
+				alert((pc.lpn_push_base_only || 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
@@ -23016,7 +23016,7 @@ var EngCalcs = EngCalcs || {};
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
 			if (!active.length) {
-				alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+				alert(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 				return;
 			}
 			// TWO different counts, because "nothing to do" has two causes needing different
@@ -23043,17 +23043,17 @@ var EngCalcs = EngCalcs || {};
 			var nodeCounts = counts(doc.nodes, 'node'), linkCounts = counts(doc.links, 'link');
 			var carriers = nodeCounts.carriers + linkCounts.carriers;
 			var targets = nodeCounts.changing + linkCounts.changing;
-			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing element has any of the properties being applied.'); return; }
+			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
 			// Distinct from the message above on purpose: "nothing carries these properties" and
 			// "everything already has these values" are opposite situations, and telling a user the
 			// first when the second is true would send them hunting for a problem that isn't there.
-			if (!targets) { alert(pc.lpn_push_no_change || 'Every element already has these values, so nothing would change.'); return; }
+			if (!targets) { alert(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
 			// The confirm NAMES the properties, it does not merely count them -- a count alone
 			// ("push 2 properties?") leaves the user guessing which two, and this action is not
 			// something to guess at. Assembled from already-translated label text plus two short
 			// heading keys, with no plural agreement anywhere: "Elements: 17" needs no plural rule,
 			// while "17 pipes and 5 junctions" would need one in every target language.
-			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing element with the current default inputs? Values you have typed will be overwritten. You can undo this.')
+			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have typed will be overwritten. You can undo this.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
 			if (!window.confirm(msg)) { return; }
@@ -23126,7 +23126,7 @@ var EngCalcs = EngCalcs || {};
 			settings.alignPipeLabels = alignInput.checked;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_align_labels || 'Align link labels with links', alignInput);
+		row(mapBody, pc.lpn_settings_align_labels || 'Draw link labels along the link line', alignInput);
 		// Task 351, and it belongs directly under the checkbox it only means anything for. A number
 		// rather than a checkbox because the right value depends on the drawing: a subdivision of
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
@@ -23142,7 +23142,7 @@ var EngCalcs = EngCalcs || {};
 			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment', biasInput,
+		row(mapBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment (degrees)', biasInput,
 			pc.lpn_settings_readability_bias_tip);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
@@ -23176,7 +23176,7 @@ var EngCalcs = EngCalcs || {};
 			settings.leaderSnapDeg = +snapSelect.value;
 			saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to angle', snapSelect,
+		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
 			pc.lpn_settings_leader_snap_tip);
 		// **NO SCALE-DEPENDENT LABEL VISIBILITY ROW HERE.** A "Widest view that shows labels" number
 		// with a "Use current view" capture button used to sit at this point and is gone (Tom,
@@ -23410,7 +23410,7 @@ var EngCalcs = EngCalcs || {};
 			var tipText = pc[tipKey] || '';
 			if (dflt !== undefined && dflt !== null && dflt !== '') {
 				tipText = (tipText ? tipText + ' ' : '')
-					+ (pc.lpn_settings_default_is || 'The usual value is {n}.').replace('{n}', String(dflt));
+					+ (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', String(dflt));
 			}
 			row(compBody, labelText, input, tipText);
 		}
@@ -23564,7 +23564,7 @@ var EngCalcs = EngCalcs || {};
 		restoreBtn.textContent = pc.calc_defaults || 'Restore defaults';
 		helpTip(restoreBtn, pc.lpn_settings_restore_tip);
 		restoreBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, default inputs, solver settings, map display, legend position, and visible labels) to their defaults? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }
+			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }
 			settings = defaultSettings();
 			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
 			// here, or every default input would come back blank instead of at its starting value.
@@ -24486,7 +24486,7 @@ var EngCalcs = EngCalcs || {};
 			// A volume curve's axes are a LEVEL and a VOLUME. The level is in the elevation unit like
 			// every other vertical distance on a tank; the volume has no family on this page and is
 			// carried as the file's own number, so it names no unit rather than an invented one.
-			return { x: (pc.lpn_field_tank_level || 'Water level') + ' (' + unitLabel('lpn_u_elevhead') + ')',
+			return { x: (pc.lpn_field_tank_level || 'Water depth') + ' (' + unitLabel('lpn_u_elevhead') + ')',
 				y: pc.lpn_curve_volume_col || 'Volume' };
 		}
 		return { x: pc.lpn_library_curve_x || 'X', y: pc.lpn_library_curve_y || 'Y' };
@@ -24848,9 +24848,9 @@ var EngCalcs = EngCalcs || {};
 			sel = document.createElement('select'), opts = [
 				['none', pc.lpn_quality_none || 'Nothing'],
 				['age', pc.lpn_quality_age || 'Water age'],
-				['trace', pc.lpn_quality_trace || 'Source share']
+				['trace', pc.lpn_quality_trace || 'Source trace']
 			];
-		opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical that decays']);
+		opts.push(['chemical', pc.lpn_quality_chemical || 'A chemical that reacts']);
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -24893,7 +24893,7 @@ var EngCalcs = EngCalcs || {};
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_settings_quality_track || 'Track', sel, pc.lpn_settings_quality_track_tip);
+		rowFn(host, pc.lpn_settings_quality_track || 'Quality parameter', sel, pc.lpn_settings_quality_track_tip);
 		if (q.mode === 'trace') {
 			var src = document.createElement('select');
 			qualitySourceCandidates().forEach(function (id) {
@@ -24919,7 +24919,7 @@ var EngCalcs = EngCalcs || {};
 				refreshPopupIfOpen();
 				scheduleSolve();
 			});
-			rowFn(host, pc.lpn_settings_quality_source || 'Water from', src,
+			rowFn(host, pc.lpn_settings_quality_source || 'Trace node', src,
 				pc.lpn_settings_quality_source_tip);
 		}
 		if (q.mode === 'chemical') { settingsChemicalRows(host, rowFn, noteFn); }
@@ -24929,7 +24929,7 @@ var EngCalcs = EngCalcs || {};
 		// The native solver has no time dimension and is not being given one.
 		if (noteFn && qualitySetting().mode !== 'none') {
 			noteFn(host, pc.lpn_quality_needs_run
-				|| 'Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press Run.');
+				|| 'Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.');
 		}
 	}
 	/**
@@ -24987,7 +24987,7 @@ var EngCalcs = EngCalcs || {};
 		coeffRow('globalWall', (pc.lpn_reaction_wall || 'Wall reaction coefficient')
 			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
 		pc.lpn_reaction_wall_tip);
-		if (noteFn) { noteFn(host, pc.lpn_reaction_note || ''); }
+		if (noteFn) { noteFn(host, pc.lpn_reaction_note || 'This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.'); }
 	}
 	/**
 	 * **WHAT THE PUMPS COST TO RUN, FOR THE WHOLE NETWORK** (Task 566; dev/pump-energy.md). A price
@@ -25052,9 +25052,9 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_energy_price_pattern || 'Price schedule', pat,
+		rowFn(host, pc.lpn_energy_price_pattern || 'Price pattern', pat,
 			pc.lpn_energy_price_pattern_tip);
-		numberRow('demandCharge', (pc.lpn_energy_demand_charge || 'Demand charge')
+		numberRow('demandCharge', (pc.lpn_energy_demand_charge || 'Peak demand charge')
 			+ ' (' + (money ? money + '/' : '') + (pc.lpn_energy_kw || 'kW') + ')',
 		pc.lpn_energy_demand_charge_tip);
 		// **A LABEL, TYPED, AND NEVER A LIST OF CURRENCIES WE CHOSE.** A select would have to be
@@ -25074,8 +25074,8 @@ var EngCalcs = EngCalcs || {};
 		});
 		rowFn(host, pc.lpn_energy_currency || 'Currency', cur, pc.lpn_energy_currency_tip);
 		if (noteFn) {
-			noteFn(host, pc.lpn_energy_price_note || '');
-			noteFn(host, pc.lpn_energy_needs_run || '');
+			noteFn(host, pc.lpn_energy_price_note || 'This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.');
+			noteFn(host, pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.');
 		}
 	}
 	/**
@@ -25134,7 +25134,7 @@ var EngCalcs = EngCalcs || {};
 			rebuildSettingsBox();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_settings_unbalanced || 'If it will not settle', sel,
+		rowFn(host, pc.lpn_settings_unbalanced || 'If it does not converge', sel,
 			pc.lpn_settings_unbalanced_tip);
 		if (hyd.unbalanced === 'continue') {
 			numberRow('unbalancedTrials', 'lpn_settings_unbalanced_trials', 'Extra trials first',
@@ -25356,10 +25356,10 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function buildCurveSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libCurvesRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || ''));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
 		// **SAID ONCE FOR THE SECTION, NOT ONCE PER CURVE.** It is the same sentence for every
 		// curve in the list, and twenty copies of it is what makes a panel unreadable.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || ''));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.'));
 		host.appendChild(libButton(pc.lpn_library_curve_add || 'Add a curve', function () {
 			saveUndoSnapshot();
 			// A NEW CURVE IS A PUMP HEAD CURVE WITH NO POINTS. `head` because that is what a person
@@ -25526,12 +25526,12 @@ var EngCalcs = EngCalcs || {};
 		if (!CURVE_KINDS.some(function (o) { return o[0] === c.kind; })) {
 			var gen = document.createElement('option');
 			gen.value = c.kind || 'generic';
-			gen.textContent = pc.lpn_curve_kind_generic || 'Not stated';
+			gen.textContent = pc.lpn_curve_kind_generic || 'Kind not stated';
 			gen.selected = true;
 			kindSel.appendChild(gen);
 		}
 		kindSel.setAttribute('aria-label', pc.lpn_library_curve_type || 'Curve type');
-		if (pc.lpn_library_curve_kind) { helpTip(kindSel, pc.lpn_library_curve_kind); }
+		if (pc.lpn_library_curve_type_tip) { helpTip(kindSel, pc.lpn_library_curve_type_tip); }
 		kindSel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			c.kind = kindSel.value;
@@ -25563,7 +25563,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
 				alert((pc.lpn_library_curve_in_use
-					|| 'This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.')
+					|| 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -25592,7 +25592,7 @@ var EngCalcs = EngCalcs || {};
 		// exactly as a bottom-pane table's id does -- and it is also the answer to "why will this not
 		// delete", standing where the Delete button is.
 		if (users.length) {
-			var used = libEl('div', 'lpn-lib-note', (pc.lpn_library_curve_used_by || 'Used by') + ' ');
+			var used = libEl('div', 'lpn-lib-note', (pc.lpn_library_curve_used_by || 'Elements using this curve') + ' ');
 			users.forEach(function (lid) {
 				var b = libButton(lid, function () { findGoTo('link', lid); });
 				b.className = 'lpn-pane-goto';
@@ -26115,10 +26115,10 @@ var EngCalcs = EngCalcs || {};
 			if (pc.lpn_library_rule_tip) { verdict.title = pc.lpn_library_rule_tip; }
 			function showVerdict(read) {
 				verdict.textContent = read.ok
-					? (pc.lpn_library_rule_ok || '✓ Understood')
+					? (pc.lpn_library_rule_ok || '✓ This rule was read')
 					: read.missing
 						? (pc.lpn_library_rule_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
-						: (pc.lpn_library_rule_bad || '⚠ Not understood');
+						: (pc.lpn_library_rule_bad || '⚠ This rule could not be read');
 			}
 			showVerdict(libReadRule(box.value));
 			box.addEventListener('input', function () { showVerdict(libReadRule(box.value)); });
@@ -26590,7 +26590,7 @@ var EngCalcs = EngCalcs || {};
 		if (on) {
 			var base = document.createElement('span');
 			base.className = 'lpn-ov-base';
-			base.textContent = (pc.lpn_scenario_base_value || 'Base: {value}')
+			base.textContent = (pc.lpn_scenario_base_value || 'Base scenario: {value}')
 				.replace('{value}', (format || formatPropValue)(baseValue(el, prop)));
 			label.appendChild(base);
 		}
@@ -26737,7 +26737,7 @@ var EngCalcs = EngCalcs || {};
 
 		sample = document.createElement('button');
 		sample.type = 'button';
-		setLabel(sample, 'globe', pc.lpn_elev_dem_sample || 'Sample DEM');
+		setLabel(sample, 'globe', pc.lpn_elev_dem_sample || 'Read DEM');
 		helpTip(sample, pc.lpn_elev_dem_sample_tip);
 		sample.addEventListener('click', function () {
 			demSample(nodeId, null);
@@ -26770,7 +26770,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
 		} else if (terrainAsked[nodeId]) {
 			// Asked and got nothing. The map notice carries the reason; this says the press landed.
-			said.textContent = pc.lpn_elev_dem_none || 'The DEM gave no height for this node.';
+			said.textContent = pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
 		} else {
 			said.textContent = '';
 		}
@@ -26838,7 +26838,7 @@ var EngCalcs = EngCalcs || {};
 		// this is a statement of record about a file that imported correctly apart from these items.
 		head.style.opacity = '.85';
 		head.textContent = pc.lpn_import_notes_heading ||
-			'This file was imported from EPANET. Some information here was not imported.';
+			'This project was read in from an EPANET file. Some of what that file holds is kept but is not used on this page.';
 		fields.appendChild(head);
 		var ul = document.createElement('ul');
 		ul.style.margin = '2px 0 0';
@@ -27549,11 +27549,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		} while (dropped && plan.length);
 		if (!plan.length) {
-			setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} others were left alone.')
+			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
 				.replace('{n}', '0').replace('{skipped}', String(skipped)));
 			return;
 		}
-		if (!window.confirm((pc.lpn_confirm_apply_prefix || 'Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.')
+		if (!window.confirm((pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
 			.replace('{n}', String(plan.length)).replace('{prefix}', prefix))) { return; }
 		saveUndoSnapshot();
 		// Phase 1 parks every one of them on an id nothing can answer to: '#' is rejected by
@@ -27571,7 +27571,7 @@ var EngCalcs = EngCalcs || {};
 		refreshLabelText();
 		scheduleSolve();
 		saveToStorage();
-		setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} others were left alone.')
+		setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
 			.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 	}
 	/**
@@ -27611,7 +27611,7 @@ var EngCalcs = EngCalcs || {};
 			[['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
 				['MASS', pc.lpn_source_type_mass || 'Mass booster'],
 				['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
-				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow paced booster']],
+				['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']],
 			effective(n, 'sourceType') || 'CONCEN',
 			function (v) { setProp(n, 'sourceType', v); refreshPopupIfOpen(); },
 			pc.lpn_source_type_tip);
@@ -27645,7 +27645,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, model = n.mixingModel || 'MIXED';
 		selectFieldPlain(fields, pc.lpn_mixing_model || 'Mixing model',
 			[['MIXED', pc.lpn_mixing_mixed || 'Complete mixing'],
-				['2COMP', pc.lpn_mixing_2comp || 'Two compartment mixing'],
+				['2COMP', pc.lpn_mixing_2comp || 'Two-compartment mixing'],
 				['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
 				['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']],
 			model,
@@ -27688,15 +27688,15 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_tank_elev_tip);
 			elevationDemRow(fields, n, nodeId,
 				function (v) { n.elev = v; updateNode(nodeId); });
-			unitNumberField(fields, pc.lpn_field_tank_level || 'Water level', 'lpn_u_elevhead',
+			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
-			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water level', 'lpn_u_elevhead',
+			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
 				function () { return n.minLevel; },
 				function (v) { n.minLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_minlevel_tip);
-			unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water level', 'lpn_u_elevhead',
+			unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
 				function () { return n.maxLevel; },
 				function (v) { n.maxLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_maxlevel_tip);
@@ -27718,7 +27718,7 @@ var EngCalcs = EngCalcs || {};
 			// the mains is an ordinary thing to model. It round-tripped from `[REACTIONS] TANK` and
 			// back with nothing on any screen able to show it until this row existed.
 			if (reactionFieldsShown()) {
-				numberFieldBlank(fields, (pc.lpn_reaction_tank || 'Tank reaction coefficient')
+				numberFieldBlank(fields, (pc.lpn_reaction_tank || 'Reaction coefficient')
 					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
 				effective(n, 'tankCoeff'),
 				function (v) { setProp(n, 'tankCoeff', v); refreshPopupIfOpen(); },
@@ -27835,7 +27835,7 @@ var EngCalcs = EngCalcs || {};
 		if (qualityMode() === 'chemical') {
 			var cu = concentrationUnitText();
 			numberFieldBlank(fields,
-				(pc.lpn_quality_initial || 'Starting concentration') + (cu ? ' (' + cu + ')' : ''),
+				(pc.lpn_quality_initial || 'Initial quality') + (cu ? ' (' + cu + ')' : ''),
 				effective(n, 'initQuality'),
 				function (v) { setProp(n, 'initQuality', v); refreshPopupIfOpen(); },
 				pc.lpn_quality_initial_tip, { el: n, prop: 'initQuality' });
@@ -28084,7 +28084,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function renderPumpCurveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {};
-		curveChooser(fields, l, 'curveId', 'head', pc.lpn_pump_curve_source || 'Head curve',
+		curveChooser(fields, l, 'curveId', 'head', pc.lpn_pump_curve_source || 'Pump head curve',
 			pc.lpn_pump_curve_source_tip);
 	}
 	/**
@@ -28104,7 +28104,7 @@ var EngCalcs = EngCalcs || {};
 			cur = effective(l, prop) || '',
 			none = document.createElement('option');
 		none.value = '';
-		none.textContent = pc.lpn_curve_none || 'No curve';
+		none.textContent = pc.lpn_curve_none || 'No curve selected';
 		sel.appendChild(none);
 		libCurvesRead().forEach(function (c) {
 			if (c.kind !== kind) { return; }
@@ -28144,7 +28144,7 @@ var EngCalcs = EngCalcs || {};
 	// efficiency curve and the GPV's head-loss curve -- because there is one chooser.
 	function curveLibraryLink() {
 		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_curve_library_link || 'Curves library', function () {
+			b = libButton(pc.lpn_curve_library_link || 'Libraries, Curves', function () {
 				openLibrarySection('curves');
 			}, pc.lpn_curve_library_link_tip);
 		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
@@ -28250,14 +28250,14 @@ var EngCalcs = EngCalcs || {};
 			globalText = globalPct === null ? (pc.lpn_energy_efficiency || 'Pump efficiency (percent)')
 				: (globalPct + '%');
 		curveChooser(fields, l, 'efficCurveId', 'effic',
-			pc.lpn_pump_effic_curve || 'Efficiency curve', pc.lpn_pump_effic_curve_tip);
+			pc.lpn_pump_effic_curve || 'Pump efficiency curve', pc.lpn_pump_effic_curve_tip);
 		if (name && !curve) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
-				|| 'This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.')
+				|| 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.')
 				.replace('{name}', name).replace('{percent}', globalText));
 		} else if (!name) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_global
-				|| 'This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.')
+				|| 'This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.')
 				.replace('{percent}', globalText));
 		}
 	}
@@ -28281,7 +28281,7 @@ var EngCalcs = EngCalcs || {};
 	// place in that table and both halves move together -- the field, and the read in assembleModel().
 	function renderPumpSpeedFields(fields, l) {
 		var pc = EngCalcs.pageConfig || {};
-		numberFieldPlain(fields, pc.lpn_field_pump_speed || 'Speed',
+		numberFieldPlain(fields, pc.lpn_field_pump_speed || 'Relative speed',
 			(typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1,
 			function (v) {
 				saveUndoSnapshot();
@@ -28322,7 +28322,7 @@ var EngCalcs = EngCalcs || {};
 		effective(l, 'energyPrice'),
 		function (v) { setProp(l, 'energyPrice', v); refreshPopupIfOpen(); },
 		pc.lpn_energy_pump_price_tip, { el: l, prop: 'energyPrice' });
-		patternField(fields, pc.lpn_energy_price_pattern || 'Price schedule',
+		patternField(fields, pc.lpn_energy_price_pattern || 'Price pattern',
 			function () { return effective(l, 'energyPattern'); },
 			function (v) { setProp(l, 'energyPattern', v || null); refreshPopupIfOpen(); },
 			pc.lpn_energy_price_pattern_tip);
@@ -28332,7 +28332,7 @@ var EngCalcs = EngCalcs || {};
 	// points directly.
 	function renderGpvCurve(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {};
-		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Head loss curve',
+		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Valve head loss curve',
 			pc.lpn_gpv_curve_source_tip);
 	}
 	function renderLinkFields(linkId) {
@@ -28575,7 +28575,7 @@ var EngCalcs = EngCalcs || {};
 			updateLabelGeometry(labelId);
 			saveToStorage();
 		});
-		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size ×') + ' ';
+		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size multiplier') + ' ';
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
@@ -28614,12 +28614,12 @@ var EngCalcs = EngCalcs || {};
 				relayoutThisLabel();
 			});
 		}
-		alignRow(pc.lpn_field_text_align || 'Horizontal justification', 'align', [
+		alignRow(pc.lpn_field_text_align || 'Horizontal alignment', 'align', [
 			['left', pc.lpn_field_text_align_left || 'Left'],
 			['center', pc.lpn_field_text_align_center || 'Centre'],
 			['right', pc.lpn_field_text_align_right || 'Right']
 		], 'center');
-		alignRow(pc.lpn_field_text_valign || 'Vertical justification', 'valign', [
+		alignRow(pc.lpn_field_text_valign || 'Vertical alignment', 'valign', [
 			['top', pc.lpn_field_text_valign_top || 'Top'],
 			['middle', pc.lpn_field_text_valign_middle || 'Middle'],
 			['bottom', pc.lpn_field_text_valign_bottom || 'Bottom']
@@ -28679,7 +28679,7 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(rotLabel);
 		var matchBtn = document.createElement('button');
 		matchBtn.type = 'button';
-		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Set to pipe angle';
+		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Turn to the angle of the nearest link';
 		matchBtn.addEventListener('click', function () {
 			// Read at the label's RENDERED point, which for an anchored label is its node plus its
 			// offset -- not lb.x/lb.y, which is the offset alone and would find the pipe nearest
@@ -28707,7 +28707,7 @@ var EngCalcs = EngCalcs || {};
 		// question on a map of parallel mains, and offers no control that would need a second one.
 		// Absent entirely on a free-floating Text: there is nothing to say.
 		if (textIsAnchored(lb)) {
-			readonlyField(fields, pc.lpn_field_text_attached || 'Attached to',
+			readonlyField(fields, pc.lpn_field_text_attached || 'Attached asset',
 				lb.anchorNode || lb.anchorLink);
 		}
 		importNotesField(fields, lb);
@@ -28753,7 +28753,7 @@ var EngCalcs = EngCalcs || {};
 		// then words -- matching the "Auto" checkbox in lengthField() rather than inventing a second
 		// order for the same control shape on the same popup.
 		var text = document.createElement('span');
-		setFieldLabel(text, pc.lpn_field_closed || 'Closed', pc.lpn_field_closed_tip);
+		setFieldLabel(text, pc.lpn_field_closed || 'Shut', pc.lpn_field_closed_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -28852,7 +28852,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		// Box first, then words, in its own <span> -- setFieldLabel() assigns textContent, which
 		// would wipe a checkbox already appended to the same element. Same order as closedField().
-		setFieldLabel(text, pc.lpn_field_active || 'In this network', pc.lpn_field_active_tip);
+		setFieldLabel(text, pc.lpn_field_active || 'Part of this network', pc.lpn_field_active_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -29660,8 +29660,8 @@ var EngCalcs = EngCalcs || {};
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
-		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These valves open and close on their own, and only the EPANET engine can compute them. The EPANET engine could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
-		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between them:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
 	// DIAGNOSTICS AND NOTICES ARE DIFFERENT KINDS OF MESSAGE AND HAVE DIFFERENT HOMES.
@@ -29830,7 +29830,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			// textContent, not the tip markup: the thank-you is a statement and not a control, so
 			// it carries no "?" and no title of its own.
-			btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. We got that.';
+			btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
 			btn.disabled = true;
 		});
 	}
@@ -30370,7 +30370,7 @@ var EngCalcs = EngCalcs || {};
 	function overrideMarkText() {
 		var pc = EngCalcs.pageConfig || {};
 		return (pc.lpn_scenario_mark_tip
-			|| 'Ringed: this element holds a value that belongs to the scenario {name} alone.')
+			|| 'The amber ring means this asset holds a value that belongs to the scenario {name} alone.')
 			.replace('{name}', scenarioDisplayName(activeScenario()));
 	}
 	function refreshScenarioMarks() {
@@ -30829,10 +30829,10 @@ var EngCalcs = EngCalcs || {};
 		// velocities.
 		boxes.design = ffSelect([
 			['off', pc.lpn_ff_design_off || 'Do not check'],
-			['nodes', pc.lpn_ff_design_nodes || 'Every other junction'],
-			['all', pc.lpn_ff_design_all || 'Every other junction and every pipe']
+			['nodes', pc.lpn_ff_design_nodes || 'All other junctions'],
+			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes']
 		], ask.design);
-		ffRow(host, pc.lpn_ff_design || 'Effect on the rest of the system', pc.lpn_ff_design_tip,
+		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
 
 		boxes.minPressure = ffInput(ask.minPressure);
@@ -30908,8 +30908,8 @@ var EngCalcs = EngCalcs || {};
 		if (rec.code === C.BELOW_AT_REST) {
 			return pc.lpn_ff_err_at_rest || 'Already below the residual before any fire flow is drawn';
 		}
-		if (rec.code === C.NO_CONVERGENCE) { return pc.lpn_ff_err_converge || 'The network did not settle'; }
-		if (rec.code === C.SOLVE_FAILED) { return pc.lpn_ff_err_solve || 'The network could not be worked out'; }
+		if (rec.code === C.NO_CONVERGENCE) { return pc.lpn_ff_err_converge || 'The network did not converge.'; }
+		if (rec.code === C.SOLVE_FAILED) { return pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.'; }
 		if (rec.code === C.NOT_A_JUNCTION) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
 		if (rec.code === C.UNKNOWN_NODE) { return pc.lpn_ff_err_not_junction || 'Not a junction'; }
 		// **THE PLACEHOLDER IS {code}, NOT {id}.** Every other {id} in this report holds an asset
@@ -30930,7 +30930,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (rec.available === undefined) { return ffReasonText(rec); }
 		if (rec.atLeast) {
-			return (pc.lpn_ff_atleast || 'over {flow}').replace('{flow}', ffQty(rec.available, 'lpn_u_flow'));
+			return (pc.lpn_ff_atleast || 'more than {flow}').replace('{flow}', ffQty(rec.available, 'lpn_u_flow'));
 		}
 		return ffQty(rec.available, 'lpn_u_flow');
 	}
@@ -30971,7 +30971,7 @@ var EngCalcs = EngCalcs || {};
 	function ffSummaryText(set) {
 		var pc = EngCalcs.pageConfig || {}, m = set.modes || { fire: 0, design: 0, clean: 0 };
 		return (pc.lpn_ff_summary
-			|| '{clean} with nothing wrong. {fire} failed the fire flow. {design} affected the rest of the system.')
+			|| '{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.')
 			.replace('{clean}', String(m.clean))
 			.replace('{fire}', String(m.fire))
 			.replace('{design}', String(m.design));
@@ -31023,10 +31023,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!worst) { return FF_DASH; }
 		text = kind === 'node'
-			? (pc.lpn_ff_affect_node || '{id} down to {pressure}')
+			? (pc.lpn_ff_affect_node || '{id} drops to {pressure}')
 				.replace('{id}', labelPrefixFor('node', 'id') + worst.id)
 				.replace('{pressure}', ffQty(worst.pressure, 'lpn_u_pressure'))
-			: (pc.lpn_ff_affect_link || '{id} at {velocity}')
+			: (pc.lpn_ff_affect_link || '{id} reaches {velocity}')
 				.replace('{id}', labelPrefixFor('link', 'id') + worst.id)
 				.replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
 		total = rec.effects.nodes.length + rec.effects.links.length;
@@ -31116,20 +31116,20 @@ var EngCalcs = EngCalcs || {};
 		if (!set) { return; }
 
 		if (set.stopped) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions.')
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions. The results below are the ones already finished.')
 				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
 		}
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		if (set.counts.error) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} could not be answered.')
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} junctions could not be answered.')
 				.replace('{n}', String(set.counts.error)), host);
 		}
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || '{solves} network solves.')
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 			.replace('{solves}', String(set.solves)), host);
 		// **THE ISO CREDIT LIMIT TRAVELS WITH THE NUMBERS AND IS NEVER APPLIED TO THEM.** Said once
 		// for the run rather than on every row: it is a fact about how a rating is credited, not
 		// about any one junction's hydraulics.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_iso || 'ISO credits a single hydrant with at most {flow}.')
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_iso || 'The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.')
 			.replace('{flow}', ffQty(set.isoCap, 'lpn_u_flow')), host);
 		// The two design columns are still drawn when the design half was turned off -- as dashes,
 		// with the reason said above the table. A column that appears and disappears makes two runs
@@ -31143,7 +31143,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!anyEffect) {
 				ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
-					'Nothing in the chosen set was pulled down by any junction tested.', host);
+					'Nothing in the chosen set went outside its limits while any junction drew its fire flow.', host);
 			}
 		}
 
@@ -31163,12 +31163,12 @@ var EngCalcs = EngCalcs || {};
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ff_col_static || 'Static pressure',
-				pc.lpn_ff_col_static_tip || 'The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running.'],
+				pc.lpn_ff_col_static_tip || 'The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts.'],
 			pc.lpn_ff_col_required || 'Required flow',
-			pc.lpn_ff_col_atrequired || 'Pressure at required',
+			pc.lpn_ff_col_atrequired || 'Pressure at required flow',
 			pc.lpn_ff_col_available || 'Available flow',
 			pc.lpn_ff_col_residual || 'Residual held',
-			pc.lpn_ff_col_affected || 'Drawdowns',
+			pc.lpn_ff_col_affected || 'Worst effect',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
@@ -31287,7 +31287,7 @@ var EngCalcs = EngCalcs || {};
 		// dialog and the table it turns into would count the same run two different ways.
 		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
 		if (counts.error) {
-			text += ' ' + (pc.lpn_ff_summary_error || '{n} could not be answered.')
+			text += ' ' + (pc.lpn_ff_summary_error || '{n} junctions could not be answered.')
 				.replace('{n}', String(counts.error));
 		}
 		ffRunUi.tally.textContent = text;
@@ -31329,7 +31329,7 @@ var EngCalcs = EngCalcs || {};
 			ids = junctions.map(function (n) { return n.id; });
 		}
 		if (!(required > 0)) {
-			setNotice(pc.lpn_ff_required_tip || '');
+			setNotice(pc.lpn_ff_required_tip || 'The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.');
 			return;
 		}
 		model = assembleModel();
@@ -31391,7 +31391,7 @@ var EngCalcs = EngCalcs || {};
 			fireFlowBusy = false;
 			closeFireFlowRunBox();
 			buildFireFlowControls();
-			setStatus(pc.lpn_ff_err_solve || 'The network could not be worked out');
+			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
 			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
 		});
 	}
@@ -31538,7 +31538,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!sum) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || '', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.', host);
 			return;
 		}
 		// **THE DURATION IS BACK INSIDE THE SENTENCE, WHICH IS WHERE TOM PUT IT** (2026-09-04).
@@ -31555,10 +31555,10 @@ var EngCalcs = EngCalcs || {};
 				: String(sum.duration)), host);
 		body = ffTable(host, [
 			pc.lpn_energy_col_pump || 'Pump',
-			pc.lpn_energy_col_running || 'Running',
+			pc.lpn_energy_col_running || '% of run',
 			pc.lpn_energy_col_effic || 'Effic.',
 			[pc.lpn_energy_col_avg_kw || 'Avg. kW',
-				pc.lpn_energy_col_avg_kw_tip || 'Averaged over the time this pump was running, not over its idle periods.'],
+				pc.lpn_energy_col_avg_kw_tip || 'The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.'],
 			pc.lpn_energy_col_peak_kw || 'Peak kW',
 			pc.lpn_energy_col_kwh || 'kWh',
 			pc.lpn_energy_col_cost || 'Cost'
@@ -31593,9 +31593,9 @@ var EngCalcs = EngCalcs || {};
 			ffEl('span', null, ffNum(sum.kwh), null), pc.lpn_energy_kwh || 'kWh');
 		ffRow(host, pc.lpn_energy_total_energy_cost || 'Cost of energy', null,
 			ffEl('span', null, energyMoney(sum.energyCost), null), '');
-		ffRow(host, pc.lpn_energy_peak_kw || 'Highest power drawn at one moment', null,
+		ffRow(host, pc.lpn_energy_peak_kw || 'Peak power usage', null,
 			ffEl('span', null, ffNum(sum.peakKw), null), pc.lpn_energy_kw || 'kW');
-		ffRow(host, pc.lpn_energy_total_demand_charge || 'Demand charge',
+		ffRow(host, pc.lpn_energy_total_demand_charge || 'Cost of peak demand',
 			pc.lpn_energy_demand_charge_tip,
 			ffEl('span', null, energyMoney(sum.demandCharge), null), '');
 		ffRow(host, pc.lpn_energy_total_cost || 'Total cost', null,
@@ -31614,7 +31614,7 @@ var EngCalcs = EngCalcs || {};
 		// The alternative is a report whose efficiency column quietly disagrees with EPANET's own.
 		if (curveNames.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_energy_curve_note ||
-				'These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.')
+				'These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.')
 				.replace('{ids}', curveNames.join(', ')), host);
 		}
 	}
@@ -31725,7 +31725,7 @@ var EngCalcs = EngCalcs || {};
 							scn: pair.scn, ok: false,
 							why: (result && result.issues && result.issues.length)
 								? result.issues.map(diagIssueText).join(' ')
-								: (pc.lpn_diag_not_converged || 'Did not converge.')
+								: (pc.lpn_diag_not_converged || 'No solution was found. Check for values that are impossible in real life, such as a diameter of zero.')
 						});
 						return;
 					}
@@ -31740,7 +31740,7 @@ var EngCalcs = EngCalcs || {};
 						maxVelocity: ext.maxVelocity, maxAt: ext.maxAt
 					});
 				}, function () {
-					rows.push({ scn: pair.scn, ok: false, why: pc.lpn_ff_err_solve || 'The network could not be worked out' });
+					rows.push({ scn: pair.scn, ok: false, why: pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.' });
 				});
 			});
 		});
@@ -31785,7 +31785,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		body = ffTable(host, [
 			pc.lpn_scenario_label || 'Scenario',
-			pc.lpn_scenario_overrides || 'Custom values',
+			pc.lpn_scenario_overrides || 'No. of custom values',
 			pc.lpn_scncmp_col_minpressure || 'Lowest pressure',
 			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
 		]);
@@ -31794,7 +31794,7 @@ var EngCalcs = EngCalcs || {};
 			// The scenario the user is working in is marked, because a table of names with no "you
 			// are here" makes the reader go and check the status strip.
 			if (r.scn.id === project.activeScenario) {
-				name += ' ' + (pc.lpn_scncmp_current || '(open now)');
+				name += ' ' + (pc.lpn_scncmp_current || '(currently open)');
 			}
 			ffCell(tr, name);
 			ffCell(tr, String(overrideCount(r.scn)));
@@ -31807,7 +31807,7 @@ var EngCalcs = EngCalcs || {};
 			ffCell(tr, scnCmpAt(r.minPressure, 'lpn_u_pressure', r.minAt, 'node'));
 			ffCell(tr, scnCmpAt(r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link'));
 			if (!r.converged) {
-				ffCell(tr, pc.lpn_diag_not_converged || 'Did not converge.');
+				ffCell(tr, pc.lpn_diag_not_converged || 'No solution was found. Check for values that are impossible in real life, such as a diameter of zero.');
 			}
 		});
 		ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_note ||
@@ -31909,7 +31909,7 @@ var EngCalcs = EngCalcs || {};
 		// row cannot.
 		if (!text) {
 			setNotice(pc.lpn_time_no_report ||
-				'There is no run report yet. The report is EPANET\u2019s own text, so it appears once this network has been calculated with the EPANET solver.');
+				'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.');
 			return false;
 		}
 		if (!box || !pre) { return false; }
@@ -31992,7 +31992,7 @@ var EngCalcs = EngCalcs || {};
 			// nothing to hand back, and it belongs in the same histogram because to the user it is
 			// the same kind of dead end.
 			logLpnDiag('not-converged');
-			setStatus(pc.lpn_diag_not_converged || 'Did not converge.', 'not-converged');
+			setStatus(pc.lpn_diag_not_converged || 'No solution was found. Check for values that are impossible in real life, such as a diameter of zero.', 'not-converged');
 			refreshLabelText();
 			refreshValueColors();
 			refreshPaneIfOpen();
@@ -32064,7 +32064,7 @@ var EngCalcs = EngCalcs || {};
 			logLpnDiag('not-converged');
 			notConvergedNote = [
 				(pc.lpn_diag_not_converged_drawn
-					|| 'The solve did not converge. These numbers are the last try, not an answer. Do not use them.'),
+					|| 'The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.'),
 				// The measured detail where the engine gave one. EPANET reports a relative error
 				// and the accuracy it actually used; the built-in solver reports neither, so it
 				// gets the trials-only sentence rather than a number invented to fill the slot.
@@ -32076,7 +32076,7 @@ var EngCalcs = EngCalcs || {};
 					// `EN_Option.Trials` and the REPORTED COUNT `EN_AnalysisStatistic.Iterations` --
 					// the same passes, named by role -- and this number comes from the statistic.
 					? (pc.lpn_diag_not_converged_error
-						|| 'It stopped after {iterations} iterations at a relative error of {error}, against an accuracy of {accuracy}.')
+						|| 'It stopped after {iterations} iterations at a relative error of {error}, which did not reach the Accuracy setting of {accuracy}.')
 						.replace('{iterations}', String(result.iterations))
 						.replace('{error}', result.relativeError.toPrecision(3))
 						.replace('{accuracy}', result.accuracy.toPrecision(3))
@@ -32109,8 +32109,8 @@ var EngCalcs = EngCalcs || {};
 		// noteOnce() has already decided that -- so a later solve neither restarts a running clock
 		// nor wipes a note the user has not finished reading.
 		var engineNotes = [
-			manningNote ? (pc.lpn_engine_manning_note || '') : '',
-			minorNote ? (pc.lpn_engine_minor_loss_note || '') : ''
+			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.') : '',
+			minorNote ? (pc.lpn_engine_minor_loss_note || 'Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.') : ''
 		].filter(function (t) { return !!t; }).join(' ');
 		if (engineNotes) { setEngineNotes(engineNotes); }
 		refreshLabelText();
@@ -32146,7 +32146,7 @@ var EngCalcs = EngCalcs || {};
 	function runSolveEpanet(model) {
 		var pc = EngCalcs.pageConfig || {};
 		var myToken = ++epanetToken;
-		setStatus(pc.lpn_engine_loading || 'Loading the EPANET engine…');
+		setStatus(pc.lpn_engine_loading || 'Loading the EPANET solver…');
 		EngCalcs.lpnSolveEpanet(model, { tol: solveAccuracy() }).then(function (result) {
 			if (myToken !== epanetToken) { return; }   // a newer solve already started; drop this one
 			// **EPANET READ THIS NETWORK AND WOULD NOT TAKE IT** (Task 471). Not a load failure --
@@ -32155,7 +32155,7 @@ var EngCalcs = EngCalcs || {};
 			// words, and say that the numbers now on screen are the built-in solver's.
 			if (result.refused) {
 				var said = [
-					(pc.lpn_engine_refused || 'The EPANET solver would not accept this network.'),
+					(pc.lpn_engine_refused || 'The EPANET solver would not accept this network, so it did not run.'),
 					result.engineError
 						? (pc.lpn_engine_refused_why || 'The EPANET solver said: {message}')
 							.replace('{message}', result.engineError)
@@ -32177,7 +32177,7 @@ var EngCalcs = EngCalcs || {};
 			// import can fail for reasons that have nothing to do with the network -- offline on
 			// a first use, a blocked module request -- and the native answer is just as correct.
 			lastSolveResult = null;
-			setStatus(pc.lpn_engine_failed || 'The EPANET engine could not be loaded; showing the built-in solver instead.');
+			setStatus(pc.lpn_engine_failed || 'The EPANET solver could not be loaded. Showing the built-in solver instead.');
 			applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
 			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
 		});

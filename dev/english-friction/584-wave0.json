@@ -560,8 +560,8 @@
     "one is a free-text purpose, the other a category",
     "one is our word, the other EPANET's"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "REFERRED because resolving it needs a look at the two call sites (which this pass did not open) to confirm they really are the same axis, and because if they are, the right answer may be deleting one key rather than rewording it -- a code change outside this pass's territory. If they are the same axis, PROPOSED: use 'Curve type' in both places, since 'type' is the noun EPANET's own file format uses. If they are genuinely different, each needs a word the other does not have. | REFERRED. Resolving it needs both call sites opened to confirm they are one axis; if they are, the answer is deleting a key rather than rewording one."
+   "disposition": "dismissed",
+   "resolution": "REFERRED because resolving it needs a look at the two call sites (which this pass did not open) to confirm they really are the same axis, and because if they are, the right answer may be deleting one key rather than rewording it -- a code change outside this pass's territory. If they are the same axis, PROPOSED: use 'Curve type' in both places, since 'type' is the noun EPANET's own file format uses. If they are genuinely different, each needs a word the other does not have. | REFERRED. Resolving it needs both call sites opened to confirm they are one axis; if they are, the answer is deleting a key rather than rewording one. | RESOLVED 2026-09-06 by opening the two call sites the pass had not opened (js/looped-network.js:25533-25542). They are NOT one axis with two labels: lpn_library_curve_type is the visible field name AND the select aria-label, and this key is the TIP on that same select. Both are correct and neither is deletable. What was genuinely confusing was the NAMING -- a tip whose key did not end in _tip -- so it was renamed lpn_library_curve_kind -> lpn_library_curve_type_tip through rename_lang_key.php, which costs no translation because the value did not move."
   },
   {
    "key": "lpn_library_curve_values_tip",
@@ -807,8 +807,8 @@
     "a reaction in general, or a total of the two above",
     "a third kind of reaction"
    ],
-   "disposition": "english",
-   "resolution": "PROPOSED English: 'Tank reaction' -- parallel with its two siblings, still short, and correct on the tank popup where it renders. Ranked low because the popup supplies the context in practice. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
+   "disposition": "dismissed",
+   "resolution": "PROPOSED English: 'Tank reaction' -- parallel with its two siblings, still short, and correct on the tank popup where it renders. Ranked low because the popup supplies the context in practice. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording. | REVERTED 2026-09-06, within an hour of being applied. It is a COLUMN HEADING in the Tanks table, where the tab already says Tanks, and dev/lpn-spike/reaction-controls-harness.js asserts by name that the heading does not repeat the tab own noun. The pass reasoned from parallelism with its two siblings without opening the render site, and the siblings are not in that table. The ambiguity it names is real and the popup supplies the context, which is why the finding was ranked low."
   },
   {
    "key": "lpn_quality_initial_tip",

@@ -99,6 +99,20 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
+- 50|593| **[AI] Five water-quality settings a file can state and no control can show.**
+  Found 2026-09-06 while closing Task 581, by surveying rather than by testing. Net2 and Net3 both
+  state `Order Bulk`, `Order Tank`, `Order Wall`, `Limiting Potential` and `Roughness Correlation`.
+  **All five parse, all five round-trip byte for byte, and all five reach the EPANET engine** -- so
+  nothing is lost and nothing is wrong. What is missing is a reader: `settingsChemicalRows()` offers
+  only `globalBulk` and `globalWall`, so a person opening one of EPA's own networks cannot see five
+  numbers their file states and their answers depend on.
+  - **It is the same shape as Task 581 and the same answer applies:** the document already knows,
+    and the gap is delivery. Five rows in the Water quality section of Settings, sparse the way its
+    neighbours are, is the whole of it.
+  - **`Limiting Potential` and `Roughness Correlation` are the two worth reading EPANET on first** --
+    each changes what a reaction coefficient MEANS rather than scaling it, so a row that shows the
+    number without its tip would be worse than no row.
+
 - 50|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
   **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
   and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size). Placed
@@ -602,8 +616,16 @@ the block.
     `lang.ec.en.php` ship and **199 already disagree** — including a sentence struck as false, two
     that fall back to the empty string, and a control the language file calls `Calculate` and the
     fallback calls `Run`. `pageconfig_check.php` guarantees the key is supplied, so none of it ever
-    renders and nothing had ever compared them. Held as a ratchet (`js_fallback_string_check.php`);
-    **walking 199 to zero and making it absolute is the open work.**
+    renders and nothing had ever compared them. **Walked to ZERO the same day and the ratchet is now
+    absolute at 0** — 219 rewritten mechanically out of `$ec_lang` itself, so no wording judgement
+    entered the sweep, and two done by hand because they are read through an alias the sweep's regex
+    did not model. `js_fallback_string_check.php` now fails the build on the first one that drifts.
+    - **AND THE SELFTEST DIED OF SUCCESS ON THE SAME DAY, which is worth knowing before writing the
+      next ratchet.** Its corpus guard asserted "at least one drifted fallback exists", to stop a
+      blinded scan reading as progress — so fixing the defect broke the guard. Replaced by a LIVE
+      MUTATION: a temporary file with one deliberately wrong fallback is written into `js/`, the
+      real check is run over the real directory, and it must name that file. That proves the same
+      property and goes on proving it at zero.
   - **THE TRANSFERABLE METHOD, and the reason this stays open:** re-reading `CLAUDE.md` cannot find
     a rule nobody wrote down. Row 32 came from COUNTING a repeated construct in the source and
     asking what writing it 892 times assumes. Next pass does that to `js/` and `lib/` as well as

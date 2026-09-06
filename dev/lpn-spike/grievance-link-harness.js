@@ -79,7 +79,7 @@ ok('both doors are buttons rather than links',
 // The tip is the helper's, which is what makes it reachable on a touch screen: initTips() wires
 // long-press for a tip inside a control and hover for everything else, and it only ever looks at
 // .ec-help[title].
-const tipCount = (html.match(/<span class="ec-help" title="One tap tells us/g) || []).length;
+const tipCount = (html.match(/<span class="ec-help" title="One press tells us/g) || []).length;
 ok('each door carries a helper-built .ec-help tip, so touch can read it', tipCount === 2, tipCount);
 // Scoped to the two buttons, not counted across the page: four other controls on this page end
 // their label the same way, and a page-wide count would have said 4 and meant nothing.
@@ -281,7 +281,9 @@ const tip = val('lpn_wrong_tip');
 const thanksEn = val('lpn_wrong_thanks');
 const btnEn = val('lpn_wrong_btn');
 ok('all three strings are defined in English', !!tip && !!thanksEn && !!btnEn);
-ok('the tip says the press is what sends it', /one tap/i.test(tip));
+// 'One press', not 'One tap' -- Wave 0, 2026-09-06. The gesture word follows the page's own
+// pointer-first design; a 44px touch target is not an argument here and neither is its verb.
+ok('the tip says the press is what sends it', /one press/i.test(tip));
 ok('...names every field that goes: the page, the language, the message', /page/i.test(tip) &&
 	/language/i.test(tip) && /message/i.test(tip));
 ok('...and says outright that the drawing is not sent', /drawing/i.test(tip));

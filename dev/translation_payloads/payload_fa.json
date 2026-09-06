@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1672,
-        "delta_key_count": 142,
+        "expected_key_count": 1675,
+        "delta_key_count": 143,
         "exempt_key_count": 19,
         "exempt_keys": [
             "u_imgd",
@@ -25,7 +25,7 @@
             "lpn_field_y",
             "lpn_labels_col_decimals_example"
         ],
-        "out_of_scope_key_count": 9,
+        "out_of_scope_key_count": 11,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
             "lpn"
@@ -504,65 +504,65 @@
     },
     "keys_to_translate": {
         "lpn_wrong_btn": "Something wrong here?",
-        "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
-        "lpn_wrong_thanks": "Thank you. We got that.",
-        "lpn_find_prop_demand_desc": "Demand category description",
+        "lpn_wrong_tip": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
+        "lpn_wrong_thanks": "Thank you. That reached us.",
+        "lpn_find_prop_demand_desc": "Description of demand category",
         "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
-        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both require the EPANET engine here.",
-        "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
-        "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
-        "lpn_gpv_curve_source": "Head loss curve",
+        "lpn_inp_drop_sources_mixing": "This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.",
+        "lpn_inp_drop_net_options": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
+        "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_gpv_curve_source": "Valve head loss curve",
         "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_field_tag": "Tag",
-        "lpn_field_tag_tip": "A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
-        "lpn_pump_effic_curve": "Efficiency curve",
+        "lpn_field_tag_tip": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
+        "lpn_pump_effic_curve": "Pump efficiency curve",
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_curve_none": "No curve",
-        "lpn_curve_library_link": "Curves library",
+        "lpn_curve_none": "No curve selected",
+        "lpn_curve_library_link": "Libraries, Curves",
         "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
         "lpn_curve_kind_volume": "Tank volume",
         "lpn_curve_kind_headloss": "Valve head loss",
-        "lpn_curve_kind_generic": "Not stated",
+        "lpn_curve_kind_generic": "Kind not stated",
         "lpn_curve_volume_col": "Volume",
         "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.",
-        "lpn_pump_effic_unstated": "This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.",
-        "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were ignored in this run: {ids}",
+        "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.",
+        "lpn_pump_effic_unstated": "This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.",
+        "lpn_rule_dangling_note": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}",
         "lpn_rule_unreadable_note": "These rules could not be read, so they were ignored in this run: {ids}",
         "lpn_time_run_report_copy": "Copy",
         "lpn_time_run_report_copied": "Copied",
-        "lpn_setbox_divider": "Settings index width",
+        "lpn_setbox_divider": "Width of the Settings section list",
         "lpn_quality_chemical_name": "Chemical and units",
-        "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg\/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
+        "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in: for example, write Chlorine mg\/L as one entry. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
         "lpn_quality_initial": "Initial quality",
-        "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.",
+        "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty and the node starts with none of the chemical.",
         "lpn_result_concentration": "Concentration",
         "lpn_result_concentration_tip": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
         "lpn_source_type": "Source type",
-        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.",
+        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the Source quality value. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the Source quality value and no further. Flow-paced booster adds the Source quality value to whatever is already in the water.",
         "lpn_source_type_concen": "Concentration",
         "lpn_source_type_mass": "Mass booster",
         "lpn_source_type_setpoint": "Setpoint booster",
-        "lpn_source_type_flowpaced": "Flow paced booster",
+        "lpn_source_type_flowpaced": "Flow-paced booster",
         "lpn_source_quality": "Source quality",
         "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
         "lpn_source_pattern": "Source pattern",
         "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.",
         "lpn_mixing_model": "Mixing model",
-        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
+        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two-compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
         "lpn_mixing_mixed": "Complete mixing",
-        "lpn_mixing_2comp": "Two compartment mixing",
+        "lpn_mixing_2comp": "Two-compartment mixing",
         "lpn_mixing_fifo": "FIFO plug flow",
         "lpn_mixing_lifo": "LIFO plug flow",
         "lpn_mixing_fraction": "Mixing fraction",
         "lpn_mixing_fraction_tip": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
         "lpn_reaction_bulk": "Bulk reaction coefficient",
-        "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
+        "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
         "lpn_reaction_wall": "Wall reaction coefficient",
-        "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
+        "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
         "lpn_reaction_pipe_tip": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
         "lpn_reaction_tank": "Reaction coefficient",
         "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.",
@@ -578,22 +578,22 @@
         "lpn_reports_epanet": "EPANET run",
         "lpn_energy_title": "Pump energy report",
         "lpn_energy_menu": "Pump energy",
-        "lpn_energy_menu_tip": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
+        "lpn_energy_menu_tip": "What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
-        "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
+        "lpn_energy_efficiency_tip": "The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
         "lpn_energy_price": "Price of power",
         "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
         "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
         "lpn_energy_price_pattern": "Price pattern",
-        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off peak rate is specified. Leave it empty for one price throughout the run.",
+        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.",
         "lpn_energy_demand_charge": "Peak demand charge",
-        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
+        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.",
         "lpn_energy_currency": "Currency",
-        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.",
+        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.",
         "lpn_energy_kwh": "kWh",
         "lpn_energy_kw": "kW",
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
+        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_scncmp_title": "Scenario comparison",
         "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
@@ -602,11 +602,11 @@
         "lpn_scncmp_col_minpressure": "Lowest pressure",
         "lpn_scncmp_col_maxvelocity": "Highest velocity",
         "lpn_scncmp_at": "{value} at {id}",
-        "lpn_scncmp_current": "(open now)",
+        "lpn_scncmp_current": "(currently open)",
         "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
         "lpn_energy_over": "For extended period simulation of {time}",
         "lpn_energy_col_pump": "Pump",
-        "lpn_energy_col_running": "Running",
+        "lpn_energy_col_running": "% of run",
         "lpn_energy_col_effic": "Effic.",
         "lpn_energy_col_avg_kw": "Avg. kW",
         "lpn_energy_col_avg_kw_tip": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
@@ -616,97 +616,98 @@
         "lpn_energy_total_kwh": "Energy used",
         "lpn_energy_total_energy_cost": "Cost of energy",
         "lpn_energy_peak_kw": "Peak power usage",
-        "lpn_energy_total_demand_charge": "Peak demand charge",
+        "lpn_energy_total_demand_charge": "Cost of peak demand",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_price_zero": "This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.",
+        "lpn_energy_curve_note": "These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.",
         "lpn_library_curve_add": "Add a curve",
-        "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_type_tip": "What this curve describes",
         "lpn_library_curve_type": "Curve type",
         "lpn_library_curve_equation": "Equation",
         "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
-        "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
+        "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.",
         "lpn_library_curve_note_label": "Description",
         "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
         "lpn_library_curve_remove_point": "Remove this point",
         "lpn_library_curve_copy": "Copy points",
         "lpn_library_curve_copy_tip": "Copies every point as two columns, ready to paste into a spreadsheet.",
         "lpn_library_curve_copy_manual": "Copy these points",
-        "lpn_library_curve_used_by": "Used by",
+        "lpn_library_curve_used_by": "Elements using this curve",
         "lpn_library_curve_unused": "Nothing uses this curve.",
-        "lpn_library_curve_in_use": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
+        "lpn_library_curve_in_use": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.",
         "lpn_library_curve_x": "X",
         "lpn_library_curve_y": "Y",
         "lpn_library_rules": "Rules",
-        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
+        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time reaches a value you set. Rules can test more than one thing at once, and they can say what to do when the test fails.",
         "lpn_library_rule_add": "Add a rule",
         "lpn_library_rule_tip": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
-        "lpn_library_rule_ok": "✓ Understood",
-        "lpn_library_rule_bad": "⚠ Not understood",
+        "lpn_library_rule_ok": "✓ This rule was read",
+        "lpn_library_rule_bad": "⚠ This rule could not be read",
         "lpn_library_rule_missing": "⚠ This network has nothing called {id}",
-        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts."
     },
     "keys": {
         "lpn_wrong_btn": "Something wrong here?",
-        "lpn_wrong_tip": "One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
-        "lpn_wrong_thanks": "Thank you. We got that.",
-        "lpn_find_prop_demand_desc": "Demand category description",
+        "lpn_wrong_tip": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
+        "lpn_wrong_thanks": "Thank you. That reached us.",
+        "lpn_find_prop_demand_desc": "Description of demand category",
         "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
-        "lpn_inp_drop_sources_mixing": "This file says where more of the substance is added to the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both require the EPANET engine here.",
-        "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
-        "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
-        "lpn_gpv_curve_source": "Head loss curve",
+        "lpn_inp_drop_sources_mixing": "This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.",
+        "lpn_inp_drop_net_options": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
+        "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
+        "lpn_gpv_curve_source": "Valve head loss curve",
         "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_field_tag": "Tag",
-        "lpn_field_tag_tip": "A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
-        "lpn_pump_effic_curve": "Efficiency curve",
+        "lpn_field_tag_tip": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
+        "lpn_pump_effic_curve": "Pump efficiency curve",
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
-        "lpn_curve_none": "No curve",
-        "lpn_curve_library_link": "Curves library",
+        "lpn_curve_none": "No curve selected",
+        "lpn_curve_library_link": "Libraries, Curves",
         "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
         "lpn_curve_kind_volume": "Tank volume",
         "lpn_curve_kind_headloss": "Valve head loss",
-        "lpn_curve_kind_generic": "Not stated",
+        "lpn_curve_kind_generic": "Kind not stated",
         "lpn_curve_volume_col": "Volume",
         "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.",
-        "lpn_pump_effic_unstated": "This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.",
-        "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were ignored in this run: {ids}",
+        "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.",
+        "lpn_pump_effic_unstated": "This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.",
+        "lpn_rule_dangling_note": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}",
         "lpn_rule_unreadable_note": "These rules could not be read, so they were ignored in this run: {ids}",
         "lpn_time_run_report_copy": "Copy",
         "lpn_time_run_report_copied": "Copied",
-        "lpn_setbox_divider": "Settings index width",
+        "lpn_setbox_divider": "Width of the Settings section list",
         "lpn_quality_chemical_name": "Chemical and units",
-        "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in, for example Chlorine mg\/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
+        "lpn_quality_chemical_name_tip": "The name of the chemical and the units its concentrations are written in: for example, write Chlorine mg\/L as one entry. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.",
         "lpn_quality_initial": "Initial quality",
-        "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.",
+        "lpn_quality_initial_tip": "How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty and the node starts with none of the chemical.",
         "lpn_result_concentration": "Concentration",
         "lpn_result_concentration_tip": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
         "lpn_source_type": "Source type",
-        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.",
+        "lpn_source_type_tip": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the Source quality value. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the Source quality value and no further. Flow-paced booster adds the Source quality value to whatever is already in the water.",
         "lpn_source_type_concen": "Concentration",
         "lpn_source_type_mass": "Mass booster",
         "lpn_source_type_setpoint": "Setpoint booster",
-        "lpn_source_type_flowpaced": "Flow paced booster",
+        "lpn_source_type_flowpaced": "Flow-paced booster",
         "lpn_source_quality": "Source quality",
         "lpn_source_quality_tip": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
         "lpn_source_pattern": "Source pattern",
         "lpn_source_pattern_tip": "A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.",
         "lpn_mixing_model": "Mixing model",
-        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
+        "lpn_mixing_model_tip": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two-compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
         "lpn_mixing_mixed": "Complete mixing",
-        "lpn_mixing_2comp": "Two compartment mixing",
+        "lpn_mixing_2comp": "Two-compartment mixing",
         "lpn_mixing_fifo": "FIFO plug flow",
         "lpn_mixing_lifo": "LIFO plug flow",
         "lpn_mixing_fraction": "Mixing fraction",
         "lpn_mixing_fraction_tip": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
         "lpn_reaction_bulk": "Bulk reaction coefficient",
-        "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
+        "lpn_reaction_bulk_tip": "Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1\/day. An empty box means no bulk reaction.",
         "lpn_reaction_wall": "Wall reaction coefficient",
-        "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
+        "lpn_reaction_wall_tip": "Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.",
         "lpn_reaction_pipe_tip": "This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.",
         "lpn_reaction_tank": "Reaction coefficient",
         "lpn_reaction_tank_tip": "Reaction in the water held in this tank, as a rate in 1\/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.",
@@ -722,22 +723,22 @@
         "lpn_reports_epanet": "EPANET run",
         "lpn_energy_title": "Pump energy report",
         "lpn_energy_menu": "Pump energy",
-        "lpn_energy_menu_tip": "How long each pump ran, what power it drew and what it cost over the last extended period simulation.",
+        "lpn_energy_menu_tip": "What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.",
         "lpn_energy_efficiency": "Pump efficiency (percent)",
-        "lpn_energy_efficiency_tip": "The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
+        "lpn_energy_efficiency_tip": "The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.",
         "lpn_energy_price": "Price of power",
         "lpn_energy_price_tip": "What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.",
         "lpn_energy_pump_price_tip": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
         "lpn_energy_price_pattern": "Price pattern",
-        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off peak rate is specified. Leave it empty for one price throughout the run.",
+        "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.",
         "lpn_energy_demand_charge": "Peak demand charge",
-        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.",
+        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.",
         "lpn_energy_currency": "Currency",
-        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.",
+        "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.",
         "lpn_energy_kwh": "kWh",
         "lpn_energy_kw": "kW",
         "lpn_energy_price_note": "This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.",
-        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.",
+        "lpn_energy_needs_run": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.",
         "lpn_energy_no_pumps": "This network has no pumps, so there is nothing drawing power.",
         "lpn_scncmp_title": "Scenario comparison",
         "lpn_scncmp_menu_tip": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
@@ -746,11 +747,11 @@
         "lpn_scncmp_col_minpressure": "Lowest pressure",
         "lpn_scncmp_col_maxvelocity": "Highest velocity",
         "lpn_scncmp_at": "{value} at {id}",
-        "lpn_scncmp_current": "(open now)",
+        "lpn_scncmp_current": "(currently open)",
         "lpn_scncmp_note": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
         "lpn_energy_over": "For extended period simulation of {time}",
         "lpn_energy_col_pump": "Pump",
-        "lpn_energy_col_running": "Running",
+        "lpn_energy_col_running": "% of run",
         "lpn_energy_col_effic": "Effic.",
         "lpn_energy_col_avg_kw": "Avg. kW",
         "lpn_energy_col_avg_kw_tip": "The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.",
@@ -760,35 +761,36 @@
         "lpn_energy_total_kwh": "Energy used",
         "lpn_energy_total_energy_cost": "Cost of energy",
         "lpn_energy_peak_kw": "Peak power usage",
-        "lpn_energy_total_demand_charge": "Peak demand charge",
+        "lpn_energy_total_demand_charge": "Cost of peak demand",
         "lpn_energy_total_cost": "Total cost",
         "lpn_energy_no_price": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy.",
-        "lpn_energy_curve_note": "These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.",
+        "lpn_energy_price_zero": "This network states a price of zero, so every cost here is zero. Change it under Settings, Energy.",
+        "lpn_energy_curve_note": "These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.",
         "lpn_library_curve_add": "Add a curve",
-        "lpn_library_curve_kind": "What this curve describes",
+        "lpn_library_curve_type_tip": "What this curve describes",
         "lpn_library_curve_type": "Curve type",
         "lpn_library_curve_equation": "Equation",
         "lpn_library_curve_equation_tip": "The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.",
-        "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
+        "lpn_library_curve_values_tip": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.",
         "lpn_library_curve_note_label": "Description",
         "lpn_library_curve_note_tip": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
         "lpn_library_curve_remove_point": "Remove this point",
         "lpn_library_curve_copy": "Copy points",
         "lpn_library_curve_copy_tip": "Copies every point as two columns, ready to paste into a spreadsheet.",
         "lpn_library_curve_copy_manual": "Copy these points",
-        "lpn_library_curve_used_by": "Used by",
+        "lpn_library_curve_used_by": "Elements using this curve",
         "lpn_library_curve_unused": "Nothing uses this curve.",
-        "lpn_library_curve_in_use": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
+        "lpn_library_curve_in_use": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.",
         "lpn_library_curve_x": "X",
         "lpn_library_curve_y": "Y",
         "lpn_library_rules": "Rules",
-        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
+        "lpn_library_rules_tip": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time reaches a value you set. Rules can test more than one thing at once, and they can say what to do when the test fails.",
         "lpn_library_rule_add": "Add a rule",
         "lpn_library_rule_tip": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
-        "lpn_library_rule_ok": "✓ Understood",
-        "lpn_library_rule_bad": "⚠ Not understood",
+        "lpn_library_rule_ok": "✓ This rule was read",
+        "lpn_library_rule_bad": "⚠ This rule could not be read",
         "lpn_library_rule_missing": "⚠ This network has nothing called {id}",
-        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from."
+        "lpn_ff_col_static_tip": "The pressure at this junction before any fire flow is drawn, with the system's ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts."
     },
     "key_context": {
         "lpn_wrong_btn": {
@@ -878,12 +880,12 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_quality",
                     "value": "این فایل شرح می‌دهد کیفیت آب هنگام حرکت چگونه تغییر می‌کند: در آغاز چه چیزی در آب است، آن ماده از کجا بیشتر وارد می‌شود، چگونه واکنش می‌دهد، و تانک‌ها چگونه مخلوط می‌شوند. این صفحه سن آب و ردیابی منبع را حساب می‌کند، اما نه شیمی را، پس هیچ‌کدام از آن‌ها اینجا استفاده نمی‌شود. آن خط‌ها نگه داشته می‌شوند، و اگر یک فایل EPANET ذخیره کنید دوباره نوشته می‌شوند.",
-                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file."
                 },
                 "next_translated": {
                     "key": "lpn_inp_drop_energy",
                     "value": "این فایل EPANET داده‌های مدل‌سازی هزینهٔ پمپاژ را دارد. این صفحه انرژی یا هزینه را حساب نمی‌کند، پس چیزی در اینجا از آن اعداد استفاده نمی‌کند. آن‌ها نگه داشته می‌شوند، و اگر یک فایل EPANET ذخیره کنید دوباره نوشته می‌شوند.",
-                    "english": "This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file."
+                    "english": "This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file."
                 }
             }
         },
@@ -926,7 +928,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_gpv_curve",
                     "value": "این شیر منحنی افت هدی را نام می‌برد که در فایل نیست. شیر بدون منحنی وارد شد، پس تا وقتی یکی به آن ندهید، کاملاً باز می‌ماند.",
-                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
+                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in with no curve, so it stays fully open until you give it one."
                 },
                 "next_translated": {
                     "key": "lpn_field_valve_setting_pressure",
@@ -942,7 +944,7 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_gpv_curve",
                     "value": "این شیر منحنی افت هدی را نام می‌برد که در فایل نیست. شیر بدون منحنی وارد شد، پس تا وقتی یکی به آن ندهید، کاملاً باز می‌ماند.",
-                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
+                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in with no curve, so it stays fully open until you give it one."
                 },
                 "next_translated": {
                     "key": "lpn_field_valve_setting_pressure",
@@ -958,7 +960,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -974,7 +976,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -990,7 +992,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1006,7 +1008,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1022,7 +1024,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1038,7 +1040,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1054,7 +1056,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1070,7 +1072,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1086,7 +1088,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1102,7 +1104,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1118,7 +1120,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1134,7 +1136,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1150,7 +1152,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1166,7 +1168,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1182,7 +1184,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1198,7 +1200,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -1214,7 +1216,7 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "منبع منحنی",
-                    "english": "Head curve"
+                    "english": "Pump head curve"
                 },
                 "next_translated": {
                     "key": "lpn_mode_select",
@@ -2647,6 +2649,22 @@
                 }
             }
         },
+        "lpn_energy_price_zero": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_quality_needs_run",
+                    "value": "کیفیت آب با گذر زمان در طول لوله‌ها منتقل می‌شود، پس به موتور EPANET و یک کل مدت اجرا نیاز دارد. یک کل مدت اجرا زیر زمان تنظیم کنید، سپس دکمهٔ محاسبه را بزنید.",
+                    "english": "Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button."
+                },
+                "next_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "رتبه",
+                    "english": "Rank"
+                }
+            }
+        },
         "lpn_energy_curve_note": {
             "reason": "missing",
             "current_value": null,
@@ -2670,7 +2688,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2679,14 +2697,14 @@
                 }
             }
         },
-        "lpn_library_curve_kind": {
+        "lpn_library_curve_type_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2702,7 +2720,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2718,7 +2736,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2734,7 +2752,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2750,7 +2768,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2766,7 +2784,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2782,7 +2800,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2798,7 +2816,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2814,7 +2832,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2830,7 +2848,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2846,7 +2864,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2862,7 +2880,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2878,7 +2896,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2894,7 +2912,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2910,7 +2928,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",
@@ -2926,7 +2944,7 @@
                 "previous_translated": {
                     "key": "lpn_library_curves_note",
                     "value": "یک منحنی متعلق به پمپ یا شیری است که آن را به کار می‌برد، پس این‌جا همهٔ آن‌ها در یک‌جا برای مشاهده گرد آمده‌اند. روی یک شناسه کلیک کنید تا به آن المان بروید و نقاطش را همان‌جا تغییر دهید. برای یک پمپ، خط رسم‌شده همان منحنی‌ای است که اجرا از آن استفاده می‌کند و از میان نقاط برازش شده؛ برای یک شیر، پله‌های مستقیم میان نقاط است.",
-                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
+                    "english": "A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown."
                 },
                 "next_translated": {
                     "key": "lpn_library_controls",

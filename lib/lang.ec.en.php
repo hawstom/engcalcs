@@ -2845,7 +2845,7 @@ $ec_lang['lpn_reaction_tank_tip']='Reaction in the water held in this tank, as a
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='Bulk reaction';
 $ec_lang['lpn_reaction_wall_short']='Wall reaction';
-$ec_lang['lpn_reaction_tank_short']='Tank reaction';
+$ec_lang['lpn_reaction_tank_short']='Reaction';
 // The two unit words the coefficient labels are built from. Translatable, because the abbreviation
 // for a day is not the same word everywhere.
 $ec_lang['lpn_reaction_per_day']='1/day';
@@ -2980,11 +2980,11 @@ $ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how so
 // curve is pointed at an element from.
 $ec_lang['lpn_library_curves_note']='A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.';
 $ec_lang['lpn_library_curve_add']='Add a curve';
-$ec_lang['lpn_library_curve_kind']='What this curve describes';
+$ec_lang['lpn_library_curve_type_tip']='What this curve describes';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
-// what it is called here; `lpn_library_curve_kind` above stays as its tip, where the longer sentence
+// what it is called here; `lpn_library_curve_type_tip` above stays as its tip, where the longer sentence
 // belongs.
 $ec_lang['lpn_library_curve_type']='Curve type';
 // **THE FIT, WRITTEN OUT, AND IT IS DERIVED AND STORED NOWHERE.** EPANET's curve editor prints the

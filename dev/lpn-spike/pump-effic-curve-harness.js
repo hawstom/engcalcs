@@ -484,8 +484,14 @@ const FIXTURE = [
 	chainPump._efficCurveId = 'GHOST';
 	L.renderLinkFields('P1');
 	const ghostText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
-	check(/GHOST/.test(ghostText) && /undefined/.test(ghostText),
-		`a curve named but not stated is disclosed by name: ${/This pump calls[^]{0,110}/.exec(ghostText)}`);
+	// **THE PROPERTY, NOT THE WORD.** This used to require the literal 'undefined', which is how
+	// lpn_pump_effic_unstated happened to be worded; Wave 0 rewrote it to say the same thing without
+	// that word and the check failed on a string that had just been IMPROVED. What actually matters
+	// is that the ghost name reaches the reader AND that the sentence shown is the unstated one
+	// rather than its sibling lpn_pump_effic_global, which is about a pump that names no curve at
+	// all. Those two are told apart by whether a name is offered, so asserting both halves pins it.
+	check(/GHOST/.test(ghostText) && !/no efficiency curve selected/.test(ghostText),
+		`a curve named but not stated is disclosed by name, and not confused with naming none: ${/This pump[^]{0,120}/.exec(ghostText)}`);
 	chainPump._efficCurveId = keptName;
 
 	// =========================================================================================

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**45 still to read**, of 145 untranslated keys, of 1675 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**44 still to read**, of 145 untranslated keys, of 1675 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (7 to read @@ NEEDS RULING)
+## Questions from the translators  (6 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -44,13 +44,6 @@ is the one you meant. "The first one" is a complete answer.
   1. a button that copies the curve's points (lpn_library_curve_copy's intent)
   2. a manual-copy prompt over a pre-selected block (lpn_library_curve_copy_manual's intent)
   3. two buttons that do different things
-  @@ NEEDS RULING
-- **`lpn_library_curve_kind`**
-  > What this curve describes
-  *The finding:* medium: lpn_library_curve_kind is 'What this curve describes' and lpn_library_curve_type is 'Curve type'. Read as a pair with no page around them, they look like two different properties -- a free-text purpose field and a categorical type field. CLAUDE.md says EPANET has exactly four KINDS and that this is the axis; two labels in two grammatical shapes (a question-like clause and a noun phrase) is exactly the 'two faces of one control written in two moods' failure mode this pass is asked to look for. In several languages 'kind' and 'type' collapse to one word, so a translator will be unable to distinguish them and will guess whether they are the same field.
-  1. both label EPANET's four-way curve kind, in two places (probable intent)
-  2. one is a free-text purpose, the other a category
-  3. one is our word, the other EPANET's
   @@ NEEDS RULING
 - **`lpn_scenario_overrides`**
   > No. of custom values
@@ -90,7 +83,7 @@ is the one you meant. "The first one" is a complete answer.
   > Not connected
   @@ NEEDS RULING
 
-## lpn_  (143, 43 to read @@ NEEDS RULING)
+## lpn_  (143, 42 to read @@ NEEDS RULING)
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
@@ -272,9 +265,6 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_library_curve_in_use`**
   > This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.
   @@ NEEDS RULING
-- **`lpn_library_curve_kind`**
-  > What this curve describes
-  _Ruled OK 2026-09-05._
 - **`lpn_library_curve_note_label`**
   > Description
   _Ruled OK 2026-09-05._
@@ -286,6 +276,9 @@ is the one you meant. "The first one" is a complete answer.
   _Ruled OK 2026-09-05._
 - **`lpn_library_curve_type`**
   > Curve type
+  _Ruled OK 2026-09-05._
+- **`lpn_library_curve_type_tip`**
+  > What this curve describes
   _Ruled OK 2026-09-05._
 - **`lpn_library_curve_unused`**
   > Nothing uses this curve.
@@ -408,8 +401,8 @@ is the one you meant. "The first one" is a complete answer.
   > Reaction coefficient
   _Ruled OK 2026-09-04._
 - **`lpn_reaction_tank_short`**
-  > Tank reaction
-  @@ NEEDS RULING
+  > Reaction
+  _Ruled OK 2026-09-04._
 - **`lpn_reaction_tank_tip`**
   > Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Leave it empty and the tank uses the bulk reaction coefficient set for the whole network under Settings, Water quality.
   _Ruled OK 2026-09-04._

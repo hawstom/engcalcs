@@ -107,13 +107,17 @@ That is one sprint's worth and it is what a sprint should be sized against.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-1. **The sprint**, once Wave 0 (`dev/english-friction/584-wave0.json`) is answered. 39 drifted plus
-   144 untranslated.
-2. **The JS fallback literals.** Every localized string this page reads has an English copy beside it
-   as `pageConfig.<key> || '<literal>'`, and **201 of 888 have drifted from `lib/lang.ec.en.php`**
-   (measured 2026-09-06). `pageconfig_check.php` guarantees the key is supplied, so none of it
-   renders today, which is exactly why it rotted. `js/lpn-time.js`'s seven are synced; the rest, and
-   the check that holds them at zero, are Task 322's.
+1. **THE SPRINT IS GATED ON TOM AND ON NOTHING ELSE.** Wave 0 ran on 2026-09-06 over 178 new and
+   changed strings and filed **64 findings** — 44 applied, 7 referred to him, the rest dismissed or
+   ruled. `friction_check.php` counts a `refer-to-human` as unanswered by design, so those 7 are the
+   hard gate. Separately `dev/new-english-keys.md` stands at **45 to read**, and 43 of those are
+   keys whose earlier ruling LAPSED because Wave 0 changed the wording — which is the ruling
+   mechanism working, not a regression.
+2. **The JS fallback literals — DONE 2026-09-06, and named here for the lesson.** Every localized
+   string is copied beside its key as `pageConfig.<key> || '<literal>'`, and 199 of 893 had drifted
+   from `lib/lang.ec.en.php` — invisible because `pageconfig_check.php` guarantees the key is
+   supplied, so none of it renders, which is exactly why it rotted. All 199 corrected mechanically
+   out of `$ec_lang`, and `js_fallback_string_check.php` is absolute at 0.
 3. **Task 539 phase two — the gang move.** Phase one measured it and overturned the plan: across 28
    drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the cheap
    segment-intersection test the roadmap proposed as the opening sees about a tenth of the problem.

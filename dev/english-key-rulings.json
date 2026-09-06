@@ -777,7 +777,7 @@
    "on": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
    "ruled": "2026-09-05"
   },
-  "lpn_library_curve_kind": {
+  "lpn_library_curve_type_tip": {
    "on": "What this curve describes",
    "ruled": "2026-09-05"
   },

@@ -31,10 +31,16 @@
  *     language file was corrected and the copy beside it was not, which is the failure mode of
  *     every duplicate that nothing compares.
  *
- * WHY A RATCHET RATHER THAN A RULE, following em_dash_ratchet_check.php. 199 corrections are 199
- * edits inside `js/`, and this check was written in a worktree that does not own those files. A
- * ratchet costs nothing today, stops the number growing, and can be walked to zero and made
- * absolute. LOWER EC_JS_FALLBACK_BASELINE when you fix some; never raise it.
+ * **IT WAS WALKED TO ZERO THE SAME DAY, AND THE BASELINE IS NOW 0**, which makes this a plain rule
+ * wearing a ratchet's clothes: a fallback that disagrees with the language file fails the build.
+ * It began at 199 because the check was written in a worktree that did not own `js/`; the 219 that
+ * were rewritten were rewritten mechanically, from `$ec_lang` itself, so no wording judgement was
+ * made in the sweep and none could be. Two survived it because they are read through an ALIAS the
+ * sweep's own regex did not model, and were done by hand.
+ *
+ * LOWER EC_JS_FALLBACK_BASELINE if it ever needs to be; never raise it. It is 0, and the honest
+ * reading of any rise is that a language string was edited and its copy was not, which is the
+ * entire defect.
  *
  * THE OTHER LEG BLOCKS AT ZERO, because it is a different defect. A fallback written against a key
  * `lib/lang.ec.en.php` does not define means the JS is reading a key that can never be supplied, so
@@ -74,10 +80,10 @@
 require_once __DIR__ . '/lang_parse.inc.php';
 
 /**
- * The measured count on 2026-09-06. LOWER THIS as fallbacks are corrected; never raise it.
- * Raising it is the one edit that makes this script pointless.
+ * ZERO since 2026-09-06, the day the 199 were measured and the same day they were corrected.
+ * Never raise it. Raising it is the one edit that makes this script pointless.
  */
-const EC_JS_FALLBACK_BASELINE = 199;
+const EC_JS_FALLBACK_BASELINE = 0;
 
 /**
  * Every `<pageConfig-or-alias>.<key> || '<literal>'` in one JS source.

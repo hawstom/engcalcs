@@ -536,7 +536,10 @@ const FIVE = [
 		'by name as well as by value');
 	check(opts.some((o) => o.value === 'C1') && opts.some((o) => o.value === ''),
 		'and still offers every head curve the Library holds, plus "no curve"');
-	const link = buttonsIn(fields, []).filter((b) => /Curves library/i.test(String(b.textContent)))[0];
+	// Found by the label `lpn_curve_library_link` carries TODAY. It read 'Curves library' until
+	// 2026-09-06, when Wave 0 moved it to 'Libraries, Curves' -- the comma-path shape the rest of
+	// this page uses for a place to go. What the check is ABOUT is the click below.
+	const link = buttonsIn(fields, []).filter((b) => /Libraries, Curves/i.test(String(b.textContent)))[0];
 	check(!!link, 'a link into the Library stands beside it');
 	if (link) {
 		fire(link, 'click');
