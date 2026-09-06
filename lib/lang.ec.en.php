@@ -1246,8 +1246,8 @@ $ec_lang['lpn_help_notes']='Notes on this page';
 // say what it posts is asking for trust it has not earned. It also says no reply is coming, which
 // is the honesty boundary that document draws: a thank-you must never imply an answer.
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
-$ec_lang['lpn_wrong_tip']='One tap tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends no text, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
-$ec_lang['lpn_wrong_thanks']='Thank you. We got that.';
+$ec_lang['lpn_wrong_tip']='One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
+$ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
 // reason: a string that is not in a lang file is a string no translator will ever see. The manifest
@@ -1320,7 +1320,7 @@ $ec_lang['lpn_units_velocity']='Velocity';
 $ec_lang['lpn_result_gradient']='Head loss gradient';
 $ec_lang['lpn_result_gradient_tip']='Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit.';
 $ec_lang['lpn_result_water_age']='Water age';
-$ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. Where flows meet, the water arriving carries a mix of ages, and the number here is their average weighted by flow: a junction fed mostly by a short new main reads young even if a long dead end also feeds it. In a tank it is the average age of the water held, which is why a tank that turns over slowly is usually the oldest water in a network. There is no regulatory limit to compare it against, so judge the number against your own system.';
+$ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. Where flows meet, the water arriving carries a mix of ages, and the number here is their average weighted by flow: a junction fed mostly by a short new main shows a low age even if a long dead end also feeds it. In a tank it is the average age of the water held, which is why a tank that turns over slowly is usually the oldest water in a network. There is no regulatory limit to compare it against, so judge the number against your own system.';
 $ec_lang['lpn_result_source_share']='Source share';
 $ec_lang['lpn_result_source_share_tip']='How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.';
 $ec_lang['lpn_result_head']='Head';
@@ -1632,7 +1632,7 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_desc']='Demand category description';
+$ec_lang['lpn_find_prop_demand_desc']='Description of demand category';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -1862,7 +1862,7 @@ $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing wa
 $ec_lang['lpn_inp_report_label_anchor']='Text labels are placed as EPANET places them, from their top left corner.';
 $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
-$ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still indicates it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
+$ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know which engine is now
 // working out their network, not because anything was thrown away.
@@ -1871,30 +1871,30 @@ $ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, an
 $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They came in as open pipes, so the network is still joined up, but nothing controls pressure or flow there any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
-$ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out, because the part of this page that runs an extended period simulation did not load. Every demand is the number written in the file.';
+$ec_lang['lpn_inp_drop_patterns']='This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.';
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the run. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
-$ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. It came in with no curve, so it adds no head.';
+$ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. The pump came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_head_pattern']='These reservoirs rise and fall through the run. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the one their curve was measured at, or change speed through the run. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
-$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept as you wrote them, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs an extended period simulation did not load, so only the starting conditions came in.';
-$ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_sources_mixing']='This file says where more of the substance is added to the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both require the EPANET engine here.';
-$ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_sources_mixing']='This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.';
+$ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset\'s properties, where you can read it or change it.';
 $ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for how it formats the report it prints. You can read the engine\'s report here, under Reports, EPANET run, but it comes out in the engine\'s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used: water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run one. All of them are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run a chemical. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_demand_model']='This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_other_options']='This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_net_options']='This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
-$ec_lang['lpn_net_emergency']='This was an EPANET .net file. That is EPANET\'s own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
+$ec_lang['lpn_inp_drop_net_options']='This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
+$ec_lang['lpn_net_emergency']='This was an EPANET .net file. That is EPANET\'s own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
@@ -2081,7 +2081,7 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 // Library's Curves section is where a curve is read and edited.
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pump curve';
-$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit. A curve can hold more than three points. The built-in solver reads three of them, the first, the middle and the last, to fit the equation above; the EPANET engine reads every point you gave it.';
+$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points, the head at zero flow, the normal working point, and the point of highest flow, fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit. A curve can hold more than three points. The built-in solver reads three of them, the first, the middle and the last, to fit the equation above; the EPANET engine reads every point you gave it.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2173,8 +2173,8 @@ $ec_lang['lpn_valve_type_pbv']='Pressure breaker (PBV)';
 $ec_lang['lpn_valve_type_gpv']='General purpose (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Pressure drop';
 $ec_lang['lpn_field_valve_setting_drop_tip']='The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.';
-$ec_lang['lpn_inp_drop_gpv_curve']='This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
-$ec_lang['lpn_gpv_curve_source']='Head loss curve';
+$ec_lang['lpn_inp_drop_gpv_curve']='This valve refers to a head loss curve that is not in the file. The valve came in with no curve, so it stays fully open until you give it one.';
+$ec_lang['lpn_gpv_curve_source']='Valve head loss curve';
 $ec_lang['lpn_gpv_curve_source_tip']='The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 $ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.';
@@ -2197,7 +2197,7 @@ $ec_lang['lpn_field_km_short']='Minor loss, k';
 // `lpn_pump_curve_ref_note` went with the change: they were the two halves of `curveRef`, which
 // named ANOTHER PUMP to copy points from because there was nothing else to point at. Two pumps on
 // one curve name the same curve now, so there is no borrow to describe.
-$ec_lang['lpn_pump_curve_source']='Head curve';
+$ec_lang['lpn_pump_curve_source']='Pump head curve';
 $ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
@@ -2217,17 +2217,17 @@ $ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says 
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
 $ec_lang['lpn_field_tag']='Tag';
-$ec_lang['lpn_field_tag_tip']='A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.';
-$ec_lang['lpn_pump_effic_curve']='Efficiency curve';
+$ec_lang['lpn_field_tag_tip']='A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.';
+$ec_lang['lpn_pump_effic_curve']='Pump efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
 // pump's efficiency curve and a valve's head-loss curve, so its fixed entries are keyed once.
-$ec_lang['lpn_curve_none']='No curve';
+$ec_lang['lpn_curve_none']='No curve selected';
 // **THE CHOOSER OFFERS NO WAY TO MAKE A CURVE** (Tom, 2026-09-05: *"Pump properties has no 'New
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Curves library';
+$ec_lang['lpn_curve_library_link']='Libraries, Curves';
 $ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
@@ -2247,7 +2247,7 @@ $ec_lang['lpn_curve_kind_headloss']='Valve head loss';
 // **NOT A FIFTH KIND.** A curve whose file states no type comment and which nothing references, so
 // there is nothing to state. It is never offered as a choice; it is only shown, already selected,
 // on a curve in that state, so it can be seen and changed.
-$ec_lang['lpn_curve_kind_generic']='Not stated';
+$ec_lang['lpn_curve_kind_generic']='Kind not stated';
 // A volume curve's second column. It has no unit family on this page and is carried as the file's
 // own number, so the heading names the quantity and no unit.
 $ec_lang['lpn_curve_volume_col']='Volume';
@@ -2256,8 +2256,8 @@ $ec_lang['lpn_pump_effic_col']='Efficiency';
 // is three fixed rows, because this page FITS a head curve from at most three points while EPANET
 // reads an efficiency curve directly: truncating an imported five-point curve would be rewriting
 // numbers that are the user's.
-$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.';
-$ec_lang['lpn_pump_effic_unstated']='This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.';
+$ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve selected, so it runs at the efficiency set for the whole network, {percent}.';
+$ec_lang['lpn_pump_effic_unstated']='This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
@@ -2281,7 +2281,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a Text. Cl
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page comes home to: it returns here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.';
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
@@ -2607,7 +2607,7 @@ $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in
 // nothing to point at leaves the user reading every sentence they ever wrote.
 $ec_lang['lpn_control_dangling_note']='These controls name an element that is no longer in this project, so they were left out: {ids}';
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
-$ec_lang['lpn_rule_dangling_note']='These rules name an element that is no longer in this project, so they were ignored in this run: {ids}';
+$ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
 $ec_lang['lpn_engine_minor_loss_note']='Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
@@ -2715,9 +2715,9 @@ $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
-$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs an extended period simulation.';
+$ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.';
 $ec_lang['lpn_time_slider']='Time';
-$ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings to run an extended period simulation.';
+$ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.';
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';
@@ -2742,7 +2742,7 @@ $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step, f
 // that is both the true cause and the one the reader can act on.
 // Full record, including why the row could not be closed as a wording question:
 // `dev/eps-terminology-audit.md` section 5.
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This project is set not to recalculate automatically, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
+$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
@@ -2767,7 +2767,7 @@ $ec_lang['lpn_settings_search_tip']='Type a word to see only the settings that m
 $ec_lang['lpn_settings_no_match']='No setting mentions that word.';
 // The grab strip between the two panes (ROADMAP Task 576). An aria-label, so it is a NAME rather
 // than an instruction: what the control adjusts, not how to operate it.
-$ec_lang['lpn_setbox_divider']='Settings index width';
+$ec_lang['lpn_setbox_divider']='Width of the Settings section list';
 $ec_lang['lpn_rpane_empty']='Nothing is docked here yet. Everything that belongs to the whole project is in Settings.';
 $ec_lang['lpn_time_settings_open']='Time settings';
 
@@ -2804,9 +2804,9 @@ $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as t
 // concentration is TEXT the document states beside the chemical name and is never converted, which
 // is why there is no unit family and no unit key here.
 $ec_lang['lpn_quality_chemical_name']='Chemical and units';
-$ec_lang['lpn_quality_chemical_name_tip']='The name of the chemical and the units its concentrations are written in, for example Chlorine mg/L. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.';
+$ec_lang['lpn_quality_chemical_name_tip']='The name of the chemical and the units its concentrations are written in: for example, write Chlorine mg/L as one entry. This is a label. EPANET does not convert a concentration, so every concentration and every coefficient in the project has to be written in these units already.';
 $ec_lang['lpn_quality_initial']='Initial quality';
-$ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty for none.';
+$ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Leave it empty and the node starts with none of the chemical.';
 $ec_lang['lpn_result_concentration']='Concentration';
 $ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
@@ -2815,27 +2815,27 @@ $ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at th
 // tank behaviour. A source strength has no unit family for the same reason an initial quality has
 // none: it is written in the units named beside the chemical, and nobody converts it.
 $ec_lang['lpn_source_type']='Source type';
-$ec_lang['lpn_source_type_tip']='What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.';
+$ec_lang['lpn_source_type_tip']='What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the Source quality value. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the Source quality value and no further. Flow-paced booster adds the Source quality value to whatever is already in the water.';
 $ec_lang['lpn_source_type_concen']='Concentration';
 $ec_lang['lpn_source_type_mass']='Mass booster';
 $ec_lang['lpn_source_type_setpoint']='Setpoint booster';
-$ec_lang['lpn_source_type_flowpaced']='Flow paced booster';
+$ec_lang['lpn_source_type_flowpaced']='Flow-paced booster';
 $ec_lang['lpn_source_quality']='Source quality';
 $ec_lang['lpn_source_quality_tip']='How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.';
 $ec_lang['lpn_source_pattern']='Source pattern';
 $ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.';
 $ec_lang['lpn_mixing_model']='Mixing model';
-$ec_lang['lpn_mixing_model_tip']='How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.';
+$ec_lang['lpn_mixing_model_tip']='How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two-compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.';
 $ec_lang['lpn_mixing_mixed']='Complete mixing';
-$ec_lang['lpn_mixing_2comp']='Two compartment mixing';
+$ec_lang['lpn_mixing_2comp']='Two-compartment mixing';
 $ec_lang['lpn_mixing_fifo']='FIFO plug flow';
 $ec_lang['lpn_mixing_lifo']='LIFO plug flow';
 $ec_lang['lpn_mixing_fraction']='Mixing fraction';
 $ec_lang['lpn_mixing_fraction_tip']='The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.';
 $ec_lang['lpn_reaction_bulk']='Bulk reaction coefficient';
-$ec_lang['lpn_reaction_bulk_tip']='Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one grows it. First order unless the file says otherwise, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.';
+$ec_lang['lpn_reaction_bulk_tip']='Reaction in the body of the water, used for every pipe that does not carry its own. A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1/day. An empty box means no bulk reaction.';
 $ec_lang['lpn_reaction_wall']='Wall reaction coefficient';
-$ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. First order unless the file says otherwise, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.';
+$ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall, used for every pipe that does not carry its own. A negative number decays the chemical. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a length per day, written in the project length unit. An empty box means no wall reaction.';
 $ec_lang['lpn_reaction_pipe_tip']='This pipe on its own. Leave it empty and the pipe uses the coefficient set for the whole network under Settings, Water quality.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
@@ -2845,7 +2845,7 @@ $ec_lang['lpn_reaction_tank_tip']='Reaction in the water held in this tank, as a
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='Bulk reaction';
 $ec_lang['lpn_reaction_wall_short']='Wall reaction';
-$ec_lang['lpn_reaction_tank_short']='Reaction';
+$ec_lang['lpn_reaction_tank_short']='Tank reaction';
 // The two unit words the coefficient labels are built from. Translatable, because the abbreviation
 // for a day is not the same word everywhere.
 $ec_lang['lpn_reaction_per_day']='1/day';
@@ -2864,22 +2864,22 @@ $ec_lang['lpn_reports_menu_tip']='The finished answers this page produces once a
 $ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
-$ec_lang['lpn_energy_menu_tip']='How long each pump ran, what power it drew and what it cost over the last extended period simulation.';
+$ec_lang['lpn_energy_menu_tip']='What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
-$ec_lang['lpn_energy_efficiency_tip']='The wire to water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
+$ec_lang['lpn_energy_efficiency_tip']='The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
 $ec_lang['lpn_energy_price']='Price of power';
 $ec_lang['lpn_energy_price_tip']='What one kilowatt hour costs. It applies to every pump that does not carry a price of its own. Leave it empty and every cost in the report is zero.';
 $ec_lang['lpn_energy_pump_price_tip']='What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.';
 $ec_lang['lpn_energy_price_pattern']='Price pattern';
-$ec_lang['lpn_energy_price_pattern_tip']='A pattern that multiplies the price at each pattern step, which is how an off peak rate is specified. Leave it empty for one price throughout the run.';
+$ec_lang['lpn_energy_price_pattern_tip']='A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.';
 $ec_lang['lpn_energy_demand_charge']='Peak demand charge';
-$ec_lang['lpn_energy_demand_charge_tip']='What the utility bills for each kilowatt of the highest power every pump drew at one moment. It is charged on that one moment, not on the energy used, so it is added once and not per pump.';
+$ec_lang['lpn_energy_demand_charge_tip']='What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.';
 $ec_lang['lpn_energy_currency']='Currency';
-$ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you name.';
+$ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.';
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 $ec_lang['lpn_energy_price_note']='This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.';
-$ec_lang['lpn_energy_needs_run']='Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, press the Calculate button, then open Pump energy report under Calculate.';
+$ec_lang['lpn_energy_needs_run']='Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.';
 $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing drawing power.';
 
 // ---- The scenario comparison (the planning engineer's wish-list row 2) ------------------------
@@ -2893,11 +2893,11 @@ $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to
 $ec_lang['lpn_scncmp_col_minpressure']='Lowest pressure';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
 $ec_lang['lpn_scncmp_at']='{value} at {id}';
-$ec_lang['lpn_scncmp_current']='(open now)';
+$ec_lang['lpn_scncmp_current']='(currently open)';
 $ec_lang['lpn_scncmp_note']='Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.';
 $ec_lang['lpn_energy_over']='For extended period simulation of {time}';
 $ec_lang['lpn_energy_col_pump']='Pump';
-$ec_lang['lpn_energy_col_running']='Running';
+$ec_lang['lpn_energy_col_running']='% of run';
 $ec_lang['lpn_energy_col_effic']='Effic.';
 $ec_lang['lpn_energy_col_avg_kw']='Avg. kW';
 $ec_lang['lpn_energy_col_avg_kw_tip']='The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.';
@@ -2907,10 +2907,10 @@ $ec_lang['lpn_energy_col_cost']='Cost';
 $ec_lang['lpn_energy_total_kwh']='Energy used';
 $ec_lang['lpn_energy_total_energy_cost']='Cost of energy';
 $ec_lang['lpn_energy_peak_kw']='Peak power usage';
-$ec_lang['lpn_energy_total_demand_charge']='Peak demand charge';
+$ec_lang['lpn_energy_total_demand_charge']='Cost of peak demand';
 $ec_lang['lpn_energy_total_cost']='Total cost';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
-$ec_lang['lpn_energy_curve_note']='These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.';
+$ec_lang['lpn_energy_curve_note']='These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.';
 // The Labels lists' two narrowest column headings, which are a column three characters wide each.
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
 // because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'
@@ -2970,11 +2970,11 @@ $ec_lang['lpn_library_patterns']='Patterns';
 $ec_lang_syn['lpn_library_patterns']='Data series, Sequence, Time series, Progression, Schedule, Variation profile';
 $ec_lang['lpn_library_patterns_tip']='A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.';
 $ec_lang['lpn_library_curves']='Curves';
-$ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how something performs: how much head a pump makes at each flow, how efficient it is there, or how much head a valve loses.';
+$ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how something performs: how much head a pump adds at each flow, how efficient it is at that flow, or how much head a valve loses at each flow.';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
-$ec_lang['lpn_library_curves_note']='A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.';
+$ec_lang['lpn_library_curves_note']='A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.';
 $ec_lang['lpn_library_curve_add']='Add a curve';
 $ec_lang['lpn_library_curve_kind']='What this curve describes';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
@@ -2992,7 +2992,7 @@ $ec_lang['lpn_library_curve_equation_tip']='The curve fitted through the points,
 // **NOW A GRID, SO THIS SENTENCE IS ABOUT PASTING INTO ONE** (Tom, 2026-09-05: *"The line given is
 // worse than EPANET, and it really can't take a spreadsheet paste."*). Shown once under the section
 // heading rather than once per curve, so it is a note and no longer a tip.
-$ec_lang['lpn_library_curve_values_tip']='Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.';
+$ec_lang['lpn_library_curve_values_tip']='Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.';
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Description';
@@ -3003,13 +3003,13 @@ $ec_lang['lpn_library_curve_remove_point']='Remove this point';
 $ec_lang['lpn_library_curve_copy']='Copy points';
 $ec_lang['lpn_library_curve_copy_tip']='Copies every point as two columns, ready to paste into a spreadsheet.';
 $ec_lang['lpn_library_curve_copy_manual']='Copy these points';
-$ec_lang['lpn_library_curve_used_by']='Used by';
+$ec_lang['lpn_library_curve_used_by']='Elements using this curve';
 $ec_lang['lpn_library_curve_unused']='Nothing uses this curve.';
 // **A CURVE IN USE IS NOT DELETED.** A junction with no pattern still has a steady demand, so
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.';
+$ec_lang['lpn_library_curve_in_use']='This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -3036,11 +3036,11 @@ $ec_lang['lpn_library_control_ok']='✓ Understood';
 $ec_lang['lpn_library_control_bad']='⚠ Not understood';
 $ec_lang['lpn_library_control_missing']='⚠ This network has nothing called {id}';
 $ec_lang['lpn_library_rules']='Rules';
-$ec_lang['lpn_library_rules_tip']='A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.';
+$ec_lang['lpn_library_rules_tip']='A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time reaches a value you set. Rules can test more than one thing at once, and they can say what to do when the test fails.';
 $ec_lang['lpn_library_rule_add']='Add a rule';
 $ec_lang['lpn_library_rule_tip']='One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.';
-$ec_lang['lpn_library_rule_ok']='✓ Understood';
-$ec_lang['lpn_library_rule_bad']='⚠ Not understood';
+$ec_lang['lpn_library_rule_ok']='✓ This rule was read';
+$ec_lang['lpn_library_rule_bad']='⚠ This rule could not be read';
 $ec_lang['lpn_library_rule_missing']='⚠ This network has nothing called {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
@@ -3075,7 +3075,7 @@ $ec_lang['lpn_field_head_pattern_tip']='How this reservoir’s water level rises
 $ec_lang['lpn_field_pump_speed']='Relative speed';
 $ec_lang['lpn_field_pump_speed_tip']='1 is this pump turning at the speed its curve was measured at. 0.9 is the same pump turning slower, which lowers the head it adds and the flow it passes. A speed pattern takes the place of this number while the run is going.';
 $ec_lang['lpn_field_speed_pattern']='Speed pattern';
-$ec_lang['lpn_field_speed_pattern_tip']='How this pump’s speed rises and falls through the run. Each multiplier IS the relative speed for that part of the run, and takes the place of the speed above, so a multiplier of 0 stops the pump.';
+$ec_lang['lpn_field_speed_pattern_tip']='How this pump’s speed rises and falls through the run. Each multiplier is the relative speed for that part of the run, and it replaces the Speed setting rather than scaling it, so a multiplier of 0 stops the pump.';
 
 // ---- place-name search and terrain elevations (Task 507) ---------------------------------------
 // Both features ask an outside service for something, and each asks its own permission question
@@ -3174,7 +3174,7 @@ $ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map,
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
 $ec_lang['lpn_ff_required_own']='Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='The fire flow required at this particular junction, from your fire code or your fire authority for the land use it serves. Leave it blank and the junction is tested against the number in the Fire flow analysis box.';
+$ec_lang['lpn_ff_required_node_tip']='The fire flow required at this particular junction for the land use it serves, from your fire code or your fire authority. Leave it blank and the junction is tested against the number in the Fire flow analysis box.';
 $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
@@ -3233,7 +3233,7 @@ $ec_lang['lpn_ff_summary_error']='{n} junctions could not be answered.';
 $ec_lang['lpn_ff_report_all']='Every junction tested';
 $ec_lang['lpn_ff_col_junction']='Junction';
 $ec_lang['lpn_ff_col_static']='Static pressure';
-$ec_lang['lpn_ff_col_static_tip']='The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both use this name for the reading a fire flow test starts from.';
+$ec_lang['lpn_ff_col_static_tip']='The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts.';
 $ec_lang['lpn_ff_col_available']='Available flow';
 $ec_lang['lpn_ff_col_required']='Required flow';
 $ec_lang['lpn_ff_col_residual']='Residual held';

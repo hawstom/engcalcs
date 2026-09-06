@@ -12,8 +12,8 @@
     "the letter n as an ordinary word or abbreviation to be rendered in the target language",
     "the size of rock chosen for the design (intended) vs a rock of a size that is itself 'design' grade"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED, two parts, and only the second costs a retranslation. (a) $ec_lang_syn PROPOSAL (off-limits to AI, recorded for written permission) on all four keys: a 'symbol' flag, which is exactly the tag this repo already defines for 'contains a variable symbol; keep every letter and subscript exactly as in English'. That alone fixes the letter n in 26 languages with no English edit. (b) English rewrite, if (a) is judged not enough: \"Manning's n from design rock size (Strickler method)\" and the three siblings to match -- it names the quantity, keeps the symbol beside its name, and stays a results-row label rather than a column heading so the extra word costs no width. Cost of (b): 4 keys x 26 = 104 retranslations."
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED, two parts, and only the second costs a retranslation. (a) $ec_lang_syn PROPOSAL (off-limits to AI, recorded for written permission) on all four keys: a 'symbol' flag, which is exactly the tag this repo already defines for 'contains a variable symbol; keep every letter and subscript exactly as in English'. That alone fixes the letter n in 26 languages with no English edit. (b) English rewrite, if (a) is judged not enough: \"Manning's n from design rock size (Strickler method)\" and the three siblings to match -- it names the quantity, keeps the symbol beside its name, and stays a results-row label rather than a column heading so the extra word costs no width. Cost of (b): 4 keys x 26 = 104 retranslations. | REFERRED, with its three siblings. The proposed first move is an $ec_lang_syn 'symbol' flag, which is off-limits to AI without written permission and costs zero retranslations if taken."
   },
   {
    "key": "mhp_notes_3_def",
@@ -26,7 +26,7 @@
     "assuming costs that are high, at the end of 2026"
    ],
    "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: '... often falls around 4-6% where electricity is expensive.' That fixes both readings and removes the year. REFERRED because dropping '2026' is a scope call, not a wording one: the number 4-6% depends on the price assumption, and whether the note should keep a dated anchor (and be re-dated annually in 27 languages) or state the assumption qualitatively is Tom's to decide. Cost of the rewrite: 26 retranslations."
+   "resolution": "PROPOSED English: '... often falls around 4-6% where electricity is expensive.' That fixes both readings and removes the year. REFERRED because dropping '2026' is a scope call, not a wording one: the number 4-6% depends on the price assumption, and whether the note should keep a dated anchor (and be re-dated annually in 27 languages) or state the assumption qualitatively is Tom's to decide. Cost of the rewrite: 26 retranslations. | REFERRED. Whether the note keeps a dated price anchor ('2026') and is re-dated annually in 27 languages, or states the assumption qualitatively, is scope rather than wording."
   },
   {
    "key": "lpn_wrong_tip",
@@ -38,8 +38,8 @@
     "it sends no text at all -- so the map message it just promised to send is not text?",
     "one tap [out of several needed] tells us something is wrong"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: replace 'It sends no text, no address, and nothing at all out of your drawing' with 'It sends nothing you have typed, no address, and nothing at all out of your drawing.' and open with 'One press tells us that something on this page is wrong.' The privacy claim is unchanged and becomes checkable; 'press' matches the pointer-first design and the wording every other button tip on this page uses. Cost: 26 retranslations, and this is a privacy string, so getting it right in 26 languages is the reason to pay."
+   "disposition": "english",
+   "resolution": "PROPOSED English: replace 'It sends no text, no address, and nothing at all out of your drawing' with 'It sends nothing you have typed, no address, and nothing at all out of your drawing.' and open with 'One press tells us that something on this page is wrong.' The privacy claim is unchanged and becomes checkable; 'press' matches the pointer-first design and the wording every other button tip on this page uses. Cost: 26 retranslations, and this is a privacy string, so getting it right in 26 languages is the reason to pay. | APPLIED 2026-09-06. 'One tap' -> 'One press' and 'It sends no text' -> 'It sends nothing you have typed'. The privacy claim is unchanged and is now checkable against itself."
   },
   {
    "key": "lpn_wrong_thanks",
@@ -51,8 +51,8 @@
     "we understood what you meant",
     "we obtained/acquired that"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Thank you. That reached us.' or 'Thank you. Your report arrived.' Cost: 26 retranslations for a two-word string, which is why this is ranked low rather than medium."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Thank you. That reached us.' or 'Thank you. Your report arrived.' Cost: 26 retranslations for a two-word string, which is why this is ranked low rather than medium. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_result_water_age_tip",
@@ -64,8 +64,8 @@
     "the junction itself is young, i.e. newly built",
     "someone reads the junction while young"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'a junction fed mostly by a short new main shows a low age even if a long dead end also feeds it.' 'Low age' keeps the quantity and drops the personification. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'a junction fed mostly by a short new main shows a low age even if a long dead end also feeds it.' 'Low age' keeps the quantity and drops the personification. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_find_prop_demand_desc",
@@ -77,8 +77,8 @@
     "a description of the category of demand",
     "demand, category and description as three separate properties"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Description of demand category' -- one function word breaks the stack and fixes the bracketing in every language. It is a Find property label rather than a narrow column heading, so the extra word is affordable. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Description of demand category' -- one function word breaks the stack and fixes the bracketing in every language. It is a Find property label rather than a narrow column heading, so the extra word is affordable. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_tank_curve",
@@ -90,8 +90,8 @@
     "the tank still displays/shows the curve",
     "the tank still points at it on the map"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'the tank still refers to it' -- 'refer to' is on the sanctioned list in CLAUDE.md for exactly this verb, and it cannot be read as displaying. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'the tank still refers to it' -- 'refer to' is on the sanctioned list in CLAUDE.md for exactly this verb, and it cannot be read as displaying. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_curve_missing",
@@ -103,8 +103,8 @@
     "the curve came in empty, so the curve adds no head",
     "the file came in with no curve"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'The pump came in with no curve, so it adds no head.' Naming the antecedent once removes the whole problem. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'The pump came in with no curve, so it adds no head.' Naming the antecedent once removes the whole problem. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_rules",
@@ -116,8 +116,8 @@
     "your own edits to the rules are preserved",
     "the rules you wrote earlier are kept"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'They are kept exactly as the file states them, and they are written back if you save an EPANET file.' The sibling strings lpn_inp_drop_quality, lpn_inp_drop_energy, lpn_inp_drop_report and lpn_inp_drop_quality_options all use 'The lines are kept', which is already correct -- this one key is the outlier in a parallel set, and parallel siblings are a rule in this repo. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'They are kept exactly as the file states them, and they are written back if you save an EPANET file.' The sibling strings lpn_inp_drop_quality, lpn_inp_drop_energy, lpn_inp_drop_report and lpn_inp_drop_quality_options all use 'The lines are kept', which is already correct -- this one key is the outlier in a parallel set, and parallel siblings are a rule in this repo. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_sources_mixing",
@@ -129,8 +129,8 @@
     "more of some unnamed material",
     "'Both' = the dose and the mixing model (intended) vs 'both' = the two things in the first sentence, i.e. the sources and the mixing"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.' Names the substance, names what 'both' are, and replaces the dangling 'here'. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.' Names the substance, names what 'both' are, and replaces the dangling 'here'. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording. The substance is named, 'both' is spelled out, and the dangling 'here' is gone."
   },
   {
    "key": "lpn_inp_drop_energy",
@@ -142,8 +142,8 @@
     "a menu called Calculate, which does not exist",
     "the Calculate button, which does not open a report"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost.' Same fix is needed on lpn_energy_needs_run, which has the same stale path. Cost: 26 retranslations per key; worth paying, because a wrong menu path is wrong in all 27 languages including English."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost.' Same fix is needed on lpn_energy_needs_run, which has the same stale path. Cost: 26 retranslations per key; worth paying, because a wrong menu path is wrong in all 27 languages including English. | APPLIED 2026-09-06. Path corrected to 'Water, Reports, Pump energy'. VERIFIED against the code first: buildMenuBar() builds File, Edit, Map, Water, Help and reportMenuRows() is the Reports flyout inside Water, so there was no Calculate menu to open. 26 retranslations owed."
   },
   {
    "key": "lpn_energy_needs_run",
@@ -155,8 +155,8 @@
     "a menu called Calculate",
     "the report appears somewhere after pressing the Calculate button just mentioned"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.' This also fixes the run-time path (see the lpn_time_no_period entry). Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.' This also fixes the run-time path (see the lpn_time_no_period entry). Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording, which also corrects the run-time path to 'Settings, Calculation, Time' -- verified against Looped-Network.php:795-806, where lpn_set_time_fields sits under lpn_settings_sec_calculation > lpn_time_menu. 26 retranslations owed."
   },
   {
    "key": "lpn_inp_drop_quality",
@@ -168,8 +168,8 @@
     "some control directly under the Calculation section",
     "a different setting from the one the Water quality strings name"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Choose a chemical under Settings, Calculation, Water quality' -- three levels, matching the real tree, and consistent with the sibling family. A single path spelling across the whole quality family should be settled before the sprint, not after. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Choose a chemical under Settings, Calculation, Water quality' -- three levels, matching the real tree, and consistent with the sibling family. A single path spelling across the whole quality family should be settled before the sprint, not after. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_time_no_period",
@@ -181,8 +181,8 @@
     "a Time menu on the menu bar",
     "somewhere in Settings, unspecified"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English on all three keys: 'Set a Total run time in Settings, Calculation, Time'. Comma-separated labels is the shape this repo already declares for a menu path, and one spelling in three places is what makes it findable. Cost: 3 keys x 26 = 78 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English on all three keys: 'Set a Total run time in Settings, Calculation, Time'. Comma-separated labels is the shape this repo already declares for a menu path, and one spelling in three places is what makes it findable. Cost: 3 keys x 26 = 78 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_net_emergency",
@@ -194,8 +194,8 @@
     "the page reads the file simply by looking at it, which is easy",
     "a physical way in / an entrance"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '... it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route.' Keeps the honesty, drops the two idioms. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '... it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route.' Keeps the honesty, drops the two idioms. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_notes_5_def",
@@ -206,8 +206,8 @@
     "an appositive list naming the three points (intended)",
     "no ambiguity of meaning -- this is the reception advisory, not a reading defect"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: replace the dash pair with commas around the appositive, or with parentheses. No other change. Filed low precisely because meaning does not move; apply it only in the same edit as something else, per the ratchet's own rule."
+   "disposition": "english",
+   "resolution": "PROPOSED English: replace the dash pair with commas around the appositive, or with parentheses. No other change. Filed low precisely because meaning does not move; apply it only in the same edit as something else, per the ratchet's own rule. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_gpv_curve",
@@ -219,8 +219,8 @@
     "the valve is standing/upright",
     "the valve's status is left available/unresolved"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'The valve came in with no curve, so it stays fully open until you give it one.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'The valve came in with no curve, so it stays fully open until you give it one.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_pump_curve_source",
@@ -232,8 +232,8 @@
     "the curve at the head/top of something",
     "a different quantity from 'Pump head' in the Curves library, since it is worded differently"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Pump head curve' and, for lpn_gpv_curve_source, 'Valve head loss curve' -- each then contains its own kind label verbatim, so a translator who has rendered the kind reuses those words and the two screens agree by construction. lpn_pump_effic_curve ('Efficiency curve') would become 'Pump efficiency curve' for the same reason. These are property-popup labels, not narrow column headings, so width is not the constraint. Cost: 3 keys x 26 = 78 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Pump head curve' and, for lpn_gpv_curve_source, 'Valve head loss curve' -- each then contains its own kind label verbatim, so a translator who has rendered the kind reuses those words and the two screens agree by construction. lpn_pump_effic_curve ('Efficiency curve') would become 'Pump efficiency curve' for the same reason. These are property-popup labels, not narrow column headings, so width is not the constraint. Cost: 3 keys x 26 = 78 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_curve_library_link",
@@ -245,8 +245,8 @@
     "a library named Curves, distinct from Libraries",
     "a library of curves in general, e.g. a catalogue of manufacturers' curves"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Libraries, Curves' as the link label, matching the comma-path shape the repo declares and the three sibling tips exactly. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Libraries, Curves' as the link label, matching the comma-path shape the repo declares and the three sibling tips exactly. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_field_tag",
@@ -260,7 +260,7 @@
     "a label attached to the map, i.e. this page's own Label object"
    ],
    "disposition": "refer-to-human",
-   "resolution": "PROPOSED, and it is NOT an English rewrite: 'Tag' is EPANET's own term for its own section and CLAUDE.md says to use EPANET's terminology, so an English reader with the page in front of them does not stumble. Routing per the CLAUDE.md table: this belongs in glossary.json as a concept (it recurs -- lpn_field_tag, lpn_field_tag_tip, lpn_inp_drop_tags, and the Find property) with an avoid array naming the markup and price senses, plus a gloss: pointer from this key. REFERRED because writing to $ec_lang_syn needs Tom's written permission in the conversation, and because adding a glossary term also means checking that 'lpn' is wired in prefixToTermNames() before the sprint. No retranslation cost if routed this way."
+   "resolution": "PROPOSED, and it is NOT an English rewrite: 'Tag' is EPANET's own term for its own section and CLAUDE.md says to use EPANET's terminology, so an English reader with the page in front of them does not stumble. Routing per the CLAUDE.md table: this belongs in glossary.json as a concept (it recurs -- lpn_field_tag, lpn_field_tag_tip, lpn_inp_drop_tags, and the Find property) with an avoid array naming the markup and price senses, plus a gloss: pointer from this key. REFERRED because writing to $ec_lang_syn needs Tom's written permission in the conversation, and because adding a glossary term also means checking that 'lpn' is wired in prefixToTermNames() before the sprint. No retranslation cost if routed this way. | REFERRED. The route is glossary.json plus an $ec_lang_syn avoid array, and both need Tom's written permission. The English is EPANET's own term and is correct. lpn_field_tag_tip was rewritten separately, which is an English fix and did not need the route."
   },
   {
    "key": "lpn_field_tag_tip",
@@ -272,8 +272,8 @@
     "EPANET has no tags and discards them",
     "the tag is not used by this page, and separately EPANET does not use this page"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_curve_kind_generic",
@@ -285,8 +285,8 @@
     "you have not yet stated the kind -- a validation complaint",
     "a kind whose name is deliberately withheld"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Kind not stated' -- it supplies the noun the participle must agree with, keeps it a category name rather than a complaint, and stays parallel with the four sibling options by leading with the thing rather than the negation. Cost: 26 retranslations. Note the same shape is why the repo's own rule about 'High'/'Low' in a narrow cell exists."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Kind not stated' -- it supplies the noun the participle must agree with, keeps it a category name rather than a complaint, and stays parallel with the four sibling options by leading with the thing rather than the negation. Cost: 26 retranslations. Note the same shape is why the repo's own rule about 'High'/'Low' in a narrow cell exists. | APPLIED 2026-09-06. 'Not stated' -> 'Kind not stated'. Supplies the noun the participle must agree with and cannot be read as a validation message."
   },
   {
    "key": "lpn_pump_effic_unstated",
@@ -299,8 +299,8 @@
     "the pump calls a curve named 'undefined'",
     "{percent} is a bare number needing a % sign, vs {percent} already reads '75%'"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the network efficiency of {percent}.' 'Refers to' is on the sanctioned verb list; the relative clause puts 'undefined' where it belongs. The {percent} half should be answered by an $ec_lang_syn commentary note on both keys saying the substitution carries its own sign (PROPOSAL, off-limits to AI). Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the network efficiency of {percent}.' 'Refers to' is on the sanctioned verb list; the relative clause puts 'undefined' where it belongs. The {percent} half should be answered by an $ec_lang_syn commentary note on both keys saying the substitution carries its own sign (PROPOSAL, off-limits to AI). Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_pump_effic_global",
@@ -312,8 +312,8 @@
     "an efficiency figure computed for the network as a whole",
     "the efficiency of the network as a system"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'so it runs at the efficiency set for the whole network, {percent}.' -- the exact wording two sibling strings already use, which makes the three parallel. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'so it runs at the efficiency set for the whole network, {percent}.' -- the exact wording two sibling strings already use, which makes the three parallel. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_tip_select",
@@ -325,8 +325,8 @@
     "the page returns to its starting state",
     "the page's home screen"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.' The 'returns ... comes back' pair is already in the string, so only the idiom moves. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.' The 'returns ... comes back' pair is already in the string, so only the idiom moves. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_scenario_overrides",
@@ -339,7 +339,7 @@
     "an item number or index"
    ],
    "disposition": "refer-to-human",
-   "resolution": "PROPOSED English: 'Custom values' for the shared key -- it reads correctly as a column heading AND as 'Custom values: 3' on the button, and it is already the fallback the code carries at line 31751. Spelling it 'Number of custom values' fixes the abbreviation but makes the button read 'Number of custom values: 3'. REFERRED because the Task 512 code comment records a deliberate decision that 'the count has to say what it is counting', so dropping the counting word is a reversal of a ruling rather than a wording fix, and because splitting the key in two (heading and button) is a code change outside this pass's territory. Either way the 'No.' abbreviation must go. Cost: 26 retranslations."
+   "resolution": "PROPOSED English: 'Custom values' for the shared key -- it reads correctly as a column heading AND as 'Custom values: 3' on the button, and it is already the fallback the code carries at line 31751. Spelling it 'Number of custom values' fixes the abbreviation but makes the button read 'Number of custom values: 3'. REFERRED because the Task 512 code comment records a deliberate decision that 'the count has to say what it is counting', so dropping the counting word is a reversal of a ruling rather than a wording fix, and because splitting the key in two (heading and button) is a code change outside this pass's territory. Either way the 'No.' abbreviation must go. Cost: 26 retranslations. | REFERRED. Dropping 'No. of' reverses the Task 512 decision recorded in the code comment, and the real fix may be splitting the key, which is a code change. The abbreviation defect is real either way."
   },
   {
    "key": "lpn_rule_dangling_note",
@@ -352,8 +352,8 @@
     "these rules are named after an element",
     "{ids} lists the missing elements vs {ids} lists the ignored rules"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}' -- 'refer to' is on the sanctioned list and carries only the intended direction. The {ids} ambiguity should be answered by an $ec_lang_syn commentary note saying which list it is (PROPOSAL, off-limits to AI). Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}' -- 'refer to' is on the sanctioned list and carries only the intended direction. The {ids} ambiguity should be answered by an $ec_lang_syn commentary note saying which list it is (PROPOSAL, off-limits to AI). Cost: 26 retranslations. | APPLIED 2026-09-06. 'name' -> 'refer to', which is on Tom's own sanctioned list for exactly this verb."
   },
   {
    "key": "lpn_time_run_note",
@@ -365,8 +365,8 @@
     "the project has some other setting that prevents recalculation",
     "'first reporting time' = the earliest time step the report covers (intended) vs the first time you asked for a report vs a clock reading"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'You are seeing the network at the first reporting step. The Recalculate automatically setting is off, so the results for the later steps are not kept up to date while you work. Press the Calculate button to bring them up to date.' Names the control in the declared shape and replaces 'time' with 'step', which is what the clock actually indexes. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'You are seeing the network at the first reporting step. The Recalculate automatically setting is off, so the results for the later steps are not kept up to date while you work. Press the Calculate button to bring them up to date.' Names the control in the declared shape and replaces 'time' with 'step', which is what the clock actually indexes. Cost: 26 retranslations. | APPLIED IN PART 2026-09-06. The control is now named in the declared shape ('The Recalculate automatically setting is off'). The proposed 'reporting step' for 'reporting time' was NOT taken: EPANET reports at reporting TIMES and the transport says so throughout this page, so the substitution would have made one string disagree with its neighbours."
   },
   {
    "key": "lpn_setbox_divider",
@@ -378,8 +378,8 @@
     "the width of a numeric index",
     "the width setting whose index is 'Settings'"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Width of the Settings section list' -- it is an aria-label, not a visible label, so length costs nothing and clarity is the entire point. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Width of the Settings section list' -- it is an aria-label, not a visible label, so length costs nothing and clarity is the entire point. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_source_type_tip",
@@ -391,8 +391,8 @@
     "a strength lower than some threshold",
     "the strength listed further down in this tip"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: replace both instances of 'the strength below' with 'the Source quality value' (or 'the strength in the Source quality box'), which is the declared control-naming shape and survives any layout. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: replace both instances of 'the strength below' with 'the Source quality value' (or 'the strength in the Source quality box'), which is the declared control-naming shape and survives any layout. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_mixing_2comp",
@@ -404,8 +404,8 @@
     "two kinds of compartment mixing",
     "mixing of two compartments"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Two-compartment mixing' on lpn_mixing_2comp, and the same hyphen in the two tips that contain the phrase. EPANET's own interface writes '2COMP'/'Two-Compartment'; this keeps EPANET's term and adds only the hyphen. Cost: 3 keys x 26 = 78 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Two-compartment mixing' on lpn_mixing_2comp, and the same hyphen in the two tips that contain the phrase. EPANET's own interface writes '2COMP'/'Two-Compartment'; this keeps EPANET's term and adds only the hyphen. Cost: 3 keys x 26 = 78 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_reaction_bulk_tip",
@@ -417,8 +417,8 @@
     "a positive coefficient cultivates/grows the chemical",
     "'the file' = the imported .inp file (intended) vs the project file vs some settings file"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1/day.' Same second fix on lpn_reaction_wall_tip. Cost: 2 keys x 26 = 52 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'A negative number decays the chemical and a positive one increases it. The reaction is first order unless an imported EPANET file states another order, so the coefficient is a rate in 1/day.' Same second fix on lpn_reaction_wall_tip. Cost: 2 keys x 26 = 52 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_energy_efficiency_tip",
@@ -430,8 +430,8 @@
     "the wire, applied to water efficiency",
     "the efficiency of a wire with respect to water"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own.' Hyphens only; the term is unchanged. A glossary.json entry for wire-to-water efficiency would also be well earned, since it recurs in the energy family. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own.' Hyphens only; the term is unchanged. A glossary.json entry for wire-to-water efficiency would also be well earned, since it recurs in the energy family. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_energy_price_pattern_tip",
@@ -443,8 +443,8 @@
     "a rate that is off the peak",
     "a peak rate that is switched off"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'off-peak rate'. Cost: 26 retranslations, which is why it is low: an experienced energy translator will get there anyway."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'off-peak rate'. Cost: 26 retranslations, which is why it is low: an experienced energy translator will get there anyway. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_energy_demand_charge_tip",
@@ -456,8 +456,8 @@
     "for each pump, the highest power it drew, charged per pump",
     "the highest power any single pump drew"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.' 'Total ... together' and 'for the whole network' close both halves. Cost: 26 retranslations, and worth it: a wrong reading produces a wrong bill."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.' 'Total ... together' and 'for the whole network' close both halves. Cost: 26 retranslations, and worth it: a wrong reading produces a wrong bill. | APPLIED 2026-09-06, in the proposed wording. VERIFIED against js/looped-network.js:31554: 'the largest total power every pump drew at one moment', added once. The collective reading is the one the code computes."
   },
   {
    "key": "lpn_energy_total_demand_charge",
@@ -469,8 +469,8 @@
     "the money charged for the peak over this run (lpn_energy_total_demand_charge's intent)",
     "one quantity appearing in two places"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: keep 'Peak demand charge' on the Settings input (it is the tariff's own name) and change the report total to 'Cost of peak demand' -- which also makes it parallel with the two report rows beside it, 'Cost of energy' and 'Total cost'. The parallel is the argument: the totals block already names its money rows 'Cost of X'. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: keep 'Peak demand charge' on the Settings input (it is the tariff's own name) and change the report total to 'Cost of peak demand' -- which also makes it parallel with the two report rows beside it, 'Cost of energy' and 'Total cost'. The parallel is the argument: the totals block already names its money rows 'Cost of X'. Cost: 26 retranslations. | APPLIED 2026-09-06. The report total is now 'Cost of peak demand', parallel with 'Cost of energy' and 'Total cost' beside it; the Settings input keeps 'Peak demand charge', which is the tariff's own name."
   },
   {
    "key": "lpn_energy_col_running",
@@ -482,8 +482,8 @@
     "whether the pump is running now -- a status",
     "how long the pump ran -- a duration"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '% of run' or, deferring to EPANET, 'Utilized'. '% of run' is shorter, needs no gender agreement and carries the unit; a narrow column heading is exactly where the repo's own rule says abbreviation is fine. lpn_energy_menu_tip's 'How long each pump ran' should become 'What share of the run each pump was on' in the same edit, or the tip re-creates the defect. Cost: 2 keys x 26 = 52 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '% of run' or, deferring to EPANET, 'Utilized'. '% of run' is shorter, needs no gender agreement and carries the unit; a narrow column heading is exactly where the repo's own rule says abbreviation is fine. lpn_energy_menu_tip's 'How long each pump ran' should become 'What share of the run each pump was on' in the same edit, or the tip re-creates the defect. Cost: 2 keys x 26 = 52 retranslations. | APPLIED 2026-09-06. '% of run'. VERIFIED against js/looped-network.js:31537, where the cell is energyPercent(row.usage). lpn_energy_menu_tip was changed in the same edit to 'What share of the run each pump was on', or the tip would have re-created the defect. 2 x 26 retranslations owed."
   },
   {
    "key": "lpn_energy_over",
@@ -495,8 +495,8 @@
     "for the extended period simulation identified by the time {time}",
     "for extended period simulation as of {time}"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Over an extended period simulation lasting {time}'. The code comment explains why the string must not append a unit word ('at 1:30 the trailing word would be wrong'), and 'lasting' respects that -- it names the kind of quantity without naming a unit. Cost: 26 retranslations."
+   "disposition": "dismissed",
+   "resolution": "PROPOSED English: 'Over an extended period simulation lasting {time}'. The code comment explains why the string must not append a unit word ('at 1:30 the trailing word would be wrong'), and 'lasting' respects that -- it names the kind of quantity without naming a unit. Cost: 26 retranslations. | DISMISSED 2026-09-06, and not on the merits of the reading. 'For extended period simulation of {time}' is TOM'S OWN WORDING, written by him on 2026-09-04 after he rejected a two-line repair and put the duration back inside the sentence himself (dev/eps-terminology-audit.md §4). AI does not rewrite a string he wrote. If the attachment question is real it goes back to him as a question, not as an edit."
   },
   {
    "key": "lpn_scncmp_at",
@@ -509,7 +509,7 @@
     "a value belonging to an identifier"
    ],
    "disposition": "refer-to-human",
-   "resolution": "PROPOSED, and it is not an English rewrite: the English is correct and idiomatic for its own reader; only the translator is stuck, which routes it to $ec_lang_syn by the CLAUDE.md table. PROPOSED entry (off-limits to AI, awaiting written permission): a commentary note saying {value} is a pressure or velocity with its unit already attached and {id} is the id of the junction or pipe where that extreme occurs. No retranslation cost."
+   "resolution": "PROPOSED, and it is not an English rewrite: the English is correct and idiomatic for its own reader; only the translator is stuck, which routes it to $ec_lang_syn by the CLAUDE.md table. PROPOSED entry (off-limits to AI, awaiting written permission): a commentary note saying {value} is a pressure or velocity with its unit already attached and {id} is the id of the junction or pipe where that extreme occurs. No retranslation cost. | REFERRED. The English is correct; only the translator is stuck, which routes it to $ec_lang_syn and therefore to written permission."
   },
   {
    "key": "lpn_scncmp_current",
@@ -521,8 +521,8 @@
     "open this one now -- an instruction or a link",
     "this scenario is still open, i.e. unfinished"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '(you are working in this one)' or, shorter, '(currently open)'. 'Currently open' cannot be read as an imperative because the adverb precedes the participle; the longer form removes even the unfinished reading. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '(you are working in this one)' or, shorter, '(currently open)'. 'Currently open' cannot be read as an imperative because the adverb precedes the participle; the longer form removes even the unfinished reading. Cost: 26 retranslations. | APPLIED 2026-09-06. '(currently open)' -- the adverb before the participle blocks the imperative reading."
   },
   {
    "key": "lpn_energy_curve_note",
@@ -534,8 +534,8 @@
     "the ids are the networks",
     "the ids are the curves with no points"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'These pumps ran at the efficiency set for the whole network, because the efficiency curve they call has no points: {ids}.' Better still, put the list first: 'These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.' Two sentences remove the attachment question entirely. lpn_rule_dangling_note and lpn_rule_unreadable_note have the same trailing-colon shape but a nearer correct antecedent, so they are less exposed. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'These pumps ran at the efficiency set for the whole network, because the efficiency curve they call has no points: {ids}.' Better still, put the list first: 'These pumps call an efficiency curve with no points: {ids}. They ran at the efficiency set for the whole network.' Two sentences remove the attachment question entirely. lpn_rule_dangling_note and lpn_rule_unreadable_note have the same trailing-colon shape but a nearer correct antecedent, so they are less exposed. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_library_curves_note",
@@ -547,8 +547,8 @@
     "several curves can use the same curve",
     "several projects can use the same curve"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Several elements can use the same curve, and editing it here changes all of them.' Supplying the noun costs one word and removes an agreement decision from 26 translators. Note this string is Tom's own wording elsewhere in the sentence ('indicates'), which is deliberately left untouched. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Several elements can use the same curve, and editing it here changes all of them.' Supplying the noun costs one word and removes an agreement decision from 26 translators. Note this string is Tom's own wording elsewhere in the sentence ('indicates'), which is deliberately left untouched. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_library_curve_kind",
@@ -561,7 +561,7 @@
     "one is our word, the other EPANET's"
    ],
    "disposition": "refer-to-human",
-   "resolution": "REFERRED because resolving it needs a look at the two call sites (which this pass did not open) to confirm they really are the same axis, and because if they are, the right answer may be deleting one key rather than rewording it -- a code change outside this pass's territory. If they are the same axis, PROPOSED: use 'Curve type' in both places, since 'type' is the noun EPANET's own file format uses. If they are genuinely different, each needs a word the other does not have."
+   "resolution": "REFERRED because resolving it needs a look at the two call sites (which this pass did not open) to confirm they really are the same axis, and because if they are, the right answer may be deleting one key rather than rewording it -- a code change outside this pass's territory. If they are the same axis, PROPOSED: use 'Curve type' in both places, since 'type' is the noun EPANET's own file format uses. If they are genuinely different, each needs a word the other does not have. | REFERRED. Resolving it needs both call sites opened to confirm they are one axis; if they are, the answer is deleting a key rather than rewording one."
   },
   {
    "key": "lpn_library_curve_values_tip",
@@ -573,8 +573,8 @@
     "lines out of an EPANET file also perform pasting",
     "the curve name and everything else in the file comes with it"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'You can also paste lines copied straight out of an EPANET file, including the curve name.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'You can also paste lines copied straight out of an EPANET file, including the curve name.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_library_curve_in_use",
@@ -586,8 +586,8 @@
     "N element(s) with a literal bracket rendered into a language that has no such convention",
     "'then delete it' = delete this curve (intended) vs delete the other curve you just pointed them at"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.' A plain plural with a numeral is what every language can inflect naturally, and it is what the rest of this file does; the (s) buys nothing even in English when {count} is 1 and the sentence is about a refusal. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.' A plain plural with a numeral is what every language can inflect naturally, and it is what the rest of this file does; the (s) buys nothing even in English when {count} is 1 and the sentence is about a refusal. Cost: 26 retranslations. | APPLIED 2026-09-06. The (s) hack is gone; a plain plural with a numeral is what every target language can inflect."
   },
   {
    "key": "lpn_library_curve_used_by",
@@ -599,8 +599,8 @@
     "the people or projects that use this",
     "an instruction: to be used by ..."
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Used by these elements' or 'Elements using this curve'. The second is better: a noun-headed phrase needs no agreement decision at all, and its sibling lpn_library_curve_unused ('Nothing uses this curve.') is already a full clause, so the pair becomes consistent. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Used by these elements' or 'Elements using this curve'. The second is better: a noun-headed phrase needs no agreement decision at all, and its sibling lpn_library_curve_unused ('Nothing uses this curve.') is already a full clause, so the pair becomes consistent. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_library_curve_copy",
@@ -612,8 +612,8 @@
     "a manual-copy prompt over a pre-selected block (lpn_library_curve_copy_manual's intent)",
     "two buttons that do different things"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: no English change to the values, but the pair needs $ec_lang_syn commentary saying which is the button and which the manual fallback (PROPOSAL, off-limits to AI). Ranked low because the two strings are both correct in isolation and the risk is only that a translator flattens them. No retranslation cost if routed this way."
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED: no English change to the values, but the pair needs $ec_lang_syn commentary saying which is the button and which the manual fallback (PROPOSAL, off-limits to AI). Ranked low because the two strings are both correct in isolation and the risk is only that a translator flattens them. No retranslation cost if routed this way. | REFERRED. $ec_lang_syn commentary only; no English change is proposed."
   },
   {
    "key": "lpn_library_rule_ok",
@@ -625,8 +625,8 @@
     "acknowledged / understood, as a person replies",
     "the rule was understood by the reader"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '✓ This rule was read' / '⚠ This rule could not be read', which supplies the subject, removes the agreement decision, and matches lpn_rule_unreadable_note's own wording ('These rules could not be read'). The glyph stays leading, per the verdict-string convention. Cost: 2 keys x 26 = 52 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '✓ This rule was read' / '⚠ This rule could not be read', which supplies the subject, removes the agreement decision, and matches lpn_rule_unreadable_note's own wording ('These rules could not be read'). The glyph stays leading, per the verdict-string convention. Cost: 2 keys x 26 = 52 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_field_speed_pattern_tip",
@@ -638,8 +638,8 @@
     "the multiplier is applied to the relative speed",
     "'the speed above' = the Speed field in this popup (intended) vs a speed mentioned earlier in the tip"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'How this pump's speed rises and falls through the run. Each multiplier is the relative speed for that part of the run, and it replaces the Speed setting rather than scaling it, so a multiplier of 0 stops the pump.' The emphasis moves from typography into the words ('replaces ... rather than scaling'), which survives translation, and the field is named in the declared shape. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'How this pump's speed rises and falls through the run. Each multiplier is the relative speed for that part of the run, and it replaces the Speed setting rather than scaling it, so a multiplier of 0 stops the pump.' The emphasis moves from typography into the words ('replaces ... rather than scaling'), which survives translation, and the field is named in the declared shape. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_ff_col_static_tip",
@@ -651,8 +651,8 @@
     "'this name' = some name used earlier in the tip, which there is none",
     "'this name' = the name of the reading in general"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '... both call this reading the static pressure, and it is where a fire flow test starts.' Stating the term inside the tip makes the claim checkable and gives the translator the anchor to match their heading against. Note this is also the string that carries the term of art 'static pressure', which plain_english_swap_check.php exists to protect -- it must be stated, not paraphrased. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '... both call this reading the static pressure, and it is where a fire flow test starts.' Stating the term inside the tip makes the claim checkable and gives the translator the anchor to match their heading against. Note this is also the string that carries the term of art 'static pressure', which plain_english_swap_check.php exists to protect -- it must be stated, not paraphrased. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_ff_required_node_tip",
@@ -664,8 +664,8 @@
     "the fire authority responsible for that land use",
     "the fire code that covers that land use"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'The fire flow required at this particular junction for the land use it serves, from your fire code or your fire authority.' Moving the prepositional phrase next to what it modifies fixes the attachment with no new words. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'The fire flow required at this particular junction for the land use it serves, from your fire code or your fire authority.' Moving the prepositional phrase next to what it modifies fixes the attachment with no new words. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_library_curves_tip",
@@ -677,8 +677,8 @@
     "the head a pump produces/manufactures",
     "the valve item is not per-flow, unlike the two before it"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '... how much head a pump adds at each flow, how efficient it is at that flow, or how much head a valve loses at each flow.' One verb across the family and a complete parallel. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '... how much head a pump adds at each flow, how efficient it is at that flow, or how much head a valve loses at each flow.' One verb across the family and a complete parallel. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_library_rules_tip",
@@ -690,8 +690,8 @@
     "when one of those things indicates/announces something",
     "when a level or a time gives permission"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '... when a water level, a pressure, a flow or a time reaches a value you set.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: '... when a water level, a pressure, a flow or a time reaches a value you set.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_quality_chemical_name_tip",
@@ -703,8 +703,8 @@
     "type a chemical, then units, e.g. 'Chlorine, mg/L'",
     "the example is missing punctuation and should be repaired"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'for example, write Chlorine mg/L as one entry.' -- it names the shape rather than leaving the reader to infer it from an unpunctuated example, and it stops a translator repairing the punctuation. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'for example, write Chlorine mg/L as one entry.' -- it names the shape rather than leaving the reader to infer it from an unpunctuated example, and it stops a translator repairing the punctuation. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_time_no_engine",
@@ -716,8 +716,8 @@
     "as soon as you connect to the internet, fetch the solver",
     "connect at some earlier time"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.' Cost: 26 retranslations. | APPLIED 2026-09-06: \"once\" -> \"one time\"."
   },
   {
    "key": "lpn_source_type_flowpaced",
@@ -729,8 +729,8 @@
     "a flow, and a paced booster",
     "a booster for paced flow"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Flow-paced booster'. The EPANET term is unchanged; only the hyphen is added. Note lpn_source_type_tip contains the same phrase and would move with it. Cost: 2 keys x 26 = 52 retranslations, which is why it is low: the four source types are a set a chemistry translator is likely to know."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Flow-paced booster'. The EPANET term is unchanged; only the hyphen is added. Note lpn_source_type_tip contains the same phrase and would move with it. Cost: 2 keys x 26 = 52 retranslations, which is why it is low: the four source types are a set a chemistry translator is likely to know. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_curve_none",
@@ -742,8 +742,8 @@
     "there is no curve -- an assertion",
     "the curve is absent/missing"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'No curve selected' -- unambiguously a state, and it matches lpn_pump_effic_global's own phrase 'has no efficiency curve selected'. Ranked low because a chooser context resolves it for most translators. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'No curve selected' -- unambiguously a state, and it matches lpn_pump_effic_global's own phrase 'has no efficiency curve selected'. Ranked low because a chooser context resolves it for most translators. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_quality_options",
@@ -755,8 +755,8 @@
     "quality as the ordinary noun, as used elsewhere in the same sentence",
     "the three named settings map one-to-one onto the three analyses listed after them, which they do not"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: name each one in the declared shape -- 'the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance' -- and split the last sentence so the three settings and the three analyses are not read as a mapping. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: name each one in the declared shape -- 'the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance' -- and split the last sentence so the three settings and the three analyses are not read as a mapping. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_net_options",
@@ -768,8 +768,8 @@
     "the settings are in physical locations the page cannot name",
     "the page cannot find the places"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_inp_drop_patterns",
@@ -781,8 +781,8 @@
     "the file did not contain demand patterns",
     "the patterns were excluded by the person who made the file"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_energy_menu_tip",
@@ -794,8 +794,8 @@
     "how long, what power, and -- over the last run -- what it cost",
     "'how long each pump ran' = a duration in hours, which is not what is shown"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'For the last extended period simulation: what share of the run each pump was on, what power it drew and what it cost.' Fronting the scope closes the attachment question and the first item now matches the column. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'For the last extended period simulation: what share of the run each pump was on, what power it drew and what it cost.' Fronting the scope closes the attachment question and the first item now matches the column. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_reaction_tank_short",
@@ -807,8 +807,8 @@
     "a reaction in general, or a total of the two above",
     "a third kind of reaction"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Tank reaction' -- parallel with its two siblings, still short, and correct on the tank popup where it renders. Ranked low because the popup supplies the context in practice. Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Tank reaction' -- parallel with its two siblings, still short, and correct on the tank popup where it renders. Ranked low because the popup supplies the context in practice. Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_quality_initial_tip",
@@ -820,8 +820,8 @@
     "leave it empty and no initial quality is set, which may not be the same as zero",
     "leave it empty for no value"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Leave it empty and the node starts with none of the chemical.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'Leave it empty and the node starts with none of the chemical.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   },
   {
    "key": "lpn_energy_currency_tip",
@@ -833,8 +833,8 @@
     "the currency you work in",
     "the currency you specify elsewhere"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'so write the prices in the currency you have written here.' Cost: 26 retranslations."
+   "disposition": "english",
+   "resolution": "PROPOSED English: 'so write the prices in the currency you have written here.' Cost: 26 retranslations. | APPLIED 2026-09-06, in the proposed wording."
   }
  ]
 }
