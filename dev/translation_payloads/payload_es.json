@@ -722,7 +722,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. That reached us.",
-        "lpn_find_prop_demand_desc": "Description of demand category",
+        "lpn_find_prop_demand_desc": "Description of this demand category",
         "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
         "lpn_inp_drop_sources_mixing": "This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.",
         "lpn_inp_drop_net_options": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
@@ -735,7 +735,7 @@
         "lpn_pump_effic_curve": "Pump efficiency curve",
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_curve_none": "No curve selected",
-        "lpn_curve_library_link": "Libraries, Curves",
+        "lpn_curve_library_link": "Curves",
         "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
@@ -803,7 +803,7 @@
         "lpn_energy_price_pattern": "Price pattern",
         "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.",
         "lpn_energy_demand_charge": "Peak demand charge",
-        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.",
+        "lpn_energy_demand_charge_tip": "What the utility charges per kW for the peak load demanded by the pumps in the system.",
         "lpn_energy_currency": "Currency",
         "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.",
         "lpn_energy_kwh": "kWh",
@@ -869,7 +869,7 @@
         "lpn_wrong_btn": "Something wrong here?",
         "lpn_wrong_tip": "One press tells us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.",
         "lpn_wrong_thanks": "Thank you. That reached us.",
-        "lpn_find_prop_demand_desc": "Description of demand category",
+        "lpn_find_prop_demand_desc": "Description of this demand category",
         "lpn_new_units_tip": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
         "lpn_inp_drop_sources_mixing": "This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.",
         "lpn_inp_drop_net_options": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
@@ -882,7 +882,7 @@
         "lpn_pump_effic_curve": "Pump efficiency curve",
         "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_curve_none": "No curve selected",
-        "lpn_curve_library_link": "Libraries, Curves",
+        "lpn_curve_library_link": "Curves",
         "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
@@ -950,7 +950,7 @@
         "lpn_energy_price_pattern": "Price pattern",
         "lpn_energy_price_pattern_tip": "A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.",
         "lpn_energy_demand_charge": "Peak demand charge",
-        "lpn_energy_demand_charge_tip": "What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.",
+        "lpn_energy_demand_charge_tip": "What the utility charges per kW for the peak load demanded by the pumps in the system.",
         "lpn_energy_currency": "Currency",
         "lpn_energy_currency_tip": "Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.",
         "lpn_energy_kwh": "kWh",
@@ -3332,5 +3332,7 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_field_tag": "User defined field, Asset tag, Grouping field"
+    }
 }

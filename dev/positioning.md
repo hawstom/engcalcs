@@ -53,6 +53,19 @@ Consequences, so the rule is operational rather than a sentiment:
     everywhere. LibreWaterNet's own lead is still the invitation, not a comparison. And EPANET is
     not a competitor in the sense this rule was written about: it is public-domain federal software
     we vendor and depend on, which is why the exception is arguable at all.
+  - **AND THE LINK IS A PAIR OF WORDMARKS, UPPER LEFT, ON BOTH SITES** (Tom, 2026-09-06: *"At the
+    upper left of each site we have the domain name. Let's put a link to the other one next to it.
+    For example LibreWaterNet Not EPANET and Not EPANET LibreWaterNet"*). Built the same day.
+    **It is the strictest reading of what the rule above forbids** -- a menu item naming EPANET, in
+    the one place every reader looks first, on the landing page whose lead is supposed to be the
+    invitation. It is his instruction and it stands; it is recorded here at that strength so nobody
+    later reads §1 as a contradiction and quietly takes it out again. The name is not a headline and
+    it is not the tagline: it is the second of two doors, set quieter than our own name, and it
+    carries the word *Not*.
+    **NOT PUBLISHED UNTIL `not-epanet.org` RESOLVES.** Task 591's rule holds -- nothing is deployed
+    and no domain is pointed anywhere without Tom saying so -- and a landing page linking to a dead
+    host is worse than one that does not link at all. The markup is committed in
+    `~/webdev/librewaternet.org/index.html` and is waiting on the domain, not on a decision.
 - **A comparison belongs only on a page where it can be substantiated**, which Task 296 already
   anticipated and nobody has written. If that page is ever wanted, it is a deliberate decision, not
   a place to spill this file into.

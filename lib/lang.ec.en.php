@@ -422,7 +422,7 @@ $ec_lang_syn['mtc_sgrock']='| gloss: specific gravity';
 $ec_lang['mtc_d50_in']='Design rock size, D<sub>50</sub>';
 $ec_lang_syn['mtc_d50_in']='';
 $ec_lang['mtc_n_strickler']='n from design rock size (Strickler method)';
-$ec_lang_syn['mtc_n_strickler']='';
+$ec_lang_syn['mtc_n_strickler']='Manning\'s n from the design rock size, by the Strickler method | symbol; the bare lower-case n is Manning\'s roughness coefficient, not a word';
 $ec_lang['mtc_n_blodgett']='n from design rock size (Blodgett method)';
 $ec_lang_syn['mtc_n_blodgett']='';
 $ec_lang['mtc_n_bathurst']='n from design rock size (Bathurst method)';
@@ -610,7 +610,7 @@ $ec_lang['mhp_notes_2_def']='Check that velocity is reasonable for the available
 $ec_lang_syn['mhp_notes_2_def']='';
 $ec_lang['mhp_notes_3_term']='Head Loss Target';
 $ec_lang_syn['mhp_notes_3_term']='| gloss: head loss';
-$ec_lang['mhp_notes_3_def']='Penstock (supply pipe) losses below 10% of gross head are generally economical. The optimal trade-off between pipe cost and lost power often falls around 4–6% assuming 2026 high-end electricity costs.';
+$ec_lang['mhp_notes_3_def']='Penstock (supply pipe) losses below 10% of gross head are generally economical. The optimal trade-off between pipe cost and lost power often falls around 4–6% where the price of electricity is at the high end.';
 $ec_lang_syn['mhp_notes_3_def']='';
 $ec_lang['mhp_notes_6_term']='Efficiency';
 $ec_lang_syn['mhp_notes_6_term']='';
@@ -1632,7 +1632,7 @@ $ec_lang['lpn_find_no_value']='Type what to look for.';
 // said as a CONDITION on one property, so the report is the Find panel with a different condition
 // rather than a second tool. Each op completes the sentence "Junction.Connection ___".
 $ec_lang['lpn_find_prop_connection']='Connectivity';
-$ec_lang['lpn_find_prop_demand_desc']='Description of demand category';
+$ec_lang['lpn_find_prop_demand_desc']='Description of this demand category';
 // **ALL FOUR ARE TOM'S OWN WORDS, 2026-08-26**, and so is the ORDER. His frame: *"I see two
 // points, sources and this node. And I see either no connection (missing link) or no open
 // connection."* Two points x two kinds of break, plus his original local question, is this menu.
@@ -2217,6 +2217,13 @@ $ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says 
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
 $ec_lang['lpn_field_tag']='Tag';
+// Tom, 2026-09-06, in dev/new-english-keys.md, answering Wave 0's finding that a bare 'Tag'
+// reads as markup or as a price tag in most languages: Add _syn 'Tag or user defined field
+// possibly for grouping assets possibly in pressure zones'. His sentence is the commentary,
+// verbatim and right of the pipe; the substitutable half is left of it, because the generator
+// strips commentary by POSITION and a whole sentence on the left ships to 26 agents as a
+// synonym list.
+$ec_lang_syn['lpn_field_tag']='User defined field, Asset tag, Grouping field | EPANET\'s own [TAGS] value: one unspaced token of the user\'s own meaning, often a pressure zone or a work order. Not a markup tag, not a price tag, and not this page\'s Label object.';
 $ec_lang['lpn_field_tag_tip']='A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.';
 $ec_lang['lpn_pump_effic_curve']='Pump efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
@@ -2227,7 +2234,7 @@ $ec_lang['lpn_curve_none']='No curve selected';
 // curve...' button. And it shouldn't unless that's a link to the Curves library."*). It offered
 // one, and it made curve DATA from inside a pump's properties. This is the link that replaced it,
 // and it opens the box rather than describing where it is.
-$ec_lang['lpn_curve_library_link']='Libraries, Curves';
+$ec_lang['lpn_curve_library_link']='Curves';
 $ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An asset states which curve it uses.';
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
@@ -2873,7 +2880,7 @@ $ec_lang['lpn_energy_pump_price_tip']='What one kilowatt hour costs at this pump
 $ec_lang['lpn_energy_price_pattern']='Price pattern';
 $ec_lang['lpn_energy_price_pattern_tip']='A pattern that multiplies the price at each pattern step, which is how an off-peak rate is specified. Leave it empty for one price throughout the run.';
 $ec_lang['lpn_energy_demand_charge']='Peak demand charge';
-$ec_lang['lpn_energy_demand_charge_tip']='What the utility bills for each kilowatt of the highest total power all the pumps together drew at any one moment. It is charged on that one moment, not on the energy used, so it is added once for the whole network and never per pump.';
+$ec_lang['lpn_energy_demand_charge_tip']='What the utility charges per kW for the peak load demanded by the pumps in the system.';
 $ec_lang['lpn_energy_currency']='Currency';
 $ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside every money figure. It is a label. Prices and costs are never converted, so write the prices in the currency you have written here.';
 $ec_lang['lpn_energy_kwh']='kWh';

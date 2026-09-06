@@ -121,7 +121,16 @@ function ecCheckTableClaims(string $md): array
             }
         }
         if (stripos($cell, 'selftest') !== false) {
+            /* **A ROW THAT NAMES ITS SELFTEST OUTRIGHT NEEDS NOTHING DEDUCED.** The `x_check.php` +
+             * selftest idiom is a shorthand, and the error below tells a writer whose script does
+             * not fit it to name the file instead -- so the file being named has to satisfy this,
+             * or the check asks for a fix it then rejects. `harvest_english_rulings.php` is the
+             * first row to take that advice: it is a TOOL with a --check mode, not an `x_check.php`,
+             * and its guard is `harvest_rulings_selftest.php`. */
+            $namesOne = false;
+            foreach ($named as $file) { if (substr($file, -13) === '_selftest.php') { $namesOne = true; } }
             foreach ($named as $file) {
+                if ($namesOne && substr($file, -10) !== '_check.php') { continue; }
                 if (substr($file, -10) === '_check.php') {
                     $derived[] = substr($file, 0, -10) . '_selftest.php';
                     $scripts[] = substr($file, 0, -10) . '_selftest.php';

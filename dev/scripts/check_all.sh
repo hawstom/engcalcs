@@ -303,6 +303,13 @@ run_check "stale claim selftest"         blocking php dev/scripts/stale_claim_se
 run_check "features list fresh"          blocking php dev/scripts/generate_features.php --check
 run_check "new english keys listed"     blocking php dev/scripts/new_english_keys.php --check
 
+# Tom, 2026-09-06: *"dev/new-english-keys.md: I edited it. I already ruled on many of these. You are
+# losing my rulings."* Third time. The --write refusal above already stops a regeneration from
+# DESTROYING his marks; this stops a mark from living only in a working-tree markdown that nothing
+# reads, which loses it in the only sense he cares about -- he is asked the same question again.
+run_check "english rulings harvested"   blocking php dev/scripts/harvest_english_rulings.php --check
+run_check "harvest selftest"            blocking php dev/scripts/harvest_rulings_selftest.php
+
 # --- lpn solver and editor --------------------------------------------------------------------
 # Count derived, not typed: the label said "(12)" while 15 scripts were running, because
 # run_harnesses.sh globs and nothing tied the number to the glob. A stale count in a checklist is

@@ -199,7 +199,16 @@ function ecRulingLine(string $key, string $value): string
     if (!isset($rulings[$key]) || !is_array($rulings[$key])) { return ''; }
     $r = $rulings[$key];
     if (!isset($r['on']) || $r['on'] !== $value) { return ''; }
-    return "  _Ruled OK " . (isset($r['ruled']) ? $r['ruled'] : '') . "._\n";
+    /* **HIS OWN WORDS COME BACK, NOT A BOOLEAN.** `harvest_english_rulings.php` stores the mark
+     * verbatim, because "OK." and "It's fine as is. Add a _syn per 1." are both readings and only
+     * one of them is finished. Printing it back is also the receipt: he can see on the page that
+     * what he wrote was kept, which is the whole of the complaint that produced the harvester. */
+    $date = isset($r['ruled']) ? $r['ruled'] : '';
+    $answer = isset($r['answer']) ? trim((string) $r['answer']) : '';
+    if ($answer !== '' && !preg_match('/^(ok|ok\.|okay|okay\.|edited|edited\.|fine|fine\.)$/i', $answer)) {
+        return "  _Ruled " . $date . ": " . str_replace("\n", ' ', $answer) . "_\n";
+    }
+    return "  _Ruled OK " . $date . "._\n";
 }
 
 // **LEAD WITH THE NUMBER THAT NEEDS A HUMAN, NOT THE ONE THAT NEEDS A SPRINT.** These two counts

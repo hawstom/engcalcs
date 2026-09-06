@@ -502,6 +502,29 @@ the block.
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
+- 75|594| **Entry tables that behave like a spreadsheet: select, copy and paste a block.**
+  Tom, 2026-09-06: *"Add a roadmap task to make our entry tables more spreadsheet-like. Selection of
+  multiple cells, copying and pasting multiple cells."*
+  - **THE PASTE HALF IS BUILT, ONCE, AND ONLY IN THE CURVES GRID** (Task 586). `libPasteCells()`,
+    `libDropNameColumn()` and `libMergePaste()` take a tab-separated block, land it at the cell it
+    was pasted into, fill down and across and grow the grid; a line with no tab is split on
+    whitespace so an `[CURVES]` block out of an e-mail pastes too. They are pure and
+    `dev/lpn-spike/curve-library-harness.js` asserts them against real clipboard text. **So this
+    task is mostly about the two halves that do NOT exist -- a cell SELECTION, and COPY OUT -- and
+    about the tables that got neither.**
+  - **The tables that want it are the four row-table calculators** (`Branched-Network`,
+    `Irrigation-Pressure`, `Manning-Irregular`, `Weir-Flow-Irregular`), where a user types a
+    cross-section or a lateral schedule that already exists in a spreadsheet, plus the `lpn_`
+    Patterns and Rules sections. Those calculators build rows through `initRows()`/`addRow()`/`cell()`
+    and share no grid component with the Curves editor, so the first question is whether the
+    selection model is written once and reused or copied twice.
+  - **The clerk's seat owns this and has not been asked.** One extra gesture times four hundred rows
+    is the arithmetic the `data-entry-clerk` exists to do, and a selection model chosen without it
+    is the shape of decision that seat was hired to catch. Ask before designing, and put the answer
+    in its hopper.
+  - Not to be confused with Task 266, which selects ELEMENTS ON THE MAP. Same word, different
+    object, and neither is the foundation for the other.
+
 - 25|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
   where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet

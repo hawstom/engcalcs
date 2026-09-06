@@ -8460,7 +8460,7 @@ var EngCalcs = EngCalcs || {};
 		var BAND_NODE = [
 			['elev', 'lpn_field_elev', 'Elevation'],
 			['demand', 'lpn_field_base_demand', 'Base demand'],
-			['demandCategory', 'lpn_find_prop_demand_desc', 'Demand description'],
+			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
 			['fireFlow', 'lpn_ff_required', 'Required fire flow']
 		];
 		var RESULT_NODE = [
@@ -28144,7 +28144,7 @@ var EngCalcs = EngCalcs || {};
 	// efficiency curve and the GPV's head-loss curve -- because there is one chooser.
 	function curveLibraryLink() {
 		var pc = EngCalcs.pageConfig || {},
-			b = libButton(pc.lpn_curve_library_link || 'Libraries, Curves', function () {
+			b = libButton(pc.lpn_curve_library_link || 'Curves', function () {
 				openLibrarySection('curves');
 			}, pc.lpn_curve_library_link_tip);
 		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what

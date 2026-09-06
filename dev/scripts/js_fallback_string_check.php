@@ -94,9 +94,11 @@ const EC_JS_FALLBACK_BASELINE = 0;
  *
  * @param string $js    Source text of one JS file.
  * @param array<string,bool> $reads key => true, from ecPageConfigReads().
+ * @param array<string,string> $en    key => English, for the triple shape below, which the read
+ *                                    detector cannot see because its key is read dynamically.
  * @return array<int,array{key:string,literal:string}>
  */
-function ecJsFallbacks(string $js, array $reads): array
+function ecJsFallbacks(string $js, array $reads, array $en = []): array
 {
     // The receiver alias list comes from the same discriminator pageconfig_check.php uses: an
     // assignment of the OBJECT, whose next non-space character is not a dot.
@@ -111,6 +113,36 @@ function ecJsFallbacks(string $js, array $reads): array
     $out = [];
     foreach ($m as $hit) {
         if (!isset($reads[$hit[1]])) { continue; }
+        $out[] = ['key' => $hit[1], 'literal' => stripcslashes(substr($hit[2], 1, -1))];
+    }
+
+    /**
+     * **THE SECOND SHAPE: A TABLE OF `[prop, key, 'English']` TRIPLES.**
+     *
+     * `js/looped-network.js` declares its property bands as arrays of three -- the model property,
+     * the language key, and the English -- and reads the key through pageConfig later, somewhere
+     * else entirely. So the fallback and the `||` are in different functions and the pattern above
+     * cannot see a single one of them. Twenty such literals ship, and the drift ratchet read them
+     * as ZERO.
+     *
+     * It was found the way row 32 was found, and Task 322 says to keep finding them that way:
+     * COUNT a repeated construct in the source and ask what writing it twenty times assumes. Here it
+     * assumes somebody editing an English string will also edit a literal three files away from the
+     * `$ec_lang` line -- which is precisely the assumption that put 199 wrong fallbacks on the page.
+     *
+     * Deliberately narrow: the middle element must be a name the bridge actually reads, so a triple
+     * of ordinary strings (`['pipe', 'pump', 'valve']`) can never be mistaken for one of these.
+     */
+    $re3 = "/\\[\\s*'[A-Za-z0-9_\\$]+'\\s*,\\s*'([a-z][a-z0-9]*(?:_[a-z0-9]+)+)'\\s*,\\s*('(?:[^'\\\\\\\\]++|\\\\\\\\.)*+')\\s*\\]/";
+    preg_match_all($re3, $js, $m3, PREG_SET_ORDER);
+    foreach ($m3 as $hit) {
+        /* **NOT $reads HERE, and that is the whole reason this shape was invisible.** These triples
+         * are consumed as `pc[entry[1]]` -- a DYNAMIC read, which `ecPageConfigReads()` cannot see
+         * and never will; requiring the key to be one of its findings drops every last one of them.
+         * A defined English key in the middle slot is the discriminator instead: it is what makes
+         * the triple a language triple rather than three ordinary strings, and it also means the
+         * undefined-key leg can never fire on this shape. */
+        if (!array_key_exists($hit[1], $en)) { continue; }
         $out[] = ['key' => $hit[1], 'literal' => stripcslashes(substr($hit[2], 1, -1))];
     }
     return $out;
@@ -133,7 +165,7 @@ foreach (glob($root . '/js/*.js') as $path) {
     $js = file_get_contents($path);
     if (strpos($js, 'pageConfig') === false) { continue; }
     $reads = array_flip(ecPageConfigReads($js));
-    foreach (ecJsFallbacks($js, $reads) as $fb) {
+    foreach (ecJsFallbacks($js, $reads, $en) as $fb) {
         $total++;
         $key = $fb['key'];
         if (!array_key_exists($key, $en)) {

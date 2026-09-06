@@ -85,9 +85,32 @@ function w0Main(array $argv): int
     }
 
     $set = w0Scope($en, $opts);
+    $ruled = w0Rulings();
     $reviewed = [];
     $skipped = [];
+    $alreadyRuled = [];
     foreach ($set as $key => $value) {
+        /* **A STRING TOM HAS ALREADY RULED ON IS OUT OF SCOPE, and that is not a courtesy.**
+         *
+         * Tom, 2026-09-06, on `lpn_scenario_overrides`: *"We resolved this yesterday. Please note
+         * this so that it doesn't arise again. You are wrong."* He was right on both counts. He had
+         * personally changed that string to 'No. of custom values' two days earlier, as a ruling;
+         * Wave 0 then read it cold, filed it HIGH, and put it back in front of him for a decision he
+         * had already made. A wave-0 agent reads strings with no memory by design -- that blindness
+         * is what makes the pass work -- so the memory has to live in the KEYSET, here, or the same
+         * argument is re-run at his expense every sprint.
+         *
+         * **IT LAPSES BY ITSELF, because a ruling is keyed on the exact English it was made on.**
+         * Reword the string and it is a string nobody has approved, and Wave 0 gets it back. So this
+         * suppresses re-litigation and never suppresses review of anything new.
+         *
+         * It is a HARDER exclusion than the $ec_lang_syn pre-filter beside it, and deliberately: a
+         * syn entry means somebody helped a translator, which is "a cheaper second look"; a ruling
+         * means the person whose call it is has made it. */
+        if (isset($ruled[$key]) && $ruled[$key] === (string)$value) {
+            $alreadyRuled[$key] = (string)$value;
+            continue;
+        }
         if ($opts['filter'] && isset($syn[$key]) && trim((string)$syn[$key]) !== '') {
             $skipped[$key] = ['english' => (string)$value, 'syn' => trim((string)$syn[$key])];
         } else {
@@ -102,14 +125,17 @@ function w0Main(array $argv): int
                 'exclude_prefix' => $opts['exclude'],
                 'new_and_changed' => $opts['new_and_changed'],
                 'pre_filter' => $opts['filter'] ? 'skip keys with a non-empty $ec_lang_syn' : 'none',
+                'ruled_excluded' => 'keys whose exact current English carries a ruling in dev/english-key-rulings.json',
             ],
             'counts' => [
                 'in_scope' => count($set),
                 'to_review' => count($reviewed),
                 'skipped_has_syn' => count($skipped),
+                'excluded_already_ruled' => count($alreadyRuled),
             ],
             'keys_to_review' => $reviewed,
             'skipped_has_syn' => $skipped,
+            'excluded_already_ruled' => array_keys($alreadyRuled),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), "\n";
         return 0;
     }
@@ -126,6 +152,9 @@ function w0Main(array $argv): int
     }
     echo "\n";
 
+    if ($alreadyRuled) {
+        echo 'Already ruled: ' . count($alreadyRuled) . " excluded -- Tom has ruled on this exact English.\n";
+    }
     if ($opts['filter']) {
         $pct = count($set) > 0 ? round(100 * count($skipped) / count($set), 1) : 0.0;
         echo 'Pre-filter: ' . count($skipped) . " skipped ({$pct}%) -- already carry a non-empty \$ec_lang_syn.\n";
@@ -275,6 +304,23 @@ function w0Measure(string $sprint, array $syn, bool $json): int
     echo "NOTE: this reads TODAY'S \$ec_lang_syn. A syn entry written as a RESULT of this pass\n";
     echo "      inflates the saving; check the syn state at the pass's own commit before quoting it.\n";
     return 0;
+}
+
+/**
+ * Keys whose CURRENT English carries a ruling, as key => the exact text ruled on. A ruling recorded
+ * against different words is not a ruling about these words, so the caller compares before trusting.
+ */
+function w0Rulings(): array
+{
+    $f = dirname(__DIR__) . '/english-key-rulings.json';
+    if (!is_file($f)) { return []; }
+    $j = json_decode((string)file_get_contents($f), true);
+    if (!is_array($j) || !isset($j['rulings']) || !is_array($j['rulings'])) { return []; }
+    $out = [];
+    foreach ($j['rulings'] as $k => $r) {
+        if (is_array($r) && isset($r['on'])) { $out[$k] = (string)$r['on']; }
+    }
+    return $out;
 }
 
 function w0LoadEnglish(): array
