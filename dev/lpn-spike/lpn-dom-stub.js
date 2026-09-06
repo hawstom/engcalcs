@@ -398,6 +398,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
   // its first line and the report is invisible to every harness.
   'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report',
+  // The EPANET run report's own box (ROADMAP Task 570) -- the sixth of the family.
+  'lpn_rptbox', 'lpn_rptbox_title', 'lpn_rptbox_close', 'lpn_rptbox_copy', 'lpn_rptbox_pre',
   // The scenario comparison box (planning engineer's wish-list row 2). Absent from this list,
   // rebuildScenarioCompareReport() returns at its first line and the table is invisible to every
   // harness -- the same silent hole the two boxes above it describe.

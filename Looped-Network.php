@@ -933,6 +933,26 @@ echoHeader("EngCalcs", $html_title, "", false);
 		<div id="lpn_scncmp_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // THE EPANET RUN REPORT GETS A BOX OF ITS OWN (ROADMAP Task 570). Tom, 2026-09-02: *"EPANET
+      // report: How about we make that another draggable, sizeable, modal box?"* -- and, asked,
+      // *"I meant non-modal. Sorry. Not easy to remember."* So it is the sixth ORDINARY box and
+      // stops nothing, on the same shell as the fire flow, pump energy and scenario comparison
+      // reports. It cost almost nothing structurally, which is the whole point of those seams.
+      //
+      // **THE BODY IS A <pre> WITH ITS OWN HORIZONTAL SCROLLER, and that is not a detail.** The
+      // text is EPANET's own and untranslated (lpn_time_run_report_tip says so), and an EPANET
+      // .rpt is column-aligned monospace: wrapping it destroys the only structure it has. The
+      // popover body scrolls vertically already; this adds the other axis, inside the box. ?>
+<div id="lpn_rptbox" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_rptbox_title">
+	<div id="lpn_rptbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_time_run_report']?></div>
+	<?php // Beside the close button rather than inside the body: the report can be thousands of
+	      // lines, and a Copy that scrolls away with the text is a Copy nobody finds. ?>
+	<button type="button" id="lpn_rptbox_copy" class="lpn-rptbox-copy"><?=$ec_lang['lpn_time_run_report_copy']?></button>
+	<button type="button" id="lpn_rptbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">

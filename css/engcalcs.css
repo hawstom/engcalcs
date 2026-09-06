@@ -204,6 +204,25 @@ input.ec-spin[type=number] {
 .lpn-status-notes {
 	transition: opacity 0.8s linear;
 }
+
+/* The EPANET run report's own box (ROADMAP Task 570). The text is the engine's, column-aligned
+   monospace, so it must NOT wrap -- `overflow-x` inside the box is what keeps the page itself
+   from scrolling sideways. The Copy button sits on the title bar, clear of the close X. */
+.lpn-rptbox-pre {
+	margin: 0;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.35;
+	white-space: pre;
+	overflow-x: auto;
+}
+.lpn-rptbox-copy {
+	position: absolute;
+	top: 8px;
+	right: 34px;
+	font-size: 11px;
+	padding: 1px 6px;
+}
 @media (prefers-reduced-motion: reduce) {
 	.lpn-status-notes { transition: none; }
 }
@@ -2534,24 +2553,17 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* No transition on the width. The fill is driven by EPANET's own clock at the end of each slice,
    so an animation would be a second, slower, made-up progress bar drawn over the real one. */
 .lpn-runbox-fill { height: 100%; width: 0; background: #1976d2; }
-.lpn-runbox-report { margin-top: 0.4em; }
-.lpn-runbox-report summary { cursor: pointer; }
-/* EPANET'S OWN TEXT, so it is monospaced and it SCROLLS INSIDE ITSELF in both directions: the
-   report is column-aligned and reflowing it would destroy the alignment the engine wrote. */
-/* The copy button lives inside the report's own `<summary>`, so it is there the moment the report
-   is open. Quiet by default: it is a convenience beside a heading, not a command competing with the
-   box's close button. */
-.lpn-runbox-copy {
-	float: inline-end; margin-inline-start: 8px; font: inherit; font-size: .85em;
-	padding: 0 6px; cursor: pointer; background: none; border: 1px solid var(--rule, #999);
+/* THE DOOR TO THE REPORT, not the report (ROADMAP Task 570). The .rpt used to be a `<details>`
+   with its own `<pre>` and its own Copy inside this PROGRESS box; it has a draggable, sizeable box
+   of its own now (.lpn-rptbox-pre, above), and what is left here is one button that opens it.
+   Quiet by default: it is an offer beside a progress bar, not a command competing with the box's
+   close button. */
+.lpn-runbox-reportbtn {
+	margin-top: 0.4em; font: inherit; font-size: .85em;
+	padding: 1px 8px; cursor: pointer; background: none; border: 1px solid var(--rule, #999);
 	border-radius: 3px; color: inherit;
 }
-.lpn-runbox-copy:hover, .lpn-runbox-copy:focus { background: #eef3fd; }
-.lpn-runbox-pre {
-	margin: 0.4em 0 0; max-height: 40vh; overflow: auto;
-	padding: 0.4em; background: #f7f7f7; border: 1px solid #e0e0e0;
-	font-family: monospace; font-size: 0.85em; white-space: pre;
-}
+.lpn-runbox-reportbtn:hover, .lpn-runbox-reportbtn:focus { background: #eef3fd; }
 /* ---- THE LIBRARIES BOX (ROADMAP Tasks 462 and 460) -------------------------------------------
 
    It borrows the Settings box's whole shell -- .lpn-popover for the size caps, .lpn-setbox for the

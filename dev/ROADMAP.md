@@ -557,21 +557,6 @@ the block.
     than a disappointment; "a third of them" makes several open tasks much more urgent.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
-- 100|570| **The EPANET report gets a box of its own: draggable, sizeable, and one of the family.**
-  Tom, 2026-09-02, having just spent a session on the window model: *"EPANET report: How about we
-  make that another draggable, sizeable, modal box?"* The engine's own `.rpt` text is read through
-  `lpn_time_run_report_tip` today and has no home of its own.
-  - **It is the sixth box, so it costs almost nothing structurally** — `makePanelDraggable()` carries
-    the drag, the touch gesture and the raise; `addPanelResizeGrip()` the corner; `placePanelForScreen()`
-    the opening and the phone fill; `hidePanel()` the close and the tip sweep. A seventh panel cannot
-    arrive half-wired, which is the whole point of those seams.
-  - **NON-MODAL, settled 2026-09-02.** He wrote "modal" and corrected it when asked: *"I meant
-    non-modal. Sorry. Not easy to remember."* So it is the sixth ordinary box and stops nothing —
-    which is also what the rest of this session established, that every box must stay movable while
-    another is open. **The word is the trap, not the design**: on this page "modal box" has come to
-    mean "a proper window", and the one genuinely modal thing here is `#lpn_dialog`.
-  - The text is the engine's own and untranslated, which the tip already says. It wants a monospace
-    body and its own scroller, and `.lpn-popover-body` already scrolls.
 
 
 - 75|569| **The cursor flickers to the default pointer at ~12 px from a node, on a PC.**

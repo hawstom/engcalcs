@@ -130,7 +130,7 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 	ok('...and it clears the fill on the way back to a pointer machine',
 		/resetPanelFill\(box\)/.test(body('placePanelForScreen')));
 
-	// **THE FIVE THAT FILL.** Named by their opener rather than by an id: what has to be true is
+	// **THE SIX THAT FILL.** Named by their opener rather than by an id: what has to be true is
 	// that the function which PLACES the box goes through the seam.
 	const FILLS = [['openSettingsBox', 'Settings'], ['openLibraryBox', 'the Library box'],
 		['openFireFlowBox', 'Fire flow'], ['toggleFindPopup', 'Find'],
@@ -139,7 +139,11 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openEnergyBox', 'Pump energy'],
 		// The scenario comparison: a table one row per scenario, and the same case as Pump energy
 		// -- wide enough that a phone wants the whole window for it.
-		['openScenarioCompareBox', 'the scenario comparison']];
+		['openScenarioCompareBox', 'the scenario comparison'],
+		// The EPANET run report (Task 570): the strongest case of the three, because the text is
+		// the engine's own column-aligned monospace and must not wrap. On a phone a box narrower
+		// than the window means scrolling sideways inside something that is itself scrolling.
+		['openRunReportBox', 'the EPANET run report']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

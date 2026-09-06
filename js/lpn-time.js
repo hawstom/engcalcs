@@ -1109,10 +1109,6 @@
 
 	var boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 },
 		boxReport = '',
-		// Whether the report inside the box starts EXPANDED. It does when the box was opened to show
-		// a report and only then -- a run in progress opens its own box collapsed, because the
-		// report does not exist yet and the thing to watch is the bar.
-		boxReportOpen = false,
 		boxUi = null;
 	// **THE LAST RUN'S REPORT OUTLIVES THE BOX, and is kept whether or not a box was ever shown.**
 	// `boxReport` is the copy the box is rendering and dies with it; this is the document's answer to
@@ -1125,7 +1121,6 @@
 	function boxStart(token) {
 		boxState = { open: true, phase: 'running', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: token };
 		boxReport = '';
-		boxReportOpen = false;
 		renderBox(true);
 	}
 	function boxProgress(p) {
@@ -1161,7 +1156,6 @@
 	function boxHide() {
 		boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 };
 		boxReport = '';
-		boxReportOpen = false;
 		renderBox(true);
 	}
 
@@ -1229,14 +1223,7 @@
 		// **THE ENGINE'S OWN REPORT, OR NOTHING.** Where the build wrote none, the control is
 		// absent rather than empty -- offering a report and then showing an empty box would be a
 		// worse answer than not offering one.
-		if (boxReport) {
-			boxUi.pre.textContent = boxReport;
-			boxUi.report.style.display = '';
-			boxUi.report.open = boxReportOpen;
-		} else {
-			boxUi.pre.textContent = '';
-			boxUi.report.style.display = 'none';
-		}
+		boxUi.report.style.display = boxReport ? '' : 'none';
 	}
 
 	function buildBox(S) {
@@ -1253,32 +1240,27 @@
 			}),
 			fill = el('div', { 'class': 'lpn-runbox-fill' }),
 			pct = el('span', { 'class': 'lpn-runbox-pct' }),
-			report = el('details', { 'class': 'lpn-runbox-report' }),
-			summary = el('summary', null, S.runReport),
-			// **INSIDE THE `<summary>`, so it is reachable the moment the report is open and never
-			// competes with the box's own close button.** A `<summary>` toggles the `<details>` on
-			// click, so this button stops its event from reaching the parent -- without that, copying
-			// the report also collapses the thing you were reading.
-			copy = el('button', { type: 'button', 'class': 'lpn-runbox-copy' }, S.reportCopy),
-			pre = el('pre', { 'class': 'lpn-runbox-pre' });
-		copy.addEventListener('click', function (ev) {
+			// **THE REPORT IS A DOOR, NOT A DRAWER** (ROADMAP Task 570). It used to be a
+			// `<details>` with the whole .rpt inside this box, and this box is a PROGRESS dialog:
+			// a report the reader wanted to keep on screen was living inside the thing that says
+			// how far a run has got. It has a draggable, sizeable box of its own now, built in
+			// js/looped-network.js with the other five, so this file keeps the TEXT and offers the
+			// way in. The copy control went with it, to the title bar where it cannot scroll away.
+			report = el('button', { type: 'button', 'class': 'lpn-runbox-reportbtn' }, S.runReport);
+		report.addEventListener('click', function (ev) {
 			ev.preventDefault();
-			ev.stopPropagation();
-			copyText(pre.textContent || '', copy);
+			if (EC.lpnOpenRunReportBox) { EC.lpnOpenRunReportBox(); }
 		});
 		x.addEventListener('click', boxHide);
 		bar.appendChild(fill);
 		head.appendChild(title);
 		head.appendChild(pct);
 		head.appendChild(x);
-		summary.appendChild(copy);
-		report.appendChild(summary);
-		report.appendChild(pre);
 		root.appendChild(head);
 		root.appendChild(msg);
 		root.appendChild(bar);
 		root.appendChild(report);
-		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, pre: pre, x: x, copy: copy };
+		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, x: x };
 	}
 
 	/**
@@ -1336,11 +1318,15 @@
 	 * **EPANET'S OWN REPORT FOR THE LAST RUN, VERBATIM.** Never composed by us: see the note on
 	 * EngCalcs.lpnEpanetRun. Empty string when there is none.
 	 */
-	// The copier, for dev/lpn-spike/run-box-harness.js. A button that silently fails to copy looks
-	// exactly like one that worked, so both routes and the label change are asserted rather than
-	// trusted to a browser no harness runs in. The BUTTON is not exported: that harness has no
-	// document.body and builds no DOM, so the copier is the part worth reaching.
-	EC.lpnTimeCopyForTest = function (text, btn) { return copyText(text, btn); };
+	// **THE COPIER, WHICH IS NOW THE REPORT BOX'S** (Task 570). It stays in this file because this
+	// file owns the report text and its two labels, and because it is the one clipboard route on
+	// this page that works on a plain-http deploy -- `navigator.clipboard` is absent there and this
+	// suite is installed by people who may not have a certificate. js/looped-network.js's Copy
+	// button calls it; `lpnTimeCopyForTest` is the same function under the name
+	// dev/lpn-spike/run-box-harness.js already asserts both routes and the label change through,
+	// because a button that silently fails to copy looks exactly like one that worked.
+	EC.lpnCopyText = function (text, btn) { return copyText(text, btn); };
+	EC.lpnTimeCopyForTest = EC.lpnCopyText;
 	EC.lpnTimeRunReport = function () { return boxReport; };
 	/**
 	 * **PROJECT > EPANET RUN REPORT** (Task 467): put the last run's report on screen.
@@ -1357,17 +1343,10 @@
 	// The same act as the box's X, Escape and Enter, exposed so a harness can close it the way a
 	// person does rather than by reaching into state.
 	EC.lpnTimeRunBoxHide = function () { boxHide(); };
-	EC.lpnTimeShowReport = function () {
-		if (!lastReport) { return false; }
-		boxState = {
-			open: true, phase: 'done', fraction: 1, frames: lastReportFrames,
-			ms: lastReportMs, reportLength: lastReport.length, message: '', token: 0
-		};
-		boxReport = lastReport;
-		boxReportOpen = true;
-		renderBox(true);
-		return true;
-	};
+	// **`lpnTimeShowReport()` IS GONE (Task 570).** It reopened this PROGRESS box, with its bar and
+	// its percentage, purely to hold a `<details>` -- the shape that made "the report has no home
+	// of its own" true. The menu row calls js/looped-network.js's openRunReportBox() now, which
+	// reads lpnTimeLastReport() and draws it in the sixth box.
 
 	// ================================================================================================
 	// THE TRANSPORT, ON THE TOOLBAR

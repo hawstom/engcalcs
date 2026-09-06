@@ -245,6 +245,7 @@ console.log('\n--- the boot path reopens exactly the three boxes, and nothing el
 	// an empty display, and asserting on the literal 'none' would have been asserting about the stub.
 	[['lpn_ff_box', 'fire flow -- a report about a run, and a reload has no run'],
 	 ['lpn_energy_box', 'energy -- same'],
+	 ['lpn_rptbox', 'the EPANET run report -- same again, and a reload has no .rpt either'],
 	 ['lpn_scncmp_box', 'scenario compare -- opening it starts N solves'],
 	 ['lpn_popup', 'the property popup -- an answer to a selection that is not restored'],
 	 ['lpn_new_panel', 'the New-project box -- a modal'],

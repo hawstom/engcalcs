@@ -215,18 +215,21 @@ async function boxSection() {
 	// Two properties, and the second is the one a stub could hide:
 	//   * closing the box does not destroy the report;
 	//   * an AUTOMATIC run, which never had a box at all, still leaves one.
+	//
+	// **THE REPORT LEFT THIS BOX IN TASK 570 and this file now asserts the half that stayed.**
+	// `lpnTimeShowReport()` is gone: it reopened this PROGRESS dialog, bar and percentage and all,
+	// purely to hold a `<details>`, which is what "the report has no home of its own" meant. The
+	// text is still owned here, still outlives the box, and is still what Project > EPANET run
+	// report reads -- the DRAWING of it is js/looped-network.js's sixth box, and
+	// dev/lpn-spike/box-open-memory-harness.js is where that is asserted, because this harness
+	// loads js/lpn-time.js alone and has no boxes to open.
 	EngCalcs.lpnTimeRunBoxHide();
 	eq(EngCalcs.lpnTimeRunBoxState().open, false, 'set up: the box is closed, as its X closes it');
 	eq(EngCalcs.lpnTimeLastReport(), report, 'the last run\'s report is kept after the run');
-	check(EngCalcs.lpnTimeShowReport(), 'and Project > EPANET run report puts it back on screen');
 	{
-		const shown = EngCalcs.lpnTimeRunBoxState();
-		eq(shown.open, true, '...in the run box, which is the one place a run\'s outcome is shown');
-		eq(shown.phase, 'done', '...saying the run finished rather than that one is running');
-		eq(shown.reportLength, report.length, '...with the whole report in it');
-		eq(EngCalcs.lpnTimeRunReport(), report, '...unedited');
-		// The copy button is only reachable while a report is open, which is also the only state a
-		// user can press it in -- so it is exercised here rather than after the box is torn down.
+		// The copy button is the run box's no longer, but the COPIER is still this file's -- it is
+		// the one clipboard route that works on a plain-http deploy, and both of its routes and the
+		// label change are asserted here as they always were.
 		await copySection();
 	}
 
@@ -237,9 +240,7 @@ async function boxSection() {
 	hydraulicEdit();
 	await wait(160);
 	eq(EngCalcs.lpnTimeRunBoxState().open, false, 'an automatic run still opens no box');
-	eq(EngCalcs.lpnTimeLastReport(), report, '...and still records its report');
-	check(EngCalcs.lpnTimeShowReport(), '...which the menu row can show');
-	eq(EngCalcs.lpnTimeRunReport(), report, '...and it is THIS run\'s report, not the earlier one');
+	eq(EngCalcs.lpnTimeLastReport(), report, '...and still records its report, which the menu row reads');
 	EngCalcs.lpnTimeRunBoxHide();
 
 	// ---- A SUPERSEDED RUN TAKES ITS BOX WITH IT ----
@@ -292,7 +293,10 @@ async function boxSection() {
 // gets, so it is asserted too.
 async function copySection() {
 	console.log('\n---- the run report copies itself out ----');
-	const report = EngCalcs.lpnTimeRunReport();
+	// **`lpnTimeLastReport()`, not `lpnTimeRunReport()`** (Task 570). What the Copy button hands
+	// over is the LAST run's report, which is what the box it now sits on is showing; `boxReport`
+	// is the copy the transient run box was rendering and is empty as soon as that box is closed.
+	const report = EngCalcs.lpnTimeLastReport();
 	eq(typeof report === 'string' && report.length > 0, true, 'there is a report to copy');
 	// A stand-in for the button: the copier only ever reads and writes its label.
 	const btn = { textContent: 'Copy' };

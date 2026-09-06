@@ -2683,11 +2683,10 @@ var EngCalcs = EngCalcs || {};
 				// the report exists, while a sentence saying why there is none teaches exactly that
 				// (the native solver prints nothing, so a network that has never reached EPANET has
 				// no report and never will until it does).
-				fn: function () {
-					if (EngCalcs.lpnTimeShowReport && EngCalcs.lpnTimeShowReport()) { return; }
-					setNotice(pc.lpn_time_no_report ||
-						'There is no run report yet. The report is EPANET\u2019s own text, so it appears once this network has been calculated with the EPANET solver.');
-				}
+				// The box says the same sentence itself where there is no report, so the row is
+				// one call. It stays here rather than being hidden when there is nothing to show,
+				// for the reason openRunReportBox() states.
+				fn: function () { closeMenu(); openRunReportBox(); }
 			}
 		];
 	}
@@ -19918,6 +19917,7 @@ var EngCalcs = EngCalcs || {};
 		wireFireFlowBox();
 		wireEnergyBox();
 		wireScenarioCompareBox();
+		wireRunReportBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
@@ -32077,6 +32077,86 @@ var EngCalcs = EngCalcs || {};
 		});
 		initTipsIn(box);
 	}
+	// ---- THE EPANET RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
+	//
+	// Tom, 2026-09-02: *"EPANET report: How about we make that another draggable, sizeable, modal
+	// box?"*, corrected when asked to *"I meant non-modal."* So it stops nothing, and it is the
+	// sixth box rather than a new kind of thing: makePanelDraggable() carries the drag, the touch
+	// gesture and the raise, addPanelResizeGrip() the corner, placePanelForScreen() the opening and
+	// the phone fill, hidePanel() the close and the tip sweep.
+	//
+	// **IT IS NOW THE ONLY PLACE THE .rpt TEXT IS RENDERED.** It used to be a <details> inside the
+	// transient run box, which the menu row reopened just to hold it -- so a report the reader
+	// wanted to keep on screen was living inside a progress dialog. js/lpn-time.js keeps the text
+	// and offers a button; the drawing of it is here, with the rest of the boxes.
+	function rptBoxEl() { return document.getElementById('lpn_rptbox'); }
+	function rptBoxIsOpen() {
+		var box = rptBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	/** The engine's own report for the last run, or '' -- js/lpn-time.js owns it. */
+	function lastRunReportText() {
+		return (EngCalcs.lpnTimeLastReport && EngCalcs.lpnTimeLastReport()) || '';
+	}
+	function openRunReportBox() {
+		var pc = EngCalcs.pageConfig || {}, box = rptBoxEl(),
+			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(), h, r, top;
+		// **SHOWN, OR EXPLAINED -- never an empty box.** The same rule the menu row already kept:
+		// the built-in solver prints nothing, so a network that has never reached EPANET has no
+		// report and never will until it does, and a sentence saying that teaches what a vanishing
+		// row cannot.
+		if (!text) {
+			setNotice(pc.lpn_time_no_report ||
+				'There is no run report yet. The report is EPANET\u2019s own text, so it appears once this network has been calculated with the EPANET solver.');
+			return false;
+		}
+		if (!box || !pre) { return false; }
+		closeMenu();
+		hideOpenTips();
+		pre.textContent = text;
+		box.style.display = 'flex';
+		// Centred and re-measured on every open, for the reason the energy box is: it is
+		// resizeable, the window may have changed, and a box remembered off-screen never comes back.
+		placePanelForScreen(box, function () {
+			h = fitPanelToViewport(box);
+			r = box.getBoundingClientRect();
+			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
+			capPanelToRoomBelow(box, top);
+			box.style.top = top + 'px';
+		});
+		initTipsIn(box);
+		return true;
+	}
+	function closeRunReportBox() { hidePanel(rptBoxEl()); }
+	function wireRunReportBox() {
+		var box = rptBoxEl(),
+			x = document.getElementById('lpn_rptbox_close'),
+			copy = document.getElementById('lpn_rptbox_copy');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeRunReportBox); }
+		if (copy) {
+			// js/lpn-time.js's copier, not libCopyOut(): it owns the report's two labels, it
+			// swaps the button to "Copied" and back on its own, and its textarea route is the one
+			// that still works on a plain-http deploy where navigator.clipboard is simply absent.
+			copy.addEventListener('click', function () {
+				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(lastRunReportText(), copy); }
+			});
+		}
+		makePanelDraggable(box, null);
+		addPanelResizeGrip(box);
+	}
+	/** A new run replaced the report the reader is looking at, or dropped it. */
+	function refreshRunReportBoxIfOpen() {
+		var pre;
+		if (!rptBoxIsOpen()) { return; }
+		pre = document.getElementById('lpn_rptbox_pre');
+		if (!pre) { return; }
+		// A run that produced no report leaves the box standing on the last one it had rather than
+		// blanking it: an empty <pre> under a title claiming a report is the empty box this page
+		// refuses to show anywhere else.
+		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
+	}
 	function closeEnergyBox() { hidePanel(energyBoxEl()); }
 	function wireEnergyBox() {
 		var box = energyBoxEl(), x = document.getElementById('lpn_energy_close');
@@ -32240,6 +32320,9 @@ var EngCalcs = EngCalcs || {};
 		// been re-done, or whose frames an edit dropped, must not leave last time's money on
 		// screen with nothing saying it is stale.
 		refreshEnergyBoxIfOpen();
+		// And the EPANET run report, on the same seam: a new run writes a new .rpt, and a box left
+		// showing the previous one would be last time's answer under this time's title.
+		refreshRunReportBoxIfOpen();
 		// And the scenario comparison, on the same seam and for exactly the same reason: the table
 		// answered a network that has just changed under it, so it is dropped rather than left
 		// standing as though it were still true.
@@ -32376,6 +32459,11 @@ var EngCalcs = EngCalcs || {};
 	// calls it unconditionally when `cookieToForm()` finds no cookie -- every first-time visitor --
 	// so its absence throws a TypeError that aborts the rest of that function, taking `loadFromUrl()`
 	// and the first `pageCalculator()` with it.
+
+	// **THE ONE DOOR js/lpn-time.js NEEDS.** The run box offers a button to the report and this
+	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
+	// owns the boxes, and neither reaches into the other's state.
+	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
 
 	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {

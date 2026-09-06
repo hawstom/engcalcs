@@ -560,9 +560,12 @@ exports.run = async function ({ browser, report }) {
 				dom: !!el, phase: s.phase, frames: s.frames,
 				msg: el ? (el.querySelector('.lpn-runbox-msg').textContent || '') : '',
 				barShown: !!(el && el.querySelector('.lpn-runbox-bar').style.display !== 'none'),
-				summary: el ? ((el.querySelector('.lpn-runbox-report summary') || {}).textContent || '') : '',
-				reportShown: !!(el && el.querySelector('.lpn-runbox-report').style.display !== 'none'),
-				report: window.EngCalcs.lpnTimeRunReport()
+				// The report is a DOOR now, not a drawer (ROADMAP Task 570): this box offers a
+				// button and js/looped-network.js's sixth box draws the text.
+				summary: el ? ((el.querySelector('.lpn-runbox-reportbtn') || {}).textContent || '') : '',
+				reportShown: !!(el && el.querySelector('.lpn-runbox-reportbtn')
+					&& el.querySelector('.lpn-runbox-reportbtn').style.display !== 'none'),
+				report: window.EngCalcs.lpnTimeLastReport()
 			};
 		});
 		report.ok(boxDone.dom && boxDone.phase === 'done',
@@ -576,6 +579,17 @@ exports.run = async function ({ browser, report }) {
 		// composed out of our own numbers and labelled EPANET's would be worse than none.
 		report.ok(boxDone.reportShown && /EPANET/i.test(boxDone.summary),
 			'the EPANET run report is offered', boxDone.summary);
+		// ...and the door actually opens the box, with the engine's own text in it.
+		const rpt = await a.page.evaluate(() => {
+			document.querySelector('#lpn_runbox .lpn-runbox-reportbtn').click();
+			const b = document.getElementById('lpn_rptbox');
+			return { open: !!b && b.style.display !== 'none',
+				text: (document.getElementById('lpn_rptbox_pre') || {}).textContent || '' };
+		});
+		report.ok(rpt.open && /E P A N E T/.test(rpt.text),
+			'...and pressing it opens the report\'s own box, holding the engine\'s text',
+			`open=${rpt.open} [${rpt.text.length} chars]`);
+		await a.page.evaluate(() => { document.getElementById('lpn_rptbox_close').click(); });
 		report.ok(/E P A N E T/.test(boxDone.report) && /Version 2\.3/.test(boxDone.report),
 			'...and it is the engine\'s own text, banner and version and all',
 			(boxDone.report || '').split('\n').slice(2, 3).join('') + ` [${(boxDone.report || '').length} chars]`);
