@@ -637,7 +637,25 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 25|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+- 75|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+  - **RAISED FROM 25 ON TOM'S OWN WORDS, 2026-09-05:** *"Pipe library: I foresee very soon that we
+    will add the ability to refer to a library pipe for roughness, reaction coefficients, and maybe
+    diameter (depending on what user chooses to include in the library pipe definition). The Library
+    pipe selector can be immediately after ID, and any properties defined in the Library are disabled
+    or removed in the pipe properties box. Very cool and open to user needs."*
+  - **HIS SHAPE ANSWERS THE ENGINEER'S TWO OBJECTIONS BELOW, WHICH IS WHY IT IS WORTH SAYING THEY
+    DISAGREE.** The engineer ranked this low partly because roughness is a function of material AND
+    age (so "a PVC type" needs a per-element qualifier) and partly because a live-linked edit
+    propagates with no confirmation step. Tom's version makes the definition's CONTENTS the user's
+    choice — a library pipe that states roughness and not diameter is legal — so the aging wrinkle is
+    the user's to resolve by defining two library pipes, not ours to model. And a property the library
+    defines is DISABLED in the properties box, which is the visible detached-versus-inherited state
+    the note below says is mandatory, arrived at from the other direction.
+  - **AND THE INDIRECTION IS NO LONGER NEW.** Task 586 shipped exactly this pattern for curves: a
+    document-level object, an element holding only a reference, a Library section that creates and
+    renames and refuses to delete what is in use, and a rename that carries every reference. The
+    engineer's "one slice it does NOT rank low" was the pump curve, and it is built. What is left for
+    pipes is `effective()` and the disabled-control rendering, not the concept.
   - **RESEARCHED 2026-08-25 by `utility-planning-engineer`, and its answer is: TWO features, not
     one — which is the thing we would have got wrong.** WaterGEMS separates a **Prototype** (stamps
     starting values onto elements drawn AFTERWARDS, not retroactive) from an **Engineering Library**

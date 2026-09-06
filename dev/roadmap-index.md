@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**66 open tasks.** Next (100): 6 · Soon (75): 15 · Someday (50): 14 · Maybe (25): 14 · Parked (5): 17
+**66 open tasks.** Next (100): 6 · Soon (75): 16 · Someday (50): 14 · Maybe (25): 13 · Parked (5): 17
 
 ## 100 — Next (6)
 
@@ -18,13 +18,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 545 — The list is a file, the marks are data, and both survived a reading.
 - Task 553 — Demands and Hydraulics options: BUILT, and every option now has a control.
 
-## 75 — Soon (15)
+## 75 — Soon (16)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
+- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 479 — [H] · One question left: should the suite answer at librewaternet.org/engcalcs/ ?
 - ! Task 532 — An English style guide for label wording — Tom says he is writing one by intuition.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
@@ -53,7 +54,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
 - Task 575 — The six element symbols, redrawn from Tom's sketch.
 
-## 25 — Maybe (14)
+## 25 — Maybe (13)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -64,7 +65,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 348 — Sub-categories and paging in the examples gallery.
 - Task 390 — Finish the unit paradigm migration: a unit is a NAME.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
-- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 484 — Log which unhandled EPANET features actually arrive in real imports.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 574 — What is left of the `.net` slot map: nine slots nothing identifies.
