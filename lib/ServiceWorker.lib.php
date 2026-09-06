@@ -46,8 +46,60 @@
  * new lpn module; the check is what stops that recurring.)
  */
 
-/** Web path prefix this suite is mounted at. Matches the hardcoded paths throughout the app. */
+/**
+ * Web path prefix the suite's own FILES are addressed by. Matches the ~210 root-anchored
+ * '/engcalcs/...' paths hardcoded throughout the app, and is therefore where every precache entry
+ * lives whatever URL the visitor arrived at.
+ */
 if (!defined('EC_SW_BASE')) define('EC_SW_BASE', '/engcalcs/');
+
+/**
+ * Every web path a VISITOR may be served this suite at, and why each one exists.
+ *
+ * WHY THIS IS A LIST AND NOT EC_SW_BASE (ROADMAP Task 479). A service worker can only control
+ * pages underneath its own scope, so a worker scoped to '/engcalcs/' is deaf to a page served at
+ * '/app'. It does not error, it does not warn, and the page works perfectly in every other
+ * respect -- the visitor simply has no offline suite, and nobody on this side can see it. That is
+ * the whole defect, and it is why the mounts are DECLARED here rather than inferred from a path
+ * somewhere: adding a mount without widening the scope has no symptom.
+ *
+ * Serving the FILES is a separate question and is already answered: '/app' is a rewrite onto a
+ * page that still loads its assets from '/engcalcs/', which is why Task 487's refactor stays
+ * unbought. This list is about CONTROL, not about resolution.
+ *
+ * @return array<string,string> mount prefix => why it exists.
+ */
+function ecSwMounts() {
+    return [
+        EC_SW_BASE => 'the canonical mount on hawsedc.com; every absolute path in the source names it',
+        '/app/'    => 'librewaternet.org/app, a rewrite onto Looped-Network.php (Task 479)',
+    ];
+}
+
+/**
+ * The narrowest scope that covers every mount: their longest common path prefix.
+ *
+ * With two mounts sharing nothing this is '/', which needs a `Service-Worker-Allowed` header from
+ * sw.php because the script itself sits under '/engcalcs/'. That header is the entire cost of the
+ * widening, and it is sent from the one file the browser fetches the worker from. Deriving the
+ * scope rather than writing '/' means a suite that is only ever mounted at one path gets the
+ * narrow scope back automatically, with no header needed and nothing to remember.
+ */
+function ecSwScope() {
+    $mounts = array_keys(ecSwMounts());
+    $scope = array_shift($mounts);
+    foreach ($mounts as $mount) {
+        $i = 0;
+        $max = min(strlen($scope), strlen($mount));
+        while ($i < $max && $scope[$i] === $mount[$i]) { $i++; }
+        // A scope is a path prefix, so truncate back to the last '/' rather than mid-segment:
+        // '/app/' and '/apple/' share '/app', which would scope the worker over '/apple/' too.
+        $scope = substr($scope, 0, $i);
+        $cut = strrpos($scope, '/');
+        $scope = $cut === false ? '/' : substr($scope, 0, $cut + 1);
+    }
+    return $scope === '' ? '/' : $scope;
+}
 
 /**
  * Assets deliberately NOT precached, and why. Present on disk, shipped, and still excluded.

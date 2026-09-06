@@ -1,4 +1,10 @@
 <?php
+// The footer's service-worker registration asks for the scope ecSwScope() derives from every path
+// the suite is served at, so the mount list has ONE home (lib/ServiceWorker.lib.php) rather than a
+// second copy written into the registration. Function and constant definitions only -- it starts
+// nothing and reads nothing.
+require_once(__DIR__ . '/ServiceWorker.lib.php');
+
 function echoHeader($type="normal", $html_title = "", $html_head = "", $show_name_field = true) {
   switch (strtolower($type)) {
     case "normal":
@@ -312,11 +318,24 @@ if ($ec_footer_left !== '') { echo '<div class="left d-print-none">' . $ec_foote
 <script>
 // The worker is GENERATED (sw.php, ROADMAP Task 318) so its precached URLs carry the same
 // filemtime the pages request; a static sw.js could not, because deployment is `git pull` and
-// git does not preserve mtimes. sw.php sits in the suite root, so '/engcalcs/' is the widest
-// scope it is allowed and no Service-Worker-Allowed header is needed. A registration is keyed by
-// SCOPE, so this replaces a returning visitor's old '/engcalcs/sw.js' registration in place.
+// git does not preserve mtimes. A registration is keyed by SCOPE, so this replaces a returning
+// visitor's old '/engcalcs/sw.js' registration in place.
+//
+// The scope is DERIVED from every path the suite is served at (ecSwMounts(), ROADMAP Task 479):
+// a worker cannot control a page outside its own scope, so one scoped to '/engcalcs/' is deaf to
+// a visitor who arrived at '/app' -- with no error and no symptom but a missing offline suite.
+// Anything wider than this script's own directory needs sw.php's Service-Worker-Allowed header,
+// and if that header does not arrive the registration is REJECTED OUTRIGHT. So the wide ask
+// falls back to the narrow one: a misconfigured host loses '/app' rather than losing offline
+// support on every page of the suite, which is the worse failure and the silent one.
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/engcalcs/sw.php', { scope: '/engcalcs/' });
+  var ecSwScope = <?=json_encode(ecSwScope(), JSON_UNESCAPED_SLASHES)?>;
+  navigator.serviceWorker.register('/engcalcs/sw.php', { scope: ecSwScope })
+    .catch(function () {
+      if (ecSwScope !== <?=json_encode(EC_SW_BASE, JSON_UNESCAPED_SLASHES)?>) {
+        navigator.serviceWorker.register('/engcalcs/sw.php', { scope: <?=json_encode(EC_SW_BASE, JSON_UNESCAPED_SLASHES)?> });
+      }
+    });
 }
 </script>
 </body>

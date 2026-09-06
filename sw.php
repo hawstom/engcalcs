@@ -7,12 +7,20 @@
  * Licensed under GNU GPL v3.0 or later
  *
  * It is registered as '/engcalcs/sw.php' by lib/HeadersFooters.lib.php. A worker's scope is
- * capped by its own URL path, and this file sits in the suite root, so the '/engcalcs/' scope the
- * registration asks for is exactly the maximum it is allowed -- no Service-Worker-Allowed header
- * needed. A registration is keyed by SCOPE, so pointing the same scope at a new script URL
- * replaces the old '/engcalcs/sw.js' registration on the next page load rather than creating a
- * second one; combined with skipWaiting()/clients.claim() below, returning visitors migrate
- * without doing anything.
+ * capped by its own URL path unless the response says otherwise, and the suite is served at more
+ * than one path (ecSwMounts()), so this file sends `Service-Worker-Allowed: <scope>` and the
+ * registration asks for that same derived scope. Without the header the registration is REJECTED
+ * outright, which is why the page falls back to the narrow scope rather than losing offline
+ * support suite-wide. A registration is keyed by SCOPE, so pointing the same scope at a new
+ * script URL replaces the old '/engcalcs/sw.js' registration on the next page load rather than
+ * creating a second one; combined with skipWaiting()/clients.claim() below, returning visitors
+ * migrate without doing anything.
+ *
+ * A WIDE SCOPE IS NOT A WIDE APPETITE. The scope says which pages this worker may control; it
+ * says nothing about which requests it answers. Every route below is gated on inScope(), so on a
+ * host where the suite shares an origin with somebody else's site -- which is the case on both
+ * domains -- a page outside the declared mounts is controlled and then passed straight to the
+ * network, byte for byte. Widening the scope must never mean quietly caching a neighbour's CSS.
  *
  * Serving it through PHP rather than rewriting /engcalcs/sw.js to it keeps the change independent
  * of mod_rewrite being available on this shared host -- .htaccess here already carries a warning
@@ -27,6 +35,10 @@
 require_once(__DIR__ . '/lib/ServiceWorker.lib.php');
 $ecSwManifest = ecServiceWorkerManifest(__DIR__);
 header('Content-Type: application/javascript; charset=utf-8');
+// The one header the scope widening costs. Without it a registration asking for anything wider
+// than '/engcalcs/' -- this script's own directory -- is rejected by the browser, and the suite
+// silently has no service worker at all.
+header('Service-Worker-Allowed: ' . ecSwScope());
 // Browsers cap service-worker script caching at 24h anyway; say it explicitly so an intermediary
 // cannot pin a stale manifest and freeze the precache list.
 header('Cache-Control: no-cache');
@@ -51,6 +63,11 @@ const STATIC_ASSETS = <?=$ecSwJson($ecSwManifest['assets'])?>;
 
 // Calculator pages: network-first, fall back to cache.
 const CALC_PAGES = <?=$ecSwJson($ecSwManifest['pages'])?>;
+
+// Every path the suite is served at -- see ecSwMounts() in lib/ServiceWorker.lib.php. The worker's
+// SCOPE is wide enough to control all of them; this list is what decides which requests it
+// actually answers, so anything else on the origin is left alone entirely.
+const APP_MOUNTS = <?=$ecSwJson(array_keys(ecSwMounts()))?>;
 
 // Install: pre-cache everything.
 //
@@ -114,6 +131,11 @@ self.addEventListener('fetch', event => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  // Anything outside this suite's own mounts is none of our business, whatever the scope
+  // allows us to control. Returning without calling respondWith() is a true pass-through:
+  // the browser makes the request itself, exactly as if no worker existed.
+  if (!inScope(url)) return;
+
   // Static assets → cache-first
   if (isStaticAsset(url)) {
     event.respondWith(cacheFirst(event.request, ASSET_CACHE));
@@ -121,11 +143,16 @@ self.addEventListener('fetch', event => {
   }
 
   // EngCalcs pages → network-first
-  if (url.pathname.startsWith('/engcalcs/')) {
-    event.respondWith(networkFirst(event.request, PAGE_CACHE));
-    return;
-  }
+  event.respondWith(networkFirst(event.request, PAGE_CACHE));
 });
+
+// Same origin, and under one of the declared mounts. A mount is written with its trailing slash,
+// so the bare form is matched separately: '/app' is a real URL a visitor is handed, and
+// startsWith('/app/') does not match it.
+function inScope(url) {
+  if (url.origin !== self.location.origin) return false;
+  return APP_MOUNTS.some(m => url.pathname.startsWith(m) || url.pathname === m.slice(0, -1));
+}
 
 function isStaticAsset(url) {
   return (

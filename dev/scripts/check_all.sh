@@ -125,6 +125,8 @@ run_check "service worker precache"      blocking php dev/scripts/sw_manifest_ch
 # hand-written fetch route counts exactly as much as a manifest entry.
 run_check "service worker map hosts"     blocking php dev/scripts/sw_map_host_check.php
 run_check "sw map host selftest"         blocking php dev/scripts/sw_map_host_selftest.php
+run_check "service worker scope"         blocking php dev/scripts/sw_scope_check.php
+run_check "sw scope selftest"            blocking php dev/scripts/sw_scope_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
