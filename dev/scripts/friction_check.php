@@ -121,8 +121,21 @@ function main(array $argv): int
 function readEntries(string $file, string $sprint, int &$malformed): ?array
 {
     $raw = json_decode((string)file_get_contents($file), true);
+    // **THIS DIRECTORY HOLDS TWO KINDS OF FILE, AND THE CHECK HAS TO KNOW BOTH.** A friction LOG
+    // carries `entries`; a sprint KEY LIST carries `keys` and no entries at all -- the CHANGED half
+    // of a resync, whose job is to tell 26 agents which existing translations to overwrite
+    // (`573-changed-keys.json`). It is data for a sprint, not a finding anybody can answer, so it has
+    // no disposition and can never be "open". Before this, the bare `friction_check.php` exited 2 on
+    // it -- the documented gate `--sprint=<id>` passed, so the failure was invisible until somebody
+    // ran the script the obvious way and read a MALFORMED line about a file that is not malformed.
+    // Declared by SHAPE rather than by filename, so the next resync's list needs no edit here.
+    if (is_array($raw) && !isset($raw['entries']) && isset($raw['keys']) && is_array($raw['keys'])) {
+        echo "[{$sprint}] key list, not a friction log: " . count($raw['keys']) . " keys for a resync.\n";
+        return null;   // reported above, counted as neither a log nor a malformation
+    }
     if (!is_array($raw) || !isset($raw['entries']) || !is_array($raw['entries'])) {
-        fwrite(STDERR, "MALFORMED [{$sprint}]: expected an object with an 'entries' array.\n");
+        fwrite(STDERR, "MALFORMED [{$sprint}]: expected an object with an 'entries' array, or a "
+            . "'keys' object if this is a sprint key list.\n");
         $malformed++;
         return null;
     }
