@@ -143,15 +143,22 @@ $LINK_SLOT = array(
 // readers of one format, compared byte for byte by dev/lpn-spike/net-import-harness.js. The slot
 // numbers were measured from a real file's own import report on 2026-09-02 and every name is
 // checked against what EPANET wrote for the same model, in dev/net-import-study/. Slots 18 to 22
-// are `[REACTIONS]` and are named below; slots 16, 17, 39 and 40 are still unnamed on purpose.
+// are `[REACTIONS]` and are named below. Slots 16, 17, 39 and 40 were closed 2026-09-06 out of
+// EPA's own GUI source (`Uglobals.pas`, `Uexport.pas`); 16 is named but still not written, because
+// EPANET does not state it in an `.inp` either. See dev/epanet-net-format.md.
 $OPTION_ORDER = array(
 	0 => 'Units', 1 => 'Headloss', 2 => 'Specific Gravity', 3 => 'Viscosity', 4 => 'Trials',
 	5 => 'Accuracy', 6 => 'Unbalanced', 8 => 'Demand Multiplier', 9 => 'Emitter Exponent',
 	13 => 'Diffusivity', 15 => 'Tolerance',
 	36 => 'CheckFreq', 37 => 'MaxCheck', 38 => 'DampLimit',
+	39 => 'HEADERROR', 40 => 'FLOWCHANGE',
 	41 => 'Demand Model', 42 => 'Minimum Pressure', 43 => 'Required Pressure',
 	44 => 'Pressure Exponent'
 );
+// EPANET writes these two only when they parse as a positive number (`Uexport.pas` guards each
+// with `GetSingle(...) and (v > 0)`), which is why its export of a file holding `0` states nothing
+// to match them against and measurement could never have reached them.
+$OPTION_ONLY_IF_POSITIVE = array(39 => true, 40 => true);
 $OPTION_PATTERN = 7;
 $OPT_QUALITY = 11; $OPT_QUAL_UNITS = 12; $OPT_TRACE_NODE = 14;
 $REPORT_ORDER = array(10 => 'Status');
@@ -167,11 +174,12 @@ $ENERGY_ORDER = array(
 // js/lpn-net.js**, which carries the evidence: 19 and 20 are anchored by Net1's own `-.5` and `-1`
 // against EPANET's `Global Bulk -.5` and `Global Wall -1`, 21 and 22 close the interval up to the
 // confirmed slot 23, and slot 18 stores the wall order as a WORD where the `.inp` writes a number.
-// Slots 16, 17, 39 and 40 stay unnamed on purpose -- 17 holds `1` and so do BOTH `Order Bulk` and
-// `Order Tank` in all three reference models, so nothing separates them.
+// Slot 17 is the bulk order, and EPANET writes BOTH `Order Bulk` and `Order Tank` from that one
+// index -- which is why nothing in any model ever separated them, and why both lines are written.
 $REACTION_ORDER = array(
 	19 => 'Global Bulk', 20 => 'Global Wall', 21 => 'Limiting Potential', 22 => 'Roughness Correlation'
 );
+$OPT_BULK_ORDER = 17;
 $OPT_WALL_ORDER = 18;
 $WALL_ORDER_NUMBER = array('FIRST' => '1', 'ZERO' => '0');
 
@@ -305,7 +313,8 @@ function numOr($s, $default) { return $s === '' ? $default : $s; }
 function netToInp($net) {
 	global $OPTION_ORDER, $OPTION_PATTERN, $TIME_ORDER, $ENERGY_ORDER, $REPORT_ORDER,
 		$OPT_QUALITY, $OPT_QUAL_UNITS, $OPT_TRACE_NODE,
-		$REACTION_ORDER, $OPT_WALL_ORDER, $WALL_ORDER_NUMBER;
+		$REACTION_ORDER, $OPT_BULK_ORDER, $OPT_WALL_ORDER, $WALL_ORDER_NUMBER,
+		$OPTION_ONLY_IF_POSITIVE;
 	$L = array();
 	$L[] = '[TITLE]';
 	$L[] = 'Converted from ' . $net['file'] . ' by dev/scripts/epanet_net_to_inp.php';
@@ -442,8 +451,15 @@ function netToInp($net) {
 		if (isset($WALL_ORDER_NUMBER[$up])) { $wallOrderNumber = $WALL_ORDER_NUMBER[$up]; }
 		elseif (preg_match('/^[-+]?(\d+\.?\d*|\.\d+)$/', $wallOrder)) { $wallOrderNumber = $wallOrder; }
 	}
-	$reactions = $wallOrderNumber === ''
-		? array() : array(sprintf(' %-20s %s', 'Order Wall', $wallOrderNumber));
+	// `Order Bulk` and `Order Tank`, both out of slot 17: EPANET writes the one value twice under
+	// two keywords, so writing either alone would differ from its own export of the same `.net`.
+	$bulkOrder = $optAt($OPT_BULK_ORDER);
+	$reactions = $bulkOrder === '' ? array() : array(
+		sprintf(' %-20s %s', 'Order Bulk', $bulkOrder),
+		sprintf(' %-20s %s', 'Order Tank', $bulkOrder));
+	if ($wallOrderNumber !== '') {
+		$reactions[] = sprintf(' %-20s %s', 'Order Wall', $wallOrderNumber);
+	}
 	$put('REACTIONS', array_merge($reactions, $rowsFor($REACTION_ORDER)), 'Global reaction settings');
 	$put('TIMES', $rowsFor($TIME_ORDER), 'Clock and reporting');
 	$put('REPORT', $rowsFor($REPORT_ORDER), 'EPANET report settings');
@@ -452,6 +468,7 @@ function netToInp($net) {
 	foreach ($OPTION_ORDER as $i => $name) {
 		$v = $optAt($i);
 		if ($v === '') { continue; }
+		if (isset($OPTION_ONLY_IF_POSITIVE[$i]) && !(floatval($v) > 0)) { continue; }
 		$L[] = sprintf(' %-20s %s', $name, $v);
 	}
 	// One line from three slots, its grammar set by its own first token.
