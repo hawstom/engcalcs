@@ -2579,8 +2579,8 @@ $ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
 $ec_lang['lpn_settings_demand_multiplier_tip']='A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project\'s.';
 $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
-$ec_lang['lpn_settings_engine_epanet']='Solve with the EPANET solver';
-$ec_lang_syn['lpn_settings_engine_epanet']='';
+$ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
+$ec_lang_syn['lpn_settings_engine_native']='';
 // "IS FASTER" WAS FALSE AND IS GONE (Tom, 2026-08-14: *"is our tip about 'faster' right? I
 // thought you proved that it's too close to call."* He is right, and it was my own measurement
 // that showed it). Task 313 timed both: at this page's 10-20 node target the built-in solver is
@@ -2595,8 +2595,8 @@ $ec_lang_syn['lpn_settings_engine_epanet']='';
 // and Manning 0.6%. Both are also announced in the status line when a network actually contains
 // the thing, but a user deciding whether to TURN THE ENGINE ON is asking the question here, and
 // finding out afterwards is finding out too late.
-$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. On a network this size you will not see a speed difference. The two solvers agree closely, but not exactly: EPANET rounds the value it uses for gravity, so its minor (local) losses come out about 0.08% lower than the built-in solver, and with Manning roughness its head loss comes out about 0.6% lower. The first time you tick this box, about 650 KB is downloaded and then kept on this device.';
-$ec_lang_syn['lpn_settings_engine_epanet_tip']='';
+$ec_lang['lpn_settings_engine_native_tip']='Solves with the built-in solver wherever it can, and calls the EPANET solver from the US EPA, here in your browser, when it cannot. Some networks go to the EPANET solver whatever this box says: an extended-period run always does, and so does a network holding an active PRV, PSV, or FCV. On a network this size you will not see a speed difference. The two solvers agree closely, but not exactly: EPANET rounds the value it uses for gravity, so its minor (local) losses come out about 0.08% lower than the built-in solver, and with Manning roughness its head loss comes out about 0.6% lower. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
+$ec_lang_syn['lpn_settings_engine_native_tip']='';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';

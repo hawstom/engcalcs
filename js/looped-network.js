@@ -23638,11 +23638,22 @@ var EngCalcs = EngCalcs || {};
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when the native path is the one this page
 		// is built around.
+		//
+		// **THE BOX IS DISPLAYED THE OTHER WAY ROUND FROM THE WAY IT IS STORED** (Task 602, Tom
+		// 2026-09-06: *"This is really a choice about the built-in solver. They don't get a choice
+		// about the EPANET solver."*). Ticked means `native`, unticked means `epanet`. The label
+		// used to say "Solve with the EPANET solver", so unticked read as "never EPANET", which is
+		// false on two paths the user does not control: an extended-period run and an active
+		// PRV/PSV/FCV go to EPANET whatever this box says.
+		//
+		// `settings.engine` KEEPS its `epanet`/`native` vocabulary in storage, untouched, so no
+		// saved project changes meaning. Display polarity and storage polarity are different
+		// things, and the two lines below are the whole of the inversion.
 		var engInput = document.createElement('input');
 		engInput.type = 'checkbox';
-		engInput.checked = (settings.engine === 'epanet');
+		engInput.checked = (settings.engine !== 'epanet');
 		engInput.addEventListener('change', function () {
-			settings.engine = engInput.checked ? 'epanet' : 'native';
+			settings.engine = engInput.checked ? 'native' : 'epanet';
 			// A different engine makes the engine-difference notes new again (Task 525).
 			resetEngineNotes();
 			// Fetch it now rather than on the next solve: the user just asked for this engine, so
@@ -23650,7 +23661,7 @@ var EngCalcs = EngCalcs || {};
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
-		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
+		row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip);
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET
@@ -32329,7 +32340,7 @@ var EngCalcs = EngCalcs || {};
 		//
 		// They are also not facts about this solve. They are facts about the engine you picked,
 		// they are 0.08% and 0.6%, nothing can be done about either, and the identical sentences
-		// already sit in `lpn_settings_engine_epanet_tip` where the engine is chosen. Saying them
+		// already sit in `lpn_settings_engine_native_tip` where the engine is chosen. Saying them
 		// once, the first time they arise, tells a user who never opens that tip; saying them
 		// forever spends a fifth of a phone screen on a rounding difference.
 		//
