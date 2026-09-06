@@ -16376,10 +16376,10 @@ var EngCalcs = EngCalcs || {};
 			// A DEMAND PATTERN IS NOW APPLIED at the one moment this page solves (Task 423), so it
 			// is no longer the same report as a head pattern, which still is not. It stays in the
 			// report because the rest of the day still does not run.
-			case 'demand-pattern': return pc.lpn_inp_drop_demand_pattern || 'These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
+			case 'demand-pattern': return pc.lpn_inp_drop_demand_pattern || 'These junctions change their demand through the run. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
 			// A HEAD PATTERN IS NOW APPLIED (Task 248.02), exactly as a demand pattern is, so it is
 			// no longer the same report as a whole clock that failed to load.
-			case 'head-pattern': return pc.lpn_inp_drop_head_pattern || 'These reservoirs rise and fall through the day. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
+			case 'head-pattern': return pc.lpn_inp_drop_head_pattern || 'These reservoirs rise and fall through the run. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
 			case 'patterns': return pc.lpn_inp_drop_patterns || 'Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
 			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see or change it yet.';
 			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page fits a curve from.';
@@ -16420,7 +16420,7 @@ var EngCalcs = EngCalcs || {};
 			case 'quality':
 			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose the chemical analysis under Settings, Calculation, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'sources':
-			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where more of the substance is added to the network, and how the water in a tank mixes. This page does not work out either of those yet, so a chemical run here starts from the amount the file gives each junction, reservoir and tank, and every tank is treated as completely mixed. Those lines are kept, and they are written back if you save an EPANET file.';
+			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Pump energy under Calculate to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. There is nowhere on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.';
 			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for the report it prints. This page shows its answers in its own way, so nothing here uses them. They are kept, and they are written back if you save an EPANET file.';
@@ -18833,6 +18833,7 @@ var EngCalcs = EngCalcs || {};
 		syncNewBoxRoughness();
 		syncNewBoxPlace();
 		box.style.display = 'block';
+		raisePanel(box);   // centred, not dragged, so it is raised where it becomes visible
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();
 		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
@@ -19134,6 +19135,7 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		closeViewPopovers();
 		popup.style.display = 'block';
+		raisePanel(popup);   // centred, not dragged, so it is raised where it becomes visible
 		var h = fitPanelToViewport(popup);
 		var pr = popup.getBoundingClientRect();
 		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
@@ -26143,6 +26145,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function raisePanel(el) {
 		if (!el || !el.style) { return; }
+		// **REGISTERED HERE, NOT ONLY IN makePanelDraggable()** (2026-09-05). Two boxes that are
+		// centred rather than dragged -- the New project box and the Notes popover -- open over the
+		// map and were in no stack at all; the popover carried a hard `z-index: 20` and so opened
+		// UNDER every panel and under the chrome. Registering on the first raise means a box only has
+		// to ask to be raised, and renormalisation still sees it. Draggable panels are registered a
+		// second time by makePanelDraggable(), which is a no-op here and deliberate: a panel must be
+		// in the registry from the moment it is wired, not from its first raise.
+		if (lpnPanels.indexOf(el) < 0) { lpnPanels.push(el); }
 		// Already in front: do not burn a number on every pointerdown of a drag.
 		if (Number(el.style.zIndex) === lpnPanelZ) { return; }
 		if (lpnPanelZ + 1 > LPN_PANEL_Z_CEILING) { renormalisePanelStack(); }
@@ -27079,6 +27089,14 @@ var EngCalcs = EngCalcs || {};
 		var popup = document.getElementById('lpn_popup'), r, h, at;
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px'; popup.style.display = 'block';
+		// **RAISED HERE, WHERE IT BECOMES VISIBLE** (Tom, 2026-09-05: *"When an asset is clicked and
+		// its properties box opens, it is hidden under Libraries... It needs to win at the moment the
+		// asset is clicked."*). The property popup is the one panel that does NOT go through
+		// placePanelForScreen(), which is where every standing box is raised -- it opens beside the
+		// element it describes rather than restoring a remembered corner -- so the raise the other
+		// six get for free had simply never been wired to it. openPopupAt() is the single seam all
+		// three doors (node, link, label) come through, so this is one line and not three.
+		if (popup.__lpnRaise) { popup.__lpnRaise(); }
 		// Clamp into the viewport (Tom, tall/phone mode: the popup opened partly off-screen).
 		// Measured after display:block since an element's size isn't known while display:none.
 		// The HEIGHT is capped first (Task 372) and the clamp is then given the capped height: an
@@ -28010,11 +28028,11 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_pump_effic_curve || 'Efficiency curve', pc.lpn_pump_effic_curve_tip);
 		if (name && !curve) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
-				|| 'This pump names the efficiency curve {name}, which its file does not state, so it runs at the network efficiency of {percent}. Type its points below.')
+				|| 'This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.')
 				.replace('{name}', name).replace('{percent}', globalText));
 		} else if (!name) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_global
-				|| 'This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.')
+				|| 'This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.')
 				.replace('{percent}', globalText));
 		}
 		efficPointTable(fields, l);
@@ -31929,9 +31947,9 @@ var EngCalcs = EngCalcs || {};
 			// than one shared with the simple controls above: a user who wrote a sentence and a user
 			// who wrote a rule are looking in two different places for the thing to fix.
 			droppedNote('rule-dangling', 'lpn_rule_dangling_note',
-				'These rules name an element that is no longer in this project, so they were left out: {ids}'),
+				'These rules name an element that is no longer in this project, so they were ignored in this run: {ids}'),
 			droppedNote('rule-unreadable', 'lpn_rule_unreadable_note',
-				'These rules could not be read, so they were left out: {ids}'),
+				'These rules could not be read, so they were ignored in this run: {ids}'),
 			// The same kind of thing as valveRouteNote: a fact about THIS network that has to be
 			// known to read the numbers on screen. Here, that only the first reporting time is
 			// being kept up to date, because working the whole period out costs more than this

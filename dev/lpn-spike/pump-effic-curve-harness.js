@@ -460,8 +460,8 @@ const FIXTURE = [
 	chainPump._efficCurveId = 'GHOST';
 	L.renderLinkFields('P1');
 	const ghostText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
-	check(/GHOST/.test(ghostText) && /does not state/.test(ghostText),
-		`a curve named but not stated is disclosed by name: ${/This pump names[^]{0,110}/.exec(ghostText)}`);
+	check(/GHOST/.test(ghostText) && /undefined/.test(ghostText),
+		`a curve named but not stated is disclosed by name: ${/This pump calls[^]{0,110}/.exec(ghostText)}`);
 	chainPump._efficCurveId = keptName;
 
 	// =========================================================================================

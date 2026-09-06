@@ -81,6 +81,86 @@ console.log('\n--- one place makes a panel draggable ---');
 }
 
 // ---------------------------------------------------------------------------
+// 1b. A PANEL THAT BECOMES VISIBLE COMES TO THE FRONT.
+//
+//     Tom, 2026-09-05: *"When an asset is clicked and its properties box opens, it is hidden under
+//     Libraries... It needs to win at the moment the asset is clicked."* The raise mechanism had
+//     existed since 2026-09-02 and reached six of the eight panels, because it was wired to
+//     placePanelForScreen() -- the seam that RESTORES A REMEMBERED CORNER. The two boxes that place
+//     themselves instead of remembering are the fire flow run dialog (which had already been caught,
+//     for the same reason, three days earlier) and the property popup, which had not.
+//
+//     So the invariant is stated over the SEAMS rather than over the boxes: a function that makes a
+//     panel visible must raise it in the same breath. Asserted as "every function that sets a
+//     registered panel's display to block or flex also calls the raise", which is what makes a ninth
+//     panel written next month fail here rather than open behind something.
+// ---------------------------------------------------------------------------
+console.log('\n--- a panel that opens comes to the front ---');
+{
+	ok('raisePanel() exists and the panels have a bounded band',
+		/function raisePanel\s*\(/.test(code) && /LPN_PANEL_Z_CEILING/.test(code));
+	// The three seams, each named with what it does that the others do not.
+	const SEAMS = [
+		['placePanelForScreen', 'the six standing boxes, which restore a remembered corner'],
+		['openPopupAt', 'the property popup, which opens beside the element it describes'],
+		['openFireFlowRunBox', 'the run dialog, which centres itself on every open']
+	];
+	SEAMS.forEach(function (pair) {
+		const b = body(pair[0]);
+		ok(pair[0] + '() raises the panel it shows -- ' + pair[1],
+			!!b && /__lpnRaise/.test(b), b ? '' : 'FUNCTION NOT FOUND');
+	});
+	// **THE NEGATIVE HALF, which is the one that catches the ninth panel.** Every assignment that
+	// makes something visible must sit in a function that also raises -- either by calling the raise
+	// itself, or by going through placePanelForScreen(), which raises whatever it places. Stated over
+	// the ENCLOSING FUNCTION rather than over the seam list, because the six standing boxes set their
+	// own `display` a few lines above the placing call and are correct.
+	function coveringFn(at) {
+		let i = code.lastIndexOf('function ', at);
+		while (i >= 0) {
+			let j = code.indexOf('{', i), depth = 0, end = j;
+			for (; end < code.length; end++) {
+				if (code[end] === '{') { depth++; }
+				else if (code[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+			}
+			if (end > at) { return code.slice(i, end); }
+			i = code.lastIndexOf('function ', i - 1);
+		}
+		return '';
+	}
+	const shows = [];
+	const re = /([A-Za-z_$][\w$]*)\.style\.display = '(?:block|flex)'/g;
+	let m;
+	while ((m = re.exec(code)) !== null) {
+		const fn = coveringFn(m.index);
+		if (/__lpnRaise|raisePanel\(|placePanelForScreen\(/.test(fn)) { continue; }
+		shows.push(m[1] + ' @' + code.slice(0, m.index).split('\n').length);
+	}
+	// Declared: what is made visible that is NOT a draggable panel. A row here is a sentence somebody
+	// had to write, exactly as in section 2's NOT_A_PANEL.
+	const NOT_A_PANEL_SHOW = [
+		[/^lab @/, 'a node data label on the map'],
+		[/^valLab @/, 'a valve data label on the map'],
+		[/^qLab @/, 'a water-quality label on the map'],
+		[/^row @/, 'a row inside a box that is already open'],
+		[/^sepRow @/, 'a row inside a box that is already open'],
+		[/^div @/, 'a row inside a box that is already open'],
+		[/^banner @/, 'the one-line status banner across the top of the map'],
+		[/^back @/, 'the modal dialog backdrop -- an empty scrim, holding no control'],
+		[/^dlg @/, 'the modal dialog itself, centred by CSS and outranking everything'],
+		[/^panel @/, 'openPanelAtAnchor(): the menus, their fly-outs and the panels that hang off a '
+			+ 'control. These live in the CHROME band by Tom\'s 2026-08-24 ruling and must NOT be '
+			+ 'raised into the 1200 band -- a menu belongs to the button that opened it. The six '
+			+ 'standing boxes that ALSO hang off a control go through placePanelForScreen().']
+	];
+	const undeclared = shows.filter(function (s) {
+		return !NOT_A_PANEL_SHOW.some(function (r) { return r[0].test(s); });
+	});
+	ok('nothing outside those seams makes a panel visible', undeclared.length === 0,
+		JSON.stringify(undeclared));
+}
+
+// ---------------------------------------------------------------------------
 // 2. ONE FUNCTION HIDES A PANEL, AND SWEEPING ITS TIPS IS PART OF HIDING IT.
 //
 //    The assertion is the NEGATIVE one -- no other `display = 'none'` -- with

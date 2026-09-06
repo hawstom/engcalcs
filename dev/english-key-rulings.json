@@ -1,6 +1,50 @@
 {
  "_note": "See dev/scripts/new_english_keys.php. A ruling is remembered against the EXACT English it was made on; change the string and the ruling lapses.",
  "rulings": {
+  "lpn_curve_kind_effic": {
+   "on": "Pump efficiency",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_kind_generic": {
+   "on": "Not stated",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_kind_head": {
+   "on": "Pump head",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_kind_headloss": {
+   "on": "Valve head loss",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_kind_volume": {
+   "on": "Tank volume",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_library_link": {
+   "on": "Curves library",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_library_link_tip": {
+   "on": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element names a curve; it does not hold one.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_long_note": {
+   "on": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_none": {
+   "on": "No curve",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_shared_note": {
+   "on": "These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_curve_volume_col": {
+   "on": "Volume",
+   "ruled": "2026-09-05"
+  },
   "lpn_demand_add": {
    "on": "Add demand category",
    "ruled": "2026-08-29"
@@ -90,7 +134,7 @@
    "ruled": "2026-09-04"
   },
   "lpn_energy_curve_note": {
-   "on": "These pumps name an efficiency curve that the file they came from does not state, so they ran at the efficiency set for the whole network: {ids}.",
+   "on": "These pumps call an efficiency curve with no points, so they ran at the efficiency set for the whole network: {ids}.",
    "ruled": "2026-09-05"
   },
   "lpn_energy_demand_charge": {
@@ -497,6 +541,14 @@
    "on": "Name or description of the category.",
    "ruled": "2026-08-29"
   },
+  "lpn_field_tag": {
+   "on": "Tag",
+   "ruled": "2026-09-05"
+  },
+  "lpn_field_tag_tip": {
+   "on": "A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
+   "ruled": "2026-09-05"
+  },
   "lpn_field_text_attached": {
    "on": "Attached to",
    "ruled": "2026-08-29"
@@ -653,6 +705,14 @@
    "on": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
    "ruled": "2026-08-29"
   },
+  "lpn_gpv_curve_source": {
+   "on": "Head loss curve",
+   "ruled": "2026-09-05"
+  },
+  "lpn_gpv_curve_source_tip": {
+   "on": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.",
+   "ruled": "2026-09-05"
+  },
   "lpn_inp_drop_energy": {
    "on": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
    "ruled": "2026-09-01"
@@ -689,9 +749,121 @@
    "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
    "ruled": "2026-09-02"
   },
+  "lpn_library_curve_add": {
+   "on": "Add a curve",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_copy": {
+   "on": "Copy points",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_copy_manual": {
+   "on": "Copy these points",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_copy_tip": {
+   "on": "Copies every point as two columns, ready to paste into a spreadsheet.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_in_use": {
+   "on": "This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_kind": {
+   "on": "What this curve describes",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_note_label": {
+   "on": "Description",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_note_tip": {
+   "on": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_remove_point": {
+   "on": "Remove this point",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_unused": {
+   "on": "Nothing uses this curve.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_used_by": {
+   "on": "Used by",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_values_tip": {
+   "on": "Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines out of an EPANET file paste too, curve name and all.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_x": {
+   "on": "X",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_curve_y": {
+   "on": "Y",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rule_add": {
+   "on": "Add a rule",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rule_bad": {
+   "on": "⚠ Not understood",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rule_missing": {
+   "on": "⚠ This network has nothing called {id}",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rule_ok": {
+   "on": "✓ Understood",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rule_tip": {
+   "on": "One rule, in the words EPANET uses, one clause per line. A first line names it: RULE 1. Then a condition: IF TANK 2 LEVEL BELOW 17.1. Then what to do about it: THEN PUMP 9 STATUS IS OPEN. A last line may rank it: PRIORITY 1. Add AND or OR lines to test more than one thing, and ELSE lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Write the numbers in the units this project is showing; they are converted for you. Leave the keywords in English; they are what the page and EPANET read.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rules": {
+   "on": "Rules",
+   "ruled": "2026-09-05"
+  },
+  "lpn_library_rules_tip": {
+   "on": "A rule is a short paragraph that opens or closes a link, or gives it a setting, when a water level, a pressure, a flow or a time says so. Rules can test more than one thing at once, and they can say what to do when the test fails.",
+   "ruled": "2026-09-05"
+  },
   "lpn_menu_map": {
    "on": "Map",
    "ruled": "2026-08-29"
+  },
+  "lpn_mixing_2comp": {
+   "on": "Two compartment mixing",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_fraction": {
+   "on": "Mixing fraction",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_fraction_tip": {
+   "on": "The share of the tank volume that the inlet zone takes up, between 0 and 1. Only two compartment mixing uses it. Leave it empty and the whole tank is the inlet zone, which is what EPANET assumes.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_lifo": {
+   "on": "LIFO plug flow",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_mixed": {
+   "on": "Complete mixing",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_model": {
+   "on": "Mixing model",
+   "ruled": "2026-09-05"
+  },
+  "lpn_mixing_model_tip": {
+   "on": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
+   "ruled": "2026-09-05"
   },
   "lpn_net_emergency": {
    "on": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
@@ -792,6 +964,38 @@
   "lpn_profile_saved": {
    "on": "Saved paths",
    "ruled": "2026-08-29"
+  },
+  "lpn_pump_curve_source_tip": {
+   "on": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can name the same curve, and editing it changes all of them.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_col": {
+   "on": "Efficiency",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_curve": {
+   "on": "Efficiency curve",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_curve_tip": {
+   "on": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_global": {
+   "on": "This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_note": {
+   "on": "Flow vs percent efficiency. A pump with no efficiency curve selected runs at the network efficiency.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_remove": {
+   "on": "Remove this point",
+   "ruled": "2026-09-05"
+  },
+  "lpn_pump_effic_unstated": {
+   "on": "This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.",
+   "ruled": "2026-09-05"
   },
   "lpn_quality_age": {
    "on": "Water age",
@@ -932,6 +1136,14 @@
   "lpn_result_water_age_tip": {
    "on": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
    "ruled": "2026-09-01"
+  },
+  "lpn_rule_dangling_note": {
+   "on": "These rules name an element that is no longer in this project, so they were ignored in this run: {ids}",
+   "ruled": "2026-09-05"
+  },
+  "lpn_rule_unreadable_note": {
+   "on": "These rules could not be read, so they were ignored in this run: {ids}",
+   "ruled": "2026-09-05"
   },
   "lpn_scenario_mark_tip": {
    "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
@@ -1144,6 +1356,46 @@
   "lpn_settings_viscosity_tip": {
    "on": "The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
    "ruled": "2026-08-29"
+  },
+  "lpn_source_pattern": {
+   "on": "Source pattern",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_pattern_tip": {
+   "on": "A time pattern that scales the dose through the day, for a feed that does not run flat out around the clock. No pattern means that the dose is the same at every step.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_quality": {
+   "on": "Source quality",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_quality_tip": {
+   "on": "How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass of chemical per minute. Leave it empty and nothing is added here, which is not the same as a zero: a zero is a feed that is running and adding nothing.",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_type": {
+   "on": "Source type",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_type_concen": {
+   "on": "Concentration",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_type_flowpaced": {
+   "on": "Flow paced booster",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_type_mass": {
+   "on": "Mass booster",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_type_setpoint": {
+   "on": "Setpoint booster",
+   "ruled": "2026-09-05"
+  },
+  "lpn_source_type_tip": {
+   "on": "What kind of dose this node applies to the water passing through it. Concentration treats the water entering the network here as arriving at the strength below. Mass booster adds a mass of chemical every minute, whatever the flow is. Setpoint booster lifts the concentration leaving this node to the strength below and no further. Flow paced booster adds the strength below to whatever is already in the water.",
+   "ruled": "2026-09-05"
   },
   "lpn_terrain_blank_ids": {
    "on": "These nodes are still blank: {ids}",
