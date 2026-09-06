@@ -103,52 +103,64 @@ standing in the way is not code.
   two distinct English terms landed on one Pashto word on the same screen. No English defect; it
   needs a Pashto speaker. It is in `dev/new-english-keys.md` under the translators' section.
 
-## 4. STATE — checked and pruned 2026-09-06
+## 4. STATE — checked and pruned 2026-09-06, second pass
 
-**Everything §4 and §5 said to verify about the curves paradigm change (Task 586) was verified on
-2026-09-06 and is true**, so the checklist is gone rather than carried: `doc.curves` is the store;
-`curvePoints`, `efficPoints` and `curveRef` survive only inside `mintCurveLibrary()`, which is the
-one-way migration, and in the helper `curvePointsOf()`; all four EPANET kinds exist as library
-objects; and a tank USES its volume curve (Task 587 closed the same day, `lpnTankVolumeAttach()` in
-`js/lpn-time.js`, anchored by `dev/lpn-spike/tank-volume-curve-harness.js`). Nothing here needs
-believing any more; the harnesses assert it.
+**Everything the curves paradigm change (Task 586) asked to be verified is verified and the
+checklist is gone rather than carried.** `doc.curves` is the store; `curvePoints`, `efficPoints` and
+`curveRef` survive only inside `mintCurveLibrary()` (the one-way migration) and in `curvePointsOf()`;
+all four EPANET kinds exist as library objects; a tank USES its volume curve. The harnesses assert
+all of it. Nothing here needs believing.
 
-**`dev/new-english-keys.md` is at ZERO still to read, 2026-09-06.** Tom read the whole list again
-and wrote 50 marks on it, and all 50 are now in `dev/english-key-rulings.json` and
-`dev/english-friction/584-wave0.json` rather than in the working tree.
-`harvest_english_rulings.php --check` is blocking, so a mark can no longer sit only in the markdown.
-**The sprint is gated on ONE string:** `lpn_scncmp_at`, where he asked *"I need more context. Where
-is this used?"* — answered in the friction log, and waiting on his ruling. Nothing else blocks it.
+**THE TRANSLATION BACKLOG IS ESSENTIALLY EMPTY, WHICH IS A CHANGE OF STATE AND NOT A GOOD NUMBER TO
+GUESS AT.** Sprint 584-wave1 closed at 26/26. Both friction logs PASS with every entry answered
+(wave0: 64 entries, wave1: 34). `detect_english_drift.php` reports **1** changed key and
+`new_english_keys.php` **1** untranslated — both of them `lpn_tool_key_hint`, written the same day.
+**So there is no sprint to propose.** An earlier version of this file said 39 drifted and 144
+untranslated; that debt was discharged, not deferred, and quoting it would size a sprint against
+work that is done.
 
-**The retranslation debt is the live number:** `detect_english_drift.php` reports 39 keys whose
-English moved after a translation was written, and `new_english_keys.php` reports 144 untranslated.
-That is one sprint's worth and it is what a sprint should be sized against.
+**`lpn_scncmp_at` no longer gates anything.** Tom ruled in conversation on 2026-09-06 — the English
+stands as `{value} at {id}` — and his mark did not reach `dev/new-english-keys.md`, which is why the
+harvester exists. The `$ec_lang_syn` half was PROPOSED and is still unwritten: it needs written
+permission naming it, and has been put to him once, labelled.
 
 ---
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-1. **THE SPRINT IS GATED ON TOM AND ON NOTHING ELSE.** Wave 0 ran on 2026-09-06 over 178 new and
-   changed strings and filed **64 findings** — 44 applied, 7 referred to him, the rest dismissed or
-   ruled. `friction_check.php` counts a `refer-to-human` as unanswered by design, so those 7 are the
-   hard gate. Separately `dev/new-english-keys.md` stands at **45 to read**, and 43 of those are
-   keys whose earlier ruling LAPSED because Wave 0 changed the wording — which is the ruling
-   mechanism working, not a regression.
-2. **The JS fallback literals — DONE 2026-09-06, and named here for the lesson.** Every localized
-   string is copied beside its key as `pageConfig.<key> || '<literal>'`, and 199 of 893 had drifted
-   from `lib/lang.ec.en.php` — invisible because `pageconfig_check.php` guarantees the key is
-   supplied, so none of it renders, which is exactly why it rotted. All 199 corrected mechanically
-   out of `$ec_lang`, and `js_fallback_string_check.php` is absolute at 0.
-3. **Task 539 phase two — the gang move.** Phase one measured it and overturned the plan: across 28
-   drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the cheap
-   segment-intersection test the roadmap proposed as the opening sees about a tenth of the problem.
-   Build for the second trigger.
-4. **Task 436's measurement is DONE, 2026-09-06, and it turned a suspicion into a decision.** Text
-   measurement was the suspect and is now proven: 70-79% of the block, `getBBox` at 0.8 ms a call,
-   ~100% of the calls from one caller. The standing warning against the arithmetic fix is FALSE
-   (0 of 3,608 `getComputedTextLength` calls returned zero) and the real obstacle is that advance
-   width runs 0.636% mean / 1.801% worst under the ink box. The fix is named and costed in the
-   roadmap block; what is left is Tom's call on whether "byte-identical placement" may be relaxed.
+**Four questions are with Tom and each blocks a specific thing. None blocks everything.**
+
+1. **Task 596 — lpn-only Help row, or a suite-wide `echoFooter()` link** for the Not EPANET site.
+   Same 26 translations either way; the footer reaches fifteen more pages. Do not write the string
+   before he answers, because the answer changes what the string may say.
+2. **Task 465 — is a library pipe allowed to be something a `.inp` round trip loses?** A typed pipe
+   flattens on export and cannot be rebuilt on import, so Task 281's byte-identical guarantee holds
+   for the file's numbers but not for the TYPE. Curves escaped this because EPANET has curves. The
+   first buildable slice (`effective()`, disabled-control rendering) can start before he answers.
+3. **Task 574 — he may be able to unblock it cheaply.** Indices 16-22, 39 and 40 have no second
+   source to match against, and guessing is what wrote `Duration 0.0` into a converted file the
+   first time. EPANET persists PROFILES and CALIBRATION files; if either lives in that range it
+   would explain the stray `1` and `First`. The test is one save-and-reimport by him.
+4. **Task 602 — the engine label.** Recommended wording is *"Always solve with the EPANET solver"*,
+   which keeps the checkbox polarity. **Do NOT invert it**: `settings.engine` is stored per project,
+   so flipping the sense silently reverses every saved file that states one.
+
+**Buildable now, needing nobody:**
+
+5. **Task 599 — graph a value against time across an EPS.** The highest-value gap and the cheapest
+   of the plot family, because the data already exists: a run keeps every reporting step. Draw it
+   the way `lpn_profile_*` is drawn — no chart library, nothing vendored.
+6. **Task 597/598 — table filters and dictionary-order comparison.** Reuse Find's predicate rather
+   than writing a second one, and use EPANET's own words: Below, Equal to, Above (Tom's ruling).
+   `Intl.Collator` with `numeric: true` for the string half, or P10 sorts before P2.
+7. **Task 539 phase two — the gang move.** Phase one overturned the plan it was written against:
+   across 28 drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the
+   segment-intersection test the roadmap proposed sees about a tenth of the problem. Build for the
+   second trigger.
+
+**Closed this session and named so they are not re-opened from habit:** 436 (arithmetic shed
+pricing, tolerance relaxed on Tom's word to a measured 1.111%), 595 (digit keys select a tool),
+591 (Not EPANET site deployed), 583, 593, 569.
 
 ---
 
