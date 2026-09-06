@@ -402,3 +402,9 @@ const onLeader = Collide.placeLabelsFirstFit(
 eq(onLeader[0].dropped, true, 'a label may not sit on a leader');
 
 console.log('label-priority-harness: phase 1 section passed');
+// **EXIT EXPLICITLY.** See dev/testing-notes.md, "A HARNESS THAT FINISHES AND DOES NOT EXIT STOPS
+// THE WHOLE SUITE": the page under test leaves debounce timers pending, so falling off the end
+// here waits for them and this harness never returned -- which stalled run_harnesses.sh and, with
+// it, every check_all run on this tree. The 300 s timeout in run_harnesses.sh is the net; this is
+// the cause.
+process.exit(0);
