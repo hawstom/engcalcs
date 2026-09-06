@@ -215,6 +215,90 @@ async function reshedBlockMs(a, notches, dir) {
 	}), [notches, dir]);
 }
 
+// **WHAT THE REMAINING SECONDS ARE ACTUALLY SPENT ON** (Task 436). The block above is reported and
+// not asserted because nothing could say what was IN it: the counts were held (9 forced layouts a
+// notch, ~7 overlap tests a label) and seconds were still going somewhere, so the roadmap named text
+// measurement as the suspect and said plainly that it was unproven.
+//
+// This settles it by measurement rather than by profile-reading. The two layout READS the label
+// pipeline uses -- getBBox() and getComputedTextLength() -- are wrapped ON THEIR PROTOTYPES from
+// inside the page for the duration of one gesture, so every call is counted and timed wherever it is
+// made. **Nothing in js/looped-network.js is touched**, which matters twice: an instrument that
+// lives in the source is an instrument that ships, and one that lives in a wrapper cannot be
+// bypassed by a call site the wrapper's author forgot.
+//
+// **A CALL IS NOT A FORCED LAYOUT, and conflating the two is the mistake this measures away.** A
+// forced synchronous layout happens only when a read follows a WRITE; a run of reads with no write
+// between them costs almost nothing. So the count and the time answer different questions, and it is
+// the TIME as a share of the block that decides whether the suspect is guilty.
+//
+// The wrapper's own overhead is two performance.now() calls per call, which is nanoseconds against a
+// layout flush -- if the share comes back small, the overhead cannot be hiding a large true cost.
+//
+// **IT CAME BACK LARGE, AND IT NAMED THE WRONG HALF GUILTY.** Five runs on this grid, 2026-09-06:
+//
+//     getBBox                  1,391 calls   1,076-1,672 ms
+//     getComputedTextLength    7,729 calls          20-32 ms
+//     share of the block                          73-79%
+//
+// So text measurement IS the remaining cost, which Task 436 suspected -- but it is **getBBox at
+// 0.8 ms a call**, not the per-tspan widths. Six times as many getComputedTextLength calls cost a
+// fiftieth as much, because they run in a batch with no DOM write between them and force no layout.
+//
+// **AND ~100% OF THE getBBox CALLS COME FROM ONE CALLER.** A 1-in-7 stack sample put 198 of 198 in
+// measureLabelWidths(), two thirds of them under an Array.forEach and one third under
+// renderLinkLabel() -- which is shedAlignedForConflicts()'s `while` loop in js/looped-network.js,
+// writing one label and measuring it, one rung at a time. That is the un-batched write/read pattern
+// Task 440 removed from the other two shed paths, still standing in this one. The roadmap's line
+// that "the cascade still runs one label at a time and always will" is true of the OUTER loop over
+// labels, where each placed label is an obstacle for the next; the per-rung redraw inside one
+// label's own cascade is a different loop and is not forced by that.
+//
+// **AND THE STANDING WARNING AGAINST THE ARITHMETIC FIX RESTS ON A FALSE PREMISE.** The comment at
+// the head of the fitting cascade says a banked per-tspan width "measures correctly under the
+// headless stub, produces NOTHING in a real browser". Measured here: **0 of 7,729 calls returned
+// zero**, mean 8.280e-5 -- real values in the SVG's user units, which in a geographic project are
+// DEGREES, so they are correct and tiny. Anything comparing them against a pixel-scale number would
+// read them as zero, which is a likelier account of the original failure than the call not working.
+// Recorded, not acted on: the fix is in js/looped-network.js and belongs to Task 436.
+async function reshedBlockCost(a, notches, dir) {
+	return await a.page.evaluate(([notches, dir]) => new Promise((resolve) => {
+		var G = SVGGraphicsElement.prototype, T = SVGTextContentElement.prototype;
+		var origBB = G.getBBox, origCTL = T.getComputedTextLength;
+		var bbN = 0, bbMs = 0, ctlN = 0, ctlMs = 0;
+		G.getBBox = function () {
+			var t = performance.now();
+			try { return origBB.apply(this, arguments); } finally { bbMs += performance.now() - t; bbN += 1; }
+		};
+		T.getComputedTextLength = function () {
+			var t = performance.now();
+			try { return origCTL.apply(this, arguments); } finally { ctlMs += performance.now() - t; ctlN += 1; }
+		};
+		var c = document.getElementById('lpn_canvas');
+		var r = c.getBoundingClientRect();
+		for (var i = 0; i < notches; i++) {
+			c.dispatchEvent(new WheelEvent('wheel', {
+				deltaY: 100 * dir, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2,
+				bubbles: true, cancelable: true
+			}));
+		}
+		// Same instrument as reshedBlockMs(): the pass is one synchronous block, so the longest gap
+		// between animation frames IS the block.
+		var worst = 0, last = performance.now(), until = last + 8000;
+		(function frame(now) {
+			if (now - last > worst) { worst = now - last; }
+			last = now;
+			if (now < until) {
+				requestAnimationFrame(frame);
+			} else {
+				G.getBBox = origBB;
+				T.getComputedTextLength = origCTL;
+				resolve({ block: worst, bbN: bbN, bbMs: bbMs, ctlN: ctlN, ctlMs: ctlMs });
+			}
+		})(last);
+	}), [notches, dir]);
+}
+
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
@@ -260,6 +344,19 @@ exports.run = async function ({ browser, report }) {
 		const reshed = await reshedBlockMs(a, 10, 1);
 		report.ok(true, 'the label pass after a zoom still blocks the main thread',
 			reshed.toFixed(0) + ' ms — see ROADMAP Task 436');
+
+		// ---- and WHAT that pass spends its time on (Task 436's open question) ---------------------
+		// Reported, never asserted: it is a measurement of where the time goes, and the share it
+		// prints is the answer to "is text measurement the suspect". Zoomed back out, so this is the
+		// mirror-image gesture on the same drawing rather than a second notch in the same direction.
+		const cost = await reshedBlockCost(a, 10, -1);
+		const textMs = cost.bbMs + cost.ctlMs;
+		const share = cost.block > 0 ? (100 * textMs / cost.block) : 0;
+		report.ok(true, 'and the two layout reads it makes, counted and timed',
+			cost.bbN + ' x getBBox ' + cost.bbMs.toFixed(0) + ' ms + '
+			+ cost.ctlN + ' x getComputedTextLength ' + cost.ctlMs.toFixed(0) + ' ms = '
+			+ textMs.toFixed(0) + ' ms of a ' + cost.block.toFixed(0) + ' ms block ('
+			+ share.toFixed(1) + '%)');
 
 		// ---- and closing a project that lands on it ----------------------------------------------
 		// The tab strip lands on the neighbour that slides into the closed tab's spot, so closing the

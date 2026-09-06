@@ -15,6 +15,7 @@ standing in the way is not code.
 
 - `dev/new-english-keys.md` stood at **59 still to read, 136 untranslated** at the end of this
   session, all `lpn_`. It was **0 still to read** that morning; one day of EPANET work added them all.
+  **He read them. It stands at 3 on 2026-09-06** -- see §4.
 - **A sprint before he has read them is paid work thrown away** — that is what sprint 459 recorded,
   when nine agents translated a payload that disagreed with the source. Do not launch one on a
   general "proceed"; CLAUDE.md requires explicit authorization and it means it.
@@ -85,74 +86,43 @@ standing in the way is not code.
 
 ---
 
-## 4. STATE AS OF 2026-09-05 — perishable, check before trusting
+## 4. STATE — checked and pruned 2026-09-06
 
-**Shipped this day**, all with harnesses, all pushed: `[RULES]` (the language, per-clause unit
-conversion, an editor), `[SOURCES]`, `[MIXING]`, `[TAGS]`, pump efficiency curves (read, honoured,
-editable), Tag in Find and replace, example tags (Task 531), the label-crossing detector (Task 539
-phase one), and four fixes from Tom's own browser passes.
+**Everything §4 and §5 said to verify about the curves paradigm change (Task 586) was verified on
+2026-09-06 and is true**, so the checklist is gone rather than carried: `doc.curves` is the store;
+`curvePoints`, `efficPoints` and `curveRef` survive only inside `mintCurveLibrary()`, which is the
+one-way migration, and in the helper `curvePointsOf()`; all four EPANET kinds exist as library
+objects; and a tank USES its volume curve (Task 587 closed the same day, `lpnTankVolumeAttach()` in
+`js/lpn-time.js`, anchored by `dev/lpn-spike/tank-volume-curve-harness.js`). Nothing here needs
+believing any more; the harnesses assert it.
 
-**THE CURVES PARADIGM CHANGE LANDED THE SAME DAY (Task 586).** `doc.curves` is the store;
-`curvePoints`, `efficPoints` and `curveRef` are gone from the document format; storage version 10 ->
-11, minted at both doors and idempotent. All four EPANET kinds exist as library objects. §5 below is
-what to verify rather than believe. **Three defects fell out of moving the seam, and the first is the
-one to remember: a GPV drawn ON THIS PAGE never reached the engine with its curve at all** --
-`assembleModel()` passed a valve's type and setting and nothing else, so only an IMPORTED GPV ever
-worked. An unreferenced `[CURVES]` entry was also being dropped on export, and the `[0, 0.5, 0.9]`
-sampling existed in two copies that a harness was holding together.
+**`dev/new-english-keys.md` stood at 59 still to read when this file was written. Tom read them.**
+It stands at 3 on 2026-09-06, and the sprint is now gated on Wave 0 rather than on his reading.
 
-**Two defects found by surveying rather than by testing, both worth knowing even after they are
-fixed:**
-
-1. **A pump head curve of more than three points was destroyed on import** — sampled at its ends and
-   middle, exported as three, and re-sampled again for the engine. Reported honestly as
-   `pump-curve-reduced`, which is why it survived since July. Honest is not correct. The library is
-   the structural fix.
-2. **`replaceSpecs()` read only the pull-down state**, so after a compound typed query (`A OR B`)
-   Replace wrote the PREVIOUS query's elements under a count the user had already approved. Wrong
-   for every property since compound queries shipped. Fixed via `findRunQuery()`.
+**The retranslation debt is the live number:** `detect_english_drift.php` reports 39 keys whose
+English moved after a translation was written, and `new_english_keys.php` reports 144 untranslated.
+That is one sprint's worth and it is what a sprint should be sized against.
 
 ---
 
-## 5. WHAT MUST BE TRUE WHEN THE CURVES WORK LANDS
+## 5. THE NEXT THINGS, in the order I would take them
 
-Check these rather than believing a report:
-
-- `doc.curves` holds every curve; **no element carries curve POINTS.** `curvePoints`, `curveRef`,
-  `efficPoints` should all be gone from the document format.
-- **All four EPANET types exist as library objects**, including `VOLUME`, even though a tank cannot
-  yet USE one.
-- **A curve nothing references survives a round trip.** The Library can create one now, so an
-  orphan is legitimate document data and dropping it on save is the class of defect we spent this
-  day fixing.
-- **A curve's TYPE is read from EPANET's own `;PUMP:` / `;EFFICIENCY:` / `;VOLUME:` / `;HEADLOSS:`
-  comment**, not inferred from what references it — inference fails for a newly created curve.
-- **A five-point pump curve imports with five points and exports byte-identically.**
-- **`curveId` is in `LPN_OVERRIDABLE.link`** and every READ of it goes through `effective()` — not
-  only the write. The reads are the half that is easy to do partially: `pumpCurveSI()`,
-  `docEnergy()`, `assembleModel()`, the exporter, the engine writer, and the Library's
-  "which elements use this curve" list.
-- **EPANET now gets the curve's real points** instead of a re-sample of our fit, so answers change
-  for any file with a >3-point pump curve. That change should be MEASURED and stated somewhere, not
-  silent.
-
----
-
-## 6. THE NEXT THINGS, in the order I would take them
-
-1. **Tom's reading of `dev/new-english-keys.md`**, then the sprint. Everything else is behind it.
-   59 of them, and 20 arrived with the curve library in the last hour of the day.
-2. **A tank USES its volume curve** — the last piece of "all of EPANET" and the one that may not fit
-   before Sep 17. It is arithmetic, not plumbing: it changes the level-to-volume relationship the
-   extended-period run integrates. The import note `tank-volume-curve` currently reassures the
-   reader that only the level's movement over time is lost; that note predates EPS shipping, so a
-   tank with a volume curve today runs an EPS that fills and drains on the wrong schedule.
+1. **The sprint**, once Wave 0 (`dev/english-friction/584-wave0.json`) is answered. 39 drifted plus
+   144 untranslated.
+2. **The JS fallback literals.** Every localized string this page reads has an English copy beside it
+   as `pageConfig.<key> || '<literal>'`, and **201 of 888 have drifted from `lib/lang.ec.en.php`**
+   (measured 2026-09-06). `pageconfig_check.php` guarantees the key is supplied, so none of it
+   renders today, which is exactly why it rotted. `js/lpn-time.js`'s seven are synced; the rest, and
+   the check that holds them at zero, are Task 322's.
 3. **Task 539 phase two — the gang move.** Phase one measured it and overturned the plan: across 28
    drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the cheap
    segment-intersection test the roadmap proposed as the opening sees about a tenth of the problem.
    Build for the second trigger.
-4. **Priority 100 is otherwise empty of buildable work.** 545, 553 and 509 are done and awaiting
-   Tom; 322 is advisory; 508 is a records task; 436's last piece is *"awaiting Tom's wording only"*.
+4. **Task 436's last piece is a MEASUREMENT, not a wording call** — an earlier version of this file
+   said "awaiting Tom's wording only" and that was wrong. The block is explicit: after both fixes,
+   a zoom notch still costs 2.5-3.3 s with labels on against 0.5-0.7 s with them off, forced layouts
+   are held at 9 and overlap tests at ~7 per label, so what is left is per-label work no index
+   removes. Text measurement is the suspect and is UNPROVEN.
 
 ---
 

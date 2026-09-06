@@ -99,23 +99,38 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 100|583| **Two EPS sentences left, and one states an unmeasured cause.**
-  Tom read `dev/eps-terminology-audit.md` and marked all eight rows; his marks are committed verbatim
-  (`9562285a`) and §4 records what came of each. **Five applied 2026-09-04** -- three translated, so
-  **78 retranslations are owed** (`lpn_inp_drop_eps`, `lpn_time_no_engine`, `lpn_time_no_period`).
-  - **`lpn_energy_over` is SETTLED**, in a second ruling the same day and in his own wording: *For
-    extended period simulation of {time}*. The first pass had dropped the duration, which
-    `energy-anchor-harness.js` caught as the guarded property it is; he rejected the two-line repair
-    and put the duration back inside the sentence. Untranslated, so free. §4 has the one place the
-    shipped string departs from his sketch and why (H:MM cannot carry a trailing "hours").
-  - **`lpn_time_running` is the one row of eight he left blank.** Unruled, so unchanged, and the
-    audit rated it the single best place to name the analysis: it is the progress line.
-  - **[H] `lpn_time_run_note` was not a wording question, and answering it found a defect** (§5).
-    The behaviour is sound -- the page computes one instant of an EPS project only when the user has
-    unchecked *Recalculate automatically* themselves, `autoRunAllowed()` being the whole gate, and
-    above `LPN_TIME_SLOW_MS` the page only advises it. **But the sentence asserts a speed the code
-    never tests**: `lpnTimeStatusNote()` reads no timing at all, so a user who unchecks the box on a
-    fast network is told their network is slow. Replacement in §5, awaiting his word. Translated: 26.
+- 50|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
+  **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
+  and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size). Placed
+  at 50 rather than 75 because nothing is waiting on it and Tom has not asked for it; the case for
+  moving it up is the researcher's, not this line's.
+  - **The evidence is a paper trail rather than an inference.** A field survey -- the actual input
+    method for the EWB chapters and Peace Corps volunteers this suite most resembles -- produces a
+    flat list of id, latitude and longitude, never an `.inp`. EPANET has no path for it either, and
+    the researcher found independent Open Water Analytics and Eng-Tips threads asking how, each
+    answered with an ad hoc workaround.
+  - **The hard parts are built.** Geographic projects already store longitude and latitude and
+    already derive their own frame (`dev/geographic-projects.md`); what is missing is one column
+    mapping step and one batch of junctions created at their surveyed coordinates. It belongs
+    behind the `Settings > New assets` door Task 542 already opened rather than a new one, and the
+    coordinate order rule applies on both sides: the FILE is read as whatever its header says, the
+    person reads lat,lon.
+  - **The one design question is the same one the `.inp` importer already answered:** a row that
+    cannot be honoured is reported, never dropped and never guessed at.
+
+- 100|583| **One EPS sentence left, and it is Tom's to rule.**
+  `dev/eps-terminology-audit.md` §4 has all eight rows and his marks on seven of them.
+  - **`lpn_time_running` is the one row he left blank.** Unruled, so unchanged, and the audit rated
+    it the single best place to name the analysis: it is the progress line, what the page says while
+    it is doing the thing. Suggested: *Working out the extended period simulation with the EPANET
+    solver.* Translated: 26.
+  - **`lpn_time_run_note` shipped 2026-09-06**, in §5's wording, and the sentence that asserted an
+    unmeasured cause is gone. **Answering it found something bigger**: the correction had been
+    written into `lib/lang.ec.en.php` and not into the JS fallback literal beside it, and a measure
+    of all of them found **201 of 888 fallbacks across `js/*.js` disagreeing with the language
+    file**. `js/lpn-time.js`'s seven are synced; the rest and the check are Task 322's.
+  - **Retranslations owed: 4 x 26 = 104** -- `lpn_inp_drop_eps`, `lpn_time_no_engine`,
+    `lpn_time_no_period`, `lpn_time_run_note`. Closes with the next sprint.
 
 
 - 100|581| **An empty box cannot say "this file states zero" apart from "nothing is set".**
@@ -150,13 +165,33 @@ the block.
     - **THIS PASS CONVERGES ACROSS PASSES,** which is a trap for anyone comparing it: it seeds node
       labels as obstacles where the last layout PLACED them, so two identical runs back to back in
       one process already disagree on one label. Compare backends in separate processes.
-  - **AND IT IS STILL 2.5–3.3 s END TO END, WHICH THE COUNTS CANNOT SEE.** Measured in Chromium
-    AFTER both fixes above, on the same 736-element geographic grid: the block after a zoom runs
-    2.5–3.3 s with labels on against **0.5–0.7 s with every label field switched off**, so what is
-    left is label work. One run of the identical gesture hit 16.9 s. Forced layouts are held at 9
-    per notch and overlap tests at ~7 per label, so the remaining cost is PER-LABEL work no index
-    removes — text measurement is the suspect and is unproven. `specs/perf.js` reports the number
-    and asserts no bound: the spread is wider than any honest threshold.
+  - **AND IT IS STILL SECONDS END TO END, AND 2026-09-06 MEASURED WHAT OF.** The suspect was named
+    as text measurement and is now proven — and the guilty half is the opposite of the one the code
+    guards against. Wrapping both layout reads on their prototypes from inside the page, five runs
+    on the 736-element geographic grid (`dev/browser-pass/specs/perf.js`, which needs nothing in
+    `js/looped-network.js`):
+
+    | | calls | time |
+    |---|---|---|
+    | `getBBox` | 1,391 | 1,076–1,672 ms |
+    | `getComputedTextLength` | 7,729 | 20–32 ms |
+
+    **73–79% of the block, in `getBBox` at 0.8 ms a call.** Six times as many per-tspan reads cost a
+    fiftieth as much, because they run in a batch with no DOM write between them and force nothing.
+  - **ONE CALLER, AND IT IS A LOOP TASK 440 ALREADY KNOWS HOW TO FIX.** A 1-in-7 stack sample put
+    198 of 198 in `measureLabelWidths()` — under `shedAlignedForConflicts()`'s `while` loop, which
+    writes one label and measures it, one rung at a time. **The line above that "the cascade still
+    runs one label at a time and always will" is true of the OUTER loop**, where each placed label
+    is an obstacle for the next; the per-rung redraw inside ONE label's own cascade is a different
+    loop and nothing forces it to be sequential.
+  - **AND THE STANDING WARNING AGAINST THE ARITHMETIC FIX RESTS ON A FALSE PREMISE.** The comment at
+    the head of the fitting cascade (`js/looped-network.js`) forbids a banked per-tspan width because
+    it "measures correctly under the headless stub, produces NOTHING in a real browser". Measured:
+    **0 of 7,729 calls returned zero**, mean 8.280e-5 — real values in the SVG's user units, which in
+    a geographic project are DEGREES. Correct and tiny, so anything comparing them against a
+    pixel-scale number would read them as zero. **That is a likelier account of the original failure
+    than the call not working, and it must be checked before the warning is either obeyed or
+    struck.** The fix is not written; this row is now a specific piece of work rather than a suspicion.
   - **AND THAT CONVERGENCE WAS HIDING A DEFECT, FIXED 2026-08-23.** Because the seed lags, a first
     layout sheds link labels for ground the node labels do not take, and the node then takes ground
     under a pipe label using `yields` — which granted the position and never made the holder leave.

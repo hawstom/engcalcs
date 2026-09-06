@@ -392,22 +392,27 @@
 			// away -- the step selector holds one step and that is the whole of what there is to say.
 			// (lpn_time_no_engine is a DIFFERENT thing and stays: "the engine is unreachable, so you
 			// are seeing one instant" is a fact about this session that the user acts on.)
-			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET engine.',
-			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver works out one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs an extended period simulation.',
+			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET solver.',
+			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs an extended period simulation.',
 			slider: pageConfig.lpn_time_slider || 'Time',
-			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is one moment to show. Set a Total run time in Settings to run an extended period simulation.',
+			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
 			prev: pageConfig.lpn_time_prev || 'Step back',
 			play: pageConfig.lpn_time_play || 'Play',
 			pause: pageConfig.lpn_time_pause || 'Pause',
 			next: pageConfig.lpn_time_next || 'Step forward',
 			last: pageConfig.lpn_time_last || 'Go to the end',
-			// **"Run", because EPANET's own command is Run Analysis.** Not "Simulate", which is
-			// epanet-js's word rather than ours, and not "Recalculate", which is both long for an
+			// **"Calculate", the label this button has carried since 2026-08-20** (`011fe8c5`). It
+			// began as "Run", after EPANET's own Run Analysis command, and Tom renamed it: every
+			// other control on this page calculates, and a strip where one button ran and the rest
+			// calculated made the reader ask what the difference was. Not "Simulate", which is
+			// epanet-js's word rather than ours, and not "Recalculate", which is long for an
 			// icon-only strip and untrue of a page where everything else recalculates as you type.
-			run: pageConfig.lpn_time_run || 'Run',
-			runTip: pageConfig.lpn_time_run_tip || 'Work out this network at every reporting time, from the start of the run to the end of it.',
-			runNote: pageConfig.lpn_time_run_note || 'You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.',
+			// Three shipped sentences now tell the reader to press the Calculate button BY NAME, so
+			// this literal is the button's name and not a synonym for it.
+			run: pageConfig.lpn_time_run || 'Calculate',
+			runTip: pageConfig.lpn_time_run_tip || 'Solve this network at every hydraulic time step, from the start of the run to the end of it.',
+			runNote: pageConfig.lpn_time_run_note || 'You are seeing the network at the first reporting time. This project is set not to recalculate automatically, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.',
 			// ---- the run box (Task 450) ----
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
 			// already the sentence the status bar uses for exactly this moment.
@@ -428,7 +433,7 @@
 			// EPANET's own words, untranslated on purpose -- they name what it choked on, and
 			// nothing of ours could reconstruct that.
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'The EPANET solver said: {message}',
-			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It works out one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
+			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It calculates one moment at a time, so this is the network at {time} only, with every tank still sitting at its starting level.',
 			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
 			runSlowAdvice: pageConfig.lpn_time_run_slow || 'This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.',
 			close: pageConfig.lpn_close || 'Close',

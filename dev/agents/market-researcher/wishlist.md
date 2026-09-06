@@ -7,7 +7,12 @@
 
 ## 1. CSV/GPX import of surveyed points as junctions
 
-**Not on `dev/ROADMAP.md`** (checked 2026-09-04, grepped for csv/gpx, zero hits). A field
+**PROMOTED 2026-09-06 — it is now `dev/ROADMAP.md` Task 592, priority 50.** Placed at 50 rather than
+75 because nothing is waiting on it and Tom has not asked for it; the case for moving it up is this
+row's, and it is made below. Left here in full, because a wish list records what this seat wanted
+and why, not only what is still unbuilt.
+
+**Was not on `dev/ROADMAP.md`** (checked 2026-09-04, grepped for csv/gpx, zero hits). A field
 survey — the actual input method for the EWB chapters and Peace Corps volunteers who most
 resemble this suite's audience (journal rows 4–5) — produces a flat list of id/lat/lon,
 never an EPANET `.inp`. EPANET itself has no built-in path for this either; multiple

@@ -7,14 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**53 open tasks.** Next (100): 5 · Soon (75): 12 · Someday (50): 12 · Maybe (25): 7 · Parked (5): 17
+**54 open tasks.** Next (100): 5 · Soon (75): 12 · Someday (50): 13 · Maybe (25): 7 · Parked (5): 17
 
 ## 100 — Next (5)
 
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 436 — What a wheel notch costs, and the placement leftovers.
 - ! Task 581 — An empty box cannot say "this file states zero" apart from "nothing is set".
-- Task 583 — Two EPS sentences left, and one states an unmeasured cause.
+- Task 583 — One EPS sentence left, and it is Tom's to rule.
 - ! Task 591 — The Not EPANET site: a gateway built on deep honesty and deep gratitude.
 
 ## 75 — Soon (12)
@@ -32,7 +32,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 569 — The cursor flickers to the default pointer at ~12 px from a node, on a PC.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 
-## 50 — Someday (12)
+## 50 — Someday (13)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -46,6 +46,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
 - Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
+- Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 
 ## 25 — Maybe (7)
 
@@ -81,5 +82,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-47 of 53 titles are within 4–12 words. `!` marks the rest;
+48 of 54 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -98,8 +98,8 @@ verbatim above (`9562285a`) and are the authority for what follows.
   unchanged, and it is the row the audit rated the single best place to name the analysis.
 - **`lpn_time_run_note` is not a wording question and is answered in §5.**
 
-The five JS fallback strings for these keys were brought into line in the same edit, so the sentence
-a visitor sees if the PHP-to-JS bridge ever fails is the sentence Tom ruled on.
+Five JS fallback strings were brought into line in the same edit. **`lpn_time_run_note`'s was not**,
+and §5 records what that turned out to be a symptom of.
 
 ## 5. WHAT THAT NOTE IS ACTUALLY SAYING, AND THE PART OF IT THAT IS FALSE
 
@@ -134,8 +134,26 @@ later times are not kept up to date."* A user who unchecks that box on a small, 
 their network is slow, and it is not. The page is stating a cause it never measured, in place of the
 cause it knows for certain.
 
-**Recommendation: say the true cause, which is also the one the reader can act on.** Suggested:
-*You are seeing the network at the first reporting time. This project is set not to recalculate
-automatically, so the results for the later times are not kept up to date while you work. Press the
-Calculate button to bring them up to date.* Translated, so 26 retranslations. This is a correctness
-fix rather than a terminology one, and it is why the row could not be closed as *Leave*.
+**SHIPPED, in that wording:** *You are seeing the network at the first reporting time. This project
+is set not to recalculate automatically, so the results for the later times are not kept up to date
+while you work. Press the Calculate button to bring them up to date.* It says the true cause, which
+is also the one the reader can act on. 26 retranslations owed. A correctness fix rather than a
+terminology one, which is why the row could not be closed as *Leave*.
+
+**AND THE OLD FALSE SENTENCE WAS STILL SHIPPING, in `js/lpn-time.js`, until 2026-09-06.** Every
+localized string this page reads has a JS fallback literal beside it -- `pageConfig.<key> ||
+'<English>'` -- and the correction above was written into `lib/lang.ec.en.php` and not into the
+fallback, so the rejected sentence sat in a shipped file for anyone reading the source. §4's own
+closing line, *"the five JS fallback strings for these keys were brought into line in the same
+edit"*, was true of five and not of this one.
+
+- **It is not visitor-facing today and that is exactly the problem.** `pageconfig_check.php`
+  guarantees the key IS supplied, so the fallback never renders; it is unreachable prose that
+  nothing checks and nobody reads, which is how it stayed wrong.
+- **THE SCOPE IS NOT ONE STRING. Measured 2026-09-06: 201 of 888 fallbacks across `js/*.js` disagree
+  with `lib/lang.ec.en.php`** -- an uncontrolled second copy of the English, a quarter of it stale.
+  Among them `lpn_engine_manning_note` and `lpn_engine_minor_loss_note` fall back to the EMPTY
+  string, `lpn_time_no_report` carries a broken `u2019` escape, and `lpn_time_run` falls back to
+  *Run* against a button now named *Calculate*.
+- `js/lpn-time.js`'s seven were synced the same day. The rest, and the check that holds them, are
+  Task 322's.
