@@ -64,6 +64,13 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
+- 25|588| **Do Delete and Vertices want the same two ways out?**
+  The two exits that shipped 2026-09-05 -- a link click and Escape -- cover the six add-* tools
+  only, because that is what Tom named when he said entry mode. A link CLICK
+  cannot join them -- deleting the pipe and bending it are what those two tools are for -- but
+  Escape could, and being in Delete without knowing it is the scariest of the three. Unasked, so
+  unbuilt. One `if` in the same handler if he wants it.
+
 - 25|574| **What is left of the `.net` slot map: nine slots nothing identifies.**
   **MOSTLY CLOSED 2026-09-03.** The slots were MEASURED, not inferred: the import report prints
   `index: value`, Tom imported his Net3 and read the indices back, and every name was then checked
