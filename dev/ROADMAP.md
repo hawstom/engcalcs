@@ -158,75 +158,50 @@ the block.
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
 - 75|479| **The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.**
-  - **DECIDED 2026-09-06, and the useful finding is that `/app` IS CHEAP.** Tom: *"I do think we
-    need to be at LWN/app. We better move that way. I trust your judgement about meta tags."*
-    - **The 210 absolute `/engcalcs/...` paths do not have to move.** `/app` is a rewrite to
-      `Looped-Network.php`; the assets keep resolving because the symlink makes `/engcalcs/` answer
-      on that host too. So `/app` is a pretty URL over a suite that still lives at `/engcalcs/`,
-      and Task 487's refactor stays unbought.
-    - **THE ONE THING THAT BREAKS, AND IT BREAKS SILENTLY: the service worker.**
-      `lib/HeadersFooters.lib.php:319` registers `/engcalcs/sw.php` with `scope: '/engcalcs/'`, and
-      a worker cannot control a page outside its own path -- so a visitor arriving at `/app` gets no
-      offline support and no error. Fix by sending `Service-Worker-Allowed: /` from `sw.php` and
-      widening the scope, or by serving a worker from the domain root. **Nothing else on the page
-      notices the path**, which is exactly why this one would ship unnoticed.
-    - **MY JUDGEMENT ON THE META TAGS, since he delegated it: consolidate ONTO LibreWaterNet, one
-      direction, no split.** `librewaternet.org/app` declares itself canonical; the pages still
-      served at `hawsedc.com/engcalcs/` declare `librewaternet.org` canonical and defer. That is the
-      standard site-move play and it is the only arrangement in which the two copies do not divide
-      each other's ranking signal. The rejected alternative is leaving both self-canonical, which is
-      the split `canonical_origin_check.php` exists to make visible rather than accidental.
-    - **The cost is real and worth stating once: consolidating hands the accumulated hawsedc.com
-      history to a new domain, and that transfer is slow and imperfectly reversible.** It is the
-      price of the brand decision he has already made, not a separate question -- but it is the
-      reason to do it deliberately and in one move rather than drifting into two canonical homes.
-    - Sequence: widen the worker scope, make the symlink, add the `/app` rewrite, then change the
-      whitelist. The canonical change is LAST, because it is the slow one to undo.
-  **TOM'S ANSWER, 2026-09-05:** *"LibreWaterNet.org/app is what I think the url would be."* That
-  settles the goal and MOVES the work, because the plan below assumed the path stayed `/engcalcs/`
-  and one symlink would do it. **`/app` makes this Task 487's problem** -- 210 absolute
-  `/engcalcs/...` paths resolve only under that one path name, which is why 487 was raised the same
-  day. Sequence: 487 first, then this.
-  - **The canonical decision is still his and is unchanged by the path.** `librewaternet.org` maps
-    to `https://librewaternet.org` in the whitelist, so a mirror would serve two copies of every
-    page each declaring ITSELF canonical -- not a penalty, but a split signal. Map it to
-    `https://hawsedc.com` so the mirror defers, or accept the split for the marketing gain.
-  *(Superseded, kept so it is not re-proposed: the `/engcalcs/` symlink, and the 2026-08-25 parking
-  of the question for want of clarity. Clarity arrived.)*
-  **The landing page and the code half are DONE and LIVE** — `https://librewaternet.org` and
-  `/features.html` both serve, `libreepanet.org` 302s to it (Tom, 2026-08-24: *"Keep both, but
-  EPANET is silent."*), and `CANONICAL_ORIGIN` became a host→origin whitelist on 2026-08-23 with
-  `canonical_origin_check.php` guarding it. The landing page's own repository is
-  `~/webdev/librewaternet.org`; see `dev/librewaternet-landing.md`.
-  - **DROPPED 2026-08-25 on Tom's ruling:** the `constructionnotesmanager.com/hawsedc/engcalcs`
-    redirect. *"It has never been canonical. No redirect is required."*
-  - **THE ONE OPEN QUESTION, and it is his.** `librewaternet.org/engcalcs/Looped-Network.php`
-    currently 404s, because the planned symlink was never made. Tom, 2026-08-25: *"I forgot what our
-    goal was. We wanted lpn to appear at lwn?"*
-    - **The recorded goal was yes**, and the reasoning is in `dev/hosting-layout.md`: the 210
-      absolute `/engcalcs/…` paths all resolve under `<newdomain>/engcalcs/`, so one symlink serves
-      the whole suite under the new domain and **no code changes at all** — which is why the symlink
-      beat the refactor.
-    - **Nothing is broken while it is absent.** The landing page's buttons point at
-      `https://hawsedc.com/engcalcs/…` and work. So this is a positioning choice, not a defect: does
-      a visitor who arrives at LibreWaterNet stay on that domain when they start a model, or get
-      handed to hawsedc.com?
-    - **PARKED 2026-08-25 ON TOM'S RULING:** *"Since I don't have clarity, let's leave it as it is
-      for now."* So the suite is NOT mirrored, the landing page keeps handing visitors to
-      hawsedc.com, and nothing is broken. The analysis below stands for whenever clarity arrives.
-    - **IS THE MIRROR AN SEO PROBLEM? Answer: not a penalty, but AS CONFIGURED TODAY it would split
-      the signal, and the fix is one line.** Google's own position
-      on duplicate content across domains is that it is not grounds for a penalty, but that
-      identical pages must nominate ONE canonical or the engine picks for you and the ranking
-      signals divide between the two. **Our whitelist currently maps `librewaternet.org` to
-      `https://librewaternet.org`** (`lib/config.inc.php`), so a mirrored suite would serve two
-      copies of every page each declaring ITSELF canonical — precisely the split. Three ways out,
-      and the choice is Tom's: map `librewaternet.org` to `https://hawsedc.com` so the mirror defers
-      and consolidates; leave it self-canonical and accept a divided signal for a marketing gain;
-      or do not mirror, and let the landing page keep handing visitors to hawsedc.com as it does
-      now. **`canonical_origin_check.php` exists precisely so this is a lookup and not a guess.**
-    - If yes, it is `ln -s ~/public_html/hawsedc/engcalcs ~/librewaternet.org/engcalcs` after
-      testing `Options +FollowSymLinks` on that host, plus the canonical decision above.
+  **DECIDED 2026-09-06** (Tom: *"I do think we need to be at LWN/app. We better move that way. I
+  trust your judgement about meta tags."*), and the useful finding is that **`/app` IS CHEAP**: it
+  is a rewrite onto `Looped-Network.php`, and the ~210 absolute `/engcalcs/...` paths keep
+  resolving because a symlink makes `/engcalcs/` answer on that host too. So Task 487's refactor
+  stays unbought and `/app` is a pretty URL over a suite that still lives where it lived.
+  - **Sequence: worker scope, then the symlink, then the `/app` rewrite, then the whitelist.**
+    The canonical change is LAST because it is the slow one to undo.
+  - **STEP 1 IS DONE.** The one thing that broke was the service worker, silently: a worker cannot
+    control a page outside its scope, so a visitor arriving at `/app` got no offline support and no
+    error. `ecSwMounts()` now declares both paths and the scope, the `Service-Worker-Allowed`
+    header and the fetch routing all derive from it; `sw_scope_check.php` blocks on any of the four
+    disagreeing. **Everything remaining is on the SERVER and is Tom's** -- the symlink, the rewrite
+    rule, and the whitelist line.
+  - **META TAGS, since he delegated it: consolidate ONTO LibreWaterNet, one direction, no split.**
+    `librewaternet.org/app` declares itself canonical; `hawsedc.com/engcalcs/` declares
+    `librewaternet.org` canonical and defers. That is the standard site-move play and the only
+    arrangement in which two copies do not divide each other's ranking signal -- the rejected
+    alternative, both self-canonical, is the split `canonical_origin_check.php` makes visible.
+    **The cost is real: consolidating hands hawsedc.com's accumulated history to a new domain, and
+    that transfer is slow and imperfectly reversible.** It is the price of the brand decision he
+    has already made, which is the reason to do it in one deliberate move rather than drift into
+    two canonical homes.
+  - The landing page half is DONE and LIVE -- `librewaternet.org` and `/features.html` both serve,
+    `libreepanet.org` 302s to it, and `CANONICAL_ORIGIN` is a host->origin whitelist. Its own
+    repository is `~/webdev/librewaternet.org`; see `dev/librewaternet-landing.md`.
+  *(Superseded, kept so it is not re-proposed: serving at `<newdomain>/engcalcs/` by symlink alone,
+  the 2026-08-25 parking for want of clarity, and the `constructionnotesmanager.com` redirect Tom
+  dropped -- *"It has never been canonical."*)*
+
+- 75|603| **Name the nodes along the profile plot's own axis, as EPANET does.**
+  Tom, 2026-09-06: *"I note that EPANET puts node labels on a profile plot. Very useful."*
+  - **IT IS THE ONE THING A PROFILE IS READ FOR, and we do not have it.** `lpn_profile_*` draws the
+    ground and the hydraulic grade against distance, so a low point is visible and ANONYMOUS: the
+    reader can see where the pressure falls and cannot say which junction it falls at. Every use of
+    a profile ends in naming a node out loud, to a colleague or in a report.
+  - **The distance axis already knows where each node lands**, so this is a reader over geometry
+    that exists, not new arithmetic -- the same reason Task 599 ranks where it does.
+  - **THE HARD HALF IS CROWDING, AND IT IS ALREADY SOLVED HERE.** A profile through forty junctions
+    has forty labels on one axis. `js/lpn-collide.js` is exactly this problem as pure weighted-box
+    relaxation and `js/lpn-geom.js` owns label rects; reach for those rather than inventing a
+    second answer, and Task 283's auto-hide rule is the same question again.
+  - Do it with Task 599 if they land together: a time-series plot and a profile that both name
+    their points want one idiom, and a second plotting vocabulary on this page is the expensive
+    mistake either way.
 
 - 75|596| **Link the Not EPANET gateway from inside the suite.**
   - **SETTLED 2026-09-06 (Tom: *"Not EPANET link: lpn-only row"*).** One row in the `lpn_` Help
