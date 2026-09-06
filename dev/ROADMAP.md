@@ -87,26 +87,6 @@ the block.
     offsets were not; a run of repeated zeros cannot be counted by eye. The repair was not more
     care, it was making the file state its own indices.
 
-- 50|575| **The six element symbols, redrawn from Tom's sketch.**
-  Prototype published 2026-09-02 and both open questions answered: the junction becomes a shaded
-  RING rather than a solid dot, and the menu pipe keeps its end bars with the line stopping at them
-  rather than crossing.
-  - **The convention Tom stated, which three of six symbols do not follow today:** map NODE symbols
-    carry a thematic shaded fill; PUMP and VALVE are solid. Read out of `lib/Icons.lib.php`, the
-    junction ships solid with no outline, the valve ships shaded rather than solid, and the pump
-    carries no fill at all.
-  - **Two shapes change: reservoir becomes a triangle and tank a rectangle.** The argument is
-    Tom's own correction about colouring -- a coloured asset floods ENTIRELY, fill and stroke in
-    one colour, so no outline survives. Today those two are told apart by a flat top against a
-    domed one, which is an OUTLINE difference and exactly what flooding destroys.
-  - **The pump diverges between menu and map on purpose, and it is the only symbol that does apart
-    from the pipe's bars.** EPANET draws the map pump with a snout as long as the body is wide,
-    about 2:1, which is the proportion a reader recognises on a drawing and the wrong one for a menu
-    row. Body 10 and snout 10 on the map; body 12 and snout 6.5 in the menu.
-  - **Each new silhouette needs its matching opaque backdrop path** (`prependSymbolBackdrop`), or a
-    pipe appears to stop short of the shape instead of running behind it.
-  - **Separate and undecided: the default map colour.** The map draws linework black; the sketch
-    paints it suite blue. That governs every project with colouring OFF, which is most of them.
 
 
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
@@ -289,25 +269,6 @@ the block.
     fix is one derived base-path constant plus a check failing on a new hardcoded prefix — and keep
     root-relative, because root-relative was itself the 2026-08-08 fix for a `../` bug.
 
-- 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
-  record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
-  portable Wikipedia mechanisms, the honesty boundary, the spam design, and the codebase-specific
-  notes. Two things to carry without opening it: **the lever is the COST of replying, not the
-  visibility of the request** (0.01% is what a link-to-a-form structurally produces, so rewording
-  cannot move it), and **planting intentional mistakes to bait corrections is permanently rejected**
-  — do not re-propose it.
-  **Not blocked, but do not build blind.** Task 206's contact-funnel logging shipped 2026-08-07 and
-  starts at zero; read the "Contact funnel" section of `log/lang-log-stats.sh` once both counts are
-  out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
-  - **AUTHORIZED 2026-09-02** (Tom: *"I would like that! Use our logs to know where to put a low-cost
-    grievance link."*) — **and it lands on `lpn_` first**, which is the only calculator with no
-    `echoFeedback()` invitation at all. Placement, what one tap sends, and why this needs no consent
-    bump: the last section of `dev/dilettante-path.md`. **The log reading came in 2026-09-03 and moved the
-    answer**: the diagnostic box is met ~3 times in 10 days, so the link cannot live only there.
-    Not blocked any more — what is left is Tom's wording of three or four English strings.
-    **BUILD BRIEF FOR A SUBAGENT: `dev/rung0-handoff.md`** (2026-09-03). Its one non-obvious
-    finding: the transport already exists — `EngCalcs.logSignal` posts, dedupes and queues offline
-    through `log-signal-event.php`, so this adds a detail slug and an affordance, not a channel.
 
 
 
@@ -572,6 +533,32 @@ the block.
   - The shape a k table would take is this page's own settled one: a Library object elements refer
     to, as a curve is since Task 586 -- not a per-element blob.
 
+- 100|591| **The Not EPANET site: a gateway built on deep honesty and deep gratitude.**
+  Tom, 2026-09-06, having registered `note-epanet.org` and `notepanet.org` (and, the day before,
+  `NotEPANET.org` and `Not-EPANET.org` -- **four domains and he has named two different pairs, so
+  confirm which one is canonical before anything is deployed**): *"I want to add to our roadmap a
+  task to create this Not EPANET web site as a gateway to lwn and lpn. My vision is for it to be a
+  model/example/demonstration/leadership of deep honesty and deep gratitude."*
+  - **THIS IS THE RULING TASK 544 WAS OPENED TO WAIT FOR, and it REVERSES a standing rule.**
+    `dev/positioning.md` §1 says no competitor appears in a title, meta description, tagline, menu
+    item or headline, and extends that to names we legally could use. A site called Not EPANET is
+    that rule inverted on purpose. His argument is the one to keep: *"That feels deeply honest and
+    quietly rebuking of name dropping while all the while invoking the EPANET name for SEO."*
+    **The reversal is scoped to EPANET and to this site.** Every live commercial trademark stays
+    banned everywhere, and the invitation still leads on LibreWaterNet itself.
+  - **The two halves are his, and the honesty half is the load-bearing one:** deeply dependent on
+    EPANET; not public domain and therefore less free, less trusting and arguably less collegial
+    than EPANET, under GPL-3.0 deliberately and open to being argued out of it; new, with all that
+    implies; and AI-assisted, with his own reason for using AI at all. The gratitude half names the
+    US government, the EPA, the public domain release, the libraries, EPANET's UI, and *"successors
+    and other great souls (Cynthia Brewer, Richard M. Stallman, etc)"*.
+  - **The risk this task exists to manage is EPA endorsement.** Nothing may imply affiliation,
+    sponsorship or review by a federal agency, and the disclaimer is the site's whole premise, so it
+    leads. Naming Cynthia Brewer is separately constrained by the ColorBrewer licence, which this
+    suite already carries: attribution is required and promotion is forbidden.
+  - Draft lives outside this repository at `~/webdev/notepanet.org`, as the landing page does.
+    Nothing is deployed and no domain is pointed anywhere without Tom saying so.
+
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   - **TWO MORE LANDED 2026-09-01 — rows 21 and 26 — and THE ENFORCED COUNT IS 57, not 34.** The
     survey's own table was the stale thing: rows 10, 15, 17, 18 and 20 had shipped on 2026-08-29 and
@@ -831,7 +818,12 @@ the block.
     re-measure the same view, and the count falls or the strategy is wrong.
 
 
-- 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have not decided what to do.**
+- 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**
+  **THE ANSWER ARRIVED 2026-09-06 and it is Task 591**: we do not fight fire with fire, we build a
+  site whose subject is our own dependence and our own gratitude, and we let that stand as the
+  contrast. Nothing here is a grievance and the school of thought that said "do what they do" is
+  not the one taken. What is LEFT in this row is only the thing it originally recorded: that the
+  behaviour was observed, and that `dev/positioning.md` remains the authority for every sentence.
   Tom, 2026-08-26, and he calls it socially difficult: *"epanetjs is legally, but unethically,
   implicitly claiming to be epanet. For example, they have a Youtube video posted with the title
   'Fire flow analysis with EPANET'. We need to note this because one school of thought says that we

@@ -87,6 +87,7 @@ ksort($new);
 const EC_RULING_FLAG = '@@ NEEDS RULING';
 
 function newKeysMarkdown($new, $total, $langCount) {
+    $root = dirname(__DIR__, 2);
     $out = "# English strings nobody has ruled on yet
 
 ";
@@ -134,6 +135,7 @@ files — which is, by construction, every string that has been written and not 
         . "it, and a fully ruled group says `all ruled` and can be skipped whole.\n"
         . "Write your answer on the flag's own line. Anything is fine; \"OK\" is enough.
 ";
+    $out .= ecFrictionSection($root, $langCount);
     if (!$new) { return $out . "
 None. Every English key is present in at least one other language.
 "; }
@@ -351,3 +353,91 @@ foreach ($groups as $p => $keys) {
     echo "\n";
 }
 exit(0);
+
+/**
+ * **THE TRANSLATORS' OWN QUESTIONS, IN THE SAME FILE AND UNDER THE SAME FLAG** (Tom, 2026-09-06:
+ * *"16 English questions above: Put them in new-english-keys.md for my rulings."*).
+ *
+ * WHY IT BELONGS HERE. These are not new keys — they are SHIPPED, TRANSLATED strings that a wave-0
+ * pass or a translator flagged as readable two ways, and `friction_check.php` refuses to launch a
+ * sprint while any of them is unanswered. They therefore had exactly the problem this whole script
+ * exists to fix: a list that lived in a script's output, which Tom never sees, while the one file
+ * he does read said nothing about them. Two lists is one list somebody forgets.
+ *
+ * DERIVED, NEVER REMEMBERED. Read straight out of `dev/english-friction/*.json`; an entry appears
+ * here iff its disposition is still open or referred, so answering one in the JSON removes it from
+ * this file by itself and nobody has to delete anything.
+ *
+ * The ANSWER is harvested back into that entry's `disposition` and `resolution` by whoever reads
+ * his marks, exactly as an approval is harvested into `dev/english-key-rulings.json`. The
+ * hand-edit guard on `--write` protects both alike.
+ */
+function ecFrictionSection(string $root, int $langCount): string
+{
+    $dir = $root . '/dev/english-friction';
+    if (!is_dir($dir)) { return ''; }
+    $open = array();
+    foreach (glob($dir . '/*.json') as $f) {
+        $doc = json_decode((string)file_get_contents($f), true);
+        if (!is_array($doc) || !isset($doc['entries']) || !is_array($doc['entries'])) { continue; }
+        $sprint = isset($doc['sprint']) ? (string)$doc['sprint'] : basename($f, '.json');
+        foreach ($doc['entries'] as $e) {
+            if (!is_array($e) || !isset($e['key'])) { continue; }
+            $d = isset($e['disposition']) ? (string)$e['disposition'] : 'open';
+            if ($d !== 'open' && $d !== 'refer-to-human') { continue; }
+            $e['_sprint'] = $sprint;
+            $open[] = $e;
+        }
+    }
+    if (!$open) {
+        return "\n## Questions from the translators  (0, all answered)\n\n"
+            . "Nothing is waiting. Every English-friction finding has a disposition, so"
+            . " `friction_check.php` is clear and a sprint can launch.\n";
+    }
+    usort($open, function ($a, $b) {
+        return strcmp($a['_sprint'] . $a['key'], $b['_sprint'] . $b['key']);
+    });
+    $out = "\n## Questions from the translators  (" . count($open) . " to read " . EC_RULING_FLAG . ")\n\n"
+        . "**These are SHIPPED strings, already translated into " . $langCount . " languages.** A wave-0\n"
+        . "reading or a translator found each one readable two ways, and no sprint launches while one is\n"
+        . "unanswered. You are not being asked to approve wording here; you are being asked which reading\n"
+        . "is the one you meant. \"The first one\" is a complete answer.\n";
+    $lastSprint = null;
+    foreach ($open as $e) {
+        if ($e['_sprint'] !== $lastSprint) {
+            $lastSprint = $e['_sprint'];
+            $out .= "\n### from sprint " . $lastSprint . "\n\n";
+        }
+        $out .= "- **`" . $e['key'] . "`**\n";
+        $val = ecLangValueOf($root, (string)$e['key']);
+        if ($val !== null) {
+            $out .= "  > " . str_replace("\n", "\n  > ", $val) . "\n";
+        }
+        if (!empty($e['complaint'])) {
+            $out .= "  *The finding:* " . trim((string)$e['complaint']) . "\n";
+        }
+        if (!empty($e['readings']) && is_array($e['readings'])) {
+            foreach ($e['readings'] as $i => $r) {
+                $out .= "  " . ($i + 1) . ". " . $r . "\n";
+            }
+        }
+        $out .= "  " . EC_RULING_FLAG . "\n";
+    }
+    return $out;
+}
+
+/** The current English for a key, or null. Read fresh so a finding can never quote a stale string. */
+function ecLangValueOf(string $root, string $key): ?string
+{
+    static $lang = null;
+    if ($lang === null) {
+        $lang = array();
+        $src = (string)file_get_contents($root . '/lib/lang.ec.en.php');
+        if (preg_match_all("/\\\$ec_lang\\['([a-z0-9_]+)'\\]='((?:[^'\\\\]|\\\\.)*)';/", $src, $m, PREG_SET_ORDER)) {
+            foreach ($m as $hit) {
+                $lang[$hit[1]] = str_replace(array("\\'", '\\\\'), array("'", '\\'), $hit[2]);
+            }
+        }
+    }
+    return isset($lang[$key]) ? $lang[$key] : null;
+}

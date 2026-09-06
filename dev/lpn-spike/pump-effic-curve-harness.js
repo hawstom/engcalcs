@@ -62,6 +62,9 @@ const L = loadLoopedNetwork(
 	// Task 586: the curve is the document's and the pump names it, so the harness asks the page's
 	// own resolver rather than reaching for a field that has moved.
 	"\t\tcurves: docCurvesRead, curveById: curveById, effective: effective,\n" +
+	// Task 591: the POINTS are edited in the Library and nowhere else, so the token-preservation
+	// assertions moved to the box that renders them.
+	"\t\tbuildCurveEntry: buildCurveEntry, libCurves: libCurves, setProp: setProp,\n" +
 	"\t\tgetDoc: function () { return doc; }, docEnergy: docEnergy,\n" +
 	"\t\tassembleModel: assembleModel, renderLinkFields: renderLinkFields, toSI: toSI,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -434,14 +437,33 @@ const FIXTURE = [
 		return out;
 	}
 	function efficInputs() { return under(document.getElementById('lpn_popup_fields'), 'lpn-effic-table', []); }
-	const boxes = efficInputs();
-	check(boxes.map((b) => b.value).join('|') === '317.0065|40|634.0129|70|951.0194|55||',
-		`the boxes hold the file's own gpm tokens, unconverted, plus one blank row: ${boxes.map((b) => b.value).join('|')}`);
+	// **THE POPUP EDITS NO POINTS AT ALL SINCE 2026-09-06**, and this is the assertion that holds
+	// it. Tom, asked whether it still should now that the Library owns the curve: *"No. Remove
+	// that UI."* A pump holds a reference; the definition lives in one place and is edited in one
+	// box. Two editors of one curve were two chances to disagree about what editing it meant.
+	check(efficInputs().length === 0,
+		`the popup offers no point boxes at all: ${efficInputs().length}`);
+	check(under(document.getElementById('lpn_popup_fields'), 'lpn-curve-table', []).length === 0,
+		'and none for the head curve either');
+
+	// **THE EXACT TOKEN IS NOW THE LIBRARY'S TO KEEP, so it is asserted where it is rendered.**
+	// The property has not changed and neither has the reason for it: reading the points back out
+	// of docEnergy()'s m3/s and converting them for display printed 951.0194000000001 for a file
+	// that says 951.0194, which is the user's own number rewritten on a screen. The points are
+	// stored in the project's own flow unit for exactly that reason.
+	// `_lpnCells` is the grid the entry hangs on itself -- rows of [x, y] inputs. Read that rather
+	// than every input under the entry, which would also collect the curve's ID and description
+	// fields and count an empty description as an empty point.
+	const libHost = document.createElement('div');
+	L.buildCurveEntry(libHost, L.curveById('E1'));
+	const libBoxes = [].concat.apply([], libHost.children[0]._lpnCells || []);
+	check(libBoxes.map((b) => b.value).join('|') === '317.0065|40|634.0129|70|951.0194|55||',
+		`the Library grid holds the file's own gpm tokens, unconverted, plus one blank row: ${libBoxes.map((b) => b.value).join('|')}`);
 	// **THE BLANK ROW IS HOW A CURVE GROWS AND HOW AN EMPTY ONE STARTS.** Three points and eight
-	// boxes: six filled and a pair waiting. The head curve's table offers exactly three rows because
-	// this page FITS from at most three points; EPANET reads an efficiency curve directly, so
-	// truncating an imported five-point one would be rewriting numbers that are the user's.
-	check(boxes.length === 8, `three points and one blank row: ${boxes.length} boxes`);
+	// boxes: six filled and a pair waiting. No ceiling on the count, because EPANET reads an
+	// efficiency curve directly and truncating an imported five-point one would be rewriting
+	// numbers that are the user's.
+	check(libBoxes.length === 8, `three points and one blank row: ${libBoxes.length} boxes`);
 
 	// **THE THIRD STATE IS THE ONE WORTH GETTING RIGHT.** "This pump has no curve" and "this pump
 	// names a curve its file never stated" reach the same arithmetic -- the global efficiency -- by
@@ -454,8 +476,10 @@ const FIXTURE = [
 	const noneText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/no efficiency curve/.test(noneText) && /75%/.test(noneText),
 		`with no curve at all it names the network efficiency and its number: ${/no efficiency curve[^]{0,70}/.exec(noneText)}`);
-	check(efficInputs().length === 2,
-		`and still offers one blank row to type one into: ${efficInputs().length} boxes`);
+	// It still offers no boxes -- the answer to "this pump has no curve" is now the Curves library
+	// link beside the chooser, not a table appearing under it.
+	check(efficInputs().length === 0,
+		`and still offers no point boxes, only the chooser and the library link: ${efficInputs().length}`);
 
 	chainPump._efficCurveId = 'GHOST';
 	L.renderLinkFields('P1');
@@ -482,10 +506,14 @@ const FIXTURE = [
 	// 50 L/s is still half way along the 40-to-60 leg, so the answer becomes (70 + 35) / 2 = 52.5%,
 	// which is not the unedited 62.5, not the global 75, and not the 40 a lost flow conversion pins
 	// it at. Four distinguishable numbers.
-	L.renderLinkFields('P1');
-	const editBoxes = efficInputs();
-	editBoxes[5].value = '35';
-	(editBoxes[5]._listeners.change || []).forEach((f) => f());
+	// **EDITED IN THE BOX THAT STILL HAS ONE**, which is the Library's grid since 2026-09-06. The
+	// pump popup holds a reference and nothing typeable; driving the edit through the grid is
+	// driving it through the page's own remaining door, which is what this section is about.
+	const editHost = document.createElement('div');
+	L.buildCurveEntry(editHost, L.curveById('E1'));
+	const editCells = [].concat.apply([], editHost.children[0]._lpnCells || []);
+	editCells[5].value = '35';
+	(editCells[5]._listeners.change || []).forEach((f) => f());
 	check(JSON.stringify(efficPts('E1')) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
 		`the edit lands on the CURVE in the project's own unit: ${JSON.stringify(efficPts('E1'))}`);
 	const edited = L.exportInp();
@@ -522,21 +550,31 @@ const FIXTURE = [
 	L.importInp({ name: 'bare.inp', _text: BARE });
 	check(!L.effective(L.linkById('P1'), 'efficCurveId'),
 		'the pump opens naming no curve at all');
+	// **THE ROAD CHANGED ON 2026-09-06 AND THE DESTINATION DID NOT.** A user used to give a pump a
+	// curve by typing into a table on its popup, which minted one behind them. Tom removed that UI
+	// (*"No. Remove that UI."*), so the journey is now the Library's: make the curve, type its
+	// points, point the pump at it. What must still be true at the end is the thing Task 582 closed
+	// and this section exists for -- an `[ENERGY]` row naming a curve no `[CURVES]` section defines
+	// is an input real EPANET refuses at the door.
 	L.renderLinkFields('P1');
+	check(efficInputs().length === 0,
+		'and the popup offers nowhere to type a point, which is the change');
+	L.libCurves().push({ id: 'E_P1', kind: 'effic', points: [] });
 	[['317.0065', '40'], ['634.0129', '70'], ['951.0194', '35']].forEach(function (pt) {
-		const b = efficInputs();
-		b[b.length - 2].value = pt[0];
-		b[b.length - 1].value = pt[1];
-		(b[b.length - 1]._listeners.change || []).forEach((f) => f());
-		L.renderLinkFields('P1');
+		const h = document.createElement('div');
+		L.buildCurveEntry(h, L.curveById('E_P1'));
+		const cells = [].concat.apply([], h.children[0]._lpnCells || []);
+		cells[cells.length - 2].value = pt[0];
+		cells[cells.length - 1].value = pt[1];
+		(cells[cells.length - 1]._listeners.change || []).forEach((f) => f());
 	});
 	check(JSON.stringify(efficPts('E_P1')) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
-		`three points typed into an empty table: ${JSON.stringify(efficPts('E_P1'))}`);
-	// **THE CURVE IS MINTED AND NAMED THE MOMENT IT GETS A POINT**, because an [ENERGY] row naming a
-	// curve no [CURVES] section defines is an input EPANET refuses -- the very defect Task 582
-	// closed. The reference goes onto the pump through setProp(), because it is overridable.
+		`three points typed into the Library's empty grid: ${JSON.stringify(efficPts('E_P1'))}`);
+	// The reference goes onto the pump through setProp(), because it is overridable -- a direct
+	// write would edit BASE from inside a scenario (dev/scenario-seam-repair.md).
+	L.setProp(L.linkById('P1'), 'efficCurveId', 'E_P1');
 	check(L.effective(L.linkById('P1'), 'efficCurveId') === 'E_P1',
-		`and a name of its own, after the pump: ${L.effective(L.linkById('P1'), 'efficCurveId')}`);
+		`and the pump states it: ${L.effective(L.linkById('P1'), 'efficCurveId')}`);
 	const madeUp = L.exportInp();
 	check(madeUp.ok && /^ E_P1\t317\.0065\t40$/m.test(madeUp.inp)
 		&& /^ E_P1\t951\.0194\t35$/m.test(madeUp.inp),

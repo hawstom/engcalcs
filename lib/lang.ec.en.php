@@ -1872,7 +1872,7 @@ $ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out, because the pa
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the run. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
-$ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
+$ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. It came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_head_pattern']='These reservoirs rise and fall through the run. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the one their curve was measured at, or change speed through the run. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
@@ -2073,8 +2073,9 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
+// prints with the page, and is translated with everything else. **The popup no longer carries even
+// a pointer to here** (Tom, 2026-09-06): it holds a curve REFERENCE and nothing else, and the
+// Library's Curves section is where a curve is read and edited.
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pump curve';
 $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit. A curve can hold more than three points. The built-in solver reads three of them, the first, the middle and the last, to fit the equation above; the EPANET engine reads every point you gave it.';
@@ -2169,10 +2170,9 @@ $ec_lang['lpn_valve_type_pbv']='Pressure breaker (PBV)';
 $ec_lang['lpn_valve_type_gpv']='General purpose (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Pressure drop';
 $ec_lang['lpn_field_valve_setting_drop_tip']='The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.';
-$ec_lang['lpn_inp_drop_gpv_curve']='This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
+$ec_lang['lpn_inp_drop_gpv_curve']='This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
 $ec_lang['lpn_gpv_curve_source']='Head loss curve';
-$ec_lang['lpn_gpv_curve_source_tip']='The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.';
-$ec_lang['lpn_gpv_curve_note']='Up to three points of flow and the head loss at that flow. Leave them empty and the valve stays fully open.';
+$ec_lang['lpn_gpv_curve_source_tip']='The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 $ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.';
 $ec_lang['lpn_field_valve_setting_flow']='Flow setting';
@@ -2194,15 +2194,14 @@ $ec_lang['lpn_field_km_short']='Minor loss, k';
 // `lpn_pump_curve_ref_note` went with the change: they were the two halves of `curveRef`, which
 // named ANOTHER PUMP to copy points from because there was nothing else to point at. Two pumps on
 // one curve name the same curve now, so there is no borrow to describe.
-$ec_lang['lpn_pump_curve_source']='Curve';
-$ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can name the same curve, and editing it changes all of them.';
+$ec_lang['lpn_pump_curve_source']='Head curve';
+$ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
 // drawing surface and its notes are a Help row. The sentence now names the row the way the menu
 // does. Reworded in English only, so the 26 translations are stale until the next sprint resyncs
 // them -- `detect_english_drift.php` is what carries that.
-$ec_lang['lpn_pump_curve_note']='One, two, or three points. See "Pump curve" under Help, Notes on this page.';
 // **THE PUMP'S OWN EFFICIENCY, ON THE PUMP** (Tom, 2026-09-05: *"The pump has no efficiency of its
 // own, and I don't see an interface for that."*). Three states and three sentences, because "this
 // pump has no curve" and "this pump names a curve the file never stated" reach the same arithmetic
@@ -2217,7 +2216,7 @@ $ec_lang['lpn_pump_curve_note']='One, two, or three points. See "Pump curve" und
 $ec_lang['lpn_field_tag']='Tag';
 $ec_lang['lpn_field_tag_tip']='A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.';
 $ec_lang['lpn_pump_effic_curve']='Efficiency curve';
-$ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.';
+$ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a
 // pump's efficiency curve and a valve's head-loss curve, so its fixed entries are keyed once.
 $ec_lang['lpn_curve_none']='No curve';
@@ -2230,11 +2229,9 @@ $ec_lang['lpn_curve_library_link_tip']='Opens the Libraries box on its Curves se
 // {name} and {ids} are placeholders and not concatenation (Task 193). Said only when a second
 // element is really on the curve: a table on one element's popup reads as that element's own, and
 // the moment it is not is exactly the moment an edit here moves somebody else's answer.
-$ec_lang['lpn_curve_shared_note']='These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.';
 // A curve of more than three points is READ-ONLY on the popup: this table offers three rows because
 // the page fits a head curve from at most three points, and shrinking a manufacturer's curve to fit
 // a widget is what the curve library exists to have stopped.
-$ec_lang['lpn_curve_long_note']='Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.';
 // **WHAT A CURVE DESCRIBES, AND EPANET HAS EXACTLY FOUR** (Tom, 2026-09-05: *"there will be four
 // kinds of curve, Pump (head), (Pump) Efficiency, (Tank) Volume, and Headloss. Right?"*). The kind
 // decides the two column headings and their units. EPANET states it in a `;PUMP:`-style comment
@@ -2256,13 +2253,8 @@ $ec_lang['lpn_pump_effic_col']='Efficiency';
 // is three fixed rows, because this page FITS a head curve from at most three points while EPANET
 // reads an efficiency curve directly: truncating an imported five-point curve would be rewriting
 // numbers that are the user's.
-$ec_lang['lpn_pump_effic_note']='Flow vs percent efficiency. A pump with no efficiency curve selected runs at the network efficiency.';
-$ec_lang['lpn_pump_effic_remove']='Remove this point';
 $ec_lang['lpn_pump_effic_global']='This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.';
 $ec_lang['lpn_pump_effic_unstated']='This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.';
-$ec_lang['lpn_pump_point1']='Point 1';
-$ec_lang['lpn_pump_point2']='Point 2';
-$ec_lang['lpn_pump_point3']='Point 3';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.

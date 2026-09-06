@@ -64,6 +64,22 @@ of English: it says whose words to use, not what sort of words to prefer.)*
 - **Do not rename eponyms or bibliographic citations** — Manning, Darcy-Weisbach, Robinson and actual
   paper titles stay as published in every role.
 
+**SETTLED: Oxford is the reference for MECHANICS, and mechanics only.** Tom, 2026-09-06: *"I would
+like to standardize on Oxford until/unless it proves unworkable for this project. In fact, I would
+not be shy to state that in public."* So New Hart's Rules / the Oxford style decides spelling
+(`-ize`), punctuation, and the serial comma, everywhere this project writes English: `dev/*.md`,
+code comments, commit messages, and visitor-facing strings alike.
+
+**This does not reinstate the house style struck above, and reading it that way is the error to
+avoid.** A style guide answers *how is this written down*; the struck house style answered *what may
+be said*, and that is the one that licensed "rest pressure", "pulled down" and "settle" three times
+over. Oxford has no opinion about whether a string may say *drawdown*, and neither does this line.
+Nothing here overrides `plain_english_swap_check.php`, `$ec_lang_syn`, `glossary.json` or Tom's own
+reading of `dev/new-english-keys.md`, all of which remain the evidence a wording decision rests on.
+
+**The one deliberate departure is the em dash**, which Oxford is perfectly happy with and this
+project is not, for the reason immediately below. Where the two disagree, the advisory wins.
+
 **ADVISORY: avoid the em dash in visitor-facing English, until further notice.** Tom, 2026-09-01,
 restoring this one deliberately after the rest of the house style was struck: *"we do need an
 advisory against the lovely em dash; the public has turned against it in the age of AI. That bias is

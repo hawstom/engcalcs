@@ -43,6 +43,16 @@ Consequences, so the rule is operational rather than a sentiment:
 - **No competitor appears in a title, meta description, tagline, menu item or headline.** This
   extends the existing Task 296 ruling (which banned live trademarks — WaterCAD, WaterGEMS,
   Bentley) to the *voluntary* case: we also decline to name the ones we legally could.
+  - **ONE DELIBERATE EXCEPTION, GRANTED 2026-09-06, AND IT IS EPANET ON ONE SITE** (ROADMAP Task
+    591). Tom registered `note-epanet.org` / `notepanet.org` and asked for a **Not EPANET** gateway
+    to LibreWaterNet: *"That feels deeply honest and quietly rebuking of name dropping while all
+    the while invoking the EPANET name for SEO."* A site whose entire subject is how dependent on
+    EPANET we are, and how grateful, cannot be written without the name in the title.
+    **The exception is scoped and does not travel.** It covers EPANET, on that site, and the link
+    to it from LibreWaterNet and the `lpn_` page. Every live commercial trademark stays banned
+    everywhere. LibreWaterNet's own lead is still the invitation, not a comparison. And EPANET is
+    not a competitor in the sense this rule was written about: it is public-domain federal software
+    we vendor and depend on, which is why the exception is arguable at all.
 - **A comparison belongs only on a page where it can be substantiated**, which Task 296 already
   anticipated and nobody has written. If that page is ever wanted, it is a deliberate decision, not
   a place to spill this file into.

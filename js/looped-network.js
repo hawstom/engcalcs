@@ -16368,7 +16368,7 @@ var EngCalcs = EngCalcs || {};
 			// arrive as themselves. The case is kept so an older saved report still renders a
 			// sentence rather than a blank; delete the key once nothing can produce it.
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
-			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
+			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
 			// 'demand-categories' IS NO LONGER EMITTED (Task 468): a junction holds its demands as a
 			// LIST, so nothing is added together and there is no difference to report. Kept, like
@@ -16385,7 +16385,7 @@ var EngCalcs = EngCalcs || {};
 			case 'patterns': return pc.lpn_inp_drop_patterns || 'Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
 			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see or change it yet.';
 			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page fits a curve from.';
-			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
+			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump refers to a curve that is not in the file. It came in with no curve, so it adds no head.';
 			// A SPEED AND A SCHEDULE ARE KEPT AND SOLVED (Task 248.02). Only constant POWER is still
 			// a pump this page cannot describe, so it keeps the old sentence by itself.
 			case 'pump-constant-power': return pc.lpn_inp_drop_pump_other || 'This pump is described by power, speed or a schedule rather than by a curve. It came in with no curve, so it adds no head.';
@@ -16397,7 +16397,10 @@ var EngCalcs = EngCalcs || {};
 			// It shares nothing with the simple-control message any more: a control that cannot be
 			// read is discarded, where a rule is KEPT and written back. Two different fates need two
 			// different sentences, and the old one would have a user believing their rules were lost.
-			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. They are not applied here, so the pipes, pumps and valves they name stay at the state written in the file. The rules themselves are kept, and they are written back if you save an EPANET file.';
+			// The fallback is kept in step with the key, as the tank volume curve's is: this is what
+			// a page whose pageConfig failed to load shows, and it stated the OPPOSITE of what the
+			// page does once Task 248.03 shipped.
+			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept as you wrote them, and they are written back if you save an EPANET file.';
 			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file describes an extended period simulation. This page solves one moment, so only the starting conditions came in.';
 			// **NOTHING IS DISCARDED ANY MORE, AND THE SENTENCES SAY SO** (Tom, 2026-08-29, reading
 			// the old one: *"It seems to be saying that quality and pump energy cost info is
@@ -21215,7 +21218,7 @@ var EngCalcs = EngCalcs || {};
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
 				pc.lpn_field_tank_level || 'Water level', pc.lpn_field_tank_diameter || 'Tank diameter',
-				pc.lpn_pump_point1 ? (pc.lpn_result_head || 'Head') + ' (pump curve)' : 'pump curve'];
+				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
 		}
 		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
 		if (name === 'lpn_u_flow') {
@@ -23873,6 +23876,18 @@ var EngCalcs = EngCalcs || {};
 					setboxUnitText(sec.querySelector('.lpn-set-head')).indexOf(q) >= 0,
 				n = body ? filterSetboxContainer(body, headMatch ? '' : q) : 0;
 			if (headMatch) { n = Math.max(n, 1); }
+			// **A SECTION MAY DECLARE ITSELF UNFILTERABLE, AND EXACTLY ONE DOES** (Task 591).
+			// Credits became a section of its own on 2026-09-06; as a bare footer it sat outside
+			// this loop and was therefore on screen whenever the box was, which is what Apache-2.0
+			// clause 2 asks of the ColorBrewer acknowledgement. An ordinary section would go on any
+			// search but the word "credits" -- the licence broken by a text box. It is deliberately
+			// NOT counted toward `total` either: a search that matches nothing must still say so
+			// rather than be answered by an acknowledgement nobody was looking for.
+			if (sec.getAttribute('data-set-nofilter')) {
+				sec.style.display = '';
+				live[sec.id] = true;
+				return;
+			}
 			sec.style.display = n ? '' : 'none';
 			live[sec.id] = !!n;
 			total += n;
@@ -28064,11 +28079,8 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function renderPumpCurveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {};
-		curveChooser(fields, l, 'curveId', 'head', pc.lpn_pump_curve_source || 'Curve',
+		curveChooser(fields, l, 'curveId', 'head', pc.lpn_pump_curve_source || 'Head curve',
 			pc.lpn_pump_curve_source_tip);
-		curvePointTable(fields, l, 'curveId', 'head', (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
-			pc.lpn_pump_curve_note
-				|| 'One, two, or three points. See "Pump curve" under Help, Notes on this page.');
 	}
 	/**
 	 * The chooser itself, shared by the pump's head curve, the pump's efficiency curve and the GPV's
@@ -28243,154 +28255,12 @@ var EngCalcs = EngCalcs || {};
 				|| 'This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.')
 				.replace('{percent}', globalText));
 		}
-		efficPointTable(fields, l);
 	}
 	function pumpEfficNote(fields, text) {
 		var d = document.createElement('div');
 		d.style.fontSize = '0.9em';
 		d.textContent = text;
 		fields.appendChild(d);
-	}
-	/**
-	 * The named efficiency curve, as an editable table of flow against percent.
-	 *
-	 * **GROWABLE, WHERE THE HEAD CURVE'S IS THREE FIXED ROWS, AND THE DIFFERENCE IS PHYSICAL.**
-	 * `curvePointTable()` offers exactly three because this page FITS h = h0 - a Q^b from at most
-	 * three points, so a fourth would not reach the native solver. EPANET reads an efficiency curve
-	 * directly and interpolates it, so a five-point curve is a five-point curve. One blank row
-	 * always sits at the end, which is the demand table's own way of growing.
-	 *
-	 * **THE FILE'S OWN TOKENS, UNCONVERTED.** The points are stored in the project's flow unit --
-	 * the file's own unit -- so `951.0194` is printed as `951.0194`. Reading them back out of
-	 * docEnergy()'s m3/s and converting for display is what printed `951.0194000000001` for a file
-	 * that says `951.0194`, which is this suite's oldest rule broken on a screen instead of in a
-	 * file. `String()` and not `toFixed()`, for the same reason.
-	 *
-	 * **A CURVE, NOT A PUMP.** Typing here edits the curve every element naming it shares -- see
-	 * curveNoteFor(), which says so on screen the moment a second element is on it.
-	 */
-	function efficPointTable(fields, l) {
-		var pc = EngCalcs.pageConfig || {},
-			curve = elementCurve(l, 'efficCurveId'),
-			table = document.createElement('table'), thead = document.createElement('thead'),
-			hrow = document.createElement('tr'), tbody = document.createElement('tbody'),
-			rows = curve ? curvePointsOf(curve).slice() : [], i;
-		table.className = 'lpn-curve-table lpn-effic-table';
-		[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-			(pc.lpn_pump_effic_col || 'Efficiency') + ' (%)', ''].forEach(function (t) {
-			var th = document.createElement('th');
-			th.textContent = t;
-			hrow.appendChild(th);
-		});
-		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
-		rows.push(null);   // the blank row that is how a curve grows, and how an empty one starts
-		for (i = 0; i < rows.length; i++) {
-			efficPointRow(tbody, l, rows[i], i);
-		}
-		fields.appendChild(table);
-		curveNoteFor(fields, l, 'efficCurveId');
-		var note = document.createElement('div');
-		note.style.fontSize = '0.9em';
-		note.textContent = pc.lpn_pump_effic_note
-			|| 'Flow and the percent efficiency at that flow, in the order the pump works through them. With no points the pump runs at the network efficiency.';
-		fields.appendChild(note);
-	}
-	/**
-	 * **THE CURVE THIS BOX IS REALLY EDITING, SAID OUT LOUD WHEN IT IS SHARED.** A point table on an
-	 * element's popup reads as that element's own until the moment it is not, and the moment it is
-	 * not is exactly when an edit here changes another element's answer. Silent for a curve only
-	 * this element names, which is the ordinary case and needs no sentence.
-	 */
-	function curveNoteFor(fields, l, prop) {
-		var pc = EngCalcs.pageConfig || {}, name = effective(l, prop),
-			users = name ? curveUsers(name) : [], others;
-		if (!name || users.length < 2) { return; }
-		others = users.filter(function (id) { return id !== l.id; });
-		pumpEfficNote(fields, (pc.lpn_curve_shared_note
-			|| 'These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.')
-			.replace('{name}', name).replace('{ids}', others.join(', ')));
-	}
-	// **A NEW, EMPTY CURVE FOR THIS ELEMENT, AND THE ELEMENT POINTED AT IT.** Named after the
-	// ELEMENT, which is what an exported file would have called it anyway, and walked past anything
-	// already taken. The reference goes through setProp(), because it is overridable and this is a
-	// write site like any other.
-	function mintCurveFor(l, prop, kind) {
-		var stem = (kind === 'effic' ? 'E_' : kind === 'headloss' ? 'G_' : 'C_') + l.id,
-			name = curveById(stem) ? libFreeId(libCurves(), stem + '_') : stem,
-			c = { id: name, kind: kind, points: [] };
-		libCurves().push(c);
-		setProp(l, prop, name);
-		return c;
-	}
-	// **THE CURVE THIS ELEMENT NAMES, MINTED IF IT HAS TO BE.** Typing the first point into an empty
-	// table is how a person gives an element a curve without visiting the chooser.
-	//
-	// **A NAME THE DOCUMENT DOES NOT STATE KEEPS ITS NAME** -- that is the file that names a curve it
-	// never defined, and the popup discloses it. Typing a point there fills in the curve the file
-	// was missing, under the name the file used, which is what the reader is trying to do.
-	function curveForEdit(l, prop, kind) {
-		var name = effective(l, prop), c = name ? curveById(name) : null;
-		if (c) { return c; }
-		if (!name) { return mintCurveFor(l, prop, kind); }
-		c = { id: name, kind: kind, points: [] };
-		libCurves().push(c);
-		return c;
-	}
-	function efficPointRow(tbody, l, pt, idx) {
-		var pc = EngCalcs.pageConfig || {},
-			tr = document.createElement('tr'),
-			qCell = document.createElement('td'), eCell = document.createElement('td'),
-			xCell = document.createElement('td'),
-			qInput = document.createElement('input'), eInput = document.createElement('input'), del;
-		qInput.type = 'number'; qInput.step = 'any'; qInput.size = 6;
-		eInput.type = 'number'; eInput.step = 'any'; eInput.size = 6;
-		qInput.value = pt ? String(pt[0]) : '';
-		eInput.value = pt ? String(pt[1]) : '';
-		function commit() {
-			var qv = qInput.value === '' ? undefined : +qInput.value,
-				ev = eInput.value === '' ? undefined : +eInput.value,
-				c, list, before;
-			saveUndoSnapshot();
-			c = curveForEdit(l, 'efficCurveId', 'effic');
-			list = curvePointsOf(c).slice();
-			before = list.length;
-			// Both fields or neither: a lone flow or a lone percent is not a point any curve can use.
-			list[idx] = (qv !== undefined && ev !== undefined && isFinite(qv) && isFinite(ev))
-				? [qv, ev] : undefined;
-			list = list.filter(function (x) { return x; });
-			c.points = list;
-			// The file's own text no longer states these numbers; see the Library editor's own note.
-			delete c.src; delete c.tok;
-			afterPropertyEdit(l);
-			// The blank row at the end has just become a real one, or a cleared row has gone: either
-			// way the row count moved and the table has to be rebuilt to offer the next blank.
-			if (before !== list.length) { refreshPopupIfOpen(); }
-		}
-		qInput.addEventListener('change', commit);
-		eInput.addEventListener('change', commit);
-		qCell.appendChild(qInput); eCell.appendChild(eInput);
-		if (pt) {
-			del = document.createElement('button');
-			// The demand table's own remove control: a language-free glyph, its words in the tip,
-			// and the style already written for one. `lpn-demand-del` is where that style lives.
-			del.type = 'button'; del.className = 'lpn-demand-del'; del.textContent = '\u00d7';
-			helpTip(del, pc.lpn_pump_effic_remove || 'Remove this point');
-			del.addEventListener('click', function () {
-				saveUndoSnapshot();
-				var c = elementCurve(l, 'efficCurveId'), list;
-				if (c) {
-					list = curvePointsOf(c).slice();
-					list.splice(idx, 1);
-					c.points = list;
-					delete c.src; delete c.tok;
-				}
-				afterPropertyEdit(l);
-				refreshPopupIfOpen();
-			});
-			xCell.appendChild(del);
-		}
-		tr.appendChild(qCell); tr.appendChild(eCell); tr.appendChild(xCell);
-		tbody.appendChild(tr);
 	}
 	// **SPEED AND ITS SCHEDULE** (Task 248.02), the pump's twin of the reservoir's head pattern and
 	// the junction's demand pattern. Two rows, and they compose the way EPANET composes them: the
@@ -28452,113 +28322,6 @@ var EngCalcs = EngCalcs || {};
 			function (v) { setProp(l, 'energyPattern', v || null); refreshPopupIfOpen(); },
 			pc.lpn_energy_price_pattern_tip);
 	}
-	/**
-	 * THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both name a curve
-	 * whose second column differs -- a pump's is (flow, head), a general purpose valve's is (flow,
-	 * head LOSS) -- so only the heading and the unit change. Two copies of this markup would be two
-	 * chances to disagree about what a curve point is.
-	 *
-	 * No factors since Task 263: a point is stored in the units its column heading names.
-	 *
-	 * A real <table> with real column HEADINGS: two unlabelled number boxes whose only clue lives in
-	 * a title= tooltip are invisible on touch. Flow first, matching both the [Q, H] storage order and
-	 * the way a manufacturer's curve is read (a head AT a flow).
-	 *
-	 * **THE POINTS ARE THE CURVE'S** (Task 586). This box writes `doc.curves`, so an edit moves
-	 * every element naming that curve; curveNoteFor() says so on screen the moment a second one is.
-	 *
-	 * **A CURVE OF MORE THAN THREE POINTS IS SHOWN READ-ONLY, AND THE LIBRARY IS WHERE IT IS
-	 * EDITED.** Three rows is what the FIT can read, and a widget that only has three rows must not
-	 * be the thing that decides how many points a manufacturer's curve is allowed to have -- that
-	 * truncation is the defect this task removed. Saying which box to use beats silently dropping
-	 * points or growing a table the fit cannot consume.
-	 */
-	function curvePointTable(fields, l, prop, kind, valueHeading, valueUnitId, note) {
-		var pc = EngCalcs.pageConfig || {},
-			curve = elementCurve(l, prop),
-			pts = curve ? curvePointsOf(curve) : [],
-			readOnly = pts.length > 3,
-			pointLabels = [
-				pc.lpn_pump_point1 || 'Point 1 (required)',
-				pc.lpn_pump_point2 || 'Point 2 (optional)',
-				pc.lpn_pump_point3 || 'Point 3 (optional)'
-			],
-			table = document.createElement('table'), thead = document.createElement('thead'),
-			hrow = document.createElement('tr'), tbody = document.createElement('tbody');
-		table.className = 'lpn-curve-table';
-		[ '', (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-			valueHeading + ' (' + unitLabel(valueUnitId) + ')' ].forEach(function (t) {
-			var th = document.createElement('th');
-			th.textContent = t;
-			hrow.appendChild(th);
-		});
-		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
-		fields.appendChild(table);
-		curveNoteFor(fields, l, prop);
-		// One line pointing at the Notes rather than the equation and its fitting cases inline: this
-		// popup floats over the map and has to stay readable on a phone (Tom, 2026-07-30, weighing
-		// the two placements). See lpn_notes_5_def.
-		if (note && !readOnly) {
-			var curveNote = document.createElement('div');
-			curveNote.style.fontSize = '0.9em';
-			curveNote.textContent = note;
-			fields.appendChild(curveNote);
-		}
-		if (readOnly) {
-			var longNote = document.createElement('div');
-			longNote.style.fontSize = '0.9em';
-			longNote.textContent = (pc.lpn_curve_long_note
-				|| 'The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.')
-				.replace('{name}', curve.id).replace('{count}', String(pts.length));
-			fields.appendChild(longNote);
-			pts.forEach(function (pt) {
-				var row = document.createElement('tr'), labCell = document.createElement('th'),
-					qCell = document.createElement('td'), hCell = document.createElement('td');
-				labCell.textContent = '';
-				qCell.textContent = String(pt[0]);
-				hCell.textContent = String(pt[1]);
-				row.appendChild(labCell); row.appendChild(qCell); row.appendChild(hCell);
-				tbody.appendChild(row);
-			});
-			return;
-		}
-		var pi;
-		for (pi = 0; pi < 3; pi++) {
-			(function (pi) {
-				var pt = pts[pi] || [undefined, undefined];
-				var row = document.createElement('tr'), labCell = document.createElement('th'),
-					qCell = document.createElement('td'), hCell = document.createElement('td'),
-					lab = document.createElement('span'),
-					qInput = document.createElement('input'), hInput = document.createElement('input');
-				lab.textContent = pointLabels[pi];
-				qInput.type = 'number'; qInput.step = 'any'; qInput.size = 6;
-				qInput.value = pt[0] !== undefined ? String(+pt[0].toFixed(6)) : '';
-				hInput.type = 'number'; hInput.step = 'any'; hInput.size = 6;
-				hInput.value = pt[1] !== undefined ? String(+pt[1].toFixed(6)) : '';
-				function commit() {
-					var qv = qInput.value === '' ? undefined : +qInput.value,
-						hv = hInput.value === '' ? undefined : +hInput.value,
-						c, list;
-					saveUndoSnapshot();
-					c = curveForEdit(l, prop, kind);
-					list = curvePointsOf(c).slice();
-					// Both fields or neither -- a lone Q or lone H is not a point any curve can use.
-					list[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
-					c.points = list.filter(function (x) { return x; });
-					delete c.src; delete c.tok;
-					// afterPropertyEdit, not scheduleSolve alone: curveForEdit() may have just
-					// written the reference through setProp(), and that has to be saved and marked
-					// exactly as any other property edit is.
-					afterPropertyEdit(l);
-				}
-				qInput.addEventListener('change', commit);
-				hInput.addEventListener('change', commit);
-				labCell.appendChild(lab); qCell.appendChild(qInput); hCell.appendChild(hInput);
-				row.appendChild(labCell); row.appendChild(qCell); row.appendChild(hCell);
-				tbody.appendChild(row);
-			})(pi);
-		}
-	}
 	// A GPV's own curve. Flow against HEAD LOSS -- the quantity a general purpose valve is defined
 	// by -- and no "pump curve" note, because none of that fitting applies: EPANET reads these
 	// points directly.
@@ -28566,9 +28329,6 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		curveChooser(fields, l, 'curveId', 'headloss', pc.lpn_gpv_curve_source || 'Head loss curve',
 			pc.lpn_gpv_curve_source_tip);
-		curvePointTable(fields, l, 'curveId', 'headloss', (pc.lpn_result_headloss || 'Head loss'),
-			'lpn_u_elevhead',
-			pc.lpn_gpv_curve_note || 'Up to three points of flow and the head loss at that flow. With no points the valve is simply open.');
 	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};

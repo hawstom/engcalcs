@@ -42,6 +42,17 @@ function roadmapIndexRender($openPath)
         5   => 'Parked',
     );
 
+    // A one-line primer under a band heading, for the band whose meaning is not obvious from its
+    // name. Tom, 2026-09-06, of Parked: *"please add a reminder/primer explanation like 'Ruled
+    // against and kept here for documentation.'"* Parked is the only band a reader can misread as
+    // a backlog, and a row here is alive ONLY so that it is not proposed again from scratch.
+    // Kept in the generator rather than in `dev/ROADMAP.md`'s own priority table, because this
+    // file is the one somebody reads in a hurry.
+    $primers = array(
+        5 => 'Ruled against, or set aside, and kept here for documentation. A row is alive only so'
+           . " that it is not re-proposed from scratch.",
+    );
+
     $out  = "# Roadmap index — open tasks, titles only\n\n";
     $out .= "**Script-generated. Do not edit.** Regenerate with `php dev/scripts/generate_roadmap_index.php`.\n";
     $out .= "`roadmap_id_check.php` fails if this file is stale. Edit `dev/ROADMAP.md`; this follows.\n\n";
@@ -77,6 +88,7 @@ function roadmapIndexRender($openPath)
         });
         $name = isset($bands[$p]) ? $bands[$p] : 'Priority ' . $p;
         $out .= "\n## $p — $name (" . count($list) . ")\n\n";
+        if (isset($primers[$p])) { $out .= '*' . $primers[$p] . "*\n\n"; }
         foreach ($list as $t) {
             $bits = array();
             if ($t['marker'] !== '') { $bits[] = $t['marker']; }

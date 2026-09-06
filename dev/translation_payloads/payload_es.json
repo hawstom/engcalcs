@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1681,
-        "delta_key_count": 146,
+        "expected_key_count": 1672,
+        "delta_key_count": 142,
         "exempt_key_count": 33,
         "exempt_keys": [
             "calc_units_us",
@@ -526,17 +526,15 @@
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_gpv_curve_source": "Head loss curve",
-        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.",
-        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can name the same curve, and editing it changes all of them.",
+        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
+        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_field_tag": "Tag",
         "lpn_field_tag_tip": "A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
         "lpn_pump_effic_curve": "Efficiency curve",
-        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
+        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_curve_none": "No curve",
         "lpn_curve_library_link": "Curves library",
         "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.",
-        "lpn_curve_shared_note": "These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.",
-        "lpn_curve_long_note": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
         "lpn_curve_kind_volume": "Tank volume",
@@ -544,8 +542,6 @@
         "lpn_curve_kind_generic": "Not stated",
         "lpn_curve_volume_col": "Volume",
         "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_note": "Flow vs percent efficiency. A pump with no efficiency curve selected runs at the network efficiency.",
-        "lpn_pump_effic_remove": "Remove this point",
         "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.",
         "lpn_pump_effic_unstated": "This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.",
         "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were ignored in this run: {ids}",
@@ -674,17 +670,15 @@
         "lpn_inp_drop_net_options": "This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
         "lpn_net_emergency": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by inspection, so treat it as a way in when you have no other rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
         "lpn_gpv_curve_source": "Head loss curve",
-        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.",
-        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can name the same curve, and editing it changes all of them.",
+        "lpn_gpv_curve_source_tip": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
+        "lpn_pump_curve_source_tip": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_field_tag": "Tag",
         "lpn_field_tag_tip": "A tag can have any meaning you require such as pressure zone, work order, etc. It is not used here or by EPANET. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.",
         "lpn_pump_effic_curve": "Efficiency curve",
-        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.",
+        "lpn_pump_effic_curve_tip": "The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.",
         "lpn_curve_none": "No curve",
         "lpn_curve_library_link": "Curves library",
         "lpn_curve_library_link_tip": "Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.",
-        "lpn_curve_shared_note": "These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.",
-        "lpn_curve_long_note": "Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.",
         "lpn_curve_kind_head": "Pump head",
         "lpn_curve_kind_effic": "Pump efficiency",
         "lpn_curve_kind_volume": "Tank volume",
@@ -692,8 +686,6 @@
         "lpn_curve_kind_generic": "Not stated",
         "lpn_curve_volume_col": "Volume",
         "lpn_pump_effic_col": "Efficiency",
-        "lpn_pump_effic_note": "Flow vs percent efficiency. A pump with no efficiency curve selected runs at the network efficiency.",
-        "lpn_pump_effic_remove": "Remove this point",
         "lpn_pump_effic_global": "This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.",
         "lpn_pump_effic_unstated": "This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.",
         "lpn_rule_dangling_note": "These rules name an element that is no longer in this project, so they were ignored in this run: {ids}",
@@ -948,12 +940,12 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_gpv_curve",
                     "value": "Esta válvula indica una curva de pérdida de carga que no está en el archivo. La válvula se importó sin curva, así que permanece abierta hasta que le asigne una.",
-                    "english": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
+                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
                 },
                 "next_translated": {
-                    "key": "lpn_gpv_curve_note",
-                    "value": "Hasta tres puntos de caudal y la pérdida de carga en ese caudal. Déjelos vacíos y la válvula permanece totalmente abierta.",
-                    "english": "Up to three points of flow and the head loss at that flow. Leave them empty and the valve stays fully open."
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "Ajuste de presión",
+                    "english": "Pressure setting"
                 }
             }
         },
@@ -964,12 +956,12 @@
                 "previous_translated": {
                     "key": "lpn_inp_drop_gpv_curve",
                     "value": "Esta válvula indica una curva de pérdida de carga que no está en el archivo. La válvula se importó sin curva, así que permanece abierta hasta que le asigne una.",
-                    "english": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
+                    "english": "This valve refers to a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one."
                 },
                 "next_translated": {
-                    "key": "lpn_gpv_curve_note",
-                    "value": "Hasta tres puntos de caudal y la pérdida de carga en ese caudal. Déjelos vacíos y la válvula permanece totalmente abierta.",
-                    "english": "Up to three points of flow and the head loss at that flow. Leave them empty and the valve stays fully open."
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "Ajuste de presión",
+                    "english": "Pressure setting"
                 }
             }
         },
@@ -980,12 +972,12 @@
                 "previous_translated": {
                     "key": "lpn_pump_curve_source",
                     "value": "Origen de la curva",
-                    "english": "Curve"
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -994,14 +986,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1010,14 +1002,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1026,14 +1018,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1042,14 +1034,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1058,14 +1050,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1074,14 +1066,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1090,46 +1082,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
-                }
-            }
-        },
-        "lpn_curve_shared_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
-                },
-                "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
-                }
-            }
-        },
-        "lpn_curve_long_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
-                },
-                "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1138,14 +1098,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1154,14 +1114,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1170,14 +1130,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1186,14 +1146,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1202,14 +1162,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1218,14 +1178,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1234,46 +1194,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
-                }
-            }
-        },
-        "lpn_pump_effic_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
-                },
-                "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
-                }
-            }
-        },
-        "lpn_pump_effic_remove": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
-                },
-                "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1282,14 +1210,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },
@@ -1298,14 +1226,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_pump_curve_note",
-                    "value": "Uno, dos o tres puntos — vea \"Curva de la bomba\" en las Notas abajo.",
-                    "english": "One, two, or three points. See \"Pump curve\" under Help, Notes on this page."
+                    "key": "lpn_pump_curve_source",
+                    "value": "Origen de la curva",
+                    "english": "Head curve"
                 },
                 "next_translated": {
-                    "key": "lpn_pump_point1",
-                    "value": "Punto 1",
-                    "english": "Point 1"
+                    "key": "lpn_mode_select",
+                    "value": "Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Use la herramienta Vértices para agregar o quitar las curvas de una tubería.",
+                    "english": "Mode: Select. Click an asset or a label to see or change it. Drag to move a node, a vertex, or a label. Use the Vertices tool to add or remove the bends in a pipe."
                 }
             }
         },

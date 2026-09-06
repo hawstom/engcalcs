@@ -823,19 +823,31 @@ echoHeader("EngCalcs", $html_title, "", false);
 						<div class="lpn-set-subbody"><div id="lpn_set_quality_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
-				<?php // **THE COLOUR-SCHEME ACKNOWLEDGEMENTS ARE A FOOTER, NOT A SETTING** (Tom, 2026-08-19:
-				      // "Did we intend to leave the full credits right before the Page section? It's a bit
-				      // long for this place"). Three sentences of licence text stood between Map appearance
-				      // and Page, in the middle of the reading path, looking like something to act on. They
-				      // are now the last thing in the content pane, below every section -- which is where a
-				      // reader expects fine print and where nothing has to be read past.
+				<?php // **CREDITS IS A CATEGORY OF ITS OWN, AND IT IS THE LAST ONE** (Tom, 2026-09-06:
+				      // "Add a category of one at the bottom of lpn Settings for Credits, and put the Credits
+				      // there."). It was a bare FOOTER under every section, which is where Tom put it on
+				      // 2026-08-19 after finding three sentences of licence text standing between Map
+				      // appearance and Page ("It's a bit long for this place"). Both placements answer that
+				      // complaint; a named section also earns a row in the index, so a reader looking for the
+				      // acknowledgement can find it instead of scrolling to the bottom hoping.
 				      //
-				      // **NOT COLLAPSED, and not filtered away.** Apache-2.0 clause 2 says the
-				      // acknowledgement must appear in the software, so it is on screen whenever the box is
-				      // open -- including while a search matches nothing, since it sits outside the sections
-				      // applySetboxFilter() hides. Filled by buildColoringSection() from
+				      // **AND IT IS EXEMPT FROM THE SEARCH FILTER, WHICH THE FOOTER GOT FOR FREE AND A
+				      // SECTION DOES NOT.** Apache-2.0 clause 2 says the acknowledgement must appear in the
+				      // software; the footer sat outside the nodes applySetboxFilter() hides, so it was on
+				      // screen whenever the box was. An ordinary section would vanish on any search but the
+				      // word "credits", which would be the licence broken by a text box. `data-set-nofilter`
+				      // is that exemption, and it is read in one place.
+				      //
+				      // The heading reuses lpn_settings_color_credits -- the same whole label the colouring
+				      // section's own link carries, which is what that link now jumps to. One concept, one
+				      // key, 27 languages already written. Filled by buildColoringSection() from
 				      // EngCalcs.lpnRamps.CREDITS, verbatim and untranslated. ?>
-				<div id="lpn_set_ramp_credits" class="lpn-rp-credit"></div>
+				<section id="lpn_set_sec_credits" class="lpn-set-sec" data-set-sec="credits" data-set-nofilter="1">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_color_credits']?></h3>
+					<div class="lpn-set-secbody">
+						<div id="lpn_set_ramp_credits" class="lpn-rp-credit"></div>
+					</div>
+				</section>
 			</div>
 		</div>
 		<?php // Shown only while the filter matches nothing, so an empty box is never mistaken for a
@@ -1143,7 +1155,6 @@ EngCalcs.pageConfig = {
 	lpn_field_valve_setting_drop: <?=json_encode($ec_lang['lpn_field_valve_setting_drop'])?>,
 	lpn_field_valve_setting_drop_tip: <?=json_encode($ec_lang['lpn_field_valve_setting_drop_tip'])?>,
 	lpn_inp_drop_gpv_curve: <?=json_encode($ec_lang['lpn_inp_drop_gpv_curve'])?>,
-	lpn_gpv_curve_note: <?=json_encode($ec_lang['lpn_gpv_curve_note'])?>,
 	lpn_gpv_curve_source: <?=json_encode($ec_lang['lpn_gpv_curve_source'])?>,
 	lpn_gpv_curve_source_tip: <?=json_encode($ec_lang['lpn_gpv_curve_source_tip'])?>,
 	lpn_tool_color_tip: <?=json_encode($ec_lang["lpn_tool_color_tip"])?>,
@@ -1498,27 +1509,19 @@ EngCalcs.pageConfig = {
 	lpn_curve_none: <?=json_encode($ec_lang['lpn_curve_none'])?>,
 	lpn_curve_library_link: <?=json_encode($ec_lang['lpn_curve_library_link'])?>,
 	lpn_curve_library_link_tip: <?=json_encode($ec_lang['lpn_curve_library_link_tip'])?>,
-	lpn_curve_shared_note: <?=json_encode($ec_lang['lpn_curve_shared_note'])?>,
-	lpn_curve_long_note: <?=json_encode($ec_lang['lpn_curve_long_note'])?>,
 	lpn_curve_kind_head: <?=json_encode($ec_lang['lpn_curve_kind_head'])?>,
 	lpn_curve_kind_effic: <?=json_encode($ec_lang['lpn_curve_kind_effic'])?>,
 	lpn_curve_kind_headloss: <?=json_encode($ec_lang['lpn_curve_kind_headloss'])?>,
 	lpn_curve_kind_volume: <?=json_encode($ec_lang['lpn_curve_kind_volume'])?>,
 	lpn_curve_kind_generic: <?=json_encode($ec_lang['lpn_curve_kind_generic'])?>,
 	lpn_curve_volume_col: <?=json_encode($ec_lang['lpn_curve_volume_col'])?>,
-	lpn_pump_curve_note: <?=json_encode($ec_lang['lpn_pump_curve_note'])?>,
 	lpn_field_tag: <?=json_encode($ec_lang['lpn_field_tag'])?>,
 	lpn_field_tag_tip: <?=json_encode($ec_lang['lpn_field_tag_tip'])?>,
 	lpn_pump_effic_curve: <?=json_encode($ec_lang['lpn_pump_effic_curve'])?>,
 	lpn_pump_effic_curve_tip: <?=json_encode($ec_lang['lpn_pump_effic_curve_tip'])?>,
-	lpn_pump_effic_note: <?=json_encode($ec_lang['lpn_pump_effic_note'])?>,
-	lpn_pump_effic_remove: <?=json_encode($ec_lang['lpn_pump_effic_remove'])?>,
 	lpn_pump_effic_col: <?=json_encode($ec_lang['lpn_pump_effic_col'])?>,
 	lpn_pump_effic_global: <?=json_encode($ec_lang['lpn_pump_effic_global'])?>,
 	lpn_pump_effic_unstated: <?=json_encode($ec_lang['lpn_pump_effic_unstated'])?>,
-	lpn_pump_point1: <?=json_encode($ec_lang['lpn_pump_point1'])?>,
-	lpn_pump_point2: <?=json_encode($ec_lang['lpn_pump_point2'])?>,
-	lpn_pump_point3: <?=json_encode($ec_lang['lpn_pump_point3'])?>,
 	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
 	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
 	lpn_mode_vertices: <?=json_encode($ec_lang['lpn_mode_vertices'])?>,

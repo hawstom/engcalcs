@@ -325,14 +325,18 @@ ok('every key still on the pending list is still pending', arrived.length === 0,
   arrived.length ? arrived.join(',') + ' -- delete these from PENDING_KEYS' : '');
 
 // --- 7. a placeholder is not left unsubstituted ------------------------
-// `lpn_pump_curve_ref_note` went with `curveRef` (Task 586): a pump no longer borrows another
-// pump's points, it names the same library curve. The shared-curve note is the string that took
-// over the job of saying which OTHER elements an edit here will move.
-ok('the shared-curve note carries {name} and {ids}',
-  EngCalcs.pageConfig.lpn_curve_shared_note.indexOf('{name}') >= 0
-  && EngCalcs.pageConfig.lpn_curve_shared_note.indexOf('{ids}') >= 0);
-ok('the shared-curve note is substituted at the call site',
-   /lpn_curve_shared_note[\s\S]{0,220}\.replace\('\{name\}'/.test(jsSrc));
+// **THE POPUP EDITS NO CURVE POINTS AT ALL SINCE 2026-09-06** (Tom, asked whether it still should
+// now that the Library owns them: *"No. Remove that UI."*). So `lpn_curve_shared_note` is gone with
+// the table it warned about -- it said "changing them HERE changes them everywhere", and here is
+// no longer a place anything can be changed. `lpn_library_curve_used_by` says the same thing in
+// the one box that does edit points. What section 6 above still holds is the property that
+// mattered: no reference to a key that is not there. This is the placeholder rule, kept on a
+// string that still has one.
+ok('the in-use refusal carries {count} and {ids}',
+  EngCalcs.pageConfig.lpn_library_curve_in_use.indexOf('{count}') >= 0
+  && EngCalcs.pageConfig.lpn_library_curve_in_use.indexOf('{ids}') >= 0);
+ok('...and is substituted at the call site',
+   /lpn_library_curve_in_use[\s\S]{0,240}\.replace\('\{count\}'/.test(jsSrc));
 
 // --- 8. solver still works through effective() --------------------------
 L.setDoc({

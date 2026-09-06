@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read**, of 146 untranslated keys, of 1681 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read**, of 142 untranslated keys, of 1672 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,124 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (146, 2 to read @@ NEEDS RULING)
+## Questions from the translators  (16 to read @@ NEEDS RULING)
+
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
+
+### from sprint 239-wave0-calcs
+
+- **`bpn_topology_warn_short`**
+  > Network
+  *The finding:* medium: the short verdict cell says 'Network'. Its siblings in that role are verdict words -- 'Low' for pressure, 'OK'/'High' elsewhere -- so the slot's convention is a judgement, and 'Network' is a bare noun that judges nothing. It means 'the network topology is broken'. Every language will translate the noun and inherit the same emptiness.
+  1. there is a problem with the network topology (intended)
+  2. a heading naming the network
+  3. the network is fine
+  @@ NEEDS RULING
+- **`cs_pct_loss`**
+  > Fraction lost
+  *The finding:* medium: the label says 'Fraction lost' and the field beside it defaults to the percent unit (Units.lib.php maps the 'percentage' family to depthPercent), so the page routinely shows 'Fraction lost   12.5 %'. The label and the number disagree in kind. A translator choosing their language's word for 'fraction' (a ratio, 0 to 1) is translating faithfully and still mislabels the displayed value; one choosing 'percentage' contradicts the English. Also unstated: lost as a share of WHAT (inflow).
+  1. the seepage loss as a ratio of inflow, 0 to 1
+  2. the seepage loss as a percentage of inflow
+  3. the portion of the reach where loss occurs
+  @@ NEEDS RULING
+- **`dw_friction_factor_method`**
+  > Friction factor method
+  *The finding:* medium: 'Friction factor method' is a three-noun stack with two bracketings -- [friction factor] method (the equation used to get f, intended) or friction [factor method] / a named 'friction-factor method' of doing something else. Languages that must build an explicit genitive have to choose. $ec_lang_syn is empty.
+  1. which equation is used to compute the friction factor f (intended)
+  2. a design method known as the friction factor method
+  @@ NEEDS RULING
+- **`ip_max_head`**
+  > Max. allow. pipe pressure
+  *The finding:* low: 'Max. allow. pipe pressure' stacks two abbreviations, and the second one is the ambiguous one -- 'allow.' expands to allowable (a limit) or allowance (a margin added). The tip resolves it, but the tip is a separate key that a translator may batch separately from the label.
+  1. maximum allowable pipe pressure (intended)
+  2. maximum pressure allowance
+  @@ NEEDS RULING
+- **`ip_press`**
+  > Press.
+  *The finding:* medium: 'Press.' is the abbreviation of Pressure and also the imperative of the verb to press, and abbreviation-with-period is exactly the form a UI uses for a button. This is a results column heading with no tip of its own, sitting next to 'Flow'. $ec_lang_syn['ip_press'] is empty, so nothing tells the translator which word is being shortened.
+  1. pressure at this node, abbreviated for column width (intended)
+  2. the imperative verb: press this
+  @@ NEEDS RULING
+- **`ip_t_run`**
+  > Runtime (hours)
+  *The finding:* medium: 'Runtime (hours)' is a computing term of art (a runtime library, at runtime) as well as the irrigation sense of how long the zone runs. In a suite that is software, the wrong sense is the more available one for a translator working from a string list. $ec_lang_syn['ip_t_run'] is empty.
+  1. how long the zone must run to apply the target depth (intended)
+  2. runtime in the software sense
+  3. elapsed time of the calculation
+  @@ NEEDS RULING
+- **`mhp_annual_kwh`**
+  > Annual energy at 100% capacity
+  *The finding:* low: 'Annual energy at 100% capacity' -- capacity factor (running every hour of the year, which is what mhp_notes_7_def says) or rated capacity (running at full output whenever it runs). The two differ by the capacity factor itself, often a factor of two or more.
+  1. energy if the plant ran at full output all 8760 hours (intended)
+  2. energy at the plant's rated capacity, over however many hours it runs
+  3. energy at 100% of installed capacity, unspecified duration
+  @@ NEEDS RULING
+- **`mhp_notes_3_def`**
+  > Penstock (supply pipe) losses below 10% of gross head are generally economical. The optimal trade-off between pipe cost and lost power often falls around 4–6% where electricity is most valuable.
+  *The finding:* low: 'often falls around 4-6% where electricity is most valuable' -- 'where' is locative or conditional, and both make sense here (in high-tariff regions; in situations where power is worth more). Several languages must choose different conjunctions for the two.
+  1. in places or markets where electricity commands a high price (intended)
+  2. in the situation where electricity has the greatest value
+  3. at the point on the curve where the power is worth most
+  @@ NEEDS RULING
+- **`mhp_vel_ok_short`**
+  > OK
+  *The finding:* low: the three short verdicts 'OK', 'High', 'Low' stand alone in a narrow cell whose row label ('Velocity check') is a separate key. Out of context High and Low are also quality judgements (high quality, low quality) and, in several languages, must agree in gender with the noun they describe -- which the translator cannot see. $ec_lang_syn is empty for all three.
+  1. the velocity is high / low / acceptable (intended)
+  2. a quality or priority rating
+  3. a position: upper / lower
+  @@ NEEDS RULING
+- **`mi_n617`**
+  > Comp.<br />n
+  *The finding:* medium: the column heading is 'Comp.<br />n'. The existing $ec_lang_syn entry carries commentary only ('| layout: column heading; symbol') and no synonyms, so it says how to lay the string out but never says what 'Comp.' abbreviates. Composite, computed, comparison and component are all live expansions and only one is right; the neighbouring keys (mi_notes_1_term 'Composite n') are a separate batch.
+  1. composite n for the region, by Chow 6-17 (intended)
+  2. computed n
+  3. comparison n
+  4. component n
+  @@ NEEDS RULING
+- **`mtc_blodgett_v_bathurst`**
+  > Blodgett vs. Bathurst
+  *The finding:* medium: the label 'Blodgett vs. Bathurst' names a comparison, but the cell does not report a comparison -- js/Manning.lib.js writes one of 'Bathurst', 'Blodgett', '----' or '++++', i.e. which method the relative submergence selects, or a marker for out of range. A translator reads the label as 'difference between the two methods' and may render it as a quantity heading. The two range markers are also untranslatable glyphs whose meaning (below range / above range) appears nowhere.
+  1. which of the two roughness methods applies at this relative submergence (intended)
+  2. the numerical difference between the Blodgett and Bathurst results
+  3. a side-by-side of both values
+  @@ NEEDS RULING
+- **`mtc_n_strickler`**
+  > n for design rock size (Strickler method)
+  *The finding:* medium: 'n for design rock size (Strickler method)' -- the preposition carries the whole meaning and it points both ways. The value is n computed FROM the design rock size; the string equally supports 'the n you should use when designing rock size'. Four sibling keys share the pattern (mtc_n_strickler, mtc_n_blodgett, mtc_n_bathurst, mtc_n_pi), so whichever reading a translator picks, they pick it four times consistently and invisibly.
+  1. roughness computed from the design rock size by this method (intended)
+  2. the roughness to use for the purpose of sizing rock
+  @@ NEEDS RULING
+- **`odt_sketch_end`**
+  > End
+  *The finding:* medium: partner of odt_sketch_start. 'End' alone is a noun, a verb and a time boundary; the intended sense is the ending water surface level.
+  1. the ending water surface level (intended)
+  2. End: stop the run
+  3. the end of the pond/basin
+  @@ NEEDS RULING
+- **`odt_sketch_start`**
+  > Start
+  *The finding:* medium: a bare 'Start' on the drain-time sketch, where it marks the starting water surface. Read cold it is the imperative verb that begins a run, and this page has a calculate action. Its partner odt_sketch_end has the same problem with the same object left out.
+  1. the starting water surface level (intended)
+  2. Start: begin the calculation
+  3. the beginning of the time axis
+  @@ NEEDS RULING
+- **`rc_sketch_filter`**
+  *The finding:* medium: a bare 'Filter' on a definition sketch. In software vocabulary Filter is overwhelmingly a control or a verb, and this suite has filters elsewhere in its UI. The sketch means the granular filter/bedding layer under the rock. Every language has a settled construction term for that layer and a different word for the UI sense, and the string gives no signal which is wanted.
+  1. the filter (bedding) layer beneath the rock lining (intended)
+  2. a UI filter control
+  3. the verb: to filter
+  @@ NEEDS RULING
+- **`wi_save_and_calculate`**
+  *The finding:* medium: 'Save and Calculate' never says what is saved or where. In 2026 the dominant reading of Save on a web page is 'write a file to my computer', and this suite genuinely has file save elsewhere (the network page writes .inp). Here it stores the entered cross-section points in the page's own input cookie and recalculates. A translator choosing the file sense promises something the button does not do.
+  1. store the values you entered on this page and recalculate (intended)
+  2. save a file to disk, then calculate
+  3. save the results
+  @@ NEEDS RULING
+
+## lpn_  (142, 5 to read @@ NEEDS RULING)
 
 - **`lpn_curve_kind_effic`**
   > Pump efficiency
@@ -44,14 +161,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_curve_library_link_tip`**
   > Opens the Libraries box on its Curves section, where a curve is added, described, edited and deleted. An element states which curve it uses; it does not hold one.
   @@ NEEDS RULING
-- **`lpn_curve_long_note`**
-  > Curve ID {name} has {count} points; it is shown here and edited under Libraries, Curves.
-  _Ruled OK 2026-09-05._
 - **`lpn_curve_none`**
   > No curve
-  _Ruled OK 2026-09-05._
-- **`lpn_curve_shared_note`**
-  > These points belong to curve ID {name}, which {ids} also use. Changing them here changes them there too.
   _Ruled OK 2026-09-05._
 - **`lpn_curve_volume_col`**
   > Volume
@@ -177,8 +288,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Head loss curve
   _Ruled OK 2026-09-05._
 - **`lpn_gpv_curve_source_tip`**
-  > The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.
-  _Ruled OK 2026-09-05._
+  > The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
@@ -288,8 +399,8 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.
   _Ruled OK 2026-09-04._
 - **`lpn_pump_curve_source_tip`**
-  > The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can name the same curve, and editing it changes all of them.
-  _Ruled OK 2026-09-05._
+  > The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.
+  @@ NEEDS RULING
 - **`lpn_pump_effic_col`**
   > Efficiency
   _Ruled OK 2026-09-05._
@@ -297,16 +408,10 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Efficiency curve
   _Ruled OK 2026-09-05._
 - **`lpn_pump_effic_curve_tip`**
-  > The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.
-  _Ruled OK 2026-09-05._
+  > The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.
+  @@ NEEDS RULING
 - **`lpn_pump_effic_global`**
   > This pump has no efficiency curve selected, so it runs at the network efficiency of {percent}.
-  _Ruled OK 2026-09-05._
-- **`lpn_pump_effic_note`**
-  > Flow vs percent efficiency. A pump with no efficiency curve selected runs at the network efficiency.
-  _Ruled OK 2026-09-05._
-- **`lpn_pump_effic_remove`**
-  > Remove this point
   _Ruled OK 2026-09-05._
 - **`lpn_pump_effic_unstated`**
   > This pump calls the undefined efficiency curve ID {name}, so it runs at the network efficiency of {percent}.

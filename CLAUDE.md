@@ -212,7 +212,19 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     AI-written whatever it says. A ratchet on new and edited strings, not a sweep: 60 shipped
     strings carry 69 of them and rewriting those would buy 1,560 retranslations of text whose
     meaning did not move. `dev/language-strings.md` has the scope and Tom's wording.
-  - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
+  - **AND THE ONE THING THAT IS NOW SETTLED IS MECHANICS, WHICH IS NOT A VOICE** (Tom, 2026-09-06:
+    *"I would like to standardize on Oxford until/unless it proves unworkable for this project. In
+    fact, I would not be shy to state that in public."*). **New Hart's Rules / the Oxford style is
+    this project's reference for spelling, punctuation and the serial comma**, in `dev/*.md`, in
+    code comments, in commit messages and in visitor-facing English alike. This does NOT reinstate
+    the rule struck above and must not be read as licence to: it decides whether a list takes a
+    comma before "and", not whether a sentence is allowed to say *drawdown*. A style GUIDE answers
+    "how is this written down"; a house STYLE answered "what may be said", and that is the one that
+    licensed *rest pressure* and *pulled down* three times. **The two failure modes it settles are
+    real and small**: `-ize` against `-ise`, and the serial comma, both of which had been decided
+    per sentence by whoever was typing. **The one place it is deliberately overruled is the em
+    dash**, which Oxford is happy with and this project is not, for the reason above. He is willing
+    to state the choice in public, so it may appear on a page; nothing has been written yet.  - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
     trace mystifies me if it's intended to mean Share from source"*). It did: `lpn_quality_trace`
     named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source
     share". The analysis is EPANET's **Source trace** on EPANET's **Trace node**; the number it
@@ -245,8 +257,18 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 - **A CURVE IS A DOCUMENT OBJECT AND AN ELEMENT HOLDS ONLY A REFERENCE** (Task 586, Tom
   2026-09-05: *"move all pump curve data to the Library under curves and leave only curve
   references in the pump properties"*). `doc.curves` holds `{id, kind, points, src, tok}`; a pump,
-  a GPV and a pump's efficiency name one by id, and the Library's Curves section is where one is
-  created, renamed, edited and deleted. Per-element `curvePoints`/`efficPoints` and the `curveRef`
+  a GPV and a pump's efficiency STATE one by id, and the Library's Curves section is where one is
+  created, renamed, edited and deleted. **The element popup edits no points at all, and that was
+  finished 2026-09-06** (Tom, asked whether it still should: *"No. Remove that UI."*): a pump, a
+  GPV and an efficiency reference each show a chooser and a link to the Curves library, and the
+  point tables, `mintCurveFor()` and `curveForEdit()` went with them. Two editors of one definition
+  were two chances to disagree about what editing it meant. Deleted with the UI, and named here so
+  they are not re-added: `lpn_pump_effic_note`, `lpn_pump_curve_note`, `lpn_pump_point1/2/3`,
+  `lpn_curve_long_note`, `lpn_curve_shared_note`, `lpn_gpv_curve_note`, `lpn_pump_effic_remove`.
+  **And a reference is STATED, never "named"** (Tom, 2026-09-06, on the transitive verb: *"I am not
+  liking the word 'name' ... Alert that in some contexts 'name' may mean 'use'."*). Use *state*,
+  *indicate*, *refer to*, *select* or *call* in a visitor-facing string; his own edit of
+  `lpn_library_curves_note` uses *indicates*. Per-element `curvePoints`/`efficPoints` and the `curveRef`
   borrow are GONE, and were an accident of chronology rather than a design — the pump curve was
   written in the first two days of this page, before there was a Library. **The REFERENCE is
   scenario-overridable (his ruling: *"Scenario pump reference: Yes."*) and the POINTS are not** —
