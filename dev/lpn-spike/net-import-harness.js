@@ -334,7 +334,10 @@ console.log('\n--- and the .inp reader then agrees about the network ---');
 		p1.diameter === 12 && p1.roughness === 130,
 		p1.diameter + ' in, C=' + p1.roughness);
 	ok('the emitter came across', parsed.nodes.find((n) => n.id === 'J2').emitter > 0);
-	ok('the pump found its curve', parsed.links.find((l) => l.id === 'PU1').curvePoints.length === 3);
+	// The pump NAMES its curve and the curve is the document's (Task 586).
+	const pu1 = parsed.links.find((l) => l.id === 'PU1');
+	const pu1Curve = (parsed.curves || []).find((c) => c.id === pu1.curveId);
+	ok('the pump found its curve', !!pu1Curve && pu1Curve.points.length === 3);
 	ok('the backdrop is reported as a name we do not have',
 		parsed.dropped.some((d) => d.code === 'backdrop-not-embedded'));
 }

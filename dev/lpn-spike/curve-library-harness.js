@@ -1,0 +1,372 @@
+// A CURVE IS A DOCUMENT OBJECT, AND AN ELEMENT HOLDS ONLY A REFERENCE (ROADMAP Task 586). Run:
+//   node dev/lpn-spike/curve-library-harness.js
+//
+// Tom, 2026-09-05: *"In the first two days programming lpn at the end of July, we needed a pump
+// curve, but we didn't have a Library. Now we have a library, and it's time to move the pump curves
+// to the Library with the other Curves... move all pump curve data to the Library under curves and
+// leave only curve references in the pump properties."*
+//
+// **THE DEFECT THIS CLOSES IS THE STRONGEST ARGUMENT FOR THE CHANGE, AND SECTION 1 IS IT.** A pump
+// head curve of more than three points was SAMPLED at its ends and its middle on the way in
+// (`pump-curve-reduced`), written back out as those three points, and re-sampled AGAIN off our own
+// fitted curve for the engine at [0, 0.5, 0.9] q_max. A five-point manufacturer's curve was
+// therefore rewritten twice and the user's own numbers never came back -- CLAUDE.md's oldest and
+// most absolute rule broken, honestly reported and still wrong.
+//
+// What the library buys is structural: the document keeps every point the file stated, and the
+// three-point FIT becomes a derived thing the NATIVE solver alone needs.
+//
+// Sections:
+//   1. a five-point head curve imports whole and exports byte-identically
+//   2. a v10 project -- curvePoints, a curveRef borrow and an efficiency curve -- migrates to v11
+//      and solves to the same answer
+//   3. the id collision: two pumps whose unrelated curves are both called C1
+//   4. EPANET's answer on a >3-point curve, and the size of the change from the old sampling
+
+const fs = require('fs');
+const path = require('path');
+const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+
+const L = loadLoopedNetwork(
+	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections,\n" +
+	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
+	"\t\tserializeProject: serializeProject, applySaved: applySaved, migrateSaved: migrateSaved,\n" +
+	"\t\tmintCurveLibrary: mintCurveLibrary, assembleModel: assembleModel,\n" +
+	"\t\tsetDoc: function (d) { doc = d; }, getDoc: function () { return doc; },\n" +
+	"\t\tlinkById: linkById, effective: effective, curveById: curveById,\n" +
+	"\t\tresolveCurvePoints: resolveCurvePoints, pumpFit: pumpFit,\n" +
+	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), { effective: effective }); },\n" +
+	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+	"\t\t\tworld = el('g', {}, svg);\n" +
+	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+	"\t\t\trubberBandEl = el('line', {}, world); }\n"
+);
+const EngCalcs = global.EngCalcs;
+require(path.join(ROOT, 'js', 'lpn-inp.js'));
+require(path.join(ROOT, 'js', 'lpn-patterns.js'));
+require(path.join(ROOT, 'js', 'lpn-epanet.js'));
+require(path.join(ROOT, 'js', 'lpn-time.js'));
+
+let failures = 0;
+function check(ok, msg) {
+	console.log((ok ? '  ok   ' : '  FAIL ') + msg);
+	if (!ok) { failures++; }
+}
+function head(t) { console.log('\n' + t); }
+
+setUnitSet('us');
+L.buildLayers();
+L.seedDefaultInputs();
+
+// **A FIVE-POINT PUMP CURVE, WRITTEN IN THE EXPORTER'S OWN COLUMN STYLE** so section 1 can compare
+// the WHOLE FILE rather than a section of it. The tokens are deliberately awkward -- `300.0`,
+// `104.`, `20.00` -- because `String(parseFloat(t))` reproduces none of the three, which is exactly
+// the 9.3% of EPA's own tokens the token bag exists for.
+const FIVE = [
+	'[TITLE]',
+	'five.inp',
+	'',
+	'[JUNCTIONS]',
+	' J1\t100\t250',
+	'',
+	'[RESERVOIRS]',
+	' R1\t0',
+	'',
+	'[PUMPS]',
+	' P1\tR1\tJ1\tHEAD C1',
+	'',
+	'[CURVES]',
+	' C1\t0\t300.0',
+	' C1\t250\t290',
+	' C1\t500\t260',
+	' C1\t750\t200',
+	' C1\t1000\t104.',
+	'',
+	// The clock the exporter writes for a document that carries one. Stated here so the comparison
+	// in section 1 can be the WHOLE FILE: a partial one is what lets a lost line through.
+	'[TIMES]',
+	' Duration\t0:00',
+	' Hydraulic Timestep\t1:00',
+	' Pattern Timestep\t1:00',
+	' Pattern Start\t0:00',
+	' Report Timestep\t1:00',
+	' Report Start\t0:00',
+	' Start ClockTime\t0:00',
+	'',
+	'[OPTIONS]',
+	' Units\tGPM',
+	' Headloss\tH-W',
+	'',
+	'[COORDINATES]',
+	' J1\t10\t10',
+	' R1\t0\t0',
+	'',
+	'[END]',
+	''
+].join('\n');
+
+(async function () {
+
+	// =========================================================================================
+	head('1. A FIVE-POINT HEAD CURVE, WHOLE, AND BYTE-IDENTICAL BACK OUT');
+	// =========================================================================================
+	const parsed = EngCalcs.lpnInpParse(FIVE);
+	check(parsed.ok, 'the fixture parses as an .inp');
+	const c1 = (parsed.curves || []).filter((c) => c.id === 'C1')[0];
+	check(!!c1 && c1.points.length === 5,
+		`all five points arrive, where three used to: ${JSON.stringify(c1 && c1.points)}`);
+	check(!!c1 && c1.kind === 'head', 'and the curve is typed by what references it');
+	// **NOTHING IS REPORTED AS REDUCED ANY MORE, BECAUSE NOTHING IS REDUCED.** `pump-curve-reduced`
+	// was the honest disclosure of a rewrite; the rewrite is gone, so the disclosure is too.
+	check(!(parsed.dropped || []).some((d) => d.code === 'pump-curve-reduced'),
+		`no pump-curve-reduced: ${JSON.stringify((parsed.dropped || []).map((d) => d.code))}`);
+	check(parsed.links[0].curveId === 'C1', 'the pump holds the file\'s own curve name');
+
+	L.applyUnitSelections(L.inpUnitSelections(parsed));
+	const doc = L.docFromInp(parsed, 'five.inp');
+	L.applySaved(JSON.parse(JSON.stringify(doc)));
+	const out = L.exportInp();
+	check(out.ok, `the document exports: ${JSON.stringify(out.error)}`);
+	if (out.ok) {
+		// Not "within tolerance" -- identical, which is this repo's acceptance criterion for a value
+		// the user did not edit. The five-point curve is the value that could not meet it before.
+		check(out.inp === FIVE, 'the exported text equals the imported text, character for character');
+		if (out.inp !== FIVE) {
+			const a = FIVE.split('\n'), b = out.inp.split('\n');
+			for (let i = 0; i < Math.max(a.length, b.length); i++) {
+				if (a[i] !== b[i]) { console.log(`      line ${i + 1}: ${JSON.stringify(a[i])} vs ${JSON.stringify(b[i])}`); }
+			}
+		}
+		// The two tokens that make the point: neither survives parseFloat + String.
+		check(/^ C1\t0\t300\.0$/m.test(out.inp) && /^ C1\t1000\t104\.$/m.test(out.inp),
+			'including `300.0` and `104.`, which String(parseFloat(t)) cannot reproduce');
+	}
+
+	// **THE FIT IS DERIVED AND SEES AT MOST THREE**, sampled at the ends and the middle. That is the
+	// only place the reduction survives, and it writes nothing back.
+	const fitPts = L.resolveCurvePoints(L.linkById('P1'));
+	check(fitPts.length === 5, `the document still holds five points after the export: ${fitPts.length}`);
+	const fit = L.pumpFit(L.linkById('P1'));
+	check(isFinite(fit.h0) && fit.h0 > 0, `and the native solver gets a fit from three of them: h0 = ${fit.h0}`);
+	check(L.curveById('C1').points.length === 5, 'with nothing written back onto the curve');
+
+	// =========================================================================================
+	head('2. A v10 PROJECT MIGRATES: points, a curveRef borrow, and an efficiency curve');
+	// =========================================================================================
+	// The shape of a real project saved the day before this task: two pumps, the second BORROWING
+	// the first's curve by naming the pump, and an efficiency curve held on the pump.
+	const v10 = {
+		v: 10, format: 'lpn', project: { name: 'legacy', activeScenario: 'base' },
+		scenarios: [{ id: 'base', name: 'Base', isBase: true, overrides: {} }],
+		origin: { x: 0, y: 0 },
+		nodes: [
+			{ id: 'R1', type: 'reservoir', x: 0, y: 0, _head: 0 },
+			{ id: 'J1', type: 'junction', x: 100, y: 0, elev: 0, _demand: 300 }
+		],
+		links: [
+			{ id: 'P1', type: 'pump', from: 'R1', to: 'J1', verts: [],
+				curvePoints: [[0, 300], [500, 260], [1000, 104]], curveRef: null, curveId: 'C1',
+				efficPoints: [[200, 40], [500, 70], [800, 55]], efficCurveId: 'E1',
+				_diameter: 8, _roughness: 130, _length: 0, _k: 0, _status: 'open' },
+			{ id: 'P2', type: 'pump', from: 'R1', to: 'J1', verts: [],
+				curvePoints: [], curveRef: 'P1',
+				_diameter: 8, _roughness: 130, _length: 0, _k: 0, _status: 'open' }
+		],
+		labels: [], settings: {}, units: {
+			lpn_u_length: 'ft', lpn_u_elevhead: 'fth2o', lpn_u_pressure: 'psi',
+			lpn_u_diameter: 'in', lpn_u_flow: 'gpm', lpn_u_velocity: 'ftps',
+			lpn_u_gradient: 'gradePercent'
+		}
+	};
+	// THE ANSWER BEFORE THE MOVE, computed the way the old code did: the fit off the pump's own
+	// points. Nothing in this harness can run the old code, so what is compared is the FIT -- which
+	// is the whole of what the solver ever saw of a curve.
+	// **A RELATIVE COMPARISON AND NOT A BIT ONE, DELIBERATELY.** The page crosses to SI through
+	// EngCalcs.unitFactor(); this line divides by the same gpm-per-m3/s number written out, and the
+	// two differ in the last bit. What the assertion is about is that the migration did not change
+	// the pump, and 1e-12 says that far more strongly than the tolerance any answer is read at.
+	const wantFit = EngCalcs.lpnPumpFromCurve(
+		v10.links[0].curvePoints.map((p) => [p[0] / 15850.323141488905, p[1] * 0.3048]));
+	const near = (a, b) => Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(b));
+
+	const migrated = L.migrateSaved(JSON.parse(JSON.stringify(v10)));
+	check(migrated.v === 11, `the project is stamped v11: ${migrated.v}`);
+	L.applySaved(migrated);
+	const mDoc = L.getDoc();
+	check((mDoc.curves || []).length === 2,
+		`two curves are minted, not three: ${(mDoc.curves || []).map((c) => c.id + '/' + c.kind).join(', ')}`);
+	check(!!L.curveById('C1') && L.curveById('C1').kind === 'head'
+			&& L.curveById('C1').points.length === 3, 'the head curve keeps the name the file gave it');
+	check(!!L.curveById('E1') && L.curveById('E1').kind === 'effic',
+		'and the efficiency curve keeps its own');
+	// **THE BORROW BECOMES A SHARED REFERENCE**, which is what a library makes it mean.
+	check(L.effective(L.linkById('P1'), 'curveId') === 'C1'
+			&& L.effective(L.linkById('P2'), 'curveId') === 'C1',
+		`both pumps name the one curve: ${L.effective(L.linkById('P2'), 'curveId')}`);
+	check(!L.linkById('P2').curveRef && !L.linkById('P1').curvePoints
+			&& !L.linkById('P1').efficPoints,
+		'and nothing of the old paradigm is left on either element');
+	// SAME ANSWER. The fit the solver is handed is bit-identical to the one the old document gave.
+	const f1 = L.pumpFit(L.linkById('P1')), f2 = L.pumpFit(L.linkById('P2'));
+	check(near(f1.h0, wantFit.h0) && near(f1.a, wantFit.a) && near(f1.b, wantFit.b),
+		`the solved fit is unchanged across the migration: ${f1.h0} vs ${wantFit.h0}`);
+	check(f2.h0 === f1.h0 && f2.a === f1.a && f2.b === f1.b,
+		'and the borrowing pump is identical rather than similar, as it was before');
+	// IDEMPOTENT: migrating an already-migrated document must find nothing left to do.
+	const twice = L.mintCurveLibrary(JSON.parse(JSON.stringify(migrated)));
+	check((twice.curves || []).length === 2,
+		`minting twice mints nothing new: ${(twice.curves || []).length}`);
+
+	// =========================================================================================
+	head('3. THE ID COLLISION: two pumps whose unrelated curves are both called C1');
+	// =========================================================================================
+	// **THIS IS THE RISK THE MOVE CREATES.** Before Task 586 a curve id was unique per ELEMENT, so
+	// two pumps could perfectly well both call their curve `C1` and mean different machines. Merging
+	// them would silently give one pump the other's performance.
+	const clash = JSON.parse(JSON.stringify(v10));
+	clash.links[1].curveRef = null;
+	clash.links[1].curveId = 'C1';
+	clash.links[1].curvePoints = [[0, 150], [500, 130], [1000, 52]];   // half the head, same name
+	const cm = L.migrateSaved(clash);
+	L.applySaved(cm);
+	const names = (L.getDoc().curves || []).map((c) => c.id);
+	check(names.length === 3, `three curves, not two: ${names.join(', ')}`);
+	check(L.effective(L.linkById('P1'), 'curveId') === 'C1',
+		'the first claimant keeps the name');
+	check(L.effective(L.linkById('P2'), 'curveId') === 'C1_P2',
+		`and the second takes one of its own, after its element: ${L.effective(L.linkById('P2'), 'curveId')}`);
+	check(L.resolveCurvePoints(L.linkById('P1'))[0][1] === 300
+			&& L.resolveCurvePoints(L.linkById('P2'))[0][1] === 150,
+		'so neither pump was given the other\'s performance');
+	// AND THE OTHER HALF OF THE RULE: identical points under one name is SHARING, not a collision.
+	const same = JSON.parse(JSON.stringify(v10));
+	same.links[1].curveRef = null;
+	same.links[1].curveId = 'C1';
+	same.links[1].curvePoints = JSON.parse(JSON.stringify(same.links[0].curvePoints));
+	L.applySaved(L.migrateSaved(same));
+	check((L.getDoc().curves || []).length === 2,
+		`two pumps stating the identical C1 share one curve: ${(L.getDoc().curves || []).map((c) => c.id).join(', ')}`);
+	check(L.effective(L.linkById('P2'), 'curveId') === 'C1', 'both naming C1');
+
+	// =========================================================================================
+	head('4. EPANET\'S ANSWER ON A >3-POINT CURVE, AND THE SIZE OF THE CHANGE');
+	// =========================================================================================
+	// **THIS CHANGES ANSWERS, IN THE DIRECTION OF CORRECTNESS, AND THE NUMBER IS STATED RATHER THAN
+	// HIDDEN.** Until Task 586 the engine was handed three samples of OUR fit; it is handed the
+	// user's own points now. The two are compared on the same network, so what comes out is the size
+	// of the change a real five-point curve sees.
+	L.applyUnitSelections(L.inpUnitSelections(parsed));
+	L.applySaved(L.migrateSaved(L.docFromInp(EngCalcs.lpnInpParse(FIVE), 'five.inp')));
+	const model = L.assembleModel();
+	const now = await EngCalcs.lpnSolveEpanet(model);
+	check(now.ok, `the five-point network runs: ${JSON.stringify(now.issues || now.error || '')}`);
+
+	// The OLD behaviour, reproduced exactly: strip `curveSI` and the writer falls back to the fit's
+	// own [0, 0.5, 0.9] sampling, which is the branch it still takes for three points or fewer.
+	const asBefore = JSON.parse(JSON.stringify(model));
+	asBefore.links.forEach((l) => { if (l.type === 'pump') { l.curveSI = [l.curveSI[0], l.curveSI[2], l.curveSI[4]]; } });
+	const before = await EngCalcs.lpnSolveEpanet(asBefore);
+	check(before.ok, 'and so does the same network reduced to three points, as it used to be');
+	if (now.ok && before.ok) {
+		const hNow = now.heads.J1, hWas = before.heads.J1;
+		const dFt = Math.abs(hNow - hWas) / 0.3048;
+		console.log(`       J1 head: ${(hNow / 0.3048).toFixed(4)} ft with all five points, `
+			+ `${(hWas / 0.3048).toFixed(4)} ft with the three it used to keep`);
+		console.log(`       the measured change on this curve: ${dFt.toFixed(4)} ft`);
+		// **THE ASSERTION IS THAT THEY REALLY DIFFER**, because a change of zero would mean the
+		// engine never saw the extra points and this whole section proves nothing. The direction is
+		// not asserted: which way a particular curve moves is a fact about that curve.
+		check(dFt > 0.01, `the extra points really reach the engine and move the answer: ${dFt.toFixed(4)} ft`);
+		// A five-point curve is not a power law, so the engine must be interpolating it: the head at
+		// the pump has to sit ON the user's own curve rather than on our fit through three of it.
+		// **AND THE NEW ANSWER IS THE USER'S OWN NUMBER.** The demand is 250 gpm and the curve STATES
+		// 290 ft at 250 gpm, so an engine reading the curve reports exactly 290; one reading a power
+		// law fitted through three of the five reports 291.84. That is the whole change in one line:
+		// the answer moved onto the point the manufacturer published.
+		check(Math.abs(hNow / 0.3048 - 290) < 5e-4,
+			`the five-point answer IS the curve's own stated point: ${(hNow / 0.3048).toFixed(4)} ft against 290`);
+		check(Number.isFinite(hNow), 'and the answer is a number, not a NaN from a re-typed curve');
+	}
+
+	// =========================================================================================
+	head('5. THE FOUR KINDS, THE FILE\'S OWN TYPE COMMENT, AND THE TANK VOLUME CURVE');
+	// =========================================================================================
+	// Tom, 2026-09-05: *"When we are finished there will be four kinds of curve, Pump (head), (Pump)
+	// Efficiency, (Tank) Volume, and Headloss. Right?"* Right, and `[CURVES]` has no fifth.
+	//
+	// **EPANET STATES A CURVE'S TYPE IN A `;PUMP:`-STYLE COMMENT** and its own writer always emits
+	// one -- Net1, Net2 and Net3 all carry them. That comment is the ONLY thing that can type a
+	// curve nothing references, which is exactly what the Library's "Add a curve" button makes.
+	const FOUR = [
+		'[JUNCTIONS]', ' J1\t100\t250',
+		'[RESERVOIRS]', ' R1\t0',
+		'[TANKS]', ' T1\t100\t10\t0\t20\t50\t0\tVC1',
+		'[PIPES]', ' L1\tJ1\tT1\t100\t12\t130\t0\tOpen',
+		'[PUMPS]', ' P1\tR1\tJ1\tHEAD C1',
+		'[CURVES]',
+		';PUMP: the duty curve',
+		' C1\t0\t300', ' C1\t250\t290',
+		';EFFICIENCY: how well it does it',
+		' E1\t100\t60', ' E1\t300\t72',
+		';VOLUME: the tank is a cone',
+		' VC1\t0\t0', ' VC1\t20\t9000',
+		';HEADLOSS:',
+		' HL1\t0\t0', ' HL1\t40\t6',
+		' UNTYPED\t1\t2',
+		'[ENERGY]', ' PUMP\tP1\tEFFIC\tE1',
+		'[COORDINATES]', ' J1\t10\t10', ' R1\t0\t0', ' T1\t20\t20',
+		'[OPTIONS]', ' Units\tGPM', ' Headloss\tH-W', '[END]', ''
+	].join('\n');
+	const four = EngCalcs.lpnInpParse(FOUR);
+	const kindOf = (id) => ((four.curves || []).find((c) => c.id === id) || {}).kind;
+	check(four.ok, 'the four-kind fixture parses');
+	check(kindOf('C1') === 'head' && kindOf('E1') === 'effic'
+			&& kindOf('VC1') === 'volume' && kindOf('HL1') === 'headloss',
+		`each curve takes the type its own comment states: ${['C1', 'E1', 'VC1', 'HL1'].map(kindOf).join(', ')}`);
+	// **A HEADLOSS CURVE NOTHING REFERENCES IS STILL A HEADLOSS CURVE**, which is the whole reason
+	// the comment is read rather than the type being inferred from references alone. No valve in
+	// this file names HL1, and before Task 586 its lines were dropped on export entirely.
+	check(!four.links.some((l) => l.curveId === 'HL1'), 'HL1 is referenced by nothing');
+	check(kindOf('HL1') === 'headloss', 'and is typed anyway, out of the file\'s own comment');
+	// A curve with neither a comment nor a reference: EPANET's own G_CURVE, and it survives.
+	check(kindOf('UNTYPED') === 'generic',
+		`a curve with no comment and no reference is generic, not guessed: ${kindOf('UNTYPED')}`);
+	check((four.curves || []).length === 5, `all five curves reach the library: ${(four.curves || []).length}`);
+	// The comment's DESCRIPTION is the user's text and is kept with the rest of the curve.
+	check(((four.curves || []).find((c) => c.id === 'C1') || {}).note === 'the duty curve',
+		'the comment\'s own words are kept beside the curve');
+	// **THE TANK NAMES ITS VOLUME CURVE**, which is the column that used to be read, reported and
+	// thrown away -- so an exported file lost it and EPANET read a cylinder.
+	const t1 = four.nodes.find((n) => n.id === 'T1');
+	check(t1 && t1.volCurve === 'VC1', `the tank keeps the name of its volume curve: ${t1 && t1.volCurve}`);
+	check((four.dropped || []).some((d) => d.code === 'tank-volume-curve'),
+		'and the difference is still reported, because nothing here USES one yet');
+
+	L.applyUnitSelections(L.inpUnitSelections(four));
+	const fourDoc = L.docFromInp(four, 'four.inp');
+	L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(fourDoc))));
+	const fourOut = L.exportInp();
+	check(fourOut.ok, `the four-kind document exports: ${JSON.stringify(fourOut.error)}`);
+	if (fourOut.ok) {
+		check(/^ T1\t100\t10\t0\t20\t50\t0\tVC1$/m.test(fourOut.inp),
+			`the [TANKS] row states its volume curve in column eight: ${(fourOut.inp.match(/^ T1[^\n]*/m) || [])[0]}`);
+		[';PUMP: the duty curve', ';EFFICIENCY: how well it does it', ';VOLUME: the tank is a cone']
+			.forEach((ln) => {
+				check(fourOut.inp.indexOf('\n' + ln + '\n') >= 0,
+					`the type comment goes back out verbatim: ${ln}`);
+			});
+		check(/^ HL1\t40\t6$/m.test(fourOut.inp) && /^ UNTYPED\t1\t2$/m.test(fourOut.inp),
+			'and a curve nothing references is written back rather than dropped');
+	}
+	// **A CURVE CREATED HERE CARRIES ITS TYPE OUT IN EPANET'S OWN COMMENT**, which is the only place
+	// it can: nothing references it, so a reader has nothing else to go on.
+	L.getDoc().curves.push({ id: 'NEW1', kind: 'headloss', points: [[0, 0], [10, 2]] });
+	const withNew = L.exportInp();
+	check(withNew.ok && /\n;HEADLOSS:\n NEW1\t0\t0/.test(withNew.inp),
+		`a curve made in the Library states its own type: ${(withNew.inp.match(/;HEADLOSS:[^\n]*\n NEW1[^\n]*/) || [])[0]}`);
+
+	console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All curve-library checks passed.'));
+	process.exit(failures ? 1 : 0);
+}());

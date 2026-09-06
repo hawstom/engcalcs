@@ -350,14 +350,21 @@ Rules, stated as rules because each is silently wrong when broken:
   (auto = unitless canvas distance, manual = SI-converted real length) was an unnecessary split
   and has been removed.
 
-- **Pump curve entry — DONE 2026-07-30 (ROADMAP Task 176), built exactly to this sketch.** The
-  Pump property popup's field slot is a `<select>`: "Enter points below" (default) shows up to 3
-  `[Q,H]` point rows feeding `EngCalcs.lpnPumpFromCurve()`, or any OTHER pump's id, which makes this
-  pump copy that pump's curve (`l.curveRef`) instead of using its own points — one slot serves both
-  cases, as sketched. Reference resolution is a single hop only (`resolveCurvePoints()` never
-  chases a chain), so a reference cycle can't form; a deleted or renamed referenced pump is handled
-  by `renameLink()` rewriting every `curveRef` that pointed at the old id, and a reference to a
-  since-deleted id simply falls back to the referencing link's own (possibly empty) points.
+- **Pump curve entry — a CURVE IS A DOCUMENT OBJECT (ROADMAP Task 586, 2026-09-05).** `doc.curves`
+  holds every curve the project has, as `{ id, kind, points, src, tok }`, and a pump, a general
+  purpose valve and a pump's efficiency each hold only a REFERENCE to one. The popup's field slot is
+  a `<select>` over the curves of the matching kind, plus "No curve" and plus one entry that mints
+  one; the three-row point table below it edits the curve the element names, and a curve of more
+  than three points is shown read-only there and edited under Libraries, Curves.
+  *(Superseded, recorded so it is not re-proposed: from 2026-07-30 to 2026-09-05 a pump held its
+  own `curvePoints`, and `curveRef` named ANOTHER PUMP to copy them from — a borrow that existed
+  only because there was nothing else to point at, and that `renameLink()` had to chase. Tom:
+  *"we needed a pump curve, but we didn't have a Library... move all pump curve data to the Library
+  under curves and leave only curve references in the pump properties."*)*
+  **The reference is scenario-overridable and the points are not** (Tom, 2026-09-05: *"Scenario pump
+  reference: Yes."*): `curveId` and `efficCurveId` are in `LPN_OVERRIDABLE.link` and go through
+  `setProp()`, while a curve's points are the document's, shared by everything naming it, so a
+  scenario that edited them would move every other scenario's answer.
   **Amended 2026-07-30 (ROADMAP Tasks 179/180):** a new pump gets NO curve at all rather than a
   default design point — a pump does exactly what the curve you entered says, and nothing until you
   enter one (`recomputePumpCurve()` sets `h0 = a = 0`, and the solver's pump branch has an explicit
@@ -365,7 +372,10 @@ Rules, stated as rules because each is silently wrong when broken:
   lossless connection). There is no separate "head gain" quantity anywhere: a pump reports a
   NEGATIVE head loss. The equation and the 1/2/3-point cases are documented in the page's own Notes
   list (`lpn_notes_5`), with a one-line pointer under the popup's curve table.
-  `js/looped-network.js`.
+  **The FIT reads at most three points and is derived, never stored** (`pumpFitPoints()` samples a
+  longer curve at its ends and its middle). EPANET is handed the curve's REAL points once there are
+  more than three of them, which is what stopped a five-point manufacturer's curve being rewritten
+  twice on the way through. `js/looped-network.js`.
 - **Versioning:** `v` is a monotonic integer. `v > CURRENT` refuses to load and says so — never
   silently drop unknown fields. `v < CURRENT` runs an ordered chain of pure migrations, keeping a
   `_backup` copy first, because there is no undo in localStorage.

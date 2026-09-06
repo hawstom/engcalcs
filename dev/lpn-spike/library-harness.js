@@ -40,7 +40,13 @@ const L = loadLoopedNetwork(
 	"\t\tspanText: libSpanText, sparkline: libSparkline, curveChart: libCurveChart,\n" +
 	"\t\treadControl: libReadControl, controlText: libControlText,\n" +
 	"\t\trenamePattern: libRenamePattern, deletePattern: libDeletePattern,\n" +
-	"\t\tcurves: libCurves, freeId: libFreeId,\n" +
+	"\t\tcurves: libCurvesRead, freeId: libFreeId,\n" +
+	// The Curves section is an EDITOR from Task 586: a rename that every reference follows, a
+	// "who uses this" answer that makes a delete refusable, and the resolver every reader goes
+	// through -- all of them the functions the box's own controls call.
+	"\t\trenameCurve: libRenameCurve, curveUsers: curveUsers,\n" +
+	"\t\tresolveCurvePoints: resolveCurvePoints, effective: effective, setProp: setProp,\n" +
+	"\t\tparsePoints: libParsePoints, formatPoints: libFormatPoints,\n" +
 	// The Rules section (Task 248.03), by the same seam and for the same reason: these ARE the
 	// functions the box's controls call, so a check here is a check on the code path a click takes.
 	"\t\treadRule: libReadRule, ruleChunks: libRuleChunks, rulesWith: libRulesWith,\n" +
@@ -278,18 +284,47 @@ function check(ok, msg, detail) {
 	const run2 = await EngCalcs.lpnEpanetRun(after);
 	check(run2.ok, 'and the network still runs with that pattern deleted');
 
-	// ---- 5. THE CURVE LIST IS A VIEW OF WHAT THE LINKS ALREADY HOLD ---------------------------
+	// ---- 5. THE CURVE LIST IS THE DOCUMENT'S OWN LIBRARY (Task 586) ---------------------------
 	console.log('\n-- curves --');
 	const curves = L.curves();
-	check(curves.length === 2, 'Net3\'s two pumps are the whole curve list', String(curves.length));
-	check(curves.every((l) => (l.curvePoints || []).length === 3),
-		'each with its three points, read off the link rather than off a copy',
-		curves.map((l) => (l.curvePoints || []).length).join('/'));
-	// A pump that BORROWS another pump's curve is deliberately not listed: it owns no curve, and
-	// listing it would show the same three points twice under two names.
-	curves[1].curveRef = curves[0].id;
-	check(L.curves().length === 1, 'a pump that borrows another\'s curve is not a second entry',
+	check(curves.length === 2, 'Net3\'s two curves are the whole curve list', String(curves.length));
+	check(curves.every((c) => c.points.length === 3),
+		'each with its three points, held once, in the document',
+		curves.map((c) => c.points.length).join('/'));
+	check(curves.every((c) => c.kind === 'head'),
+		'and each typed as a pump head curve, because that is what references it',
+		curves.map((c) => c.kind).join('/'));
+	// **TWO ELEMENTS SHARING ONE CURVE, WHICH IS WHAT THE RETIRED `curveRef` BORROW BECAME.** The
+	// list does not grow, both pumps read the same points, and editing the curve moves both.
+	const pumpsNow = back.links.filter((l) => l.type === 'pump');
+	L.setProp(pumpsNow[1], 'curveId', curves[0].id);
+	check(L.curves().length === 2, 'pointing one pump at another\'s curve adds no entry',
 		String(L.curves().length));
+	check(JSON.stringify(L.resolveCurvePoints(pumpsNow[0]))
+			=== JSON.stringify(L.resolveCurvePoints(pumpsNow[1])),
+		'and both pumps now read the identical points');
+	check(L.curveUsers(curves[0].id).length === 2,
+		'the library says both elements use it, which is what makes a delete refusable',
+		L.curveUsers(curves[0].id).join(','));
+	// ONE EDIT, BOTH ELEMENTS. The point of a shared definition, and the thing per-element points
+	// could not do.
+	curves[0].points = [[0, 999], [500, 500], [1000, 100]];
+	check(L.resolveCurvePoints(pumpsNow[0])[0][1] === 999
+			&& L.resolveCurvePoints(pumpsNow[1])[0][1] === 999,
+		'editing the shared curve moves both elements at once');
+	// **A RENAME CARRIES EVERY REFERENCE WITH IT.** A curve id is its own namespace from Task 586,
+	// and a reference left pointing at the old name would empty a pump's curve in silence.
+	L.renameCurve(curves[0], 'RENAMED');
+	check(L.effective(pumpsNow[0], 'curveId') === 'RENAMED'
+			&& L.effective(pumpsNow[1], 'curveId') === 'RENAMED',
+		'a curve rename is followed by every element naming it',
+		L.effective(pumpsNow[0], 'curveId') + '/' + L.effective(pumpsNow[1], 'curveId'));
+	check(L.renameCurve(curves[0], curves[1].id) === false,
+		'and a rename onto a name already taken is refused rather than merging two curves');
+	L.renameCurve(curves[0], '1');
+	// Put the two pumps back where Net3 had them, so the sections below run on Net3's own network.
+	L.setProp(pumpsNow[1], 'curveId', curves[1].id);
+	curves[0].points = [[0, 250], [500, 200], [1000, 100]];
 
 	// ---- 6. THE CURVE CHART DRAWS WHAT THE SOLVER APPLIES --------------------------------------
 	//
@@ -319,7 +354,7 @@ function check(ok, msg, detail) {
 	// The fitted curve must FALL as flow rises, which is the one thing everybody knows about a pump
 	// curve and the thing a sign error in the frame would invert. y grows DOWNWARD in SVG, so a
 	// falling head is a rising y.
-	const pumpPts = curves[0].curvePoints;
+	const pumpPts = curves[0].points;
 	const fitted = chartOf(L.curveChart(pumpPts, true));
 	const ys = (fitted.d.match(/[ML]([-\d.]+) ([-\d.]+)/g) || []).map((m) => +m.split(' ')[1]);
 	check(ys.length > 8 && ys[ys.length - 1] > ys[0],

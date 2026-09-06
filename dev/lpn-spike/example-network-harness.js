@@ -76,6 +76,9 @@ const L = loadLoopedNetwork(
   "\t\tsubMenuOpen: function () { return document.getElementById('lpn_menu_popup2').style.display === 'block'; },\n" +
   "\t\tsubClosePending: function () { return subCloseTimer !== null; },\n" +
   "\t\tmenuRowLabels: function () { return Array.prototype.map.call(document.getElementById('lpn_menu_list').children, function (c) { return c.textContent || (c.children[1] && c.children[1].textContent) || ''; }); },\n" +
+  // Task 586: a pump names a curve and the curve is the document's, so the harness resolves it
+  // through the page's own reader rather than reaching for a field that has moved.
+  "\t\tresolveCurvePoints: resolveCurvePoints, docCurves: docCurvesRead,\n" +
   "\t\tniceDefault: niceDefault, setUnitEl: function (name) { return unitEl(name); },\n" +
   "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
@@ -305,7 +308,8 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   });
 
   // The pump curve is real datasheet shape: 3 points, head falling with flow, from zero flow.
-  const cp = pumps[0].curvePoints;
+  // It is a LIBRARY curve the pump names (Task 586), so it is read out of the document.
+  const cp = L.resolveCurvePoints(pumps[0]);
   ok('pump curve has 3 points starting at zero flow', cp.length === 3 && cp[0][0] === 0);
   ok('pump curve head falls monotonically', cp[0][1] > cp[1][1] && cp[1][1] > cp[2][1]);
 
@@ -642,7 +646,6 @@ console.log('\n--- Settings panel stays in sync ---');
   j3.elev = 15.24; j3._demand = 0.0315;          // metres, m3/s
   const p3 = L.addLink('pipe', r3.id, j3.id);
   p3._diameter = 0.2032; p3._length = 675.4; p3._roughness = 130; p3._k = 2;
-  p3.curvePoints = null;
   L.setDocVersion(2);
   ok('the document is below the declarative version before the answer', L.docVersion() === 2);
   ok('...and a save of it writes v2, so the offer survives a round trip',

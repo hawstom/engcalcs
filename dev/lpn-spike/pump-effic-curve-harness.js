@@ -59,6 +59,9 @@ const L = loadLoopedNetwork(
 	// three seams that chain actually runs through: the document, the settings behind it, and the
 	// bridge that turns them into what lpnToInp() writes.
 	"\t\tsetDoc: function (d) { doc = d; }, setSettings: function (s) { settings = s; },\n" +
+	// Task 586: the curve is the document's and the pump names it, so the harness asks the page's
+	// own resolver rather than reaching for a field that has moved.
+	"\t\tcurves: docCurvesRead, curveById: curveById, effective: effective,\n" +
 	"\t\tgetDoc: function () { return doc; }, docEnergy: docEnergy,\n" +
 	"\t\tassembleModel: assembleModel, renderLinkFields: renderLinkFields, toSI: toSI,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -140,17 +143,21 @@ const FIXTURE = [
 	// =========================================================================================
 	const parsed = EngCalcs.lpnInpParse(FIXTURE);
 	check(parsed.ok, 'the fixture parses as an .inp');
-	const carried = (parsed.inpSections || {}).CURVES || [];
-	check(carried.length === 3, `three [CURVES] lines are carried: ${carried.length}`);
-	check(carried.every((ln) => /^\s*E1\b/.test(ln)),
-		`and every one of them is E1's, not C1's: ${JSON.stringify(carried)}`);
-	// **THE FILE'S OWN CHARACTERS, TABS INCLUDED.** A carried line that had been re-spaced would
+	// **EVERY CURVE IS A DOCUMENT OBJECT NOW** (Task 586), so nothing is "carried" in
+	// `inpSections`: both C1 and E1 are in the library, each with its own lines and its own kind.
+	check(!((parsed.inpSections || {}).CURVES),
+		`[CURVES] is not a carried section any more: ${JSON.stringify((parsed.inpSections || {}).CURVES)}`);
+	const lib = parsed.curves || [];
+	check(lib.length === 2, `both curves reach the library: ${lib.map((c) => c.id).join(',')}`);
+	const e1 = lib.filter((c) => c.id === 'E1')[0], c1 = lib.filter((c) => c.id === 'C1')[0];
+	check(!!e1 && e1.kind === 'effic' && e1.points.length === 3,
+		`E1 is an efficiency curve of three points: ${JSON.stringify(e1 && [e1.kind, e1.points])}`);
+	check(!!c1 && c1.kind === 'head' && c1.points.length === 2,
+		`C1 is a head curve of two: ${JSON.stringify(c1 && [c1.kind, c1.points])}`);
+	// **THE FILE'S OWN CHARACTERS, TABS INCLUDED.** A source line that had been re-spaced would
 	// still look right in a diff of tokens and would fail the byte test in section 2.
-	check(carried[1] === ' E1\t500\t70', `the middle line is the file's own text: ${JSON.stringify(carried[1])}`);
-	// A pump's HEAD curve is redrawn by the exporter from the document's own points, so carrying its
-	// text as well would write the section twice. This is the half of the selection rule that has no
-	// symptom until somebody adds a second kind of curve.
-	check(!carried.some((ln) => /\bC1\b/.test(ln)), 'the pump head curve is excluded from the carry');
+	check(!!e1 && e1.src[1] === ' E1\t500\t70', `the middle line is the file's own text: ${JSON.stringify(e1 && e1.src[1])}`);
+	check(!!c1 && c1.src.length === 2, 'and the head curve keeps its own lines too, which it never did before');
 	// And the [ENERGY] row itself is still read the way Task 566 reads it.
 	const energy = EngCalcs.lpnEnergyParse((parsed.inpSections || {}).ENERGY || []);
 	check(energy.effic.P1 === 'E1', `the EFFIC row still names the curve: ${JSON.stringify(energy.effic.P1)}`);
@@ -160,8 +167,8 @@ const FIXTURE = [
 	// =========================================================================================
 	L.applyUnitSelections(L.inpUnitSelections(parsed));
 	const doc = L.docFromInp(parsed, 'effic.inp');
-	check(((doc.inpSections || {}).CURVES || []).length === 3,
-		'the carry reaches the saved document, so it survives save and reopen');
+	check((doc.curves || []).length === 2,
+		`the library reaches the saved document, so it survives save and reopen: ${(doc.curves || []).map((c) => c.id).join(',')}`);
 	const out = EngCalcs.lpnExportInp(doc);
 	check(out.ok, `the document exports: ${JSON.stringify(out.error)}`);
 	if (out.ok) {
@@ -261,9 +268,12 @@ const FIXTURE = [
 	// conversion the whole task turns on, and it is stated against the file's own tokens rather than
 	// against a number typed here twice.
 	const GPM_TO_SI = 1 / EngCalcs.unitFactor('gpm');
-	const fromDoc = EngCalcs.lpnEfficCurves(doc.inpSections, GPM_TO_SI);
-	check(!!fromDoc.E1 && fromDoc.E1.length === 3, 'the carried lines read back as three points');
-	if (fromDoc.E1) {
+	// The library holds the points in the FILE'S OWN unit (gpm here), untouched; the crossing to SI
+	// is docEnergy()'s, at the engine boundary, and is applied here exactly as it applies it.
+	const libE1 = (doc.curves || []).filter((c) => c.id === 'E1')[0];
+	const fromDoc = { E1: (libE1 ? libE1.points : []).map((pt) => [pt[0] * GPM_TO_SI, pt[1]]) };
+	check(fromDoc.E1.length === 3, 'the library curve reads back as three points');
+	if (fromDoc.E1.length) {
 		check(fromDoc.E1[0][1] === 40 && fromDoc.E1[2][1] === 55,
 			'the ordinate is a percent and crosses untouched');
 		// 500 gal/min x 3.785411784 L/gal / 60 s = 31.5450982 L/s. Arithmetic, not a fixture.
@@ -271,8 +281,8 @@ const FIXTURE = [
 		check(Math.abs(lps - 500 * 3.785411784 / 60) < 1e-9,
 			`500 gpm arrives as ${lps.toFixed(7)} L/s against 3.785411784/60 x 500 = ${(500 * 3.785411784 / 60).toFixed(7)}`);
 		// And a factor of 1 -- the mistake this is guarding -- would have left it at 500.
-		check(Math.abs(EngCalcs.lpnEfficCurves(doc.inpSections, 1).E1[1][0] - 500) < 1e-12,
-			'with no factor the same line reads 500, which is what a missing conversion looks like');
+		check(Math.abs(libE1.points[1][0] - 500) < 1e-12,
+			'stored with no factor the same line reads 500, which is the document\'s own unit');
 	}
 	// End to end: those SI points through the engine writer come out in L/s.
 	const gpmBuilt = EngCalcs.lpnToInp(pumpModel({ effic: { PU: 'E1' }, efficCurves: fromDoc }));
@@ -382,14 +392,20 @@ const FIXTURE = [
 	head('7. THE PUMP\'S OWN POPUP, AND IT IS A CONTROL NOW (Tom, 2026-09-05: "Proceed")');
 	// =========================================================================================
 	// *"The pump has no efficiency of its own, and I don't see an interface for that."* Phase one
-	// put it on screen; Task 585 makes it editable, and the curve lives on the PUMP -- `efficPoints`
-	// in the project's own flow unit and `efficCurveId` for what the file calls it, which is the
-	// head curve's own shape rather than a document-level curve library this page has never had.
+	// put it on screen; Task 585 made it editable on the PUMP; Task 586 moved the curve itself to
+	// the document's library and left the pump holding only `_efficCurveId` -- a REFERENCE, and an
+	// overridable one.
+	const efficPts = (id) => {
+		const c = L.curveById(id);
+		return c ? c.points : null;
+	};
 	L.renderLinkFields('P1');
 	const popup = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/E1/.test(popup), `the popup names the curve: ${popup.replace(/\s+/g, ' ').slice(-260)}`);
-	check(!!(L.getDoc().links[0].efficPoints || []).length,
-		`and the points are ON THE PUMP, not on the setting: ${JSON.stringify(L.getDoc().links[0].efficPoints)}`);
+	check(L.effective(L.getDoc().links[0], 'efficCurveId') === 'E1',
+		`the pump holds a REFERENCE and nothing else: ${L.effective(L.getDoc().links[0], 'efficCurveId')}`);
+	check(!!(efficPts('E1') || []).length,
+		`and the points are in the LIBRARY: ${JSON.stringify(efficPts('E1'))}`);
 	check(!((L.getSettings().energy || {}).effic || {}).P1,
 		'the staging map on settings.energy is emptied, so there is one home for the name');
 	// **THE EXACT TOKEN, NOT A ROUND TRIP.** Reading the points back out of docEnergy()'s m3/s and
@@ -432,8 +448,8 @@ const FIXTURE = [
 	// different roads, and only the second is something the reader can act on. Both now also get
 	// the table, because the answer to either is to type the points.
 	const chainPump = L.getDoc().links[0];
-	const keptPts = chainPump.efficPoints, keptName = chainPump.efficCurveId;
-	delete chainPump.efficPoints; delete chainPump.efficCurveId;
+	const keptName = chainPump._efficCurveId;
+	delete chainPump._efficCurveId;
 	L.renderLinkFields('P1');
 	const noneText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/no efficiency curve/.test(noneText) && /75%/.test(noneText),
@@ -441,12 +457,12 @@ const FIXTURE = [
 	check(efficInputs().length === 2,
 		`and still offers one blank row to type one into: ${efficInputs().length} boxes`);
 
-	chainPump.efficCurveId = 'GHOST';
+	chainPump._efficCurveId = 'GHOST';
 	L.renderLinkFields('P1');
 	const ghostText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
 	check(/GHOST/.test(ghostText) && /does not state/.test(ghostText),
 		`a curve named but not stated is disclosed by name: ${/This pump names[^]{0,110}/.exec(ghostText)}`);
-	chainPump.efficCurveId = keptName; chainPump.efficPoints = keptPts;
+	chainPump._efficCurveId = keptName;
 
 	// =========================================================================================
 	head('8. AN EDITED CURVE IS COMPOSED, REACHES THE ENGINE, AND MOVES THE ANSWER');
@@ -455,8 +471,9 @@ const FIXTURE = [
 	// person would click, export, and run. Nothing in this section is a model this file assembled.
 	L.importInp({ name: 'chain.inp', _text: CHAIN });
 	const pumpIn = L.linkById('P1');
-	check(!!(pumpIn.efficPoints || []).length,
-		`the imported pump carries its curve: ${JSON.stringify(pumpIn.efficPoints)}`);
+	check(L.effective(pumpIn, 'efficCurveId') === 'E1'
+			&& !!(efficPts('E1') || []).length,
+		`the imported pump names its curve and the library states it: ${JSON.stringify(efficPts('E1'))}`);
 	const clean = L.exportInp();
 	check(clean.ok && /^ E1\t951\.0194\t55$/m.test(clean.inp),
 		'and an untouched export still states the file\'s own last point');
@@ -469,8 +486,8 @@ const FIXTURE = [
 	const editBoxes = efficInputs();
 	editBoxes[5].value = '35';
 	(editBoxes[5]._listeners.change || []).forEach((f) => f());
-	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
-		`the edit lands on the pump in the project's own unit: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
+	check(JSON.stringify(efficPts('E1')) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
+		`the edit lands on the CURVE in the project's own unit: ${JSON.stringify(efficPts('E1'))}`);
 	const edited = L.exportInp();
 	check(edited.ok && /^ E1\t951\.0194\t35$/m.test(edited.inp),
 		`the exported [CURVES] states the edited point: ${(edited.inp.match(/^ E1[^\n]*/gm) || []).join(' / ')}`);
@@ -503,8 +520,8 @@ const FIXTURE = [
 	// edit, and a user typing three points into an empty table.
 	const BARE = CHAIN.split('\n').filter((ln) => !/^\s*E1\b/.test(ln) && !/EFFIC/.test(ln)).join('\n');
 	L.importInp({ name: 'bare.inp', _text: BARE });
-	check(!L.linkById('P1').efficPoints && !L.linkById('P1').efficCurveId,
-		'the pump opens with no curve of its own');
+	check(!L.effective(L.linkById('P1'), 'efficCurveId'),
+		'the pump opens naming no curve at all');
 	L.renderLinkFields('P1');
 	[['317.0065', '40'], ['634.0129', '70'], ['951.0194', '35']].forEach(function (pt) {
 		const b = efficInputs();
@@ -513,12 +530,13 @@ const FIXTURE = [
 		(b[b.length - 1]._listeners.change || []).forEach((f) => f());
 		L.renderLinkFields('P1');
 	});
-	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
-		`three points typed into an empty table: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
-	// **THE CURVE GETS A NAME THE MOMENT IT GETS A POINT**, because an [ENERGY] row naming a curve
-	// no [CURVES] section defines is an input EPANET refuses -- the very defect Task 582 closed.
-	check(L.linkById('P1').efficCurveId === 'E_P1',
-		`and a name of its own, after the pump: ${L.linkById('P1').efficCurveId}`);
+	check(JSON.stringify(efficPts('E_P1')) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
+		`three points typed into an empty table: ${JSON.stringify(efficPts('E_P1'))}`);
+	// **THE CURVE IS MINTED AND NAMED THE MOMENT IT GETS A POINT**, because an [ENERGY] row naming a
+	// curve no [CURVES] section defines is an input EPANET refuses -- the very defect Task 582
+	// closed. The reference goes onto the pump through setProp(), because it is overridable.
+	check(L.effective(L.linkById('P1'), 'efficCurveId') === 'E_P1',
+		`and a name of its own, after the pump: ${L.effective(L.linkById('P1'), 'efficCurveId')}`);
 	const madeUp = L.exportInp();
 	check(madeUp.ok && /^ E_P1\t317\.0065\t40$/m.test(madeUp.inp)
 		&& /^ E_P1\t951\.0194\t35$/m.test(madeUp.inp),
@@ -538,9 +556,9 @@ const FIXTURE = [
 	// =========================================================================================
 	const saved = JSON.parse(JSON.stringify(L.serialize()));
 	L.applySaved(L.migrateSaved(saved));
-	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
-		`a saved and reopened project keeps the curve: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
-	check(L.linkById('P1').efficCurveId === 'E_P1', 'and what it is called');
+	check(JSON.stringify(efficPts('E_P1')) === '[[317.0065,40],[634.0129,70],[951.0194,35]]',
+		`a saved and reopened project keeps the curve: ${JSON.stringify(efficPts('E_P1'))}`);
+	check(L.effective(L.linkById('P1'), 'efficCurveId') === 'E_P1', 'and what it is called');
 	// **THE DOCUMENT THIS GUARD EXISTS FOR.** Saved between Task 582 and Task 585: it carries
 	// `settings.energy` with the name still on it, the curve's own lines on `inpSections.CURVES`,
 	// and nothing on any pump. A read nested inside the `!settings.energy` test walks straight past
@@ -548,17 +566,24 @@ const FIXTURE = [
 	// would open with a pump running at the global efficiency and no way to see why.
 	const legacy = JSON.parse(JSON.stringify(saved));
 	delete legacy.settings.efficCurves;
+	delete legacy.curves;
+	legacy.v = 10;
 	legacy.settings.energy = { globalEfficiency: 75, effic: { P1: 'E1' } };
-	(legacy.links || []).forEach(function (l) { delete l.efficPoints; delete l.efficCurveId; });
+	(legacy.links || []).forEach(function (l) { delete l.efficPoints; delete l._efficCurveId; });
 	legacy.inpSections = Object.assign({}, legacy.inpSections, {
+		ENERGY: [' Global Efficiency\t75', ' PUMP\tP1\tEFFIC\tE1'],
 		CURVES: [' E1\t317.0065\t40', ' E1\t634.0129\t70', ' E1\t951.0194\t55']
 	});
 	L.applySaved(L.migrateSaved(legacy));
-	check(JSON.stringify(L.linkById('P1').efficPoints) === '[[317.0065,40],[634.0129,70],[951.0194,55]]',
-		`a project saved between the two tasks gains its curve on open: ${JSON.stringify(L.linkById('P1').efficPoints)}`);
-	check(L.linkById('P1').efficCurveId === 'E1', 'under the name its own file gave it');
+	check(JSON.stringify(efficPts('E1')) === '[[317.0065,40],[634.0129,70],[951.0194,55]]',
+		`a project saved between the two tasks gains its curve on open: ${JSON.stringify(efficPts('E1'))}`);
+	check(L.effective(L.linkById('P1'), 'efficCurveId') === 'E1', 'under the name its own file gave it');
 	check(!((L.getSettings().energy || {}).effic || {}).P1,
 		'and the staging map is emptied, so nothing can later disagree with the pump');
+	// **AND `inpSections.CURVES` IS EMPTIED WITH IT** (Task 586): two homes for one curve is a
+	// disagreement waiting for the first edit, and the exporter composes [CURVES] from the library.
+	check(!((L.getDoc().inpSections || {}).CURVES),
+		`the carried lines are gone, not left to be written twice: ${JSON.stringify((L.getDoc().inpSections || {}).CURVES)}`);
 
 	console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All checks passed.'));
 	process.exit(failures ? 1 : 0);

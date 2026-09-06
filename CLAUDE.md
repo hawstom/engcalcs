@@ -241,6 +241,26 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   preference; the routing is a fact about this network). The native solver refuses such a network by
   name if the engine is unreachable. `EngCalcs.lpnValveIsNative` is the one place that line is drawn;
   `EngCalcs.lpnLinkK` is the one place a TCV's loss is read from its SETTING rather than its `k`.
+- **A CURVE IS A DOCUMENT OBJECT AND AN ELEMENT HOLDS ONLY A REFERENCE** (Task 586, Tom
+  2026-09-05: *"move all pump curve data to the Library under curves and leave only curve
+  references in the pump properties"*). `doc.curves` holds `{id, kind, points, src, tok}`; a pump,
+  a GPV and a pump's efficiency name one by id, and the Library's Curves section is where one is
+  created, renamed, edited and deleted. Per-element `curvePoints`/`efficPoints` and the `curveRef`
+  borrow are GONE, and were an accident of chronology rather than a design — the pump curve was
+  written in the first two days of this page, before there was a Library. **The REFERENCE is
+  scenario-overridable (his ruling: *"Scenario pump reference: Yes."*) and the POINTS are not** —
+  a curve is shared, so a scenario editing its points would move every other scenario's answer.
+  **The three-point FIT is DERIVED and stored nowhere**, which is what lets a curve keep every
+  point the file stated: a >3-point pump curve used to be sampled to three on import and
+  re-sampled off our fit for the engine, so a manufacturer's curve was rewritten twice.
+  Deleting a curve elements use is REFUSED by name; renaming one carries every reference.
+  **EPANET HAS EXACTLY FOUR KINDS and states each in a `;PUMP:`-style COMMENT** above the curve's
+  own rows: PUMP, EFFICIENCY, VOLUME, HEADLOSS (Tom, 2026-09-05). Read it, keep it, write it back —
+  it is the only thing that can type a curve nothing references, which is what the Library's own
+  Add button makes. `generic` is not a fifth kind, it is EPANET's `G_CURVE`, and no control offers
+  it. **A VOLUME curve is carried in full and USED BY NOTHING** — a tank names it and still solves
+  as a cylinder, which is exact at one instant and wrong over a run (Task 587).
+  `dev/lpn-spike/curve-library-harness.js`; `dev/pump-energy.md` for the efficiency side.
 - **A tank is a fixed head at its water surface** — what EPANET itself solves at t=0.
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
   LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts

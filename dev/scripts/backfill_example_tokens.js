@@ -87,7 +87,8 @@ PAIRS.forEach(function (pair) {
 	// **A PUMP'S CURVE NAME IS THE USER'S TEXT TOO** (Task 430(b)). It is not in a `tok` bag -- a
 	// token is text for a NUMBER -- but it is spent in exactly the same way: without it the writer
 	// invents `C_<pumpid>` and Net3's curves `1` and `2` come back as `C_10` and `C_335`.
-	fresh.links.forEach(function (l) { if (l.curveId) { curveIds[l.id] = l.curveId; } });
+	// Task 586: a pump NAMES a library curve, so the name it holds is `_curveId`.
+	fresh.links.forEach(function (l) { if (l._curveId) { curveIds[l.id] = l._curveId; } });
 	fresh.links.forEach(function (l) {
 		if (l.tok) { bag['l|' + l.id] = l.tok; }
 		// A VERTEX HAS TOKENS TOO and is matched by POSITION IN ITS LINK, which is the only identity a
@@ -131,7 +132,7 @@ PAIRS.forEach(function (pair) {
 	(ex.nodes || []).forEach(function (n) { merge(n, 'n|' + n.id); });
 	(ex.links || []).forEach(function (l) {
 		merge(l, 'l|' + l.id);
-		if (curveIds[l.id] && !l.curveId) { l.curveId = curveIds[l.id]; added++; }
+		if (curveIds[l.id] && !l._curveId) { l._curveId = curveIds[l.id]; added++; }
 		(l.verts || []).forEach(function (v, i) { merge(v, 'v|' + l.id + '|' + i); });
 	});
 

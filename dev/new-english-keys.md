@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**38 still to read**, of 115 untranslated keys, of 1652 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**59 still to read**, of 136 untranslated keys, of 1671 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,8 +21,38 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## lpn_  (115, 38 to read @@ NEEDS RULING)
+## lpn_  (136, 59 to read @@ NEEDS RULING)
 
+- **`lpn_curve_kind_effic`**
+  > Pump efficiency
+  @@ NEEDS RULING
+- **`lpn_curve_kind_generic`**
+  > Not stated
+  @@ NEEDS RULING
+- **`lpn_curve_kind_head`**
+  > Pump head
+  @@ NEEDS RULING
+- **`lpn_curve_kind_headloss`**
+  > Valve head loss
+  @@ NEEDS RULING
+- **`lpn_curve_kind_volume`**
+  > Tank volume
+  @@ NEEDS RULING
+- **`lpn_curve_long_note`**
+  > The curve {name} has {count} points, so it is shown here and edited under Libraries, Curves.
+  @@ NEEDS RULING
+- **`lpn_curve_new`**
+  > New curve...
+  @@ NEEDS RULING
+- **`lpn_curve_none`**
+  > No curve
+  @@ NEEDS RULING
+- **`lpn_curve_shared_note`**
+  > These points belong to the curve {name}, which {ids} also use. Changing them here changes them there too.
+  @@ NEEDS RULING
+- **`lpn_curve_volume_col`**
+  > Volume
+  @@ NEEDS RULING
 - **`lpn_energy_col_avg_kw`**
   > Avg. kW
   _Ruled OK 2026-09-04._
@@ -140,11 +170,41 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_find_prop_demand_description`**
   > Demand category description
   _Ruled OK 2026-09-04._
+- **`lpn_gpv_curve_source`**
+  > Head loss curve
+  @@ NEEDS RULING
+- **`lpn_gpv_curve_source_tip`**
+  > The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can name the same curve, and editing it changes all of them.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_net_options`**
   > This EPANET .net file states these settings in places this page has no name for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.
   _Ruled OK 2026-09-04._
 - **`lpn_inp_drop_sources_mixing`**
   > This file says where more of the substance is added to the network, and how the water in a tank mixes. This page reads both and uses both. A dose shows up on the node it is added at, and a tank says which mixing model it follows; run the model with the EPANET engine and both are worked out along with the rest of the water quality. The lines are kept, and they are written back if you save an EPANET file.
+  @@ NEEDS RULING
+- **`lpn_library_curve_add`**
+  > Add a curve
+  @@ NEEDS RULING
+- **`lpn_library_curve_in_use`**
+  > This curve is used by {count} element(s): {ids}. Point them at another curve first, then delete it.
+  @@ NEEDS RULING
+- **`lpn_library_curve_kind`**
+  > What this curve describes
+  @@ NEEDS RULING
+- **`lpn_library_curve_unused`**
+  > Nothing uses this curve.
+  @@ NEEDS RULING
+- **`lpn_library_curve_used_by`**
+  > Used by
+  @@ NEEDS RULING
+- **`lpn_library_curve_values_tip`**
+  > The points, as pairs. Paste two columns from a spreadsheet or the lines out of an EPANET file if you have them. Every number is read in order and paired up, so spaces, commas and semicolons all work.
+  @@ NEEDS RULING
+- **`lpn_library_curve_x`**
+  > X
+  @@ NEEDS RULING
+- **`lpn_library_curve_y`**
+  > Y
   @@ NEEDS RULING
 - **`lpn_library_rule_add`**
   > Add a rule
@@ -197,6 +257,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 - **`lpn_new_units_tip`**
   > A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.
   _Ruled OK 2026-09-04._
+- **`lpn_pump_curve_source_tip`**
+  > The curve in the Libraries box that says how much head this pump makes at each flow. Several pumps can name the same curve, and editing it changes all of them.
+  @@ NEEDS RULING
 - **`lpn_pump_effic_col`**
   > Efficiency
   @@ NEEDS RULING
@@ -204,7 +267,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
   > Efficiency curve
   @@ NEEDS RULING
 - **`lpn_pump_effic_curve_tip`**
-  > The name this pump's efficiency curve is written under in an EPANET file. Its points are below and you can edit them there. A pump you gave a curve to here is named after the pump.
+  > The curve in the Libraries box that says how efficient this pump is at each flow. Its points are below and you can edit them there. Several pumps can name the same curve, and editing it changes all of them.
   @@ NEEDS RULING
 - **`lpn_pump_effic_global`**
   > This pump has no efficiency curve, so it runs at the network efficiency of {percent}. Type points below to give it one.

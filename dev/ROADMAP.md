@@ -107,6 +107,16 @@ the block.
   - **Separate and undecided: the default map colour.** The map draws linework black; the sketch
     paints it suite blue. That governs every project with colouring OFF, which is most of them.
 
+- 75|587| **A tank with a volume curve fills on the wrong schedule.**
+  The curve is a first-class Library object since Task 586 -- imported whole, editable, exported
+  byte-identically, and named by the tank in `[TANKS]` column eight. **Nothing USES it.** The tank
+  is solved as a cylinder of its stated diameter, which is exact at a single instant (the water
+  surface is the level the file gives) and wrong over time: the level-to-volume relationship an
+  extended-period run integrates is the curve's, not a circle's. `lpn_inp_drop_tank_curve` says so
+  in those words now, where before EPS shipped it promised the results matched.
+  The work is arithmetic, not plumbing: `js/lpn-time.js` and the EPANET bridge decide how a level
+  step becomes a volume step, and `EngCalcs.lpnIsFixedHead`'s equivalence is untouched by it.
+
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.

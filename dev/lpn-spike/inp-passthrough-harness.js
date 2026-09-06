@@ -180,16 +180,23 @@ const before = fails;
 	// preserved in a file nobody re-generated and invisible to every check here because the compared
 	// fields were named one by one and this one was not on the list. Found 2026-08-18 by Tom, reading
 	// the numbers. The values are exact today; what was missing was anything that would say so.
+	// **THE CORPUS PREDATES THE CURVE LIBRARY AND IS DELIBERATELY NOT REGENERATED** (Task 586).
+	// Those `.lwn` files hold their points on the pump; a fresh import holds them in `doc.curves`
+	// and the pump names one. So the comparison crosses the two paradigms on purpose: it is the
+	// same question -- did this pump's own numbers survive -- asked of a file written before the
+	// move and a document built after it.
+	const gotCurve = (id) => (got.curves || []).find((c) => c.id === id);
 	want.links.forEach((l) => {
 		if (!l.curvePoints || !gotLink[l.id]) { return; }
-		const got = gotLink[l.id].curvePoints || [];
+		const c = gotCurve(gotLink[l.id]._curveId);
+		const got2 = c ? c.points : [];
 		ok(json + ' ' + l.id + ' curve has the same number of points',
-			got.length === l.curvePoints.length, got.length + ' vs ' + l.curvePoints.length);
+			got2.length === l.curvePoints.length, got2.length + ' vs ' + l.curvePoints.length);
 		l.curvePoints.forEach((pt, i) => {
-			if (!got[i]) { return; }
+			if (!got2[i]) { return; }
 			ok(json + ' ' + l.id + ' curve point ' + i,
-				got[i][0] === pt[0] && got[i][1] === pt[1],
-				JSON.stringify(got[i]) + ' vs ' + JSON.stringify(pt));
+				got2[i][0] === pt[0] && got2[i][1] === pt[1],
+				JSON.stringify(got2[i]) + ' vs ' + JSON.stringify(pt));
 		});
 	});
 });
