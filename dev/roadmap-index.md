@@ -7,14 +7,13 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**50 open tasks.** Next (100): 2 · Soon (75): 12 · Someday (50): 12 · Maybe (25): 7 · Parked (5): 17
+**56 open tasks.** Next (100): 1 · Soon (75): 17 · Someday (50): 15 · Maybe (25): 6 · Parked (5): 17
 
-## 100 — Next (2)
+## 100 — Next (1)
 
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- ! Task 591 — The Not EPANET site: a gateway built on deep honesty and deep gratitude.
 
-## 75 — Soon (12)
+## 75 — Soon (17)
 
 - Task 178 — NOTHING in the suite links to the screenshots page. Fix that first.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -22,33 +21,40 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
-- Task 465 — [H] · Reusable pipe and pump TYPES, so editing one edits 400.
+- Task 465 — Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 479 — [H] · The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
+- Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
+- Task 596 — Link the Not EPANET gateway from inside the suite.
+- Task 597 — Filter the tables, in EPANET's own words: Below, Equal to, Above.
+- Task 598 — Below and Above on ID, Tag and Text, in dictionary order.
+- Task 599 — Graph a value against time across an extended-period run.
 
-## 50 — Someday (12)
+## 50 — Someday (15)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
 - Task 234 — Canal Seepage must prove its worth or go.
+- Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
 - Task 269 — Both EWB chapters answered, and Phoenix invited a talk.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
 - Task 285 — We do not know what devices anybody uses this on.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
-- Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
+- Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
+- Task 601 — Calibration files: measured field data, against the model that predicts it.
+- Task 602 — The engine checkbox reads as the whole story, and is a preference.
 
-## 25 — Maybe (7)
+## 25 — Maybe (6)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
-- Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
 - Task 303 — Usage logging: the remaining lower-value questions.
 - Task 348 — Sub-categories and paging in the examples gallery.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
@@ -78,5 +84,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-46 of 50 titles are within 4–12 words. `!` marks the rest;
+53 of 56 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

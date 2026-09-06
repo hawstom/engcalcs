@@ -204,6 +204,112 @@ the block.
     - If yes, it is `ln -s ~/public_html/hawsedc/engcalcs ~/librewaternet.org/engcalcs` after
       testing `Options +FollowSymLinks` on that host, plus the canonical decision above.
 
+- 75|596| **Link the Not EPANET gateway from inside the suite.**
+  Tom, 2026-09-06: *"Is there a good place, maybe in Help, where we can link it?"* The site is live
+  (Task 591) and nothing in the suite points at it.
+  - **THE SLOT IS THE `lpn_` HELP MENU, ABOVE THE LEGAL SEPARATOR**, beside Walkthroughs. That menu
+    already opens external tabs, already carries the rows a first-time reader goes looking for, and
+    is the only Help furniture this page has -- it has no footer, which is why the legal row lives
+    there too. One row, one new key, `ext()` and a new tab, as Walkthroughs does.
+  - **AND IT WANTS A SECOND HOME, because the Help menu is on ONE page.** The other 15 calculators
+    reach a visitor through `echoFooter()`, which is where a suite-wide link belongs if we want one.
+    Decide whether this is an lpn-only row or a suite-wide footer link BEFORE writing the string:
+    the second costs the same 26 translations and reaches fifteen more pages.
+  - **THE ROW IS THE ONE PLACE A COMPETITOR NAME IS NOW ALLOWED IN A MENU ITEM**, on Task 591's
+    scoped reversal. It says where the link GOES; it does not restate the site's argument, and it
+    must not imply EPA affiliation. Nothing else in `dev/positioning.md` §1 moves.
+
+- 75|597| **Filter the tables, in EPANET's own words: Below, Equal to, Above.**
+  Tom, 2026-09-06: *"EPANET allows table filters. Maybe Find could have next to the Find button a
+  Filter in tables button ... with a selector for which table. I see this as not being the most
+  click-efficient solution possible. But I think it's more click-efficient than EPANET."*
+  - **HIS OWN ESTIMATE IS THE ACCEPTANCE BAR AND IT IS A MODEST ONE** -- beat EPANET's click count,
+    not some ideal. Say so in the design rather than chasing the ideal and shipping nothing.
+  - **REUSE FIND'S PREDICATE, DO NOT WRITE A SECOND ONE.** Find already knows how to compare a
+    property against a value across every element; a filter is that same predicate pointed at a
+    table's row set instead of at the map's selection. Two implementations of "which elements
+    match" would disagree the first time one of them learned a new property type.
+  - **THE COMPARISON VOCABULARY IS EPANET'S, ON TOM'S RULING THE SAME DAY:** *"EPANET uses Below,
+    Equal to, and Above for filter comparisons. I like this."* That is CLAUDE.md's default-to-EPANET
+    rule doing its job, and it settles the words for Find as well as for the filter -- one
+    vocabulary, or the two boxes teach different language for one idea.
+
+- 75|598| **Below and Above on ID, Tag and Text, in dictionary order.**
+  Tom, 2026-09-06: *"ID, Tag, and Text should also allow Below and Above for a localized
+  alphanumeric order (dictionary order) comparison."*
+  - **THE WORD "LOCALIZED" IS THE WHOLE TASK, and `Intl.Collator` is the answer** -- `<` on two
+    strings is UTF-16 code-unit order, which puts every accented letter after `z`, sorts Cyrillic
+    and Arabic by codepoint block, and is wrong in most of the 27 languages before it is wrong in
+    English. A collator built once for the current language, reused for every comparison.
+  - **AND IT WANTS `numeric: true`, which is what a user typing pipe IDs actually means:** P2 comes
+    before P10. Without it a text comparison on an ID column is technically correct and useless,
+    which is the failure a user reports as "the filter is broken".
+  - Same predicate as Task 597, so build it there once; this row exists because a STRING comparison
+    is a different decision from a numeric one and would otherwise be made by accident.
+
+- 75|599| **Graph a value against time across an extended-period run.**
+  Tom, 2026-09-06: *"We haven't added anything for time series reporting or graphing such as one or
+  more nodes' pressure or head across an EPS."* Correct, and it is the gap that costs most: the run
+  ships (`js/lpn-time.js`), the frames are already kept, and the only way to read one node across
+  them is to scrub the transport and watch a number change.
+  - **THE DATA IS ALREADY THERE, WHICH IS WHY THIS RANKS ABOVE THE OTHER PLOTS.** A run holds every
+    reporting step; nothing has to be re-solved, re-fetched or stored differently. This is a reader
+    over state we already have.
+  - **DRAW IT THE WAY THE PROFILE IS DRAWN.** `lpn_profile_*` already owns an axis pair, a unit
+    label per axis, a legend and a hand-rolled plot -- no chart library, nothing vendored, and it
+    survives `vendor_integrity_check.php` by having nothing to declare. A second plotting idiom on
+    this page would be the expensive mistake.
+  - **MULTI-SERIES IS THE POINT** (*"one or more nodes' pressure or head"*): one node over time is a
+    number, several on one axis is the comparison an operator is actually making.
+
+- 50|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
+  Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
+  frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
+  and time series is Task 599, so this row is the remaining three.
+  - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
+    nodal value over the plane between nodes, so it needs a decision about what happens where there
+    are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
+  - **FREQUENCY DISTRIBUTION is nearly free** and would be the first slice: a histogram of one
+    property over one element type is a sort and a bucket count, no interpolation and no geometry.
+  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
+    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
+    negative demands and consumed is positive demands"*; that matches how the engine accounts for
+    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
+    definition wrong here is a number a user would believe.
+
+- 50|601| **Calibration files: measured field data, against the model that predicts it.**
+  Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
+  Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
+  - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
+    filed at 50 rather than as an afterthought to the plots: every number on this page today is
+    either typed or derived, and a calibration file is neither. It has its own format, its own
+    units question, and its own answer to what happens when a measurement names a node that is not
+    in the network.
+  - **READ EPANET'S HELP FIRST AND COPY THE REPORT'S SHAPE.** Three tabbed pages is a design that
+    has been in front of users for twenty years; we have no evidence that beats it, and CLAUDE.md's
+    default-to-EPANET rule applies to the vocabulary as much as to the layout.
+  - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
+    computed series belong on one axis, and that axis is the time-series plot.
+
+- 50|602| **The engine checkbox reads as the whole story, and is a preference.**
+  Tom, 2026-09-06: *"I have Net3 up and running, but I don't have EPANET solver checked. Is that an
+  omission? Should we check the box ourselves ... Should we reword or redefine this setting?"*
+  **No omission and no defect** -- an extended-period run goes through EPANET always, and an active
+  PRV/PSV/FCV routes there whatever the box says, both deliberate. **And we must NOT tick it for
+  him:** the setting is a preference and the routing is a fact about this network, so writing one
+  from the other means deleting the duration leaves him on an engine he never chose.
+  - **WHAT IS ACTUALLY WRONG IS THE LABEL.** `lpn_settings_engine_epanet` reads "Solve with the
+    EPANET solver", so unchecked reads as "never EPANET", which is false on both paths above. His
+    own suggestion -- *"(Use the built-in solver when possible)"* -- states the truth exactly: EPANET
+    whenever it is needed, built-in as a preference in the cases where either would work.
+  - **BUT DO NOT INVERT THE CHECKBOX TO GET THERE.** `settings.engine` is stored per project as
+    `epanet`/`native`, so flipping the polarity silently reverses the meaning of every saved file
+    that already states one. The same truth keeps the polarity: **"Always solve with the EPANET
+    solver"**, whose unchecked state honestly means "only when needed". One key reworded, one
+    retranslation round, no migration, no stored value touched.
+  - The tip already carries the download size and the two solvers' measured disagreement; what it
+    does not say is that some networks route regardless. That sentence belongs in it.
+
 - 50|487| **The suite only works when its URL path is `/engcalcs/`.**
   Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
   `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
@@ -236,7 +342,20 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 75|465| **[H] Reusable pipe and pump TYPES, so editing one edits 400.**
+- 75|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
+  - **WHAT THE `[H]` WAS, AND WHY IT IS GONE (Tom, 2026-09-06: *"Why [H]? What do you need from
+    me?"*).** It marked a genuine disagreement -- `utility-planning-engineer` researched this and
+    recommended parking it; Tom then specified a shape that answers both of its objections. **That
+    ruling IS the human decision, so the tag was stale**, and a stale `[H]` is worse than none: it
+    reads as "blocked on Tom" when nothing is.
+  - **THE ONE THING STILL WANTED FROM HIM, and it is a trade rather than a design question:** a
+    typed pipe FLATTENS on `.inp` export and cannot be rebuilt on import, because EPANET has no
+    such concept. That breaks Task 281's byte-identical round trip for any typed element -- not
+    the file's numbers, which still come back exactly, but the TYPE, which comes back as 400
+    pipes each repeating what one definition used to say. So: is a library pipe allowed to be
+    something a `.inp` round trip loses? Curves escaped this because EPANET HAS curves. Nothing
+    else in the task waits on an answer, and the first buildable slice -- `effective()` and the
+    disabled-control rendering -- can start before it.
   - **RAISED FROM 25 ON TOM'S OWN WORDS, 2026-09-05:** *"Pipe library: I foresee very soon that we
     will add the ability to refer to a library pipe for roughness, reaction coefficients, and maybe
     diameter (depending on what user chooses to include in the library pipe definition). The Library
@@ -438,7 +557,7 @@ the block.
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
-- 25|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
+- 50|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
   where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
   that writes a value to every selected element. **Blocked on Task 415's `selected` property**, which
@@ -480,7 +599,12 @@ the block.
 
 
 
-- 50|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
+- 75|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
+  **RAISED TO 75 BY TOM, 2026-09-06, AND LINKED TO TASK 465**, which is the reason: a fittings
+  picker and a library pipe are the same indirection seen from two ends. A pipe TYPE that states
+  roughness may as well state a fittings set, and the `effective()` resolution layer 465 has to
+  build is the one a picked fitting list would resolve through. Design them together or the
+  second one re-litigates the first.
   Tom, 2026-09-05, on the market researcher's finding: *"Fittings library: Put it in our roadmap.
   Thanks, Market Researcher!"* A `lpn_` pipe has one bare minor-loss `k` field and nothing else.
   - **Every tool the seat could examine offers a picker and none defaults to a nonzero `k`:**
@@ -494,38 +618,6 @@ the block.
     engineer's, not the researcher's. `dev/agents/market-researcher/wishlist.md` No. 5.
   - The shape a k table would take is this page's own settled one: a Library object elements refer
     to, as a curve is since Task 586 -- not a per-element blob.
-
-- 100|591| **The Not EPANET site: a gateway built on deep honesty and deep gratitude.**
-  Tom, 2026-09-06: *"I want to add to our roadmap a task to create this Not EPANET web site as a
-  gateway to lwn and lpn. My vision is for it to be a model/example/demonstration/leadership of
-  deep honesty and deep gratitude."*
-  - **`not-epanet.org` IS THE CANONICAL NAME**, settled the same day by his own correction: *"When
-    I saw that notepanet.org had the word 'note' in it prominently, I felt that I had made a
-    mistake, and so I registered not-epanet.org as a correction."* The standing advice against
-    hyphenated domains does not reach this case -- it is about names whose unhyphenated form reads
-    correctly, and `notepanet` reads as "note panet" to everyone. A hyphen setting a word boundary
-    is the standard remedy for exactly that, and camel case cannot help because host names are
-    case-insensitive and display lowercased. The other five are defensive and redirect here.
-    The draft folder is `~/webdev/not-epanet.org`, named for it.
-  - **THIS IS THE RULING TASK 544 WAS OPENED TO WAIT FOR, and it REVERSES a standing rule.**
-    `dev/positioning.md` §1 says no competitor appears in a title, meta description, tagline, menu
-    item or headline, and extends that to names we legally could use. A site called Not EPANET is
-    that rule inverted on purpose. His argument is the one to keep: *"That feels deeply honest and
-    quietly rebuking of name dropping while all the while invoking the EPANET name for SEO."*
-    **The reversal is scoped to EPANET and to this site.** Every live commercial trademark stays
-    banned everywhere, and the invitation still leads on LibreWaterNet itself.
-  - **The two halves are his, and the honesty half is the load-bearing one:** deeply dependent on
-    EPANET; not public domain and therefore less free, less trusting and arguably less collegial
-    than EPANET, under GPL-3.0 deliberately and open to being argued out of it; new, with all that
-    implies; and AI-assisted, with his own reason for using AI at all. The gratitude half names the
-    US government, the EPA, the public domain release, the libraries, EPANET's UI, and *"successors
-    and other great souls (Cynthia Brewer, Richard M. Stallman, etc)"*.
-  - **The risk this task exists to manage is EPA endorsement.** Nothing may imply affiliation,
-    sponsorship or review by a federal agency, and the disclaimer is the site's whole premise, so it
-    leads. Naming Cynthia Brewer is separately constrained by the ColorBrewer licence, which this
-    suite already carries: attribution is required and promotion is forbidden.
-  - Draft lives outside this repository at `~/webdev/notepanet.org`, as the landing page does.
-    Nothing is deployed and no domain is pointed anywhere without Tom saying so.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
