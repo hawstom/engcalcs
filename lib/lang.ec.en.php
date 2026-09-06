@@ -1507,6 +1507,13 @@ $ec_lang['lpn_pane_tab_pumps']='Pumps';
 $ec_lang['lpn_pane_tab_valves']='Valves';
 $ec_lang['lpn_pane_tab_tip']='This tab shows the assets of this kind as a table you can sort and edit. Result columns cannot be edited.';
 $ec_lang['lpn_pane_none']='This network has none of these yet.';
+// What a filtered table says above its rows, so hidden rows always have a visible cause. {q} is the
+// query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
+$ec_lang['lpn_pane_filter_note']='Filtered by {q}. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_clear']='Show all';
+// Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
+// different fact and the one the reader needs.
+$ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
@@ -1604,18 +1611,29 @@ $ec_lang['lpn_find_property']='Property';
 $ec_lang['lpn_find_condition']='Condition';
 $ec_lang['lpn_find_value']='Value';
 $ec_lang['lpn_find_btn']='Find';
-// The four conditions read as the middle of a sentence: "ID contains 12", "Pressure less than 20".
+// THE TABLE FILTER (Task 597). {q} is the query line as the reader wrote it, {n} and {all} are
+// whole numbers. Tom, 2026-09-06: "Maybe Find could have next to the Find button a Filter in tables
+// button ... with a selector for which table."
+$ec_lang['lpn_find_filter_btn']='Filter in tables';
+$ec_lang['lpn_find_filter_table']='Table to filter';
+$ec_lang['lpn_find_filter_tip']='Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
+// The conditions read as the middle of a sentence: "ID contains 12", "Pressure below 20".
 // Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE
 // (Task 438 Wave 0): a finite verb has to agree with the property noun chosen in the select above
 // it, and no one fixed fragment can agree with Diameter, Elevation and Status at once.
+// **THE COMPARISON WORDS ARE EPANET'S** (Tom, 2026-09-06: "EPANET uses Below, Equal to, and Above
+// for filter comparisons. I like this."). They were "greater than" and "less than" until the table
+// filter shipped (Task 597), and one vocabulary across the two boxes is the whole point: a filter
+// and a search that teach different words for one idea are two things to learn. The old spellings
+// are still ACCEPTED by the query parser, so a line written down before the change still reads.
 $ec_lang['lpn_find_op_contains']='contains';
 $ec_lang['lpn_find_op_equals']='equal to';
-$ec_lang['lpn_find_op_gt']='greater than';
-$ec_lang['lpn_find_op_lt']='less than';
+$ec_lang['lpn_find_op_gt']='above';
+$ec_lang['lpn_find_op_lt']='below';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
 $ec_lang['lpn_find_none']='Nothing matched.';
-// The two extremes, as conditions on the same footing as "greater than" -- the Value box holds how
+// The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
 // top is an edge, and lowercased with the count moved in FRONT on 2026-08-26 -- both Tom's ("'n
 // highest' and 'n lowest' will be better"). Every other operator is lowercase so the three

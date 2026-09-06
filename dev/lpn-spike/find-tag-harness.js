@@ -180,9 +180,12 @@ ok('under Everything it is between ID and Connection',
 // The popup's own whole label, reused rather than re-keyed (CLAUDE.md's concept-level reuse rule).
 ok('the row is labelled with the popup\'s own word', L.propLabels('pipe')[1] === 'Tag',
 	JSON.stringify(L.propLabels('pipe')[1]));
-// **A TAG IS TEXT, SO IT GETS THE TEXT CONDITIONS** -- contains and equals, plus the two extremes,
-// and NOT greater/less than, which on a word means nothing.
-ok('its conditions are the text ones', same(L.opKeys('pipe', 'tag'), ['contains', 'equals', 'top', 'bottom']),
+// **A TAG IS TEXT, SO IT GETS THE TEXT CONDITIONS** -- contains and equals, the two extremes, and
+// since Task 598 above and below as well, which on a word means DICTIONARY ORDER in the reader's
+// own language (Tom, 2026-09-06: *"ID, Tag, and Text should also allow Below and Above"*). "every
+// asset our register calls MAIN-19xx or later" is a real question about somebody else's numbering.
+ok('its conditions are the text ones',
+	same(L.opKeys('pipe', 'tag'), ['contains', 'equals', 'gt', 'lt', 'top', 'bottom']),
 	JSON.stringify(L.opKeys('pipe', 'tag')));
 
 // =====================================================================================
