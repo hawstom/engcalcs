@@ -566,205 +566,26 @@ the block.
     Nothing is deployed and no domain is pointed anywhere without Tom saying so.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
-  - **TWO MORE LANDED 2026-09-01 — rows 21 and 26 — and THE ENFORCED COUNT IS 57, not 34.** The
-    survey's own table was the stale thing: rows 10, 15, 17, 18 and 20 had shipped on 2026-08-29 and
-    still read as "reachable and not yet enforced". Each was re-read against its script before being
-    marked; three enforce MORE than their row claimed. What is left is four rows (13, 14, 22, 23),
-    and every one states in its own text why it cannot be a blocking `check_all.sh` entry — two are
-    advisory at best, two are git hooks, which `check_all.sh` runs before a commit message exists.
-    **So the reachable-and-unreached column is effectively empty**, which retires half of what this
-    task was.
-  - **ROW 26 IS THE ONE TO READ, because reading the RENDERER bought a blind spot.** The row's
-    stated risk was that "which strings are verdicts has to be inferred from the key name". It need
-    not be: a verdict is what `EngCalcs.writeCheckHTML()` renders as one, which yields 32 keys and
-    864 values across 27 files with nothing chosen by name. **But that seam works because the
-    renderer supplies the glyph — so for a verdict built BY HAND the glyph is part of the translated
-    value and can simply be deleted, and all three original legs reason about a glyph that is
-    present.** Found by mutation, not by reading: `'✓ Understood'` → `'OK: Understood'` removed the
-    glyph AND added a marker word, and the check said OK. Leg 4 holds the three declared hand-built
-    keys, and the declaration is itself guarded — its first draft named `lpn_library_control_warn`,
-    which does not exist, and reported OK while guarding nothing.
-  - **Row 21 (`calculator_page_check.php`) found nothing on today's tree** — 16 calculators, 16
-    documented prefixes, the same 16 — and that is the honest result for a rule nobody had broken.
-    It holds four things beyond the row: menu `title=` key ≡ page `$html_desc` key, no duplicate
-    prefix, no dead menu link, no unclaimed documented prefix.
-  - **SIX MORE LANDED THE SAME DAY — rows 3c, 3d, 11, 12, 16 and 19 — and ROW 12 IS THE ONE TO READ.**
-    `storage_inventory_check.php` found **two things on visitors' devices that the inventory whose
-    only claim is completeness did not list**: `bpn_sketch_toggles` (`localStorage`, which of five
-    fields the Branched-Network sketch shows) and `engcalcs-lpn` (IndexedDB, the `handles` store of
-    Task 212 and the `recent` store of Task 258). **Nothing about what is stored was changed** — both
-    are now documented on the exemption limbs the file already argues for their siblings, and
-    **those two exemption claims are AI's and want Tom's eye**, because that is the legal-flavoured
-    judgement the check deliberately never makes.
-    - **AND A GAP IT FOUND AND DID NOT CLOSE: `engcalcs-lpn` is not erased by `wipeAllStorage()`**,
-      so "all settings" in that button's confirm is not quite true. Changing it is a behaviour
-      change, so it is recorded and not done.
-    - Cache Storage (`sw.php`'s `engcalcs-assets`) is OUT of the check's scope and its docblock says
-      so. Widening it is a scope decision with a legal flavour.
-  - **Row 16 found that NO SCRIPT READ `meta.anchor_languages` AT ALL** — the rule that anchors are
-    read from the JSON and not restated was, in its entirety, prose. It blocks now, scoped to the two
-    current-state documents: 15 lines elsewhere in `dev/*.md` name an anchor set and every one is
-    correct as history.
-  - **Row 3c's walk finds 0 candidates today and that is the honest number.** The case it was written
-    for — `lpn_terrain_menu` and its tip behind two uncalled functions — had already been deleted on
-    Tom's ruling. It was verified against a RECONSTRUCTION of that tree, and fixture 1 of
-    `key_hygiene_selftest.php` is that shape verbatim: it is the only thing standing between an
-    advisory walk and a silent zero. Two conservatisms were measured, not guessed — the dev harnesses
-    count as root text (without that, 18 test seams read as corpses) and keys are sought in
-    comment-STRIPPED source (a file's own comment naming its deleted key had suppressed a candidate).
-  - **AND THE FALSE ALARM THAT COST FOUR AGENTS A DETOUR IS GONE.** `payload freshness` judged by
-    MTIME, and neither `git pull` nor a worktree checkout preserves those, so it called all 26
-    payloads stale in any freshly checked-out tree. It compares CONTENT now — building the payload IS
-    the input list, which also retires an eight-path list that had already missed an include once.
-    `touch lib/lang.ec.en.php` no longer fails it, and that is a fixture.
-    - Behaviour change worth knowing: `--check --prefix=X` now reports stale, because it builds a
-      prefix-filtered `lang.en.json` that does not match the unfiltered one on disk. The mtime
-      version ignored the prefix. Unused by `check_all.sh`.
-  - **NINE MORE CHECKS LANDED 2026-08-29, taking the enforced count from 34 to 43** — survey rows
-    4, 5, 10, 15, 17, 18, 20, 24 and 25, each with a selftest, each blocking, each green on the
-    tree it landed on. Two found the same thing row 6 found: **the RULE was wrong.**
-    `lib/Language.Settings.php` told a contributor to register a language in a
-    `VALID_LANGUAGES` constant that does not exist anywhere in the suite; `$all_language_settings`
-    is the sole registry. **That is three prose rules in two sessions found to name a thing that
-    is not there, every one of them only by trying to execute it.**
-    - **Row 5 is the one that stops the drift recurring.** `check_all.sh` is what RUNS and this
-      file's table is what everybody READS, and nothing tied them: **eight checks ran unlisted**,
-      and the `php + js syntax` row had silently covered a third pass since the shell check was
-      added. Matched on script FILENAME, not on labels, so neither file has to be reworded to
-      please the other.
-    - Row 25 judges by PROVENANCE rather than by guessing what reads as explanatory: a title
-      equal to a tip-shaped `$ec_lang` value blocks, a title that NAMES its destination passes.
-      That is what lets `*_main_desc` on the main menu and `LANGNAME` in the switcher through
-      while catching the thing that is unreachable on touch.
-  - **AND THE RUNNER AUDIT THIS BLOCK ASKED FOR IS DONE — six of seven runners had the shape,
-    and TWO were real coverage holes rather than reporting weaknesses.** `social_card_check.php`
-    `continue`d silently past a page that renders no `<head>`, so **`consent.php` had never been
-    examined at all**; and `validate_epanet.js` ran `.filter(Boolean)` over a typed list of case
-    objects, so a case renamed in `cases.js` arrived as `undefined`, was dropped, and the run
-    simply got shorter with everything left passing. Neither would ever have shown up as a
-    failing run. Both harness runners also died on the FIRST failure under `set -e` and reported
-    no total; an empty glob now fails instead of reporting a clean run of nothing. Recorded as
-    row 3d and a per-runner table in `dev/enforceable-rules-survey.md`.
-  - **DONE 2026-08-29: the six orphan keys were deleted**, 162 strings across 27 files —
-    `lpn_settings_scope_project`, `_scope_calculator`, `_computation`, `_map_height_px`,
-    `_map_height_tip`, `_colors`. The orphan list is 2 now, and both are the canonical mode names
-    `mode_name_check.php` holds every other string to. **Row 3c's reachability walk is still
-    unwritten**, so the two dead terrain strings behind a dead reader are still invisible.
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
-  recommendations."* `check_all.sh` reports these every run and nobody can act on them — and
-  CLAUDE.md's own argument is that **a rule a machine enforces is worth roughly ten a human must
-  remember.** Every rule here that became a script stopped being violated; every rule that stayed
-  prose kept being violated by people who had read it.
-  - **THE SURVEY IS DONE, 2026-08-28: `dev/enforceable-rules-survey.md`.** The count CLAUDE.md's
-    own "unexecutable half is decoration" line invited and nobody had ever made: **34 rules
-    enforced, 27 enforceable and not, 41 permanently prose** — a third, a quarter, two fifths. Its
-    conclusion is worth more than the arithmetic: *the prose is not decoration where it carries the
-    rules no check can reach; it is decoration where a check was possible and nobody wrote it.* The
-    27 are ranked by value/cost, with the false-positive risk stated per row, and rows 4–27 are the
-    remaining worklist.
-  - **AND THREE LANDED WITH IT, 2026-08-28.** `lang_key_resolve_check.php` (blocking): a literal
-    `$ec_lang['typo']` renders as the empty string in all 27 languages with no warning — a token
-    scan, so a concatenated key, a variable key and a key in a comment are all invisible to it and a
-    false positive is impossible. `unit_family_check.php` (blocking): the four unit-family
-    absolutes, every one of which fails with a page that renders and looks right. Both carry a
-    selftest, following `stale_claim_selftest.php`: a check whose demotions nothing tests looks
-    identical whether it works or has gone blind.
-    - **And the english-drift advisory was printing NOTHING.** `check_all.sh` piped its report
-      through `grep -q "^CHANGED"`, so the NOTE appeared with no text under it. **93 CHANGED, 79
-      NEW, 33 REMOVED and nine ROLE CHANGES had been invisible.** Still advisory, deliberately: a
-      fixed URL and a rewritten sentence produce the same hash mismatch, and blocking would push
-      the reader toward `--update`, which baselines the drift away.
-  - **FOUR MORE LANDED THE SAME DAY, rows 6-9: `page_meta_check.php` and `no_session_check.php`,
-    each with a selftest.** Row 6 is the one worth reading, because writing a check found that the
-    RULE was wrong: CLAUDE.md said *"call `ecSessionStart()`"* and **that function does not exist** —
-    Task 288 removed `PHPSESSID` outright and the helper went with it, so the honest number of
-    sessions in this suite is ZERO, not "one, gated". The prose had been sending a future
-    contributor to a helper that is not there. Both CLAUDE.md and `dev/cookie-storage-inventory.md`
-    are corrected. **That is the survey's whole argument arriving as an instance**: the rule was
-    written down, read, and had drifted from the code, and only executing it noticed.
-    - `page_meta_check.php` also takes the exempt list out of prose and into the check, where an
-      entry naming a page that no longer exists is itself a finding. That list had been measurably
-      wrong once already.
-  - **AND ROW 27, THE ONE THAT GUARDS WHAT STRANGERS READ.** `public_claim_check.php` denies the
-    four sentences that were written, SHIPPED, and struck by Tom personally — *"your phone"* (it is
-    always *"a phone"*), *"PC application"*, *"the only third-party request"*, *"no extended-period
-    simulation yet"*. Every one reads perfectly reasonably, which is why they come back; two of them
-    he caught by eye where no check could.
-    - **Scoped to `lang.ec.en.php` and blind to `dev/*.md` on purpose**: all four phrases live in
-      `dev/positioning.md` and `CLAUDE.md` inside the rule forbidding them, and a check that reports
-      the rule as a violation of itself is a check somebody deletes.
-    - **The load-bearing fixture is the SANCTIONED sentence** — *"And although you of course prefer
-      working on your PC, it works also on a phone in tall mode."* It holds "your PC" and "a phone",
-      one word from two of the denials, so a check that matched the pronoun instead of the noun
-      would report the sentence Tom wrote and approved.
-    - It is a FLOOR, not a guarantee: it cannot see `~/webdev/librewaternet.org`, which is where
-      three of the four actually shipped. `dev/positioning.md` stays the authority.
-  - **AND THE CLEAREST INSTANCE THE SURVEY HAS PRODUCED, 2026-08-29: A THIRD OF THE BROWSER PASS
-    HAD BEEN DEAD FOR TWO DAYS.** Twelve of thirty-eight sections threw at their first line, because
-    `Session._newFromTemplate()` drove `File > New project… > <template>` — the fly-out Task 477
-    replaced with the New-project BOX on 2026-08-27. Four more stale references rode along:
-    `#lpn_menu_insert` and `#lpn_menu_view` (both retired by Task 543), a row-index into the Water
-    menu that assumed nothing would ever be inserted above it, and two tab labels from before the
-    examples became `.lwn` files.
-    - **THE ALARM EXISTED AND WAS WORSE THAN USELESS.** Every run ended `26/38 sections completed
-      <-- SHORT RUN` under a cheerful `849/864 checks passed` — and **that percentage is a fraction
-      of what RAN, so it rises as coverage falls.** A number that improves as the suite dies is not
-      a metric, it is camouflage. Now a short run is shouted, NAMES the sections that threw, and
-      says outright that the percentage above it cannot be trusted.
-    - **THE GENERAL LESSON, and it is a survey row nobody has written:** a test runner that can
-      SKIP work must report skips as loudly as failures, and its headline must be a fraction of what
-      was ASKED FOR, not of what was reached. `check_all.sh` gets this right by counting from a glob;
-      `run.js` did not. Worth auditing the other runners for the same shape.
-    - Repaired: 38/38 sections, 1059+ checks against 864. `dev/browser-pass/README.md` carries the
-      account.
-  - **DELIBERATELY LEFT ADVISORY, and the reasoning is the useful part:** `size_budget_check.php`
-    entirely (both numbers are judgement, and a ratchet fails a legitimate addition, which is the
-    fastest way to teach a team `--no-verify`); both `key_hygiene_check.php` findings (whether a key
-    is debt is judgement — whether it EXISTS is not, which is what the new check took); and
-    `stale_claim_check.php` (citing a closed task as a record is legitimate).
-  - **A ROW THE SURVEY DOES NOT HAVE YET, FOUND BY HAND 2026-08-28 AND WORTH ADDING:**
-    `pageconfig_check.php` matches literal `EngCalcs.pageConfig.<key>` reads only, and
-    `js/looped-network.js` reads every one of its 838 strings through the one-letter alias `pc` —
-    **so the entire `lpn_` page is invisible to the check that exists to guard it.** Diffing
-    `pc.<key>` against the block by hand found `lpn_labels_col_drop`: translated into all 26
-    languages, never wired, English on every screen. **FIXED THE SAME DAY:** the check reads alias
-    declarations now (`= EngCalcs.pageConfig` whose next non-space character is not a dot) and
-    `<alias>.<lower_snake_key>` reads. **Its coverage went 107 reads → 743.** The key SHAPE is the
-    false-positive defence, and it is load-bearing because this check BLOCKS: an alias's ordinary
-    properties have no underscore and every declared key has one. `pageconfig_selftest.php` pins
-    both directions, including the shape a first draft got wrong (`el.textContent =
-    EngCalcs.pageConfig.x` is a READ, not an alias named `textContent`), and the real defect was
-    re-introduced to prove the check catches it.
-  - **AND ITS MIRROR, SAME DAY: A DEAD READER HIDES A DEAD KEY.** `key_hygiene_check.php` reports a
-    key "rendered by nothing" by looking for a reference to it. Task 542 deleted the terrain menu
-    ROW but left `EC.lpnTerrainMenuLabel()` and `EC.lpnTerrainMenuTip()` — which read
-    `lpn_terrain_menu` and its tip and are themselves now called by nobody. So two strings live in
-    27 language files, reach no screen, and **do not appear in the orphan list**. A reachability
-    walk from the page's own entry points is the honest version; a reference count is not.
-  - **`js/looped-network.js` is over 20,000 lines**, with `rebuildSettingsFields()` and
-    `drawExampleNetwork()` the two obvious extractions. Task 293 established the split-by-PURITY
-    pattern and it worked. *(The 9,740 recorded here through 2026-08-23 was less than half the truth
-    — an advisory nobody acts on is also an advisory nobody re-reads.)*
-  - **DONE 2026-08-26: the stale-claim advisory was 9-for-9 FALSE POSITIVES, and now it is 2.**
-    All nine high-ranked lines were legitimate records. **This is the second time it has drifted
-    there** — on 2026-08-23 all eleven were, two demotions cut it to seven, and it climbed back.
-    Two more demotions (the task is the AGENT of a completed action; a POINTER is not a claim) take
-    it to 2. **The standing obligation is not "read the nine", it is demote whatever legitimate
-    SHAPE the nine share** — an advisory that is all false positives teaches its reader to skip it,
-    which is the prose failure the tool exists to catch, arriving in the tool.
-    - **AND THE DEMOTIONS THEMSELVES ARE NOW GUARDED, BLOCKING**
-      (`dev/scripts/stale_claim_selftest.php`, 13 fixtures). A demotion trades coverage for a
-      shorter list and the tool prints fewer lines either way, whether it got smarter or went
-      blind — so the three false claims that actually shipped are pinned as HIGH forever. That
-      caught a real hole while being written: `not built yet — see Task 146` is ordinary prose and
-      the pointer demotion would have excused it, so the pointer rule is guarded by a
-      hard-builtness test and the record rule is not.
-  - **DONE 2026-08-25:** `key_hygiene_check.php` learned two more dynamic-key shapes (an interpolated
-    build and a prefix test), dropping 14 false orphans from its list — 35 → 21, then → 16 after
-    Task 294's deletions. A check that is 40% noise is a check people learn to skip.
-  - **DONE 2026-08-23:** `mpf_spreadheet_notice` renamed to `mpf_spreadsheet_notice` across all 27
-    lang files in one `rename_lang_key.php` pass.
-  - **DONE 2026-08-14:** the js syntax check globs `sw.js` and `js/vendor/` too.
+  recommendations."* Record, ranked list and the per-runner audit: `dev/enforceable-rules-survey.md`.
+  - **HALF A IS DONE.** 62 rules enforced, 4 left (rows 13, 14, 22, 23) and every one states why no
+    blocking `check_all.sh` entry can hold it: two are advisory at best, two are git hooks and
+    `check_all.sh` runs before a commit message exists. Three landed rows found the RULE was wrong
+    rather than the code, each only by trying to execute it.
+  - **HALF B IS NOT, AND THE 2026-09-06 PASS IS WHY.** Five rules had been classified into neither
+    column, and the one that matters was **in no document at all**: `js/*.js` writes every string
+    read as `pc.<key> || '<English literal>'`, so 892 uncontrolled second copies of
+    `lang.ec.en.php` ship and **199 already disagree** — including a sentence struck as false, two
+    that fall back to the empty string, and a control the language file calls `Calculate` and the
+    fallback calls `Run`. `pageconfig_check.php` guarantees the key is supplied, so none of it ever
+    renders and nothing had ever compared them. Held as a ratchet (`js_fallback_string_check.php`);
+    **walking 199 to zero and making it absolute is the open work.**
+  - **THE TRANSFERABLE METHOD, and the reason this stays open:** re-reading `CLAUDE.md` cannot find
+    a rule nobody wrote down. Row 32 came from COUNTING a repeated construct in the source and
+    asking what writing it 892 times assumes. Next pass does that to `js/` and `lib/` as well as
+    re-reading the prose.
+  - **Row 13's own worst offender was this block**, at 201 lines against a 15-line cap, until it
+    was compressed on 2026-09-06.
 
 - 25|348| **Sub-categories and paging in the examples gallery.** The grid is `auto-fit`, so both
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops

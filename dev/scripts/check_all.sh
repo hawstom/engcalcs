@@ -88,6 +88,14 @@ run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_che
 # into 26 languages reached no screen. The selftest pins the alias shapes it must find AND the ones
 # it must not take for a key: this check BLOCKS, so a false positive stops a commit.
 run_check "pageConfig selftest"          blocking php dev/scripts/pageconfig_selftest.php
+# Task 322. THE OTHER HALF OF THAT BRIDGE. js/*.js writes almost every read as
+# `pc.<key> || '<English literal>'`, so 892 fallback literals ship as an uncontrolled second copy of
+# lib/lang.ec.en.php -- and because the check above guarantees the key IS supplied, a wrong one
+# never renders and nothing has ever compared them. 199 of the 892 already disagree, including a
+# sentence struck as false and two that fall back to the EMPTY STRING. A RATCHET on that measured
+# number: it may fall and may not rise. The undefined-key leg blocks at zero.
+run_check "js fallback strings"          blocking php dev/scripts/js_fallback_string_check.php
+run_check "js fallback selftest"         blocking php dev/scripts/js_fallback_string_selftest.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
 # Task 322 row 25. js/Calculators.lib.js wires tap tooltips on .ec-help[title] alone, so a tip
 # parked on a bare <a title=> just navigates on touch and the explanation is simply gone. Judges by
@@ -185,6 +193,13 @@ run_check "vendored code integrity"      blocking php dev/scripts/vendor_integri
 # worktrees that produced it had DISJOINT FILE TERRITORY exactly as required. The file rule protects
 # files; this protects the seam, which is what they actually shared.
 run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_check.php
+# Task 322 x Task 584. A lpn_ setting belongs to the PROJECT or to the BROWSER, never to both.
+# Window furniture that leaked into serializeProject() is invisible to whoever added it -- on their
+# machine it restores the layout they already had -- and visible only to the colleague who opens the
+# file on a laptop and inherits a 32-inch layout. The furniture list is DERIVED from the page's own
+# direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
+run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
+run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
 # apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE
@@ -203,6 +218,12 @@ run_check "unit family selftest"         blocking php dev/scripts/unit_family_se
 # echoUnitSelect() call and the 'units' => array(...) declaration unit_family_check.php cannot see.
 run_check "unit select families"         blocking php dev/scripts/unit_select_family_check.php
 run_check "unit select selftest"         blocking php dev/scripts/unit_select_family_selftest.php
+# Task 322. A page's `default` number is in the DISPLAYED unit, so a field whose family shows one
+# unit under us and another under si needs one default per preset. A scalar 6 there reads as 6 in
+# under us and 6 mm under si -- the page renders, the answer comes back, and it is wrong by 25.4 for
+# whichever preset the author was not using. Empty and zero are unit-independent and allowed.
+run_check "unit defaults per preset"     blocking php dev/scripts/unit_default_preset_check.php
+run_check "unit default selftest"        blocking php dev/scripts/unit_default_preset_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
