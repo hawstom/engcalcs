@@ -79,9 +79,18 @@ function click(x, y) {
 	fire('pointerdown', { pointerId: 3, clientX: x, clientY: y, pointerType: 'mouse', button: 0 });
 	fire('pointerup', { pointerId: 3, clientX: x, clientY: y, pointerType: 'mouse' });
 }
+// **stopPropagation IS HONOURED, and it is not decoration here.** All four of this page's Escape
+// listeners sit on `document`; three are capture-phase and one is the bubble-phase listener that
+// closes the boxes. In a browser, a capture listener calling stopPropagation means the event never
+// reaches document again in the bubble phase, so the bubble listener does not run -- which is
+// exactly the precedence a half-drawn pipe relies on: it takes the key, and the tool is put away
+// only by a SECOND press. A helper that ran every listener regardless made this harness see one
+// press cost both, and reported the abandonment as a lost tool.
 function esc() {
+	var stopped = false;
+	var ev = { key: 'Escape', stopPropagation: function () { stopped = true; }, preventDefault: function () {} };
 	(global.document._listeners.keydown || []).slice().forEach(function (fn) {
-		fn({ key: 'Escape', stopPropagation: function () {}, preventDefault: function () {} });
+		if (!stopped) { fn(ev); }
 	});
 }
 

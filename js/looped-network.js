@@ -8168,6 +8168,40 @@ var EngCalcs = EngCalcs || {};
 		return pendingLinkFrom ? nodeById(pendingLinkFrom) : null;
 	}
 
+	// ---- THE TWO WAYS OUT OF AN ENTRY MODE (Tom, 2026-09-05) ------------------------------------
+	//
+	// *"Clicking on a link (pipe, pump, or valve) while in entry mode should end entry mode. Esc
+	// should end entry mode."* Both gestures land the page back in `select`, and the click also does
+	// what a click on a link normally does -- selects it and shows its properties. Ending the mode
+	// and then making the user click the same pipe again is a gesture tax, and the sentence is about
+	// getting out of a tool he no longer wants rather than about a tidy state machine.
+	//
+	// **IT IS THE TOOLS FOR WHICH A LINK MEANS NOTHING, AND THAT IS THE WHOLE RULE.** In add-text a
+	// click on a pipe ANCHORS the new Text to that pipe (Task 502), so a link there is part of the
+	// gesture and the tool keeps it -- the same reason a NODE is left alone in every tool below. A
+	// node is the drawing gesture in add-pipe/pump/valve, and in the three node tools a click on an
+	// existing node already opens it and already switches to Select, which is Tom's rule arrived at
+	// from the other side (see the snap-on-create branch in wirePointerEvents). So this list is
+	// exactly the tools where clicking a pipe used to do something nobody asked for: drop an
+	// unconnected junction on top of it, bend a half-drawn pipe, or nothing at all.
+	//
+	// Vertices and Delete are not entry modes and are deliberately absent: a link click is the whole
+	// point of both.
+	var LINK_CLICK_EXITS_MODE = {
+		'add-junction': true, 'add-reservoir': true, 'add-tank': true,
+		'add-pipe': true, 'add-pump': true, 'add-valve': true
+	};
+	// The link a press landed on, by the browser's own hit test alone -- a link's own data label
+	// included, because that label IS the link's data and a click on it opens the link in Select.
+	// **No generous finder here, deliberately:** giving an add tool a link reach would steal
+	// placements from every point that happens to lie near a pipe, which is most of a network.
+	function tapLinkId(t) {
+		if (!t || !t.dataset) { return null; }
+		if (t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) { return t.dataset.link; }
+		if (t.dataset.linklbl !== undefined) { return t.dataset.linklbl; }
+		return null;
+	}
+
 	// **ESCAPE ABANDONS A HALF-DRAWN LINK** (Task 567). Once a click in open space is a BEND rather
 	// than an abandonment, the gesture that used to cancel a drawing is gone, so the drawing needs a
 	// way out of its own. Capture phase and the same "innermost first" argument the profile
@@ -18528,6 +18562,19 @@ var EngCalcs = EngCalcs || {};
 		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
 		openMenuAnchor = null;
 	}
+	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
+	// below run, because afterwards nothing is open and the question is unanswerable. Exactly the
+	// things this handler closes and nothing else: the Find box, for instance, is not on Escape at
+	// all, so an open Find must not stand between the reader and their tool.
+	function escapeClosableOpen() {
+		var open = ['lpn_menu_popup', 'lpn_popup'].concat(VIEW_POPOVERS).some(function (id) {
+			var p = document.getElementById(id);
+			return !!p && !!p.style.display && p.style.display !== 'none';
+		});
+		var hint = document.getElementById('lpn_empty_hint');
+		return open || setboxIsOpen() || libBoxIsOpen() ||
+			!!(hint && hint.style.display === 'block');
+	}
 	// Escape dismisses whatever pull-down is showing -- the other half of "these are menus, not
 	// boxes" (Tom, 2026-08-13). It is what closed the panels before the X went away, and it is the
 	// keyboard equivalent of clicking away. The DIALOG is deliberately untouched here: it asks a
@@ -18535,6 +18582,7 @@ var EngCalcs = EngCalcs || {};
 	// the click-away dismissal skips it.
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== 'Escape') { return; }
+		var hadBox = escapeClosableOpen();
 		closeMenu();
 		closeViewPopovers();
 		// The element PROPERTY popup too (Tom, 2026-08-17: *"Can the element properties box and other
@@ -18556,6 +18604,17 @@ var EngCalcs = EngCalcs || {};
 		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
 		var hint = document.getElementById('lpn_empty_hint');
 		if (hint && hint.style.display === 'block') { hideExamplesGallery(); }
+		// **AND FAILING ALL OF THOSE, ESCAPE ENDS AN ENTRY MODE** (Tom, 2026-09-05: *"Esc should end
+		// entry mode."*).
+		//
+		// **ONE ESCAPE COSTS ONE THING, INNERMOST FIRST**, which is the precedence the rest of this
+		// page already keeps and the reason the tool is LAST. A reader who opened Settings over an
+		// armed tool and pressed Escape meant the box; disarming the tool in the same press takes
+		// something they never asked for and cannot see going. A half-drawn pipe is inner still and
+		// never reaches this line at all -- its own capture-phase handler abandons the drawing and
+		// stops the key -- so a pipe in flight costs one Escape to abandon and a second to put the
+		// tool away, in that order.
+		if (!hadBox && mode.indexOf('add-') === 0) { setMode('select'); }
 	});
 	// File > New project (Task 264). A second popup off the same anchor rather than a hover-out
 	// submenu: the menu machinery here is one flat popover, and hover submenus are a poor bargain on
@@ -20593,6 +20652,30 @@ var EngCalcs = EngCalcs || {};
 			// honest about what it does.
 			// Selection is NOT set here (Task 415) -- the pointerDOWN handler already did it, for
 			// every select-mode press, tap and drag alike.
+			// **A CLICK ON A LINK ENDS AN ENTRY MODE, AND STILL OPENS THE LINK** (Tom, 2026-09-05).
+			// See LINK_CLICK_EXITS_MODE for which tools and why it is not all of them.
+			//
+			// **A NODE WITHIN REACH OUTRANKS THIS, in every one of those tools**, which is what keeps
+			// the drawing gesture whole: the second click of a pipe that ends on a junction sitting
+			// on top of another pipe is a connection, not an exit. It is the same reach the branches
+			// below snap with, asked once, so there is no second tolerance to keep in step.
+			//
+			// setMode() abandons a half-drawn link on the way out -- it calls setPendingLinkFrom(null),
+			// which is the one door where the from-node, the rubber band and the picked bends all
+			// die together. Nothing was written to the document, so there is nothing to undo.
+			var exitLinkId = LINK_CLICK_EXITS_MODE[mode] &&
+				!nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) ? tapLinkId(t) : null;
+			if (exitLinkId !== null && exitLinkId !== undefined && linkById(exitLinkId)) {
+				setMode('select');
+				// Selected AND opened, because that is what this press would have done in Select and
+				// the mode is what the user is giving up, not the click. Synchronous, unlike a
+				// Select-mode link tap: the 300 ms debounce there exists to let a double-click cancel
+				// the popup and add a vertex, and no double-click means anything in a tool that has
+				// just been put away.
+				setSelection('link', exitLinkId);
+				openLinkPopup(exitLinkId, e.clientX, e.clientY);
+				return;
+			}
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within this gesture's own reach of an existing node reuses
 				// it instead of creating a new, overlapping one -- see TOUCH_REACH_PX.
