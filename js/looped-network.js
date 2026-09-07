@@ -12482,6 +12482,11 @@ var EngCalcs = EngCalcs || {};
 			// and no map keyed by id can be reached with the wrong one.
 			spec.sort = { col: 'id', dir: 1 };
 			spec.cells = null;
+			spec.tds = null;
+			// The spreadsheet selection (Task 186), anchor and focus as (element id, column key).
+			// On the SPEC, because switching tabs is switching data sets: a shared one would
+			// resolve against another table's rows.
+			spec.sel = null;
 			spec.sig = '';
 			spec.orderIds = null;
 			return spec;
@@ -12718,6 +12723,7 @@ var EngCalcs = EngCalcs || {};
 		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
 		spec.sig = sig;
 		spec.cells = {};
+		spec.tds = {};
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
 		// rows with no visible cause is the one way this feature can mislead somebody.
@@ -12768,6 +12774,11 @@ var EngCalcs = EngCalcs || {};
 		// paneTableRow() to format is the one-seam fix: a cell's first value and its every later
 		// value are then written by the same line, so they cannot round differently.
 		refillPaneTable(spec, rows);
+		// The selection is keyed on ids, so it survives this rebuild -- but the <td>s carrying its
+		// highlight do not, and the listeners went with the old table. Both are re-established
+		// here, which is also why there is nothing to unhook: they die with the table they are on.
+		paneWireTable(spec, table);
+		paneSelPaint(spec, rows, paneCols(spec));
 		initTipsIn(host);
 	}
 	function sortPaneTable(spec, col) {
@@ -12777,10 +12788,17 @@ var EngCalcs = EngCalcs || {};
 		renderPaneTable(spec);
 	}
 	function paneTableRow(spec, el) {
-		var tr = document.createElement('tr'), cells = {};
+		var tr = document.createElement('tr'), cells = {}, tds = {};
 		paneCols(spec).forEach(function (c, i) {
 			var td = document.createElement('td'), btn, input;
 			td.className = paneCellClass(c, i);
+			// **EVERY CELL KNOWS WHICH CELL IT IS**, by element id and column key rather than by
+			// position: a sort or a filter re-orders the rows under it, so an index written here
+			// would be stale by the next click. The selection model (Task 186) resolves these two
+			// back into indices against whatever the table is showing at the moment it is asked.
+			td._lpnPaneId = el.id;
+			td._lpnPaneKey = c.key;
+			tds[c.key] = td;
 			if (c.key === 'id') {
 				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
 				// it, the same gesture a Find result row is. Renaming stays in the property popup,
@@ -12796,10 +12814,27 @@ var EngCalcs = EngCalcs || {};
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
 				if (!c.result) { td.textContent = paneCellText(c, el); }
+				// Focusable but not in the tab order: End and Ctrl+End must be able to land on a
+				// read-only column, exactly as a spreadsheet's End does not skip a protected cell,
+				// while Tab still walks the boxes a person can actually type in.
+				td.tabIndex = -1;
 				cells[c.key] = td;
 			} else {
 				input = document.createElement('input');
-				input.type = 'number';
+				// **TEXT, NOT number, AND THE KEYBOARD IS THE REASON** (Task 186; the Curves grid
+				// under Task 588 had to make the identical change for the identical reason). Two
+				// things a `number` input does made Tom's arrow-key spec impossible:
+				//   - Up and Down are its SPINNER. In a spreadsheet they move a row, and a table
+				//     where Down silently adds 1 to a diameter is worse than one with no keyboard.
+				//   - `selectionStart` THROWS on it in Chrome and Firefox, so there is no way to
+				//     ask whether the caret is at the edge of the value -- and without that, Left
+				//     and Right either always leave the cell (and nobody can fix the middle of
+				//     `1000`) or never do.
+				// inputmode="decimal" keeps the numeric keypad on a phone, which was the only
+				// thing `number` was buying: nothing validated against it either, because a
+				// browser's number input simply declines the keystroke and says nothing.
+				input.type = 'text';
+				input.setAttribute('inputmode', 'decimal');
 				paneApplyColWidth(input, c);
 				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
@@ -12809,6 +12844,15 @@ var EngCalcs = EngCalcs || {};
 					// **A BLANK COLUMN PASSES `undefined`, exactly as numberFieldBlank() does** --
 					// `+'' === 0`, and for a reaction coefficient an empty box ("use the global")
 					// and a typed 0 ("does not react") are two different statements about the water.
+					// **A TEXT BOX CAN HOLD SOMETHING THAT IS NOT A NUMBER, AND A NUMBER BOX
+					// COULD NOT** -- so what the old input type refused silently now has to be
+					// refused out loud. The cell goes back to what the document holds rather than
+					// writing NaN into the user's own field, which nothing downstream could
+					// distinguish from a value they meant.
+					if (input.value !== '' && !isFinite(+input.value)) {
+						input.value = paneCellText(c, el);
+						return;
+					}
 					c.set(el, (c.blank && input.value === '') ? undefined : +input.value);
 					completeEdit(c.prop ? { el: el, prop: c.prop } : null);
 					refreshPopupIfOpen();
@@ -12819,6 +12863,7 @@ var EngCalcs = EngCalcs || {};
 			tr.appendChild(td);
 		});
 		spec.cells[el.id] = cells;
+		spec.tds[el.id] = tds;
 		return tr;
 	}
 	// Refill, not rebuild: the results change on every solve and the typed values change when the
@@ -12842,6 +12887,310 @@ var EngCalcs = EngCalcs || {};
 	}
 	function activeElementSafe() {
 		try { return document.activeElement; } catch (e) { return null; }
+	}
+
+	// ---- THE TABLES ARE A SPREADSHEET (ROADMAP Task 186) ---------------------------------------
+	//
+	// Tom, 2026-09-06, in his own numbering: (1) cells abut each other like Google Sheets, in
+	// appearance and not only in behaviour; (2) keyboard navigation by arrows, Ctrl+arrows, Home,
+	// End, Ctrl+Home, Ctrl+End; (3) blocks and ranges selectable for clipboard copy, by mouse drag
+	// or by Shift+arrows and Ctrl+Shift+arrows.
+	//
+	// **THE ONE THING THAT DECIDES WHETHER THIS WORKS: a browser's native drag-selection cannot
+	// span two <input> elements at all**, and every editable cell here is one. Drag from B3 to D40
+	// and press Ctrl+C against the browser's own selection and you get an empty clipboard, one
+	// input's worth of text, or page chrome -- never the rectangle that was dragged over, and never
+	// an error either. So the highlight is OURS (a class on the <td>s, from application state) and
+	// the clipboard write is OURS (a `copy` listener building TSV), and neither asks the browser
+	// what is selected. This is the same shape libCopyOut() already uses for a curve's points,
+	// generalised from "this curve" to "the rectangle the state is holding".
+	//
+	// **THE SELECTION IS KEYED ON (element id, column key), NEVER ON A DOM NODE.** A sort click, a
+	// filter edit or a new part rebuilds the whole tbody through renderPaneTable(), and node
+	// references would die on every one of them. Ids and keys survive a rebuild; where one has gone
+	// -- the row was deleted, the column stopped existing -- the selection resolves to null and the
+	// table simply has none, which is the honest answer rather than a rectangle drawn somewhere
+	// arbitrary.
+	//
+	// **ONE SELECTION PER TABLE, ON THE SPEC**, because switching tabs is switching data sets: the
+	// six tables genuinely have six of everything already, and a shared selection would resolve
+	// against the wrong table's rows.
+	function paneIndexOfId(rows, id) {
+		var i;
+		for (i = 0; i < rows.length; i++) { if (rows[i].id === id) { return i; } }
+		return -1;
+	}
+	function paneIndexOfKey(cols, key) {
+		var i;
+		for (i = 0; i < cols.length; i++) { if (cols[i].key === key) { return i; } }
+		return -1;
+	}
+	// The selection resolved against the table AS IT IS RENDERED NOW -- so a filtered, sorted table
+	// gives back indices into what is actually on screen, and Ctrl+End goes to the last row a
+	// reader can see rather than to some notion of document order.
+	function paneSelBox(spec, rows, cols) {
+		var s = spec.sel, ar, ac, fr, fc;
+		if (!s) { return null; }
+		ar = paneIndexOfId(rows, s.aId); ac = paneIndexOfKey(cols, s.aKey);
+		fr = paneIndexOfId(rows, s.fId); fc = paneIndexOfKey(cols, s.fKey);
+		if (ar < 0 || ac < 0 || fr < 0 || fc < 0) { return null; }
+		return {
+			r0: Math.min(ar, fr), r1: Math.max(ar, fr),
+			c0: Math.min(ac, fc), c1: Math.max(ac, fc),
+			fr: fr, fc: fc, ar: ar, ac: ac
+		};
+	}
+	// A plain click collapses the selection to one cell; Shift (or a drag) moves the FOCUS and
+	// leaves the anchor where it was, which is the whole of the anchor-plus-focus model.
+	function paneSelSet(spec, rows, cols, r, c, extend) {
+		if (!rows.length || !cols.length) { spec.sel = null; return; }
+		r = Math.max(0, Math.min(rows.length - 1, r));
+		c = Math.max(0, Math.min(cols.length - 1, c));
+		if (!extend || !spec.sel || !paneSelBox(spec, rows, cols)) {
+			spec.sel = { aId: rows[r].id, aKey: cols[c].key, fId: rows[r].id, fKey: cols[c].key };
+		} else {
+			spec.sel.fId = rows[r].id;
+			spec.sel.fKey = cols[c].key;
+		}
+	}
+	function paneSelPaint(spec, rows, cols) {
+		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {};
+		rows.forEach(function (el, r) {
+			cols.forEach(function (c, i) {
+				var td = tds[el.id] && tds[el.id][c.key], on;
+				if (!td) { return; }
+				on = !!box && r >= box.r0 && r <= box.r1 && i >= box.c0 && i <= box.c1;
+				// One class, and the box is a rectangle, so a cell either is in it or is not.
+				if (on) { td.classList.add('lpn-pane-sel'); } else { td.classList.remove('lpn-pane-sel'); }
+			});
+		});
+	}
+	// The control standing in a cell, or the cell itself where there is none. A result cell and an
+	// identity carry no control at all and are given tabIndex -1 so the caret can still land on
+	// them: End must be able to reach the last column even when it is read-only, exactly as a
+	// spreadsheet's End does not skip a protected cell.
+	function paneCellFocusable(td) {
+		var kids = (td && td.children) || [], i, tag;
+		if (!td) { return null; }
+		for (i = 0; i < kids.length; i++) {
+			tag = kids[i].tagName || (kids[i]._tag && String(kids[i]._tag).toUpperCase());
+			if (tag === 'INPUT' || tag === 'BUTTON') { return kids[i]; }
+		}
+		return td;
+	}
+	function paneTdOfEvent(spec, node) {
+		while (node && node !== document) {
+			if (node.nodeType === 1 && node.tagName === 'TD' && node._lpnPaneKey) { return node; }
+			node = node.parentNode;
+		}
+		return null;
+	}
+	/**
+	 * **MOVE BY WRITING FIRST AND LOOKING UP THE TARGET AFTERWARDS**, which is the lesson
+	 * libCurveGridRow()'s gridMove() already had to learn: leaving a cell blurs it, a blur fires
+	 * `change`, and that commit re-solves and may rebuild the table -- so a <td> captured before
+	 * the write can be a detached node by the time it is focused. Blur, THEN re-read spec.tds.
+	 *
+	 * The `_selMoving` flag is what stops our own focus() call reading back through the focusin
+	 * listener and collapsing a Shift-extended selection to one cell.
+	 */
+	function paneFocusCell(spec, id, key) {
+		var active = activeElementSafe(), target;
+		spec._selMoving = true;
+		try {
+			if (active && active.blur && active.tagName === 'INPUT') { active.blur(); }
+			target = paneCellFocusable(spec.tds && spec.tds[id] && spec.tds[id][key]);
+			if (!target) { return false; }
+			target.focus();
+			// A cell arrived at by keyboard has its contents SELECTED, which is also what makes
+			// Left and Right behave: the first press collapses the selection the way a text field
+			// should, and only the second one leaves the cell.
+			if (target.select && target.tagName === 'INPUT') { target.select(); }
+			return true;
+		} finally { spec._selMoving = false; }
+	}
+	// **THE SAME EMPTINESS THE SCREEN SHOWS.** A jump reads paneCellText(), not the raw value, so a
+	// cell that looks blank to the reader is blank to Ctrl+Down. A permanently blank reaction
+	// coefficient is a real value ("use the global") and this jumps straight through it, exactly as
+	// a spreadsheet does on a sparse column -- a second notion of "meaningfully blank" is a
+	// distinction a spreadsheet-literate user has no way to discover.
+	function paneCellBlankAt(rows, cols, r, c) {
+		return paneCellText(cols[c], rows[r]) === '';
+	}
+	/**
+	 * Excel's Ctrl+Arrow, which is one rule read from both sides of a gap: from a cell whose
+	 * neighbour is filled, run to the LAST filled cell of that run; from a cell whose neighbour is
+	 * blank, run to the NEXT filled cell. Either way, running out of table stops at its edge.
+	 */
+	function paneJumpEdge(rows, cols, r, c, dr, dc) {
+		var horiz = dc !== 0, step = horiz ? dc : dr,
+			lim = horiz ? cols.length : rows.length,
+			pos = horiz ? c : r, n = pos + step, seekFilled, nb;
+		if (n < 0 || n >= lim) { return { r: r, c: c }; }
+		seekFilled = horiz ? paneCellBlankAt(rows, cols, r, n) : paneCellBlankAt(rows, cols, n, c);
+		while (n >= 0 && n < lim) {
+			nb = horiz ? paneCellBlankAt(rows, cols, r, n) : paneCellBlankAt(rows, cols, n, c);
+			if (seekFilled) { if (!nb) { break; } } else if (nb) { n -= step; break; }
+			n += step;
+		}
+		if (n < 0) { n = 0; }
+		if (n >= lim) { n = lim - 1; }
+		return horiz ? { r: r, c: n } : { r: n, c: c };
+	}
+	// **THE FIRST DATA COLUMN IS INDEX 1, NOT THE ID.** Home is a spreadsheet user's most common
+	// keystroke, and the ID cell is a button that pans the map -- putting Home on it would take the
+	// reader somewhere else entirely the first time they tried to type over it. There is no row
+	// header in these tables for it to mean instead.
+	function paneHomeCol(cols) { return Math.min(1, cols.length - 1); }
+	// **THE CARET HAS TO BE AT THE EDGE BEFORE LEFT OR RIGHT LEAVES THE CELL**, or nobody can put
+	// the caret inside `1000` to make it `1500`. A field that refuses to answer is treated as an
+	// edge, which at least still moves. Same rule and same reason as the Curves grid.
+	function paneCaretEdge(input, atEnd) {
+		var st, en, len;
+		if (!input || input.tagName !== 'INPUT') { return true; }
+		len = String(input.value === undefined ? '' : input.value).length;
+		try { st = input.selectionStart; en = input.selectionEnd; } catch (e) { return true; }
+		if (st === null || st === undefined) { return true; }
+		if (st !== en) { return false; }
+		return atEnd ? st >= len : st <= 0;
+	}
+	/**
+	 * **THE HEADERS COME WITH A WHOLE-TABLE COPY AND WITH NOTHING ELSE.** Selecting B5:D40 in a
+	 * spreadsheet does not silently prepend a heading nobody selected; selecting the whole table
+	 * is a different gesture and means "give me this table", which is the one Task 186's out
+	 * direction is about. paneHeadingText() already carries the unit in parentheses, so the units
+	 * on the clipboard are the units on the strip with no second formatter.
+	 *
+	 * **A FILTERED TABLE COPIES WHAT IT SHOWS, FOR FREE.** Task 597 removes non-matching rows from
+	 * the DOM rather than hiding them, so a rectangle can only ever be built out of rows that are
+	 * on screen. Excel makes you ask for that with Alt+semicolon and silently includes hidden rows
+	 * if you forget; here it is true by construction.
+	 */
+	function paneCopyTsv(spec, rows, cols, box) {
+		var whole = box.r0 === 0 && box.r1 === rows.length - 1 &&
+				box.c0 === 0 && box.c1 === cols.length - 1,
+			out = [], r, c, line;
+		if (whole) {
+			line = [];
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneHeadingText(cols[c])); }
+			out.push(line.join('\t'));
+		}
+		for (r = box.r0; r <= box.r1; r++) {
+			line = [];
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneCellText(cols[c], rows[r])); }
+			out.push(line.join('\t'));
+		}
+		return out.join('\n');
+	}
+	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
+	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
+	// key is ordinary typing and must stay that way.
+	function paneHandleKey(spec, e) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), key = e && e.key,
+			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
+			active = activeElementSafe(), r, c, at;
+		if (!key || !rows.length || !cols.length) { return false; }
+		if (e.altKey) { return false; }
+		if (!box) {
+			// Nothing selected yet and a navigation key pressed: start at the top left, which is
+			// where a spreadsheet with no selection puts you.
+			if (key.indexOf('Arrow') !== 0 && key !== 'Home' && key !== 'End') { return false; }
+			paneSelSet(spec, rows, cols, 0, paneHomeCol(cols), false);
+			box = paneSelBox(spec, rows, cols);
+			if (!box) { return false; }
+		}
+		r = box.fr; c = box.fc;
+		if (jump && (key === 'a' || key === 'A')) {
+			// The whole table, which is the gesture that earns the headings on the clipboard.
+			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
+				fId: rows[rows.length - 1].id, fKey: cols[cols.length - 1].key };
+			paneSelPaint(spec, rows, cols);
+			return true;
+		}
+		if (key === 'ArrowUp' || key === 'Up') { at = jump ? paneJumpEdge(rows, cols, r, c, -1, 0) : { r: r - 1, c: c }; }
+		else if (key === 'ArrowDown' || key === 'Down') { at = jump ? paneJumpEdge(rows, cols, r, c, 1, 0) : { r: r + 1, c: c }; }
+		else if (key === 'ArrowLeft' || key === 'Left') {
+			// Inside a text box, Left is ordinary editing until the caret is against the edge.
+			if (!jump && !ext && !paneCaretEdge(active, false)) { return false; }
+			at = jump ? paneJumpEdge(rows, cols, r, c, 0, -1) : { r: r, c: c - 1 };
+		} else if (key === 'ArrowRight' || key === 'Right') {
+			if (!jump && !ext && !paneCaretEdge(active, true)) { return false; }
+			at = jump ? paneJumpEdge(rows, cols, r, c, 0, 1) : { r: r, c: c + 1 };
+		} else if (key === 'Home') { at = jump ? { r: 0, c: paneHomeCol(cols) } : { r: r, c: paneHomeCol(cols) }; }
+		else if (key === 'End') { at = jump ? { r: rows.length - 1, c: cols.length - 1 } : { r: r, c: cols.length - 1 }; }
+		else { return false; }
+		paneSelSet(spec, rows, cols, at.r, at.c, ext);
+		paneSelPaint(spec, rows, cols);
+		// **EXTENDING DOES NOT MOVE THE CARET.** Shift+Down in a spreadsheet grows the highlight
+		// and leaves the cell you are editing where it is; moving the focus as well would blur the
+		// box mid-value on every press.
+		if (!ext) {
+			box = paneSelBox(spec, rows, cols);
+			if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
+		}
+		return true;
+	}
+	// One keydown, one focusin, one copy and the two drag halves, all on the TABLE -- so they are
+	// replaced with it on every rebuild and there is nothing to unhook.
+	function paneWireTable(spec, table) {
+		var dragging = false;
+		table.addEventListener('keydown', function (e) {
+			if (paneHandleKey(spec, e)) { e.preventDefault(); }
+		});
+		// Tab, a click, or anything else that lands the caret in a cell IS a selection -- so the
+		// keyboard picks up where the hand left off, with no separate act of selecting.
+		table.addEventListener('focusin', function (e) {
+			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
+			if (!td || spec._selMoving) { return; }
+			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
+			if (r < 0 || c < 0) { return; }
+			paneSelSet(spec, rows, cols, r, c, false);
+			paneSelPaint(spec, rows, cols);
+		});
+		table.addEventListener('mousedown', function (e) {
+			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
+			if (!td) { return; }
+			dragging = true;
+			if (!e.shiftKey) { return; }   // a plain press is the focusin above; Shift extends
+			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
+			if (r < 0 || c < 0) { return; }
+			paneSelSet(spec, rows, cols, r, c, true);
+			paneSelPaint(spec, rows, cols);
+			e.preventDefault();
+		});
+		// **THE BUTTON STATE IS THE ONLY HONEST END OF A DRAG.** A mouseup released outside the
+		// table never reaches a listener on it, and a document-level one would have to be unhooked
+		// on every rebuild; asking whether the button is still down heals itself instead.
+		table.addEventListener('mouseover', function (e) {
+			var td, rows, cols, r, c;
+			if (!dragging) { return; }
+			if (typeof e.buttons === 'number' && !(e.buttons & 1)) { dragging = false; return; }
+			td = paneTdOfEvent(spec, e.target);
+			if (!td) { return; }
+			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
+			if (r < 0 || c < 0) { return; }
+			paneSelSet(spec, rows, cols, r, c, true);
+			paneSelPaint(spec, rows, cols);
+			e.preventDefault();
+		});
+		table.addEventListener('mouseup', function () { dragging = false; });
+		table.addEventListener('copy', function (e) {
+			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+				box = paneSelBox(spec, rows, cols), tsv;
+			if (!box) { return; }
+			// ONE CELL IS NOT A RANGE: it is ordinary typing, and the browser's own copy of what
+			// the caret has selected inside the box is better than anything we would write.
+			if (box.r0 === box.r1 && box.c0 === box.c1) { return; }
+			tsv = paneCopyTsv(spec, rows, cols, box);
+			try {
+				e.clipboardData.setData('text/plain', tsv);
+				e.preventDefault();
+			} catch (err) { /* no clipboardData: the browser's own copy stands */ }
+		});
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------

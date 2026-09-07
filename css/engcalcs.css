@@ -1703,7 +1703,33 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    THE CLASS COMES FROM THE COLUMN'S POSITION, not from what it holds, so a table that gains a
    column cannot acquire a second left one. The printed sheet keeps the old names-left,
    figures-right split -- restated in @media print below. */
+/* **THE CELLS ABUT EACH OTHER, AS A SPREADSHEET'S DO** (Tom, 2026-09-06, Task 186 part 1: "cells
+   abut each other like Google Sheets, in appearance and not only in behaviour"). What was there
+   was two nested boxes per cell -- a padded <td> holding a bordered <input> -- so the grid a
+   reader sees was the inputs' own borders with a gap around each. The cell keeps the rule now and
+   the control inside it has none, which is the arrangement that makes a continuous grid: one line
+   between two cells rather than two lines and a gutter. The padding moves inside the control, so
+   the figures sit exactly where they did. */
 .lpn-pane-table th, .lpn-pane-table td { padding: 1px 6px 1px 0; text-align: center; border: 0; }
+.lpn-pane-table tbody td { padding: 0; border: 1px solid #ddd; }
+.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; }
+.lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)) { padding: 1px 6px; }
+/* The control IS the cell: no border of its own, no background of its own, and the cell's own
+   padding rather than the browser's. Its width is still the column's, so nothing Tom approved
+   about column widths moves. */
+.lpn-pane-table tbody td input {
+	border: 0; background: transparent; padding: 1px 4px; margin: 0; border-radius: 0;
+}
+/* The focused cell is outlined and not shaded, which is where a spreadsheet puts the eye. The
+   outline is INSET so it does not push the row apart, and it is on the cell rather than on the
+   control so a read-only cell can wear it too. */
+.lpn-pane-table tbody td:focus, .lpn-pane-table tbody td:focus-within {
+	outline: 2px solid #0645ad; outline-offset: -2px;
+}
+.lpn-pane-table tbody td input:focus { outline: 0; }
+/* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
+   block; the focused cell keeps its outline on top of it. */
+.lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
