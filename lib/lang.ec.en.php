@@ -3071,6 +3071,30 @@ $ec_lang['lpn_library_curve_in_use']='This curve is used by {count} elements: {i
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
 $ec_lang['lpn_library_curve_y']='Y';
+// ---- THE PIPE TYPE LIBRARY (Task 465) --------------------------------------------------------
+// A definition several pipes refer to for their physical properties. Bound by ID and never by name:
+// a library that matches its items by LABEL re-points every reference the moment two labels collide
+// (dev/pipe-library-design.md §4), so the picker shows the name and the document stores the id.
+$ec_lang['lpn_library_pipetypes']='Pipe types';
+$ec_lang['lpn_library_pipetypes_tip']='A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients, so that editing the definition edits every pipe that uses it.';
+// **WHAT A DEFINITION CONTAINS IS THE USER\'S CHOICE**, and the note has to say so: a type that
+// states a roughness and no diameter is the way a real approved-materials table handles two ages of
+// the same material, and it is the half of Tom\'s shape that makes the feature work.
+$ec_lang['lpn_library_pipetypes_note']='A pipe type belongs to a project, and a pipe indicates the one it uses in its own properties. A definition states only the properties you fill in, so a type that states a roughness and no diameter is a normal one to make. Editing a definition here changes every pipe that uses it.';
+$ec_lang['lpn_library_pipetype_add']='Add a pipe type';
+$ec_lang['lpn_library_pipetype_blank_tip']='Leave a box empty and this type does not state that property. A pipe using this type then keeps its own value for it.';
+$ec_lang['lpn_library_pipetype_used_by']='Pipes using this type';
+$ec_lang['lpn_library_pipetype_unused']='Nothing uses this pipe type.';
+// A TYPE IN USE IS NOT DELETED, for the reason the curve above is not: deleting it would change the
+// diameter and the roughness of every pipe that stated it, in silence. {count} and {ids} are
+// placeholders, not concatenation (Task 193).
+$ec_lang['lpn_library_pipetype_in_use']='This pipe type is used by {count} pipes: {ids}. Point those pipes at another type, or detach them, before deleting this one.';
+// The pipe popup\'s own selector and the two controls beside it.
+$ec_lang['lpn_field_pipetype']='Pipe type';
+$ec_lang['lpn_field_pipetype_tip']='The pipe type in the project library that this pipe uses. Every property the type states is read from the type, so its box here cannot be edited. Detach to give this one pipe its own values.';
+$ec_lang['lpn_pipetype_none']='No pipe type selected';
+$ec_lang['lpn_pipetype_detach']='Detach from pipe type';
+$ec_lang['lpn_pipetype_detach_tip']='Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to

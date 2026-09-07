@@ -2567,9 +2567,16 @@ var EngCalcs = EngCalcs || {};
 		// **THE OVERRIDE IS ON WHICH CURVE, NEVER ON WHAT A CURVE CONTAINS.** A curve's points are
 		// the document's, shared by every element naming it; a scenario that edited them would
 		// change the answer in every other scenario at once, which is the opposite of an override.
+		// `typeId` states which LIBRARY PIPE this pipe is (Task 465), and it is overridable on
+		// exactly the reading Task 586 gave the pump's curve reference (Tom, 2026-09-05: *"Scenario
+		// pump reference: Yes."*). "What if we spec this reach as ductile iron instead of PVC" is
+		// the question a scenario asks, and it is answered by pointing the pipe at another type.
+		// **THE OVERRIDE IS ON WHICH TYPE, NEVER ON WHAT A TYPE CONTAINS.** A definition belongs to
+		// the document and is shared by every pipe stating it; a scenario editing its numbers would
+		// move every other scenario's answer at once, which is the opposite of an override.
 		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true,
 			bulkCoeff: true, wallCoeff: true, energyPrice: true, energyPattern: true,
-			curveId: true, efficCurveId: true },
+			curveId: true, efficCurveId: true, typeId: true },
 		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
 		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
 		// its own note" with no second mechanism.
@@ -2584,10 +2591,35 @@ var EngCalcs = EngCalcs || {};
 	// `prop` is always the PLAIN public name; the element stores the same property UNDERSCORED, so a
 	// call site that forgets to route through effective() reads undefined immediately rather than
 	// working today and breaking invisibly once a second scenario exists.
+	//
+	// **THERE IS A THIRD LAYER, AND IT IS THE LIBRARY PIPE** (Task 465): override -> element ->
+	// type. A pipe that states a type inherits every property that type states, and attaching one
+	// CLEARS the element's own value for each of them (see setPipeType), so in any document this
+	// page writes the element layer is simply absent for a type-stated property and the chain reads
+	// literally in that order.
+	//
+	// **THE TYPE IS NEVERTHELESS ASKED BEFORE THE ELEMENT, AND THAT IS NOT BELT AND BRACES.** A
+	// scenario can override `typeId` on a pipe that Base leaves untyped -- Base still holds its own
+	// `_diameter`, nothing cleared it, and it is correct that it stays -- so in that scenario the
+	// element layer is present and the type must still win, or choosing a type inside a scenario
+	// would change nothing anybody could see. One rule: a property the effective type STATES is the
+	// type's.
+	//
+	// **THE COST ON THE HOT PATH IS ONE LOOKUP IN A FOUR-KEY OBJECT.** effective() runs per property
+	// per element per render and per solve, so everything else here is behind
+	// `LPN_TYPE_PROP_SET[prop]`: a demand, a head, a status or a length never reaches the type
+	// layer at all, and an untyped pipe leaves it after reading one undefined field.
 	function effective(el, prop) {
 		if (!el) { return undefined; }
-		var ov = activeScenario().overrides[ovKey(el)];
+		var ov = activeScenario().overrides[ovKey(el)], tid, t;
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
+		if (LPN_TYPE_PROP_SET[prop]) {
+			tid = (ov && Object.prototype.hasOwnProperty.call(ov, 'typeId')) ? ov.typeId : el._typeId;
+			if (tid) {
+				t = pipeTypeById(tid);
+				if (pipeTypeStates(t, prop)) { return t.props[prop]; }
+			}
+		}
 		// An ABSENT `active` must read as true, not undefined/falsy, so a topology no scenario has
 		// touched is never mistaken for inactive. This is the one property effective() defaults
 		// itself, per the trap note in Task 146.08 step 2.
@@ -2981,12 +3013,17 @@ var EngCalcs = EngCalcs || {};
 			// default or to force onto every scenario at once.
 			{ key: 'fireFlow', group: 'node', field: 'fireFlow', prop: 'fireFlow', label: pc.lpn_ff_required || 'Required fire flow',
 				applies: function (n) { return n.type === 'junction'; }, get: function (n) { return fireFlowOwn(n); }, set: function (n, v) { n._fireFlow = fireFlowStore(v); } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+			// **A PROPERTY THE PIPE'S TYPE STATES IS NOT WRITABLE FROM HERE EITHER** (Task 465). This
+			// list is read by BOTH bulk writers -- the Settings push and Find and replace -- and a
+			// bulk write to a type-owned property would be a no-op effective() never reads back,
+			// under a count the user had read and approved. `applies` is the one hook both consult,
+			// so refusing here keeps the count honest as well as the write.
 			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type !== 'pump' && !pipeTypeOwns(l, 'diameter'); }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// PIPE-ONLY, not merely not-a-pump: a valve is a zero-length link, so no friction formula
 			// ever reads its roughness, and a default for it would be a control with no effect.
 			{ key: 'roughness', group: 'link', field: 'roughness', prop: 'roughness', label: roughnessLabel(),
-				applies: function (l) { return l.type === 'pipe'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && !pipeTypeOwns(l, 'roughness'); }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE TWO REACTION COEFFICIENTS, HERE FOR FIND AND REPLACE'S REASON** (Task 566) --
@@ -3000,9 +3037,9 @@ var EngCalcs = EngCalcs || {};
 			// PIPE-ONLY, and only while a chemical is tracked: `applies` is what keeps a Replace
 			// physical, and a valve is a zero-length link that no reaction is computed along.
 			{ key: 'bulkCoeff', group: 'link', field: 'bulkCoeff', prop: 'bulkCoeff', label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient',
-				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown(); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'bulkCoeff'); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
-				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown(); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 		];
 	}
 	// Is this push spec's property visible on the map right now? The one place that question is
@@ -4045,6 +4082,145 @@ var EngCalcs = EngCalcs || {};
 			if (l.type !== 'pump') { return; }
 			delete l.h0; delete l.a; delete l.b;
 		});
+	}
+	// ---- THE PIPE TYPE LIBRARY (ROADMAP Task 465, slices 1-3) -------------------------------------
+	//
+	// **A PIPE TYPE IS A DOCUMENT OBJECT AND A PIPE HOLDS ONLY A REFERENCE.** `doc.pipeTypes` is a
+	// list of `{ id, note, props }` -- `props` being whatever subset of the physical properties this
+	// definition states -- and a pipe states one by id. It is the Task 586 curve pattern used a
+	// second time rather than a second pattern: id-keyed, renamed with every reference carried,
+	// refused deletion while anything uses it.
+	//
+	// Tom, 2026-09-05: *"Pipe library: I foresee very soon that we will add the ability to refer to
+	// a library pipe for roughness, reaction coefficients, and maybe diameter (depending on what
+	// user chooses to include in the library pipe definition). The Library pipe selector can be
+	// immediately after ID, and any properties defined in the Library are disabled or removed in the
+	// pipe properties box."*
+	//
+	// **THE CONTENTS OF A DEFINITION ARE THE USER'S CHOICE, AND THAT IS THE LOAD-BEARING HALF.** A
+	// type that states roughness and not diameter is legal, which is what dissolves the objection
+	// that roughness is a function of material AND age: a real utility's approved-materials table
+	// carries no age column either, and handles two ages with two rows. `props` therefore holds only
+	// the properties the user filled in, and `hasOwnProperty` is the whole test of what it states.
+	//
+	// **BOUND BY ID, NEVER BY NAME, AND THAT IS THE FINDING THE DESIGN RECORD IS BUILT ON.** Bentley's
+	// own Engineering Libraries synchronise on the LABEL -- *"Items are synchronized based on their
+	// label. If the label is the same, then the item's values will be made the same"* -- so a name
+	// collision silently re-points every reference and nothing looks wrong from the software's side.
+	// The picker's displayed text is the name; the stored reference is the id. dev/pipe-library-design.md §4.
+	//
+	// **WHAT NEVER BELONGS IN A TYPE:** length, the two node references, status. A length is a fact
+	// about one run of pipe, the ends are its identity, and open-or-closed is operational rather than
+	// a material property. dev/pipe-library-design.md §2 has the table and the citation.
+	//
+	// **READ THROUGH docPipeTypesRead(); WRITE THROUGH docPipeTypes()** -- the same split, for the
+	// same reason, as libPatterns()/libPatternsRead(): the materialising getter writing
+	// `pipeTypes: []` into a document that stated none is a change to the document, and a render
+	// must not make one.
+	function docPipeTypes() { return (doc.pipeTypes = doc.pipeTypes || []); }
+	function docPipeTypesRead() { return doc.pipeTypes || []; }
+	function pipeTypeById(id) {
+		if (id === undefined || id === null || id === '') { return null; }
+		var list = docPipeTypesRead(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	// **THE PROPERTIES A TYPE MAY STATE, AND THE WHOLE LIST.** Order is Tom's own -- identity, then
+	// diameter, then roughness -- with the pipe's two reaction coefficients after them because he
+	// named them in the same sentence. `blank` says the control is blank-capable, which is how a
+	// type says it does NOT state the property: an absent key, not a zero.
+	//
+	// **`length`, `status`, `k` AND THE ENDS ARE DELIBERATELY ABSENT.** The first three for the
+	// reasons in the block above; `k` because a minor-loss coefficient is a fittings question and
+	// Task 590 answers it as a list rather than as one number a type could carry.
+	var LPN_TYPE_PROPS = [
+		{ prop: 'diameter', unit: 'lpn_u_diameter' },
+		{ prop: 'roughness' },
+		{ prop: 'bulkCoeff' },
+		{ prop: 'wallCoeff' }
+	];
+	// The same list as a lookup, so effective() -- which runs once per property per element per
+	// render and per solve -- asks one small object rather than walking an array.
+	var LPN_TYPE_PROP_SET = {};
+	LPN_TYPE_PROPS.forEach(function (d) { LPN_TYPE_PROP_SET[d.prop] = true; });
+	/** Does this definition state this property? An ABSENT key is the answer, never a zero. */
+	function pipeTypeStates(t, prop) {
+		return !!(t && t.props && Object.prototype.hasOwnProperty.call(t.props, prop));
+	}
+	// The type an element resolves to, THROUGH effective(), because the reference is overridable
+	// (see LPN_OVERRIDABLE): a bare `l._typeId` read would show Base's type inside a scenario that
+	// had chosen another, and a resolver only some call sites went through would be worse than none.
+	function elementPipeType(l) { return pipeTypeById(effective(l, 'typeId')); }
+	/**
+	 * **DOES THE ELEMENT'S TYPE OWN THIS PROPERTY?** The one question the popup, the bottom-pane
+	 * tables and Find and replace all ask before offering a control: a property the type states is
+	 * the type's, so the control is shown DISABLED at its inherited value and there is nothing to
+	 * type into. Detach is how one pipe deviates.
+	 */
+	function pipeTypeOwns(l, prop) {
+		if (!l || !LPN_TYPE_PROP_SET[prop]) { return false; }
+		return pipeTypeStates(elementPipeType(l), prop);
+	}
+	/**
+	 * **STATING A TYPE, AND WHAT IT DOES TO THE PIPE'S OWN NUMBERS.**
+	 *
+	 * In BASE the properties the type states are cleared from the element, because that is what
+	 * "this pipe is an 8-inch C900 PVC" means: the number is the definition's now, and a local copy
+	 * left underneath it is a second answer nothing would ever show. Every scenario's override on
+	 * those properties goes with them, which is the valve-type precedent verbatim -- an override
+	 * that survived would win silently over the definition the user just chose, exactly as a stale
+	 * pressure survived under a valve that had become a flow control.
+	 *
+	 * IN A SCENARIO only the reference is overridden: Base's own numbers are not this scenario's to
+	 * clear, and effective() asks the type before the element for precisely this case.
+	 *
+	 * The user's numbers are not lost quietly: this is one undo snapshot away, and Detach writes the
+	 * effective values back as ordinary local ones.
+	 */
+	function setPipeType(l, id) {
+		var t = id ? pipeTypeById(id) : null, inBase = inBaseScenario();
+		setProp(l, 'typeId', id || null);
+		if (!t) { return; }
+		LPN_TYPE_PROPS.forEach(function (d) {
+			if (!pipeTypeStates(t, d.prop)) { return; }
+			if (inBase) {
+				setProp(l, d.prop, undefined);
+				scenarios.forEach(function (sc) {
+					var ov = sc.overrides[ovKey(l)];
+					if (ov) { delete ov[d.prop]; }
+				});
+			} else {
+				clearOverride(l, d.prop);
+			}
+		});
+	}
+	/**
+	 * **DETACH: THE ONE-OFF THAT MUST NOT FORK THE DEFINITION** (dev/pipe-library-design.md §5, and
+	 * flagged there as an addition to the shape Tom stated rather than part of it).
+	 *
+	 * Every real network eventually has one element that has to deviate: a single pipe relined after
+	 * a break, one service tap refitted. Defining a second library pipe for it is the propagation
+	 * problem in reverse -- two "8-inch PVC" entries differing by one pipe's worth of reality, and
+	 * nothing on either saying which is which.
+	 *
+	 * So detach COPIES the current effective values in as ordinary local values and DROPS the
+	 * reference, turning the disabled controls back into editable ones. Nothing about the pipe
+	 * changes at the moment it is pressed, which is what makes it safe: it is a statement about who
+	 * owns the numbers from here on, not an edit to any of them.
+	 *
+	 * **THE VALUES ARE READ BEFORE THE REFERENCE IS DROPPED**, in that order and not the other, or
+	 * every one of them would read back as whatever the element happened to hold underneath.
+	 */
+	function detachPipeType(l) {
+		var t = elementPipeType(l), keep = [];
+		if (!t) { return false; }
+		LPN_TYPE_PROPS.forEach(function (d) {
+			if (!pipeTypeStates(t, d.prop)) { return; }
+			keep.push([d.prop, effective(l, d.prop)]);
+		});
+		keep.forEach(function (pair) { setProp(l, pair[0], pair[1]); });
+		setProp(l, 'typeId', null);
+		return true;
 	}
 	function linkPoints(l) {
 		return Geom.polylinePointsAttr(linkPointList(l));
@@ -11994,9 +12170,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// 2.8em rather than the 2.1 Tom named for it: the same box serves Pipes and Valves, and in the
 	// SI preset a diameter is millimetres, so "1200" is four characters and 2.1em shows three.
+	// **`plainFor` IS THE PIPE-TYPE GUARD, AND IT IS THE TABLE'S HALF OF THE POPUP'S DISABLED BOX**
+	// (Task 465). A property the pipe's type states is the type's, so the cell shows the inherited
+	// number as text with no control in it -- the alternative is an input that accepts a number
+	// effective() then declines to read, which is the silent no-op this page has no other examples
+	// of. Four hundred rows is also where a bulk edit is most likely to be attempted.
 	function paneColDiameter() {
 		return { key: 'diameter', label: 'lpn_field_diameter', unit: function () { return 'lpn_u_diameter'; }, em: 3,
 			prop: 'diameter', get: function (l) { return effective(l, 'diameter'); },
+			plainFor: function (l) { return pipeTypeOwns(l, 'diameter'); },
 			set: function (l, v) { setProp(l, 'diameter', v); } };
 	}
 	// The results a link has. Velocity is pipe-and-valve only (a pump has no diameter, so its stored
@@ -12039,6 +12221,7 @@ var EngCalcs = EngCalcs || {};
 		return { key: key, label: labelKey, unitText: unitTextFn, em: 4, blank: true,
 			when: reactionFieldsShown, prop: key,
 			get: function (el) { return effective(el, key); },
+			plainFor: function (el) { return pipeTypeOwns(el, key); },   // see paneColDiameter(); a tank's own coefficient is never type-owned, so this is false there by construction
 			set: function (el, v) { setProp(el, key, v); } };
 	}
 	// A bulk coefficient is a reciprocal time; the wall one is the length per day the project's own
@@ -12160,6 +12343,7 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'roughness', label: roughnessLabel, em: 6,
 						unit: function () { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; },
 						prop: 'roughness', get: function (l) { return effective(l, 'roughness'); },
+						plainFor: function (l) { return pipeTypeOwns(l, 'roughness'); },   // see paneColDiameter(): a property the type states is read-only here
 						set: function (l, v) { setProp(l, 'roughness', v); } },
 					// 1.4em, the 0.2 Tom declared. It was widened to 2.1 earlier on 2026-08-23 to pass
 					// his own acceptance test ("'2.5' needs to work okay": 1.4em shows one of those
@@ -14884,6 +15068,11 @@ var EngCalcs = EngCalcs || {};
 			// as the patterns beside it are: a pump's head curve means nothing without the curve, and
 			// two pumps sharing one is a fact about this network.
 			curves: doc.curves || [],
+			// **THE PIPE TYPE LIBRARY** (Task 465). Modelling data, and therefore the project's, on
+			// exactly the argument the curves beside it are: a pipe stating a type means nothing
+			// without the definition, and four hundred pipes sharing one is a fact about this
+			// network rather than about the browser it was drawn in.
+			pipeTypes: doc.pipeTypes || [],
 			// Paths kept by name (Task 510). Document data, for the reason the saved-path note in
 			// the profile section gives: a path names THIS project's junctions.
 			profiles: doc.profiles || [],
@@ -15455,6 +15644,11 @@ var EngCalcs = EngCalcs || {};
 		// element for it to find.
 		mintCurveLibrary(saved);
 		doc.curves = saved.curves || [];
+		// The pipe type library (Task 465). A file written before this existed has none, and every
+		// pipe in it states its own numbers exactly as it always did -- there is no migration step
+		// and no version bump, because nothing MOVED: this adds a layer under the element's own
+		// values rather than taking anything out of them.
+		doc.pipeTypes = saved.pipeTypes || [];
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
@@ -24971,6 +25165,78 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// Every pipe type this document holds (Task 465). The same split as the curves above and for the
+	// same reason: a RENDER must not write `pipeTypes: []` into a document that stated none.
+	function libPipeTypes() { return docPipeTypes(); }
+	function libPipeTypesRead() { return docPipeTypesRead(); }
+	// **WHICH PIPES STATE THIS TYPE, IN EVERY SCENARIO.** The Library is a view of the DOCUMENT, not
+	// of the active scenario, so "is anything using this" has to be asked of Base and of every
+	// override alike -- a type stated only by a scenario is still in use, and deleting it would
+	// break that scenario silently from a box that was showing none of it. curveUsers()' argument,
+	// and the same walk.
+	function pipeTypeUsers(id) {
+		var out = [];
+		if (!id) { return out; }
+		(doc.links || []).forEach(function (l) {
+			var used = l._typeId === id;
+			if (!used) {
+				used = scenarios.some(function (sc) {
+					var ov = sc.overrides[ovKey(l)];
+					return !!ov && ov.typeId === id;
+				});
+			}
+			if (used) { out.push(l.id); }
+		});
+		return out;
+	}
+	/**
+	 * **RENAMING A PIPE TYPE, AND EVERY REFERENCE FOLLOWS IT.** This is the Bentley finding stated as
+	 * code: a library whose items are matched by LABEL re-points every reference the moment two
+	 * labels collide. Here the reference is the id, a rename carries it, and a name that is already
+	 * taken is refused rather than merged.
+	 *
+	 * Refuses a blank and refuses a clash, snapping the field back, which is the contract
+	 * libRenameCurve() and validateNewId() both give.
+	 */
+	function libRenamePipeType(t, want) {
+		var name = String(want || '').trim(), was = t.id;
+		if (!name || name === was) { return false; }
+		if (libPipeTypesRead().some(function (x) { return x !== t && x.id === name; })) { return false; }
+		t.id = name;
+		libRepointPipeType(was, name);
+		return true;
+	}
+	// One name swapped for another (or for null, on a delete) everywhere a reference can sit.
+	function libRepointPipeType(was, now) {
+		(doc.links || []).forEach(function (l) {
+			if (l._typeId === was) {
+				if (now) { l._typeId = now; } else { delete l._typeId; }   // base-write: a rename is not an edit to this scenario's value -- the reference has not changed, only the name of the thing it names, so it must move in Base and in every override alike
+			}
+			scenarios.forEach(function (sc) {
+				var ov = sc.overrides[ovKey(l)];
+				if (!ov || ov.typeId !== was) { return; }
+				if (now) { ov.typeId = now; } else { delete ov.typeId; }
+			});
+		});
+	}
+	// The label a type's property carries, in the Library and on the popup alike, so the two cannot
+	// drift. Roughness and the two reaction coefficients already name their own units and follow the
+	// friction method; a diameter names the unit strip's.
+	function pipeTypePropLabel(prop) {
+		var pc = EngCalcs.pageConfig || {};
+		if (prop === 'diameter') {
+			return (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')';
+		}
+		if (prop === 'roughness') {
+			return roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : '');
+		}
+		if (prop === 'bulkCoeff') {
+			return (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
+				+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')';
+		}
+		return (pc.lpn_reaction_wall || 'Wall reaction coefficient')
+			+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')';
+	}
 	// **A CURVE'S KIND DECIDES WHAT ITS SECOND COLUMN IS**, and therefore its heading and its unit.
 	// One table, so the Library, the popup and the exporter cannot disagree about what a curve of a
 	// given kind means. A `volume` or `other` curve is a quantity this page never computes with, so
@@ -25263,6 +25529,7 @@ var EngCalcs = EngCalcs || {};
 	var LIB_SECTIONS = [
 		{ id: 'patterns', label: 'lpn_library_patterns', tip: 'lpn_library_patterns_tip' },
 		{ id: 'curves', label: 'lpn_library_curves', tip: 'lpn_library_curves_tip' },
+		{ id: 'pipetypes', label: 'lpn_library_pipetypes', tip: 'lpn_library_pipetypes_tip' },
 		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' },
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
@@ -25299,6 +25566,7 @@ var EngCalcs = EngCalcs || {};
 		sec.appendChild(head);
 		if (libSection === 'patterns') { buildPatternSection(sec); }
 		else if (libSection === 'curves') { buildCurveSection(sec); }
+		else if (libSection === 'pipetypes') { buildPipeTypeSection(sec); }
 		else if (libSection === 'rules') { buildRuleSection(sec); }
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
@@ -25912,6 +26180,157 @@ var EngCalcs = EngCalcs || {};
 	 * sees the edit, in every scenario, because that is what one shared definition means. What a
 	 * SCENARIO can change is which curve an element names, and that is on the element's popup.
 	 */
+	/**
+	 * **THE PIPE TYPE LIBRARY SECTION** (Task 465, slice 1), and it is the Curves section's own shape
+	 * because it is the same object pattern used a second time: id-keyed records, a rename that
+	 * carries every reference, and a deletion refused by name while anything uses it.
+	 *
+	 * **A BLANK BOX IS THE WAY A TYPE SAYS IT DOES NOT STATE A PROPERTY.** That is the whole of Tom's
+	 * *"depending on what user chooses to include in the library pipe definition"*, and it needs no
+	 * second control beside each number: an absent key, not a zero, and a pipe using the type then
+	 * keeps its own value for that property. numberFieldBlank() already draws this distinction for a
+	 * pipe's reaction coefficients, so the box behaves the way one on this page already does.
+	 *
+	 * **DELETING A TYPE PIPES USE IS REFUSED, BY NAME AND WITH THE COUNT** -- the Curves section's
+	 * ruling, on the same argument: deleting it and clearing the references would change the
+	 * diameter and the roughness of every pipe that stated it, in silence, from a box showing none
+	 * of them. Detach is one press away on each pipe, and the button says which pipes to go to.
+	 *
+	 * **AND IT IS NOT A BACK DOOR INTO A SCENARIO.** A definition belongs to the document and is
+	 * written here in Base whatever scenario is active, deliberately: every pipe stating the type
+	 * sees the edit, in every scenario, because that is what one shared definition means. What a
+	 * SCENARIO can change is which type a pipe states, and that is on the pipe's popup.
+	 */
+	function buildPipeTypeSection(host) {
+		var pc = EngCalcs.pageConfig || {}, list = libPipeTypesRead();
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetypes_note || 'A pipe type belongs to a project, and a pipe indicates the one it uses in its own properties. A definition states only the properties you fill in, so a type that states a roughness and no diameter is a normal one to make. Editing a definition here changes every pipe that uses it.'));
+		// Said once for the section, not once per entry -- buildCurveSection()'s rule, and for the
+		// same reason: it is the same sentence about every row, and twenty copies of a sentence is
+		// what makes a panel unreadable.
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetype_blank_tip || 'Leave a box empty and this type does not state that property. A pipe using this type then keeps its own value for it.'));
+		host.appendChild(libButton(pc.lpn_library_pipetype_add || 'Add a pipe type', function () {
+			saveUndoSnapshot();
+			// **A NEW TYPE STATES NOTHING**, which is the honest starting point: a definition seeded
+			// with a diameter and a roughness nobody typed would be four hundred pipes' worth of
+			// invented numbers the moment somebody pointed a pipe at it. Same argument a freshly
+			// drawn pump's empty curve rests on.
+			libPipeTypes().push({ id: libFreeId(libPipeTypes(), 'T'), props: {} });
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		if (!list.length) {
+			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
+			return;
+		}
+		list.forEach(function (t) { buildPipeTypeEntry(host, t); });
+	}
+	// One blank-capable number in the Library's own field shape. Blank stores NOTHING -- the key
+	// leaves `props` -- so "this type does not state a diameter" and "this type states a diameter of
+	// zero" stay two different statements, which is numberFieldBlank()'s rule in the Library's
+	// markup.
+	function libTypeNumberField(row, t, prop, tip) {
+		var field = libEl('label', 'lpn-lib-field'), input = document.createElement('input'),
+			text = pipeTypePropLabel(prop), v = t.props ? t.props[prop] : undefined;
+		field.appendChild(libEl('span', 'lpn-lib-fieldname', text));
+		input.type = 'number';
+		input.step = 'any';
+		input.value = (v === undefined || v === null || v === '') ? '' : String(v);
+		input.setAttribute('aria-label', text);
+		if (tip) { helpTip(input, tip); }
+		input.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (!t.props) { t.props = {}; }
+			if (input.value === '') { delete t.props[prop]; } else { t.props[prop] = +input.value; }
+			libCommit();
+			// **REBUILT, because a box that has just started or stopped being stated changes the
+			// PIPE popup** -- a control there turns editable or disabled on this one keystroke, and
+			// a stale popup would take a value nothing reads.
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		field.appendChild(input);
+		row.appendChild(field);
+	}
+	function buildPipeTypeEntry(host, t) {
+		var pc = EngCalcs.pageConfig || {},
+			entry = libEl('div', 'lpn-lib-entry'),
+			headRow = libEl('div', 'lpn-lib-head lpn-lib-row'),
+			propRow = libEl('div', 'lpn-lib-row'),
+			id = document.createElement('input'),
+			desc = document.createElement('input'),
+			idField = libEl('label', 'lpn-lib-field'),
+			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
+			users = pipeTypeUsers(t.id),
+			del;
+		id.type = 'text';
+		id.className = 'lpn-lib-id';
+		id.value = t.id;
+		id.setAttribute('aria-label', pc.lpn_field_id || 'ID');
+		id.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (!libRenamePipeType(t, id.value)) { id.value = t.id; return; }
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+		});
+		idField.appendChild(libEl('span', 'lpn-lib-fieldname', pc.lpn_field_id || 'ID'));
+		idField.appendChild(id);
+		headRow.appendChild(idField);
+		// The description stands beside the id on line 1, the Curves section's own pairing -- and it
+		// is where a real approved-materials table keeps the material and the pressure class, which
+		// is how such a table is keyed (dev/pipe-library-design.md §2).
+		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
+			pc.lpn_library_curve_note_label || 'Description'));
+		desc.type = 'text';
+		desc.className = 'lpn-lib-wide';
+		desc.value = t.note || '';
+		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
+		desc.addEventListener('change', function () {
+			var s = String(desc.value || '').trim();
+			if (s === (t.note || '')) { return; }
+			saveUndoSnapshot();
+			if (s) { t.note = s; } else { delete t.note; }
+			libCommit();
+		});
+		descField.appendChild(desc);
+		headRow.appendChild(descField);
+		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+			var inUse = pipeTypeUsers(t.id);
+			if (inUse.length) {
+				alert((pc.lpn_library_pipetype_in_use
+					|| 'This pipe type is used by {count} pipes: {ids}. Point those pipes at another type, or detach them, before deleting this one.')
+					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
+				return;
+			}
+			saveUndoSnapshot();
+			doc.pipeTypes = libPipeTypes().filter(function (x) { return x !== t; });
+			libCommit();
+			rebuildLibraryBox();
+		});
+		del.className = 'lpn-lib-del';
+		headRow.appendChild(del);
+		entry.appendChild(headRow);
+		// **IDENTITY THEN PHYSICAL PROPERTIES, AND DIAMETER BEFORE ROUGHNESS** -- the order Tom put
+		// the selector in on the popup, and the order a real approved-materials table reads in.
+		LPN_TYPE_PROPS.forEach(function (d) { libTypeNumberField(propRow, t, d.prop, null); });
+		entry.appendChild(propRow);
+		// **WHO USES IT, AS THE WAY TO GET TO THEM.** Clicking an id goes to that pipe on the map,
+		// exactly as a bottom-pane table's id does -- and it is also the answer to "why will this not
+		// delete", standing where the Delete button is.
+		if (users.length) {
+			var used = libEl('div', 'lpn-lib-note', (pc.lpn_library_pipetype_used_by || 'Pipes using this type') + ' ');
+			users.forEach(function (lid) {
+				var b = libButton(lid, function () { findGoTo('link', lid); });
+				b.className = 'lpn-pane-goto';
+				used.appendChild(b);
+			});
+			entry.appendChild(used);
+		} else {
+			entry.appendChild(libEl('div', 'lpn-lib-note',
+				pc.lpn_library_pipetype_unused || 'Nothing uses this pipe type.'));
+		}
+		host.appendChild(entry);
+	}
 	function buildCurveSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libCurvesRead();
 		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
@@ -28745,6 +29164,117 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, l, prop);
 	}
+	/**
+	 * **A PROPERTY THE PIPE'S TYPE OWNS, SHOWN AS A DISABLED CONTROL AT ITS INHERITED VALUE**
+	 * (Task 465, Tom 2026-09-05: *"any properties defined in the Library are disabled or removed in
+	 * the pipe properties box"*).
+	 *
+	 * **DISABLED AND NOT REMOVED, AND THAT IS THE CHOICE THIS PAGE MAKES OF HIS TWO.** It is also
+	 * where this deliberately differs from the curve pattern beside it: a curve is a multi-row table
+	 * and Task 586 sends you to the Library to read it, but a roughness is one number, and a designer
+	 * checking a run by hand has to be able to read the effective value where the rest of the pipe's
+	 * numbers are, without a click-through. A removed row would answer "what is this pipe's C
+	 * factor" with a blank.
+	 *
+	 * **AND IT CARRIES NO OVERRIDE MARKER.** A property the type states is the type's in every
+	 * scenario, and the way to deviate is Detach, which is one button and says what it does. A tick
+	 * that quietly detached one property in one scenario would be a second detach mechanism nobody
+	 * could find again.
+	 */
+	function inheritedField(fields, labelText, value, tip) {
+		var label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'number';
+		input.disabled = true;
+		input.value = (value === undefined || value === null || value === '')
+			? '' : String(+(+value).toFixed(6));
+		setFieldLabel(label, labelText, tip);
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
+	/**
+	 * **THE LIBRARY PIPE SELECTOR, IMMEDIATELY AFTER ID** (Tom's own placement, 2026-09-05). The
+	 * option TEXT is the type's name; the stored reference is its id, which is the Bentley finding
+	 * this whole object is shaped around -- see the block at docPipeTypes().
+	 *
+	 * **THIS CHOOSER OFFERS NO WAY TO MAKE A TYPE**, on the ruling Task 586 gave the curve chooser
+	 * (Tom: *"Pump properties has no 'New curve...' button. And it shouldn't unless that's a link to
+	 * the Curves library."*): an element holds a reference and nothing else. What stands beside it is
+	 * a link into the Library's own Pipe types section, where one is created, described, edited and
+	 * deleted.
+	 *
+	 * **A TYPE THE DOCUMENT DOES NOT HOLD IS STILL SHOWN, SELECTED** -- the curve chooser's rule
+	 * again. Retargeting the pipe at some other definition on the user's behalf is not acting on
+	 * what is wrong; showing them what it states is.
+	 */
+	function pipeTypeChooser(fields, l) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			sel = document.createElement('select'),
+			cur = effective(l, 'typeId') || '',
+			none = document.createElement('option');
+		none.value = '';
+		none.textContent = pc.lpn_pipetype_none || 'No pipe type selected';
+		sel.appendChild(none);
+		libPipeTypesRead().forEach(function (t) {
+			var o = document.createElement('option');
+			o.value = t.id;
+			o.textContent = t.note ? (t.id + ' - ' + t.note) : t.id;
+			if (t.id === cur) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		if (cur && !pipeTypeById(cur)) {
+			var missing = document.createElement('option');
+			missing.value = cur;
+			missing.textContent = cur;
+			missing.selected = true;
+			sel.appendChild(missing);
+		}
+		sel.addEventListener('change', function () {
+			saveUndoSnapshot();
+			setPipeType(l, sel.value || null);
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		setFieldLabel(label, pc.lpn_field_pipetype || 'Pipe type', pc.lpn_field_pipetype_tip);
+		label.appendChild(sel);
+		fields.appendChild(label);
+		fields.appendChild(pipeTypeLibraryLink());
+		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, l, 'typeId');
+		if (elementPipeType(l)) { pipeTypeDetachButton(fields, l); }
+	}
+	function pipeTypeLibraryLink() {
+		var pc = EngCalcs.pageConfig || {},
+			b = libButton(pc.lpn_library_pipetypes || 'Pipe types', function () {
+				openLibrarySection('pipetypes');
+			}, pc.lpn_library_pipetypes_tip);
+		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
+		// makes the tip reachable by tap -- see curveLibraryLink(), where the same line is the
+		// difference between a readable tip and one no touch screen can get at.
+		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
+		return b;
+	}
+	// **DETACH, AND IT IS A BUTTON RATHER THAN A BLANK OPTION IN THE SELECTOR.** Choosing "No pipe
+	// type" and detaching are two different actions and only one of them keeps the numbers: the
+	// first leaves the pipe reading whatever it held underneath the type, the second writes the
+	// values it is showing right now into the pipe. A single control could not mean both.
+	function pipeTypeDetachButton(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, btn = document.createElement('button');
+		btn.type = 'button';
+		btn.textContent = pc.lpn_pipetype_detach || 'Detach from pipe type';
+		helpTip(btn, pc.lpn_pipetype_detach_tip);
+		btn.addEventListener('click', function () {
+			saveUndoSnapshot();
+			if (!detachPipeType(l)) { return; }
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		fields.appendChild(btn);
+		fields.appendChild(document.createElement('br'));
+	}
 	// The link that replaces the maker, on all three choosers -- the pump's head curve, the pump's
 	// efficiency curve and the GPV's head-loss curve -- because there is one chooser.
 	function curveLibraryLink() {
@@ -28951,17 +29481,32 @@ var EngCalcs = EngCalcs || {};
 			renderPumpSpeedFields(fields, l);
 			renderPumpEfficiencyFields(fields, l);
 		} else {
-			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
-				function () { return effective(l, 'diameter'); },
-				function (v) { setProp(l, 'diameter', v); refreshPopupIfOpen(); }, null,
-				{ el: l, prop: 'diameter' });
+			// **THE LIBRARY PIPE SELECTOR, IMMEDIATELY AFTER ID** (Task 465, Tom's own placement).
+			// Every field below asks pipeTypeOwns() first: a property the chosen type states is
+			// shown at its inherited value in a disabled control, and Detach is how one pipe
+			// deviates without forking the definition.
+			pipeTypeChooser(fields, l);
+			if (pipeTypeOwns(l, 'diameter')) {
+				inheritedField(fields, (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')',
+					effective(l, 'diameter'), pc.lpn_field_pipetype_tip);
+			} else {
+				unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
+					function () { return effective(l, 'diameter'); },
+					function (v) { setProp(l, 'diameter', v); refreshPopupIfOpen(); }, null,
+					{ el: l, prop: 'diameter' });
+			}
 			// Label, symbol and tip all follow settings.method (Task 271). Under Darcy-Weisbach the
 			// unit is named too, because e is a length and the bare number would be ambiguous.
-			numberFieldPlain(fields,
-				roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
-				effective(l, 'roughness'),
-				function (v) { setProp(l, 'roughness', v); refreshPopupIfOpen(); }, roughnessTip(),
-				{ el: l, prop: 'roughness' }, roughnessTableUrl());
+			if (pipeTypeOwns(l, 'roughness')) {
+				inheritedField(fields, pipeTypePropLabel('roughness'), effective(l, 'roughness'),
+					pc.lpn_field_pipetype_tip);
+			} else {
+				numberFieldPlain(fields,
+					roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
+					effective(l, 'roughness'),
+					function (v) { setProp(l, 'roughness', v); refreshPopupIfOpen(); }, roughnessTip(),
+					{ el: l, prop: 'roughness' }, roughnessTableUrl());
+			}
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion. Defaults
 			// from settings.defaults.k at creation. PLAIN-TEXT wording only, no <sub> markup: this
 			// popup's fields are built via textContent, and the suite's "k<sub>m</sub>" label
@@ -28980,16 +29525,16 @@ var EngCalcs = EngCalcs || {};
 			// **BOTH WRITE THROUGH setProp()**, like every other property on this popup: inside a
 			// scenario a direct `l._wallCoeff = v` would edit Base under every other scenario at once.
 			if (reactionFieldsShown()) {
-				numberFieldBlank(fields, (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
-					+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')',
-				effective(l, 'bulkCoeff'),
-				function (v) { setProp(l, 'bulkCoeff', v); refreshPopupIfOpen(); },
-				pc.lpn_reaction_pipe_tip, { el: l, prop: 'bulkCoeff' });
-				numberFieldBlank(fields, (pc.lpn_reaction_wall || 'Wall reaction coefficient')
-					+ ' (' + unitLabel('lpn_u_length') + '/' + (pc.lpn_reaction_day || 'day') + ')',
-				effective(l, 'wallCoeff'),
-				function (v) { setProp(l, 'wallCoeff', v); refreshPopupIfOpen(); },
-				pc.lpn_reaction_pipe_tip, { el: l, prop: 'wallCoeff' });
+				['bulkCoeff', 'wallCoeff'].forEach(function (prop) {
+					if (pipeTypeOwns(l, prop)) {
+						inheritedField(fields, pipeTypePropLabel(prop), effective(l, prop),
+							pc.lpn_field_pipetype_tip);
+						return;
+					}
+					numberFieldBlank(fields, pipeTypePropLabel(prop), effective(l, prop),
+						function (v) { setProp(l, prop, v); refreshPopupIfOpen(); },
+						pc.lpn_reaction_pipe_tip, { el: l, prop: prop });
+				});
 			}
 		}
 		closedField(fields, l, linkId);

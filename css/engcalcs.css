@@ -2705,7 +2705,7 @@ tr.lpn-ff-error { background: #f2f2f2; }
    than beside it, so the two rows line up on their fields whatever the label's language does to its
    width -- a beside-label row is the one that breaks in German and in Arabic. align-items: flex-end
    so a one-line label and a two-line one still sit their boxes on the same baseline. */
-.lpn-lib-curve-row { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
+.lpn-lib-curve-row, .lpn-lib-row { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
 .lpn-lib-field { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .lpn-lib-field-grow { flex: 1 1 8em; }
 .lpn-lib-fieldname { font-size: .9em; opacity: .8; }
