@@ -293,16 +293,6 @@ the block.
   - **The setting is a preference and the routing is a fact** (Task 602's rule): changing the
     DEFAULT is legal, rewriting a stored `settings.engine` on a file somebody saved is not.
 
-- 100|606| **A freshly-erased page limits the Settings box height until a reload.**
-  Tom, 2026-09-06, reproduced three times: *"I 'Erase page' (new shopper). I open Settings. I drag
-  and resize. The height is limited. I reload the page. Settings jumps downward against the bottom
-  of the screen. I drag and resize. Height is still limited. I repeat. Height is unlimited."*
-  Resolved with one reload twice and two reloads once. **He assumes it applies to every non-hog
-  box**, and that assumption is the first thing to test rather than the last.
-  - The tell is that a RELOAD fixes it and the box also JUMPS on reload: a max-height or a stored
-    geometry is being computed against a viewport or a container that is not yet the size it will
-    be. Erase-page is the state where nothing has been stored yet, which is why it shows there.
-
 - 25|607| **A moving picture of drawing a pipe -- Task 178's phase 2, extracted on close.**
   A filmstrip GIF from `dev/filmstrip-gif-recipe.md` of the add-pipe / add-junction workflow. A
   2026-07-30 proof of concept showed it is cheap once set up -- the hard part is precise SVG click

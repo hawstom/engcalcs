@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**55 open tasks.** Next (100): 7 · Soon (75): 12 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
+**54 open tasks.** Next (100): 6 · Soon (75): 12 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
 
-## 100 — Next (7)
+## 100 — Next (6)
 
 - Task 186 — Make the Tables pane spreadsheet-interoperable.
 - Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
@@ -17,7 +17,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 465 — Reusable pipe and pump TYPES, so editing one edits 400.
 - Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 - Task 605 — Retire the built-in solver from view: EPANET is simply the solver.
-- Task 606 — A freshly-erased page limits the Settings box height until a reload.
 
 ## 75 — Soon (12)
 
@@ -83,5 +82,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-51 of 55 titles are within 4–12 words. `!` marks the rest;
+50 of 54 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
