@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1697,
-        "delta_key_count": 23,
+        "expected_key_count": 1710,
+        "delta_key_count": 36,
         "exempt_key_count": 41,
         "exempt_keys": [
             "u_imgd",
@@ -547,7 +547,20 @@
         "lpn_reaction_limiting": "Limiting potential",
         "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
+        "lpn_library_pipetypes": "Pipe types",
+        "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients, so that editing the definition edits every pipe that uses it.",
+        "lpn_library_pipetypes_note": "A pipe type belongs to a project, and a pipe indicates the one it uses in its own properties. A definition states only the properties you fill in, so a type that states a roughness and no diameter is a normal one to make. Editing a definition here changes every pipe that uses it.",
+        "lpn_library_pipetype_add": "Add a pipe type",
+        "lpn_library_pipetype_blank_tip": "Leave a box empty and this type does not state that property. A pipe using this type then keeps its own value for it.",
+        "lpn_library_pipetype_used_by": "Pipes using this type",
+        "lpn_library_pipetype_unused": "Nothing uses this pipe type.",
+        "lpn_library_pipetype_in_use": "This pipe type is used by {count} pipes: {ids}. Point those pipes at another type, or detach them, before deleting this one.",
+        "lpn_field_pipetype": "Pipe type",
+        "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Every property the type states is read from the type, so its box here cannot be edited. Detach to give this one pipe its own values.",
+        "lpn_pipetype_none": "No pipe type selected",
+        "lpn_pipetype_detach": "Detach from pipe type",
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here."
     },
     "keys": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
@@ -572,7 +585,20 @@
         "lpn_reaction_limiting": "Limiting potential",
         "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all."
+        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe's roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.",
+        "lpn_library_pipetypes": "Pipe types",
+        "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients, so that editing the definition edits every pipe that uses it.",
+        "lpn_library_pipetypes_note": "A pipe type belongs to a project, and a pipe indicates the one it uses in its own properties. A definition states only the properties you fill in, so a type that states a roughness and no diameter is a normal one to make. Editing a definition here changes every pipe that uses it.",
+        "lpn_library_pipetype_add": "Add a pipe type",
+        "lpn_library_pipetype_blank_tip": "Leave a box empty and this type does not state that property. A pipe using this type then keeps its own value for it.",
+        "lpn_library_pipetype_used_by": "Pipes using this type",
+        "lpn_library_pipetype_unused": "Nothing uses this pipe type.",
+        "lpn_library_pipetype_in_use": "This pipe type is used by {count} pipes: {ids}. Point those pipes at another type, or detach them, before deleting this one.",
+        "lpn_field_pipetype": "Pipe type",
+        "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Every property the type states is read from the type, so its box here cannot be edited. Detach to give this one pipe its own values.",
+        "lpn_pipetype_none": "No pipe type selected",
+        "lpn_pipetype_detach": "Detach from pipe type",
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here."
     },
     "key_context": {
         "lpn_tool_key_hint": {
@@ -940,6 +966,214 @@
                     "key": "lpn_reaction_note",
                     "value": "Halaman ini tidak menawarkan koefisien reaksi bawaannya sendiri. Tidak ada uji standar untuknya, dan nilai lapangan yang diterbitkan untuk jenis air yang sama dapat berbeda hingga sepuluh kali lipat, sehingga angka yang disediakan di sini akan dibaca sebagai sebuah rekomendasi. Masukkan nilai yang telah Anda ukur sendiri atau yang dapat Anda kutip sumbernya, atau biarkan kotaknya kosong untuk bahan kimia yang tidak bereaksi.",
                     "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                }
+            }
+        },
+        "lpn_library_pipetypes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetypes_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetypes_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetype_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetype_blank_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetype_used_by": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetype_unused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_pipetype_in_use": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_field_pipetype": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_field_pipetype_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_pipetype_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_pipetype_detach": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_pipetype_detach_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "Kurva ini digunakan oleh {count} elemen: {ids}. Arahkan elemen-elemen itu ke kurva lain terlebih dahulu, baru hapus kurva ini.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "Kendali",
+                    "english": "Controls"
                 }
             }
         }

@@ -14,7 +14,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 186 — Make the Tables pane spreadsheet-interoperable.
 - Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- Task 465 — Reusable pipe and pump TYPES, so editing one edits 400.
+- ! Task 465 — Reusable pipe TYPES: slices 1-3 SHIPPED; the export alert is what is left.
 - Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 
 ## 75 — Soon (13)
@@ -82,5 +82,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-49 of 54 titles are within 4–12 words. `!` marks the rest;
+48 of 54 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

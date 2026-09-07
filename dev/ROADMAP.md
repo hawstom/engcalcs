@@ -309,28 +309,31 @@ the block.
   - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
     optimisation.
 
-- 100|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
-  One "150 mm PVC" definition that 400 pipes point at, and a fittings picker (Task 590) resolving
-  through the same layer -- Tom linked the two on 2026-09-06 and they are designed together or the
-  second re-litigates the first. **Full design record, including what a real utility's
-  approved-materials table actually contains and the five slices: `dev/pipe-library-design.md`.**
-  - **RULED 2026-09-06 (Tom: *"Yes. And we have to start showing an export alert."*)** -- a library
-    pipe MAY be something a `.inp` round trip loses, and the export must SAY what it is flattening
-    at the moment it flattens it. Scoped, or it becomes noise: §6 of the design record.
-  - **HIS SHAPE ANSWERS THE ENGINEER'S TWO OBJECTIONS**, which is why it is worth recording that
-    they disagreed: the CONTENTS of a definition are the user's choice, so the aging wrinkle is
-    resolved by defining two library pipes rather than by a per-element qualifier; and a
-    library-defined property is DISABLED in the properties box, which is the visible
-    inherited-versus-detached state the engineer said was mandatory, reached from the other side.
-    **And the real standards tables are keyed by material and class with no age field at all**, so
-    that is how the world already does it rather than a workaround we are asking anyone to accept.
-  - **The expensive slice is `effective()`** -- a third resolution layer, override -> element ->
-    type default, under the one seam the solver, renderer, labels, popups and six pane tables all
-    read through. Everything else waits on it. Task 586 shipped the indirection itself for curves,
-    so the concept is not new; what is left for pipes is `effective()` and the disabled control.
+- 100|465| **Reusable pipe TYPES: slices 1-3 SHIPPED; the export alert is what is left.**
+  One "150 mm PVC" definition that 400 pipes point at. **`doc.pipeTypes` shipped 2026-09-06** --
+  id-keyed records, a Library section that adds, renames, edits and refuses by name to delete a
+  type in use, `effective()` resolving override -> element -> type, disabled controls showing the
+  inherited value, and Detach. `dev/pipe-library-design.md` is the design record and
+  `dev/lpn-spike/pipe-library-harness.js` (8 sections) is the contract.
+  - **WHAT IS LEFT HERE IS SLICE 5, THE EXPORT ALERT** (Tom, 2026-09-06: *"Yes. And we have to
+    start showing an export alert."*). A typed pipe flattens on `.inp` export -- every NUMBER still
+    exports byte-identically, so Task 281's round trip is intact; what does not survive is the
+    indirection. Say that, and say how many elements it affects, the way find and replace states
+    its count before writing. **Two things flatten and they must not share one message**: a type
+    loses its indirection, a fittings list loses its itemisation. **Fire only where `k` is
+    fitting-list-derived**, never on a hand-typed one, or a network that never touched the feature
+    gets a warning and learns to dismiss it. Slice 4 is Task 590.
+  - **THREE THINGS THE BUILD DECIDED THAT ARE ARGUABLY TOM'S**, kept here until he rules:
+    **Detach exists at all** (the `utility-planning-engineer` found the gap -- without it the only
+    way to make one exception is to fork the whole type, which is the propagation problem in
+    reverse); **attaching a type CLEARS the pipe's own numbers** for the properties the type states,
+    the rejected alternative being a shadow value nothing can ever show; and **a type-owned property
+    carries no scenario override marker**, because a tick there would be a second, undiscoverable
+    detach for one property in one scenario.
   - **BIND BY ID, NEVER BY NAME.** Bentley's own libraries synchronise on the LABEL, so a name
-    collision silently re-points every reference. Task 586 already does it right; do not regress
-    for the sake of a dropdown-of-names.
+    collision silently re-points every reference. Asserted: a second type with the same name steals
+    nothing.
+
 - 75|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
