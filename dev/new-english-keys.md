@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read**, of 59 untranslated keys, of 1747 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**41 still to read**, of 65 untranslated keys, of 1753 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,14 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (59, 35 to read @@ NEEDS RULING)
+## lpn_  (65, 41 to read @@ NEEDS RULING)
 
+- **`lpn_area_none`**
+  > That area holds nothing.
+  @@ NEEDS RULING
+- **`lpn_area_selected`**
+  > {n} selected.
+  @@ NEEDS RULING
 - **`lpn_engine_needed_failed`**
   > The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.
   _Ruled 2026-09-07: There is that "and" construction again that is not best for an engineering software. I edited it._
@@ -201,6 +207,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pipetype_none`**
   > No pipe type selected
   _Ruled OK 2026-09-07._
+- **`lpn_tool_area_lasso`**
+  > Select a lasso
+  @@ NEEDS RULING
+- **`lpn_tool_area_polygon`**
+  > Select a polygon
+  @@ NEEDS RULING
+- **`lpn_tool_area_tip`**
+  > Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.
+  @@ NEEDS RULING
+- **`lpn_tool_area_window`**
+  > Select a window
+  @@ NEEDS RULING
 - **`lpn_tool_key_hint`**
   > Shortcut: press {key}.
   _Ruled OK 2026-09-07._

@@ -192,6 +192,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/back\.style\.display = 'none'/, 'the modal backdrop -- an empty scrim, holds no control'],
 		[/b\.el\.style\.display = 'none'; return;/, 'a legend badge on the map'],
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
+		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
 		[/el\.style\.display = 'none';\n\t}/, 'hidePanel() itself']
 	];
 	const lines = code.split('\n');

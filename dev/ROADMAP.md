@@ -511,32 +511,30 @@ the block.
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
-- 100|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
-  for bigger models."* Wants a rubber-band select and one property sheet that writes a value to
-  every selected element. **The Task 415 block is GONE** -- `selected` shipped, so the foundation
-  this was always missing is there.
-  - **RAISED TO 100 BY TOM, 2026-09-06, WITH THE SHAPE HE WANTS DISCLOSED -- epanet-js's, and he
-    named it as the paradigm to follow, not merely as prior art:**
-    1. **One toolbar location, three Select Area modes** -- window, lasso, polygon -- cycled from
-       that single slot, by clicking the icon again repeatedly. Three modes, one square of toolbar.
-       - **THE TRIANGLE IN THE LOWER-RIGHT CORNER IS A DISCLOSURE INDICATOR, NOT A SECOND TARGET**
-         (Tom, 2026-09-06, working it out: *"The little triangle in the LR corner is, I guess, just
-         an indicator that there is more to the button. Maybe it's a convention?"* -- it is, and a
-         well-settled one: Adobe's tool flyouts, the Windows split button, and macOS all use a
-         corner or edge triangle to say "this control holds more than it shows"). So **we owe the
-         indicator whether or not anything can be clicked on it.** Cycling on repeated clicks is
-         undiscoverable by itself: a user who does not already know presses the button once, gets
-         window select, and never learns the other two exist. The triangle is the only thing that
-         says to press it again.
-    2. **Properties opens with a COLLAPSIBLE HEADING PER TYPE selected**, so a selection holding
-       pipes and junctions shows both and neither is hidden.
-    3. **Editing any value in that multi-properties view sets it on every asset of that type in
-       the selection set.**
-  - **Every write goes through `setProp()`** -- 400 of them is still 400 calls at the one seam, and
-    a bulk path that writes properties directly is the Task 322 scenario-seam defect at scale.
-  - Find and replace already writes a value across many elements and states its count before it
-    does; the multi-properties view is that same act reached by pointing rather than by querying,
-    so it owes the same visible count.
+- 100|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.**
+  **THE SELECTING HALF SHIPPED 2026-09-06; EDIT-ALL-SELECTED DID NOT.** Selection is a list, Shift
+  adds and removes, and one toolbar slot cycles window, lasso and polygon with the disclosure
+  triangle Tom asked for. `dev/lpn-spike/select-area-harness.js`, 52 checks.
+  - **THE THREE SHAPES DIFFER ONLY IN HOW THE RING IS DRAWN**, and after that go through one
+    predicate -- `EngCalcs.lpnGeom.pointInPolygon()`, pure and in the geometry module. Three
+    containment tests would be three chances to disagree about an edge, on three gestures a user
+    thinks of as one command. The harness draws the same ground three ways and requires the same
+    answer.
+  - **WHAT IS "INSIDE" IS DECLARED:** a node by its own position, a LINK only when BOTH ends are
+    in (the CAD window rule), a Text label by the point it is drawn at. Crossing selection is the
+    other convention and is deliberately not offered -- with two rules a user cannot tell which
+    one they got.
+  - **THE TOOLBAR CYCLES AND THE MENU LISTS**, which is the one asymmetry to keep: the strip is
+    where width is scarce, the Edit menu is where a thing is found, and the menu rows are also the
+    only door at the small-screen breakpoint where the whole toolbar is hidden.
+  - **STILL OPEN -- points 2 and 3 of Tom's spec:** Properties opening with a COLLAPSIBLE HEADING
+    PER TYPE selected, so a mixed selection shows both and neither is hidden; and editing a value
+    there setting it on every asset of that type. **Every write goes through `setProp()`** -- 400
+    of them is still 400 calls at the one seam, and a bulk path that writes properties directly is
+    the Task 322 scenario-seam defect at scale. Find and replace states its count before it writes;
+    this owes the same, and `commitArea()` already states the count of what was caught.
+  - **NEEDS A BROWSER PASS** (2026-09-06): the marquee, the triangle, and whether a lasso drawn
+    with a finger is usable at all.
 
 - 50|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
   studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels

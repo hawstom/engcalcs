@@ -283,6 +283,16 @@ $ec_icons = array(
 	'select'     => '<path d="M6 3v14.5l3.8-3.6 2.9 6.3 2.6-1.2-2.8-6.1 4.5-.5z" fill="currentColor" stroke="none"/><path d="M15.5 4.2a5.5 5.5 0 0 1 4.3 4.4"/>',
 	'duplicate'  => '<path d="M9 9h12v12H9z"/><path d="M5 15H3V3h12v2"/>',
 
+	// ---- Select Area, three shapes in one toolbar slot (Task 266) ----
+	// A TRIO, and like the pane pair above they are only ever read against each other: the same
+	// dashed line encloses the same amount of the box in all three, so what a reader notices is the
+	// SHAPE OF THE RING and nothing else. Dashed, because that is what a marquee looks like on
+	// every drawing surface anybody has used, and because a solid rectangle here would read as the
+	// tank symbol. The little pointer in the corner of each says the ring is something you draw.
+	'select-window'  => '<rect x="3" y="5.5" width="15" height="12" stroke-dasharray="3 2.4"/><path d="M16 14v7l1.9-1.8 1.5 3.1 1.3-.6-1.4-3 2.2-.3z" fill="currentColor" stroke="none"/>',
+	'select-lasso'   => '<path d="M11 4.5c5.5 0 9 2.6 9 5.6s-3.5 5.6-9 5.6-9-2.6-9-5.6c0-1.7 1.1-3.2 3-4.2" stroke-dasharray="3 2.4"/><path d="M14 14v7l1.9-1.8 1.5 3.1 1.3-.6-1.4-3 2.2-.3z" fill="currentColor" stroke="none"/>',
+	'select-polygon' => '<path d="M3 9.5L9.5 3.5L19 6L16 15.5L6.5 16.5Z" stroke-dasharray="3 2.4"/><path d="M14 14v7l1.9-1.8 1.5 3.1 1.3-.6-1.4-3 2.2-.3z" fill="currentColor" stroke="none"/>',
+
 	// Vertices mode (Task 567). A bent line with HOLLOW SQUARE grips on its bends, which is exactly
 	// what the mode puts on the map -- EPANET's own grip shape, and the one symbol on this map that
 	// is a square, so it is not read as any other object. The line bends, because a bend is the

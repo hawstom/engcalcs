@@ -594,6 +594,9 @@
         "lpn_tool_add_valve": "Valve",
         "lpn_tool_add_text": "Text",
         "lpn_tool_vertices": "Vertices",
+        "lpn_tool_area_window": "Select a window",
+        "lpn_tool_area_lasso": "Select a lasso",
+        "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_delete": "Delete",
         "lpn_tool_zoom_extent": "Zoom to fit",
         "lpn_new_text": "Text",
@@ -727,6 +730,9 @@
         "lpn_tool_add_pump_tip": "Click one node and then another to put a pump between them.",
         "lpn_tool_add_valve_tip": "Click one node and then another to put a valve between them.",
         "lpn_tool_add_text_tip": "Click the map to write a note on the drawing.",
+        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_area_selected": "{n} selected.",
+        "lpn_area_none": "That area holds nothing.",
         "lpn_tool_vertices_tip": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics.",
         "lpn_tool_delete_tip": "Click anything on the map to remove it.",
         "lpn_tool_undo_tip": "Undo the last change.",
@@ -1749,7 +1755,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1747,
+    "count": 1753,
     "active_prefixes": [
         "about",
         "bpn",

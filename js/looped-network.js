@@ -8672,7 +8672,13 @@ var EngCalcs = EngCalcs || {};
 	// **AND IT MUST NEVER GO THROUGH setProp().** Selection is neither membership nor identity (Task
 	// 407's line), so a `selected` override would mean "highlighted in the Fire-flow scenario",
 	// stored in the document, and a click in Base would edit BASE under every scenario at once.
-	var selection = null;   // {kind:'node'|'link'|'label', id} -- one, or none. See Task 266 for many.
+	// **MANY, AS OF TASK 266, AND `selection` IS STILL THE ONE.** The list is the truth; the
+	// singular is the LAST thing added to it and is what every verb written before multi-select
+	// already reads -- the property popup, the profile's starting node, the fire-flow sweep's
+	// subject. Keeping both means a one-element selection behaves exactly as it always did, and a
+	// caller that has no multi-element meaning does not have to invent one.
+	var selections = [];    // [{kind:'node'|'link'|'label', id}, ...] -- the whole subject
+	var selection = null;   // the last of them, or null. Every pre-266 reader wants this.
 	function selectionExists(sel) {
 		if (!sel) { return false; }
 		if (sel.kind === 'node') { return !!nodeById(sel.id); }
@@ -8693,25 +8699,59 @@ var EngCalcs = EngCalcs || {};
 		var el2 = selectionMarkEl(sel);
 		if (el2 && el2.classList) { el2.classList[on ? 'add' : 'remove']('lpn-selected'); }
 	}
-	function isSelected(kind, id) { return !!selection && selection.kind === kind && selection.id === id; }
-	function selectedRef() { return selection ? { kind: selection.kind, id: selection.id } : null; }
-	// SINGLE selection: setting one clears the previous. Task 266 adds a second call shape here
-	// (add-to-selection) and turns the variable into a list; nothing outside this block reads it,
-	// which is what makes that a local change.
-	function setSelection(kind, id) {
-		paintSelection(selection, false);
-		selection = (kind && id) ? { kind: kind, id: id } : null;
-		if (!selectionExists(selection)) { selection = null; }
-		paintSelection(selection, true);
+	function isSelected(kind, id) {
+		return selections.some(function (s) { return s.kind === kind && s.id === id; });
 	}
-	function clearSelection() { setSelection(null, null); }
+	function selectedRef() { return selection ? { kind: selection.kind, id: selection.id } : null; }
+	// Copies, always. The list is view state and a caller that held a reference into it would see
+	// its own subject change under it the next time anything was clicked.
+	function selectedRefs() {
+		return selections.map(function (s) { return { kind: s.kind, id: s.id }; });
+	}
+	function selectionCount() { return selections.length; }
+	// **ONE FUNCTION SETS THE WHOLE SUBJECT, AND EVERY OTHER ONE CALLS IT.** Paint off, replace,
+	// prune what no longer exists, paint on -- so there is no path by which a mark is left behind
+	// on an element that has stopped being selected, which is the failure a second write site
+	// would produce and which nothing on screen would explain.
+	function setSelectionList(list) {
+		selections.forEach(function (s) { paintSelection(s, false); });
+		selections = (list || []).filter(function (s) {
+			return s && s.kind && s.id && selectionExists(s);
+		});
+		// The same element twice is one selection. A window drag over a node and its own data
+		// label reaches the node by two doors, and a duplicate would make the count a lie.
+		selections = selections.filter(function (s, i) {
+			return i === selections.findIndex(function (o) { return o.kind === s.kind && o.id === s.id; });
+		});
+		selection = selections.length ? selections[selections.length - 1] : null;
+		selections.forEach(function (s) { paintSelection(s, true); });
+	}
+	function setSelection(kind, id) {
+		setSelectionList((kind && id) ? [{ kind: kind, id: id }] : []);
+	}
+	// Shift-click and a shift-drag: already in means OUT again, which is what every editor's
+	// modified click does and is the only way to correct a marquee that caught one thing too many.
+	function toggleInSelection(kind, id) {
+		if (!kind || !id) { return; }
+		if (isSelected(kind, id)) {
+			setSelectionList(selections.filter(function (s) { return !(s.kind === kind && s.id === id); }));
+		} else {
+			setSelectionList(selections.concat([{ kind: kind, id: id }]));
+		}
+	}
+	function addToSelection(list) { setSelectionList(selections.concat(list || [])); }
+	// **A CASCADE TAKES ONE ELEMENT OUT OF THE SUBJECT, NOT THE WHOLE SUBJECT.** Deleting a node
+	// destroys the pipes on it, and before Task 266 dropping the entire selection at that moment
+	// cost nothing because there was only ever one. With many, a cascade that cleared everything
+	// would silently cancel a delete the user is halfway through.
+	function deselectOne(kind, id) {
+		setSelectionList(selections.filter(function (s) { return !(s.kind === kind && s.id === id); }));
+	}
+	function clearSelection() { setSelectionList([]); }
 	// buildDom() throws every element away and builds new ones, which carry no classes -- so the
 	// mark has to be re-applied, and a selection naming something the rebuild no longer contains
 	// (an undo of an Add, a project opened in this tab) has to go.
-	function refreshSelection() {
-		if (!selectionExists(selection)) { selection = null; }
-		paintSelection(selection, true);
-	}
+	function refreshSelection() { setSelectionList(selections); }
 	// THE ONE PLACE A HIT ELEMENT BECOMES A SUBJECT. Every drawn thing on this map belongs to an
 	// element, and the parts are selected as the whole: a node's own data label IS that node, a
 	// pipe's label and its vertex handles ARE that pipe. Anything else -- bare canvas, the backdrop
@@ -8725,14 +8765,34 @@ var EngCalcs = EngCalcs || {};
 		else if (d.lbl !== undefined) { setSelection('label', d.lbl); }
 		else { clearSelection(); }
 	}
+	// The same reading of a hit, ADDED to the subject rather than replacing it. It is deliberately
+	// the same door -- one place decides that a node's data label IS that node -- so Shift-click
+	// and a plain click can never disagree about what was pressed.
+	function toggleFromHit(t) {
+		var d = (t && t.dataset) || {};
+		if (d.node) { toggleInSelection('node', d.node); }
+		else if (d.nodelbl !== undefined) { toggleInSelection('node', d.nodelbl); }
+		else if (d.linklbl !== undefined) { toggleInSelection('link', d.linklbl); }
+		else if (d.link !== undefined) { toggleInSelection('link', d.link); }
+		else if (d.lbl !== undefined) { toggleInSelection('label', d.lbl); }
+		// Shift on bare canvas keeps what is there: clearing would make an accidental miss cost
+		// the whole selection, which is the one thing a modifier click exists to protect.
+	}
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
 	// a selection still pointing at what they are working on.
 	function deleteSelection() {
-		var sel = selectedRef();
-		if (!sel) { return false; }
+		var subject = selectedRefs();
+		if (!subject.length) { return false; }
 		clearSelection();
-		deleteElement(sel.kind, sel.id);
+		// **LINKS FIRST, THEN NODES.** Deleting a node CASCADES to the pipes on it, so a list that
+		// took the nodes first would hand deleteElement() link ids that had already gone -- and a
+		// multi-element delete is exactly where that ordering starts to matter, because a marquee
+		// routinely catches both ends of a pipe and the pipe itself.
+		subject.filter(function (s) { return s.kind !== 'node'; })
+			.forEach(function (s) { deleteElement(s.kind, s.id); });
+		subject.filter(function (s) { return s.kind === 'node'; })
+			.forEach(function (s) { deleteElement(s.kind, s.id); });
 		return true;
 	}
 	// A typed Delete/Backspace belongs to whatever field has focus, always. Without this, editing an
@@ -8754,6 +8814,100 @@ var EngCalcs = EngCalcs || {};
 		if (e.preventDefault) { e.preventDefault(); }
 		deleteSelection();
 	});
+
+
+	// ---- SELECT AREA: three shapes, one toolbar slot (ROADMAP Task 266) -------------------------
+	//
+	// Tom, 2026-09-06, naming epanet-js as the paradigm to follow: one toolbar location holding
+	// three Select Area modes -- window, lasso, polygon -- cycled by clicking the icon again.
+	//
+	// **THE THREE MODES DIFFER ONLY IN HOW THE RING IS DRAWN.** A window is two corners, a lasso is
+	// the path a pointer dragged, and a polygon is the ring a series of clicks built. After that
+	// they are the same ring and go through the same containment test, in lpn-geom.js, which is
+	// where a pure predicate belongs. Three containment tests would be three chances to disagree
+	// about an edge, on three gestures a user thinks of as one command.
+	//
+	// **WHAT IS "INSIDE" IS DECLARED, NOT INFERRED.** A node is caught when its own position is in
+	// the ring. A LINK is caught only when BOTH of its ends are -- the CAD window-select rule --
+	// because a marquee dragged over one junction of a long main should not carry that main and
+	// everything the next bulk edit does to it out of view. A Text label is caught by the point it
+	// is drawn at. Crossing selection (anything the boundary touches) is the other convention and
+	// is deliberately not offered: with two rules a user cannot tell which one they got.
+	var selectAreaShape = 'window';   // 'window' | 'lasso' | 'polygon'
+	var selectAreaEl = null;          // the marquee, built in init() beside the rubber band
+	var areaRing = null;              // the ring being drawn, in WORLD coordinates
+	var areaAdd = false;              // Shift: add to the standing selection rather than replace it
+	var LPN_AREA_SHAPES = ['window', 'lasso', 'polygon'];
+	function selectAreaShapeNext() {
+		return LPN_AREA_SHAPES[(LPN_AREA_SHAPES.indexOf(selectAreaShape) + 1) % LPN_AREA_SHAPES.length];
+	}
+	// The ring as the marquee should draw it. A window carries its two corners and is squared up
+	// here rather than at every point that touches it; the other two are already rings.
+	function areaRingPoints() {
+		if (!areaRing || !areaRing.length) { return []; }
+		if (selectAreaShape === 'window' && areaRing.length === 2) {
+			return EngCalcs.lpnGeom.rectRing(areaRing[0].x, areaRing[0].y, areaRing[1].x, areaRing[1].y);
+		}
+		return areaRing;
+	}
+	function paintAreaMarquee() {
+		var pts = areaRingPoints();
+		if (!selectAreaEl) { return; }
+		if (!pts.length) { selectAreaEl.style.display = 'none'; return; }
+		selectAreaEl.style.display = '';
+		selectAreaEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
+	}
+	function areaCancel() { areaRing = null; paintAreaMarquee(); }
+	// **ONE DOOR INTO THE TOOL, whichever control opened it.** The toolbar cycles and the menu
+	// lists, but both end here -- so the button's own icon and the mode can never say two different
+	// things about which shape is about to be drawn. `repaintAreaTool` is set by the toolbar when
+	// it builds its button; before that (and in a harness that builds no toolbar) there is simply
+	// nothing to repaint.
+	var repaintAreaTool = null;
+	function setSelectAreaShape(shape) {
+		if (LPN_AREA_SHAPES.indexOf(shape) < 0) { return false; }
+		selectAreaShape = shape;
+		areaCancel();
+		if (repaintAreaTool) { repaintAreaTool(); }
+		setMode('select-area');
+		return true;
+	}
+	function inArea(ring, x, y) { return EngCalcs.lpnGeom.pointInPolygon(ring, x, y); }
+	// Everything the ring holds, in the order the document holds it -- so a bulk edit's count and
+	// the order it writes in are both reproducible rather than depending on where a drag started.
+	function elementsInRing(ring) {
+		var out = [];
+		if (!ring || ring.length < 3) { return out; }
+		doc.nodes.forEach(function (n) {
+			if (inArea(ring, n.x, n.y)) { out.push({ kind: 'node', id: n.id }); }
+		});
+		doc.links.forEach(function (l) {
+			var a = nodeById(l.from), b = nodeById(l.to);
+			// BOTH ends, and a link missing one of them is not caught at all: a dangling link is a
+			// defect of the document and a marquee is not the place to make a decision about it.
+			if (a && b && inArea(ring, a.x, a.y) && inArea(ring, b.x, b.y)) {
+				out.push({ kind: 'link', id: l.id });
+			}
+		});
+		(doc.labels || []).forEach(function (lb) {
+			var pt = textLabelPoint(lb);
+			if (pt && inArea(ring, pt.x, pt.y)) { out.push({ kind: 'label', id: lb.id }); }
+		});
+		return out;
+	}
+	// **THE COMMIT SAYS WHAT IT CAUGHT.** A marquee that selects nothing and says nothing is
+	// indistinguishable from one that did not run, and a marquee that catches four hundred things
+	// silently is the more dangerous of the two -- the next edit goes to all of them. Find and
+	// replace already states its count before it writes; this owes the same.
+	function commitArea() {
+		var ring = areaRingPoints(), found = elementsInRing(ring), pc = EngCalcs.pageConfig || {};
+		areaCancel();
+		if (areaAdd) { addToSelection(found); } else { setSelectionList(found); }
+		setNotice(String(found.length
+			? (pc.lpn_area_selected || '{n} selected.')
+			: (pc.lpn_area_none || 'That area holds nothing.')).replace('{n}', String(selectionCount())));
+		return found.length;
+	}
 
 	// ---- FIND: an ID lookup and a condition, in ONE panel (ROADMAP Tasks 420 and 353) ----
 	// An ID lookup (EPANET's Map Finder) and a condition ("which pipes are under 8 inches?") are the
@@ -14582,6 +14736,10 @@ var EngCalcs = EngCalcs || {};
 		// Read-only does NOT restrict the TOOLS: open a project read-only and you can do anything
 		// with it except save it to file. The single enforcement point is writeOpenProjectToFile(),
 		// plus a disabled Save in the File menu; Save as is the way out.
+		// **A HALF-DRAWN MARQUEE DOES NOT SURVIVE THE MODE IT WAS DRAWN IN** (Task 266). A polygon
+		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
+		// left on the map by a tool that is no longer running is a shape nothing can finish.
+		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -14834,7 +14992,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function deleteNode(id) {
 		var links = incidentLinks[id].slice(), i;
-		if (isSelected('node', id)) { clearSelection(); }   // see deleteLink()
+		if (isSelected('node', id)) { deselectOne('node', id); }   // see deleteLink()
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
@@ -15055,7 +15213,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function deleteLink(id) {
 		var l = linkById(id);
-		if (isSelected('link', id)) { clearSelection(); }   // Task 415: the subject may be deleted by a cascade, not only by its own verb
+		if (isSelected('link', id)) { deselectOne('link', id); }   // Task 415: the subject may be deleted by a cascade, not only by its own verb
 		// The ONE teardown list, shared with rebuildLink() -- see removeLinkEls(). A repeat is a real
 		// element in a shared layer, so a deleted pipe forgetting one leaves its extra labels
 		// floating over the map: Tom's 2026-07-30 "when I delete a pipe, its orphaned labels are
@@ -15077,7 +15235,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function deleteLabelById(id) {
 		var lb = labelById(id), le = labelEls[id];
-		if (isSelected('label', id)) { clearSelection(); }   // see deleteLink()
+		if (isSelected('label', id)) { deselectOne('label', id); }   // see deleteLink()
 		if (le.leader) { le.leader.remove(); }
 		le.text.remove();
 		delete labelEls[id];
@@ -20152,6 +20310,17 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'vertices', label: pc.lpn_tool_vertices || 'Vertices', fn: function () {
 				setMode(mode === 'vertices' ? 'select' : 'vertices');
 			} },
+			// **THE THREE SHAPES GET THREE ROWS, WHERE THE TOOLBAR GETS ONE SLOT** (Task 266), and
+			// that asymmetry is the design rather than an oversight. The strip is where width is
+			// scarce, so it cycles; the menu is where a thing is FOUND, so it lists. It also gives
+			// the small-screen breakpoint a door, where the whole toolbar is hidden -- the same
+			// reason Select itself has a row above.
+			{ icon: 'select-window', label: pc.lpn_tool_area_window || 'Select a window',
+				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('window'); } },
+			{ icon: 'select-lasso', label: pc.lpn_tool_area_lasso || 'Select a lasso',
+				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
+			{ icon: 'select-polygon', label: pc.lpn_tool_area_polygon || 'Select a polygon',
+				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
@@ -20987,6 +21156,9 @@ var EngCalcs = EngCalcs || {};
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// IN WORLD COORDINATES, like everything else in `world`: the ring is a shape on the
+		// drawing, so a pan mid-drag moves the map under it exactly as it moves the pipes.
+		selectAreaEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world);
 		// The bends already picked (Task 567), in the same layer and the same red dash as the band:
 		// they are one drawing in progress, not two things, and giving them a second appearance
 		// would read as an object that already exists.
@@ -21324,6 +21496,48 @@ var EngCalcs = EngCalcs || {};
 		var editGroup = group();
 		editGroup.dataset.edits = '1';
 		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select, icon: 'select' }, editGroup);
+		// **ONE SLOT, THREE SHAPES, CYCLED BY PRESSING IT AGAIN** (Task 266; Tom, 2026-09-06, naming
+		// epanet-js as the paradigm). It sits beside Select because it IS select -- with a ring
+		// instead of a point -- and a toolbar strip where width is the scarce thing gets one square
+		// for all three rather than three.
+		//
+		// **THE TRIANGLE IN THE LOWER-RIGHT CORNER IS A DISCLOSURE INDICATOR AND NOT A SECOND
+		// TARGET** (Tom's own reading, and it is a well-settled convention -- Adobe's tool flyouts,
+		// the Windows split button, macOS). We owe it whether or not anything can be clicked on it,
+		// because cycling on repeated presses is undiscoverable by itself: somebody who does not
+		// already know presses once, gets a window, and never learns the other two exist. The
+		// triangle is the only thing that says to press it again. It is drawn by CSS on the button,
+		// so there is nothing in the DOM for a pointer or a screen reader to mistake for a control.
+		//
+		// **AND IT DOES NOT FOLLOW modeButton()'s TOGGLE-BACK-TO-SELECT RULE**, which is the one
+		// place this slot deliberately differs from every other tool on the strip: pressing the
+		// active tool again is how the three shapes are reached, so it cannot also mean "off".
+		// Select is one button to its left.
+		var areaBtn = document.createElement('button');
+		areaBtn.type = 'button';
+		areaBtn.dataset.tool = 'select-area';
+		areaBtn.className = 'lpn-tool-more';
+		function areaShapeLabel() {
+			return pc['lpn_tool_area_' + selectAreaShape] ||
+				({ window: 'Select a window', lasso: 'Select a lasso', polygon: 'Select a polygon' })[selectAreaShape];
+		}
+		// The button SHOWS the shape it will draw, so the strip always states which of the three is
+		// current -- otherwise the only way to find out is to drag and see what happens.
+		function paintAreaButton() {
+			setIconLabel(areaBtn, 'select-' + selectAreaShape, areaShapeLabel(), pc.lpn_tool_area_tip);
+			areaBtn.className += ' lpn-tool-more';
+			areaBtn.dataset.tool = 'select-area';
+			areaBtn.dataset.shape = selectAreaShape;
+			areaBtn.setAttribute('aria-pressed', mode === 'select-area' ? 'true' : 'false');
+		}
+		areaBtn.addEventListener('click', function () {
+			// Pressing it while it is already the tool advances the shape; pressing it from
+			// anywhere else simply enters the tool with the shape it is already showing.
+			setSelectAreaShape(mode === 'select-area' ? selectAreaShapeNext() : selectAreaShape);
+		});
+		repaintAreaTool = paintAreaButton;
+		paintAreaButton();
+		editGroup.appendChild(areaBtn);
 		// Between Select and Delete, because that is what it is: the third thing a press on the map
 		// can mean. See the Edit menu row for why it is a mode rather than a gesture (Task 567).
 		modeButton({ mode: 'vertices', key: 'lpn_tool_vertices', icon: 'vertices', tip: pc.lpn_tool_vertices_tip }, editGroup);
@@ -21604,6 +21818,27 @@ var EngCalcs = EngCalcs || {};
 				Object.assign(drag, common);
 				return;
 			}
+			// **SELECT AREA IS ITS OWN MODE AND NOTHING ELSE HAPPENS IN IT** (Task 266). No node
+			// drag, no label drag, no pan: the whole gesture is drawing a ring, and a tool that
+			// sometimes moved the pipework instead would be unusable over a dense network, which is
+			// the only kind of network anybody reaches for a marquee on.
+			if (mode === 'select-area') {
+				var wA = screenToWorld(e.clientX, e.clientY);
+				areaAdd = !!e.shiftKey;
+				if (selectAreaShape === 'polygon') {
+					// A CLICK AT A TIME, and a double-click closes it -- see the dblclick listener.
+					areaRing = (areaRing || []).concat([{ x: wA.x, y: wA.y }]);
+				} else {
+					// Window: two corners. Lasso: the first point of the path.
+					areaRing = selectAreaShape === 'window'
+						? [{ x: wA.x, y: wA.y }, { x: wA.x, y: wA.y }]
+						: [{ x: wA.x, y: wA.y }];
+					drag = { type: 'area' };
+					Object.assign(drag, common);
+				}
+				paintAreaMarquee();
+				return;
+			}
 			// 'select' mode
 			// **WHILE THE PROFILE'S PATH CHOOSER IS RUNNING, NOTHING ON THE MAP IS DRAGGED** (Task
 			// 504). The press that adds a waypoint on touch is a LONG one, and a long press that
@@ -21646,7 +21881,10 @@ var EngCalcs = EngCalcs || {};
 			if (e.pointerType === 'touch') {
 				t = touchNodeOver(e.clientX, e.clientY, t);
 			}
-			selectFromHit(t);
+			// **SHIFT ADDS, AND ADDS BY TOGGLING** (Task 266). It is how a marquee that caught one
+			// thing too many is corrected, and how a selection of three unrelated pipes is built at
+			// all -- neither of which any ring can do.
+			if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); }
 			if (t.dataset.node) {
 				var n = nodeById(t.dataset.node), w0 = screenToWorld(e.clientX, e.clientY);
 				drag = { type: 'node', id: t.dataset.node, offX: n.x - w0.x, offY: n.y - w0.y };
@@ -21709,6 +21947,11 @@ var EngCalcs = EngCalcs || {};
 			// full view-span of margin on every side, so a pan shorter than a screen never reaches
 			// a stretch that has not been labelled yet, and a longer one fills in on release.
 			var wasPan = drag && drag.type === 'pan';
+			// **A MARQUEE COMMITS ON RELEASE**, before `drag` is dropped: where the pointer let go
+			// is the whole of what it caught. A press with no travel leaves a ring of one or two
+			// coincident points, which holds nothing -- so a stray click in this mode selects
+			// nothing rather than everything, and says so.
+			if (drag && drag.type === 'area' && drag.pointerId === e.pointerId) { commitArea(); }
 			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
 			// type whose whole result is decided by where the pointer let go (Task 509).
 			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
@@ -21742,6 +21985,14 @@ var EngCalcs = EngCalcs || {};
 			// double-click on this map -- while the chooser is running, a double-click is the end of
 			// the route and never a vertex, a label reset or a vertex removal.
 			if (profileDrawEnd() || profileTookDblclick()) { return; }
+			// **A POLYGON RING CLOSES ON A DOUBLE-CLICK**, which is the same ending the profile's
+			// own path chooser uses and the one every drawing program uses for a polyline. It runs
+			// before any of the meanings below, exactly as the profile's does: while a ring is being
+			// built, a double-click is the end of the ring and nothing else.
+			if (mode === 'select-area' && selectAreaShape === 'polygon' && areaRing && areaRing.length) {
+				commitArea();
+				return;
+			}
 			var t = mapHitAt(e.clientX, e.clientY);
 			if (!t || !t.dataset) { return; }
 			// Double-click a dragged label to send it home (Tom, 2026-07-30: "Can we double-click a
@@ -22119,6 +22370,22 @@ var EngCalcs = EngCalcs || {};
 		// re-routes a reader's path -- so none of the snapshot, label or element machinery below
 		// applies to it.
 		if (drag.type === 'profilehandle') { profileHandleMove(p.x, p.y); return; }
+		// **THE MARQUEE EDITS NOTHING, SO IT COMES BEFORE THE SNAPSHOT MACHINERY** (Task 266). It
+		// is a shape on the drawing, not a change to the document, and it takes no undo snapshot
+		// for the same reason a pan does not.
+		if (drag.type === 'area') {
+			var wD = screenToWorld(p.x, p.y);
+			if (selectAreaShape === 'window') {
+				areaRing = [areaRing[0], { x: wD.x, y: wD.y }];
+			} else {
+				// **THE LASSO KEEPS EVERY FRAME IT IS GIVEN AND THAT IS THE POINT.** Thinning the
+				// path would be the difference between a ring that follows a hand and one that
+				// cuts a corner across a junction the hand went around.
+				areaRing.push({ x: wD.x, y: wD.y });
+			}
+			paintAreaMarquee();
+			return;
+		}
 		// **A LABEL DRAG NEEDS A REAL MOVEMENT BEFORE IT COMMITS.** If the first pixel makes a label
 		// MANUAL for good, a stray jiggle on a crowded label freezes it at wherever the automatic
 		// pass happened to have put it -- the stored offset is `nodeLabelPos()`, the base PLUS the

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1747,
-        "delta_key_count": 72,
+        "expected_key_count": 1753,
+        "delta_key_count": 78,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -513,7 +513,13 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_area_window": "Select a window",
+        "lpn_tool_area_lasso": "Select a lasso",
+        "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_area_selected": "{n} selected.",
+        "lpn_area_none": "That area holds nothing.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -587,7 +593,13 @@
         "lpn_inp_export_flat_fittings": "The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number."
     },
     "keys": {
+        "lpn_tool_area_window": "Select a window",
+        "lpn_tool_area_lasso": "Select a lasso",
+        "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
+        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_area_selected": "{n} selected.",
+        "lpn_area_none": "That area holds nothing.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -661,6 +673,54 @@
         "lpn_inp_export_flat_fittings": "The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number."
     },
     "key_context": {
+        "lpn_tool_area_window": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "መታጠፊያዎች",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "ሰርዝ",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_tool_area_lasso": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "መታጠፊያዎች",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "ሰርዝ",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_tool_area_polygon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "መታጠፊያዎች",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "ሰርዝ",
+                    "english": "Delete"
+                }
+            }
+        },
         "lpn_tool_key_hint": {
             "reason": "missing",
             "current_value": null,
@@ -674,6 +734,54 @@
                     "key": "lpn_tool_add_junction_tip",
                     "value": "መገናኛ ለመጨመር ካርታውን ይጫኑ፦ ቧንቧዎች የሚገናኙበት ወይም ውሃ የሚወሰድበት ነጥብ።",
                     "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
+        "lpn_tool_area_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_text_tip",
+                    "value": "በስዕሉ ላይ ማስታወሻ ለመጻፍ ካርታውን ይጫኑ።",
+                    "english": "Click the map to write a note on the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_vertices_tip",
+                    "value": "በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።",
+                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                }
+            }
+        },
+        "lpn_area_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_text_tip",
+                    "value": "በስዕሉ ላይ ማስታወሻ ለመጻፍ ካርታውን ይጫኑ።",
+                    "english": "Click the map to write a note on the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_vertices_tip",
+                    "value": "በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።",
+                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                }
+            }
+        },
+        "lpn_area_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_text_tip",
+                    "value": "በስዕሉ ላይ ማስታወሻ ለመጻፍ ካርታውን ይጫኑ።",
+                    "english": "Click the map to write a note on the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_vertices_tip",
+                    "value": "በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።",
+                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
                 }
             }
         },

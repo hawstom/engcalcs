@@ -686,6 +686,25 @@ html[lang="zh"] .ec-welcome {
 /* Dashed line from the first-picked node to the live pointer, same context (add-pipe/add-pump
    mode) -- shown/hidden and repositioned entirely from JS (rubberBandEl in looped-network.js). */
 .lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-sym, 1)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
+/* The select-area marquee (Task 266). Blue rather than the rubber band's red, because the rubber
+   band says "a pipe will be drawn here" and this says "these are the ones I mean" -- two shapes
+   that both follow the pointer and must never be mistaken for each other. A faint wash inside it,
+   so a lasso reads as an enclosure rather than as a scribble; pointer-events off, or the shape
+   being drawn would swallow the hit tests of everything under it. */
+.lpn-marquee {
+	stroke: #0645ad; stroke-width: calc(0.35 * var(--lpn-sym, 1)); stroke-dasharray: 1.2 1;
+	fill: #0645ad; fill-opacity: .08; pointer-events: none;
+}
+/* **THE DISCLOSURE TRIANGLE** (Task 266). It says "this control holds more than it shows", which
+   is the only thing that makes press-again-to-cycle discoverable. A pseudo-element, so there is
+   nothing in the DOM a pointer or a screen reader could take for a second control -- it is an
+   indicator and not a target, which is exactly what the convention it copies means. */
+.lpn-tool-more { position: relative; }
+.lpn-tool-more::after {
+	content: ''; position: absolute; right: 2px; bottom: 2px;
+	border: 3px solid transparent; border-right-color: currentColor; border-bottom-color: currentColor;
+	opacity: .65; pointer-events: none;
+}
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
    CSS font-size is wrong inside this scaled SVG group). */

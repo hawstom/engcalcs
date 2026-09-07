@@ -703,11 +703,47 @@ EngCalcs.lpnGeom = (function () {
 		var r = Math.max(-MERC_MAX_LAT, Math.min(MERC_MAX_LAT, latDeg)) * Math.PI / 180;
 		return Math.log(Math.tan(r) + 1 / Math.cos(r));
 	}
+	/**
+	 * **ONE PREDICATE SERVES ALL THREE SELECT-AREA MODES** (ROADMAP Task 266). A window is a
+	 * rectangle, a lasso is the path a finger drew, and a polygon is the one a series of clicks
+	 * built -- three ways of producing a ring, and after that the question is the same question.
+	 * Writing three containment tests would be three chances for them to disagree about an edge.
+	 *
+	 * Ray casting, the standard even-odd rule: count the edges a ray from the point crosses. A
+	 * point exactly on an edge is deliberately UNDEFINED here rather than special-cased -- a
+	 * marquee is drawn by hand and nobody can place its boundary on a coordinate on purpose, so a
+	 * rule for that case would be untestable by the person it affects.
+	 *
+	 * A ring of fewer than three points contains nothing, which is what a click with no drag is.
+	 */
+	function pointInPolygon(pts, px, py) {
+		var inside = false, i, j, xi, yi, xj, yj;
+		if (!pts || pts.length < 3) { return false; }
+		for (i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+			xi = pts[i].x; yi = pts[i].y;
+			xj = pts[j].x; yj = pts[j].y;
+			if (((yi > py) !== (yj > py)) &&
+				(px < (xj - xi) * (py - yi) / ((yj - yi) || Number.MIN_VALUE) + xi)) {
+				inside = !inside;
+			}
+		}
+		return inside;
+	}
+	// The ring a WINDOW drag makes, from the two corners the gesture actually carries. Its own
+	// function so the caller never has to decide which corner came first: a drag up and to the
+	// left is as ordinary as one down and to the right.
+	function rectRing(x0, y0, x1, y1) {
+		var lo = { x: Math.min(x0, x1), y: Math.min(y0, y1) },
+			hi = { x: Math.max(x0, x1), y: Math.max(y0, y1) };
+		return [{ x: lo.x, y: lo.y }, { x: hi.x, y: lo.y }, { x: hi.x, y: hi.y }, { x: lo.x, y: hi.y }];
+	}
 	function mercLatFromRad(m) { return Math.atan(Math.sinh(m)) * 180 / Math.PI; }
 	function mercY(latDeg) { return mercRadY(latDeg) * 180 / Math.PI; }
 	function mercLat(yDeg) { return mercLatFromRad(yDeg * Math.PI / 180); }
 
 	return {
+		pointInPolygon: pointInPolygon,
+		rectRing: rectRing,
 		polylineLength: polylineLength,
 		geodesicMeters: geodesicMeters,
 		geodesicPolylineMeters: geodesicPolylineMeters,
