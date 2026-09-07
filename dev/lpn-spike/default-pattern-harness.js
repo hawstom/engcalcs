@@ -231,19 +231,20 @@ console.log('\n--- the same shape, wherever else it lives ---');
 	// the next refactor.
 	const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
 	const assigning = (src.match(/return \(doc\.[a-zA-Z]+ = doc\.[a-zA-Z]+ \|\| \[\]\)/g) || []);
-	// SIX since 2026-09-06: docPipeTypes() joined them with the pipe type library (Task 465), split
-	// from the start for the reason docCurves() was -- the Pipe types section RENDERS on every open
-	// of the Libraries box, and a render must not write `pipeTypes: []` into a document that stated
+	// SEVEN since 2026-09-06: docPipeTypes() joined them with the pipe type library (Task 465) and
+	// docFittingSets() with the fittings library (Task 590), both split from the start for the
+	// reason docCurves() was -- each of those sections RENDERS on every open of the Libraries box,
+	// and a render must not write `pipeTypes: []` or `fittingSets: []` into a document that stated
 	// none.
-	ok('there are exactly six assigning getters, and no more crept in',
-		assigning.length === 6, assigning.length + ': ' + assigning.join(' | '));
+	ok('there are exactly seven assigning getters, and no more crept in',
+		assigning.length === 7, assigning.length + ': ' + assigning.join(' | '));
 	// Each one has a pure sibling. Named by convention so a reader can find it without asking.
 	// docCurves()/docCurvesRead() joined them 2026-09-05 with the curve library (Task 586), split
 	// from the start for exactly the reason libPatterns() had to be: the Curves section RENDERS on
 	// every open of the Libraries box, and a render must not write `curves: []` into a document
 	// that stated none.
 	['libPatternsRead', 'savedProfilesRead', 'libControlsRead', 'libRulesRead', 'docCurvesRead',
-		'docPipeTypesRead'].forEach(function (fn) {
+		'docPipeTypesRead', 'docFittingSetsRead'].forEach(function (fn) {
 		ok(fn + '() exists as the pure half',
 			new RegExp('function\\s+' + fn + '\\s*\\(\\)\\s*\\{\\s*return doc\\.[a-zA-Z]+ \\|\\| \\[\\];').test(src));
 	});

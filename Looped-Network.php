@@ -1380,6 +1380,41 @@ EngCalcs.pageConfig = {
 	lpn_pipetype_none: <?=json_encode($ec_lang['lpn_pipetype_none'])?>,
 	lpn_pipetype_detach: <?=json_encode($ec_lang['lpn_pipetype_detach'])?>,
 	lpn_pipetype_detach_tip: <?=json_encode($ec_lang['lpn_pipetype_detach_tip'])?>,
+	lpn_library_fittings: <?=json_encode($ec_lang['lpn_library_fittings'])?>,
+	lpn_library_fittings_tip: <?=json_encode($ec_lang['lpn_library_fittings_tip'])?>,
+	lpn_library_fittings_note: <?=json_encode($ec_lang['lpn_library_fittings_note'])?>,
+	lpn_library_fittings_source: <?=json_encode($ec_lang['lpn_library_fittings_source'])?>,
+	lpn_library_fittings_add: <?=json_encode($ec_lang['lpn_library_fittings_add'])?>,
+	lpn_library_fittings_used_by: <?=json_encode($ec_lang['lpn_library_fittings_used_by'])?>,
+	lpn_library_fittings_unused: <?=json_encode($ec_lang['lpn_library_fittings_unused'])?>,
+	lpn_library_fittings_in_use: <?=json_encode($ec_lang['lpn_library_fittings_in_use'])?>,
+	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
+	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
+	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,
+	lpn_fitting_add: <?=json_encode($ec_lang['lpn_fitting_add'])?>,
+	lpn_fitting_remove: <?=json_encode($ec_lang['lpn_fitting_remove'])?>,
+	lpn_fitting_total: <?=json_encode($ec_lang['lpn_fitting_total'])?>,
+	lpn_field_fittings: <?=json_encode($ec_lang['lpn_field_fittings'])?>,
+	lpn_field_fittings_tip: <?=json_encode($ec_lang['lpn_field_fittings_tip'])?>,
+	lpn_fittings_none: <?=json_encode($ec_lang['lpn_fittings_none'])?>,
+	lpn_fitting_globe: <?=json_encode($ec_lang['lpn_fitting_globe'])?>,
+	lpn_fitting_angle: <?=json_encode($ec_lang['lpn_fitting_angle'])?>,
+	lpn_fitting_swingcheck: <?=json_encode($ec_lang['lpn_fitting_swingcheck'])?>,
+	lpn_fitting_gate: <?=json_encode($ec_lang['lpn_fitting_gate'])?>,
+	lpn_fitting_elbow_short: <?=json_encode($ec_lang['lpn_fitting_elbow_short'])?>,
+	lpn_fitting_elbow_medium: <?=json_encode($ec_lang['lpn_fitting_elbow_medium'])?>,
+	lpn_fitting_elbow_long: <?=json_encode($ec_lang['lpn_fitting_elbow_long'])?>,
+	lpn_fitting_elbow_45: <?=json_encode($ec_lang['lpn_fitting_elbow_45'])?>,
+	lpn_fitting_return_bend: <?=json_encode($ec_lang['lpn_fitting_return_bend'])?>,
+	lpn_fitting_tee_run: <?=json_encode($ec_lang['lpn_fitting_tee_run'])?>,
+	lpn_fitting_tee_branch: <?=json_encode($ec_lang['lpn_fitting_tee_branch'])?>,
+	lpn_fitting_entrance: <?=json_encode($ec_lang['lpn_fitting_entrance'])?>,
+	lpn_fitting_exit: <?=json_encode($ec_lang['lpn_fitting_exit'])?>,
+	lpn_fitting_other: <?=json_encode($ec_lang['lpn_fitting_other'])?>,
+	lpn_inp_export_flat_heading: <?=json_encode($ec_lang['lpn_inp_export_flat_heading'])?>,
+	lpn_inp_export_flat_lead: <?=json_encode($ec_lang['lpn_inp_export_flat_lead'])?>,
+	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
+	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,
 	lpn_library_controls: <?=json_encode($ec_lang['lpn_library_controls'])?>,
 	lpn_library_controls_tip: <?=json_encode($ec_lang['lpn_library_controls_tip'])?>,
 	lpn_library_pattern_add: <?=json_encode($ec_lang['lpn_library_pattern_add'])?>,
@@ -2326,6 +2361,10 @@ EngCalcs.pageConfig = {
       // way to the engine; without it no [RULES] section is written and a rule-driven network
       // solves as though its rules were not there. ?>
 <script src="/engcalcs/js/lpn-rules.js?v=<?=filemtime(__DIR__.'/js/lpn-rules.js')?>"></script>
+<?php // What a pipe's minor loss is MADE OF (ROADMAP Task 590): named fittings, quantities and
+      // the sum, plus the coefficient table it seeds from. Pure arithmetic, no DOM, and BEFORE
+      // looped-network.js, which reads EngCalcs.lpnFittingsSum on every k it shows. ?>
+<script src="/engcalcs/js/lpn-fittings.js?v=<?=filemtime(__DIR__.'/js/lpn-fittings.js')?>"></script>
 <?php // The pure geometry/collision halves of the map editor (ROADMAP Task 293) -- must precede
       // looped-network.js, which reads EngCalcs.lpnGeom/lpnCollide as it defines itself. ?>
 <script src="/engcalcs/js/lpn-geom.js?v=<?=filemtime(__DIR__.'/js/lpn-geom.js')?>"></script>

@@ -807,6 +807,12 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
 // browser never has, which is the coupling-removing stub dev/testing-notes.md warns about.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-rules.js'));
 
+// The fittings arithmetic (ROADMAP Task 590). In the SHARED stub for lpn-rules.js's reason: pipeK()
+// asks it for EVERY pipe's minor loss on every model assembly, every render and every export, so a
+// harness that merely solves a document would otherwise read `undefined` at the one seam a pipe's k
+// comes through.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fittings.js'));
+
 // ---- the REAL EPANET engine (ROADMAP Task 496) ---------------------------
 //
 // **WITHOUT THIS, `settings.engine` MEANT NOTHING HERE.** runSolve() routes to EPANET only when

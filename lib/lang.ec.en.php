@@ -3097,6 +3097,64 @@ $ec_lang['lpn_field_pipetype_tip']='The pipe type in the project library that th
 $ec_lang['lpn_pipetype_none']='No pipe type selected';
 $ec_lang['lpn_pipetype_detach']='Detach from pipe type';
 $ec_lang['lpn_pipetype_detach_tip']='Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.';
+// ---- THE FITTINGS LIBRARY (ROADMAP Task 590, dev/pipe-library-design.md §3) ----
+// A pipe's minor loss is a SUM of named fittings and quantities -- Crane Technical Paper 410's
+// additive-K method, which is what Bentley's Minor Loss Collection and KYPipe's SigmaM both offer.
+// Bound by id like the pipe types above it, and for the same Bentley finding.
+$ec_lang['lpn_library_fittings']='Fittings';
+$ec_lang['lpn_library_fittings_tip']='A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.';
+$ec_lang['lpn_library_fittings_note']='Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.';
+// **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
+// unsourced coefficient is worse than none, because it looks authoritative; and a coefficient is a
+// starting point, since the real one depends on the size and the make of the fitting. This names
+// EPANET because the reader is looking at its numbers right now, which is the test that mention has
+// to pass (dev/language-strings.md).
+$ec_lang['lpn_library_fittings_source']='The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.';
+$ec_lang['lpn_library_fittings_add']='Add a fittings list';
+$ec_lang['lpn_library_fittings_used_by']='Pipes using this fittings list';
+$ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
+// A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
+// loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
+$ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.';
+$ec_lang['lpn_fitting_qty']='Quantity';
+$ec_lang['lpn_fitting_name']='Fitting';
+$ec_lang['lpn_fitting_k']='Coefficient';
+$ec_lang['lpn_fitting_add']='Add a fitting';
+$ec_lang['lpn_fitting_remove']='Remove';
+$ec_lang['lpn_fitting_total']='Total minor (local) loss coefficient, k';
+// The pipe popup\'s own selector.
+$ec_lang['lpn_field_fittings']='Fittings list';
+$ec_lang['lpn_field_fittings_tip']='A list of fittings from the project library. Its quantities and coefficients are added up into this pipe\'s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.';
+$ec_lang['lpn_fittings_none']='No fittings list selected';
+// EPANET 2.2 user manual, Table 3.3, Minor Loss Coefficients for Selected Fittings. THE MANUAL\'S
+// OWN THIRTEEN NAMES, in its own order. CLAUDE.md: default to the EPANET terminology, since a
+// hydraulic engineer has to recognise every one of these.
+$ec_lang['lpn_fitting_globe']='Globe valve, fully open';
+$ec_lang['lpn_fitting_angle']='Angle valve, fully open';
+$ec_lang['lpn_fitting_swingcheck']='Swing check valve, fully open';
+$ec_lang['lpn_fitting_gate']='Gate valve, fully open';
+$ec_lang['lpn_fitting_elbow_short']='Short radius elbow';
+$ec_lang['lpn_fitting_elbow_medium']='Medium radius elbow';
+$ec_lang['lpn_fitting_elbow_long']='Long radius elbow';
+$ec_lang['lpn_fitting_elbow_45']='45 degree elbow';
+$ec_lang['lpn_fitting_return_bend']='Closed return bend';
+$ec_lang['lpn_fitting_tee_run']='Standard tee, flow through run';
+$ec_lang['lpn_fitting_tee_branch']='Standard tee, flow through branch';
+$ec_lang['lpn_fitting_entrance']='Square entrance';
+$ec_lang['lpn_fitting_exit']='Exit';
+// THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
+// user states. Without it the picker would quietly refuse every fitting nobody could source.
+$ec_lang['lpn_fitting_other']='Other fitting';
+// ---- THE EXPORT ALERT (ROADMAP Task 465 slice 5) ----
+// The same discipline js/lpn-inp.js applies on IMPORT, pointed the other way: report the
+// difference, never drop it silently. **TWO THINGS FLATTEN AND THEY DO NOT SHARE A MESSAGE** -- a
+// pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
+// list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
+// the reader has just asked for an EPANET file, which is the test a mention has to pass.
+$ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
+$ec_lang['lpn_inp_export_flat_lead']='Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:';
+$ec_lang['lpn_inp_export_flat_types']='{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.';
+$ec_lang['lpn_inp_export_flat_fittings']='The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to

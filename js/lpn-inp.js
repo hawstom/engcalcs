@@ -51,6 +51,16 @@
 		require(__dirname + '/lpn-patterns.js');
 	}
 
+	// js/lpn-fittings.js owns what a fittings list MEANS -- k = sum(quantity x coefficient), Task
+	// 590 -- and the exporter has to ask it, because a pipe whose k is added up from a list must
+	// write the SUM and not the number sitting underneath it. Pulled in here for exactly the reason
+	// the patterns above are: in Node a harness has no script tags, and forgetting it would be
+	// silent.
+	if (typeof require === 'function' && typeof __dirname === 'string' &&
+		typeof EngCalcs.lpnFittingsSum !== 'function') {
+		require(__dirname + '/lpn-fittings.js');
+	}
+
 	// Flow unit keyword -> {toSI: m3/s per unit, system: 'us'|'si'}. The `system` is what fixes
 	// every OTHER unit in the file; EPANET has no way to mix them.
 	var FLOW_UNITS = {
@@ -2285,6 +2295,47 @@
 		var docCurves = (doc.curves || []), curveById = {};
 		docCurves.forEach(function (c) { if (c && c.id !== undefined) { curveById[c.id] = c; } });
 
+		// ---- THE TWO THINGS THAT FLATTEN (ROADMAP Tasks 465 and 590, dev/pipe-library-design.md §6) ----
+		//
+		// **THEY ARE TWO DIFFERENT LOSSES AND THEY DO NOT SHARE A MESSAGE.**
+		//
+		//   - A LIBRARY PIPE loses its INDIRECTION. Every number still goes out byte for byte -- the
+		//     definition's diameter and roughness are written on each pipe's own row -- so Task 281's
+		//     round trip is untouched. What is gone is that four hundred pipes were one definition.
+		//   - A FITTINGS LIST loses its ITEMISATION. The summed k was exportable before this feature
+		//     existed, so nothing about the export is worse than it was; only the elbows, valves and
+		//     tees behind the number are gone.
+		//
+		// **BOTH ARE REPORTED ONLY WHERE THEY REALLY HAPPEN.** A network with no types and no lists
+		// gets neither, which is the whole discipline: a warning that fires on every export teaches
+		// people to dismiss it. The ids are the PIPES affected, so the caller can state a count the
+		// way find and replace does.
+		var typedPipes = [], typesUsed = {}, fittedPipes = [],
+			fittingSetById = {};
+		(doc.fittingSets || []).forEach(function (f) {
+			if (f && f.id !== undefined) { fittingSetById[f.id] = f; }
+		});
+		/**
+		 * A LINK'S MINOR LOSS, AND WHERE IT CAME FROM. `derived` is what decides whether the file's
+		 * own token may be reused: a summed k is a number this page computed, so it has no claim on
+		 * text the user typed, and lpnNumText() must not be asked for one.
+		 */
+		function linkMinorLoss(lk) {
+			var id = eff(lk, 'fittingsId'),
+				set = (id && Object.prototype.hasOwnProperty.call(fittingSetById, id))
+					? fittingSetById[id] : null;
+			if (set && typeof EngCalcs.lpnFittingsSum === 'function') {
+				return { derived: true, k: EngCalcs.lpnFittingsSum(set) };
+			}
+			return { derived: false, k: eff(lk, 'k') || 0 };
+		}
+		function minorLossText(lk) {
+			var ml = linkMinorLoss(lk);
+			if (!ml.derived) { return n(PLAIN, lk, '_k', ml.k); }
+			fittedPipes.push(lk.id);
+			return String(ml.k);
+		}
+
 		// ---- nodes ----
 		for (i = 0; i < (doc.nodes || []).length; i++) {
 			nd = doc.nodes[i];
@@ -2449,11 +2500,18 @@
 					diff('pump-no-curve-as-pipe', [lk.id]);
 				}
 			} else {
+				// A TYPED PIPE'S NUMBERS ARE ALREADY THE DEFINITION'S HERE, because they come
+				// through the caller's own effective() -- which is why every value still goes out
+				// unchanged and only the indirection is lost.
+				if (eff(lk, 'typeId')) {
+					typedPipes.push(lk.id);
+					typesUsed[eff(lk, 'typeId')] = true;
+				}
 				pipes.push(row([lk.id, lk.from, lk.to,
 					n(cLen, lk, '_length', eff(lk, 'length') || 0),
 					dia,
 					n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
-					n(PLAIN, lk, '_k', eff(lk, 'k') || 0),
+					minorLossText(lk),
 					status]));
 			}
 			for (j = 0; j < (lk.verts || []).length; j++) {
@@ -2941,6 +2999,11 @@
 			section('LABELS', labelRows) +
 			section('BACKDROP', backdropRows) +
 			'[END]\n';
+		// Reported LAST, so the two counts are complete: the walks above are what fill them.
+		if (typedPipes.length) {
+			diff('pipe-type-flattened', typedPipes, String(Object.keys(typesUsed).length));
+		}
+		if (fittedPipes.length) { diff('fittings-flattened', fittedPipes, null); }
 		return { ok: true, inp: inp, differences: differences };
 	};
 

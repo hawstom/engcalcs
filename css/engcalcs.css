@@ -2699,6 +2699,8 @@ tr.lpn-ff-error { background: #f2f2f2; }
 .lpn-lib-head { display: flex; align-items: center; gap: 6px; }
 .lpn-lib-head .lpn-lib-id { width: 9em; }
 .lpn-lib-del { margin-left: auto; }
+/* A fitting's quantity is a small whole number; the fitting NAME beside it is what needs the room. */
+.lpn-lib-qty { width: 5em; }
 /* THE CURVE EDITOR'S TWO HEADER LINES (Tom, 2026-09-05: "put pump ID (with new ID label above it)
    and Description on row/line 1 and Type selector and Equation (for pump head) on row/line 2"),
    which is the shape of EPANET's own Curve Editor. Every control carries its name ABOVE it rather

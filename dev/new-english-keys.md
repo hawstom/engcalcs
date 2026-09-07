@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 24 untranslated keys, of 1712 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read**, of 59 untranslated keys, of 1747 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (24, all ruled)
+## lpn_  (59, 35 to read @@ NEEDS RULING)
 
 - **`lpn_engine_needed_failed`**
   > The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.
@@ -33,6 +33,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_engine_needed_loading`**
   > Loading EPANET solver while you build. Results will be available when completely loaded.
   _Ruled 2026-09-06: Tom's own sentence, written by him in the instruction that commissioned the feature: "we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches". Recorded because the words are his, not because anybody approved ours._
+- **`lpn_field_fittings`**
+  > Fittings list
+  @@ NEEDS RULING
+- **`lpn_field_fittings_tip`**
+  > A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.
+  @@ NEEDS RULING
 - **`lpn_field_pipetype`**
   > Pipe type
   _Ruled OK 2026-09-07._
@@ -48,12 +54,111 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_find_filter_tip`**
   > Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.
   _Ruled OK 2026-09-07._
+- **`lpn_fitting_add`**
+  > Add a fitting
+  @@ NEEDS RULING
+- **`lpn_fitting_angle`**
+  > Angle valve, fully open
+  @@ NEEDS RULING
+- **`lpn_fitting_elbow_45`**
+  > 45 degree elbow
+  @@ NEEDS RULING
+- **`lpn_fitting_elbow_long`**
+  > Long radius elbow
+  @@ NEEDS RULING
+- **`lpn_fitting_elbow_medium`**
+  > Medium radius elbow
+  @@ NEEDS RULING
+- **`lpn_fitting_elbow_short`**
+  > Short radius elbow
+  @@ NEEDS RULING
+- **`lpn_fitting_entrance`**
+  > Square entrance
+  @@ NEEDS RULING
+- **`lpn_fitting_exit`**
+  > Exit
+  @@ NEEDS RULING
+- **`lpn_fitting_gate`**
+  > Gate valve, fully open
+  @@ NEEDS RULING
+- **`lpn_fitting_globe`**
+  > Globe valve, fully open
+  @@ NEEDS RULING
+- **`lpn_fitting_k`**
+  > Coefficient
+  @@ NEEDS RULING
+- **`lpn_fitting_name`**
+  > Fitting
+  @@ NEEDS RULING
+- **`lpn_fitting_other`**
+  > Other fitting
+  @@ NEEDS RULING
+- **`lpn_fitting_qty`**
+  > Quantity
+  @@ NEEDS RULING
+- **`lpn_fitting_remove`**
+  > Remove
+  @@ NEEDS RULING
+- **`lpn_fitting_return_bend`**
+  > Closed return bend
+  @@ NEEDS RULING
+- **`lpn_fitting_swingcheck`**
+  > Swing check valve, fully open
+  @@ NEEDS RULING
+- **`lpn_fitting_tee_branch`**
+  > Standard tee, flow through branch
+  @@ NEEDS RULING
+- **`lpn_fitting_tee_run`**
+  > Standard tee, flow through run
+  @@ NEEDS RULING
+- **`lpn_fitting_total`**
+  > Total minor (local) loss coefficient, k
+  @@ NEEDS RULING
+- **`lpn_fittings_none`**
+  > No fittings list selected
+  @@ NEEDS RULING
 - **`lpn_help_not_epanet`**
   > Not EPANET
   _Ruled OK 2026-09-07._
 - **`lpn_help_screenshots`**
   > Screenshot gallery
   _Ruled OK 2026-09-07._
+- **`lpn_inp_export_flat_fittings`**
+  > The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_heading`**
+  > Saved {file}
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_lead`**
+  > Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_types`**
+  > {n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.
+  @@ NEEDS RULING
+- **`lpn_library_fittings`**
+  > Fittings
+  @@ NEEDS RULING
+- **`lpn_library_fittings_add`**
+  > Add a fittings list
+  @@ NEEDS RULING
+- **`lpn_library_fittings_in_use`**
+  > This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.
+  @@ NEEDS RULING
+- **`lpn_library_fittings_note`**
+  > Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.
+  @@ NEEDS RULING
+- **`lpn_library_fittings_source`**
+  > The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.
+  @@ NEEDS RULING
+- **`lpn_library_fittings_tip`**
+  > A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.
+  @@ NEEDS RULING
+- **`lpn_library_fittings_unused`**
+  > Nothing uses this fittings list.
+  @@ NEEDS RULING
+- **`lpn_library_fittings_used_by`**
+  > Pipes using this fittings list
+  @@ NEEDS RULING
 - **`lpn_library_pipetype_add`**
   > Add a pipe type
   _Ruled OK 2026-09-07._

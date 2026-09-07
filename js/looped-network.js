@@ -2576,7 +2576,12 @@ var EngCalcs = EngCalcs || {};
 		// move every other scenario's answer at once, which is the opposite of an override.
 		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true,
 			bulkCoeff: true, wallCoeff: true, energyPrice: true, energyPattern: true,
-			curveId: true, efficCurveId: true, typeId: true },
+		// `fittingsId` states which FITTINGS LIST this pipe's minor loss is added up from (Task
+		// 590). Overridable on exactly the reading `typeId` above it is: "what if we took the two
+		// throttling valves out of this reach" is the question a scenario asks, and it is answered
+		// by pointing the pipe at another list. **THE OVERRIDE IS ON WHICH LIST, NEVER ON WHAT A
+		// LIST CONTAINS**, for the reason stated for a curve above.
+			curveId: true, efficCurveId: true, typeId: true, fittingsId: true },
 		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
 		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
 		// its own note" with no second mechanism.
@@ -3025,7 +3030,7 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'roughness', group: 'link', field: 'roughness', prop: 'roughness', label: roughnessLabel(),
 				applies: function (l) { return l.type === 'pipe' && !pipeTypeOwns(l, 'roughness'); }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
+				applies: function (l) { return l.type !== 'pump' && !pipeKIsDerived(l); }, get: function (l) { return pipeK(l); }, set: function (l, v) { l._k = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base. `applies` refuses a pipe whose k is added up from a fittings list, on pipeTypeOwns()'s argument one line above: a bulk write there is a no-op nothing reads back, under a count the user had approved
 			// **THE TWO REACTION COEFFICIENTS, HERE FOR FIND AND REPLACE'S REASON** (Task 566) --
 			// the same standing a required fire flow has in this list. Neither has a row in
 			// Settings > Starting values and neither has a map label, so pushFieldShown() is false
@@ -4133,11 +4138,23 @@ var EngCalcs = EngCalcs || {};
 	// **`length`, `status`, `k` AND THE ENDS ARE DELIBERATELY ABSENT.** The first three for the
 	// reasons in the block above; `k` because a minor-loss coefficient is a fittings question and
 	// Task 590 answers it as a list rather than as one number a type could carry.
+	//
+	// **`fittingsId` IS THE ONE ENTRY THAT IS NOT A NUMBER, AND IT IS WHERE 465 AND 590 MEET** (Task
+	// 590; dev/pipe-library-design.md §2's table names it as the fourth thing a definition may
+	// state). A type that states a fittings list is saying "every pipe of this standard carries this
+	// set of fittings", which is exactly the kind of statement an approved-materials row makes. It
+	// resolves through the SAME layer as the numbers beside it, which is the whole reason the two
+	// tasks were designed together: a second resolution path for a reference would be a second set
+	// of rules about what a scenario, an element and a type each win.
+	//
+	// `ref` says the control is a CHOOSER rather than a number box, and it is the only thing the
+	// Library and the popup need to know to render it differently.
 	var LPN_TYPE_PROPS = [
 		{ prop: 'diameter', unit: 'lpn_u_diameter' },
 		{ prop: 'roughness' },
 		{ prop: 'bulkCoeff' },
-		{ prop: 'wallCoeff' }
+		{ prop: 'wallCoeff' },
+		{ prop: 'fittingsId', ref: 'fittings' }
 	];
 	// The same list as a lookup, so effective() -- which runs once per property per element per
 	// render and per solve -- asks one small object rather than walking an array.
@@ -4221,6 +4238,58 @@ var EngCalcs = EngCalcs || {};
 		keep.forEach(function (pair) { setProp(l, pair[0], pair[1]); });
 		setProp(l, 'typeId', null);
 		return true;
+	}
+	// ---- THE FITTINGS LIBRARY (ROADMAP Task 590, dev/pipe-library-design.md §3) ------------------
+	//
+	// **A FITTINGS LIST IS A DOCUMENT OBJECT AND A PIPE HOLDS ONLY A REFERENCE.** `doc.fittingSets`
+	// is a list of `{ id, note, items: [{ fit, qty, k }] }` and a pipe states one by id. Third time
+	// for the Task 586 curve pattern rather than a third pattern: id-keyed, renamed with every
+	// reference carried, refused deletion while anything uses it.
+	//
+	// **THE ARITHMETIC IS NOT HERE.** k = sum(quantity x coefficient) lives in js/lpn-fittings.js
+	// with the catalogue it seeds from, so the exporter and this page cannot come to two different
+	// totals; this file only decides which list a pipe resolves to.
+	//
+	// **A COEFFICIENT IS DIMENSIONLESS, so nothing on this limb converts anything.** k is a multiple
+	// of the velocity head, so the "changing a unit reinterprets the typed number" rule has nothing
+	// to bite on: there is no unit selector for a k on this page, and the sum reaches the solver, the
+	// engine and an `.inp` unchanged. Stated because an absence of conversion code reads exactly like
+	// conversion code somebody forgot.
+	//
+	// **READ THROUGH docFittingSetsRead(); WRITE THROUGH docFittingSets()** -- the split the curves
+	// and the pipe types are both under, for the same reason: a RENDER must not write
+	// `fittingSets: []` into a document that stated none.
+	function docFittingSets() { return (doc.fittingSets = doc.fittingSets || []); }
+	function docFittingSetsRead() { return doc.fittingSets || []; }
+	function fittingSetById(id) {
+		return EngCalcs.lpnFittingsSetById(docFittingSetsRead(), id);
+	}
+	/**
+	 * **THE LIST THIS PIPE RESOLVES TO, THROUGH effective()** -- so an override wins over the pipe's
+	 * own reference and the pipe's own reference wins over nothing, while a list stated by the pipe's
+	 * TYPE reaches it through the very same call. That is the sentence that links Task 590 to Task
+	 * 465: `fittingsId` is in LPN_TYPE_PROPS, so there is one resolution layer and not two.
+	 *
+	 * A reference to a list the document does not hold resolves to null, which reads as "no list"
+	 * and leaves the pipe's own typed k in force. Nothing is repaired on the user's behalf; the
+	 * Library is where a missing list is noticed.
+	 */
+	function pipeFittingSet(l) { return fittingSetById(effective(l, 'fittingsId')); }
+	/** Is this pipe's k added up from a fittings list rather than typed? The export alert's question. */
+	function pipeKIsDerived(l) { return !!pipeFittingSet(l); }
+	/**
+	 * **THE ONE PLACE A PIPE'S MINOR LOSS COEFFICIENT IS READ.** Everything that wants a k -- the
+	 * solve model, the popup, the pipes table, the map label, Find and replace -- comes through here,
+	 * or half the page would show the sum and the other half the number underneath it.
+	 *
+	 * **THE DEFAULT IS ZERO AND STAYS ZERO** (Task 590, and it is the half already asked and
+	 * answered): EPANET 0, epanet-js 0, WaterGEMS and KYPipe both zero absent a pick. No list means
+	 * whatever the user typed, exactly as before this feature existed.
+	 */
+	function pipeK(l) {
+		var set = pipeFittingSet(l);
+		if (set) { return EngCalcs.lpnFittingsSum(set); }
+		return effective(l, 'k') || 0;
 	}
 	function linkPoints(l) {
 		return Geom.polylinePointsAttr(linkPointList(l));
@@ -9248,7 +9317,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (FIND_EXTRA_LINK_FIELDS[prop]) {
 			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
-			var v = effective(cand.el, prop === 'km' ? 'k' : prop);
+			// **AND IT IS READ THROUGH pipeK()**, so a search for k > 5 finds a pipe whose fittings
+			// list adds up to 6 (Task 590). Reading the number underneath would answer a question
+			// about a network nobody is looking at.
+			var v = prop === 'km' ? pipeK(cand.el) : effective(cand.el, prop);
 			return typeof v === 'number' ? v : undefined;
 		}
 		return colorValueOf(cand.group, cand.el, prop);
@@ -12356,7 +12428,11 @@ var EngCalcs = EngCalcs || {};
 					// either way -- no desktop column carries a width, so a small box never wraps a
 					// heading.
 					{ key: 'km', label: 'lpn_field_km_short', prop: 'k', em: 3,
-						get: function (l) { return effective(l, 'k') || 0; },
+						get: function (l) { return pipeK(l); },
+						// A k ADDED UP FROM A FITTINGS LIST IS READ-ONLY HERE, exactly as a type-owned
+						// roughness is: the number is the list's, and a cell that accepted a typed one
+						// would take a value pipeK() never reads back.
+						plainFor: function (l) { return pipeKIsDerived(l); },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					// With the inputs and after them, which is the order this list already follows.
 					paneColReaction('bulkCoeff', 'lpn_reaction_bulk_short', paneReactionPerDay),
@@ -15076,6 +15152,10 @@ var EngCalcs = EngCalcs || {};
 			// without the definition, and four hundred pipes sharing one is a fact about this
 			// network rather than about the browser it was drawn in.
 			pipeTypes: doc.pipeTypes || [],
+			// **THE FITTINGS LIBRARY** (Task 590). Modelling data on the same argument the pipe types
+			// above it are: a pipe whose minor loss is added up from a list means nothing without the
+			// list, and four hundred pipes sharing one is a fact about this network.
+			fittingSets: doc.fittingSets || [],
 			// Paths kept by name (Task 510). Document data, for the reason the saved-path note in
 			// the profile section gives: a path names THIS project's junctions.
 			profiles: doc.profiles || [],
@@ -15652,6 +15732,10 @@ var EngCalcs = EngCalcs || {};
 		// and no version bump, because nothing MOVED: this adds a layer under the element's own
 		// values rather than taking anything out of them.
 		doc.pipeTypes = saved.pipeTypes || [];
+		// The fittings library (Task 590). Same as the pipe types above: a file written before this
+		// existed has none, every pipe in it states its own k exactly as it always did, and there is
+		// no migration step because nothing MOVED.
+		doc.fittingSets = saved.fittingSets || [];
 		doc.defaultPattern = saved.defaultPattern || null;
 		doc.times = saved.times || null;
 		doc.controls = saved.controls || [];
@@ -16357,6 +16441,62 @@ var EngCalcs = EngCalcs || {};
 				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
 					.replace('{n}', String(out.differences.length))
 				: ''));
+		showInpExportFlattening(out.differences, a.download);
+	}
+	/**
+	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
+	 * something a round trip loses: *"Yes. And we have to start showing an export alert."*). It is
+	 * the discipline js/lpn-inp.js already applies on IMPORT, pointed the other way: report the
+	 * difference, never drop it silently.
+	 *
+	 * **TWO THINGS FLATTEN AND THEY DO NOT SHARE A MESSAGE.** A pipe type loses its INDIRECTION and
+	 * not one number; a fittings list loses its ITEMISATION and not the total. One sentence covering
+	 * both would say something untrue of each, which is the failure the import report's own
+	 * quality-and-energy message already had once.
+	 *
+	 * **IT SAYS HOW MANY ELEMENTS EACH AFFECTS**, the way Find and replace states its count before
+	 * writing.
+	 *
+	 * **AND IT IS SILENT WHERE NEITHER HAPPENED.** A network that never touched either feature must
+	 * never see this box: a warning that fires on every export is one people learn to dismiss, and
+	 * then the one that mattered is dismissed too. The other export differences keep their place in
+	 * the status line and are deliberately not raised to a dialog here.
+	 */
+	function showInpExportFlattening(differences, fileName) {
+		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, said = [];
+		(differences || []).forEach(function (d) {
+			if (d.code === 'pipe-type-flattened') { types = d; }
+			if (d.code === 'fittings-flattened') { fittings = d; }
+		});
+		if (!types && !fittings) { return; }
+		if (types) {
+			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.')
+				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
+		}
+		if (fittings) {
+			said.push((pc.lpn_inp_export_flat_fittings || 'The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.')
+				.replace('{n}', String(fittings.ids.length)));
+		}
+		openDialog(function (body) {
+			var h = document.createElement('p'), lead = document.createElement('p'),
+				ul = document.createElement('ul');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_inp_export_flat_heading || 'Saved {file}').replace('{file}', fileName);
+			body.appendChild(h);
+			lead.style.margin = '0 0 6px';
+			lead.textContent = pc.lpn_inp_export_flat_lead || 'Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:';
+			body.appendChild(lead);
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			said.forEach(function (text) {
+				var li = document.createElement('li');
+				li.style.marginBottom = '4px';
+				li.textContent = text;
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
 	function projectFileName(name) {
 		return safeFileName(name === undefined ? projectDisplayName(project) : name) + LPN_FILE_EXT;
@@ -25242,6 +25382,95 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
+	// Every fittings list this document holds (Task 590). The same split as the pipe types above and
+	// for the same reason: a RENDER must not write `fittingSets: []` into a document that stated none.
+	function libFittingSets() { return docFittingSets(); }
+	function libFittingSetsRead() { return docFittingSetsRead(); }
+	// **WHICH PIPES REFER TO THIS LIST, IN EVERY SCENARIO -- AND THROUGH A PIPE TYPE TOO.** The first
+	// two limbs are pipeTypeUsers()' walk verbatim. The third is what a fittings list has that a pipe
+	// type does not: a TYPE may state one, so a list can be in use without a single pipe naming it,
+	// and deleting it would change the minor loss of every pipe of that standard at once.
+	function fittingSetUsers(id) {
+		var out = [], typed = {};
+		if (!id) { return out; }
+		docPipeTypesRead().forEach(function (t) {
+			if (pipeTypeStates(t, 'fittingsId') && t.props.fittingsId === id) { typed[t.id] = true; }
+		});
+		(doc.links || []).forEach(function (l) {
+			var used = l._fittingsId === id;
+			if (!used) {
+				used = scenarios.some(function (sc) {
+					var ov = sc.overrides[ovKey(l)];
+					return !!ov && ov.fittingsId === id;
+				});
+			}
+			// Through the type, in Base and in every scenario alike -- effective() would answer only
+			// for the scenario on screen, and the Library is a view of the DOCUMENT.
+			if (!used && typed[l._typeId]) { used = true; }
+			if (!used) {
+				used = scenarios.some(function (sc) {
+					var ov = sc.overrides[ovKey(l)];
+					return !!ov && !!typed[ov.typeId];
+				});
+			}
+			if (used) { out.push(l.id); }
+		});
+		return out;
+	}
+	/**
+	 * **RENAMING A FITTINGS LIST, AND EVERY REFERENCE FOLLOWS IT.** libRenamePipeType()'s contract
+	 * and libRenameCurve()'s before it: refuses a blank, refuses a clash, and carries the id rather
+	 * than merging two lists that happen to share a label. dev/pipe-library-design.md §4.
+	 */
+	function libRenameFittingSet(set, want) {
+		var name = String(want || '').trim(), was = set.id;
+		if (!name || name === was) { return false; }
+		if (libFittingSetsRead().some(function (x) { return x !== set && x.id === name; })) { return false; }
+		set.id = name;
+		libRepointFittingSet(was, name);
+		return true;
+	}
+	// One name swapped for another (or for null, on a delete) everywhere a reference can sit -- the
+	// pipe, every scenario's override on it, AND a pipe type that states one.
+	function libRepointFittingSet(was, now) {
+		docPipeTypesRead().forEach(function (t) {
+			if (!pipeTypeStates(t, 'fittingsId') || t.props.fittingsId !== was) { return; }
+			if (now) { t.props.fittingsId = now; } else { delete t.props.fittingsId; }
+		});
+		(doc.links || []).forEach(function (l) {
+			if (l._fittingsId === was) {
+				if (now) { l._fittingsId = now; } else { delete l._fittingsId; }   // base-write: a rename is not an edit to this scenario's value -- the reference has not changed, only the name of the thing it refers to, so it must move in Base and in every override alike
+			}
+			scenarios.forEach(function (sc) {
+				var ov = sc.overrides[ovKey(l)];
+				if (!ov || ov.fittingsId !== was) { return; }
+				if (now) { ov.fittingsId = now; } else { delete ov.fittingsId; }
+			});
+		});
+	}
+	// The name a fitting carries on screen. **THE STORED TOKEN IS NEVER THE NAME** -- a name is
+	// translated into 27 languages, so a document keyed on one would re-point every row the day a
+	// wording moved. js/lpn-fittings.js carries the token and the coefficient; the words are here.
+	// Written out one key at a time rather than composed, because a composed key is invisible to
+	// dev/scripts/pageconfig_check.php and to the fallback ratchet alike.
+	function fittingNames() {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			globe: pc.lpn_fitting_globe || 'Globe valve, fully open',
+			angle: pc.lpn_fitting_angle || 'Angle valve, fully open',
+			swingcheck: pc.lpn_fitting_swingcheck || 'Swing check valve, fully open',
+			gate: pc.lpn_fitting_gate || 'Gate valve, fully open',
+			elbow_short: pc.lpn_fitting_elbow_short || 'Short radius elbow',
+			elbow_medium: pc.lpn_fitting_elbow_medium || 'Medium radius elbow',
+			elbow_long: pc.lpn_fitting_elbow_long || 'Long radius elbow',
+			elbow_45: pc.lpn_fitting_elbow_45 || '45 degree elbow',
+			return_bend: pc.lpn_fitting_return_bend || 'Closed return bend',
+			tee_run: pc.lpn_fitting_tee_run || 'Standard tee, flow through run',
+			tee_branch: pc.lpn_fitting_tee_branch || 'Standard tee, flow through branch',
+			entrance: pc.lpn_fitting_entrance || 'Square entrance',
+			exit: pc.lpn_fitting_exit || 'Exit'
+		};
+	}
 	// The label a type's property carries, in the Library and on the popup alike, so the two cannot
 	// drift. Roughness and the two reaction coefficients already name their own units and follow the
 	// friction method; a diameter names the unit strip's.
@@ -25252,6 +25481,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (prop === 'roughness') {
 			return roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : '');
+		}
+		// A FITTINGS LIST IS A REFERENCE AND NAMES NO UNIT: a coefficient is dimensionless, and the
+		// control beside this label is a chooser rather than a number box.
+		if (prop === 'fittingsId') {
+			return pc.lpn_field_fittings || 'Fittings list';
 		}
 		if (prop === 'bulkCoeff') {
 			return (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
@@ -25553,6 +25787,9 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'patterns', label: 'lpn_library_patterns', tip: 'lpn_library_patterns_tip' },
 		{ id: 'curves', label: 'lpn_library_curves', tip: 'lpn_library_curves_tip' },
 		{ id: 'pipetypes', label: 'lpn_library_pipetypes', tip: 'lpn_library_pipetypes_tip' },
+		// Beside the pipe types, because a type may state one and the two are read together
+		// (dev/pipe-library-design.md §2).
+		{ id: 'fittings', label: 'lpn_library_fittings', tip: 'lpn_library_fittings_tip' },
 		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' },
 		{ id: 'rules', label: 'lpn_library_rules', tip: 'lpn_library_rules_tip' }
 	];
@@ -25590,6 +25827,7 @@ var EngCalcs = EngCalcs || {};
 		if (libSection === 'patterns') { buildPatternSection(sec); }
 		else if (libSection === 'curves') { buildCurveSection(sec); }
 		else if (libSection === 'pipetypes') { buildPipeTypeSection(sec); }
+		else if (libSection === 'fittings') { buildFittingSection(sec); }
 		else if (libSection === 'rules') { buildRuleSection(sec); }
 		else { buildControlSection(sec); }
 		content.appendChild(sec);
@@ -26335,7 +26573,12 @@ var EngCalcs = EngCalcs || {};
 		entry.appendChild(headRow);
 		// **IDENTITY THEN PHYSICAL PROPERTIES, AND DIAMETER BEFORE ROUGHNESS** -- the order Tom put
 		// the selector in on the popup, and the order a real approved-materials table reads in.
-		LPN_TYPE_PROPS.forEach(function (d) { libTypeNumberField(propRow, t, d.prop, null); });
+		// A `ref` entry is a CHOOSER and not a number box (Task 590's fittings list), which is the
+		// only difference the two controls have; everything else about a stated property is the same.
+		LPN_TYPE_PROPS.forEach(function (d) {
+			if (d.ref) { libTypeFittingsField(propRow, t); return; }
+			libTypeNumberField(propRow, t, d.prop, null);
+		});
 		entry.appendChild(propRow);
 		// **WHO USES IT, AS THE WAY TO GET TO THEM.** Clicking an id goes to that pipe on the map,
 		// exactly as a bottom-pane table's id does -- and it is also the answer to "why will this not
@@ -26351,6 +26594,274 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			entry.appendChild(libEl('div', 'lpn-lib-note',
 				pc.lpn_library_pipetype_unused || 'Nothing uses this pipe type.'));
+		}
+		host.appendChild(entry);
+	}
+	/**
+	 * **A PIPE TYPE MAY STATE A FITTINGS LIST**, which is the sentence where Task 465 and Task 590
+	 * meet (dev/pipe-library-design.md §2). Blank stores NOTHING -- the key leaves `props` -- so
+	 * "this type does not state a fittings list" and "this type states an empty one" stay two
+	 * different statements, exactly as libTypeNumberField()'s blank does.
+	 */
+	function libTypeFittingsField(row, t) {
+		var pc = EngCalcs.pageConfig || {},
+			field = libEl('label', 'lpn-lib-field'),
+			text = pipeTypePropLabel('fittingsId'),
+			sel = document.createElement('select');
+		field.appendChild(libEl('span', 'lpn-lib-fieldname', text));
+		fillFittingSetOptions(sel, t.props ? t.props.fittingsId : undefined);
+		sel.setAttribute('aria-label', text);
+		sel.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (!t.props) { t.props = {}; }
+			if (sel.value === '') { delete t.props.fittingsId; } else { t.props.fittingsId = sel.value; }
+			libCommit();
+			// Rebuilt for libTypeNumberField()'s reason: the PIPE popup's own chooser has just
+			// become disabled or editable, and a stale popup would take a value nothing reads.
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		field.appendChild(sel);
+		row.appendChild(field);
+	}
+	/**
+	 * The options on every fittings chooser -- the Library's, the pipe type's and the pipe popup's --
+	 * so the three cannot disagree about what exists. The option TEXT is the list's name; the stored
+	 * value is its id (dev/pipe-library-design.md §4).
+	 *
+	 * **A LIST THE DOCUMENT DOES NOT HOLD IS STILL SHOWN, SELECTED** -- the curve and pipe type
+	 * choosers' rule. Retargeting the pipe at some other list on the user's behalf is not acting on
+	 * what is wrong; showing them what it states is.
+	 */
+	function fillFittingSetOptions(sel, cur) {
+		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option'), found = false;
+		sel.innerHTML = '';
+		none.value = '';
+		none.textContent = pc.lpn_fittings_none || 'No fittings list selected';
+		sel.appendChild(none);
+		libFittingSetsRead().forEach(function (f) {
+			var o = document.createElement('option');
+			o.value = f.id;
+			o.textContent = f.note ? (f.id + ' - ' + f.note) : f.id;
+			if (f.id === cur) { o.selected = true; found = true; }
+			sel.appendChild(o);
+		});
+		if (cur && !found) {
+			var missing = document.createElement('option');
+			missing.value = cur;
+			missing.textContent = cur;
+			missing.selected = true;
+			sel.appendChild(missing);
+		}
+	}
+	function buildFittingSection(host) {
+		var pc = EngCalcs.pageConfig || {}, list = libFittingSetsRead();
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.'));
+		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
+		// number that looks authoritative is worse than none at all, so the source is named on the
+		// screen and not only at the code.
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_source || 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.'));
+		host.appendChild(libButton(pc.lpn_library_fittings_add || 'Add a fittings list', function () {
+			saveUndoSnapshot();
+			// EMPTY, for the reason a new curve has no points: a list that arrived with an elbow in
+			// it would be a fitting the user never chose, on a pipe they are about to point at it.
+			libFittingSets().push({ id: libFreeId(libFittingSets(), 'F'), items: [] });
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		if (!list.length) {
+			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
+			return;
+		}
+		list.forEach(function (f) { buildFittingSetEntry(host, f); });
+	}
+	/**
+	 * ONE FITTING, AS THREE COLUMNS: quantity, which fitting, and its coefficient. It is Bentley's
+	 * own *Minor Loss Collection* shape, cited in dev/pipe-library-design.md §3, and its own words
+	 * for the first column are *"the number of minor losses of the same type to be added to the
+	 * composite minor loss for the pipe"*.
+	 *
+	 * **THE COEFFICIENT IS EDITABLE AND THAT IS A DEPARTURE FROM BENTLEY'S READ-ONLY THIRD COLUMN.**
+	 * Crane's K is n x f_T, so the real coefficient of a 90 degree elbow depends on the size and the
+	 * make of it; a table that refused to be corrected would send a designer who has the
+	 * manufacturer's number back to the single bare k this feature exists to replace. Choosing a
+	 * fitting SEEDS the coefficient from EPANET's table and the document then holds the number, so
+	 * nothing of ours ever moves it again.
+	 */
+	function buildFittingRow(host, set, idx) {
+		var pc = EngCalcs.pageConfig || {}, names = fittingNames(),
+			it = set.items[idx],
+			row = libEl('div', 'lpn-lib-row'),
+			qtyField = libEl('label', 'lpn-lib-field'),
+			fitField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
+			kField = libEl('label', 'lpn-lib-field'),
+			qty = document.createElement('input'),
+			sel = document.createElement('select'),
+			kIn = document.createElement('input'),
+			qtyText = pc.lpn_fitting_qty || 'Quantity',
+			fitText = pc.lpn_fitting_name || 'Fitting',
+			kText = pc.lpn_fitting_k || 'Coefficient',
+			other = document.createElement('option'),
+			del;
+		qty.type = 'number';
+		qty.step = 'any';
+		qty.className = 'lpn-lib-qty';
+		qty.value = String(it.qty === undefined ? 0 : it.qty);
+		qty.setAttribute('aria-label', qtyText);
+		qty.addEventListener('change', function () {
+			saveUndoSnapshot();
+			it.qty = qty.value === '' ? 0 : +qty.value;
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		qtyField.appendChild(libEl('span', 'lpn-lib-fieldname', qtyText));
+		qtyField.appendChild(qty);
+		row.appendChild(qtyField);
+		EngCalcs.lpnFittingCatalog.forEach(function (c) {
+			var o = document.createElement('option');
+			o.value = c.key;
+			o.textContent = names[c.key] || c.key;
+			if (c.key === it.fit) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		// **THE ONE ROW THAT IS NOT EPANET'S TABLE.** A fitting nobody can source is left OUT of the
+		// catalogue rather than given an invented number, so there has to be a way to state one:
+		// this option types no coefficient of its own and hands the box to the user.
+		other.value = '';
+		other.textContent = pc.lpn_fitting_other || 'Other fitting';
+		if (!EngCalcs.lpnFittingCatalogEntry(it.fit)) { other.selected = true; }
+		sel.appendChild(other);
+		sel.setAttribute('aria-label', fitText);
+		sel.addEventListener('change', function () {
+			var entry = EngCalcs.lpnFittingCatalogEntry(sel.value);
+			saveUndoSnapshot();
+			it.fit = sel.value;
+			// SEEDED, not bound: the number is the document's from here on.
+			if (entry) { it.k = entry.k; }
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		fitField.appendChild(libEl('span', 'lpn-lib-fieldname', fitText));
+		fitField.appendChild(sel);
+		row.appendChild(fitField);
+		kIn.type = 'number';
+		kIn.step = 'any';
+		kIn.value = String(it.k === undefined ? 0 : it.k);
+		kIn.setAttribute('aria-label', kText);
+		kIn.addEventListener('change', function () {
+			saveUndoSnapshot();
+			it.k = kIn.value === '' ? 0 : +kIn.value;
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		kField.appendChild(libEl('span', 'lpn-lib-fieldname', kText));
+		kField.appendChild(kIn);
+		row.appendChild(kField);
+		del = libButton(pc.lpn_fitting_remove || 'Remove', function () {
+			saveUndoSnapshot();
+			set.items.splice(idx, 1);
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		del.className = 'lpn-lib-del';
+		row.appendChild(del);
+		host.appendChild(row);
+	}
+	function buildFittingSetEntry(host, set) {
+		var pc = EngCalcs.pageConfig || {},
+			entry = libEl('div', 'lpn-lib-entry'),
+			headRow = libEl('div', 'lpn-lib-head lpn-lib-row'),
+			id = document.createElement('input'),
+			desc = document.createElement('input'),
+			idField = libEl('label', 'lpn-lib-field'),
+			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
+			users = fittingSetUsers(set.id),
+			del;
+		if (!set.items) { set.items = []; }
+		id.type = 'text';
+		id.className = 'lpn-lib-id';
+		id.value = set.id;
+		id.setAttribute('aria-label', pc.lpn_field_id || 'ID');
+		id.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (!libRenameFittingSet(set, id.value)) { id.value = set.id; return; }
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+		});
+		idField.appendChild(libEl('span', 'lpn-lib-fieldname', pc.lpn_field_id || 'ID'));
+		idField.appendChild(id);
+		headRow.appendChild(idField);
+		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
+			pc.lpn_library_curve_note_label || 'Description'));
+		desc.type = 'text';
+		desc.className = 'lpn-lib-wide';
+		desc.value = set.note || '';
+		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
+		desc.addEventListener('change', function () {
+			var t = String(desc.value || '').trim();
+			if (t === (set.note || '')) { return; }
+			saveUndoSnapshot();
+			if (t) { set.note = t; } else { delete set.note; }
+			libCommit();
+		});
+		descField.appendChild(desc);
+		headRow.appendChild(descField);
+		// **A LIST IN USE IS REFUSED BY NAME**, with the count and the pipes -- the pipe type's own
+		// rule, and for the harder reason: deleting one would change the minor loss of every pipe
+		// that referred to it, in silence.
+		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+			var inUse = fittingSetUsers(set.id);
+			if (inUse.length) {
+				alert((pc.lpn_library_fittings_in_use
+					|| 'This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.')
+					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
+				return;
+			}
+			saveUndoSnapshot();
+			doc.fittingSets = libFittingSets().filter(function (x) { return x !== set; });
+			libCommit();
+			rebuildLibraryBox();
+		});
+		del.className = 'lpn-lib-del';
+		headRow.appendChild(del);
+		entry.appendChild(headRow);
+		set.items.forEach(function (it, i) { buildFittingRow(entry, set, i); });
+		entry.appendChild(libButton(pc.lpn_fitting_add || 'Add a fitting', function () {
+			var first = EngCalcs.lpnFittingCatalog[0];
+			saveUndoSnapshot();
+			// ONE OF THE CATALOGUE'S OWN, with its own coefficient and a quantity of one, because a
+			// row that arrived blank would need three edits before it did anything at all.
+			set.items.push({ fit: first.key, qty: 1, k: first.k });
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		}));
+		// THE SUM, WHERE THE ROWS THAT MAKE IT ARE. It is the whole output of this box, and the one
+		// number a pipe referring to this list will show.
+		entry.appendChild(libEl('div', 'lpn-lib-note lpn-lib-values',
+			(pc.lpn_fitting_total || 'Total minor (local) loss coefficient, k') + ' = ' +
+			String(+EngCalcs.lpnFittingsSum(set).toFixed(6))));
+		if (users.length) {
+			var used = libEl('div', 'lpn-lib-note', (pc.lpn_library_fittings_used_by || 'Pipes using this fittings list') + ' ');
+			users.forEach(function (lid) {
+				var b = libButton(lid, function () { findGoTo('link', lid); });
+				b.className = 'lpn-pane-goto';
+				used.appendChild(b);
+			});
+			entry.appendChild(used);
+		} else {
+			entry.appendChild(libEl('div', 'lpn-lib-note',
+				pc.lpn_library_fittings_unused || 'Nothing uses this fittings list.'));
 		}
 		host.appendChild(entry);
 	}
@@ -29268,6 +29779,53 @@ var EngCalcs = EngCalcs || {};
 		overrideMarker(fields, l, 'typeId');
 		if (elementPipeType(l)) { pipeTypeDetachButton(fields, l); }
 	}
+	/**
+	 * **THE FITTINGS LIST CHOOSER** (Task 590). The same object as the pipe type selector above it,
+	 * one indirection further out: the option text is the list's name, the stored reference is its
+	 * id, and there is no way to MAKE a list from here -- what stands beside it is a link into the
+	 * Library's own Fittings section, which is the ruling Task 586 gave the curve chooser.
+	 *
+	 * **A LIST STATED BY THE PIPE'S TYPE IS SHOWN DISABLED**, exactly as a type-stated diameter is,
+	 * because `fittingsId` resolves through the same layer those numbers do. Detach is how one pipe
+	 * deviates; there is no second mechanism here.
+	 */
+	function pipeFittingsChooser(fields, l) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			sel = document.createElement('select');
+		fillFittingSetOptions(sel, effective(l, 'fittingsId') || '');
+		if (pipeTypeOwns(l, 'fittingsId')) {
+			sel.disabled = true;
+			setFieldLabel(label, pc.lpn_field_fittings || 'Fittings list', pc.lpn_field_pipetype_tip);
+			label.appendChild(sel);
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+			return;
+		}
+		sel.addEventListener('change', function () {
+			saveUndoSnapshot();
+			setProp(l, 'fittingsId', sel.value || null);
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
+			refreshPaneIfOpen();
+		});
+		setFieldLabel(label, pc.lpn_field_fittings || 'Fittings list', pc.lpn_field_fittings_tip);
+		label.appendChild(sel);
+		fields.appendChild(label);
+		fields.appendChild(fittingsLibraryLink());
+		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, l, 'fittingsId');
+	}
+	function fittingsLibraryLink() {
+		var pc = EngCalcs.pageConfig || {},
+			b = libButton(pc.lpn_library_fittings || 'Fittings', function () {
+				openLibrarySection('fittings');
+			}, pc.lpn_library_fittings_tip);
+		// APPENDED, not assigned: helpTip() put `ec-help` on this button, and that class is what
+		// makes the tip reachable by tap -- see curveLibraryLink().
+		b.className = (b.className ? b.className + ' ' : '') + 'lpn-pane-goto';
+		return b;
+	}
 	function pipeTypeLibraryLink() {
 		var pc = EngCalcs.pageConfig || {},
 			b = libButton(pc.lpn_library_pipetypes || 'Pipe types', function () {
@@ -29535,9 +30093,19 @@ var EngCalcs = EngCalcs || {};
 			// popup's fields are built via textContent, and the suite's "k<sub>m</sub>" label
 			// (mphl_total_junction_k) is HTML-bearing. The concept-level reuse rule is about wording,
 			// not forcing markup into a plain-text slot.
-			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
-				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
-				{ el: l, prop: 'k' }, kmTableUrl());
+			pipeFittingsChooser(fields, l);
+			// **THE COEFFICIENT IS THE LIST'S SUM WHEN THERE IS A LIST** (Task 590), shown in the
+			// same disabled control a type-owned property gets, and for the same reason: the number
+			// is somewhere else's, so there is nothing to type here. Editing the list is how it
+			// moves, and choosing no list is how the box becomes the user's again.
+			if (pipeKIsDerived(l)) {
+				inheritedField(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
+					pipeK(l), pc.lpn_field_fittings_tip);
+			} else {
+				numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
+					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
+					{ el: l, prop: 'k' }, kmTableUrl());
+			}
 			lengthField(fields, l);
 			// **THE PIPE'S OWN REACTION COEFFICIENTS** (Task 566), shown only while a chemical is
 			// being tracked: they change nothing under water age or a source share, and two
@@ -30637,7 +31205,10 @@ var EngCalcs = EngCalcs || {};
 				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
 				// unchanged -- the same reason they use rawLine() rather than numLine() on the map.
 				diameter: toSI(effective(l, 'diameter') || 0, 'lpn_u_diameter'), roughness: roughnessSI(l),
-				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k')
+				// pipeK(), never effective(l, 'k'): a pipe whose fittings are listed has its k added
+				// up from the list (Task 590), and a solve reading the number underneath would answer
+				// a network nobody is looking at.
+				length: linkLengthSI(l), status: effective(l, 'status'), k: pipeK(l)
 			};
 			// THE FITTED PUMP CURVE IS DERIVED HERE AND NOWHERE ELSE (Task 390 step 5). It used to
 			// be read off the link, where a stored copy had to be repaired on every unit switch.
@@ -31348,7 +31919,7 @@ var EngCalcs = EngCalcs || {};
 			length: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'length'), ld.length) : undefined; })),
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
-			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
+			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(pipeK(l), ld.km) : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], resultUnit('velocity'), ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
@@ -31452,7 +32023,7 @@ var EngCalcs = EngCalcs || {};
 				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
 				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), extrema.length, ld.length))); }
 				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), extrema.roughness, ld.roughness))); }
-				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(effective(l, 'k') || 0, extrema.km, ld.km))); }
+				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), extrema.km, ld.km))); }
 			} else if (l.type === 'valve') {
 				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
 				// roughness do not exist on it, and its loss lives in a SETTING whose meaning

@@ -144,3 +144,19 @@ the feature must never see one. Curves escaped all of this because EPANET has cu
 4. The fittings set: named fittings with quantities, summed into `k`, resolving through the same
    layer. A fittings set is stated by a type or by an element, and it is one more reference.
 5. The export alert, scoped as in §6.
+
+**SLICES 1 TO 5 ALL SHIPPED 2026-09-06.** `doc.fittingSets` is the fourth id-keyed document object,
+`js/lpn-fittings.js` holds the arithmetic and the catalogue, `fittingsId` is the fifth entry in
+`LPN_TYPE_PROPS` (which is how a type states one), and `pipeK()` is the single seam every reader of a
+pipe's minor loss goes through. The export alert is `showInpExportFlattening()`, raised from the two
+new difference codes `pipe-type-flattened` and `fittings-flattened`, and it is silent where neither
+happened. `dev/lpn-spike/fittings-harness.js` is the contract; `dev/lpn-spike/pipe-library-harness.js`
+remains the contract for 1 to 3.
+
+**THE SEEDED COEFFICIENTS ARE EPANET 2.2 USER MANUAL TABLE 3.3 AND NOTHING ELSE** -- thirteen rows,
+verbatim, in the manual's order and with the manual's names. Public domain, citable, and already the
+reference in front of the person modelling here. A fourteenth row, "Other fitting", carries no number
+at all and hands the coefficient box to the user, which is what makes leaving an unsourceable fitting
+OUT of the table affordable. **Every coefficient is a starting point rather than an answer** -- Crane's
+K is n x f_T, so the real one depends on the size and the make -- and the Library says so on screen,
+not only at the code.
