@@ -26,18 +26,16 @@ a website by Thomas Gail Haws. Using it means accepting these terms.</p>
 
 <h2>2. The service is not-for-profit</h2>
 
-<p>The service exists solely to tell you and your community that you are loved. The service is
-costly. It is offered to you freely today, and if one day it cannot be, costs may be passed through
-to you. That is a statement about this website and not about the software: the software is licensed
-to you under §3 and cannot be taken back, so if the hosted service ever changes, what you already
-have stays yours to run. Either way, you are invited to be generously mindful of its value to you
-and to others, its role in your life's work, and the alignment of its mission with yours.</p>
+<p>The service exists solely to tell you and your community that you are loved. It is costly, it is
+offered to you freely today, and if one day it cannot be, costs may be passed through to you. The
+software is a separate matter: §3 licenses it to you, and that cannot be taken back. Either way, you
+are invited to be generously mindful of its value to you and to others, its role in your life's
+work, and the alignment of its mission with yours.</p>
 
 <h2>3. The software is not-for-profit</h2>
 
-<p>The software is licensed to the public under the terms of the <strong>GNU General Public
-License, version 3 or later</strong>. You may use, study, share, modify, and redistribute them. The
-source is published at
+<p>The software is licensed to the public under the <strong>GNU General Public License, version 3
+or later</strong>. You may use, study, share, modify and redistribute it. The source is published at
 <a target="_blank" rel="noopener" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a>. You
 are invited to contribute to the software and to request more lenient terms as your situation
 requires.</p>
@@ -45,9 +43,9 @@ requires.</p>
 <h2>4. Professional responsibility &mdash; read this one</h2>
 
 <p><strong>These calculators are tools, not engineers.</strong> They implement published methods
-(Manning, Hazen-Williams, Darcy-Weisbach, EPANET&rsquo;s own hydraulic engine, and others), and they
-implement them carefully &mdash; but a result is only as good as what you typed, and only as good as
-the method&rsquo;s fit to your problem.</p>
+(Manning, Hazen-Williams, Darcy-Weisbach, EPANET&rsquo;s own hydraulic engine, and others) carefully.
+A result is still only as good as what you typed, and as good as the method&rsquo;s fit to your
+problem.</p>
 
 <p><strong>You are responsible for every number you take from this site.</strong> Check it.
 Understand the method. Know its assumptions and its limits. Anything used in a real design must be

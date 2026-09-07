@@ -1,5 +1,13 @@
 # Editorial review: the two sites and the application
 
+## HOW TO READ THIS FILE: two keywords, and you can skip everything else
+
+- **`ASK-TGH`** — open questions waiting for Tom. **Search this and nothing else if you are short of
+  time.** There are four, all in PASS FIVE.
+- **`SETTLED`** — decided, done, and recorded only so it is not re-proposed. Every pass above PASS
+  FIVE is settled; his `RULE` marks are on those lines and they are never rewritten.
+- `RULE EDR…` lines are the ruling mechanism for a pass that is still being decided.
+
 ## ONE TRUE COPY. There is no second file.
 
 Tom, 2026-09-06: *"Let's avoid proliferating copies and let's try to honor One True Copy of this."*
@@ -13,6 +21,8 @@ one of them and the work is in the other.
 - **Keys never restart.** Pass one is `EDR-nn`, pass two `EDR2-nn`, and the next is `EDR3-nn`.
 - **His marks are the record.** Do not rewrite a `RULE` line, ever, except to add the outcome
   beneath it.
+
+**Status of PASS ONE: SETTLED.** All 23 ruled 2026-09-06 and applied.
 
 **Read as:** a senior editor at a trade periodical, briefed to find anything that would embarrass
 the masthead if a reader, a rival, or a reporter went looking. Two questions all the way through:
@@ -492,6 +502,8 @@ cd ~/webdev/not-epanet.org   && sh check.sh && git push
 
 # PASS TWO, 2026-09-06: the application's own public pages
 
+**Status: SETTLED.** All 12 ruled 2026-09-06 and applied.
+
 Pass one reviewed the two marketing sites. This pass reviews **what a visitor actually uses** — the
 suite's own non-calculator pages at `hawsedc.com/engcalcs` — plus the furniture that appears on
 every page of every calculator, which is the most-read text either project owns.
@@ -703,6 +715,8 @@ RULE EDR2-12: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 ---
 
 # PASS THREE, 2026-09-06: the snob's read
+
+**Status: SETTLED.** All 8 ruled 2026-09-06 and applied.
 
 Tom: *"Give it another go with computer's speed-reading and an elitist snob's nose."* So: everything
 counted first, then read slowly with no goodwill. Both sites after the pass-one edits, plus the
@@ -1006,6 +1020,8 @@ own rule about prose against scripts. **Tom's call, not mine to add to the roadm
 
 # PASS FOUR, 2026-09-07: bloat and rambling
 
+**Status: SETTLED** without a separate ruling: Tom's next instruction was to do the tightening, so EDR4-01 to EDR4-06 were carried out as part of PASS FIVE, and EDR4-07's rule is adopted.
+
 Tom, after rewriting a section of `privacy.php` himself: *"That is far too wordy. The next thing I
 want you to do is look for bloat and pointless rambling."* His rewrite is shipped verbatim and cut
 101 words from section 5.
@@ -1115,3 +1131,69 @@ I will not retro-trim the passes Tom has already ruled on: his marks are on thos
 file's own header forbids rewriting them.
 
 RULE EDR4-07: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+---
+
+# PASS FIVE, 2026-09-07: the tightening
+
+Tom: *"Review LibreWaterNet.org and Not-EPANET.org again for prose that is weak because it is
+bloated, fat, and rambling. Tighten it... Don't lose the humans with too many words. Use simple
+bulleted lists and tables where helpful... For privacy.php, include the bare legal minimum."*
+
+Done under that authority; **SETTLED** unless a line below says `ASK-TGH`.
+
+| File | Before | After | What changed |
+|---|---|---|---|
+| `privacy.php` | 2,446 w | **1,291 w** | Rebuilt as tables. Legal content is complete and unchanged |
+| `terms.php` | 661 w | 628 w | §2's software/service split in 17 words instead of 40; §3 and §4 tightened |
+| not-epanet index | 2,584 w | **2,482 w** | Dependency bullets, the Brewer credit, § 105, the FSF paragraph; the Viridis correction now appears once instead of twice |
+| LibreWaterNet index | prose | lists | Draw and Solve are bulleted; the privacy four are a list; the languages paragraph is 85 w instead of 138 |
+| `features.html` | prose | lists | The edges note is three bullets; the intro lost its throat-clearing |
+
+**What went, in one line: rationale shown to the reader.** Sentences explaining why the sentence
+beside them was worded as it is, the same promise made three times on one page, and licence-clause
+analysis a reader who wanted it would get from the licence.
+
+**A check caught the one thing that did go wrong, which is the argument for having it.**
+Rebuilding the recipients paragraph as a table dropped the words *"for the satellite images"*, and
+`third_party_request_check.php` failed the build: each of the four third-party purposes must keep a
+disclosing paragraph in `privacy.php`, and the check holds the marker phrase rather than trusting
+that a rewrite kept the meaning. It was right. Restored inside the table row, where it now reads
+*"Mapbox, for the satellite images"*. **A tightening pass is exactly when a disclosure goes missing,
+because the sentence carrying it looks like padding.**
+
+**What did not go:** every fact, every number, every legal element, and every word Tom wrote
+himself. The privacy notice still carries controller, purposes, five legal bases, recipients,
+transfers with their Article 49 derogations, retention, rights, withdrawal, complaint, automated
+decision-making, and the device-storage table.
+
+## The four questions
+
+### ASK-TGH 1 — `About.php` is the last long page, and it costs 26 retranslations
+
+`about_body_html` is a translated key, so tightening it is not free the way the two sites and the
+legal pages were: the English edit makes 26 translations stale and the drift detector will list it
+for the next sprint. It is about 430 words and would come down to roughly 300 without losing a
+fact. **Tighten it and let the sprint pick it up, or leave it?**
+
+### ASK-TGH 2 — not-epanet's honesty item 1 is 700 words of bullets. Table?
+
+Seven bullets, each a claim plus its evidence. As a two-column table (*what we depend on* / *the
+specifics*) it would be scannable in about ten seconds instead of two minutes, and the claims page
+already carries the sources. **The cost is tone**: a table reads as an inventory, and this section
+is a confession. My instinct is to leave it as prose because the confession is the point, but it is
+the longest thing on the site and you asked for tables where they help.
+
+### ASK-TGH 3 — should the access log get a retention after all?
+
+The notice now says, in your words, that it may stay on the server indefinitely. The alternative is
+one more line in the crontab that already runs four EngCalcs jobs, deleting `~/logs` past a period
+you pick, after which the notice states a number that something enforces. **A policy decision, not
+an editorial one**, which is why it is a question rather than a change.
+
+### ASK-TGH 4 — the not-epanet disclaimer block is 197 words and leads the page
+
+It is the legal heart of the site and I did not touch it. It could be a lead sentence and three
+bullets (*not EPANET · not EPA's · not reviewed or endorsed by them*), which a stranger arriving
+from a search would take in at a glance, where 197 words of paragraph is something they may skim.
+**Your call, because it is the one block where being complete may matter more than being read.**
