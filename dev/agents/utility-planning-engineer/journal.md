@@ -14,6 +14,110 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-06 — Contour plotting, re-verified from primary sources at Tom's direct question
+
+Tom asked outright whether EPANET offers contour plotting. I had already answered this once today
+(entry below) partly from a search-surfaced secondary source; this pass went back to the manual
+itself and to three other tools, and everything below is either a fetched primary source or named
+as secondary where it stayed secondary.
+
+- **CITED, fetched directly, EPANET 2.2 User Manual (EPA/600/R-20/133), §9.2 "Viewing Results with a
+  Graph," the plot-type table (its own Figure 9.2):** the manual's own words for what a Contour Plot
+  is and does — **"Shows regions of the map where values fall within specific intervals," "Applies
+  To: All nodes at a specific time."** It sits in the GUI reached by **Report >> Graph**, alongside
+  Time Series, Profile, Frequency and System Flow plots; only nodes can be put on a Contour plot
+  ("only Nodes can be graphed on Profile and Contour plots"). §9.2 also states the render has two
+  styles, set in the Contour Options dialog (its Figure 9.5): **"Filled Contours — Plot uses colored
+  area-filled contours"** and **"Line Contours — Plot uses colored line contours."** I could not get
+  the actual EPA PDF (`epanet_users_manual_2.2.0-1.pdf`, downloaded from epa.gov) to extract as text
+  in this environment — no `pdftotext`/poppler, no PyPDF, no `sudo` to install one — so I fetched the
+  wording from `epanet-manual.readthedocs.io/en/latest/9_viewing_results.html`, a community HTML
+  transcription of the same manual that preserves its own section and figure numbers (9.2, Figure
+  9.2, Figure 9.5); I read the raw HTML myself rather than trusting a paraphrase, and the wording
+  above is verbatim from that source. **Tool limitation, not evidence of anything about EPANET** —
+  flagging it so a later invocation does not treat the readthedocs step as a downgrade in what the
+  manual says, only in which copy of the text I could parse.
+- **CITED, same source, direct search of the whole page: the manual states no interpolation rule
+  anywhere on it.** No triangulation, no grid, no "nearest node," nothing. This confirms my earlier
+  finding rather than just repeating it — I re-read the full page text this time, not a search
+  snippet. A network is a graph, and EPANET's own reference GUI draws a filled or lined area between
+  point values without ever saying, in its own manual, what rule fills the gaps.
+- **CITED, fetched directly, `roadmap.epanetjs.com/results-visualization`:** contour maps sit on
+  epanet-js's own public roadmap, unbuilt — its own wording: **"the application will be able to
+  generate contour maps (isopleths) for any nodal output variable. This is most commonly used to
+  create pressure contours..."** Present tense of intent, not of the product. Today epanet-js's
+  results visualization is colour-coded nodes/links and flow paths (epanetjs.com's own front page
+  copy), the same category of thing `lpn_`'s thematic colouring already is — so the tool this suite
+  is most often measured against does not have this either, as of this fetch.
+- **CITED, fetched directly, Bentley's WaterGEMS/WaterCAD "Enhanced Pressure Contours" help page**
+  (`docs.bentley.com`, WaterGEMS SS6): the commercial product that DOES ship a contour distinguishes
+  two tiers. Plain contouring "only include[s] model nodes, such as junctions, tanks and
+  reservoirs" — the same node-only support EPANET's manual describes. The "enhanced" tier adds
+  hand-placed **spot elevations** with no model node, and states its own purpose in words worth
+  quoting exactly because they are the risk I flagged from theory in my last entry, now confirmed
+  from a vendor's own copy: **"Enhanced pressure contours can help the modeler to understand the
+  behavior of the system even in areas that have not been included directly in the model."** That
+  is extrapolation past the model's own support, offered as a selling point rather than a caveat. The
+  page names no interpolation algorithm (TIN, kriging, IDW) either — so all three tools I could
+  reach documentation for (EPANET, epanet-js, WaterGEMS) are silent on the actual math, and one of
+  the three explicitly recommends reading past where the model has any value to interpolate from.
+- **Not found, and I say so rather than guess: QWater's (QGIS plugin) own contour capability.**
+  Search surfaced only that it imports/exports `.inp` and runs EPANET through QGIS's own rendering,
+  which likely inherits QGIS's general raster/contour tools rather than shipping a bespoke one — I
+  did not confirm this and am not asserting it. Flagging the gap rather than filling it with a
+  plausible sentence.
+- **CITED, search-surfaced, secondary (search-engine synthesis of PDF search results, not full
+  document fetches — the master-plan PDFs I tried to fetch directly all returned as unreadable
+  binary streams to WebFetch, same tool limitation as the EPA manual above):** pressure and
+  fire-flow maps are real, named exhibits in published master plans, not a feature I am inventing a
+  use for. New Mexico State University's Water System Master Plan Update names **Figure 10 "Existing
+  System Peak Day Pressure Summary"** and Figure 11, the future-system equivalent. The City of
+  Klamath Falls 2020 Water Master Plan names **Figure 4-3 "Fire Flow at Maximum Day Demand in the
+  Existing System (Excluding Dead Ends)."** Schaumburg, IL's master plan links its WaterGEMS/GIS
+  model so "pressures and fire flows are readily available to staff." Bridgewater, MA (2024) and
+  Hanson, MA (2018) both report system pressure results against a stated psi band (35-80 psi;
+  above 35 psi) by demand scenario, which is the pressure-zone/adequacy judgment a contour or a
+  thematic map is drawn to answer, whichever way it is rendered. I did not find one of these that
+  states its own interpolation method either — consistent with the pattern above, not a fourth
+  independent confirmation.
+- **My own answer, separated from the citations above. Is a contour worth having in `lpn_`?
+  Judged against what is already read in `dev/looped-network-calculator-scope.md` and
+  `CLAUDE.md`'s `lpn_` section: `js/looped-network.js` already has thematic colour-by-value on
+  nodes AND links (closed Tasks 327, 384 — `dev/roadmap-closed-ids.md:343,396`), one control,
+  EPANET's own break/ramp conventions. What a contour adds over that is exactly one thing: a filled
+  AREA between nodes, which a coloured node does not draw at all — a node's colour tells you the
+  value AT that point and nothing about the ground between it and its neighbour. For a loosely
+  spaced system (a subdivision, an Elm Street Center scale) that gap is small and the area fill adds
+  almost nothing a reader could not infer by eye from the coloured dots. For a real utility zone with
+  genuine spatial gaps — an undeveloped parcel, a river crossing, a pressure-zone boundary that does
+  not follow a pipe — the area between nodes is exactly the question a pressure-zone map is drawn to
+  answer, and coloured points alone force the reader to do the interpolation in their head, which
+  is the thing Bentley's own "enhanced" feature exists to stop doing badly. So: worth having FOR THE
+  SYSTEM-SCALE READER, not for the subdivision one — a rare case here where the flashy-looking
+  feature is not subdivision theatre, because the theatre risk runs the other way, toward extrapolating
+  past a sparse system model rather than toward being unnecessary at small scale.
+- **The honest-vs-dishonest line, stated concretely rather than in the abstract:** the dishonest
+  version is Bentley's "enhanced" default — fill confidently past the outermost nodes that carry the
+  value, because a filled rectangle looks more finished than a filled polygon with a ragged edge. The
+  honest version, which I already named in my last entry and now have a vendor's own counter-example
+  to point at: **never fill past the convex hull of the nodes carrying the plotted value, and draw
+  every node that has the value ON TOP of the fill, always on, no toggle to hide them** — so a reader
+  can see exactly how many real solved points a smooth-looking patch of colour is standing on. A
+  screen that shows only the smooth fill and hides its own support points is indistinguishable from
+  a hand-drawn illustration to the person reading it, and that is the actual failure mode, not "the
+  math is hard."
+- **This does not change my ranking.** The contour third of Task 600 stays where I put it in the
+  entry below — real, wanted ("very cool" per Tom), and still the most expensive and highest
+  misuse-risk of the three things bundled in that row, now with two more primary citations (the
+  EPANET manual's own silence, confirmed by direct read rather than a snippet; and Bentley's stated
+  extrapolation practice) rather than a change of mind.
+
+Wishlist: no re-rank; a one-line pointer addendum added under the existing 2026-09-06 contour
+paragraph rather than a new section, since the order is unchanged and a wish list that keeps
+re-writing the same conclusion has told nobody anything new.
+
+---
+
 ## 2026-09-06 — Ranked Tasks 599/600/601/603/578; the contour unknown; what a submitted report needs
 
 Asked to rank five new rows Tom filed from his own EPANET plot/report-menu reading, answer Task

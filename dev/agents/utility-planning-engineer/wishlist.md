@@ -95,6 +95,16 @@ that analog's own reliability threshold sits astride this suite's own target sca
 at than at the small end this suite mainly serves — the opposite of the usual direction a scale
 argument runs here.
 
+**Addendum, same day, primary sources this time, no re-rank:** full re-verification in the journal,
+2026-09-06 entry "Contour plotting, re-verified from primary sources." Fetched directly this pass
+(not search snippets): the EPANET 2.2 manual's own §9.2 table text (still no interpolation rule
+stated anywhere on the page, confirmed by reading the whole page, not a snippet); epanet-js's own
+public roadmap, where contour maps are listed unbuilt ("the application *will be able to*..."); and
+Bentley WaterGEMS/WaterCAD's "Enhanced Pressure Contours" help page, which states its extrapolation
+past model nodes as the selling point — **"can help the modeler to understand the behavior of the
+system even in areas that have not been included directly in the model"** — the exact failure mode
+I named from theory now confirmed as a vendor's stated practice, not my own worry. This hardens the
+case for the convex-hull-only, points-always-visible convention above; it does not change the rank.
 **On what a submitted report needs, asked directly, and this is where I would not oversell this
 suite:** a full calibrated, system-wide master-plan hydraulic model for a 2,000-node utility is
 EPANET/WaterCAD/InfoWater territory and I would say so to Tom without hedging — this suite is not
