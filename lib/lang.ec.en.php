@@ -1435,7 +1435,7 @@ $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network in the window.';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a condition, and change them all at once.';
-$ec_lang['lpn_help_icons']='What the toolbar icons mean';
+$ec_lang['lpn_help_icons']='Toolbar';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
 $ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';

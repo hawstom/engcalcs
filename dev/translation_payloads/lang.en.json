@@ -733,7 +733,7 @@
         "lpn_tool_zoom_extent_tip": "Fit the whole network in the window.",
         "lpn_tool_settings_tip": "Open the settings for this project.",
         "lpn_find_menu_tip": "Find an asset by its ID, or find every asset matching a condition, and change them all at once.",
-        "lpn_help_icons": "What the toolbar icons mean",
+        "lpn_help_icons": "Toolbar",
         "lpn_pane_right_toggle": "Visibility",
         "lpn_pane_right_toggle_tip": "Show or hide the panel at the right of the map. It holds the label and color choices.",
         "lpn_color_legend_open_tip": "Click to open the Visibility panel and change these colors.",

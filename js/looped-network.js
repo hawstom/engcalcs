@@ -19563,8 +19563,6 @@ var EngCalcs = EngCalcs || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
-			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
 			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
 			// ONE row in this menu that does not open a new tab, because it does not leave the page
 			// at all -- the notes are still in this document, hidden, and this reveals them. See the
@@ -19576,7 +19574,7 @@ var EngCalcs = EngCalcs || {};
 			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
 			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
 			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'What the toolbar icons mean', submenu: iconGuideRows },
+			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
 			{ separator: true },
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
 			// reports actually received are a wrong word or a bad number, and "Fix something" invites
@@ -19600,6 +19598,12 @@ var EngCalcs = EngCalcs || {};
 			// to drift from the banner they operate.
 			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
 				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
+			{ separator: true },
+			// **THE ORDER OF THIS MENU IS TOM'S OWN, 2026-09-06**, given as a numbered list: the
+			// two rows that leave for another SITE sit below the legal block rather than at the
+			// top. Task 596 had put Not EPANET above that separator; this supersedes it.
+			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
+			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
 			{ separator: true },
 			// About last, where every other Help menu in the world puts it.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: ext('About.php') }
@@ -26981,6 +26985,7 @@ var EngCalcs = EngCalcs || {};
 			if (!drag) { return; }
 			drag = null;
 			if (popup.hasPointerCapture && popup.hasPointerCapture(e.pointerId)) { popup.releasePointerCapture(e.pointerId); }
+			relaxPanelCap(popup);
 		}
 		popup.addEventListener('pointerup', endDrag);
 		popup.addEventListener('pointercancel', endDrag);
@@ -27698,6 +27703,52 @@ var EngCalcs = EngCalcs || {};
 	// Given the top the caller is about to use, this caps the panel to what is genuinely left, so the
 	// overflow lands inside `.lpn-popover-body` where a finger can reach it. Returns the height to
 	// place with -- callers must use it rather than their own earlier measurement.
+	// **A CAP IS THE ROOM WHERE THE BOX WAS, AND THE BOX MOVES** (Task 606; Tom, 2026-09-06:
+	// *"I open Settings. I drag and resize. The height is limited... I repeat. Height is unlimited."*).
+	// capPanelToRoomBelow() writes an inline max-height at OPEN time, measured from the chrome
+	// floor. Drag the box upward and that number is stale: it is the room at a place the box has
+	// left, and every pixel between the two is height the user has just made and cannot use. The
+	// browser's own resize widget simply stops against it, with nothing on screen saying why.
+	//
+	// It resolved on a reload for a reason worth keeping: only a height BELOW the cap is stored
+	// (see the ResizeObserver in wireSettingsBox()), so once the user happens to shrink the box the
+	// next open measures a natural height that fits and never caps at all. That is the "one or two
+	// reloads" in his report, not a race.
+	//
+	// **IT ONLY EVER LOOSENS.** A drag may not start capping a panel that was never capped, and may
+	// not tighten one that was: dragBounds() deliberately lets a box hang off the bottom edge, and
+	// squaring that up on release would move a box the user had just placed. Tom's rule for a drag
+	// is that where the box goes is his business; this hands back height he has made room for and
+	// touches nothing else.
+	//
+	// **AND THE RENDERED HEIGHT IS FROZEN BEFORE THE CEILING MOVES**, so the box does not spring to
+	// its natural height in the user's hand at the moment he lets go. What he gets is a box the same
+	// size with a grabber that now answers -- which is what he was reaching for.
+	//
+	// Resizable panels only, and that is the line rather than a shortlist: a box the user can size
+	// owns its height already, while a menu or the property popup is as tall as its contents and
+	// freezing one would pin it to whatever it last held.
+	function relaxPanelCap(panel) {
+		var body, capped, room, r, res;
+		if (!panel || !panel.style || !window.getComputedStyle) { return; }
+		capped = parseFloat(panel.style.maxHeight);
+		if (!isFinite(capped)) { return; }
+		res = window.getComputedStyle(panel).resize;
+		if (!res || res === 'none') { return; }
+		r = panel.getBoundingClientRect();
+		room = Math.max(0, (window.innerHeight || 0) - r.top - POPUP_EDGE);
+		if (room <= capped + 1) { return; }
+		// The cap is REPLACED by the room here, never simply dropped. Dropping it would hand back
+		// the height and take away the thing the cap is for -- a box grown past the bottom edge
+		// cannot be shrunk again, because the grabber it grew by is the corner that just left the
+		// window (measured 2026-08-19, and the reason the ResizeObserver clamps too).
+		body = panelBody(panel);
+		// Frozen only where the cap was actually BINDING. A box already shorter than its ceiling is
+		// its content's height, and pinning that would freeze a box whose contents later change.
+		if (r.height >= capped - 1) { panel.style.height = Math.round(r.height) + 'px'; }
+		resetPanelHeight(panel, body);
+		capPanelHeight(panel, body, room, panel.getBoundingClientRect().height);
+	}
 	function capPanelToRoomBelow(panel, top) {
 		var body = panelBody(panel), avail = Math.max(0, (window.innerHeight || 0) - top - POPUP_EDGE), h;
 		resetPanelHeight(panel, body);

@@ -104,7 +104,7 @@ console.log('\n-- the Help menu rows --');
 	// screenshots page was live, annotated and reachable from nothing for weeks; the gateway site
 	// is the one place dev/positioning.md now permits a competitor name in a menu item, and that
 	// permission covers not-epanet.org and nowhere else.
-	report(/pc\.lpn_help_screenshots/.test(body), 'Pictures of this page in use');
+	report(/pc\.lpn_help_screenshots/.test(body), 'Screenshot gallery');
 	report(/pc\.lpn_help_not_epanet/.test(body), 'Not EPANET');
 	report(/LPN_SCREENSHOTS_URL/.test(body) && /librewaternet\.org\/screenshots\.html/.test(src),
 		'and the screenshots row reaches the live page, not a repository path');
@@ -123,6 +123,22 @@ console.log('\n-- the Help menu rows --');
 	// "halve each other's weight rather than doubling the invitation".
 	report(!/pc\.contact_main_menu/.test(body),
 		'and Contact is gone, so two rows do not compete for one destination');
+
+	// **THE ORDER IS TOM'S OWN, given as a numbered list on 2026-09-06**, so it is a
+	// specification and not a layout preference: Walkthroughs, Notes, Toolbar, Fix, the legal
+	// block, Screenshot gallery, Not EPANET, About. Asserted as POSITIONS of each key in the
+	// function body rather than as a rendered list, because openMenu() is the thing that renders
+	// and this harness reads source. The two site-leaving rows moved BELOW the legal block, which
+	// reverses where Task 596 put Not EPANET -- assert it so a future session restoring 596's
+	// wording does not silently restore its position too.
+	const order = ['lpn_help_walkthroughs', 'lpn_help_notes', 'lpn_help_icons', 'lpn_help_fix',
+		'privacy_link', 'terms_link', 'consent_settings_link',
+		'lpn_help_screenshots', 'lpn_help_not_epanet', 'about_main_menu'];
+	const at = order.map(k => body.indexOf('pc.' + k));
+	report(at.every(i => i >= 0), 'every row Tom numbered is in the menu');
+	report(at.every((v, i) => i === 0 || v > at[i - 1]),
+		'and they stand in the order he numbered them',
+		order.filter((k, i) => i > 0 && at[i] < at[i - 1]).join(', ') || 'in order');
 	// The query string is part of the destination, not noise: ?from= is how formmail.php learns
 	// which calculator somebody was on, and this page is the one that cannot be inferred from a
 	// referrer. Matched loosely on the path so a later parameter does not turn this red, then

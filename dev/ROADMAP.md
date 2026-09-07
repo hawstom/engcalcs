@@ -75,6 +75,11 @@ the block.
     already written for the calibration files of Task 601.
   - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
     line on an axis.
+  - **IT GETS A MINUSCULE SLICE OF THE INTERFACE, on Tom's ruling of 2026-09-06:** *"Creating a
+    profile is so easy now using the Google paradigm that I don't think there is much value in
+    importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
+    deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
+    existing menu, never a control on the profile panel itself.
 
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
@@ -275,7 +280,37 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 75|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
+- 100|605| **Retire the built-in solver from view: EPANET is simply the solver.**
+  Tom, 2026-09-06, the day after Task 602 renamed the checkbox: *"I think it's time to retire the
+  built-in solver, or at least to keep very quiet about it."* Three parts, in his own numbering:
+  1. **"Always use the EPANET solver" is the page default.** A new project solves through EPANET.
+  2. **No more banner about the EPANET solver.**
+  3. **Scrub every tip and alert for undue weight on the existence of two solvers.** He asked
+     directly for a DEEP audit of the language, not a spot fix.
+  - **The code stays; the advertising goes.** The built-in solver is what answers when EPANET is
+    unreachable, which is the offline promise, so this is a change to defaults and wording rather
+    than a deletion. What must stop is the page teaching every user that there is a choice to make.
+  - **The setting is a preference and the routing is a fact** (Task 602's rule): changing the
+    DEFAULT is legal, rewriting a stored `settings.engine` on a file somebody saved is not.
+
+- 100|606| **A freshly-erased page limits the Settings box height until a reload.**
+  Tom, 2026-09-06, reproduced three times: *"I 'Erase page' (new shopper). I open Settings. I drag
+  and resize. The height is limited. I reload the page. Settings jumps downward against the bottom
+  of the screen. I drag and resize. Height is still limited. I repeat. Height is unlimited."*
+  Resolved with one reload twice and two reloads once. **He assumes it applies to every non-hog
+  box**, and that assumption is the first thing to test rather than the last.
+  - The tell is that a RELOAD fixes it and the box also JUMPS on reload: a max-height or a stored
+    geometry is being computed against a viewport or a container that is not yet the size it will
+    be. Erase-page is the state where nothing has been stored yet, which is why it shows there.
+
+- 25|607| **A moving picture of drawing a pipe -- Task 178's phase 2, extracted on close.**
+  A filmstrip GIF from `dev/filmstrip-gif-recipe.md` of the add-pipe / add-junction workflow. A
+  2026-07-30 proof of concept showed it is cheap once set up -- the hard part is precise SVG click
+  targeting, not GIF assembly -- and the POC GIFs were never committed.
+  - **A still shows a STATE; only a moving asset shows a GESTURE**, and "how do I draw a pipe" is a
+    gesture. That is why closing 178 on the Help link did not retire this.
+
+- 100|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
   - **RULED 2026-09-06 (Tom: *"Yes. And we have to start showing an export alert."*).** A library
     pipe MAY be something a `.inp` round trip loses. That is the trade accepted, and it comes with
     an obligation: **the export must SAY what it is flattening, at the moment it flattens it.**
@@ -503,11 +538,24 @@ the block.
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
-- 50|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
-  for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
-  where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
-  that writes a value to every selected element. **Blocked on Task 415's `selected` property**, which
-  is the foundation this was always missing.
+- 100|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
+  for bigger models."* Wants a rubber-band select and one property sheet that writes a value to
+  every selected element. **The Task 415 block is GONE** -- `selected` shipped, so the foundation
+  this was always missing is there.
+  - **RAISED TO 100 BY TOM, 2026-09-06, WITH THE SHAPE HE WANTS DISCLOSED -- epanet-js's, and he
+    named it as the paradigm to follow, not merely as prior art:**
+    1. **One toolbar location, three Select Area modes** -- window, lasso, polygon -- cycled from
+       that single slot, either by clicking the tiny arrow at its lower-right corner or by
+       clicking the icon again. Three modes, one square of toolbar.
+    2. **Properties opens with a COLLAPSIBLE HEADING PER TYPE selected**, so a selection holding
+       pipes and junctions shows both and neither is hidden.
+    3. **Editing any value in that multi-properties view sets it on every asset of that type in
+       the selection set.**
+  - **Every write goes through `setProp()`** -- 400 of them is still 400 calls at the one seam, and
+    a bulk path that writes properties directly is the Task 322 scenario-seam defect at scale.
+  - Find and replace already writes a value across many elements and states its count before it
+    does; the multi-properties view is that same act reached by pointing rather than by querying,
+    so it owes the same visible count.
 
 - 50|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
   studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels
@@ -545,7 +593,7 @@ the block.
 
 
 
-- 75|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
+- 100|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
   **RAISED TO 75 BY TOM, 2026-09-06, AND LINKED TO TASK 465**, which is the reason: a fittings
   picker and a library pipe are the same indirection seen from two ends. A pipe TYPE that states
   roughness may as well state a fittings set, and the `effective()` resolution layer 465 has to
@@ -807,24 +855,6 @@ the block.
   should figure out what "printable" should even mean per calculator type (a two-column input/
   result form vs. a map/canvas page are different problems) before building anything.
 
-- 75|178| **NOTHING in the suite links to the screenshots page. Fix that first.**
-  **CORRECTION, 2026-08-25.** The previous version of this block implied Help already pointed at
-  `https://librewaternet.org/screenshots.html`. Tom: *"What points at the live screenshots page? I
-  expected Help, but that doesn't."* **He is right and I checked: nothing does.** No `.php` in this
-  suite contains the string `librewaternet` outside `lib/config.inc.php`'s canonical whitelist. The
-  page is live, annotated and unreachable from the software it depicts.
-  - **PHASE 1 SHIPPED 2026-09-06.** One row in the `lpn_` Help menu beside Walkthroughs, the slot
-    Task 596 settled for the same menu the same day. `lpn_help_screenshots` reads *Pictures of this
-    page in use* and reaches Tom on `dev/new-english-keys.md`, which is where the wording ruling he
-    reserved actually happens. **The other fifteen calculators still do not link it** -- that is a
-    footer decision, costed at the same 26 translations, and 596 declined it for its own row.
-  - **Phase 2 is the original task and is NOT the same thing:** a filmstrip GIF from
-    `dev/filmstrip-gif-recipe.md` (the add-pipe / add-junction workflow). A 2026-07-30 proof of
-    concept showed it is cheap once set up — the hard part is precise SVG click targeting, not GIF
-    assembly — and the POC GIFs were never committed.
-  - **They are not substitutes.** A still shows a STATE; only a moving asset shows a GESTURE, and
-    "how do I draw a pipe" is a gesture. Doing phase 1 does not retire phase 2.
-
 - 5|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
   width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
@@ -833,7 +863,7 @@ the block.
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 
-- 75|186| **Make the Tables pane spreadsheet-interoperable.**
+- 100|186| **Make the Tables pane spreadsheet-interoperable.**
   **GATE, Tom 2026-09-06: this and Task 185 go to 100 IF AND ONLY IF all of the EPANET file is
   implemented.** *"Let's prioritize these two as 100 if and only if all of the EPANET file is
   implemented."* Not a deadline and not a decay -- a CONDITION, so the priority stays 75 until the
