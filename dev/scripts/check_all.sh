@@ -131,6 +131,17 @@ run_check "log bucket column"            blocking php dev/scripts/log_bucket_che
 run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
+# Task 322 rows 40-42, all three found by COUNTING a construct and asking what writing it that
+# many times assumes. Every failure below renders perfectly and is invisible to anyone using the
+# page: a lookup that returns null on a page this suite guards with `if (el)`, an install manifest
+# nothing in this repository had ever read, and a storage access that throws for exactly the
+# privacy-conscious visitors this suite is written for.
+run_check "DOM ids resolve"              blocking php dev/scripts/dom_id_resolve_check.php
+run_check "DOM id selftest"              blocking php dev/scripts/dom_id_resolve_selftest.php
+run_check "web app manifest"             blocking php dev/scripts/web_manifest_check.php
+run_check "web app manifest selftest"    blocking php dev/scripts/web_manifest_selftest.php
+run_check "web storage guarded"          blocking php dev/scripts/storage_guard_check.php
+run_check "storage guard selftest"       blocking php dev/scripts/storage_guard_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
