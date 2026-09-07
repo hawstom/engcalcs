@@ -734,7 +734,7 @@ somewhere else.
 Smallest fix, and it costs the claim nothing: *"...or the `.net` file EPANET saves, which we read by
 working the format out from examples and which the page tells you to trust less."*
 
-RULE EDR3-01: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-01: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR3-02 - LOW - "How good each language is is recorded openly"
 
@@ -742,7 +742,7 @@ LibreWaterNet index. It is grammatical — a noun clause followed by its verb �
 read it twice and assume a typo. *"The quality of each language is recorded openly"* says the same
 thing and cannot be misread.
 
-RULE EDR3-02: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-02: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR3-03 - MEDIUM - Two flourishes in one paragraph, on the page's best subject
 
@@ -762,7 +762,7 @@ RTL laid out RTL — and they are doing the work already.
 > taken as much work, and it exists because the people who most need a free network solver are
 > very often not working in English.
 
-RULE EDR3-03: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-03: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR3-04 - LOW - A sentence that trips on its own repetition
 
@@ -771,7 +771,7 @@ the numbers on them are numbers it worked out."*
 
 *"...and the numbers on them are its own."*
 
-RULE EDR3-04: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-04: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR3-05 - LOW - "its own separate permission"
 
@@ -779,7 +779,7 @@ not-epanet.org, in the services paragraph. *Own* and *separate* are the same wor
 its own permission"*. (LibreWaterNet's version of the sentence, *"each one asks separately"*, is
 already right, which is how the duplication shows.)
 
-RULE EDR3-05: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-05: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR3-06 - LOW - My own tribute paragraph is too long in the middle, and it is new today
 
@@ -792,7 +792,11 @@ quietly keeping it. The tightened version:
 > one semi-retired engineer with an AI to build this in a summer. That is not a boast about us. It
 > is the measure of what they left lying around for somebody to pick up.
 
-RULE EDR3-06: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-06: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH: I preferred not to name any names in this paragraph. See below:
+
+For thirty years, people have been wrapping, porting, rebuilding, teaching and arguing about this engine, mostly for nothing and mostly on their own time. The graphical front ends, free and commercial. The hydraulic solver. The university courses that taught a generation to read an .inp file. The people answering the same file-format question in public for the tenth year running.
+
+We mention them together because the list is longer than we know and we would get it wrong. What we can say is what it cost them and what it cost us: they did that work before the age of AI, in evenings and weekends and unpaid hours, and it is what made it possible for one semi-retired engineer with an AI to build this. That is not a boast about us. It is the measure of what they left lying around for somebody to pick up, and the reason the polite thing to do with it is to give ours away too.
 
 ## EDR3-07 - MEDIUM - "World class and world owned."
 
@@ -805,7 +809,7 @@ I am not going to propose a replacement headline for a phrase that may be yours 
 The question is only whether the first three words are paying their way beside the last three.
 *"World owned."* alone, on two lines, is stronger than either half.
 
-RULE EDR3-07: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-07: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR3-08 - LOW - A claim about somebody else's browser, undated
 
@@ -815,7 +819,7 @@ years. Either date it (*"as of 2026"*) or make it conditional (*"if your browser
 option, the calculators still cache and work offline"*), which is the sentence the reader actually
 needs and which cannot go stale.
 
-RULE EDR3-08: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR3-08: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ---
 
@@ -866,3 +870,78 @@ that makes a *yes* feel reasonable rather than the part that makes the ask sound
 also two words shorter than what is there.
 
 **Do not ship this on its own.** Changing the question re-asks everybody who has already answered.
+
+---
+
+# PASS THREE OUTCOMES, and one question answered
+
+All eight ruled, seven `fix` and EDR3-06 rewritten by Tom.
+
+| Key | Done |
+|---|---|
+| EDR3-01 | The index now says the `.net` route is read by working the format out from examples and that the page tells you to trust it less |
+| EDR3-02 | *"The quality of each language is recorded openly"* |
+| EDR3-03 | Both cut; the paragraph is its facts now |
+| EDR3-04 | *"...and the numbers on them are its own"* |
+| EDR3-05 | *"each asks its own permission"* |
+| EDR3-06 | **His paragraph, verbatim, and it names nobody.** Ledger row 4.8a records the instruction and its reason; the one printed name is the licence credit below, which is where a credit belongs |
+| EDR3-07 | The headline is **World owned.** |
+| EDR3-08 | *"If your browser offers no install option, nothing is lost..."*, with Firefox named as the common case rather than as the claim |
+
+## EDR2-10 - SHIPPED, and my "later" was wrong
+
+**Tom, 2026-09-06: *"Why not ship the consent wording fix?"*** He was right and the answer is that
+I priced it wrong. Written out, because the mistake is a useful one:
+
+**I conflated two different triggers.** `lib/config.inc.php` re-asks on a **materially changed
+ask** — bumping `EC_CONSENT_VERSION` invalidates the middle answer, *"Allow this"*, which is
+scope-limited consent meaning *yes to this, ask me again if you add another purpose*. What is
+material is a change in **what is stored or what it is for**. This edit changes neither: same one
+digit, same purpose, same three answers, same cookie. **A clearer sentence about an unchanged
+practice does not invalidate a consent already given, and re-asking on it would be nagging people
+who have already said yes** — which `config.inc.php` names as the one direction that makes a consent
+flow worse rather than safer. `EC_CONSENT_VERSION` stays at `1`.
+
+The real cost was one key in 26 languages, in a sprint that is going to run anyway. That is not a
+reason to leave a hard sentence standing on the one screen where every visitor has to answer a
+question. **The rule this leaves behind: price a consent edit by asking whether the ANSWER a person
+already gave still means what they meant, not by asking whether the words moved.**
+
+Shipped:
+
+> May we keep one digit in this browser to remember that we have already counted this page? It
+> records nothing about you and nothing you type. Without it we cannot tell your second visit from
+> somebody else's first.
+
+**`detect_english_drift.php` now lists `consent_body` as CHANGED**, so the next sprint retranslates
+it; until then non-English visitors read the previous sentence, which is clumsier and still true.
+
+### ONE THING IS OUTSTANDING AND IT IS NOT MINE TO WRITE
+
+**`$ec_lang_syn['consent_body']` still describes the OLD sentence** and would ship the old wording's
+synonyms to 26 translation agents. The synonym channel is off-limits to AI without written
+permission in the conversation, so here is the diff for approval, not an edit:
+
+```
+- Will you allow (permit) us to keep (store, save, put) a single digit per page in this browser
+  profile's storage to prevent us from logging (recording) its visits repeatedly?
++ May we keep (store, save, put) one digit in this browser to remember (record) that we have
+  already counted (tallied) this page? It records nothing about you and nothing you type. Without
+  it we cannot tell (distinguish) your second visit from somebody else's first.
+```
+
+Every parenthesis passes the substitution test: each could stand in the sentence as written.
+
+## EDR2-05 follow-up: the log retention number
+
+Tom: *"there is a cron job enforcing rotation and retirement, I believe. You can check."* **Checked,
+and what is in this repository is the OTHER log.** `dev/scripts/trim_logs.php` is the backstop for
+the **usage counts** — 26 months, the number `privacy.php` already promises, made a fact rather than
+an intention by Task 286. Nothing in this tree touches the **web server's access log**, whose
+rotation belongs to the host; production SSH is blocked from here, so I cannot read its
+`logrotate.d` entry.
+
+The notice now says the access log *"is rotated and deleted automatically on a schedule, rather
+than kept indefinitely"*, and that it is deleted much sooner than the 26 months. **That is the
+weakest sentence in the notice and it wants a number** — the host's rotation interval, in days or
+weeks. One look at the hosting control panel or `/etc/logrotate.d/apache2` on the server settles it.
