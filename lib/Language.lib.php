@@ -317,6 +317,9 @@ function chooseLanguage($all_language_settings) {
  *     user-labelled variant of the same calculator (see echoHTMLHead) -- those are for
  *     bookmarking and sharing, not for indexing as separate pages.
  *   - /index.php collapses to the directory URL, so the suite front page has one address.
+ *   - A page served at a PRETTY URL nominates that URL, from the declaration in
+ *     lib/Canonical.lib.php. SCRIPT_NAME under a rewrite names the script, not the address, so
+ *     '/app' nominated '/engcalcs/Looped-Network.php' until Task 479.01.
  *
  * @param string|null $lang  language code; defaults to the language being served
  * @return string            absolute URL, unescaped (escape at the point of output)
@@ -324,8 +327,10 @@ function chooseLanguage($all_language_settings) {
 function ec_canonical_url($lang = null) {
     global $clanguage;
     if ($lang === null) $lang = isset($clanguage) ? $clanguage : 'en';
-    $path = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '/engcalcs/index.php';
-    if (substr($path, -10) === '/index.php') $path = substr($path, 0, -9);
+    // The PATH is ecCanonicalPath()'s to decide, not this function's: a page served at a pretty
+    // URL states that URL in lib/Canonical.lib.php, and SCRIPT_NAME under such a rewrite is the
+    // script the rewrite landed on rather than the address anybody reads (ROADMAP Task 479.01).
+    $path = ecCanonicalPath(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '/engcalcs/index.php');
     return CANONICAL_ORIGIN . $path . '?lang=' . $lang;
 }
 

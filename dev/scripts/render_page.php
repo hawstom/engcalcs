@@ -23,6 +23,13 @@
  * Usage:
  *   php dev/scripts/render_page.php Manning-Pipe-Flow.php > /tmp/page.html
  *   php dev/scripts/render_page.php Manning-Pipe-Flow.php --lang=es
+ *   php dev/scripts/render_page.php Looped-Network.php --host=librewaternet.org --uri=/app
+ *
+ * `--host` seeds HTTP_HOST, which is what CANONICAL_ORIGIN's host -> origin whitelist looks up, so
+ * it is the only way to see outside a web request which address a page nominates on each domain
+ * this one checkout is served at. `--uri` seeds REQUEST_URI alone and deliberately NOT SCRIPT_NAME:
+ * under a rewrite those two genuinely differ, and SCRIPT_NAME staying the real script is the whole
+ * reason a pretty URL cannot be recovered from the environment (ROADMAP Task 479.01).
  *
  * `--lang` seeds the ec_language COOKIE, which is how a returning visitor's language actually
  * arrives. It matters for more than translated labels: EC_DEFAULT_UNIT_SET is derived from the
@@ -43,9 +50,13 @@ $__rp_root = dirname(__DIR__, 2);
 $__rp_page = '';
 $__rp_lang = '';
 $__rp_query = '';
+$__rp_host = 'hawsedc.com';
+$__rp_uri = '';
 foreach (array_slice($argv, 1) as $__rp_arg) {
     if (preg_match('/^--lang=([a-z]{2})$/i', $__rp_arg, $__rp_m)) { $__rp_lang = strtolower($__rp_m[1]); }
     elseif (substr($__rp_arg, 0, 6) === '--get=') { $__rp_query = substr($__rp_arg, 6); }
+    elseif (substr($__rp_arg, 0, 7) === '--host=') { $__rp_host = substr($__rp_arg, 7); }
+    elseif (substr($__rp_arg, 0, 6) === '--uri=') { $__rp_uri = substr($__rp_arg, 6); }
     elseif (substr($__rp_arg, 0, 1) !== '-' && $__rp_page === '') { $__rp_page = basename($__rp_arg); }
 }
 $__rp_path = $__rp_root . '/' . $__rp_page;
@@ -61,10 +72,11 @@ if ($__rp_lang !== '') { $_COOKIE['ec_language'] = $__rp_lang; }
 // read a parameter of their own, such as contact.php's ?from=.
 if ($__rp_query !== '') { parse_str($__rp_query, $_GET); }
 $_SERVER['QUERY_STRING']   = $__rp_query;
-$_SERVER['REQUEST_URI']    = '/engcalcs/' . $__rp_page . ($__rp_query !== '' ? '?' . $__rp_query : '');
+$_SERVER['REQUEST_URI']    = ($__rp_uri !== '' ? $__rp_uri : '/engcalcs/' . $__rp_page)
+                           . ($__rp_query !== '' ? '?' . $__rp_query : '');
 $_SERVER['SCRIPT_NAME']    = '/engcalcs/' . $__rp_page;
-$_SERVER['SERVER_NAME']    = 'hawsedc.com';
-$_SERVER['HTTP_HOST']      = 'hawsedc.com';
+$_SERVER['SERVER_NAME']    = $__rp_host;
+$_SERVER['HTTP_HOST']      = $__rp_host;
 $_SERVER['REQUEST_METHOD'] = 'GET';
 $_SERVER['HTTPS']          = 'on';
 

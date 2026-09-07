@@ -92,12 +92,21 @@ define('BASE_DIRECTORY', $basedirectory);
 // Match on the bare hostname: lowercased, port stripped, one leading 'www.' removed, because
 // the server answers on all four of http/https x www/non-www with no redirect and each pair must
 // land on one origin. Add a domain here and nowhere else; ec_canonical_check.php reads this array.
+//
+// CONSOLIDATED ONTO LibreWaterNet 2026-09-06 (ROADMAP Tasks 479 and 479.01). Both hosts serve
+// every page -- librewaternet.org/engcalcs is a symlink onto this docroot -- so until this edit
+// each domain nominated ITSELF and the two copies divided one page's ranking signal between them.
+// Every host therefore now maps to the one origin: librewaternet.org is the address that gets
+// indexed, and hawsedc.com defers to it. That is the standard site-move play, and its cost is
+// real and already accepted: hawsedc.com's accumulated history transfers slowly and imperfectly
+// reversibly. The array stays an array precisely because it is the thing that would have to move
+// again; a single hard-coded string is how the suite got into a split in the first place.
 $ec_canonical_origins = Array(
-    'hawsedc.com'                    => 'https://hawsedc.com',
+    'hawsedc.com'                    => 'https://librewaternet.org',
     'librewaternet.org'              => 'https://librewaternet.org',
-    'constructionnotesmanager.com'   => 'https://hawsedc.com',
+    'constructionnotesmanager.com'   => 'https://librewaternet.org',
 );
-define('CANONICAL_ORIGIN_DEFAULT', 'https://hawsedc.com');
+define('CANONICAL_ORIGIN_DEFAULT', 'https://librewaternet.org');
 
 $ec_canonical_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
 if (($ec_colon = strpos($ec_canonical_host, ':')) !== false) {

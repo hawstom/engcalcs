@@ -1,6 +1,6 @@
 <?php
 /**
- * Generate hawsedc.com/sitemap.xml (ROADMAP Task 149).
+ * Generate the sitemap (ROADMAP Task 149).
  *
  * Usage:  php dev/scripts/generate_sitemap.php [--stdout]
  *
@@ -22,7 +22,13 @@
 
 $repoRoot   = dirname(__DIR__, 2);              // .../hawsedc/engcalcs
 $siteRoot   = dirname($repoRoot);               // .../hawsedc          (parent site, not a repo)
-$origin     = 'https://hawsedc.com';            // keep in step with CANONICAL_ORIGIN
+$origin     = 'https://librewaternet.org';       // keep in step with CANONICAL_ORIGIN_DEFAULT
+// The PARENT SITE's own pages did not move and could not: /sewslope.php and /peakfact.php are
+// hawsedc.com documents that exist nowhere else, and the suite consolidating onto LibreWaterNet
+// (Task 479.01) says nothing about them. Listing them under $origin would advertise three URLs
+// that 404. Two origins in one sitemap is therefore correct here and is not drift -- see the note
+// this script prints at the end about what that costs in Search Console.
+$parentOrigin = 'https://hawsedc.com';
 $outFile    = $siteRoot . '/sitemap.xml';
 $toStdout   = in_array('--stdout', $argv, true);
 
@@ -30,6 +36,13 @@ $toStdout   = in_array('--stdout', $argv, true);
 // Read straight from the app's own settings file so a new language never needs a second edit here.
 $_SERVER['SCRIPT_NAME'] = 'generate_sitemap.php';
 require $repoRoot . '/lib/Language.Settings.php';
+
+// A page served at a PRETTY URL is listed at that URL and at no other, because the sitemap must
+// name the address the page itself nominates -- listing '/engcalcs/Looped-Network.php' beside a
+// page whose canonical is '/app' advertises a URL the page disowns (ROADMAP Task 479.01). One
+// declaration, read here and by ec_canonical_url(); this file requires it directly because it
+// runs outside a web request and never loads the bootstrap.
+require $repoRoot . '/lib/Canonical.lib.php';
 $languages = array_keys($all_language_settings);
 
 // --- Multilingual pages ----------------------------------------------------------------------
@@ -85,14 +98,14 @@ $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
 foreach ($parentPages as $p) {
-    $xml .= "  <url>\n    <loc>" . htmlspecialchars($origin . $p, ENT_XML1) . "</loc>\n"
+    $xml .= "  <url>\n    <loc>" . htmlspecialchars($parentOrigin . $p, ENT_XML1) . "</loc>\n"
           . "    <lastmod>$today</lastmod>\n  </url>\n";
 }
 
 $count = count($parentPages);
 foreach ($pages as $file) {
-    // Match ec_canonical_url(): /index.php collapses to the directory URL.
-    $path = ($file === 'index.php') ? '/engcalcs/' : '/engcalcs/' . $file;
+    // Match ec_canonical_url() exactly, pretty URLs and the /index.php collapse alike.
+    $path = ecCanonicalPath('/engcalcs/' . $file);
     if (in_array($file, $englishOnly, true)) {
         $xml .= "  <url>\n    <loc>" . htmlspecialchars($origin . $path, ENT_XML1) . "</loc>\n"
               . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
@@ -119,6 +132,11 @@ file_put_contents($outFile, $xml);
 printf("Wrote %s\n  %d URLs (%d pages x %d languages, plus %d parent-site pages)\n",
     $outFile, $count, count($pages), count($languages), count($parentPages));
 echo "  Excluded: " . implode(', ', array_keys($excluded)) . "\n";
-echo "\nNot done by this script (parent-site root, one-time):\n";
-echo "  robots.txt needs the line:  Sitemap: $origin/sitemap.xml\n";
-echo "  and the sitemap should be submitted once in Google Search Console.\n";
+echo "\nNot done by this script (server-side, and CHANGED by Task 479.01):\n";
+echo "  This file is written to the hawsedc.com site root and now lists $origin URLs for\n";
+echo "  every suite page, because that is the address those pages nominate. A sitemap listing\n";
+echo "  another host's URLs is CROSS-SUBMISSION: Google honours it only when both properties are\n";
+echo "  verified by the same owner, so librewaternet.org must be a verified property alongside\n";
+echo "  hawsedc.com, or the suite's 540 URLs are simply ignored.\n";
+echo "  robots.txt at each host needs the line:  Sitemap: $parentOrigin/sitemap.xml\n";
+echo "  and the sitemap should be re-submitted in Google Search Console after this move.\n";

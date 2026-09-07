@@ -47,6 +47,11 @@ $ec_sessionAgeMs = ecSessionAgeMs();
 // They are needed for determining the session language in Session.lib.php below.
 require_once('Language.Settings.php');
 
+// Which URL each page nominates as its own (ecCanonicalPath()). Must precede Language.lib.php:
+// ec_canonical_url() calls it, and HeadersFooters.lib.php builds canonical, hreflang and og:url
+// from that one function.
+require_once('Canonical.lib.php');
+
 // Load the language functions and set current language.
 require_once('Language.lib.php');
 

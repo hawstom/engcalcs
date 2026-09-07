@@ -148,6 +148,8 @@ run_check "storage guard selftest"       blocking php dev/scripts/storage_guard_
 # LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
+run_check "canonical path override"      blocking php dev/scripts/canonical_path_check.php
+run_check "canonical path selftest"      blocking php dev/scripts/canonical_path_selftest.php
 # Task 322 rows 11 and 12. FOUR third-party requests, all opt-in, each behind its own gate -- and
 # every cookie, localStorage key and IndexedDB store a shipped file writes is written down. The
 # second found two that were not, in the file whose only claim is that it is complete. Neither
