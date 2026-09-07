@@ -26203,11 +26203,11 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function buildPipeTypeSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libPipeTypesRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetypes_note || 'A pipe type belongs to a project, and a pipe indicates the one it uses in its own properties. A definition states only the properties you fill in, so a type that states a roughness and no diameter is a normal one to make. Editing a definition here changes every pipe that uses it.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetypes_note || 'Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.'));
 		// Said once for the section, not once per entry -- buildCurveSection()'s rule, and for the
 		// same reason: it is the same sentence about every row, and twenty copies of a sentence is
 		// what makes a panel unreadable.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetype_blank_tip || 'Leave a box empty and this type does not state that property. A pipe using this type then keeps its own value for it.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_pipetype_blank_tip || 'Blank properties in a pipe type definition are left to be entered individually for each pipe.'));
 		host.appendChild(libButton(pc.lpn_library_pipetype_add || 'Add a pipe type', function () {
 			saveUndoSnapshot();
 			// **A NEW TYPE STATES NOTHING**, which is the honest starting point: a definition seeded
@@ -26298,7 +26298,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = pipeTypeUsers(t.id);
 			if (inUse.length) {
 				alert((pc.lpn_library_pipetype_in_use
-					|| 'This pipe type is used by {count} pipes: {ids}. Point those pipes at another type, or detach them, before deleting this one.')
+					|| 'This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}

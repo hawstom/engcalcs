@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**13 still to read**, of 22 untranslated keys, of 1710 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 22 untranslated keys, of 1710 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,14 +25,14 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (22, 13 to read @@ NEEDS RULING)
+## lpn_  (22, all ruled)
 
 - **`lpn_field_pipetype`**
   > Pipe type
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_field_pipetype_tip`**
-  > The pipe type in the project library that this pipe uses. Every property the type states is read from the type, so its box here cannot be edited. Detach to give this one pipe its own values.
-  @@ NEEDS RULING
+  > The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.
+  _Ruled OK 2026-09-07._
 - **`lpn_find_filter_btn`**
   > Filter in current table
   _Ruled OK 2026-09-07._
@@ -50,28 +50,28 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-07._
 - **`lpn_library_pipetype_add`**
   > Add a pipe type
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_library_pipetype_blank_tip`**
-  > Leave a box empty and this type does not state that property. A pipe using this type then keeps its own value for it.
-  @@ NEEDS RULING
+  > Blank properties in a pipe type definition are left to be entered individually for each pipe.
+  _Ruled OK 2026-09-07._
 - **`lpn_library_pipetype_in_use`**
-  > This pipe type is used by {count} pipes: {ids}. Point those pipes at another type, or detach them, before deleting this one.
-  @@ NEEDS RULING
+  > This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.
+  _Ruled OK 2026-09-07._
 - **`lpn_library_pipetype_unused`**
   > Nothing uses this pipe type.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_library_pipetype_used_by`**
   > Pipes using this type
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_library_pipetypes`**
   > Pipe types
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_library_pipetypes_note`**
-  > A pipe type belongs to a project, and a pipe indicates the one it uses in its own properties. A definition states only the properties you fill in, so a type that states a roughness and no diameter is a normal one to make. Editing a definition here changes every pipe that uses it.
-  @@ NEEDS RULING
+  > Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.
+  _Ruled 2026-09-07: Please note the drastically different style here than what you have been using._
 - **`lpn_library_pipetypes_tip`**
-  > A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients, so that editing the definition edits every pipe that uses it.
-  @@ NEEDS RULING
+  > A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.
+  _Ruled OK 2026-09-07._
 - **`lpn_pane_filter_clear`**
   > Show all
   _Ruled OK 2026-09-07._
@@ -83,13 +83,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-07._
 - **`lpn_pipetype_detach`**
   > Detach from pipe type
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_pipetype_detach_tip`**
   > Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_pipetype_none`**
   > No pipe type selected
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-07._
 - **`lpn_tool_key_hint`**
   > Shortcut: press {key}.
   _Ruled OK 2026-09-07._

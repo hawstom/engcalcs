@@ -570,6 +570,16 @@
             "on": "Name or description of the category.",
             "ruled": "2026-08-29"
         },
+        "lpn_field_pipetype": {
+            "on": "Pipe type",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_field_pipetype_tip": {
+            "on": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
+            "ruled": "2026-09-07",
+            "answer": "Edited."
+        },
         "lpn_field_tag": {
             "on": "Tag",
             "ruled": "2026-09-05"
@@ -880,6 +890,46 @@
             "on": "Y",
             "ruled": "2026-09-05"
         },
+        "lpn_library_pipetype_add": {
+            "on": "Add a pipe type",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_library_pipetype_blank_tip": {
+            "on": "Blank properties in a pipe type definition are left to be entered individually for each pipe.",
+            "ruled": "2026-09-07",
+            "answer": "Edited"
+        },
+        "lpn_library_pipetype_in_use": {
+            "on": "This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_library_pipetype_unused": {
+            "on": "Nothing uses this pipe type.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_library_pipetype_used_by": {
+            "on": "Pipes using this type",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_library_pipetypes": {
+            "on": "Pipe types",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_library_pipetypes_note": {
+            "on": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
+            "ruled": "2026-09-07",
+            "answer": "Please note the drastically different style here than what you have been using."
+        },
+        "lpn_library_pipetypes_tip": {
+            "on": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
+            "ruled": "2026-09-07",
+            "answer": "Edited."
+        },
         "lpn_library_rule_add": {
             "on": "Add a rule",
             "ruled": "2026-09-05"
@@ -1006,6 +1056,21 @@
         },
         "lpn_pane_filter_note": {
             "on": "Filtered by {q}. Showing {n} of {all}.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_pipetype_detach": {
+            "on": "Detach from pipe type",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_pipetype_detach_tip": {
+            "on": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_pipetype_none": {
+            "on": "No pipe type selected",
             "ruled": "2026-09-07",
             "answer": "OK."
         },
