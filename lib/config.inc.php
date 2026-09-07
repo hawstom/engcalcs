@@ -268,7 +268,22 @@ if (isset($_GET['ec_nolog']) && !headers_sent()) {
     } else {
         // Ten years: this is a standing choice by someone who works on the site, not a preference
         // anyone needs to revisit.
-        setcookie(EC_NOLOG_COOKIE, '1', time() + (10 * 365 * 86400), '/');
+        //
+        // THE ATTRIBUTES ARE NAMED, like every other cookie this suite sets (Task 322 half B).
+        // This was the one write left in the POSITIONAL form of setcookie(), whose fourth argument
+        // is the path and which has no slot for SameSite at all -- so the cross-site rule was
+        // whatever the visitor's browser applied, and browsers do not agree. httponly is true
+        // because ecLoggingOptedOut() is the only reader and it is PHP; secure follows the scheme,
+        // because this host answers on http as well and a Secure cookie set over http is silently
+        // dropped. ecCookieSecure() is defined further down this file and hoisted, so it is
+        // callable here.
+        setcookie(EC_NOLOG_COOKIE, '1', [
+            'expires'  => time() + (10 * 365 * 86400),
+            'path'     => '/',
+            'samesite' => 'Lax',
+            'secure'   => ecCookieSecure(),
+            'httponly' => true,
+        ]);
         $_COOKIE[EC_NOLOG_COOKIE] = '1';
     }
 }

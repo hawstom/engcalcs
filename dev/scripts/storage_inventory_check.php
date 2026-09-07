@@ -288,8 +288,14 @@ $sources = [];
 foreach (glob($root . '/js/*.js') as $f) {
     $sources[substr($f, strlen($root) + 1)] = ecReadJsCode($f);
 }
+// PHP COMMENTS ARE BLANKED TOO, for the reason the docblock gives about JS and which is not
+// specific to JS: this repository comments at length about storage, and about the FORM of a write.
+// Found 2026-09-06 (Task 322 half B) -- a comment reading "the POSITIONAL form of setcookie(),
+// whose fourth argument is the path" was read as a real write whose cookie name is `)`, and the
+// check failed the build over a sentence. A false positive in a blocking check is expensive
+// exactly here, where the honest fix looks like a rule violation.
 foreach (array_merge(glob($root . '/*.php'), glob($root . '/lib/*.php')) as $f) {
-    $sources[substr($f, strlen($root) + 1)] = (string) file_get_contents($f);
+    $sources[substr($f, strlen($root) + 1)] = ecBlankJsComments((string) file_get_contents($f));
 }
 if (!$sources) {
     echo "storage_inventory_check.php read no shipped source at all. That is a broken check, not a\n";
