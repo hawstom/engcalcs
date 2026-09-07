@@ -104,7 +104,7 @@ const SOURCE_OF = {
 // Read as: a settings key matching one of these is FURNITURE or a deliberate presentation choice.
 // Everything else on `settings` is model and is compared.
 const CURATED_SETTING = {
-	engine: 'the gallery opens Net1 on EPANET so its chemistry runs; the routing is not the model',
+	engine: 'every gallery example opens on EPANET, which is the page default since Task 605; the routing is not the model',
 	sectionsOpen: 'which Settings sections are unfolded',
 	colorClassesNode: 'legend banding', colorClassesLink: 'legend banding',
 	colorRampNode: 'palette', colorRampLink: 'palette',

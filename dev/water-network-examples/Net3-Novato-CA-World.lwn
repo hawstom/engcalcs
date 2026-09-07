@@ -2637,7 +2637,7 @@
 			"emitterExponent": 0.5
 		},
 		"tolerance": 1e-9,
-		"engine": "native",
+		"engine": "epanet",
 		"autoRun": true,
 		"defaults": {
 			"nodeElev": 0,

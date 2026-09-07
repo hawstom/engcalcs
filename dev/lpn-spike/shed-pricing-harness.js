@@ -85,6 +85,22 @@ const L = loadLoopedNetwork(
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); }"
 );
+
+// **THIS HARNESS PINS THE BUILT-IN SOLVER, AND THE REASON IS SYNCHRONY** (Task 605). EPANET is the
+// page's default since that task, and runSolve() hands a network to it through a promise: a
+// harness that calls L.runSolve() and reads the drawing on the next line would be reading the
+// PREVIOUS solve, which is the stale-but-plausible answer dev/testing-notes.md warns about. This
+// file is about how a shed subset is priced against its real width and asserts nothing whatever about engines, so it takes the
+// solver that answers on the same tick rather than becoming async throughout.
+//
+// Pinned INSIDE the wrapper rather than once at the top, because L.reset() and L.applySaved() both
+// seat a fresh settings object carrying the new 'epanet' default, and a pin placed before either
+// of them is silently undone.
+{
+	const realRunSolve = L.runSolve;
+	L.runSolve = function () { L.settings().engine = 'native'; return realRunSolve.apply(this, arguments); };
+}
+
 L.buildLayers();
 L.setCanvas(1000, 700);
 L.seedDefaultInputs();

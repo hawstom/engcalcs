@@ -420,8 +420,13 @@ const EngCalcs = global.EngCalcs;
 	// A report with no run says so rather than showing zeros.
 	L.rebuildEnergyReport();
 	const reportHost = document.getElementById('lpn_energy_report');
-	check(/EPANET engine/.test(reportHost.textContent || ''),
-		'with no run in hand the report says it needs the engine and a run time');
+	// **IT NAMES THE RUN, NOT THE ENGINE** (Task 605). It used to say "the EPANET engine and a
+	// total run time", and asserting on the engine's name is what made this check a hostage to the
+	// wording rather than to the promise. The promise is that a report with no run tells the reader
+	// what to go and do, which is set a total run time and press Calculate.
+	check(/extended period simulation/.test(reportHost.textContent || '')
+		&& /Total run time/.test(reportHost.textContent || ''),
+	'with no run in hand the report says it needs an extended period simulation and a run time');
 	// And with one, it draws the table. The summary is handed in through the one door the page
 	// reads it by, so this exercises the real path rather than a private hook.
 	EngCalcs.lpnTimeRunEnergy = function () {

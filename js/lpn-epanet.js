@@ -13,17 +13,19 @@
 // says, and js/lpn-solver.js refuses it by name if this module cannot be reached. See the note
 // on EngCalcs.lpnValveIsNative there for the reasoning and the measurement behind it.
 //
-// THE NATIVE SOLVER IS THE DEFAULT, AND NOT FOR SPEED -- EPANET IS FASTER. Measured by
-// dev/lpn-spike/engine-bench.js:
+// THIS MODULE IS THE DEFAULT SOLVER (Task 605, Tom 2026-09-06: *"'Always use the EPANET solver'
+// is the page default."*). It used to be the opt-in, and the reason was never speed -- EPANET is
+// faster, measured by dev/lpn-spike/engine-bench.js:
 //
 //   21 nodes    native 0.43 ms    EPANET's actual SOLVE 0.05 ms     -- EPANET ~9x faster
 //   201 nodes   native 36.3 ms    EPANET's actual SOLVE 0.78 ms     -- EPANET ~46x faster
 //
 // The C engine beats a JavaScript dense Cholesky and degrades gracefully where ours is O(n^3).
-// The honest cost of choosing EPANET is the ONE-TIME module load: 663 KB to fetch (236 KB
-// gzipped) and ~33 ms to import and instantiate in Node. That is a real cost for the
-// offline/low-bandwidth case this suite cares about, and it is the whole of the case for keeping
-// a native solver at all. It is not a speed argument, and must not be written up as one.
+// The honest cost of this module is the ONE-TIME load: 663 KB to fetch (236 KB gzipped) and
+// ~33 ms to import and instantiate in Node. A first-time visitor now pays it on their first
+// solve, and that is the accepted consequence of the ruling rather than a defect. It remains the
+// whole of the case for KEEPING a native solver: js/lpn-solver.js is what answers when this
+// module cannot be fetched, which is this page's offline promise. Never a speed argument.
 //
 // MEASURE THE EXPORTED FUNCTION END TO END before believing any decomposition of its cost. Two
 // separate benches of this file went wrong by hoisting setup out of their own timing loop, so

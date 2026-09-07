@@ -1,5 +1,5 @@
-// THE ENGINE CHECKBOX IS DISPLAYED THE OTHER WAY ROUND FROM THE WAY IT IS STORED -- ROADMAP
-// Task 602. Run with:
+// THE ENGINE CHECKBOX IS DISPLAYED THE OTHER WAY ROUND FROM THE WAY IT IS STORED (Task 602), AND
+// SINCE TASK 605 THE DEFAULT IS EPANET AND NOTHING MIGRATES A SAVED FILE. Run with:
 //   node dev/lpn-spike/engine-checkbox-harness.js
 //
 // WHY THIS EXISTS. Tom, 2026-09-06: *"This is really a choice about the built-in solver. They
@@ -147,6 +147,45 @@ ok('a pre-602 file stating "epanet" still selects EPANET', L.settings().engine =
 L.rebuildSettingsFields();
 ok('...and shows the built-in box unticked, which is what it now means',
 	!!engineBox() && engineBox().checked === false);
+
+// ---- 6. Task 605: EPANET IS THE DEFAULT, AND NOTHING MIGRATES -------------------------------
+// Tom, 2026-09-06: *"'Always use the EPANET solver' is the page default."* The default moved from
+// 'native' to 'epanet' in defaultSettings(), and the three things that could go wrong with that
+// are asserted separately, because each fails silently on its own.
+//
+// The FIRST is the default itself, read out of defaultSettings() rather than out of a fresh
+// project, so a reset that happened to leave a stale object behind cannot make it look right.
+ok('a new project states engine "epanet"', L.defaultSettings().engine === 'epanet',
+	L.defaultSettings().engine);
+L.reset();
+L.rebuildSettingsFields();
+ok('...and a new project shows the built-in box unticked, which is what that means',
+	!!engineBox() && engineBox().checked === false, engineBox() && engineBox().checked);
+
+// The SECOND is the absence of a migration, and it is the mirror of section 5. A file saved when
+// 'native' was the default states 'native' because that is what its author was solving with; the
+// setting is a PREFERENCE and the routing is a fact about the network (Task 602's rule), so moving
+// the default may not reach back into a file anybody has already saved. A "helpful" upgrade here
+// would change every one of those files' answers with nothing on screen saying so.
+const preDefault = JSON.parse(JSON.stringify(L.serializeProject()));
+preDefault.settings.engine = 'native';
+L.reset();
+L.applySaved(preDefault);
+L.buildDom();
+ok('a file saved before the default moved still selects the built-in solver',
+	L.settings().engine === 'native', L.settings().engine);
+L.rebuildSettingsFields();
+ok('...and still shows its box ticked', !!engineBox() && engineBox().checked === true);
+
+// The THIRD is the banner. Tom, same message: *"No more banner about the EPANET solver."* The
+// gallery's welcome line was, under Task 222, the one place this page said what engine it runs.
+// The line stays -- a greeting is not an advertisement -- and the engine clause is gone. Asserted
+// on the shipped English rather than on the rendered pane because the pane fetches a manifest;
+// what the ruling is about is the sentence.
+const WELCOME = (global.EngCalcs.pageConfig || {}).lpn_examples_welcome;
+ok('the gallery still greets the visitor', typeof WELCOME === 'string' && WELCOME.length > 0, WELCOME);
+ok('...and the greeting names no engine and no solver',
+	!/EPANET/i.test(WELCOME || '') && !/solver/i.test(WELCOME || ''), WELCOME);
 
 console.log(fails === 0 ? '\nAll checks passed.' : '\n' + fails + ' FAILURE(S).');
 process.exit(fails === 0 ? 0 : 1);

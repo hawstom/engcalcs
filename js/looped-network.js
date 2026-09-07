@@ -3243,19 +3243,25 @@ var EngCalcs = EngCalcs || {};
 			// **`tolerance` IS DEPRECATED AND IS NO LONGER SEEDED HERE** (2026-08-28). EPANET's
 			// `Accuracy` replaced it; solveAccuracy() still READS it so a project saved before the
 			// change keeps its own number, but a new project no longer carries the field at all.
-			// 'native' (js/lpn-solver.js) or 'epanet' (the real EPANET engine as WASM,
-			// js/lpn-epanet.js). The two agree to 1e-5..1e-3 m of head
+			// 'epanet' (the real EPANET engine as WASM, js/lpn-epanet.js) or 'native'
+			// (js/lpn-solver.js). The two agree to 1e-5..1e-3 m of head
 			// (dev/lpn-spike/validate_epanet.js).
 			//
-			// NATIVE IS THE DEFAULT, BUT NOT BECAUSE IT IS FASTER -- it is not.
-			// dev/lpn-spike/engine-bench.js: EPANET's own solve is ~0.05 ms at this page's target and
-			// ~0.78 ms at 201 nodes, where ours is 0.43 ms and 36 ms. EPANET wins at every size, by
-			// more as the network grows.
+			// **EPANET IS THE DEFAULT** (Task 605, Tom 2026-09-06: *"'Always use the EPANET solver'
+			// is the page default."*). It used to be 'native', and the reason given was the ONE-TIME
+			// 663 KB module load rather than speed -- EPANET wins on speed at every size. A new
+			// project therefore now fetches that module on its first solve. That is the accepted
+			// cost of this ruling and it is Tom's to revisit, not a defect to work around here.
 			//
-			// The real and only cost of EPANET is the ONE-TIME 663 KB module load, a genuine cost on
-			// a slow connection and why the default has not moved. See Task 313 -- the per-solve gap
-			// that remains is our own .inp round trip, not the engine.
-			engine: 'native',
+			// **THE CODE ON THE OTHER SIDE STAYS.** The built-in solver is what answers when the
+			// module cannot be fetched, which is this page's offline promise, and it still refuses a
+			// PRV/PSV/FCV network by name. What changed is the default and the advertising, not the
+			// solver.
+			//
+			// **AND NOTHING MIGRATES A SAVED PROJECT** (Task 602's rule: the setting is a preference,
+			// the routing is a fact about the network). applySaved() reads what the file states and
+			// leaves it there; a file saved stating 'native' still solves native.
+			engine: 'epanet',
 			// **AUTOMATIC RECALCULATION, AS A STATED PREFERENCE** (ROADMAP Task 467). Tom,
 			// 2026-08-20: *"a toggle under Calculation.Hydraulics for 'Recalculate the simulation
 			// for this project automatically.' If it's on, we do our debounce and calculate, and we
@@ -14265,10 +14271,15 @@ var EngCalcs = EngCalcs || {};
 			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' }, pc.lpn_examples_loading || 'Loading examples…'));
 			return;
 		}
-		// The welcome line sits ABOVE the heading and is the one place this page says what engine it
-		// runs (Task 222). A <p>, not a second <h2>: there is one heading on this pane and it is the
-		// instruction, not the greeting.
-		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || 'Welcome to water supply network modelling, with the EPANET solver'));
+		// The welcome line sits ABOVE the heading. A <p>, not a second <h2>: there is one heading on
+		// this pane and it is the instruction, not the greeting.
+		//
+		// **IT NO LONGER NAMES THE ENGINE** (Task 605, Tom 2026-09-06: *"No more banner about the
+		// EPANET solver."*). Under Task 222 this was the one place this page said what engine it
+		// runs, said to a visitor who had just arrived. EPANET is now simply what solves, so the
+		// clause advertised a choice nobody is being asked to make. The line stays because a
+		// gallery greeting is not an engine advertisement; only the clause went.
+		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || 'Welcome to water supply network modelling'));
 		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || 'Open an example'));
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || 'Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.'));
 		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT.** Nothing guarantees the cards fit the map's
@@ -16817,8 +16828,8 @@ var EngCalcs = EngCalcs || {};
 			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve, so there
 			// is no substitution to report. The remaining three say which outcome a valve met -- kept
 			// and solvable here, kept but needing the EPANET engine, or turned back into a pipe.
-			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out.';
-			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.';
+			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, holding the same loss the file gives them.';
+			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them.';
 			// 'valve-dropped' IS NO LONGER EMITTED (Task 248): PBV and GPV are real elements and
 			// arrive as themselves. The case is kept so an older saved report still renders a
 			// sentence rather than a blank; delete the key once nothing can produce it.
@@ -16855,7 +16866,7 @@ var EngCalcs = EngCalcs || {};
 			// The fallback is kept in step with the key, as the tank volume curve's is: this is what
 			// a page whose pageConfig failed to load shows, and it stated the OPPOSITE of what the
 			// page does once Task 248.03 shipped.
-			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
+			case 'rules': return pc.lpn_inp_drop_rules || 'This file has rule-based controls. This page reads them and uses them. Run the model and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
 			case 'extended-period': return pc.lpn_inp_drop_eps || 'This file describes an extended period simulation. The part of this page that runs an extended period simulation did not load, so only the starting conditions came in.';
 			// **NOTHING IS DISCARDED ANY MORE, AND THE SENTENCES SAY SO** (Tom, 2026-08-29, reading
 			// the old one: *"It seems to be saying that quality and pump energy cost info is
@@ -16878,10 +16889,10 @@ var EngCalcs = EngCalcs || {};
 			// one sentence covering all four would claim a chemical is modelled for a file whose
 			// only water-quality section is [MIXING]. One name doing two jobs gets split.
 			case 'quality':
-			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'sources':
-			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.';
-			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
+			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset\'s properties, where you can read it or change it.';
 			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for how it formats the report it prints. You can read the engine\'s report here, under Reports, EPANET run, but it comes out in the engine\'s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
@@ -16889,7 +16900,7 @@ var EngCalcs = EngCalcs || {};
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
-			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run a chemical. All of them are written back if you save an EPANET file.';
+			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are used when you run a chemical. All of them are written back if you save an EPANET file.';
 			// **A DIFFERENCE IN THE ANSWERS, NOT IN WHAT THE FILE HOLDS**, which is why it is not on
 			// the kept-but-unused limb below it. EPANET 2.2's pressure-driven analysis gives a
 			// junction less water when the pressure is low; this page solves demand-driven, so the
@@ -23922,8 +23933,7 @@ var EngCalcs = EngCalcs || {};
 		row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip);
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
-		// and a select would imply the two are peers when the native path is the one this page
-		// is built around.
+		// and a select would imply the two are peers when EPANET is simply what solves.
 		//
 		// **THE BOX IS DISPLAYED THE OTHER WAY ROUND FROM THE WAY IT IS STORED** (Task 602, Tom
 		// 2026-09-06: *"This is really a choice about the built-in solver. They don't get a choice
@@ -23931,6 +23941,10 @@ var EngCalcs = EngCalcs || {};
 		// used to say "Solve with the EPANET solver", so unticked read as "never EPANET", which is
 		// false on two paths the user does not control: an extended-period run and an active
 		// PRV/PSV/FCV go to EPANET whatever this box says.
+		//
+		// **UNTICKED IS NOW THE DEFAULT** (Task 605): defaultSettings() states 'epanet'. The
+		// control stays -- Tom asked for the page to stop advertising the choice, and said whether
+		// the setting deserves to exist at all is a separate question and his. Do not delete it.
 		//
 		// `settings.engine` KEEPS its `epanet`/`native` vocabulary in storage, untouched, so no
 		// saved project changes meaning. Display polarity and storage polarity are different
@@ -25419,7 +25433,7 @@ var EngCalcs = EngCalcs || {};
 		// The native solver has no time dimension and is not being given one.
 		if (noteFn && qualitySetting().mode !== 'none') {
 			noteFn(host, pc.lpn_quality_needs_run
-				|| 'Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.');
+				|| 'Water quality is carried along the pipes as the water travels, so it needs an extended period simulation. Set a Total run time under Time, then press the Calculate button.');
 		}
 	}
 	/**
@@ -25619,7 +25633,7 @@ var EngCalcs = EngCalcs || {};
 		rowFn(host, pc.lpn_energy_currency || 'Currency', cur, pc.lpn_energy_currency_tip);
 		if (noteFn) {
 			noteFn(host, pc.lpn_energy_price_note || 'This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.');
-			noteFn(host, pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.');
+			noteFn(host, pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.');
 		}
 	}
 	/**
@@ -31123,7 +31137,7 @@ var EngCalcs = EngCalcs || {};
 		if ((settings.engine === 'epanet' || epanetOnly.length > 0) && EngCalcs.lpnSolveEpanet) {
 			if (epanetOnly.length > 0 && settings.engine !== 'epanet') {
 				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
-					'Worked out with the EPANET engine, because these valves open and close on their own:') +
+					'Solved with the EPANET solver, because these valves open and close on their own:') +
 					' ' + epanetOnly.join(', ');
 			}
 			runSolveEpanet(model);
@@ -32170,7 +32184,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!sum) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.', host);
 			return;
 		}
 		// **THE DURATION IS BACK INSIDE THE SENTENCE, WHICH IS WHERE TOM PUT IT** (2026-09-04).
@@ -32541,7 +32555,7 @@ var EngCalcs = EngCalcs || {};
 		// row cannot.
 		if (!text) {
 			setNotice(pc.lpn_time_no_report ||
-				'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.');
+				'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.');
 			return false;
 		}
 		if (!box || !pre) { return false; }
@@ -32671,11 +32685,16 @@ var EngCalcs = EngCalcs || {};
 		// depend only on the ENGINE and the network having minor losses or Manning roughness, so
 		// they were re-emitted on every keystroke's solve and could never go away.
 		//
-		// They are also not facts about this solve. They are facts about the engine you picked,
-		// they are 0.08% and 0.6%, nothing can be done about either, and the identical sentences
-		// already sit in `lpn_settings_engine_native_tip` where the engine is chosen. Saying them
-		// once, the first time they arise, tells a user who never opens that tip; saying them
-		// forever spends a fifth of a phone screen on a rounding difference.
+		// They are also not facts about this solve. They are facts about EPANET's rounded
+		// constants, they are 0.08% and 0.6%, and nothing can be done about either. Saying them
+		// once, the first time they arise, is the whole of the disclosure; saying them forever
+		// spends a fifth of a phone screen on a rounding difference.
+		//
+		// **NEITHER SENTENCE NAMES THE BUILT-IN SOLVER ANY MORE** (Task 605). They used to read as
+		// a comparison between two solvers, and the same pair sat in
+		// `lpn_settings_engine_native_tip` where the engine was chosen. EPANET is now simply what
+		// solves, so the reference point is the exact form of the equation rather than the other
+		// implementation, and the tip no longer carries them at all.
 		//
 		// Cleared when the ENGINE changes and when a different project is applied, because for
 		// either the fact is new again. Deliberately NOT persisted: a page reload is cheap, and a
@@ -32741,8 +32760,8 @@ var EngCalcs = EngCalcs || {};
 		// noteOnce() has already decided that -- so a later solve neither restarts a running clock
 		// nor wipes a note the user has not finished reading.
 		var engineNotes = [
-			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.') : '',
-			minorNote ? (pc.lpn_engine_minor_loss_note || 'Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.') : ''
+			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.') : '',
+			minorNote ? (pc.lpn_engine_minor_loss_note || 'Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.') : ''
 		].filter(function (t) { return !!t; }).join(' ');
 		if (engineNotes) { setEngineNotes(engineNotes); }
 		refreshLabelText();

@@ -812,7 +812,7 @@ $ec_lang['about_main_title']='About HawsEDC Engineering Calculators';
 $ec_lang_syn['about_main_title']='';
 $ec_lang['about_main_desc']='Mission, Libre Software, and Contributing';
 $ec_lang_syn['about_main_desc']='';
-$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>This is an invitation, not a price. There is no paid tier, no free tier that can be withdrawn, and no delay before the code becomes yours. The full version you see today is free for everyone now and forever to use and to modify.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>These calculators work as a <strong>Progressive Web App (PWA)</strong>. Visit any calculator page while connected, and your browser will cache all the calculators automatically. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser\'s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser\'s address bar.</p><p>You can also save any individual calculator using your browser\'s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>This is an invitation, not a price. There is no paid tier, no free tier that can be withdrawn, and no delay before the code becomes yours. The full version you see today is free for everyone now and forever to use and to modify. That is a promise about the software, which the licence puts beyond anybody\'s power to take back, including ours. The website that serves it is offered freely today; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser\'s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser\'s address bar.</p><p>You can also save any individual calculator using your browser\'s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang_syn['about_body_html']='';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang_syn['contactSendMessage']='';
@@ -1208,15 +1208,13 @@ $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start b
 // -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
 // the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
 // a key translated into 26 languages to get it back a week later is the expensive direction.
-// **WHERE THE ENGINE CLAIM IS MADE** (Task 222, Tom 2026-08-17). About.php never named EPANET, and
-// he ruled that page has no good place for it -- "It's already in our page titles. About the best
-// other place for it is the Gallery intro." So it is said once, here, to a visitor who has just
-// arrived and has not yet drawn anything. His wording, unedited.
-//
-// It stays a QUALIFICATION and not a headline (dev/positioning.md §3): the sentence is about what
-// this software is FOR, with the engine as a subordinate clause. EPANET is public domain, so naming
-// it is safe; naming a competitor would not be (Task 296).
-$ec_lang['lpn_examples_welcome']='Welcome to water supply network modelling, with the EPANET solver';
+// **THE ENGINE CLAUSE IS GONE FROM THIS BANNER** (Task 605, Tom 2026-09-06: *"No more banner about
+// the EPANET solver."*). It read "with the EPANET solver" and was, under Task 222, the one place
+// this page said what engine it runs. EPANET is now simply what solves, so a banner announcing it
+// advertises a choice the visitor is no longer being asked to make. The gallery keeps its welcome;
+// lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
+// true and stays.
+$ec_lang['lpn_examples_welcome']='Welcome to water supply network modelling';
 $ec_lang['lpn_examples_heading']='Open an example';
 $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.';
 $ec_lang['lpn_examples_open']='Open';
@@ -1565,7 +1563,7 @@ $ec_lang['lpn_settings_auto_run_tip']='When this is on, this project recalculate
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
-$ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated with the EPANET solver.';
+$ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';
@@ -1888,10 +1886,10 @@ $ec_lang['lpn_inp_report_lead']='This page does not use everything EPANET does, 
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. The curve is kept in the Libraries box, the tank still refers to it, and an extended period simulation fills and empties the tank on the schedule that curve gives. A single instant is the same either way, because the water surface is the level the file sets. The diameter written in the file is kept beside the curve and is what a tank with no curve is drawn and solved as.';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
-// a loss; the first two are reported because the reader deserves to know which engine is now
-// working out their network, not because anything was thrown away.
-$ec_lang['lpn_inp_drop_tcv']='These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out.';
-$ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.';
+// a loss; the first two are reported because the reader deserves to know what became of a valve
+// their file states, not because anything was thrown away.
+$ec_lang['lpn_inp_drop_tcv']='These throttle valves came in as throttle valves, holding the same loss the file gives them.';
+$ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them.';
 $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They came in as open pipes, so the network is still joined up, but nothing controls pressure or flow there any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
@@ -1905,15 +1903,15 @@ $ec_lang['lpn_inp_drop_head_pattern']='These reservoirs rise and fall through th
 $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the one their curve was measured at, or change speed through the run. The speed and its pattern came in whole, and the head you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
-$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model with the EPANET engine and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs an extended period simulation did not load, so only the starting conditions came in.';
-$ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model with the EPANET engine, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_sources_mixing']='This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are calculated by the EPANET engine only.';
-$ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model with the EPANET engine, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_sources_mixing']='This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
+$ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_tags']='This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset\'s properties, where you can read it or change it.';
 $ec_lang['lpn_inp_drop_report']='This file holds EPANET\'s own settings for how it formats the report it prints. You can read the engine\'s report here, under Reports, EPANET run, but it comes out in the engine\'s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
-$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are handed to the EPANET engine when you run a chemical. All of them are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are used when you run a chemical. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds hydraulics already worked out. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_demand_model']='This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_other_options']='This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
@@ -2088,13 +2086,13 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // surprising: the built-in solver does a single moment and holds every tank at its starting
 // level, so a whole run needs the EPANET solver. dev/lpn-spike/eps-net3-harness.js reproduces
 // EPA's own published 24-hour Net3 report at all 25 reporting steps.
-$ec_lang['lpn_notes_1_def']='Each moment is solved with the same global gradient algorithm EPANET uses. Set a total run time and the EPANET solver calculates every reporting step in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back. The built-in solver calculates one moment at a time and holds every tank at its starting level.';
+$ec_lang['lpn_notes_1_def']='Each moment is solved with the global gradient algorithm. Set a total run time and every reporting step is calculated in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
 // VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
 // the honest half of it: the valves are all modeled now, but the three that open and close on
 // their own are solved by the EPANET solver and not by the built-in solver. That is a real
 // thing for a reader to know -- it is why such a network needs the engine downloaded once.
-$ec_lang['lpn_notes_2_def']='Water quality chemistry is not modeled; water age and source trace are. Valves: a throttle valve works in either solver, and the valves that set their own position (PRV, PSV, FCV) are solved with the EPANET solver, which this page turns on by itself when your network holds one of those valves.';
+$ec_lang['lpn_notes_2_def']='Water quality chemistry is not modeled; water age and source trace are. Throttle valves are solved, and so are the valves that set their own position (PRV, PSV, FCV).';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2105,7 +2103,7 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 // Library's Curves section is where a curve is read and edited.
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pump curve';
-$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points, the head at zero flow, the normal working point, and the point of highest flow, fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit. A curve can hold more than three points. The built-in solver reads three of them, the first, the middle and the last, to fit the equation above; the EPANET engine reads every point you gave it.';
+$ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points, the head at zero flow, the normal working point, and the point of highest flow, fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit. A curve can hold more than three points, and every point you gave it is read.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2557,7 +2555,7 @@ $ec_lang['lpn_settings_accuracy']='Accuracy';
 // because the translator has no term to look up. See the correction added to
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='The default is {n}.';
-$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page uses a stricter accuracy than EPANET\'s own default.';
+$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next, against the sum of the link flows. A smaller number is more exact and takes longer. Left empty, this page uses a stricter accuracy than EPANET\'s own default.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
@@ -2583,17 +2581,17 @@ $ec_lang['lpn_settings_trials_tip']='How many trials are allowed before the solv
 // not know which engine is answering cannot tell a control that did nothing from a setting that had
 // no effect. Saying it in the tip is cheaper than a second Settings section, and honest.
 $ec_lang['lpn_settings_unbalanced']='If it does not converge';
-$ec_lang['lpn_settings_unbalanced_tip']='What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution. Only the EPANET solver reads this box. The built-in solver always stops and marks the answer as not converged.';
+$ec_lang['lpn_settings_unbalanced_tip']='What to do with a network that has used up its trials and still has not converged. Allowing extra trials often reaches convergence. Stopping reports the last trial as it stands, which is not a solution.';
 $ec_lang['lpn_settings_unbalanced_continue']='Allow extra trials';
 $ec_lang['lpn_settings_unbalanced_stop']='Stop and report the last trial';
 $ec_lang['lpn_settings_unbalanced_trials']='Extra trials before reporting';
-$ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_unbalanced_trials_tip']='How many further trials to allow after the maximum above is used up, before the last trial is reported.';
 $ec_lang['lpn_settings_head_error']='Head error limit';
-$ec_lang['lpn_settings_head_error_tip']='An additional test the solver must pass before it stops: the largest head error remaining in any one pipe. Zero means do not apply this test. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_head_error_tip']='An additional test the solver must pass before it stops: the largest head error remaining in any one pipe. Zero means do not apply this test.';
 $ec_lang['lpn_settings_flow_change']='Flow change limit';
-$ec_lang['lpn_settings_flow_change_tip']='An additional test the solver must pass before it stops: the maximum change in any one pipe\'s flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_flow_change_tip']='An additional test the solver must pass before it stops: the maximum change in any one pipe\'s flow from one trial to the next. Zero means do not apply this test.';
 $ec_lang['lpn_settings_damp_limit']='Damping starts at';
-$ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can help an oscillating network to converge. Zero means the solver never damps. Only the EPANET solver reads this box.';
+$ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can help an oscillating network to converge. Zero means the solver never damps.';
 $ec_lang['lpn_settings_option_unset']='Not stated';
 $ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
 $ec_lang['lpn_settings_demand_multiplier_tip']='A single factor applied to every demand in the network at once. Use it to ask what the system does at more or less than present-day use. It does not change the numbers you typed. A scenario can carry its own, so average day, maximum day and peak hour are one number each; leave it blank in a scenario to use the project\'s.';
@@ -2601,21 +2599,18 @@ $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 $ec_lang_syn['lpn_settings_engine_native']='';
-// "IS FASTER" WAS FALSE AND IS GONE (Tom, 2026-08-14: *"is our tip about 'faster' right? I
-// thought you proved that it's too close to call."* He is right, and it was my own measurement
-// that showed it). Task 313 timed both: at this page's 10-20 node target the built-in solver is
-// 0.30 ms against EPANET's 0.41 ms -- the same number to a person -- and at 201 nodes EPANET is
-// TEN TIMES faster, because ours is a dense O(n^3) Cholesky and EPANET is sparse. So the honest
-// trade is not speed at all: it is the one-time download, which is the thing a visitor on a slow
-// connection actually pays.
+// **THIS TIP NO LONGER ARGUES THE TWO SOLVERS AGAINST EACH OTHER** (Task 605, Tom 2026-09-06:
+// *"We scrub our tips and alerts for any undue weight on the existence of two solvers."*). It
+// spent three sentences on speed and on the two measured disagreements -- minor losses 0.08%
+// (EPANET rounds g to 32.2 ft/s^2) and Manning 0.6% -- addressed to a reader who is no longer
+// being asked to choose an engine. Both are still announced in the status line when a network
+// actually holds the thing, which is where they are a fact about the number on screen rather
+// than a comparison offered in advance.
 //
-// THE DISAGREEMENTS ARE NAMED HERE BECAUSE THIS IS THE CHECKBOX (Tom, 2026-08-17: "Just disclose
-// it, maybe at the checkbox location"). It used to claim "Both solvers give the same answers",
-// which is false in two measured places -- minor losses 0.08% (EPANET rounds g to 32.2 ft/s^2)
-// and Manning 0.6%. Both are also announced in the status line when a network actually contains
-// the thing, but a user deciding whether to TURN THE ENGINE ON is asking the question here, and
-// finding out afterwards is finding out too late.
-$ec_lang['lpn_settings_engine_native_tip']='Solves with the built-in solver wherever it can, and calls the EPANET solver from the US EPA, here in your browser, when it cannot. Some networks go to the EPANET solver whatever this box says: an extended-period run always does, and so does a network holding an active PRV, PSV, or FCV. On a network this size you will not see a speed difference. The two solvers agree closely, but not exactly: EPANET rounds the value it uses for gravity, so its minor (local) losses come out about 0.08% lower than the built-in solver, and with Manning roughness its head loss comes out about 0.6% lower. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
+// What the tip keeps is the two things a person ticking this box does need: which paths go to
+// EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
+// connection actually pays.
+$ec_lang['lpn_settings_engine_native_tip']='This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
 $ec_lang_syn['lpn_settings_engine_native_tip']='';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
@@ -2626,7 +2621,7 @@ $ec_lang_syn['lpn_engine_failed']='';
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these valves open and close on their own:';
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.';
-$ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
+$ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.';
 $ec_lang_syn['lpn_engine_manning_note']='';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
@@ -2649,7 +2644,7 @@ $ec_lang['lpn_control_dangling_note']='These controls name an element that is no
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
 $ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
-$ec_lang['lpn_engine_minor_loss_note']='Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.';
+$ec_lang['lpn_engine_minor_loss_note']='Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
@@ -2754,7 +2749,7 @@ $ec_lang['lpn_time_report_step']='Report time step';
 $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
-$ec_lang['lpn_time_running']='Working out the extended period simulation with the EPANET solver.';
+$ec_lang['lpn_time_running']='Working out the extended period simulation.';
 $ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.';
 $ec_lang['lpn_time_slider']='Time';
 $ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.';
@@ -2838,7 +2833,7 @@ $ec_lang['lpn_quality_none']='Nothing';
 $ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';
 $ec_lang['lpn_quality_chemical']='A chemical that reacts';
-$ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as the water travels, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time under Time, then press the Calculate button.';
+$ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as the water travels, so it needs an extended period simulation. Set a Total run time under Time, then press the Calculate button.';
 // **THE CHEMICAL / REACTION MODE** (ROADMAP Task 566, dev/water-quality.md). EPANET's own words
 // throughout: bulk and wall reaction coefficient, initial quality, concentration. The unit of a
 // concentration is TEXT the document states beside the chemical name and is never converted, which
@@ -2937,7 +2932,7 @@ $ec_lang['lpn_energy_currency_tip']='Whatever you write here is printed beside e
 $ec_lang['lpn_energy_kwh']='kWh';
 $ec_lang['lpn_energy_kw']='kW';
 $ec_lang['lpn_energy_price_note']='This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.';
-$ec_lang['lpn_energy_needs_run']='Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.';
+$ec_lang['lpn_energy_needs_run']='Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.';
 $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing drawing power.';
 
 // ---- The scenario comparison (the planning engineer's wish-list row 2) ------------------------
@@ -3050,7 +3045,7 @@ $ec_lang['lpn_library_curve_type']='Curve type';
 // at all for a kind that has no equation, because a placeholder there would be a promise of an
 // answer that does not exist.
 $ec_lang['lpn_library_curve_equation']='Equation';
-$ec_lang['lpn_library_curve_equation_tip']='The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The built-in solver runs on this equation; the EPANET engine reads the points themselves.';
+$ec_lang['lpn_library_curve_equation_tip']='The curve fitted through the points, and the line drawn on the plot below. It is worked out from the points every time it is shown and is never stored, and its numbers are in the units the table above shows. The run reads the points themselves.';
 // **NOW A GRID, SO THIS SENTENCE IS ABOUT PASTING INTO ONE** (Tom, 2026-09-05: *"The line given is
 // worse than EPANET, and it really can't take a spreadsheet paste."*). Shown once under the section
 // heading rather than once per curve, so it is a note and no longer a tip.
