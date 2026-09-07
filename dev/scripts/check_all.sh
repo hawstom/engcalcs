@@ -131,6 +131,12 @@ run_check "log bucket column"            blocking php dev/scripts/log_bucket_che
 run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
+# Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
+# name is one lib/Icons.lib.php draws -- and a miss is the quietest failure in the suite: ecIcon()
+# returns the empty string, EngCalcs.iconEl() returns null, every drawing site is `if (ic)`, so the
+# control keeps its word and its tip and simply has no picture until a person notices the gap.
+run_check "icon names resolve"           blocking php dev/scripts/icon_name_check.php
+run_check "icon name selftest"           blocking php dev/scripts/icon_name_selftest.php
 # Task 322 rows 40-42, all three found by COUNTING a construct and asking what writing it that
 # many times assumes. Every failure below renders perfectly and is invisible to anyone using the
 # page: a lookup that returns null on a page this suite guards with `if (el)`, an install manifest
@@ -158,6 +164,13 @@ run_check "third-party requests"         blocking php dev/scripts/third_party_re
 run_check "third-party selftest"         blocking php dev/scripts/third_party_request_selftest.php
 run_check "storage inventory"            blocking php dev/scripts/storage_inventory_check.php
 run_check "storage inventory selftest"   blocking php dev/scripts/storage_inventory_selftest.php
+# Task 322 row 44, and it is row 38's shape exactly: the tree had decided the same question twice
+# in opposite directions. Five cookie writes named samesite, secure and httponly and argued each in
+# a comment; the two ec_nolog writes named none, being in the positional form of setcookie(), which
+# has no slot for SameSite at all. An attribute we do not name is one the browser names for us, and
+# browsers do not agree -- with nothing on the page different either way.
+run_check "cookie attributes"            blocking php dev/scripts/cookie_attribute_check.php
+run_check "cookie attribute selftest"    blocking php dev/scripts/cookie_attribute_selftest.php
 # Task 322 rows 7-9. Three page-level rules that break for a SEARCH ENGINE, a share card or a
 # visitor on a stale asset, and for nobody on this side. The exemption list was measurably wrong
 # once already -- it named index.php, which has its own description, and omitted privacy.php and
