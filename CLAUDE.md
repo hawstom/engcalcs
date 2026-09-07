@@ -893,7 +893,7 @@ Full inventory: `dev/cookie-storage-inventory.md`.
 
 ---
 
-## Deploying: three facts that are in no file you will be editing
+## Deploying: four facts that are in no file you will be editing
 
 - **`Options -Indexes` in `.htaccess` needs `AllowOverride Options`, and where that grant is missing
   Apache returns 500 FOR EVERY REQUEST under `/engcalcs/`** — it does not ignore the line. Confirmed
@@ -907,6 +907,17 @@ Full inventory: `dev/cookie-storage-inventory.md`.
 - **`git pull` does not preserve mtimes**, so every file's `filemtime` on production is its checkout
   time. That is why the service worker is generated at request time rather than built — a baked file
   cannot know the mtimes the pages will actually request.
+
+- **A NEW HOST SERVING THE SUITE MUST BE SET TO THE SAME PHP VERSION, and cPanel does not do it
+  for you.** `librewaternet.org` was created on `ea-php56` while `hawsedc.com` runs `ea-php83`, so
+  the moment the symlink made the suite reachable there, every page returned 500 with
+  `PHP Parse error: syntax error, unexpected '?' in lib/config.inc.php` -- the null coalescing
+  operator, which needs PHP 7.0 and appears 17 times in `lib/` alone. **Nothing in the repository
+  can see this: the same files parse fine on the other host.** Fix is one call,
+  `LangPHP::php_set_vhost_versions`, or MultiPHP Manager. **New domains on this account default to
+  `ea-php56`**, so the next one will do it again. Keep the two suite hosts on the SAME version; they
+  serve one checkout through a symlink, and a version split produces a bug that reproduces on one
+  URL and not the other.
 
 Production SSH is blocked on port 22; origin is GitHub, pulled over `ssh.github.com:443`.
 

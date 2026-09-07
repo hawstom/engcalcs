@@ -161,8 +161,8 @@ the block.
     control a page outside its scope, so a visitor arriving at `/app` got no offline support and no
     error. `ecSwMounts()` now declares both paths and the scope, the `Service-Worker-Allowed`
     header and the fetch routing all derive from it; `sw_scope_check.php` blocks on any of the four
-    disagreeing. **Everything remaining is on the SERVER and is Tom's** -- the symlink, the rewrite
-    rule, and the whitelist line.
+    disagreeing. **STEPS 1 AND 2 ARE DONE AND LIVE (2026-09-06):** the symlink and the `/app`
+    rewrite. What remains is the canonical change, and it is NOT server-only -- see 479.01.
   - **META TAGS, since he delegated it: consolidate ONTO LibreWaterNet, one direction, no split.**
     `librewaternet.org/app` declares itself canonical; `hawsedc.com/engcalcs/` declares
     `librewaternet.org` canonical and defers. That is the standard site-move play and the only
@@ -178,6 +178,27 @@ the block.
   *(Superseded, kept so it is not re-proposed: serving at `<newdomain>/engcalcs/` by symlink alone,
   the 2026-08-25 parking for want of clarity, and the `constructionnotesmanager.com` redirect Tom
   dropped -- *"It has never been canonical."*)*
+
+- 75|479.01| **The canonical half of 479 is CODE, not just a config line.**
+  Found 2026-09-06 doing the server steps; 479 files everything left as server work and three of
+  these are not.
+  - **`/app` CANNOT declare itself canonical today, MEASURED not predicted.** `ec_canonical_url()`
+    builds from `$_SERVER['SCRIPT_NAME']`, which under the rewrite is `/engcalcs/Looped-Network.php`.
+    Live, `https://librewaternet.org/app` emits
+    `<link rel="canonical" href="https://librewaternet.org/engcalcs/Looped-Network.php?lang=en">`
+    and the same value in `og:url`. 479 states the opposite as the design. Needs a per-page
+    canonical path override, and it must reach hreflang and `og:url` too, because all three read
+    that one function.
+  - **Changing `'hawsedc.com' => 'https://librewaternet.org'` ALONE FAILS THE BUILD.**
+    `canonical_origin_check.php` rule 4 requires `CANONICAL_ORIGIN_DEFAULT` to be one of the
+    whitelisted values, and it is still `'https://hawsedc.com'`. The default moves in the same edit.
+  - **`generate_sitemap.php` hard-codes `$origin = 'https://hawsedc.com'`** with a comment to keep
+    it in step, and the check enforces the pairing. The sitemap moves too, and `CLAUDE.md` records
+    that `../sitemap.xml` is NOT tracked by git, so it must be regenerated and re-uploaded by hand.
+  - **THE SELF-CANONICAL SPLIT IS OPEN AS OF 2026-09-06 and only this task closes it.** Both hosts
+    now serve every page and each declares itself canonical, because `librewaternet.org` already
+    maps to itself in the whitelist. Measured the day the symlink landed. The sequence was right --
+    hawsedc.com cannot defer to URLs that 404 -- but the window is a real cost, not a neutral pause.
 
 - 75|603| **Name the nodes along the profile plot's own axis, as EPANET does.**
   Tom, 2026-09-06: *"I note that EPANET puts node labels on a profile plot. Very useful."*

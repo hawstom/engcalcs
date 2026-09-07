@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**54 open tasks.** Next (100): 5 · Soon (75): 13 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
+**55 open tasks.** Next (100): 5 · Soon (75): 14 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
 
 ## 100 — Next (5)
 
@@ -17,13 +17,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 465 — Reusable pipe TYPES: slices 1-3 SHIPPED; the export alert is what is left.
 - Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 
-## 75 — Soon (13)
+## 75 — Soon (14)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 479 — The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
+- Task 479.01 — The canonical half of 479 is CODE, not just a config line.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
@@ -82,5 +83,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-48 of 54 titles are within 4–12 words. `!` marks the rest;
+49 of 55 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
