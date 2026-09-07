@@ -8833,23 +8833,43 @@ var EngCalcs = EngCalcs || {};
 	// everything the next bulk edit does to it out of view. A Text label is caught by the point it
 	// is drawn at. Crossing selection (anything the boundary touches) is the other convention and
 	// is deliberately not offered: with two rules a user cannot tell which one they got.
+	// **ALL THREE ARE CLICK-AND-RUBBER-BAND, NOT DRAG** (Tom, 2026-09-07: *"Instead of dragging,
+	// make all three of them click and rubber band."*). A press-hold-release marquee is one gesture
+	// a hand has to hold steady; a click, a look, and a second click is two gestures with a pause
+	// between them, and the pause is where the user reads what they are about to catch. It also
+	// makes the lasso possible AT ALL as a considered act -- tracing a boundary round twelve
+	// junctions with the button held is a test of grip, not of judgement.
+	//
+	//   window   click a corner, move, click the opposite corner.
+	//   lasso    click to start the trace, move (button UP) to draw it, click to close it.
+	//   polygon  click each vertex with the ring growing behind the pointer, double-click the last.
+	//
+	// **`areaRing` IS WHAT HAS BEEN COMMITTED AND `areaLive` IS WHERE THE POINTER IS.** Keeping the
+	// live point out of the ring is what lets the same ring be re-read on every frame without the
+	// previous frame's pointer position accumulating in it -- which is the bug a single array
+	// produces on a window and does not produce on a lasso, so it would ship.
 	var selectAreaShape = 'window';   // 'window' | 'lasso' | 'polygon'
 	var selectAreaEl = null;          // the marquee, built in init() beside the rubber band
-	var areaRing = null;              // the ring being drawn, in WORLD coordinates
+	var areaRing = null;              // the committed points, in WORLD coordinates
+	var areaLive = null;              // where the pointer is now, or null between gestures
 	var areaAdd = false;              // Shift: add to the standing selection rather than replace it
 	var LPN_AREA_SHAPES = ['window', 'lasso', 'polygon'];
 	function selectAreaShapeNext() {
 		return LPN_AREA_SHAPES[(LPN_AREA_SHAPES.indexOf(selectAreaShape) + 1) % LPN_AREA_SHAPES.length];
 	}
-	// The ring as the marquee should draw it. A window carries its two corners and is squared up
-	// here rather than at every point that touches it; the other two are already rings.
+	// The ring as the marquee should draw it, committed points plus the live one. A window is two
+	// corners squared up here rather than at every point that touches it; the other two are already
+	// rings and simply gain the pointer at the end.
 	function areaRingPoints() {
+		var pts;
 		if (!areaRing || !areaRing.length) { return []; }
-		if (selectAreaShape === 'window' && areaRing.length === 2) {
-			return EngCalcs.lpnGeom.rectRing(areaRing[0].x, areaRing[0].y, areaRing[1].x, areaRing[1].y);
+		if (selectAreaShape === 'window') {
+			pts = areaLive || areaRing[1] || areaRing[0];
+			return EngCalcs.lpnGeom.rectRing(areaRing[0].x, areaRing[0].y, pts.x, pts.y);
 		}
-		return areaRing;
+		return areaLive ? areaRing.concat([areaLive]) : areaRing.slice();
 	}
+	function areaDrawing() { return !!(areaRing && areaRing.length); }
 	function paintAreaMarquee() {
 		var pts = areaRingPoints();
 		if (!selectAreaEl) { return; }
@@ -8857,7 +8877,26 @@ var EngCalcs = EngCalcs || {};
 		selectAreaEl.style.display = '';
 		selectAreaEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
 	}
-	function areaCancel() { areaRing = null; paintAreaMarquee(); }
+	function areaCancel() { areaRing = null; areaLive = null; paintAreaMarquee(); updateAreaHint(); }
+	/**
+	 * **THE BUBBLE SAYS WHAT THE NEXT CLICK WILL DO** (Task 266, Tom 2026-09-07). It changes as the
+	 * gesture progresses, which is the whole reason it is not another line in the mode hint: before
+	 * the first click the three shapes want three different sentences, and after it they want three
+	 * more. The Shift rule rides along on every one of them, because Tom's own reading of the
+	 * shipped tool was *"I see how Shift adds, but I don't see how it removes"* -- and a modifier
+	 * whose second half is undiscoverable is a modifier with one half.
+	 */
+	function updateAreaHint() {
+		var box = document.getElementById('lpn_area_hint'), pc = EngCalcs.pageConfig || {},
+			started = areaDrawing(), key, text;
+		if (!box) { return; }
+		if (mode !== 'select-area') { box.style.display = 'none'; box.textContent = ''; return; }
+		key = 'lpn_area_hint_' + selectAreaShape + (started ? '_go' : '_start');
+		text = pc[key] || '';
+		box.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
+			'Hold Shift to add to the selection, or to take something out of it.');
+		box.style.display = '';
+	}
 	// **ONE DOOR INTO THE TOOL, whichever control opened it.** The toolbar cycles and the menu
 	// lists, but both end here -- so the button's own icon and the mode can never say two different
 	// things about which shape is about to be drawn. `repaintAreaTool` is set by the toolbar when
@@ -8899,6 +8938,46 @@ var EngCalcs = EngCalcs || {};
 	// indistinguishable from one that did not run, and a marquee that catches four hundred things
 	// silently is the more dangerous of the two -- the next edit goes to all of them. Find and
 	// replace already states its count before it writes; this owes the same.
+	/**
+	 * One click in select-area mode. **THE SHIFT IS READ ON THE FIRST CLICK AND HELD**, because a
+	 * polygon takes several clicks and asking the user to keep a modifier down for all of them
+	 * would be exactly the endurance test that click-and-rubber-band exists to remove.
+	 */
+	function areaPress(w, shift) {
+		var pt = { x: w.x, y: w.y };
+		if (!areaDrawing()) {
+			areaAdd = shift;
+			areaRing = [pt];
+			areaLive = pt;
+			paintAreaMarquee();
+			updateAreaHint();
+			return 'start';
+		}
+		// The second click ENDS a window and a lasso. A polygon is a vertex at a time and ends on
+		// the double-click, so a press there only ever adds a point.
+		if (selectAreaShape === 'polygon') {
+			areaRing.push(pt);
+			areaLive = pt;
+			paintAreaMarquee();
+			updateAreaHint();
+			return 'vertex';
+		}
+		areaLive = pt;
+		commitArea();
+		return 'commit';
+	}
+	// Every frame the pointer moves while a ring is open. A lasso RECORDS the path it traces; the
+	// other two only follow it, which is why the live point is kept out of the committed ring.
+	function areaMove(w) {
+		if (!areaDrawing()) { return false; }
+		areaLive = { x: w.x, y: w.y };
+		// **THE LASSO KEEPS EVERY FRAME IT IS GIVEN AND THAT IS THE POINT.** Thinning the path
+		// would be the difference between a ring that follows a hand and one that cuts a corner
+		// across a junction the hand went around.
+		if (selectAreaShape === 'lasso') { areaRing.push(areaLive); }
+		paintAreaMarquee();
+		return true;
+	}
 	function commitArea() {
 		var ring = areaRingPoints(), found = elementsInRing(ring), pc = EngCalcs.pageConfig || {};
 		areaCancel();
@@ -8906,6 +8985,13 @@ var EngCalcs = EngCalcs || {};
 		setNotice(String(found.length
 			? (pc.lpn_area_selected || '{n} selected.')
 			: (pc.lpn_area_none || 'That area holds nothing.')).replace('{n}', String(selectionCount())));
+		// **FINISHING A SELECTION OPENS THE PROPERTIES** (Tom, 2026-09-07: *"Now we need a nice way
+		// to open the properties if it isn't open. Maybe we open it automatically on finishing the
+		// selection."*). It is the one moment where the answer is unambiguous: the user has just
+		// said which elements they mean, and the only thing left to do with them is change
+		// something. A ring that caught nothing opens nothing, because there would be nothing in
+		// the box to show.
+		if (selectionCount()) { openMultiProperties(); }
 		return found.length;
 	}
 
@@ -12989,28 +13075,24 @@ var EngCalcs = EngCalcs || {};
 				// browser's number input simply declines the keystroke and says nothing.
 				input.type = 'text';
 				input.setAttribute('inputmode', 'decimal');
+				// **A CELL IS NOT IN EDIT MODE UNTIL IT IS PUT THERE** (Task 186, Tom 2026-09-07:
+				// *"Cells can be (a) overwritten (direct typing) or (b) edited (double-click or
+				// F2). When not in edit mode, navigation is one arrow per cell, and the arrow does
+				// not get sucked into the text."*). `readOnly` is what makes that true rather than
+				// merely intended: a read-only input is focusable, selectable and styled exactly
+				// as before, and it has no caret at all -- so an arrow key CANNOT be consumed by
+				// the text, whatever the key handler does or forgets to do. Modelling the mode in
+				// a flag alone would leave the browser still moving a caret underneath it.
+				input.readOnly = true;
 				paneApplyColWidth(input, c);
 				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
-				input.addEventListener('change', function () {
-					// The popup's own ending, not a second one: set, then completeEdit(), which
-					// marks the override, re-counts the status bar, re-solves and saves.
-					// **A BLANK COLUMN PASSES `undefined`, exactly as numberFieldBlank() does** --
-					// `+'' === 0`, and for a reaction coefficient an empty box ("use the global")
-					// and a typed 0 ("does not react") are two different statements about the water.
-					// **A TEXT BOX CAN HOLD SOMETHING THAT IS NOT A NUMBER, AND A NUMBER BOX
-					// COULD NOT** -- so what the old input type refused silently now has to be
-					// refused out loud. The cell goes back to what the document holds rather than
-					// writing NaN into the user's own field, which nothing downstream could
-					// distinguish from a value they meant.
-					if (input.value !== '' && !isFinite(+input.value)) {
-						input.value = paneCellText(c, el);
-						return;
-					}
-					c.set(el, (c.blank && input.value === '') ? undefined : +input.value);
-					completeEdit(c.prop ? { el: el, prop: c.prop } : null);
-					refreshPopupIfOpen();
-				});
+				input._lpnCell = { spec: spec, c: c, el: el };
+				input.addEventListener('change', function () { paneCommitCell(input); });
+				// A DOUBLE-CLICK IS THE OTHER DOOR INTO EDIT MODE, and it is the one a person finds
+				// without being told. It keeps the value and puts the caret in it; typing over a
+				// cell wipes it, which is the difference between (b) and (a) in Tom's own numbering.
+				input.addEventListener('dblclick', function () { paneEnterEdit(input, false); });
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
@@ -13033,7 +13115,11 @@ var EngCalcs = EngCalcs || {};
 				if (!target) { return; }
 				if (paneCellIsPlain(c, el)) {
 					target.textContent = paneCellText(c, el);
-				} else if (target !== activeElementSafe()) {
+				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
+					// **ONLY A CELL BEING EDITED IS LEFT ALONE** (Task 186). It used to be any cell
+					// with the caret in it, which was the same thing when focus WAS editing; now a
+					// person can sit on a cell for a minute without typing, and a solve that
+					// refused to refresh it would leave one stale number in a live table.
 					target.value = paneCellText(c, el);
 				}
 			});
@@ -13236,6 +13322,146 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out.join('\n');
 	}
+	// ---- EDIT MODE, AND THE PASTE (ROADMAP Task 186, Tom 2026-09-07) ---------------------------
+	//
+	// *"Now that they are a spreadsheet, we will have spreadsheet expectations... Reason says that
+	// we are over the tipping point and we should go all the way."* So the model is the
+	// spreadsheet's own, and the two states are real states rather than a manner of speaking:
+	//
+	//   NAVIGATION  the cell is `readOnly`. It has no caret, so an arrow cannot be swallowed by the
+	//               text under any circumstances. Typing a character OVERWRITES; F2 or a
+	//               double-click EDITS; Delete empties.
+	//   EDIT        the cell is writable and behaves as a text box. Left and Right are the caret
+	//               until it reaches an edge; Up, Down, Enter and Tab commit and move; Escape
+	//               abandons what was typed and puts back what the document holds.
+	//
+	// **`readOnly` IS THE MECHANISM AND NOT A DECORATION.** Modelling the mode in a flag alone
+	// would leave the browser moving a caret underneath it, and every arrow key would be a race
+	// between our handler and the caret. A read-only input has no caret to move.
+	function paneInEdit(input) {
+		return !!(input && input.tagName === 'INPUT' && input._lpnCell && input.readOnly === false);
+	}
+	function paneEnterEdit(input, wipe) {
+		if (!input || !input._lpnCell) { return false; }
+		input.readOnly = false;
+		// **WHAT THE CELL HELD WHEN EDITING BEGAN**, so Escape has something to put back. Read
+		// here rather than from the document, because the document is where a commit has ALREADY
+		// landed and Escape must undo the typing, not the last commit.
+		input._lpnWas = input.value;
+		if (wipe) { input.value = ''; }
+		else if (input.select) { input.select(); }
+		return true;
+	}
+	function paneLeaveEdit(input) {
+		if (!input || !input._lpnCell) { return; }
+		input.readOnly = true;
+		delete input._lpnWas;
+	}
+	// Escape. **IT PUTS BACK WHAT WAS THERE AND FIRES NOTHING** -- restoring the text before the
+	// blur means the value at blur equals the value at focus, so the browser's own `change` never
+	// fires and there is no commit to undo. A flag telling the commit to skip itself would be a
+	// second way of saying the same thing, and the two could disagree.
+	function paneCancelEdit(input) {
+		var ctx = input && input._lpnCell;
+		if (!ctx || !paneInEdit(input)) { return false; }
+		input.value = (input._lpnWas !== undefined) ? input._lpnWas : paneCellText(ctx.c, ctx.el);
+		paneLeaveEdit(input);
+		return true;
+	}
+	// The one ending for a typed cell, whatever ended it -- a blur, an Enter, an arrow out.
+	//
+	// **A BLANK COLUMN PASSES `undefined`, exactly as numberFieldBlank() does**: `+'' === 0`, and
+	// for a reaction coefficient an empty box ("use the global") and a typed 0 ("does not react")
+	// are two different statements about the water.
+	//
+	// **A TEXT BOX CAN HOLD SOMETHING THAT IS NOT A NUMBER, AND A NUMBER BOX COULD NOT** -- so what
+	// the old input type refused silently now has to be refused out loud. The cell goes back to
+	// what the document holds rather than writing NaN into a field of the user's, which nothing
+	// downstream could tell from a value they meant.
+	function paneCommitCell(input) {
+		var ctx = input && input._lpnCell, c, el;
+		if (!ctx) { return false; }
+		c = ctx.c; el = ctx.el;
+		if (input.value !== '' && !isFinite(+input.value)) {
+			input.value = paneCellText(c, el);
+			paneLeaveEdit(input);
+			return false;
+		}
+		c.set(el, (c.blank && input.value === '') ? undefined : +input.value);
+		completeEdit(c.prop ? { el: el, prop: c.prop } : null);
+		refreshPopupIfOpen();
+		paneLeaveEdit(input);
+		return true;
+	}
+	// Writing a cell that nobody is standing in -- what a paste does, forty times. Same validation
+	// and the same `c.set()` as a typed one, because a paste IS the user typing (CLAUDE.md), and it
+	// therefore obeys every rule about the user's own numbers. Returns false where the text is not
+	// a number, so the caller can COUNT what it refused instead of discarding it in silence.
+	function paneWriteCellText(spec, c, el, text) {
+		var t = String(text === null || text === undefined ? '' : text).trim();
+		if (paneCellIsPlain(c, el) || !c.set) { return false; }
+		if (t !== '' && !isFinite(+t)) { return false; }
+		c.set(el, (c.blank && t === '') ? undefined : +t);
+		return true;
+	}
+	/**
+	 * **THE PASTE TILES, AND THE RULE IS TOM'S OWN** (2026-09-07): *"Pasting a single cell or row
+	 * to multiple cells or rows should fill them all"*, and *"if multiple rows are copied to
+	 * multiple rows, the source rows repeat as many fractional times as necessary (but at least 1
+	 * whole time) to fill the target number of rows."*
+	 *
+	 * Both halves of that fall out of ONE line -- `max(selection, source)`, then modulo:
+	 *   - one cell into a rectangle: the rectangle is bigger, so it is filled by repetition.
+	 *   - two rows into six: three whole repeats.
+	 *   - two rows into three: one and a half, which is the fractional case, and the half is the
+	 *     first row of the source again rather than nothing.
+	 *   - three rows into one selected cell: the SOURCE is bigger, so all three land -- "at least
+	 *     one whole time" is what stops a selection of one from truncating a block of forty.
+	 *
+	 * Columns work the same way and are not restricted between columns, on his ruling: *"since this
+	 * is a custom application we would be justified to restrict copying among columns. But I don't
+	 * know that we need to do that."* We do not, so we do not.
+	 *
+	 * **IT CANNOT GROW THE TABLE.** A row is an element on the map and a column is a property; a
+	 * paste that ran off the bottom would have to invent junctions, which is Task 186's paste-IN
+	 * phase and a different question with an ID-collision story of its own. Anything past the last
+	 * row or the last column is dropped and COUNTED.
+	 */
+	function panePasteAt(spec, cells) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), pc = EngCalcs.pageConfig || {},
+			srcRows = cells.length, srcCols = 0, nRows, nCols, r, cIdx, line, txt,
+			wrote = 0, refused = 0, dropped = 0, col, el;
+		if (!box || !srcRows) { return null; }
+		cells.forEach(function (line2) { srcCols = Math.max(srcCols, line2.length); });
+		if (!srcCols) { return null; }
+		nRows = Math.max(box.r1 - box.r0 + 1, srcRows);
+		nCols = Math.max(box.c1 - box.c0 + 1, srcCols);
+		saveUndoSnapshot();
+		for (r = 0; r < nRows; r++) {
+			line = cells[r % srcRows];
+			for (cIdx = 0; cIdx < nCols; cIdx++) {
+				if (box.r0 + r >= rows.length || box.c0 + cIdx >= cols.length) { dropped++; continue; }
+				el = rows[box.r0 + r];
+				col = cols[box.c0 + cIdx];
+				txt = line[cIdx % srcCols];
+				if (txt === undefined) { dropped++; continue; }
+				// **A RESULT COLUMN REFUSES A PASTE EXACTLY AS IT REFUSES A KEYSTROKE.** There is
+				// no code path by which a computed cell could receive a typed value, and a paste
+				// must hit the same wall rather than quietly finding a way round it.
+				if (paneWriteCellText(spec, col, el, txt)) { wrote++; } else { refused++; }
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+		// **IT SAYS WHAT IT DID, INCLUDING WHAT IT DID NOT DO.** A paste that silently skipped
+		// eleven read-only cells is a paste the user believes landed.
+		setNotice(String(pc.lpn_pane_pasted || 'Pasted {n} cells. {skipped} were not changed.')
+			.replace('{n}', String(wrote))
+			.replace('{skipped}', String(refused + dropped)));
+		return { wrote: wrote, refused: refused, dropped: dropped };
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -13244,8 +13470,31 @@ var EngCalcs = EngCalcs || {};
 			box = paneSelBox(spec, rows, cols), key = e && e.key,
 			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
 			active = activeElementSafe(), r, c, at;
+		var editing = paneInEdit(active);
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
+		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
+		// it must work whatever else the key handler would have made of the moment.
+		if (key === 'Escape' || key === 'Esc') { return paneCancelEdit(active); }
+		// **F2 IS THE KEYBOARD'S DOOR INTO EDIT MODE**, the double-click's twin. It keeps the
+		// value; typing over a cell wipes it, which is Tom's (a) against his (b).
+		if (key === 'F2' && !editing) { return paneEnterEdit(active, false); }
+		// **A PRINTABLE CHARACTER OVERWRITES**, which is the spreadsheet's own most-used gesture:
+		// land on a cell, type, move on. The mode is switched here and the keystroke is then left
+		// to the browser, so the character the user pressed is inserted by the same machinery that
+		// would have inserted it in any text box -- rather than by us guessing at it, which is how
+		// a dead key or an IME composition gets lost.
+		if (!editing && !jump && key.length === 1) {
+			if (paneEnterEdit(active, true)) { return false; }
+		}
+		// **DELETE EMPTIES A CELL IN NAVIGATION MODE.** The map's own Delete listener cannot reach
+		// here -- keyboardIsTyping() turns away any key inside an <input> -- so this is the only
+		// meaning Delete has with the caret in a table, and a spreadsheet user expects exactly one.
+		if (!editing && (key === 'Delete' || key === 'Backspace') && active && active._lpnCell) {
+			active.value = '';
+			paneCommitCell(active);
+			return true;
+		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
 			// where a spreadsheet with no selection puts you.
@@ -13265,15 +13514,26 @@ var EngCalcs = EngCalcs || {};
 		if (key === 'ArrowUp' || key === 'Up') { at = jump ? paneJumpEdge(rows, cols, r, c, -1, 0) : { r: r - 1, c: c }; }
 		else if (key === 'ArrowDown' || key === 'Down') { at = jump ? paneJumpEdge(rows, cols, r, c, 1, 0) : { r: r + 1, c: c }; }
 		else if (key === 'ArrowLeft' || key === 'Left') {
-			// Inside a text box, Left is ordinary editing until the caret is against the edge.
-			if (!jump && !ext && !paneCaretEdge(active, false)) { return false; }
+			// **THE CARET RULE APPLIES IN EDIT MODE AND ONLY THERE** (Tom's point 2). While editing,
+			// Left is ordinary text editing until the caret is against the edge, or nobody could
+			// put the caret inside `1000` to make it `1500`. In navigation mode there IS no caret
+			// -- the cell is read-only -- so the arrow simply moves, every time.
+			if (editing && !jump && !ext && !paneCaretEdge(active, false)) { return false; }
 			at = jump ? paneJumpEdge(rows, cols, r, c, 0, -1) : { r: r, c: c - 1 };
 		} else if (key === 'ArrowRight' || key === 'Right') {
-			if (!jump && !ext && !paneCaretEdge(active, true)) { return false; }
+			if (editing && !jump && !ext && !paneCaretEdge(active, true)) { return false; }
 			at = jump ? paneJumpEdge(rows, cols, r, c, 0, 1) : { r: r, c: c + 1 };
 		} else if (key === 'Home') { at = jump ? { r: 0, c: paneHomeCol(cols) } : { r: r, c: paneHomeCol(cols) }; }
 		else if (key === 'End') { at = jump ? { r: rows.length - 1, c: cols.length - 1 } : { r: r, c: cols.length - 1 }; }
+		// Enter commits and drops a row; Shift+Enter goes back up. The spreadsheet's own ending,
+		// and the reason a column of forty numbers can be typed without touching the mouse.
+		else if (key === 'Enter') { at = { r: r + (ext ? -1 : 1), c: c }; ext = false; }
 		else { return false; }
+		// **LEAVING A CELL COMMITS IT, BEFORE ANYTHING ELSE HAPPENS.** paneFocusCell() blurs and a
+		// blur fires `change`, so this is belt and braces for the one case where the focus does not
+		// move at all -- an arrow at the table's edge, which clamps to the same cell and would
+		// otherwise leave the mode on with the value uncommitted.
+		if (editing && active) { paneCommitCell(active); }
 		paneSelSet(spec, rows, cols, at.r, at.c, ext);
 		paneSelPaint(spec, rows, cols);
 		// **EXTENDING DOES NOT MOVE THE CARET.** Shift+Down in a spreadsheet grows the highlight
@@ -13332,6 +13592,23 @@ var EngCalcs = EngCalcs || {};
 			e.preventDefault();
 		});
 		table.addEventListener('mouseup', function () { dragging = false; });
+		// **A PASTE IS THE USER TYPING**, so it goes through the same c.set() a keystroke does and
+		// obeys every rule about the user's own numbers. Intercepted only when the clipboard holds
+		// a GRID: one cell is ordinary typing and the browser does it better than we would --
+		// libPasteIsGrid()'s own rule, reused rather than restated.
+		table.addEventListener('paste', function (e) {
+			var text, cells;
+			// While a cell is being EDITED, a paste is a text paste into that box and nothing else.
+			// Intercepting there would make it impossible to paste a number into half a value.
+			if (paneInEdit(activeElementSafe())) { return; }
+			try { text = e.clipboardData && e.clipboardData.getData('text/plain'); }
+			catch (err) { return; }
+			if (!text) { return; }
+			cells = libPasteCells(text);
+			if (!libPasteIsGrid(cells)) { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+			panePasteAt(spec, cells);
+		});
 		table.addEventListener('copy', function (e) {
 			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 				box = paneSelBox(spec, rows, cols), tsv;
@@ -14749,6 +15026,7 @@ var EngCalcs = EngCalcs || {};
 		if (svg) { svg.classList.toggle('lpn-vertexmode', newMode === 'vertices'); }
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
+		updateAreaHint();
 	}
 
 	function addNode(type, x, y) {
@@ -21760,6 +22038,13 @@ var EngCalcs = EngCalcs || {};
 			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
 			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
 		});
+		// The select-area ring, which follows the pointer with NO BUTTON DOWN (Task 266). Its own
+		// listener beside the rubber band's, and for the same reason: the two shapes both track the
+		// pointer between clicks and neither should depend on the other being wired.
+		svg.addEventListener('pointermove', function (e) {
+			if (mode !== 'select-area') { return; }
+			areaMove(screenToWorld(e.clientX, e.clientY));
+		});
 		// The profile path chooser's hover (Task 433) -- the same shape as the rubber band above and
 		// for the same reason: between clicks the user must see what the next click would commit.
 		// Its own listener, so it is unaffected by whether either of the two above is wired.
@@ -21823,20 +22108,7 @@ var EngCalcs = EngCalcs || {};
 			// sometimes moved the pipework instead would be unusable over a dense network, which is
 			// the only kind of network anybody reaches for a marquee on.
 			if (mode === 'select-area') {
-				var wA = screenToWorld(e.clientX, e.clientY);
-				areaAdd = !!e.shiftKey;
-				if (selectAreaShape === 'polygon') {
-					// A CLICK AT A TIME, and a double-click closes it -- see the dblclick listener.
-					areaRing = (areaRing || []).concat([{ x: wA.x, y: wA.y }]);
-				} else {
-					// Window: two corners. Lasso: the first point of the path.
-					areaRing = selectAreaShape === 'window'
-						? [{ x: wA.x, y: wA.y }, { x: wA.x, y: wA.y }]
-						: [{ x: wA.x, y: wA.y }];
-					drag = { type: 'area' };
-					Object.assign(drag, common);
-				}
-				paintAreaMarquee();
+				areaPress(screenToWorld(e.clientX, e.clientY), !!e.shiftKey);
 				return;
 			}
 			// 'select' mode
@@ -21947,11 +22219,6 @@ var EngCalcs = EngCalcs || {};
 			// full view-span of margin on every side, so a pan shorter than a screen never reaches
 			// a stretch that has not been labelled yet, and a longer one fills in on release.
 			var wasPan = drag && drag.type === 'pan';
-			// **A MARQUEE COMMITS ON RELEASE**, before `drag` is dropped: where the pointer let go
-			// is the whole of what it caught. A press with no travel leaves a ring of one or two
-			// coincident points, which holds nothing -- so a stray click in this mode selects
-			// nothing rather than everything, and says so.
-			if (drag && drag.type === 'area' && drag.pointerId === e.pointerId) { commitArea(); }
 			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
 			// type whose whole result is decided by where the pointer let go (Task 509).
 			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
@@ -22370,22 +22637,6 @@ var EngCalcs = EngCalcs || {};
 		// re-routes a reader's path -- so none of the snapshot, label or element machinery below
 		// applies to it.
 		if (drag.type === 'profilehandle') { profileHandleMove(p.x, p.y); return; }
-		// **THE MARQUEE EDITS NOTHING, SO IT COMES BEFORE THE SNAPSHOT MACHINERY** (Task 266). It
-		// is a shape on the drawing, not a change to the document, and it takes no undo snapshot
-		// for the same reason a pan does not.
-		if (drag.type === 'area') {
-			var wD = screenToWorld(p.x, p.y);
-			if (selectAreaShape === 'window') {
-				areaRing = [areaRing[0], { x: wD.x, y: wD.y }];
-			} else {
-				// **THE LASSO KEEPS EVERY FRAME IT IS GIVEN AND THAT IS THE POINT.** Thinning the
-				// path would be the difference between a ring that follows a hand and one that
-				// cuts a corner across a junction the hand went around.
-				areaRing.push({ x: wD.x, y: wD.y });
-			}
-			paintAreaMarquee();
-			return;
-		}
 		// **A LABEL DRAG NEEDS A REAL MOVEMENT BEFORE IT COMMITS.** If the first pixel makes a label
 		// MANUAL for good, a stray jiggle on a crowded label freezes it at wherever the automatic
 		// pass happened to have put it -- the stored offset is `nodeLabelPos()`, the base PLUS the
@@ -30875,6 +31126,143 @@ var EngCalcs = EngCalcs || {};
 		var at = popupAnchorFor(le, l ? linkLabelPos(l) : null, nodeRadius({ type: 'junction' }) * 2, sx, sy);
 		openPopupAt(at.x, at.y);
 	}
+
+	// ---- THE MULTI-PROPERTIES VIEW (ROADMAP Task 266, points 2 and 3) --------------------------
+	//
+	// Tom's own spec: *"Properties opens with a COLLAPSIBLE HEADING PER TYPE selected, so a
+	// selection holding pipes and junctions shows both and neither is hidden"*, and *"editing any
+	// value in that multi-properties view sets it on every asset of that type in the selection."*
+	//
+	// **THE PROPERTY LIST IS THE TABLES PANE'S OWN COLUMN SPEC, REUSED RATHER THAN RESTATED.**
+	// `paneTables()` already declares, per type, every editable property with its label, its unit,
+	// its `prop` for the scenario override marker, its getter and a setter that goes through
+	// `setProp()`. A second list here would be a second opinion about what a pipe HAS, and the
+	// first thing to go stale the day a column is added. It also means this box and the table
+	// cannot disagree about a unit, which they would within a week.
+	//
+	// **EVERY WRITE GOES THROUGH `setProp()`** -- 400 of them is still 400 calls at the one seam.
+	// A bulk path that wrote properties directly is the Task 322 scenario-seam defect at scale:
+	// inside a scenario it would edit BASE, under every other scenario at once, with the right
+	// numbers still on screen.
+	function multiGroups() {
+		var byType = {}, out = [];
+		selectedRefs().forEach(function (s) {
+			var el = s.kind === 'node' ? nodeById(s.id) : (s.kind === 'link' ? linkById(s.id) : labelById(s.id));
+			if (!el) { return; }
+			if (!byType[el.type]) { byType[el.type] = []; }
+			byType[el.type].push(el);
+		});
+		paneTables().forEach(function (spec) {
+			if (byType[spec.type]) { out.push({ spec: spec, els: byType[spec.type] }); delete byType[spec.type]; }
+		});
+		// Whatever no table describes -- a Text object -- still gets a heading, because a section
+		// missing from a box that says "12 selected" is 12 minus the ones you can see.
+		Object.keys(byType).forEach(function (t) { out.push({ spec: null, type: t, els: byType[t] }); });
+		return out;
+	}
+	// The value every selected element of this type shares, or undefined where they differ. **THE
+	// DIFFERENCE BETWEEN "THEY ALL SAY 8" AND "THEY DISAGREE" IS THE WHOLE HONESTY OF THIS BOX**:
+	// a blank field that silently means one of them would write that one over the other eleven.
+	function multiCommonText(c, els) {
+		var first = null, i, t;
+		for (i = 0; i < els.length; i++) {
+			t = paneCellText(c, els[i]);
+			if (i === 0) { first = t; } else if (t !== first) { return undefined; }
+		}
+		return first;
+	}
+	function multiRow(host, c, els) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			input = document.createElement('input'),
+			common = multiCommonText(c, els), was;
+		input.type = 'text';
+		input.setAttribute('inputmode', 'decimal');
+		input.value = (common === undefined) ? '' : common;
+		if (common === undefined) { input.placeholder = pc.lpn_multi_varies || 'Various'; }
+		was = input.value;
+		input.setAttribute('aria-label', paneHeadingText(c));
+		input.addEventListener('change', function () {
+			var n = 0;
+			// **AN UNTOUCHED ROW WRITES NOTHING.** Every row in this box is a field the user did
+			// not necessarily come here for, and a box of twelve rows that committed all twelve on
+			// close would set a shared value onto elements the user never meant to change.
+			if (input.value === was) { return; }
+			if (input.value !== '' && !isFinite(+input.value)) { input.value = was; return; }
+			// ONE SNAPSHOT FOR THE WHOLE ROW, so undo takes back the act the user performed
+			// rather than the last of forty writes it was made of.
+			saveUndoSnapshot();
+			els.forEach(function (el) { if (paneWriteCellText(null, c, el, input.value)) { n++; } });
+			was = input.value;
+			completeEdit(null);
+			// **IT STATES ITS COUNT, exactly as Find and replace does before it writes.** A bulk
+			// edit whose reach is invisible is the one gesture on this page that can quietly be
+			// wrong about four hundred elements.
+			setNotice(String(pc.lpn_multi_applied || 'Set {prop} on {n}.')
+				.replace('{prop}', paneHeadingText(c)).replace('{n}', String(n)));
+			refreshPaneIfOpen();
+			refreshSelection();
+		});
+		label.appendChild(document.createTextNode(paneHeadingText(c)));
+		label.appendChild(input);
+		host.appendChild(label);
+	}
+	function multiSection(host, group) {
+		var pc = EngCalcs.pageConfig || {},
+			box = document.createElement('details'),
+			head = document.createElement('summary'),
+			name = group.spec ? (pc[group.spec.label] || group.spec.id) : (group.type || '');
+		// **OPEN, ALL OF THEM.** Tom's own words are that a mixed selection shows both and NEITHER
+		// IS HIDDEN, so collapsing is something the reader does, never the default.
+		box.open = true;
+		box.className = 'lpn-multi-section';
+		head.textContent = name + ' (' + group.els.length + ')';
+		box.appendChild(head);
+		if (!group.spec) {
+			box.appendChild(libEl('p', 'lpn-multi-note',
+				pc.lpn_multi_no_fields || 'These have nothing that can be set together here.'));
+			host.appendChild(box);
+			return;
+		}
+		paneCols(group.spec).forEach(function (c) {
+			// A result and an identity are not editable one at a time and are not editable forty at
+			// a time either. `plainFor` is asked PER ELEMENT, so a property that is read-only on any
+			// one of the selection is read-only for the whole group -- the safe direction, and the
+			// only one that cannot write a number where a type or a fittings list owns it.
+			if (c.result || !c.set) { return; }
+			if (group.els.some(function (el) { return paneCellIsPlain(c, el); })) { return; }
+			multiRow(box, c, group.els);
+		});
+		host.appendChild(box);
+	}
+	/**
+	 * Open the property popup on the WHOLE selection. With exactly one element selected this is
+	 * not the right box -- the single-element popup has the id, the rename, the curve choosers and
+	 * everything else a type carries -- so one falls through to the popup it always had.
+	 */
+	function openMultiProperties() {
+		var pc = EngCalcs.pageConfig || {},
+			fields = document.getElementById('lpn_popup_fields'),
+			title = document.getElementById('lpn_popup_title'),
+			sel = selectedRef(), groups;
+		if (!fields || !title) { return false; }
+		if (selectionCount() === 1 && sel) {
+			if (sel.kind === 'node') { openPopup(sel.id); }
+			else if (sel.kind === 'link') { openLinkPopup(sel.id); }
+			else { openLabelPopup(sel.id); }
+			return true;
+		}
+		if (!selectionCount()) { return false; }
+		groups = multiGroups();
+		currentPopup = { kind: 'multi', id: null };
+		clearFields(fields);
+		title.textContent = String(pc.lpn_multi_title || '{n} selected')
+			.replace('{n}', String(selectionCount()));
+		groups.forEach(function (g) { multiSection(fields, g); });
+		openPopupAt(Math.round(window.innerWidth / 2) - 140, 120);
+		return true;
+	}
+
 	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
 	// idField()/rename here, unlike node/link popups; a Text's id has no user-facing meaning to
 	// rename. Reuses pc.lpn_tool_add_text ("Text") for both the popup title and the field label,

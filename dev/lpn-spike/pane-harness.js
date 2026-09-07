@@ -522,8 +522,14 @@ console.log('\n--- the write seam ---');
 		'...and link results from colorLinkValue()');
 	// Every edit ends the way the popup's does, so a table write cannot forget the override mark,
 	// the status count or the save.
-	report(/completeEdit\(c\.prop \? \{ el: el, prop: c\.prop \} : null\);/.test(fnBody('paneTableRow')),
+	// **THE ENDING MOVED INTO paneCommitCell() UNDER TASK 186**, because a cell is now ended four
+	// ways -- a blur, an Enter, an arrow out, and a paste -- and four copies of it is four chances
+	// to forget the override mark. paneTableRow() calls that one function; this asserts the ending
+	// where it now lives.
+	report(/completeEdit\(c\.prop \? \{ el: el, prop: c\.prop \} : null\);/.test(fnBody('paneCommitCell')),
 		'every table edit ends in completeEdit(), the popup’s own ending');
+	report(/paneCommitCell\(input\)/.test(fnBody('paneTableRow')),
+		'...and a cell reaches it through the one commit, never by repeating it');
 }
 
 // ---- 10. seven tabs wrap, and the pane still fits ---------------------------------------------

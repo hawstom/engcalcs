@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**41 still to read**, of 65 untranslated keys, of 1753 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**53 still to read**, of 77 untranslated keys, of 1765 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,29 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (65, 41 to read @@ NEEDS RULING)
+## lpn_  (77, 53 to read @@ NEEDS RULING)
 
+- **`lpn_area_hint_lasso_go`**
+  > Move to draw the outline, then click to close it.
+  @@ NEEDS RULING
+- **`lpn_area_hint_lasso_start`**
+  > Click to start the outline.
+  @@ NEEDS RULING
+- **`lpn_area_hint_polygon_go`**
+  > Click each corner. Double-click the last one to finish.
+  @@ NEEDS RULING
+- **`lpn_area_hint_polygon_start`**
+  > Click the first corner of the shape. Double-click the last one to finish.
+  @@ NEEDS RULING
+- **`lpn_area_hint_shift`**
+  > Hold Shift to add to the selection, or to take something out of it.
+  @@ NEEDS RULING
+- **`lpn_area_hint_window_go`**
+  > Click the opposite corner to finish.
+  @@ NEEDS RULING
+- **`lpn_area_hint_window_start`**
+  > Click one corner of the window.
+  @@ NEEDS RULING
 - **`lpn_area_none`**
   > That area holds nothing.
   @@ NEEDS RULING
@@ -189,6 +210,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_library_pipetypes_tip`**
   > A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.
   _Ruled OK 2026-09-07._
+- **`lpn_multi_applied`**
+  > Set {prop} on {n}.
+  @@ NEEDS RULING
+- **`lpn_multi_no_fields`**
+  > These have nothing that can be set together here.
+  @@ NEEDS RULING
+- **`lpn_multi_title`**
+  > {n} selected
+  @@ NEEDS RULING
+- **`lpn_multi_varies`**
+  > Various
+  @@ NEEDS RULING
 - **`lpn_pane_filter_clear`**
   > Show all
   _Ruled OK 2026-09-07._
@@ -198,6 +231,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_filter_note`**
   > Filtered by {q}. Showing {n} of {all}.
   _Ruled OK 2026-09-07._
+- **`lpn_pane_pasted`**
+  > Pasted {n} cells. {skipped} were not changed.
+  @@ NEEDS RULING
 - **`lpn_pipetype_detach`**
   > Detach from pipe type
   _Ruled OK 2026-09-07._

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 1753,
-        "delta_key_count": 78,
+        "expected_key_count": 1765,
+        "delta_key_count": 90,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -508,6 +508,18 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_area_hint_window_start": "Click one corner of the window.",
+        "lpn_area_hint_window_go": "Click the opposite corner to finish.",
+        "lpn_area_hint_lasso_start": "Click to start the outline.",
+        "lpn_area_hint_lasso_go": "Move to draw the outline, then click to close it.",
+        "lpn_area_hint_polygon_start": "Click the first corner of the shape. Double-click the last one to finish.",
+        "lpn_area_hint_polygon_go": "Click each corner. Double-click the last one to finish.",
+        "lpn_area_hint_shift": "Hold Shift to add to the selection, or to take something out of it.",
+        "lpn_multi_title": "{n} selected",
+        "lpn_multi_varies": "Various",
+        "lpn_multi_applied": "Set {prop} on {n}.",
+        "lpn_multi_no_fields": "These have nothing that can be set together here.",
+        "lpn_pane_pasted": "Pasted {n} cells. {skipped} were not changed.",
         "lpn_tool_area_window": "Select a window",
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
@@ -588,6 +600,18 @@
         "lpn_inp_export_flat_fittings": "The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number."
     },
     "keys": {
+        "lpn_area_hint_window_start": "Click one corner of the window.",
+        "lpn_area_hint_window_go": "Click the opposite corner to finish.",
+        "lpn_area_hint_lasso_start": "Click to start the outline.",
+        "lpn_area_hint_lasso_go": "Move to draw the outline, then click to close it.",
+        "lpn_area_hint_polygon_start": "Click the first corner of the shape. Double-click the last one to finish.",
+        "lpn_area_hint_polygon_go": "Click each corner. Double-click the last one to finish.",
+        "lpn_area_hint_shift": "Hold Shift to add to the selection, or to take something out of it.",
+        "lpn_multi_title": "{n} selected",
+        "lpn_multi_varies": "Various",
+        "lpn_multi_applied": "Set {prop} on {n}.",
+        "lpn_multi_no_fields": "These have nothing that can be set together here.",
+        "lpn_pane_pasted": "Pasted {n} cells. {skipped} were not changed.",
         "lpn_tool_area_window": "Select a window",
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
@@ -668,6 +692,198 @@
         "lpn_inp_export_flat_fittings": "The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number."
     },
     "key_context": {
+        "lpn_area_hint_window_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_window_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_lasso_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_lasso_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_polygon_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_polygon_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_shift": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_multi_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_multi_varies": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_multi_applied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_multi_no_fields": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_pane_pasted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "نقاط الانعطاف",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "حذف",
+                    "english": "Delete"
+                }
+            }
+        },
         "lpn_tool_area_window": {
             "reason": "missing",
             "current_value": null,

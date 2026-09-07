@@ -254,6 +254,14 @@ echoHeader("EngCalcs", $html_title, "", false);
 		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
 		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:calc(4px + var(--lpn-overlay-right, 0px));display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
 			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<?php // **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266, Tom 2026-09-07: *"Show an
+			      // instructions popup bubble for how to continue and end the current mode."*). A
+			      // box of its own rather than more text in the mode line, because it says
+			      // something the mode line cannot: what the NEXT click will do, which changes
+			      // between the first click and the second. It is empty and hidden except while
+			      // that tool is running, and it is pointer-events:none like everything in this
+			      // column -- an instruction you have to dismiss is an instruction in the way. ?>
+			<div id="lpn_area_hint" class="lpn-area-hint" style="display:none"></div>
 			<?php // The solver's standing diagnostic ("Add a reservoir"), true until the model
 			      // changes. Deliberately NOT d-print-none: if the drawing on screen has no answers,
 			      // a print of it should say why rather than look like a finished network. ?>
@@ -1135,6 +1143,18 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_valve: <?=json_encode($ec_lang['lpn_tool_add_valve'])?>,
 	lpn_tool_add_text: <?=json_encode($ec_lang['lpn_tool_add_text'])?>,
 	lpn_tool_vertices: <?=json_encode($ec_lang['lpn_tool_vertices'])?>,
+	lpn_area_hint_window_start: <?=json_encode($ec_lang['lpn_area_hint_window_start'])?>,
+	lpn_area_hint_window_go: <?=json_encode($ec_lang['lpn_area_hint_window_go'])?>,
+	lpn_area_hint_lasso_start: <?=json_encode($ec_lang['lpn_area_hint_lasso_start'])?>,
+	lpn_area_hint_lasso_go: <?=json_encode($ec_lang['lpn_area_hint_lasso_go'])?>,
+	lpn_area_hint_polygon_start: <?=json_encode($ec_lang['lpn_area_hint_polygon_start'])?>,
+	lpn_area_hint_polygon_go: <?=json_encode($ec_lang['lpn_area_hint_polygon_go'])?>,
+	lpn_area_hint_shift: <?=json_encode($ec_lang['lpn_area_hint_shift'])?>,
+	lpn_multi_title: <?=json_encode($ec_lang['lpn_multi_title'])?>,
+	lpn_multi_varies: <?=json_encode($ec_lang['lpn_multi_varies'])?>,
+	lpn_multi_applied: <?=json_encode($ec_lang['lpn_multi_applied'])?>,
+	lpn_multi_no_fields: <?=json_encode($ec_lang['lpn_multi_no_fields'])?>,
+	lpn_pane_pasted: <?=json_encode($ec_lang['lpn_pane_pasted'])?>,
 	lpn_tool_area_window: <?=json_encode($ec_lang['lpn_tool_area_window'])?>,
 	lpn_tool_area_lasso: <?=json_encode($ec_lang['lpn_tool_area_lasso'])?>,
 	lpn_tool_area_polygon: <?=json_encode($ec_lang['lpn_tool_area_polygon'])?>,

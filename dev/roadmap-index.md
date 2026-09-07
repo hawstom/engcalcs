@@ -7,17 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**54 open tasks.** Next (100): 3 · Soon (75): 15 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
+**54 open tasks.** Next (100): 4 · Soon (75): 14 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
 
-## 100 — Next (3)
+## 100 — Next (4)
 
+- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 186 — Make the Tables pane spreadsheet-interoperable.
 - Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 
-## 75 — Soon (15)
+## 75 — Soon (14)
 
-- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.

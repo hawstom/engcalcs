@@ -56,6 +56,11 @@ const L = loadLoopedNetwork(
 	"\t\tsetCell: function (id, elId, key, v) { var s = paneTableById(id),\n" +
 	"\t\t\tel = (s.group === 'link' ? doc.links : doc.nodes).filter(function (x) { return x.id === elId; })[0];\n" +
 	"\t\t\tpaneColByKey(s, key).set(el, v); },\n" +
+	// The two modes and the paste through their own doors — never by setting `readOnly` here,
+	// which is the very mechanism under test.
+	"\t\tinEdit: paneInEdit, enterEdit: paneEnterEdit, cancelEdit: paneCancelEdit,\n" +
+	"\t\tpasteAt: function (id, cells) { return panePasteAt(paneTableById(id), cells); },\n" +
+	"\t\tpasteCells: libPasteCells, pasteIsGrid: libPasteIsGrid,\n" +
 	"\t\tcellText: function (id, elId, key) { var s = paneTableById(id),\n" +
 	"\t\t\tel = (s.group === 'link' ? doc.links : doc.nodes).filter(function (x) { return x.id === elId; })[0];\n" +
 	"\t\t\treturn paneCellText(paneColByKey(s, key), el); },\n" +
@@ -313,6 +318,146 @@ console.log('\n--- what replaces the number input\'s silent refusal ---');
 	cell.value = '12.5';
 	fire(cell, 'change', {});
 	report(L.cellText('junctions', ids[1], 'demand') === '12.5', 'and a real number still lands', L.cellText('junctions', ids[1], 'demand'));
+}
+
+
+// ---- 13. the two modes, which is the whole of Tom's 2026-09-07 spec --------------------------
+console.log('\n--- navigation mode and edit mode ---');
+// **A FRESH DOCUMENT, because the sections above deliberately DELETE elements** — section 10
+// proves a selection whose element has gone resolves to nothing, and it does that by removing one.
+// Everything below needs four junctions again, built the way the page builds them.
+const made2 = [L.addNode('junction', 0, 40), L.addNode('junction', 10, 40),
+	L.addNode('junction', 20, 40), L.addNode('junction', 30, 40)];
+const ids2 = made2.map((x) => x.id);
+// The survivors of the sections above are cleared out, so the ROW ORDER below is known: every
+// assertion here is about which row a key or a paste reached, and it cannot be read against a
+// table whose order depends on what an earlier section happened to delete.
+doc.nodes.length = 0;
+made2.forEach((x) => doc.nodes.push(x));
+doc.links.length = 0;
+ids2.forEach((id, i) => L.setCell('junctions', id, 'elev', 200 + i));
+ids2.forEach((id, i) => L.setCell('junctions', id, 'demand', (i + 1) * 10));
+L.paneTableById('junctions').sel = null;
+// The sort is a GESTURE that is then held, and section 9 clicked a heading twice — so it is
+// still descending on elevation. Put it back to the id ordering a fresh table opens on.
+L.paneTableById('junctions').sort = { col: 'id', dir: 1 };
+L.paneTableById('junctions').orderIds = null;
+L.paneTableById('junctions').sig = '';
+L.renderTable('junctions');
+report(L.tableOrder('junctions').join(',') === ids2.join(','),
+	'four junctions, in a known order, for everything below', L.tableOrder('junctions').join(','));
+{
+	const cell = td(ids2[0], 'demand').children[0];
+	report(cell.readOnly === true, 'a cell is born in NAVIGATION mode, read-only');
+	report(!L.inEdit(cell), '...and reports itself not editing');
+	// **THE POINT OF readOnly IS THAT THERE IS NO CARET TO SWALLOW AN ARROW.** A flag alone would
+	// leave the browser moving one underneath us.
+	clickCell(ids2[0], 'demand');
+	key('ArrowDown');
+	report(spec.sel.fId === ids2[1], 'an arrow in navigation mode moves one cell, always', spec.sel.fId);
+
+	// F2 keeps the value; typing over a cell wipes it. Tom's (b) against his (a).
+	clickCell(ids2[0], 'demand');
+	const c0 = td(ids2[0], 'demand').children[0];
+	c0.focus();
+	const held = c0.value;
+	key('F2');
+	report(L.inEdit(c0), 'F2 puts the cell into edit mode');
+	report(c0.value === held, '...and keeps what was there', JSON.stringify(c0.value));
+
+	// Escape puts back what was typed over and fires no commit.
+	c0.value = '999';
+	key('Escape');
+	report(!L.inEdit(c0), 'Escape leaves edit mode');
+	report(c0.value === held, '...and puts back what the cell held', JSON.stringify(c0.value));
+	report(L.cellText('junctions', ids2[0], 'demand') === held,
+		'...having written nothing to the document', L.cellText('junctions', ids2[0], 'demand'));
+
+	// A printable character OVERWRITES: the mode switches and the box is emptied, and the
+	// keystroke itself is left to the browser so a dead key or an IME composition is not lost.
+	c0.focus();
+	key('7');
+	report(L.inEdit(c0), 'typing a character starts an edit');
+	report(c0.value === '', '...on an emptied cell, because typing OVERWRITES', JSON.stringify(c0.value));
+
+	// Delete empties a cell without entering edit mode at all.
+	c0.value = held; L.cancelEdit(c0); c0.readOnly = true;
+	clickCell(ids2[2], 'demand');
+	const c2 = td(ids2[2], 'demand').children[0];
+	c2.focus();
+	key('Delete');
+	// **A COLUMN WITH NO BLANK STATE READS AN EMPTIED CELL AS 0**, which is the same rule the
+	// change handler has always followed: `+'' === 0`. A demand of nothing IS a demand of zero. On
+	// a column that declares `blank` -- a reaction coefficient, where an empty box means "use the
+	// global" and a typed 0 means "does not react" -- the same gesture passes `undefined` instead.
+	report(L.cellText('junctions', ids2[2], 'demand') === '0',
+		'Delete empties a cell in navigation mode, without entering it',
+		JSON.stringify(L.cellText('junctions', ids2[2], 'demand')));
+	L.setCell('junctions', ids2[2], 'demand', 30);
+	L.renderTable('junctions');
+}
+
+// ---- 14. the paste tiles, by Tom's own rule ---------------------------------------------------
+console.log("\n--- pasting, and the fractional repeat ---");
+{
+	// The clipboard reader is the Curves grid's, reused rather than restated.
+	report(L.pasteIsGrid(L.pasteCells('1\t2\n3\t4')), 'a tab-separated block is a grid');
+	report(!L.pasteIsGrid(L.pasteCells('7')), '...and one cell is not, so the browser keeps it');
+
+	// ONE CELL INTO A RECTANGLE FILLS IT.
+	L.renderTable('junctions');
+	clickCell(ids2[0], 'demand');
+	key('ArrowDown', { shiftKey: true });
+	key('ArrowDown', { shiftKey: true });
+	L.pasteAt('junctions', [['55']]);
+	report(ids2.slice(0, 3).every((id) => L.cellText('junctions', id, 'demand') === '55'),
+		'one cell pasted into three fills all three',
+		ids2.map((id) => L.cellText('junctions', id, 'demand')).join('|'));
+
+	// TWO ROWS INTO THREE — the fractional case, and the half is the source's first row again.
+	clickCell(ids2[0], 'demand');
+	key('ArrowDown', { shiftKey: true });
+	key('ArrowDown', { shiftKey: true });
+	L.pasteAt('junctions', [['11'], ['22']]);
+	report(L.cellText('junctions', ids2[0], 'demand') === '11' &&
+		L.cellText('junctions', ids2[1], 'demand') === '22' &&
+		L.cellText('junctions', ids2[2], 'demand') === '11',
+		'two rows into three repeat one and a HALF times',
+		ids2.slice(0, 3).map((id) => L.cellText('junctions', id, 'demand')).join(','));
+
+	// THREE ROWS INTO ONE SELECTED CELL — the source is bigger, so all three land. "At least one
+	// whole time" is what stops a selection of one truncating a block of forty.
+	clickCell(ids2[0], 'demand');
+	L.pasteAt('junctions', [['1'], ['2'], ['3']]);
+	report(L.cellText('junctions', ids2[0], 'demand') === '1' &&
+		L.cellText('junctions', ids2[1], 'demand') === '2' &&
+		L.cellText('junctions', ids2[2], 'demand') === '3',
+		'three rows into one selected cell all land',
+		ids2.slice(0, 3).map((id) => L.cellText('junctions', id, 'demand')).join(','));
+
+	// IT CANNOT GROW THE TABLE. A row is an element on the map; a paste that ran off the bottom
+	// would have to invent junctions, which is a different question with an ID-collision story.
+	const before = doc.nodes.length;
+	clickCell(ids2[3], 'demand');
+	const off = L.pasteAt('junctions', [['5'], ['6'], ['7']]);
+	report(doc.nodes.length === before, 'a paste past the last row invents no elements');
+	report(off && off.dropped === 2, '...and counts what it dropped rather than dropping it quietly',
+		off && String(off.dropped));
+
+	// A RESULT COLUMN REFUSES A PASTE EXACTLY AS IT REFUSES A KEYSTROKE.
+	clickCell(ids2[0], 'head');
+	const res = L.pasteAt('junctions', [['1'], ['2']]);
+	report(res && res.wrote === 0 && res.refused === 2,
+		'a computed column refuses every pasted cell and says how many',
+		res && JSON.stringify(res));
+
+	// A PASTE IS THE USER TYPING, so nonsense is refused by the same test a keystroke meets.
+	clickCell(ids2[0], 'demand');
+	const bad = L.pasteAt('junctions', [['abc'], ['9']]);
+	report(bad && bad.wrote === 1 && bad.refused === 1,
+		'letters in a pasted block are refused, and the numbers beside them still land',
+		bad && JSON.stringify(bad));
+	report(L.cellText('junctions', ids2[1], 'demand') === '9', '...the number landing where it was aimed');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

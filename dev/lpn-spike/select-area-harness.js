@@ -28,6 +28,11 @@ const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 require(path.join(ROOT, 'js', 'lpn-geom.js'));
 
 let checks = 0, failures = 0;
+// A bubbled event as the element sees one. The stub does not bubble, so the harness delivers what
+// a browser would.
+function fire(el, type, ev) {
+	((el && el._listeners && el._listeners[type]) || []).slice().forEach((f) => f(ev || {}));
+}
 function report(ok, label, detail) {
 	checks++;
 	if (!ok) { failures++; }
@@ -74,7 +79,20 @@ const L = loadLoopedNetwork(
 	// The area tool through its own door, and the ring set the way a drag sets it.
 	"\t\tsetAreaShape: setSelectAreaShape, areaShape: function () { return selectAreaShape; },\n" +
 	"\t\tareaShapeNext: selectAreaShapeNext,\n" +
-	"\t\tsetRing: function (pts) { areaRing = pts; paintAreaMarquee(); },\n" +
+	"\t\tsetRing: function (pts) { areaRing = pts; areaLive = null; paintAreaMarquee(); },\n" +
+	// The gesture itself, driven exactly as the pointer listeners drive it: a press is a press and
+	// a move is a move, and the harness supplies world coordinates because screenToWorld() is the
+	// only thing between it and a real one.
+	"\t\tpress: function (x, y, shift) { return areaPress({ x: x, y: y }, !!shift); },\n" +
+	"\t\tmove: function (x, y) { return areaMove({ x: x, y: y }); },\n" +
+	"\t\tdrawing: areaDrawing, ringNow: areaRingPoints,\n" +
+	"\t\thintText: function () { var b = document.getElementById('lpn_area_hint');\n" +
+	"\t\t\treturn b && b.style.display !== 'none' ? b.textContent : null; },\n" +
+	// The multi-properties box through its own door, and read back off the real popup elements.
+	"\t\topenMulti: openMultiProperties, multiGroups: multiGroups,\n" +
+	"\t\tpopupTitle: function () { return document.getElementById('lpn_popup_title').textContent; },\n" +
+	"\t\tpopupSections: function () { return document.getElementById('lpn_popup_fields').children\n" +
+	"\t\t\t.filter(function (c) { return c._tag === 'details'; }); },\n" +
 	"\t\tringPoints: areaRingPoints, elementsInRing: elementsInRing,\n" +
 	"\t\tcommitArea: function (add) { areaAdd = !!add; return commitArea(); },\n" +
 	"\t\tmarqueeShown: function () { return selectAreaEl && selectAreaEl.style.display !== 'none'; },\n" +
@@ -244,6 +262,147 @@ console.log('\n--- deleting many ---');
 	L.refreshSelection();
 	report(L.selectionCount() === 1 && L.isSelected('node', ids[0]),
 		'and one whose element has gone is pruned, leaving the rest', String(L.selectionCount()));
+}
+
+
+// ---- 10. the gesture is CLICK and rubber band, not drag ---------------------------------------
+console.log('\n--- click, move, click ---');
+{
+	// Rebuilt, because section 7 deleted most of the network to prove a cascade. ADDED rather than
+	// spliced in: nodeEls still holds drawn elements for what went, and emptying doc.nodes behind
+	// the drawing's back is a state the page itself can never produce.
+	const m = [L.addNode('junction', 0, 0), L.addNode('junction', 10, 0),
+		L.addNode('junction', 20, 0), L.addNode('junction', 30, 0)];
+	const q = m.map((x) => x.id);
+	const pp = [L.addLink('pipe', q[0], q[1]), L.addLink('pipe', q[1], q[2]), L.addLink('pipe', q[2], q[3])];
+	L.clearSelection();
+
+	// A WINDOW IS TWO CLICKS with a look in between, not a press and a release.
+	L.setAreaShape('window');
+	report(!L.drawing(), 'nothing is being drawn before the first click');
+	report(L.press(5, -5, false) === 'start', 'the first click starts the ring');
+	report(L.drawing(), '...and the ring is now open');
+	L.move(15, 2);
+	report(L.ringNow().length === 4, 'the pointer squares a window up as it moves', String(L.ringNow().length));
+	// **THE LIVE POINT IS NOT IN THE COMMITTED RING**, which is what lets the same ring be re-read
+	// on every frame without the previous frame's pointer accumulating in it.
+	L.move(25, 5);
+	report(L.ringNow().length === 4, '...and a second frame does not grow it', String(L.ringNow().length));
+	report(L.press(25, 5, false) === 'commit', 'the second click finishes it');
+	report(!L.drawing(), '...and the ring is closed');
+	report(L.selectionCount() === 3, 'and it caught the two middle junctions and the pipe between them',
+		String(L.selectionCount()));
+
+	// A LASSO records the path the pointer traces, with no button held.
+	L.clearSelection();
+	L.setAreaShape('lasso');
+	L.press(5, -5, false);
+	[[15, -6], [25, -5], [25, 5], [15, 6], [5, 5]].forEach((pt) => L.move(pt[0], pt[1]));
+	report(L.ringNow().length >= 6, 'a lasso keeps every frame it is given', String(L.ringNow().length));
+	L.press(5, 5, false);
+	report(!L.drawing(), 'a second click closes the lasso');
+	report(L.selectionCount() === 3, '...catching the same three as the window did',
+		String(L.selectionCount()));
+
+	// A POLYGON is a vertex per click, and only the double-click ends it.
+	L.clearSelection();
+	L.setAreaShape('polygon');
+	L.press(5, -5, false);
+	report(L.press(25, -5, false) === 'vertex', 'a second click on a polygon adds a vertex, it does not finish');
+	report(L.drawing(), '...so the ring is still open');
+	L.press(25, 5, false);
+	L.move(5, 5);
+	report(L.ringNow().length === 4, 'the ring grows behind the pointer', String(L.ringNow().length));
+	L.press(5, 5, false);
+	report(L.drawing(), 'a fourth click is still only a vertex');
+	L.commitArea(false);   // the dblclick listener's own call
+	report(!L.drawing(), 'and the double-click is what ends it');
+	report(L.selectionCount() === 3, '...catching the same three again', String(L.selectionCount()));
+
+	// SHIFT IS READ ON THE FIRST CLICK AND HELD, because a polygon takes several and nobody should
+	// have to keep a modifier down through all of them.
+	const held = L.selectionCount();
+	L.setAreaShape('window');
+	L.press(-5, -5, true);
+	L.press(5, 5, false);
+	report(L.selectionCount() > held, 'Shift on the FIRST click adds, whatever the last one held',
+		held + ' -> ' + L.selectionCount());
+	report(L.isSelected('link', pp[1].id), '...and what the previous ring caught is still in it');
+}
+
+// ---- 11. the instruction bubble says what the NEXT click does ---------------------------------
+console.log('\n--- the bubble ---');
+{
+	L.setMode('select');
+	report(L.hintText() === null, 'no bubble outside the tool');
+	L.setAreaShape('window');
+	const before = L.hintText();
+	report(!!before && before.indexOf('corner') >= 0, 'the tool opens saying what the first click does', before);
+	report(before.indexOf('Shift') >= 0, '...and every state carries the Shift rule, both halves of it');
+	L.press(0, 0, false);
+	const during = L.hintText();
+	report(!!during && during !== before, 'and the sentence CHANGES once the ring is open', during);
+	report(during.indexOf('opposite') >= 0, '...to what the second click will do');
+	L.setAreaShape('polygon');
+	report(L.hintText().indexOf('Double-click') >= 0,
+		'a polygon says how to END it, which is the one thing nobody guesses', L.hintText());
+	L.setMode('select');
+	report(L.hintText() === null, 'and it goes away with the tool');
+}
+
+// ---- 12. the multi-properties box --------------------------------------------------------------
+console.log('\n--- properties for many ---');
+{
+	L.setMode('select');
+	const j = [L.addNode('junction', 0, 0), L.addNode('junction', 10, 0), L.addNode('junction', 20, 0)];
+	const t = L.addNode('tank', 30, 0);
+	const pipe = L.addLink('pipe', j[0].id, j[1].id);
+	L.setSelection('node', j[0].id);
+	[j[1].id, j[2].id, t.id].forEach((id) => L.toggleInSelection('node', id));
+	L.toggleInSelection('link', pipe.id);
+	report(L.selectionCount() === 5, 'three junctions, a tank and a pipe are selected');
+
+	const groups = L.multiGroups();
+	report(groups.length === 3, 'they group into three types', groups.map((g) => g.spec && g.spec.id).join(','));
+	report(groups.map((g) => g.els.length).join(',') === '3,1,1',
+		'with the right count in each', groups.map((g) => g.els.length).join(','));
+
+	L.openMulti();
+	report(L.popupTitle().indexOf('5') >= 0, 'the box says how many it is about', L.popupTitle());
+	const secs = L.popupSections();
+	report(secs.length === 3, 'one collapsible heading per type', String(secs.length));
+	// **OPEN, ALL OF THEM.** Tom's own words: a mixed selection shows both and NEITHER is hidden.
+	report(secs.every((d) => d.open === true), 'and every one of them is open, so nothing is hidden');
+	report(secs.every((d) => /\(\d\)/.test(d.children[0].textContent)),
+		'each heading states its own count', secs.map((d) => d.children[0].textContent).join(' / '));
+
+	// Editing a row writes to every element of that type, through setProp().
+	const junctionSec = secs[0];
+	const rows = junctionSec.children.filter((c) => c._tag === 'label');
+	report(rows.length > 0, 'the junction section has editable rows', String(rows.length));
+	const elevRow = rows.filter((r) => (r.textContent || '').indexOf('Elev') >= 0)[0]
+		|| rows[0];
+	const box = elevRow.children.filter((c) => c._tag === 'input')[0];
+	report(!!box, 'a row is a label and an input');
+	box.value = '321';
+	fire(box, 'change', {});
+	report(j.every((n) => String(n.elev) === '321' || String(n._elev) === '321'),
+		'editing one row set it on all three junctions',
+		j.map((n) => n.elev + '/' + n._elev).join(' '));
+	report(String(t.elev) !== '321' && String(t._elev) !== '321',
+		'...and NOT on the tank, which is a different type in a different section');
+
+	// The property list is the Tables pane's own, so a result column can never appear here.
+	const labels = rows.map((r) => r.textContent || '').join(' | ');
+	report(labels.indexOf('Pressure') < 0 && labels.indexOf('Head') < 0,
+		'no computed column is offered, exactly as none is typeable in the table', labels);
+
+	// One element falls through to the popup it always had, which carries the id, the rename and
+	// everything else a type is.
+	L.setSelection('node', j[0].id);
+	L.openMulti();
+	report(L.popupTitle().indexOf('selected') < 0,
+		'with one selected it is the ordinary single-element popup', L.popupTitle());
 }
 
 // ---- 9. what the source has to keep saying ------------------------------------------------------

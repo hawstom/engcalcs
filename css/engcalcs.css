@@ -699,6 +699,23 @@ html[lang="zh"] .ec-welcome {
    is the only thing that makes press-again-to-cycle discoverable. A pseudo-element, so there is
    nothing in the DOM a pointer or a screen reader could take for a second control -- it is an
    indicator and not a target, which is exactly what the convention it copies means. */
+/* **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266). It says what the NEXT click will do, so it
+   changes mid-gesture and has to be readable at a glance against whatever the map is showing: a
+   solid ground rather than the mode line's wash, and a border, because it sits over a drawing.
+   pointer-events are off from its parent overlay column, which is what keeps an instruction from
+   being something the reader has to get out of the way. */
+.lpn-area-hint {
+	font-size: 11px; line-height: 1.35; max-width: 22em;
+	background: #fff; color: #12211f;
+	border: 1px solid #0645ad; border-radius: 3px;
+	padding: 4px 8px;
+	box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+/* A collapsible heading per type in the multi-properties box. Open by default and the reader
+   closes what they are not using, never the other way round. */
+.lpn-multi-section { margin: 0 0 .5em; }
+.lpn-multi-section > summary { font-weight: bold; cursor: pointer; padding: 2px 0; }
+.lpn-multi-note { margin: .2em 0 .4em; font-size: .9em; }
 .lpn-tool-more { position: relative; }
 .lpn-tool-more::after {
 	content: ''; position: absolute; right: 2px; bottom: 2px;

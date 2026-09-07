@@ -193,6 +193,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/b\.el\.style\.display = 'none'; return;/, 'a legend badge on the map'],
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
 		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
+		[/box\.style\.display = 'none'; box\.textContent = '';/, 'the select-area instruction bubble, which holds no control'],
 		[/el\.style\.display = 'none';\n\t}/, 'hidePanel() itself']
 	];
 	const lines = code.split('\n');

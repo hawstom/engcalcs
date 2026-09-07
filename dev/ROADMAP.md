@@ -367,9 +367,9 @@ the block.
     it is one run of the rebuilt `log/lang-log-stats.sh` over HW and the band pages, same window and
     same bucket, long enough that the denominator is not marked `~`.
 
-- 75|185| **Match/Copy properties tool (originated during Task 146).**
-  **GATE: 100 with Task 186, and only when all of the EPANET file is implemented** (Tom, 2026-09-06
-  -- the same sentence gates both).
+- 100|185| **Match/Copy properties tool (originated during Task 146).**
+  **RAISED TO 100 BY TOM, 2026-09-07.** The earlier gate -- 100 with Task 186, and only once all of
+  the EPANET file is implemented -- is superseded by his own promotion, exactly as Task 186's was.
   - **THE PREMISE IT WAS CONCEIVED UNDER IS GONE, AND HE KEPT IT ANYWAY.** Tom, 2026-09-06: *"This
     was conceived 'in the absence of the table editor'. But now we have a table editor.
     Nevertheless, this could be a very cool visual feature if done right."* So it is no longer the
@@ -512,29 +512,35 @@ the block.
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
 - 100|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.**
-  **THE SELECTING HALF SHIPPED 2026-09-06; EDIT-ALL-SELECTED DID NOT.** Selection is a list, Shift
-  adds and removes, and one toolbar slot cycles window, lasso and polygon with the disclosure
-  triangle Tom asked for. `dev/lpn-spike/select-area-harness.js`, 52 checks.
-  - **THE THREE SHAPES DIFFER ONLY IN HOW THE RING IS DRAWN**, and after that go through one
-    predicate -- `EngCalcs.lpnGeom.pointInPolygon()`, pure and in the geometry module. Three
-    containment tests would be three chances to disagree about an edge, on three gestures a user
-    thinks of as one command. The harness draws the same ground three ways and requires the same
-    answer.
-  - **WHAT IS "INSIDE" IS DECLARED:** a node by its own position, a LINK only when BOTH ends are
-    in (the CAD window rule), a Text label by the point it is drawn at. Crossing selection is the
-    other convention and is deliberately not offered -- with two rules a user cannot tell which
-    one they got.
-  - **THE TOOLBAR CYCLES AND THE MENU LISTS**, which is the one asymmetry to keep: the strip is
-    where width is scarce, the Edit menu is where a thing is found, and the menu rows are also the
-    only door at the small-screen breakpoint where the whole toolbar is hidden.
-  - **STILL OPEN -- points 2 and 3 of Tom's spec:** Properties opening with a COLLAPSIBLE HEADING
-    PER TYPE selected, so a mixed selection shows both and neither is hidden; and editing a value
-    there setting it on every asset of that type. **Every write goes through `setProp()`** -- 400
-    of them is still 400 calls at the one seam, and a bulk path that writes properties directly is
-    the Task 322 scenario-seam defect at scale. Find and replace states its count before it writes;
-    this owes the same, and `commitArea()` already states the count of what was caught.
-  - **NEEDS A BROWSER PASS** (2026-09-06): the marquee, the triangle, and whether a lasso drawn
-    with a finger is usable at all.
+  **BUILT 2026-09-06 AND REWORKED TO TOM'S GESTURE ON 2026-09-07.**
+  `dev/lpn-spike/select-area-harness.js`, 91 checks.
+  - **ALL THREE ARE CLICK-AND-RUBBER-BAND, NOT DRAG** (his instruction). A press-hold-release
+    marquee is one gesture a hand has to hold steady; a click, a look and a second click is two
+    gestures with a pause between them, and the pause is where the user reads what they are about
+    to catch. It is also what makes a lasso a considered act rather than a test of grip. Window is
+    two clicks, lasso is click-trace-click with the button UP, polygon is a click per vertex and a
+    double-click to end.
+  - **`areaRing` IS COMMITTED AND `areaLive` IS THE POINTER**, kept apart so the ring can be
+    re-read every frame without the previous frame accumulating in it -- a bug a single array
+    produces on a window and not on a lasso, so it would have shipped.
+  - **THE THREE SHAPES GO THROUGH ONE PREDICATE**, `EngCalcs.lpnGeom.pointInPolygon()`. A node is
+    caught by its position, a LINK only when BOTH ends are in (the CAD window rule), a Text by its
+    drawn point. Crossing selection is deliberately not offered: with two rules a user cannot tell
+    which one they got.
+  - **THE BUBBLE SAYS WHAT THE NEXT CLICK WILL DO**, and changes mid-gesture, which is why it is
+    not another line in the mode hint. Every state carries the Shift rule, because Tom's own
+    reading of the first build was *"I see how Shift adds, but I don't see how it removes"* -- a
+    modifier whose second half is undiscoverable has one half. Shift is read on the FIRST click and
+    held, so a polygon does not ask anybody to keep a key down for six of them.
+  - **THE MULTI-PROPERTIES BOX TAKES ITS PROPERTY LIST FROM THE TABLES PANE'S OWN COLUMN SPEC.**
+    `paneTables()` already declares, per type, every editable property with its label, its unit,
+    its `prop` and a setter that goes through `setProp()`; a second list here would be a second
+    opinion about what a pipe HAS. A collapsible heading per type, all open, each stating its
+    count; an untouched row writes nothing; one undo snapshot per row; and it states its reach the
+    way Find and replace does. Finishing a selection opens it, which is the moment the subject is
+    unambiguous.
+  - **NEEDS A BROWSER PASS** (2026-09-07): the marquee, the triangle, the bubble's placement, and
+    whether a lasso traced with a finger is usable at all.
 
 - 50|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
   studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels
@@ -823,32 +829,29 @@ the block.
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 
 - 100|186| **Make the Tables pane spreadsheet-interoperable.**
-  **THREE OF THE FIVE SLICES SHIPPED 2026-09-06** -- Tom's parts 1, 2 and 3, less the table-switch
-  pair he himself ranked late. Cells abut (the <td> carries the grid line and the control inside it
-  has none); arrows, Shift+arrows, Ctrl+arrows, Ctrl+Shift+arrows, Home, End, Ctrl+Home, Ctrl+End
-  and Ctrl+A all navigate and extend; a range copies as TSV out of `paneCellText()`, headings and
-  units on a whole-table copy alone. `dev/lpn-spike/pane-select-harness.js`, 53 checks.
-  - **Every cell had to become `type="text"` with `inputmode="decimal"`**, exactly as the Curves
-    grid did under Task 588 and for the same two reasons: Up and Down are a number input's spinner,
-    and `selectionStart` throws on one in Chrome and Firefox, so caret-edge detection is impossible.
-    What the old input type refused silently is now refused out loud -- letters put the cell back to
-    what the document holds rather than writing NaN into a field of the user's.
-  - **The selection is keyed on `(element id, column key)` and the highlight and the clipboard are
-    both ours.** A browser's native drag-selection cannot span two `<input>` elements at all, so a
-    Ctrl+C against the browser's own selection returns an empty clipboard with no error. Ours is a
-    class on the `<td>`s and a `copy` listener, and it survives the tbody rebuild a sort or a filter
-    causes.
-  - **STILL OPEN, in the `data-entry-clerk`'s own order** (its fourth journal entry is the spec and
-    this does not restate it): paste IN of a multi-cell block, which is real design work about ID
-    collisions, validating every cell and undo rather than a slice of the first three -- reuse
-    `libPasteCells()`/`libMergePaste()` verbatim, and refuse a result column the way a keystroke
-    already does; then `Ctrl`+`Shift`+`PageUp`/`PageDn` for the next table, which Tom ranks *"lower
-    priority, but very cool"*.
-  - **NEEDS A BROWSER PASS** (2026-09-06): the abutting-cell CSS is the one part no harness can
-    judge, and it moves a look Tom has approved before.
-  - Distinct from Task 146.04 (read-only report tables). The Library's Curves grid is the worked
-    example for the paste direction: `libPasteCells()`, `libDropNameColumn()`, `libMergePaste()`,
-    `libCopyOut()`.
+  **THE SPREADSHEET IS COMPLETE except paste-that-creates-rows** (2026-09-07). Cells abut; the
+  whole arrow, Home/End and Ctrl family navigates and extends; range copy is TSV out of
+  `paneCellText()`. Tom then asked for the rest of the paradigm and it is in: *"we are over the
+  tipping point and we should go all the way."* `dev/lpn-spike/pane-select-harness.js`, 75 checks.
+  - **NAVIGATION AND EDIT ARE REAL MODES, AND `readOnly` IS THE MECHANISM.** A cell is read-only
+    until something puts it into edit, so an arrow key CANNOT be swallowed by the text -- whatever
+    the key handler does or forgets to do. A flag alone would leave the browser moving a caret
+    underneath it. Typing OVERWRITES, F2 or a double-click EDITS, Escape abandons, Delete empties.
+  - **ESCAPE PUTS THE TEXT BACK AND FIRES NOTHING.** Restoring before the blur means the value at
+    blur equals the value at focus, so the browser's own `change` never fires and there is no
+    commit to undo. A flag telling the commit to skip itself is a second way of saying the same
+    thing and the two could disagree.
+  - **THE PASTE TILES OUT OF ONE LINE** -- `max(selection, source)` then modulo -- which is both
+    halves of Tom's rule at once: one cell fills a rectangle, two rows into six repeat three times,
+    two into three repeat one and a HALF, and three rows into one selected cell all land, because
+    "at least one whole time" is what stops a selection of one truncating a block of forty. Columns
+    are not restricted, on his ruling. It cannot grow the table: a row is an element on the map, so
+    anything past the last row is dropped and COUNTED.
+  - **STILL OPEN:** paste that CREATES elements, which is the ID-collision and validation question
+    the `data-entry-clerk` ranks separately; and `Ctrl`+`Shift`+`PageUp`/`PageDn` for the next
+    table, which Tom ranks *"lower priority, but very cool"*.
+  - **NEEDS A BROWSER PASS** (2026-09-07): the abutting-cell CSS, and whether an IME or a dead key
+    survives the overwrite path, which no harness can see.
 
 - 5|191| **Junction emitters: surface the pressure-dependent demand already solved.**
   Originated during Task 146. Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
