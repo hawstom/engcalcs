@@ -941,7 +941,44 @@ an intention by Task 286. Nothing in this tree touches the **web server's access
 rotation belongs to the host; production SSH is blocked from here, so I cannot read its
 `logrotate.d` entry.
 
-The notice now says the access log *"is rotated and deleted automatically on a schedule, rather
-than kept indefinitely"*, and that it is deleted much sooner than the 26 months. **That is the
-weakest sentence in the notice and it wants a number** — the host's rotation interval, in days or
-weeks. One look at the hosting control panel or `/etc/logrotate.d/apache2` on the server settles it.
+### Corrected the same day, after Tom asked why I could not just determine it
+
+**He was right that I gave up early, and the sentence I wrote was worse than that: it named the
+wrong mechanism.** `/etc/logrotate.d/apache2` is a stock-Linux answer, and this host is not one.
+
+What the repository itself says, and I should have read before answering: `dev/hosting-layout.md`
+and `dev/usage-data-log.md` between them give the account (`jconstru`), the production path
+(`~/addon_html/hawsedc.com/engcalcs`), the PHP (`/usr/local/bin/php`, 8.3), the shell
+(`/usr/local/cpanel/bin/jailshell`) and the crontab's own quirks. **It is cPanel shared hosting**,
+so raw Apache logs are not rotated by logrotate at all:
+
+- the live log is `~/access-logs/hawsedc.com`, a symlink into `domlogs`, which **cPanel's
+  statistics run truncates when it processes it** — daily on a normal configuration;
+- an archived copy is kept as `~/logs/hawsedc.com-<Mon>-<YYYY>.gz` **only if** the account has
+  *Archive logs in your home directory* ticked, and cPanel deletes last month's archive at month
+  end **only if** *Remove the previous month's archived logs* is also ticked.
+
+**Those two checkboxes are the whole answer, and they are account settings that cannot be read from
+here or from anything in git.** So the honest split is: the platform and the mechanism are
+determinable and I have now determined them; the retention is one of three states depending on two
+tick boxes, and the difference between them is "about a day" and "for ever".
+
+**The cron block Tom was thinking of is a different log.** `dev/usage-data-log.md` documents it,
+enabled on production 2026-09-03: weekly report, monthly archive rotation, monthly 26-month trim
+(`trim_logs.php`), daily chain audit. All four are the EngCalcs **usage counts**. Nothing in it
+touches the web server's access log.
+
+**Because the answer could be "for ever", the notice no longer guesses.** The claim that it is
+*"deleted much sooner"* than 26 months was mine, unverified, and could be false with archiving on
+and removal off, which is the ordinary cPanel default pair. It now says only what is certainly
+true: the log is rotated on the hosting account's own schedule rather than by this site's code, and
+is no part of the 26-month period.
+
+**Thirty seconds on production settles it**, and then the notice gets a number:
+
+```sh
+ls -l ~/access-logs/ ~/logs/ | head -20; date
+```
+
+The live log's size and date, and the oldest `.gz` in `~/logs/`, give the retention directly.
+The same two facts are in cPanel under **Metrics → Raw Access**, where the two checkboxes are.

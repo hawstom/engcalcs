@@ -123,9 +123,9 @@ choice about it.</p>
 <p>What it is for is keeping the site up and defending it: finding what broke, and recognising
 abuse. <strong>We do not use it to count visits, to build statistics, or to learn anything about
 you</strong>, and we never join it to the usage counts described in section 1. Nobody profiles it,
-and it goes nowhere else. It is rotated and deleted automatically on a schedule, rather than kept
-indefinitely, and it is not part of the 26-month retention promised for the usage counts above: it
-is deleted much sooner than that.</p>
+and it goes nowhere else. It is rotated on the hosting account&rsquo;s own schedule rather than by
+this site&rsquo;s code, and it is no part of the 26-month period promised for the usage counts
+above.</p>
 
 <p>This is the one place on this site where your IP address is written down. We say so plainly here
 because a privacy notice that quietly omits the server log is the commonest way one of these

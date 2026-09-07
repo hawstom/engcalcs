@@ -133,7 +133,7 @@ $ec_lang_syn['template_printable_subtitle']='';
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='May we keep one digit in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else\'s first.';
-$ec_lang_syn['consent_body']='Will you allow (permit) us to keep (store, save, put) a single digit per page in this browser profile\'s storage to prevent us from logging (recording) its visits repeatedly?';
+$ec_lang_syn['consent_body']='May we keep (store, save, put) one digit in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else\'s first.';
 $ec_lang['consent_accept']='Allow this';
 $ec_lang_syn['consent_accept']='Allow (permit, accept) this ask (this request, this question)';
 $ec_lang['consent_accept_all']='Allow all';
