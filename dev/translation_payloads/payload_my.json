@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1710,
-        "delta_key_count": 38,
+        "expected_key_count": 1713,
+        "delta_key_count": 41,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -527,7 +527,10 @@
         "lpn_find_filter_btn": "Filter in current table",
         "lpn_find_filter_table": "Table to filter",
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+        "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+        "lpn_engine_needed_failed": "The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.",
         "lpn_field_tag": "Tag",
+        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -567,7 +570,10 @@
         "lpn_find_filter_btn": "Filter in current table",
         "lpn_find_filter_table": "Table to filter",
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+        "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+        "lpn_engine_needed_failed": "The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.",
         "lpn_field_tag": "Tag",
+        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -742,6 +748,38 @@
                 }
             }
         },
+        "lpn_engine_needed_loading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "ကိုယ်တိုင် ဖွင့်\/ပိတ် လုပ်ဆောင်သော ဗားလ်များကို ဖြေရှင်းပေးသည့် EPANET ဖြေရှင်းစက်ကို ရယူ၍မရခဲ့ပါ။ အင်တာနက်ကို တစ်ကြိမ်သာ ချိတ်ဆက်ပါ၊ ထို့နောက် ဤစက်ပေါ်တွင် သိမ်းထားပါလိမ့်မည်။",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "ဤဗားလ်များသည် ၎င်းတို့ကိုယ်တိုင် ဖွင့်\/ပိတ် လုပ်ဆောင်ကြပြီး၊ EPANET ဖြေရှင်းစက်ကသာ ၎င်းတို့ကို တွက်ချက်နိုင်သည်။ EPANET ဖြေရှင်းစက်ကို ဖွင့်၍မရခဲ့ပါ၊ ထို့ကြောင့် အောက်ပါ အဖြေများ ပျောက်ဆုံးနေသည် -",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_engine_needed_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "ကိုယ်တိုင် ဖွင့်\/ပိတ် လုပ်ဆောင်သော ဗားလ်များကို ဖြေရှင်းပေးသည့် EPANET ဖြေရှင်းစက်ကို ရယူ၍မရခဲ့ပါ။ အင်တာနက်ကို တစ်ကြိမ်သာ ချိတ်ဆက်ပါ၊ ထို့နောက် ဤစက်ပေါ်တွင် သိမ်းထားပါလိမ့်မည်။",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "ဤဗားလ်များသည် ၎င်းတို့ကိုယ်တိုင် ဖွင့်\/ပိတ် လုပ်ဆောင်ကြပြီး၊ EPANET ဖြေရှင်းစက်ကသာ ၎င်းတို့ကို တွက်ချက်နိုင်သည်။ EPANET ဖြေရှင်းစက်ကို ဖွင့်၍မရခဲ့ပါ၊ ထို့ကြောင့် အောက်ပါ အဖြေများ ပျောက်ဆုံးနေသည် -",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
         "lpn_field_tag": {
             "reason": "equal_to_english",
             "current_value": "Tag",
@@ -754,7 +792,23 @@
                 "next_translated": {
                     "key": "lpn_field_tag_tip",
                     "value": "Tag သည် ဖိအားဇုန် (သို့) အလုပ်အမိန့်စာ ကဲ့သို့ သင်လိုသလို မည်သည့်အဓိပ္ပါယ်မဆို ဆောင်နိုင်သည်။ ဤနေရာ (သို့) EPANET ရှိ မည်သည့် တွက်ချက်မှုမျှ ၎င်းကို မဖတ်ပါ။ Tag သည် စကားလုံးတစ်လုံးသာ ဖြစ်ရမည် - EPANET သည် ကွက်လပ်ပထမဆုံးတွင် ဖတ်ရှုမှု ရပ်တန့်သောကြောင့်၊ သင်ရိုက်နေစဉ် ကွက်လပ်ကို ငြင်းပယ်မည်။ ၎င်းကို EPANET ဖိုင်ထဲသို့ သယ်ဆောင်ပြီး ထုတ်ဆောင်သည်။",
-                    "english": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file."
+                    "english": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it."
+                }
+            }
+        },
+        "lpn_settings_engine_native_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native_tip",
+                    "value": "US EPA ၏ EPANET ဖြေရှင်းစက်ကို သင့်ဘရောက်ဇာထဲတွင် ဤနေရာမှ လည်ပတ်စေသည်။ ဤအရွယ်အစား ကွန်ရက်တစ်ခုတွင် အမြန်နှုန်းကွာခြားမှု မမြင်ရပါ။ ဖြေရှင်းစက်နှစ်ခုသည် အနီးစပ်ဆုံး တူညီသောအဖြေများ ပေးသော်လည်း အတိအကျ မတူပါ - EPANET သည် ဆွဲငင်အားအတွက် သုံးသည့်တန်ဖိုးကို ဂဏန်းချုံ့ ထားသောကြောင့်၊ ၎င်း၏ ဒေသဆိုင်ရာ ဆုံးရှုံးမှုများသည် အတွင်းပါ ဖြေရှင်းစက်ထက် ခန့်မှန်းခြေ 0.08% နိမ့်ပြီး၊ မန်နင်းကြမ်းတမ်းမှုဖြင့် တွက်ချက်ပါက ၎င်း၏ ဖိမြင့်ဆင့်ဆုံးရှုံးမှုသည် ခန့်မှန်းခြေ 0.6% နိမ့်ထွက်လာမည်။ ဤအမှန်ခြစ်ကို ပထမဆုံးအကြိမ် ဖွင့်သောအခါ၊ ခန့်မှန်းခြေ 650 KB ကို ဒေါင်းလုဒ်လုပ်ပြီး ဤစက်ပေါ်တွင် သိမ်းထားပါလိမ့်မည်။",
+                    "english": "This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "EPANET ဖြေရှင်းစက်ကို ဖွင့်နေသည်…",
+                    "english": "Loading the EPANET solver…"
                 }
             }
         },

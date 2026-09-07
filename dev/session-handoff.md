@@ -109,6 +109,17 @@ Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he 
   BESIDE the carried lines, with the exporter writing those lines back while they still parse to
   what the document states. `lpnSourcesText(live, src)` is the pattern; `[SOURCES]`, `[MIXING]` and
   `[TAGS]` all follow it.
+- **COPY-ASIDE-AND-RESTORE ON A SHARED FILE DESTROYS THE OTHER SESSION'S LINES, and it is a
+  technique this project INVENTED and then got bitten by, on 2026-09-06.** Two sessions were editing
+  `lib/lang.ec.en.php`. To commit its own change without sweeping the other's uncommitted work into
+  the commit, one session copied the worktree file aside, reset it to `HEAD`, re-applied only its own
+  edits, committed with a pathspec, and copied the saved file back. **Every line the other session
+  wrote during that window was in neither copy and was silently gone** -- three language keys,
+  already written and verified, found only because a harness reported them dangling. **The technique
+  is correct only while nobody else is writing that file**, which is exactly the condition under
+  which it is not needed. Where two writers are live: commit the whole file and DISCLOSE what of
+  theirs it carries, or wait. Do not reach for the dance.
+
 - **The DOM stub's `querySelectorAll()` returns `[]` for everything.** Walk the tree in the harness;
   do not teach the stub a selector engine to satisfy one assertion. That is the
   stub-that-removes-the-coupling trap `dev/testing-notes.md` warns about.

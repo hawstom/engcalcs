@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1710,
-        "delta_key_count": 35,
+        "expected_key_count": 1713,
+        "delta_key_count": 38,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -529,6 +529,9 @@
         "lpn_find_filter_btn": "Filter in current table",
         "lpn_find_filter_table": "Table to filter",
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+        "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+        "lpn_engine_needed_failed": "The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -566,6 +569,9 @@
         "lpn_find_filter_btn": "Filter in current table",
         "lpn_find_filter_table": "Table to filter",
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+        "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+        "lpn_engine_needed_failed": "The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -735,6 +741,54 @@
                     "key": "lpn_find_op_contains",
                     "value": "conține",
                     "english": "contains"
+                }
+            }
+        },
+        "lpn_engine_needed_loading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Rezolvitorul EPANET nu a putut fi obținut; acesta este cel care rezolvă vanele care se deschid și se închid singure. Conectați-vă la internet o singură dată, iar apoi rămâne pe acest dispozitiv.",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "Aceste vane se deschid și se închid singure, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_engine_needed_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Rezolvitorul EPANET nu a putut fi obținut; acesta este cel care rezolvă vanele care se deschid și se închid singure. Conectați-vă la internet o singură dată, iar apoi rămâne pe acest dispozitiv.",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "Aceste vane se deschid și se închid singure, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_settings_engine_native_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native_tip",
+                    "value": "Rulează rezolvitorul EPANET de la US EPA, chiar aici, în browserul dvs. Pentru o rețea de această dimensiune nu veți observa nicio diferență de viteză. Cele două rezolvitoare dau rezultate apropiate, dar nu identice: EPANET rotunjește valoarea pe care o folosește pentru gravitație, astfel încât pierderile locale (minore) ies cu aproximativ 0,08% mai mici decât la rezolvitorul intern, iar cu rugozitatea Manning pierderea de sarcină iese cu aproximativ 0,6% mai mică. Prima dată când bifați această opțiune, se descarcă aproximativ 650 KB, care rămân apoi pe acest dispozitiv.",
+                    "english": "This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "Se încarcă rezolvitorul EPANET…",
+                    "english": "Loading the EPANET solver…"
                 }
             }
         },

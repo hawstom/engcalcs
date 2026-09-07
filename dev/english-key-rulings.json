@@ -1635,6 +1635,11 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_engine_needed_loading": {
+            "on": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+            "ruled": "2026-09-06",
+            "answer": "Tom's own sentence, written by him in the instruction that commissioned the feature: \"we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches\". Recorded because the words are his, not because anybody approved ours."
         }
     }
 }

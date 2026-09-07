@@ -2248,7 +2248,7 @@ $ec_lang['lpn_field_tag']='Tag';
 // strips commentary by POSITION and a whole sentence on the left ships to 26 agents as a
 // synonym list.
 $ec_lang_syn['lpn_field_tag']='User defined field, Asset tag, Grouping field | EPANET\'s own [TAGS] value: one unspaced token of the user\'s own meaning, often a pressure zone or a work order. Not a markup tag, not a price tag, and not this page\'s Label object.';
-$ec_lang['lpn_field_tag_tip']='A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it. It is carried into and out of the EPANET file.';
+$ec_lang['lpn_field_tag_tip']='A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it.';
 $ec_lang['lpn_pump_effic_curve']='Pump efficiency curve';
 $ec_lang['lpn_pump_effic_curve_tip']='The curve in the Libraries box that says how efficient this pump is at each flow. Several pumps can use the same curve, and editing it there changes all of them. This pump holds only the reference; the points themselves are read and edited under Libraries, Curves.';
 // **THE STRINGS EVERY CURVE CONTROL SHARES** (Task 586). One chooser serves a pump's head curve, a

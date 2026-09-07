@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 1710,
-        "delta_key_count": 35,
+        "expected_key_count": 1713,
+        "delta_key_count": 38,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -526,6 +526,9 @@
         "lpn_find_filter_btn": "Filter in current table",
         "lpn_find_filter_table": "Table to filter",
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+        "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+        "lpn_engine_needed_failed": "The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -563,6 +566,9 @@
         "lpn_find_filter_btn": "Filter in current table",
         "lpn_find_filter_table": "Table to filter",
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+        "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+        "lpn_engine_needed_failed": "The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -732,6 +738,54 @@
                     "key": "lpn_find_op_contains",
                     "value": "ina",
                     "english": "contains"
+                }
+            }
+        },
+        "lpn_engine_needed_loading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Imeshindwa kupata kitatuzi cha EPANET, ndicho kinachotatua vali zinazojifungua na kujifunga zenyewe. Unganisha na mtandao mara moja, na kitabaki kwenye kifaa hiki tangu hapo.",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "Vali hizi hujifungua na kujifunga zenyewe, na ni kitatuzi cha EPANET pekee kinachoweza kuzikokotoa. Kitatuzi cha EPANET kimeshindwa kupakiwa, hivyo majibu haya hayapo:",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_engine_needed_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Imeshindwa kupata kitatuzi cha EPANET, ndicho kinachotatua vali zinazojifungua na kujifunga zenyewe. Unganisha na mtandao mara moja, na kitabaki kwenye kifaa hiki tangu hapo.",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "Vali hizi hujifungua na kujifunga zenyewe, na ni kitatuzi cha EPANET pekee kinachoweza kuzikokotoa. Kitatuzi cha EPANET kimeshindwa kupakiwa, hivyo majibu haya hayapo:",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_settings_engine_native_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native_tip",
+                    "value": "Inaendesha kitatuzi cha EPANET kutoka Shirika la Ulinzi wa Mazingira la Marekani (US EPA), hapa ndani ya kivinjari chako. Kwenye mtandao wa ukubwa huu hutaona tofauti ya kasi. Vitatuzi vyote viwili hukubaliana karibu kabisa, lakini si kabisa: EPANET hurunda thamani inayoitumia kwa mvuto wa dunia, hivyo upotevu wake wa ndani hutokea chini kwa takriban 0.08% kuliko kitatuzi kilichojengwa ndani, na kwa usuguo wa Manning upotevu wake wa kimo hutokea chini kwa takriban 0.6%. Mara ya kwanza unapowasha kisanduku hiki, takriban KB 650 hupakuliwa kisha kubaki kwenye kifaa hiki.",
+                    "english": "This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "Inapakia kitatuzi cha EPANET…",
+                    "english": "Loading the EPANET solver…"
                 }
             }
         },
