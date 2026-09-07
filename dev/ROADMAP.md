@@ -287,6 +287,28 @@ the block.
   - **A still shows a STATE; only a moving asset shows a GESTURE**, and "how do I draw a pipe" is a
     gesture. That is why closing 178 on the Help link did not retire this.
 
+- 75|608| **[H] The engine's 664 KB is no longer opt-in, and somebody pays for it.**
+  Task 605 made EPANET the default, so a first-time visitor now fetches `js/vendor/epanet-js.js`
+  on their FIRST SOLVE rather than on opting in. **A blanket precache is the wrong answer and that
+  half is settled**: it moves the cost to service-worker install, paid by every visitor to all
+  sixteen calculators including people who never open this page.
+  - **RESEARCHED 2026-09-06 by `market-researcher`** (its journal carries the citations, and flags
+    which numbers are secondary-source and must be re-verified before any public claim leans on
+    them). 664 KB floors at roughly **7 s on 3G and 21 s on 2G** before handshake, and in the
+    worst-priced data markets a megabyte is a measurable fraction of daily income. The population
+    this suite is written for is disproportionately there.
+  - **CHEAP AND INDEPENDENT OF THE REST: a percent-done indicator on that first fetch.** Nielsen's
+    response-time doctrine is explicit that past ten seconds a wait needs one or the reader leaves,
+    and this is a DELIBERATE CLICK rather than a page load, which is the more forgiving case
+    provided the wait is legible. Buildable now, needing nobody.
+  - **THE THIRD OPTION THE FRAMING MISSED: a connection-aware idle prefetch, on this page only.**
+    `navigator.connection.effectiveType` and `.saveData` let the page ask the visitor's own browser
+    which cost is smaller, and prefetch after idle unless they are on 2G or have data-saver on.
+    **Chromium-only**, so Safari and Firefox get no signal and must fall back to today's behaviour
+    rather than to an unconditional prefetch.
+  - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
+    optimisation.
+
 - 100|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
   One "150 mm PVC" definition that 400 pipes point at, and a fittings picker (Task 590) resolving
   through the same layer -- Tom linked the two on 2026-09-06 and they are designed together or the
