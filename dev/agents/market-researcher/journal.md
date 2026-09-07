@@ -387,3 +387,177 @@ alternative only (I do not recommend shipping this on the gratitude page itself)
 > we have not copied any. This is a factual note, not an endorsement, and epanet-js has not reviewed
 > or sponsored this project.
 
+## 2026-09-06 — Task 605's open question: precache the 664 KB EPANET engine, or leave it fetch-on-click?
+
+Question as posed: the built-in solver is retired from view and EPANET is now the page default
+(Task 605). `js/vendor/epanet-js.js` (~664 KB) is deliberately excluded from the service worker's
+precache manifest (`lib/ServiceWorker.lib.php:110-114`), so it used to be fetched only by a visitor
+who opted into EPANET; now every first-time solve on `lpn_` fetches it. The alternative — precaching
+it — moves that cost to every visitor to any of the 16 calculators, at service-worker install time.
+
+### 1. Who is actually on the other end of this fetch, on bandwidth terms
+
+**OBSERVED first:** `dev/positioning.md` §6.1 already flagged this exact tradeoff on 2026-08-14, for
+the LibreEPANET variant, before Task 605 made it the whole suite's problem: *"The 678 KB engine is
+lazily imported BECAUSE it is off by default, so on-by-default makes every visit pay for it — which
+cuts against the low-bandwidth case."* That sentence is now true of `Looped-Network.php` itself, not
+just a hypothetical variant.
+
+- **Fixed 664 KB is a genuinely different cost depending on the connection**, computed directly
+  (8 bits/byte, no protocol overhead, so these are floors not ceilings): slow-2G (~50 kbps) ≈ 106 s;
+  2G (~250 kbps) ≈ 21 s; 3G (~750 kbps) ≈ 7 s; weak 4G (~1.5 Mbps) ≈ 3.5 s; 4G (~10 Mbps) ≈ 0.5 s;
+  fibre (~50 Mbps) ≈ 0.1 s. SPECULATION-labelled-as-arithmetic: real mobile TCP/TLS handshake and
+  server latency add to every one of these, so treat them as best-case floors.
+- **A material share of this suite's most-cited population (journal 2026-09-04, rows 3–5: RWSN's
+  150+-country LMIC membership, EWB chapters, Peace Corps volunteers) work in places where 2G/3G,
+  not 4G, is the effective connection, and where data is priced per megabyte rather than flat-rate.**
+  CITED: mobile download speeds vary enormously by country and network generation — Speedtest
+  Global Index-derived reporting puts Morocco (Africa's fastest) at 123.87 Mbps mobile median but
+  most of sub-Saharan Africa well below the ~105.7 Mbps global average, with Nigeria and Kenya
+  ranked "mid-tier" (axis-intelligence.com/internet-speed-by-country-statistics,
+  speedtesthq.com/reports/average-internet-speeds-by-country, both accessed 2026-09-06 via search
+  synopsis — I could not open the Ookla Speedtest Global Index itself this session, so treat the
+  specific Mbps figures as secondary-source and re-verify before quoting a number in public copy).
+- **The COST side, not just the speed side, is separately documented and arguably the sharper fact
+  for this suite's audience:** the Alliance for Affordable Internet's affordability standard is
+  1 GB ≤ 2% of average monthly income; by ITU 2023 data cited in current reporting, sub-Saharan
+  Africa averages ~5.8% of monthly income for 1 GB, and the worst-priced markets (Central African
+  Republic, DRC, Chad) run 15–24% of monthly income for 1 GB. CITED: statranker.org/digital-
+  innovation/countries-by-mobile-data-price-2026 and cellesim.com/en/mobile-data-affordability-by-
+  country-2026 (both accessed 2026-09-06 via search synopsis; original A4AI/ITU reports not opened
+  directly this session — re-verify before public citation). **At the worst end of that range, 664 KB
+  is a small but non-zero fraction of a visitor's money, not merely their time** — a fact the
+  time-to-load literature below does not capture at all, and the sharper reason "lazy vs. precache"
+  is not a pure UX question for this suite's stated audience.
+- I could not find a source measuring bandwidth specifically for NRWA's US rural-utility membership
+  (journal row 2) — US rural/small systems are a genuinely different case from the LMIC populations
+  above (FCC data generally shows US rural fixed broadband gaps, not mobile 2G/3G gaps), and I did
+  not find a citation strong enough to put a number on it this session. Flagging the gap rather than
+  guessing.
+
+### 2. Is a click-triggered wait judged differently from a page-load wait? Yes, and it matters here.
+
+**These are genuinely two different bodies of evidence, and the framing in the brief is right to
+separate them.**
+
+- **Page-load abandonment (the wrong analogy for this decision):** Google's aggregated 2015–2016
+  analysis of 4,500+ mobile sites found 53% of visits abandoned when a page took over 3 seconds to
+  load. CITED: widely reported, e.g. marketingdive.com/news/google-53-of-mobile-users-abandon-sites-
+  that-take-over-3-seconds-to-load/426070 (original Google/DoubleClick report; I did not locate the
+  primary Google document itself this session, so this is corroborated-by-multiple-secondary-sources
+  rather than primary-source-verified — flagged accordingly). **This measures patience BEFORE any
+  relationship with the page exists** — a stranger deciding whether to stay at all. It is the wrong
+  number for "does an EPANET solve after Calculate feel too slow", because by that moment the visitor
+  has already loaded the page, drawn a network and pressed a button they chose to press.
+- **Click-triggered / "system busy" waits are governed by a different, older and more directly
+  relevant body of work: Nielsen's three response-time thresholds (from *Usability Engineering*,
+  1993, restated by NN/g).** CITED: nngroup.com/articles/response-times-3-important-limits. 0.1 s
+  reads as instantaneous; up to 1.0 s keeps the user's flow of thought unbroken with no special
+  feedback needed; up to 10 s is tolerated ONLY with a percent-done indicator and a way to cancel;
+  past 10 s, satisfaction drops sharply and abandonment follows. A 7-second engine fetch on 3G, or a
+  21-second one on 2G, sits squarely in "needs a percent-done indicator," not in "acceptable
+  silence" — which is a testable, fixable UX gap regardless of which precache strategy is chosen.
+- **Perceived wait is not the same as measured wait, and the gap is a lever, not a footnote.**
+  CITED: NN/G "Progress Indicators Make a Slow System Less Insufferable"
+  (nngroup.com/articles/progress-indicators) and the CHI/ACM literature it cites — an animated,
+  percent-done indicator measurably reduces perceived wait and abandonment relative to a spinner or
+  silence, and *active* waiting (the user believes something concrete is happening) is tolerated far
+  better than *passive* waiting (research cited there finds passive wait overestimated by ~36%).
+  **Concretely for this suite: "Fetching the EPANET engine (664 KB, first use only)…" with a percent
+  bar is a small, well-evidenced fix that helps regardless of which precache decision is made**, and
+  today's fallback strings (`lpn_engine_unavailable` etc., per Task 605's own closing note) were not
+  examined for whether they carry this — worth a look, but sizing that is not this seat's job.
+
+### 3. What comparable tools do about a large engine payload
+
+- **epanet-js (the vendored TOOLKIT, `epanet-js`/`epanet-engine`, not the web app) is architected
+  for exactly this choice, and its docs name the tradeoff explicitly:** "By default epanet-js bundles
+  the latest LTS engine, but to pick a specific version, you can use the slim Workspace, which ships
+  without an engine, and load one with `loadModuleVersion`." CITED (source/docs, not a blog post):
+  github.com/epanet-js/epanet-js-toolkit (README, accessed 2026-09-06 via search synopsis; I did not
+  clone and diff this repo this session the way the 2026-09-05 entry above did for the app repo — a
+  future invocation should verify by reading the actual `loadModuleVersion` call site before citing
+  this as confirmed-by-source). This is independent published confirmation that engine-loading
+  strategy (bundle vs. lazy-load-by-version) is a first-class, documented design axis for the exact
+  library both projects vendor — not a problem unique to this suite.
+  - **OBSERVED, in this repo:** `js/vendor/README.md` (per the 2026-09-06 entry above) already
+    records that this suite uses "the toolkit," so the toolkit's own slim/lazy pattern is a direct,
+    load-bearing precedent for what this suite already does (dynamic `import()`, no precache) —
+    this is not a hypothetical alternative design, it is the upstream library's own documented
+    intended use.
+- I could not determine what the epanet-js.com WEB APPLICATION itself does about its engine's
+  loading strategy (precache vs. on-demand) — its bundling is not open source (FSL-1.1-MIT per
+  `dev/positioning.md` §2) and I did not find a public engineering write-up of its loading approach.
+  **A real result: I looked and could not verify this**, not an oversight.
+- **The general web-performance literature (not this domain specifically) treats "ship WASM/large
+  JS lazily, gated on the feature that needs it" as the standard pattern**, e.g. Webpack's own
+  "Lazy Loading" guide and multiple engineering write-ups on WASM module splitting (rustwasm/team
+  issue #52, webpack.js.org/guides/lazy-loading) — this is closer to prevailing practice than
+  precaching a large optional module unconditionally. CITED as general practice, not as a
+  domain-specific ruling.
+
+### 4. A third option the framing misses: condition the choice on the CONNECTION, not on the page
+
+**The brief's two options are both "one policy, applied to everyone." Neither is necessary — the
+Network Information API lets the page ask the visitor's own browser, in real time, which of the two
+costs is smaller for THIS visitor, without a server round trip or an account.**
+
+- **The API:** `navigator.connection.effectiveType` (`'slow-2g'|'2g'|'3g'|'4g'`) and
+  `navigator.connection.saveData` (true when the visitor has turned on their OS/browser's
+  data-saver mode) are read synchronously, no permission prompt. CITED: web.dev/articles/adaptive-
+  loading-cds-2019 and MDN's Network Information API documentation (addyosmani.com/blog/adaptive-
+  serving and the same web.dev article restate the same API surface; MDN itself was not fetched
+  directly this session).
+- **The design this suggests, stated as a design not a decision (that is the planning/field seats'
+  and Tom's call, not mine):** after the `lpn_` page itself has rendered and gone idle (i.e. NOT at
+  service-worker install, so the other 15 calculators never pay for it), prefetch
+  `js/vendor/epanet-js.js` in the background UNLESS `saveData` is true or `effectiveType` is
+  `'2g'`/`'slow-2g'` — in which case leave it exactly as it is today, fetch-on-click, with the
+  percent-done indicator from §2 covering the wait that results. This reconciles the two costs
+  along the axis that actually varies: a visitor on fibre or a decent 4G connection never notices
+  either the prefetch or the click-fetch; a visitor on 2G with data-saver on is exactly the visitor
+  this suite's stated mission (300 km rural scope, 27 languages toward LMIC audiences) most wants to
+  protect from an unwanted background fetch, and is the one population still routed to the honest,
+  visible, cancellable fetch-on-click path.
+- **Caveat, found and worth stating plainly rather than glossing over:** the Network Information API
+  is a Chromium-only feature — not implemented in Safari/WebKit or Firefox as of the sources found
+  this session (web.dev's own article notes it is "currently only supported in Chromium browsers").
+  CITED: web.dev/articles/adaptive-loading-cds-2019. **So this is a progressive enhancement, not a
+  complete answer**: browsers without the API would need to fall back to one of the two policies in
+  the original framing (I'd suggest the safer one — leave as fetch-on-click — as the fallback,
+  since an unconditional precache on an unknown connection reintroduces exactly the cost this idea
+  exists to avoid). I did not find current Safari/Firefox market share data for this suite's
+  specific mobile audience this session; that would matter for how much this caveat weakens the
+  recommendation, and I flag it as unresolved rather than guessing a number.
+
+### 5. Recommendation, ranked, sizes are honest estimates from this seat, not an engineering estimate
+
+1. **Do not add `epanet-js.js` to the precache manifest as a blanket change.** Every calculator
+   visitor paying 664 KB at install time for a feature 15 of 16 pages never touch is the wrong
+   default for a suite whose own positioning file already flags low bandwidth as a differentiator
+   (`dev/positioning.md` §3.4, §8 horn 3). This is a "do not" — zero cost to leave alone, and it is
+   the one part of this recommendation I am confident does not need further research.
+2. **Add a percent-done progress indicator to the first-fetch wait, regardless of any other change.**
+   Smallest possible size (a fetch-progress readout on an already-computed byte count), directly
+   backed by NN/g's response-time thresholds and progress-indicator literature in §2, and it helps
+   every visitor on every connection whether or not idea 3 below is ever built. This is the one
+   finding here I would put in front of Tom first, because it is cheap, evidenced, and orthogonal to
+   the harder precache-or-not question.
+3. **Consider the connection-aware idle-prefetch in §4, scoped to the `lpn_` page only, as a
+   medium-sized enhancement** — bigger than #2, smaller than a general precache, and it is the one
+   idea in this entry that answers "what is the third option" rather than re-arguing the two given.
+   I have not sized the engineering effort (that is not this seat's job) and flag the Chromium-only
+   caveat honestly above; it degrades safely to today's status quo everywhere it is unsupported.
+4. **Leave the manifest exactly as it is today (status quo) if neither 2 nor 3 is prioritised.** The
+   honest sentence for a visitor on 2G today is that their first EPANET solve after Task 605 costs
+   them several to tens of seconds and, in the worst-priced LMIC data markets, a measurable fraction
+   of a cent-to-several-cents of real money — not catastrophic, but no longer opt-in, which is the
+   fact Task 605's own closing note already surfaced and left open for this seat.
+
+**What I could NOT find, stated plainly:** a citation measuring abandonment specifically for a
+*click-triggered feature fetch* of this size and shape (as against page-load abandonment or generic
+UI response-time doctrine) — the literature in §2 is the closest available evidence, assembled from
+two adjacent bodies of work, not a single study of exactly this scenario. Also could not verify the
+epanetjs.com web app's own loading strategy (§3), Ookla's primary Speedtest Global Index data (§1),
+or the primary A4AI/ITU affordability report (§1) — all noted above as secondary-source and flagged
+for re-verification before any public claim leans on the specific numbers.

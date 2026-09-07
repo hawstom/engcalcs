@@ -118,3 +118,32 @@ Separately, checked and clean: MIT attribution for the vendored `epanet-js` npm 
 Butler) is fully discharged today — `js/vendor/README.md`, `js/vendor/epanet-js.LICENSE`, and the
 on-page Notes entry (`lpn_notes_engine_def`) all name it. No licence gap exists on this question
 either way.
+
+## 7. Progress indicator on the first EPANET-engine fetch, and a connection-aware idle-prefetch as the missed third option
+
+Task 605 (2026-09-06) made EPANET the page default, which means every first-time `lpn_` visitor now
+pays the 664 KB engine fetch on click rather than by opt-in. Two findings, ranked:
+
+**(a) Add a percent-done progress indicator to that fetch, regardless of anything else.** Cheapest
+possible size, directly backed by Nielsen's response-time thresholds (nngroup.com/articles/response-
+times-3-important-limits: past ~1s needs feedback, past 10s needs a percent-done indicator or
+abandonment follows) and NN/g's progress-indicator literature (perceived wait falls measurably with
+an animated percent bar vs. silence or a spinner). Helps every visitor on every connection and is
+independent of the precache decision.
+
+**(b) A connection-aware idle-prefetch, scoped to the `lpn_` page only, as the third option the
+original framing (precache-for-everyone vs. fetch-on-click) missed.** `navigator.connection
+.effectiveType`/`.saveData` let the page itself decide, per visitor, which cost is smaller — prefetch
+in the background once the page is idle UNLESS the visitor is on 2G/slow-2G or has data-saver on, in
+which case leave today's fetch-on-click path (with indicator (a)) exactly as is. This protects the
+exact population (RWSN/EWB/Peace Corps LMIC users, journal 2026-09-04) this suite's own mission
+targets, without taxing the other 15 calculators' visitors the way a blanket precache would. Caveat
+found and stated plainly: the Network Information API is Chromium-only (web.dev/articles/adaptive-
+loading-cds-2019) — Safari/Firefox visitors get no signal and should fall back to the safer default
+(fetch-on-click), not to an unconditional prefetch.
+
+Full citations, the bandwidth/cost numbers for the affected populations, and what I could not verify
+(Ookla primary data, the A4AI/ITU primary report, epanetjs.com's own loading strategy): journal
+2026-09-06. Ranked below the CSV/GPX importer (already promoted to Task 592) because that one has a
+documented population stuck on it; this one is my own inference from response-time literature plus
+one architectural idea, not a user asking for it by name.
