@@ -56,6 +56,12 @@ function mkEl(tag, svgNS) {
     },
     className: '', id: '', title: '', type: '', value: '', _text: '', _innerHTML: '',
     checked: false, placeholder: '', step: '', min: '', _listeners: {},
+    // **`disabled` IS A BOOLEAN THAT EXISTS BEFORE ANYBODY SETS IT.** A real input answers `false`,
+    // never `undefined`, so code that only ever ENABLES a control looks identical here to code that
+    // forgot the property. Task 608 asserts a control is not disabled, and without this the
+    // assertion would have to be written as `!== true`, which passes for an element that has no
+    // such property at all -- the stub-that-removes-the-coupling trap in dev/testing-notes.md.
+    disabled: false,
     // **A CARET, BECAUSE A GRID THAT MOVES ON ARROW KEYS ASKS WHERE IT IS.** null is what a real
     // input answers before anybody has put a caret in it, and the page reads that as "at the edge"
     // -- so a harness that sets neither is testing the ordinary case, and one that wants the caret

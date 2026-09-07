@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1713,
-        "delta_key_count": 25,
+        "expected_key_count": 1712,
+        "delta_key_count": 24,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -526,7 +526,6 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
-        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
         "lpn_library_pipetypes": "Pipe types",
         "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
         "lpn_library_pipetypes_note": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
@@ -553,7 +552,6 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
-        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
         "lpn_library_pipetypes": "Pipe types",
         "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
         "lpn_library_pipetypes_note": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
@@ -742,22 +740,6 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "វ៉ាល់ទាំងនេះបើក និងបិទដោយខ្លួនឯង ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ ឧបករណ៍ដោះស្រាយ EPANET មិនអាចផ្ទុកបានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់៖",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
-                }
-            }
-        },
-        "lpn_settings_engine_native_off": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_engine_native_tip",
-                    "value": "ដំណើរការឧបករណ៍ដោះស្រាយ EPANET ពី US EPA នៅទីនេះក្នុងកម្មវិធីរុករករបស់អ្នក។ លើបណ្ដាញទំហំនេះ អ្នកនឹងមិនឃើញភាពខុសគ្នានៃល្បឿនទេ។ ឧបករណ៍ដោះស្រាយទាំងពីរផ្ដល់ចម្លើយស្របគ្នាយ៉ាងជិតស្និទ្ធ ប៉ុន្តែមិនដូចគ្នាបេះបិទឡើយ៖ EPANET បង្គត់តម្លៃទំនាញផែនដីដែលវាប្រើ ដូច្នេះការបាត់បង់មូលដ្ឋាន (local) របស់វាចេញមកទាបជាងឧបករណ៍ដោះស្រាយខាងក្នុងប្រហែល 0.08% ហើយជាមួយភាពក្រញ៉ោងម៉ាន់នីង ការបាត់បង់ថ្ពល់របស់វាចេញមកទាបជាងប្រហែល 0.6%។ លើកទីមួយដែលអ្នកជាប់សញ្ញានៅប្រអប់នេះ ទិន្នន័យប្រមាណ 650 KB ត្រូវបានទាញយក ហើយរក្សាទុកនៅក្នុងឧបករណ៍នេះ។",
-                    "english": "This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device."
-                },
-                "next_translated": {
-                    "key": "lpn_engine_loading",
-                    "value": "កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET…",
-                    "english": "Loading the EPANET solver…"
                 }
             }
         },

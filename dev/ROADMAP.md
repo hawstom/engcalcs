@@ -179,6 +179,26 @@ the block.
   the 2026-08-25 parking for want of clarity, and the `constructionnotesmanager.com` redirect Tom
   dropped -- *"It has never been canonical."*)*
 
+- 75|609| **The installed app claims one path, and `/app` is not in it.**
+  `manifest.json` states `"scope": "/engcalcs/"` while the suite now answers at `/app` as well.
+  **A manifest whose scope does not contain the linking document is dropped WHOLE**, so
+  `librewaternet.org/app` is not installable at all -- silently, with no error anywhere. Found by
+  `web_manifest_check.php` (Task 322 half B), which holds it as a declared ratchet: a SECOND
+  uncovered mount fails the build. **Tom, 2026-09-06: *"Fix it now."***
+  - **DO NOT WIDEN THE SCOPE TO `/`, and that is the whole trap.** Scope is what the INSTALLED APP
+    WINDOW claims, so `/` means every navigation on the origin stays inside the app -- on
+    hawsedc.com that swallows the entire parent site, and even on librewaternet.org somebody who
+    installs the editor gets the marketing site inside it. The service worker could widen only
+    because every route is gated on `inScope()`; an app window has no such gate.
+  - **DERIVE IT FROM `ecSwMounts()`, the way the worker's scope, its `Service-Worker-Allowed`
+    header and its fetch routing already do.** A static `manifest.json` is the last thing still
+    hardcoding one path, and a third mount should need no second edit.
+  - **ONE SERVER LINE IS NEEDED AND IT IS TOM'S: `/app` must 301 to `/app/`.** Manifest scope is
+    matched as a STRING PREFIX, so a scope of `/app` also matches `/apple-anything`; the safe scope
+    is `/app/` with `start_url` `/app/`, and a visitor at the bare `/app` is then outside it.
+  - **Land it AFTER Task 479.01**, so the canonical URL and the installed app agree about what
+    `/app` is.
+
 - 75|479.01| **The canonical half of 479 is CODE, not just a config line.**
   Found 2026-09-06 doing the server steps; 479 files everything left as server work and three of
   these are not.

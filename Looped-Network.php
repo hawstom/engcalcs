@@ -2186,7 +2186,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_tolerance_tip: <?=json_encode($ec_lang['lpn_settings_tolerance_tip'])?>,
 	lpn_settings_engine_native: <?=json_encode($ec_lang['lpn_settings_engine_native'])?>,
 	lpn_settings_engine_native_tip: <?=json_encode($ec_lang['lpn_settings_engine_native_tip'])?>,
-	lpn_settings_engine_native_off: <?=json_encode($ec_lang['lpn_settings_engine_native_off'])?>,
 	lpn_engine_loading: <?=json_encode($ec_lang['lpn_engine_loading'])?>,
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
 	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,

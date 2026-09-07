@@ -1437,11 +1437,6 @@
             "on": "Energy",
             "ruled": "2026-09-04"
         },
-        "lpn_settings_engine_native_off": {
-            "on": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
-            "ruled": "2026-09-07",
-            "answer": "I don't understand why the checkbox must be disabled. Can we discuss this?"
-        },
         "lpn_settings_flow_change": {
             "on": "Flow change limit",
             "ruled": "2026-09-02"

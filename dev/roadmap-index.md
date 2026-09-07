@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**55 open tasks.** Next (100): 5 · Soon (75): 14 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
+**56 open tasks.** Next (100): 5 · Soon (75): 15 · Someday (50): 13 · Maybe (25): 6 · Parked (5): 17
 
 ## 100 — Next (5)
 
@@ -17,7 +17,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 465 — Reusable pipe TYPES: slices 1-3 SHIPPED; the export alert is what is left.
 - Task 590 — A fittings picker, so a pipe's `k` is summed rather than guessed.
 
-## 75 — Soon (14)
+## 75 — Soon (15)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
@@ -33,6 +33,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 603 — Name the nodes along the profile plot's own axis, as EPANET does.
 - ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
+- Task 609 — The installed app claims one path, and `/app` is not in it.
 
 ## 50 — Someday (13)
 
@@ -83,5 +84,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-49 of 55 titles are within 4–12 words. `!` marks the rest;
+50 of 56 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -2614,7 +2614,6 @@ $ec_lang_syn['lpn_settings_engine_native']='';
 // connection actually pays.
 $ec_lang['lpn_settings_engine_native_tip']='This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
 $ec_lang_syn['lpn_settings_engine_native_tip']='';
-$ec_lang['lpn_settings_engine_native_off']='This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';

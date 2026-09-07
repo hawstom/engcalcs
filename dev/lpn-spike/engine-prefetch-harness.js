@@ -49,6 +49,8 @@ function ok(name, cond, extra) {
 }
 
 const PC = global.EngCalcs.pageConfig || {};
+// Read for one ABSENCE assertion below: a key nobody renders is 27 strings maintained for nothing.
+const LANG_EN = require('fs').readFileSync(require('path').resolve(__dirname, '..', '..', 'lib/lang.ec.en.php'), 'utf8');
 const doc$ = global.document;
 const noticeEl = doc$.getElementById('lpn_map_notice');
 const bannerEl = doc$.getElementById('lpn_engine_banner');
@@ -255,9 +257,21 @@ console.log('\n--- a PRV, which the built-in solver does not switch ---');
 	L.rebuildSettingsFields();
 	const box = engineBox(L);
 	ok('the settings panel still renders the engine checkbox', !!box);
-	ok('...and it is DISABLED, not hidden', !!box && box.disabled === true, box && box.disabled);
-	ok('...and the reason is written beside it',
-		hydraulicsNotes(L).indexOf(PC.lpn_settings_engine_native_off) !== -1, hydraulicsNotes(L));
+	// **NOT DISABLED, AND THIS ASSERTION IS A REVERSAL** (Tom, 2026-09-06). It shipped disabled for
+	// one round on his own instruction and he withdrew it: the tip on this very row already names
+	// both cases permanently, so the greying was a conditional duplicate of a permanent telling --
+	// bought at the price of a control that flickers as you draw, and of the user losing the one
+	// thing the box is for, which is saying what they want for the network's OTHER states.
+	ok('...and it is NOT disabled, because three other things already say this', !!box && box.disabled === false,
+		box && box.disabled);
+	ok('...and the tip is where that fact lives permanently',
+		/PRV, PSV, or FCV/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the valve case');
+	ok('...and names the other case too',
+		/extended period run/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the EPS case');
+	// The note that explained the greying went with the greying. Asserted as an ABSENCE, because a
+	// key nobody renders is 27 strings maintained for nothing.
+	ok('...and the note that explained the greying is gone from the file',
+		!/lpn_settings_engine_native_off/.test(LANG_EN), 'no such key in lang.ec.en.php');
 
 	// **THE ABSENCE THAT MATTERS.** Task 602: the setting is a preference, the routing is a fact
 	// about this network. Nothing here may write to settings.engine -- not the disabling, not the
@@ -271,16 +285,14 @@ console.log('\n--- a PRV, which the built-in solver does not switch ---');
 	await settle();
 	ok('the banner clears when the engine arrives', banner() === '', JSON.stringify(banner()));
 
-	// AND THE CHECKBOX COMES BACK WITH THE NETWORK, because the disabled state was never anything
-	// but a rendering of it.
+	// AND THE NETWORK GOING BACK TO ORDINARY CHANGES NOTHING ABOUT THE BOX, which is the point of
+	// not disabling it: there is no state to come back from.
 	const d = L.getDoc();
 	d.links.pop(); d.nodes.pop();          // the PRV and the junction beyond it
 	L.runSolve();
 	L.rebuildSettingsFields();
-	ok('deleting the valve enables the checkbox again',
+	ok('deleting the valve leaves the checkbox exactly as it was',
 		!!engineBox(L) && engineBox(L).disabled === false, engineBox(L) && engineBox(L).disabled);
-	ok('...and takes the reason away with it',
-		hydraulicsNotes(L).indexOf(PC.lpn_settings_engine_native_off) === -1, hydraulicsNotes(L));
 	ok('...and the user\'s choice is still their own', L.settings().engine === 'native', L.settings().engine);
 }
 

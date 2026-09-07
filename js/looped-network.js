@@ -15046,11 +15046,14 @@ var EngCalcs = EngCalcs || {};
 	// `app` is a URL rather than a product name: the product name is unsettled, and a URL stays
 	// useful to somebody who finds this file knowing nothing. Old readers ignore unknown keys.
 	var LPN_FILE_FORMAT = 'hawsedc-lpn';
-	// Matches CANONICAL_ORIGIN in lib/config.inc.php (no `www`). HARDCODED, not derived from
+	// The CANONICAL address of this page: CANONICAL_ORIGIN_DEFAULT in lib/config.inc.php plus the
+	// pretty URL lib/Canonical.lib.php declares for it (no `www`). HARDCODED, not derived from
 	// location.origin: a file saved from a dev host would record the dev host forever, and this key
-	// says where the format lives, not where one save happened.
-
-	var LPN_FILE_APP = 'https://hawsedc.com/engcalcs/Looped-Network.php';
+	// says where the format lives, not where one save happened. It must be the INDEXED address for
+	// the same reason -- the marker outlives the request that wrote it and has no Host header of its
+	// own, so it names the one address the suite asks to be found at (Task 479.01, 2026-09-06).
+	// dev/lpn-spike/file-naming-harness.js holds it against the config.
+	var LPN_FILE_APP = 'https://librewaternet.org/app';
 	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
@@ -24144,22 +24147,28 @@ var EngCalcs = EngCalcs || {};
 		// saved project changes meaning. Display polarity and storage polarity are different
 		// things, and the two lines below are the whole of the inversion.
 		//
-		// **AND WHERE THE NETWORK ITSELF SETTLES THE QUESTION, THE BOX IS DISABLED AND SAYS WHY**
-		// (Task 608, Tom 2026-09-06: *"If there is anything that the built-in solver can't handle, we
-		// disable the built-in solver"*). Disabled rather than hidden, with the reason under it: a
-		// control that greys out with nothing beside it is worse than one that lies, because the
-		// reader is left to guess at their own software.
+		// **THE BOX IS NEVER DISABLED, AND THAT REVERSES TASK 608'S FIRST BUILD** (Tom, 2026-09-06:
+		// *"I am not sure it's right to disable the checkbox"*, then *"You are right about 'the truth
+		// was already being told without disabling'. I agree."*). It shipped disabled for one round on
+		// his own instruction, and the argument for it -- an enabled control that does nothing is a lie
+		// -- turned out to rest on a false premise. THREE THINGS ALREADY TELL THE TRUTH: this row's own
+		// tip names both cases permanently ("an extended period run always does, and so does a network
+		// holding an active PRV, PSV, or FCV"); `lpn_engine_valve_route` says it again at the moment of
+		// the solve; and the banner says it while the engine loads. A fourth telling was a conditional
+		// duplicate of a permanent one.
 		//
-		// **settings.engine IS NOT WRITTEN HERE, AND THAT IS TASK 602'S RULE, NOT A DETAIL.** The
-		// setting is the user's PREFERENCE and the routing is a FACT ABOUT THIS NETWORK, so a
-		// network's contents may not reach into a stored preference. The disabled state is a
-		// rendering of the network as it stands, and it comes back the moment the network no longer
-		// needs EPANET -- which is only true because nothing was overwritten meanwhile.
-		var engineForced = networkNeedsEpanet();
+		// **AND THE COST WAS A CONTROL THAT FLICKERS AS YOU DRAW.** Add a PRV and the box greys; delete
+		// it and the box returns. Nothing else in Settings does that, it reads as instability rather
+		// than as information, and it takes away the one thing the box is for: recording what the user
+		// wants for every OTHER state this network will be in. `lpn_settings_engine_native_off`, the
+		// string that explained the greying, went with it -- see dev/roadmap-closed-ids.md for 608.
+		//
+		// **settings.engine IS STILL NEVER WRITTEN HERE, AND THAT IS TASK 602'S RULE.** The setting is
+		// the user's PREFERENCE and the routing is a FACT ABOUT THIS NETWORK, so a network's contents
+		// may not reach into a stored preference.
 		var engInput = document.createElement('input');
 		engInput.type = 'checkbox';
 		engInput.checked = (settings.engine !== 'epanet');
-		engInput.disabled = engineForced;
 		engInput.addEventListener('change', function () {
 			settings.engine = engInput.checked ? 'native' : 'epanet';
 			// A different engine makes the engine-difference notes new again (Task 525).
@@ -24170,9 +24179,6 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip);
-		if (engineForced) {
-			note(compBody, pc.lpn_settings_engine_native_off || 'This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.');
-		}
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 25 untranslated keys, of 1713 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 24 untranslated keys, of 1712 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (25, all ruled)
+## lpn_  (24, all ruled)
 
 - **`lpn_engine_needed_failed`**
   > The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.
@@ -96,9 +96,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pipetype_none`**
   > No pipe type selected
   _Ruled OK 2026-09-07._
-- **`lpn_settings_engine_native_off`**
-  > This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.
-  _Ruled 2026-09-07: I don't understand why the checkbox must be disabled. Can we discuss this?_
 - **`lpn_tool_key_hint`**
   > Shortcut: press {key}.
   _Ruled OK 2026-09-07._

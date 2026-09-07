@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 1713,
-        "delta_key_count": 38,
+        "expected_key_count": 1712,
+        "delta_key_count": 37,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -527,7 +527,6 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
-        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -567,7 +566,6 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
-        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -769,22 +767,6 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "دا والوونه پخپله خلاصیږي او بندیږي، او یوازې د EPANET حل کوونکی یې محاسبولی شي. د EPANET حل کوونکی نشو پورته کیدی، نو دا پایلې ورک دي:",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
-                }
-            }
-        },
-        "lpn_settings_engine_native_off": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_engine_native_tip",
-                    "value": "د متحده ایالاتو د EPA د EPANET حل کوونکی چلوي، دلته ستاسو براوزر کې. پدې اندازې شبکه کې به تاسو د چټکتیا توپیر ونه ویني. دواړه حل کوونکي نږدې ورته پایلې ورکوي، خو نه په بشپړه توګه: EPANET د جاذبې لپاره کارول شوی ارزښت مقرري کوي، نو د هغه ځایی (لوکل) ضیاع د جوړ شوي حل کوونکي په پرتله شاوخوا 0.08% ټیټه راځي، او د مانینګ خشونت سره یې د سر ضیاع شاوخوا 0.6% ټیټه راځي. کله چې تاسو دا بکس لومړی ځل نښه کړئ، شاوخوا 650 KB ډاونلوډ کیږي او بیا پدې وسیله کې ساتل کیږي.",
-                    "english": "This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device."
-                },
-                "next_translated": {
-                    "key": "lpn_engine_loading",
-                    "value": "د EPANET حل کوونکی پورته کیږي…",
-                    "english": "Loading the EPANET solver…"
                 }
             }
         },

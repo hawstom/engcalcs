@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1713,
-        "delta_key_count": 41,
+        "expected_key_count": 1712,
+        "delta_key_count": 40,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -530,7 +530,6 @@
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
         "lpn_field_tag": "Tag",
-        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -573,7 +572,6 @@
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
         "lpn_field_tag": "Tag",
-        "lpn_settings_engine_native_off": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day",
         "lpn_reaction_order_bulk": "Bulk reaction order",
@@ -793,22 +791,6 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Tag သည် ဖိအားဇုန် (သို့) အလုပ်အမိန့်စာ ကဲ့သို့ သင်လိုသလို မည်သည့်အဓိပ္ပါယ်မဆို ဆောင်နိုင်သည်။ ဤနေရာ (သို့) EPANET ရှိ မည်သည့် တွက်ချက်မှုမျှ ၎င်းကို မဖတ်ပါ။ Tag သည် စကားလုံးတစ်လုံးသာ ဖြစ်ရမည် - EPANET သည် ကွက်လပ်ပထမဆုံးတွင် ဖတ်ရှုမှု ရပ်တန့်သောကြောင့်၊ သင်ရိုက်နေစဉ် ကွက်လပ်ကို ငြင်းပယ်မည်။ ၎င်းကို EPANET ဖိုင်ထဲသို့ သယ်ဆောင်ပြီး ထုတ်ဆောင်သည်။",
                     "english": "A tag can have any meaning you require, such as a pressure zone or a work order. No calculation here or in EPANET reads it. A tag is one word: EPANET stops reading at the first space, so a space is refused as you type it."
-                }
-            }
-        },
-        "lpn_settings_engine_native_off": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_engine_native_tip",
-                    "value": "US EPA ၏ EPANET ဖြေရှင်းစက်ကို သင့်ဘရောက်ဇာထဲတွင် ဤနေရာမှ လည်ပတ်စေသည်။ ဤအရွယ်အစား ကွန်ရက်တစ်ခုတွင် အမြန်နှုန်းကွာခြားမှု မမြင်ရပါ။ ဖြေရှင်းစက်နှစ်ခုသည် အနီးစပ်ဆုံး တူညီသောအဖြေများ ပေးသော်လည်း အတိအကျ မတူပါ - EPANET သည် ဆွဲငင်အားအတွက် သုံးသည့်တန်ဖိုးကို ဂဏန်းချုံ့ ထားသောကြောင့်၊ ၎င်း၏ ဒေသဆိုင်ရာ ဆုံးရှုံးမှုများသည် အတွင်းပါ ဖြေရှင်းစက်ထက် ခန့်မှန်းခြေ 0.08% နိမ့်ပြီး၊ မန်နင်းကြမ်းတမ်းမှုဖြင့် တွက်ချက်ပါက ၎င်း၏ ဖိမြင့်ဆင့်ဆုံးရှုံးမှုသည် ခန့်မှန်းခြေ 0.6% နိမ့်ထွက်လာမည်။ ဤအမှန်ခြစ်ကို ပထမဆုံးအကြိမ် ဖွင့်သောအခါ၊ ခန့်မှန်းခြေ 650 KB ကို ဒေါင်းလုဒ်လုပ်ပြီး ဤစက်ပေါ်တွင် သိမ်းထားပါလိမ့်မည်။",
-                    "english": "This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device."
-                },
-                "next_translated": {
-                    "key": "lpn_engine_loading",
-                    "value": "EPANET ဖြေရှင်းစက်ကို ဖွင့်နေသည်…",
-                    "english": "Loading the EPANET solver…"
                 }
             }
         },
