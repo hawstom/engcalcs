@@ -301,72 +301,27 @@ the block.
     gesture. That is why closing 178 on the Help link did not retire this.
 
 - 100|465| **Reusable pipe and pump TYPES, so editing one edits 400.**
-  - **RULED 2026-09-06 (Tom: *"Yes. And we have to start showing an export alert."*).** A library
-    pipe MAY be something a `.inp` round trip loses. That is the trade accepted, and it comes with
-    an obligation: **the export must SAY what it is flattening, at the moment it flattens it.**
-    - This is not a new mechanism. `js/lpn-inp.js` already reports every difference on IMPORT
-      rather than dropping it silently, and five impossible round trips are reported rather than
-      faked (closed Task 281). An export alert is that same discipline pointed the other way, and
-      it is the first thing on the EXPORT side that has needed it.
-    - **The alert is about the TYPE, never about the numbers.** A typed pipe still exports every
-      value byte-identically; what does not survive is the indirection -- 400 pipes come back each
-      repeating what one definition used to say. Say that, and say how many elements it affects,
-      the way find-and-replace states its count before writing.
-    - **Scope it to what is genuinely lost, or it becomes noise.** Curves export fine, because
-      EPANET has curves. A warning that fires on every export teaches people to dismiss it.
-  - **WHAT THE `[H]` WAS, AND WHY IT IS GONE (Tom, 2026-09-06: *"Why [H]? What do you need from
-    me?"*).** It marked a genuine disagreement -- `utility-planning-engineer` researched this and
-    recommended parking it; Tom then specified a shape that answers both of its objections. **That
-    ruling IS the human decision, so the tag was stale**, and a stale `[H]` is worse than none: it
-    reads as "blocked on Tom" when nothing is.
-  - **THE ONE THING STILL WANTED FROM HIM, and it is a trade rather than a design question:** a
-    typed pipe FLATTENS on `.inp` export and cannot be rebuilt on import, because EPANET has no
-    such concept. That breaks Task 281's byte-identical round trip for any typed element -- not
-    the file's numbers, which still come back exactly, but the TYPE, which comes back as 400
-    pipes each repeating what one definition used to say. So: is a library pipe allowed to be
-    something a `.inp` round trip loses? Curves escaped this because EPANET HAS curves. Nothing
-    else in the task waits on an answer, and the first buildable slice -- `effective()` and the
-    disabled-control rendering -- can start before it.
-  - **RAISED FROM 25 ON TOM'S OWN WORDS, 2026-09-05:** *"Pipe library: I foresee very soon that we
-    will add the ability to refer to a library pipe for roughness, reaction coefficients, and maybe
-    diameter (depending on what user chooses to include in the library pipe definition). The Library
-    pipe selector can be immediately after ID, and any properties defined in the Library are disabled
-    or removed in the pipe properties box. Very cool and open to user needs."*
-  - **HIS SHAPE ANSWERS THE ENGINEER'S TWO OBJECTIONS BELOW, WHICH IS WHY IT IS WORTH SAYING THEY
-    DISAGREE.** The engineer ranked this low partly because roughness is a function of material AND
-    age (so "a PVC type" needs a per-element qualifier) and partly because a live-linked edit
-    propagates with no confirmation step. Tom's version makes the definition's CONTENTS the user's
-    choice — a library pipe that states roughness and not diameter is legal — so the aging wrinkle is
-    the user's to resolve by defining two library pipes, not ours to model. And a property the library
-    defines is DISABLED in the properties box, which is the visible detached-versus-inherited state
-    the note below says is mandatory, arrived at from the other direction.
-  - **AND THE INDIRECTION IS NO LONGER NEW.** Task 586 shipped exactly this pattern for curves: a
-    document-level object, an element holding only a reference, a Library section that creates and
-    renames and refuses to delete what is in use, and a rename that carries every reference. The
-    engineer's "one slice it does NOT rank low" was the pump curve, and it is built. What is left for
-    pipes is `effective()` and the disabled-control rendering, not the concept.
-  - **RESEARCHED 2026-08-25 by `utility-planning-engineer`, and its answer is: TWO features, not
-    one — which is the thing we would have got wrong.** WaterGEMS separates a **Prototype** (stamps
-    starting values onto elements drawn AFTERWARDS, not retroactive) from an **Engineering Library**
-    (live-linked, retroactive). This task conflates them. Its recommendation: **leave the full type
-    system parked** — at this suite's stated scale the motivating case cannot arise, roughness is a
-    function of material AND AGE so even "a PVC type" needs a per-element qualifier, and diameter is
-    not shared even in the commercial tools. **Find-and-replace already does better than a library
-    on the thing that matters**: it previews an exact change count before writing and goes through
-    `setProp()`, where a live-linked library edit propagates with no confirmation step it could
-    find documented. **The one slice it does NOT rank low: a live-linked pump CURVE table** — no
-    aging wrinkle, no diameter conflation, `curveRef` already copies once, and the Curves panel's
-    own code comment names the missing piece (`js/looped-network.js:19466`).
-  One "150 mm PVC" definition that 400 pipes point at. A type carries diameter, roughness and minor-loss k; an element names
-  a type instead of repeating the numbers. Tom named these beside Patterns/Curves/Controls in Task 462,
-  but those are things the document already HOLDS — this is a new indirection through the element model.
-  - **It starts at `effective()`, which is the expensive part.** A third resolution layer — override →
-    element → type-default — under the one seam the solver, renderer, labels, popups and six pane
-    tables all read through. Plus a visible detached-versus-inherited state per property, or a user
-    edits a definition and cannot see why nothing moved.
-  - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild it,
-    which breaks Task 281's byte-identical round trip for anything typed. Task 390-sized.
-
+  One "150 mm PVC" definition that 400 pipes point at, and a fittings picker (Task 590) resolving
+  through the same layer -- Tom linked the two on 2026-09-06 and they are designed together or the
+  second re-litigates the first. **Full design record, including what a real utility's
+  approved-materials table actually contains and the five slices: `dev/pipe-library-design.md`.**
+  - **RULED 2026-09-06 (Tom: *"Yes. And we have to start showing an export alert."*)** -- a library
+    pipe MAY be something a `.inp` round trip loses, and the export must SAY what it is flattening
+    at the moment it flattens it. Scoped, or it becomes noise: §6 of the design record.
+  - **HIS SHAPE ANSWERS THE ENGINEER'S TWO OBJECTIONS**, which is why it is worth recording that
+    they disagreed: the CONTENTS of a definition are the user's choice, so the aging wrinkle is
+    resolved by defining two library pipes rather than by a per-element qualifier; and a
+    library-defined property is DISABLED in the properties box, which is the visible
+    inherited-versus-detached state the engineer said was mandatory, reached from the other side.
+    **And the real standards tables are keyed by material and class with no age field at all**, so
+    that is how the world already does it rather than a workaround we are asking anyone to accept.
+  - **The expensive slice is `effective()`** -- a third resolution layer, override -> element ->
+    type default, under the one seam the solver, renderer, labels, popups and six pane tables all
+    read through. Everything else waits on it. Task 586 shipped the indirection itself for curves,
+    so the concept is not new; what is left for pipes is `effective()` and the disabled control.
+  - **BIND BY ID, NEVER BY NAME.** Bentley's own libraries synchronise on the LABEL, so a name
+    collision silently re-points every reference. Task 586 already does it right; do not regress
+    for the sake of a dropdown-of-names.
 - 75|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and

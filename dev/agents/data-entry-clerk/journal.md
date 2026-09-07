@@ -362,3 +362,261 @@ to digits exactly as they did to letters.
 the precedent does not change the arithmetic — a tool-select key saves a click per tool SWITCH, not
 per element.
 
+
+## Fourth invocation, 2026-09-06 (later) — Task 186 raised to 100, asked to design the selection model
+
+Tom's verbatim spec (`dev/ROADMAP.md:874-879`) has three parts: (1) cells abut like Google Sheets,
+appearance not just behaviour; (2) arrows/Ctrl+arrows/Home/End/Ctrl+Home/Ctrl+End/Ctrl+Shift+PageUp/
+PageDn; (3) blocks and ranges selectable for copy, by drag or Shift+arrows/Ctrl+Shift+arrows. The
+task text names me directly and says to ask before designing the selection model.
+
+### What exists today, read before answering
+
+**OBSERVED** `js/looped-network.js:12513-12557` (`paneTableRow`) — every editable cell is its own
+`<input type=number>`, one DOM element per (row, column). The ID column (`c.key === 'id'`) is a
+`<button>`, not a cell of any kind — clicking it calls `findGoTo()` and pans the map; it holds no
+typed value and is not part of `paneCols(spec)`'s data columns in the row-creation sense. A plain
+cell (`paneCellIsPlain()`, `:12356`) — a result column, or an identity the drawing owns — is a bare
+`<td>` with `textContent`, no control at all.
+
+**OBSERVED** `css/engcalcs.css:1679-1737` — `.lpn-pane-table th, .lpn-pane-table td { padding: 1px
+6px 1px 0; }` and `.lpn-pane-table input { width: var(--lpn-pane-col-w, 7em); }`. Each editable
+cell is a bordered, padded `<input>` sitting inside a further-padded `<td>` — visually two boxes
+nested, not one abutting grid cell. This is exactly the gap Tom's part (1) names.
+
+**OBSERVED** There is no selection state anywhere in the Tables pane today — no highlighted range,
+no anchor/focus tracking, no multi-cell awareness. `sortPaneTable()`, `refillPaneTable()` and the
+per-input `change` handler are the entire interaction surface. Confirmed by reading every function
+between `:11983` and `:12660`; none of them reads or writes anything named `selection`, `range`,
+`anchor` or `focus`.
+
+**OBSERVED** The Library's Curves grid (`js/looped-network.js:26299-26483`, `libCurveGridRow`) is
+the one place on this page that already does keyboard cell-to-cell navigation and clipboard paste
+on a real 2-column table — Task 588. It is the closest worked example and it answers three of my
+five questions by demonstration, but it is missing exactly the piece Task 186 part 3 asks for:
+
+- **Cells are `type="text"`, not `type="number"`, and the comment at `:26307-26317` states why in
+  the file's own words**: Up/Down are the number spinner, and `selectionStart` throws on a number
+  input in Chrome and Firefox, so there is no way to know whether the caret is at an edge, which is
+  what Left/Right-out-of-cell needs. **This is a hard constraint on Task 186 too**: today's Tables
+  pane cells (`paneTableRow`, `:12535`) are `input.type = 'number'`, and every one of Tom's
+  keyboard-navigation asks (arrows in particular) will hit the identical wall the Curves grid
+  already hit and solved. The fix has to be the same one: cells become `type="text"` with
+  `inputmode="decimal"`, validated on commit rather than by input type. This is a real, sizeable
+  piece of work, not a keyboard-handler add-on — every one of the six tables' number cells changes
+  kind.
+- **Column-first Tab order, one cell at a time via `gridMove()`, `:26388-26405`.** Tab commits the
+  current cell, may REBUILD the enclosing entry if the last row just grew, and only then focuses the
+  target — because a commit-triggered rebuild replaces the DOM node the old listener was on. Any
+  Tables-pane selection model that lets an edit trigger a re-sort or a filter re-evaluation (both of
+  which do happen here — `sortPaneTable()` and the live filter) inherits the same hazard: moving
+  focus must happen AFTER the write, against whatever DOM the write left behind, never against a
+  captured reference to the old cell.
+- **`libPasteCells()`/`libPasteIsGrid()`/`libMergePaste()` (`:26188-26236`) are pure functions**
+  already reusable verbatim for the Tables pane's paste-IN: split on tab, fall back to whitespace
+  for a headerless block, distinguish a single-cell paste (let the browser handle it) from a
+  multi-cell one (intercept), fill down-and-across from the drop cell. `dev/ROADMAP.md:928-931`
+  already says so for Task 186's IN direction; I confirm it by reading the functions myself rather
+  than taking the roadmap's word for it — they take a 2-D array of strings and a drop point and
+  return a 2-D array, with no reference to curves, tanks or any Tables-pane concept baked in.
+- **What the Curves grid does NOT have, and is exactly Task 186 part 3: no COPY of a selected
+  range, and no SELECTION at all.** `libCurveTsv()` (`:26239-26241`) copies the WHOLE curve's
+  points, unconditionally, from a single "Copy points" button — there is no notion of "the cells the
+  user highlighted." There is no drag-select, no Shift+arrow extension, no highlighted rectangle.
+  Task 588 solved paste-in and single-cell keyboard nav; it did not attempt block selection, so it
+  is a partial precedent and not a finished one for what Tom is asking now.
+
+### Q1 — Selection model: anchor + focus, exactly as Sheets/Excel
+
+**CITED** (Excel's own documented behaviour, via multiple secondary sources retrieved 2026-09-06 —
+MyExcelOnline's "Ctrl+Shift+Arrows: Move/Highlight Cells," and the Microsoft Q&A thread on
+Ctrl+Arrow "jump to edge of data region" behaviour): Ctrl+Arrow moves to the edge of a contiguous
+non-blank run in that direction, stopping at the first blank cell or the sheet edge, whichever comes
+first; from inside a run of blanks it instead jumps to the next NON-blank cell (or the far edge if
+there is none) — the two rules are the same rule read from opposite sides of a gap. Ctrl+Shift+Arrow
+does the identical edge-finding and extends the highlighted range to it rather than merely moving.
+Ctrl+Home goes to the top-left of the used range; Ctrl+End goes to the last used cell.
+
+Recommend the identical model for the Tables pane: **one piece of state, `{anchorRow, anchorCol,
+focusRow, focusCol}`**, scoped per table-tab (each of the six tabs keeps its own selection, since
+switching tabs is switching data sets entirely). The highlighted rectangle is the min/max box of
+anchor and focus. A plain click with no modifier sets both anchor and focus to the clicked cell
+(collapses to one cell). Concretely, per key:
+
+| Key | Behaviour |
+|---|---|
+| Arrow | Move focus one cell in that direction; collapse anchor to focus (new single-cell selection). Clamped at the table's edges — does not wrap to the next row/column and does not leave the table. |
+| Shift+Arrow | Move focus one cell in that direction; anchor stays put. Extends the highlighted rectangle. |
+| Ctrl+Arrow | Jump focus to the edge of the contiguous non-blank run of CELL TEXT in that column/row (an empty string is blank, matching `panePresent()`/`paneCellText()`'s own emptiness rule so the same value that reads blank on screen is what the jump treats as blank); if already on the edge cell or the run is already exhausted, jump to the table's own edge. Collapses anchor to focus. |
+| Ctrl+Shift+Arrow | Same edge-finding as Ctrl+Arrow, but extends rather than moves (anchor stays). |
+| Home | Focus (and, absent Shift, anchor) moves to the FIRST DATA COLUMN of the current row — **not the ID column and not a row header**, because there is no row header in this table at all (confirmed: no numbered gutter column exists anywhere in `paneTableRow`/`renderPaneTable`), and the ID column is itself data (an element's identifier) that the ID button already exposes through a different gesture (`findGoTo`). Treating ID as column 1 for Home would put a spreadsheet user's most common keystroke on a button that does something else (navigate away to the map) the first time they try to type over it — the worse of the two choices. Recommend: Home goes to the first EDITABLE-OR-PLAIN cell after ID, i.e. index 1 of `paneCols(spec)`. |
+| End | Focus moves to the LAST column of the current row (the rightmost `paneCols(spec)` entry, which on most tables is a read-only result column — End must still be able to land there, since a spreadsheet's End does not skip read-only cells). |
+| Ctrl+Home | Focus (and anchor) moves to row 1, column 1 of data (same column Home uses) of the currently rendered table — i.e. `paneTableRowsInOrder(spec)[0]`, which already reflects the active sort AND the active filter (Task 597), so Ctrl+Home on a filtered, sorted table goes to the top of what is actually on screen, not to some notion of the unfiltered document order. |
+| Ctrl+End | Focus moves to the last row, last column of the currently rendered (sorted, filtered) table. |
+| Ctrl+Shift+PageDn / PageUp | Switch to the next/previous of the six table TABS in `buildPaneTables()`'s own array order, wrapping past the last back to the first (Pipes → Pumps → Valves → Junctions, not a dead stop at Valves) — Tom's own words rank this "lower priority, but very cool," so I would ship it after the rest of the keyboard set, not with it. |
+
+**On Ctrl+Down inside a run of blank cells specifically** (the question the task asked me to
+answer explicitly): the reaction-coefficient columns (`paneColReaction`, `:12032-12037`) are
+deliberately, permanently blank on most rows — a blank there is a real value ("use the global
+coefficient"), not an unfilled cell waiting for data, and Task 566's own comment says so
+(`:12028-12031`, "BLANK IS A STATE, NOT A ZERO"). Excel's Ctrl+Down does not know the difference
+between "empty because unfilled" and "empty because that is the value" — it treats both as a gap and
+jumps across them identically. I recommend accepting that: **Ctrl+Down inside a run of blank
+reaction-coefficient cells jumps straight through to the next non-blank cell or the bottom of the
+table**, exactly as it would in a real spreadsheet on a sparse column, because building a second
+notion of "meaningfully blank" versus "actually blank" is exactly the kind of invented distinction a
+spreadsheet-literate user has no reason to expect and no way to discover.
+
+### Q2 — Copy: contents, headers, units, filtering, computed columns
+
+**Contents:** TSV of exactly the highlighted rectangle's cell TEXT, using the same `paneCellText()`
+(`:12363-12369`) that already renders every cell on screen and on the print sheet (`:12588-12596`
+says this explicitly is "the one function that decides what a cell says," specifically to stop a
+sheet in someone's hand rounding differently from the screen it was copied off). Reusing it for copy
+means a copied result column reads the same 2-decimal round the screen already shows, with no
+fourth place a number could be formatted.
+
+**Headers:** included only if the selection's top row is the header row (i.e., the user dragged
+from a heading cell, or pressed Ctrl+A / a "select whole table" affordance) — matching ordinary
+spreadsheet behaviour, where selecting `B5:D40` does not silently prepend a header you did not
+select. **A dedicated "Copy whole table" action (or Ctrl+A) always includes headers, in the units
+already on the strip** — this is what satisfies Task 186's own OUT-direction sentence ("with the
+headers, in the units on the strip"), and it is a DIFFERENT gesture from a plain range-drag copy,
+not two ways of asking for the same thing. `paneHeadingText()` (`:12396-12406`) already appends the
+unit in parentheses to every header it builds, so no new formatting code is needed for this half.
+
+**Units:** the DISPLAYED unit only — never SI, never a second column of unit codes. This is the
+same rule the rest of the suite already lives under ("a calculator stores what the user typed";
+CLAUDE.md's coordinate/unit rules) applied to a new surface: what is on screen is what goes on the
+clipboard, because a spreadsheet user pasting a Tables-pane copy into a submittal report wants the
+numbers they were looking at, in the unit the column heading already states.
+
+**A filtered table (Task 597):** copies only the rows currently rendered, because `paneFilterQuery`
+removes non-matching rows from the DOM entirely rather than hiding them with CSS (confirmed —
+`renderPaneTable()` builds `tbody` only from `paneTableRowsInOrder(spec)`, which is already
+filtered). **This is the SAFE side of a well-documented Excel trap, not a design choice we have to
+make deliberately**: Excel's own default copy-of-a-filtered-range silently includes hidden rows
+unless the user knows to press Alt+; ("select visible cells only") first — a defect real enough that
+multiple how-to pages exist purely to explain the workaround (see Q1's Excel citations). Because a
+row that fails the filter is never in the DOM here, our selection rectangle can only ever be built
+from rows that are actually showing, so we get the behaviour Excel makes you ask for, for free, by
+construction. **Worth stating in the eventual UI or tip** so it reads as a stated fact ("copy
+respects the current filter") rather than something a spreadsheet-literate user has to discover by
+being pleasantly surprised.
+
+**A column of computed results** (flow, velocity, headloss, head, pressure, quality): included in a
+copy exactly like any other cell, using `paneCellText()`'s already-rounded string. **Refused on
+paste-IN**, the same way `paneCellIsPlain()` already refuses to build an `<input>` for a result
+column at all (`:12528-12533`) — there is no code path today by which a result cell could receive a
+typed value, and paste-IN should hit the identical wall a keystroke does: land the cursor past it
+(or skip it, spreadsheet-style, the way pasting over a protected cell in Excel does) and report which
+cells were skipped, rather than silently discarding the pasted value with no message.
+
+### Q3 — The one behaviour that will make a spreadsheet-literate person give up on this table
+
+**OBSERVED, and load-bearing for the whole build:** every editable Tables-pane cell today is a
+separate `<input type="number">` DOM element (`js/looped-network.js:12535`). **A browser's native
+click-and-drag text selection cannot span multiple `<input>` elements at all** — dragging a mouse
+across several form controls does not produce a combined, copyable text selection the way dragging
+across plain table cells or `<td>` text does; only the one focused input's own internal selection is
+ever copyable, and the moment the drag crosses into a second input the browser either does nothing
+useful or selects surrounding page chrome instead of cell contents. **CITED** — this is the
+documented reason Chromium/WebKit ship a dedicated layout test for exactly this boundary
+(`fast/forms/select-multiple-elements-with-mouse-drag.html`,
+chromium.googlesource.com/external/WebKit_LayoutTests), i.e. cross-input drag selection is a
+platform edge case specific enough to need its own test, not ordinary behaviour a page gets for
+free.
+
+**The testable claim:** if we ship Task 186 with the selection model living only in application
+state (an internal `{anchor, focus}` I can query) but the actual on-screen HIGHLIGHT and the actual
+`Ctrl+C` clipboard write still rely on the browser's native selection over a grid of `<input>`
+elements, a user who drags from cell B3 to cell D40 and presses Ctrl+C will get either an empty
+clipboard, one input's worth of text, or garbage — never the rectangle they dragged over. That is
+immediate and silent: no error, just a paste into their spreadsheet that is wrong or empty, on the
+very first thing a spreadsheet-literate visitor will try. **It is testable by literally that
+sequence** — drag a range, Ctrl+C, paste into a real spreadsheet cell, diff the pasted text against
+`paneCellText()` for every cell in the dragged rectangle. Getting this right means our OWN highlight
+rendering (CSS class on the selected `<td>`s, not native selection) and our OWN `copy` event
+listener building the TSV from application state (`document.addEventListener('copy', ...)`,
+`e.clipboardData.setData('text/plain', tsv)`, `e.preventDefault()`) — the same shape
+`libCopyOut()` already uses for the Curves "Copy points" button (`:26245-26257`), generalized from
+"copy this one curve's points" to "copy the state's current rectangle." **This is the one piece with
+no partial credit**: keyboard navigation without working range-copy is a nicer editor; range-copy
+that silently fails on drag is a broken spreadsheet.
+
+### Q4 — Shipping order, and the arithmetic that ranks it
+
+My own rule, restated: one extra keystroke times four hundred rows is an hour; a feature that saves
+nothing per row but a lot per SESSION ranks far below one that saves a little per row. Ranked:
+
+1. **Range copy via `Ctrl+C`/drag-select/Shift+arrows, OUT direction only, headers+units on a
+   whole-table copy.** This is Task 186's own stated priority ("out means copy and paste that
+   lands correctly... it cannot corrupt anything") and it is the one thing with no safe partial
+   version — see Q3. It also does the most FOR my seat's own case even though it reads as a
+   reporting feature: a clerk who has already typed 400 rows into the Tables pane by hand (today's
+   only way in, one cell at a time) can now pull a column back out to spot-check it in a real
+   spreadsheet against the marked-up plan set, which is a real workflow this page has none of today.
+2. **Arrow / Shift+Arrow / Ctrl+Arrow / Ctrl+Shift+Arrow, single-cell and range, WITHIN one
+   table.** This is the highest-volume keystroke of the whole spec — every one of 400 rows, typing
+   across 5-8 columns, is dozens of arrow presses, and today none of them exist at all (Tab is DOM
+   order and reaches every cell, but Tab-only means an accidental extra Tab lands you in the WRONG
+   COLUMN of the next row with no way back except more tabbing or the mouse — the exact "one
+   extra keystroke times four hundred rows" cost my seat exists to name). Requires the
+   `type="number"` → `type="text"`/`inputmode="decimal"` change Q1 already flags as a real cost, so
+   this is not a pure keyboard-handler add; budget the input-type migration into it.
+3. **Home / End / Ctrl+Home / Ctrl+End.** Real, but each saves at most a handful of keystrokes per
+   SESSION (jumping to a known edge), not per row — a clerk mid-column rarely needs "jump to the very
+   first or very last cell of the table," they need the NEXT cell, which item 2 already gives them.
+4. **Paste-IN of a multi-cell block onto existing rows**, reusing `libPasteCells()`/
+   `libMergePaste()` verbatim. I rank this below the keyboard-navigation items even though it is
+   the single highest-value thing for raw row count, because Task 186's own text (and my earlier
+   wish-list item 1) already flags paste-in as "the harder half" needing an ID-collision story,
+   validation-of-every-cell and undo integration that copy-out and navigation do not — it is real
+   work with open design questions, not a slice of the same mechanism. Ship it once 1–3 exist to
+   land on.
+5. **Ctrl+Shift+PageUp/PageDn (table switch).** Tom's own words rank it "lower priority, but very
+   cool." I agree with his own ranking and would not spend the first pass on it — it saves one click
+   on a toolbar tab that is already one click away.
+
+### Q5 — What in the current markup will fight a real selection model
+
+- **`input.type = 'number'`** (`:12535` in the Tables pane; already fixed once, in the Curves grid,
+  for exactly this reason) is the single biggest fight: Up/Down are the browser's own spinner, and
+  `selectionStart` throws on a number input in the two dominant engines, which blocks caret-edge
+  detection for Left/Right-out-of-cell. Must become `type="text"` + `inputmode="decimal"`, validated
+  on `change`/commit rather than by input type — `libCurveGridRow`'s own comment
+  (`js/looped-network.js:26307-26317`) states the exact reasoning and is the worked precedent.
+- **The live filter (Task 597) and live sort both rebuild the table on a signature change**
+  (`paneTableSignature`, `:12415-12419`), and `renderPaneTable()` (`:12447-12506`) fully replaces
+  `tbody` — including every `<input>` — whenever the signature changes, which happens on a SORT
+  click, a FILTER edit, or a row's own count changing. **Any selection state keyed to DOM node
+  references dies on every such rebuild**; it must be keyed to `(elementId, columnKey)` pairs
+  instead (mirroring how `spec.cells[el.id]` already survives a refill in `refillPaneTable()`,
+  `:12562-12576`), and the selection-restoring code needs to run after a rebuild the same way
+  `libRebuildCurveEntry()`'s caller re-focuses into the NEW DOM (`:26295-26297`, "Handed back so a
+  keystroke that GREW the table can put the caret in the row it just made").
+- **A cell the user is mid-edit is deliberately left alone by `refillPaneTable()`**
+  (`target !== activeElementSafe()`, `:12571`) so a live solve does not clobber a half-typed number.
+  A selection model built on top has to respect the same guard for its OWN rewrites — a Ctrl+Arrow
+  jump must still commit the cell it is leaving (matching the Curves grid's `gridMove()` pattern of
+  "write, then move") rather than abandoning a half-typed value the way a raw DOM refocus would.
+- **The ID column's `<button>` is not a data cell in the same sense as the rest of the row** but
+  does occupy column-index 0 of `paneCols(spec)` for class-naming purposes (`paneCellClass`,
+  `:12384-12387`, `i === 0` gets `lpn-pane-first`). A selection model that treats column 0
+  uniformly with the rest (letting a drag start there, letting Shift+Right extend into it) will
+  need its own rule for what "selecting the ID cell" means for copy (copy the ID text — trivial) and
+  for paste (refuse — an ID paste is a rename, and renames already go through `rename_lang_key`-
+  style dedicated machinery elsewhere on this page, never a bare cell write). Decide this explicitly
+  rather than let it fall out of whatever the generic cell code happens to do.
+- **The filter banner (`paneFilterBanner`, `:12429-12446`) and the "none of these yet" / "nothing
+  matches the filter" empty-state paragraph (`:12460-12471`) both replace the entire table with a
+  `<p>` when a table has zero rows** — a selection model has to treat "the table currently has no
+  cells at all" as a valid, unremarkable state (empty selection, no anchor) rather than assuming a
+  cell always exists to hold focus. This is a real but small edge case, worth a line of code and a
+  fixture, not a design problem.
+- **No row-hide control exists in the Tables pane at all** (confirmed: no `view_hide_line`,
+  `hideRow` or similar token appears anywhere in the six table specs or their renderers) — this is
+  a Find-results concept (`focus_order_check.php`'s per-line "X"), not a Tables-pane one, so it is
+  NOT something the selection model has to route around here. Flagging it only because the check
+  it's named in reads across surfaces I was asked to compare it against, and I want the record to
+  show I looked and found nothing to reconcile.

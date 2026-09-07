@@ -172,3 +172,31 @@ and buys an EPANET user's existing muscle memory; my letters bought a mnemonic a
 two collisions in seven. See my journal for what I got wrong in the research and the rule I have
 written for myself about documentation-only answers.
 
+
+## UPDATE 2026-09-06 to item 1: Task 186 raised to priority 100 and I was asked to design the selection model — full spec in journal, ranking within it stated here
+
+Task 186 (spreadsheet-interoperable Tables pane) went to priority 100 and its roadmap text now
+names this seat directly, asking for the selection model before it is built. I answered in full in
+the journal, fourth invocation, 2026-09-06 (later) — anchor+focus selection matching Excel/Sheets,
+key-by-key behaviour at the edges, what lands on copy, and the one behaviour (native browser
+selection cannot span multiple `<input>` cells at all, so range-copy MUST be built on application
+state and a `copy` event listener, never on native drag-select) that breaks the whole feature for a
+spreadsheet-literate visitor if it is missed.
+
+**My shipping order, restated here because it is a ranking and this file is where my rankings
+live:** (1) range copy via Ctrl+C/drag/Shift+arrows, whole-table copy with headers and units — the
+one piece with no safe partial version; (2) single-cell and range arrow-key navigation within one
+table, including the `type="number"`→`type="text"` migration every cell needs first, because it is
+the highest-volume keystroke in the whole spec; (3) Home/End/Ctrl+Home/Ctrl+End, real but
+per-session rather than per-row; (4) paste-IN of a multi-cell block onto EXISTING rows, which is
+real work with its own open questions (ID-collision, validation) and not a slice of 1-3; (5)
+Ctrl+Shift+PageUp/PageDn to switch tables, which Tom's own words already rank "lower priority, but
+very cool" and I agree with him.
+
+**This does not change my item-1 ranking above** (paste-IN must be able to CREATE elements, not
+just edit them) — that remains a request about SCOPE (what Task 186's "in" direction should
+eventually cover) and is now item 4 of the shipping order for THIS piece of it, still after the
+copy/navigation work that has no design questions left to answer. I am recording both because they
+answer different questions: this entry is "in what order should the approved spec ship," the
+original item 1 is "the approved spec's IN direction is narrower than my seat needs, widen it
+before it is called done."
