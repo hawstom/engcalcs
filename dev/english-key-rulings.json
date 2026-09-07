@@ -261,6 +261,16 @@
             "on": "Energy used",
             "ruled": "2026-09-04"
         },
+        "lpn_engine_needed_failed": {
+            "on": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
+            "ruled": "2026-09-07",
+            "answer": "There is that \"and\" construction again that is not best for an engineering software. I edited it."
+        },
+        "lpn_engine_needed_loading": {
+            "on": "Loading EPANET solver while you build. Results will be available when completely loaded.",
+            "ruled": "2026-09-06",
+            "answer": "Tom's own sentence, written by him in the instruction that commissioned the feature: \"we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches\". Recorded because the words are his, not because anybody approved ours."
+        },
         "lpn_ff_accounting": {
             "on": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
             "ruled": "2026-09-01"
@@ -1427,6 +1437,11 @@
             "on": "Energy",
             "ruled": "2026-09-04"
         },
+        "lpn_settings_engine_native_off": {
+            "on": "This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.",
+            "ruled": "2026-09-07",
+            "answer": "I don't understand why the checkbox must be disabled. Can we discuss this?"
+        },
         "lpn_settings_flow_change": {
             "on": "Flow change limit",
             "ruled": "2026-09-02"
@@ -1635,11 +1650,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_engine_needed_loading": {
-            "on": "Loading EPANET solver while you build. Results will be available when completely loaded.",
-            "ruled": "2026-09-06",
-            "answer": "Tom's own sentence, written by him in the instruction that commissioned the feature: \"we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches\". Recorded because the words are his, not because anybody approved ours."
         }
     }
 }

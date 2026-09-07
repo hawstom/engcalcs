@@ -2145,7 +2145,7 @@ $ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve 
 $ec_lang['lpn_engine_ready_valve']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
 $ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
-$ec_lang['lpn_engine_needed_failed']='The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.';
+$ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
@@ -2614,7 +2614,7 @@ $ec_lang_syn['lpn_settings_engine_native']='';
 // connection actually pays.
 $ec_lang['lpn_settings_engine_native_tip']='This project solves with the EPANET solver from the US EPA, here in your browser. Tick this box and the built-in solver answers instead wherever it can. Some networks go to the EPANET solver whatever this box says: an extended period run always does, and so does a network holding an active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
 $ec_lang_syn['lpn_settings_engine_native_tip']='';
-$ec_lang['lpn_settings_engine_native_off']='This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.';
+$ec_lang['lpn_settings_engine_native_off']='This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
@@ -3056,7 +3056,7 @@ $ec_lang['lpn_library_curve_values_tip']='Select one or two columns in a spreads
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Description';
-$ec_lang['lpn_library_curve_note_tip']='What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.';
+$ec_lang['lpn_library_curve_note_tip']='What this curve is, in your own words.';
 $ec_lang['lpn_library_curve_remove_point']='Remove this point';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.

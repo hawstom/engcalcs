@@ -344,13 +344,16 @@ the block.
     loses its indirection, a fittings list loses its itemisation. **Fire only where `k` is
     fitting-list-derived**, never on a hand-typed one, or a network that never touched the feature
     gets a warning and learns to dismiss it. Slice 4 is Task 590.
-  - **THREE THINGS THE BUILD DECIDED THAT ARE ARGUABLY TOM'S**, kept here until he rules:
-    **Detach exists at all** (the `utility-planning-engineer` found the gap -- without it the only
-    way to make one exception is to fork the whole type, which is the propagation problem in
-    reverse); **attaching a type CLEARS the pipe's own numbers** for the properties the type states,
-    the rejected alternative being a shadow value nothing can ever show; and **a type-owned property
-    carries no scenario override marker**, because a tick there would be a second, undiscoverable
-    detach for one property in one scenario.
+  - **TWO OF THE THREE OPEN CALLS ARE RULED, 2026-09-06, BOTH IN FAVOUR OF WHAT SHIPPED.**
+    **Detach stays** -- Tom: *"I think it would be fatal if Detach didn't exist."* It was the
+    `utility-planning-engineer`'s addition rather than his spec, and it is now load-bearing: without
+    it the only way to make one exception is to fork the whole type, which is the propagation
+    problem in reverse. **Attaching a type DESTROYS the pipe's own numbers** for the properties the
+    type states -- *"I am afraid that I agree that Attaching does need to destroy the pipes
+    numbers"* -- the rejected alternative being a shadow value nothing can ever show. The third,
+    **a type-owned property carrying no scenario override marker**, still stands unruled and is
+    low stakes: a tick there would be a second, undiscoverable detach for one property in one
+    scenario.
   - **BIND BY ID, NEVER BY NAME.** Bentley's own libraries synchronise on the LABEL, so a name
     collision silently re-points every reference. Asserted: a second type with the same name steals
     nothing.

@@ -116,6 +116,34 @@ the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
+### RULED 2026-09-06: when a string may mention EPANET
+
+**An EPANET mention earns its place when it explains something the reader is experiencing right
+now, and does not when it answers a question they did not ask.** Tom agreed strongly with that
+sentence on 2026-09-06 and it is the rule; what follows is only how to apply it.
+
+**The failure it prevents is a POSITIONING one, not a wording one.** Tom, striking the last
+sentence of `lpn_field_tag_tip` (*"It is carried into and out of the EPANET file."*):
+*"Unsatisfactory. The implication I am trying to avoid is that we are routinely reading and writing
+EPANET files. Why do we even need to mention the file round trip?"* Each such sentence is defensible
+alone; together they teach a reader that this page's normal working mode is shuttling files to and
+from another program. `dev/positioning.md` is the authority for why that matters.
+
+**Worked, on the two strings this ruling was made against:**
+
+| Mention | Verdict | Why |
+|---|---|---|
+| `lpn_field_tag_tip`: *EPANET stops reading at the first space, so a space is refused as you type it* | **KEEP** | The refusal is happening in front of the reader. A constraint with no reason invites people to ask us to lift it. |
+| `lpn_field_tag_tip`: *It is carried into and out of the EPANET file* | **STRUCK** | Answers a question nobody asked, while the reader is doing something with no files in it. Deleted with no replacement -- the fact is still true and nobody needed telling. |
+| `lpn_library_curve_note_tip`: *It is written above the curve in an EPANET file and read back from there* | **STRUCK**, same day, same reasoning (Tom: *"Same. Remove."*) | Identical shape on a free-text field. |
+| The whole `lpn_inp_drop_*` family | **KEEP** | The reader has just imported an EPANET file. There it is the subject, not an aside. |
+
+**It resisted becoming a check, and the reason is worth stating** so nobody re-opens it as an
+oversight: "is this reader experiencing this right now" is a fact about a screen and a moment, and
+no scan of a string can see either. A ratchet on the COUNT of EPANET mentions was considered and
+rejected -- it would block a legitimate mention in the import family, which is exactly where they
+belong.
+
 ### Naming a control from inside another string
 
 **A control's name written into prose is a cross-key match a translator cannot see.** Wave 0 on Task

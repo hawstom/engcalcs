@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read**, of 25 untranslated keys, of 1713 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 25 untranslated keys, of 1713 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,11 +25,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (25, 2 to read @@ NEEDS RULING)
+## lpn_  (25, all ruled)
 
 - **`lpn_engine_needed_failed`**
-  > The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.
-  @@ NEEDS RULING
+  > The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.
+  _Ruled 2026-09-07: There is that "and" construction again that is not best for an engineering software. I edited it._
 - **`lpn_engine_needed_loading`**
   > Loading EPANET solver while you build. Results will be available when completely loaded.
   _Ruled 2026-09-06: Tom's own sentence, written by him in the instruction that commissioned the feature: "we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches". Recorded because the words are his, not because anybody approved ours._
@@ -97,8 +97,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > No pipe type selected
   _Ruled OK 2026-09-07._
 - **`lpn_settings_engine_native_off`**
-  > This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.
-  @@ NEEDS RULING
+  > This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.
+  _Ruled 2026-09-07: I don't understand why the checkbox must be disabled. Can we discuss this?_
 - **`lpn_tool_key_hint`**
   > Shortcut: press {key}.
   _Ruled OK 2026-09-07._

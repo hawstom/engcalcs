@@ -24171,7 +24171,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip);
 		if (engineForced) {
-			note(compBody, pc.lpn_settings_engine_native_off || 'This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.');
+			note(compBody, pc.lpn_settings_engine_native_off || 'This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box is enabled again as soon as the network no longer needs the EPANET solver.');
 		}
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
@@ -31843,7 +31843,7 @@ var EngCalcs = EngCalcs || {};
 				// The one case where a failed background fetch IS the user's business: without the
 				// engine this network has no answers at all, so silence would be a blank page with
 				// no reason given.
-				text = pc.lpn_engine_needed_failed || 'The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.';
+				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
 		}
 		el.textContent = text;
