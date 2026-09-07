@@ -968,17 +968,19 @@ enabled on production 2026-09-03: weekly report, monthly archive rotation, month
 (`trim_logs.php`), daily chain audit. All four are the EngCalcs **usage counts**. Nothing in it
 touches the web server's access log.
 
-**Because the answer could be "for ever", the notice no longer guesses.** The claim that it is
-*"deleted much sooner"* than 26 months was mine, unverified, and could be false with archiving on
-and removal off, which is the ordinary cPanel default pair. It now says only what is certainly
-true: the log is rotated on the hosting account's own schedule rather than by this site's code, and
-is no part of the 26-month period.
+**And then Tom closed it, which is the better answer than the number:** *"Simply drop any pretense
+of a claim about the server logs unless you want to say that they may stay there forever."*
 
-**Thirty seconds on production settles it**, and then the notice gets a number:
+So the notice says the worst case out loud and promises nothing:
 
-```sh
-ls -l ~/access-logs/ ~/logs/ | head -20; date
-```
+> **We make no promise about how long it is kept, and it may stay on the server indefinitely.** The
+> log belongs to the hosting service rather than to this site, we do not manage it, and the
+> 26-month limit stated below is about our usage counts and does not reach it. We would rather tell
+> you that than offer you a period we do not control.
 
-The live log's size and date, and the oldest `.gz` in `~/logs/`, give the retention directly.
-The same two facts are in cPanel under **Metrics → Raw Access**, where the two checkboxes are.
+**The rule this leaves behind, and it is the more useful outcome than a rotation interval:** a
+retention period is a PROMISE ABOUT YOUR OWN CONDUCT, so state one only where you control the
+deletion. We control `trim_logs.php`, which is why 26 months can be promised and is; we do not
+control the host's domlogs, so the honest disclosure is the worst case, not a period read off a
+checkbox that somebody could untick a year from now without telling us. **A number here would have
+aged into a lie the first time the hosting plan changed.**

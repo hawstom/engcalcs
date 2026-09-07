@@ -123,9 +123,12 @@ choice about it.</p>
 <p>What it is for is keeping the site up and defending it: finding what broke, and recognising
 abuse. <strong>We do not use it to count visits, to build statistics, or to learn anything about
 you</strong>, and we never join it to the usage counts described in section 1. Nobody profiles it,
-and it goes nowhere else. It is rotated on the hosting account&rsquo;s own schedule rather than by
-this site&rsquo;s code, and it is no part of the 26-month period promised for the usage counts
-above.</p>
+and it goes nowhere else.</p>
+
+<p><strong>We make no promise about how long it is kept, and it may stay on the server
+indefinitely.</strong> The log belongs to the hosting service rather than to this site, we do not
+manage it, and the 26-month limit stated below is about our usage counts and does not reach it. We
+would rather tell you that than offer you a period we do not control.</p>
 
 <p>This is the one place on this site where your IP address is written down. We say so plainly here
 because a privacy notice that quietly omits the server log is the commonest way one of these
