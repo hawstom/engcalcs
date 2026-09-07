@@ -3,7 +3,9 @@
 ## HOW TO READ THIS FILE: two keywords, and you can skip everything else
 
 - **`ASK-TGH`** — open questions waiting for Tom. **Search this and nothing else if you are short of
-  time.** There are four, all in PASS FIVE.
+  time. It currently matches nothing: there is no open question.** Write the token only on a real
+  one, and convert it to `SETTLED (was ASK-TGH n)` the moment he answers, keeping his words verbatim
+  beneath it.
 - **`SETTLED`** — decided, done, and recorded only so it is not re-proposed. Every pass above PASS
   FIVE is settled; his `RULE` marks are on those lines and they are never rewritten.
 - `RULE EDR…` lines are the ruling mechanism for a pass that is still being decided.
@@ -1167,33 +1169,59 @@ himself. The privacy notice still carries controller, purposes, five legal bases
 transfers with their Article 49 derogations, retention, rights, withdrawal, complaint, automated
 decision-making, and the device-storage table.
 
-## The four questions
+## The four questions — ALL FOUR RULED 2026-09-07. Nothing here is pending.
 
-### ASK-TGH 1 — `About.php` is the last long page, and it costs 26 retranslations
+### SETTLED (was ASK-TGH 1) — `About.php` is the last long page, and it costs 26 retranslations
 
 `about_body_html` is a translated key, so tightening it is not free the way the two sites and the
 legal pages were: the English edit makes 26 translations stale and the drift detector will list it
 for the next sprint. It is about 430 words and would come down to roughly 300 without losing a
-fact. **Tighten it and let the sprint pick it up, or leave it?**
+fact. 
+[TGH: **Leave it**]
 
-### ASK-TGH 2 — not-epanet's honesty item 1 is 700 words of bullets. Table?
+### SETTLED (was ASK-TGH 2) — not-epanet's honesty item 1 is 700 words of bullets. Table?
 
 Seven bullets, each a claim plus its evidence. As a two-column table (*what we depend on* / *the
 specifics*) it would be scannable in about ten seconds instead of two minutes, and the claims page
 already carries the sources. **The cost is tone**: a table reads as an inventory, and this section
 is a confession. My instinct is to leave it as prose because the confession is the point, but it is
 the longest thing on the site and you asked for tables where they help.
+[TGH: Do the best you can without a table. Maybe it's okay. Don't go for a target. Just do a smell test.]
 
-### ASK-TGH 3 — should the access log get a retention after all?
+### SETTLED (was ASK-TGH 3) — should the access log get a retention after all?
 
 The notice now says, in your words, that it may stay on the server indefinitely. The alternative is
 one more line in the crontab that already runs four EngCalcs jobs, deleting `~/logs` past a period
 you pick, after which the notice states a number that something enforces. **A policy decision, not
 an editorial one**, which is why it is a question rather than a change.
+[TGH: No change]
 
-### ASK-TGH 4 — the not-epanet disclaimer block is 197 words and leads the page
+### SETTLED (was ASK-TGH 4) — the not-epanet disclaimer block is 197 words and leads the page
 
 It is the legal heart of the site and I did not touch it. It could be a lead sentence and three
 bullets (*not EPANET · not EPA's · not reviewed or endorsed by them*), which a stranger arriving
 from a search would take in at a glance, where 197 words of paragraph is something they may skim.
 **Your call, because it is the one block where being complete may matter more than being read.**
+
+[TGH: Swap top and bottom, moving "We use EPANET's name here for three reasons: [remove the rest of the line]" and everything below it to the top. Other than that, leave it as is.]
+
+## What his four rulings changed, 2026-09-07
+
+| Was | His ruling | Done |
+|---|---|---|
+| 1. About.php | *"Leave it"* | Untouched. It stays the longest page and that is a decision, not an oversight |
+| 2. Honesty item 1 | *"Do the best you can without a table. Maybe it's okay. Don't go for a target. Just do a smell test."* | Read all seven bullets cold. **Six passed.** One did not: *"section by section across the sections we support"* said section three times and now reads *"from `[TITLE]` to `[END]` across the sections we support"*. Nothing else changed, and no table |
+| 3. Access log retention | *"No change"* | The notice still promises nothing and says it may stay indefinitely |
+| 4. The disclaimer block | *"Swap top and bottom"* | The three reasons now lead the box and the denial follows them, with the trailing half of the lead line removed as he asked |
+
+**The reordering is the interesting one, and the reason is in the page's own comment now.** A reader
+who arrived from a search for EPANET is owed the answer to *why is this page called that* before the
+denial; put the denial first and it reads as a disclaimer somebody was made to write. `epanet.html`
+still opens with the denial, because a page reached directly from a search carries its own.
+
+**A claim about the site moved with it.** `README.md` said the denial *"is the first block of
+substance on every page"*, which stopped being true the moment the box was reordered; it now records
+the order and the date. That sentence had already been corrected once, on 2026-09-06, for saying
+"above everything else". **It is the third time this one paragraph has drifted from the page it
+describes**, which is an argument for the ledger rather than the prose: `CLAIMS.md` states what is
+claimed, and nothing in it needed changing today.
