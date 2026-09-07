@@ -350,34 +350,6 @@ the block.
   - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
     optimisation.
 
-- 100|465| **Reusable pipe TYPES: slices 1-3 SHIPPED; the export alert is what is left.**
-  One "150 mm PVC" definition that 400 pipes point at. **`doc.pipeTypes` shipped 2026-09-06** --
-  id-keyed records, a Library section that adds, renames, edits and refuses by name to delete a
-  type in use, `effective()` resolving override -> element -> type, disabled controls showing the
-  inherited value, and Detach. `dev/pipe-library-design.md` is the design record and
-  `dev/lpn-spike/pipe-library-harness.js` (8 sections) is the contract.
-  - **WHAT IS LEFT HERE IS SLICE 5, THE EXPORT ALERT** (Tom, 2026-09-06: *"Yes. And we have to
-    start showing an export alert."*). A typed pipe flattens on `.inp` export -- every NUMBER still
-    exports byte-identically, so Task 281's round trip is intact; what does not survive is the
-    indirection. Say that, and say how many elements it affects, the way find and replace states
-    its count before writing. **Two things flatten and they must not share one message**: a type
-    loses its indirection, a fittings list loses its itemisation. **Fire only where `k` is
-    fitting-list-derived**, never on a hand-typed one, or a network that never touched the feature
-    gets a warning and learns to dismiss it. Slice 4 is Task 590.
-  - **TWO OF THE THREE OPEN CALLS ARE RULED, 2026-09-06, BOTH IN FAVOUR OF WHAT SHIPPED.**
-    **Detach stays** -- Tom: *"I think it would be fatal if Detach didn't exist."* It was the
-    `utility-planning-engineer`'s addition rather than his spec, and it is now load-bearing: without
-    it the only way to make one exception is to fork the whole type, which is the propagation
-    problem in reverse. **Attaching a type DESTROYS the pipe's own numbers** for the properties the
-    type states -- *"I am afraid that I agree that Attaching does need to destroy the pipes
-    numbers"* -- the rejected alternative being a shadow value nothing can ever show. The third,
-    **a type-owned property carrying no scenario override marker**, still stands unruled and is
-    low stakes: a tick there would be a second, undiscoverable detach for one property in one
-    scenario.
-  - **BIND BY ID, NEVER BY NAME.** Bentley's own libraries synchronise on the LABEL, so a name
-    collision silently re-points every reference. Asserted: a second type with the same name steals
-    nothing.
-
 - 75|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
@@ -601,26 +573,6 @@ the block.
   - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 
 
-
-- 100|590| **A fittings picker, so a pipe's `k` is summed rather than guessed.**
-  **RAISED TO 75 BY TOM, 2026-09-06, AND LINKED TO TASK 465**, which is the reason: a fittings
-  picker and a library pipe are the same indirection seen from two ends. A pipe TYPE that states
-  roughness may as well state a fittings set, and the `effective()` resolution layer 465 has to
-  build is the one a picked fitting list would resolve through. Design them together or the
-  second one re-litigates the first.
-  Tom, 2026-09-05, on the market researcher's finding: *"Fittings library: Put it in our roadmap.
-  Thanks, Market Researcher!"* A `lpn_` pipe has one bare minor-loss `k` field and nothing else.
-  - **Every tool the seat could examine offers a picker and none defaults to a nonzero `k`:**
-    EPANET 0, epanet-js 0 (verified in their source, `DEFAULT_MINOR_LOSS = 0`), WaterGEMS/WaterCAD's
-    *Minor Loss Collection* and KYPipe's *SigmaM* both sum named fittings and quantities, which is
-    zero absent a pick. **So the DEFAULT stays zero** -- that half was asked and answered, and it is
-    the rejected alternative worth keeping.
-  - **The seat ranks it BELOW CSV/GPX import and says why:** it has no evidence anybody in this
-    suite's actual population (small and rural utilities, EWB, Peace Corps) has hit it as a blocker,
-    where CSV/GPX has a documented forum trail of people stuck. Sizing it is the planning
-    engineer's, not the researcher's. `dev/agents/market-researcher/wishlist.md` No. 5.
-  - The shape a k table would take is this page's own settled one: a Library object elements refer
-    to, as a curve is since Task 586 -- not a per-element blob.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such

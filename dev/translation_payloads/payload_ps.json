@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 1712,
-        "delta_key_count": 37,
+        "expected_key_count": 1747,
+        "delta_key_count": 72,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -552,7 +552,42 @@
         "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
         "lpn_pipetype_none": "No pipe type selected",
         "lpn_pipetype_detach": "Detach from pipe type",
-        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here."
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+        "lpn_library_fittings": "Fittings",
+        "lpn_library_fittings_tip": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
+        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
+        "lpn_library_fittings_source": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
+        "lpn_library_fittings_add": "Add a fittings list",
+        "lpn_library_fittings_used_by": "Pipes using this fittings list",
+        "lpn_library_fittings_unused": "Nothing uses this fittings list.",
+        "lpn_library_fittings_in_use": "This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.",
+        "lpn_fitting_qty": "Quantity",
+        "lpn_fitting_name": "Fitting",
+        "lpn_fitting_k": "Coefficient",
+        "lpn_fitting_add": "Add a fitting",
+        "lpn_fitting_remove": "Remove",
+        "lpn_fitting_total": "Total minor (local) loss coefficient, k",
+        "lpn_field_fittings": "Fittings list",
+        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+        "lpn_fittings_none": "No fittings list selected",
+        "lpn_fitting_globe": "Globe valve, fully open",
+        "lpn_fitting_angle": "Angle valve, fully open",
+        "lpn_fitting_swingcheck": "Swing check valve, fully open",
+        "lpn_fitting_gate": "Gate valve, fully open",
+        "lpn_fitting_elbow_short": "Short radius elbow",
+        "lpn_fitting_elbow_medium": "Medium radius elbow",
+        "lpn_fitting_elbow_long": "Long radius elbow",
+        "lpn_fitting_elbow_45": "45 degree elbow",
+        "lpn_fitting_return_bend": "Closed return bend",
+        "lpn_fitting_tee_run": "Standard tee, flow through run",
+        "lpn_fitting_tee_branch": "Standard tee, flow through branch",
+        "lpn_fitting_entrance": "Square entrance",
+        "lpn_fitting_exit": "Exit",
+        "lpn_fitting_other": "Other fitting",
+        "lpn_inp_export_flat_heading": "Saved {file}",
+        "lpn_inp_export_flat_lead": "Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:",
+        "lpn_inp_export_flat_types": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.",
+        "lpn_inp_export_flat_fittings": "The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number."
     },
     "keys": {
         "lpn_tool_key_hint": "Shortcut: press {key}.",
@@ -591,7 +626,42 @@
         "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
         "lpn_pipetype_none": "No pipe type selected",
         "lpn_pipetype_detach": "Detach from pipe type",
-        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here."
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+        "lpn_library_fittings": "Fittings",
+        "lpn_library_fittings_tip": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
+        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
+        "lpn_library_fittings_source": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
+        "lpn_library_fittings_add": "Add a fittings list",
+        "lpn_library_fittings_used_by": "Pipes using this fittings list",
+        "lpn_library_fittings_unused": "Nothing uses this fittings list.",
+        "lpn_library_fittings_in_use": "This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.",
+        "lpn_fitting_qty": "Quantity",
+        "lpn_fitting_name": "Fitting",
+        "lpn_fitting_k": "Coefficient",
+        "lpn_fitting_add": "Add a fitting",
+        "lpn_fitting_remove": "Remove",
+        "lpn_fitting_total": "Total minor (local) loss coefficient, k",
+        "lpn_field_fittings": "Fittings list",
+        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+        "lpn_fittings_none": "No fittings list selected",
+        "lpn_fitting_globe": "Globe valve, fully open",
+        "lpn_fitting_angle": "Angle valve, fully open",
+        "lpn_fitting_swingcheck": "Swing check valve, fully open",
+        "lpn_fitting_gate": "Gate valve, fully open",
+        "lpn_fitting_elbow_short": "Short radius elbow",
+        "lpn_fitting_elbow_medium": "Medium radius elbow",
+        "lpn_fitting_elbow_long": "Long radius elbow",
+        "lpn_fitting_elbow_45": "45 degree elbow",
+        "lpn_fitting_return_bend": "Closed return bend",
+        "lpn_fitting_tee_run": "Standard tee, flow through run",
+        "lpn_fitting_tee_branch": "Standard tee, flow through branch",
+        "lpn_fitting_entrance": "Square entrance",
+        "lpn_fitting_exit": "Exit",
+        "lpn_fitting_other": "Other fitting",
+        "lpn_inp_export_flat_heading": "Saved {file}",
+        "lpn_inp_export_flat_lead": "Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:",
+        "lpn_inp_export_flat_types": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.",
+        "lpn_inp_export_flat_fittings": "The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number."
     },
     "key_context": {
         "lpn_tool_key_hint": {
@@ -1171,6 +1241,566 @@
             }
         },
         "lpn_pipetype_detach_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_source": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_used_by": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_unused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_library_fittings_in_use": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_qty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_k": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_total": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_field_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_field_fittings_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fittings_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_globe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_angle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_swingcheck": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_gate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_elbow_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_elbow_medium": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_elbow_long": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_elbow_45": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_return_bend": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_tee_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_tee_branch": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_entrance": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_exit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_fitting_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_inp_export_flat_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_inp_export_flat_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_inp_export_flat_types": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_curve_in_use",
+                    "value": "دا منحنۍ د {count} عناصرو له خوا کارول کیږي: {ids}. لومړی هغوی بلې منحنۍ ته وګرځوئ، بیا دا یوه ړنګه کړئ.",
+                    "english": "This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one."
+                },
+                "next_translated": {
+                    "key": "lpn_library_controls",
+                    "value": "کنترولونه",
+                    "english": "Controls"
+                }
+            }
+        },
+        "lpn_inp_export_flat_fittings": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

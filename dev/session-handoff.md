@@ -143,6 +143,47 @@ Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he 
   two distinct English terms landed on one Pashto word on the same screen. No English defect; it
   needs a Pashto speaker. It is in `dev/new-english-keys.md` under the translators' section.
 
+## 3c. THE 2026-09-06 ORCHESTRATION SESSION — what it decided, in one place
+
+**Six rulings of Tom's, all built, none to re-ask:**
+
+- **Task 605: the built-in solver is retired FROM VIEW, not from the code.** `epanet` is the
+  default, the gallery banner lost its engine clause, 25 English values stopped framing EPANET as
+  one of two options. **What deliberately SURVIVED is every sentence a reader meets only when
+  something has gone wrong** -- a fallback that does not say what answered is worse than one that
+  does, and the built-in solver is still what answers when the module cannot be reached, which IS
+  the offline promise.
+- **Task 608: the engine is fetched BEFORE anybody is waiting**, silently, as soon as there is a
+  solveable network or a Calculate; and Tom's own banner shows while a network that only EPANET can
+  solve is loading it. **THE CHECKBOX IS NOT DISABLED, and that reversed his own first
+  instruction** -- he withdrew it the same day, because the tip on that row already names both
+  cases permanently, so the greying was a conditional duplicate bought at the price of a control
+  that flickers as you draw. `lpn_settings_engine_native_off` was deleted with it.
+- **Tasks 465 and 590: pipe types and fittings, one indirection from two ends.** Detach STAYS
+  (*"fatal if Detach didn't exist"*); attaching a type DESTROYS the pipe's own numbers.
+- **The EPANET-mention rule, and it is now the standing test for any string**: *an EPANET mention
+  earns its place when it explains something the reader is experiencing right now, and does not
+  when it answers a question they did not ask.* Written up with worked examples in
+  `dev/language-strings.md`. It struck two round-trip sentences and KEEPS the whole
+  `lpn_inp_drop_*` family.
+- **Task 479.01: the canonical split is closed** -- one address, `https://librewaternet.org/app/`,
+  from every door on both hosts.
+
+**Three traps measured this day, each of which cost something:**
+
+- **COPY-ASIDE-AND-RESTORE ON A SHARED FILE DESTROYS THE OTHER WRITER'S LINES.** Recorded in full
+  in §3 above. It was invented in this session and bit in this session.
+- **TWO CORRECT CHANGES, HOURS APART, MADE A LIVE DEFECT.** 479.01 declared the canonical `/app`;
+  the manifest work then made `/app` 301 to `/app/`. Together, every page and all 545 sitemap URLs
+  nominated an address that redirects. **Neither was wrong when it was written, and no check saw
+  it** -- it was found by curling the live site. The rule is now agreement with the mount, and the
+  latent half is the lesson: `ecSwMounts()` had said `/app/` since the mount existed, so an
+  exact-match rule would have caught it on day one.
+- **A COUNT CATCHES WHAT READING DOES NOT.** A scripted roadmap edit with a careless range nearly
+  deleted nine task blocks; `roadmap_id_check.php`'s open-task count fell from 54 to 45 and that is
+  the only reason it was noticed. **Bound a scripted block replacement by LINE NUMBERS you have
+  just printed, never by `index()` of the next heading you assume follows.**
+
 ## 4. STATE — rewritten 2026-09-06, third pass
 
 **The curves paradigm change (Task 586) is verified and its checklist is gone rather than carried.**

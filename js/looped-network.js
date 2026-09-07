@@ -15129,7 +15129,7 @@ var EngCalcs = EngCalcs || {};
 	// the same reason -- the marker outlives the request that wrote it and has no Host header of its
 	// own, so it names the one address the suite asks to be found at (Task 479.01, 2026-09-06).
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
-	var LPN_FILE_APP = 'https://librewaternet.org/app';
+	var LPN_FILE_APP = 'https://librewaternet.org/app/';
 	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
