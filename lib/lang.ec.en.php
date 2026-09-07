@@ -1333,7 +1333,7 @@ $ec_lang['lpn_units_velocity']='Velocity';
 $ec_lang['lpn_result_gradient']='Head loss gradient';
 $ec_lang['lpn_result_gradient_tip']='Head loss divided by the length of the pipe. Use it to compare pipes of different lengths against one design limit.';
 $ec_lang['lpn_result_water_age']='Water age';
-$ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. Where flows meet, the water arriving carries a mix of ages, and the number here is their average weighted by flow: a junction fed mostly by a short new main shows a low age even if a long dead end also feeds it. In a tank it is the average age of the water held, which is why a tank that turns over slowly is usually the oldest water in a network. There is no regulatory limit to compare it against, so judge the number against your own system.';
+$ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. Where flows meet, the number is the average of the arriving ages, weighted by flow. In a tank it is the average age of the water held, so a tank that turns over slowly usually holds the oldest water in a network. There is no regulatory limit to compare it against, so judge the number against your own system.';
 $ec_lang['lpn_result_source_share']='Source share';
 $ec_lang['lpn_result_source_share_tip']='How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.';
 $ec_lang['lpn_result_head']='Head';
@@ -1487,7 +1487,7 @@ $ec_lang['lpn_georef_drop']='Put the model here';
 $ec_lang['lpn_georef_finish']='Keep this placement';
 $ec_lang['lpn_georef_cancel']='Cancel';
 $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
-$ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. A drawing made on a plain grid usually says nothing about this, so set it here — or let Go to… ask you how wide the site is and work it out.';
+$ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. A drawing made on a plain grid usually says nothing about this, so set it here, or let Go to… ask you how wide the site is and work it out.';
 $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, anticlockwise, so that its north points north.';
 $ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag assets one at a time afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
@@ -1565,18 +1565,18 @@ $ec_lang['lpn_menu_project']='Water';
 // the TOOLBAR, above the map. Do not qualify this sentence again. The rule it states is in
 // dev/looped-network-calculator-scope.md: every command lives in the menu bar, the transport is the
 // one exception, and it is exempt because it is a position in a run rather than a command.
-$ec_lang['lpn_menu_project_tip']='Everything about water network modeling is here in one place, except the animation play controls. There is no need to guess where things are.';
+$ec_lang['lpn_menu_project_tip']='Everything about water network modeling is here in one place, except the animation play controls.';
 $ec_lang['lpn_tables_menu']='Tables';
 $ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
-$ec_lang['lpn_run_menu_tip']='Recalculate this network now. Looking for the Calculate button? It is hidden while the Recalculate automatically setting is on. To bring the button back, turn Recalculate automatically off in Settings, Calculation, Hydraulics.';
+$ec_lang['lpn_run_menu_tip']='Recalculate this network now. The Calculate button is hidden while the Recalculate automatically setting is on; turn that setting off in Settings, Calculation, Hydraulics to bring the button back.';
 // ---- automatic recalculation (Task 467) ----
 // "Simulation" rather than "network" or "results": it is the word EPANET uses for working a network
 // out over time, and this switch is about the run, not about the drawing.
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
-$ec_lang['lpn_settings_auto_run_tip']='When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar because there is nothing left for it to do. Turn it off on a large network where waiting for each change to be recalculated gets in the way of typing, and the Calculate button comes back so you choose when to run.';
+$ec_lang['lpn_settings_auto_run_tip']='When this is on, this project recalculates shortly after every change you make, and the Calculate button is taken off the toolbar. Turn it off on a large network, where waiting for each recalculation gets in the way of typing, and the Calculate button comes back so you choose when to run.';
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
@@ -2363,7 +2363,7 @@ $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='Draws a line above the highest value of each labelled property on the map (an overline), and a line below the lowest value of that property (an underline), so you can pick out the highest and the lowest without reading the numbers.';
+$ec_lang['lpn_labels_mark_extrema_tip']='Marks the highest value of each labelled property on the map with a line above it (an overline), and the lowest with a line below it (an underline).';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
@@ -2575,7 +2575,7 @@ $ec_lang['lpn_settings_accuracy']='Accuracy';
 // because the translator has no term to look up. See the correction added to
 // dev/language-strings.md and guarded by dev/scripts/plain_english_swap_check.php.
 $ec_lang['lpn_settings_default_is']='The default is {n}.';
-$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the amount by which the flows are still changing from one trial to the next, against the sum of the link flows. A smaller number is more exact and takes longer. Left empty, this page uses a stricter accuracy than EPANET\'s own default.';
+$ec_lang['lpn_settings_accuracy_tip']='How close the solver has to get before it stops, measured as the total change in flow from one trial to the next, divided by the total flow in the links. A smaller number is more exact and takes longer. Left empty, this page uses a stricter accuracy than EPANET\'s own default.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
 $ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
@@ -2687,7 +2687,7 @@ $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 // **NOT "snap to grid"** -- nothing here snaps to a grid of positions, and a reader who has used a
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='Snap leader lines to set angles';
-$ec_lang['lpn_settings_leader_snap_tip']='When you drag a label away from what it names, the line back to it is pulled onto the nearest of the set angles if you drag close to one. Keep dragging and the snap lets go, so any angle is still available. Off drags freely, which is what this page has always done.';
+$ec_lang['lpn_settings_leader_snap_tip']='When you drag a label away from its asset, the line back to it snaps to the nearest of the set angles if you drag close to one. Keep dragging and the snap lets go, so any angle is still available. Off drags freely.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
@@ -2915,14 +2915,14 @@ $ec_lang['lpn_reaction_order_bulk_tip']='The power the concentration is raised t
 $ec_lang['lpn_reaction_order_tank']='Tank reaction order';
 $ec_lang['lpn_reaction_order_tank_tip']='The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine\'s own default stands.';
 $ec_lang['lpn_reaction_order_wall']='Wall reaction order';
-$ec_lang['lpn_reaction_order_wall_tip']='Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two, which is why this is a chooser and not a number. It also decides how this page converts the wall coefficient, so the row above it means something different depending on what you pick here.';
+$ec_lang['lpn_reaction_order_wall_tip']='Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two. Changing this changes what the wall coefficient above means, and how this page converts it.';
 $ec_lang['lpn_reaction_order_unstated']='Not stated';
 $ec_lang['lpn_reaction_order_zero']='0, zero order';
 $ec_lang['lpn_reaction_order_first']='1, first order';
 $ec_lang['lpn_reaction_limiting']='Limiting potential';
-$ec_lang['lpn_reaction_limiting_tip']='A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. It is written in the same units as the chemical itself, and EPANET converts a concentration for nobody, so write it in the units named beside the chemical. Leave it empty and there is no limit.';
+$ec_lang['lpn_reaction_limiting_tip']='A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Write it in the units named beside the chemical, which EPANET never converts. Leave it empty and there is no limit.';
 $ec_lang['lpn_reaction_rough_corr']='Roughness correlation';
-$ec_lang['lpn_reaction_rough_corr_tip']='Ties the wall reaction to each pipe\'s own roughness instead of one number for the whole network, which is how a rougher pipe is made to react faster. When it is set, this page and EPANET work out a wall coefficient per pipe from that pipe\'s roughness, and the single wall coefficient above is no longer what is used. Leave it empty and it is not used at all.';
+$ec_lang['lpn_reaction_rough_corr_tip']='Ties the wall reaction to each pipe\'s own roughness, so a rougher pipe reacts faster. When it is set, a wall coefficient is worked out for each pipe from that pipe\'s roughness, and the single wall coefficient above is no longer used. Leave it empty and it is not used at all.';
 $ec_lang['lpn_reaction_note']='This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.';
 // **PUMP ENERGY AND COST** (ROADMAP Task 566, dev/pump-energy.md). EPANET's own words: efficiency,
 // price, demand charge, energy pattern. The one section of this page whose answer is money, so the
