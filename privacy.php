@@ -78,8 +78,8 @@ page, recording only which counts we have already made. <strong>There is no iden
 want to do something different. <em>Allow all</em> covers that too, so we never ask again.</p>
 
 <p><strong>If you say no, we keep nothing in your browser, and nothing we record can be connected
-to you or to your other visits.</strong> We still count the page load itself, in the same way any
-web server records that a page was served: the page name, the language your browser asked for, and
+to you or to your other visits.</strong> We still count the page load itself, in a more limited way than a
+typical web server records that a page was served: the page name, the language your browser asked for, and
 the time. Those rows carry no identifier, so we cannot tell your second visit from somebody
 else&rsquo;s first, and we count them separately from the visits of people who did agree,
 precisely because they are a different kind of number.</p>
@@ -122,20 +122,9 @@ whatever you answer to the counting question, and there is no way for a website 
 choice about it.</p>
 
 <p>What it is for is keeping the site up and defending it: finding what broke, and recognising
-abuse. <strong>We do not use it to count visits, to build statistics, or to learn anything about
-you</strong>, and we never join it to the usage counts described in section 1. Nobody profiles it,
-and it goes nowhere else.</p>
-
-<p><strong>We make no promise about how long it is kept, and it may stay on the server
-indefinitely.</strong> The log is ours: it sits in our own hosting account, nobody else is given
-it, and we can delete it whenever we choose. What we have not done is put it on a deletion schedule
-the way we have for the usage counts below, whose 26-month limit does not reach it. So the honest
-answer is that there is no period to tell you yet, rather than a period you should assume is
-short.</p>
-
-<p>This is the one place on this site where your IP address is written down. We say so plainly here
-because a privacy notice that quietly omits the server log is the commonest way one of these
-documents is untrue.</p>
+abuse. <strong>We do not use it to learn anything about you</strong>, and we never join it to the
+usage counts described in section 1. It goes nowhere else. <strong>We make no promise about how
+long it is kept, and it may stay on the server indefinitely.</strong></p>
 
 <h2>What we store on your device</h2>
 

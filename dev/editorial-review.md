@@ -1001,3 +1001,117 @@ checkbox, but a line in the same crontab that already runs four EngCalcs jobs on
 deleting `~/logs` entries past a period Tom picks. Then the notice states a number and the number
 is true because something enforces it, which is the whole argument of that task and of this file's
 own rule about prose against scripts. **Tom's call, not mine to add to the roadmap.**
+
+---
+
+# PASS FOUR, 2026-09-07: bloat and rambling
+
+Tom, after rewriting a section of `privacy.php` himself: *"That is far too wordy. The next thing I
+want you to do is look for bloat and pointless rambling."* His rewrite is shipped verbatim and cut
+101 words from section 5.
+
+**Measured.** `privacy.php` 2,446 words, 24.5 per sentence. `terms.php` 661. not-epanet 2,584.
+LibreWaterNet index 1,430. The bloat is not spread evenly: it is in **rationale shown to the
+reader** — sentences explaining why the sentence beside them is worded as it is — and in **the same
+promise made three times on one page**. Entries below carry the replacement, so a `fix` is an
+instruction, not a brief.
+
+## EDR4-01 - privacy.php, "Who else sees it" opener - 74w to 34w
+
+> Four features reach outside this site, all of them on one page, and every one of them asks you
+> first. **The rule matters more than the list: nothing goes to anybody else until you switch that
+> particular feature on, and each one asks separately, because they do not tell the same thing about
+> you.** All four belong to the Looped Pipe Network calculator, and every other page in the suite
+> makes none of them.
+
+*"The rule matters more than the list"* tells the reader how to weigh what they are reading. The
+rule is then restated four times below, once per feature. Replace with:
+
+> Four features reach outside this site, all on one page, and each asks you first and separately,
+> because they do not tell the same thing about you. They all belong to the Looped Pipe Network
+> calculator; no other page in the suite makes any of them.
+
+RULE EDR4-01: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR4-02 - privacy.php, features 3 and 4 - about 60w
+
+Both end by explaining our own cookie design to the visitor:
+
+> **That is why it asks you on its own instead of riding on the answer you gave about the map, and
+> why your yes is remembered in its own `ec_geosearch` cookie.**
+
+The cookie is already a row in the table above, with its purpose in it. The distinction that earns
+the separate question — *a map tile says where you are looking; a search says what you typed* — is
+one sentence earlier and does the work. Cut both sentences (the `ec_terrain` twin reads the same),
+and cut *"and it never sends anything until you press it"*, which is the same promise as *"asks you
+first"*.
+
+RULE EDR4-02: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR4-03 - privacy.php, "Every stylesheet..." - one sentence
+
+> The one thing you can type that leaves your browser is a place-name search on the map, which is
+> described below and which asks you first.
+
+Said again, better, two paragraphs later, where the search is the subject. Cut.
+
+RULE EDR4-03: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR4-04 - terms.php §2 - 40w to 17w, and it is mine
+
+I wrote this last week and it is the same fault:
+
+> That is a statement about this website and not about the software: the software is licensed to you
+> under §3 and cannot be taken back, so if the hosted service ever changes, what you already have
+> stays yours to run.
+
+> The software is a separate matter: §3 licenses it to you, and that cannot be taken back.
+
+RULE EDR4-04: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR4-05 - not-epanet.org, the Brewer credit - 68w to 30w
+
+> Her schemes ship in our software under the Apache License 2.0, **whose clause 2 fixes the exact
+> wording of the acknowledgement below and whose clauses 4 and 5 forbid using the project name to
+> endorse or promote anything. So the sentence is reproduced verbatim and untranslated, and no
+> control, menu, or feature in our software carries the ColorBrewer name.** What follows is the
+> licence's own text, not ours:
+
+A reader who wanted licence-clause analysis would read the licence. Replace with:
+
+> Her schemes ship in our software under the Apache License 2.0, which fixes the wording of the
+> acknowledgement below. It is the licence's text, not ours:
+
+The compliance reasoning stays in `CLAIMS.md` §7, where it belongs and already is.
+
+RULE EDR4-05: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR4-06 - not-epanet.org, the Viridis correction is on the page twice
+
+Honesty item 1 already says the five EPANET colours are in the palette unsoftened and that the
+shipped default is Viridis. The gratitude section's *EPANET's own interface* then says it again, at
+length, including *"and it would be easy to imply otherwise"* — which is the page watching itself.
+Keep the first. In the second, keep only what is not already said:
+
+> It is customary in this field to describe EPANET's user interface as dated. We decline to. It is
+> the interface that taught most working modellers what a network model is, and our editor is
+> informed by it deliberately: the curve editor is modelled on EPANET's, and the table of assets is
+> the view EPANET has had since version 2.0.
+
+RULE EDR4-06: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR4-07 - This file is the worst offender, and I am the author
+
+1,050 lines, and the trend is the one this pass exists to stop: each round I write more about the
+finding than the finding is worth. Pass one's entries average 180 words; several carry a paragraph
+of reasoning that is already implied by the quote above it.
+
+**Proposed rule, from here on: a finding is the quote, the fault in one sentence, and the
+replacement.** The reasoning goes in only where a competent reader would otherwise re-propose the
+thing being cut. The two long sections that have earned their length — the pass-one verdict, and
+EDR2-05's record of two wrong answers about the log — stay; nothing else needs to say why twice.
+
+I will not retro-trim the passes Tom has already ruled on: his marks are on those lines and the
+file's own header forbids rewriting them.
+
+RULE EDR4-07: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
