@@ -16,7 +16,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## The calculators
 
-- Manning pipe flow solves in both directions — the flow from a depth, and the depth from a flow. <!-- 13 -->
+- Manning pipe flow solves in both directions: the flow from a depth, and the depth from a flow. <!-- 13 -->
 - Every pipe and channel page checks the velocity it just computed and says when it is too fast or too slow. <!-- 52, 65 -->
 - Orifice flow, and the time a tank takes to drain through one. <!-- 6, 12 -->
 - Micro-hydropower, from gross head and penstock losses to the power a small site can actually deliver. <!-- 16 -->
@@ -31,7 +31,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## Drawing a water network
 
-- A drawing toolbar — junction, reservoir, tank, pipe, pump, valve and text — placed by clicking the map. <!-- 146.02 -->
+- A drawing toolbar (junction, reservoir, tank, pipe, pump, valve and text), placed by clicking the map. <!-- 146.02 -->
 - Many named projects, saved in your own browser, each open in its own tab. <!-- 146.08, 447 -->
 - The property box is a window you can drag out of your way, not a panel that owns an edge of the screen. <!-- 344 -->
 - ID prefixes you choose, with Apply to all for when you change your mind. <!-- 345 -->
@@ -51,7 +51,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 ## Solving it
 
 - A looped network solved by the global gradient method, in the page, with no install and no upload. <!-- 146 -->
-- Or solved by the EPANET 2.3 engine itself, compiled into the page and named by version where you can see it. <!-- 451 -->
+- Or solved by the EPANET 2.3.5 engine itself, compiled into the page and named by version where you can see it. <!-- 451 -->
 - Standard gravity throughout, and where the two engines disagree the page tells you by how much. <!-- 419 -->
 - Answers follow your edits as you make them, and if a big network makes that slow, it is a project setting you can turn off. <!-- 467 -->
 
@@ -69,15 +69,15 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Opens EPANET `.inp` files, takes the part it supports, and reports every difference instead of dropping it quietly. <!-- 196 -->
 - An import note is filed on the element it concerns, and you read it in that element's own property box. <!-- 483 -->
 - Writes `.inp` files back out. Every value you did not edit comes back exactly as it went in, character for character. <!-- 281 -->
-- Projects are `.lwn` files — JSON inside, on your own disk, readable without us. <!-- 246 -->
+- Projects are `.lwn` files: JSON inside, on your own disk, readable without us. <!-- 246 -->
 - An examples library that opens Net1, Net2, Net3, Elm Street Center and a Net3 placed on the world, in one click. <!-- 314, 257, 454 -->
 
 ## The map and the world
 
 - A geographic project is drawn in latitude and longitude over a street map or satellite imagery, with the same drawing tools. <!-- 145 -->
-- An existing x/y network can be placed on the world — moved, scaled and rotated onto its real ground. <!-- 476 -->
+- An existing x/y network can be placed on the world, moved, scaled and rotated onto its real ground. <!-- 476 -->
 - Type a place name and the map goes there, if you turn that on. <!-- 437 -->
-- Ground elevations read from terrain data and typed into the document — as each node is drawn, or over a set you found — never replacing a number without your having asked for exactly that. <!-- 497 -->
+- Ground elevations read from terrain data and typed into the document (as each node is drawn, or over a set you found), never replacing a number without your having asked for exactly that. <!-- 497 -->
 
 ## Labels and lettering
 
@@ -91,7 +91,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## Reading the results
 
-- A table for each kind of part in the bottom pane — junctions, reservoirs, tanks, pipes, pumps and valves. <!-- 434, 455 -->
+- A table for each kind of part in the bottom pane: junctions, reservoirs, tanks, pipes, pumps and valves. <!-- 434, 455 -->
 - Colour the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 colour ramps. <!-- 384, 327 -->
 - Profiles. Click along the map to choose the path, and see ground, hydraulic grade and the pressure between them. <!-- 409, 433, 506 -->
 - A profile path is saved with the project under a name you give it, and a project holds as many of them as you draw. <!-- 510 -->

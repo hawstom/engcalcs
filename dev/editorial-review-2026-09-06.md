@@ -51,7 +51,7 @@ valid HTML document.
 Fix: `<!doctype html>` and `<html lang="en">` as the first lines, above the charset -- and then keep
 the charset within the first 1024 bytes, which is the sibling site's existing rule.
 
-RULE EDR-01: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-01: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-02 - HIGH - No viewport meta, on the site that says it works on a phone
 
@@ -64,7 +64,7 @@ tall mode."*
 That sentence was written to be scrupulously honest. It is currently being read on a page that
 demonstrates the opposite. This is one line in each file.
 
-RULE EDR-02: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-02: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-03 - MEDIUM - No `lang` attribute, on the page whose subject is 27 languages
 
@@ -73,7 +73,7 @@ welcome page, which is in English, and which your browser has translated if you 
 another one."* Browser translation, and every screen reader, take the source language from that
 attribute. The page asks the browser to do a job and withholds the one input the browser needs.
 
-RULE EDR-03: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-03: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-04 - MEDIUM - No meta description, no share card, and two context-free titles
 
@@ -86,7 +86,7 @@ whatever it finds first.
 The suite's own `CLAUDE.md` has a rule for exactly this (`$html_desc`, Task 534, `og:description`).
 The marketing site never received it.
 
-RULE EDR-04: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-04: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-05 - HIGH - Google Fonts, on the site whose pitch is per-feature consent
 
@@ -108,7 +108,7 @@ own boast, verbatim: *"There is no CDN, no hosted font, and no third-party code 
 Fix: self-host the three families, or drop to a system stack as not-epanet.org did. Either is an
 afternoon and removes the only thing on the site a privacy-minded reader can catch it doing.
 
-RULE EDR-05: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-05: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-06 - MEDIUM - The two doors are only one door in public
 
@@ -121,7 +121,7 @@ are the same people.
 Deploy, or (if the pairing is not yet meant to be public) note that the commit is queued and the
 sequencing was intended.
 
-RULE EDR-06: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-06: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ---
 
@@ -143,10 +143,10 @@ made on the smaller site and never carried to the flagship. A reader who takes t
 draw a network, then try to hand somebody the map -- finds a screenshot key.
 
 Fix: say what is true. The labels, leader lines and haloed lettering are real and are the point;
-what the reader takes away is the browser's own print or a screen capture. Either say that, or ship
+what the reader takes away is **a screen capture**. Either say that, or ship
 an export and then say it.
 
-RULE EDR-07: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-07: [ ] fix   [x] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-08 - MEDIUM - "twelve more, annotated" is eleven more
 
@@ -154,7 +154,7 @@ Index caption, line 416. The index shows plates `0007`, `0026`, `0028`. The scre
 fourteen plates and those three are among them. Twelve is off by one, and it is off in the
 flattering direction, on a site that has made an editorial virtue of never doing that.
 
-RULE EDR-08: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-08: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-09 - MEDIUM - "41 Brewer ramps" is wrong, on the page built for checking
 
@@ -167,7 +167,7 @@ Brewer, in the row that credits her.
 
 Two sites, two numbers, and the one whose whole purpose is verifiability holds the wrong one.
 
-RULE EDR-09: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-09: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-10 - MEDIUM - Backslashes visible on the published ledger
 
@@ -176,7 +176,7 @@ list...`. The escapes are in `CLAIMS.md:70` and the generator passes them straig
 but it is on the page that argues nothing here drifts, and it is the kind of thing a reader notices
 first because it looks like machine output that nobody read.
 
-RULE EDR-10: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-10: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-11 - MEDIUM - The ledger cites a folder on one laptop
 
@@ -189,14 +189,14 @@ it from nowhere. This is the one finding where the fix is a strict upgrade with 
 define `EC` as the GitHub URL and let every path in the table become a link a stranger can follow.
 Until then the ledger asks to be taken on trust, which is the specific thing it exists not to do.
 
-RULE EDR-11: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-11: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-12 - LOW - "the EPANET 2.3 engine" against 2.3.5 everywhere else
 
 `features.html:281`. The ledger, the vendor README and the run report all say 2.3.5 (printed
 2.3.05). Version numbers are the one place an engineering audience checks you for sport.
 
-RULE EDR-12: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-12: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ---
 
@@ -222,7 +222,7 @@ stronger and the nav already says so). Delete the sentences that comment on the 
 belonging to them. Keep every fact. The page gets shorter and reads as though a person with nothing
 to prove wrote it.
 
-RULE EDR-13: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-13: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-14 - MEDIUM - Honesty item 3 is a heading with nothing under it
 
@@ -231,10 +231,10 @@ RULE EDR-13: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 That is the whole item, apart from a quotation that follows. The section promised *"Five things a
 reasonable person would want to know"*; four of them deliver specifics and this one delivers a
-posture. Either say what new means here -- how long, how many networks it has been run on, what has
-already been found wrong and fixed -- or fold the quotation into item 5 and have four items.
+posture. Either say what new means here -- how long (**development started on 28 Jul 2026**), how many networks it has been run on (**one real-world design report as of 1 Sep 2026**), what has
+already been found wrong and fixed (**countless fool's errand; don't do it**) -- or fold the quotation into item 5 and have four items.
 
-RULE EDR-14: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-14: [ ] fix   [x] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-15 - MEDIUM - The tics, counted
 
@@ -257,7 +257,7 @@ will place this within a paragraph, which on a site about honesty costs more tha
 anywhere else. Practical remedy: one pass per page with a quota -- at most two "rather than", at
 most one "not X; it is Y", no fragment stacks -- and read it aloud.
 
-RULE EDR-15: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-15: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-16 - MEDIUM - The em dash rule stops at the property line
 
@@ -269,7 +269,7 @@ more-visited one has never heard of it.
 This does not need a sweep. It needs the same ratchet: the number may fall and may not rise, and
 the screenshots page, at 18 in 1,300 words, is where a rewrite would actually pay.
 
-RULE EDR-16: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-16: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-17 - LOW - Three spellings against the house standard
 
@@ -278,7 +278,7 @@ Oxford style was adopted 2026-09-06 and takes `-ize`. Live: *"search-engine opti
 mixed apostrophes on LibreWaterNet: curly in *"Stallman's"* and *"page's"*, straight elsewhere on
 the same three pages.
 
-RULE EDR-17: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-17: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-23 - MEDIUM - One sentence on the index that cannot be read
 
@@ -289,7 +289,7 @@ RULE EDR-17: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 thing well: *"We know what we built and we know some of what we lack; we do not know the size of the
 gap."* Use that.
 
-RULE EDR-23: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-23: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ---
 
@@ -316,10 +316,9 @@ Two problems, and the second is the serious one.
 My recommendation is to name it. The ban exists to keep a competitor out of a title, a tagline, a
 menu or a headline; a licence credit in a thanks list is none of those, and the confusion the ledger
 worries about is *created* by the silence rather than avoided by it. If the ban stands, then the
-honest move is the opposite one: drop section 7's explanation rather than publish a commercial
-reason on a gratitude page.
+honest move is the opposite one: **drop section 7's explanation rather than publish a commercial reason on a gratitude page**.
 
-RULE EDR-18: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-18: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-19 - LOW - "It worked on you if you arrived here from a search"
 
@@ -328,7 +327,7 @@ clause needles the reader about a thing they did not do wrong, and it is a guess
 here. *"That is search-engine optimisation, and it matters to us. We are not going to pretend
 otherwise"* keeps everything and loses the poke.
 
-RULE EDR-19: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-19: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-20 - LOW - "Public domain by operation of law" is a US statement
 
@@ -339,17 +338,20 @@ taxes, can model a water system tonight"*, which is the sentence a lawyer would 
 EPA distributes EPANET to the world and nobody is chasing anybody, so the fix is one clause -- "in
 the United States" -- not a rewrite.
 
-RULE EDR-20: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-20: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-21 - LOW - The public repositories publish more than the sites do
 
-`github.com/hawstom/not-epanet.org` is public and its README names a board member -- **Mary Cabais,
-P.E., in the Philippines** -- quotes your private brief, and narrates four corrections you made by
-name. None of that appears on the site, which is right. But the README is a page on the open web
-too, and naming a living person and her country in it is a decision that belongs to her as much as
-to you. Worth one email.
+`github.com/hawstom/not-epanet.org` is public and its README names a board member (with
+credential and country), quotes your private brief, and narrates four corrections you made by name.
+The README is a page on the open web, and naming a living person in it is a decision that belongs to
+them as much as to you. Worth one email.
 
-RULE EDR-21: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+**Found while fixing this, and worse than the finding:** the name was also in ledger row 3.7, which
+is not a README but a LIVE PAGE. Removed from both, 2026-09-06, along with this file's own copy of
+it -- the EngCalcs repository is public too. Anonymize.
+
+RULE EDR-21: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-22 - LOW - Refusing the 2.2 date is scruple that reads as fussiness
 
@@ -358,9 +360,9 @@ two are Wikipedia (23 July 2020) and a comment in your own vendor README (Decemb
 not two public records disagreeing; it is one public record and one internal note. EPA's own release
 material settles it. Publishing the refusal invites the reader to think the disagreement is deeper
 than it is, and the section title -- *"What we could not verify"* -- is doing real work elsewhere on
-this page and should be spent on things that genuinely resist checking.
+this page and should be spent on things that genuinely resist checking. **Give the estimate as around early 2020**.
 
-RULE EDR-22: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-22: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ---
 
@@ -380,3 +382,94 @@ Stated so a later pass does not "improve" it:
 - *"a phone in tall mode"*, and the indefinite article in it.
 - LibreWaterNet's stakeholder section: four named kinds of person, no donation button, and
   *"A wish list is a specification."* That is the best line on either site.
+
+---
+
+# What was done, 2026-09-06
+
+Tom ruled `fix` on all 23, with three amendments (EDR-07 the takeaway is a screen capture; EDR-14
+the two dates supplied; EDR-18 the bolded path). Two calls put to him in the interview:
+**EDR-18 drop §7's explanation and leave the package name unprinted**, and **EDR-05 a system font
+stack rather than self-hosting**, which is why the drawing-sheet type is plainer than it was.
+
+Both sites are edited and committed. **Neither site repository is pushed** — a push publishes, and
+the copy on both is now different enough that it should be read once before it is public. The
+commands are at the end.
+
+| Key | Done |
+|---|---|
+| EDR-01/02/03/04 | All three LibreWaterNet pages are real documents: doctype, `<html lang="en">`, `<head>`, `<body>`, viewport, description, canonical, Open Graph and Twitter card. Titles rewritten so they stand alone |
+| EDR-05 | Google Fonts gone. Three CSS variables (`--font-ui`, `--font-cond`, `--font-serif`) carry a system stack. **The condensed drafting labels are noticeably plainer**; that is the cost you chose |
+| EDR-06 | Nothing to do here: the commit is already pushed and the host has not pulled. **Yours to deploy** |
+| EDR-07 | *"it publishes a map"* is now *"it letters the map well enough to put in a report"*; the **Publish** heading is **Label**; the paragraph says what leaves the screen is a screen capture |
+| EDR-08 | Eleven |
+| EDR-09 | Row 2.11b: 41 ramps in all, 35 of them Brewer's (18 sequential, 9 diverging, 8 qualitative) |
+| EDR-10 | Backslashes gone; the `PUBLIC_REWRITES` entry that produced them is retired and the list is empty, with a note saying an empty list is the correct state |
+| EDR-11 | `EC` is now `github.com/hawstom/engcalcs`, linked. Two other `~/webdev/...` citations went with it |
+| EDR-12 | 2.3.5, fixed upstream in `dev/features-source.md` so the rebuild keeps it |
+| EDR-13 | The boasting is gone from both sites. **Deep honesty** → **Honesty**, **Deep gratitude** → **Gratitude**, *said without decoration* → *What we are*, and eleven self-praising clauses cut. Written into both working guides as a rule |
+| EDR-14 | Item 3 carries your two dates and says what follows from them |
+| EDR-15 | The tics: the fragment stack, three "not X; it is Y" pivots, two reassurance codas, *startling amount*, *worth spelling out* |
+| EDR-16 | 28 em dashes in visitor text → **0**, and check 6 on each site fails on the next one |
+| EDR-17 | `optimisation`/`characterisation`/`pressurised` → `-ize`/`-ized`. Apostrophes typographic throughout, including in the generated feature list, which needed a change in `tools/build-features.php` |
+| EDR-18 | §7's explanation deleted. The credit stands as written; no name, no reason published |
+| EDR-19 | The poke at the reader is gone; the disclosure is not |
+| EDR-20 | *"in the public domain in the United States by operation of law, and distributed to the world on that basis"*, with ledger row 4.12a |
+| EDR-21 | Anonymised in the README **and on the live ledger page**, see EDR-26 |
+| EDR-22 | *"around early 2020"*, marked as an approximation, in `epanet.html` and in ledger §6 |
+| EDR-23 | Replaced with the features page's own better sentence |
+
+**Six new checks, mutation-tested.** `librewaternet.org/check.sh` grew document structure, no
+cross-origin fetch, and the em-dash ratchet; `not-epanet.org/check.sh` did not exist and now holds
+six. Testing them by planting violations paid immediately: **the first draft of both em-dash checks
+was blind**, because a sed range over `<script src=...></script>` deletes to end of file and a
+`s/<!--.*-->//g` over a joined file deletes everything between the first and last comment. A check
+that deletes its own haystack passes.
+
+## Four more findings, found while fixing
+
+## EDR-24 - HIGH - "no board" was still on the front page
+
+`index.html` said *"There is no foundation, no board and no governing document"*. You have a board
+member; not-epanet.org removed the same claim on your instruction earlier the same day, and the
+flagship kept it. Now *"no foundation and no governing document"*.
+
+**This is EDR-07's shape twice in one review**, which is why it is written into both working guides
+as a rule rather than left as two corrections.
+
+RULE EDR-24: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR-25 - MEDIUM - The features page was nine features behind its own source
+
+The page said *"53 things it does"*; `dev/features.md` had 62. The count is generated, so the page
+was simply built from an older source and nobody rebuilt it. Rebuilding was necessary to carry the
+`-ize` and dash fixes through the generated block, so **the page now publishes nine feature
+sentences you have not read on this site** — each one your own text from `features-source.md`, each
+citing a closed task, but new to the public page. Worth ten minutes of reading before the push.
+
+RULE EDR-25: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR-26 - HIGH - The name was on the live ledger, not only in the README
+
+EDR-21 said a README on a public repository named a board member. While anonymising it, the same
+name, credential and country turned up in **ledger row 3.7, on the published page**. Removed from
+the ledger, the README, and this file. `check.sh` check 6 now fails on `Firstname Lastname, P.E.`
+anywhere in the site's HTML or Markdown; it holds the slip that happened and cannot hold the general
+rule, which is a person's judgement.
+
+RULE EDR-26: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR-27 - LOW - Every screenshot declared the wrong size
+
+Sixteen `<img>` tags declared `width="1920" height="920"` against files that are 1917x919, 1922x918,
+838x879 and so on. The browser reserves the declared box and then paints a slightly different one,
+which is a small layout shift on every image. Corrected from the files themselves.
+
+RULE EDR-27: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## To publish
+
+```sh
+cd ~/webdev/librewaternet.org && sh check.sh && git push     # then pull on the host
+cd ~/webdev/not-epanet.org   && sh check.sh && git push
+```

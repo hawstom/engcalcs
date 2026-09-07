@@ -36,7 +36,7 @@ have something to generate; the wording is his call, not ours.
 
 ## The calculators
 
-- 13| Manning pipe flow solves in both directions — the flow from a depth, and the depth from a flow.
+- 13| Manning pipe flow solves in both directions: the flow from a depth, and the depth from a flow.
 - 52, 65| Every pipe and channel page checks the velocity it just computed and says when it is too fast or too slow.
 - 6, 12| Orifice flow, and the time a tank takes to drain through one.
 - 16| Micro-hydropower, from gross head and penstock losses to the power a small site can actually deliver.
@@ -51,7 +51,7 @@ have something to generate; the wording is his call, not ours.
 
 ## Drawing a water network
 
-- 146.02| A drawing toolbar — junction, reservoir, tank, pipe, pump, valve and text — placed by clicking the map.
+- 146.02| A drawing toolbar (junction, reservoir, tank, pipe, pump, valve and text), placed by clicking the map.
 - 146.08, 447| Many named projects, saved in your own browser, each open in its own tab.
 - 344| The property box is a window you can drag out of your way, not a panel that owns an edge of the screen.
 - 345| ID prefixes you choose, with Apply to all for when you change your mind.
@@ -71,7 +71,7 @@ have something to generate; the wording is his call, not ours.
 ## Solving it
 
 - 146| A looped network solved by the global gradient method, in the page, with no install and no upload.
-- 451| Or solved by the EPANET 2.3 engine itself, compiled into the page and named by version where you can see it.
+- 451| Or solved by the EPANET 2.3.5 engine itself, compiled into the page and named by version where you can see it.
 - 419| Standard gravity throughout, and where the two engines disagree the page tells you by how much.
 - 467| Answers follow your edits as you make them, and if a big network makes that slow, it is a project setting you can turn off.
 
@@ -89,15 +89,15 @@ have something to generate; the wording is his call, not ours.
 - 196| Opens EPANET `.inp` files, takes the part it supports, and reports every difference instead of dropping it quietly.
 - 483| An import note is filed on the element it concerns, and you read it in that element's own property box.
 - 281| Writes `.inp` files back out. Every value you did not edit comes back exactly as it went in, character for character.
-- 246| Projects are `.lwn` files — JSON inside, on your own disk, readable without us.
+- 246| Projects are `.lwn` files: JSON inside, on your own disk, readable without us.
 - 314, 257, 454| An examples library that opens Net1, Net2, Net3, Elm Street Center and a Net3 placed on the world, in one click.
 
 ## The map and the world
 
 - 145| A geographic project is drawn in latitude and longitude over a street map or satellite imagery, with the same drawing tools.
-- 476| An existing x/y network can be placed on the world — moved, scaled and rotated onto its real ground.
+- 476| An existing x/y network can be placed on the world, moved, scaled and rotated onto its real ground.
 - 437| Type a place name and the map goes there, if you turn that on.
-- 497| Ground elevations read from terrain data and typed into the document — as each node is drawn, or over a set you found — never replacing a number without your having asked for exactly that.
+- 497| Ground elevations read from terrain data and typed into the document (as each node is drawn, or over a set you found), never replacing a number without your having asked for exactly that.
 
 ## Labels and lettering
 
@@ -111,7 +111,7 @@ have something to generate; the wording is his call, not ours.
 
 ## Reading the results
 
-- 434, 455| A table for each kind of part in the bottom pane — junctions, reservoirs, tanks, pipes, pumps and valves.
+- 434, 455| A table for each kind of part in the bottom pane: junctions, reservoirs, tanks, pipes, pumps and valves.
 - 384, 327| Colour the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 colour ramps.
 - 409, 433, 506| Profiles. Click along the map to choose the path, and see ground, hydraulic grade and the pressure between them.
 - 510| A profile path is saved with the project under a name you give it, and a project holds as many of them as you draw.
