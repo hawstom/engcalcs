@@ -607,6 +607,21 @@
             "on": "No links at node",
             "ruled": "2026-08-29"
         },
+        "lpn_find_filter_btn": {
+            "on": "Filter in current table",
+            "ruled": "2026-09-07",
+            "answer": "Edited."
+        },
+        "lpn_find_filter_table": {
+            "on": "Table to filter",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_find_filter_tip": {
+            "on": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
         "lpn_find_op_conn_nolinksource": {
             "on": "no link path to a source",
             "ruled": "2026-09-01"
@@ -744,6 +759,16 @@
         "lpn_gpv_curve_source_tip": {
             "on": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
             "ruled": "2026-09-06"
+        },
+        "lpn_help_not_epanet": {
+            "on": "Not EPANET",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_help_screenshots": {
+            "on": "Screenshot gallery",
+            "ruled": "2026-09-07",
+            "answer": "Edited."
         },
         "lpn_inp_drop_energy": {
             "on": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
@@ -968,6 +993,21 @@
         "lpn_new_units_tip": {
             "on": "A project keeps its own units, so this choice belongs to this project alone and nothing here is saved as a browser setting. To start new projects a particular way, save an empty project as your template and make a copy of it each time.",
             "ruled": "2026-09-04"
+        },
+        "lpn_pane_filter_clear": {
+            "on": "Show all",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_pane_filter_none": {
+            "on": "Nothing in this table matches the filter.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
+        },
+        "lpn_pane_filter_note": {
+            "on": "Filtered by {q}. Showing {n} of {all}.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
         },
         "lpn_profile_delete": {
             "on": "Delete path",
@@ -1499,6 +1539,11 @@
         "lpn_time_run_report_copy": {
             "on": "Copy",
             "ruled": "2026-09-04"
+        },
+        "lpn_tool_key_hint": {
+            "on": "Shortcut: press {key}.",
+            "ruled": "2026-09-07",
+            "answer": "OK."
         },
         "lpn_wrong_btn": {
             "on": "Something wrong here?",

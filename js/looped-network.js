@@ -9991,7 +9991,7 @@ var EngCalcs = EngCalcs || {};
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
 			'Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
-		btn.textContent = pc.lpn_find_filter_btn || 'Filter in tables';
+		btn.textContent = pc.lpn_find_filter_btn || 'Filter in current table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
 		box.appendChild(row);
@@ -19563,7 +19563,7 @@ var EngCalcs = EngCalcs || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			{ icon: 'help', label: pc.lpn_help_screenshots || 'Pictures of this page in use', fn: ext(LPN_SCREENSHOTS_URL) },
+			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
 			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
 			// ONE row in this menu that does not open a new tab, because it does not leave the page
