@@ -978,9 +978,26 @@ So the notice says the worst case out loud and promises nothing:
 > 26-month limit stated below is about our usage counts and does not reach it. We would rather tell
 > you that than offer you a period we do not control.
 
-**The rule this leaves behind, and it is the more useful outcome than a rotation interval:** a
-retention period is a PROMISE ABOUT YOUR OWN CONDUCT, so state one only where you control the
-deletion. We control `trim_logs.php`, which is why 26 months can be promised and is; we do not
-control the host's domlogs, so the honest disclosure is the worst case, not a period read off a
-checkbox that somebody could untick a year from now without telling us. **A number here would have
-aged into a lie the first time the hosting plan changed.**
+**Then he corrected the correction, and this is the part worth keeping:** *"I'd rather not say
+that we don't control the log. In fact we do control them. Just look at `~/logs` on production."*
+
+I had written *"the log belongs to the hosting service rather than to this site, we do not manage
+it"* — which is **not a hedge, it is a disclaimer of responsibility, and it is false.** The file is
+in his own hosting account. He can delete it this afternoon. Writing that a log is somebody else's
+when it is sitting in your own home directory is exactly the move a privacy notice should never
+make, and it is worse than the guess it replaced: the guess was wrong about a number, this was
+wrong about who is answerable.
+
+**So the rule is not the one I wrote.** A retention period is a promise about your own conduct, and
+what makes it promisable is a MECHANISM, not ownership. We own both logs. We have a mechanism for
+one of them — `trim_logs.php`, which is why 26 months is promised and kept — and none for the other
+yet. The notice now says precisely that: the log is ours, nobody else is given it, we can delete it
+whenever we choose, and there is **no period to tell you yet** rather than a period a reader should
+assume is short.
+
+**Which leaves an obvious, cheap piece of work that is nobody's task yet:** the same treatment for
+the access log that Task 286 gave the usage counts. Not a rotation interval read off a cPanel
+checkbox, but a line in the same crontab that already runs four EngCalcs jobs on that account,
+deleting `~/logs` entries past a period Tom picks. Then the notice states a number and the number
+is true because something enforces it, which is the whole argument of that task and of this file's
+own rule about prose against scripts. **Tom's call, not mine to add to the roadmap.**

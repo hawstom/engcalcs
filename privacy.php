@@ -114,7 +114,8 @@ its last activity.</p>
 running</em></h3>
 
 <p>Separately from anything above, the web server that sends you these pages keeps a standard
-access log, as almost every web server does. <strong>It records the IP address of each request</strong>,
+access log, as almost every web server does. It is written into our own hosting account, so it is
+ours and not a third party&rsquo;s. <strong>It records the IP address of each request</strong>,
 along with the time, the page asked for, the response, and the browser&rsquo;s own description of
 itself. It is written by the server software before this site&rsquo;s code runs, so it happens
 whatever you answer to the counting question, and there is no way for a website to offer you a
@@ -126,9 +127,11 @@ you</strong>, and we never join it to the usage counts described in section 1. N
 and it goes nowhere else.</p>
 
 <p><strong>We make no promise about how long it is kept, and it may stay on the server
-indefinitely.</strong> The log belongs to the hosting service rather than to this site, we do not
-manage it, and the 26-month limit stated below is about our usage counts and does not reach it. We
-would rather tell you that than offer you a period we do not control.</p>
+indefinitely.</strong> The log is ours: it sits in our own hosting account, nobody else is given
+it, and we can delete it whenever we choose. What we have not done is put it on a deletion schedule
+the way we have for the usage counts below, whose 26-month limit does not reach it. So the honest
+answer is that there is no period to tell you yet, rather than a period you should assume is
+short.</p>
 
 <p>This is the one place on this site where your IP address is written down. We say so plainly here
 because a privacy notice that quietly omits the server log is the commonest way one of these
