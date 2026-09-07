@@ -547,8 +547,15 @@ the block.
     named it as the paradigm to follow, not merely as prior art:**
     1. **One toolbar location, three Select Area modes** -- window, lasso, polygon -- cycled from
        that single slot, by clicking the icon again repeatedly. Three modes, one square of toolbar.
-       *(Corrected by Tom 2026-09-06: the earlier version of this line also offered a tiny arrow at
-       the icon's lower-right corner. There is no arrow. Repeated clicks are the whole mechanism.)*
+       - **THE TRIANGLE IN THE LOWER-RIGHT CORNER IS A DISCLOSURE INDICATOR, NOT A SECOND TARGET**
+         (Tom, 2026-09-06, working it out: *"The little triangle in the LR corner is, I guess, just
+         an indicator that there is more to the button. Maybe it's a convention?"* -- it is, and a
+         well-settled one: Adobe's tool flyouts, the Windows split button, and macOS all use a
+         corner or edge triangle to say "this control holds more than it shows"). So **we owe the
+         indicator whether or not anything can be clicked on it.** Cycling on repeated clicks is
+         undiscoverable by itself: a user who does not already know presses the button once, gets
+         window select, and never learns the other two exist. The triangle is the only thing that
+         says to press it again.
     2. **Properties opens with a COLLAPSIBLE HEADING PER TYPE selected**, so a selection holding
        pipes and junctions shows both and neither is hidden.
     3. **Editing any value in that multi-properties view sets it on every asset of that type in
