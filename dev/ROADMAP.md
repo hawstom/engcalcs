@@ -809,42 +809,35 @@ the block.
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 
 - 100|186| **Make the Tables pane spreadsheet-interoperable.**
-  **GATE, Tom 2026-09-06: this and Task 185 go to 100 IF AND ONLY IF all of the EPANET file is
-  implemented.** *"Let's prioritize these two as 100 if and only if all of the EPANET file is
-  implemented."* Not a deadline and not a decay -- a CONDITION, so the priority stays 75 until the
-  `.inp` work is genuinely finished and then both move together. Whoever closes the last EPANET-file
-  row owes this promotion; Task 593 is the nearest open one.
-  - **HIS SPEC, VERBATIM AND IN HIS OWN NUMBERING** (2026-09-06), which is broader than the
-    out-then-in plan below and supersedes it as the definition of done:
-    1. **Cells abut each other like Google Sheets** -- appearance, not just behaviour.
-    2. **Keyboard navigation** by arrows, `Ctrl`+arrows, `Home`, `End`, `Ctrl`+`Home`,
-       `Ctrl`+`End`, and `Ctrl`+`Shift`+`PageUp` / `Ctrl`+`Shift`+`PageDn` for the next table
-       (*"lower priority, but very cool"* -- his words, so the table-switch pair may ship late).
-    3. **Blocks and ranges selectable for clipboard copy**, by mouse drag or by `Shift`+arrows and
-       `Ctrl`+`Shift`+arrows.
-  - **The `data-entry-clerk` owns the arithmetic here and has already ranked it**: one extra
-    keystroke times four hundred rows is an hour. Its wish list asks for this widened beyond the
-    scalar-only version and says so explicitly. Ask it before designing the selection model.
-  Reworked by Tom 2026-08-25: *"186 reworked to make our Tables spreadsheet-interoperable."* The
-  original asked for a whole table-paradigm EDITOR (*"For the future a table-paradigm editor with
-  spreadsheet-like copy and paste would be very cool"*, 2026-07-30). **The rework is smaller and
-  better aimed: we already HAVE tables — make them talk to a spreadsheet.**
-  - **Out means copy and paste that lands correctly**, with the headers, in the units on the strip.
-    The pane already builds the rows; what a spreadsheet needs is tab-separated text on the
-    clipboard, which is a formatter, not an editor.
-  - **In is the harder half and is where the old task's real content survives**: paste parsing,
-    per-column unit handling, undo integration, and validation of every pasted cell. **A paste is
-    the user typing, so every rule about the user's own numbers applies to it.**
-  - **Do the OUT direction first and separately.** It is most of the value — a model that already
-    exists in a spreadsheet is the case Tom named, and getting a report out is what a submittal
-    needs — and it cannot corrupt anything.
-  - Distinct from Task 146.04 (node/link report tables), which is read-only reporting.
-  - **The Library's Curves grid already does both directions, for curves alone** (Task 588): a
-    spreadsheet paste in, a Copy points button out, TSV either way. It is the worked example of the
-    paste rules above rather than a claim on this task -- `libPasteCells()`, `libDropNameColumn()`
-    and `libMergePaste()` in `js/looped-network.js` are pure and reusable, and the Tables pane's own
-    per-column units are the part they do not answer.
-
+  **RAISED TO 100 BY TOM, 2026-09-06.** (The earlier gate -- 100 only once all of the EPANET file
+  is implemented -- is superseded by his own promotion.) Reworked from the 2026-07-30 request for a
+  whole table-paradigm EDITOR: we already HAVE tables, so make them talk to a spreadsheet.
+  - **HIS SPEC, VERBATIM AND IN HIS OWN NUMBERING** (2026-09-06): 1. cells abut each other like
+    Google Sheets, in appearance and not only in behaviour; 2. keyboard navigation by arrows,
+    `Ctrl`+arrows, `Home`, `End`, `Ctrl`+`Home`, `Ctrl`+`End`, and `Ctrl`+`Shift`+`PageUp`/`PageDn`
+    for the next table (*"lower priority, but very cool"* -- so that pair may ship late); 3. blocks
+    and ranges selectable for clipboard copy, by mouse drag or by `Shift`+arrows and
+    `Ctrl`+`Shift`+arrows.
+  - **THE SELECTION MODEL IS SPECIFIED, by the `data-entry-clerk`, 2026-09-06** -- anchor plus
+    focus, one per table tab, with the per-key table including the edge cases. Its journal entry
+    (`dev/agents/data-entry-clerk/journal.md`, fourth invocation) is the buildable spec and the
+    roadmap does not restate it.
+  - **THE ONE THING THAT DECIDES WHETHER THIS WORKS:** every editable cell is its own
+    `<input type="number">`, and a browser's native drag-select cannot span two inputs at all.
+    Range highlight and copy must be built on application state and a `copy` listener -- never on
+    native selection -- and the cells must migrate to `type="text"` with `inputmode="decimal"`,
+    exactly as the Curves grid already had to. Selection is keyed on `(elementId, columnKey)`,
+    because `paneTableSignature` replaces the whole `tbody` on any sort or filter.
+  - **Slice in this order** (the clerk's, and it owns the keystrokes-times-400-rows arithmetic):
+    range copy; arrow navigation; the Home/End family; paste IN, which is real design work about ID
+    collisions and validation rather than a slice of the first three; the table-switch pair last.
+  - **Copy is TSV built from `paneCellText()`**, so it cannot disagree with the screen or the print
+    sheet; headers and units on a whole-table copy only; a filtered table copies what it shows, for
+    free, because Task 597 removes non-matching rows rather than hiding them. **A paste is the user
+    typing**, so every rule about the user's own numbers applies to it.
+  - Distinct from Task 146.04 (read-only report tables). The Library's Curves grid already does both
+    directions for curves alone (Task 588) and is the worked example: `libPasteCells()`,
+    `libDropNameColumn()`, `libMergePaste()`, `libCopyOut()`.
 - 5|191| **Junction emitters: surface the pressure-dependent demand already solved.**
   Originated during Task 146. Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
   row: *"Do we have emitters? Do we do something with this?"* The honest answer was **no** — that
