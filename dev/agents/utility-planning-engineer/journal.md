@@ -1579,3 +1579,143 @@ network is edited again) attached to the EXISTING Scenario mechanism, not a seco
 paradigm sitting beside it. This is a direct disagreement with treating the Run Manager finding as
 "go build one" — it is evidence the STORAGE model needs a new axis, not evidence the INTERFACE
 needs seven tabs.
+
+## 2026-09-06 — Task 465/590 design constraints (Tom's ruling stands; not re-litigating)
+
+Tom raised both to priority 100 and linked them explicitly (ROADMAP.md:596-601): a fittings
+picker and a library pipe are the same indirection from two ends, so design them together or the
+second re-litigates the first's `effective()` resolution layer. My prior recommendation to park
+465 was superseded 2026-09-06 by his own specified shape (contents of a library pipe are the
+user's choice; a library-defined property is DISABLED in the element popup). That ruling stands.
+This entry is design-constraint research for the build, not a second opinion on whether to build.
+
+### Q1 — what must a library pipe CONTAIN, and in what order
+
+**CITED, aggregated from published utility design-standards manuals surfaced this pass** (search
+results synthesizing Harrisonburg VA, Rockford IL, El Paso Water, Virginia Beach design-standards
+PDFs; I could not get readable text out of the PDFs directly — pdftoppm unavailable in this
+environment — so treat the specific numbers as secondary/aggregator-sourced, the STRUCTURE as the
+reliable part): a utility's own approved-pipe-materials table is organized **by material and
+pressure class first**, with diameter and a design C-factor as columns under each — e.g. "8-inch
+C900 PVC," "12-inch cement-lined ductile iron," each row carrying its own C. Rockford IL's own
+manual (title surfaced directly, CITED) states design use of Hazen-Williams **C = 100** suite-wide
+for the design case, not a new-pipe catalog value — consistent with the general aging finding
+below.
+
+**CITED, general Hazen-Williams-by-material literature (aggregator synthesis, treat as
+directionally right, re-verify a specific number before publishing it in a spec):** new PVC/HDPE
+~150, new cement-lined ductile iron ~140, new unlined cast/ductile iron ~130, but a **design**
+C-factor for metallic pipe is commonly discounted well below the new-pipe value — into the
+100–120 range — because "design" means a pipe 15–20 years into service, not new. **This is the
+concrete answer to "roughness is a function of material AND age": a real utility's own standard
+does not solve this by adding an age field to a pipe-type table — it solves it by publishing a
+DESIGN C already discounted for expected aging**, one number per material/class row, and expects
+the pipe to be re-evaluated (not the type edited) as it actually ages. Tom's ruling — split into
+two library pipes if two ages matter — is consistent with how the real standard tables already
+work: they are organized by material/class, not by material/class/age.
+
+**What follows for CONTENTS and ORDER, for a library pipe definition to map onto a real
+standard:** the fields that recur across a utility's own material/class rows are the ones that
+belong in the type — **Material/class label, Diameter, design Roughness (C or Darcy-Weisbach
+equivalent), and optionally a default minor-loss/fittings-set reference (this is where 465 and 590
+meet)**. Fields that are inherently per-instance and must NEVER be in a type: Length, the two node
+references, Status (open/closed is operational, not a material property). Order: **label/name
+first (matching how a utility's own table is keyed — by material and class), then Diameter, then
+Roughness, then the optional fittings-set reference** — mirroring Tom's own instruction that the
+Library pipe selector sits "immediately after ID" on the pipe popup, i.e., identity-then-physical-
+properties in both places.
+
+### Q2 — fittings: named list + quantity, summed, is the right model, and it is the market's model
+
+**CITED, Crane Technical Paper 410** (aggregator-sourced this pass, structure confirmed by
+multiple independent summaries): the K-method the whole market is built on. K = n·f_T per fitting
+TYPE and PIPE SIZE (n a fixed L/D-equivalent ratio, f_T the fully-turbulent friction factor for
+that size), and Ks for fittings in series **sum directly** — a 90° elbow ≈0.3–0.8, a globe valve
+≈6 vs a gate valve ≈0.15 at the same size, illustrating the spread a bare single k field on a pipe
+cannot honestly represent today.
+
+**CITED, Bentley's own "Minor Loss Collection" dialog** (`docs.bentley.com`, StormCAD/WaterGEMS,
+fetched directly): exactly the shape ROADMAP Task 590 already proposes — three columns, Quantity /
+Minor Loss (a picker into a library) / Headloss Coefficient (read-only, populated from the
+library), and the page's own words: "the number of minor losses of the same type **to be added**
+to the composite minor loss for the pipe" — i.e., **sum(quantity_i × k_i)**, additive in series,
+which is the same physical assumption Crane's own method rests on (each fitting is a separate
+turbulent loss in the same flow path). **This confirms the model Task 590 already specifies is
+the market's own model, not a guess.** Named-fittings-list-with-quantity, summed, is right; there
+is no alternative in active commercial use I could find (KYPipe's SigmaM is cited in the roadmap
+block already and matches the same shape).
+
+### Q3 — the one thing that most often goes wrong: name-based binding instead of stable-id binding
+
+**CITED, Bentley's own Engineering Libraries documentation** (`docs.bentley.com`, fetched
+directly): *"Items are synchronized based on their label. If the label is the same, then the
+item's values will be made the same."* **And, same page: no confirmation step is documented before
+a library edit propagates to every model using it** — "the changes automatically affect all
+hydraulic models using that entry," silent, on load. Two separate defects bundled in one design,
+and this suite has already independently solved the second one (Task 586, `doc.curves` holds
+`{id,...}`, a rename carries every reference rather than breaking the link) without ever solving
+the first, because the first didn't exist as a problem until *this* task introduces a
+document-external-feeling "library" concept for the first time. **The first is the one to name
+explicitly before building 465/590: if a library pipe type or a fitting definition is ever
+identified by its NAME rather than a stable id, an import that happens to reuse a name (a second
+project's "8-inch PVC" merged into this one, or a rename that collides) silently re-points every
+element that referenced it — with no warning, because from the software's point of view nothing
+changed, a label still matches a label.** Task 586's pattern (id-keyed, rename carries references,
+delete-in-use refused by name) already avoids this; the requirement is simply: do not let 465/590
+regress to name-keying for the sake of a "looks like a dropdown of names" picker UI. The picker's
+displayed text can be the name; the stored reference must be the id, exactly as it is for curves.
+
+### Q4 — disabled-and-showing-inherited-value is right for a scalar; the missing piece is a detach action, not a what-if preview
+
+Task 586's own pattern for curves is a **click-through** (a chooser plus a link to the Curves
+library, no point-editing in the element popup) because a curve is a multi-row table that does not
+fit in a property row. A library pipe's roughness or diameter is a single scalar, so the
+Task 465 shape Tom specified — disabled control, inherited value shown inline — is the right
+analogue at THIS grain: a designer reviewing a pipe still needs to read its effective roughness at
+a glance (for a hand check, for a report) without a click-through, and a disabled field showing
+the resolved number does that. **I do not think a designer additionally needs to see "what it
+would be if detached"** — that is a hypothetical with no real audience once deletion-in-use is
+refused by name (the Task 586 pattern this task should also adopt): there is no scenario where the
+type silently disappears out from under an element, so there is nothing to preview.
+
+**What IS a real, load-bearing gap if the shape stops at reference-and-disable: no exception
+path.** Every real network eventually has one element of a type that needs to deviate without
+splitting the whole type (a single service tap retrofitted with a different fitting set, one pipe
+relined after a break) — and Tom's own answer to the aging objection ("define two library pipes")
+does not cover a true one-off. WaterGEMS's own Prototype-vs-Engineering-Library split exists
+partly for this reason (SPECULATION, mine, not directly cited: a stamp-forward Prototype produces
+one-off editable values by design, precisely because a live-linked library cannot). **Recommend
+a "detach from library" action on the disabled control**: it copies the current effective value(s)
+into the element as a plain local override and drops the reference, turning the field back into an
+ordinary editable one. Without it, the only way to make one pipe an exception is to fork the whole
+library entry — which is the propagation problem in reverse (now you have two "8-inch PVC" types
+differing in one pipe's worth of reality) and is exactly the kind of silent-drift failure mode
+real utilities keep asset registers to prevent.
+
+### Q5 — export-alert scoping: two different things flatten, and a single alert message would blur them
+
+`.inp` has no concept of a pipe TYPE and no concept of a named fitting — EPANET's `[PIPES]` table
+carries exactly one `MinorLoss` number per pipe (OBSERVED convention stated in ROADMAP.md:325,
+"Curves export fine, because EPANET has curves" — the same sentence is false for both 465 and 590,
+neither has an EPANET counterpart). Two DIFFERENT things are lost on export, and they should not
+collapse into one alert sentence:
+
+1. **A library pipe reference flattens**: the shared definition disappears and N pipes each carry
+   their own copy of its resolved numeric values (byte-identical numbers, per the suite's own
+   absolute rule — nothing about the numbers is wrong). What is lost is the INDIRECTION: editing
+   the export file's "one pipe" no longer edits the other 399.
+2. **A fittings list flattens to a sum**: the numbers were already exportable before this feature
+   existed (a bare `k` has always been one EPANET column) — what's NEW and lost is the ITEMIZATION,
+   the named-fitting-and-quantity breakdown that justified the number. A pipe with `k=2.3` from
+   "2 elbows + 1 tee" and a pipe with a hand-typed `k=2.3` export identically, and only the first
+   had anything to lose.
+
+**The alert must not fire on every nonzero-k pipe** — that would be noise on networks that have
+never touched the new picker, since a hand-typed `k` predates both tasks and always exported fine.
+It should fire only where a pipe's `k` is DERIVED from a fittings-list reference, and its wording
+should name what's lost (the itemization) rather than reuse the library-pipe-type wording (the
+indirection) — a designer reading "this pipe's type was flattened" when what actually happened is
+"the elbow-count breakdown was flattened" will look for the wrong kind of information loss on the
+next open. Recommend two distinct alert sentences sharing one mechanism (both are already the
+"say what's flattening and how many elements it affects" discipline ROADMAP.md:321-326 already
+commits to for 465), not one generic "some pipes were flattened" line.
