@@ -277,6 +277,19 @@ echoHeader("EngCalcs", $html_title, "", false);
 			      // d-print-none although the box around it is not: a printed sheet should carry
 			      // the diagnostic and cannot carry a button. pointer-events:auto because the
 			      // overlay stack it sits in is inert. ?><button type="button" id="lpn_wrong_status_btn" class="lpn-wrong-btn d-print-none"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button></p>
+			<?php // THE ENGINE WAIT (ROADMAP Task 608). Its own row in this column rather than a
+			      // second writer of the diagnostic or of the one-shot notice, because it outlives
+			      // both: it stands for as long as the download does, and every solve in between
+			      // rewrites #lpn_status while a notice expires after eight seconds.
+			      //
+			      // It is a PROGRESS REPORT and not the advertisement Task 605 struck: it appears
+			      // only for a network that cannot be solved without the engine, only while the file
+			      // is in flight, and it goes when the file lands. Filled and shown by
+			      // refreshEpanetBanner() in looped-network.js, which is its one writer.
+			      //
+			      // d-print-none, unlike the diagnostic beside it: a printed sheet should say why a
+			      // drawing has no answers, and "still loading" will not be true of the paper. ?>
+			<p id="lpn_engine_banner" class="d-print-none" role="status" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:rgba(255,255,255,.9);border:1px solid #05a"></p>
 		</div>
 		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 		      // saving a project put a line of text above the canvas and "moves the map down past the
@@ -1587,6 +1600,10 @@ EngCalcs.pageConfig = {
 	lpn_engine_fetching_valve: <?=json_encode($ec_lang['lpn_engine_fetching_valve'])?>,
 	lpn_engine_ready_valve: <?=json_encode($ec_lang['lpn_engine_ready_valve'])?>,
 	lpn_engine_unavailable: <?=json_encode($ec_lang['lpn_engine_unavailable'])?>,
+<?php   // The Task 608 pair: the wait a reader is currently in, and the one failure a background
+        // fetch is entitled to report, because without the engine this network has no answers. ?>
+	lpn_engine_needed_loading: <?=json_encode($ec_lang['lpn_engine_needed_loading'])?>,
+	lpn_engine_needed_failed: <?=json_encode($ec_lang['lpn_engine_needed_failed'])?>,
 	lpn_diag_valve_needs_epanet: <?=json_encode($ec_lang['lpn_diag_valve_needs_epanet'])?>,
 	lpn_diag_valve_on_fixed_head: <?=json_encode($ec_lang['lpn_diag_valve_on_fixed_head'])?>,
 	lpn_settings_default_is: <?=json_encode($ec_lang['lpn_settings_default_is'])?>,
@@ -2169,6 +2186,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_tolerance_tip: <?=json_encode($ec_lang['lpn_settings_tolerance_tip'])?>,
 	lpn_settings_engine_native: <?=json_encode($ec_lang['lpn_settings_engine_native'])?>,
 	lpn_settings_engine_native_tip: <?=json_encode($ec_lang['lpn_settings_engine_native_tip'])?>,
+	lpn_settings_engine_native_off: <?=json_encode($ec_lang['lpn_settings_engine_native_off'])?>,
 	lpn_engine_loading: <?=json_encode($ec_lang['lpn_engine_loading'])?>,
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
 	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,

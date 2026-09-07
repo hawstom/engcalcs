@@ -427,6 +427,23 @@ EngCalcs.lpnEpanetOnlyValves = function (model) {
 	return out;
 };
 
+// **IS THERE ENOUGH HERE FOR AN ANSWER TO MEAN ANYTHING?** (Task 608.)
+//
+// The page needs this to decide when to start fetching the EPANET engine in the background, and it
+// must not grow a second opinion about what a solve needs. So the definition is borrowed rather
+// than written: lpnDiagnose() below already refuses an unsound network BY NAME, and asked with no
+// engine it answers the engine-independent question "is this network sound?". A network it accepts
+// is a network either engine could be handed.
+//
+// The one thing lpnDiagnose() is silent about is a drawing with nothing in it to solve: a lone
+// reservoir is perfectly sound and answers nothing, because a head with no link off it is not a
+// hydraulic question. Hence the link count -- one fixed head and one link is the floor.
+EngCalcs.lpnIsSolveable = function (model) {
+	if (!model || !model.nodes || !model.links) { return false; }
+	if (model.links.length === 0) { return false; }
+	return EngCalcs.lpnDiagnose(model).length === 0;
+};
+
 // The minor-loss coefficient a link actually contributes, stated ONCE because it is read in two
 // places (the iteration and the report) and they must not diverge.
 //

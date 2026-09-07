@@ -24143,9 +24143,23 @@ var EngCalcs = EngCalcs || {};
 		// `settings.engine` KEEPS its `epanet`/`native` vocabulary in storage, untouched, so no
 		// saved project changes meaning. Display polarity and storage polarity are different
 		// things, and the two lines below are the whole of the inversion.
+		//
+		// **AND WHERE THE NETWORK ITSELF SETTLES THE QUESTION, THE BOX IS DISABLED AND SAYS WHY**
+		// (Task 608, Tom 2026-09-06: *"If there is anything that the built-in solver can't handle, we
+		// disable the built-in solver"*). Disabled rather than hidden, with the reason under it: a
+		// control that greys out with nothing beside it is worse than one that lies, because the
+		// reader is left to guess at their own software.
+		//
+		// **settings.engine IS NOT WRITTEN HERE, AND THAT IS TASK 602'S RULE, NOT A DETAIL.** The
+		// setting is the user's PREFERENCE and the routing is a FACT ABOUT THIS NETWORK, so a
+		// network's contents may not reach into a stored preference. The disabled state is a
+		// rendering of the network as it stands, and it comes back the moment the network no longer
+		// needs EPANET -- which is only true because nothing was overwritten meanwhile.
+		var engineForced = networkNeedsEpanet();
 		var engInput = document.createElement('input');
 		engInput.type = 'checkbox';
 		engInput.checked = (settings.engine !== 'epanet');
+		engInput.disabled = engineForced;
 		engInput.addEventListener('change', function () {
 			settings.engine = engInput.checked ? 'native' : 'epanet';
 			// A different engine makes the engine-difference notes new again (Task 525).
@@ -24156,6 +24170,9 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip);
+		if (engineForced) {
+			note(compBody, pc.lpn_settings_engine_native_off || 'This network can only be solved by the EPANET solver, so the built-in solver is not offered for it. Your own choice is not changed, and this box works again as soon as the network no longer needs the EPANET solver.');
+		}
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET
@@ -31652,7 +31669,14 @@ var EngCalcs = EngCalcs || {};
 			refreshLabelText();
 			return;
 		}
-		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
+		var model = assembleModel();
+		// **THE EPANET FETCH STARTS HERE, BEFORE ANY OPINION ABOUT THE NETWORK IS FORMED** (Task
+		// 608). This is the one function every edit's debounce and every Calculate demand arrive at,
+		// so it is the one place the two triggers Tom named are already together. Both calls below
+		// are silent and both are cheap; the state machine makes the fetch itself once-only.
+		maybeWarmEpanetInBackground(model);
+		syncEpanetNeed(model);
+		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
@@ -31705,6 +31729,14 @@ var EngCalcs = EngCalcs || {};
 	// be solved by it -- when the user picks an active valve type, or turns the engine on -- because
 	// they are necessarily online then, having just loaded the page.
 	//
+	// **AND SINCE TASK 605 MADE EPANET THE PAGE DEFAULT, THAT IS NO LONGER EARLY ENOUGH** (Task 608,
+	// Tom 2026-09-06: *"We always start, if not present, an EPANET fetch in the background as soon as
+	// there is a solveable network or a Calculate demand."*). A first-time visitor who draws an
+	// ordinary network of pipes and junctions now waits 664 KB at their first solve, having asked for
+	// nothing and having been told nothing. So the fetch also starts the moment the drawing becomes
+	// a network an engine could be handed -- see maybeWarmEpanetInBackground() below, and
+	// EngCalcs.lpnIsSolveable in js/lpn-solver.js for what that means.
+	//
 	// IT IS NOT A GATE. A user who is offline right now may still build a PRV: refusing would block
 	// them from DESIGNING a network they intend to solve later. What changes is WHEN they are told --
 	// at the moment they choose the type, while they can still act on it.
@@ -31712,24 +31744,37 @@ var EngCalcs = EngCalcs || {};
 	// Waiting for the debounced solve to trigger the load is not enough: the gap between choosing a
 	// valve type and the solve firing is exactly where a phone drops its connection.
 	var epanetWarmState = 'cold';   // cold | warming | ready | unavailable
-	// `why` is 'valve' or 'engine'. THE SAME FETCH HAS TWO REASONS and one message cannot be true of
-	// both: Tom turned the solver on and was told about valves he had not created (2026-08-14).
+	// `why` is 'valve', 'engine' or 'background'. THE SAME FETCH HAS THREE REASONS and one message
+	// cannot be true of all of them: Tom turned the solver on and was told about valves he had not
+	// created (2026-08-14).
+	//
+	// **AND THE BACKGROUND REASON SAYS NOTHING AT ALL, IN EITHER DIRECTION** (Task 608). The user
+	// asked for nothing on that path, so a message about it is noise -- and a failure report is
+	// noise twice over, because nobody is waiting on it. The two reasons where somebody IS waiting
+	// keep every word they had. What the background fetch may still put on screen is the Part 2
+	// banner, and only for a network that cannot be solved without it; refreshEpanetBanner() owns
+	// that and asks the network, not the reason.
 	function warmEpanetEngine(why) {
 		var pc = EngCalcs.pageConfig || {},
+			quiet = (why === 'background'),
 			suffix = (why === 'valve') ? '_valve' : '';
 		if (!EngCalcs.lpnEpanetLoad) { return; }
 		// 'unavailable' is retried on purpose -- the engine load no longer caches a failure
 		// (js/lpn-epanet.js), so a user who was offline a moment ago gets another attempt the next
-		// time they touch a valve, which is the moment they care.
+		// time they touch a valve, which is the moment they care. The BACKGROUND leg does not retry:
+		// see maybeWarmEpanetInBackground(), which refuses to start from any state but 'cold'.
 		if (epanetWarmState === 'warming' || epanetWarmState === 'ready') { return; }
 		epanetWarmState = 'warming';
-		setNotice(pc['lpn_engine_fetching' + suffix] || 'Getting the EPANET solver.');
+		if (!quiet) { setNotice(pc['lpn_engine_fetching' + suffix] || 'Getting the EPANET solver.'); }
+		refreshEpanetBanner();
 		EngCalcs.lpnEpanetLoad().then(function () {
 			epanetWarmState = 'ready';
-			setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.');
+			if (!quiet) { setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.'); }
+			refreshEpanetBanner();
 		}, function () {
 			epanetWarmState = 'unavailable';
-			setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.');
+			if (!quiet) { setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.'); }
+			refreshEpanetBanner();
 		});
 	}
 	// Warm if the document ALREADY holds a valve only EPANET can solve -- opening a saved project or
@@ -31738,8 +31783,90 @@ var EngCalcs = EngCalcs || {};
 	function warmEpanetIfNeeded() {
 		if (!EngCalcs.lpnEpanetOnlyValves) { return; }
 		try {
-			if (EngCalcs.lpnEpanetOnlyValves(assembleModel()).length > 0) { warmEpanetEngine('valve'); }
+			var model = assembleModel();
+			// The arriving document decides the checkbox and the banner too, and it decides them
+			// before any solve has run: opening a file with a PRV in it is exactly the moment the
+			// built-in solver stops being available for it.
+			syncEpanetNeed(model);
+			if (EngCalcs.lpnEpanetOnlyValves(model).length > 0) { warmEpanetEngine('valve'); }
 		} catch (e) { /* a half-built document is not a reason to shout */ }
+	}
+
+	// ---- WHEN ONLY EPANET WILL DO (Task 608, part 2) ---------------------------------------------
+	//
+	// TWO THINGS PUT A NETWORK BEYOND THE BUILT-IN SOLVER, and both lines are drawn elsewhere: an
+	// active PRV/PSV/FCV (EngCalcs.lpnValveIsNative, reached through lpnEpanetOnlyValves) and a
+	// document that states a duration (EngCalcs.lpnTimeIsExtended). This is the one place the page
+	// asks the two together, so the checkbox and the banner cannot come to different answers.
+	function modelNeedsEpanet(model) {
+		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) { return true; }
+		return !!(EngCalcs.lpnEpanetOnlyValves && EngCalcs.lpnEpanetOnlyValves(model).length > 0);
+	}
+	// The same question when no model is to hand -- the settings panel being rebuilt, for instance.
+	// A half-built document is not an answer of "yes", so it answers no rather than throwing.
+	function networkNeedsEpanet() {
+		try { return modelNeedsEpanet(assembleModel()); } catch (e) { return false; }
+	}
+	// Remembered ONLY to notice the moment the answer changes, because that is when the settings
+	// panel has to be repainted. Never read as the answer itself: networkNeedsEpanet() is, live, at
+	// every render. It starts FALSE rather than null because that is what an empty new project
+	// renders as, and a null would repaint the whole panel once on every page's first solve for
+	// nothing.
+	var epanetNeedLast = false;
+	function syncEpanetNeed(model) {
+		var need = modelNeedsEpanet(model);
+		if (need !== epanetNeedLast) {
+			epanetNeedLast = need;
+			// The checkbox is a RENDERING OF THIS NETWORK, so it comes back by itself the moment the
+			// network no longer needs EPANET. rebuildSettingsFields() and not rebuildSettingsBox():
+			// the Time section holds the duration field somebody may be typing in, and it is not
+			// this function's to redraw.
+			rebuildSettingsFields();
+		}
+		refreshEpanetBanner();
+	}
+	// **A PROGRESS REPORT, WHICH IS NOT THE ADVERTISEMENT TASK 605 STRUCK.** 605 removed the welcome
+	// line naming the EPANET solver as something this page offers, and nothing here brings it back:
+	// this sentence appears only for a network that cannot be solved without the engine, only while
+	// the file is actually in flight, and it goes away the moment it lands. A page that offers a
+	// choice and a page that reports a wait the reader is already in are different pages. The words
+	// are Tom's own, 2026-09-06.
+	function refreshEpanetBanner() {
+		var el = document.getElementById('lpn_engine_banner'),
+			pc = EngCalcs.pageConfig || {},
+			text = '';
+		if (!el) { return; }
+		if (networkNeedsEpanet()) {
+			if (epanetWarmState === 'warming') {
+				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
+			} else if (epanetWarmState === 'unavailable') {
+				// The one case where a failed background fetch IS the user's business: without the
+				// engine this network has no answers at all, so silence would be a blank page with
+				// no reason given.
+				text = pc.lpn_engine_needed_failed || 'The EPANET solver could not be loaded, and this network can only be solved by it. Connect to the internet once and it is kept on this device from then on.';
+			}
+		}
+		el.textContent = text;
+		el.style.display = text ? 'block' : 'none';
+	}
+	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
+	// timer of its own:
+	//   * runSolve() is the only caller, and every edit reaches it through scheduleSolve()'s 300 ms
+	//     debounce -- so a burst of typing or a drag is one call, not one per keystroke or frame.
+	//     The other door into runSolve() is the Calculate demand itself (the Project menu row and the
+	//     toolbar button, through js/lpn-time.js's host.solveNow), which is the second half of what
+	//     Tom asked for.
+	//   * epanetWarmState leaves 'cold' on the first attempt and never returns to it, so the fetch
+	//     is started at most once whatever happens afterwards -- a failure included, because a
+	//     network drawn offline would otherwise re-request 664 KB after every edit.
+	// SILENT on both legs -- start and failure alike. See warmEpanetEngine()'s `quiet`.
+	function maybeWarmEpanetInBackground(model) {
+		if (epanetWarmState !== 'cold') { return; }
+		// A network that is not yet solveable but already holds a PRV is worth fetching for: the
+		// user is building towards a network only this engine can answer, and telling them at the
+		// end of the build is telling them too late.
+		if (!(EngCalcs.lpnIsSolveable && EngCalcs.lpnIsSolveable(model)) && !modelNeedsEpanet(model)) { return; }
+		warmEpanetEngine('background');
 	}
 
 	// ---- Fire flow: the whole-system sweep (ROADMAP Task 530) -----------------------------------

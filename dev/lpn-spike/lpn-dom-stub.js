@@ -334,6 +334,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // is the shape that deletes the button on every solve -- so a stub missing it would have made
   // the regression this feature can cause untestable.
   'lpn_status_text', 'lpn_status_notes', 'lpn_wrong_btn', 'lpn_wrong_status_btn',
+  // The engine-wait banner (ROADMAP Task 608), a third row of the same top-left column. Absent
+  // from this list, refreshEpanetBanner() returns at its first line and the whole of Part 2 --
+  // the sentence Tom wrote and the failure that replaces it -- is invisible to every harness.
+  'lpn_engine_banner',
   // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
   // its first line in every harness and the licence credit was the one piece of map chrome no test
   // could see -- which is how it shipped invisible on the boot path (Task 486).
