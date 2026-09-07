@@ -546,8 +546,9 @@ the block.
   - **RAISED TO 100 BY TOM, 2026-09-06, WITH THE SHAPE HE WANTS DISCLOSED -- epanet-js's, and he
     named it as the paradigm to follow, not merely as prior art:**
     1. **One toolbar location, three Select Area modes** -- window, lasso, polygon -- cycled from
-       that single slot, either by clicking the tiny arrow at its lower-right corner or by
-       clicking the icon again. Three modes, one square of toolbar.
+       that single slot, by clicking the icon again repeatedly. Three modes, one square of toolbar.
+       *(Corrected by Tom 2026-09-06: the earlier version of this line also offered a tiny arrow at
+       the icon's lower-right corner. There is no arrow. Repeated clicks are the whole mechanism.)*
     2. **Properties opens with a COLLAPSIBLE HEADING PER TYPE selected**, so a selection holding
        pipes and junctions shows both and neither is hidden.
     3. **Editing any value in that multi-properties view sets it on every asset of that type in

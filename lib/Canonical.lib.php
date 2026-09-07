@@ -8,9 +8,9 @@
  * WHY THIS FILE EXISTS (ROADMAP Task 479.01, 2026-09-06).
  *
  * `ec_canonical_url()` built the path from `$_SERVER['SCRIPT_NAME']`, which is exactly right while
- * every page answers at the address of its own script. It stopped being right the day '/app'
+ * every page answers at the address of its own script. It stopped being right the day '/app/'
  * landed: that is a rewrite onto Looped-Network.php, so SCRIPT_NAME under it is still
- * '/engcalcs/Looped-Network.php' and the page served at https://librewaternet.org/app nominated
+ * '/engcalcs/Looped-Network.php' and the page served at https://librewaternet.org/app/ nominated
  * https://librewaternet.org/engcalcs/Looped-Network.php instead -- in `<link rel="canonical">`, in
  * every hreflang alternate and in `og:url`, because all three read that one function. The pretty
  * URL was therefore the one address in the suite that could not be indexed.
@@ -36,15 +36,28 @@
  * parameter is appended by ec_canonical_url() exactly as it is for an ordinary page.
  *
  * A PAGE HAS ONE CANONICAL ADDRESS, so the OTHER path keeps working and defers. Looped-Network.php
- * is genuinely served at both '/engcalcs/Looped-Network.php' and '/app'; naming '/app' here makes
- * both of them, on both domains, emit the '/app' canonical -- which is the entire point, since two
+ * is genuinely served at both '/engcalcs/Looped-Network.php' and '/app/'; naming '/app/' here makes
+ * both of them, on both domains, emit the '/app/' canonical -- which is the entire point, since two
  * copies each nominating themselves is the split that divides one page's ranking signal in half.
+ *
+ * **THE TRAILING SLASH IS LOAD-BEARING AND IT COST A LIVE DEFECT** (2026-09-06). This said '/app'
+ * for one afternoon, and then '/app' was made to 301 to '/app/' so that the web app manifest's
+ * scope could contain it -- manifest scope is compared as a plain STRING PREFIX, so a scope of
+ * '/app' also matches '/apple-anything'. The two were written hours apart and neither was wrong
+ * when it was written; together they had every page, and all 545 sitemap URLs, NOMINATING AN
+ * ADDRESS THAT REDIRECTS. A canonical pointing at a redirect is the ambiguity this whole task
+ * exists to remove, and it was found by curling the live site rather than by any check.
+ *
+ * **SO THE RULE IS NOW EXACT-MATCH AGAINST THE MOUNT, not merely under it**, and
+ * canonical_path_check.php holds it: ecSwMounts() has declared '/app/' since the day the mount
+ * existed, so the mismatch was latent from the start and an exact-match rule would have caught it
+ * before the redirect ever made it visible.
  *
  * @return array<string,string> page filename => root-anchored canonical path.
  */
 function ecCanonicalPaths() {
     return array(
-        'Looped-Network.php' => '/app',
+        'Looped-Network.php' => '/app/',
     );
 }
 

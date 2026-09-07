@@ -30,7 +30,7 @@ $langOld = "\$path = isset(\$_SERVER['SCRIPT_NAME']) ? \$_SERVER['SCRIPT_NAME'] 
         . "if (substr(\$path, -10) === '/index.php') \$path = substr(\$path, 0, -9);\n";
 $mapOK  = "\$path = ecCanonicalPath('/engcalcs/' . \$file);\n";
 $mapOld = "\$path = (\$file === 'index.php') ? '/engcalcs/' : '/engcalcs/' . \$file;\n";
-$good   = ['Looped-Network.php' => '/app'];
+$good   = ['Looped-Network.php' => '/app/'];
 
 $cases = [
     // ---- what it MUST find -----------------------------------------------------------------
@@ -43,17 +43,25 @@ $cases = [
     ['a canonical path under no declared mount -- indexed, and uncontrollable by the worker',
         [['Looped-Network.php' => '/editor'], $mounts, $base, $pages, $langOK, $mapOK], true],
     ['TWO PAGES CLAIMING ONE URL, which is the split wearing a different hat',
-        [['Looped-Network.php' => '/app', 'Manning-Pipe-Flow.php' => '/app'], $mounts, $base, $pages, $langOK, $mapOK], true],
+        [['Looped-Network.php' => '/app/', 'Manning-Pipe-Flow.php' => '/app/'], $mounts, $base, $pages, $langOK, $mapOK], true],
     ['a "pretty" URL inside EC_SW_BASE, where the script already answers at its own address',
         [['Looped-Network.php' => '/engcalcs/app'], $mounts, $base, $pages, $langOK, $mapOK], true],
-    ['a trailing slash, because /app and /app/ are two addresses and only one may be canonical',
-        [['Looped-Network.php' => '/app/'], $mounts, $base, $pages, $langOK, $mapOK], true],
+    // **THE SHIPPED DEFECT, VERBATIM, AND IT INVERTED THIS FIXTURE.** It read the other way round
+    // until 2026-09-06 -- a trailing slash was the defect and '/app' was correct -- which is what
+    // let the declaration disagree with ecSwMounts()'s own '/app/' from the first day. Once '/app'
+    // was made to 301 to '/app/' for the manifest's scope, every page and all 545 sitemap URLs
+    // nominated an address that redirects. Found by curling the live site; no check saw it.
+    ['the slashless form of a declared mount, which is the address that redirects',
+        [['Looped-Network.php' => '/app'], $mounts, $base, $pages, $langOK, $mapOK], true],
+    // A slash that is NOT a mount is still an invented second address, so that half survives.
+    ['a trailing slash on a path no mount declares',
+        [['Looped-Network.php' => '/pipe/'], $mounts, $base, $pages, $langOK, $mapOK], true],
     ['a query string in the declaration, which would double the ?lang= the caller appends',
-        [['Looped-Network.php' => '/app?v=2'], $mounts, $base, $pages, $langOK, $mapOK], true],
+        [['Looped-Network.php' => '/app/?v=2'], $mounts, $base, $pages, $langOK, $mapOK], true],
     ['a path that is not root-anchored, so it would fuse onto the origin',
         [['Looped-Network.php' => 'app'], $mounts, $base, $pages, $langOK, $mapOK], true],
     ['a declared page that does not exist -- a rename of the script, silent on every screen',
-        [['Looped-Net.php' => '/app'], $mounts, $base, $pages, $langOK, $mapOK], true],
+        [['Looped-Net.php' => '/app/'], $mounts, $base, $pages, $langOK, $mapOK], true],
 
     // ---- what it must NOT find -------------------------------------------------------------
     ['the tree as it stands: one pretty URL, declared, mounted and read by both callers',
@@ -61,8 +69,14 @@ $cases = [
     ['NO pretty URL and no mount but EC_SW_BASE -- the suite before /app, which was correct',
         [[], ['/engcalcs/' => 'the only mount'], $base, $pages, $langOK, $mapOK], false],
     ['a second pretty URL, properly declared and mounted alongside the first',
-        [['Looped-Network.php' => '/app', 'Manning-Pipe-Flow.php' => '/pipe'],
+        [['Looped-Network.php' => '/app/', 'Manning-Pipe-Flow.php' => '/pipe/'],
          $mounts + ['/pipe/' => 'a second pretty URL'], $base, $pages, $langOK, $mapOK], false],
+    // **A DEEPER PRETTY URL IS STILL LEGAL**, and this fixture is why the slash rule is written
+    // as agreement-with-a-mount rather than as "must end in a slash": '/app/reports' is under the
+    // '/app/' mount, is not a mount itself, and invents no second address.
+    ['a deeper pretty URL under an existing mount, which is not a mount of its own',
+        [['Looped-Network.php' => '/app/', 'Manning-Pipe-Flow.php' => '/app/reports'],
+         $mounts, $base, $pages, $langOK, $mapOK], false],
 ];
 
 $fails = 0;

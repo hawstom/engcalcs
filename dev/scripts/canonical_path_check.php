@@ -15,9 +15,10 @@
  *
  * WHAT IS ASSERTED
  *   1. Every page in ecCanonicalPaths() (lib/Canonical.lib.php) is a real page in the repo root.
- *   2. Every declared path is root-anchored, carries no query string and no trailing slash, and
- *      is NOT under EC_SW_BASE -- a "pretty" URL inside /engcalcs/ is the script's own address
- *      wearing a hat, and two pages could then claim one URL.
+ *   2. Every declared path is root-anchored, carries no query string, AGREES WITH ITS MOUNT about
+ *      the trailing slash, and is NOT under EC_SW_BASE -- a "pretty" URL inside /engcalcs/ is the
+ *      script's own address wearing a hat, and two pages could then claim one URL. The slash is
+ *      the half that cost a live defect; see the rule's own comment.
  *   3. No two pages claim the same path.
  *   4. Every declared path is covered by a mount ecSwMounts() declares. A canonical URL outside
  *      every mount is an address the service worker cannot control: the visitor who arrives at the
@@ -67,9 +68,25 @@ function ecCanonicalPathFindings(array $pretty, array $mounts, $swBase, array $p
             $out[] = "canonical path '$path' for '$page' carries a query string. ec_canonical_url() "
                    . "appends '?lang=xx' itself.";
         }
-        if (strlen($path) > 1 && substr($path, -1) === '/') {
-            $out[] = "canonical path '$path' for '$page' has a trailing slash. A pretty URL is one "
-                   . "address, and '/app' and '/app/' are two.";
+        // **'/app' AND '/app/' ARE TWO ADDRESSES, AND THE ONE THAT COUNTS IS THE MOUNT'S.**
+        // This rule used to forbid a trailing slash outright, and that was backwards: it was
+        // written when '/app' was the only address, and hours later '/app' was made to 301 to
+        // '/app/' so the web app manifest's scope could contain it. ecSwMounts() had said '/app/'
+        // since the mount existed, so the declaration and the mount disagreed from the first day,
+        // and the old rule INSISTED on the disagreement. The result was live for one afternoon:
+        // every page, and all 545 sitemap URLs, nominating an address that redirects.
+        //
+        // So the rule is agreement with the mount, in both directions, and it deliberately still
+        // permits a deeper pretty URL ('/app/reports') that is not a mount of its own.
+        if (isset($mounts[$path . '/'])) {
+            $out[] = "canonical path '$path' for '$page' is the slashless form of the mount "
+                   . "'{$path}/' that ecSwMounts() declares. '$path' and '{$path}/' are two "
+                   . "addresses; nominate the one the mount, the manifest scope and the server "
+                   . "redirect already agree on, which is '{$path}/'.";
+        } elseif (strlen($path) > 1 && substr($path, -1) === '/' && !isset($mounts[$path])) {
+            $out[] = "canonical path '$path' for '$page' ends in a slash but is not a mount "
+                   . "ecSwMounts() declares. A trailing slash is right only where it IS the "
+                   . "mount's own address; anywhere else it invents a second address for one page.";
         }
         if (strpos($path, $swBase) === 0) {
             $out[] = "canonical path '$path' for '$page' is under EC_SW_BASE ('$swBase'), where every "
