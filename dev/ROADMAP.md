@@ -280,19 +280,6 @@ the block.
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 100|605| **Retire the built-in solver from view: EPANET is simply the solver.**
-  Tom, 2026-09-06, the day after Task 602 renamed the checkbox: *"I think it's time to retire the
-  built-in solver, or at least to keep very quiet about it."* Three parts, in his own numbering:
-  1. **"Always use the EPANET solver" is the page default.** A new project solves through EPANET.
-  2. **No more banner about the EPANET solver.**
-  3. **Scrub every tip and alert for undue weight on the existence of two solvers.** He asked
-     directly for a DEEP audit of the language, not a spot fix.
-  - **The code stays; the advertising goes.** The built-in solver is what answers when EPANET is
-    unreachable, which is the offline promise, so this is a change to defaults and wording rather
-    than a deletion. What must stop is the page teaching every user that there is a choice to make.
-  - **The setting is a preference and the routing is a fact** (Task 602's rule): changing the
-    DEFAULT is legal, rewriting a stored `settings.engine` on a file somebody saved is not.
-
 - 25|607| **A moving picture of drawing a pipe -- Task 178's phase 2, extracted on close.**
   A filmstrip GIF from `dev/filmstrip-gif-recipe.md` of the add-pipe / add-junction workflow. A
   2026-07-30 proof of concept showed it is cheap once set up -- the hard part is precise SVG click
