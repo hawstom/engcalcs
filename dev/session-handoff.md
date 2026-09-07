@@ -1,4 +1,4 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-06
+# Session handoff — written 2026-09-05, state refreshed 2026-09-06 (third session)
 
 **Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of one
 unusually dense day and it goes stale fast: everything below is either a RULING Tom made (permanent
@@ -13,9 +13,9 @@ you can tell). Delete a state line once you have checked it and it is no longer 
 Sep 17, that would be very cool."*** That is 12 days from the day this was written, and the thing
 standing in the way is not code.
 
-- `dev/new-english-keys.md` stood at **59 still to read, 136 untranslated** at the end of this
-  session, all `lpn_`. It was **0 still to read** that morning; one day of EPANET work added them all.
-  **He read them. It stands at 3 on 2026-09-06** -- see §4.
+- `dev/new-english-keys.md` swung from **0 still to read** to 59 and back inside two days. **He has
+  read everything outstanding: it stands at 0 still to read on 2026-09-06**, and the nine keys still
+  untranslated all carry his ruling. Read the count from the script, never from this line.
 - **A sprint before he has read them is paid work thrown away** — that is what sprint 459 recorded,
   when nine agents translated a payload that disagreed with the source. Do not launch one on a
   general "proceed"; CLAUDE.md requires explicit authorization and it means it.
@@ -53,6 +53,35 @@ standing in the way is not code.
   not parity. Flagged to him; he has not asked for it.
 
 ---
+
+## 2b. THE EDITORIAL REVIEW, 2026-09-06 — `dev/editorial-review.md` is the ONE file
+
+Tom asked for a senior editor's reading of both public sites, ruled on all 23 findings the same day,
+then asked for a second pass over the application's own pages and a third. **Everything lands in
+`dev/editorial-review.md`** — one file, appended passes, keys never restarting (`EDR-`, `EDR2-`,
+`EDR3-`), on his instruction: *"Let's avoid proliferating copies and let's try to honor One True
+Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he has marked.
+
+- **THE ENGLISH THE PRODUCT SHIPS IS CLEAN AND THE MARKETING PROSE WAS NOT.** Swept: 1,697 shipped
+  strings, **zero** marketing-slop words. Both sites, meanwhile, were announcing their own honesty
+  in eleven places. Tom, on one clause: *"Methinkest thou boastest too much."* **Write the fact and
+  stop.** Every clause praising the page's own conduct is gone from both sites, and the rule is in
+  both working guides.
+- **EDR2-01 IS DONE AND IS WORTH KNOWING ABOUT ANYWAY**: `lib/Language.Settings.php` had
+  `Francais` and `Portugues` — two of the four CORE languages, spelled without their own
+  diacritics, in the language menu of every page in all 27 languages, while every other name
+  carried its accents and while librewaternet.org spelled both correctly. Fixed 2026-09-06. **The
+  general lesson is that nothing checks LANGNAME against anything**, so the next one will be silent
+  too; `language_declaration_check.php` asserts a LANGNAME exists and says nothing about what is in
+  it.
+- **EDR2-11, accepted as recommended (his words), so it is a standing note rather than a task:**
+  67 em dashes remain in shipped English, concentrated in `privacy.php` and `terms.php` where they
+  do real parenthetical work. The ratchet may fall and may not rise. **If a sprint touches those two
+  pages for another reason, lower the baseline while you are in there** — do not open a sweep for
+  it, and do not retranslate meaning that did not move.
+- **Both site repositories are committed and NOT pushed**, deliberately: a push publishes, and the
+  copy changed enough to be read first. `sh check.sh && git push` in each, then pull on the host for
+  librewaternet.org.
 
 ## 3. TRAPS MEASURED ON THIS TREE — each one cost real time
 
@@ -109,11 +138,13 @@ standing in the way is not code.
 `doc.curves` is the store; all four EPANET kinds exist as library objects; a tank USES its volume
 curve. The harnesses assert it. Nothing here needs believing.
 
-**THE TRANSLATION BACKLOG IS SMALL AND IS NOT ZERO ANY MORE.** `detect_english_drift.php` reports
-the keys changed by this session's builds and `new_english_keys.php` the ones written new. **Read
-both scripts rather than this line** — it is the number that goes stale fastest in this file, and an
-earlier version of it sized a sprint against work that was already done. There is no sprint worth
-26 agents until the count is worth it; accumulate, then propose once.
+**THE TRANSLATION BACKLOG IS ACCUMULATING ON PURPOSE.** On 2026-09-06, after Task 605, it stood at
+**31 CHANGED and 9 NEW**. **Read the two scripts rather than this line** — it is the number that goes
+stale fastest in this file, and an earlier version of it sized a sprint against work that was already
+done. **The judgement that keeps being re-made and should not be: do not sprint into churning
+English.** Task 605 alone moved 25 shipped values, and the pipe library is moving more. One sprint
+after the churn settles costs 26 agents; two sprints across it cost 52 and the first one's output is
+partly thrown away. Accumulate, then propose once.
 
 **`lpn_scncmp_at` no longer gates anything.** Tom ruled in conversation on 2026-09-06 — the English
 stands as `{value} at {id}`. The `$ec_lang_syn` half was PROPOSED and is still unwritten: it needs
@@ -130,7 +161,17 @@ the slow one to undo.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-**FOUR RULINGS WERE SPENT ON 2026-09-06 AND ALL FOUR ARE NOW BUILT. Do not re-ask, and do not
+**A SECOND ROUND OF RULINGS LANDED THE SAME DAY AND IS ALSO BUILT.** Task **605** retired the
+built-in solver from view -- `epanet` is the default, the gallery banner lost its engine clause, and
+25 English values stopped framing EPANET as one of two options; what deliberately SURVIVED is every
+sentence a reader meets only when something has gone wrong, because a fallback that does not say
+what answered is worse than one that does. Task **606** fixed the box-height cap that did not follow
+its box. Task **178** closed on his word, with its filmstrip half extracted as Task 607. **His Help
+menu order is now his own numbered list and is asserted**, which reverses where 596 put Not EPANET.
+**The open question 605 leaves is the PRECACHE and it is his**: the ~664 KB engine is not in the
+service worker's manifest, so a first-time visitor now fetches it on their first solve.
+
+**FOUR EARLIER RULINGS WERE SPENT ON 2026-09-06 AND ALL FOUR ARE NOW BUILT. Do not re-ask, and do not
 re-propose the alternatives they declined.** 596 shipped as an lpn-only Help row and **the
 suite-wide footer link stays DECLINED**. 602 shipped as label (a) with the DISPLAY inverted and
 `settings.engine` untouched in storage — a project stating `epanet` still selects EPANET and now
@@ -138,6 +179,14 @@ shows the box unticked. 479's code half is above. 574 is CLOSED, and the answer 
 in no `.net` at all: EPANET writes it to a separate `.PRO` file through an ordinary save dialog and
 records the path nowhere, so reading one is Task 604 and there is nothing to recover from a project
 file.
+
+**THE PRIORITY 100 BAND IS NOW FIVE ROWS AND FOUR OF THEM WANT `js/looped-network.js`**, which is
+the sequencing problem below stated as a fact about today's backlog rather than as a warning: 465
+(library pipes, with 590's fittings picker resolving through the same `effective()`), 266
+(multi-select, in epanet-js's three-mode paradigm Tom disclosed), 186 (spreadsheet tables, whose
+selection model the `data-entry-clerk` has specified) and 322 (half B, the survey). **Two design
+records were written on 2026-09-06 so the building does not have to re-derive them**:
+`dev/pipe-library-design.md`, and the clerk's fourth journal entry for 186.
 
 **Buildable now, needing nobody:**
 
