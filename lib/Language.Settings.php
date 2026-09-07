@@ -116,7 +116,7 @@ $all_language_settings['fa']=array(
 //-- settings for french
 $all_language_settings['fr']=array(
 'QUALITY'=>'0.85',
-'LANGNAME'=>'Francais',
+'LANGNAME'=>'Français',
 'TITLE_WORDS'=>array(),
 );
 
@@ -180,7 +180,7 @@ $all_language_settings['ps']=array(
 //-- settings for portuguese
 $all_language_settings['pt']=array(
 'QUALITY'=>'0.85',
-'LANGNAME'=>'Portugues',
+'LANGNAME'=>'Português',
 'LANG_USE'=>true,
 // Title words is a list of words that are not capitalized in titles.
 'TITLE_WORDS'=>array(),

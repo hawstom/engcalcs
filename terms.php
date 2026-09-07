@@ -21,15 +21,17 @@ engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <h2>1. What this is</h2>
 
-<p>HawsEDC Calculators is a service and a set of software that comprise a set of engineering
-calculators published and served by Thomas Gail Haws. Using it means accepting these terms.</p>
+<p>HawsEDC Calculators is a set of engineering calculators, published as software and served as
+a website by Thomas Gail Haws. Using it means accepting these terms.</p>
 
 <h2>2. The service is not-for-profit</h2>
 
 <p>The service exists solely to tell you and your community that you are loved. The service is
-costly. It may be offered to you free of charge or costs may be passed through to you. Either way,
-you are invited to be generously mindful of its value to you and to others, its role in your life's
-work, and the alignment of its mission with yours.</p>
+costly. It is offered to you freely today, and if one day it cannot be, costs may be passed through
+to you. That is a statement about this website and not about the software: the software is licensed
+to you under §3 and cannot be taken back, so if the hosted service ever changes, what you already
+have stays yours to run. Either way, you are invited to be generously mindful of its value to you
+and to others, its role in your life's work, and the alignment of its mission with yours.</p>
 
 <h2>3. The software is not-for-profit</h2>
 

@@ -1,4 +1,18 @@
-# Editorial review: LibreWaterNet.org and Not-EPANET.org
+# Editorial review: the two sites and the application
+
+## ONE TRUE COPY. There is no second file.
+
+Tom, 2026-09-06: *"Let's avoid proliferating copies and let's try to honor One True Copy of this."*
+Every editorial pass lands **in this file**, appended as a new PASS section, keeping its own key
+series. A pass that starts a second file starts a second set of rulings, and then his marks are in
+one of them and the work is in the other.
+
+- **The file was renamed on 2026-09-06** from `dev/editorial-review-2026-09-06.md`, and
+  `dev/editorial-review-2-2026-09-06.md` was folded into it and deleted. A date in the name says a
+  document is finished; this one is not.
+- **Keys never restart.** Pass one is `EDR-nn`, pass two `EDR2-nn`, and the next is `EDR3-nn`.
+- **His marks are the record.** Do not rewrite a `RULE` line, ever, except to add the outcome
+  beneath it.
 
 **Read as:** a senior editor at a trade periodical, briefed to find anything that would embarrass
 the masthead if a reader, a rival, or a reporter went looking. Two questions all the way through:
@@ -437,7 +451,7 @@ flagship kept it. Now *"no foundation and no governing document"*.
 **This is EDR-07's shape twice in one review**, which is why it is written into both working guides
 as a rule rather than left as two corrections.
 
-RULE EDR-24: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-24: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-25 - MEDIUM - The features page was nine features behind its own source
 
@@ -447,7 +461,7 @@ was simply built from an older source and nobody rebuilt it. Rebuilding was nece
 sentences you have not read on this site** — each one your own text from `features-source.md`, each
 citing a closed task, but new to the public page. Worth ten minutes of reading before the push.
 
-RULE EDR-25: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-25: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-26 - HIGH - The name was on the live ledger, not only in the README
 
@@ -457,7 +471,7 @@ the ledger, the README, and this file. `check.sh` check 6 now fails on `Firstnam
 anywhere in the site's HTML or Markdown; it holds the slip that happened and cannot hold the general
 rule, which is a person's judgement.
 
-RULE EDR-26: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-26: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## EDR-27 - LOW - Every screenshot declared the wrong size
 
@@ -465,7 +479,7 @@ Sixteen `<img>` tags declared `width="1920" height="920"` against files that are
 838x879 and so on. The browser reserves the declared box and then paints a slightly different one,
 which is a small layout shift on every image. Corrected from the files themselves.
 
-RULE EDR-27: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+RULE EDR-27: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 
 ## To publish
 
@@ -473,3 +487,382 @@ RULE EDR-27: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
 cd ~/webdev/librewaternet.org && sh check.sh && git push     # then pull on the host
 cd ~/webdev/not-epanet.org   && sh check.sh && git push
 ```
+
+---
+
+# PASS TWO, 2026-09-06: the application's own public pages
+
+Pass one reviewed the two marketing sites. This pass reviews **what a visitor actually uses** — the
+suite's own non-calculator pages at `hawsedc.com/engcalcs` — plus the furniture that appears on
+every page of every calculator, which is the most-read text either project owns.
+
+**Reviewed:** the LIVE pages, fetched 2026-09-06: `index.php`, `About.php`, `privacy.php`,
+`terms.php`, `contact.php`, `Install.php`, the header, the navigation and the consent banner. Plus
+a mechanical sweep of all 1,697 shipped English strings.
+
+**Verdict.** The application's own English is the best-written text in either project, and the sweep
+says so: of 1,697 shipped strings, **zero** contain a word from the marketing-slop list (*seamless*,
+*powerful*, *robust*, *leverage*, *intuitive*, *empower*, *unlock*, *dive into*, and eleven more).
+The privacy notice is better than most published by companies with legal departments. What is wrong
+is not style but **age and inconsistency**: three pieces of furniture are years out of date, two of
+the four core languages are misspelled in the language menu, and the terms reserve a right the rest
+of the site promises never to use.
+
+## EDR2-01 - HIGH - Two of the four core languages are misspelled in the language menu
+
+`lib/Language.Settings.php:119` and `:183`:
+
+```
+'LANGNAME'=>'Francais',      // should be Français
+'LANGNAME'=>'Portugues',     // should be Português
+```
+
+Every other language in the menu carries its own diacritics correctly — `Español`, `Türkçe`,
+`Čeština`, `Română`, `Български`, `Kiswahili`. French and Portuguese do not, and they are **two of
+the four core languages**, the ones the whole suite is translated into. The menu is on every page of
+every calculator in all 27 languages.
+
+A visitor whose language is spelled wrong in the menu learns something about how carefully the
+translation behind it was done, before they have read a word of it. It is two characters.
+
+RULE EDR2-01: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-02 - HIGH - "Blog (new in 2009)", on every page of the site
+
+`lib/Menus.lib.php:41`. The link works and the blog is there. The parenthesis has been announcing
+its own novelty for seventeen years, and it is in the navigation of every page the suite serves.
+
+Nothing else on either site is capable of dating the project this precisely. Drop the parenthesis;
+the word "Blog" carries everything it needs to.
+
+RULE EDR2-02: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-03 - HIGH - The terms reserve a right the rest of the site promises never to use
+
+`terms.php`, §2, the operative legal text:
+
+> The service is costly. It may be offered to you free of charge or **costs may be passed through
+> to you.**
+
+`About.php`, two clicks away:
+
+> There is no paid tier, no free tier that can be withdrawn, and no delay before the code becomes
+> yours. The full version you see today is **free for everyone now and forever**.
+
+And LibreWaterNet.org says the same, and not-epanet.org's doors say *"Free, no sign-up"*.
+
+**Strictly, these do not contradict.** About and LibreWaterNet are promising about the SOFTWARE,
+which is GPL v3 and genuinely cannot be taken back; terms §2 is reserving about the SERVICE, which
+is your hosting bill and is a different thing. But no reader performs that separation, the terms are
+what governs, and "free for everyone now and forever" is the sentence they will remember when a
+charge appears.
+
+The fix is one clause in each, not a retreat from either: the software is free forever and cannot
+become otherwise; the hosted service is offered **freely** today and, if it ever cannot be, the software
+is still yours to run. That is both true and better than either sentence alone.
+
+RULE EDR2-03: [ ] fix   [x] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-04 - HIGH - A promise that dates itself, and dated wrong
+
+`contact.php:34`:
+
+> I created this form around 2013. As of 2025, I am still replying promptly. :-)
+
+It is 2026. The sentence's whole job is to reassure a stranger that the form is live, and its own
+date now says the opposite. A hand-maintained date is a promise to maintain it; nobody does.
+
+Say it without a year: "**Many years later,** I still reply to this form myself, usually within a few days." If the
+2013 provenance matters, it can stay — it is the *"As of 2025"* that expires.
+
+**And the emoticon.** I would cut it: this is the page where somebody decides whether a real
+engineer is on the other end, immediately below a line naming you as a Professional Engineer.
+
+RULE EDR2-04: [ ] fix   [x] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-05 - MEDIUM - The privacy notice is silent about the web server's own log
+
+The notice is careful and specific everywhere else, and this is the one gap a data-protection
+reader would find first. It says:
+
+> **We never record your IP address in our usage logs**, and those logs contain no identifier that
+> could be traced back to you.
+
+That is scoped precisely to *our usage logs*, which is honest. But almost every Apache installation
+also keeps an access log with the IP address of every request, kept by the host rather than by the
+application, and the notice never mentions it. Under the GDPR that is processing, and the standard
+answer is one short paragraph: what the server records, why (security and abuse), how long it is
+kept, and that it is never joined to the usage counts.
+
+I cannot check this from here — it depends on the host's configuration, which you know and I do
+not. **If the access log is off, say so and it becomes a strength.** If it is on, the paragraph
+costs nothing and closes the only hole in an otherwise exemplary notice.
+
+RULE EDR2-05: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-06 - MEDIUM - The first sentence of the terms is tangled
+
+> HawsEDC Calculators is a service and a set of software that comprise a set of engineering
+> calculators published and served by Thomas Gail Haws.
+
+"a set of... a set of", and *comprise* is used the wrong way round (a whole comprises its parts).
+The rest of that document is unusually clear, which makes its opening sentence conspicuous.
+
+> HawsEDC Calculators is a set of engineering calculators, published as software and served as a
+> website by Thomas Gail Haws.
+
+RULE EDR2-06: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-07 - MEDIUM - A street address on two public pages
+
+`contact.php` and `privacy.php` both print **859 N Lafayette, Mesa AZ 85201**. The GDPR does want a
+contactable address for the controller, and a P.E. publishing a business address is ordinary. I am
+flagging it only to be sure it is a business address and a deliberate choice, because it is the one
+item on either site that cannot be taken back once it is indexed.
+
+If it is your home, a PO box or a registered agent satisfies the same requirement.
+
+RULE EDR2-07: [ ] fix   [ ] fix as amended   [x] reject   [ ] later   -- TGH:
+
+## EDR2-08 - MEDIUM - The masthead, on every calculator page
+
+> Drop your fears at the door; love is spoken here. You are not ruining everything.
+
+This is not a defect and I am not going to treat it as one. It is the mission, it is stated
+plainly elsewhere in your own words, and a project whose stated purpose is that message should not
+be advised into blandness by an editor.
+
+The one editorial observation worth having: on `index.php`, `About.php` and `terms.php` it is
+framing, and it reads as such. On a calculator page it is the first line above a form somebody
+opened to size a pipe, where the reader has no context for it yet and it is doing its work on the
+least receptive audience the site has. If you ever want it to land harder, the move is fewer
+placements, not softer words.
+
+Entirely your call, and "reject" is a perfectly good answer.
+
+RULE EDR2-08: [ ] fix   [ ] fix as amended   [x] reject   [ ] later   -- TGH: Suggest what would land harder.
+
+## EDR2-09 - LOW - The blog link is `http://`
+
+`lib/Menus.lib.php:41` points at `http://tomsthird.blogspot.com/`, which redirects to HTTPS. One
+character, and it removes a redirect hop on every page.
+
+RULE EDR2-09: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR2-10 - LOW - The consent question is hard to read, and I recommend leaving it alone
+
+> Will you allow us to keep a single digit per page in this browser profile's storage to prevent us
+> from logging its visits repeatedly?
+
+Twenty-six words, two nested purposes, and the reader has to hold "single digit per page" and
+"prevent us from logging repeatedly" at once to answer. A clearer version exists.
+
+**And it should probably not be written.** Changing it means 26 retranslations, and the surrounding
+rules say a changed consent question is an `EC_CONSENT_VERSION` bump that re-asks everybody who has
+already answered. That is a real cost for a sentence that is accurate, and honest about a practice
+most sites do not disclose at all. Recorded so that the next person to notice it can see it was
+noticed and priced.
+
+RULE EDR2-10: [ ] fix   [ ] fix as amended   [ ] reject   [x] later   -- TGH: Suggest something
+
+## EDR2-11 - LOW - Sixty-seven em dashes in shipped English
+
+The suite's ratchet is a baseline, not a sweep, and this is only a note on where they sit: the
+concentration is in `privacy.php` and `terms.php`, the two longest pieces of prose, where the dash
+is doing real parenthetical work and a comma would sometimes be worse. Nothing to do today. If a
+sprint ever touches those pages for another reason, lower the baseline while you are in there.
+
+RULE EDR2-11: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH: Accepted as recommended. Add to handoff doc.
+
+## EDR2-12 - LOW - The offline section leads with the acronym
+
+`About.php`: *"These calculators work as a Progressive Web App (PWA)."* The reader who needs that
+section is the one who does not know the term. Lead with what happens — *"Open any calculator once
+while you are online and all of them keep working when you are not"* — and let the acronym follow
+for the reader who wants to look it up.
+
+RULE EDR2-12: [x] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+---
+
+# What is right, and is worth knowing that it is right
+
+- **1,697 shipped English strings, zero marketing slop.** Swept for *seamless*, *powerful*,
+  *robust*, *leverage*, *delve*, *cutting-edge*, *effortless*, *intuitive*, *unlock*, *empower*,
+  *elevate*, *game-changing*, *in today's...*, *navigate the*, *dive into*, *harness*. Not one
+  match. Most commercial engineering software cannot say that about a single page.
+- **The privacy notice, with the one gap at EDR2-05.** It explains the storage inventory item by
+  item, names what each is for, says which need consent, and describes the three answers. The
+  paragraph distinguishing a map tile ("where you are looking") from a place-name search ("what you
+  typed") is better than the equivalent text at companies with a privacy office.
+- **Terms §4**, on professional responsibility. *"These calculators are tools, not engineers"* is
+  the right sentence in the right place, and the EEA/UK consumer carve-out in §5 and §8 is the
+  detail a careless site omits.
+- **Every navigation link resolves.** All nine, checked.
+
+---
+
+# PASS THREE, 2026-09-06: the snob's read
+
+Tom: *"Give it another go with computer's speed-reading and an elitist snob's nose."* So: everything
+counted first, then read slowly with no goodwill. Both sites after the pass-one edits, plus the
+application pages pass two did not finish.
+
+**What the counting says.** 401 sentences across the five public pages. Sentence openers are varied
+(no opener above 17% on any page); "which" appears 23 times in 9,000 words, which is normal English
+rather than a tic; the negation-per-word rate that flagged `epanet.html` in pass one has come down
+with the trims. **The machine cadence is gone.** What is left is ordinary human unevenness, and the
+findings below are that: six sentences that trip, one claim the product is more honest about than
+the page is, and one headline I would put to you rather than change.
+
+## EDR3-01 - MEDIUM - The page is less honest about `.net` than the program is
+
+LibreWaterNet's index: *"Open an EPANET `.inp` or `.net` file and it tells you every difference it
+found rather than dropping anything quietly."* Two formats, one clause, equal billing.
+
+The program itself, when you open one (`lpn_inp_net_note`):
+
+> This was an EPANET .net file. That is EPANET's own project file, it has no published description,
+> and this page reads it by working the format out from example files, **so use it only when you
+> have nothing else rather than as a dependable route.**
+
+The application warns; the marketing page does not, and `features.html` does not mention `.net` at
+all, so the two pages of the same site disagree about whether the feature exists. This is EDR-07's
+family: a claim that survives because nobody grepped for it after the honest version was written
+somewhere else.
+
+Smallest fix, and it costs the claim nothing: *"...or the `.net` file EPANET saves, which we read by
+working the format out from examples and which the page tells you to trust less."*
+
+RULE EDR3-01: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-02 - LOW - "How good each language is is recorded openly"
+
+LibreWaterNet index. It is grammatical — a noun clause followed by its verb — and every reader will
+read it twice and assume a typo. *"The quality of each language is recorded openly"* says the same
+thing and cannot be misread.
+
+RULE EDR3-02: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-03 - MEDIUM - Two flourishes in one paragraph, on the page's best subject
+
+Same section:
+
+> Your feedback improves every language, English included, **in one long global conversation**.
+
+> **This is the deepest single investment in the project**, and it exists because the people who
+> most need a free network solver are very often not working in English.
+
+The first is a flourish; the second is a superlative about your own effort, which is the pass-one
+category (announcing rather than showing) wearing different clothes. The facts around them are the
+strongest on the page — 27 languages, term-by-term against a glossary, quality recorded openly,
+RTL laid out RTL — and they are doing the work already.
+
+> Your feedback improves every language, English included. ... Nothing else in the project has
+> taken as much work, and it exists because the people who most need a free network solver are
+> very often not working in English.
+
+RULE EDR3-03: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-04 - LOW - A sentence that trips on its own repetition
+
+Screenshots page: *"Nothing here is a mock-up: every frame is the program running in a browser, and
+the numbers on them are numbers it worked out."*
+
+*"...and the numbers on them are its own."*
+
+RULE EDR3-04: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-05 - LOW - "its own separate permission"
+
+not-epanet.org, in the services paragraph. *Own* and *separate* are the same word twice. *"each asks
+its own permission"*. (LibreWaterNet's version of the sentence, *"each one asks separately"*, is
+already right, which is how the duplication shows.)
+
+RULE EDR3-05: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-06 - LOW - My own tribute paragraph is too long in the middle, and it is new today
+
+The credit you asked for is written and epanet-js is named in it. The second paragraph's middle
+sentence runs to 50 words with a polysyndeton in it (*"in evenings and weekends and unpaid hours"*),
+which is exactly the register this review has been cutting elsewhere. Flagging my own rather than
+quietly keeping it. The tightened version:
+
+> They did that work before the age of AI, on their own time, and it is what made it possible for
+> one semi-retired engineer with an AI to build this in a summer. That is not a boast about us. It
+> is the measure of what they left lying around for somebody to pick up.
+
+RULE EDR3-06: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-07 - MEDIUM - "World class and world owned."
+
+The hero headline. **"World owned" is the idea**, it is yours, it is unusual, and the whole page
+earns it. *"World class"* is the half a snob stops on: it is the one self-award on a site that has
+just had every other self-award removed, and it is the sort of claim a reader tests against the
+first rough edge they find. The rhyme is doing the work, which is why it has survived.
+
+I am not going to propose a replacement headline for a phrase that may be yours and load-bearing.
+The question is only whether the first three words are paying their way beside the last three.
+*"World owned."* alone, on two lines, is stronger than either half.
+
+RULE EDR3-07: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+## EDR3-08 - LOW - A claim about somebody else's browser, undated
+
+`Install.php`: *"Firefox does not support installing PWAs on desktop."* True when written, and it is
+a statement about a product that changes without telling us, on a page that will not be re-read for
+years. Either date it (*"as of 2026"*) or make it conditional (*"if your browser offers no install
+option, the calculators still cache and work offline"*), which is the sentence the reader actually
+needs and which cannot go stale.
+
+RULE EDR3-08: [ ] fix   [ ] fix as amended   [ ] reject   [ ] later   -- TGH:
+
+---
+
+# The two suggestions you asked for
+
+## EDR2-08, rejected: what would make the masthead land harder
+
+Your ruling stands and I am not reopening it. You asked what would land harder, so:
+
+**The line is competing with itself in the two places it appears.** On `index.php` and `About.php`
+it is the frame around everything, and it reads as one. On a calculator page it sits above a form in
+the same visual weight as the page furniture, where a reader who came to size a pipe reads it as
+decoration and skips it — which is the one outcome you do not want for that sentence.
+
+Three ways to make it land, cheapest first:
+
+1. **Let it end the page rather than open it.** Above the form it is an interruption; below the
+   answer, after the calculator has just been useful to somebody for free, it is a gift with a note
+   attached. Same words, same pages, different position, and the reader who has been helped is a
+   different reader from the one who has not started.
+2. **Give it one line of attribution.** Unsigned on every page it reads as branding. *"— Tom Haws"*
+   under it, once, makes it a person saying something to you, which is what it is.
+3. **Say it once, whole, somewhere it can breathe** — the About page has the room for the paragraph
+   behind it, and the calculator pages carry the short form linking there. The mission is stated
+   better on `About.php` than in the masthead, and almost nobody reaches `About.php`.
+
+The honest counter-argument, which is why I would try 1 before 3: repetition is how a line like this
+gets into somebody's head, and the people you most want to reach are exactly the ones who will only
+ever see one page.
+
+## EDR2-10, later: what the consent question could say
+
+Filed for whenever a consent-version bump is happening anyway, because the retranslation is the
+cost, not the writing. Current:
+
+> Will you allow us to keep a single digit per page in this browser profile's storage to prevent us
+> from logging its visits repeatedly?
+
+Two purposes nested in one 26-word question. The reader must answer for something they have not been
+told the point of yet. Proposed:
+
+> **May we keep one digit in this browser to remember that we have already counted this page?**
+> It records nothing about you and nothing you type. Without it we cannot tell your second visit
+> from somebody else's first.
+
+Three sentences: the ask, the reassurance, the reason. The reason is last because it is the part
+that makes a *yes* feel reasonable rather than the part that makes the ask sound complicated. It is
+also two words shorter than what is there.
+
+**Do not ship this on its own.** Changing the question re-asks everybody who has already answered.

@@ -31,7 +31,8 @@ Mesa, AZ  85201<br />
 
 <h3><?php echo $ec_lang['contactSendMessage'];?></h3>
 
-<p>I created this form around 2013. As of 2025, I am still replying promptly. :-)</p>
+<p>I created this form around 2013. Many years later, I still reply to it myself, usually
+within a few days.</p>
 
 <div>
 <form class="blue"

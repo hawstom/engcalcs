@@ -38,7 +38,7 @@ function echoMainMenu() {
         array('/engserv.php','Engineering Services'),
         array('/engcalcs/index.php','Engineering Calculators'),
         array('/techdocs.php','Technical Documents'),
-        array('http://tomsthird.blogspot.com/','Blog (new in 2009)'),
+        array('https://tomsthird.blogspot.com/','Blog'),
         array('/thomas','Personal essays'),
         array('/famtree.php','Collaborative Family Trees'),
         array('/engcalcs/contact.php','Contact')

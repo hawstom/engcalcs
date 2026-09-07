@@ -53,6 +53,22 @@ Consequences, so the rule is operational rather than a sentiment:
     everywhere. LibreWaterNet's own lead is still the invitation, not a comparison. And EPANET is
     not a competitor in the sense this rule was written about: it is public-domain federal software
     we vendor and depend on, which is why the exception is arguable at all.
+  - **A SECOND EXCEPTION, GRANTED 2026-09-06: `epanet-js` IS NAMED, IN THE GRATITUDE LIST.** The
+    not-epanet.org gratitude page credited the browser build of the engine by licence, author and
+    function while withholding its name, and its own published ledger explained why: a ban on
+    naming competing products, and a similarly-named web application by other people. An editorial
+    review put it back to Tom — a page whose subject is deep gratitude, admitting in an appendix
+    that it will not name a benefactor for competitive reasons, is the paragraph a hostile reporter
+    would quote — and he lifted the ban for the name, in the generous direction rather than the
+    silent one: *"We can include epanetjs by adding a wand-waved credit to all the other software
+    that has extended EPANET over the years... A lot of nerds worked really hard. And everybody is
+    a hero; a tragically wounded hero, but a hero nonetheless."*
+    **The scope is a LIBRARY WE DEPEND ON, not an application we compete with.** epanet-js is
+    vendored, MIT, and runs every EPANET solve this suite performs; the honest way to credit a
+    library is to say what it is called. The similarly-named application is still not named
+    anywhere, and no live commercial trademark is. The credit sits inside a tribute to everybody
+    who has wrapped, ported, rebuilt and taught EPANET for thirty years, which is Tom's own framing
+    and is what keeps it a thank-you rather than a comparison.
   - **AND THE LINK IS A PAIR OF WORDMARKS, UPPER LEFT, ON BOTH SITES** (Tom, 2026-09-06: *"At the
     upper left of each site we have the domain name. Let's put a link to the other one next to it.
     For example LibreWaterNet Not EPANET and Not EPANET LibreWaterNet"*). Built the same day.

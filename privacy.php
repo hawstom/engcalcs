@@ -31,8 +31,11 @@ engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <p>We do not sell anything, we do not advertise, and we do not profile you. There is no analytics
 vendor, no tag manager, no advertising network, and no social media pixel on this site.
-<strong>We never record your IP address in our usage logs</strong>, and those logs contain no
-identifier that could be traced back to you.</p>
+<strong>Our own usage counts never record your IP address</strong>, and they contain no identifier
+that could be traced back to you. <strong>The web server underneath them does keep an ordinary
+access log, and that log does record IP addresses</strong>, the way almost every web server on the
+internet does. The two are separate and we never join them. Both are described below, the server
+log under <em>5. The web server&rsquo;s own log</em>.</p>
 
 <p>The calculators run entirely in your browser. <strong>The numbers you type are never sent to
 us.</strong> Three optional features on one page can fetch something from OpenStreetMap or Mapbox,
@@ -106,6 +109,26 @@ provide the feature you asked for</em></h3>
 the name or initials you type are stored on our server alongside the project identifier and a
 timestamp, and are shown to anyone else who opens that file. The record is deleted 30 days after
 its last activity.</p>
+
+<h3>5. The web server&rsquo;s own log &mdash; <em>our legitimate interest in keeping the site
+running</em></h3>
+
+<p>Separately from anything above, the web server that sends you these pages keeps a standard
+access log, as almost every web server does. <strong>It records the IP address of each request</strong>,
+along with the time, the page asked for, the response, and the browser&rsquo;s own description of
+itself. It is written by the server software before this site&rsquo;s code runs, so it happens
+whatever you answer to the counting question, and there is no way for a website to offer you a
+choice about it.</p>
+
+<p>What it is for is keeping the site up and defending it: finding what broke, and recognising
+abuse. <strong>We do not use it to count visits, to build statistics, or to learn anything about
+you</strong>, and we never join it to the usage counts described in section 1. Nobody profiles it,
+and it goes nowhere else. How long it is held is set by the hosting service&rsquo;s own log
+rotation rather than by us.</p>
+
+<p>This is the one place on this site where your IP address is written down. We say so plainly here
+because a privacy notice that quietly omits the server log is the commonest way one of these
+documents is untrue.</p>
 
 <h2>What we store on your device</h2>
 
