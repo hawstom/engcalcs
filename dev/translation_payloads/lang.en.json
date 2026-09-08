@@ -600,7 +600,9 @@
         "lpn_area_hint_lasso_go": "Move to draw the outline, then click to close it.",
         "lpn_area_hint_polygon_start": "Click the first corner of the shape. Double-click the last one to finish.",
         "lpn_area_hint_polygon_go": "Click each corner. Double-click the last one to finish.",
-        "lpn_area_hint_shift": "Hold Shift to add to the selection, or to take something out of it.",
+        "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
+        "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
+        "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -742,7 +744,7 @@
         "lpn_tool_add_pump_tip": "Click one node and then another to put a pump between them.",
         "lpn_tool_add_valve_tip": "Click one node and then another to put a valve between them.",
         "lpn_tool_add_text_tip": "Click the map to write a note on the drawing.",
-        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
         "lpn_tool_vertices_tip": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.",
@@ -1767,7 +1769,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1765,
+    "count": 1767,
     "active_prefixes": [
         "about",
         "bpn",

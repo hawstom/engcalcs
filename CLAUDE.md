@@ -855,7 +855,7 @@ Task 584 — his own position, adopted verbatim.)
   therefore **no per-browser unit cookie for this page**.
 - **FURNITURE belongs to the BROWSER** and is a `localStorage` sibling key that
   `serializeProject()` must never learn about: `lpn_pane`, `lpn_rpane`, `lpn_setbox`,
-  `lpn_findbox`. Where a box sits and how wide a pane is is a fact about the SCREEN somebody is
+  `lpn_findbox`, and since 2026-09-08 `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`. Where a box sits and how wide a pane is is a fact about the SCREEN somebody is
   sitting at, and a colleague opening the file on a laptop must not inherit a 32-inch layout.
   **So opening a project does NOT open its windows as saved, and must not learn to** — furniture
   is already where you left it, across every project, which is why the gap that name suggests

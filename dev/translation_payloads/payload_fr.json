@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1765,
-        "delta_key_count": 90,
+        "expected_key_count": 1767,
+        "delta_key_count": 92,
         "exempt_key_count": 47,
         "exempt_keys": [
             "u_depthFrac",
@@ -537,7 +537,9 @@
         "lpn_area_hint_lasso_go": "Move to draw the outline, then click to close it.",
         "lpn_area_hint_polygon_start": "Click the first corner of the shape. Double-click the last one to finish.",
         "lpn_area_hint_polygon_go": "Click each corner. Double-click the last one to finish.",
-        "lpn_area_hint_shift": "Hold Shift to add to the selection, or to take something out of it.",
+        "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
+        "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
+        "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -547,7 +549,7 @@
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
-        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
@@ -629,7 +631,9 @@
         "lpn_area_hint_lasso_go": "Move to draw the outline, then click to close it.",
         "lpn_area_hint_polygon_start": "Click the first corner of the shape. Double-click the last one to finish.",
         "lpn_area_hint_polygon_go": "Click each corner. Double-click the last one to finish.",
-        "lpn_area_hint_shift": "Hold Shift to add to the selection, or to take something out of it.",
+        "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
+        "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
+        "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -639,7 +643,7 @@
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
-        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
@@ -812,6 +816,38 @@
             }
         },
         "lpn_area_hint_shift": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Sommets",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "Supprimer",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_touch_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Sommets",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "Supprimer",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_touch_go": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
