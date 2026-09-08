@@ -560,8 +560,12 @@ the block.
 
 - 50|285| **We do not know what devices anybody uses this on.**
   Several decisions have quietly assumed an answer. Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
-  `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
-  there is no device signal anywhere in this project's instrumentation — every touch-target,
+  **Instrumented 2026-09-08, not yet read:** `log-human-view.php` and `log-calc-event.php` carry
+  `pointer: coarse|fine|''` as a fifth column and the report prints it as its own DEVICE tier. Every
+  row on file predates it; the first reading is the next weekly report. Close this once one has been
+  read into `dev/usage-data-log.md`. Until then the sentence below still describes the record.
+  Before that date the two writers recorded **page and language and nothing else**, so
+  there was no device signal anywhere in this project's instrumentation — every touch-target,
   breakpoint and two-pane-layout argument ever made here has rested on a guess.
   - **Not a small guess.** "Touch-friendly" is load-bearing in the suite's own conventions (the
     whole-label `.ec-help` tap-target rule exists for it) and Task 284's layout hinges on it. All of

@@ -143,7 +143,9 @@ define('LANG_LOG', dirname(__DIR__) . '/log/engcalcs-lang.log');
 // user-triggered calculation happens at least 10s after page load in a given
 // session for a given calculator. Deduped once per (session, page) so reloads
 // and repeated recalculation of the same calculator don't inflate counts.
-// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language
+// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language TAB pointer
+// The fifth column is 'coarse', 'fine' or '' -- see ecPointerClass(); rows written before
+// 2026-09-08 have no fifth column and the report reads them as pointer unknown.
 // Answers "what calculators/languages are humans actually using" (bots essentially
 // never run this far), as opposed to LANG_LOG's raw browser-preference/demand signal.
 // Run log/lang-log-stats.sh to analyze.
@@ -157,7 +159,11 @@ define('CALC_USAGE_LOG', dirname(__DIR__) . '/log/engcalcs-calc-usage.log');
 // Session age, not page age, is the gate: once a session has proven itself human on
 // one page, later pages in the same session don't need their own 10s wait. Deduped
 // once per (session, page, lang) so reloads don't inflate counts.
-// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language
+// Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language TAB pointer
+// The fifth column is the DEVICE TIER (ROADMAP Task 285): 'coarse', 'fine' or '', from
+// matchMedia('(pointer: coarse)') on the client, closed-set filtered by ecPointerClass(). It is
+// the only device signal in the suite and it is one bit on purpose. Rows written before
+// 2026-09-08 have no fifth column; the report counts them as pointer unknown, never as fine.
 // Run log/lang-log-stats.sh to analyze.
 define('HUMAN_VIEW_LOG', dirname(__DIR__) . '/log/engcalcs-human-view.log');
 
@@ -181,8 +187,12 @@ define('CONTACT_SEND_LOG', dirname(__DIR__) . '/log/engcalcs-contact-send.log');
 // the one behavior the suite exists to produce and the one no other counter here approximates:
 // CALC_USAGE_LOG says they got an answer, this says they intend to pass it on.
 // Each line: ISO-8601 UTC timestamp TAB page-basename TAB served-lang TAB raw-Accept-Language TAB field
-// The fifth column is 'title' or 'subtitle'. Both are logged because they are different acts:
-// a title labels a scratch calculation, a subtitle as well means someone is building a document.
+// The fifth column is 'title' or 'subtitle' on a form calculator, 'save' or 'rename' on
+// Looped-Network (added 2026-09-08 -- the map page has no title field, so until then it had no
+// naming instrument at all and the report printed "n/a"). Each is logged because each is a
+// different act: a title labels a scratch calculation, a subtitle as well means someone is
+// building a document; a project saved to a file or a tab renamed is the same intent on the map.
+// The closed set and the de-duplication bit per field live in ecNamingFieldBit().
 // Deduped once per (session, page, field), so editing a title five times counts once.
 // Run log/lang-log-stats.sh to analyze.
 define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
@@ -545,6 +555,54 @@ function ecBrowserLangTag() {
     $tag = explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0];
     // trim() first so an ordinary ' en-gb' still yields a tag; it is not the filter, it never was.
     return preg_match('/^[a-z0-9-]{1,35}/', strtolower(trim($tag)), $m) ? $m[0] : '';
+}
+
+/**
+ * Whether the request carried an Accept-Language header at all. ecBrowserLangTag() answers ''
+ * both for "no header" and for "a header with nothing usable in it", and lib/Units.lib.php
+ * needs the two apart: no header is a CLI render or a crawler and keeps the status-quo preset,
+ * while a browser that names no region is a person and gets SI. Lives here because this file is
+ * the one place the header may be read (Task 319).
+ */
+function ecAcceptLanguagePresent() {
+    return isset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+}
+
+/**
+ * The pointer column of the two confirmed-human logs (ROADMAP Task 285): 'coarse' (a finger),
+ * 'fine' (a mouse, a pen, a trackpad) or '' (the browser could not say, or an older client sent
+ * nothing). A CLOSED SET, never sanitized free text: the client has no business inventing a
+ * third pointer, and an unknown value is a bug worth a blank cell rather than a new vocabulary.
+ *
+ * This is the whole of the device signal, deliberately. A user-agent string is
+ * fingerprinting-grade on a suite that offers an opt-out and means it; one bit from
+ * matchMedia('(pointer: coarse)') answers the only question anybody here has asked -- does
+ * anybody use this on a phone -- and identifies nobody. It stores nothing on the device, so
+ * consent_body stays true and EC_CONSENT_VERSION does not move.
+ */
+function ecPointerClass($raw) {
+    return in_array($raw, array('coarse', 'fine'), true) ? $raw : '';
+}
+
+/**
+ * The naming events TITLE_LOG accepts, and the ec_seen bit each de-duplicates on. The two title
+ * fields belong to the form calculators; 'save' and 'rename' are Looped-Network's equivalents
+ * (Tom, 2026-09-08: *"Rename and Save are meaningful as tests"*) -- a project saved to a file, a
+ * tab renamed. Those two REUSE the title and subtitle bits, and that is safe by construction:
+ * the digit is per PAGE, the map page renders no Printable Title or Subtitle, and a form page
+ * saves no project. The five bits stay five, so the banner's "a single digit per page" stays
+ * true.
+ *
+ * @return int  the bit, or 0 for a field this log does not accept.
+ */
+function ecNamingFieldBit($field) {
+    $bits = array(
+        'title'    => EC_SEEN_TITLE,
+        'subtitle' => EC_SEEN_SUBTITLE,
+        'save'     => EC_SEEN_TITLE,
+        'rename'   => EC_SEEN_SUBTITLE,
+    );
+    return isset($bits[$field]) ? $bits[$field] : 0;
 }
 
 /**

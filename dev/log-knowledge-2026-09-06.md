@@ -18,9 +18,10 @@ Six logs, all tab-separated, all beginning with an ISO-8601 UTC timestamp, all d
 | Tier | Log | Written by | An entry means |
 |---|---|---|---|
 | **reach** | `engcalcs-lang.log` | `logLanguageSelection()`, `lib/Language.lib.php` | A page load. **Includes crawlers.** High reach with near-zero shopping is a bot signature, not an audience. |
-| **shopping** | `engcalcs-human-view.log` | `log-human-view.php`, beacon from `EngCalcs.maybeLogHumanView()` | A confirmed-human view. Fires once the *session* (not the page) is at least 10 s old, whether or not anybody calculates. Window shopping. |
-| **using** | `engcalcs-calc-usage.log` | `log-calc-event.php`, beacon from `EngCalcs.maybeLogCalcUsage()` | A confirmed calculation: a **user-triggered recalculation at least 10 s after page load**. It means "typed their own numbers", never "looked at the default answer". |
-| **naming** | `engcalcs-title.log` | `log-title-event.php` | A Printable Title or Subtitle was typed. The visitor intends to put the result in front of another person. The text itself is never sent and never stored. |
+| **shopping** | `engcalcs-human-view.log` | `log-human-view.php`, beacon from `EngCalcs.maybeLogHumanView()` | A confirmed-human view. Fires once the *session* (not the page) is at least 10 s old, whether or not anybody calculates. Window shopping. **Since 2026-09-08 carries the pointer tier** — `coarse`, `fine` or blank — as its fifth column (Task 285). |
+| **using** | `engcalcs-calc-usage.log` | `log-calc-event.php`, beacon from `EngCalcs.maybeLogCalcUsage()` | A confirmed calculation: a **user-triggered recalculation at least 10 s after page load**. It means "typed their own numbers", never "looked at the default answer". Same pointer column since 2026-09-08. |
+| **naming** | `engcalcs-title.log` | `log-title-event.php`, from `EngCalcs.logNamingEvent()` | A Printable Title or Subtitle was typed — or, on Looped-Network since 2026-09-08, a project was **saved** to a file or a tab **renamed**. The visitor intends to put the result in front of another person. The text itself is never sent and never stored. |
+| **device** | the fifth column of the two logs above | the same two beacons | Whether the page was used with a finger (`coarse`) or a mouse (`fine`). **Its own tier**, never folded into the three above; rows older than 2026-09-08 read as unknown, never as fine. |
 | **sends** | `engcalcs-contact-send.log` | `formmail.php`, server-side in its `mail()` success branch | A message was actually mailed. Server-side deliberately: a beacon from the submit handler races the navigation and could only count attempts. |
 | **signals** | `engcalcs-signal.log` | `log-signal-event.php`, from `EngCalcs.logSignal()` | One of six diagnostics in an event column: `outbound`, `touch`, `units`, `repeat`, `lpn`, `share`. |
 
@@ -233,7 +234,18 @@ the former; by the 2026-09-03 reading it was 15% of page loads.
 
 **Reference lookups are the largest behavioural signal in the suite.** In the 2026-08-21 window,
 154 clicks to Engineering ToolBox's Manning roughness table against 47 to
-`hawsedc.com/frictionslope.php`; by the 2026-09-03 window, **210 against 70**. Reference clicks by
+`hawsedc.com/frictionslope.php`; by the 2026-09-03 window, **210 against 70**. **Those are two
+different links answering two different questions, and an earlier draft of this sentence called
+the second one "hawsedc.com's own roughness table", which it is not.** The first is the `n` label
+on Manning-Pipe-Flow, Manning-Pipe-Head-Loss, Manning-Trap and Manning-Irregular, which
+`lib/References.lib.php` points at
+`engineeringtoolbox.com/mannings-roughness-d_799.html` — a roughness table, and the whole of
+Task 217's case for a table of our own. The second is the **Friction slope, S_f** label on
+Manning-Pipe-Flow (`mpf_friction_slope`, carrying its own `<a>` in all 27 language files), which
+points at `../frictionslope.php` — a page of the PARENT site, outside this repository, titled
+*"What's Friction Slope, and Can I Use Pipe Slope Instead?"*, an English-only explainer Tom wrote.
+It counts as a reference click because it leaves `/engcalcs/`. So the pair reads: three people
+look up a roughness value for every one who asks what friction slope is. Reference clicks by
 served language in the 2026-08-21 window: en 224, es 23, fr 10, it 2, pt 1 — and a non-English
 visitor opening an English-only roughness table is a complete signal in itself (Task 216 feeding
 Task 217).
@@ -303,6 +315,18 @@ comparable in size and converts at 1%. Also on file: 55 queries are LLM-retrieva
 `… pdf`), all circling one question — is Manning valid for full or pressurised pipe, and is
 R = D/4 — for 118 impressions and zero clicks.
 
+**A second export, 2026-09-07, is now on file** (`dev/usage-data-log.md`, same date), read by
+`dev/scripts/search_console_summary.php` so the clusters are reproducible from here on. It says:
+the sewer-slope cluster is **still the largest unconverted demand** — 190 non-Manning queries,
+3,557 impressions, 60 clicks, 1.7% CTR, half of Manning's impressions returning 3% of its clicks,
+led by *"4 inch sewer pipe minimum slope in mm"* at 505 impressions and 3 clicks; **Looped-Network
+is indexed and invisible** — 62 impressions across nine URL variants, position 34 on its main
+variant, zero clicks on every "network" query; **LibreWaterNet cannot be seen from this export**,
+being its own Search Console property; and, the one number bearing on Task 285 from outside the
+logs, **8% of search clicks and 19% of impressions are on a phone.** English-reading SI countries
+are 23.5% of clicks against 54.6% from the United States, which is the evidence behind the unit
+preset change of the same day.
+
 ---
 
 ## 3. What we do NOT know
@@ -310,12 +334,12 @@ R = D/4 — for 118 impressions and zero clicks.
 Each of these is derived from the instrumentation, not guessed. They are blind spots by
 construction, not gaps somebody forgot to fill.
 
-- **What device, screen or pointer anybody uses.** `log-human-view.php` and `log-calc-event.php`
-  record page and language and nothing else; no writer touches `HTTP_USER_AGENT`. **There is no
-  device signal anywhere in this project.** ROADMAP Task 285 states it plainly, and Tom, 2026-08-11:
-  *"we don't know whether anybody uses this on a phone."* Every touch-target, breakpoint and
-  two-pane-layout argument ever made here rests on a guess. It is not a small guess:
-  "touch-friendly" is load-bearing in the suite's own conventions.
+- **What device, screen or pointer anybody uses — INSTRUMENTED 2026-09-08, NOT YET READ.**
+  `log-human-view.php` and `log-calc-event.php` now carry one bit, `coarse` or `fine`, from
+  `matchMedia('(pointer: coarse)')`; no writer touches `HTTP_USER_AGENT` and none will. Every row
+  on file predates the column, so the first reading is the next weekly report, and until then
+  Tom's 2026-08-11 *"we don't know whether anybody uses this on a phone"* stands, with one outside
+  number beside it: 8% of search clicks arrive from a phone (Search Console, 2026-09-07).
 - **Whether the lpn page is used by anyone but Tom.** Nothing in a row distinguishes one visitor
   from another. `?ec_nolog=1` is the only exclusion and it is per-browser, so a browser he has not
   marked is counted like anybody else's. The 2026-09-03 lpn repeat-use figure of 8 of 23 is the
@@ -328,17 +352,26 @@ construction, not gaps somebody forgot to fill.
   design (Task 288). De-duplication is five bits per page in `ec_seen`, which answers "have we
   counted this" and nothing else. No row can be joined to another row, so "they tried MPF then
   Hazen-Williams" is unanswerable.
-- **Where visitors come from.** No referrer is logged. Search Console is a separate instrument and
-  the only export on file is 2026-07-27; nothing in the logs says whether a visit came from search,
-  a link, or a bookmark.
-- **Which language most of the audience was actually served.** `engcalcs-lang.log`'s language
-  column means two different things by row source: `get`, `cookie` and `view` rows carry the
-  language we **served**, while `browser` and `anon` rows carry the raw Accept-Language tag. Since
-  Task 286 the `anon` rows are the majority, so **for most of the audience the reach log does not
-  record which language we served at all.** The fix is one line in `logLanguageSelection()`.
+- **Where visitors come from.** No referrer is logged. Search Console is a separate instrument;
+  two exports are on file, 2026-07-27 and 2026-09-07, and `dev/scripts/search_console_summary.php`
+  reads the next one the same way. Nothing in the logs says whether a visit came from search, a
+  link, or a bookmark.
+- **Which language most of the audience was actually served — CORRECTION: this was never a
+  blind spot at the date of this reading.** `engcalcs-lang.log`'s column 2 does mean two things by
+  row source, but since 2026-08-22 (`55494d9b`) every row also carries the served language and the
+  asked tag as their own columns before the bucket, and the report's "What the reach log SERVED,
+  and what it was ASKED for" section reads them. The first draft of this file said the fix was
+  "one line in `logLanguageSelection()`"; it had been written two weeks earlier. What the pair
+  shows in the live window is served-non-English ABOVE asked-non-English in the page-load bucket
+  (42% against 14%), which is crawlers fetching the `?lang=xx` URLs — the reason the
+  confirmed-human figures in 2e are the ones to read.
 - **Whether a shared link was ever opened.** The `share` signal says the control was used, `copy`
   or `manual`. An opened link arrives as an ordinary page view and nothing distinguishes it.
-- **Whether anybody names an lpn calculation.** No instrument exists on that page, per 2h.
+- **Whether anybody names an lpn calculation — instrument built 2026-09-08, call sites pending.**
+  `log-title-event.php` accepts `save` and `rename` and `EngCalcs.logNamingEvent(field)` sends
+  them; the report reads a save as "named" and prints renames beside it. Until
+  `js/looped-network.js` calls the function at a file Save and a tab Rename the page still prints
+  `n/a`, which is correct.
 - **Why Hazen-Williams leaks**, per 2b, and why Manning-Pipe-Head-Loss underperforms its sibling.
   Both are undiagnosed and the HW figure is stated in retired metrics.
 - **Whether a quiet page is quiet because nobody wants it or because nobody can find it.** The
@@ -388,53 +421,70 @@ truncated to their dates. `log/.last-report-window` holds that same fingerprint.
 report rebuild and before the 2026-08-23 archiving change. Production has rotated twice since.
 Every real number in section 2 came from `dev/usage-data-log.md`, which is where snapshots of
 production live; the honest way to read current production is
-`sh dev/scripts/publish_usage_report.sh` on the server, or its published URL, which has been live
-since it first ran there on 2026-09-03.
+`sh dev/scripts/publish_usage_report.sh` on the server, or its published URL,
+`https://hawsedc.com/engcalcs/spock/public/usage-6189c17caf18ab3682420140e466af5d.html`, which has
+been live since it first ran there on 2026-09-03 and read `WINDOW 2026-09-03 .. 2026-09-07` on
+2026-09-08 — so the Monday cron is running and a session can read production without a paste.
 
 ---
 
-## 5. What would be cheapest to learn next
+## 5. What would be cheapest to learn next — and what of it is now done (2026-09-08)
 
 Ranked by cost against the decision each would change. Task 285's own reasoning governs the first
 one and generalises to the rest: **decide what the answer would change before collecting it, and
-keep the signal coarse.**
+keep the signal coarse.** Tom read this list on 2026-09-08 and asked for 1, 2, 4 and 5; the status
+of each is stated on its row.
 
-**1. A coarse pointer or viewport bucket on the existing beacon.** *(ROADMAP Task 285, priority 50.)*
-Cost: one extra field on `log-human-view.php` and `log-calc-event.php`, `pointer: coarse|fine` from
-a media query or a viewport-width band. It stores nothing on the device, so `consent_body` stays
-true, `EC_CONSENT_VERSION` does not move, and no retranslation is bought. A full user-agent string
-is fingerprinting-grade on a suite that offers an opt-out and means it; do not collect one.
-Decision it changes: **"almost nobody" means we stop paying for phone-shaped compromises on `lpn_`
-specifically, which is a design freedom rather than a disappointment; "a third of them" makes
-several open tasks much more urgent.** Add the reading to `dev/usage-data-log.md` as its own tier,
-never folded into reach, shopping or using.
+**1. A coarse pointer bucket on the existing beacon — DONE 2026-09-08.** *(ROADMAP Task 285.)*
+`log-human-view.php` and `log-calc-event.php` carry `pointer: coarse|fine|''` from
+`matchMedia('(pointer: coarse)')`, closed-set filtered by `ecPointerClass()`, as a fifth column
+before the bucket. Nothing stored on the device, `consent_body` unchanged, `EC_CONSENT_VERSION`
+unchanged; `privacy.php` names the fact in one clause. The report prints it as its own DEVICE tier
+and `dev/scripts/log_format_selftest.php` holds the format. **Nothing on file carries it yet: the
+first reading is the next weekly report.** Decision it changes, unchanged: **"almost nobody" means
+we stop paying for phone-shaped compromises on `lpn_`; "a third of them" makes several open tasks
+much more urgent.** The outside number to read it against: 8% of search clicks are from a phone.
 
-**2. Split the overloaded language column in `logLanguageSelection()`.** Cost: one line in
-`lib/Language.lib.php`, writing the served language and the browser tag as two columns instead of
-one. It recovers the served language for the `anon` rows, which are the majority of the audience.
-Decision it changes: the served-versus-asked gap of section 2e is currently measurable only from
-the two confirmed-human logs, so the discovery defect it names is sized from 307 people rather than
-from all reach.
+**2. Split the overloaded language column — WAS ALREADY DONE, 2026-08-22.** This row was stale when
+written: `logLanguageSelection()` has written served and asked as two columns since `55494d9b`, and
+the report reads them. Section 3 carries the correction. Nothing to do.
 
 **3. Nothing at all — read the next monthly archive.** Cost: zero. The cron is installed on
-production as of 2026-09-03; the rotation is monthly because a month is the shortest window that
-regularly clears the report's own small-n floor of 40. Decision it changes: **the `zh`
-pre-registered test needs n = 30 views and nothing else**, and Task 144 needs Hazen-Williams
-re-derived on current definitions before a single hour is spent on it. Both are waiting on time,
-not on instrumentation.
+production as of 2026-09-03 and the published copy confirmed it ran on 2026-09-07. Decision it
+changes: **the `zh` pre-registered test needs n = 30 views and nothing else**, and Task 144 needs
+Hazen-Williams re-derived on current definitions before a single hour is spent on it. Both are
+waiting on time, not on instrumentation.
 
-**4. A naming instrument for `Looped-Network`.** Cost: one `log-title-event.php` call at a project
-save, a tab rename, or a Text object, plus a decision about which of those actually means "I mean
-to show this to somebody". Decision it changes: lpn is the only page whose top funnel stage is
-unmeasurable, so its 0-of-12 naming figure is currently uninterpretable, and the suite's own stated
-reason for existing is the thing it cannot see there.
+**4. A naming instrument for `Looped-Network` — SERVER AND LIBRARY DONE 2026-09-08, CALL SITES
+PENDING.** `log-title-event.php` accepts `save` and `rename`; `EngCalcs.logNamingEvent(field)` is the
+one-line client call; the report reads a save as "named" and prints renames beside it. What remains
+is two lines in `js/looped-network.js` — at a successful file Save (`saveCurrent`/`saveAs`) and at
+the tab Rename (`renameProject` from the tab menu) — and the exclusion of gallery copies, which is
+the editor's knowledge: `openExample()` is the one place a project is known to be a gallery copy.
+Tom, 2026-09-08: *"Rename and Save are meaningful as tests. If we want to get clever we can count
+saving or renaming any project other than the gallery examples."*
 
-**5. A second Search Console export.** Cost: one download and a paste into
-`dev/usage-data-log.md`. The only one on file is 2026-07-27, taken before `Looped-Network` had been
-indexed at all. Decision it changes: whether the sewer-slope cluster — 188 queries, 1,007
-impressions, 1.1% CTR — is still the largest unconverted demand in the record, which is the
-strongest discoverability argument the project has.
+**5. A second Search Console export — DONE 2026-09-07/08.** On file in `dev/usage-data-log.md`, read
+by `dev/scripts/search_console_summary.php` so the next one is the same reading. The sewer-slope
+cluster **is still the largest unconverted demand** (3,557 impressions, 60 clicks, 1.7%);
+Looped-Network is indexed at position 34 with 2 clicks; LibreWaterNet is a separate property and
+needs its own export before anything can be said about it.
 
 **6. Nothing about the contact funnel yet.** Cost of acting: real. Cost of waiting: nothing. At 3
 clicks and 1 send there is no signal, and the two possible causes call for opposite fixes. Wait for
 a window with a two-digit numerator before touching either the invitation or the form.
+
+### What has to happen outside this repository for the next report to be better
+
+- **Nothing on production beyond `git pull`.** The weekly and monthly cron entries are installed and
+  the 2026-09-07 run proves the weekly one; the new columns are written by the same endpoints and
+  read by the same script, so the next Monday run carries the pointer tier and, once the editor's
+  call sites land, the map page's saves and renames.
+- **Add `librewaternet.org` as a Search Console property** if it is not one, and export it too; the
+  hawsedc.com export cannot see it, and `/app` is the front door the landing page points at.
+- **Opt out each of your own browsers on each host** (`?ec_nolog=1` on `hawsedc.com`,
+  `www.hawsedc.com` and `librewaternet.org`), and check each by opening
+  `/engcalcs/log-human-view.php` on that host: it answers "not counted" or "counted".
+- **The two per-family defaults the data argues for and this pass did not touch** — slope in
+  percent, gpm on Manning-Pipe-Flow — are Tom's call, because each moves a page's default numbers
+  and its worked example (`dev/unit-families.md`, 2026-09-08).

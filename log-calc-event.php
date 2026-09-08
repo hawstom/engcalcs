@@ -27,6 +27,9 @@ if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
 
 $page = isset($_POST['page']) ? preg_replace('/[^A-Za-z0-9_-]/', '', $_POST['page']) : '';
 $lang = isset($_POST['lang']) ? preg_replace('/[^A-Za-z-]/', '', $_POST['lang']) : '';
+// Task 285: the one device bit, so a calculation can be read by pointer beside a view. Closed
+// set, see ecPointerClass(); anything else is ''.
+$pointer = ecPointerClass(isset($_POST['pointer']) ? $_POST['pointer'] : '');
 
 if ($page === '') {
     http_response_code(400);
@@ -62,7 +65,7 @@ if (!$alreadyLogged) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . ecLogBucketSuffix() . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\t" . $pointer . ecLogBucketSuffix() . "\n";
     @file_put_contents(CALC_USAGE_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

@@ -129,6 +129,11 @@ run_check "service worker scope"         blocking php dev/scripts/sw_scope_check
 run_check "sw scope selftest"            blocking php dev/scripts/sw_scope_selftest.php
 run_check "log bucket column"            blocking php dev/scripts/log_bucket_check.php
 run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_selftest.php
+# 2026-09-08: the pointer column, the save/rename naming fields and the served/asked reading,
+# driven from a mixed-vintage fixture through the REAL report. An old row and a new one differ
+# in field count and awk reads positionally, so a reader testing the wrong field prints a number
+# that looks fine.
+run_check "log format selftest"          blocking php dev/scripts/log_format_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
@@ -256,6 +261,11 @@ run_check "unit select selftest"         blocking php dev/scripts/unit_select_fa
 # whichever preset the author was not using. Empty and zero are unit-independent and allowed.
 run_check "unit defaults per preset"     blocking php dev/scripts/unit_default_preset_check.php
 run_check "unit default selftest"        blocking php dev/scripts/unit_default_preset_selftest.php
+# 2026-09-08: the first-visit preset is decided by the Accept-Language REGION on an English page
+# (en-us -> US, anything else -> SI, no header -> the status quo the harnesses anchor on), and the
+# option order in lib/Units.lib.php is a measurement. Both render a page that looks right when
+# wrong, so the rule is a table here and the first option of each reordered family is pinned.
+run_check "unit default set selftest"    blocking php dev/scripts/unit_default_set_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php

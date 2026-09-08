@@ -51,12 +51,14 @@ USA.</p>
 <table class="ec-legal-table">
 	<tr><th>What</th><th>Why</th><th>Legal basis</th></tr>
 	<tr>
-		<td><strong>Usage counts.</strong> The page name, the language, the time, and sometimes one
-			short fact about what happened on the page: which reference link you followed, that you
-			changed some input, which units you chose, that this browser had used this calculator
-			before, that you copied the page link, or which drawing tool and which error message you
-			met on the pipe-network map. <strong>Never anything you type.</strong> No IP address, no
-			account, no identifier</td>
+		<td><strong>Usage counts.</strong> The page name, the language, the time, whether the page
+			was used with a finger or with a mouse, and sometimes one short fact about what happened
+			on the page: which reference link you followed, that you changed some input, which units
+			you chose, that this browser had used this calculator before, that you copied the page
+			link, that you saved or renamed a pipe-network project, or which drawing tool and which
+			error message you met on the pipe-network map. <strong>Never anything you type.</strong>
+			No IP address, no account, no identifier, and no description of your browser or
+			device beyond that one finger-or-mouse fact</td>
 		<td>To decide which calculators to improve and which languages to translate into</td>
 		<td>Your consent</td>
 	</tr>
@@ -99,7 +101,8 @@ to do something different; <em>Allow all</em> covers that too.</p>
 
 <p>If you say no we keep nothing in your browser, and we still count the page load itself, in a more
 limited way than a typical web server records that a page was served: the page name, the language
-your browser asked for, and the time. Those rows carry no identifier, so we cannot tell your second
+your browser asked for, the time, and whether the page was used with a finger or with a mouse.
+Those rows carry no identifier, so we cannot tell your second
 visit from somebody else&rsquo;s first, and we count them separately from the visits of people who
 did agree, because they are a different kind of number.</p>
 

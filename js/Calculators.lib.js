@@ -291,6 +291,25 @@ EngCalcs.flushQueue = function () {
 window.addEventListener('online', function () { EngCalcs.flushQueue(); });
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.flushQueue(); });
 
+// THE ONE DEVICE BIT (ROADMAP Task 285). 'coarse' is a finger, 'fine' is a mouse, pen or
+// trackpad, '' is a browser that cannot say. It rides on the two confirmed-human beacons and on
+// nothing else, and it is deliberately the whole of the device signal: a user-agent string is
+// fingerprinting-grade on a suite that offers an opt-out and means it, while one bit from a media
+// query answers the only question anybody here has asked -- does anybody use this on a phone --
+// and identifies nobody. Read at send time, not at load: a tablet with a keyboard docked is a
+// different device than the same tablet in a hand. Stores nothing.
+EngCalcs.pointerClass = function () {
+	'use strict';
+	if (!window.matchMedia) return '';
+	try {
+		if (window.matchMedia('(pointer: coarse)').matches) return 'coarse';
+		if (window.matchMedia('(pointer: fine)').matches) return 'fine';
+	} catch (err) {
+		// A stub or an ancient engine that throws on an unknown query: unknown is the honest answer.
+	}
+	return '';
+};
+
 // Logs one confirmed-human calculator-usage event (see log-calc-event.php),
 // gated to real user-triggered recalculation at least 10s after page load so
 // the automatic initial calc-on-load and fast/scripted interaction don't count.
@@ -302,7 +321,8 @@ EngCalcs.maybeLogCalcUsage = function () {
 	this._calcUsageLogged = true;
 	this._sendOrQueue('/engcalcs/log-calc-event.php', {
 		page: this.cookieName || '',
-		lang: document.documentElement.lang || ''
+		lang: document.documentElement.lang || '',
+		pointer: this.pointerClass()
 	});
 };
 
@@ -321,7 +341,8 @@ EngCalcs.maybeLogHumanView = function () {
 	setTimeout(function () {
 		self._sendOrQueue('/engcalcs/log-human-view.php', {
 			page: self.cookieName || '',
-			lang: document.documentElement.lang || ''
+			lang: document.documentElement.lang || '',
+			pointer: self.pointerClass()
 		});
 	}, delay);
 };
@@ -340,7 +361,18 @@ document.addEventListener('DOMContentLoaded', function () {
 // page load or a calculation, whereas typing into a text field is already the human proof the
 // timer is a proxy for. Deduped per page load here, and per (session, page, field) server-side.
 EngCalcs._titleLogged = {};
-EngCalcs.maybeLogTitleEvent = function (field) {
+// ONE naming instrument for the whole suite (2026-09-08). `field` is 'title' or 'subtitle' on a
+// form calculator, 'save' or 'rename' on Looped-Network -- a project saved to a file and a tab
+// renamed are that page's way of saying the same thing a typed title says, and until this
+// existed the map page had no naming instrument at all and the report printed "n/a" for it.
+// The server holds the closed set (ecNamingFieldBit() in lib/config.inc.php) and answers 400 to
+// anything else, so a typo here is visible rather than a new column value. Carries the FACT
+// and never the name: what a project is called is the user's business.
+// Gated like every other beacon: the server de-duplicates only for a consenting visitor and
+// counts everybody else once per page load in the 'visit' bucket; the offline queue is written
+// only with consent (see _queueBeacon). Deduped per page load here, per (visit, page, field)
+// server-side.
+EngCalcs.logNamingEvent = function (field) {
 	'use strict';
 	if (this._titleLogged[field]) return;
 	this._titleLogged[field] = true;
@@ -349,6 +381,10 @@ EngCalcs.maybeLogTitleEvent = function (field) {
 		lang: document.documentElement.lang || '',
 		field: field
 	});
+};
+EngCalcs.maybeLogTitleEvent = function (field) {
+	'use strict';
+	this.logNamingEvent(field);
 };
 // Bound here rather than in the inputs' onchange attributes (lib/Calculators.lib.php) so this
 // works on any page carrying those ids, including the JS-built ones, and so the markup keeps one
