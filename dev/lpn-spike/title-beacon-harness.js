@@ -139,5 +139,52 @@ function load(transport) {
   ok('  tagged field=subtitle', /field=subtitle/.test(t.titlePosts()[1].body));
 });
 
+
+// ---- the map page's own naming call sites (2026-09-08) -----------------
+//
+// Looped-Network has no title field, so the two gestures that mean the same thing are SAVING a
+// project to a file and RENAMING a tab. Read out of the source rather than driven, because the save
+// path is three awaits deep in the File System Access API and a stub of it would be testing the
+// stub. What can silently rot is the WIRING, and that is what these read:
+//
+//   - the beacon is on the one routine all three save routes pass through, so Save, Save as and
+//     Save all each count once rather than Save alone counting;
+//   - a project opened from the examples gallery is excluded, or the wall inflates the count with
+//     saves nobody named anything for;
+//   - both calls are GUARDED. The save one runs inside the try whose catch reports a file error to
+//     the user, so an absent instrument would turn a written file into a reported failure -- the
+//     beacon breaking the thing it measures.
+console.log('\n--- Looped-Network naming call sites ---');
+{
+  const LPN = fs.readFileSync(path.resolve(__dirname, '..', '..', 'js', 'looped-network.js'), 'utf8');
+  const save = LPN.slice(LPN.indexOf('async function writeOpenProjectToFile'));
+  const saveBody = save.slice(0, save.indexOf('\n\tfunction ', 10));
+  ok('a successful file write logs a naming event',
+    /EngCalcs\.logNamingEvent\('save'\)/.test(saveBody));
+  ok('  gated on the project not having come from the gallery',
+    /!project\.gallery[\s\S]{0,80}?EngCalcs\.logNamingEvent\('save'\)/.test(saveBody));
+  ok('  and guarded, so a missing instrument cannot fail the save',
+    /&& EngCalcs\.logNamingEvent\)[\s\S]{0,40}?logNamingEvent\('save'\)/.test(saveBody));
+  ok('  it is on the shared write routine, not on one save command',
+    saveBody.indexOf("logNamingEvent('save')") > 0 &&
+    !/function saveCurrent[\s\S]*logNamingEvent\('save'\)/.test(LPN));
+  ok('renaming a tab logs its own event',
+    /renameProject\(id, v\.trim\(\)\);[\s\S]{0,400}?logNamingEvent\('rename'\)/.test(LPN));
+  ok('  guarded the same way',
+    /if \(EngCalcs\.logNamingEvent\) \{ EngCalcs\.logNamingEvent\('rename'\); \}/.test(LPN));
+  ok('opening an example records which file it was',
+    /project\.gallery = ex\.file;/.test(LPN));
+  const ex = LPN.slice(LPN.indexOf('function openExample'));
+  ok('  before the saved baseline is stamped, or the new tab wears an asterisk',
+    ex.indexOf('project.gallery = ex.file;') < ex.indexOf('stampProjectSaved(id)'));
+  // The server answers 400 to a field outside its closed set, so a typo here is a silent zero.
+  const CFG = fs.readFileSync(path.resolve(__dirname, '..', '..', 'lib', 'config.inc.php'), 'utf8');
+  const bits = CFG.slice(CFG.indexOf('function ecNamingFieldBit'));
+  ['save', 'rename'].forEach(function (f) {
+    ok("  '" + f + "' is a field the server accepts",
+      new RegExp("'" + f + "'\\s*=>").test(bits.slice(0, bits.indexOf('}'))));
+  });
+}
+
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
 process.exit(fails ? 1 : 0);

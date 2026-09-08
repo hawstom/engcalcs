@@ -15692,6 +15692,10 @@ var EngCalcs = EngCalcs || {};
 				if (!saved) { return; }
 				var id = importProject(saved);
 				if (!id) { return; }
+				// **WHICH EXAMPLE THIS CAME FROM, so a later Save is not counted as naming.** Set
+				// BEFORE stampProjectSaved() below, or it lands outside the saved baseline and the
+				// tab wears an asterisk for a project nobody has touched.
+				project.gallery = ex.file;
 				// **The example's own name is the project name, not the file's.** The document
 				// carries what it should be called; deriving it from the file name here would be a
 				// third naming convention beside projectFileName() and projectNameFromFileName().
@@ -18887,6 +18891,14 @@ var EngCalcs = EngCalcs || {};
 				return false;
 			}
 			setFileError(false);
+			// **THE NAMING BEACON, and this is the one place all three save routes pass through** --
+			// Save, Save as and Save all. It carries the FACT and never the file name. A project
+			// opened from the gallery is excluded: the user chose it off a wall rather than deciding
+			// to call something something. Deduped per page load inside logNamingEvent().
+			// Guarded like every other cross-file beacon here (logSignal, maybeLogCalcUsage): this
+			// one is inside the try whose catch reports a FILE ERROR, so an absent instrument would
+			// turn a written file into a failed save.
+			if (!project.gallery && EngCalcs.logNamingEvent) { EngCalcs.logNamingEvent('save'); }
 			var entry = indexEntry(id);
 			if (entry) {
 				entry.savedSig = sigWritten;
@@ -21369,6 +21381,9 @@ var EngCalcs = EngCalcs || {};
 					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', entry.name || '');
 					if (v === null) { return; }
 					renameProject(id, v.trim());
+					// Here rather than inside renameProject(), which a future caller could reach
+					// programmatically: what this records is a PERSON deciding on a name.
+					if (EngCalcs.logNamingEvent) { EngCalcs.logNamingEvent('rename'); }
 					renderTabs();
 				}
 			},
