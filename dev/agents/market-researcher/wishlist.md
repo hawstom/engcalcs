@@ -147,3 +147,37 @@ Full citations, the bandwidth/cost numbers for the affected populations, and wha
 2026-09-06. Ranked below the CSV/GPX importer (already promoted to Task 592) because that one has a
 documented population stuck on it; this one is my own inference from response-time literature plus
 one architectural idea, not a user asking for it by name.
+
+## 8. A direct, personal note to Luke Butler — cheap, well-supported by evidence, and independent of any code question
+
+2026-09-08: Tom asked about allying with Luke Butler (Iterating/epanet-js). The one piece of evidence
+that actually answers "can this person be trusted with a friendly overture" is Tom MacWright's own
+account (macwright.com/2025/07/03/epanet-placemark) of Butler and Payá voluntarily sending fixes
+upstream to Placemark, the MIT codebase epanet-js is built on, before/alongside commercialising their
+own product on top of it. That is independently-sourced evidence of good-faith open-source behaviour,
+not Iterating's own marketing. **Recommendation: a short, honest, no-ask message from Tom to Luke
+Butler directly** (not through epanetjs.com, per Tom's own stated constraint) — draft in the journal
+entry above. Cost: one message. This is a "send it" row, not a "build" row, and it is entirely
+Tom's call whether and when. Ranked here rather than higher because it is a relationship gesture, not
+a product finding, and this seat's job is findings.
+
+**Separately, and more load-bearing for the "can we join" question: the cheaper and more natural
+door is OWA-EPANET (the engine's own MIT community), not Iterating.** No CLA found, contribution
+starts at GitHub Issues, per the project's own README. If Tom wants to "join the EPANET community" in
+the sense of the engine itself, that is a different and easier target than an alliance with Luke
+Butler specifically, and the two should not be conflated in any outreach he sends.
+
+## 9. The EWB contour sentence — a claim of absence, not of primacy, and exactly what it can and cannot cover
+
+2026-09-08, ahead of Tom's EWB presentation in ~10 days: the safe sentence is in the journal entry
+above verbatim. The one thing worth surfacing here because it is actionable before the talk: **do not
+let the sentence expand past its evidenced boundary** — EPANET (source read directly), Bentley's
+public docs (silent), epanet-js's public roadmap (silent), and one direct prior-art search (nothing
+found). It has NOT been checked against WaterGEMS's actual algorithm (undocumented), InfoWater, QGIS/
+GRASS plugins purpose-built for water networks (not searched this session), or the academic literature
+(Ohmer et al. 2017 and Walski et al.'s textbook both unreachable). If there are ten days before the
+talk, the single highest-value follow-up this seat could do is try again to reach Walski et al.,
+*Advanced Water Distribution Modeling and Management* (via a library, not the open web) and the
+Ohmer et al. 2017 abstract on ScienceDirect through an institutional proxy — both blocked this session
+and last, and both are the most likely places a competing claim could already exist. Flagging as the
+next action rather than doing it now, since it needs an access route this environment does not have.
