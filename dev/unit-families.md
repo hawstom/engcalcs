@@ -399,3 +399,31 @@ runs from a known tailwater upstream.
 
 **Translation of the two new button labels.** `calc_units_us` = "US" and `calc_units_si` = "SI" are
 seeded as English in all 27 files and add 52 to the payload delta. They ride the next sprint.
+
+## 2026-09-08 — two things the usage data decided
+
+**The option order inside a family is a measurement.** The dropdown is opened by somebody switching
+away from the preset, so the unit people switch TO belongs first. Ranked by the `units` signal rows
+pooled over the two windows on record (the counts are in `dev/usage-data-log.md`, same date):
+`distance_small` mm, m, ft, in; `distance_medium` m, mm, ft, in; the shared flow list lps, gpm,
+m3ps, mgd, ft3ps, mld; `slope`/`gradient` gradePercent, grade; `fraction`/`percentage`
+depthPercent, depthFrac. A pair fewer than 5 selections apart keeps its old order, nothing is
+deleted, and `dev/scripts/unit_default_set_selftest.php` pins the first option of each so an "SI
+first" tidy-up fails rather than undoing a measurement. This is the reason `$u_distance` became two
+lists: the two distance families now differ in order as well as in default, and a list carries its
+order.
+
+**The first-visit preset reads the Accept-Language region on an English page.** The KNOWN
+LIMITATION recorded under Task 165 — "English is not United States" — was measured: 298 SI preset
+presses against 141 US on English pages in twelve and a half days, and 23.5% of search clicks from
+English-reading SI countries against 54.6% from the United States. `ecDefaultUnitSet()` in
+`lib/Units.lib.php` gives US customary to `en-us` (and the US territories) on an English page and SI
+to every other tag, to a bare `en` (Tom: *"I lean toward SI when it's ambiguous anyway"*) and to
+every other language. A request with no header at all keeps US for English, which is what the
+calc-spike worked examples were anchored on. The earlier note that one exception to the two-letter
+code "is worse than one imperfect default" is withdrawn: the exception is one function with a
+thirteen-row table, and the imperfect default was wrong for a quarter of the English audience.
+
+**Seen and not acted on**, because each moves a page's default *numbers* and not a dropdown: slope
+is switched to percent 4.6:1 while both presets default to raw grade, and gpm is chosen 5:1 over the
+US preset's ft3ps on Manning-Pipe-Flow. Both are Tom's call.

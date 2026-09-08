@@ -35,11 +35,16 @@
 # lib/config.inc.php for the authoritative field lists.
 #
 #   engcalcs-lang.log         reach     ts lang source page [served asked] [bucket]
-#   engcalcs-human-view.log   shopping  ts page lang browser_lang [bucket]
-#   engcalcs-calc-usage.log   using     ts page lang browser_lang [bucket]
+#   engcalcs-human-view.log   shopping  ts page lang browser_lang [pointer] [bucket]
+#   engcalcs-calc-usage.log   using     ts page lang browser_lang [pointer] [bucket]
 #   engcalcs-title.log        naming    ts page lang browser_lang field [bucket]
+#                                       field: title|subtitle (forms), save|rename (Looped-Network)
 #   engcalcs-signal.log       behaviour ts page lang browser_lang event detail [bucket]
 #   engcalcs-contact-send.log sends     ts page lang browser_lang [bucket]   (server-side)
+#
+# THE POINTER COLUMN (Task 285, 2026-09-08) is 'coarse', 'fine' or '' and sits BEFORE the bucket
+# on the two confirmed-human logs. A row with five fields or fewer predates it; the report reads
+# those as pointer UNKNOWN and never as fine, so the tier starts empty and fills, like every other.
 #
 # THE BUCKET COLUMN IS THE LAST FIELD and holds 'visitor' or 'visit' (ecLogBucketSuffix()). Rows
 # written before 2026-08-21 carry a 'visit' marker or no marker at all; a row whose last field is
@@ -310,6 +315,9 @@ echo "             around >=10s, whether or not anybody calculates. Window shopp
 echo "   using     a confirmed calculation: a user-triggered recalculation >=10s after load. It"
 echo "             means 'typed their own numbers', not 'looked at the default answer'."
 echo "   naming    a Printable Title or Subtitle was typed — they mean to show it to somebody."
+echo "             On Looped-Network, a project saved to a file or a tab renamed (since 2026-09-08)."
+echo "   device    the pointer on a shopping or using row: coarse (a finger) or fine (a mouse)."
+echo "             Its own tier, never folded into the three above (Task 285, since 2026-09-08)."
 echo ""
 echo "   %shopping = shopping/reach. A LOWER BOUND on human reach, never an estimate of it."
 echo "   %using    = using/shopping. A RATIO OF TWO INDEPENDENTLY GATED BEACONS, and it can exceed"
@@ -559,6 +567,24 @@ printf "    %-10s %10s %12s\n" "language" "people" "page loads"
     END { for (k in seen) printf "%d\t%d\t%s\n", (k in p?p[k]:0), (k in l?l[k]:0), k }' \
 | sort -t$'\t' -k1,1rn -k2,2rn | awk -F'\t' '{ printf "    %-10s %10d %12d\n", $3, $1, $2 }'
 echo ""
+echo "--- English by REGION asked for (reach rows carrying the asked column, both buckets) ---"
+echo "    The region subtag decides the unit preset since 2026-09-08: an English page in a"
+echo "    browser asking for en-us opens on US customary, any other tag on SI, and a bare 'en'"
+echo "    on SI (Tom: 'I lean toward SI when it's ambiguous'). This table is that rule's"
+echo "    denominator, and it is the one place a bare 'en' can be seen to matter or not."
+echo ""
+printf "    %-10s %10s %12s\n" "asked" "people" "page loads"
+{
+    awk -F'\t' 'NF>=6 && $6 ~ /^en(-|$)/ {print $6"\tp"}' "$TMP/p-lang"
+    awk -F'\t' 'NF>=6 && $6 ~ /^en(-|$)/ {print $6"\tl"}' "$TMP/l-lang"
+} | awk -F'\t' '
+    { if ($2=="p") p[$1]++; else l[$1]++; seen[$1]=1 }
+    END { n=0; for (k in seen) { printf "%d\t%d\t%s\n", (k in p?p[k]:0), (k in l?l[k]:0), k; n++ }
+          if (n==0) print "NONE" }' \
+| sort -t$'\t' -k1,1rn -k2,2rn | head -15 | awk -F'\t' '
+    /^NONE/ { print "    (no reach row carries the asked column in this window)"; next }
+    { printf "    %-10s %10d %12d\n", $3, $1, $2 }'
+echo ""
 echo "--- Arrival pattern for non-English humans (bot-dwell check) ---"
 echo "    A crawler that dwells >=10s trips the shopping beacon and never calculates, which is"
 echo "    exactly the signature of a language with high shopping and near-zero using. Humans"
@@ -615,12 +641,19 @@ echo "   The closest instrument this suite has to its own reason for existing. A
 echo "   looked, a calculation says they got an answer, a typed title says they intend to put"
 echo "   the result in front of somebody else. The text typed is never sent and never stored."
 echo ""
+echo "   On Looped-Network, which has no title field, the same intent is a project SAVED to a"
+echo "   file or a tab RENAMED (Tom, 2026-09-08: 'Rename and Save are meaningful as tests'). Those"
+echo "   two are logged in the same file since 2026-09-08 and are printed beside the titles, never"
+echo "   added to them: a title and a save are the same act on two different kinds of page."
+echo ""
 for b in p l; do
     if [ "$b" = "p" ]; then label="PEOPLE"; else label="PAGE LOADS"; fi
     [ -s "$TMP/$b-title" ] || continue
     t=$(awk -F'\t' '$5=="title"' "$TMP/$b-title" | wc -l | tr -d ' ')
     s=$(awk -F'\t' '$5=="subtitle"' "$TMP/$b-title" | wc -l | tr -d ' ')
-    printf "   %-12s titles %6d   subtitles %6d\n" "$label" "$t" "$s"
+    sv=$(awk -F'\t' '$5=="save"' "$TMP/$b-title" | wc -l | tr -d ' ')
+    rn=$(awk -F'\t' '$5=="rename"' "$TMP/$b-title" | wc -l | tr -d ' ')
+    printf "   %-12s titles %6d   subtitles %6d   saves %6d   renames %6d\n" "$label" "$t" "$s" "$sv" "$rn"
 done
 # A PAGE WITH NO TITLE INPUTS CANNOT SCORE HERE, AND A 0% SAYS THE OPPOSITE. The Printable Title
 # and Subtitle are rendered by echoCalculatorForm(); a page that does not call it -- Looped-Network,
@@ -628,7 +661,10 @@ done
 # "0%~" for it reads as a failure that is really an absence. The list is DERIVED from the source
 # below, never typed, so a page that gains or loses the form moves on its own.
 NO_TITLE_PAGES=""
-for f in "$DIR"/../*.php; do
+# The pages live beside THIS SCRIPT's parent, never beside the log directory: an archive under
+# spock/<date>/ has no *.php a level up, so the old "$DIR"/.. read an empty list for every
+# archived run and printed a title rate for the map page. Found by the selftest fixture, 2026-09-08.
+for f in "$(dirname "$0")"/../*.php; do
     [ -f "$f" ] || continue
     b=$(basename "$f" .php)
     # Comment lines are stripped first: Looped-Network.php MENTIONS echoCalculatorForm() in a
@@ -639,27 +675,90 @@ done
 if [ -s "$TMP/p-title" ] || [ -s "$TMP/l-title" ]; then
     echo ""
     echo "--- Named per confirmed calculation, by page (PEOPLE) ---"
+    # 'named' is a TITLE on a form page and a SAVE on the map page -- one instrument per kind of
+    # page, never both on one page, so the column adds nothing to itself. A rename is printed on
+    # its own: it is a second, weaker naming act on the same page and a person who did both is
+    # two rows, so folding it in would count them twice.
     {
-        awk -F'\t' '$5=="title" {print $2"\tnamed"}' "$TMP/p-title"
+        awk -F'\t' '$5=="title" || $5=="save" {print $2"\tnamed"}' "$TMP/p-title"
+        awk -F'\t' '$5=="rename" {print $2"\trenamed"}' "$TMP/p-title"
         awk -F'\t' '{print $2"\tcalc"}' "$TMP/p-calc"
     } | awk -F'\t' -v notitle="$NO_TITLE_PAGES" "$AWK_LIB"'
         BEGIN { split(notitle, q, " "); for (i in q) if (q[i] != "") none[q[i]] = 1 }
-        { if ($2=="named") n[$1]++; else c[$1]++; seen[$1]=1 }
-        END { for (p in seen) printf "%d\t%s\t%d\t%s\n", (p in c?c[p]:0), p, (p in n?n[p]:0), (p in none?"none":"") }' \
+        { if ($2=="named") n[$1]++; else if ($2=="renamed") r[$1]++; else c[$1]++; seen[$1]=1 }
+        END { for (p in seen) printf "%d\t%s\t%d\t%s\t%d\n", (p in c?c[p]:0), p, (p in n?n[p]:0),
+                  ((p in none) && !(p in n) && !(p in r) ? "none" : ""), (p in r?r[p]:0) }' \
     | sort -rn | awk -F'\t' "$AWK_LIB"'
-        !hdr { printf "   %-28s %10s %10s %9s %-11s\n", "page", "calcs", "named", "%named", "95% CI"; hdr=1 }
+        !hdr { printf "   %-28s %10s %10s %9s %-11s %8s\n", "page", "calcs", "named", "%named", "95% CI", "renamed"; hdr=1 }
         $4=="none" { printf "   %-28s %10d %10s %9s %-11s\n", $2, $1, "n/a", "n/a", "no title field"; next }
-        { printf "   %-28s %10d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
+        { printf "   %-28s %10d %10d %9s %-11s %8d\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):""), $5 }'
     echo ""
-    echo "   'no title field' is an ABSENCE OF INSTRUMENT, not a score of zero: that page renders no"
-    echo "   Printable Title or Subtitle, so nothing on it can reach this log. On Looped-Network the"
-    echo "   equivalent intent would be renaming a tab, saving a project, or placing a Text object."
-    echo "   NONE OF THE THREE IS LOGGED TODAY — engcalcs-signal.log's lpn rows carry only"
-    echo "   'first:<example|element|backdrop|import>', 'diag:<code>' and 'wrong:<code>'. Adding one"
-    echo "   is a roadmap decision, not something this report can infer."
+    echo "   'named' is a Printable Title on a form calculator and a project SAVED TO A FILE on"
+    echo "   Looped-Network; 'renamed' is a Looped-Network tab renamed, printed on its own because"
+    echo "   somebody who did both is two rows. 'no title field' is an ABSENCE OF INSTRUMENT, not a"
+    echo "   score of zero: that page renders no Printable Title or Subtitle and has logged no save"
+    echo "   or rename in this window. The map page's save and rename have been logged since"
+    echo "   2026-09-08; a window entirely before that date shows n/a for it, correctly."
 else
     echo "   (nobody has typed a Printable Title in this window)"
 fi
+
+# ---- device: the pointer tier (Task 285) -------------------------------------------------------
+# Its own tier, per Task 285 -- never folded into reach, shopping or using. The column is the
+# fifth field of the two confirmed-human logs, present only on rows written since 2026-09-08, so
+# a row with five fields or fewer is UNKNOWN, printed as such, and never assumed fine.
+echo ""
+echo "==============================================================================="
+echo " DEVICE — coarse pointer (a finger) or fine (a mouse, pen or trackpad)"
+echo "==============================================================================="
+echo "   The only device signal in the suite, and it is one bit on purpose: a user-agent string"
+echo "   is fingerprinting-grade on a suite that offers an opt-out. 'unknown' is a row written"
+echo "   before the column existed or a browser that could not say; it is never counted as fine."
+echo "   The decision this changes: 'almost nobody' means Looped-Network stops paying for"
+echo "   phone-shaped compromises; 'a third of them' makes several open tasks urgent."
+echo ""
+ec_pointer_of() {  # $1 = file. Prints coarse|fine|unknown per row, from the field before the bucket.
+    awk -F'\t' '{ p = (NF >= 6 ? $5 : ""); print (p == "coarse" || p == "fine") ? p : "unknown" }' "$1"
+}
+for b in p l; do
+    if [ "$b" = "p" ]; then label="PEOPLE"; else label="PAGE LOADS"; fi
+    tot=$(n_of "$TMP/$b-view")
+    if [ "$tot" -eq 0 ]; then
+        echo "   $label — no confirmed-human page views in this window."
+        echo ""
+        continue
+    fi
+    echo "   $label — confirmed-human page views: $tot"
+    ec_pointer_of "$TMP/$b-view" | sort | uniq -c | sort -rn | awk -v tot="$tot" "$AWK_LIB"'
+        { printf "     %-10s %8d  %s %s\n", $2, $1, rate($1, tot), wilson($1, tot) }'
+    echo ""
+done
+echo "--- Coarse pointer by page (PAGE LOADS, where both sides are page loads) ---"
+echo "    Rows whose pointer is known only. The Looped-Network row is the one Task 285 asked for."
+echo ""
+{
+    awk -F'\t' 'NF >= 6 && ($5 == "coarse" || $5 == "fine") { print $2 "\t" $5 }' "$TMP/l-view"
+} | awk -F'\t' "$AWK_LIB"'
+    { if ($2 == "coarse") c[$1]++; k[$1]++ }
+    END { n = 0; for (p in k) { printf "%d\t%s\t%d\n", k[p], p, (p in c ? c[p] : 0); n++ }
+          if (n == 0) print "NONE" }' | sort -rn | awk -F'\t' "$AWK_LIB"'
+    /^NONE/ { print "    (no page-load row carries a pointer yet — the column began 2026-09-08)"; next }
+    !hdr { printf "    %-26s %11s %10s %9s %-11s\n", "page", "known", "coarse", "%coarse", "95% CI"; hdr=1 }
+    { printf "    %-26s %11d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
+echo ""
+echo "--- Calculated, by pointer (PAGE LOADS): does a finger get as far as a mouse? ---"
+echo "    using/shopping within each pointer class, the same ratio as the funnel and with the"
+echo "    same caveat: two independently gated beacons, so it can exceed 100%."
+echo ""
+{
+    ec_pointer_of "$TMP/l-view" | awk '{ print $1 "\tshop" }'
+    ec_pointer_of "$TMP/l-calc" | awk '{ print $1 "\tuse" }'
+} | awk -F'\t' "$AWK_LIB"'
+    { if ($2 == "shop") s[$1]++; else u[$1]++; seen[$1] = 1 }
+    END { for (p in seen) printf "%d\t%s\t%d\n", (p in s ? s[p] : 0), p, (p in u ? u[p] : 0) }' \
+| sort -rn | awk -F'\t' "$AWK_LIB"'
+    !hdr { printf "    %-10s %10s %10s %9s %-11s\n", "pointer", "shopping", "using", "%using", "95% CI"; hdr=1 }
+    { printf "    %-10s %10d %10d %9s %-11s\n", $2, $1, $3, rate($3,$1), ($1>0?wilson($3,$1):"") }'
 
 # ---- contact funnel ---------------------------------------------------------------------------
 echo ""
@@ -764,6 +863,13 @@ awk -F'\t' '$5=="units" && $6 ~ /^preset:/ {print $6}' "$TMP/signal" | sort | un
 echo ""
 echo "--- Preset clicks by served language (a language always clicking US is one this gets wrong) ---"
 awk -F'\t' '$5=="units" && $6 ~ /^preset:/ {print ($3==""?"(none)":$3)"\t"$6}' "$TMP/signal" | sort | uniq -c | sort -rn | head -30
+echo ""
+echo "--- Preset clicks by ASKED tag, English pages only (the check on the 2026-09-08 default rule) ---"
+echo "    A button is pressed by somebody the default got wrong. Since 2026-09-08 an English page"
+echo "    opens on US customary for en-us and on SI for every other tag, so the counter-signal"
+echo "    is en-gb / en-au / en-ca pressing US, or en-us pressing SI. Before that date every"
+echo "    English page opened on US, so an old window shows SI presses on every tag, correctly."
+awk -F'\t' '$5=="units" && $6 ~ /^preset:/ && $3 ~ /^en(-|$)/ {print ($4==""?"(none)":$4)"\t"$6}' "$TMP/signal" | sort | uniq -c | sort -rn | head -20
 echo ""
 echo "--- Individual unit selections, by family ---"
 awk -F'\t' '$5=="units" && $6 !~ /^preset:/ {print $6}' "$TMP/signal" | sort | uniq -c | sort -rn | head -40

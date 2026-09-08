@@ -33,11 +33,13 @@ if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
 $page = isset($_POST['page']) ? preg_replace('/[^A-Za-z0-9_-]/', '', $_POST['page']) : '';
 $lang = isset($_POST['lang']) ? preg_replace('/[^A-Za-z-]/', '', $_POST['lang']) : '';
 
-// Which of the two fields. A closed set, not sanitized free text: the client has no business
-// naming a new column value, and an unknown one is a bug worth seeing as a 400 rather than
-// quietly widening the vocabulary of the log.
+// Which field. A closed set, not sanitized free text: the client has no business naming a new
+// column value, and an unknown one is a bug worth seeing as a 400 rather than quietly widening
+// the vocabulary of the log. The set is 'title' and 'subtitle' on a form calculator and 'save'
+// and 'rename' on Looped-Network (2026-09-08), and it lives in ecNamingFieldBit() with the
+// de-duplication bit each one owns.
 $field = isset($_POST['field']) ? $_POST['field'] : '';
-if (!in_array($field, array('title', 'subtitle'), true)) {
+if (ecNamingFieldBit($field) === 0) {
     $field = '';
 }
 
@@ -70,7 +72,7 @@ if (isset($_POST['offline_ts'])) {
 // to the 'visit' bucket rather than being dropped.
 // Task 288: title and subtitle are two different findings and keep their own bits, so somebody
 // who adds a subtitle after a title still shows up as both.
-$fieldFlag = ($field === 'title') ? EC_SEEN_TITLE : EC_SEEN_SUBTITLE;
+$fieldFlag = ecNamingFieldBit($field);
 $alreadyLogged = ecAnalyticsConsented() && ecSeen($page, $fieldFlag);
 if (!$alreadyLogged) {
     ecMarkSeen($page, $fieldFlag);

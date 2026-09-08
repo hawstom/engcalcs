@@ -28,21 +28,48 @@
  */
 
 // Shared option lists. A family below either names one of these or spells out its own.
-$u_distance      = Array('m', 'mm', 'ft', 'in');
+//
+// THE ORDER IS MEASURED, NOT ALPHABETICAL AND NOT "SI FIRST" (Tom, 2026-09-08: *"Let's act on the
+// units ordering"*). The dropdown is opened only by somebody switching AWAY from the preset, so the
+// unit people switch TO belongs at the top. Ranked by the `units` signal rows of
+// engcalcs-signal.log, pooled over the two windows on record, 2026-08-14..22 (8.5 d) and
+// 2026-09-03..07 (4.0 d), both buckets -- dev/usage-data-log.md, 2026-09-08 entry:
+//
+//   distance_small   mm 165   m 127   ft 43   in 40
+//   distance_medium  m 50     mm 19   in 9    ft 7
+//   flow_channel     lps 245  gpm 167  m3ps 101  mgd 75  ft3ps 33  mld 4   (flow_pipe adds 19 rows
+//                    in the same order and is too small to argue with)
+//   slope            gradePercent 539   grade 118
+//   fraction         depthPercent 324   depthFrac 92
+//   head/pressure    mh2o 35 and then single digits -- left in its SI-then-US grouping
+//
+// Two rules keep this from being re-sorted on noise: a pair whose counts differ by fewer than 5
+// keeps the order it had (distance_medium's in 9 / ft 7), and NOTHING IS EVER DELETED -- an unused
+// option costs a user nothing, a missing one costs them the calculator. Order is cosmetic to
+// every mechanism here: presets pick by NAME, the cookie stores the NAME, and the only reader of
+// position is js/Cookies.lib.js falling back to the first option when a saved unit is no longer
+// offered (dev/unit-families.md).
+$u_distance_small  = Array('mm', 'm', 'ft', 'in');
+$u_distance_medium = Array('m', 'mm', 'ft', 'in');
 $u_head_pressure = Array('mh2o', 'mmh2o', 'kpa', 'bar', 'kgfcm2', 'fth2o', 'inh2o', 'psi');
 $u_water_column  = Array('mh2o', 'mmh2o', 'fth2o', 'inh2o');
-$u_flow          = Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd');
-$u_fraction      = Array('depthFrac', 'depthPercent');
+$u_flow          = Array('lps', 'gpm', 'm3ps', 'mgd', 'ft3ps', 'mld');
+$u_fraction      = Array('depthPercent', 'depthFrac');
+$u_slope         = Array('gradePercent', 'grade');
 
 $ec_unit_families = Array(
     // --- Distance. Three families, by the scale of the thing being measured. ---
-    'distance_small'   => $u_distance,                          // pipe diameter, roughness, rock size
-    'distance_medium'  => $u_distance,                          // pipe/channel length, depths, elevations
+    // distance_small and distance_medium offer the same four units and differ in DEFAULT; they
+    // now also differ in ORDER, because the measured switch-to unit differs (mm on a diameter, m
+    // on a length). Two lists, then, each shared by every family that ranks the same way.
+    'distance_small'   => $u_distance_small,                    // pipe diameter, roughness, rock size
+    'distance_medium'  => $u_distance_medium,                   // pipe/channel length, depths, elevations
     'distance_site'    => Array('m', 'ft'),                      // canal & penstock length, gross head
     // Absolute roughness height is conventionally quoted in FEET in US practice
     // (0.0005 ft commercial steel), not inches -- hence its own family rather than
     // distance_small. Same option list; different default. That is the rule at work.
-    'roughness'        => $u_distance,
+    // No selection data of its own (2 rows), so it follows its sibling's order.
+    'roughness'        => $u_distance_small,
 
     // --- Head and pressure. ---
     // total_head deliberately offers water-column units ONLY: an EGL or HGL is an
@@ -80,14 +107,14 @@ $ec_unit_families = Array(
     'flow_area'        => Array('m2', 'mm2', 'ft2', 'in2'),
     'land_area'        => Array('m2', 'ft2'),
     'velocity'         => Array('mps', 'ftps'),
-    'slope'            => Array('grade', 'gradePercent'),
+    'slope'            => $u_slope,
     // Same two options as 'slope', different DEFAULT (ROADMAP Task 177, lpn_'s head loss
     // gradient) -- per CLAUDE.md's unit-family rule, a family splits on a differing DEFAULT, not
     // differing options. mpf_/mphl_'s friction slope defaults to raw grade (ft/ft) and formats it
     // to 4 decimals in its own JS; lpn_'s generic 2-decimal-everywhere label formatter would show
     // a typical small pipe gradient (e.g. 0.0036) as "0.00" at that precision, so it needs
     // gradePercent (0.36) as its default instead, without changing mpf_/mphl_'s own default.
-    'gradient'         => Array('grade', 'gradePercent'),
+    'gradient'         => $u_slope,
     'stress'           => Array('npm2', 'psf'),
     'volume'           => Array('m3', 'ft3', 'acft'),
     'unit_discharge'   => Array('m2ps', 'ft2ps'),
@@ -179,28 +206,59 @@ $ec_unit_sets['si'] = Array(
 );
 
 /**
- * Which preset a first-time visitor sees, chosen by their language (ROADMAP Task 165,
- * Tom 2026-07-28).
+ * Which preset a first-time visitor sees (ROADMAP Task 165, Tom 2026-07-28; refined on the
+ * measured data 2026-09-08).
  *
- * English gets US customary; every other language gets SI. Rationale: measured
- * per-language human reach is en 83%, es 10%, then a <=1% tail, and the English
- * audience is dominated by US municipal/storm-drain work that is quoted in inches,
- * feet, cfs, gpm and psi -- while essentially every other language in the suite is
- * spoken where SI is the working system. A single global default had to be wrong for
- * one of those two groups.
+ * US CUSTOMARY ONLY FOR AN ENGLISH PAGE IN A BROWSER THAT SAYS IT IS IN THE UNITED STATES;
+ * SI FOR EVERYBODY ELSE. Task 165's rule was "English gets US customary, every other language
+ * SI", and it carried its own known limitation: English is not the United States. The usage
+ * logs then measured that limitation. Preset clicks on pages SERVED IN ENGLISH, pooled over the
+ * two windows on record (2026-08-14..22 and 2026-09-03..07, dev/usage-data-log.md):
  *
- * KNOWN LIMITATION: "English" is not "United States". A visitor in the UK, Australia,
- * India, Ireland, New Zealand, Nigeria or South Africa works in SI but reads English,
- * and lands on US units. Refining this would mean reading the region subtag from
- * Accept-Language (en-GB vs en-US) rather than the app's normalised two-letter code;
- * deliberately not done here, because the two-letter code is what the whole language
- * system is built on and one exception to that is worse than one imperfect default.
- * Such visitors get a correct page, one click from right.
+ *     SI  298      US  141
  *
- * Returning visitors are unaffected either way: the cookie stores each select's option
- * VALUE (the conversion factor), not its index or its label.
+ * A preset button is pressed by somebody the default got wrong, so those are 298 English
+ * readers per twelve and a half days switching to SI against 141 switching back -- and the
+ * Search Console export of 2026-09-07 says why: 54.6% of search clicks come from the United
+ * States and 23.5% from Canada, Australia, New Zealand, the UK, India and South Africa, who
+ * read English and work in SI. One default for "English" is wrong for a quarter of the
+ * English audience, and the browser already says which quarter.
+ *
+ * So the region subtag of the browser's first Accept-Language tag decides, and it decides
+ * for the ENGLISH page only -- Task 165's SI rule for every other language is untouched. Tom,
+ * 2026-09-08: *"I lean toward SI when it's ambiguous anyway"*, which settles the two tags that
+ * carry no region: a bare `en` gets SI. A request with NO Accept-Language header at all is a
+ * different case -- a CLI render, a crawler, a harness -- and keeps the status quo, US for
+ * English, so every worked example in dev/calc-spike/ still renders the US defaults it was
+ * anchored on (render_page.php seeds no header).
+ *
+ * NOTHING NEW IS STORED and no cookie is read: the header is on every request already, and a
+ * returning visitor is unaffected either way because the page's own cookie stores each
+ * select's option VALUE (the unit's NAME), never its index or its label.
+ *
+ * The next report checks this: log/lang-log-stats.sh prints preset clicks by ASKED tag, so an
+ * en-gb visitor now landing on SI who presses US is the counter-signal, and it is visible.
+ *
+ * @param string $lang     the two-letter language the page is served in
+ * @param string|null $askedTag  ecBrowserLangTag() -- lowercase first Accept-Language tag, '' when
+ *                          the header is present but empty, null when there is no header
+ * @return string 'us' or 'si'
  */
-define('EC_DEFAULT_UNIT_SET', (isset($clanguage) && $clanguage === 'en') ? 'us' : 'si');
+function ecDefaultUnitSet($lang, $askedTag) {
+    if ($lang !== 'en') return 'si';
+    if ($askedTag === null) return 'us';                 // no header: the status quo, see above
+    // The United States and its territories. Liberia and Myanmar also use customary units
+    // and are not listed: a browser in either sends 'en-lr' or 'en-mm' once in a blue moon,
+    // and SI is the wrong answer they are one click from, not a broken page.
+    $usRegions = array('en-us', 'en-um', 'en-pr', 'en-gu', 'en-vi', 'en-as', 'en-mp');
+    return in_array($askedTag, $usRegions, true) ? 'us' : 'si';
+}
+// The header is read through lib/config.inc.php's two helpers and nowhere else (Task 319:
+// browser_lang_tag_check.php fails any other file that touches it).
+define('EC_DEFAULT_UNIT_SET', ecDefaultUnitSet(
+    isset($clanguage) ? $clanguage : '',
+    function_exists('ecAcceptLanguagePresent') && ecAcceptLanguagePresent() ? ecBrowserLangTag() : null
+));
 
 /**
  * CONVERSION FACTORS

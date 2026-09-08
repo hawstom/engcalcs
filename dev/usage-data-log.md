@@ -1309,3 +1309,210 @@ instead of having them inferred from the rows it still holds.
 **One number outside lpn, because it is the largest behavioural signal in the report:** 210 outbound
 clicks to Engineering ToolBox's Manning roughness table, against 70 to `hawsedc.com/frictionslope.php`.
 That is Task 216's instrument answering Task 217's question at a volume nothing else here reaches.
+
+---
+
+## Search Console export, 2026-09-07 — the second one on file, read by a script this time
+
+Source: `hawsedc.com-Performance-on-Search-2026-09-07.zip`, the hawsedc.com property, filter
+"Last 3 months", Web search. **Read by `php dev/scripts/search_console_summary.php <zip>`**, which
+is new: the 2026-07-27 clusters above were hand-typed and could not be reproduced, so this export
+and every later one use the regular expressions in that script, printed with their numbers. The
+two readings are therefore the same *shape* but not the same *method*; a cluster's count moved
+partly because the definition did. The zip itself is not committed, as before.
+
+**How to hand over the next one:** download the same Performance export as a zip, put it anywhere
+(the Desktop is fine), and give the path. The script unpacks it, prints the block below, and the
+block is pasted here under a dated heading. Nothing else is needed.
+
+```
+filter: Date = Last 3 months        days with data: 52, 2026-07-16 .. 2026-09-05
+site totals (Chart.csv): 6,770 clicks, 104,090 impressions, CTR 6.5%
+Queries.csv is Google's top 1,000 rows: 2,970 clicks, 26,080 impressions -- a sample
+```
+
+**The property's data begins 2026-07-16**, which is why "three months" is 52 days. Everything in
+the 2026-07-27 reading (999 queries, 5,621 impressions) was eleven days of the same property; this
+is 52, so absolute counts are not comparable and shares are.
+
+### Devices — the only device figure that exists outside the new pointer column
+
+| device | clicks | share | impressions | share | CTR | position |
+|---|---:|---:|---:|---:|---:|---:|
+| Desktop | 6,212 | 91.8% | 84,255 | 80.9% | 7.4% | 10.2 |
+| Mobile | 540 | 8.0% | 19,476 | 18.7% | 2.8% | 7.7 |
+| Tablet | 18 | 0.3% | 359 | 0.3% | 5.0% | 12.3 |
+
+Search arrivals only, so not the audience — but it is the first number anywhere in this project
+bearing on ROADMAP Task 285, and it says: **a fifth of the people Google shows us are on a phone,
+and a twelfth of the ones who click are.** Phones see us at a better position (7.7 against 10.2)
+and click a third as often. The pointer column shipped the same day answers the on-site half.
+
+### Countries — the evidence behind the unit-preset change
+
+| country | clicks | share |
+|---|---:|---:|
+| United States | 3,698 | 54.6% |
+| Canada | 591 | 8.7% |
+| Australia | 503 | 7.4% |
+| Spain | 237 | 3.5% |
+| New Zealand | 223 | 3.3% |
+| Mexico | 158 | 2.3% |
+| Brazil | 101 | 1.5% |
+| United Kingdom | 83 | 1.2% |
+| Colombia | 80 | 1.2% |
+| Peru | 66 | 1.0% |
+| India | 55 | 0.8% (2,782 impressions, CTR 2%) |
+
+**English-reading, SI-working countries are 23.5% of clicks** (Canada, Australia, UK, India,
+Ireland, NZ, South Africa, Nigeria, Philippines, Pakistan, Kenya, Singapore, Malaysia, Ghana), against
+54.6% from the United States. That is the quarter of the English audience the old "English gets
+US units" rule was wrong for, and it is what the region-subtag rule below fixes.
+
+### Query clusters (top-1,000 sample; regexes in the script)
+
+| cluster | queries | impressions | clicks | CTR |
+|---|---:|---:|---:|---:|
+| Manning | 195 | 7,032 | 1,961 | **27.9%** |
+| Sewer / drainage | 189 | 3,782 | 67 | 1.8% |
+| Slope / grade / fall | 151 | 2,997 | 26 | 0.9% |
+| Channel / trapezoid | 47 | 1,508 | 118 | 7.8% |
+| Hazen-Williams | 71 | 1,335 | 49 | 3.7% |
+| Darcy / friction factor | 39 | 549 | 1 | 0.2% |
+| LLM-retrieval-shaped | 62 | 496 | 34 | 6.9% |
+| Weir | 22 | 451 | 17 | 3.8% |
+| Culvert | 11 | 357 | 10 | 2.8% |
+| Peaking factor / Harmon | 14 | 309 | 6 | 1.9% |
+| Network / EPANET / looped | 3 | 80 | 0 | 0% |
+| Orifice | 7 | 46 | 1 | 2.2% |
+
+**Is the sewer-slope cluster still the largest unconverted demand? Yes, and by more than before.**
+Sewer, drainage and slope queries with no "manning" in them: **190 queries, 3,557 impressions,
+60 clicks, 1.7% CTR** — half of Manning's impressions returning 3% of its clicks. The single
+largest query on the site that we do not win is *"4 inch sewer pipe minimum slope in mm"*: 505
+impressions, 3 clicks, position 6. Then *"sewer pipe slope"* 179/0, *"minimum slope for 3 inch
+sewer pipe"* 154/0, *"minimum slope for sewer pipe"* 101/1, *"minimum sewer slope"* 73/0 at
+position 3.5. These people want a table or a rule of thumb, not a calculator, and they are
+arriving at position 3–10 and not clicking. The 2026-07-27 reading said the same with smaller
+numbers; nothing has been built for it and the demand has not moved.
+
+The LLM-retrieval cluster is now 62 queries and 34 clicks (it was 55 and zero), so somebody's
+retrieval is landing. Manning is still won at 27.9% CTR; *"pipe flow calculator"* alone is 310
+clicks on 1,695 impressions at position 3, the largest single generic term.
+
+### How Looped-Network and LibreWaterNet are indexed
+
+**`Looped-Network.php` is indexed and invisible.** Nine URL variants, 62 impressions, 2 clicks.
+The `?lang=en` variant carries 51 of the impressions at **position 33.8**; the bare URL has 3
+impressions at position 8.3. Every "network" query in the sample — *"pipe network calculation"*
+(60 impressions, position 38.9), *"water network simulation"* (14, position 39.3), *"plumbing
+network"* (6, position 66.8) — got zero clicks. Compare Branched-Network: 37 impressions, 2 clicks.
+The map page has not yet earned a search presence, and the canonical consolidation onto
+LibreWaterNet (`57d68579`) had not had time to register when this export was taken.
+
+**`librewaternet.org` does not appear at all, and cannot:** this export is the hawsedc.com property.
+LibreWaterNet is its own property in Search Console (if it has been added), and its export would
+be a second zip. Until one is on file, nothing here says how the landing page or `/app` is indexed.
+
+Two housekeeping facts from the Pages sheet: **clicks are split across two hosts**, `hawsedc.com`
+4,396 against `www.hawsedc.com` 2,405 (with 40 on `www.dev.hawsedc.com`, which should not be
+indexed at all), and **translated URLs take 13% of clicks** — `?lang=es` 696, `pt` 91, `fr` 90, `he`
+38 — with Google's own "Translated results" feature adding 23 clicks on 1,072 impressions. `es`
+alone is 10.2% of all clicks, which is the same share the 2026-07-21 language reading found.
+
+---
+
+## 2026-09-08 — four instruments changed, and two decisions taken on the data
+
+Tom read `dev/log-knowledge-2026-09-06.md` and asked for the changes below. None of them stores
+anything new on a visitor's device; `consent_body` and `EC_CONSENT_VERSION` are untouched, and
+`privacy.php` gained one clause naming the pointer fact.
+
+### The pointer tier (Task 285) — a new column, and its own tier
+
+`engcalcs-human-view.log` and `engcalcs-calc-usage.log` now carry a fifth column before the bucket:
+`coarse` (a finger), `fine` (a mouse, pen or trackpad) or blank, from
+`matchMedia('(pointer: coarse)')` at send time, closed-set filtered by `ecPointerClass()`. Rows
+written before this date have no fifth column and the report counts them as **unknown, never as
+fine**. The report prints it as a DEVICE section of its own — shares per bucket, coarse by page in
+the page-load bucket, and using/shopping within each pointer class — and never folds it into
+reach, shopping or using. **The first reading is the next weekly report; nothing on file has the
+column yet.**
+
+### The naming instrument for Looped-Network
+
+`engcalcs-title.log` accepts `save` and `rename` beside `title` and `subtitle`
+(`ecNamingFieldBit()` holds the closed set). `save` de-duplicates on the title bit and `rename` on
+the subtitle bit, which is safe because the digit is per page and the map page renders neither
+field. `EngCalcs.logNamingEvent(field)` in `js/Calculators.lib.js` is the one client entry point;
+**the call sites in `js/looped-network.js` are not in yet** — the report's "named" column for
+Looped-Network reads a save, its "renamed" column a rename, and until the editor calls the
+function the page still prints `n/a`, correctly.
+
+### The unit-option order is now a measurement
+
+`units` signal rows, both buckets, pooled over the two windows on record (2026-08-14..22, 8.5 d,
+and 2026-09-03..07, 4.0 d — different populations, pooled only to rank options):
+
+| family | selections, most to least |
+|---|---|
+| distance_small | mm 165, m 127, ft 43, in 40 |
+| distance_medium | m 50, mm 19, in 9, ft 7 |
+| flow_channel | lps 245, gpm 167, m3ps 101, mgd 75, ft3ps 33, mld 4 |
+| flow_pipe | m3ps 7, lps 6, gpm 4, ft3ps 2 (too small; shares flow_channel's list) |
+| slope | gradePercent 539, grade 118 |
+| fraction | depthPercent 324, depthFrac 92 |
+| velocity | mps 65, ftps 4 (already in that order) |
+| flow_area | m2 51, mm2 13, in2 5, ft2 3 (already m2 first; in/ft within noise) |
+| head and pressure | mh2o 35, then single digits (left in its SI-then-US grouping) |
+
+`lib/Units.lib.php` lists each reordered family in that order; a pair fewer than 5 apart keeps
+its old order (distance_medium's ft/in), and nothing was deleted. Pinned by
+`dev/scripts/unit_default_set_selftest.php` until somebody re-measures.
+
+**Two things the same data says that were NOT acted on**, because each changes a page's default
+numbers rather than a dropdown, and Tom's instruction was about the preset: `slope` selections run
+4.6:1 toward percent while both presets default to raw grade, and on Manning-Pipe-Flow's
+`flow_channel` family gpm is chosen 5:1 over the US preset's ft3ps. A selection is a switch away
+from the default, so both are real; either change means editing every page default in that family
+and its worked example, and is a decision for Tom.
+
+### The first-visit preset: US customary for an English page in a United States browser only
+
+Preset clicks on pages served in English, pooled over the same two windows: **SI 298, US 141.** A
+preset button is pressed by somebody the default got wrong, and the Search Console countries above
+say who: the 23.5% of the English audience that works in SI. So `ecDefaultUnitSet()` now reads the
+region subtag of the browser's first Accept-Language tag: `en-us` (and the US territories) opens on
+US customary, every other tag on SI, a bare `en` on SI (Tom: *"I lean toward SI when it's ambiguous
+anyway"*), every other language on SI as before. A request with no header at all — a CLI render, a
+crawler — keeps the status quo, so the calc-spike worked examples still render US. **The next report
+checks the rule** with two new tables: English by region asked (the reach log's asked column) and
+preset clicks by asked tag on English pages, where an `en-gb` pressing US or an `en-us` pressing
+SI is the counter-signal.
+
+### The served/asked split was already in
+
+Recommendation 2 of the reading was done on 2026-08-22 (`55494d9b`): `logLanguageSelection()` has
+written the served language and the asked tag as two columns since then, and the report's "What
+the reach log SERVED, and what it was ASKED for" section reads them. The reading was stale on
+that point and is corrected. In the live window 2026-09-03..07 the page-load bucket showed served
+non-English 42% against asked non-English 14% — served ABOVE asked, which is crawlers fetching the
+`?lang=xx` URLs, and the reason the confirmed-human figures are the ones to read.
+
+### The opt-out, verifiable
+
+`?ec_nolog=1` on any page sets the cookie; it is httponly, so nothing on a page could show it.
+`https://hawsedc.com/engcalcs/log-human-view.php` opened by hand (a GET) now answers one plain
+line — counted or not counted — for the browser that opened it. The cookie is per host: set it on
+each host you use (`hawsedc.com`, `www.hawsedc.com`, `librewaternet.org`) in each browser.
+
+### Two defects found on the way
+
+- The report derived its "no title field" page list from `"$DIR"/../*.php`, i.e. beside the LOG
+  directory, so every archived run under `spock/<date>/` read an empty list and printed a title
+  rate for the map page. Now `$(dirname "$0")/../*.php`. Found by the selftest fixture.
+- Not a defect, a confirmation: the published copy at
+  `https://hawsedc.com/engcalcs/spock/public/usage-6189c17caf18ab3682420140e466af5d.html` read
+  `WINDOW 2026-09-03 .. 2026-09-07` on 2026-09-08, so the Monday cron ran and the URL is the way to
+  read production from a session. (`librewaternet.org/spock/...` is a 404; that host serves the
+  suite under `/app`, not the checkout root.)

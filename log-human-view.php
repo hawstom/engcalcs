@@ -20,6 +20,18 @@ require_once __DIR__ . '/lib/config.inc.php';
 
 header('Content-Type: text/plain');
 
+// OPENED IN A BROWSER BY HAND, this endpoint says whether THAT browser is counted. It is the only
+// way to verify the ?ec_nolog=1 opt-out took: the cookie is httponly, so no script and no
+// address-bar trick can read it, and a beacon answers 204 whether it wrote a row or not. Plain
+// text, no markup, nothing logged. A GET with no page is what a person typing the address
+// produces; a beacon is always a POST. Task 210.
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    echo (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut())
+        ? "not counted: this browser carries ec_nolog=1 and no usage log will record it\n"
+        : "counted: this browser is not opted out (open any page with ?ec_nolog=1 to opt out)\n";
+    exit;
+}
+
 // Task 210: a browser that opted out is not counted. Answered 204 like a normal success so the
 // beacon is never queued for retry -- an opted-out event must not come back later.
 if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
@@ -29,6 +41,8 @@ if (function_exists('ecLoggingOptedOut') && ecLoggingOptedOut()) {
 
 $page = isset($_POST['page']) ? preg_replace('/[^A-Za-z0-9_-]/', '', $_POST['page']) : '';
 $lang = isset($_POST['lang']) ? preg_replace('/[^A-Za-z-]/', '', $_POST['lang']) : '';
+// Task 285: the one device bit. Closed set, see ecPointerClass(); anything else is ''.
+$pointer = ecPointerClass(isset($_POST['pointer']) ? $_POST['pointer'] : '');
 
 if ($page === '') {
     http_response_code(400);
@@ -80,7 +94,7 @@ if (!$alreadyLogged) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . ecLogBucketSuffix() . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\t" . $pointer . ecLogBucketSuffix() . "\n";
     @file_put_contents(HUMAN_VIEW_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 
