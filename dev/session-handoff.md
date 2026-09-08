@@ -1,4 +1,4 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-06 (third session)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-08 (fourth session)
 
 **Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of one
 unusually dense day and it goes stale fast: everything below is either a RULING Tom made (permanent
@@ -184,81 +184,63 @@ Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he 
   the only reason it was noticed. **Bound a scripted block replacement by LINE NUMBERS you have
   just printed, never by `index()` of the next heading you assume follows.**
 
-## 4. STATE — rewritten 2026-09-06, third pass
+## 4. STATE — written 2026-09-08, fourth session, cut short by Tom's session limit
 
-**The curves paradigm change (Task 586) is verified and its checklist is gone rather than carried.**
-`doc.curves` is the store; all four EPANET kinds exist as library objects; a tank USES its volume
-curve. The harnesses assert it. Nothing here needs believing.
+**Tom's 2026-09-08 message is the worklist and it is long.** It is reproduced in
+`dev/tom-2026-09-08-worklist.md`, item by item, with DONE / RUNNING / NOT STARTED against each.
+Read that file first; the rest of this section is the mechanics.
 
-**THE TRANSLATION BACKLOG IS ACCUMULATING ON PURPOSE.** On 2026-09-06, after Task 605, it stood at
-**31 CHANGED and 9 NEW**. **Read the two scripts rather than this line** — it is the number that goes
-stale fastest in this file, and an earlier version of it sized a sprint against work that was already
-done. **The judgement that keeps being re-made and should not be: do not sprint into churning
-English.** Task 605 alone moved 25 shipped values, and the pipe library is moving more. One sprint
-after the churn settles costs 26 agents; two sprints across it cost 52 and the first one's output is
-partly thrown away. Accumulate, then propose once.
-
-**`lpn_scncmp_at` no longer gates anything.** Tom ruled in conversation on 2026-09-06 — the English
-stands as `{value} at {id}`. The `$ec_lang_syn` half was PROPOSED and is still unwritten: it needs
-written permission naming it, and has been put to him once, labelled.
-
-**THE SERVER HALF OF TASK 479 IS WAITING ON TOM AND ON NOBODY ELSE.** The code half shipped
-2026-09-06: `ecSwMounts()` declares `/engcalcs/` and `/app/`, the worker's scope, its
-`Service-Worker-Allowed` header and its fetch routing all derive from that list, and
-`sw_scope_check.php` blocks on any of the four disagreeing. What remains is the symlink, the `/app`
-rewrite and the `CANONICAL_ORIGIN` line, in that order, with the canonical change LAST because it is
-the slow one to undo.
-
----
+- **Two agent worktrees may hold UNCOMMITTED work** under `.claude/worktrees/`: the lpn batch
+  (box persistence, the eight Task 266 follow-ups, Esc to unselect) and the icon retry
+  (WT-WIDE and WT-TALL-3 with the catwalk, `dev/icon-preview/concepts-2026-09-08b.html`). If a
+  worktree is dirty and its agent is gone, `git -C <worktree> diff` and finish it by hand or
+  brief a fresh agent from `git diff`; do not discard it. If it has commits, merge, run
+  `check_all.sh`, push, delete the branch. `git worktree remove -f -f` is needed while the
+  agent's lock is held.
+- **AI commits carry `--author="Claude Code for Tom Haws <tom.haws@gmail.com>"`** (CLAUDE.md).
+- **Style guide is APA now, not Oxford.** `dev/language-strings.md` has the list.
+- **A translation sprint is authorized in Tom's words for this session** (*"Proceed with a
+  translation sprint whenever you deem it prudent"* and *"A full translation sprint is needed"*),
+  but a new session must re-confirm before spawning 26 agents: the authorization was given for
+  that conversation. 131 English keys changed and 77 are new since the last sync
+  (`detect_english_drift.php`). Sprint AFTER the second lpn batch lands, since it edits more English.
+- **Screenshot 0082.PNG is in `dev/screenshots/`** and is Tom's centerpiece (Task 612): it leads
+  `dev/screenshots/INDEX.md`, the landing page screenshots and the social card. Not done yet.
+- **`dev/positioning.md` §6 cites epanet-js as precedent for our LibreEPANET name.** Tom's
+  2026-09-08 ruling on the EPANET name (market researcher journal, second 2026-09-08 entry)
+  undercuts that precedent; ask him before editing.
+- **The lpn naming log call site is NOT in `js/looped-network.js` yet.** The logging agent's
+  report gave the one-liners: `EngCalcs.logNamingEvent('save')` after a successful save when
+  `!project.gallery`, `EngCalcs.logNamingEvent('rename')` after `renameProject()`, and
+  `project.gallery = ex.file` in `openExample()`. First job of the second lpn batch.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-**A SECOND ROUND OF RULINGS LANDED THE SAME DAY AND IS ALSO BUILT.** Task **605** retired the
-built-in solver from view -- `epanet` is the default, the gallery banner lost its engine clause, and
-25 English values stopped framing EPANET as one of two options; what deliberately SURVIVED is every
-sentence a reader meets only when something has gone wrong, because a fallback that does not say
-what answered is worse than one that does. Task **606** fixed the box-height cap that did not follow
-its box. Task **178** closed on his word, with its filmstrip half extracted as Task 607. **His Help
-menu order is now his own numbered list and is asserted**, which reverses where 596 put Not EPANET.
-**The open question 605 leaves is the PRECACHE and it is his**: the ~664 KB engine is not in the
-service worker's manifest, so a first-time visitor now fetches it on their first solve.
-
-**FOUR EARLIER RULINGS WERE SPENT ON 2026-09-06 AND ALL FOUR ARE NOW BUILT. Do not re-ask, and do not
-re-propose the alternatives they declined.** 596 shipped as an lpn-only Help row and **the
-suite-wide footer link stays DECLINED**. 602 shipped as label (a) with the DISPLAY inverted and
-`settings.engine` untouched in storage — a project stating `epanet` still selects EPANET and now
-shows the box unticked. 479's code half is above. 574 is CLOSED, and the answer is that a profile is
-in no `.net` at all: EPANET writes it to a separate `.PRO` file through an ordinary save dialog and
-records the path nowhere, so reading one is Task 604 and there is nothing to recover from a project
-file.
-
-**THE PRIORITY 100 BAND IS NOW FIVE ROWS AND FOUR OF THEM WANT `js/looped-network.js`**, which is
-the sequencing problem below stated as a fact about today's backlog rather than as a warning: 465
-(library pipes, with 590's fittings picker resolving through the same `effective()`), 266
-(multi-select, in epanet-js's three-mode paradigm Tom disclosed), 186 (spreadsheet tables, whose
-selection model the `data-entry-clerk` has specified) and 322 (half B, the survey). **Two design
-records were written on 2026-09-06 so the building does not have to re-derive them**:
-`dev/pipe-library-design.md`, and the clerk's fourth journal entry for 186.
-
-**Buildable now, needing nobody:**
-
-1. **Task 599 — graph a value against time across an EPS.** The utility-planning-engineer ranked
-   this joint first of the five plot rows on 2026-09-06 and its reason is worth carrying: every
-   published master-plan hydraulic chapter it read reports results this way, and this suite can
-   solve the run today and cannot hand over the chart. The data already exists — a run keeps every
-   reporting step. Draw it the way `lpn_profile_*` is drawn: no chart library, nothing vendored.
-2. **Task 603 — name the nodes on the profile axis.** Tied first in the same ranking, and cheap: it
-   closes a real deficiency in a feature already shipped, because a profile with no names answers
-   *where* and cannot answer *which junction*, which is the whole reason a profile gets read aloud.
-3. **Task 600's cheap two thirds — frequency distribution and system flow balance.** A histogram is
-   a sort and a bucket count. **The engineer ranked CONTOUR fourth, below both**, against Tom
-   starring it: it is the only one with real geometry, and its own answer is that a filled contour
-   must never be extrapolated past the convex hull of the nodes carrying the value.
-4. **Task 539 phase two — the gang move.** Phase one overturned the plan it was written against:
-   across 28 drawings there are **9 leader-leader crossings against 76 label-on-leader**, so the
-   segment-intersection test the roadmap proposed sees about a tenth of the problem.
-
----
+1. Merge or finish the two worktrees above. Push.
+2. **Second lpn batch, one agent on the big file** (Opus is fine; Tom said so): naming-log call
+   site; pipes and pumps too hard to click on a PC without their label (hit tolerance on the
+   geometry, not the label); Esc clears selection in select mode if not already done; node
+   label drop order lowest-last like links, then reword `lpn_labels_priority_node_tip` like the
+   link tip; `lpn_goto_tip` and the Go-to parser accept `lat,lon` with a comma; verify
+   `lpn_georef_twopt_tip` no longer needs "press again to stop picking" (Tom removed it; if the
+   button does toggle, ask him to test); switching project tabs mid xy-to-lat/lon wizard is fatal
+   to both projects, so disable the switch during the wizard; rules: add two `[RULES]` to Net1's
+   example so Tom can test, and validate referenced assets when a rule is saved ("Passed: rule is
+   valid" / "Failed: Tank 26 not found"); Quality tolerance: the setting Tom flagged in
+   `dev/lpn-tip-copy-review.md` is EPANET's water-quality TOLERANCE (default 0.01), not a hydraulic
+   convergence, so relabel and retip, and delete the unread `lpn_settings_tolerance` if nothing
+   renders it; tank reaction order EXISTS in EPANET (`ORDER TANK`, toolkit `EN_TANKORDER`, not
+   in the GUI), so the tip should say so; a junction Source Quality editor (Source type, Source
+   quality, Time pattern) is missing from the junction popup though `lpn_source_*` keys exist;
+   audit `lpn_settings_emitter_exponent`, `lpn_time_menu`, `lpn_reaction_pipe_tip` (Tom cannot
+   find them in the UI) and the `lpn_inp_drop_*` family (all but `lpn_inp_drop_controls` are still
+   read by JS; delete only what nothing renders and say which).
+3. Task 611 library import from another project file; Task 599 time series; Task 592 CSV
+   junction import; Task 247 customers first slice. All on the big file, so sequential.
+4. Translation sprint (re-confirm with Tom), then `detect_english_drift.php --baseline-new`.
+5. Task 612 screenshot 0082 placement. CLAUDE.md's `web_manifest_check.php` table row still
+   describes the old `/app` ratchet, and `README.md:137` and `dev/hosting-layout.md` §3 predate
+   the canonical consolidation.
 
 ## 7. THINGS NOT TO DO
 
