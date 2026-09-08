@@ -181,3 +181,38 @@ talk, the single highest-value follow-up this seat could do is try again to reac
 Ohmer et al. 2017 abstract on ScienceDirect through an institutional proxy — both blocked this session
 and last, and both are the most likely places a competing claim could already exist. Flagging as the
 next action rather than doing it now, since it needs an access route this environment does not have.
+
+## 10. SUPERSEDES ROW 8 — OWA-EPANET first, Luke Butler second, and the note raises the naming concern
+
+2026-09-08, after Tom's ruling on the EPANET name (journal, second entry of that date, section 1,
+his words verbatim). **Row 8 above is superseded and must not be sent as drafted**: it offered
+no-strings contribution to epanetjs.com, which is precisely what he says he cannot offer in good
+faith. It is left in place as the record of what this seat recommended before knowing his position.
+
+**What changed and what did not.** The evidence for writing to Luke Butler at all is untouched
+(MacWright, `macwright.com/2025/07/03/epanet-placemark`). What changed is the shape: the note now
+raises the naming reservation up front and states plainly what Tom would and would not do. Revised
+draft, 246 words, is in the journal entry, section 5.
+
+**Two things I verified that should reach him before he sends anything.** (a) The channel is
+`youtube.com/@iteratinginc`; **7 of the 10 titles in its feed name epanet-js, and only 3 do not** —
+"Fire flow analysis with EPANET", "Georeference an EPANET model", "From GIS to running model -
+EPANET modeling workshop". The title he recalled does not exist verbatim. The fair charge is
+search-intent ambiguity, not dishonesty, and I recommend he not use that word in a first message.
+(b) **I could not reach any primary trademark register from this environment** — eight routes
+tried, all blocked, each named in the journal. Nothing secondary suggests a registration exists for
+EPANET, epanet-js or Iterating, and EPA's own page says EPANET is public domain and that EPA
+endorses nobody. Do not upgrade that to "there is no trademark" without a person checking
+`tmsearch.uspto.gov` by hand.
+
+**The ranked recommendation: OWA-EPANET first, and it is now a sequencing argument, not just a
+cheaper door.** Tom's objection is that the EPANET name belongs to the community; OWA-EPANET IS
+that community. Contributing there is the positive form of the same conviction, has no awkward
+first sentence, is where our actual dependency lives, and gives him standing in the community he is
+invoking when the note to Butler goes out. Honest caution: OWA is asynchronous and GitHub-shaped,
+so it produces a contribution over weeks, not a handshake in ten days.
+
+**One thing for Tom, not for me: `dev/positioning.md` section 6 currently cites epanet-js as "the
+standing proof that the name can be used this way" and says the question is settled.** His ruling
+removes that precedent. The legal leg is untouched; the norms leg loses its only citation. I have
+not edited that file and will not — flagging it so he decides.
