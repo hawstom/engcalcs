@@ -27,6 +27,14 @@ uncommitted; silence means commit and push.
   `git log --oneline origin/master..master` is empty. Never tell Tom to `git pull` before verifying
   the push landed.
 
+### Every AI commit is authored "Claude Code for Tom Haws" (Tom, 2026-09-08)
+
+**`git commit --author="Claude Code for Tom Haws <tom.haws@gmail.com>"` on every commit an AI
+makes**, in a worktree or on `master`. Tom: *"I would like some way to distinguish my own commits
+from those done by Claude Code."* The committer stays Tom, so nothing about push rights or
+attribution to the account changes; `git log --author="Claude Code"` and `git blame` tell the two
+apart. The trailer line is not enough because `blame` does not read trailers.
+
 ### Commit messages: subject only by default (Tom, 2026-08-16)
 
 **Write a subject line of ≤72 characters and NO body.** Add a body only when a future reader would
@@ -213,19 +221,20 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     AI-written whatever it says. A ratchet on new and edited strings, not a sweep: 60 shipped
     strings carry 69 of them and rewriting those would buy 1,560 retranslations of text whose
     meaning did not move. `dev/language-strings.md` has the scope and Tom's wording.
-  - **AND THE ONE THING THAT IS NOW SETTLED IS MECHANICS, WHICH IS NOT A VOICE** (Tom, 2026-09-06:
-    *"I would like to standardize on Oxford until/unless it proves unworkable for this project. In
-    fact, I would not be shy to state that in public."*). **New Hart's Rules / the Oxford style is
-    this project's reference for spelling, punctuation and the serial comma**, in `dev/*.md`, in
-    code comments, in commit messages and in visitor-facing English alike. This does NOT reinstate
-    the rule struck above and must not be read as licence to: it decides whether a list takes a
-    comma before "and", not whether a sentence is allowed to say *drawdown*. A style GUIDE answers
-    "how is this written down"; a house STYLE answered "what may be said", and that is the one that
-    licensed *rest pressure* and *pulled down* three times. **The two failure modes it settles are
-    real and small**: `-ize` against `-ise`, and the serial comma, both of which had been decided
-    per sentence by whoever was typing. **The one place it is deliberately overruled is the em
-    dash**, which Oxford is happy with and this project is not, for the reason above. He is willing
-    to state the choice in public, so it may appear on a page; nothing has been written yet.  - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
+  - **AND THE ONE THING THAT IS NOW SETTLED IS MECHANICS, WHICH IS NOT A VOICE** (Tom, 2026-09-08:
+    *"After doing some research, I see that we need to follow APA, not Oxford. Please make the
+    change and teach me as we go."* This supersedes his 2026-09-06 choice of Oxford). **The APA
+    Publication Manual, 7th edition, is this project's reference for spelling, punctuation, numbers
+    and the serial comma**, in `dev/*.md`, in code comments, in commit messages and in
+    visitor-facing English alike. In practice: Merriam-Webster American spelling (*color*, *center*,
+    *meter*, *modeling*, *-ize*), the serial comma, numerals from 10 up and for anything with a unit.
+    A ratchet on new and edited strings, never a sweep. The full list of what it settles, with
+    examples, is in `dev/language-strings.md`. This does NOT reinstate the rule struck above and
+    must not be read as licence to: it decides whether a list takes a comma before "and", not
+    whether a sentence is allowed to say *drawdown*. **The one place it is deliberately overruled is
+    the em dash**, which APA is happy with and this project is not, for the reason above. He is
+    willing to state the choice in public, so it may appear on a page; nothing has been written yet.
+  - **AND WHEN ONE NAME IS DOING TWO JOBS, SPLIT IT RATHER THAN CHOOSE** (Tom, 2026-09-01: *"Source
     trace mystifies me if it's intended to mean Share from source"*). It did: `lpn_quality_trace`
     named the ANALYSIS and `lpn_result_source_share` named the NUMBER, and both said "Source
     share". The analysis is EPANET's **Source trace** on EPANET's **Trace node**; the number it

@@ -64,21 +64,39 @@ of English: it says whose words to use, not what sort of words to prefer.)*
 - **Do not rename eponyms or bibliographic citations** — Manning, Darcy-Weisbach, Robinson and actual
   paper titles stay as published in every role.
 
-**SETTLED: Oxford is the reference for MECHANICS, and mechanics only.** Tom, 2026-09-06: *"I would
-like to standardize on Oxford until/unless it proves unworkable for this project. In fact, I would
-not be shy to state that in public."* So New Hart's Rules / the Oxford style decides spelling
-(`-ize`), punctuation, and the serial comma, everywhere this project writes English: `dev/*.md`,
-code comments, commit messages, and visitor-facing strings alike.
+**SETTLED: APA is the reference for MECHANICS, and mechanics only** (superseding Oxford, which
+stood for two days). Tom, 2026-09-08: *"After doing some research, I see that we need to follow
+APA, not Oxford. Please make the change and teach me as we go. We will do our best with this unless
+it proves to be unworkable or incompatible with our literature."* So the *Publication Manual of the
+American Psychological Association*, 7th edition, decides spelling, punctuation, and the serial
+comma everywhere this project writes English: `dev/*.md`, code comments, commit messages, and
+visitor-facing strings alike. What APA settles, in the order it will come up here:
+- **Spelling is Merriam-Webster's first listing**, so American: *color*, *center*, *meter*, *liter*,
+  *modeling*, *gray*, *program*, *catalog*, and *-ize* (which Oxford also had). A RATCHET on new and
+  edited strings, never a sweep: a shipped *colour* is not retranslated to change nothing a reader
+  of 26 languages sees.
+- **The serial comma is required**: *pressure, velocity, and head loss*.
+- **Numbers**: numerals for 10 and above and for anything with a unit or a decimal (*6 in*, *0.5*,
+  *3 tanks* is the exception that follows the under-10 rule: *three tanks*); words for zero to nine
+  otherwise, and never a numeral to open a sentence.
+- **Abbreviations are defined at first use** in a page's prose (*extended-period simulation
+  (EPS)*), then used bare. An abbreviation on a column heading needs no definition; the tip is
+  where it lives.
+- **Hyphenation follows Merriam-Webster**, and a compound modifier before a noun takes the hyphen
+  (*fixed-head node*, *two-point fit*) while the same words after it do not (*the node is fixed
+  head*).
+- **Punctuation goes inside closing quotation marks**, and a colon introduces a list or an
+  explanation only after a complete clause.
 
 **This does not reinstate the house style struck above, and reading it that way is the error to
 avoid.** A style guide answers *how is this written down*; the struck house style answered *what may
 be said*, and that is the one that licensed "rest pressure", "pulled down" and "settle" three times
-over. Oxford has no opinion about whether a string may say *drawdown*, and neither does this line.
+over. APA has no opinion about whether a string may say *drawdown*, and neither does this line.
 Nothing here overrides `plain_english_swap_check.php`, `$ec_lang_syn`, `glossary.json` or Tom's own
 reading of `dev/new-english-keys.md`, all of which remain the evidence a wording decision rests on.
 
-**The one deliberate departure is the em dash**, which Oxford is perfectly happy with and this
-project is not, for the reason immediately below. Where the two disagree, the advisory wins.
+**The one deliberate departure is the em dash**, which APA uses freely (closed up, no spaces) and
+this project does not, for the reason immediately below. Where the two disagree, the advisory wins.
 
 **ADVISORY: avoid the em dash in visitor-facing English, until further notice.** Tom, 2026-09-01,
 restoring this one deliberately after the rest of the house style was struck: *"we do need an

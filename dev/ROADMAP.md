@@ -47,6 +47,29 @@ the block.
 
 # Tasks
 
+- 75|610| **Paste that CREATES table rows, and Ctrl+Shift+PageUp/PageDn to the next table.**
+  The two halves of Task 186 that did not ship when it closed 2026-09-08. Paste past the last row is
+  dropped and counted today because a row is an element on the map; creating one is the ID-collision
+  and validation question the `data-entry-clerk` ranks separately (its wish list §1). The table hop is
+  Tom's *"lower priority, but very cool"*.
+
+- 75|611| **Import a library (pipe types, fittings, curves) from another project file.**
+  Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
+  file, then import anything that is not a name conflict, that probably would be all that's needed."*
+  No export function: a project file already is the export. A name conflict is reported and skipped,
+  never renamed silently.
+
+- 75|612| **[H] Screenshot 0082 is the centerpiece of any lpn display.**
+  Tom, 2026-09-08, having replaced it: *"I consider my replacement to be the quintessential
+  expression of the state of this project. I would consider it the current centerpiece of any
+  display about lpn."* The file is not in `dev/screenshots/` yet (the folder ends at 0081); once it
+  lands, it leads `dev/screenshots/INDEX.md`, the landing page's screenshots, and the social card.
+
+- 25|613| **[H] "Note" instead of "Text" for the free-text map object.**
+  Tom, 2026-09-08: *"Maybe it doesn't matter or we should wait for user demand or a population we
+  can poll."* Waiting for that population. Renaming touches every `lpn_text_*` key in 27 languages,
+  so it is not done on a hunch. EPANET calls the same object a Label, which we already declined.
+
 - 5|537| **[H] PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.**
   Tom parked it 2026-08-26 (*"Compact and park. 5"*) after asking whether file access was the field
   operator's blocker. Researched from both seats, separately, and they converged.
@@ -91,7 +114,7 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 75|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
+- 100|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
   **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
   and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size).
   **RAISED TO 75 by Tom the same day**: *"I am excited about this contribution of Market
@@ -220,29 +243,7 @@ the block.
     maps to itself in the whitelist. Measured the day the symlink landed. The sequence was right --
     hawsedc.com cannot defer to URLs that 404 -- but the window is a real cost, not a neutral pause.
 
-- 75|603| **Name the nodes along the profile plot's own axis, as EPANET does.**
-  Tom, 2026-09-06: *"I note that EPANET puts node labels on a profile plot. Very useful."*
-  - **IT IS THE ONE THING A PROFILE IS READ FOR, and we do not have it.** `lpn_profile_*` draws the
-    ground and the hydraulic grade against distance, so a low point is visible and ANONYMOUS: the
-    reader can see where the pressure falls and cannot say which junction it falls at. Every use of
-    a profile ends in naming a node out loud, to a colleague or in a report.
-  - **The distance axis already knows where each node lands**, so this is a reader over geometry
-    that exists, not new arithmetic -- the same reason Task 599 ranks where it does.
-  - **THE HARD HALF IS CROWDING, AND THE ANSWER IS ALREADY WRITTEN IN THE RIGHT FILE.**
-    `labelStride(positions, minGap)` in `js/lpn-profile.js` takes coordinates along an axis and
-    returns the indices there is room to draw -- greedily from the left, **and the last one always,
-    because the end of a path is the one station a reader looks for by name**. That is this problem
-    exactly, in the module that already owns the axis. `js/lpn-collide.js` is the MAP's answer and is
-    the wrong reach: a row of labels on one axis is a one-dimensional stride, not weighted-box
-    relaxation in a plane.
-  - **The drawing lives in `js/looped-network.js`, not in `js/lpn-profile.js`**, which is pure and
-    holds the series and the axis arithmetic. Say so in the brief -- a track that assumes otherwise
-    will find its territory is the big file after all.
-  - Do it with Task 599 if they land together: a time-series plot and a profile that both name
-    their points want one idiom, and a second plotting vocabulary on this page is the expensive
-    mistake either way.
-
-- 75|599| **Graph a value against time across an extended-period run.**
+- 100|599| **Graph a value against time across an extended-period run.**
   Tom, 2026-09-06: *"We haven't added anything for time series reporting or graphing such as one or
   more nodes' pressure or head across an EPS."* Correct, and it is the gap that costs most: the run
   ships (`js/lpn-time.js`), the frames are already kept, and the only way to read one node across
@@ -489,7 +490,7 @@ the block.
   `Irrigation.php` it has a real in-site path. Check what that contributes before assuming the
   numbers mean nobody wants it.
 
-- 75|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
+- 100|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
   EPANET does not. **Full design, with the costs priced: `dev/customer-demands.md`.**
   - **Tom's expansion, in his words:** *"expand/envision as a Customer management model where we are
@@ -827,31 +828,6 @@ the block.
   size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
-
-- 100|186| **Make the Tables pane spreadsheet-interoperable.**
-  **THE SPREADSHEET IS COMPLETE except paste-that-creates-rows** (2026-09-07). Cells abut; the
-  whole arrow, Home/End and Ctrl family navigates and extends; range copy is TSV out of
-  `paneCellText()`. Tom then asked for the rest of the paradigm and it is in: *"we are over the
-  tipping point and we should go all the way."* `dev/lpn-spike/pane-select-harness.js`, 75 checks.
-  - **NAVIGATION AND EDIT ARE REAL MODES, AND `readOnly` IS THE MECHANISM.** A cell is read-only
-    until something puts it into edit, so an arrow key CANNOT be swallowed by the text -- whatever
-    the key handler does or forgets to do. A flag alone would leave the browser moving a caret
-    underneath it. Typing OVERWRITES, F2 or a double-click EDITS, Escape abandons, Delete empties.
-  - **ESCAPE PUTS THE TEXT BACK AND FIRES NOTHING.** Restoring before the blur means the value at
-    blur equals the value at focus, so the browser's own `change` never fires and there is no
-    commit to undo. A flag telling the commit to skip itself is a second way of saying the same
-    thing and the two could disagree.
-  - **THE PASTE TILES OUT OF ONE LINE** -- `max(selection, source)` then modulo -- which is both
-    halves of Tom's rule at once: one cell fills a rectangle, two rows into six repeat three times,
-    two into three repeat one and a HALF, and three rows into one selected cell all land, because
-    "at least one whole time" is what stops a selection of one truncating a block of forty. Columns
-    are not restricted, on his ruling. It cannot grow the table: a row is an element on the map, so
-    anything past the last row is dropped and COUNTED.
-  - **STILL OPEN:** paste that CREATES elements, which is the ID-collision and validation question
-    the `data-entry-clerk` ranks separately; and `Ctrl`+`Shift`+`PageUp`/`PageDn` for the next
-    table, which Tom ranks *"lower priority, but very cool"*.
-  - **NEEDS A BROWSER PASS** (2026-09-07): the abutting-cell CSS, and whether an IME or a dead key
-    survives the overwrite path, which no harness can see.
 
 - 5|191| **Junction emitters: surface the pressure-dependent demand already solved.**
   Originated during Task 146. Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
