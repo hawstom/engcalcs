@@ -200,3 +200,19 @@ copy/navigation work that has no design questions left to answer. I am recording
 answer different questions: this entry is "in what order should the approved spec ship," the
 original item 1 is "the approved spec's IN direction is narrower than my seat needs, widen it
 before it is called done."
+
+## UPDATE 2026-09-08 to item 1: paste-onto-EXISTING-rows has shipped; the remaining gap is narrower
+
+**OBSERVED** (journal, fifth invocation): `panePasteAt()` (`js/looped-network.js:13677-13711`) now
+tiles a copied spreadsheet block onto the Tables pane's current selection, with validation, undo
+and a notice reporting what was refused or dropped. This closes the "no Add row control... no path
+by which typing could ever set a pipe's endpoints" complaint for SCALAR properties of elements that
+already exist — that part of my original item 1 is done.
+
+**What is still missing, unchanged from the original ask:** row CREATION by paste. The function's
+own comment says so directly: *"IT CANNOT GROW THE TABLE... Anything past the last row or the last
+column is dropped and COUNTED."* From/To and X/Y are still not typeable at all (unverified again
+this session whether that half changed; not re-checked). **Ranking unchanged** — still item 1,
+still behind nothing I found reason to move it behind — but the size of the remaining gap is
+smaller than when I wrote the original entry, and a future invocation should re-verify the
+From/To and X/Y claim before repeating it, since the paste mechanism clearly moved since 2026-09-04.

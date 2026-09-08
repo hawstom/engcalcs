@@ -990,3 +990,160 @@ now:
 - The one honest caution: OWA is asynchronous and GitHub-shaped. There is no mailing list and no
   community call (I searched, 2026-09-08, and found neither). "Joining" means opening an issue and
   doing work, over weeks. It is not a handshake, and it will not produce a relationship in ten days.
+
+## 2026-09-08 — Tom's two statements: license-freedom hierarchy, and a standing donation offer
+
+### The two statements, verbatim (CITED — Tom is the source, both sent 2026-09-08)
+
+(1) *"Luke Butler: The other reservation, and I love my Luke Butler and want to know him better, is
+that I can't contribute to epanetjs.com — less free than LibreWaterNet.org — when there is a
+realistically sustainable way to realize LibreWaterNet.org — less free than EPANET, we all have our
+rationalizations."*
+
+(2) Sent minutes later: *"Luke Butler: I forgot to say that I would very happily donate this project
+in its entirety to any foundation or person who would let me stay on in my current role while
+keeping or improving on my mission and means (license terms). I can talk to anybody in that
+context. I can talk to anybody in that context."*
+
+### Part 1 — verifying the license-freedom hierarchy in (1)
+
+The three-step hierarchy is: EPANET (freest) > LibreWaterNet (GPL) > epanet-js (least free).
+Checked directly, 2026-09-08:
+
+- **EPANET itself is US EPA public-domain software** — confirmed already in this journal's earlier
+  2026-09-08 entry via `https://www.epa.gov/water-research/epanet`: *"EPANET is public domain
+  software that can be freely copied and distributed."* Public domain has no licence at all, which
+  is a stronger claim than any open-source licence, GPL included. CITED, unchanged from earlier
+  today.
+- **LibreWaterNet (this suite) is GPL v3 or later.** OBSERVED: `dev/positioning.md:107` ("We are GPL
+  v3 or later, with no paid tier..."), matching the repository copyright header convention.
+- **epanetjs.com, the web app, is FSL-1.1-MIT.** CITED, fetched directly today from
+  `https://github.com/epanet-js/epanet-js/blob/main/LICENSE`: the file carries two licences layered
+  by date — an MIT block for "Copyright (c) 2023 Placemark" covering the original fork, and an
+  **FSL-1.1-MIT block, "Copyright 2025 ITERATING INC."**, for everything contributed after the first
+  commit. FSL (Functional Source License) restricts "Competing Use" and converts to plain MIT two
+  years after each release — i.e., not OSI-approved open source today, becomes so later, one release
+  at a time. This matches `dev/positioning.md:102-104` exactly (*"the app at epanetjs.com is
+  FSL-1.1-MIT — not FLOSS today; it converts to MIT after two years"*) — **positioning.md is current
+  on this point, not stale.**
+- **The TOOLKIT this repo vendors is a narrower thing and checks out as MIT.** OBSERVED:
+  `js/vendor/epanet-js.LICENSE:1-3` is a plain MIT block, "Copyright (c) 2019 Luke Butler," with no
+  FSL text at all — this is the npm-published `epanet-js@0.9.0` package specifically, not the
+  GitHub source tree. `js/vendor/README.md` states this correctly.
+- **One thing worth flagging as risk, not as a positioning error: the GitHub `epanet-js` toolkit
+  repo's OWN `main`-branch `LICENSE` file, fetched today, already carries the FSL-1.1-MIT block for
+  post-fork contributions dated 2025 and credited to Iterating Inc.** — the same company, the same
+  licence, as the web app. That does not touch the vendored `0.9.0` (its licence file has none of
+  that text), but it means a FUTURE `npm pack epanet-js` — the exact upgrade path
+  `js/vendor/README.md`'s own "Upgrading" section names — could pull FSL-covered code without
+  anyone noticing, because that section's instructions do not include a licence re-check step.
+  **Recommendation, size zero: add "re-fetch and diff `LICENSE`" to the Upgrading steps.** Flagged
+  in the wish list below rather than edited into `js/vendor/README.md` myself, since it is a shipped
+  file.
+- **Net verdict on (1): the hierarchy is factually correct as stated, and `dev/positioning.md` needs
+  no correction.** EPANET (public domain) is freest; LibreWaterNet (GPL v3+, copyleft, cannot be
+  taken private) is in the middle; the epanetjs.com *application* (FSL, temporarily non-free,
+  converting to MIT on a two-year lag) is least free of the three. Tom's "we all have our
+  rationalizations" is his own editorializing and is not a factual claim to check.
+
+### Part 2 — candidate homes for a donated GPL project where the founder stays on as maintainer
+
+Checked six candidates against three questions: does it accept GPL, does it require copyright
+assignment (which would collide with statement (1)'s valuation of staying free), and would a
+founder credibly keep maintaining post-donation. All CITED, fetched 2026-09-08 unless noted.
+
+1. **Software Freedom Conservancy (SFC).** Best license-philosophy fit — it is the FSF's own
+   fiscal-sponsorship spinoff and explicitly champions copyleft. Requires an OSI-approved AND
+   DFSG-free licence (GPL v3 qualifies on both). **Copyright assignment is OPTIONAL, not
+   mandatory** — CITED, `sfconservancy.org/projects/apply/`: *"Conservancy will accept partial
+   copyright assignment"* and unified assignment is offered as a service, not demanded — so this is
+   the one candidate that does NOT collide with (1)'s reservation about giving anything up.
+   Member-project structure keeps the project's own leadership in place; SFC provides the legal/fiscal
+   shell around existing maintainers, which fits "let me stay on" directly. **The real obstacle is
+   maturity, not licence:** *"an existing, vibrant, diverse community... Projects under one year old
+   or mere proof-of-concept implementations typically don't qualify"* and evaluation runs *"over a
+   period of many months."* Cost: 10% of any revenue Conservancy processes (moot — this project takes
+   no donations today). **This suite does not have an external contributor community; it has Tom and
+   AI seats.** That is the actual bar, not the licence.
+
+2. **NumFOCUS.** Requires an OSI-approved licence (GPL qualifies) and an explicit public governance
+   structure, but ALSO **requires a leadership body of at least 3 people who are not employed by the
+   same entity**, plus 3–5 signatories on the fiscal-sponsorship agreement. CITED,
+   `github.com/dask/governance` issue #1 and corroborating pages. **LibreWaterNet fails this test by
+   structure today** — one human maintainer — independent of the licence question. NumFOCUS's own
+   sponsored-project roster also skews scientific-Python/numerical computing (pandas, NumPy,
+   Jupyter); a PHP/JS hydraulic-calculator suite is an atypical mission fit, though I found no
+   explicit exclusion rule — SPECULATION on the mission-fit point, not confirmed by NumFOCUS's own
+   criteria text.
+
+3. **Open Source Geospatial Foundation (OSGeo).** CLA modeled on Apache's, but **copyright stays
+   with the original contributor by default; assignment to the foundation is optional**, CITED
+   `wiki.osgeo.org/wiki/Contributor_Agreement` and `osgeo.org/about/licenses/`. Accepts any
+   OSI-approved licence (GPL is fine — QGIS itself is GPL and is an OSGeo project). Mission fit is
+   partial: this suite's `lpn_` calculator has a real geographic mode (Mercator projection, lon/lat
+   storage, Task 497 elevation), but the suite's centre of gravity is hydraulic calculators, not GIS
+   — OSGeo's own incubation checklist expects a geospatial-software identity. Incubation is a
+   multi-stage, checklist-driven process (`wiki.osgeo.org/wiki/Project_Graduation_Checklist`) that
+   plainly runs months to years, not days.
+
+4. **Apache Software Foundation.** **Ruled out on licence grounds alone.** CITED,
+   `apache.org/licenses/GPL-compatibility.html`: ASF requires all its own code be distributed under
+   Apache License 2.0, and GPLv3 code cannot be incorporated into an ASF project *because it would be
+   incompatible with that requirement* — accepting a GPL codebase into the Incubator means relicensing
+   it to Apache-2.0, a permissive licence. That is the opposite direction from what statement (1)
+   values (GPL as the freer choice, permissive as a lesser rationalization) — donating to Apache would
+   require Tom to do the exact thing his own quote frames as a compromise. Not a fit; no further
+   research warranted.
+
+5. **Linux Foundation / LF Energy.** Accepts any OSI-approved licence for the *code* (copyright stays
+   with contributors), but **requires the project to "agree to transfer any relevant trademarks to
+   The Linux Foundation or its affiliate, LF Projects, LLC"** and to have "a successful license scan,"
+   CITED `lfenergy.org` hosting-requirements pages. Trademark surrender is a real, named cost — the
+   project's name and branding pass to LF's neutral ownership, which is a different (milder) version
+   of the naming-control question already live in this journal re: Luke Butler/EPANET. Also requires
+   **sponsorship by an existing LF Energy Technical Advisory Committee (TAC) member** to even start —
+   i.e., an internal champion Tom does not currently have. Mission fit for LF Energy specifically
+   (grid/energy software) is weak for a water-utility tool; the parent Linux Foundation hosts a
+   broader range but I found no faster or lower-barrier path there.
+
+6. **A water-sector-specific body: the Open Water Foundation (OWF).** The one genuine sector match I
+   found. CITED, `openwaterfoundation.org` (fetched today) and ProPublica Nonprofit Explorer
+   (`projects.propublica.org/nonprofits/organizations/462676240`): a real 501(c)(3), *"create open
+   source software and open data solutions to make better decisions about water resources,"* small —
+   FY2024 revenue $45,650, CEO Steve Malers. **What I could NOT verify: whether OWF acts as a fiscal
+   host/umbrella for THIRD-PARTY donated projects at all**, versus developing its own tools (its
+   visible flagship is TSTool, a time-series utility) — its public page states no policy on accepting
+   outside projects, no licence requirement, no governance model for one. This is a stated absence,
+   not a "no": the honest next step is a direct email, not an inference. Cheapest of the six to check
+   and the only one worth a one-message ask before any foundation conversation with the bigger names.
+
+7. **Open Water Analytics (the OWA-EPANET community itself).** Not a candidate on the same footing as
+   1–6: it is a community, not a legal entity I could confirm can receive a donated codebase or hold
+   a governance agreement — OBSERVED via `github.com/OpenWaterAnalytics/EPANET` fetched today, "an
+   international group of EPANET developers and users," no CLA, MIT licence, no foundation structure
+   named. This is the existing recommendation (wish-list row 10, journal earlier today) for
+   CONTRIBUTION, not for DONATION — different question, already answered separately.
+
+### What is actionable before 2026-09-17, and what is not
+
+**None of candidates 1–5 are actionable within nine days as an actual donation conversation** — every
+one that gave a timeline said months (SFC explicitly; OSGeo's checklist process implies the same;
+NumFOCUS and LF both gate on structural prerequisites — a 3-person leadership body, a TAC sponsor —
+that do not exist yet and cannot be manufactured by 2026-09-17). This is a next-year conversation, not
+a this-week one, **with one exception**: SFC's actual disqualifier is not licence or paperwork, it is
+"no external community yet," and that is the same gap the OWA-contribution track (wish-list row 10)
+is already built to close. **The single highest-leverage action available in the short term is the
+one already queued: contribute visibly to OWA-EPANET.** It does double duty — it is the honest form
+of Tom's naming stance (already argued), and it is also the one concrete thing that starts the clock
+on SFC's "existing, vibrant community" bar, which today is the real blocker, not the licence.
+
+**What IS cheap and doable this week: one exploratory email to the Open Water Foundation** asking
+whether they take on donated third-party projects and on what terms — candidate 6, above, is the only
+one where the honest answer is "unknown, and a single message would resolve it," rather than "known,
+and it takes months."
+
+SPECULATION, mine: statement (2) reads as a genuine standing offer rather than a decision to act on —
+Tom's own words are "I would very happily donate... I can talk to anybody in that context," which is
+an open door, not a plan. Nothing here should be read as a recommendation to initiate a donation
+conversation now; it is a recommendation about which door is cheapest to knock on first, and that
+door (OWF) costs one email.

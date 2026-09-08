@@ -5,6 +5,35 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0. Add a licence re-check step to the epanet-js upgrade instructions
+
+2026-09-08: checking Tom's EPANET-freedom-hierarchy statement, I found that `epanet-js`'s own
+GitHub `LICENSE` file (`github.com/epanet-js/epanet-js/blob/main/LICENSE`, fetched today) now
+carries a mixed MIT + FSL-1.1-MIT structure — plain MIT for the original Placemark-era commit,
+FSL-1.1-MIT (Iterating Inc., 2025) for everything contributed since. The vendored `0.9.0` package
+(`js/vendor/epanet-js.LICENSE`) is still pure MIT with none of that text, so nothing shipped today
+is affected. But `js/vendor/README.md`'s own "Upgrading" section says `npm pack epanet-js`,
+re-copy two files, redo one import-specifier edit, run the validator — **no step re-checks the
+licence**, so a future upgrade past 0.9.0 could silently pull FSL-covered code. Cheap, one line
+added to that section. Not something this seat can edit itself (shipped file); recording it here
+for whoever next touches that README. Ranked at 0 because it costs nothing and prevents a real
+mistake, not because it is urgent — nobody is upgrading that dependency today.
+
+## 0b. One exploratory email to the Open Water Foundation
+
+2026-09-08, prompted by Tom's standing donate-the-project offer: of six candidate foundation homes
+checked (Software Freedom Conservancy, NumFOCUS, OSGeo, Apache, Linux Foundation/LF Energy, Open
+Water Foundation), five have a known, months-long process and structural prerequisites this project
+does not meet today (SFC wants "an existing, vibrant, diverse community"; NumFOCUS wants a 3-person
+leadership body from different employers; Apache would force a GPL-to-permissive relicense, which
+runs against the freedom-hierarchy Tom himself stated the same day). **The Open Water Foundation
+(openwaterfoundation.org, a small water-sector 501(c)(3), CEO Steve Malers) is the only one where I
+could not find a public answer either way to "do you take on donated third-party projects,"** and it
+is the closest sector match of the six. A single email would resolve that unknown for near-zero
+cost. Full comparison: journal, 2026-09-08 entry, Part 2. This is a fact-finding suggestion, not a
+donation recommendation — see that entry's closing note on what statement (2) actually is (a
+standing offer, not a decision to act).
+
 ## 1. CSV/GPX import of surveyed points as junctions
 
 **PROMOTED 2026-09-06 — it is now `dev/ROADMAP.md` Task 592, priority 50.** Placed at 50 rather than

@@ -620,3 +620,162 @@ nothing per row but a lot per SESSION ranks far below one that saves a little pe
   NOT something the selection model has to route around here. Flagging it only because the check
   it's named in reads across surfaces I was asked to compare it against, and I want the record to
   show I looked and found nothing to reconcile.
+
+## Fifth invocation, 2026-09-08 — Tom's two direct questions
+
+### Q1: toolbar visual order vs. keyboard (digit) order
+
+**OBSERVED** The digit scheme I got wrong on 2026-09-06 (I said no comparable tool bound a bare
+key; Tom corrected me from the running product) has since shipped: `LPN_TOOL_KEYS`
+(`js/looped-network.js:32254-32257`) = `{1: select, 2: add-junction, 3: add-reservoir,
+4: add-tank, 5: add-pipe, 6: add-pump, 7: add-valve, 9: add-text}` (8 deliberately withheld for a
+future Customer element). The handler at `:32258-32265` fires on a bare digit, gated on
+`isTextEntry()`, exactly the guard I recommended.
+
+**OBSERVED** The visual (DOM) order, read from `wireToolbar()` (`js/looped-network.js:21937` on):
+`fileGroup` (Open, Save — no digits) → `addGroup` (Junction, Reservoir, Tank, Pipe, Pump, Valve,
+Text — `:22037-22045`, digits 2,3,4,5,6,7,9 in that order) → `editGroup` (Select, then the
+select-area cycle button, Vertices, Delete, Undo — `:22047-22100`, Select carries digit 1; the
+other four carry no digit) → `viewGroup` (Zoom to fit) → the water-network group (Libraries,
+Settings, Run, Transport, time selectors — none of these carry a digit).
+
+**The mismatch is exactly one button.** Every digit-bearing button EXCEPT Select already sits in
+strict ascending order left to right (2,3,4,5,6,7,9). Select carries the lowest digit (1) but sits
+visually eighth among the eight keyed buttons, because `addGroup` (the Insert tools, all keyed)
+was placed before `editGroup` (which happens to hold Select). Tom's own two remedies both fix this
+same one button; they differ in how much else moves with it.
+
+- **"Break up the Edit group"**: pull only Select out of `editGroup` and place it ahead of
+  `addGroup`, leaving select-area/vertices/delete/undo where they are. Achieves full digit-order
+  compliance (the four unkeyed siblings have no digit to be out of order with). Cost: it splits
+  Select from the three other selection/editing operations it currently sits beside, so the visual
+  cluster that currently reads "these five buttons are the editing group" becomes two clusters with
+  Select isolated at the front.
+- **"Move it all left of the Insert group"**: relocate the whole five-button `editGroup` ahead of
+  `addGroup`. Also achieves full compliance (same reasoning: only Select's digit matters), and does
+  it while keeping the editing cluster intact. It also happens to put Select — the default,
+  resting-state tool — in the leftmost position right after the two File buttons, which is the
+  common convention in pointer/drawing tools generally (pointer/select tool first, leftmost) —
+  SPECULATION, not independently re-verified this session; I have cited this convention in past
+  sessions for other suites (Illustrator, Photoshop-style tool palettes) but did not re-source it
+  today, so treat it as a plausible pattern rather than a confirmed one.
+
+**Recommendation: move the whole Edit group, not just Select.** It reaches the identical
+digit-order result at (as far as I can tell from reading `wireToolbar()`) a smaller code change —
+swap the order two `group()` blocks are appended in, rather than extracting one `modeButton()` call
+out of a five-button block and re-homing it — and it does not fracture the one existing grouping
+cue (an editing operations cluster) that a first-time reader currently gets for free.
+
+**Ground this honestly in my seat's own arithmetic, and say where it does NOT apply.** My seat's
+usual claim is "one extra keystroke times four hundred rows is an hour" — a cost that scales with
+row count. **Toolbar visual order does not scale that way for the fluent keyboard user this seat
+represents**: once a clerk has the digit bindings memorized, they never look at, click, or scan the
+toolbar to switch tools mid-batch — my own gesture count from 2026-09-06 says a homogeneous batch
+(placing 400 of one element type) needs at most a handful of tool SWITCHES for the whole session,
+not 400. So the volume-user cost of getting toolbar visual order wrong is close to zero for someone
+who has already learned the digits. **The real cost this decision affects is a ONE-TIME, per-person
+cost: how fast a new user, scanning the toolbar left to right and reading each button's tip
+("Shortcut: press {key}.", `:21969-21972`), builds the correct mental model that digit order
+follows left-to-right position.** With Select out of place, the first tip a newcomer reads is
+"press 2" (Junction), with no "press 1" anywhere in view until they scroll past the whole Insert
+group — a small, real friction, but a friction of ONBOARDING, not of the repeated-row arithmetic my
+seat usually measures. I am flagging that distinction rather than manufacturing a per-row number
+that is not there: **the premise (visual order should match keyboard order) is reasonable, but the
+volume-user cost argument for it is thin — the case for fixing it rests mostly on new-user
+legibility, not on gestures saved per pipe.**
+
+**Do I think the premise is wrong?** No, but I do not think it is load-bearing for MY seat
+specifically, and I would say so plainly if asked to rank it against Task 186 or 592 — it is a
+correct, cheap, low-risk cleanup, not a volume-entry fix. Move the whole Edit group; it is the
+cheaper of the two remedies and it does not cost the one grouping cue the strip currently offers
+for free.
+
+### Q2: Tables pane paste-in tip wording
+
+**OBSERVED — the feature has substantially shipped since my fourth invocation (2026-09-06), which
+changes the ground under Tom's question.** At that session paste-in onto existing rows was still
+future work (my own shipping-order item 4). It is now built: `panePasteAt()`
+(`js/looped-network.js:13677-13711`) tiles a copied block onto the current selection with Tom's own
+fill rule (2026-09-07, quoted in the code at `:13655-13670`), `paneWriteCellText()` (`:13646-13653`)
+refuses a result column exactly as a keystroke would, and the table's own `paste` listener
+(`:13846-13858`) intercepts a clipboard grid. **It still explicitly cannot CREATE a row** —
+`panePasteAt()`'s own comment, `:13672-13675`: *"IT CANNOT GROW THE TABLE... Anything past the last
+row or the last column is dropped and COUNTED."* This is exactly the gap my wishlist item 1 named
+in the OUT/IN framing — row creation by paste is still Task 186's undone half — and it is directly
+relevant to the wording Tom proposed.
+
+**OBSERVED — `lpn_pane_tab_tip` is the right home for a Tables-specific note, and `lpn_pane_none`
+is the wrong one.** `lpn_pane_tab_tip` (`lib/lang.ec.en.php:1190`, current value: *"This tab shows
+the assets of this kind as a table you can sort and edit. Result columns cannot be edited."*) is
+wired ONLY at `js/looped-network.js:11457`, inside the `forEach` over the six asset-table specs
+(Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves) — Profile has its own tip key and is excluded.
+**`lpn_pane_none`** (`lib/lang.ec.en.php:1191`, *"This network has none of these yet."*) looked like
+the natural home at first — it is the empty-state message, shown exactly when a clerk opens a fresh
+tab with nothing in it, which is the moment a "paste from a spreadsheet" hint matters most — but
+grepping every call site shows it is reused across **at least six Library sections that have
+nothing to do with pasting**: Patterns, Pipe types, Fittings lists, Curves, Controls and Rules
+(`js/looped-network.js:27533, 27753, 27943, 28156, 28741, 28881`), where new entries are created by
+an "Add a ___" button (`libFreeId()`), not by paste. Only the Curves section among those six
+supports paste-creates-rows today (`lpn_library_curve_values_tip`, `:2797` in the lang file, *"The
+rows are added as they are needed"*). **Editing `lpn_pane_none` to claim spreadsheet paste would be
+false on five of its six other call sites** — CLAUDE.md's own tip rule ("reuse stops at sentences...
+a tip shared across controls must be true of all of them") rules this key out directly. Do not
+touch it.
+
+**The wording problem, stated plainly:** Tom's proposed sentence — *"This table is intended to be
+ready for asset entry and creation by pasting from a spreadsheet"* — describes the FUTURE state
+(row creation by paste), which is real, tracked (Task 186, my own wishlist item 1) and not yet
+built. Shipped today as literal fact, it would overclaim: a clerk who reads it, pastes 400 new
+junction IDs into a blank Junctions tab expecting rows to appear, and gets nothing (dropped and
+silently counted per the code comment above, though a UI notice does report the count) would
+correctly conclude the tip lied to them. **This is exactly the shape of failure `public_claim_check.php`
+and the "no extended-period simulation yet" correction in CLAUDE.md exist to catch in shipped
+English — a sentence that was true of a plan and false of the product.**
+
+**Proposed strings, two versions, and which to ship now:**
+
+1. **Ship now, true of the product as it stands** — new key, e.g. `lpn_pane_paste_note`, wired the
+   same way `lpn_pane_tab_tip` already is (only on the six asset-table tabs):
+
+   > "This table is meant for entering values by pasting from a spreadsheet into rows that already
+   > exist. If it does not meet your needs, use Help, Fix something to tell us."
+
+   "Use Help, Fix something" matches the suite's own existing convention for pointing at that exact
+   menu item — `lpn_wrong_tip` (`lib/lang.ec.en.php:910`) already ends *"Use Help, Fix something
+   when you want to say more"* — rather than Tom's own draft phrasing ("please reach out using the
+   Help menu"), which would be the first "please" and the first "Help menu" (rather than "Help,
+   <item>") phrasing anywhere in the `lpn_` tip vocabulary I could find (grepped the whole lang
+   file: "please" appears four times total, all outside `lpn_`, mostly in `about_body_html`). No em
+   dash, no numeral (nothing ≥10 to spell as a digit), and no invented substitute for a term of art
+   — "table", "paste", "spreadsheet", "rows" are all already this file's own vocabulary.
+
+2. **Hold for Task 186's create-by-paste phase, close to Tom's own words** — same key, revised once
+   row creation ships:
+
+   > "This table is meant to be ready for asset entry and creation by pasting from a spreadsheet.
+   > If it does not meet your needs, use Help, Fix something to tell us."
+
+   This is his sentence almost verbatim, with the same Help-item substitution. **Do not ship this
+   version before row creation by paste exists** — it is the sentence CLAUDE.md's own struck-claims
+   section warns against writing before the code backs it.
+
+**Placement, not just wording — flagging this since it changes what "the tip" even means here.**
+`lpn_pane_tab_tip` is a HOVER tip on the tab button itself (`title=`-shaped, reached the same way
+every other toolbar tip is). Given how low the discovery rate for a hover-only tip is on a strip
+Tom's own toolbar comments call "the most expensive space on the page," and given the Curves
+library's OWN precedent for teaching this exact workflow — `lpn_library_curve_values_tip` is
+rendered as a persistent `<p class="lpn-lib-note">` ABOVE the list, not a hover tip
+(`js/looped-network.js:28156`, *"Said once for the section, not once per curve... twenty copies of
+it is what makes a panel unreadable"*) — I would recommend the same persistent-note treatment for
+the Tables pane rather than folding the new sentence into the existing hover tip. That is an
+engineering decision (a new render call in `buildPaneTables()`/`renderPaneTable()`), not just a
+string edit, and outside what I was asked to propose here — flagging it because the wording I
+propose above reads differently depending on whether it is a tooltip glanced at once or a
+persistent line sitting above the table every time it is open, and I think the persistent form
+does more of the job Tom is actually asking for (steer a first-time spreadsheet-literate user
+toward pasting, the same way the Curves note already does).
+
+**Provenance summary for this entry:** the toolbar order finding and the paste-shipped finding are
+both OBSERVED against the current file, line-cited. The "pointer tool first" convention claim is
+SPECULATION, marked as such above. The Help-item phrasing convention is OBSERVED (grepped and
+quoted). Nothing here is CITED — no external source was needed for either question.
