@@ -756,3 +756,237 @@ not re-derived here. This session added one confirming search.
   unreachable this session and last. The honest boundary of the claim is: EPANET (source read
   directly), Bentley's public docs (silent on method), epanet-js's public roadmap (silent on method),
   and a direct search for prior art (none found) — not "the whole field."
+
+## 2026-09-08 (second entry) — Tom's ruling on the EPANET name, and what I verified against it
+
+### 1. Tom's position, verbatim, as a dated ruling (2026-09-08). These are HIS words, not mine.
+
+> "While there is nothing magic or sacred about the name epanetjs, there is something magic and
+> sacred about the name EPANET. WaterCAD didn't call itself EPANET++, WaterGEMS didn't call itself
+> EPANET-GEMS, etc. And for epanetjs to call itself so is, let's just say, impolitely audacious.
+> Beyond that, posting epanetjs.com Youtube tutorial videos with titles like 'How to model Fire Flow
+> in EPANET' is simply dishonest. And dishonesty aside, if I approach Luke, I can't in good faith
+> offer to contribute to epanetjs.com with no strings attached because as heroic as Luke is, I think
+> he is making a mistake with epanetjs, or at least I would be making a mistake going in that
+> direction. I would need to address that first with him, and I am happy to do so in an appropriate
+> way. I appreciate and need [your] advice about reaching out to Luke Butler or anybody else. But
+> [you] should be fully aware of my reasoning before proceeding. This isn't something we should
+> ignore. But we need to have full understanding before proceeding."
+
+**Operative consequences for this seat, read straight off that paragraph and not extended:**
+(a) any outreach to Luke Butler must raise the naming concern BEFORE or WITH any offer to
+contribute, not after; (b) "no strings attached" is off the table as a framing for the epanetjs.com
+app specifically; (c) his objection is to the NAME and to the video TITLES, and he is explicit that
+Luke himself is "heroic" — this is not an objection to the person; (d) my earlier 2026-09-08 draft
+note (above in this journal, and wish-list row 8) is SUPERSEDED, because it offered exactly the
+no-strings contribution he says he cannot in good faith offer. The superseding draft is in section 5
+below.
+
+**A TENSION HE SHOULD SEE, and I am flagging it rather than resolving it, because it is his call
+and `dev/positioning.md` is the authority I am not permitted to contradict.** That file, section 6
+("Our standing on the name — settled, do not re-argue"), currently rests our own claim on
+LibreEPANET.org partly on this sentence: *"EPANET is US EPA public-domain software. It has no owner
+to license from, and epanet-js is the standing proof that the name can be used this way."* If
+epanet-js's use of the name is impolitely audacious, then it is no longer available to us as the
+proof that the use is proper — the legal leg (public domain, no owner) survives untouched, but the
+NORMS leg loses its only cited precedent. His own 2026-08-24 ruling *"Keep both, but EPANET is
+silent"* already points the same way and largely absorbs this, so nothing public is at risk today.
+But section 6 says in terms "settled, do not re-argue", and this is the one input that would reopen
+it. **I have not edited `dev/positioning.md`; it is not mine to write.** SPECULATION as to the
+consequence; the quoted sentences are OBSERVED (`dev/positioning.md`, section 6).
+
+### 2. VERIFIED: the YouTube channel and every title on it
+
+**The channel is `Iterating` — `https://www.youtube.com/@iteratinginc`, channel id
+`UC-dNJi0VNlYdEhhrShP1TGA`** (found linked from `https://epanetjs.com/blog/`, fetched 2026-09-08).
+The YouTube web UI is behind a bot wall in this environment; I read the channel's own Atom feed
+instead, which is primary and machine-readable:
+`https://www.youtube.com/feeds/videos.xml?channel_id=UC-dNJi0VNlYdEhhrShP1TGA` (fetched
+2026-09-08). **CAVEAT: that feed carries only the most recent 15 uploads. Ten came back, so if the
+channel has ever posted more than 15, older titles are invisible to me. I did not verify the total.**
+
+**All ten titles, verbatim, newest first, with dates and URLs — CITED:**
+
+| # | Title (verbatim) | Published | URL |
+|---|---|---|---|
+| 1 | GIS to EPANET tutorial: Building the Rosebery water model with epanet-js | 2026-08-12 | youtube.com/watch?v=p2TJjAWM8ck |
+| 2 | **Georeference an EPANET model** | 2026-06-29 | youtube.com/watch?v=vqSDORj6Ku8 |
+| 3 | Getting started with epanet-js | 2026-02-26 | youtube.com/watch?v=iZiin9UQsUI |
+| 4 | **From GIS to running model - EPANET modeling workshop** | 2026-01-29 | youtube.com/watch?v=QXv6oeFmDoQ |
+| 5 | **Fire flow analysis with EPANET** | 2025-12-07 | youtube.com/watch?v=Rx9JsUwjS3Y |
+| 6 | Visualizing EPANET hydraulic results in epanet-js – Map styling, legends & color ramps | 2025-10-29 | youtube.com/watch?v=IgQHWNpcDVY |
+| 7 | Introducing epanet-js | 2025-10-03 | youtube.com/watch?v=tbbYdd4kWYE |
+| 8 | epanet-js feature update - Split pipes while drawing | 2025-09-22 | youtube.com/watch?v=RqwC1yuqVf4 |
+| 9 | Build an EPANET model with GIS data using epanet-js | 2025-08-11 | youtube.com/watch?v=3B9UWHMb3W4 |
+| 10 | Get started drawing an EPANET model with epanet-js | 2025-07-22 | youtube.com/watch?v=jw7xXLr3wLo |
+
+**The exact title Tom quoted, "How to model Fire Flow in EPANET", does not exist on this channel.**
+The nearest is #5, **"Fire flow analysis with EPANET"**. He was recalling, not quoting; the
+substance of what he saw is real and is #5.
+
+**Are the videos about epanet-js the app, or about EPANET the EPA program? About their own products,
+in all ten cases.** I read every `media:description` out of the same feed. Verbatim openings for the
+three whose TITLE does not contain "epanet-js":
+
+- #5 *Fire flow analysis with EPANET*: "Calculate fire flows in your EPANET hydraulic model.
+  `https://utils.epanetjs.com/fire-flow` - you can do it yourself here!"
+- #2 *Georeference an EPANET model*: "Georeference your EPANET hydraulic models on a real-world
+  basemap. `https://utils.epanetjs.com/georeference` - you can do it yourself here!"
+- #4 *From GIS to running model - EPANET modeling workshop*: "Join Luke Butler, one of the creators
+  of epanet-js, for a deep-dive technical workshop..."
+
+The other seven name epanet-js in the title itself and link `https://epanetjs.com`.
+
+**So the honest scoreboard is 3 of 10, not 10 of 10, and I have to say plainly that "simply
+dishonest" is stronger than what I can support.** Seven titles name their own product. The three
+that do not are ambiguous rather than false, and there is a real defence available for each: an
+`.inp` file genuinely IS "an EPANET model" the way a `.docx` is a Word document, the utilities at
+`utils.epanetjs.com` genuinely do operate on EPANET models, and their engine genuinely is
+OWA-EPANET. **What survives of Tom's point after that deflation, and it does survive, is the
+SEARCH-INTENT argument:** somebody typing "fire flow EPANET" into YouTube is looking for the EPA
+program, and titles 2, 4 and 5 are the ones that meet that search without saying whose product the
+answer is. That is a claim about ambiguity capturing search traffic, which is checkable and fair;
+"dishonest" is a claim about intent, which I cannot check and would not put in a first message.
+**Recommendation: he should not use the word "dishonest" to Luke Butler.** It converts a
+conversation into an accusation on a point where the other side has a plausible answer, and it is
+not needed — the naming argument stands on its own without it.
+
+### 3. VERIFIED, and one thing I could NOT verify: trademarks
+
+- **EPA asserts no trademark in EPANET and states the opposite kind of thing.** From EPA's own page,
+  fetched directly 2026-09-08 (`https://www.epa.gov/water-research/epanet`): *"EPANET is public
+  domain software that can be freely copied and distributed."* The same page carries EPA's standard
+  non-endorsement language: *"EPA and its employees do not endorse commercial products, services, or
+  enterprises"* and *"Any mention of trade names, manufacturers, or products does not imply an
+  endorsement by EPA."* **That second sentence is the sharpest thing I found for Tom's case, and it
+  is not a trademark argument at all** — EPA does not need a mark to have a policy of not endorsing
+  anybody. I am NOT asserting that epanet-js implies EPA endorsement; I am recording that EPA
+  disclaims it in advance, for everyone.
+- **Iterating Inc. asserts no registered mark that I could find, and asserts ordinary ownership of
+  its own site content.** From `https://epanetjs.com/terms-conditions/` (last updated 05 Oct 2025,
+  fetched 2026-09-08), verbatim: *"epanet-js and all associated content, including but not limited
+  to the user interface, graphic design, and text, are the property of Iterating Inc., unless
+  expressly stated otherwise"*, and a use restriction: *"Do not use trademarks, logos, text, or
+  graphic elements from the Web Site for commercial purposes without the express authorization of
+  Iterating Inc."* That is boilerplate and names no registration number, no (R) and no (TM).
+- **NO disclaimer of EPA affiliation exists anywhere I looked on epanetjs.com** — not on the home
+  page, not in the Terms and Conditions. I grepped both full rendered pages for "affiliat",
+  "endorse", "trademark" and "EPA". The Terms hit only the boilerplate above. **This is a real
+  finding of ABSENCE and it is checkable.** Meanwhile the home page's own headline copy, verbatim
+  from the same fetch, is *"The EPANET you know, enhanced"*, the Free tier's first listed feature is
+  *"Web-based EPANET model"*, and their About text opens *"You may not know this, but for decades,
+  the U.S. EPA has given the water industry an extraordinary gift..."*.
+- **WHAT I COULD NOT DO, stated plainly rather than papered over: I could not query any primary
+  trademark register from this environment.** I tried, in this order, and each failed for a stated
+  reason: USPTO's own search backend (`tmsearch.uspto.gov`, several endpoint shapes — the API fronts
+  an S3 bucket that returns `MethodNotAllowed`, and the UI is an Angular app behind an AWS WAF
+  challenge); USPTO's assignment API (`assignment-api.uspto.gov`, empty response);
+  `developer.uspto.gov` (301); Justia Trademarks (Cloudflare "Just a moment" interstitial);
+  Trademarkia (HTTP 403); WIPO Global Brand Database (SPA shell, no usable API without a session);
+  TMview / `tmdn.org` (connection refused, curl code 000); CIPO's Canadian trademark search
+  (redirects to a language-selection page, no reachable API). **So: no secondary source I searched
+  surfaced any registration for EPANET, epanet-js or Iterating Inc., and I found no (R) anywhere on
+  either party's site — but I have NOT read the US or Canadian register and a later invocation must
+  not quote this as "there is no trademark".** The correct sentence is: *I looked in eight places and
+  could not reach a primary register; nothing in any secondary source suggested a registration
+  exists.* If this matters enough to settle, it needs a person with a browser and ten minutes on
+  `tmsearch.uspto.gov` by hand.
+
+### 4. Revised advice: what the honest approach looks like, and what happens after
+
+**Tom's constraint changes the SHAPE of the message but not the case for sending one.** The
+2026-09-08 MacWright evidence still stands unmodified (`macwright.com/2025/07/03/epanet-placemark`:
+Butler and Payá sent fixes upstream to Placemark voluntarily) and it is exactly the evidence that
+this is a person who can receive a hard sentence without treating it as an attack. Sending nothing
+and privately holding the objection is the worst of the options: it costs the relationship anyway if
+it ever surfaces, and it buys nothing.
+
+**The three design rules the revised note follows, each earned from something above:**
+
+1. **Raise the reservation, do not level the charge.** "I have a reservation about the name" is
+   checkable and answerable; "your video titles are dishonest" is an intent claim I could not verify
+   (section 2) and cannot be answered except defensively.
+2. **Say what he WOULD do and what he would NOT.** His own constraint is that he cannot offer
+   no-strings contribution to the app. The honest form of that is to name both halves in the same
+   message rather than withhold the offer silently: he is glad to share findings, and he is not
+   signing a CLA that assigns rights to Iterating (a real, separately-documented cost —
+   `dev/epanet-js-contour-contribution.md` section 4).
+3. **No comparison of the two products, and no pitch.** `dev/positioning.md` section 1 (lead with
+   the invitation, not the comparison) applies to a private message as much as to a page, and a
+   naming objection that arrives bundled with "and by the way here is my competing product" reads as
+   competitive positioning wearing an ethics costume. The message may say what Tom builds — he has
+   to, it is why he has standing to write at all — but it must not argue that it is better.
+
+**Plausible outcomes, my honest read (SPECULATION, all four — nobody can source another person's
+reaction):**
+
+- **Most likely: a civil disagreement that costs nothing and buys a real relationship.** Butler has
+  a public answer available (EPA's public domain, no owner, and every commercial vendor in this
+  market has traded on the EPANET name for thirty years), he has already published his reasoning
+  about licensing openly, and the MacWright account says he engages rather than bristles. Tom gets a
+  straight answer and a named correspondent; the naming question stays unresolved and that is a
+  perfectly good result.
+- **Second: he takes the point partially** — e.g. future video titles carry "with epanet-js" the way
+  seven of ten already do. Cheap for him, and the trend is arguably already that way (the two most
+  recent uploads both name epanet-js in the title; #2 and #5 are the older shape). Tom should notice
+  that trend before writing, because it makes the ask smaller and the message kinder.
+- **Third, and the one to price: he reads it as a competitor lecturing him about ethics.** The guard
+  against this is rules 1 and 3 above, plus the fact that Tom is genuinely a user of Butler's MIT
+  toolkit and can say so truthfully in the first line. The risk is real but not large, and the
+  downside is one unanswered email, not a dispute.
+- **Fourth, near zero: any legal consequence.** Nothing in section 3 gives either party a mark to
+  assert, and Tom is not proposing to use anybody's name for anything.
+
+### 5. The revised note — 246 words, in his voice, his to edit or discard
+
+> Hi Luke,
+>
+> I'm Tom Haws, a civil engineer in Arizona. I build LibreWaterNet, a free GPL browser suite of
+> hydraulic calculators with a looped-network editor. It runs on your epanet-js toolkit under MIT,
+> and we credit you by name inside the app.
+>
+> I read Tom MacWright's account of you and Sam sending fixes back upstream to Placemark before you
+> built on it. That is the kind of thing I would like my own project to be part of, and it is why I
+> am writing to a person rather than to a company.
+>
+> I want to put one reservation on the table first, because I would rather say it than sit on it.
+> It is about the name. EPANET came from the EPA as a gift to the whole industry, and to me that
+> name belongs to the community rather than to any one product. WaterCAD never called itself
+> EPANET++. When I see a video titled "Fire flow analysis with EPANET" that is teaching your tool,
+> I understand the reasoning, but I do not think a newcomer can tell which thing they are learning.
+>
+> I may be wrong about this, and I would genuinely like to hear how you see it.
+>
+> I am not asking you to change anything. I would gladly share findings and testing with you, and I
+> should say honestly that I would not sign a contributor agreement assigning rights. I wanted you
+> to know where I stand before offering, not after.
+>
+> Tom
+
+**Two notes on the draft, for him.** The "I would not sign a contributor agreement" sentence is
+there because his own constraint makes silence about it dishonest; if he would rather not raise the
+CLA at all in a first message, delete that clause and the note still works at 231 words. And the
+contour write-up is deliberately NOT offered here — offering it in the same breath as the objection
+makes the objection look like a bargaining chip. It is a second message, after he has a reply.
+
+### 6. Is OWA-EPANET the better first alliance regardless? YES, and Tom's ruling makes it more so.
+
+I said this earlier on 2026-09-08 (wish-list row 8) before knowing his position, and it holds harder
+now:
+
+- **It is the community he is actually talking about.** His whole objection is that the EPANET name
+  belongs to the community rather than to a product. OWA-EPANET IS that community: the WDSA Standing
+  Committee's 2015 successor project, MIT, with EPA's own Rossman and Tryby in `AUTHORS` and EPA's
+  own page pointing at it (all CITED in the earlier 2026-09-08 entry above). Joining it is the
+  positive form of the same conviction, where the note to Luke Butler is the negative form.
+- **It has no naming problem to raise, so there is no awkward first sentence.** Contribution starts
+  at a GitHub issue per the repo's own README, MIT, no CLA found.
+- **It is where our actual dependency lives.** We vendor OWA-EPANET 2.3.5 (`js/vendor/README.md`).
+- **And it de-risks the Butler note.** If Tom is already a visible contributor to OWA-EPANET when he
+  writes, the naming reservation arrives from somebody with standing in the community he is
+  invoking, rather than from a stranger with a competing product. **That is a SEQUENCING
+  recommendation and it is the one concrete thing I would change about the plan: OWA first, Butler
+  second.** SPECULATION as to the effect on Butler's reception; the facts about OWA are CITED above.
+- The one honest caution: OWA is asynchronous and GitHub-shaped. There is no mailing list and no
+  community call (I searched, 2026-09-08, and found neither). "Joining" means opening an issue and
+  doing work, over weeks. It is not a handshake, and it will not produce a relationship in ten days.
