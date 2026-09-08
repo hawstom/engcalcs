@@ -561,3 +561,198 @@ two adjacent bodies of work, not a single study of exactly this scenario. Also c
 epanetjs.com web app's own loading strategy (§3), Ookla's primary Speedtest Global Index data (§1),
 or the primary A4AI/ITU affordability report (§1) — all noted above as secondary-source and flagged
 for re-verification before any public claim leans on the specific numbers.
+
+## 2026-09-08 — Tom's questions after the contour finding: who is who in EPANET licensing, who is Luke Butler, and is the barrier/breakline contour idea innovative
+
+Tom's questions verbatim, condensed: (1a) who provides the EPANET solver, who started it, who runs it,
+licence, can we join; (1b) who is Luke Butler/Iterating, his disposition, can we ally with him; (2) is
+the barrier/breakline contour idea innovative, and what can he safely say to EWB in 10 days.
+
+### 1a. The EPA → OWA-EPANET chain, primary sources
+
+- **EPANET's author is a named person, not an agency abstraction.** Dr. Lewis Rossman, a US EPA
+  environmental engineer, wrote EPANET; it first appeared in 1993. CITED:
+  en.wikipedia.org/wiki/EPANET (via search synopsis; not fetched directly this session — the OWA
+  repo's own README corroborates "originally developed by the U.S. Environmental Protection Agency").
+- **EPA's own current statement, fetched directly:** *"EPANET is public domain software that can be
+  freely copied and distributed."* EPA directs ongoing development to GitHub: *"Continued development
+  and bug fixes for EPANET are occurring under an open source project site in GitHub."* CITED:
+  epa.gov/water-research/epanet (fetched 2026-09-08). EPA's own page does not name Open Water
+  Analytics — it just points at "an open source project site in GitHub," which is OWA's repo.
+- **Open Water Analytics (OWA) formed in 2015, from an institutional body, not a lone hobbyist.** *"In
+  2015, the Water Distribution System Analysis (WDSA) Standing Committee voted to initiate an open
+  source software project for the continued development of EPANET. Software developers from EPA and
+  the water community came together via the community organization and forum, Open Water Analytics
+  (OWA)."* CITED: search synopsis drawing on epa.gov/sciencematters/epanet-220-epa-and-water-
+  community-collaboration and wateranalytics.org (not fetched directly; re-verify before quoting the
+  2015/WDSA detail in public copy). **OWA has been maintaining a community branch since May 2014**,
+  per the repo's own README (below) — i.e. informal collaboration predates the 2015 vote by about a
+  year.
+- **The repository, read directly, 2026-09-08:** `https://github.com/OpenWaterAnalytics/EPANET`
+  (branch `dev`). Verbatim from `README.md`:
+  > "Both EPANET and its toolkit were originally developed by the U.S. Environmental Protection
+  > Agency (USEPA)... this project covers only the EPANET hydraulic and water quality solver engine,
+  > not the graphical user interface."
+  > "Everyone is welcome to participate in this project... The path for contribution starts with the
+  > Issues... Once you get a clear path forward, Fork this repo to your own account... open a Pull
+  > Request."
+  > "Although OWA is not formally affiliated with nor endorsed by USEPA, this project has been a
+  > collaborative effort between the two that builds upon and extends the USEPA's legacy EPANET 2.0
+  > code base."
+  **Licence: MIT**, per the repo's own declared licence field and `js/vendor/README.md`'s existing
+  record here.
+- **How to join, concretely, read off the repo itself — no mailing list, no Slack, no scheduled
+  community call found anywhere.** The channels that exist: GitHub Issues (where contribution starts,
+  by the README's own instruction), GitHub Discussions at
+  `https://github.com/orgs/OpenWaterAnalytics/discussions` ("For more general community discussion of
+  the project, please go to OWA Discussions"), the OWA Community forum at `wateranalytics.org`, and
+  a step-by-step external contributing tutorial (a 2016-era SlideShare deck by Demetrios Eliades,
+  linked from the README — old but still linked live). **I searched specifically for a mailing list or
+  a recurring community call and found neither** — a real result, not an oversight; whatever
+  "community" means for OWA today is asynchronous, GitHub- and forum-based, not synchronous.
+- **Named contributors, read directly from `AUTHORS` on the `dev` branch (2026-09-08).** Two are
+  marked "Contributions in the Public Domain": Lewis Rossman and Michael Tryby (both EPA). Contributors
+  "Subject to Copyright" across versions 2.1–2.2 include Demetrios Eliades, Sam Hatchett, Bryant
+  McDonnell, Elad Salomons, James Uber and others — a genuine multi-person, multi-institution roster
+  (academic emails, a `.gov` address, personal Gmail addresses), not a single maintainer's personal
+  project. **This repo's own `js/vendor/README.md` already correctly names the engine as "OWA-EPANET
+  2.3.5, released 2025-02-20"** and distinguishes it from EPA's still-current 2.2.0 download — that
+  record needed no correction.
+- **Answering "can we join": yes, mechanically, the same way anyone can** — open an issue, discuss,
+  fork, PR, per the README's own instructions, MIT licence, no CLA barrier recorded anywhere for this
+  repository (unlike epanet-js's FSL repo, see 1b). This is a materially easier door than epanet-js's.
+  There is no evidence of a formal advisory-board or "member" status to apply for; "the community" here
+  means showing up in Issues/Discussions and doing the work.
+
+### 1b. Luke Butler and Iterating Inc — who he is, and his disposition
+
+- **Iterating Inc., founded 2025 by Luke Butler and Sam Payá, Toronto.** CITED: iterating.ca (fetched
+  2026-09-08) — verbatim: *"The company that makes Mastering Water Models and epanet-js... Established
+  2025 by Luke and Sam."* Contact: `founders@iterating.ca`. The site is deliberately minimal; no
+  mission statement, no open-source policy statement on it.
+- **Luke Butler's professional background:** a graduate at a water utility in Australia, later an
+  independent consultant automating water-modelling workflows with code. CITED: search synopsis of
+  LinkedIn (`linkedin.com/in/lukepbutler`) and his LinkedIn article "Seven water modelling apps in one
+  year" — not fetched as raw HTML this session (LinkedIn blocks direct fetch in this environment); the
+  synopsis is a secondary reading, re-verify direct quotes before using them in a first-contact
+  message.
+- **The strongest, most concrete evidence of his disposition is a THIRD PARTY's account, not his own
+  marketing.** Tom MacWright — the original author of Placemark, the MIT-licensed map editor epanet-js
+  is built on top of — wrote about this directly. CITED: macwright.com/2025/07/03/epanet-placemark
+  (fetched 2026-09-08). Key facts from that post: **Butler and Payá "contributed improvements back to
+  Placemark's codebase voluntarily"** — i.e. before or alongside building their own commercial product
+  on it, they sent fixes upstream to the free codebase they were building on, which they had no
+  obligation to do under Placemark's MIT licence. MacWright's own framing: he "celebrates seeing his
+  permissive-licensed code fuel commercial ventures... fulfilling his goal of being helpful," and
+  praises "the team's collaborative approach to upstream contributions." **This is a favourable,
+  independently-sourced account from the person whose code was built upon** — not Iterating's own
+  copy, which makes it more useful evidence for Tom's "can I trust this person" question than
+  anything on epanetjs.com itself.
+- **His stated view of his own licensing choice** (secondary-sourced, LinkedIn synopsis, flag for
+  re-verification): on the epanet-js MIT **toolkit** specifically, he is quoted/paraphrased as saying
+  it "provides users almost no restriction in the reuse of my library, including commercially." He
+  publishes example scripts and tools openly on LinkedIn and GitHub (`github.com/lbutler`), which the
+  synopsis characterises as treating "other developers and modelers as collaborators rather than
+  competitors."
+- **The asymmetry to hold onto: the TOOLKIT (his MIT choice) and the WEB APP (Iterating's FSL-1.1-MIT
+  choice) are different decisions by the same person**, and both are documented and consistent —
+  give away the library, monetise the finished product. That is not evidence of bad faith; it is the
+  same shape as plenty of open-core businesses, and `dev/positioning.md` §2 already treats the
+  distinction correctly. Nothing found this session suggests dishonesty, only a commercial choice about
+  where the licence line sits.
+- **What "allying" could concretely mean, ranked by cost, per the existing contour research
+  (`dev/epanet-js-contour-contribution.md`, already thorough and not re-derived here):**
+  1. **Contributing to OWA-EPANET itself** (the engine, MIT, EPA's own project) — cheapest, cleanest,
+     and arguably the more natural "join the community" move given Tom's question is really about
+     EPANET's own community, which is OWA's, not Iterating's. No CLA barrier found. This is a
+     different target than "allying with Luke Butler" and should not be conflated with it.
+  2. **Contributing to `epanet-js-toolkit` (MIT, the library we vendor)** — same licence family as
+     ours, a genuine peer relationship (we already depend on his MIT code), and the natural venue for
+     a code-level ally relationship if one is wanted.
+  3. **Contributing DESIGN/FINDINGS (not code) to the epanetjs.com web app's public roadmap** — what
+     the contour document already recommends as Step 0: a GitHub issue and a Canny comment, no CLA,
+     no rights assignment, pure goodwill. This is the cheapest way to "ally" with the app side.
+  4. **Contributing CODE to the epanetjs.com web app** — the FSL app repo's `CONTRIBUTING.md` (created
+     2026-09-04, three days before Tom's original ask) requires an as-yet-unwritten CLA that
+     "assign[s] the relevant rights to Iterating." Real cost, and `dev/epanet-js-contour-contribution.md`
+     §4 already recommends against this until the CLA text exists and Tom has read it.
+  5. **Cross-linking / co-authoring / a personal note to Luke Butler** — cheapest of all, costs nothing
+     but the message itself, and is independent of any code question. Given the MacWright evidence
+     above, a direct, honest note (not through epanetjs.com, per Tom's own instruction) is
+     well-supported: he has a track record of receiving this kind of gesture well, from the one
+     documented case available.
+- **"Unless 'diversity' is the answer" — reading Tom's own phrase honestly:** if he means "maybe the
+  right posture is simply that two independent projects exist and that is fine, not an alliance," that
+  reading is consistent with `dev/positioning.md` §1's whole stance (we do not answer their framing,
+  we do not run a comparison, we are not the aggrieved party) and with §5 (we do not track their
+  bugs). Nothing found this session argues against that being a perfectly sufficient answer on its
+  own — an ally relationship is not necessary for either project's health, and `dev/positioning.md`
+  already treats non-alliance as the default, correct posture.
+
+### Draft first-contact message, in Tom's voice, for him to edit
+
+Addressed to Luke Butler directly (not through epanetjs.com, per his own stated constraint), by
+whichever channel he prefers (LinkedIn, GitHub, or `founders@iterating.ca`):
+
+> Hi Luke — I build LibreWaterNet / EngCalcs, a free GPL browser suite of hydraulic calculators
+> including a looped-network editor that also runs through your epanet-js toolkit (MIT), which we
+> vendor and credit by name in our Notes and gratitude pages. I've read about how you and Sam built
+> on Tom MacWright's Placemark and sent improvements back upstream before building epanet-js on
+> top of it — that's the kind of thing I hope our own project can be part of too. I'm not writing
+> to pitch anything or ask for a partnership; I just wanted to say thank you directly, tell you we
+> exist, and ask whether there's a way our two projects could occasionally point at each other or
+> compare notes as two people trying to get good hydraulic modelling into more hands. No pressure
+> either way — genuinely just glad you're out there doing this.
+
+> If it's useful: we found a small thing while reading EPANET's own contouring source
+> (`Fcontour.pas`) that your team's roadmap doesn't currently document an answer to — how to
+> interpolate pressure contours honestly on a sparse, irregular network, including across closed
+> valves and pressure-zone boundaries, which no tool we could find (EPANET, Bentley, or your own
+> roadmap item) currently handles. Happy to share the write-up if it's useful to you, no strings
+> attached.
+
+### 2. The contour barrier/breakline idea — is it innovative, and what can Tom say to EWB
+
+Full technical grounding is already in `dev/epanet-js-contour-contribution.md`, written 2026-09-07 —
+not re-derived here. This session added one confirming search.
+
+- **In GIS generally: NO, breaklines are standard and long-established, and Tom should not claim
+  otherwise.** A breakline in a terrain TIN (a ridge, a stream, a road edge) that interpolation must
+  not cross is decades-old, textbook GIS/surveying practice — hydrographic breaklines in USGS/Esri TIN
+  workflows are the standard example. `dev/epanet-js-contour-contribution.md` already cites the
+  parallel case directly from ITRC (groundwater "faults"/breaklines in potentiometric surfaces,
+  including a worked USGS example where a river breakline changed a modelled plume's fate). **The
+  general concept — some interpolators need a discontinuity feature — is not new anywhere.**
+- **In water-NETWORK software specifically, applying that same well-known GIS concept to the network's
+  own pipes/valves as barriers: I found no prior art, and neither did the 2026-09-07 research**, which
+  read EPANET's own Delphi contour source directly (fills the whole rectangle, no barrier, no hull),
+  found no interpolation-method disclosure at all in Bentley's WaterGEMS/WaterCAD docs, and found
+  epanet-js's own public roadmap item (`roadmap.epanetjs.com/.../contour-map-generation`, posted by
+  their own team 2025-09-29, 3 votes) says nothing about method or barriers at all. **My own
+  2026-09-08 search for "breakline" or "barrier" interpolation specifically in water distribution
+  network / pressure-zone contexts turned up nothing on point** — patent and paper results about valve
+  isolation and pressure-zone GIS delineation, but nothing about USING that network topology as an
+  interpolation barrier for a contour plot. CITED (search, confirming absence, not presence):
+  uspto.gov patent PDFs on network isolation, iwaponline.com "Isolated pressure zones based on GIS,"
+  none of which propose contour-barrier interpolation.
+- **The honest, careful sentence, and the one Tom can safely say:** *"The general idea that some
+  boundary should stop an interpolation from crossing it — a breakline — is a standard, decades-old
+  GIS technique, most familiar from terrain modelling. What appears not to exist yet, in EPANET, in
+  Bentley's WaterGEMS/WaterCAD, or in the newer browser tool epanet-js, is applying that same idea to
+  a water network's OWN topology — treating a closed valve or a pressure-zone boundary as a barrier a
+  pressure contour should not cross. We read EPANET's own contouring source code directly and
+  confirmed it does not do this; we could not find any published water-modelling tool or paper that
+  does either."* **This is a claim of absence ("we could not find it"), not a claim of primacy ("we
+  invented it")** — the correct register for an unpublished, unpatented idea nobody has built yet, and
+  it matches `dev/positioning.md` §2's own discipline about never claiming completeness against a
+  field of "infinite depth." **Do not say "nobody has ever thought of this"** — only that a real,
+  documented search across the tools whose internals or docs could be read did not find it.
+- **What NOT to say, and why:** do not call breaklines themselves the innovation (§2's TIN table in
+  the contour doc already establishes this is decades old in GIS); do not claim the feature is BUILT
+  (`lpn_` has no hull, triangulation or contour code today, per the 2026-09-07 doc's own grep); and do
+  not claim it has been checked against every commercial water-modelling product — WaterGEMS's actual
+  algorithm remains unconfirmed (their docs name no method), and Ohmer et al. 2017 and Walski et al.'s
+  textbook, the two sources most likely to settle this in the academic literature, were both
+  unreachable this session and last. The honest boundary of the claim is: EPANET (source read
+  directly), Bentley's public docs (silent on method), epanet-js's public roadmap (silent on method),
+  and a direct search for prior art (none found) — not "the whole field."
