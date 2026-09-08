@@ -21,7 +21,10 @@ draft up to the move is in this repository's log:
   per-image publishable judgement, and the graphics plan reaches across to it. That is a deliberate
   cross-repository pointer, not an oversight: the pictures belong with the thing they are pictures
   of.
-- **Task 479** is still the open task. The hosting decision is unchanged by the move.
+- **Task 479 closed 2026-09-08.** The app is `https://librewaternet.org/app/`, that page's
+  three buttons point there, and `/app` and its 301 to `/app/` live in that repository's
+  `.htaccess`, which is the librewaternet.org docroot. The suite's own `.htaccess` knows nothing
+  of `/app`; `ecSwMounts()` and `ecCanonicalPaths()` here are where the mount is declared.
 
 ## The feature list lives on that site too (2026-08-25)
 

@@ -3,7 +3,7 @@
 // the suite is served at, so the mount list has ONE home (lib/ServiceWorker.lib.php) rather than a
 // second copy written into the registration. Function and constant definitions only -- it starts
 // nothing and reads nothing.
-require_once(__DIR__ . '/ServiceWorker.lib.php');
+require_once(__DIR__ . '/WebManifest.lib.php'); // requires ServiceWorker.lib.php itself
 
 function echoHeader($type="normal", $html_title = "", $html_head = "", $show_name_field = true) {
   switch (strtolower($type)) {
@@ -174,7 +174,10 @@ $og_image = CANONICAL_ORIGIN . '/engcalcs/' . $og_card;
 	<meta property="og:image:alt" content="<?=htmlspecialchars($og_card_alt, ENT_QUOTES, 'UTF-8')?>" />
 	<meta name="twitter:card" content="summary_large_image" />
 <?php unset($og_title, $og_image, $og_card, $og_card_h, $og_card_alt, $og_page); ?>
-	<link rel="manifest" href="/engcalcs/manifest.json">
+	<?php // GENERATED per mount (manifest.php, ROADMAP Task 609): a manifest has one scope, the suite
+	      // has two mounts, and a scope that does not contain this page drops the manifest whole.
+	      // ecSwMountFor() SELECTS among the declared mounts and never infers one from the URI. ?>
+	<link rel="manifest" href="<?=htmlspecialchars(ecWebManifestHref(ecSwMountFor(isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '')), ENT_QUOTES, 'UTF-8')?>">
 	<meta name="theme-color" content="#1a6faf">
 	<?php // Both spellings, deliberately. `mobile-web-app-capable` is the standard one and the only
 	      // one Chrome still wants -- it logs a deprecation for the apple- prefix on every page load.
