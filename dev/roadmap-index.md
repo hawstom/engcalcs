@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**53 open tasks.** Next (100): 6 · Soon (75): 9 · Someday (50): 13 · Maybe (25): 8 · Parked (5): 17
+**53 open tasks.** Next (100): 6 · Soon (75): 8 · Someday (50): 14 · Maybe (25): 8 · Parked (5): 17
 
 ## 100 — Next (6)
 
@@ -18,7 +18,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 
-## 75 — Soon (9)
+## 75 — Soon (8)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -26,11 +26,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
-- Task 610 — Paste that CREATES table rows, and Ctrl+Shift+PageUp/PageDn to the next table.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
 - Task 612 — [H] · Screenshot 0082 is the centerpiece of any lpn display.
 
-## 50 — Someday (13)
+## 50 — Someday (14)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -45,6 +44,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
 - Task 601 — Calibration files: measured field data, against the model that predicts it.
 - Task 604 — Read an EPANET `.PRO` profile file.
+- Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 
 ## 25 — Maybe (8)
 

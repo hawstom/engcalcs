@@ -47,11 +47,15 @@ the block.
 
 # Tasks
 
-- 75|610| **Paste that CREATES table rows, and Ctrl+Shift+PageUp/PageDn to the next table.**
-  The two halves of Task 186 that did not ship when it closed 2026-09-08. Paste past the last row is
-  dropped and counted today because a row is an element on the map; creating one is the ID-collision
-  and validation question the `data-entry-clerk` ranks separately (its wish list §1). The table hop is
-  Tom's *"lower priority, but very cool"*.
+- 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
+  Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
+  that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
+  having read the clerk's wish list, *"I am sympathetic."* His conditions, which are the whole
+  task: the Junction table gains the project's location coordinates (xy, or lat,lon) as columns;
+  a paste that ADDS is refused unless every row carries an ID that validates as non-duplicating,
+  and a link row names two existing nodes; and pipe vertices need a stated cell format, which the
+  `data-entry-clerk` must specify (*"there is no point in our guessing it"*) before anything is
+  built. Ctrl+Shift+PageUp/PageDn to the next table (*"lower priority, but very cool"*) rides here.
 
 - 75|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
