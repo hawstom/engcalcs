@@ -748,6 +748,23 @@ the block.
   - **Do not assume this is worth doing.** Task 151 found these queries already *rank*, so the CTR
     problem may be snippet quality (now fixed) rather than language.
 
+- 50|614| **The sewer-slope cluster is the largest demand we do not convert.**
+  Raised by Tom, 2026-09-08. Measured twice, 2026-07-27 and 2026-09-07, and unmoved: sewer, drainage
+  and slope queries with no "manning" in them are 190 queries, 3,557 impressions, 60 clicks —
+  **1.7% CTR against Manning's 27.9%** — and the biggest single loss is *"4 inch sewer pipe minimum
+  slope in mm"* at 505 impressions, 3 clicks, position 6 (`dev/usage-data-log.md`).
+  - **IT IS NOT A CONTENT GAP.** `sewslope.php` has answered that exact query since Task 151: 4 in /
+    100 mm reads 8.4 mm/m and 0.84% in Table 1, in the units asked for. We rank 3–10 and are not
+    clicked, so more table answers what is already answered. Task 158 is these same two pages on the
+    language question, which is a different one.
+  - **DIAGNOSE BEFORE BUILDING: three hypotheses, three answers.** Position 3–10 is not enough for a
+    table query; or the SERP answers it itself by featured snippet or AI overview, so the click is
+    not on offer, CTR is the wrong target and doing nothing is correct; or the title does not use
+    the searcher's words (the H1 is "Minimum Sanitary Sewer Slopes"). Reading the live SERP for
+    those queries decides which, and `market-researcher` is the seat that can look.
+  - **The page is in no repository** — `~/webdev/hawsedc.subset/` is a hand-kept subset, not a
+    checkout — so an edit ships by hand, and clicks split across `hawsedc.com` and `www.hawsedc.com`.
+
 - 5|175| **A real printable version, suite-wide.** Raised by Tom, 2026-07-30, while reviewing the
   `lpn_` map page: the suite's only print affordance today is `d-print-none` hiding chrome
   (toolbar, unit-select row, nav) so `Ctrl+P` on the bare page reads a little cleaner — there is no
@@ -932,9 +949,11 @@ here rather than under water conveyance because evaporative cooling consumes wat
 
 ## Discoverability (Search Reach)
 
-Evidence base for this whole section: the 2026-07-27 Google Search Console query export — cluster
-table, CTRs and the two smaller findings are in `dev/usage-data-log.md`. The headline: **Manning is
-won and needs nothing** (position 1, 25% CTR), while the comparable sewer-slope cluster converts at 1%.
+Evidence base for this whole section: the Google Search Console query exports of 2026-07-27 and
+2026-09-07 — cluster tables, CTRs and the smaller findings are in `dev/usage-data-log.md`. The
+headline: **Manning is won and needs nothing** (position 1, 25% then 27.9% CTR), while the comparable
+sewer-slope cluster converts at 1%, and at 1.7% on the second export. That non-conversion is
+**Task 614**; Tasks 155 and 158 are the other open search-reach ones.
 
 ## Completed
 
