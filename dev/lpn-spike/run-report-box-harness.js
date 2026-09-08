@@ -143,8 +143,13 @@ console.log('\n=== 4. it is the SIXTH box, wired through the family\'s own seams
 	const src = fs.readFileSync(require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
 	const at = src.indexOf('function wireRunReportBox(');
 	const body = src.substring(at, src.indexOf('\n\t}', at));
-	ok('wireRunReportBox() calls makePanelDraggable()', at > 0 && body.indexOf('makePanelDraggable(') > 0);
-	ok('...and addPanelResizeGrip()', body.indexOf('addPanelResizeGrip(') > 0);
+	// Through wireBoxMemory() since 2026-09-08 (Tom: the box survives a reload), which is where the
+	// drag, the grip and the remembered corner now live for all four report boxes.
+	const memAt = src.indexOf('function wireBoxMemory(');
+	const memBody = src.substring(memAt, src.indexOf('\n\t}', memAt));
+	ok('wireRunReportBox() wires through wireBoxMemory()', at > 0 && body.indexOf('wireBoxMemory(') > 0);
+	ok('...which calls makePanelDraggable()', memAt > 0 && memBody.indexOf('makePanelDraggable(') > 0);
+	ok('...and addPanelResizeGrip()', memBody.indexOf('addPanelResizeGrip(') > 0);
 	ok('...and the Copy button reaches js/lpn-time.js\'s copier, not a second one here',
 		body.indexOf('lpnCopyText') > 0, body);
 	const openAt = src.indexOf('function openRunReportBox(');
@@ -152,7 +157,7 @@ console.log('\n=== 4. it is the SIXTH box, wired through the family\'s own seams
 	ok('openRunReportBox() places itself with placePanelForScreen()',
 		openAt > 0 && openBody.indexOf('placePanelForScreen(') > 0);
 	ok('...and closeRunReportBox() closes through hidePanel(), which also sweeps the tips',
-		/function closeRunReportBox\(\) \{ hidePanel\(rptBoxEl\(\)\); \}/.test(src));
+		/function closeRunReportBox\(\) \{\s*hidePanel\(rptBoxEl\(\)\);/.test(src));
 	// The run box offers a DOOR and draws nothing, which is the whole of the move.
 	const timeSrc = fs.readFileSync(require('path').join(__dirname, '../../js/lpn-time.js'), 'utf8');
 	ok('js/lpn-time.js no longer renders the report itself',

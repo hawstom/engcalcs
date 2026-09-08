@@ -16,10 +16,12 @@
 //      deliberately owns no placement of its own -- it calls the same opener a menu row calls, which
 //      re-clamps. If that ever stopped being true, the box would come back at coordinates nobody can
 //      reach, and on a phone that is a box with no visible X.
-//   3. **A box that must NOT come back.** The three report boxes and every modal are deliberately
+//   3. **A box that must NOT come back.** Every modal and transient chooser is deliberately
 //      excluded (see restoreOpenBoxes()), and "deliberately excluded" and "nobody wired it yet"
 //      look identical in a diff. Asserted here so that adding one is a decision somebody makes on
-//      purpose, against a failing test.
+//      purpose, against a failing test. The four report boxes were on this list until 2026-09-08,
+//      when Tom asked for them to survive a reload; that decision was made against this test and
+//      they now have dev/lpn-spike/report-box-memory-harness.js.
 //   4. **Escape writes to storage on every press.** closeSettingsBox() and closeLibraryBox() run on
 //      every Escape whether or not the box is showing. Unguarded, that is a localStorage write
 //      behind a key the reader never touched, on a key they may never have created.
@@ -243,11 +245,9 @@ console.log('\n--- the boot path reopens exactly the three boxes, and nothing el
 	// reason it is excluded; this is that note held to. "Shut" is "restoreOpenBoxes() did not SHOW
 	// it" -- the stub does not read the page's inline styles, so a box it has never touched reports
 	// an empty display, and asserting on the literal 'none' would have been asserting about the stub.
-	[['lpn_ff_box', 'fire flow -- a report about a run, and a reload has no run'],
-	 ['lpn_energy_box', 'energy -- same'],
-	 ['lpn_rptbox', 'the EPANET run report -- same again, and a reload has no .rpt either'],
-	 ['lpn_scncmp_box', 'scenario compare -- opening it starts N solves'],
-	 ['lpn_popup', 'the property popup -- an answer to a selection that is not restored'],
+	// **The four report boxes LEFT this list on 2026-09-08**, on Tom's word, and have a harness of
+	// their own: dev/lpn-spike/report-box-memory-harness.js.
+	[['lpn_popup', 'the property popup -- an answer to a selection that is not restored'],
 	 ['lpn_new_panel', 'the New-project box -- a modal'],
 	 ['lpn_ff_run_box', 'the fire-flow run dialog -- a modal'],
 	 ['lpn_notes_popup', 'the notes popover -- transient'],

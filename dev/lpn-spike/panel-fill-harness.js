@@ -156,7 +156,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 			'resizeable either, so it is not one of the boxes Tom was talking about.'],
 		['wireFireFlowBox', 'the fire flow RUN dialog -- a bar, two lines and a Stop button, over a ' +
 			'drawing it is reporting on. Its own stylesheet comment already says it is narrow on ' +
-			'purpose. (This wiring function also wires the fire flow BOX, which does fill.)']
+			'purpose. (This wiring function also wires the fire flow BOX, which does fill.)'],
+		['wireAreaHint', 'the select-area instruction bubble (Tom, 2026-09-08: centred, on top and ' +
+			'draggable) -- two sentences over the map the reader is about to draw a ring on. Filling ' +
+			'the window with it would hide the very elements the ring is for.']
 	];
 	// Every panel made draggable is either opened through the seam or declared above. The count is
 	// the guard: a seventh draggable panel makes this fail until somebody decides which it is.
@@ -172,7 +175,11 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 			const at = l.indexOf('//');
 			return at < 0 ? l : l.slice(0, at);
 		}).join('\n');
-	const wired = (codeOnly.match(/makePanelDraggable\(/g) || []).length - 1;
+	// The four report boxes drag through wireBoxMemory() since 2026-09-08, which holds ONE
+	// makePanelDraggable() call for all four: each wireBoxMemory() call is a wired panel, and the
+	// call inside its own body is not.
+	const wired = (codeOnly.match(/makePanelDraggable\(/g) || []).length - 1 +
+		(codeOnly.match(/wireBoxMemory\(/g) || []).length - 2;
 	ok('every draggable panel is either filled or declared exempt', wired === FILLS.length + EXEMPT.length,
 		wired + ' draggable panels, ' + FILLS.length + ' filled + ' + EXEMPT.length + ' exempt');
 	EXEMPT.forEach(function (e) {

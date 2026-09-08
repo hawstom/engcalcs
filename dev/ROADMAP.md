@@ -441,7 +441,12 @@ the block.
 
 - 100|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.**
   **BUILT 2026-09-06 AND REWORKED TO TOM'S GESTURE ON 2026-09-07.**
-  `dev/lpn-spike/select-area-harness.js`, 91 checks.
+  `dev/lpn-spike/select-area-harness.js`, 150 checks.
+  - **2026-09-08, on his first use:** Shift now KEEPS the selection and TOGGLES what the ring
+    catches (it added); a finger draws a window or lasso by press-drag-lift (pointerType, never
+    width); Shift-click opens the multi box; the bubble is a centred, draggable panel carrying the
+    count; Text objects have a table (and so rows), every table has an Active column, one row per
+    line, box opens beside the selection's extent; Escape in bare Select clears the selection.
   - **ALL THREE ARE CLICK-AND-RUBBER-BAND, NOT DRAG** (his instruction). A press-hold-release
     marquee is one gesture a hand has to hold steady; a click, a look and a second click is two
     gestures with a pause between them, and the pause is where the user reads what they are about

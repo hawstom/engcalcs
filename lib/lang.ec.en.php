@@ -780,7 +780,13 @@ $ec_lang['lpn_area_hint_lasso_start']='Click to start the outline.';
 $ec_lang['lpn_area_hint_lasso_go']='Move to draw the outline, then click to close it.';
 $ec_lang['lpn_area_hint_polygon_start']='Click the first corner of the shape. Double-click the last one to finish.';
 $ec_lang['lpn_area_hint_polygon_go']='Click each corner. Double-click the last one to finish.';
-$ec_lang['lpn_area_hint_shift']='Hold Shift to add to the selection, or to take something out of it.';
+// Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
+// selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
+$ec_lang['lpn_area_hint_shift']='Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.';
+// On a finger a window or a lasso is press, drag, lift (Tom, 2026-09-08); the polygon keeps its
+// taps and its own two sentences above.
+$ec_lang['lpn_area_hint_touch_start']='Press on the map and drag around what you want, then lift.';
+$ec_lang['lpn_area_hint_touch_go']='Drag around what you want, then lift to finish.';
 $ec_lang['lpn_multi_title']='{n} selected';
 $ec_lang['lpn_multi_varies']='Various';
 $ec_lang['lpn_multi_applied']='Set {prop} on {n}.';
@@ -1092,8 +1098,9 @@ $ec_lang['lpn_tool_add_pipe_tip']='Click one node and then another to draw a pip
 $ec_lang['lpn_tool_add_pump_tip']='Click one node and then another to put a pump between them.';
 $ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a valve between them.';
 $ec_lang['lpn_tool_add_text_tip']='Click the map to write a note on the drawing.';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_area_tip']='Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.';
+// Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
+// the selection and toggles what the shape catches (it used to say "add").
+$ec_lang['lpn_tool_area_tip']='Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.';
 $ec_lang['lpn_area_selected']='{n} selected.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nothing found in that area.';
