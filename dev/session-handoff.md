@@ -190,13 +190,10 @@ Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he 
 `dev/tom-2026-09-08-worklist.md`, item by item, with DONE / RUNNING / NOT STARTED against each.
 Read that file first; the rest of this section is the mechanics.
 
-- **Two agent worktrees may hold UNCOMMITTED work** under `.claude/worktrees/`: the lpn batch
-  (box persistence, the eight Task 266 follow-ups, Esc to unselect) and the icon retry
-  (WT-WIDE and WT-TALL-3 with the catwalk, `dev/icon-preview/concepts-2026-09-08b.html`). If a
-  worktree is dirty and its agent is gone, `git -C <worktree> diff` and finish it by hand or
-  brief a fresh agent from `git diff`; do not discard it. If it has commits, merge, run
-  `check_all.sh`, push, delete the branch. `git worktree remove -f -f` is needed while the
-  agent's lock is held.
+- **Both agent worktrees are merged, pushed and deleted** (checked 2026-09-08, fifth session:
+  `git worktree list` is bare, no branches remain). The lpn batch landed as `2cf99b07` and the
+  icon retry as `4fec808a`. The icons themselves still need Tom's eyes —
+  `dev/icon-preview/concepts-2026-09-08b.html` is a preview, not an approval.
 - **AI commits carry `--author="Claude Code for Tom Haws <tom.haws@gmail.com>"`** (CLAUDE.md).
 - **Style guide is APA now, not Oxford.** `dev/language-strings.md` has the list.
 - **A translation sprint is authorized in Tom's words for this session** (*"Proceed with a
@@ -216,8 +213,7 @@ Read that file first; the rest of this section is the mechanics.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-1. Merge or finish the two worktrees above. Push.
-2. **Second lpn batch, one agent on the big file** (Opus is fine; Tom said so): naming-log call
+1. **Second lpn batch, one agent on the big file** (Opus is fine; Tom said so): naming-log call
    site; pipes and pumps too hard to click on a PC without their label (hit tolerance on the
    geometry, not the label); Esc clears selection in select mode if not already done; node
    label drop order lowest-last like links, then reword `lpn_labels_priority_node_tip` like the
