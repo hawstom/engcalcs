@@ -153,7 +153,9 @@ console.log('\n-- wiring: opening an example reuses the upload path’s loader -
 	report(/importProject\(saved\)/.test(body), 'and lands through importProject');
 	report(/stampProjectSaved\(id\)/.test(body),
 		'the example arrives SAVED — it is not the user’s unsaved work');
-	report(/fetch\('examples\/' \+ ex\.file/.test(body), 'it fetches the served copy');
+	// Absolute, not relative: the page can be served at the '/app/' rewrite mount, and a relative
+	// fetch resolved to '/app/examples/...', which that mount's rewrite does not cover.
+	report(/fetch\('\/engcalcs\/examples\/' \+ ex\.file/.test(body), 'it fetches the served copy');
 	// "They were your copies because you downloaded and installed them" — an example must never be
 	// a read-only view of a file on our server, and must never write back.
 	report(!/writeOpenProjectToFile|stampFile\(/.test(body),

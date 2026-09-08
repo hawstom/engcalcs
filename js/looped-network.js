@@ -15596,7 +15596,7 @@ var EngCalcs = EngCalcs || {};
 				// <img> rather than inlined markup: it is cacheable, it cannot collide with the
 				// page's own ids or styles, and a broken one degrades to the title below it.
 				card.appendChild(elh('img', {
-					'class': 'lpn-example-thumb', src: 'examples/' + ex.thumb, alt: '', loading: 'lazy'
+					'class': 'lpn-example-thumb', src: '/engcalcs/examples/' + ex.thumb, alt: '', loading: 'lazy'
 				}));
 			}
 			// **THE TRANSLATED STRING WINS; THE MANIFEST'S ENGLISH IS THE FALLBACK.** Card text lives
@@ -15670,7 +15670,10 @@ var EngCalcs = EngCalcs || {};
 		if (examplesState === 'loading' || examplesState === 'loaded') { return; }
 		examplesState = 'loading';
 		renderExamplesGallery();
-		fetch('examples/manifest.json', { cache: 'no-cache' })
+		// Absolute, not relative: examples/ is served under /engcalcs/ regardless of which mount
+		// the page answers at, and a relative fetch from a document at /app/ resolved to
+		// /app/examples/..., which the landing repo's rewrite (app$ and app/?$ only) does not cover.
+		fetch('/engcalcs/examples/manifest.json', { cache: 'no-cache' })
 			.then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.json(); })
 			.then(function (j) {
 				examplesManifest = (j && j.examples) || [];
@@ -15682,7 +15685,7 @@ var EngCalcs = EngCalcs || {};
 	function openExample(ex) {
 		var pc = EngCalcs.pageConfig || {};
 		logLpnFirstAction('example');
-		fetch('examples/' + ex.file, { cache: 'no-cache' })
+		fetch('/engcalcs/examples/' + ex.file, { cache: 'no-cache' })
 			.then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.text(); })
 			.then(function (text) {
 				var saved = acceptImportedText(text);
