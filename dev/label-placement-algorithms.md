@@ -328,6 +328,82 @@ harness asserts the pure cases and prints the live numbers.
 
 ---
 
+## 9. Tom's phase-two sketch, 2026-09-08, verbatim
+
+He raised Task 539 to 100 the same day with a deadline on it (*"If we are going to try to squeeze
+this distraction in before 17 Sep, It's now or never. May as well give it a try. If in the process
+we need to re-open the dev control knobs, we can."*), and then set out a method at length. It is
+recorded here rather than in the roadmap because of its length, and verbatim because it is a
+DESIGN and not a preference — a paraphrase would lose the parts that make it buildable.
+
+**He named two routes and asked for both to be tried.** *"For this task, we can try to be smart
+about geometry or we can just add another trick to our brute force hunting, where the trick is to
+notice overlapping leaders and labels and respond to it by trying successive stacking orders. We
+could scientifically try both approaches to see which works better. I intuit that if we are smart
+enough about geometry, it would be the better approach or a key to optimizing the brute force
+effort."*
+
+**The brute-force route in one line** is §8's crossing detector wired to a retry: where
+`Collide.labelCrossings()` flags a pair, try successive stacking orders for that pair and keep the
+order with the lowest count. It needs nothing that is not already built, and it is the control the
+geometry route is measured against.
+
+### 9a. The geometry route, his four steps, verbatim
+
+*"Geometry awareness might involve (1) identifying a prime spot_prime of open real estate (n labels
+could stack here!) near failures or needs, (2) identifying the estimated box_est extents for the n
+stacked labels in the spot_prime location, (3) gathering angles and distances from the middle left
+point leftward or middle right point rightward of box_est to the set of n closest failed or needy
+nodes to these points combined, (4) using the angles to determine the placement of failed or needy
+labels inside box_est."*
+
+Step 4 is the whole gang idea made concrete and is worth restating in our own words because it is
+easy to miss: **the labels are ordered inside the stack by the ANGLE of the node each one belongs
+to**, which is exactly what makes their leaders fan out instead of cross. Two leaders cross when
+the upper label belongs to the lower node; sorting the stack by angle is the condition that cannot
+happen.
+
+### 9b. Finding `spot_prime`, and his own flag on it
+
+*"I waved my wand over finding spot-prime; if it's hard, let me know."* **So this is the one part
+he has not specified and the one part to report back on.** His proposal for making it affordable:
+
+*"the good news is that a tile-indexed spot_prime list can be pre-calculated and stored in the form
+of centroids and extreme boxes (for fully bounded prime spots) and angles (for edge prime spots).
+By extreme boxes I mean that three boxes can be pre-calculated for every bounded spot_prime:
+Tallest skinny box, widest squat box, and biggest spot_prime_box_square, where the size of
+spot_prime_box_square tells us how to limit skinny and squat dimensions."*
+
+### 9c. His sizing method, verbatim, and the one number it produces
+
+*"(a) We can precalculate by trial and error (cheap because we do it as the network grows where
+possible) the universal text_size_largest_perfect_fit at which a single-line label for every node in
+the network can fit either into a spot_prime_box_square or an edge direction (much easier) without
+breaking any of our 'perfect world' rules including leaders crossing links or symbols. We could
+(phase 2 or by selector) do the same for multiple line node labels, up to 3, 4, or 5 lines) (b)
+using the text_size_largest_perfect_fit array, we can calculate the height of a single label, and we
+can very roughly guess the length/width of a single label, maybe using current node label settings
+for drop order and possibly display (and we could recalculate this when node display settings
+change). (c) We set each skinny equal to its length/width and each squat to its height, and from
+those we calculate/find/iterate tall and wide, all in advance of zooms, and all only once for the
+network."*
+
+**`text_size_largest_perfect_fit` is the interesting object in the whole sketch**: a single scalar
+per network at which every label places without breaking a rule. It is a property of the DRAWING
+rather than of a view, which is what lets his last clause hold — *"all in advance of zooms, and all
+only once for the network"*.
+
+### 9d. What is settled and what is not
+
+- **Settled**: both routes get built and measured against each other; §8's per-view crossing count
+  is the measurement; the dev control knobs may be re-opened for the experiment.
+- **Not settled, and his own flag**: how `spot_prime` is found. Report back before building it.
+- **Not stated either way**: whether the geometry route replaces `shedAlignedForConflicts()` or
+  runs as a repair pass after it. The repair-pass shape is the cheaper experiment and preserves
+  every measurement in §8, so that is the one to try first unless he says otherwise.
+
+---
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.

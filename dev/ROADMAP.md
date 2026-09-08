@@ -57,7 +57,7 @@ the block.
   `data-entry-clerk` must specify (*"there is no point in our guessing it"*) before anything is
   built. Ctrl+Shift+PageUp/PageDn to the next table (*"lower priority, but very cool"*) rides here.
 
-- 75|611| **Import a library (pipe types, fittings, curves) from another project file.**
+- 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
   file, then import anything that is not a name conflict, that probably would be all that's needed."*
   No export function: a project file already is the export. A name conflict is reported and skipped,
@@ -277,6 +277,12 @@ the block.
     rather than to an unconditional prefetch.
   - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
     optimisation.
+  - **HE ANSWERED 2026-09-08** (numbering it 600, which is the plots task; the words are this one's):
+    *"I am open to your ideas. I am also open to putting up a banner 'Loading solver. Results
+    delayed momentarily. Continue working.'"* So the percent-done bullet above is authorized, and
+    the sentence he wrote is the sentence to use. **"Continue working" is the load-bearing half** --
+    it says the page is not frozen, which is the thing a wait most needs to say and the thing a bare
+    spinner cannot. The `[H]` stands on the connection-aware prefetch, which he has not ruled on.
 
 - 75|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
@@ -439,42 +445,6 @@ the block.
     `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
     **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
 
-- 100|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.**
-  **BUILT 2026-09-06 AND REWORKED TO TOM'S GESTURE ON 2026-09-07.**
-  `dev/lpn-spike/select-area-harness.js`, 150 checks.
-  - **2026-09-08, on his first use:** Shift now KEEPS the selection and TOGGLES what the ring
-    catches (it added); a finger draws a window or lasso by press-drag-lift (pointerType, never
-    width); Shift-click opens the multi box; the bubble is a centred, draggable panel carrying the
-    count; Text objects have a table (and so rows), every table has an Active column, one row per
-    line, box opens beside the selection's extent; Escape in bare Select clears the selection.
-  - **ALL THREE ARE CLICK-AND-RUBBER-BAND, NOT DRAG** (his instruction). A press-hold-release
-    marquee is one gesture a hand has to hold steady; a click, a look and a second click is two
-    gestures with a pause between them, and the pause is where the user reads what they are about
-    to catch. It is also what makes a lasso a considered act rather than a test of grip. Window is
-    two clicks, lasso is click-trace-click with the button UP, polygon is a click per vertex and a
-    double-click to end.
-  - **`areaRing` IS COMMITTED AND `areaLive` IS THE POINTER**, kept apart so the ring can be
-    re-read every frame without the previous frame accumulating in it -- a bug a single array
-    produces on a window and not on a lasso, so it would have shipped.
-  - **THE THREE SHAPES GO THROUGH ONE PREDICATE**, `EngCalcs.lpnGeom.pointInPolygon()`. A node is
-    caught by its position, a LINK only when BOTH ends are in (the CAD window rule), a Text by its
-    drawn point. Crossing selection is deliberately not offered: with two rules a user cannot tell
-    which one they got.
-  - **THE BUBBLE SAYS WHAT THE NEXT CLICK WILL DO**, and changes mid-gesture, which is why it is
-    not another line in the mode hint. Every state carries the Shift rule, because Tom's own
-    reading of the first build was *"I see how Shift adds, but I don't see how it removes"* -- a
-    modifier whose second half is undiscoverable has one half. Shift is read on the FIRST click and
-    held, so a polygon does not ask anybody to keep a key down for six of them.
-  - **THE MULTI-PROPERTIES BOX TAKES ITS PROPERTY LIST FROM THE TABLES PANE'S OWN COLUMN SPEC.**
-    `paneTables()` already declares, per type, every editable property with its label, its unit,
-    its `prop` and a setter that goes through `setProp()`; a second list here would be a second
-    opinion about what a pipe HAS. A collapsible heading per type, all open, each stating its
-    count; an untouched row writes nothing; one undo snapshot per row; and it states its reach the
-    way Find and replace does. Finishing a selection opens it, which is the moment the subject is
-    unambiguous.
-  - **NEEDS A BROWSER PASS** (2026-09-07): the marquee, the triangle, the bubble's placement, and
-    whether a lasso traced with a finger is usable at all.
-
 - 50|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
   studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels
   (`alignedLabelAnchor()`) both shipped under Tasks 333 and 329; two pieces are left.
@@ -581,7 +551,7 @@ the block.
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 75|539| **Gang the neighbour labels so their leaders stop crossing.**
+- 100|539| **Gang the neighbour labels so their leaders stop crossing.**
   Tom, 2026-08-26, with a screenshot of two node labels whose leaders cross: *"This might be
   forgiveable if it looked difficult or impossible. But when it looks so easy (to a human) to
   resolve, it's embarrassing."* **That is the right test and it is the one to build against** — not
@@ -612,6 +582,12 @@ the block.
     phase two is judged on one stated view before and after.
   - Phase two is therefore a COMPARISON and needs no absolute target: stack a flagged gang,
     re-measure the same view, and the count falls or the strategy is wrong.
+  - **RAISED TO 100 BY TOM, 2026-09-08, with a deadline and a method**: *"If we are going to try to
+    squeeze this distraction in before 17 Sep, It's now or never."* He sketched a geometry-aware
+    approach at length and offered brute force as the alternative, asking that both be tried. **His
+    sketch is recorded in full in `dev/label-placement-algorithms.md` §9** rather than here, per the
+    length rule; the one thing that belongs on this line is that **he authorized re-opening the dev
+    control knobs** if phase two needs them.
 
 
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**

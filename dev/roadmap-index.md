@@ -7,26 +7,25 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**54 open tasks.** Next (100): 6 · Soon (75): 8 · Someday (50): 15 · Maybe (25): 8 · Parked (5): 17
+**53 open tasks.** Next (100): 7 · Soon (75): 6 · Someday (50): 15 · Maybe (25): 8 · Parked (5): 17
 
-## 100 — Next (6)
+## 100 — Next (7)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
-- Task 266 — Multi-select (lasso) plus edit-all-selected, as EPANET has.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
+- Task 611 — Import a library (pipe types, fittings, curves) from another project file.
 
-## 75 — Soon (8)
+## 75 — Soon (6)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
-- Task 611 — Import a library (pipe types, fittings, curves) from another project file.
 - Task 612 — [H] · Screenshot 0082 is the centerpiece of any lpn display.
 
 ## 50 — Someday (15)
@@ -82,5 +81,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-49 of 54 titles are within 4–12 words. `!` marks the rest;
+48 of 53 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
