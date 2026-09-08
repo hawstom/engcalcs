@@ -529,9 +529,9 @@
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
-        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
         "lpn_area_selected": "{n} selected.",
-        "lpn_area_none": "That area holds nothing.",
+        "lpn_area_none": "Nothing found in that area.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -543,18 +543,18 @@
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
-        "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
+        "lpn_reaction_order_bulk_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
         "lpn_reaction_order_wall": "Wall reaction order",
-        "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two. Changing this changes what the wall coefficient above means, and how this page converts it.",
+        "lpn_reaction_order_wall_tip": "1 means that wall reaction occurs according to the given coefficient(s). 0 means it does not. This is an on and off switch. Default value is 1.",
         "lpn_reaction_order_unstated": "Not stated",
         "lpn_reaction_order_zero": "0, zero order",
         "lpn_reaction_order_first": "1, first order",
         "lpn_reaction_limiting": "Limiting potential",
-        "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Write it in the units named beside the chemical, which EPANET never converts. Leave it empty and there is no limit.",
+        "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Use consistent units. No limit if blank.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness, so a rougher pipe reacts faster. When it is set, a wall coefficient is worked out for each pipe from that pipe's roughness, and the single wall coefficient above is no longer used. Leave it empty and it is not used at all.",
+        "lpn_reaction_rough_corr_tip": "Correlates the wall reaction to each pipe’s own roughness, so a rougher pipe reacts faster. When it is set, a wall coefficient is worked out for each pipe from that pipe’s roughness, and the single wall coefficient above is no longer used. Not used if blank.",
         "lpn_library_pipetypes": "Pipe types",
         "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
         "lpn_library_pipetypes_note": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
@@ -567,10 +567,10 @@
         "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
         "lpn_pipetype_none": "No pipe type selected",
         "lpn_pipetype_detach": "Detach from pipe type",
-        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.",
         "lpn_library_fittings": "Fittings",
         "lpn_library_fittings_tip": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
-        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
+        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
         "lpn_library_fittings_source": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
         "lpn_library_fittings_add": "Add a fittings list",
         "lpn_library_fittings_used_by": "Pipes using this fittings list",
@@ -583,7 +583,7 @@
         "lpn_fitting_remove": "Remove",
         "lpn_fitting_total": "Total minor (local) loss coefficient, k",
         "lpn_field_fittings": "Fittings list",
-        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
         "lpn_fittings_none": "No fittings list selected",
         "lpn_fitting_globe": "Globe valve, fully open",
         "lpn_fitting_angle": "Angle valve, fully open",
@@ -621,9 +621,9 @@
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
-        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
         "lpn_area_selected": "{n} selected.",
-        "lpn_area_none": "That area holds nothing.",
+        "lpn_area_none": "Nothing found in that area.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -635,18 +635,18 @@
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
-        "lpn_reaction_order_bulk_tip": "The power the concentration is raised to in the reaction in the body of the water. One is first order, which is what most chlorine decay is modelled as and what EPANET assumes when nothing is stated. Zero makes the rate constant, independent of how much chemical is there. This is not a coefficient: it changes what the bulk coefficient means, so changing it changes every answer even though no coefficient moved.",
+        "lpn_reaction_order_bulk_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
         "lpn_reaction_order_tank": "Tank reaction order",
-        "lpn_reaction_order_tank_tip": "The same exponent, for the water standing in tanks, which can react differently from the water moving in pipes. EPANET assumes one when nothing is stated. An empty box means nothing is stated and the engine's own default stands.",
+        "lpn_reaction_order_tank_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
         "lpn_reaction_order_wall": "Wall reaction order",
-        "lpn_reaction_order_wall_tip": "Whether the reaction at the pipe wall depends on how much chemical is in the water. First order means it does, and the wall coefficient is then a length per day. Zero order means it does not, and the coefficient becomes a mass per area per day instead. EPANET allows only these two. Changing this changes what the wall coefficient above means, and how this page converts it.",
+        "lpn_reaction_order_wall_tip": "1 means that wall reaction occurs according to the given coefficient(s). 0 means it does not. This is an on and off switch. Default value is 1.",
         "lpn_reaction_order_unstated": "Not stated",
         "lpn_reaction_order_zero": "0, zero order",
         "lpn_reaction_order_first": "1, first order",
         "lpn_reaction_limiting": "Limiting potential",
-        "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Write it in the units named beside the chemical, which EPANET never converts. Leave it empty and there is no limit.",
+        "lpn_reaction_limiting_tip": "A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Use consistent units. No limit if blank.",
         "lpn_reaction_rough_corr": "Roughness correlation",
-        "lpn_reaction_rough_corr_tip": "Ties the wall reaction to each pipe's own roughness, so a rougher pipe reacts faster. When it is set, a wall coefficient is worked out for each pipe from that pipe's roughness, and the single wall coefficient above is no longer used. Leave it empty and it is not used at all.",
+        "lpn_reaction_rough_corr_tip": "Correlates the wall reaction to each pipe’s own roughness, so a rougher pipe reacts faster. When it is set, a wall coefficient is worked out for each pipe from that pipe’s roughness, and the single wall coefficient above is no longer used. Not used if blank.",
         "lpn_library_pipetypes": "Pipe types",
         "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
         "lpn_library_pipetypes_note": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
@@ -659,10 +659,10 @@
         "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
         "lpn_pipetype_none": "No pipe type selected",
         "lpn_pipetype_detach": "Detach from pipe type",
-        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.",
         "lpn_library_fittings": "Fittings",
         "lpn_library_fittings_tip": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
-        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
+        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
         "lpn_library_fittings_source": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
         "lpn_library_fittings_add": "Add a fittings list",
         "lpn_library_fittings_used_by": "Pipes using this fittings list",
@@ -675,7 +675,7 @@
         "lpn_fitting_remove": "Remove",
         "lpn_fitting_total": "Total minor (local) loss coefficient, k",
         "lpn_field_fittings": "Fittings list",
-        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
         "lpn_fittings_none": "No fittings list selected",
         "lpn_fitting_globe": "Globe valve, fully open",
         "lpn_fitting_angle": "Angle valve, fully open",
@@ -965,7 +965,7 @@
                 "next_translated": {
                     "key": "lpn_tool_vertices_tip",
                     "value": "በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።",
-                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                    "english": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses."
                 }
             }
         },
@@ -981,7 +981,7 @@
                 "next_translated": {
                     "key": "lpn_tool_vertices_tip",
                     "value": "በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።",
-                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                    "english": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses."
                 }
             }
         },
@@ -997,7 +997,7 @@
                 "next_translated": {
                     "key": "lpn_tool_vertices_tip",
                     "value": "በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።",
-                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                    "english": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses."
                 }
             }
         },
@@ -1173,7 +1173,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1189,7 +1189,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1205,7 +1205,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1221,7 +1221,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1237,7 +1237,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1253,7 +1253,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1269,7 +1269,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1285,7 +1285,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1301,7 +1301,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1317,7 +1317,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1333,7 +1333,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1349,7 +1349,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },
@@ -1365,7 +1365,7 @@
                 "next_translated": {
                     "key": "lpn_reaction_note",
                     "value": "ይህ ገጽ የራሱ ግብረመልስ ቅንጅት አያቀርብም። ለእሱ መደበኛ ምርመራ የለም፣ ለተመሳሳይ ዓይነት ውሃ የታተሙ የመስክ ዋጋዎችም እስከ አስር እጥፍ ይለያያሉ፣ ስለዚህ እዚህ የሚቀርብ ቁጥር እንደ ምክር ይነበባል። እርስዎ የለኩትን ወይም መጥቀስ የሚችሉትን ያስገቡ፣ ወይም ግብረመልስ ለሌለው ኬሚካል ሳጥኖቹን ባዶ ይተውዋቸው።",
-                    "english": "This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
+                    "english": "This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react."
                 }
             }
         },

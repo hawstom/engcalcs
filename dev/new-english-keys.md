@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**53 still to read**, of 77 untranslated keys, of 1765 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**54 still to read**, of 77 untranslated keys, of 1765 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (77, 53 to read @@ NEEDS RULING)
+## lpn_  (77, 54 to read @@ NEEDS RULING)
 
 - **`lpn_area_hint_lasso_go`**
   > Move to draw the outline, then click to close it.
@@ -49,7 +49,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Click one corner of the window.
   @@ NEEDS RULING
 - **`lpn_area_none`**
-  > That area holds nothing.
+  > Nothing found in that area.
   @@ NEEDS RULING
 - **`lpn_area_selected`**
   > {n} selected.
@@ -64,7 +64,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Fittings list
   @@ NEEDS RULING
 - **`lpn_field_fittings_tip`**
-  > A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.
+  > A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.
   @@ NEEDS RULING
 - **`lpn_field_pipetype`**
   > Pipe type
@@ -172,7 +172,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.
   @@ NEEDS RULING
 - **`lpn_library_fittings_note`**
-  > Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.
+  > Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.
   @@ NEEDS RULING
 - **`lpn_library_fittings_source`**
   > The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.
@@ -238,8 +238,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Detach from pipe type
   _Ruled OK 2026-09-07._
 - **`lpn_pipetype_detach_tip`**
-  > Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.
-  _Ruled OK 2026-09-07._
+  > Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.
+  @@ NEEDS RULING
 - **`lpn_pipetype_none`**
   > No pipe type selected
   _Ruled OK 2026-09-07._
@@ -250,7 +250,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Select a polygon
   @@ NEEDS RULING
 - **`lpn_tool_area_tip`**
-  > Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.
+  > Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.
   @@ NEEDS RULING
 - **`lpn_tool_area_window`**
   > Select a window

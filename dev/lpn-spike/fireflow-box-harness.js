@@ -182,8 +182,8 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	ok('and it still names what is not modelled',
 		controls.indexOf('nozzle are not modelled') >= 0);
 	ok('and it says which engine will do the work, in the present tense',
-		controls.indexOf('This is worked out with') >= 0 &&
-		controls.indexOf('will be worked out') < 0);
+		controls.indexOf(' is used.') >= 0 &&
+		controls.indexOf('will be used') < 0);
 	ok('a run has not happened yet, so there is no report', textOf(byId.lpn_ff_report).trim() === '');
 
 	console.log('\n--- one run, one result set, one wide table ---');

@@ -267,7 +267,7 @@ console.log('\n--- a PRV, which the built-in solver does not switch ---');
 	ok('...and the tip is where that fact lives permanently',
 		/PRV, PSV, or FCV/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the valve case');
 	ok('...and names the other case too',
-		/extended period run/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the EPS case');
+		/extended period simulation/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the EPS case');
 	// The note that explained the greying went with the greying. Asserted as an ABSENCE, because a
 	// key nobody renders is 27 strings maintained for nothing.
 	ok('...and the note that explained the greying is gone from the file',

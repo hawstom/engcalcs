@@ -416,7 +416,7 @@ const EngCalcs = global.EngCalcs;
 		&& /Peak demand charge/.test(labels) && /Currency/.test(labels),
 	'and they are the efficiency, the price, the peak demand charge and the currency');
 	// **THE DISCLOSURE IS IN THE BOX**, not in a comment: there is no default price on this page.
-	check(/no price of its own/.test(labels), 'with the note that this page offers no price of its own');
+	check(/no price suggestions/.test(labels), 'with the note that this application offers no price suggestions');
 	// A report with no run says so rather than showing zeros.
 	L.rebuildEnergyReport();
 	const reportHost = document.getElementById('lpn_energy_report');

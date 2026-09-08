@@ -411,7 +411,7 @@
 			// Three shipped sentences now tell the reader to press the Calculate button BY NAME, so
 			// this literal is the button's name and not a synonym for it.
 			run: pageConfig.lpn_time_run || 'Calculate',
-			runTip: pageConfig.lpn_time_run_tip || 'Solve this network at every hydraulic time step, from the start of the run to the end of it.',
+			runTip: pageConfig.lpn_time_run_tip || 'Solve this network at every hydraulic time step.',
 			runNote: pageConfig.lpn_time_run_note || 'You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.',
 			// ---- the run box (Task 450) ----
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is

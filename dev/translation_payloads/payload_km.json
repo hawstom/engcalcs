@@ -531,9 +531,9 @@
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
-        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
         "lpn_area_selected": "{n} selected.",
-        "lpn_area_none": "That area holds nothing.",
+        "lpn_area_none": "Nothing found in that area.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -556,10 +556,10 @@
         "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
         "lpn_pipetype_none": "No pipe type selected",
         "lpn_pipetype_detach": "Detach from pipe type",
-        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.",
         "lpn_library_fittings": "Fittings",
         "lpn_library_fittings_tip": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
-        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
+        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
         "lpn_library_fittings_source": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
         "lpn_library_fittings_add": "Add a fittings list",
         "lpn_library_fittings_used_by": "Pipes using this fittings list",
@@ -572,7 +572,7 @@
         "lpn_fitting_remove": "Remove",
         "lpn_fitting_total": "Total minor (local) loss coefficient, k",
         "lpn_field_fittings": "Fittings list",
-        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
         "lpn_fittings_none": "No fittings list selected",
         "lpn_fitting_globe": "Globe valve, fully open",
         "lpn_fitting_angle": "Angle valve, fully open",
@@ -610,9 +610,9 @@
         "lpn_tool_area_lasso": "Select a lasso",
         "lpn_tool_area_polygon": "Select a polygon",
         "lpn_tool_key_hint": "Shortcut: press {key}.",
-        "lpn_tool_area_tip": "Drag on the map to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
+        "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift to add to what is already selected.",
         "lpn_area_selected": "{n} selected.",
-        "lpn_area_none": "That area holds nothing.",
+        "lpn_area_none": "Nothing found in that area.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -635,10 +635,10 @@
         "lpn_field_pipetype_tip": "The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.",
         "lpn_pipetype_none": "No pipe type selected",
         "lpn_pipetype_detach": "Detach from pipe type",
-        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
+        "lpn_pipetype_detach_tip": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.",
         "lpn_library_fittings": "Fittings",
         "lpn_library_fittings_tip": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
-        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
+        "lpn_library_fittings_note": "Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.",
         "lpn_library_fittings_source": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
         "lpn_library_fittings_add": "Add a fittings list",
         "lpn_library_fittings_used_by": "Pipes using this fittings list",
@@ -651,7 +651,7 @@
         "lpn_fitting_remove": "Remove",
         "lpn_fitting_total": "Total minor (local) loss coefficient, k",
         "lpn_field_fittings": "Fittings list",
-        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe's minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+        "lpn_field_fittings_tip": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
         "lpn_fittings_none": "No fittings list selected",
         "lpn_fitting_globe": "Globe valve, fully open",
         "lpn_fitting_angle": "Angle valve, fully open",
@@ -941,7 +941,7 @@
                 "next_translated": {
                     "key": "lpn_tool_vertices_tip",
                     "value": "បន្ថែម និងលុបចំណុចកំណត់ដែលកំណត់រាងបំពង់នៅលើផែនទី។ ចុចលើបំពង់ដើម្បីបន្ថែមចំណុចកំណត់ ចុចលើចំណុចកំណត់ដើម្បីលុបវា ហើយអូសចំណុចកំណត់ដើម្បីផ្លាស់ទីវា។ ចំណុចកំណត់ផ្លាស់ប្ដូរតែផ្លូវគំនូរប៉ុណ្ណោះ មិនមែនធារាសាស្ត្រទេ។",
-                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                    "english": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses."
                 }
             }
         },
@@ -957,7 +957,7 @@
                 "next_translated": {
                     "key": "lpn_tool_vertices_tip",
                     "value": "បន្ថែម និងលុបចំណុចកំណត់ដែលកំណត់រាងបំពង់នៅលើផែនទី។ ចុចលើបំពង់ដើម្បីបន្ថែមចំណុចកំណត់ ចុចលើចំណុចកំណត់ដើម្បីលុបវា ហើយអូសចំណុចកំណត់ដើម្បីផ្លាស់ទីវា។ ចំណុចកំណត់ផ្លាស់ប្ដូរតែផ្លូវគំនូរប៉ុណ្ណោះ មិនមែនធារាសាស្ត្រទេ។",
-                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                    "english": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses."
                 }
             }
         },
@@ -973,7 +973,7 @@
                 "next_translated": {
                     "key": "lpn_tool_vertices_tip",
                     "value": "បន្ថែម និងលុបចំណុចកំណត់ដែលកំណត់រាងបំពង់នៅលើផែនទី។ ចុចលើបំពង់ដើម្បីបន្ថែមចំណុចកំណត់ ចុចលើចំណុចកំណត់ដើម្បីលុបវា ហើយអូសចំណុចកំណត់ដើម្បីផ្លាស់ទីវា។ ចំណុចកំណត់ផ្លាស់ប្ដូរតែផ្លូវគំនូរប៉ុណ្ណោះ មិនមែនធារាសាស្ត្រទេ។",
-                    "english": "Add and remove the vertices that shape a pipe on the map. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes only the drawn route, not the hydraulics."
+                    "english": "Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses."
                 }
             }
         },

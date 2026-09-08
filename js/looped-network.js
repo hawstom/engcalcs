@@ -3102,7 +3102,7 @@ var EngCalcs = EngCalcs || {};
 		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
-		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values that belong to those scenarios alone are thrown away. You can undo this.')
+		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.')
 			+ (only ? '\n\n' + (pc.lpn_field_id || 'ID') + ': ' + only.id : '')
 			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios affected:') + ' ' + touched
@@ -8984,7 +8984,7 @@ var EngCalcs = EngCalcs || {};
 		if (areaAdd) { addToSelection(found); } else { setSelectionList(found); }
 		setNotice(String(found.length
 			? (pc.lpn_area_selected || '{n} selected.')
-			: (pc.lpn_area_none || 'That area holds nothing.')).replace('{n}', String(selectionCount())));
+			: (pc.lpn_area_none || 'Nothing found in that area.')).replace('{n}', String(selectionCount())));
 		// **FINISHING A SELECTION OPENS THE PROPERTIES** (Tom, 2026-09-07: *"Now we need a nice way
 		// to open the properties if it isn't open. Maybe we open it automatically on finishing the
 		// selection."*). It is the one moment where the answer is unambiguous: the user has just
@@ -18015,8 +18015,8 @@ var EngCalcs = EngCalcs || {};
 			case 'sources':
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
-			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset\'s properties, where you can read it or change it.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET\'s own settings for how it formats the report it prints. You can read the engine\'s report here, under Reports, EPANET run, but it comes out in the engine\'s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset’s properties, where you can read it or change it.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET’s own settings for how it formats the report it prints. You can read the engine’s report here, under Reports, EPANET run, but it comes out in the engine’s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
@@ -18074,7 +18074,7 @@ var EngCalcs = EngCalcs || {};
 				netNote.style.margin = '0 0 8px';
 				netNote.style.fontWeight = 'bold';
 				netNote.textContent = pc.lpn_net_emergency
-					|| 'This was an EPANET .net file. That is EPANET\'s own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
+					|| 'This was an EPANET .net file. That is EPANET’s own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.';
 				body.appendChild(netNote);
 			}
 			var sum = document.createElement('p');
@@ -20461,7 +20461,7 @@ var EngCalcs = EngCalcs || {};
 					// The file NAME, not the project name: this list is about files on the disk, and
 					// the project inside one may since have been renamed or may not exist here at all.
 					label: rec.name,
-					tip: (pc.lpn_recent_tip || 'Open {file} again without having to find it on your computer.').replace('{file}', rec.name),
+					tip: (pc.lpn_recent_tip || 'Open {file} again from the same location on your computer.').replace('{file}', rec.name),
 					fn: function () { openRecentFile(rec); }
 				});
 			});
@@ -26941,7 +26941,7 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_reaction_limiting_tip);
 		coeffRow('roughnessCorrelation', pc.lpn_reaction_rough_corr || 'Roughness correlation',
 			pc.lpn_reaction_rough_corr_tip);
-		if (noteFn) { noteFn(host, pc.lpn_reaction_note || 'This page offers no reaction coefficient of its own. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten, so a number supplied here would be read as a recommendation. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.'); }
+		if (noteFn) { noteFn(host, pc.lpn_reaction_note || 'This application offers no reaction coefficient suggestions. There is no standard test for one, and published field values for the same kind of water differ by a factor of ten. Enter one you have measured or one you can cite, or leave the boxes empty for a chemical that does not react.'); }
 	}
 	/**
 	 * **WHAT THE PUMPS COST TO RUN, FOR THE WHOLE NETWORK** (Task 566; dev/pump-energy.md). A price
@@ -27028,7 +27028,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		rowFn(host, pc.lpn_energy_currency || 'Currency', cur, pc.lpn_energy_currency_tip);
 		if (noteFn) {
-			noteFn(host, pc.lpn_energy_price_note || 'This page offers no price of its own. What power costs depends on the utility, the country, the hour and the year, so a number supplied here would be read as a recommendation. Enter the price from your own tariff.');
+			noteFn(host, pc.lpn_energy_price_note || 'This application offers no price suggestions. What power costs depends on the utility, the country, the hour and the year.');
 			noteFn(host, pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.');
 		}
 	}
@@ -27523,7 +27523,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function buildFittingSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libFittingSetsRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe refers to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.'));
 		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
 		// number that looks authoritative is worse than none at all, so the source is named on the
 		// screen and not only at the code.
@@ -27734,7 +27734,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function buildCurveSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libCurvesRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'A curve belongs to a project, and a pump or a valve indicates the one it uses in its own properties. Several elements can use the same curve, and editing it here changes all of them. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
 		// **SAID ONCE FOR THE SECTION, NOT ONCE PER CURVE.** It is the same sentence for every
 		// curve in the list, and twenty copies of it is what makes a panel unreadable.
 		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.'));
@@ -34062,7 +34062,7 @@ var EngCalcs = EngCalcs || {};
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ff_col_static || 'Static pressure',
-				pc.lpn_ff_col_static_tip || 'The pressure at this junction before any fire flow is drawn, with the system\'s ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts.'],
+				pc.lpn_ff_col_static_tip || 'The pressure at this junction before any fire flow is drawn, with the system’s ordinary demands still running. Nothing is shut off to measure it, so this is not a zero-flow pressure for the system; it is the same pressure the map shows at this junction. AWWA M31 and NFPA 291 both call this reading the static pressure, and it is where a fire flow test starts.'],
 			pc.lpn_ff_col_required || 'Required flow',
 			pc.lpn_ff_col_atrequired || 'Pressure at required flow',
 			pc.lpn_ff_col_available || 'Available flow',
@@ -34457,7 +34457,7 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_energy_col_running || '% of run',
 			pc.lpn_energy_col_effic || 'Effic.',
 			[pc.lpn_energy_col_avg_kw || 'Avg. kW',
-				pc.lpn_energy_col_avg_kw_tip || 'The average power used when this pump was running. It is not averaged over idle periods, so a pump that was idle for much of the extended period simulation still reports the power it used while it ran.'],
+				pc.lpn_energy_col_avg_kw_tip || 'The average power used when this pump was running. It is not averaged over idle periods so that a pump that was idle for much of the extended period simulation still reports the power it used while it ran.'],
 			pc.lpn_energy_col_peak_kw || 'Peak kW',
 			pc.lpn_energy_col_kwh || 'kWh',
 			pc.lpn_energy_col_cost || 'Cost'
