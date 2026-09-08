@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**56 open tasks.** Next (100): 6 · Soon (75): 13 · Someday (50): 13 · Maybe (25): 7 · Parked (5): 17
+**53 open tasks.** Next (100): 6 · Soon (75): 9 · Someday (50): 13 · Maybe (25): 8 · Parked (5): 17
 
 ## 100 — Next (6)
 
@@ -18,18 +18,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 
-## 75 — Soon (13)
+## 75 — Soon (9)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
-- Task 479 — The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.
-- Task 479.01 — The canonical half of 479 is CODE, not just a config line.
-- Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
-- Task 609 — The installed app claims one path, and `/app` is not in it.
 - Task 610 — Paste that CREATES table rows, and Ctrl+Shift+PageUp/PageDn to the next table.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
 - Task 612 — [H] · Screenshot 0082 is the centerpiece of any lpn display.
@@ -50,13 +46,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 601 — Calibration files: measured field data, against the model that predicts it.
 - Task 604 — Read an EPANET `.PRO` profile file.
 
-## 25 — Maybe (7)
+## 25 — Maybe (8)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
 - Task 303 — Usage logging: the remaining lower-value questions.
 - Task 348 — Sub-categories and paging in the examples gallery.
 - Task 416 — The tester control panel: move it, prune it, repurpose it.
+- Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - ! Task 607 — A moving picture of drawing a pipe -- Task 178's phase 2, extracted on close.
 - Task 613 — [H] · "Note" instead of "Text" for the free-text map object.
 
@@ -84,5 +81,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-51 of 56 titles are within 4–12 words. `!` marks the rest;
+48 of 53 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

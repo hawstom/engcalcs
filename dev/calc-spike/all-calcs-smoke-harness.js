@@ -47,7 +47,10 @@ const NOT_CALCULATORS = new Set([
 	'Orifice-Drain-Time-Ref.php',
 	// Not a page at all: it emits the service worker as JavaScript (Task 318). Its own syntax is
 	// checked by dev/scripts/sw_manifest_check.php, which parses what it generates.
-	'sw.php'
+	'sw.php',
+	// Not a page either: it emits the web app manifest as JSON, one scope per mount (Task 609).
+	// dev/scripts/web_manifest_check.php reads what it generates.
+	'manifest.php'
 ]);
 
 // A page whose results live in DYNAMIC ROWS writes nothing until those rows exist, and building

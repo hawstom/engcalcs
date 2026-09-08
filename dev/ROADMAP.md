@@ -172,77 +172,6 @@ the block.
     answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
-- 75|479| **The suite answers at librewaternet.org/app -- one path, and it is not `/engcalcs/`.**
-  **DECIDED 2026-09-06** (Tom: *"I do think we need to be at LWN/app. We better move that way. I
-  trust your judgement about meta tags."*), and the useful finding is that **`/app` IS CHEAP**: it
-  is a rewrite onto `Looped-Network.php`, and the ~210 absolute `/engcalcs/...` paths keep
-  resolving because a symlink makes `/engcalcs/` answer on that host too. So Task 487's refactor
-  stays unbought and `/app` is a pretty URL over a suite that still lives where it lived.
-  - **Sequence: worker scope, then the symlink, then the `/app` rewrite, then the whitelist.**
-    The canonical change is LAST because it is the slow one to undo.
-  - **STEP 1 IS DONE.** The one thing that broke was the service worker, silently: a worker cannot
-    control a page outside its scope, so a visitor arriving at `/app` got no offline support and no
-    error. `ecSwMounts()` now declares both paths and the scope, the `Service-Worker-Allowed`
-    header and the fetch routing all derive from it; `sw_scope_check.php` blocks on any of the four
-    disagreeing. **STEPS 1 AND 2 ARE DONE AND LIVE (2026-09-06):** the symlink and the `/app`
-    rewrite. What remains is the canonical change, and it is NOT server-only -- see 479.01.
-  - **META TAGS, since he delegated it: consolidate ONTO LibreWaterNet, one direction, no split.**
-    `librewaternet.org/app` declares itself canonical; `hawsedc.com/engcalcs/` declares
-    `librewaternet.org` canonical and defers. That is the standard site-move play and the only
-    arrangement in which two copies do not divide each other's ranking signal -- the rejected
-    alternative, both self-canonical, is the split `canonical_origin_check.php` makes visible.
-    **The cost is real: consolidating hands hawsedc.com's accumulated history to a new domain, and
-    that transfer is slow and imperfectly reversible.** It is the price of the brand decision he
-    has already made, which is the reason to do it in one deliberate move rather than drift into
-    two canonical homes.
-  - The landing page half is DONE and LIVE -- `librewaternet.org` and `/features.html` both serve,
-    `libreepanet.org` 302s to it, and `CANONICAL_ORIGIN` is a host->origin whitelist. Its own
-    repository is `~/webdev/librewaternet.org`; see `dev/librewaternet-landing.md`.
-  *(Superseded, kept so it is not re-proposed: serving at `<newdomain>/engcalcs/` by symlink alone,
-  the 2026-08-25 parking for want of clarity, and the `constructionnotesmanager.com` redirect Tom
-  dropped -- *"It has never been canonical."*)*
-
-- 75|609| **The installed app claims one path, and `/app` is not in it.**
-  `manifest.json` states `"scope": "/engcalcs/"` while the suite now answers at `/app` as well.
-  **A manifest whose scope does not contain the linking document is dropped WHOLE**, so
-  `librewaternet.org/app` is not installable at all -- silently, with no error anywhere. Found by
-  `web_manifest_check.php` (Task 322 half B), which holds it as a declared ratchet: a SECOND
-  uncovered mount fails the build. **Tom, 2026-09-06: *"Fix it now."***
-  - **DO NOT WIDEN THE SCOPE TO `/`, and that is the whole trap.** Scope is what the INSTALLED APP
-    WINDOW claims, so `/` means every navigation on the origin stays inside the app -- on
-    hawsedc.com that swallows the entire parent site, and even on librewaternet.org somebody who
-    installs the editor gets the marketing site inside it. The service worker could widen only
-    because every route is gated on `inScope()`; an app window has no such gate.
-  - **DERIVE IT FROM `ecSwMounts()`, the way the worker's scope, its `Service-Worker-Allowed`
-    header and its fetch routing already do.** A static `manifest.json` is the last thing still
-    hardcoding one path, and a third mount should need no second edit.
-  - **ONE SERVER LINE IS NEEDED AND IT IS TOM'S: `/app` must 301 to `/app/`.** Manifest scope is
-    matched as a STRING PREFIX, so a scope of `/app` also matches `/apple-anything`; the safe scope
-    is `/app/` with `start_url` `/app/`, and a visitor at the bare `/app` is then outside it.
-  - **Land it AFTER Task 479.01**, so the canonical URL and the installed app agree about what
-    `/app` is.
-
-- 75|479.01| **The canonical half of 479 is CODE, not just a config line.**
-  Found 2026-09-06 doing the server steps; 479 files everything left as server work and three of
-  these are not.
-  - **`/app` CANNOT declare itself canonical today, MEASURED not predicted.** `ec_canonical_url()`
-    builds from `$_SERVER['SCRIPT_NAME']`, which under the rewrite is `/engcalcs/Looped-Network.php`.
-    Live, `https://librewaternet.org/app` emits
-    `<link rel="canonical" href="https://librewaternet.org/engcalcs/Looped-Network.php?lang=en">`
-    and the same value in `og:url`. 479 states the opposite as the design. Needs a per-page
-    canonical path override, and it must reach hreflang and `og:url` too, because all three read
-    that one function.
-  - **Changing `'hawsedc.com' => 'https://librewaternet.org'` ALONE FAILS THE BUILD.**
-    `canonical_origin_check.php` rule 4 requires `CANONICAL_ORIGIN_DEFAULT` to be one of the
-    whitelisted values, and it is still `'https://hawsedc.com'`. The default moves in the same edit.
-  - **`generate_sitemap.php` hard-codes `$origin = 'https://hawsedc.com'`** with a comment to keep
-    it in step, and the check enforces the pairing. The sitemap moves too, and `CLAUDE.md` records
-    that `../sitemap.xml` is NOT tracked by git, so it must be regenerated and re-uploaded by hand.
-  - **THE SELF-CANONICAL SPLIT IS OPEN AS OF 2026-09-06 and only this task closes it.** Both hosts
-    now serve every page and each declares itself canonical, because `librewaternet.org` already
-    maps to itself in the whitelist. Measured the day the symlink landed. The sequence was right --
-    hawsedc.com cannot defer to URLs that 404 -- but the window is a real cost, not a neutral pause.
-
 - 100|599| **Graph a value against time across an extended-period run.**
   Tom, 2026-09-06: *"We haven't added anything for time series reporting or graphing such as one or
   more nodes' pressure or head across an EPS."* Correct, and it is the gap that costs most: the run
@@ -287,24 +216,18 @@ the block.
   - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
     computed series belong on one axis, and that axis is the time-series plot.
 
-- 75|487| **The suite only works when its URL path is `/engcalcs/`.**
-  **UNPARKED 2026-09-06 (Tom: *"I do think we need to be at LWN/app. We better move that way."*).**
-  This is now the first half of Task 479 rather than a rejected refactor, but **the refactor is
-  still not what it needs** -- see 479 for why `/app` costs no code change.
-  Measured 2026-08-22: 79 root-anchored `/engcalcs/` occurrences across 18 root `.php` pages plus
-  `sw.php` and `consent.php`, and three `Redirect 301` rules in `.htaccess` naming it absolutely.
-  **210 counting the JS.**
-  - **DEMOTED 25 on 2026-08-23, because this task and `dev/hosting-layout.md` §3 contradicted each
-    other and the hosting doc is right.** The refactor is rejected while a symlink does the job:
-    serving at `<newdomain>/engcalcs/` needs no code at all, and the count grew 112 → 210 between
-    measurements, so the refactor gets more expensive over time, not less. This blocks nothing that
-    is planned.
-  - **It becomes real only if the suite must be served at a path that is NOT `/engcalcs/`.** Then the
-    fix is one derived base-path constant plus a check failing on a new hardcoded prefix — and keep
-    root-relative, because root-relative was itself the 2026-08-08 fix for a `../` bug.
-
-
-
+- 25|487| **The suite only works when its URL path is `/engcalcs/`.**
+  A rejected refactor, kept so it is not re-proposed. Measured 2026-08-22: 79 root-anchored
+  `/engcalcs/` occurrences across 18 root `.php` pages plus `sw.php` and `consent.php`, three
+  `Redirect 301` rules in `.htaccess`, **210 counting the JS**, up from 112 -- it gets dearer.
+  - **Task 479 closed 2026-09-08 WITHOUT it.** `librewaternet.org/app/` is a rewrite onto
+    `Looped-Network.php` and a symlink makes `/engcalcs/` answer on that host too, so every
+    absolute path resolves; the canonical, the worker scope and the web app manifest all derive
+    from declarations (`ecCanonicalPaths()`, `ecSwMounts()`) rather than from a base path.
+  - **It becomes real only if the suite must be served at a path that is NOT `/engcalcs/` with no
+    `/engcalcs/` beside it.** Then the fix is one derived base-path constant plus a check failing
+    on a new hardcoded prefix, and keep root-relative: root-relative was itself the 2026-08-08 fix
+    for a `../` bug. `dev/hosting-layout.md` §3 is the record.
 
 - 50|269| **Both EWB chapters answered, and Phoenix invited a talk.**
   Tom, 2026-08-10 — human replies to outreach, and he has replied gratefully. This is the first real

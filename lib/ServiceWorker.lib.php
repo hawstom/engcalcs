@@ -134,6 +134,7 @@ function ecSwPageExclusions() {
         'lpn-lock.php'          => 'multi-tab lock endpoint; a cached answer would be a wrong one',
         'consent.php'           => 'records the consent choice; must always reach the server',
         'sw.php'                => 'the service worker itself; the browser manages its own copy',
+        'manifest.php'          => 'the web app manifest, generated per mount; the browser keeps its own copy',
         // Pages that need the network by definition, or that no offline user is looking for.
         'contact.php'           => 'a form that cannot be sent offline',
         'Compare-Languages.php' => 'a translation-review tool, not a calculator',
@@ -180,9 +181,9 @@ function ecServiceWorkerManifest($root = null) {
  */
 function ecSwAssetFiles($root) {
     $files = array_merge(
-        // The PWA manifest itself: without it, an offline visitor who opens the installed app
-        // has the pages but not the thing that makes it an app.
-        glob($root . '/manifest.json'),
+        // The web app manifest is generated per mount by manifest.php (Task 609) and is not here:
+        // the browser keeps its own copy of the manifest it installed from, and a precache
+        // keyed on one URL would hand every mount the base mount's scope.
         glob($root . '/css/*.css'),
         glob($root . '/css/vendor/*.css'),
         glob($root . '/js/*.js'),

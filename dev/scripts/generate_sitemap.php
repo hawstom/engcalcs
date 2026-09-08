@@ -59,6 +59,7 @@ $excluded = [
     'log-signal-event.php' => 'beacon endpoint, emits no HTML',
     'lpn-lock.php'         => 'POST-only lock broker, answers a GET with 405',
     'sw.php'               => 'generates the service worker, serves JavaScript',
+    'manifest.php'         => 'generates the web app manifest per mount, serves JSON',
 ];
 // English-only pages: real content, indexable, but with no ?lang= variants because the body is
 // hard-coded English (ROADMAP Task 286 -- legal prose is not machine-translated). Emitting 27

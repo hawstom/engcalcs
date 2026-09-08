@@ -145,7 +145,7 @@ foreach (array_keys($tipValues) as $v) { unset($named[$v]); }
 
 // ---- the pages, one per process ----------------------------------------------------------------
 $skip = ['lpn-lock.php', 'log-calc-event.php', 'log-human-view.php', 'log-signal-event.php',
-         'log-title-event.php', 'formmail.php', 'sw.php', 'consent.php'];
+         'log-title-event.php', 'formmail.php', 'sw.php', 'consent.php', 'manifest.php'];
 $pages = array_filter(glob($root . '/*.php'),
     fn($p) => !in_array(basename($p), $skip, true));
 
