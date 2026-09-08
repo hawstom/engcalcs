@@ -2017,7 +2017,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a Text. Cl
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode. Another [Esc] unselects any selected objects.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. The label highlights briefly to alert you that it was moved. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
