@@ -1,39 +1,55 @@
-# Tom's 2026-09-08 worklist, with status at the session cut-off
+# Tom's 2026-09-08 worklist, with status
 
-Status words: DONE (on origin/master), RUNNING (agent worktree, see `dev/session-handoff.md` §4),
-NOT STARTED. Delete this file once every line is DONE or has become a roadmap task.
+Status words: DONE (on origin/master), RUNNING (an agent has it), NOT STARTED.
+Delete this file once every line is DONE or has become a roadmap task.
 
-- 186, 266, 603 done: 186 and 603 CLOSED. The lpn batch LANDED 2026-09-08 (`2cf99b07`); 266 stays
-  open on its own `NEEDS A BROWSER PASS` line, which is Tom's to do.
+## First message, 2026-09-08 (fourth session)
+
+- 186, 266, 603 done: 186 and 603 CLOSED. **266 CLOSED 2026-09-08** on his own browser pass.
 - 247, 592, 599 to 100: DONE.
 - LibreWaterNet.org/app: DONE. Landing buttons go to `/app/`; manifest per mount; canonical was already live.
 - 0082.PNG centerpiece: file in place; placement is Task 612, NOT STARTED.
-- Non-hog boxes survive reload: DONE (`2cf99b07`).
+- Non-hog boxes survive reload: DONE (`2cf99b07`); the OVERHANG half is in the second lpn batch.
 - Shift+Enter: answered (standard in Excel, Calc, Sheets). DONE.
-- 266 follow-ups (1)-(8): DONE (`2cf99b07`), per the task's own 2026-09-08 line. Unverified in a browser.
-- Usage report (1)-(9): DONE except the lpn naming call site in `js/looped-network.js` (NOT STARTED, one-liners in handoff).
-- Contours and licensing: DONE, in the market researcher's journal, two entries dated 2026-09-08, including the revised outreach draft. Tom's ruling on the EPANET name is recorded there.
-- Favicons: retry LANDED as a preview (`4fec808a`, `dev/icon-preview/concepts-2026-09-08b.html`).
-  Waiting on Tom's eyes, not on code.
-- Tip review file and lang edits: committed with `// Edited by TGH 2026-09-07` markers. DONE.
-- Wizard tab-switch bug: NOT STARTED (second lpn batch).
-- Rules testing example, rule validation: NOT STARTED (second lpn batch).
+- 266 follow-ups (1)-(8): DONE (`2cf99b07`). Verified by Tom 2026-09-08.
+- Usage report (1)-(9): DONE. The lpn naming call site landed as `d740aa20`.
+- Contours and licensing: DONE, market researcher's journal, 2026-09-08.
+- Favicons: preview landed (`4fec808a`, `dev/icon-preview/concepts-2026-09-08b.html`). **Waiting on Tom's eyes, not on code.**
+- Tip review file and lang edits: DONE.
 - Delete fire-flow branch: DONE.
 - Claude Code author on commits: DONE, rule in CLAUDE.md.
-- Pump on Net3 needs zoom to edit; pipes hard to select without label: NOT STARTED (second lpn batch).
-- Unselect with Esc: DONE (`2cf99b07`) — Escape in bare Select clears the selection.
+- Unselect with Esc: DONE. Tom extended `lpn_tip_select` himself 2026-09-08 (`a7619c66`).
 - Tank reaction order: answered (exists in EPANET, `ORDER TANK`); tip wording NOT STARTED.
-- Sources editor on junctions: NOT STARTED (second lpn batch).
-- Pipe libraries exchange: Task 611, NOT STARTED.
-- Quality tolerance: NOT STARTED (second lpn batch).
-- Full translation sprint: NOT STARTED; re-confirm, then run after the second lpn batch.
-- lpn_wrong_btn: answered (a borderless `<button>`; rows in `log/engcalcs-signal.log` as `wrong:`). DONE.
+- Pipe libraries exchange: Task 611, raised to 100, NOT STARTED.
+- Full translation sprint: NOT STARTED. **Gated on his reading, not on us** -- 56 keys still to read, 132 changed and 79 untranslated as of 2026-09-08.
+- lpn_wrong_btn: answered. DONE.
 - Style guide APA: DONE.
 - Text/Note: Task 613, waiting for user demand. DONE as a decision.
 - lpn_tool_area_tip rewrite: DONE (`2cf99b07`).
-- Node label drop order and tip: NOT STARTED.
-- lpn_goto_tip lat,lon: NOT STARTED.
-- lpn_georef_twopt_tip "press again": NOT STARTED (verify).
-- lpn_settings_emitter_exponent, lpn_time_menu, lpn_reaction_pipe_tip not in UI: NOT STARTED (audit).
-- lpn_inp_drop_* removal: NOT STARTED (all but one are still read; audit per key).
-- Task 610 paste-creates-rows: restated on Tom's conditions, priority 50, needs the clerk's vertices spec.
+- Task 610 paste-creates-rows: priority 50, needs the clerk's vertices spec.
+
+## Second message, 2026-09-08 (fifth session)
+
+- **"goto with a comma"**: it is HIS OWN earlier item, not a roadmap task -- `lpn_goto_tip` and the
+  Go-to parser accept `lat,lon` with a comma as well as a space. Never had an ID. RUNNING.
+- **Toolbar in keyboard order**: ANSWERED by the clerk (`dev/agents/data-entry-clerk/journal.md`,
+  2026-09-08). Exactly ONE button is out of order -- Select carries digit 1 and sits eighth, because
+  the all-keyed Insert group was placed ahead of the Edit group. Its recommendation is to move the
+  whole Edit group left of Insert rather than extract Select. NOT STARTED.
+- **Luke Butler, epanet-js, and the donation offer**: in the market researcher's journal, 2026-09-08.
+- **"Hide these titles" link on the page titles**: RUNNING.
+- **Boxes jump on reload; overhangs not preserved**: RUNNING.
+- **266 complete**: DONE, closed.
+- **600 / the solver-loading banner**: recorded on Task 608, which is the task those words describe.
+  His sentence is the sentence to use.
+- **611 to 100**: DONE.
+- **539 to 100**: DONE. His geometry sketch is `dev/label-placement-algorithms.md` §9, verbatim.
+- **He edited `lang.ec.en`**: committed as his own (`a7619c66`).
+- **Net3-World Text X3 "2026-08-26Break"**: REMOVED (`c57a5ee9`). **His "its properties are not
+  editable" is a separate bug** and is being reproduced -- that Text was anchored to a link, and a
+  link-anchored Text stores an OFFSET rather than a position.
+- **Tables paste tip**: the clerk proposed exact wording (`dev/agents/data-entry-clerk/journal.md`).
+  It found the feature has moved: paste fills EXISTING rows and cannot create them, so his own
+  sentence would be false today. Two strings offered, one true now and one for when row creation
+  ships. NOT STARTED, waiting on his pick.
+- **Area help bubble dismissable with a "Show this" checkbox**: RUNNING.
