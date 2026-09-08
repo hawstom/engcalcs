@@ -1407,10 +1407,13 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	// The wiring, so the arithmetic above is actually reached. Both boxes that wear the
 	// .lpn-setbox shell measure the floor ONCE and hand the same number to the cap and to the clamp
 	// -- two calls to chromeFloor() around a style write are two layouts and two chances to differ.
-	['openSettingsBox', 'openLibraryBox', 'openFireFlowBox'].forEach((name) => {
+	// The fire flow box places through placeBoxRemembered() since 2026-09-08 (it remembers its
+	// corner now), so the cap is asserted on that function for it.
+	['openSettingsBox', 'openLibraryBox', 'placeBoxRemembered'].forEach((name) => {
 		const b = code(name);
 		ok(`${name}() caps its box to the room below the chrome`, /capPanelToRoomBelow\(/.test(b));
 	});
+	ok('openFireFlowBox() places through placeBoxRemembered()', /placeBoxRemembered\(/.test(code('openFireFlowBox')));
 	['openSettingsBox', 'openLibraryBox'].forEach((name) => {
 		const b = code(name);
 		const capAt = b.indexOf('capPanelToRoomBelow(');

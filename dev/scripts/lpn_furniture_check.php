@@ -115,6 +115,12 @@ const EC_LPN_FURNITURE = [
     'lpn_setbox'      => 'position and size of the Settings box',
     'lpn_findbox'     => 'position and size of the Find and replace box',
     'lpn_libbox'      => 'position and size of the Library box',
+    // The four report boxes, on Tom's word (2026-09-08: *"only Settings and Libraries survive a
+    // reload... Fix this."*). Same purpose and the same shape of record as the three boxes above.
+    'lpn_ffbox'       => 'position, size and openness of the Fire flow box',
+    'lpn_energybox'   => 'position, size and openness of the Pump energy report',
+    'lpn_cmpbox'      => 'position, size and openness of the Scenario comparison box',
+    'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
     'lpn_show_titles' => 'whether the page titles above the map are shown -- a reading preference '
                        . 'on this screen, and the four small-screen items of Task 486 turn it off',
 ];

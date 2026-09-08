@@ -586,6 +586,9 @@ echoHeader("EngCalcs", $html_title, "", false);
 		<div id="lpn_pane_pipes" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_pipes"></div>
 		<div id="lpn_pane_pumps" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_pumps"></div>
 		<div id="lpn_pane_valves" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_valves"></div>
+		<?php // The Text table (Tom, 2026-09-08): the multi-properties box takes its rows from the
+		      // tables' column specs, so a Text object needed a table before it could have rows. ?>
+		<div id="lpn_pane_text" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_text"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -1150,6 +1153,8 @@ EngCalcs.pageConfig = {
 	lpn_area_hint_polygon_start: <?=json_encode($ec_lang['lpn_area_hint_polygon_start'])?>,
 	lpn_area_hint_polygon_go: <?=json_encode($ec_lang['lpn_area_hint_polygon_go'])?>,
 	lpn_area_hint_shift: <?=json_encode($ec_lang['lpn_area_hint_shift'])?>,
+	lpn_area_hint_touch_start: <?=json_encode($ec_lang['lpn_area_hint_touch_start'])?>,
+	lpn_area_hint_touch_go: <?=json_encode($ec_lang['lpn_area_hint_touch_go'])?>,
 	lpn_multi_title: <?=json_encode($ec_lang['lpn_multi_title'])?>,
 	lpn_multi_varies: <?=json_encode($ec_lang['lpn_multi_varies'])?>,
 	lpn_multi_applied: <?=json_encode($ec_lang['lpn_multi_applied'])?>,

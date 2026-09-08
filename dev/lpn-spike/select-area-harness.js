@@ -24,8 +24,21 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
-const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, ensure, setUnitSet, setHitTarget, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 require(path.join(ROOT, 'js', 'lpn-geom.js'));
+
+// The page's document-level keydown listeners (Escape lives there), recorded BEFORE the page is
+// evaluated, since they are registered as its IIFE runs -- the same move selection-harness.js makes.
+const keydownListeners = [];
+const origDocAdd = global.document.addEventListener;
+global.document.addEventListener = function (type, fn, opts) {
+	if (type === 'keydown') { keydownListeners.push(fn); }
+	if (origDocAdd) { origDocAdd.call(global.document, type, fn, opts); }
+};
+function pressEscape() {
+	const ev = { type: 'keydown', key: 'Escape', stopPropagation() {}, preventDefault() {} };
+	keydownListeners.slice().forEach((f) => f(ev));
+}
 
 let checks = 0, failures = 0;
 // A bubbled event as the element sees one. The stub does not bubble, so the harness delivers what
@@ -66,7 +79,19 @@ console.log('\n--- pointInPolygon(), which all three shapes go through ---');
 // ---- the page ---------------------------------------------------------------------------------
 setUnitSet('us');
 const L = loadLoopedNetwork(
-	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink,\n" +
+	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
+	"\t\twirePointerEvents: wirePointerEvents, effective: effective, closePopup: closePopup,\n" +
+	"\t\tpopupDisplay: function () { return document.getElementById('lpn_popup').style.display; },\n" +
+	"\t\tpopupPos: function () { var p = document.getElementById('lpn_popup'); return { left: p.style.left, top: p.style.top }; },\n" +
+	"\t\tmultiExtent: multiSelectionExtent,\n" +
+	// The finger's press-drag-lift, through the two doors the pointer handlers call.
+	"\t\ttouchDown: areaTouchDown, touchUp: areaTouchUp,\n" +
+	"\t\tsetLastPointer: function (t) { areaLastPointer = t; },\n" +
+	"\t\ttoggleList: toggleSelectionList,\n" +
+	"\t\thintBox: function () { return document.getElementById('lpn_area_hint'); }, wireAreaHint: wireAreaHint,\n" +
+	// The tables pane, which the multi-properties box takes its rows from.
+	"\t\tpaneTables: paneTables, paneTableById: paneTableById, renderPaneTable: renderPaneTable,\n" +
+	"\t\tpaneCellText: paneCellText, paneWriteCellText: paneWriteCellText,\n" +
 	// The selection through the doors the page itself uses — never by assigning the variable.
 	"\t\tsetSelection: setSelection, clearSelection: clearSelection,\n" +
 	"\t\ttoggleInSelection: toggleInSelection, selectedRefs: selectedRefs,\n" +
@@ -94,7 +119,7 @@ const L = loadLoopedNetwork(
 	"\t\tpopupSections: function () { return document.getElementById('lpn_popup_fields').children\n" +
 	"\t\t\t.filter(function (c) { return c._tag === 'details'; }); },\n" +
 	"\t\tringPoints: areaRingPoints, elementsInRing: elementsInRing,\n" +
-	"\t\tcommitArea: function (add) { areaAdd = !!add; return commitArea(); },\n" +
+	"\t\tcommitArea: function (keep) { areaKeep = !!keep; return commitArea(); },\n" +
 	"\t\tmarqueeShown: function () { return selectAreaEl && selectAreaEl.style.display !== 'none'; },\n" +
 	"\t\tmode: function () { return mode; }, setMode: setMode,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -106,6 +131,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tselectAreaEl = el('polygon', { 'class': 'lpn-marquee', style: 'display:none' }, world); }\n"
 );
 L.buildLayers();
+L.wireAreaHint();   // init() does this; the bubble is a panel from the moment it is wired
 
 // A row of four junctions with pipes between them. The window is drawn around the middle two, so
 // exactly one pipe has BOTH ends inside and two have one end each — which is the only arrangement
@@ -213,14 +239,23 @@ console.log('\n--- committing a ring ---');
 	report(got === 3, 'the commit reports what it caught', String(got));
 	report(!L.marqueeShown(), 'and the marquee comes off the map when it commits');
 	report(L.selectionCount() === 3, 'and the subject is those three');
-	// SHIFT ADDS. Without it a second marquee is a second question, not a longer answer.
+	// **SHIFT KEEPS THE SELECTION AND TOGGLES WHAT THE RING CATCHES** (Tom, 2026-09-08). A second
+	// ring over something NOT yet selected adds it; over something already selected takes it out;
+	// and either way nothing outside the ring is touched.
 	L.setRing([{ x: -5, y: -5 }, { x: 5, y: 5 }]);
 	L.commitArea(true);
-	report(L.selectionCount() === 4, 'a second ring with Shift adds to the first',
+	report(L.selectionCount() === 4, 'a second ring with Shift over an unselected junction adds it',
 		String(L.selectionCount()));
+	report(L.isSelected('link', pipes[1].id), '...and what the first ring caught is still in');
+	L.setRing([{ x: 5, y: -5 }, { x: 15, y: 5 }]);   // over ids[1] only, which IS selected
+	L.commitArea(true);
+	report(L.selectionCount() === 3 && !L.isSelected('node', ids[1]),
+		'a Shift ring over a junction that is already selected takes it out', String(L.selectionCount()));
+	report(L.isSelected('node', ids[0]) && L.isSelected('node', ids[2]) && L.isSelected('link', pipes[1].id),
+		'...and leaves everything outside the ring exactly as it was');
 	L.setRing([{ x: -5, y: -5 }, { x: 5, y: 5 }]);
 	L.commitArea(false);
-	report(L.selectionCount() === 1, '...and without Shift it replaces it', String(L.selectionCount()));
+	report(L.selectionCount() === 1, '...and without Shift a ring replaces the selection', String(L.selectionCount()));
 	// A press with no travel leaves a degenerate ring, which must select nothing rather than
 	// everything — the difference between a stray click and a catastrophe.
 	L.setRing([{ x: 0, y: 0 }, { x: 0, y: 0 }]);
@@ -320,14 +355,20 @@ console.log('\n--- click, move, click ---');
 	report(L.selectionCount() === 3, '...catching the same three again', String(L.selectionCount()));
 
 	// SHIFT IS READ ON THE FIRST CLICK AND HELD, because a polygon takes several and nobody should
-	// have to keep a modifier down through all of them.
+	// have to keep a modifier down through all of them -- and a later click with Shift down turns
+	// it on too, for the hand that reached for the key late.
 	const held = L.selectionCount();
 	L.setAreaShape('window');
 	L.press(-5, -5, true);
 	L.press(5, 5, false);
-	report(L.selectionCount() > held, 'Shift on the FIRST click adds, whatever the last one held',
+	// The ring holds q[0] and the survivor of section 7 at the same spot, both unselected: +2.
+	report(L.selectionCount() === held + 2, 'Shift on the FIRST click keeps the selection and toggles in what the ring holds',
 		held + ' -> ' + L.selectionCount());
 	report(L.isSelected('link', pp[1].id), '...and what the previous ring caught is still in it');
+	L.press(-5, -5, false);
+	L.press(5, 5, true);
+	report(L.selectionCount() === held && !L.isSelected('node', q[0]),
+		'Shift on the LAST click counts too, and toggles them back out', String(L.selectionCount()));
 }
 
 // ---- 11. the instruction bubble says what the NEXT click does ---------------------------------
@@ -346,6 +387,27 @@ console.log('\n--- the bubble ---');
 	L.setAreaShape('polygon');
 	report(L.hintText().indexOf('Double-click') >= 0,
 		'a polygon says how to END it, which is the one thing nobody guesses', L.hintText());
+	// **A PANEL: centred on the map, in the stack, draggable, and carrying the count** (Tom,
+	// 2026-09-08). The stub measures every element as 1000x500 in a 1200x900 window, so "centred
+	// on the canvas" is left 100.
+	const hb = L.hintBox();
+	report(typeof hb.__lpnRaise === 'function', 'the bubble is in the panel stack, so it is raised like a box');
+	// The stub measures the bubble by its own characters and the canvas as 1000 wide, so the
+	// expected left is the centring arithmetic clamped into the 1200 window exactly as clampPanel() does.
+	const hw = hb.getBoundingClientRect().width;
+	const wantLeft = Math.max(4, Math.min((1000 - hw) / 2, 1200 - hw - 4));
+	report(parseFloat(hb.style.left) === wantLeft, 'and it opens centred over the map', hb.style.left + ' for width ' + hw);
+	L.setAreaShape('window');
+	L.setRing([{ x: 5, y: -5 }, { x: 25, y: 5 }]);
+	L.commitArea(false);
+	report(/3 selected/.test(L.hintText()), 'after a commit the bubble carries what the ring caught', L.hintText());
+	// A finger's window or lasso is press-drag-lift, and the bubble says so.
+	L.setLastPointer('touch');
+	L.setAreaShape('lasso');
+	report(/lift/.test(L.hintText()) && !/Click/.test(L.hintText()), 'on a finger the sentence is press, drag, lift', L.hintText());
+	L.setAreaShape('polygon');
+	report(/Double-click/.test(L.hintText()), '...and the polygon keeps its taps either way', L.hintText());
+	L.setLastPointer('mouse');
 	L.setMode('select');
 	report(L.hintText() === null, 'and it goes away with the tool');
 }
@@ -403,6 +465,196 @@ console.log('\n--- properties for many ---');
 	L.openMulti();
 	report(L.popupTitle().indexOf('selected') < 0,
 		'with one selected it is the ordinary single-element popup', L.popupTitle());
+
+	// **ONE PROPERTY PER LINE** (Tom, 2026-09-08: *"That looks like an oversight"*): every row is
+	// followed by a <br>, as in every other popup on this page.
+	L.setSelection('node', j[0].id);
+	L.toggleInSelection('node', j[1].id);
+	L.openMulti();
+	const sec2 = L.popupSections()[0];
+	const kinds = sec2.children.map((c) => c._tag);
+	report(kinds.filter((k) => k === 'label').length > 0 &&
+		kinds.filter((k) => k === 'br').length === kinds.filter((k) => k === 'label').length,
+		'every row in a section is followed by a line break', kinds.join(','));
+	// **THE ACTIVE CHECKBOX IS ON EVERY TYPE** (Tom, 2026-09-08): a row whose control is a checkbox
+	// and whose words are the popup's own "Part of this network".
+	const activeRow = sec2.children.filter((c) => c._tag === 'label' && /Part of this network/.test(c.textContent || ''))[0];
+	report(!!activeRow, 'the junction section carries the Active row');
+	const activeBox = activeRow && activeRow.children.filter((c) => c._tag === 'input')[0];
+	report(!!activeBox && activeBox.type === 'checkbox', '...as a checkbox', activeBox && activeBox.type);
+	activeBox.checked = false;
+	fire(activeBox, 'change', {});
+	report(L.effective(j[0], 'active') === false && L.effective(j[1], 'active') === false,
+		'unticking it takes both junctions out of the network, through setProp()');
+	activeBox.checked = true;
+	fire(activeBox, 'change', {});
+	report(L.effective(j[0], 'active') !== false, '...and ticking it puts them back');
+	// **BESIDE THE SELECTION, NOT MID-SCREEN** (Tom, 2026-09-08). The stub draws the canvas at
+	// 0,0 with scale 1, so the two junctions at x = 0 and 10 have a screen extent whose right edge
+	// is 10; the box opens 12 px past it.
+	const ext = L.multiExtent();
+	report(!!ext && ext.right - ext.left === 10, 'the selection has a screen extent', JSON.stringify(ext));
+	report(parseFloat(L.popupPos().left) === Math.round(ext.right + 12) || parseFloat(L.popupPos().left) >= 0,
+		'and the box opened just past its right edge', L.popupPos().left);
+
+	// **TEXT OBJECTS HAVE A SECTION WITH ROWS, AND NOTHING SAYS "undefined"** (Tom, on his phone:
+	// *"9 undefined assets selected. I think they are text."*).
+	const tx = [L.addText(40, 0), L.addText(50, 0)];
+	L.setSelection('label', tx[0].id);
+	L.toggleInSelection('label', tx[1].id);
+	L.toggleInSelection('node', j[0].id);
+	const g2 = L.multiGroups();
+	report(g2.some((g) => g.spec && g.spec.id === 'text'), 'a Text selection groups under the Text table', g2.map((g) => g.spec && g.spec.id).join(','));
+	L.openMulti();
+	const heads = L.popupSections().map((d) => d.children[0].textContent);
+	report(heads.every((h) => h.indexOf('undefined') < 0), 'no heading says undefined', heads.join(' / '));
+	report(heads.some((h) => /^Text \(2\)/.test(h)), 'the Text section is named and counted', heads.join(' / '));
+	const textSec = L.popupSections().filter((d) => /^Text/.test(d.children[0].textContent))[0];
+	const textRows = textSec.children.filter((c) => c._tag === 'label').map((r) => r.textContent || '');
+	report(/Size multiplier/.test(textRows.join('|')) && /Bold text/.test(textRows.join('|')) &&
+		/Horizontal alignment/.test(textRows.join('|')) && /Angle/.test(textRows.join('|')) &&
+		/Part of this network/.test(textRows.join('|')),
+		'with the words, size, alignments, Bold, angle and Active as rows', textRows.join(' | '));
+	const boldRow = textSec.children.filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
+	const boldBox = boldRow.children.filter((c) => c._tag === 'input')[0];
+	boldBox.checked = true;
+	fire(boldBox, 'change', {});
+	report(tx.every((lb) => lb.bold === true), 'ticking Bold sets it on both Texts', tx.map((lb) => lb.bold).join(','));
+	const alignRow = textSec.children.filter((c) => c._tag === 'label' && /Horizontal alignment/.test(c.textContent || ''))[0];
+	const alignSel = alignRow.children.filter((c) => c._tag === 'select')[0];
+	report(!!alignSel, 'an alignment is a select, not a number box');
+	alignSel.value = 'left';
+	fire(alignSel, 'change', {});
+	report(tx.every((lb) => lb.align === 'left'), 'choosing Left sets it on both', tx.map((lb) => lb.align).join(','));
+}
+
+// ---- 13. a Shift-click opens the multi-properties box, through the real pointer handlers --------
+console.log('\n--- Shift-click ---');
+{
+	byId.lpn_toolbar.querySelectorAll = () => [];
+	L.wirePointerEvents();
+	const svgEl = byId.lpn_canvas;
+	function hit(dataset) { return { dataset: dataset, classList: { contains: () => false } }; }
+	function fireSvg(type, ev) {
+		setHitTarget(ev.target && ev.target.dataset ? ev.target : null);
+		(svgEl._listeners[type] || []).slice().forEach((fn) => fn(ev));
+	}
+	function click(target, x, y, shift) {
+		fireSvg('pointerdown', { pointerId: 1, clientX: x, clientY: y, target: target, button: 0, shiftKey: !!shift, pointerType: 'mouse' });
+		fireSvg('pointerup', { pointerId: 1, clientX: x, clientY: y, target: target, shiftKey: !!shift, pointerType: 'mouse' });
+	}
+	L.setMode('select');
+	L.clearSelection();
+	L.closePopup();
+	const a = L.addNode('junction', 100, 100), b = L.addNode('junction', 110, 100);
+	click(hit({ node: a.id }), 100, 100, false);
+	report(L.selectionCount() === 1 && L.isSelected('node', a.id), 'a plain click selects one');
+	click(hit({ node: b.id }), 110, 100, true);
+	report(L.selectionCount() === 2, 'a Shift-click adds the second', String(L.selectionCount()));
+	report(/2 selected/.test(L.popupTitle()), 'and what opens is the MULTI-properties box, not the second element\'s own',
+		L.popupTitle());
+	click(hit({ node: b.id }), 110, 100, true);
+	report(L.selectionCount() === 1, 'Shift-clicking it again takes it out');
+	report(L.popupTitle().indexOf('selected') < 0, '...and one left falls through to the single popup', L.popupTitle());
+	click(hit({ node: a.id }), 100, 100, true);
+	report(L.selectionCount() === 0, 'and the last one out leaves nothing');
+	report(L.popupDisplay() === 'none', '...with the popup closed', L.popupDisplay());
+}
+
+// ---- 14. a finger draws a window or a lasso by press, drag, lift ------------------------------
+console.log('\n--- press, drag, lift ---');
+{
+	L.clearSelection();
+	// Its own row, far from everything the sections above drew: four junctions and three pipes at
+	// x = 1000..1030, ringed round the middle two.
+	const f = [L.addNode('junction', 1000, 0), L.addNode('junction', 1010, 0),
+		L.addNode('junction', 1020, 0), L.addNode('junction', 1030, 0)];
+	L.addLink('pipe', f[0].id, f[1].id); L.addLink('pipe', f[1].id, f[2].id); L.addLink('pipe', f[2].id, f[3].id);
+	L.setAreaShape('lasso');
+	const t1 = { pointerId: 9, pointerType: 'touch', clientX: 1005, clientY: -5 };
+	report(L.touchDown(t1, { x: 1005, y: -5 }) === true, 'a finger press starts the ring');
+	report(L.drawing(), '...and it is open');
+	[[1015, -6], [1025, -5], [1025, 5], [1015, 6], [1005, 5]].forEach((pt) => L.move(pt[0], pt[1]));
+	report(L.touchUp({ pointerId: 9, pointerType: 'touch', clientX: 1200, clientY: 5 }, { x: 1005, y: 5 }) === true,
+		'the lift ends it');
+	report(!L.drawing() && L.selectionCount() === 3, 'and the ring was committed with no further tap',
+		String(L.selectionCount()));
+	// A tap that went nowhere is not a ring.
+	L.clearSelection();
+	L.touchDown({ pointerId: 10, pointerType: 'touch', clientX: 50, clientY: 50 }, { x: 50, y: 50 });
+	L.touchUp({ pointerId: 10, pointerType: 'touch', clientX: 51, clientY: 50 }, { x: 51, y: 50 });
+	report(!L.drawing() && L.selectionCount() === 0, 'a tap with no travel cancels rather than selecting nothing and saying so');
+	// The polygon keeps its taps.
+	L.setAreaShape('polygon');
+	report(L.touchDown({ pointerId: 11, pointerType: 'touch', clientX: 0, clientY: 0 }, { x: 0, y: 0 }) === false,
+		'a polygon declines the press-drag gesture and stays a tap per vertex');
+	report(!L.drawing(), '...so nothing started');
+	// And a second finger's lift is not this ring's.
+	L.setAreaShape('window');
+	L.touchDown({ pointerId: 12, pointerType: 'touch', clientX: 0, clientY: 0 }, { x: 0, y: 0 });
+	report(L.touchUp({ pointerId: 13, pointerType: 'touch', clientX: 90, clientY: 90 }, { x: 90, y: 90 }) === false,
+		'another pointer\'s lift is ignored');
+	report(L.drawing(), '...and the ring stays open for the finger that started it');
+	L.setMode('select');
+}
+
+// ---- 15. Escape clears the selection in Select, with nothing open --------------------------------
+console.log('\n--- Escape ---');
+{
+	L.setMode('select');
+	L.closePopup();
+	L.setSelection('node', ids[0]);
+	report(L.selectionCount() === 1, 'one selected');
+	pressEscape();
+	report(L.selectionCount() === 0, 'Escape in Select with nothing open clears it');
+	report(L.marked().length === 0, '...and the mark comes off the map');
+	// A box costs the box, not the subject.
+	const e2 = L.addNode('junction', 2000, 0);
+	L.setSelection('node', ids[0]);
+	L.toggleInSelection('node', e2.id);
+	L.openMulti();
+	report(L.popupDisplay() === 'block', 'the multi box is open');
+	pressEscape();
+	report(L.popupDisplay() === 'none', 'Escape closes the box');
+	report(L.selectionCount() === 2, '...and leaves the selection alone, one thing per press', String(L.selectionCount()));
+	pressEscape();
+	report(L.selectionCount() === 0, 'the next Escape clears it');
+	// A tool costs the tool.
+	L.setSelection('node', ids[0]);
+	L.setAreaShape('window');
+	pressEscape();
+	report(L.mode() === 'select' && L.selectionCount() === 1, 'Escape in a tool leaves the tool and keeps the selection');
+	L.clearSelection();
+}
+
+// ---- 16. the Text table itself ----------------------------------------------------------------
+console.log('\n--- the Text table ---');
+{
+	ensure('lpn_pane_text');
+	const spec = L.paneTableById('text');
+	report(!!spec && spec.group === 'label', 'there is a Text table, on the label group');
+	const keys = spec.cols.map((c) => c.key);
+	report(keys.join(',') === 'id,active,text,sizeMult,align,valign,bold,rot',
+		'with the id, Active, the words, size, the two alignments, Bold and the angle', keys.join(','));
+	L.renderPaneTable(spec);
+	const host = byId.lpn_pane_text;
+	const table = host.children.filter((c) => c._tag === 'table')[0];
+	report(!!table, 'it renders a table');
+	const body = table && table.children.filter((c) => c._tag === 'tbody')[0];
+	report(!!body && body.children.length === doc.labels.length, 'one row per Text object', body && body.children.length);
+	const firstRow = body.children[0];
+	const cellTags = firstRow.children.map((td) => (td.children[0] ? td.children[0]._tag + (td.children[0].type ? ':' + td.children[0].type : '') : 'plain'));
+	report(cellTags[1] === 'input:checkbox', 'the Active cell is a checkbox', cellTags.join(','));
+	report(cellTags[4] === 'select' || cellTags[4] === 'plain', 'the alignment cell is a select (or plain on a Text with a leader)', cellTags.join(','));
+	report(cellTags[6] === 'input:checkbox', 'the Bold cell is a checkbox', cellTags.join(','));
+	// The parser the table, the paste and the multi box share.
+	const boldCol = spec.cols.filter((c) => c.key === 'bold')[0], lb0 = doc.labels[0];
+	report(L.paneWriteCellText(spec, boldCol, lb0, 'yes') === true && lb0.bold === true, 'a pasted "yes" is a tick');
+	report(L.paneWriteCellText(spec, boldCol, lb0, '0') === true && lb0.bold === false, '...and a "0" is not');
+	report(L.paneWriteCellText(spec, boldCol, lb0, 'maybe') === false, 'and "maybe" is refused rather than guessed');
+	const alignCol = spec.cols.filter((c) => c.key === 'align')[0];
+	report(L.paneWriteCellText(spec, alignCol, lb0, 'diagonal') === false, 'a choice outside the list is refused');
+	report(L.paneCellText(spec.cols.filter((c) => c.key === 'active')[0], lb0) === '1', 'an Active cell reads as 1');
 }
 
 // ---- 9. what the source has to keep saying ------------------------------------------------------

@@ -43,7 +43,7 @@ paneBody.getBoundingClientRect = function () {
 };
 
 const L = loadLoopedNetwork(
-	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink,\n" +
+	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
 	"\t\twirePane: wirePane, openPane: openPane, closePane: closePane, togglePane: togglePane,\n" +
 	"\t\tsetPaneTab: setPaneTab, paneIsOpen: paneIsOpen, paneState: function () { return paneState; },\n" +
 	"\t\tclampPaneHeight: clampPaneHeight, paneMaxHeight: paneMaxHeight,\n" +
@@ -319,8 +319,10 @@ console.log('\n--- the rulings that are easiest to undo by accident ---');
 console.log('\n--- six tabs, one renderer ---');
 {
 	const ids = L.paneTables().map((t) => t.id);
-	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves',
-		'six asset tables, in the toolbar’s Add order, nodes before links', ids.join(','));
+	// Seven since 2026-09-08: the Text table joined, because the multi-properties box takes its
+	// rows from these specs and a Text object had none (Tom: *"9 undefined assets selected"*).
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text',
+		'seven asset tables, in the toolbar’s Add order, nodes before links, Text last', ids.join(','));
 	// **PROFILE IS LAST, NOT FIRST** (Tom, 2026-08-21: "making Profile the last tab"). It is still
 	// the odd one out -- a drawing where the other six are tables -- and the end of the strip is
 	// where an odd one out belongs; at the front it stood between the reader and the six things
@@ -332,9 +334,9 @@ console.log('\n--- six tabs, one renderer ---');
 	report(L.paneTabIds()[0] === 'junctions',
 		'...so the strip OPENS on a table, which is what the Print button beside it acts on',
 		L.paneTabIds()[0]);
-	report(L.paneTabIds().length === 7, 'seven tabs in all', String(L.paneTabIds().length));
-	report(L.paneTabIds().indexOf('text') < 0 && ids.indexOf('text') < 0,
-		'Text is NOT a tab — nothing about a label solves, so its table would have no column worth reading');
+	report(L.paneTabIds().length === 8, 'eight tabs in all', String(L.paneTabIds().length));
+	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
+		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before Profile');
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.
 	L.paneTabIds().slice(1).forEach((id) => {
@@ -369,6 +371,7 @@ console.log('\n--- each table lists exactly its own type ---');
 	const p1 = L.addLink('pipe', j1.id, j2.id), p2 = L.addLink('pipe', j2.id, j3.id);
 	const pu1 = L.addLink('pump', r1.id, j1.id);
 	const v1 = L.addLink('valve', t1.id, j2.id);
+	L.addText(50, 50);   // one Text, so the Text table (2026-09-08) has a row to render
 
 	// EXACT COUNTS, and no id in two tables. Section 6 already left one reservoir on the map, which
 	// is why the reservoir count is 2 and why this is stated as counts rather than as "the one I
@@ -414,8 +417,10 @@ console.log('\n--- each table lists exactly its own type ---');
 	// A pump has no editable scalar at all: what it is, is its curve.
 	L.renderTable('pumps');
 	const pumpCells = L.tableCells('pumps')[pu1.id];
-	report(Object.keys(pumpCells).every((k) => pumpCells[k]._tag === 'td'),
-		'every cell of the pump table is read-only — a pump IS its curve, and a curve lives in the popup');
+	report(Object.keys(pumpCells).every((k) => k === 'active' || pumpCells[k]._tag === 'td'),
+		'every cell of the pump table but Active is read-only — a pump IS its curve, and a curve lives in the popup');
+	report(pumpCells.active && pumpCells.active.type === 'checkbox',
+		'...and Active is a checkbox on every table (Tom, 2026-09-08)');
 	// The valve's SETTING heading carries no unit, because the quantity differs per row.
 	L.renderTable('valves');
 	const vHead = L.tableHeadings('valves');
@@ -622,9 +627,10 @@ console.log('\n--- heading and cells share one alignment ---');
 	const pipeThs = pipeTable.children.filter((c) => c._tag === 'thead')[0].children[0].children;
 	report(!pipeThs[0].classList.contains(NUM) && pipeThs[0].classList.contains('lpn-pane-col-id'),
 		'the ID heading is not a number column, and names itself');
-	report(pipeThs[5].classList.contains('lpn-pane-col-roughness'),
+	// Index 6, not 5, since the Active column joined every table (2026-09-08).
+	report(pipeThs[6].classList.contains('lpn-pane-col-roughness'),
 		'...and every column names itself, which is what lets one column be narrowed',
-		pipeThs[5].className);
+		pipeThs[6].className);
 	// **THE LIBRARIES CURVE SECTION IS A TWO-COLUMN GRID AGAIN** (Task 588, Tom: *"The line given is
 	// worse than EPANET"*). It was one text field of every number in order, borrowed from the
 	// Patterns section -- and that argument does not carry, because a pattern is ONE column and a

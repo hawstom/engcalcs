@@ -702,15 +702,20 @@ html[lang="zh"] .ec-welcome {
 /* **THE SELECT-AREA INSTRUCTION BUBBLE** (Task 266). It says what the NEXT click will do, so it
    changes mid-gesture and has to be readable at a glance against whatever the map is showing: a
    solid ground rather than the mode line's wash, and a border, because it sits over a drawing.
-   pointer-events are off from its parent overlay column, which is what keeps an instruction from
-   being something the reader has to get out of the way. */
+   **A PANEL SINCE 2026-09-08** (Tom: centred on the map, on top of the stack, draggable): fixed,
+   so it escapes the overlay column it is written in, and pointer-events back ON for itself alone,
+   because makePanelDraggable() needs the press -- its children stay inert so that press lands on
+   the panel and not on a line of text. The z-index is the stack's own, set by raisePanel(). */
 .lpn-area-hint {
+	position: fixed; pointer-events: auto;
 	font-size: 11px; line-height: 1.35; max-width: 22em;
 	background: #fff; color: #12211f;
 	border: 1px solid #0645ad; border-radius: 3px;
-	padding: 4px 8px;
-	box-shadow: 0 1px 3px rgba(0,0,0,.2);
+	padding: 6px 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,.3);
 }
+.lpn-area-hint > div { pointer-events: none; }
+.lpn-area-hint-note { font-weight: bold; margin-bottom: 2px; }
 /* A collapsible heading per type in the multi-properties box. Open by default and the reader
    closes what they are not using, never the other way round. */
 .lpn-multi-section { margin: 0 0 .5em; }

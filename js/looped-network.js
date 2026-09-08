@@ -8768,6 +8768,13 @@ var EngCalcs = EngCalcs || {};
 	// The same reading of a hit, ADDED to the subject rather than replacing it. It is deliberately
 	// the same door -- one place decides that a node's data label IS that node -- so Shift-click
 	// and a plain click can never disagree about what was pressed.
+	// Is this hit an ELEMENT, by the same reading selectFromHit() makes -- as opposed to bare canvas
+	// or the backdrop, which are "nothing".
+	function hitIsElement(t) {
+		var d = (t && t.dataset) || {};
+		return !!(d.node || d.nodelbl !== undefined || d.linklbl !== undefined ||
+			d.link !== undefined || d.lbl !== undefined);
+	}
 	function toggleFromHit(t) {
 		var d = (t && t.dataset) || {};
 		if (d.node) { toggleInSelection('node', d.node); }
@@ -8852,7 +8859,21 @@ var EngCalcs = EngCalcs || {};
 	var selectAreaEl = null;          // the marquee, built in init() beside the rubber band
 	var areaRing = null;              // the committed points, in WORLD coordinates
 	var areaLive = null;              // where the pointer is now, or null between gestures
-	var areaAdd = false;              // Shift: add to the standing selection rather than replace it
+	// **SHIFT KEEPS THE STANDING SELECTION AND TOGGLES WHAT THE RING CATCHES** (Tom, 2026-09-08:
+	// *"I think what we want is: 'Hold Shift during selection to preserve the existing selection
+	// set and toggle (add/remove) affected assets.'"*). It used to ADD -- a second ring with Shift
+	// could only ever grow the subject -- and his own reading of that was that Shift *"replaces the
+	// selection set"*, which is what a modifier with no visible second half looks like. Read on
+	// the first click and held (a polygon is several clicks), and any later click with Shift down
+	// turns it on too, so a hand that reached for the key late is not refused.
+	var areaKeep = false;
+	// A press-drag-lift ring on a finger (Tom, 2026-09-08: *"Lasso on phone needs to be simply
+	// press, drag, lift."*): the pointer id of the finger drawing it, or null. Pointer gestures are
+	// untouched -- click-trace-click with the button up, because tracing with a button held is
+	// erratic with a mouse. Decided by pointerType, never by screen width.
+	var areaTouchDrag = null;
+	var areaTouchStart = null;
+	var areaLastPointer = 'mouse';    // pointerType of the last press on the map; picks the bubble's sentence
 	var LPN_AREA_SHAPES = ['window', 'lasso', 'polygon'];
 	function selectAreaShapeNext() {
 		return LPN_AREA_SHAPES[(LPN_AREA_SHAPES.indexOf(selectAreaShape) + 1) % LPN_AREA_SHAPES.length];
@@ -8877,7 +8898,7 @@ var EngCalcs = EngCalcs || {};
 		selectAreaEl.style.display = '';
 		selectAreaEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
 	}
-	function areaCancel() { areaRing = null; areaLive = null; paintAreaMarquee(); updateAreaHint(); }
+	function areaCancel() { areaRing = null; areaLive = null; areaTouchDrag = null; paintAreaMarquee(); updateAreaHint(); }
 	/**
 	 * **THE BUBBLE SAYS WHAT THE NEXT CLICK WILL DO** (Task 266, Tom 2026-09-07). It changes as the
 	 * gesture progresses, which is the whole reason it is not another line in the mode hint: before
@@ -8885,17 +8906,65 @@ var EngCalcs = EngCalcs || {};
 	 * more. The Shift rule rides along on every one of them, because Tom's own reading of the
 	 * shipped tool was *"I see how Shift adds, but I don't see how it removes"* -- and a modifier
 	 * whose second half is undiscoverable is a modifier with one half.
+	 *
+	 * **IT IS A PANEL NOW: CENTRED ON THE MAP, ON TOP OF THE STACK, AND DRAGGABLE** (Tom,
+	 * 2026-09-08: *"Would the help and the little feedback reports ... work better if they opened
+	 * in the middle of the map at max zindex (pushing other things down, of course in the
+	 * established way) and were draggable?"*). It used to sit in the top-left overlay column under
+	 * the mode line, pointer-events off, where a Settings box or the Library could cover it and a
+	 * phone reader never looked. So it goes through raisePanel() like every standing box, opens
+	 * centred on the canvas the first time, and stays wherever it is dragged to for the rest of
+	 * the session -- a session choice like popupUserPos, never stored. **THE FEEDBACK LINE LIVES
+	 * IN IT TOO**: what the last ring caught ("3 selected.") is its first line, so the count and
+	 * the next instruction are read in one place rather than one in the status bar and one here.
 	 */
+	var areaHintPos = null;    // where the reader dragged the bubble to, this session
+	var areaHintNote = '';     // what the last commit reported, shown above the instruction
 	function updateAreaHint() {
 		var box = document.getElementById('lpn_area_hint'), pc = EngCalcs.pageConfig || {},
-			started = areaDrawing(), key, text;
+			started = areaDrawing(), key, text, was, r, at, m, note, line;
 		if (!box) { return; }
 		if (mode !== 'select-area') { box.style.display = 'none'; box.textContent = ''; return; }
-		key = 'lpn_area_hint_' + selectAreaShape + (started ? '_go' : '_start');
+		// A finger's window or lasso is press-drag-lift, so its sentences differ; the polygon
+		// taps either way. `areaLastPointer` is the last press the map saw, which is the best
+		// guess available before this gesture's own press arrives.
+		key = (areaLastPointer === 'touch' && selectAreaShape !== 'polygon')
+			? 'lpn_area_hint_touch' + (started ? '_go' : '_start')
+			: 'lpn_area_hint_' + selectAreaShape + (started ? '_go' : '_start');
 		text = pc[key] || '';
-		box.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
-			'Hold Shift to add to the selection, or to take something out of it.');
+		box.textContent = '';
+		if (areaHintNote) {
+			note = document.createElement('div');
+			note.className = 'lpn-area-hint-note';
+			note.textContent = areaHintNote;
+			box.appendChild(note);
+		}
+		line = document.createElement('div');
+		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
+			'Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.');
+		box.appendChild(line);
+		was = box.style.display;
 		box.style.display = '';
+		if (box.__lpnRaise) { box.__lpnRaise(); }
+		// Placed when it APPEARS, not on every sentence change: a bubble that re-centred itself
+		// each time its text changed would jump out from under the reader who had just moved it.
+		if (was === 'none' || !box.style.left) {
+			r = box.getBoundingClientRect();
+			if (areaHintPos) { at = areaHintPos; }
+			else {
+				m = svg ? svg.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+				at = { left: m.left + (m.width - r.width) / 2, top: m.top + (m.height - r.height) / 2 };
+			}
+			at = clampPanel(at.left, at.top, r.width, r.height, window.innerWidth, window.innerHeight, chromeFloor());
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		}
+	}
+	// Wired once, from init(): the drag callback remembers the corner for the session.
+	function wireAreaHint() {
+		var box = document.getElementById('lpn_area_hint');
+		if (!box) { return; }
+		makePanelDraggable(box, function (pos) { areaHintPos = { left: pos.left, top: pos.top }; });
 	}
 	// **ONE DOOR INTO THE TOOL, whichever control opened it.** The toolbar cycles and the menu
 	// lists, but both end here -- so the button's own icon and the mode can never say two different
@@ -8906,6 +8975,7 @@ var EngCalcs = EngCalcs || {};
 	function setSelectAreaShape(shape) {
 		if (LPN_AREA_SHAPES.indexOf(shape) < 0) { return false; }
 		selectAreaShape = shape;
+		areaHintNote = '';   // a new tool, a fresh bubble: the last count belonged to the last ring
 		areaCancel();
 		if (repaintAreaTool) { repaintAreaTool(); }
 		setMode('select-area');
@@ -8946,13 +9016,14 @@ var EngCalcs = EngCalcs || {};
 	function areaPress(w, shift) {
 		var pt = { x: w.x, y: w.y };
 		if (!areaDrawing()) {
-			areaAdd = shift;
+			areaKeep = !!shift;
 			areaRing = [pt];
 			areaLive = pt;
 			paintAreaMarquee();
 			updateAreaHint();
 			return 'start';
 		}
+		if (shift) { areaKeep = true; }
 		// The second click ENDS a window and a lasso. A polygon is a vertex at a time and ends on
 		// the double-click, so a press there only ever adds a point.
 		if (selectAreaShape === 'polygon') {
@@ -8978,13 +9049,47 @@ var EngCalcs = EngCalcs || {};
 		paintAreaMarquee();
 		return true;
 	}
+	// **A PRESS-DRAG-LIFT RING ON A FINGER** (Tom, 2026-09-08). The press starts the ring exactly as
+	// a click does; the lift ends it, IF the finger travelled -- a tap that went nowhere is not a
+	// ring, and cancels rather than selecting nothing and saying so. The polygon keeps its taps:
+	// it is a vertex per press by nature, and the double-tap ends it.
+	function areaTouchDown(e, w) {
+		if (selectAreaShape === 'polygon' || areaDrawing()) { return false; }
+		areaTouchDrag = e.pointerId;
+		areaTouchStart = { x: e.clientX, y: e.clientY };
+		areaPress(w, false);
+		return true;
+	}
+	function areaTouchUp(e, w) {
+		if (areaTouchDrag === null || e.pointerId !== areaTouchDrag) { return false; }
+		areaTouchDrag = null;
+		if (!areaTouchStart || Math.hypot(e.clientX - areaTouchStart.x, e.clientY - areaTouchStart.y) < tapMovePx(e)) {
+			areaCancel();
+			return true;
+		}
+		areaLive = { x: w.x, y: w.y };
+		commitArea();
+		return true;
+	}
+	// Shift's toggle, on a whole list: what was in comes out and what was out goes in, through the
+	// one function that writes the subject. Nothing outside the ring is touched, which is the
+	// "preserve the existing selection set" half of Tom's sentence.
+	function toggleSelectionList(list) {
+		var keep = selections.filter(function (s) {
+			return !list.some(function (f) { return f.kind === s.kind && f.id === s.id; });
+		});
+		var add = list.filter(function (f) { return !isSelected(f.kind, f.id); });
+		setSelectionList(keep.concat(add));
+	}
 	function commitArea() {
 		var ring = areaRingPoints(), found = elementsInRing(ring), pc = EngCalcs.pageConfig || {};
 		areaCancel();
-		if (areaAdd) { addToSelection(found); } else { setSelectionList(found); }
-		setNotice(String(found.length
+		if (areaKeep) { toggleSelectionList(found); } else { setSelectionList(found); }
+		areaHintNote = String(found.length
 			? (pc.lpn_area_selected || '{n} selected.')
-			: (pc.lpn_area_none || 'Nothing found in that area.')).replace('{n}', String(selectionCount())));
+			: (pc.lpn_area_none || 'Nothing found in that area.')).replace('{n}', String(selectionCount()));
+		setNotice(areaHintNote);
+		updateAreaHint();
 		// **FINISHING A SELECTION OPENS THE PROPERTIES** (Tom, 2026-09-07: *"Now we need a nice way
 		// to open the properties if it isn't open. Maybe we open it automatically on finishing the
 		// selection."*). It is the one moment where the answer is unambiguous: the user has just
@@ -12553,6 +12658,83 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
 		return pc['lpn_valve_type_' + vt.toLowerCase()] || vt;
 	}
+	// **THE ACTIVE COLUMN, ON EVERY TABLE** (Tom, 2026-09-08: the scenario "Part of this network"
+	// box *"needs to show for all asset types in multi-properties, and in the tables too if
+	// reasonable"*). A checkbox cell, the popup's activeField() re-keyed: the same effective() read
+	// and the same setProp() write, so a scenario switching a pipe off in the table is the same
+	// override it would be from the popup. `prop` earns it the completeEdit() redraw.
+	function paneColActive() {
+		return { key: 'active', label: 'lpn_field_active', bool: true, em: 2, prop: 'active',
+			get: function (el) { return effective(el, 'active') !== false; },
+			set: function (el, v) { setProp(el, 'active', !!v); } };
+	}
+	// What a Text object's own popup redraws after any of size, bold, angle or alignment moves:
+	// the element's anchors, its style, then its content, measured width, geometry and visibility
+	// through refreshLabelContent(). One function, so the table, the multi-properties box and the
+	// popup cannot redraw in three different orders.
+	function textLabelRelayout(id) {
+		var lb = labelById(id), le = labelEls[id];
+		if (!lb || !le) { return; }
+		applyTextLabelJustification(lb, le);
+		le.text.setAttribute('style', textLabelStyle(lb));
+		refreshLabelContent(id);
+		saveToStorage();
+	}
+	function paneTextCols() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			paneColId(), paneColActive(),
+			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
+			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
+			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
+				get: function (lb) { return effective(lb, 'text'); },
+				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
+			{ key: 'sizeMult', label: 'lpn_field_text_size', em: 2.5,
+				get: function (lb) { return lb.sizeMult || 1; },
+				set: function (lb, v) {
+					if (!(v > 0)) { return; }
+					lb.sizeMult = v;   // base-write: size is Base-owned, exactly as position is
+					textLabelRelayout(lb.id);
+				} },
+			{ key: 'align', label: 'lpn_field_text_align',
+				choices: function () {
+					return [['left', pc.lpn_field_text_align_left || 'Left'],
+						['center', pc.lpn_field_text_align_center || 'Centre'],
+						['right', pc.lpn_field_text_align_right || 'Right']];
+				},
+				get: function (lb) { return lb.align || 'center'; },
+				plainFor: function (lb) { return textIsAnchored(lb); },
+				set: function (lb, v) {
+					lb.align = v;   // base-write: justification is Base-owned, exactly as position and size are
+					textLabelRelayout(lb.id);
+				} },
+			{ key: 'valign', label: 'lpn_field_text_valign',
+				choices: function () {
+					return [['top', pc.lpn_field_text_valign_top || 'Top'],
+						['middle', pc.lpn_field_text_valign_middle || 'Middle'],
+						['bottom', pc.lpn_field_text_valign_bottom || 'Bottom']];
+				},
+				get: function (lb) { return lb.valign || 'middle'; },
+				plainFor: function (lb) { return textIsAnchored(lb); },
+				set: function (lb, v) {
+					lb.valign = v;   // base-write: see align
+					textLabelRelayout(lb.id);
+				} },
+			{ key: 'bold', label: 'lpn_field_text_bold', bool: true, em: 2,
+				get: function (lb) { return !!lb.bold; },
+				set: function (lb, v) {
+					lb.bold = !!v;   // base-write: Base-owned, as in the popup
+					textLabelRelayout(lb.id);
+				} },
+			{ key: 'rot', label: 'lpn_field_text_rotation', em: 2.5,
+				get: function (lb) { return textLabelRotation(lb); },
+				set: function (lb, v) {
+					if (!isFinite(v)) { return; }
+					lb.rot = normalizeDeg(v);   // base-write: Base-owned, as in the popup
+					textLabelRelayout(lb.id);
+				} }
+		];
+	}
 	// Built once, on demand, because paneTabs is assembled at load time and these column getters
 	// name functions declared further down the file.
 	var paneTablesCache = null;
@@ -12566,7 +12748,7 @@ var EngCalcs = EngCalcs || {};
 				id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
 				group: 'node', type: 'junction',
 				cols: [
-					paneColId(), paneColElev(),
+					paneColId(), paneColActive(), paneColElev(),
 					// **THE TYPED ONE IS THE EDITABLE ONE, AND IT IS THE ONLY EDITABLE ONE** -- see
 					// resolvedDemand(). The Demand column beside it is a plain cell with no control
 					// in it at all, so there is no path by which the resolved number could be typed
@@ -12595,7 +12777,7 @@ var EngCalcs = EngCalcs || {};
 				id: 'reservoirs', panel: 'lpn_pane_reservoirs', label: 'lpn_pane_tab_reservoirs',
 				group: 'node', type: 'reservoir',
 				cols: [
-					paneColId(), paneColElev(),
+					paneColId(), paneColActive(), paneColElev(),
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
 					// whose water surface is its ground, not a reservoir with no head.
@@ -12613,7 +12795,7 @@ var EngCalcs = EngCalcs || {};
 				id: 'tanks', panel: 'lpn_pane_tanks', label: 'lpn_pane_tab_tanks',
 				group: 'node', type: 'tank',
 				cols: [
-					paneColId(), paneColElev(),
+					paneColId(), paneColActive(), paneColElev(),
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
@@ -12643,7 +12825,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
@@ -12691,7 +12873,7 @@ var EngCalcs = EngCalcs || {};
 				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
 				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
 				// cell and the label beside the symbol cannot disagree.
-				cols: [paneColId()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
 				])
@@ -12699,7 +12881,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
 				group: 'link', type: 'valve',
-				cols: [paneColId()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
 					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
 					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
 					// valve's setting is a different physical quantity per type -- a pressure, a
@@ -12716,6 +12898,17 @@ var EngCalcs = EngCalcs || {};
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
 				])
+			},
+			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
+			// box as *"9 undefined assets"*): the multi-properties box takes its list from here, so
+			// a Text object with no column spec had a heading and nothing under it. Its columns are
+			// the label popup's own rows, re-keyed: the words, the size, the two alignments (plain on
+			// a Text following a leader, exactly as the popup withholds them), Bold and the angle.
+			// The Turn buttons are actions rather than properties and stay in the popup.
+			{
+				id: 'text', panel: 'lpn_pane_text', label: 'lpn_tool_add_text',
+				group: 'label', type: 'text',
+				cols: paneTextCols()
 			}
 		].map(function (spec) {
 			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
@@ -12795,6 +12988,9 @@ var EngCalcs = EngCalcs || {};
 	// Every element of this type, filter or no filter -- the denominator the banner prints.
 	function paneTableAllElements(spec) {
 		var pool = spec.group === 'link' ? doc.links : doc.nodes;
+		// A Text object has no `type` of its own: every label is a Text, so the Text table is all
+		// of them (Tom, 2026-09-08).
+		if (spec.group === 'label') { return (doc.labels || []).slice(); }
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
 	function paneTableElements(spec) {
@@ -12873,10 +13069,33 @@ var EngCalcs = EngCalcs || {};
 	// comes to round differently from the screen it was taken off.
 	function paneCellText(c, el) {
 		var v = c.get(el);
+		// **A COLUMN MAY BE A YES/NO, A CHOICE OR A LINE OF TEXT** (Tom, 2026-09-08: the Text table
+		// and the Active column). A yes/no reads as 1 or 0 -- what a pasted sheet can carry and
+		// what a typed cell can be parsed back from; a choice and a text read verbatim.
+		if (c.bool) { return v ? '1' : '0'; }
 		if (!panePresent(v)) { return ''; }
 		if (c.result) { return String(plainRound(v, 2)); }
-		if (!c.set) { return String(v); }
+		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
+	}
+	// **ONE PARSER FOR A TYPED CELL, A PASTED CELL AND A MULTI-PROPERTIES ROW.** Returns {ok, v}:
+	// the value c.set() should receive, or a refusal the caller can count. A number column keeps
+	// the rule it always had (blank means `undefined` where the column says so, otherwise a finite
+	// number); a yes/no accepts the spellings a sheet or a hand would produce; a choice must be one
+	// of the column's own; a text column takes anything.
+	function paneParseCellText(c, text) {
+		var t = String(text === null || text === undefined ? '' : text).trim();
+		if (c.bool) {
+			if (/^(1|true|yes|on|y|x|✓)$/i.test(t)) { return { ok: true, v: true }; }
+			if (t === '' || /^(0|false|no|off|n)$/i.test(t)) { return { ok: true, v: false }; }
+			return { ok: false };
+		}
+		if (c.choices) {
+			return { ok: c.choices().some(function (o) { return o[0] === t; }), v: t };
+		}
+		if (c.str) { return { ok: true, v: t }; }
+		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
+		return { ok: true, v: (c.blank && t === '') ? undefined : +t };
 	}
 	// **A HEADING AND ITS CELLS ARE ONE COLUMN, SO THEY CARRY THE SAME CLASSES** (Tom, 2026-08-23:
 	// "the inputs and the headings are not middle/center justified with each other"). Three classes,
@@ -13059,6 +13278,28 @@ var EngCalcs = EngCalcs || {};
 				// while Tab still walks the boxes a person can actually type in.
 				td.tabIndex = -1;
 				cells[c.key] = td;
+			} else if (c.bool || c.choices) {
+				// **A YES/NO IS A CHECKBOX AND A CHOICE IS A SELECT** (Tom, 2026-09-08: the Active
+				// column on every table, and the Text table's alignments and Bold). Both commit
+				// through paneCommitCell() like a typed cell, so the write, the completeEdit() and
+				// the popup refresh are the same three lines. `readOnly` on the checkbox is what
+				// keeps paneInEdit() honest -- a checkbox is never "being typed in".
+				input = document.createElement(c.bool ? 'input' : 'select');
+				if (c.bool) { input.type = 'checkbox'; input.checked = !!c.get(el); input.readOnly = true; }
+				else {
+					c.choices().forEach(function (o) {
+						var opt = document.createElement('option');
+						opt.value = o[0]; opt.textContent = o[1];
+						input.appendChild(opt);
+					});
+					input.value = paneCellText(c, el);
+				}
+				paneApplyColWidth(input, c);
+				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
+				input._lpnCell = { spec: spec, c: c, el: el };
+				input.addEventListener('change', function () { paneCommitCell(input); });
+				td.appendChild(input);
+				cells[c.key] = input;
 			} else {
 				input = document.createElement('input');
 				// **TEXT, NOT number, AND THE KEYBOARD IS THE REASON** (Task 186; the Curves grid
@@ -13074,7 +13315,8 @@ var EngCalcs = EngCalcs || {};
 				// thing `number` was buying: nothing validated against it either, because a
 				// browser's number input simply declines the keystroke and says nothing.
 				input.type = 'text';
-				input.setAttribute('inputmode', 'decimal');
+				// A text column (the Text table's own words) wants the ordinary keyboard.
+				if (!c.str) { input.setAttribute('inputmode', 'decimal'); }
 				// **A CELL IS NOT IN EDIT MODE UNTIL IT IS PUT THERE** (Task 186, Tom 2026-09-07:
 				// *"Cells can be (a) overwritten (direct typing) or (b) edited (double-click or
 				// F2). When not in edit mode, navigation is one arrow per cell, and the arrow does
@@ -13115,6 +13357,8 @@ var EngCalcs = EngCalcs || {};
 				if (!target) { return; }
 				if (paneCellIsPlain(c, el)) {
 					target.textContent = paneCellText(c, el);
+				} else if (c.bool && target.type === 'checkbox') {
+					target.checked = !!c.get(el);
 				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
 					// **ONLY A CELL BEING EDITED IS LEFT ALONE** (Task 186). It used to be any cell
 					// with the caret in it, which was the same thing when focus WAS editing; now a
@@ -13342,7 +13586,7 @@ var EngCalcs = EngCalcs || {};
 		return !!(input && input.tagName === 'INPUT' && input._lpnCell && input.readOnly === false);
 	}
 	function paneEnterEdit(input, wipe) {
-		if (!input || !input._lpnCell) { return false; }
+		if (!input || !input._lpnCell || input.type !== 'text') { return false; }
 		input.readOnly = false;
 		// **WHAT THE CELL HELD WHEN EDITING BEGAN**, so Escape has something to put back. Read
 		// here rather than from the document, because the document is where a commit has ALREADY
@@ -13379,15 +13623,17 @@ var EngCalcs = EngCalcs || {};
 	// what the document holds rather than writing NaN into a field of the user's, which nothing
 	// downstream could tell from a value they meant.
 	function paneCommitCell(input) {
-		var ctx = input && input._lpnCell, c, el;
+		var ctx = input && input._lpnCell, c, el, p;
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
-		if (input.value !== '' && !isFinite(+input.value)) {
+		// A checkbox cell carries its answer in `checked`; every other cell in its text.
+		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : input.value);
+		if (!p.ok) {
 			input.value = paneCellText(c, el);
 			paneLeaveEdit(input);
 			return false;
 		}
-		c.set(el, (c.blank && input.value === '') ? undefined : +input.value);
+		c.set(el, p.v);
 		completeEdit(c.prop ? { el: el, prop: c.prop } : null);
 		refreshPopupIfOpen();
 		paneLeaveEdit(input);
@@ -13398,10 +13644,11 @@ var EngCalcs = EngCalcs || {};
 	// therefore obeys every rule about the user's own numbers. Returns false where the text is not
 	// a number, so the caller can COUNT what it refused instead of discarding it in silence.
 	function paneWriteCellText(spec, c, el, text) {
-		var t = String(text === null || text === undefined ? '' : text).trim();
+		var p;
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
-		if (t !== '' && !isFinite(+t)) { return false; }
-		c.set(el, (c.blank && t === '') ? undefined : +t);
+		p = paneParseCellText(c, text);
+		if (!p.ok) { return false; }
+		c.set(el, p.v);
 		return true;
 	}
 	/**
@@ -15841,6 +16088,7 @@ var EngCalcs = EngCalcs || {};
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY,
 			PAGE_TITLES_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
@@ -20214,6 +20462,12 @@ var EngCalcs = EngCalcs || {};
 		// click cannot mean "leave" there -- but Escape asks for nothing and costs nothing, and
 		// being in Delete without knowing it is the scariest of the three.
 		if (!hadBox && mode !== 'select') { setMode('select'); }
+		// **AND IN SELECT, WITH NOTHING OPEN, ESCAPE CLEARS THE SELECTION** (Tom, 2026-09-08: *"How
+		// can I unselect an asset? Select empty map space. Esc doesn't do it, and maybe it should
+		// when in select (home) mode."*). The same one-thing-per-press rule: a box costs the box,
+		// a tool costs the tool, and only a bare Select with a subject costs the subject. Not from
+		// inside a field, where Escape belongs to whatever is being typed.
+		else if (!hadBox && mode === 'select' && selectionCount() && !keyboardIsTyping()) { clearSelection(); }
 	});
 	// File > New project (Task 264). A second popup off the same anchor rather than a hover-out
 	// submenu: the menu machinery here is one flat popover, and hover submenus are a poor bargain on
@@ -21539,6 +21793,7 @@ var EngCalcs = EngCalcs || {};
 		// rebuildLabelsFields(), which rebuildSettingsBox() now runs alongside its three siblings.
 		wireSettingsBox();
 		wireLibraryBox();
+		wireAreaHint();
 		wireFireFlowBox();
 		wireEnergyBox();
 		wireScenarioCompareBox();
@@ -22108,6 +22363,10 @@ var EngCalcs = EngCalcs || {};
 			// sometimes moved the pipework instead would be unusable over a dense network, which is
 			// the only kind of network anybody reaches for a marquee on.
 			if (mode === 'select-area') {
+				// A finger draws a window or a lasso by press-drag-lift (areaTouchDown()); a
+				// pointer, and a polygon on either, by clicks. pointerType, never screen width.
+				areaLastPointer = e.pointerType || 'mouse';
+				if (e.pointerType === 'touch' && areaTouchDown(e, screenToWorld(e.clientX, e.clientY))) { return; }
 				areaPress(screenToWorld(e.clientX, e.clientY), !!e.shiftKey);
 				return;
 			}
@@ -22213,6 +22472,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		function endPointer(e) {
 			pointers.delete(e.pointerId);
+			// The lift that ends a finger's ring (Task 266, Tom 2026-09-08). Before anything else,
+			// because nothing else on this page owns that finger: select-area arms no `drag`.
+			if (mode === 'select-area' && areaTouchDrag !== null) {
+				areaTouchUp(e, screenToWorld(e.clientX, e.clientY));
+			}
 			// A PAN CHANGES WHICH REPEATED LABELS ARE WORTH DRAWING, so the cull is re-run when the
 			// pan finishes -- not on every frame of it, which would rebuild elements at 60 Hz for a
 			// gesture whose whole point is that nothing in the drawing changed. The cull keeps a
@@ -22302,6 +22566,7 @@ var EngCalcs = EngCalcs || {};
 			// more: the profile's chooser reads a short touch, a long one and a double one as three
 			// different gestures (Task 506), and both facts are only available here.
 			downPt = { x: e.clientX, y: e.clientY, t: Date.now(), touch: e.pointerType === 'touch' };
+			areaLastPointer = e.pointerType || 'mouse';   // so the select-area bubble knows a finger from a mouse before its own first press
 		});
 		svg.addEventListener('pointerup', function (e) {
 			if (regMode || georefActive()) { downPt = null; return; } // a pending registration sequence, or a placement in progress
@@ -22509,6 +22774,14 @@ var EngCalcs = EngCalcs || {};
 				// and on touch it would arrive under a finger that is mid-gesture. Nothing happens,
 				// and the commentary line is still telling them what will.
 				void 0;
+			} else if (mode === 'select' && e.shiftKey && hitIsElement(t)) {
+				// **A SHIFT-CLICK OPENS THE MULTI-PROPERTIES BOX, NOT THE ELEMENT'S OWN** (Tom,
+				// 2026-09-08: *"If I Shift-click an element to add it to the selection, its
+				// individual properties opens. Multi-properties needs to open."*). The press already
+				// toggled the element in or out (toggleFromHit, on pointerdown); this is what the
+				// popup says about the subject that is left. One left falls through to the single
+				// popup inside openMultiProperties(); none left closes it.
+				if (selectionCount()) { openMultiProperties(); } else { closePopup(); }
 			} else if (mode === 'select' && t.dataset.node) {
 				// The one popup that opens SYNCHRONOUSLY inside the gesture that asked for it --
 				// the link and label popups below are on a 300 ms debounce. Neither fact is stated
@@ -25836,14 +26109,16 @@ var EngCalcs = EngCalcs || {};
 	//   coming back open somewhere it was never left. The answer was to give it the other half, not
 	//   to keep it out: see libBoxIsOpen() for the record it now keeps.
 	//
+	//   **THE FOUR REPORT BOXES JOINED THEM ON HIS WORD TOO** (Tom, 2026-09-08: *"only Settings and
+	//   Libraries survive a reload. Fire flow analysis, Pump Energy report, Scenario Comparison, and
+	//   EPANET run report do not survive. Fix this."*). They had been left out on the argument that
+	//   a report about a run should not come back to a page with no run; his ruling is that a box
+	//   left open was left open on purpose. Each comes back saying what it has -- "no run yet" in
+	//   its own words -- and each now remembers its corner and size as well, on the shared memory
+	//   above the Library section (placeBoxRemembered()).
+	//
 	//   DELIBERATELY LEFT ALONE, and each for a reason, not by omission:
 	//
-	//   * **The three report boxes -- fire flow, energy, scenario compare.** Every one of them is a
-	//     report ABOUT A RUN, and a reload has no run. Two would come back empty, saying they have
-	//     nothing to show; the third (scenario compare) RUNS N SOLVES merely by being opened, so
-	//     restoring it would spend the machine on work nobody asked for at that moment. None of them
-	//     remembers where it sits either -- they centre on every open, on Tom's own liking of that
-	//     -- so there is no half of this they already had.
 	//   * **The property popup.** It is an answer to a selection, and a selection is not restored.
 	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the notes popover,
 	//     the backdrop target panel and the two menu popovers.** Modals, transient choosers and
@@ -25865,6 +26140,13 @@ var EngCalcs = EngCalcs || {};
 	function restoreOpenBoxes() {
 		if (setboxLayout.open) { openSettingsBox(); }
 		if (libboxLayout.open) { openLibraryBox(); }
+		// The four report boxes (Tom, 2026-09-08), before Find for the reason above: Find is the
+		// smallest and ends up on top. The run report is told it is being restored, so a page with
+		// no .rpt yet opens the box with its "no report yet" sentence inside rather than a notice.
+		if (ffboxLayout.open) { openFireFlowBox(); }
+		if (energyboxLayout.open) { openEnergyBox(); }
+		if (cmpboxLayout.open) { openScenarioCompareBox(); }
+		if (rptboxLayout.open) { openRunReportBox(true); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
@@ -26155,6 +26437,109 @@ var EngCalcs = EngCalcs || {};
 	function applyLibboxSize(box) {
 		if (libboxLayout.w) { box.style.width = libboxLayout.w + 'px'; }
 		if (libboxLayout.h) { box.style.height = libboxLayout.h + 'px'; }
+	}
+
+	// ---- BOX MEMORY FOR THE FOUR REPORT BOXES (Tom, 2026-09-08) ---------------------------------
+	//
+	// Tom: *"Of our non-hog boxes (non-modal, resizeable, and draggable), only Settings and
+	// Libraries survive a reload. Fire flow analysis, Pump Energy report, Scenario Comparison, and
+	// EPANET run report do not survive. Fix this."*
+	//
+	// **THAT REVERSES THE "DELIBERATELY LEFT ALONE" RULING restoreOpenBoxes() USED TO CARRY**, which
+	// held that a report about a run should not come back to a page that has no run. His reading
+	// is the one the Library box got on 2026-09-04: a standing box the reader left open is a box
+	// the reader wants open, and the page closing it on their behalf every reload is the page
+	// overruling them. A report box that comes back before its run says so in its own words (the
+	// fire flow and energy reports already print "no run yet"; the run report gets the same
+	// sentence put in its <pre>), and the scenario comparison re-runs, which is what it does
+	// whenever it is looked at.
+	//
+	// **THE MEMORY IS THE LIBRARY BOX'S, MADE SHAREABLE.** Four numbers and a flag on one key per
+	// box, written by the drag callback, the resize observer and the two doors; read once at wiring
+	// time, before the observer is armed. One loader, one placer and one wirer here, so the four
+	// boxes cannot drift apart from each other or from the three that came before. Each box keeps
+	// its OWN constant and its own two-line saver, because lpn_furniture_check.php derives the
+	// furniture list from `localStorage.setItem(<CONST>, ...)` and a computed key would be invisible
+	// to it -- which is the one thing that check exists to make impossible.
+	//
+	// **A PHONE WRITES THE FLAG AND NOT THE GEOMETRY**, the ruling every sibling carries: at that
+	// width the box fills the window and every number measured there is the window's.
+	function newBoxLayout() { return { left: null, top: null, w: null, h: null, open: false }; }
+	function loadBoxLayout(key, layout) {
+		var raw = null, v, k;
+		try { raw = localStorage.getItem(key); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		for (k in layout) {
+			// `open` is the one boolean among four numbers -- see loadLibboxLayout() for the defect
+			// a loader that types every field as a number produced.
+			if (k === 'open') { layout.open = !!v.open; }
+			else if (typeof v[k] === 'number' && isFinite(v[k])) { layout[k] = v[k]; }
+		}
+	}
+	// A remembered size is a wish: applied, then left to the stylesheet's own min/max.
+	function applyBoxSize(box, layout) {
+		if (layout.w) { box.style.width = layout.w + 'px'; }
+		if (layout.h) { box.style.height = layout.h + 'px'; }
+	}
+	// **A REMEMBERED CORNER, ELSE CENTRED** -- the centring is what these four boxes did before they
+	// had a memory (Tom liked it), and it is still what a first-time open does. A null is "never
+	// chosen", not zero. Either way the result goes through clampPanel(), so a corner left on a
+	// 32-inch monitor cannot open off the edge of a laptop. Runs inside placePanelForScreen(), so on
+	// a phone it never runs at all and the box fills the window.
+	function placeBoxRemembered(box, layout) {
+		var floor = chromeFloor(), h, r, top, at;
+		applyBoxSize(box, layout);
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		if (layout.left === null || layout.top === null) {
+			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
+			top = Math.max(floor, (window.innerHeight - h) / 2);
+			capPanelToRoomBelow(box, top);
+			box.style.top = top + 'px';
+			return;
+		}
+		// Clamped BEFORE it is capped: a corner remembered off the bottom of this window would
+		// otherwise be capped to the zero room beneath it, and a zero-height box clamps anywhere.
+		at = clampPanel(layout.left, Math.max(floor, layout.top), r.width, r.height, window.innerWidth, window.innerHeight, floor);
+		h = capPanelToRoomBelow(box, at.top);
+		at = clampPanel(at.left, at.top, r.width, h, window.innerWidth, window.innerHeight, floor);
+		box.style.left = at.left + 'px';
+		box.style.top = at.top + 'px';
+	}
+	// The flag, written only when it changes: Escape and the closers run whether or not the box is
+	// showing, and an unguarded write would create the key for a visitor who never opened the box.
+	function rememberBoxOpen(layout, save, open) {
+		if (layout.open === !!open) { return; }
+		layout.open = !!open;
+		save();
+	}
+	// Drag, resize grip, the record read BEFORE the observer is armed, then the observer -- the same
+	// four steps wireLibraryBox() takes, in the same order and for the same reasons (its comments
+	// are the record). `isOpen` guards the observer so a closed box (0x0) cannot store a zero size,
+	// and a height the cap produced is the viewport's rather than the user's, so it is not stored.
+	function wireBoxMemory(box, key, layout, save, isOpen) {
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			layout.left = pos.left;
+			layout.top = pos.top;
+			save();
+		});
+		addPanelResizeGrip(box);
+		loadBoxLayout(key, layout);
+		if (window.ResizeObserver) {
+			new window.ResizeObserver(function () {
+				var r, capped;
+				if (!isOpen() || smallScreen()) { return; }
+				r = box.getBoundingClientRect();
+				if (!(r.width > 0) || !(r.height > 0)) { return; }
+				layout.w = Math.round(r.width);
+				capped = parseFloat(box.style.maxHeight);
+				if (!(isFinite(capped) && r.height >= capped - 1)) { layout.h = Math.round(r.height); }
+				save();
+			}).observe(box);
+		}
 	}
 
 	// ---- what the document holds, and the one place each kind is written --------------------------
@@ -31147,10 +31532,13 @@ var EngCalcs = EngCalcs || {};
 	function multiGroups() {
 		var byType = {}, out = [];
 		selectedRefs().forEach(function (s) {
-			var el = s.kind === 'node' ? nodeById(s.id) : (s.kind === 'link' ? linkById(s.id) : labelById(s.id));
+			var el = s.kind === 'node' ? nodeById(s.id) : (s.kind === 'link' ? linkById(s.id) : labelById(s.id)),
+				// A Text object carries no `type`; its table is keyed 'text'. Never undefined --
+				// that was Tom's *"9 undefined assets selected"* (2026-09-08).
+				ty = s.kind === 'label' ? 'text' : (el && el.type) || s.kind;
 			if (!el) { return; }
-			if (!byType[el.type]) { byType[el.type] = []; }
-			byType[el.type].push(el);
+			if (!byType[ty]) { byType[ty] = []; }
+			byType[ty].push(el);
 		});
 		paneTables().forEach(function (spec) {
 			if (byType[spec.type]) { out.push({ spec: spec, els: byType[spec.type] }); delete byType[spec.type]; }
@@ -31174,27 +31562,60 @@ var EngCalcs = EngCalcs || {};
 	function multiRow(host, c, els) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
-			input = document.createElement('input'),
+			input, opt,
 			common = multiCommonText(c, els), was;
-		input.type = 'text';
-		input.setAttribute('inputmode', 'decimal');
-		input.value = (common === undefined) ? '' : common;
-		if (common === undefined) { input.placeholder = pc.lpn_multi_varies || 'Various'; }
-		was = input.value;
+		// **THE ROW IS THE COLUMN'S OWN KIND OF CONTROL** (Tom, 2026-09-08): a checkbox for a
+		// yes/no, a select for a choice, a text box for words, and the numeric box everything
+		// else always had. "Various" is an indeterminate checkbox, a blank option, or the
+		// placeholder -- whichever the control can say it with.
+		if (c.bool) {
+			input = document.createElement('input');
+			input.type = 'checkbox';
+			input.checked = common === '1';
+			input.indeterminate = common === undefined;
+			was = common === undefined ? '' : common;
+		} else if (c.choices) {
+			input = document.createElement('select');
+			if (common === undefined) {
+				opt = document.createElement('option');
+				opt.value = ''; opt.textContent = pc.lpn_multi_varies || 'Various';
+				input.appendChild(opt);
+			}
+			c.choices().forEach(function (o) {
+				var o2 = document.createElement('option');
+				o2.value = o[0]; o2.textContent = o[1];
+				input.appendChild(o2);
+			});
+			input.value = (common === undefined) ? '' : common;
+			was = input.value;
+		} else {
+			input = document.createElement('input');
+			input.type = 'text';
+			if (!c.str) { input.setAttribute('inputmode', 'decimal'); }
+			input.value = (common === undefined) ? '' : common;
+			if (common === undefined) { input.placeholder = pc.lpn_multi_varies || 'Various'; }
+			was = input.value;
+		}
+		function rowValue() {
+			return (c.bool) ? (input.checked ? '1' : '0') : input.value;
+		}
 		input.setAttribute('aria-label', paneHeadingText(c));
 		input.addEventListener('change', function () {
-			var n = 0;
+			var n = 0, v = rowValue();
 			// **AN UNTOUCHED ROW WRITES NOTHING.** Every row in this box is a field the user did
 			// not necessarily come here for, and a box of twelve rows that committed all twelve on
 			// close would set a shared value onto elements the user never meant to change.
-			if (input.value === was) { return; }
-			if (input.value !== '' && !isFinite(+input.value)) { input.value = was; return; }
+			if (v === was) { return; }
+			if (!paneParseCellText(c, v).ok) { input.value = was; return; }
 			// ONE SNAPSHOT FOR THE WHOLE ROW, so undo takes back the act the user performed
 			// rather than the last of forty writes it was made of.
 			saveUndoSnapshot();
-			els.forEach(function (el) { if (paneWriteCellText(null, c, el, input.value)) { n++; } });
-			was = input.value;
-			completeEdit(null);
+			els.forEach(function (el) { if (paneWriteCellText(null, c, el, v)) { n++; } });
+			was = v;
+			if (c.bool) { input.indeterminate = false; }
+			// A property the element is DRAWN from (presence, the words) redraws each element, as
+			// the popup's own row does; anything else only needs the solve.
+			if (c.prop) { els.forEach(function (el) { afterPropertyEdit(el); }); } else { completeEdit(null); }
 			// **IT STATES ITS COUNT, exactly as Find and replace does before it writes.** A bulk
 			// edit whose reach is invisible is the one gesture on this page that can quietly be
 			// wrong about four hundred elements.
@@ -31203,9 +31624,12 @@ var EngCalcs = EngCalcs || {};
 			refreshPaneIfOpen();
 			refreshSelection();
 		});
-		label.appendChild(document.createTextNode(paneHeadingText(c)));
+		label.appendChild(document.createTextNode(paneHeadingText(c) + ' '));
 		label.appendChild(input);
 		host.appendChild(label);
+		// One property per line, as every other popup on this page (Tom, 2026-09-08: *"That
+		// looks like an oversight"* -- it was).
+		host.appendChild(document.createElement('br'));
 	}
 	function multiSection(host, group) {
 		var pc = EngCalcs.pageConfig || {},
@@ -31244,7 +31668,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {},
 			fields = document.getElementById('lpn_popup_fields'),
 			title = document.getElementById('lpn_popup_title'),
-			sel = selectedRef(), groups;
+			sel = selectedRef(), groups, at;
 		if (!fields || !title) { return false; }
 		if (selectionCount() === 1 && sel) {
 			if (sel.kind === 'node') { openPopup(sel.id); }
@@ -31259,8 +31683,40 @@ var EngCalcs = EngCalcs || {};
 		title.textContent = String(pc.lpn_multi_title || '{n} selected')
 			.replace('{n}', String(selectionCount()));
 		groups.forEach(function (g) { multiSection(fields, g); });
-		openPopupAt(Math.round(window.innerWidth / 2) - 140, 120);
+		// **BESIDE THE SELECTION, NOT IN THE MIDDLE OF THE SCREEN** (Tom, 2026-09-08: *"Open it
+		// immediately next to the extent of the selection"*, his preference and subject to change).
+		// Off the right edge of the subject's screen extent, top-aligned with it -- the same side
+		// the single popup opens on -- and openPopupAt() clamps it in and honours a corner the
+		// reader has dragged it to.
+		at = multiSelectionExtent();
+		if (at) { openPopupAt(Math.round(at.right + 12), Math.round(at.top)); }
+		else { openPopupAt(Math.round(window.innerWidth / 2) - 140, 120); }
 		return true;
+	}
+	// The screen box round everything selected: a node by its point, a link by both ends and its
+	// bends, a Text by its drawn point. Null with nothing on the map to measure.
+	function multiSelectionExtent() {
+		var box = null;
+		function take(p) {
+			var s;
+			if (!p) { return; }
+			s = worldToScreen(p.x, p.y);
+			if (!box) { box = { left: s.x, right: s.x, top: s.y, bottom: s.y }; return; }
+			box.left = Math.min(box.left, s.x); box.right = Math.max(box.right, s.x);
+			box.top = Math.min(box.top, s.y); box.bottom = Math.max(box.bottom, s.y);
+		}
+		if (!svg) { return null; }
+		selectedRefs().forEach(function (s) {
+			var l;
+			if (s.kind === 'node') { take(nodeById(s.id)); }
+			else if (s.kind === 'link') {
+				l = linkById(s.id);
+				if (!l) { return; }
+				take(nodeById(l.from)); take(nodeById(l.to));
+				(l.verts || []).forEach(take);
+			} else if (labelById(s.id)) { take(textLabelPoint(labelById(s.id))); }
+		});
+		return box;
 	}
 
 	// Editable text content for a Text label (Tom, 2026-07-30: "there is no way to edit it") -- no
@@ -31610,6 +32066,9 @@ var EngCalcs = EngCalcs || {};
 		if (!currentPopup || popup.style.display !== 'block') { return; }
 		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
 		else if (currentPopup.kind === 'link') { renderLinkFields(currentPopup.id); }
+		// The multi-properties box has no single id to re-render; it is rebuilt from the subject,
+		// and closes if the subject has gone.
+		else if (currentPopup.kind === 'multi') { if (selectionCount()) { openMultiProperties(); } else { closePopup(); } }
 		else { renderLabelFields(currentPopup.id); }
 	}
 
@@ -34299,7 +34758,7 @@ var EngCalcs = EngCalcs || {};
 	var fireFlowDocGuard = true;
 
 	function openFireFlowBox() {
-		var box = ffBoxEl(), h, r, top;
+		var box = ffBoxEl();
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
@@ -34307,38 +34766,36 @@ var EngCalcs = EngCalcs || {};
 		box.style.display = 'flex';
 		buildFireFlowControls();
 		rebuildFireFlowReport();
-		// **IT CENTRES** (Tom, 2026-08-27, of this box: he liked that it does). Re-measured on every
-		// open rather than remembered: the box is resizeable and the window may have changed, and a
-		// box remembered off-screen is a box that never comes back.
-		// On a phone it fills the window instead -- Tom named this box by name on 2026-09-01, and
-		// two report tables side by side were never going to be read in a 52rem box on a 360px
-		// screen anyway.
-		placePanelForScreen(box, function () {
-			h = fitPanelToViewport(box);
-			r = box.getBoundingClientRect();
-			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
-			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
-			capPanelToRoomBelow(box, top);
-			box.style.top = top + 'px';
-		});
+		// **IT CENTRES THE FIRST TIME AND THEN REMEMBERS** (Tom, 2026-08-27, liked the centring;
+		// Tom, 2026-09-08, asked for the memory -- see placeBoxRemembered()). On a phone it fills the
+		// window instead -- Tom named this box by name on 2026-09-01, and two report tables side by
+		// side were never going to be read in a 52rem box on a 360px screen anyway.
+		placePanelForScreen(box, function () { placeBoxRemembered(box, ffboxLayout); });
 		initTipsIn(box);
+		rememberBoxOpen(ffboxLayout, saveFfboxLayout, true);
 	}
 	function closeFireFlowBox() {
 		var box = ffBoxEl();
 		hidePanel(box);
+		rememberBoxOpen(ffboxLayout, saveFfboxLayout, false);
 		// **A RUN IN PROGRESS IS STOPPED BY CLOSING ITS BOX.** Otherwise a sweep of minutes goes on
 		// eating the machine with nothing on screen that can call it off.
 		if (fireFlowBusy) { fireFlowStop = true; }
+	}
+	// Where this box was left, how big, and whether it was open -- browser furniture, never project
+	// data (Task 584), on the shared memory above the Library section.
+	var LPN_FFBOX_KEY = 'lpn_ffbox';
+	var ffboxLayout = newBoxLayout();
+	function saveFfboxLayout() {
+		try { localStorage.setItem(LPN_FFBOX_KEY, JSON.stringify(ffboxLayout)); } catch (e) {}
 	}
 	function wireFireFlowBox() {
 		var box = ffBoxEl(), x = document.getElementById('lpn_ff_close'), run;
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeFireFlowBox); }
 		// Moveable and resizeable, through the same seam the property popup, Find, Settings and the
-		// Library box all use. It borrows .lpn-setbox's shell, `resize: both` included, so it
-		// borrows the touch grabber that makes that property mean anything on a phone.
-		makePanelDraggable(box, null);
-		addPanelResizeGrip(box);
+		// Library box all use -- and remembered, through the same memory the Library box keeps.
+		wireBoxMemory(box, LPN_FFBOX_KEY, ffboxLayout, saveFfboxLayout, ffBoxIsOpen);
 		// The run dialog is moveable and NOT resizeable: it holds a bar, two lines and a button, so
 		// there is nothing in it a reader could want more room for -- but a dialog they cannot push
 		// aside is one they cannot see the map through.
@@ -34720,30 +35177,32 @@ var EngCalcs = EngCalcs || {};
 	// this is a box you land in by naming it on a menu. The other two reports already behaved this
 	// way, so the button was also the odd one of three.
 	function openScenarioCompareBox() {
-		var box = scnCmpBoxEl(), h, r, top;
+		var box = scnCmpBoxEl();
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
 		runScenarioCompare();
-		placePanelForScreen(box, function () {
-			h = fitPanelToViewport(box);
-			r = box.getBoundingClientRect();
-			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
-			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
-			capPanelToRoomBelow(box, top);
-			box.style.top = top + 'px';
-		});
+		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
+		placePanelForScreen(box, function () { placeBoxRemembered(box, cmpboxLayout); });
 		initTipsIn(box);
+		rememberBoxOpen(cmpboxLayout, saveCmpboxLayout, true);
 	}
-	function closeScenarioCompareBox() { hidePanel(scnCmpBoxEl()); }
+	function closeScenarioCompareBox() {
+		hidePanel(scnCmpBoxEl());
+		rememberBoxOpen(cmpboxLayout, saveCmpboxLayout, false);
+	}
+	var LPN_CMPBOX_KEY = 'lpn_cmpbox';
+	var cmpboxLayout = newBoxLayout();
+	function saveCmpboxLayout() {
+		try { localStorage.setItem(LPN_CMPBOX_KEY, JSON.stringify(cmpboxLayout)); } catch (e) {}
+	}
 	function wireScenarioCompareBox() {
 		var box = scnCmpBoxEl(),
 			x = document.getElementById('lpn_scncmp_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeScenarioCompareBox); }
-		makePanelDraggable(box, null);
-		addPanelResizeGrip(box);
+		wireBoxMemory(box, LPN_CMPBOX_KEY, cmpboxLayout, saveCmpboxLayout, scnCmpBoxIsOpen);
 	}
 	// **AN EDIT MAKES THE TABLE IN FRONT OF THE READER STALE**, so it is dropped rather than left
 	// standing as an answer to a network that has changed. The same rule the fire-flow run follows.
@@ -34760,23 +35219,21 @@ var EngCalcs = EngCalcs || {};
 		return runScenarioCompare();
 	}
 	function openEnergyBox() {
-		var box = energyBoxEl(), h, r, top;
+		var box = energyBoxEl();
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
 		rebuildEnergyReport();
-		// Centred and re-measured on every open, for the reason the fire flow box is: it is
-		// resizeable, the window may have changed, and a box remembered off-screen never comes back.
-		placePanelForScreen(box, function () {
-			h = fitPanelToViewport(box);
-			r = box.getBoundingClientRect();
-			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
-			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
-			capPanelToRoomBelow(box, top);
-			box.style.top = top + 'px';
-		});
+		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
+		placePanelForScreen(box, function () { placeBoxRemembered(box, energyboxLayout); });
 		initTipsIn(box);
+		rememberBoxOpen(energyboxLayout, saveEnergyboxLayout, true);
+	}
+	var LPN_ENERGYBOX_KEY = 'lpn_energybox';
+	var energyboxLayout = newBoxLayout();
+	function saveEnergyboxLayout() {
+		try { localStorage.setItem(LPN_ENERGYBOX_KEY, JSON.stringify(energyboxLayout)); } catch (e) {}
 	}
 	// ---- THE EPANET RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
 	//
@@ -34799,37 +35256,42 @@ var EngCalcs = EngCalcs || {};
 	function lastRunReportText() {
 		return (EngCalcs.lpnTimeLastReport && EngCalcs.lpnTimeLastReport()) || '';
 	}
-	function openRunReportBox() {
+	function openRunReportBox(restoring) {
 		var pc = EngCalcs.pageConfig || {}, box = rptBoxEl(),
-			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(), h, r, top;
+			pre = document.getElementById('lpn_rptbox_pre'), text = lastRunReportText(),
+			noReport = pc.lpn_time_no_report ||
+				'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.';
 		// **SHOWN, OR EXPLAINED -- never an empty box.** The same rule the menu row already kept:
 		// the built-in solver prints nothing, so a network that has never reached EPANET has no
 		// report and never will until it does, and a sentence saying that teaches what a vanishing
-		// row cannot.
-		if (!text) {
-			setNotice(pc.lpn_time_no_report ||
-				'There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.');
+		// row cannot. A box the reader ASKED for gets the sentence as a notice and no box; a box
+		// coming back with the page (Tom, 2026-09-08) is a box the reader left open, so it comes
+		// back with the sentence inside it and refreshRunReportBoxIfOpen() fills it when the run
+		// arrives.
+		if (!text && !restoring) {
+			setNotice(noReport);
 			return false;
 		}
 		if (!box || !pre) { return false; }
 		closeMenu();
 		hideOpenTips();
-		pre.textContent = text;
+		pre.textContent = text || noReport;
 		box.style.display = 'flex';
-		// Centred and re-measured on every open, for the reason the energy box is: it is
-		// resizeable, the window may have changed, and a box remembered off-screen never comes back.
-		placePanelForScreen(box, function () {
-			h = fitPanelToViewport(box);
-			r = box.getBoundingClientRect();
-			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
-			top = Math.max(chromeFloor(), (window.innerHeight - h) / 2);
-			capPanelToRoomBelow(box, top);
-			box.style.top = top + 'px';
-		});
+		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
+		placePanelForScreen(box, function () { placeBoxRemembered(box, rptboxLayout); });
 		initTipsIn(box);
+		rememberBoxOpen(rptboxLayout, saveRptboxLayout, true);
 		return true;
 	}
-	function closeRunReportBox() { hidePanel(rptBoxEl()); }
+	function closeRunReportBox() {
+		hidePanel(rptBoxEl());
+		rememberBoxOpen(rptboxLayout, saveRptboxLayout, false);
+	}
+	var LPN_RPTBOX_KEY = 'lpn_reportbox';
+	var rptboxLayout = newBoxLayout();
+	function saveRptboxLayout() {
+		try { localStorage.setItem(LPN_RPTBOX_KEY, JSON.stringify(rptboxLayout)); } catch (e) {}
+	}
 	function wireRunReportBox() {
 		var box = rptBoxEl(),
 			x = document.getElementById('lpn_rptbox_close'),
@@ -34844,8 +35306,7 @@ var EngCalcs = EngCalcs || {};
 				if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(lastRunReportText(), copy); }
 			});
 		}
-		makePanelDraggable(box, null);
-		addPanelResizeGrip(box);
+		wireBoxMemory(box, LPN_RPTBOX_KEY, rptboxLayout, saveRptboxLayout, rptBoxIsOpen);
 	}
 	/** A new run replaced the report the reader is looking at, or dropped it. */
 	function refreshRunReportBoxIfOpen() {
@@ -34858,13 +35319,15 @@ var EngCalcs = EngCalcs || {};
 		// refuses to show anywhere else.
 		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
 	}
-	function closeEnergyBox() { hidePanel(energyBoxEl()); }
+	function closeEnergyBox() {
+		hidePanel(energyBoxEl());
+		rememberBoxOpen(energyboxLayout, saveEnergyboxLayout, false);
+	}
 	function wireEnergyBox() {
 		var box = energyBoxEl(), x = document.getElementById('lpn_energy_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeEnergyBox); }
-		makePanelDraggable(box, null);
-		addPanelResizeGrip(box);
+		wireBoxMemory(box, LPN_ENERGYBOX_KEY, energyboxLayout, saveEnergyboxLayout, energyBoxIsOpen);
 	}
 	/** A run finished or was dropped, so the report in front of the reader is no longer the answer. */
 	function refreshEnergyBoxIfOpen() {

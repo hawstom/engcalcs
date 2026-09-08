@@ -355,7 +355,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // into on every render. ONE PANEL DIV PER TABLE, which is what gives each its own scroll offset.
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
-  'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves',
+  'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves', 'lpn_pane_text',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
   // The Find panel's two hosts (ROADMAP Tasks 353/420, and the disconnected report of 540). Absent
   // from this list, rebuildFindForm() and renderFindResults() return at their first line and every

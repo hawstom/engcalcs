@@ -66,7 +66,7 @@ global.window.print = function () {
 };
 
 const L = loadLoopedNetwork(
-	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink,\n" +
+	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
 	"\t\tsetProp: setProp, wirePane: wirePane, openPane: openPane, setPaneTab: setPaneTab,\n" +
 	"\t\tpaneTables: paneTables,\n" +
 	// A solve RESULT, planted rather than computed: the sheet's job is to print what the page
@@ -110,6 +110,7 @@ const p1 = L.addLink('pipe', j1.id, j2.id), p2 = L.addLink('pipe', j2.id, j3.id)
 L.setProp(p1, 'diameter', 8); L.setProp(p2, 'diameter', 12);
 const pu1 = L.addLink('pump', r1.id, j1.id);
 const v1 = L.addLink('valve', t1.id, j2.id);
+L.addText(50, 50);   // the Text table (2026-09-08) prints too, so it needs one row to print
 // A result, planted rather than solved: the sheet's job is to print what the page holds, and a
 // solve here would only make the number harder to state.
 L.plantResult({
@@ -140,9 +141,9 @@ function sheetOf(id) {
 }
 
 // ---- 1. every table prints, from the one printer ----------------------------------------------
-console.log('\n--- one printer, six tables ---');
+console.log('\n--- one printer, seven tables ---');
 {
-	report(TABLES.length === 6, 'there are six asset tables to print', TABLES.join(','));
+	report(TABLES.length === 7, 'there are seven asset tables to print', TABLES.join(','));
 	// No per-type print code. The cheap guard is that the per-type names never appear -- the same
 	// guard pane-harness.js keeps over the renderer, for the same reason.
 	report(!/function print(Junctions|Reservoirs|Tanks|Pipes|Pumps|Valves)\b/.test(src),
@@ -239,8 +240,10 @@ console.log('\n--- nothing on the sheet is a control ---');
 			const cell = live[elId][c.key];
 			// The ID column is a go-to-the-map button on screen and plain text on paper; its TEXT
 			// is the same either way, which is the claim being made.
+			// A checkbox cell (Active, Bold) holds its answer in `checked`; the sheet prints it as 1 or 0.
 			const want = c.key === 'id' ? elId
-				: (cell._tag === 'input' ? cell.value : cell.textContent);
+				: (cell._tag === 'input' ? (cell.type === 'checkbox' ? (cell.checked ? '1' : '0') : cell.value)
+					: (cell._tag === 'select' ? cell.value : cell.textContent));
 			const got = sheet.rows[r][i].text;
 			if (String(want) !== String(got)) { mismatch.push(`${elId}.${c.key}: ${want} != ${got}`); }
 		}));
