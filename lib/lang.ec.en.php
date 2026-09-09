@@ -2703,9 +2703,11 @@ $ec_lang['lpn_reaction_order_first']='1, first order';
 // help. `Limiting Potential` is still the KEYWORD in an EPANET file's [REACTIONS] section and is
 // still written and read verbatim there; this is the label a person reads.
 $ec_lang['lpn_reaction_limiting']='Limiting concentration';
+$ec_lang_syn['lpn_reaction_limiting']='Concentration ceiling, Saturation concentration, Maximum attainable concentration | avoid: an unrealized capability or potential';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_limiting_tip']='A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Use consistent units. No limit if blank.';
 $ec_lang['lpn_reaction_rough_corr']='Roughness correlation';
+$ec_lang_syn['lpn_reaction_rough_corr']='Wall reaction from roughness, Roughness-linked wall reaction | avoid: a statistical correlation';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_rough_corr_tip']='Correlates the wall reaction to each pipe’s own roughness, so a rougher pipe reacts faster. When it is set, a wall coefficient is worked out for each pipe from that pipe’s roughness, and the single wall coefficient above is no longer used. Not used if blank.';
 // Edited by TGH 2026-09-07
@@ -2957,6 +2959,7 @@ $ec_lang['lpn_fitting_return_bend']='Closed return bend';
 $ec_lang['lpn_fitting_tee_run']='Standard tee, flow through run';
 $ec_lang['lpn_fitting_tee_branch']='Standard tee, flow through branch';
 $ec_lang['lpn_fitting_entrance']='Square entrance';
+$ec_lang_syn['lpn_fitting_entrance']='Sharp-edged entrance, Sharp-angled entrance, Square-edged entrance | avoid: an entrance that is square in outline';
 $ec_lang['lpn_fitting_exit']='Exit';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 1773,
-        "delta_key_count": 3,
+        "expected_key_count": 1775,
+        "delta_key_count": 6,
         "exempt_key_count": 27,
         "exempt_keys": [
             "calc_units_us",
@@ -513,12 +513,18 @@
     "keys_to_translate": {
         "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
         "lpn_field_emitter": "Emitter coefficient",
-        "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction."
+        "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
+        "lpn_popup_boxtitle": "Properties",
+        "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
+        "lpn_pane_text_attached": "Attached"
     },
     "keys": {
         "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
         "lpn_field_emitter": "Emitter coefficient",
-        "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction."
+        "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
+        "lpn_popup_boxtitle": "Properties",
+        "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
+        "lpn_pane_text_attached": "Attached"
     },
     "key_context": {
         "lpn_field_text_attached_tip": {
@@ -566,6 +572,54 @@
                     "key": "lpn_field_elev",
                     "value": "Кота",
                     "english": "Elevation"
+                }
+            }
+        },
+        "lpn_popup_boxtitle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "Затвори",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Користите Датотека, Нови пројекат да отворите пример. Или почните додавањем резервоара, чвора и цеви из траке алата.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                }
+            }
+        },
+        "lpn_georef_save_locked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_tab_locked",
+                    "value": "Завршите постављање дугметом „Задржи ово постављање” или притисните Откажи, пре него што промените пројекат. Постављање припада овом пројекту и не може да вас прати у други.",
+                    "english": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one."
+                },
+                "next_translated": {
+                    "key": "lpn_goto_menu",
+                    "value": "Иди на географску ширину и дужину…",
+                    "english": "Go to a latitude and longitude…"
+                }
+            }
+        },
+        "lpn_pane_text_attached": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "Ова мрежа још нема ниједан од ових.",
+                    "english": "This network has none of these yet."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_paste_note",
+                    "value": "Ова табела је намењена за уношење вредности лепљењем из табеларног прорачуна у редове који већ постоје. Ако вам ово не одговара, користите Помоћ, Пријави проблем да нам јавите.",
+                    "english": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us."
                 }
             }
         }
