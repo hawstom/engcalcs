@@ -199,12 +199,27 @@ console.log('\n--- the drawing gesture is untouched ---');
 	ok('...between the two nodes', made.from === n.a && made.to === n.b, made.from + '->' + made.to);
 }
 {
-	// ADD-TEXT ANCHORS TO THE PIPE IT WAS CLICKED ON (Task 502) and must keep its tool.
+	// ADD-TEXT ANCHORS TO THE PIPE IT WAS CLICKED ON (Task 502), and the exception is about the
+	// ANCHOR and nothing else.
+	//
+	// **IT PUTS THE TOOL DOWN NOW, WHICH SUPERSEDES THIS SECTION'S 2026-09-05 ASSERTION** (Tom,
+	// 2026-09-08: *"I add a Text. It can't be dragged."*). It kept the tool, and pointerdown
+	// returns before it arms any drag while the mode still begins with `add-`, so the Text you had
+	// just placed was the one Text on the drawing you could not pick up. Nothing about the element
+	// was wrong; an OLD Text behaved differently only because reaching one meant leaving the tool
+	// first.
+	//
+	// **THE 2026-09-05 RULE IS UNTOUCHED, and this is why the two do not collide**: that rule is
+	// that a link click in an entry mode ends the mode, with add-text carved out so its click can
+	// ANCHOR instead of exiting. The anchor is asserted below and still happens; what changed is
+	// what the tool does AFTER placing, which that rule says nothing about. A Text is a one-shot
+	// placement, unlike a junction, where drawing ten in a row is the normal way to use the tool.
 	const n = build();
 	const doc = L.getDoc();
 	L.setMode('add-text');
 	click(hit({ link: n.ab }), MIDX, MIDY);
-	ok('add-text keeps its tool on a link click', L.getMode() === 'add-text', L.getMode());
+	ok('add-text puts its tool down, so the Text just placed can be dragged',
+		L.getMode() === 'select', L.getMode());
 	ok('...and anchors the new Text to that pipe',
 		doc.labels.length === 1 && doc.labels[0].anchorLink === n.ab,
 		JSON.stringify(doc.labels[0] && doc.labels[0].anchorLink));

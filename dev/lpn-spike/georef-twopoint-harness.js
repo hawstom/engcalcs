@@ -141,20 +141,35 @@ clickTwoPt();
 ok('the button arms the pick', !!L.georefState().pick);
 ok('...and says what to click', notice().indexOf('Click a point') === 0, notice());
 
+// The English a notice must equal, read out of the language file the DOM stub already loads --
+// never retyped here. Two harnesses broke on 2026-09-08 by pinning a wording Tom had just changed.
+function langValue(k) {
+	var v = (EngCalcs.pageConfig || {})[k];
+	if (v !== undefined) { return v; }
+	var lang = require('fs').readFileSync(
+		require('path').join(__dirname, '..', '..', 'lib', 'lang.ec.en.php'), 'utf8');
+	var m = new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)'").exec(lang);
+	return m ? m[1].replace(/\\'/g, "'") : null;
+}
+
 const beforeRefusals = JSON.stringify(L.georefState().t);
 
 // parseLatLon()'s own refusals, each reaching this door through the same prompt.
 [
 	['prose', 'somewhere near the tank'],
-	['one number', '38.106'],
+	// NOT '38.106' any more: Tom ruled int.int a pair on 2026-09-08, so that string is now 38 N
+	// 106 E and is accepted. A lone bare integer is still not two numbers by any reading.
+	['one bare integer, which is not a pair', '38'],
 	['three numbers, which is what a thousands separator makes', '1,234.5 -122.5'],
 	['a latitude past the pole', '138 -122'],
 	['a longitude past the antimeridian', '38 -222']
 ].forEach(function (c) {
 	promptQueue = [c[1]];
 	pressNode(1);
+	// Matched on the KEY'S OWN VALUE rather than on words: Tom rewrote this sentence on 2026-09-08
+	// and a harness pinning English is a harness that breaks on an edit that changed nothing.
 	ok('refused: ' + c[0], L.georefState().pick.pts.length === 0 &&
-		notice().indexOf('not one latitude and one longitude') > 0, notice());
+		notice() === langValue('lpn_goto_bad'), notice());
 });
 ok('...and every refusal left the pick armed on the same point, so a typo costs one click',
 	!!L.georefState().pick && L.georefState().pick.pts.length === 0);
@@ -322,39 +337,67 @@ console.log('\n--- Go to: a comma separates them, and one shape is refused on pu
 	// number binds tighter than a comma between two, so this is a European coordinate and not four.
 	ok('a decimal-comma locale\'s rendering of the same pair', at('38,106 -122,569', 38.106, -122.569));
 	ok('...and with a separating comma as well', at('38,106, -122,569', 38.106, -122.569));
-	// **THE ONE SHAPE THAT IS REFUSED, AND IT IS NOT A GAP TO CLOSE LATER.** Two bare integers
-	// joined by a bare comma are indistinguishable from the single decimal number 38.122 in a
-	// decimal-comma locale. Reading it as a pair is the silent-wrong-map failure the whole function
-	// exists to prevent; a space or a decimal point says which was meant, and the tip's own example
-	// carries a decimal point for exactly that reason.
-	ok('two bare integers on a bare comma are refused, being a decimal number in half our languages',
-		p('38,122') === null);
+	// **`38,122` AND `38.122` ARE A PAIR NOW, ON TOM'S RULING** (2026-09-08: *"I disagree with
+	// rejecting int,int or int.int. Both are obvious. Accept them."*). They used to be refused, and
+	// THE REASON IS STILL TRUE: in about half of this suite's 26 languages `38,122` IS the single
+	// number 38.122. What changed is the answer. A lone decimal number is not a coordinate at all,
+	// so the pair is the only reading that can do anything, and lpn_goto_tip states it in words --
+	// asserted below, because a rule the reader is not told about is the surprise the old refusal
+	// was avoiding.
+	ok('int,int is a pair', at('38,122', 38, 122));
+	ok('int.int is the same pair', at('38.122', 38, 122));
+	ok('...signed', at('-38.122', -38, 122));
+	ok('...and with a plus', at('+38,122', 38, 122));
+	// STILL REFUSED, and the narrowness is what keeps the shapes above from swallowing them.
 	ok('a thousands separator makes three numbers and is refused', p('1,234.5 -122.5') === null);
 	ok('prose is refused', p('Petaluma, California') === null);
 	ok('a latitude past the pole is refused', p('91, 0') === null);
+	ok('...including the one-token form: 91.5 is 91 north, which is nowhere', p('91.5') === null);
 	ok('a longitude past 180 is refused', p('38.106, -190') === null);
+	ok('one bare integer is still not a pair', p('38') === null);
+	ok('a single number with anything else typed around it is refused', p('lat 38.122') === null);
+	ok('four numbers are refused', p('38.1 -122.5 12 3') === null);
+	// A pair the tip's own example produces still reads as that pair and not as two split tokens:
+	// the split fires only when the WHOLE box is one integer-separator-integer token.
+	ok('the tip\'s own example is untouched by the split rule', at('38.106, -122.569', 38.106, -122.569));
 
-	// THE THREE STRINGS NOW TEACH BOTH FORMS. A parser that accepts a comma while every sentence
-	// says space is a feature nobody can find, which is what Tom was reporting.
+	// **THE STRINGS ARE TOM'S OWN, 2026-09-08**, and the shape of them is his ruling as much as the
+	// words: the tip says what the box is FOR in one sentence, and the EXAMPLES live in the refusal,
+	// which is where somebody whose last attempt failed is actually reading. He struck an explanation
+	// of the int,int ambiguity outright -- *"The tip clarification is pointless IMO because nobody
+	// thinks that a single number is a lat/lon."* -- so nothing here asks the tip to teach the
+	// parser. Matched on the ACCEPTED SHAPES, never on wording, so an editor may reword and a
+	// translator may render.
 	const lang = require('fs').readFileSync(
 		require('path').join(__dirname, '..', '..', 'lib', 'lang.ec.en.php'), 'utf8');
-	['lpn_goto_tip', 'lpn_goto_prompt'].forEach(function (k) {
-		const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='([^']*)'").exec(lang);
-		ok(k + ' names the comma as well as the space',
-			!!m && /comma/.test(m[1]) && /space/.test(m[1]), m && m[1]);
-	});
-	// The refusal SHOWS the two forms rather than describing them -- it is read by somebody whose
-	// last attempt failed, and an example is the shorter road back.
+	const val = (k) => {
+		const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)'").exec(lang);
+		return m ? m[1].replace(/\\'/g, "'") : null;
+	};
 	{
-		const m = new RegExp("\\$ec_lang\\['lpn_goto_bad'\\]='([^']*)'").exec(lang);
-		ok('lpn_goto_bad shows both a comma form and a space form',
-			!!m && /38\.106, -122\.569/.test(m[1]) && /38\.106 -122\.569/.test(m[1]), m && m[1]);
+		const tip = val('lpn_goto_tip');
+		ok('lpn_goto_tip names both separators it accepts', !!tip && /lat lon/.test(tip) && /lat,lon/.test(tip), tip);
+		ok('...and does not explain the parser, which Tom struck', !!tip && tip.length < 120, tip && String(tip.length));
 	}
-	['lpn_goto_tip', 'lpn_goto_bad'].forEach(function (k) {
-		const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='([^']*)'").exec(lang);
-		ok(k + ' shows an example with a decimal point, which is what disambiguates the comma',
-			!!m && /38\.106/.test(m[1]), m && m[1]);
-	});
+	{
+		// **EVERY EXAMPLE IN THE REFUSAL REALLY PARSES.** The one way this string can be wrong is by
+		// offering a shape the parser turns away, which would leave a reader copying it and failing
+		// again -- so they are pulled out of the sentence and run through parseLatLon() itself.
+		const bad = val('lpn_goto_bad');
+		ok('lpn_goto_bad exists and carries examples', !!bad && /Examples:/.test(bad), bad);
+		const egs = (bad || '').split('Examples:')[1].split(' or ').map(function (x) { return x.trim(); });
+		ok('...three of them, one per accepted shape', egs.length === 3, JSON.stringify(egs));
+		egs.forEach(function (e) { ok('...and "' + e + '" really parses', p(e) !== null); });
+		ok('...covering the bare comma, the single decimal and the space',
+			egs.some(function (e) { return /^\S+,\S+$/.test(e); }) &&
+			egs.some(function (e) { return /^[-+]?\d+\.\d+$/.test(e); }) &&
+			egs.some(function (e) { return / /.test(e); }), JSON.stringify(egs));
+	}
+	{
+		const prompt = val('lpn_goto_prompt');
+		ok('lpn_goto_prompt still names the comma as well as the space',
+			!!prompt && /comma/.test(prompt) && /space/.test(prompt), prompt);
+	}
 }
 
 // ================================================================================================
@@ -400,13 +443,20 @@ console.log('\n--- the project tabs refuse to switch while a model is being plac
 	// Comments blanked first: the note beside closeTab() names the function, and a name in a
 	// sentence is not a call site.
 	const bare = src.split('\n').filter(function (ln) { return !/^\s*\/\//.test(ln); }).join('\n');
+	//
+	// **AND THE FILE MENU AND THE OPEN BUTTON JOINED THEM** (Tom, 2026-09-08: *"I think the File
+	// menu and Open toolbar also must be disabled just for consistency and intuition."*). Open,
+	// Open example, Import and New all end in a project switch, so the menu refuses at its own
+	// door rather than opening and then refusing every row; openFromFile() carries the guard
+	// separately because the toolbar button reaches it without passing the menu.
 	const guards = (bare.match(/^\s*if \(georefBlocksProjectSwitch\(\)\)/gm) || []).length;
-	ok('the refusal is one function, called from every door that changes project', guards === 3,
-		guards + ' call sites (switchToTab, closeTab, newProject)');
-	['function switchToTab(', 'function closeTab(', 'function newProject(coords)'].forEach(function (f) {
+	ok('the refusal is one function, called from every door that changes project', guards === 5,
+		guards + ' call sites (switchToTab, closeTab, newProject, openFileMenu, openFromFile)');
+	['function switchToTab(', 'function closeTab(', 'function newProject(coords)',
+		'function openFileMenu(', 'async function openFromFile('].forEach(function (f) {
 		const at = src.indexOf(f);
-		ok(f.replace('function ', '').replace('coords', '') + ' asks it', at >= 0 &&
-			src.slice(at, at + 700).indexOf('georefBlocksProjectSwitch()') >= 0);
+		ok(f.replace('function ', '').replace('async ', '').replace('coords', '') + ' asks it',
+			at >= 0 && src.slice(at, at + 900).indexOf('georefBlocksProjectSwitch()') >= 0);
 	});
 	// The tabs stay CLICKABLE: a control that is inert cannot explain itself.
 	const css = require('fs').readFileSync(
@@ -414,6 +464,17 @@ console.log('\n--- the project tabs refuse to switch while a model is being plac
 	const rule = /\.lpn-tabs-locked[^}]*\{([^}]*)\}/.exec(css);
 	ok('the locked strip is faded, never made inert', !!rule && !/pointer-events\s*:\s*none/.test(css.slice(css.indexOf('.lpn-tabs-locked'), css.indexOf('.lpn-tabs-locked') + 400)),
 		rule && rule[1].trim());
+
+	// The File menu and the Open button take the SAME fade, and it is a fade rather than a
+	// `disabled`: an inert control cannot say why it is inert.
+	ok('there is a fade class for the other two doors, and it does not make them inert',
+		/\.lpn-ctl-locked\s*\{[^}]*opacity/.test(css) &&
+		!/\.lpn-ctl-locked\s*\{[^}]*pointer-events\s*:\s*none/.test(css));
+	ok('...and the wizard toggles it on the held File menu button and the held Open button',
+		/fileMenuButton[\s\S]{0,200}lpn-ctl-locked/.test(src) &&
+		/openToolButton[\s\S]{0,200}lpn-ctl-locked/.test(src));
+	ok('...where the Open button is HELD by the toolbar, not looked up, because the strip is rebuilt',
+		/openToolButton = openBtn;/.test(src));
 
 	L.georefCancel();
 	ok('cancelling the wizard unlocks the strip', !L.tabsLocked());

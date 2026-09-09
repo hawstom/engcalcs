@@ -91,6 +91,14 @@ const L = loadLoopedNetwork(
 	"\t\thintBox: function () { return document.getElementById('lpn_area_hint'); }, wireAreaHint: wireAreaHint,\n" +
 	// The bubble's own "Show this" checkbox and the furniture key behind it (Tom's 2026-09-08 worklist).
 	"\t\thintShown: areaHintShown, setHintShown: setAreaHintShown,\n" +
+	// **BOTH CONTROLS, AND THAT IS THE COUPLING THIS HARNESS COULD NOT SEE** (Tom, 2026-09-08:
+	// *"Bug. Doesn't uncheck in Settings."*). Everything below drives the BUBBLE'S checkbox and
+	// asks the storage seam what it says -- and the storage seam was always right. The Settings
+	// row is a SECOND control over the same state, built once when the box is opened, and both
+	// boxes can be on screen at the same time, so the disagreement was between two DOM elements
+	// neither of which this file had ever built. rebuildSettingsFields() is the shipped builder.
+	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
+	"\t\thintSettingsBox: function () { return areaHintSettingsCheck; },\n" +
 	"\t\thintShowBox: function () { var b = document.getElementById('lpn_area_hint');\n" +
 	"\t\t\tvar l = b && b.children.filter(function (c) { return c._tag === 'label'; })[0];\n" +
 	"\t\t\treturn l ? l.children.filter(function (c) { return c._tag === 'input'; })[0] : null; },\n" +
@@ -757,6 +765,61 @@ console.log('\n--- the bubble is dismissable, and the choice is the browser\'s -
 	// PROPERTY ACCESS itself throws, and this one is read while the toolbar is being used.
 	report(/function areaHintShown\(\)\s*\{\s*try \{/.test(src), '...read inside a try');
 	report(/function setAreaHintShown\([\s\S]{0,120}try \{/.test(src), '...and written inside one');
+	L.setHintShown(true);
+}
+
+// ================================================================================================
+// ONE STATE, TWO CONTROLS (Tom, 2026-09-08: *"Bug. Doesn't uncheck in Settings."*)
+// ================================================================================================
+//
+// **WHAT THE SECTION ABOVE COULD NOT SEE.** Every assertion there drives the bubble's own checkbox
+// and then asks areaHintShown() -- the storage seam, which was never wrong. The defect was between
+// two DOM elements: the bubble's box and the Settings row's box are the same switch in two places,
+// both can be on screen at once, and the Settings row is built once when the box is opened. So it
+// went on showing a tick for a bubble that had already gone. A harness holding ONE control can
+// never see two disagree, which is why this section builds both.
+console.log('\n--- the bubble\'s "Show this" and the Settings row are one switch ---');
+{
+	['lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
+		'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_energy_fields',
+		'lpn_set_page_fields'].forEach(ensure);
+	L.setHintShown(true);
+	L.setAreaShape('window');
+	L.rebuildSettingsFields();
+	const settingsBox = L.hintSettingsBox();
+	report(!!settingsBox, 'the Settings row really built a checkbox');
+	report(!!L.hintShowBox(), '...and the bubble has one too, so there are two on screen at once');
+	report(!!settingsBox && settingsBox.checked === true && L.hintShowBox().checked === true,
+		'both start ticked, because the bubble is showing');
+
+	// **THE DIRECTION TOM REPORTED.** Untick the bubble, through its own registered listener.
+	const bub = L.hintShowBox();
+	bub.checked = false;
+	(bub._listeners.change || []).forEach((f) => f({}));
+	report(!L.hintShown(), 'unticking the bubble records the choice');
+	report(!!settingsBox && settingsBox.checked === false,
+		'...and the Settings row unticks with it, on the same screen, with no reopen',
+		String(settingsBox && settingsBox.checked));
+
+	// AND BACK, which is the direction that already worked and must keep working.
+	settingsBox.checked = true;
+	(settingsBox._listeners.change || []).forEach((f) => f({}));
+	report(L.hintShown(), 'ticking the Settings row turns it back on');
+	report(L.hintVisible(), '...and the bubble comes back');
+	report(L.hintShowBox().checked === true,
+		'...ticked, read from the seam rather than asserted as a constant',
+		String(L.hintShowBox().checked));
+
+	// **THE SEAM IS ONE FUNCTION.** A future third control has to go through it too, and the
+	// bubble must never hard-code its own state again -- that literal `true` was the whole defect
+	// in the other direction.
+	const src2 = require('fs').readFileSync(
+		require('path').join(__dirname, '..', '..', 'js', 'looped-network.js'), 'utf8');
+	report(/function syncAreaHintChecks\(\)/.test(src2), 'there is one sync seam');
+	report(/function setAreaHintShown\([\s\S]{0,300}syncAreaHintChecks\(\)/.test(src2),
+		'...and the one writer calls it');
+	report(/showBox\.checked = areaHintShown\(\);/.test(src2),
+		'the bubble reads its own state from the seam, never a hard-coded true');
 	L.setHintShown(true);
 }
 

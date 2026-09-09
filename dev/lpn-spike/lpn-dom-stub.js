@@ -166,7 +166,30 @@ function mkEl(tag, svgNS) {
     // terms of popup.contains(e.target), so a stub that always said false (or always true) would
     // make the Task 264 regression test below meaningless.
     contains(n) { if (n === this) { return true; } return this.children.some(c => c.contains && c.contains(n)); },
-    getBoundingClientRect() { return { left: 0, top: 0, right: 1000, bottom: 500, width: 1000, height: 500 }; },
+    // **A BOX SITS WHERE ITS OWN INLINE left/top SAY, AND THAT IS THE ONE RELATIONSHIP THIS KNOWS.**
+    //
+    // It returned a constant rect until 2026-09-08, and that constant is exactly the coupling
+    // CLAUDE.md warns about: ask which quantity the real thing varies that the stub holds
+    // constant. Here it was POSITION. Every floating box on this page is placed by writing
+    // style.left/style.top and then re-read through getBoundingClientRect() -- by the Settings
+    // box's ResizeObserver, by placeBoxRemembered(), by capPanelToRoomBelow() -- so a stub that
+    // always answered {0, 0} made every one of those re-reads agree with a box at the corner of
+    // the screen whatever had just been written. That is why "the boxes still move to fit"
+    // (Tom, 2026-09-08) shipped twice with the panel harnesses green: the clamp that was undoing
+    // the restore could not see a restored corner to undo.
+    //
+    // Size follows the same rule, and the 1000 x 500 default stays for every element that states
+    // no geometry of its own -- which is nearly all of them, so nothing that was measuring a
+    // <text> or a menu row changes. Percentages, rem and vh answer null from parseFloat and fall
+    // back to the default too: this models px placement, which is what the placement code writes.
+    getBoundingClientRect() {
+      const px = (v) => { const n = parseFloat(v); return isFinite(n) ? n : null; };
+      const st = this.style || {};
+      const l = px(st.left), t = px(st.top), w = px(st.width), h = px(st.height);
+      const L = l === null ? 0 : l, T = t === null ? 0 : t;
+      const W = w === null ? 1000 : w, H = h === null ? 500 : h;
+      return { left: L, top: T, right: L + W, bottom: T + H, width: W, height: H };
+    },
     // WIDTH VARIES WITH FONT WEIGHT AND WITH HOW MANY CHARACTERS THERE ARE, and those are the two
     // physical relationships this stub is required to know.
     //

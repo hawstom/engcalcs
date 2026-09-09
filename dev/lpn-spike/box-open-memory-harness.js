@@ -263,6 +263,68 @@ console.log('\n--- the boot path reopens exactly the three boxes, and nothing el
 		keyNames().join(',') === [FIND_KEY, SETBOX_KEY, LIBBOX_KEY].sort().join(','), keyNames().join(','));
 }
 
+console.log('\n--- and a remembered overhang survives the OBSERVER, which fires on every open ---');
+{
+	// **THE HALF THAT SHIPPED GREEN WHILE THE BROWSER MOVED THE BOX** (Tom, 2026-09-08: *"Nothing
+	// changed. They still move to fit."*).
+	//
+	// openSettingsBox() places the box at the remembered corner through restoreBounds() and keeps
+	// the overhang -- and that was already true when he wrote that sentence. What undid it was the
+	// ResizeObserver in wireSettingsBox(): the box has just gone from display:none (0 x 0) to its
+	// real size, so the observer fires on EVERY open, re-read the corner that had been restored a
+	// moment earlier, and hauled it fully on screen with clampPanel() -- then wrote the clamped
+	// corner into localStorage, destroying the overhang before any reload could preserve it.
+	//
+	// **TWO COUPLINGS THE HARNESS WAS NOT MODELLING, AND BOTH ARE STUB-SHAPED.** First, nothing
+	// here flushed the resize observers after a restore, while a browser fires them by itself.
+	// Second, and worse, the stub's getBoundingClientRect() returned a CONSTANT {0, 0} rect
+	// whatever had just been written to style.left/style.top, so even a flushed observer read a box
+	// at the corner of the screen and found nothing to clamp. The stub now models that one
+	// relationship -- a box sits where its own inline left/top say -- which is what lets this
+	// section exist at all.
+	wipe();
+	clearResizeObservers();
+	// A corner hanging off the LEFT and off the BOTTOM: two of the three edges Tom named, and both
+	// well inside the 28 px sliver rule, so nothing here is asking for a box that cannot be grabbed.
+	global.localStorage.setItem(SETBOX_KEY, JSON.stringify({ left: -120, top: 640, w: 400, h: 260, open: true }));
+	const O = reload();
+	O.restoreOpenBoxes();
+	ok('Settings reopened', O.setboxIsOpen() === true);
+	const box = O.setboxEl();
+	ok('...at the corner it was left at, overhang and all',
+		parseFloat(box.style.left) === -120 && parseFloat(box.style.top) === 640,
+		box.style.left + ',' + box.style.top);
+	// THE BROWSER'S OWN NEXT ACT. display:none -> flex is a resize, so this is not a contrived event.
+	flushResizeObservers();
+	ok('...and the observer that fires on every open leaves it there',
+		parseFloat(box.style.left) === -120 && parseFloat(box.style.top) === 640,
+		box.style.left + ',' + box.style.top);
+	const rec = JSON.parse(global.localStorage.getItem(SETBOX_KEY));
+	ok('...and did not quietly rewrite the stored corner either',
+		rec.left === -120 && rec.top === 640, JSON.stringify(rec));
+	// A SECOND RELOAD is the test that matters: the destruction was in STORAGE, so one that only
+	// looked at the screen would have passed on the very load that had already lost the number.
+	const P = reload();
+	P.restoreOpenBoxes();
+	flushResizeObservers();
+	ok('...so a second reload still opens it where the user put it',
+		parseFloat(P.setboxEl().style.left) === -120 && parseFloat(P.setboxEl().style.top) === 640,
+		P.setboxEl().style.left + ',' + P.setboxEl().style.top);
+	// A box parked past the far edge is still pulled back to a grabbable sliver: the protection the
+	// clamp was written for is the one thing that must NOT have been given up here.
+	wipe();
+	clearResizeObservers();
+	global.localStorage.setItem(SETBOX_KEY, JSON.stringify({ left: 4000, top: 3000, w: 400, h: 260, open: true }));
+	const Q = reload();
+	Q.restoreOpenBoxes();
+	flushResizeObservers();
+	const qL = parseFloat(Q.setboxEl().style.left), qT = parseFloat(Q.setboxEl().style.top);
+	ok('a corner off a bigger monitor still leaves a sliver of the drag band on this one',
+		qL <= 1200 - 28 && qT <= 900 - 28, qL + ',' + qT);
+	wipe();
+	clearResizeObservers();
+}
+
 console.log('\n--- OPENED AND NEVER TOUCHED: no drag, no resize, and it still comes back ---');
 {
 	// Tom, 2026-09-04: *"It took a few reloads before Find started remembering."* The shape that

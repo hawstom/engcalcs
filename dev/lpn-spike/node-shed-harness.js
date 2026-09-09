@@ -549,6 +549,74 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	report(best.layouts < 40, 'and a rung is still one forced layout', best.layouts + ' forced layouts');
 }
 
+// ================================================================================================
+// THE DROP COLUMN ORDERS THE DISPLAY TOO (Tom, 2026-09-08)
+// ================================================================================================
+//
+// *"For links, but not nodes, drop order is also used to order display: 5 4 3 2 1. This is very
+// cool and intuitive and should be done for nodes."*
+//
+// **WHY THIS SECTION IS ABOUT A RULE AND NOT ABOUT THE DEFAULT NUMBERS.** A link label got the
+// agreement by accident: its lines are pushed in a hard-coded semantic order that happens to run
+// 5 4 3 2 1 down the inputs and 9 8 7 6 down the results, so the column and the label agreed
+// without anything making them. A node's hard-coded order crossed its own ranks twice. Asserting
+// the shipped default order would therefore pass on a coincidence, so this REWRITES the column and
+// asks whether the label followed -- which no default table can be right about by luck.
+console.log('\n--- a node label is stacked in the user\'s own drop order, highest first ---');
+{
+	const lsN = L.labelSettings().priority.node;
+	// A node with every value on it, so the order is visible rather than inferred from two lines.
+	const n = doc.nodes.filter(function (q) {
+		const ne = nodeEls[q.id];
+		return ne && (ne.allLines || []).length >= 4;
+	})[0];
+	report(!!n, 'there is a node carrying four or more label values to order');
+	if (n) {
+		const ranked = function () {
+			return askedFields(nodeEls[n.id]).filter(function (f) { return typeof lsN[f] === 'number'; });
+		};
+		const descends = function (fields) {
+			for (let i = 1; i < fields.length; i++) {
+				if (lsN[fields[i - 1]] < lsN[fields[i]]) { return false; }
+			}
+			return true;
+		};
+		zoomTo(80000);
+		const shipped = ranked();
+		report(descends(shipped), 'the shipped defaults come out highest rank first',
+			shipped.map(function (f) { return f + '=' + lsN[f]; }).join(' '));
+		// **THE ID LEADS AND IS NOT IN THE COLUMN.** nodeFieldRank() answers -Infinity for an
+		// unranked field, which is right for shedding and exactly backwards for display; a label
+		// whose own name migrated to the bottom would be unreadable.
+		report(askedFields(nodeEls[n.id])[0] === 'id',
+			'...with the ID still the first line, because it is what the others are about',
+			askedFields(nodeEls[n.id]).join(' '));
+
+		// NOW MOVE THE COLUMN. Reversing the ranks must reverse the label, or the agreement above
+		// was the default table's and not the rule's.
+		const keys = Object.keys(lsN), before = keys.map(function (k) { return lsN[k]; });
+		keys.forEach(function (k, i) { lsN[k] = keys.length - before[i] + 1; });
+		zoomTo(80000);
+		const moved = ranked();
+		report(descends(moved), 'a rewritten column re-stacks the label, so the order is the rule and not the defaults',
+			moved.map(function (f) { return f + '=' + lsN[f]; }).join(' '));
+		report(moved.join(' ') !== shipped.join(' '), '...and it really moved',
+			shipped.join(' ') + '  ->  ' + moved.join(' '));
+		report(askedFields(nodeEls[n.id])[0] === 'id', '...the ID still leading', askedFields(nodeEls[n.id])[0]);
+
+		// **A SHED STILL COMES OFF THE BOTTOM OF WHAT IS ON THE SCREEN.** keptLines() preserves
+		// relative order, so the two orders are one order; a reader watches the label lose its
+		// lowest line rather than one out of the middle.
+		const ne = nodeEls[n.id];
+		const shownRanked = shownFields(ne).filter(function (f) { return typeof lsN[f] === 'number'; });
+		report(descends(shownRanked), 'the DRAWN lines descend too, so a shed comes off the bottom',
+			shownRanked.join(' '));
+
+		keys.forEach(function (k, i) { lsN[k] = before[i]; });
+		zoomTo(80000);
+	}
+}
+
 console.log(`\n${failures ? 'FAILURES: ' + failures : 'all ' + checks + ' checks passed'}`);
 process.exit(failures ? 1 : 0);
 

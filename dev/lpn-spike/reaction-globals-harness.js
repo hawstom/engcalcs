@@ -85,18 +85,24 @@ console.log('1. THE FIVE ROWS EXIST AT ALL, WHICH IS THE WHOLE OF TASK 593');
 // =====================================================================================
 L.rebuildSettings();
 const rows = rowsIn(byId.lpn_set_quality_fields);
+// **KEYS, NOT ENGLISH.** These five rows were pinned here as literal regexes and one of them
+// broke on 2026-09-08, when Tom renamed `lpn_reaction_limiting` from "Limiting potential" to
+// "Limiting concentration" -- EPANET's own help's words. The harness reported a defect where a
+// label had merely been reworded, which is the trap CLAUDE.md names: assert against
+// EngCalcs.pageConfig, which the DOM stub loads from the real language file, so a rewording moves
+// both sides at once and a MISSING ROW still fails.
+const PC = EngCalcs.pageConfig || {};
 [
-	['bulk reaction order', /Bulk reaction order/i],
-	['tank reaction order', /Tank reaction order/i],
-	['wall reaction order', /Wall reaction order/i],
-	['limiting potential', /Limiting potential/i],
-	['roughness correlation', /Roughness correlation/i]
-].forEach(function (r) {
-	ok('Settings shows a ' + r[0] + ' row', rows.some(t => r[1].test(t)), rows.join(' | '));
+	'lpn_reaction_order_bulk', 'lpn_reaction_order_tank', 'lpn_reaction_order_wall',
+	'lpn_reaction_limiting', 'lpn_reaction_rough_corr'
+].forEach(function (k) {
+	const want = PC[k];
+	ok('Settings shows the ' + k + ' row', !!want && rows.some(t => t.indexOf(want) >= 0),
+		want ? rows.join(' | ') : 'key not in pageConfig');
 });
 // The two that were always there must not have been displaced by the five that arrived.
 ok('...and the two coefficients that were always there are still there',
-	rows.some(t => /Bulk reaction coefficient/i.test(t)) && rows.some(t => /Wall reaction coefficient/i.test(t)),
+	rows.some(t => t.indexOf(PC.lpn_reaction_bulk) >= 0) && rows.some(t => t.indexOf(PC.lpn_reaction_wall) >= 0),
 	rows.join(' | '));
 
 // =====================================================================================

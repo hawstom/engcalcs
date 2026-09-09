@@ -306,7 +306,18 @@ console.log('\n--- a phone box opens in its initial state every time (rule 4) --
 	// The desktop's own protections are still there: a capped height is the viewport's and is not
 	// stored, and a box grown off the window is slid back.
 	ok('...while a capped height is still not mistaken for a chosen one', /capped/.test(obs));
-	ok('...and a box grown off the window is still slid back', /clampPanel\(/.test(obs));
+	// **restoreBounds(), NOT clampPanel(), AND THIS LINE USED TO PIN THE DEFECT IN PLACE** (Tom,
+	// 2026-09-08: *"Nothing changed. They still move to fit."*). The observer fires on every open,
+	// because the box has just gone from display:none to its real size, so a clampPanel() here ran
+	// straight after openSettingsBox()'s restoreBounds() and hauled the remembered corner back
+	// inside the window -- and then wrote the clamped corner to storage, destroying the overhang
+	// before any reload. The assertion was for clampPanel and so it agreed, which is what a
+	// harness pinning the wrong rule looks like. The protection it was written for survives: a box
+	// grown off the right edge still comes back to a 28 px sliver of its own drag band.
+	ok('...and a box grown off the window is still slid back to a grabbable sliver',
+		/restoreBounds\(/.test(obs) && !/clampPanel\(/.test(obs));
+	ok('...and the observer no longer writes a corner to storage: only the user places a box',
+		!/setboxLayout\.left =/.test(obs) && !/setboxLayout\.top =/.test(obs));
 }
 
 // ============================================================================================
