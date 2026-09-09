@@ -266,6 +266,13 @@ run_check "unit default selftest"        blocking php dev/scripts/unit_default_p
 # option order in lib/Units.lib.php is a measurement. Both render a page that looks right when
 # wrong, so the rule is a table here and the first option of each reordered family is pinned.
 run_check "unit default set selftest"    blocking php dev/scripts/unit_default_set_selftest.php
+# Task 322 half B. The other end of the unit pair, and nothing had ever read it: the three seams in
+# js/Calculators.lib.js take a field NAME and a hasUnits BOOLEAN, and the page is the other half --
+# a field is unit-bearing exactly when the render carries a <select name="<name>u">. hasUnits=false
+# on a field that has one takes the number raw, so a 6 typed into a box labelled `in` reaches the
+# solver as 6 metres. The page renders, the select is right, and the answer is wrong by 25.4.
+run_check "form field units"             blocking php dev/scripts/form_field_units_check.php
+run_check "form field units selftest"    blocking php dev/scripts/form_field_units_selftest.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
@@ -276,6 +283,13 @@ run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_va
 run_check "lang keys resolve"            blocking php dev/scripts/lang_key_resolve_check.php
 run_check "lang key resolve selftest"    blocking php dev/scripts/lang_key_resolve_selftest.php
 run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parity_check.php --strict
+# Task 322 half B. lang_tag_parity_check.php holds a translation's placeholder SET against its
+# English source. It never asks whether anything can substitute the token, and it unique()s, so it
+# cannot see a repeat. An unsubstituted token reaches the visitor with its braces on in all 27
+# languages; and String.replace() with a string pattern replaces the FIRST occurrence only, which
+# matters because a repeat already ships (lpn_push_base_only carries {base} twice, everywhere).
+run_check "language placeholders"        blocking php dev/scripts/lang_placeholder_check.php
+run_check "placeholder selftest"         blocking php dev/scripts/lang_placeholder_selftest.php
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
 # Task 322 rows 16 and 19. The anchor languages are glossary.json's meta.anchor_languages and the
 # prose restating them agrees; and a new JS module is on a page and in the harness DOM stub, or

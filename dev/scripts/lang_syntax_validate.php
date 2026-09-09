@@ -444,6 +444,32 @@ function plainTextBoundKeys(): array
             }
         }
 
+        // JS path 3: a string written into a PLAIN-TEXT ATTRIBUTE from JavaScript --
+        // setAttribute('title'|'aria-label'|'placeholder'|'alt'|'data-*', ...) and the property
+        // forms (.title =, .placeholder =, .ariaLabel =).
+        //
+        // Found 2026-09-08 by Task 322's counting method, exactly as the dialog leg above was: rule
+        // B NAMES title, placeholder, alt, aria-label and data-* as its sinks, and the deriver
+        // modelled them only where PHP writes the attribute into markup. js/*.js writes 86 of them
+        // at runtime, 24 of those carrying an $ec_lang key -- roughly 650 values across the 27
+        // language files reaching an attribute the rule already covers, with nothing able to see
+        // one. Zero carry a tag today, which is what makes it a ratchet rather than a repair.
+        //
+        // The value expression is read only as far as the statement's end, and only a pageConfig
+        // read in it is resolved: anything else is not a shipped string and has no key to bind.
+        foreach ([
+            "/setAttribute\(\s*'(?:" . PLAIN_TEXT_ATTRS . ")'\s*,([^;]*)/i",
+            '/\.(?:title|placeholder|alt|ariaLabel)\s*=([^;]*)/',
+        ] as $attrRe) {
+            if (preg_match_all($attrRe, $c, $am)) {
+                foreach ($am[1] as $expr) {
+                    if (preg_match_all('/(?:pageConfig|cfg|pc)\.([A-Za-z0-9_]+)/', $expr, $pm)) {
+                        foreach ($pm[1] as $p) { $props[$p] = 'plain-text attribute'; }
+                    }
+                }
+            }
+        }
+
         foreach ($props as $prop => $how) {
             // Resolve through the page's own pageConfig block; fall back to the bare property
             // name for the pages that do use an unprefixed key.
