@@ -282,25 +282,37 @@ never from this line.
    `js/looped-network.js`, so sequential.
 6. A resync sprint for the 137 CHANGED keys, then `detect_english_drift.php --update`.
 7. **Task 612 screenshot placement.**
-8. **THE ICON IS NOT DEPLOYED AND THE REASON IS A REAL OPEN QUESTION, not a missing chore.** Tom
-   chose `wt-wide-L` from `dev/icon-preview/concepts-2026-09-08b.html` (2026-09-09: *"I want icon 6
-   wt-wide-L deployed for now."*). **The concept is a STROKE GLYPH on transparent, drawn in
-   `currentColor` -- it has no background, no tile and no colour of its own**, which is what the
-   preview sheet shows on white and on black.
-   - **The existing `icons/icon.svg` is a blue rounded tile with the letters EC**, and an
-     orchestrator carried that tile over onto Tom's glyph without saying so, rendered it, and
-     showed it to him as his icon. He caught it immediately: *"I don't know what you are looking at.
-     Here's what I see. You are hallucinating badly."* **The deployment was reverted; nothing shipped.**
-   - **THE QUESTION TO ASK HIM, and it was never asked:** `icons/icon-192.png` and `icon-512.png` are
-     declared `purpose: "any maskable"` in `lib/WebManifest.lib.php`, so they need an opaque
-     background and a safe zone or Android crops them. A transparent stroke glyph cannot be a
-     maskable icon as it stands. **What background does he want behind it, if any?** That is a design
-     decision, his, and inventing one is what went wrong.
-   - Mechanics, so the next session does not rediscover them: the concept's paths are in that
-     preview file as `data-body`; there is no rasterizer on this machine, but
-     `dev/browser-pass/node_modules/playwright-core` renders an SVG to PNG at any size. Measured on
-     the glyph: it reads at 48 px and up and fills in below that, matching the sheet's own note --
-     and every use we ship is 192 px or larger, so that limit does not bite.
+8. **THE ICON IS DEPLOYED EXCEPT FOR THE MASKABLE PNGs, AND THAT ONE GAP IS A REAL OPEN QUESTION,
+   not a missing chore.** Tom chose `wt-wide-L` from `dev/icon-preview/concepts-2026-09-08b.html`
+   and on 2026-09-09 asked for it *"as the favicon for LibreWaterNet.org and NotEPANET.org and as
+   the Water menu icon for lpn."* All three shipped that day. **The concept is a STROKE GLYPH on
+   transparent, drawn in `currentColor` -- no background, no tile, no colour of its own**, which is
+   why those three uses were straightforward and the fourth is not.
+   - **STILL OPEN, AND IT IS HIS DECISION:** `icons/icon-192.png` and `icon-512.png` are declared
+     `purpose: "any maskable"` in `lib/WebManifest.lib.php`, so they need an opaque background and a
+     safe zone or Android crops them. A transparent stroke glyph cannot be a maskable icon as it
+     stands. **What background does he want behind it, if any?** Inventing one is exactly what went
+     wrong before: an orchestrator carried the existing `icons/icon.svg` blue EC tile over onto his
+     glyph without saying so and showed him the result as his icon -- *"I don't know what you are
+     looking at. Here's what I see. You are hallucinating badly."* That deployment was reverted.
+   - **ALSO HIS, AND MEASURED RATHER THAN GUESSED: `wt-wide-L`'s own verdict on the proof sheet is
+     `MENU ONLY`**, and its `why` reads *"Culled as a favicon. At 16 the L foot lands on the catwalk
+     and the stem on the crown, so the tank fills with ink and reads as a scribble. It holds from 32
+     up."* Both places he asked for it are under 32 -- a favicon is 16, and the lpn menu bar draws at
+     `1.05em` (~17 px). Rendered at both, the L is crowded rather than a scribble, so it shipped as
+     instructed and the measurement is in `lib/Icons.lib.php`'s own comment. **Five concepts on that
+     sheet carry the verdict `FAVICON`** -- `wt-wide`, `wt-wide-heavy-walk`, `wt-wide-long-walk`,
+     `wt-wide-short-legs`, `wt-wide-thin-riser` -- so splitting the small sizes off the lettered one
+     is a one-line change if he wants it. He has been told; do not make the swap on your own.
+   - Mechanics, so the next session does not rediscover them: `php dev/scripts/icon_ascii_preview.php
+     water --size=17` renders the shipped glyph at any size in the terminal, which is the cheap
+     check; `dev/browser-pass/node_modules/playwright-core` renders an SVG to PNG when a real raster
+     is needed. There is no other rasterizer on this machine.
+   - The favicon stroke is `#4E8BC9` on both sibling sites -- librewaternet.org's own `--water-2`,
+     the one palette entry identical in its light and dark blocks, sitting between not-epanet.org's
+     light and dark `--water`. Measured 3.6:1 on Chrome's light tab strip and 4.6:1 on its dark one,
+     both clear of the 3:1 non-text floor. **Both sibling repositories are committed and NOT pushed**,
+     which is deliberate: a push publishes, and Tom pushes those.
 
 ## 7. THINGS NOT TO DO
 
