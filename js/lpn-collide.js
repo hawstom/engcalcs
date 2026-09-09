@@ -1296,6 +1296,10 @@ EngCalcs.lpnCollide = (function () {
 			// counting it would report the same constant on every drawing.
 			for (j = 0; j < live.length; j++) {
 				if (j === i || !live[j].leader) { continue; }
+				// One circle round the whole label first: this loop is every label against every
+				// leader, and on a drawing of 190 labels the overwhelming majority of those pairs
+				// are nowhere near each other.
+				if (leaderMissesLabel(live[j].leader, live[i])) { continue; }
 				for (k = 0; k < live[i].boxes.length; k++) {
 					b = live[i].boxes[k];
 					f = segmentInBoxFraction(live[j].leader, b);
@@ -1346,6 +1350,464 @@ EngCalcs.lpnCollide = (function () {
 		};
 	}
 
+	// ---- ROADMAP Task 539, phase two: MOVE the gangs phase one counts ---------------------------
+	//
+	// **PHASE ONE COUNTED; THIS ONE REPAIRS, AND IT IS A REPAIR PASS RATHER THAN A REPLACEMENT.**
+	// The first-fit has already placed every node label one at a time, each treating the last as an
+	// obstacle, which is exactly how two labels end up each locally reasonable and jointly absurd
+	// (Tom, 2026-08-26, on a screenshot of two crossed leaders: *"when it looks so easy (to a human)
+	// to resolve, it's embarrassing"*). So this runs AFTER that pass, over the few labels
+	// labelCrossings() flags, and leaves every other placement exactly where it was. Running it as a
+	// repair keeps every number in dev/label-placement-algorithms.md section 8 comparable before and
+	// after, which is the whole measurement.
+	//
+	// **TWO ROUTES, ONE SCORER, BECAUSE TOM ASKED FOR BOTH TO BE MEASURED** (his own framing,
+	// 2026-09-08: *"we can try to be smart about geometry or we can just add another trick to our
+	// brute force hunting... We could scientifically try both approaches to see which works
+	// better."*). `opts.strategies` names which routes generate candidate layouts, so a harness can
+	// run either alone and compare:
+	//
+	//   'brute' -- try the flagged labels' OWN candidate endpoints against each other, in a small
+	//              cartesian product. It knows nothing about geometry; it re-searches jointly what
+	//              the first-fit searched one label at a time.
+	//   'gang'  -- STACK the gang and order the stack by the ANGLE of the node each label belongs
+	//              to. Two leaders cross when the upper label belongs to the lower node, so an
+	//              angle-sorted stack is the arrangement in which that cannot happen. This is Tom's
+	//              step 4 (section 9a) with the stack put where the gang already stands rather than
+	//              at a `spot_prime` found by searching open ground -- that search is the part he
+	//              flagged as unspecified and it is deliberately not built here.
+	//
+	// **THE BASELINE IS ALWAYS TRIAL ZERO AND A MOVE MUST BEAT IT STRICTLY**, which is what makes
+	// the pass safe to run on every content pass: the worst it can do is leave the drawing alone.
+	//
+	// **THE SCORE IS LEXICOGRAPHIC AND THE CROSSING IS THIRD, NOT FIRST.** Boxes on hard obstacles,
+	// then boxes on other labels, then the crossings, then yielded ground, then total leader length.
+	// A crossed leader is ugly; a number printed on a node symbol or on another label is unreadable,
+	// and the first-fit treats a hard obstacle as absolute rather than as a cost. Ranking the
+	// crossing first would let this pass buy back, one gang at a time, exactly what every pass
+	// before it refused -- and it did, in the fixture that now guards it. The last term is what
+	// stops a label wandering to the far side of the map to break a tie.
+	//
+	// **THE COUNT IS THE DELTA, NOT THE TOTAL, AND IT IS EXACT.** Only the gang moves, so a pair
+	// with no gang member in it cannot change; counting only the pairs that touch a member is
+	// therefore the same comparison as re-counting the drawing, at O(members x labels) per trial
+	// instead of O(labels^2).
+	//
+	// `labels` is the placement spec list (the one placeLabelsFirstFit() read), `placed` its result.
+	// `opts.foreign` carries the labels that are drawn but cannot move -- stationed pipe labels and
+	// Text objects -- as `{id, boxes, leader}`: they are half of most flagged pairs (section 8: 76
+	// label-on-leader against 9 leader-leader) and a repair blind to them would optimize a drawing
+	// nobody sees. `opts.leaderMin` is the renderer's own leaderThreshold(): a label nearer its
+	// anchor than that draws NO leader, and counting one it does not draw would have the pass
+	// chasing a crossing the reader cannot see.
+	// **ONE CIRCLE ROUND A WHOLE LABEL, CACHED, AND IT IS WHAT MAKES THE REPAIR AFFORDABLE.** A
+	// staircase of four rows against another of four rows is sixteen oriented-box tests, and the
+	// overwhelming majority of the pairs a repair trial looks at are nowhere near each other:
+	// boxOverlapDepth() was 18% of the whole measured run before this. The circle is the union of
+	// the rows' own half-diagonal circles, so a rejection is exact and an acceptance falls through
+	// to the real test.
+	function labelBound(o) {
+		var i, b, r, x0, y0, x1, y1;
+		if (o._bound) { return o._bound; }
+		for (i = 0; i < o.boxes.length; i++) {
+			b = o.boxes[i];
+			r = Math.hypot(b.w, b.h) / 2;
+			if (i === 0) { x0 = b.cx - r; y0 = b.cy - r; x1 = b.cx + r; y1 = b.cy + r; } else {
+				if (b.cx - r < x0) { x0 = b.cx - r; }
+				if (b.cy - r < y0) { y0 = b.cy - r; }
+				if (b.cx + r > x1) { x1 = b.cx + r; }
+				if (b.cy + r > y1) { y1 = b.cy + r; }
+			}
+		}
+		o._bound = o.boxes.length
+			? { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, r: Math.hypot(x1 - x0, y1 - y0) / 2 }
+			: { cx: 0, cy: 0, r: -1 };
+		return o._bound;
+	}
+	function labelsApart(a, b) {
+		var p = labelBound(a), q = labelBound(b);
+		if (p.r < 0 || q.r < 0) { return true; }
+		return Math.hypot(p.cx - q.cx, p.cy - q.cy) > p.r + q.r;
+	}
+	function leaderMissesLabel(g, o) {
+		var p = labelBound(o);
+		return p.r < 0 || pointToSegmentDistance(p.cx, p.cy, g) > p.r;
+	}
+	function repairPairFlagged(a, b) {
+		var i;
+		if (a.leader && b.leader && segmentsCross(a.leader, b.leader)) { return true; }
+		if (b.leader && !leaderMissesLabel(b.leader, a)) {
+			for (i = 0; i < a.boxes.length; i++) {
+				if (segmentInBoxFraction(b.leader, a.boxes[i]) > 0) { return true; }
+			}
+		}
+		if (a.leader && !leaderMissesLabel(a.leader, b)) {
+			for (i = 0; i < b.boxes.length; i++) {
+				if (segmentInBoxFraction(a.leader, b.boxes[i]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
+	function anyBoxOverlapAny(a, b) {
+		var i, j;
+		for (i = 0; i < a.length; i++) {
+			for (j = 0; j < b.length; j++) {
+				if (boxOverlapDepth(a[i], b[j]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
+	function repairCrossingGangs(labels, placed, obstacles, opts) {
+		opts = opts || {};
+		var pad = opts.pad > 0 ? opts.pad : 0,
+			leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
+			strategies = opts.strategies || ['brute', 'gang'],
+			useBrute = strategies.indexOf('brute') >= 0,
+			useGang = strategies.indexOf('gang') >= 0,
+			maxCands = opts.maxCandidates > 0 ? opts.maxCandidates : 6,
+			maxTrials = opts.maxTrials > 0 ? opts.maxTrials : 512,
+			obs = obstacles || { boxes: [], segments: [] },
+			out = (placed || []).slice(), specs = {}, live = [], slotOf = {},
+			// `after` is deliberately absent until it is computed: a zero sitting there would read
+			// as "no crossings left" on every pass that never took the closing count.
+			stats = { gangs: 0, considered: 0, moved: 0, trials: 0, brute: 0, gang: 0, before: 0 };
+		(labels || []).forEach(function (l) { specs[l.id] = l; });
+		function leaderAt(spec, c) {
+			return Math.hypot(c.x - spec.anchor.x, c.y - spec.anchor.y) > leaderMin
+				? segment(spec.anchor.x, spec.anchor.y, c.x, c.y, 'leader', spec.id) : null;
+		}
+		out.forEach(function (r, i) {
+			var spec = specs[r.id], bs;
+			if (r.dropped || !spec || spec.dragged) { return; }
+			bs = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []);
+			if (!bs.length) { return; }
+			slotOf[r.id] = live.length;
+			live.push({ id: r.id, boxes: bs, leader: leaderAt(spec, { x: r.x, y: r.y }),
+				spec: spec, at: { x: r.x, y: r.y }, out: i, movable: true });
+		});
+		(opts.foreign || []).forEach(function (f) {
+			// A leader with no box of its own is a legitimate foreigner: a Text object's callout
+			// line is drawn and can be crossed, and the box it belongs to is pushed separately.
+			if (!f || (!(f.boxes && f.boxes.length) && !f.leader)) { return; }
+			live.push({ id: f.id, boxes: f.boxes || [], leader: f.leader || null, movable: false,
+				yields: !!f.yields });
+		});
+		// **A YIELDING LABEL IS ON THE MAP ONLY WHILE NO MOVABLE LABEL IS STANDING ON IT**, which is
+		// the caller's node-outranks-link ruling stated as geometry rather than as a snapshot. It
+		// has to be re-asked per trial: a move that lifts a node label off a pipe label REVEALS it,
+		// and a revealed label can be crossed. Modeling it as a fixed set instead is what made this
+		// pass raise the drawn count while its own score said it had lowered it.
+		// `over` is the movable labels that could be standing on it -- every one of them for the
+		// whole-drawing counts, the neighborhood alone inside a trial, which is the same set
+		// because two boxes that overlap are near each other by construction.
+		function shownIn(o, over) {
+			var j;
+			if (!o.yields) { return true; }
+			for (j = 0; j < over.length; j++) {
+				if (over[j] !== o && over[j].movable && !labelsApart(over[j], o)
+						&& anyBoxOverlapAny(over[j].boxes, o.boxes)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		function drawnNow() {
+			return live.filter(function (o) { return shownIn(o, live); });
+		}
+		var found = labelCrossings(drawnNow());
+		stats.before = found.counts.pairs;
+		// The pairs themselves, not just the count. Free -- labelCrossings() has just built them --
+		// and it is the only way to ask WHICH pair the model and the drawing disagree about, which
+		// is the question every surprise from this pass has come down to.
+		stats.pairsBefore = found.pairs;
+		// One trial's arrangement of one gang: an endpoint per member, already turned into the boxes
+		// and the leader the drawing would really have. **CACHED PER MEMBER PER ENDPOINT**, because
+		// a gang of three at six candidates each is 216 arrangements over 18 distinct pieces, and
+		// labelLineBoxes() is not free -- it was 40% of the pass before the cache.
+		function pieceFor(m, c, local) {
+			var k = c.x + ',' + c.y, g, bs;
+			if (!m.pieces) { m.pieces = {}; }
+			if (!m.pieces[k]) {
+				g = leaderAt(m.spec, c);
+				bs = labelLineBoxes(m.spec, c);
+				m.pieces[k] = { end: c, boxes: bs, leader: g,
+					// **THE OBSTACLE VERDICT AND THE LEADER LENGTH BELONG TO THE PIECE, not to the
+					// trial.** Nothing in the obstacle list moves during a search, so asking
+					// boxesClearOf() per trial asked the same question of the same neighborhood a
+					// thousand times over -- and it was most of the pass.
+					clear: boxesClearOf(bs, local, pad, m.id),
+					len: g ? Math.hypot(g.bx - g.ax, g.by - g.ay) : 0 };
+			}
+			return m.pieces[k];
+		}
+		function arrange(members, ends, local) {
+			return members.map(function (m, i) { return pieceFor(m, ends[i], local); });
+		}
+		// **SCORED AGAINST THE NEIGHBORHOOD, WHICH IS EXACT AND NOT AN APPROXIMATION.** Every
+		// geometry a member can reach in any trial lies inside `reach` of the gang centre, so a
+		// label or leader that never comes that close cannot be in a pair with one -- the same
+		// argument obstaclesInReach() makes, applied to the placements. Scoring against the whole
+		// drawing instead cost 2.3 s a pass on Net3-World at the 4x zoom; this is the whole
+		// difference between a pass that can run on a drag frame and one that cannot.
+		function score(members, arr, ctx) {
+			var isMem = ctx.isMem, near = ctx.near,
+				i, j, o, c = 0, blocked = 0, yielding = 0, hits = 0, len = 0, v, mine;
+			members.forEach(function (m, k) {
+				var L = live[slotOf[m.id]];
+				L.boxes = arr[k].boxes;
+				L.leader = arr[k].leader;
+				// The piece's own circle, never a stale one: a member's boxes are replaced on every
+				// trial, so a bound cached on the live entry would describe the trial before this.
+				L._bound = labelBound(arr[k]);
+			});
+			// Which of the neighborhood's yielding labels this trial leaves ON THE MAP. Asked
+			// first, because a label a member has just covered is not a crossing partner and a
+			// label a member has just uncovered is one again. **Only the MEMBERS are re-asked**:
+			// nothing else in the drawing moves, so who else covers what was settled once per gang
+			// -- the difference between a neighborhood scan per trial and a members scan, which on
+			// Net3-World is most of the pass.
+			for (j = 0; j < near.length; j++) {
+				o = near[j];
+				if (!live[o].yields) { continue; }
+				ctx.shown[o] = !ctx.covered[o];
+				for (i = 0; ctx.shown[o] && i < members.length; i++) {
+					if (!labelsApart(arr[i], live[o])
+							&& anyBoxOverlapAny(arr[i].boxes, live[o].boxes)) {
+						ctx.shown[o] = false;
+					}
+				}
+			}
+			for (i = 0; i < members.length; i++) {
+				mine = slotOf[members[i].id];
+				for (j = 0; j < near.length; j++) {
+					o = near[j];
+					if (o === mine || (isMem[o] && o < mine)) { continue; }
+					if (live[o].yields && !ctx.shown[o]) { continue; }   // covered: not on the map
+					if (repairPairFlagged(live[mine], live[o])) { c++; }
+					// A node label is never in the obstacle list -- placeLabelsFirstFit() commits
+					// its boxes to a private copy -- so label-on-label is asked of the placements
+					// instead, and asked of the STAIRCASE on both sides (Task 406). A YIELDING label
+					// is not counted here at all: a node box on a pipe label is not two labels
+					// overprinting, it is the pipe label leaving, and boxesClearOf() scores that as
+					// the yield it is.
+					if (!live[o].yields && !labelsApart(arr[i], live[o])
+							&& anyBoxOverlapAny(arr[i].boxes, live[o].boxes)) { hits++; }
+				}
+				v = arr[i].clear;
+				if (v === 'blocked') { blocked++; } else if (v === 'yielding') { yielding++; }
+				len += arr[i].len;
+			}
+			return [c, blocked, hits, yielding, len];
+		}
+		// **A TRIAL MAY NOT SPEND A HARD OVERLAP TO BUY A CROSSING, and that is a gate rather than a
+		// weight.** A crossed leader is ugly; a number printed on a node symbol or on top of another
+		// label is unreadable, and every pass before this one treats a hard obstacle as absolute
+		// rather than as a cost. So a trial is admissible only while it holds those two at or below
+		// what the layout already had, and the ranking inside the admissible set is the crossing
+		// count, which is what Task 539 is about. Ranking the crossing first without the gate let
+		// the repair buy back, one gang at a time, exactly what the first-fit refused -- measured on
+		// Net3-World, where it RAISED the count from 7 pairs to 9.
+		function admissible(sc, base) {
+			return sc[1] <= base[1] && sc[2] <= base[2];
+		}
+		function better(a, b) {
+			var i;
+			for (i = 0; i < a.length; i++) {
+				if (a[i] !== b[i]) { return a[i] < b[i]; }
+			}
+			return false;
+		}
+		// The candidate endpoints one member may be tried at: where it already is, then its own
+		// first-fit candidate list. Capped, because the product over the gang is what costs.
+		function candidatesOf(m) {
+			var outc = [m.at], s = (m.spec.sides || []), i;
+			for (i = 0; i < s.length && outc.length < maxCands; i++) {
+				if (Math.abs(s[i].x - m.at.x) > 1e-9 || Math.abs(s[i].y - m.at.y) > 1e-9) {
+					outc.push(s[i]);
+				}
+			}
+			return outc;
+		}
+		// **THE ANGLE RULE, WHICH IS THE WHOLE GANG IDEA** (Tom's section 9a, step 4). Given a
+		// column of slots, the label whose node bears most upward from the stack takes the top row.
+		// Leaders from one place to a set of targets cannot cross when their order round the stack
+		// is the order of their targets' bearings, and a stack is one place to within its own
+		// height.
+		function stackTrials(members) {
+			var trials = [], rowH = 0;
+			members.forEach(function (m) { rowH = Math.max(rowH, m.spec.h); });
+			rowH += pad;
+			function assign(slots) {
+				var mid = { x: 0, y: 0 }, order, ends = [], s = slots.slice();
+				s.forEach(function (p) { mid.x += p.x; mid.y += p.y; });
+				mid.x /= s.length; mid.y /= s.length;
+				s.sort(function (a, b) { return a.y - b.y; });
+				order = members.slice().sort(function (a, b) {
+					return Math.atan2(-(b.spec.anchor.y - mid.y), b.spec.anchor.x - mid.x)
+						- Math.atan2(-(a.spec.anchor.y - mid.y), a.spec.anchor.x - mid.x);
+				});
+				order.forEach(function (m, k) { ends[members.indexOf(m)] = s[k]; });
+				return ends;
+			}
+			// (a) the slots the gang ALREADY occupies, merely re-dealt by angle. The cheapest gang
+			// move there is: every position is one the first-fit already found room for.
+			trials.push(assign(members.map(function (m) { return m.at; })));
+			// (b) a fresh column hung at each member's own endpoint, downward and upward.
+			members.forEach(function (m) {
+				[1, -1].forEach(function (dir) {
+					var slots = [], k;
+					for (k = 0; k < members.length; k++) {
+						slots.push({ x: m.at.x, y: m.at.y + dir * k * rowH });
+					}
+					trials.push(assign(slots));
+				});
+			});
+			return trials;
+		}
+		found.gangs.forEach(function (gang) {
+			var members = [], center = { x: 0, y: 0 }, reach = 0, local, ctx, base, best, bestArr,
+				bestBy = null, cands, total = 1, rowSpan, i, k, b, idx, ends, was, arr, sc;
+			gang.forEach(function (id) {
+				var s = slotOf[id];
+				if (s !== undefined && live[s].movable) { members.push(live[s]); }
+			});
+			stats.gangs++;
+			if (!members.length) { return; }
+			if (members.length < 2 && !useBrute) { return; }
+			stats.considered++;
+			members.forEach(function (m) { center.x += m.spec.anchor.x; center.y += m.spec.anchor.y; });
+			center.x /= members.length; center.y /= members.length;
+			// **THE RADIUS HAS TO COVER EVERY TRIAL, INCLUDING THE STACK, and a radius that fell
+			// short would fail silently in the worst way**: the obstacle set would simply not
+			// contain the symbol a stacked row was about to be placed on, and boxesClearOf() would
+			// call it clear. So it is the furthest candidate endpoint OR the full height of a
+			// column of members, plus a label's diagonal beyond either -- the same argument
+			// placeLabelsFirstFit() makes about its own reach.
+			rowSpan = 0;
+			members.forEach(function (m) { rowSpan = Math.max(rowSpan, m.spec.h); });
+			rowSpan = (rowSpan + pad) * members.length;
+			members.forEach(function (m) {
+				(m.spec.sides || []).concat([m.at]).forEach(function (p) {
+					reach = Math.max(reach, Math.hypot(p.x - center.x, p.y - center.y) + rowSpan
+						+ Math.hypot(m.spec.w, m.spec.h) + pad);
+				});
+			});
+			// The obstacle neighborhood, taken ONCE per gang through the definition rather than
+			// the grid: near() is only sound out to its own cell size, and this radius is the
+			// gang's, not the one placeLabelsFirstFit() built its index for.
+			local = obstaclesInReach({ anchor: center, w: 0, h: 0 }, obs, reach);
+			// The PLACEMENTS in reach, by the same definition: a box whose centre is within the
+			// radius plus its own half-diagonal, or a leader that passes inside it. Members are
+			// always in, whatever their own geometry says.
+			ctx = { isMem: [], near: [], covered: [], shown: [], obs: local };
+			members.forEach(function (m) { ctx.isMem[slotOf[m.id]] = true; });
+			for (i = 0; i < live.length; i++) {
+				if (ctx.isMem[i]) { ctx.near.push(i); continue; }
+				if (live[i].leader
+						&& pointToSegmentDistance(center.x, center.y, live[i].leader) < reach) {
+					ctx.near.push(i);
+					continue;
+				}
+				for (k = 0; k < live[i].boxes.length; k++) {
+					b = live[i].boxes[k];
+					if (Math.hypot(b.cx - center.x, b.cy - center.y)
+							< reach + Math.hypot(b.w, b.h) / 2) {
+						ctx.near.push(i);
+						break;
+					}
+				}
+			}
+			// Who covers a yielding neighbour APART from this gang: fixed for the whole search,
+			// because nothing but the gang moves.
+			ctx.near.forEach(function (o) {
+				if (!live[o].yields) { return; }
+				ctx.covered[o] = ctx.near.some(function (p) {
+					return !ctx.isMem[p] && live[p].movable
+						&& anyBoxOverlapAny(live[p].boxes, live[o].boxes);
+				});
+			});
+			bestArr = arrange(members, members.map(function (m) { return m.at; }), local);
+			base = score(members, bestArr, ctx);
+			best = base;
+			if (useGang) {
+				stackTrials(members).forEach(function (e) {
+					stats.trials++;
+					arr = arrange(members, e, local);
+					sc = score(members, arr, ctx);
+					if (admissible(sc, base) && better(sc, best)) {
+						best = sc; bestArr = arr; bestBy = 'gang';
+					}
+				});
+			}
+			if (useBrute) {
+				cands = members.map(candidatesOf);
+				cands.forEach(function (c) { total *= c.length; });
+				if (total <= maxTrials) {
+					// **EVERY COMBINATION, while there are few enough of them.** A flagged pair at
+					// six candidates each is 36 layouts, and this is the control the geometry route
+					// is measured against: it knows nothing and tries everything.
+					for (i = 0; i < total; i++) {
+						idx = i; ends = [];
+						for (k = 0; k < members.length; k++) {
+							ends.push(cands[k][idx % cands[k].length]);
+							idx = Math.floor(idx / cands[k].length);
+						}
+						stats.trials++;
+						arr = arrange(members, ends, local);
+						sc = score(members, arr, ctx);
+						if (admissible(sc, base) && better(sc, best)) {
+							best = sc; bestArr = arr; bestBy = 'brute';
+						}
+					}
+				} else {
+					// **AND ONE MEMBER AT A TIME ONCE THE PRODUCT RUNS AWAY, which is a bounded
+					// search and not a truncated one.** Cutting the odometer off at N layouts would
+					// vary the first member and never the last, so the third label in a gang of
+					// three would simply never be tried -- a silent bias, and one nothing in the
+					// numbers would reveal. Two rounds of "hold the others, try this one's own
+					// candidates" is k x c x 2 layouts instead of c^k, and the second round is what
+					// lets a member answer a move the first round made.
+					ends = members.map(function (m) { return m.at; });
+					for (i = 0; i < 2; i++) {
+						for (k = 0; k < members.length; k++) {
+							for (idx = 0; idx < cands[k].length; idx++) {
+								was = ends[k];
+								ends[k] = cands[k][idx];
+								stats.trials++;
+								arr = arrange(members, ends, local);
+								sc = score(members, arr, ctx);
+								if (admissible(sc, base) && better(sc, best)) {
+									best = sc; bestArr = arr; bestBy = 'brute';
+								} else {
+									ends[k] = was;
+								}
+							}
+						}
+					}
+				}
+			}
+			// Whatever won, the live list must end holding it -- score() writes as it goes.
+			score(members, bestArr, ctx);
+			if (!bestBy) { return; }
+			stats.moved += members.length;
+			stats[bestBy]++;
+			members.forEach(function (m, j) {
+				var r = out[m.out], spec = m.spec, c = bestArr[j].end, sides = spec.sides || [];
+				live[slotOf[m.id]].at = { x: c.x, y: c.y };
+				out[m.out] = { id: r.id, x: c.x, y: c.y,
+					dx: c.x - spec.home.x, dy: c.y - spec.home.y,
+					dropped: false, side: sides.indexOf(c),
+					box: labelBoxAtEnd(spec, c), boxes: bestArr[j].boxes, leader: null };
+			});
+		});
+		// **THE CLOSING COUNT IS A REPORT, NOT A DECISION, so it is asked for rather than always
+		// taken.** It is a second O(labels^2) sweep of the whole drawing for a number nothing in the
+		// pass reads -- measured at a third of a gang-route pass on Net3-World -- and the harness
+		// that wants it measures the DRAWING anyway, which is the stronger statement.
+		if (opts.report) { stats.after = labelCrossings(drawnNow()).counts.pairs; }
+		return { results: out, stats: stats };
+	}
+
 	return {
 		GOAL_WEIGHT: GOAL_WEIGHT,
 		ANGLE_TUNING: ANGLE_TUNING,
@@ -1381,7 +1843,8 @@ EngCalcs.lpnCollide = (function () {
 		rawScore: rawScore,
 		effectiveScores: effectiveScores,
 		placeLabels: placeLabels,
-		labelCrossings: labelCrossings
+		labelCrossings: labelCrossings,
+		repairCrossingGangs: repairCrossingGangs
 	};
 }());
 

@@ -1682,6 +1682,9 @@ var EngCalcs = EngCalcs || {};
 		function leaderCrosses(seg, r) {
 			return lineBoxesOf(r).some(function (b) { return Collide.segmentInBoxFraction(seg, b) > 0; });
 		}
+		// Captured BEFORE the flip probes below, which re-run the whole pass and would leave
+		// `lastGangRepair` describing the probe rather than the drawing on screen.
+		var gang = lastGangRepair;
 		var i, j, pairs = 0, onLeader = 0, travel = 0;
 		for (i = 0; i < drawn.length; i++) {
 			for (j = i + 1; j < drawn.length; j++) {
@@ -1703,6 +1706,8 @@ var EngCalcs = EngCalcs || {};
 				+ hidShort + ' hid (short) \u2022 ' + hidCrowd + ' hid (crowded) \u2022 '
 				+ (flips === null ? '' : flips + ' flips under zoom \u2022 ')
 				+ (panFlips === null ? '' : panFlips + ' flips under pan \u2022 ')
+				+ (gang ? gang.moved + ' gang-moved (' + gang.before + '\u2192' + gang.after
+					+ ' pairs) \u2022 ' : '')
 				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '
 				+ (drawn.length ? (travel / drawn.length * (state.s || 1)).toFixed(1) : '0') + ' px';
@@ -2069,6 +2074,68 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The rungs the last pass ran, for a harness to read. Not a decision input -- nothing reads it.
 	var lastNodeShedRungs = 0;
+	// **THE LABELS THAT ARE DRAWN AND CANNOT MOVE, as the gang repair needs to see them** (Task
+	// 539). Stationed pipe labels and Text objects reach the drawing as OBSTACLES rather than as
+	// placements, and they are half of most flagged pairs -- 76 label-on-leader against 9
+	// leader-leader across the 28 drawings measured in dev/label-placement-algorithms.md section 8 --
+	// so a repair blind to them would be optimizing a drawing nobody sees.
+	//
+	// Read back out of the obstacle list rather than rebuilt, so there is one geometry and not two:
+	// `linkOwner` is placeStationedLabels()'s own stamp and is the whole attribution, exactly as
+	// dev/lpn-spike/label-crossing-harness.js reads it. A Text object's callout LINE comes in as a
+	// leader segment with no box; it is carried separately because it can be crossed on its own.
+	function crossingForeigners(obs) {
+		var byLink = {}, out = [], i, b;
+		for (i = 0; i < obs.boxes.length; i++) {
+			b = obs.boxes[i];
+			if (b.kind !== 'label') { continue; }
+			if (b.linkOwner === undefined) { out.push({ id: 't#' + i, boxes: [b] }); continue; }
+			if (!byLink[b.linkOwner]) { byLink[b.linkOwner] = []; }
+			byLink[b.linkOwner].push(b);
+		}
+		// **A STATIONED LABEL A NODE LABEL IS STANDING ON WILL NOT BE DRAWN, so `yields` says so and
+		// the repair works the rule out for itself.** yieldStationedLabels() runs after the repair,
+		// and the answer depends on where the repair puts the node labels -- a move that lifts a
+		// node label off a pipe label REVEALS it, and the revealed label can then be crossed. Handing
+		// the repair a snapshot of who yields today gets that backwards in both directions: it
+		// over-counted by 4 pairs on Net3-World at the fit zoom when hidden labels were counted, and
+		// then raised the drawn count when moves revealed labels the model had written off.
+		//
+		// `hiddenCrowded` is this pass's own, decided by shedAlignedForConflicts() before any of
+		// this runs, so it is read. `hiddenShort` is deliberately NOT: it is written at RENDER time,
+		// so it describes the PREVIOUS layout, and a label too short for its pipe now is one
+		// runLabelCollisionAvoidance() never stationed and which therefore owns no box here. Reading
+		// it cost 60-odd link labels at the 2x zoom -- every one hidden at the fit zoom and drawn at
+		// this one -- and the model went from over-counting to under-counting.
+		Object.keys(byLink).forEach(function (id) {
+			var le = linkEls[id];
+			if (le && le.hiddenCrowded) { return; }
+			out.push({ id: linkLabelKey(id), boxes: byLink[id], yields: true });
+		});
+		for (i = 0; i < obs.segments.length; i++) {
+			if (obs.segments[i].kind === 'leader') {
+				out.push({ id: 'lead#' + i, boxes: [], leader: obs.segments[i] });
+			}
+		}
+		return out;
+	}
+	// The ring pass's own labels, in the same shape: free link labels and dragged labels of either
+	// kind, which are drawn, carry leaders, and are not the gang repair's to move. Its leader is
+	// kept only when the renderer would draw one -- updateDataLeader() hides a leader shorter than
+	// leaderThreshold(), and a leader nobody sees cannot be crossed.
+	function ringForeigners(placed) {
+		var min = leaderThreshold(), out = [];
+		placed.forEach(function (r) {
+			var bs = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []), g = r.leader;
+			if (r.dropped || !bs.length) { return; }
+			if (g && Math.hypot(g.bx - g.ax, g.by - g.ay) <= min) { g = null; }
+			out.push({ id: r.id, boxes: bs, leader: g });
+		});
+		return out;
+	}
+	// What the last gang repair did, for a harness and for ?debug=labels to read. Not a decision
+	// input: nothing in the pass reads it back.
+	var lastGangRepair = null;
 	function runLabelCollisionAvoidance(shedNodes) {
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
 			obs = staticObstacles(), holders = {};
@@ -2207,6 +2274,39 @@ var EngCalcs = EngCalcs || {};
 				inner: t.inner * fs, outer: t.reach * fs,
 				steps: parseRingSteps(t.steps), k: t.k
 			});
+		// **AND THEN THE GANGS ARE REPAIRED** (Task 539). The first-fit places one label at a time,
+		// each treating the last as an obstacle, which is how two labels end up each locally
+		// reasonable and jointly absurd -- crossed leaders, or one label lying across the other's
+		// leader. Collide.repairCrossingGangs() finds those few by Tom's own two triggers and
+		// re-places just them, jointly. It never moves a label it cannot show an improvement for,
+		// so a drawing with no flagged pair leaves this function exactly as it was.
+		//
+		// **IT RUNS LAST, AFTER THE RING PASS, AND THAT IS NOT AN ORDERING PREFERENCE.** The ring
+		// pass reads only `obs`, so it neither sees node placements nor is seen by them -- which
+		// means a free link label and its leader were invisible to a repair placed before it, and
+		// the repair would clear two crossings while walking a node label onto a third. Measured on
+		// Net3-World: run before the ring pass it RAISED the fit-zoom count. Run after it, every
+		// label the reader will see is in front of the scorer.
+		//
+		// **BOTH ROUTES ON EVERY PASS, INCLUDING A DRAG FRAME, AND THAT IS NOT THRIFT REFUSED -- IT
+		// IS THE INVARIANT dev/lpn-spike/node-yield-harness.js HOLDS.** Where a node label sits must
+		// be a pure function of the drawing, so that clearing every yield flag and running the pass
+		// again reproduces it byte for byte. Giving a drag frame the cheap route alone breaks that
+		// by construction: the gang route re-deals slots and cannot reproduce a side the brute
+		// route chose, so 34 labels moved between a content pass and the frame after it -- a label
+		// springing back for the length of a drag and landing again on the way out, which is the
+		// flicker every pass here is written to avoid. Measured, so the price is on the record: on
+		// Net3-World with every label field on the whole repair is 19-58 ms a pass, against 25-90 ms
+		// for ONE of the four to six placeLabelsFirstFit() calls the same pass already makes.
+		var repaired = Collide.repairCrossingGangs(nodeLabels, nodePlaced, obs, {
+			pad: pad, leaderMin: leaderThreshold(),
+			// The closing count is a second sweep of the whole drawing for a number no decision
+			// reads, so it is taken only when the bench is open to print it.
+			report: debugOn('labels'),
+			foreign: crossingForeigners(obs).concat(ringForeigners(placed))
+		});
+		nodePlaced = repaired.results;
+		lastGangRepair = repaired.stats;
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
@@ -2252,7 +2352,14 @@ var EngCalcs = EngCalcs || {};
 	//
 	// INDEXED, for the same reason boxIsClear() is: this is every stationed label against every
 	// placed node line, which on the 480-pipe grid is a million box tests done one at a time.
-	function yieldStationedLabels(nodePlaced, obs) {
+	//
+	// **THE RULE IS ALSO THE GANG REPAIR'S (Task 539), which is why the set is its own function.**
+	// A pipe label a node label is standing on will not be drawn, so it cannot be half of a
+	// crossing; a repair that counted it moved good labels to clear conflicts no reader can see. The
+	// repair cannot call this one, because the answer depends on where IT puts the node labels, so
+	// it re-asks the same question per trial -- which is the honest version and is stated where it
+	// is asked. What this function must not become is a second opinion about the rule itself.
+	function stationedYieldSet(nodePlaced, obs) {
 		var nodeBoxes = [], taken = {}, i, j, bs, o, idx;
 		for (i = 0; i < nodePlaced.length; i++) {
 			if (nodePlaced[i].dropped) { continue; }
@@ -2272,6 +2379,10 @@ var EngCalcs = EngCalcs || {};
 				if (idx.anyOverlap(o)) { taken[o.linkOwner] = true; }
 			}
 		}
+		return taken;
+	}
+	function yieldStationedLabels(nodePlaced, obs) {
+		var taken = stationedYieldSet(nodePlaced, obs);
 		// **CLEARED FOR EVERY LINK ON EVERY PASS**, dragged and hidden ones included, so the pass
 		// stays idempotent in the way addDataLabel()'s nudge is: a label that yielded once must be
 		// back in contention the next time, or the drawing only ever loses labels.
