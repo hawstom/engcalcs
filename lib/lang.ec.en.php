@@ -832,7 +832,7 @@ $ec_lang['lpn_field_text_attached']='Attached asset';
 // a pipe follows it, and an attached Text is not offered the two alignment rows (his own 2026-08-18
 // ruling: the leader decides). Nothing said so, so two Texts that look alike offered different
 // controls; this row already states the attachment, so it is where the consequence belongs.
-$ec_lang['lpn_field_text_attached_tip']='This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
+$ec_lang['lpn_field_text_attached_tip']='This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
 // **A JUNCTION'S OWN EMITTER, THE ROW THAT WAS MISSING** (Task 191; Tom, 2026-09-08: *"emitter
 // coeff. ... should be under Node properties."*). EPANET states the coefficient per junction and
 // the exponent once for the whole model, which is why only the second had a control.

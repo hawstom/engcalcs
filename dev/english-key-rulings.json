@@ -645,6 +645,11 @@
             "ruled": "2026-09-09",
             "answer": "OK."
         },
+        "lpn_field_emitter_tip": {
+            "on": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_field_fittings": {
             "on": "Fittings list",
             "ruled": "2026-09-09",
@@ -677,6 +682,11 @@
         "lpn_field_text_attached": {
             "on": "Attached to",
             "ruled": "2026-08-29"
+        },
+        "lpn_field_text_attached_tip": {
+            "on": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
+            "ruled": "2026-09-09",
+            "answer": "Edited."
         },
         "lpn_find_conn_no_fixed": {
             "on": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
@@ -926,6 +936,11 @@
         "lpn_georef_backdrop_unrotated": {
             "on": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
             "ruled": "2026-08-29"
+        },
+        "lpn_georef_save_locked": {
+            "on": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
         },
         "lpn_georef_tab_locked": {
             "on": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
@@ -1349,6 +1364,11 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_pane_text_attached": {
+            "on": "Attached",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_pipetype_detach": {
             "on": "Detach from pipe type",
             "ruled": "2026-09-07",
@@ -1363,6 +1383,11 @@
             "on": "No pipe type selected",
             "ruled": "2026-09-07",
             "answer": "OK."
+        },
+        "lpn_popup_boxtitle": {
+            "on": "Properties",
+            "ruled": "2026-09-09",
+            "answer": "OK"
         },
         "lpn_profile_delete": {
             "on": "Delete path",

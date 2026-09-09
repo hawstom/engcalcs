@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read**, of 6 untranslated keys, of 1775 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 6 untranslated keys, of 1775 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -55,23 +55,23 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* THIS IS AN ENGLISH AMBIGUITY, NOT ONLY A PASHTO ONE, and it is the same shape as lpn_fitting_entrance in this same sprint: an English word with a precise technical sense in one field (statistics) being used in its looser sense in another. EPANET computes a wall reaction coefficient AS A FUNCTION OF pipe roughness; nothing is correlated in the statistical sense. A reader who knows statistics is ...
   @@ NEEDS RULING
 
-## lpn_  (6, 5 to read @@ NEEDS RULING)
+## lpn_  (6, all ruled)
 
 - **`lpn_field_emitter`**
   > Emitter coefficient
   _Ruled OK 2026-09-09._
 - **`lpn_field_emitter_tip`**
   > An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.
-  OK
+  _Ruled OK 2026-09-09._
 - **`lpn_field_text_attached_tip`**
   > This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
-  Edited.
+  _Ruled OK 2026-09-09._
 - **`lpn_georef_save_locked`**
   > Finish the placement with the "Keep this placement" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.
-  OK
+  _Ruled OK 2026-09-09._
 - **`lpn_pane_text_attached`**
   > Attached
-  OK
+  _Ruled OK 2026-09-09._
 - **`lpn_popup_boxtitle`**
   > Properties
-  OK
+  _Ruled OK 2026-09-09._
