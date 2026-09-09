@@ -62,16 +62,22 @@ async function centre(a) {
 	await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2);
 	await a.settle(150);
 	const text = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
+	//
+	// **clientWidth/clientHeight, NOT getBoundingClientRect().** applyView() writes
+	// `tx = svg.clientWidth / 2 - s * cx`, and clientWidth is an INTEGER where the rect's width is
+	// fractional — so measuring with the rect leaves up to half a pixel of disagreement, which at
+	// the home view's 3.9 px per degree is a fifth of a degree. Using the page's own two numbers
+	// makes this the exact inverse of the assignment rather than a close reading of it.
 	const view = await a.page.evaluate(() => {
+		const c = document.getElementById('lpn_canvas');
 		const g = document.querySelector('#lpn_canvas > g');
-		const b = document.getElementById('lpn_canvas').getBoundingClientRect();
 		const m = g && (g.getAttribute('transform') || '')
 			.match(/translate\(([-\d.e]+),([-\d.e]+)\)\s*scale\(([-\d.e]+)\)/);
 		if (!m) { return null; }
-		const wx = (b.width / 2 - +m[1]) / +m[3], wy = (b.height / 2 - +m[2]) / +m[3];
+		const wx = (c.clientWidth / 2 - +m[1]) / +m[3], wy = (c.clientHeight / 2 - +m[2]) / +m[3];
 		return { lat: window.EngCalcs.lpnGeom.mercLat(-wy), lon: wx };
 	});
-	if (view) { return { lat: view.lat, lon: view.lon, text }; }
+	if (view) { return { lat: view.lat, lon: view.lon, text, derived: `${view.lat.toFixed(6)}, ${view.lon.toFixed(6)}` }; }
 	// **LATITUDE FIRST, because the readout is PUBLIC ORDER** (Tom, 2026-08-24: *"It should be
 	// lat/lon everywhere... history says Lat/Lon"*; coord_order_check.php enforces it). This regex
 	// read longitude first until Task 511 and therefore matched nothing, so every check below got
@@ -158,7 +164,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(400);
 		at = await centre(a);
 		report.ok(Math.abs(at.lat - 51.5) < 0.01 && Math.abs(at.lon + 0.12) < 0.01,
-			'...and Go to a latitude and longitude still works exactly as before', at.text);
+			'...and Go to a latitude and longitude still works exactly as before', at.derived || at.text);
 
 		// ---- 4. asked again, because a no was not stored ---------------------------------------
 		a.answerConfirmsWith(true);
@@ -182,7 +188,7 @@ exports.run = async function ({ browser, report }) {
 
 		at = await centre(a);
 		report.ok(Math.abs(at.lat - 38.2326) < 0.01 && Math.abs(at.lon + 122.6365) < 0.01,
-			'the single result centres the map on it', at.text);
+			'the single result centres the map on it', at.derived || at.text);
 		report.has(await a.notice(), 'Petaluma', 'the notice names where it went');
 		report.has(await a.notice(), '© OpenStreetMap contributors',
 			'...and carries the ODbL credit with the result it belongs to');
@@ -244,7 +250,7 @@ exports.run = async function ({ browser, report }) {
 		await promptsSeen();
 		at = await centre(a);
 		report.ok(Math.abs(at.lat - 42.1015) < 0.05 && Math.abs(at.lon + 72.5898) < 0.05,
-			'choosing 2 goes to the second one', at.text);
+			'choosing 2 goes to the second one', at.derived || at.text);
 
 		// ---- 7. the rate limit, in the page rather than in a comment ---------------------------
 		// Back to back with no settle between them: the first is allowed, the second is inside the

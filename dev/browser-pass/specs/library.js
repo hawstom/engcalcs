@@ -123,9 +123,18 @@ exports.run = async function ({ browser, report }) {
 		let st = await open();
 		report.ok(st.shown, 'the Libraries menu row opens the box');
 		report.eq(st.title, LIB, 'the box is named the same as the row that opened it');
-		report.eq(st.index.join(' | '), 'Patterns | Curves | Controls',
-			'and its index is the three things the document already carries');
-		report.eq(st.current, 'Patterns', 'it opens on Patterns');
+		// **SIX SECTIONS SINCE 2026-09-09, not three**: Pipe types and Fittings joined beside each
+		// other (a type may state a fitting set, so they are read together), and Rules joined
+		// Controls. Named by key, in LIB_SECTIONS' own order, so a rewording moves both ends at
+		// once — this line held three English literals before.
+		const SECTIONS = [];
+		for (const k of ['lpn_library_patterns', 'lpn_library_curves', 'lpn_library_pipetypes',
+			'lpn_library_fittings', 'lpn_library_controls', 'lpn_library_rules']) {
+			SECTIONS.push(await a.lang(k));
+		}
+		report.eq(st.index.join(' | '), SECTIONS.join(' | '),
+			'and its index is every kind of thing the document library carries, in order');
+		report.eq(st.current, SECTIONS[0], 'it opens on Patterns');
 		report.has(st.controls.join(' | '), 'Add a pattern', 'which offers a way to make one');
 		// An empty project has no patterns, and an empty list must SAY it is empty rather than look
 		// like a section that failed to build.

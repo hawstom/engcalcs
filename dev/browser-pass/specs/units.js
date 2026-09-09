@@ -46,7 +46,8 @@ exports.run = async function ({ browser, report }) {
 			'lpn_u_roughness'].forEach((n) => {
 			report.ok(strip.selects.indexOf(n) >= 0, n + ' is on the strip');
 		});
-		['lpn_u_velocity', 'lpn_u_gradient'].forEach((n) => {
+		// `lpn_u_age` joined them 2026-09-09 with water age, and is results-only for the same reason.
+		['lpn_u_velocity', 'lpn_u_gradient', 'lpn_u_age'].forEach((n) => {
 			report.ok(strip.selects.indexOf(n) >= 0,
 				n + ' is on it too — results-only, and it never had an input twin');
 		});
@@ -72,7 +73,14 @@ exports.run = async function ({ browser, report }) {
 					widest: Math.max(name.width, sel.width)
 				};
 			}));
-		report.ok(items.length === 8, 'every selector is wrapped as its own item', String(items.length));
+		// **AGAINST THE COUNT OF SELECTORS, not against a literal 8.** This said 8 until 2026-09-09,
+		// when `lpn_u_age` joined the strip (water age, commit c447a455) and made it 9 — a red on a
+		// feature arriving correctly. The property is "EVERY selector is wrapped", which is what the
+		// label already said and what a fixed number cannot express; the list of quantities is
+		// asserted by name above, where adding one belongs.
+		report.ok(items.length === strip.selects.length,
+			'every selector is wrapped as its own item',
+			`${items.length} items for ${strip.selects.length} selectors`);
 		report.ok(items.every(i => i.stacked), 'the name sits ABOVE its control, not beside it',
 			String(items.filter(i => !i.stacked).length) + ' still side by side');
 		report.ok(items.every(i => i.width <= i.widest + 2),

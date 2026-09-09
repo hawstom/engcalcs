@@ -95,17 +95,27 @@ exports.run = async function ({ browser, report }) {
 		// **VISUALIZATION IS FIRST** (Tom, 2026-08-19: "Group the three Node and Link headings under
 		// a new Visualization main heading -- the first main heading"). Map and page keeps what is
 		// true of the whole SHEET; what is drawn beside one kind of element is its own category now.
-		report.eq(secs.join(','), 'visual,map,elements,calc',
-			'four categories, in the order Tom gave them');
+		//
+		// **CREDITS IS A FIFTH CATEGORY SINCE 2026-09-06, and it is Tom's own** ("Add a category of
+		// one at the bottom of lpn Settings for Credits, and put the Credits there"). It was a bare
+		// footer under every section; a named section also earns an index row, so the
+		// acknowledgement can be found rather than scrolled to. specs/setbox.js holds what it must
+		// still be — last, and exempt from the search filter.
+		report.eq(secs.join(','), 'visual,map,elements,calc,credits',
+			'five categories, in the order Tom gave them, with Credits last');
 		const subs = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-sub')].map(s => s.id));
 		// "Node and link" joined them on 2026-08-19: the high/low mark and the text between values
 		// are true of a node label and a link label alike, so they stand between the two symbology
 		// groups and Map appearance rather than inside either one.
+		// Energy and Quality joined the calculation category after this list was written; Quality is
+		// deliberately LAST, because it is the section fewest readers want and putting it mid-list
+		// makes everyone scroll past a chemistry question to reach the clock.
 		report.eq(subs.join(','),
 			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_nodeLink,lpn_set_sub_mapDisplay,' +
 			'lpn_set_sub_page,lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
-			'lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics',
+			'lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics,' +
+			'lpn_set_sub_energy,lpn_set_sub_quality',
 			'...and the sub-headings under them, unmoved by the regrouping', subs.join(','));
 		report.ok(!(await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-head, #lpn_setbox_content .lpn-set-sub')]
@@ -351,10 +361,21 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_setbox_none').style.display === 'block'),
 			'a search that matches nothing says so');
+		// **EXCEPT THE CREDITS ROW, AND THAT EXEMPTION IS THE POINT OF IT.** Apache-2.0 clause 2
+		// wants the ColorBrewer acknowledgement present in the software; the section it lives in
+		// carries `data-set-nofilter` so that a search for any word but "credits" cannot hide it —
+		// which is the licence broken by a text box. Everything the filter CAN hide is hidden, and
+		// nothing is left pointing at a section that is.
 		report.ok(await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_index .lpn-setbox-link')]
-				.every(r => r.style.display === 'none')),
-			'...and the index empties with it, so there is no dead jump');
+				.filter(r => r.style.display !== 'none')
+				.every(r => {
+					const id = r.getAttribute('data-sec') || r.getAttribute('data-sub');
+					const el = id && document.getElementById(id);
+					const sec = el && el.closest('.lpn-set-sec');
+					return !!(sec && sec.hasAttribute('data-set-nofilter'));
+				})),
+			'...and the index empties with it apart from the unfilterable Credits row, so there is no dead jump');
 		// Clearing it brings everything back — a filter that cannot be undone is a trap.
 		await a.page.evaluate(() => {
 			const f = document.getElementById('lpn_setbox_filter');
@@ -364,8 +385,8 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(300);
 		report.eq(await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-sec')]
-				.filter(s => s.style.display !== 'none').length), 4,
-			'clearing the search brings all four categories back');
+				.filter(s => s.style.display !== 'none').length), 5,
+			'clearing the search brings all five categories back');
 
 		// **A WORD THAT IS ONLY IN A TIP** (Tom, 2026-08-19, of the high/low mark row). It was the
 		// one row in the box carrying no tip at all, so it was searchable only by the words printed
@@ -525,11 +546,22 @@ exports.run = async function ({ browser, report }) {
 			`${Math.round(sized.width)}x${Math.round(sized.height)}`);
 		report.ok(Math.abs(sized.left - before.left) <= 2 && Math.abs(sized.top - before.top) <= 2,
 			'...and resizing does not also drag it — the grabber is not a drag handle');
-		// **AND A BOX AGAINST THE EDGE STAYS ON SCREEN AS IT GROWS.** The browser's widget only ever
-		// pushes the right and bottom edges out, so a box near the right edge grows its own grabber
-		// off the window and can never be shrunk again. Measured before the clamp was added: left 932
-		// + 554 wide in a 1400 window put the corner 86 px past the edge, and the next drag on it did
-		// nothing at all. So: shove it back against the edge, grow it, and read where it ended up.
+		// **A BOX DRAGGED PAST THE EDGE KEEPS ITS OVERHANG NOW, AND THAT REVERSES THIS CHECK.**
+		// This block used to assert that a box grown against the right edge was PULLED BACK on
+		// screen, because the browser's resize widget only ever pushes the right and bottom edges
+		// out and a box near the edge grew its own grabber off the window. Tom's 2026-09-08 worklist
+		// settled the opposite rule for every standing box on this page: a corner the user dragged
+		// to is theirs, and openSettingsBox() now restores it through restoreBounds() rather than
+		// clampPanel(). The only floor left is LPN_DRAG_SLIVER — enough of the box stays in the
+		// window to be picked up by.
+		//
+		// So what is asserted is the guarantee that ruling actually makes: **the overhang is kept,
+		// and the box is RECOVERABLE** — its drag band is still reachable, and dragging it back in
+		// brings the resize grabber with it. The note below records the consequence, because it is
+		// real and it is the thing the old clamp existed to prevent: with the box overhanging, the
+		// grabber itself is off the window and cannot be pressed until the box is dragged back.
+		// dev/browser-pass/README.md's rule — a spec ASSERTS what the tree holds and REPORTS what it
+		// is known to violate — is why that is a note and not a red.
 		const room = await a.page.evaluate(() => ({ w: window.innerWidth, h: window.innerHeight }));
 		await a.page.mouse.move(20, 400);
 		await a.settle(150);
@@ -539,20 +571,46 @@ exports.run = async function ({ browser, report }) {
 		await a.page.mouse.up();
 		await a.settle(250);
 		const atEdge = await boxRect(a);
-		await a.page.mouse.move(atEdge.left + atEdge.width - 3, atEdge.top + atEdge.height - 3);
+		report.ok(atEdge.left < room.w - 20 && atEdge.left + atEdge.width > room.w,
+			'a box dragged past the right edge KEEPS its overhang — the corner is the user\'s',
+			`left ${Math.round(atEdge.left)}, right ${Math.round(atEdge.left + atEdge.width)} ` +
+			`in ${room.w}`);
+		if (atEdge.left + atEdge.width > room.w) {
+			report.note('its resize grabber is therefore off the window until the box is dragged ' +
+				'back in — the consequence of keeping the overhang, recorded rather than asserted');
+		}
+		// Dragged back inside by its own drag band, which is the recovery the sliver promises.
+		// **BOTH AXES, because the overhang rule is both axes**: the box is 776 px tall in a 1200 px
+		// window, so a box parked low keeps its grabber below the fold exactly as this one kept it
+		// past the right edge. The drag is computed to a corner that fits, rather than a fixed
+		// nudge, so it recovers from wherever the previous drag left it.
+		// 200 px of slack on each axis, not a hair: the box is grown by ~120 px immediately after
+		// this and must still have its grabber on the window afterwards, or the shrink below has
+		// nothing to press.
+		const wantL = room.w - atEdge.width - 200, wantT = room.h - atEdge.height - 200;
+		await a.page.mouse.move(20, 400);
+		await a.settle(150);
+		await a.page.mouse.move(atEdge.left + 60, atEdge.top + 12);
+		await a.page.mouse.down();
+		await a.page.mouse.move(wantL + 60, wantT + 12, { steps: 8 });
+		await a.page.mouse.up();
+		await a.settle(250);
+		const pulledIn = await boxRect(a);
+		report.ok(pulledIn.left + pulledIn.width <= room.w + 1 &&
+			pulledIn.top + pulledIn.height <= room.h + 1,
+			'...and dragging it back by its band brings the grabber onto the window with it',
+			`${Math.round(pulledIn.left + pulledIn.width)} x ` +
+			`${Math.round(pulledIn.top + pulledIn.height)} in ${room.w} x ${room.h}`);
+		await a.page.mouse.move(pulledIn.left + pulledIn.width - 3, pulledIn.top + pulledIn.height - 3);
 		await a.settle(150);
 		await a.page.mouse.down();
-		await a.page.mouse.move(atEdge.left + atEdge.width + 120, atEdge.top + atEdge.height + 30,
+		await a.page.mouse.move(pulledIn.left + pulledIn.width + 120, pulledIn.top + pulledIn.height + 30,
 			{ steps: 10 });
 		await a.page.mouse.up();
 		await a.settle(300);
 		const grown = await boxRect(a);
-		report.ok(grown.left + grown.width <= room.w + 1 && grown.top + grown.height <= room.h + 1,
-			'...and a box grown against the right edge is pulled back on screen with its grabber',
-			`${Math.round(grown.left + grown.width)} x ${Math.round(grown.top + grown.height)} ` +
-			`in ${room.w} x ${room.h}`);
-		report.ok(grown.width > atEdge.width + 40, '...having really grown, not merely been clamped',
-			`${Math.round(atEdge.width)} -> ${Math.round(grown.width)}`);
+		report.ok(grown.width > pulledIn.width + 40, '...so the grabber works again, and it really grows',
+			`${Math.round(pulledIn.width)} -> ${Math.round(grown.width)}`);
 
 		// **THE WIDTH HAS A FLOOR, AND THE FLOOR IS WHY.** The index pane is a fixed 7.5rem, so
 		// narrowing squeezes only the content pane; below about 24rem the controls crush and the
@@ -606,7 +664,14 @@ exports.run = async function ({ browser, report }) {
 		await a.page.reload({ waitUntil: 'load' });
 		await a.settle(700);
 		await a.dismissGallery();
-		await a.toolbarClick('Settings');
+		// **THE BOX REOPENS BY ITSELF, so pressing the button here would SHUT it.** `lpn_setbox`
+		// carries an `open` flag and boot honours it; this spec pressed the toolbar gear
+		// unconditionally and measured a 0x0 rect, which reads as "the layout was lost" and was in
+		// fact the layout being restored and then toggled away. Opened only if it is not already.
+		if (!(await a.page.evaluate(() =>
+			document.getElementById('lpn_settings_box').style.display === 'flex'))) {
+			await a.toolbarClick('Settings');
+		}
 		await a.settle(500);
 		const restored = await boxRect(a);
 		report.ok(Math.abs(restored.left - placed.left) <= 3 && Math.abs(restored.top - placed.top) <= 3,
@@ -725,11 +790,17 @@ exports.run = async function ({ browser, report }) {
 		// *"Settings Libraries | Profile Tables | Run"*. The strip mirrors the Project menu from
 		// there on, so that two lists of the same commands do not have to be learned twice.
 		//
+		// **LIBRARIES LEFT THE STRIP ON 2026-09-06** — Tom's own commit c4f195c0, which took Save
+		// as…, Libraries, Profile and Tables off the toolbar as things you OPEN rather than tools
+		// you draw with. His row order still stands, on the Water MENU, and specs/library.js is
+		// where it is now asserted. What is left here is the gear itself: still on the strip, and
+		// still NOT at the right-hand end, which is the half of the 2026-08-21 ruling the toolbar
+		// can still express.
+		//
 		// Still asserted as a POSITION rather than as presence — the gear has been on this toolbar
 		// throughout and only its index says either move happened.
-		report.ok(/Settings/i.test(strip[strip.indexOf('Settings')] || '') &&
-			/Libraries/i.test(strip[strip.indexOf('Settings') + 1] || ''),
-			'Settings leads the water-network group, with Libraries beside it — the Project menu\'s own order',
+		report.ok(strip.indexOf('Settings') >= 0 && strip.indexOf('Settings') < strip.length - 2,
+			'the gear is on the strip and no longer at its right-hand end',
 			strip.join(' | '));
 		// What is at the right-hand end instead (Task 434): go somewhere, and show something.
 		report.eq(strip.slice(-2).join(' | '), 'Find and replace | Bottom panel',
