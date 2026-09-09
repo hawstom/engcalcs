@@ -116,6 +116,46 @@ console.log('\n4. EVERY KEY NAMES A MODE THE TOOLBAR ALSO OFFERS');
 	}));
 }
 
+console.log('\n5. THE STRIP READS LEFT TO RIGHT IN THE SAME ORDER THE DIGITS DO');
+{
+	// Tom, 2026-09-08: "Toolbar buttons should be in keyboard order, which means to break up the
+	// Edit group or move it all left of the Insert group." The Edit group moved. This asserts the
+	// RESULT rather than the arrangement, so a future regrouping is free as long as it keeps the
+	// reading order: every keyed button, in the order wireToolbar() appends it, carries a digit
+	// higher than the one before it. Read off the source the way toolbar-harness.js does -- the
+	// buttons are built by a shared modeButton() and the order is the order of its call sites.
+	const fs = require('fs');
+	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8')
+		.replace(/^[ \t]*\/\/.*$/gm, '');
+	const at = src.indexOf('function wireToolbar');
+	let i = src.indexOf('{', at), depth = 0, end = i;
+	for (; end < src.length; end++) {
+		if (src[end] === '{') { depth++; }
+		else if (src[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+	}
+	const bar = src.slice(at, end);
+	const keys = L.toolKeys();
+	const placed = [];
+	Object.keys(keys).forEach(function (k) {
+		const p = bar.indexOf("mode: '" + keys[k] + "'");
+		if (p >= 0) { placed.push({ key: k, mode: keys[k], at: p }); }
+	});
+	ok('every keyed mode has a button on the strip', placed.length === Object.keys(keys).length,
+		placed.length + ' of ' + Object.keys(keys).length);
+	placed.sort(function (a, b) { return a.at - b.at; });
+	const order = placed.map(function (p) { return p.key; }).join(' ');
+	ok('the keyed buttons are in ascending digit order: ' + order,
+		placed.every(function (p, n) { return n === 0 || Number(p.key) > Number(placed[n - 1].key); }), order);
+	// The one that regressed: Select is the lowest digit, so it is the first keyed button.
+	ok('Select (digit 1) is the first keyed button on the strip', placed[0] && placed[0].mode === 'select',
+		placed[0] && placed[0].mode);
+	// And the editing cluster stayed one cluster -- the half of Tom's instruction that chose
+	// "move it all" over "break up the Edit group".
+	['select', 'vertices', 'delete'].forEach(function (m) {
+		ok(m + ' is still in editGroup', new RegExp("mode: '" + m + "'[^}]*}, editGroup\\)").test(bar));
+	});
+}
+
 console.log(fails === 0 ? '\ntool keys harness: all checks passed'
 	: `\ntool keys harness: ${fails} FAILED`);
 process.exit(fails === 0 ? 0 : 1);

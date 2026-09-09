@@ -13311,6 +13311,17 @@ var EngCalcs = EngCalcs || {};
 		// rows with no visible cause is the one way this feature can mislead somebody.
 		filterNote = paneFilterBanner(spec, rows, true);
 		if (filterNote) { host.appendChild(filterNote); }
+		// **SAID ONCE FOR THE TABLE, AS A NOTE ON THE PANEL RATHER THAN A TIP ON THE TAB** (Tom,
+		// 2026-09-08). The Curves library teaches the same workflow the same way (see its
+		// lpn_library_curve_values_tip note): a hover tip on the tab strip is the easiest thing on
+		// this page to miss, and this sentence is the one that tells somebody with a spreadsheet
+		// open what this table is for. It says "rows that already exist" because panePasteAt()
+		// cannot grow the table -- when row creation by paste ships, this is the string to reword.
+		// Shown when the table is empty too, where the limit is exactly what a reader needs to know.
+		note = document.createElement('p');
+		note.className = 'lpn-lib-note';
+		note.textContent = pc.lpn_pane_paste_note || 'This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.';
+		host.appendChild(note);
 		if (!rows.length) {
 			note = document.createElement('p');
 			// One message for all six: "none of these yet" is true of every tab, and the tab the
@@ -22182,20 +22193,15 @@ var EngCalcs = EngCalcs || {};
 		// they are a correct, maintained answer to "does this control change the network", which the
 		// next feature needing that question can use without re-deriving it.
 
-		var addGroup = group();
-		addGroup.dataset.edits = '1';
-		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
-		// the ID-prefix rows. See insertAssetRows() for why that order.
-		[
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: pc.lpn_tool_add_reservoir_tip },
-			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank', tip: pc.lpn_tool_add_tank_tip },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
-			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
-		].forEach(function (t) { modeButton(t, addGroup); });
-
+		// **THE EDIT GROUP SITS LEFT OF THE INSERT GROUP SO THE STRIP READS IN KEYBOARD ORDER**
+		// (Tom, 2026-09-08: "Toolbar buttons should be in keyboard order, which means to break up
+		// the Edit group or move it all left of the Insert group."). LPN_TOOL_KEYS binds 1 Select,
+		// 2 Junction ... 9 Text, and every keyed button except Select was already in ascending
+		// order; Select alone sat eighth, because the all-keyed Insert group came first. Of his two
+		// remedies this is the one that keeps the editing cluster intact, and it also puts the
+		// resting-state tool leftmost after the file commands. The cost of getting this wrong is a
+		// one-time onboarding one, not a per-row one: a newcomer reading tips left to right met
+		// "press 2" first and found "press 1" nowhere in view.
 		var editGroup = group();
 		editGroup.dataset.edits = '1';
 		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select, icon: 'select' }, editGroup);
@@ -22250,6 +22256,20 @@ var EngCalcs = EngCalcs || {};
 		setIconLabel(undoBtn, 'undo', pc.lpn_tool_undo || 'Undo', pc.lpn_tool_undo_tip);
 		undoBtn.addEventListener('click', undo);
 		editGroup.appendChild(undoBtn);
+
+		var addGroup = group();
+		addGroup.dataset.edits = '1';
+		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
+		// the ID-prefix rows. See insertAssetRows() for why that order.
+		[
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: pc.lpn_tool_add_reservoir_tip },
+			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank', tip: pc.lpn_tool_add_tank_tip },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
+			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
+		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
