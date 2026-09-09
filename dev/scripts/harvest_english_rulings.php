@@ -44,11 +44,23 @@ $md   = $root . '/dev/new-english-keys.md';
 $apply = in_array('--apply', $argv, true);
 $check = in_array('--check', $argv, true);
 
+/* **THE BASELINE IS AN OPTION BECAUSE CLAUDE.md TELLS YOU TO COMMIT HIS MARKS FIRST.** That rule and
+ * this script's default disagreed, and the disagreement lost rulings rather than reporting them:
+ * committing the marks makes the working file EQUAL to HEAD, so the diff this script is built on
+ * finds nothing and cheerfully says "nothing unharvested" about a file full of his handwriting.
+ * Both halves were right on their own. Measured 2026-09-08 on 62 keys he had just ruled on.
+ * `--baseline=HEAD~1` is what you want immediately after committing his marks; the default stays
+ * HEAD so `--check` in check_all.sh keeps asking the question it has always asked. */
+$baseline = 'HEAD';
+foreach ($argv as $a) {
+    if (strpos($a, '--baseline=') === 0) { $baseline = substr($a, strlen('--baseline=')); }
+}
+
 /* The committed copy is the "as generated" side. Outside a git checkout there is nothing to compare
  * against, so there is no such thing as an unharvested mark and the check passes rather than
  * guessing. check_all.sh always runs in one. */
 $lines = array(); $rc = 1;
-@exec('git -C ' . escapeshellarg($root) . ' show HEAD:dev/new-english-keys.md 2>/dev/null', $lines, $rc);
+@exec('git -C ' . escapeshellarg($root) . ' show ' . escapeshellarg($baseline . ':dev/new-english-keys.md') . ' 2>/dev/null', $lines, $rc);
 if ($rc !== 0) { echo "harvest: no committed dev/new-english-keys.md to compare against — nothing to do.\n"; exit(0); }
 $committed = implode("\n", $lines);
 if (!is_file($md)) { echo "harvest: dev/new-english-keys.md is absent — nothing to do.\n"; exit(0); }

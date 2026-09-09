@@ -11,6 +11,66 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_area_hint_lasso_go": {
+            "on": "Move to draw the outline. Click to finish.",
+            "ruled": "2026-09-09",
+            "answer": "Edited to match polygon."
+        },
+        "lpn_area_hint_lasso_start": {
+            "on": "Click to start the outline.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_hint_polygon_go": {
+            "on": "Click each corner. Double-click the last one to finish.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_hint_polygon_start": {
+            "on": "Click to draw the polygon area. Double-click to finish.",
+            "ruled": "2026-09-09",
+            "answer": "Edited."
+        },
+        "lpn_area_hint_shift": {
+            "on": "Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.",
+            "ruled": "2026-09-09",
+            "answer": "I edited this."
+        },
+        "lpn_area_hint_show": {
+            "on": "Show this",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_hint_touch_go": {
+            "on": "Drag around what you want, then lift to finish.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_hint_touch_start": {
+            "on": "Press on the map and drag around what you want, then lift.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_hint_window_go": {
+            "on": "Click the opposite corner to finish.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_hint_window_start": {
+            "on": "Click one corner of the window.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_none": {
+            "on": "Nothing found in that area.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_area_selected": {
+            "on": "{n} selected.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_curve_kind_effic": {
             "on": "Pump efficiency",
             "ruled": "2026-09-05"
@@ -580,6 +640,16 @@
             "on": "Name or description of the category.",
             "ruled": "2026-08-29"
         },
+        "lpn_field_fittings": {
+            "on": "Fittings list",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_field_fittings_tip": {
+            "on": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_field_pipetype": {
             "on": "Pipe type",
             "ruled": "2026-09-07",
@@ -743,9 +813,119 @@
             "on": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
             "ruled": "2026-08-29"
         },
+        "lpn_fitting_add": {
+            "on": "Add a fitting",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_angle": {
+            "on": "Angle valve, fully open",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_elbow_45": {
+            "on": "45 degree elbow",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_elbow_long": {
+            "on": "Long radius elbow",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_elbow_medium": {
+            "on": "Medium radius elbow",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_elbow_short": {
+            "on": "Short radius elbow",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_entrance": {
+            "on": "Square entrance",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_exit": {
+            "on": "Exit",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_gate": {
+            "on": "Gate valve, fully open",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_globe": {
+            "on": "Globe valve, fully open",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_k": {
+            "on": "Coefficient",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_name": {
+            "on": "Fitting",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_other": {
+            "on": "Other fitting",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_qty": {
+            "on": "Quantity",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_remove": {
+            "on": "Remove",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_return_bend": {
+            "on": "Closed return bend",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_swingcheck": {
+            "on": "Swing check valve, fully open",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_tee_branch": {
+            "on": "Standard tee, flow through branch",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_tee_run": {
+            "on": "Standard tee, flow through run",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fitting_total": {
+            "on": "Total minor (local) loss coefficient, k",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_fittings_none": {
+            "on": "No fittings list selected",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_georef_backdrop_unrotated": {
             "on": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
             "ruled": "2026-08-29"
+        },
+        "lpn_georef_tab_locked": {
+            "on": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
+            "ruled": "2026-09-09",
+            "answer": "Edited"
         },
         "lpn_georef_twopt": {
             "on": "Use two known points",
@@ -790,6 +970,11 @@
             "ruled": "2026-09-07",
             "answer": "Edited."
         },
+        "lpn_hide_titles": {
+            "on": "Hide these titles",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_inp_drop_energy": {
             "on": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
             "ruled": "2026-09-01"
@@ -827,6 +1012,26 @@
         "lpn_inp_drop_tags": {
             "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
             "ruled": "2026-09-02"
+        },
+        "lpn_inp_export_flat_fittings": {
+            "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
+            "ruled": "2026-09-09",
+            "answer": "Edited"
+        },
+        "lpn_inp_export_flat_heading": {
+            "on": "Saved {file}",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_inp_export_flat_lead": {
+            "on": "The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:",
+            "ruled": "2026-09-09",
+            "answer": "Edited"
+        },
+        "lpn_inp_export_flat_types": {
+            "on": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
         },
         "lpn_library_curve_add": {
             "on": "Add a curve",
@@ -899,6 +1104,46 @@
         "lpn_library_curve_y": {
             "on": "Y",
             "ruled": "2026-09-05"
+        },
+        "lpn_library_fittings": {
+            "on": "Fittings",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_library_fittings_add": {
+            "on": "Add a fittings list",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_library_fittings_in_use": {
+            "on": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.",
+            "ruled": "2026-09-09",
+            "answer": "Edited"
+        },
+        "lpn_library_fittings_note": {
+            "on": "Each project has its own fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.",
+            "ruled": "2026-09-09",
+            "answer": "Edited"
+        },
+        "lpn_library_fittings_source": {
+            "on": "The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_library_fittings_tip": {
+            "on": "A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_library_fittings_unused": {
+            "on": "Nothing uses this fittings list.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_library_fittings_used_by": {
+            "on": "Pipes using this fittings list",
+            "ruled": "2026-09-09",
+            "answer": "OK"
         },
         "lpn_library_pipetype_add": {
             "on": "Add a pipe type",
@@ -1009,6 +1254,26 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_multi_applied": {
+            "on": "Set {prop} on {n}.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_multi_no_fields": {
+            "on": "These have nothing that can be set together here.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_multi_title": {
+            "on": "{n} selected",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_multi_varies": {
+            "on": "Various",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_net_emergency": {
             "on": "This was an EPANET .net file. That is EPANET's own project file, it has no published description, and this page reads it by working the format out from example files, so use it only when you have nothing else rather than as a dependable route. The .inp file is the documented format that every other program reads: in EPANET use File, Export, Network to write one, and import that instead whenever you can.",
             "ruled": "2026-09-06",
@@ -1069,15 +1334,25 @@
             "ruled": "2026-09-07",
             "answer": "OK."
         },
+        "lpn_pane_paste_note": {
+            "on": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_pane_pasted": {
+            "on": "Pasted {n} cells. {skipped} were not changed.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_pipetype_detach": {
             "on": "Detach from pipe type",
             "ruled": "2026-09-07",
             "answer": "OK."
         },
         "lpn_pipetype_detach_tip": {
-            "on": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. Nothing about the pipe changes now; from then on you can edit these values here.",
-            "ruled": "2026-09-07",
-            "answer": "OK."
+            "on": "Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
         },
         "lpn_pipetype_none": {
             "on": "No pipe type selected",
@@ -1393,6 +1668,16 @@
             "on": "How close the solver has to get before it stops, measured as the flow still changing from one trial to the next. A smaller number is more exact and takes longer. Both solvers read this one box, and each measures that change against a different total: the built-in solver against the sum of the demands, EPANET against the sum of the link flows. Left empty, this page tries far harder than EPANET does on its own.",
             "ruled": "2026-09-02"
         },
+        "lpn_settings_area_hint": {
+            "on": "Show the selection help",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_settings_area_hint_tip": {
+            "on": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
         "lpn_settings_damp_limit": {
             "on": "Damping starts at",
             "ruled": "2026-09-01"
@@ -1614,6 +1899,26 @@
         "lpn_time_run_report_copy": {
             "on": "Copy",
             "ruled": "2026-09-04"
+        },
+        "lpn_tool_area_lasso": {
+            "on": "Select a lasso",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_tool_area_polygon": {
+            "on": "Select a polygon",
+            "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_tool_area_tip": {
+            "on": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.",
+            "ruled": "2026-09-09",
+            "answer": "Edited"
+        },
+        "lpn_tool_area_window": {
+            "on": "Select a window",
+            "ruled": "2026-09-09",
+            "answer": "OK."
         },
         "lpn_tool_key_hint": {
             "on": "Shortcut: press {key}.",

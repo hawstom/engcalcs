@@ -777,12 +777,12 @@ $ec_lang['lpn_tool_vertices']='Vertices';
 $ec_lang['lpn_area_hint_window_start']='Click one corner of the window.';
 $ec_lang['lpn_area_hint_window_go']='Click the opposite corner to finish.';
 $ec_lang['lpn_area_hint_lasso_start']='Click to start the outline.';
-$ec_lang['lpn_area_hint_lasso_go']='Move to draw the outline, then click to close it.';
-$ec_lang['lpn_area_hint_polygon_start']='Click the first corner of the shape. Double-click the last one to finish.';
+$ec_lang['lpn_area_hint_lasso_go']='Move to draw the outline. Click to finish.';
+$ec_lang['lpn_area_hint_polygon_start']='Click to draw the polygon area. Double-click to finish.';
 $ec_lang['lpn_area_hint_polygon_go']='Click each corner. Double-click the last one to finish.';
 // Tom, 2026-09-08, his own sentence: *"Hold Shift during selection to preserve the existing
 // selection set and toggle (add/remove) affected assets."* Reworded so "toggle" needs no gloss.
-$ec_lang['lpn_area_hint_shift']='Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.';
+$ec_lang['lpn_area_hint_shift']='Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.';
 // On a finger a window or a lasso is press, drag, lift (Tom, 2026-09-08); the polygon keeps its
 // taps and its own two sentences above.
 $ec_lang['lpn_area_hint_touch_start']='Press on the map and drag around what you want, then lift.';
@@ -1104,7 +1104,7 @@ $ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a val
 $ec_lang['lpn_tool_add_text_tip']='Click the map to write a note on the drawing.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
-$ec_lang['lpn_tool_area_tip']='Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.';
+$ec_lang['lpn_tool_area_tip']='Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.';
 $ec_lang['lpn_area_selected']='{n} selected.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_area_none']='Nothing found in that area.';
@@ -1166,7 +1166,7 @@ $ec_lang['lpn_georef_empty']='That file has no network in it, so there is nothin
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
 // Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
 // so the strip refuses and says which two commands end the wizard.
-$ec_lang['lpn_georef_tab_locked']='Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.';
+$ec_lang['lpn_georef_tab_locked']='Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.';
 $ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_goto_tip']='Pan the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, separated by a comma or a space: 38.106, -122.569 or 38.106 -122.569';
@@ -2873,7 +2873,7 @@ $ec_lang['lpn_pipetype_detach_tip']='Copies the values this pipe reads from its 
 $ec_lang['lpn_library_fittings']='Fittings';
 $ec_lang['lpn_library_fittings_tip']='A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_fittings_note']='Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.';
+$ec_lang['lpn_library_fittings_note']='Each project has its own fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.';
 // **WHERE THE OFFERED NUMBERS CAME FROM, STATED TO THE READER RATHER THAN ONLY IN THE SOURCE.** An
 // unsourced coefficient is worse than none, because it looks authoritative; and a coefficient is a
 // starting point, since the real one depends on the size and the make of the fitting. This names
@@ -2885,7 +2885,7 @@ $ec_lang['lpn_library_fittings_used_by']='Pipes using this fittings list';
 $ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
-$ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.';
+$ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.';
 $ec_lang['lpn_fitting_qty']='Quantity';
 $ec_lang['lpn_fitting_name']='Fitting';
 $ec_lang['lpn_fitting_k']='Coefficient';
@@ -2923,9 +2923,9 @@ $ec_lang['lpn_fitting_other']='Other fitting';
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
-$ec_lang['lpn_inp_export_flat_lead']='Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:';
+$ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
 $ec_lang['lpn_inp_export_flat_types']='{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.';
-$ec_lang['lpn_inp_export_flat_fittings']='The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.';
+$ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to

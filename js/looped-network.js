@@ -9049,7 +9049,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		line = document.createElement('div');
 		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
-			'Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.');
+			'Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.');
 		box.appendChild(line);
 		// **THE 'Show this' CHECKBOX, AND ITS LABEL IS TOM'S OWN WORDING** (Tom's 2026-09-08 worklist).
 		// Checked, always: it is the state you are looking at, and the only act it offers is
@@ -17651,7 +17651,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (fittings) {
-			said.push((pc.lpn_inp_export_flat_fittings || 'The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.')
+			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
 		openDialog(function (body) {
@@ -17662,7 +17662,7 @@ var EngCalcs = EngCalcs || {};
 			h.textContent = (pc.lpn_inp_export_flat_heading || 'Saved {file}').replace('{file}', fileName);
 			body.appendChild(h);
 			lead.style.margin = '0 0 6px';
-			lead.textContent = pc.lpn_inp_export_flat_lead || 'Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:';
+			lead.textContent = pc.lpn_inp_export_flat_lead || 'The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
 			body.appendChild(lead);
 			ul.style.margin = '0';
 			ul.style.paddingLeft = '20px';
@@ -20336,7 +20336,7 @@ var EngCalcs = EngCalcs || {};
 	function georefBlocksProjectSwitch() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!georefActive()) { return false; }
-		setNotice(pc.lpn_georef_tab_locked || 'Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
+		setNotice(pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
 	}
 	function switchToTab(id) {
@@ -28189,7 +28189,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function buildFittingSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libFittingSetsRead();
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_note || 'Each project has its own fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.'));
 		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
 		// number that looks authoritative is worse than none at all, so the source is named on the
 		// screen and not only at the code.
@@ -28355,7 +28355,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = fittingSetUsers(set.id);
 			if (inUse.length) {
 				alert((pc.lpn_library_fittings_in_use
-					|| 'This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.')
+					|| 'This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}

@@ -363,7 +363,13 @@ head('7. THE EXPORT ALERT: ONE MESSAGE PER KIND, AND SILENCE WHERE NEITHER HAPPE
 	let said = dialogText();
 	check(/2 pipes here refer to 1 pipe types/.test(said),
 		`the alert states both counts: ${JSON.stringify(said)}`);
-	check(/none of them changed/.test(said), 'and says the numbers are all in the file');
+	// **ASSERT THE STRING THE PAGE ACTUALLY USES, NEVER A COPY OF ITS WORDS.** This line pinned the
+	// literal phrase "none of them changed" and broke the day Tom reworded the key (2026-09-08),
+	// reporting a wording edit as a fittings defect. The claim under test is that the lead sentence
+	// is the one the language file states -- reading it back is the same discipline
+	// js_fallback_string_check.php enforces on the module itself.
+	check(said.indexOf(EngCalcs.pageConfig.lpn_inp_export_flat_lead) !== -1,
+		'and leads with the export-flattening sentence the language file states');
 	check(!/fittings/.test(said), 'and says nothing about fittings, which did not flatten here');
 	check(/net\.inp/.test(said), 'and names the file it wrote');
 
