@@ -8,7 +8,14 @@ $html_desc = $ec_lang['lpn_main_desc'];
 // library, and File > Save is the control that does it.
 echoHeader("EngCalcs", $html_title, "", false);
 ?>
-<h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?></h2>
+<h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?>
+<?php // THE LINK RIDES ON THE THING IT HIDES (Tom's 2026-09-08 worklist: *"Can the LPN main page
+      // titles have a link to 'Hide these titles'?"*). Inside the <h2>, so it goes away with the
+      // headings and cannot become a control pointing at nothing. It is a plain link with NO title
+      // attribute: js/Calculators.lib.js activates a tap tooltip only on a help wrapper, so a tip
+      // parked here would simply navigate on a touch (link_title_check.php). The explanation is in
+      // the Settings row it opens, which is the second half of what he asked for. ?>
+ <a id="lpn_hide_titles" class="lpn-hide-titles" href="#"><?=$ec_lang['lpn_hide_titles']?></a></h2>
 <script>
 // ROADMAP Task 289. PLACEMENT IS LOAD-BEARING: this runs AFTER the three elements it hides, so
 // getElementById can find them. It first ran before the <h2>, which parses below it, so the page
@@ -1153,6 +1160,7 @@ EngCalcs.pageConfig = {
 	lpn_area_hint_polygon_start: <?=json_encode($ec_lang['lpn_area_hint_polygon_start'])?>,
 	lpn_area_hint_polygon_go: <?=json_encode($ec_lang['lpn_area_hint_polygon_go'])?>,
 	lpn_area_hint_shift: <?=json_encode($ec_lang['lpn_area_hint_shift'])?>,
+	lpn_area_hint_show: <?=json_encode($ec_lang['lpn_area_hint_show'])?>,
 	lpn_area_hint_touch_start: <?=json_encode($ec_lang['lpn_area_hint_touch_start'])?>,
 	lpn_area_hint_touch_go: <?=json_encode($ec_lang['lpn_area_hint_touch_go'])?>,
 	lpn_multi_title: <?=json_encode($ec_lang['lpn_multi_title'])?>,
@@ -1881,6 +1889,7 @@ EngCalcs.pageConfig = {
 	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,
 	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
 	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,
+	lpn_georef_tab_locked: <?=json_encode($ec_lang['lpn_georef_tab_locked'])?>,
 	lpn_goto_menu: <?=json_encode($ec_lang['lpn_goto_menu'])?>,
 	lpn_goto_tip: <?=json_encode($ec_lang['lpn_goto_tip'])?>,
 	lpn_goto_prompt: <?=json_encode($ec_lang['lpn_goto_prompt'])?>,
@@ -2248,6 +2257,8 @@ EngCalcs.pageConfig = {
 	lpn_settings_page_note: <?=json_encode($ec_lang['lpn_settings_page_note'])?>,
 	lpn_settings_show_titles: <?=json_encode($ec_lang['lpn_settings_show_titles'])?>,
 	lpn_settings_show_titles_tip: <?=json_encode($ec_lang['lpn_settings_show_titles_tip'])?>,
+	lpn_settings_area_hint: <?=json_encode($ec_lang['lpn_settings_area_hint'])?>,
+	lpn_settings_area_hint_tip: <?=json_encode($ec_lang['lpn_settings_area_hint_tip'])?>,
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
 	lpn_settings_tolerance_tip: <?=json_encode($ec_lang['lpn_settings_tolerance_tip'])?>,
 	lpn_settings_engine_native: <?=json_encode($ec_lang['lpn_settings_engine_native'])?>,

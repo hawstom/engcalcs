@@ -123,6 +123,11 @@ const EC_LPN_FURNITURE = [
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
     'lpn_show_titles' => 'whether the page titles above the map are shown -- a reading preference '
                        . 'on this screen, and the four small-screen items of Task 486 turn it off',
+    // The selection bubble's own "Show this" checkbox (Tom, 2026-09-08). Same side of the line as
+    // lpn_show_titles above and for the same reason: whether one reader still wants an instruction
+    // they have read a hundred times is a fact about that reader, and carried in the file it would
+    // take the instruction away from a colleague who has never used the tool.
+    'lpn_areahint'    => 'whether the area-selection help bubble is shown',
 ];
 
 if (defined('LPN_FURNITURE_LIB_ONLY')) {

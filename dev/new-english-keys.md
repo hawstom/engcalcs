@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read**, of 79 untranslated keys, of 1767 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**61 still to read**, of 84 untranslated keys, of 1772 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (79, 56 to read @@ NEEDS RULING)
+## lpn_  (84, 61 to read @@ NEEDS RULING)
 
 - **`lpn_area_hint_lasso_go`**
   > Move to draw the outline, then click to close it.
@@ -41,6 +41,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_area_hint_shift`**
   > Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.
+  @@ NEEDS RULING
+- **`lpn_area_hint_show`**
+  > Show this
   @@ NEEDS RULING
 - **`lpn_area_hint_touch_go`**
   > Drag around what you want, then lift to finish.
@@ -150,12 +153,18 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_fittings_none`**
   > No fittings list selected
   @@ NEEDS RULING
+- **`lpn_georef_tab_locked`**
+  > Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.
+  @@ NEEDS RULING
 - **`lpn_help_not_epanet`**
   > Not EPANET
   _Ruled OK 2026-09-07._
 - **`lpn_help_screenshots`**
   > Screenshot gallery
   _Ruled OK 2026-09-07._
+- **`lpn_hide_titles`**
+  > Hide these titles
+  @@ NEEDS RULING
 - **`lpn_inp_export_flat_fittings`**
   > The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.
   @@ NEEDS RULING
@@ -249,6 +258,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pipetype_none`**
   > No pipe type selected
   _Ruled OK 2026-09-07._
+- **`lpn_settings_area_hint`**
+  > Show the selection help
+  @@ NEEDS RULING
+- **`lpn_settings_area_hint_tip`**
+  > Shows the bubble over the map that says what your next click will do while you are selecting an area.
+  @@ NEEDS RULING
 - **`lpn_tool_area_lasso`**
   > Select a lasso
   @@ NEEDS RULING

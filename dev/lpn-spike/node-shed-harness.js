@@ -100,6 +100,8 @@ const L = loadLoopedNetwork(
 	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tnodeEls: function () { return nodeEls; },\n" +
 	"\t\tshedRungs: function () { return lastNodeShedRungs; },\n" +
+	"\t\tmaxRungs: nodeShedMaxRungs,\n" +
+	"\t\trankedNodeFields: function () { return Object.keys(labelSettings.priority.node); },\n" +
 	"\t\tshedOrder: nodeShedOrder,\n" +
 	"\t\tfs: effectiveFontSize, scale: function () { return state.s; }"
 );
@@ -464,10 +466,20 @@ function measurePass() {
 			`(drag frame ${r.m.dragMs.toFixed(1)} ms, ${r.n} nodes)`);
 	});
 	const worst = rows.reduce(function (a, r) { return r.m.placements > a ? r.m.placements : a; }, 0);
-	// One ordinary placement plus at most LPN_NODE_SHED_MAX_RUNGS rungs. The cap is what bounds this,
-	// and the bound is the cap: a node label carries at most four ranked values.
-	report(worst <= 5, 'a layout pass runs at most one placement plus four shed rungs',
+	// One ordinary placement plus at most nodeShedMaxRungs() rungs. The cap is what bounds this, and
+	// the bound is DERIVED from the ranked column rather than typed here -- a second literal 4 in a
+	// harness is how the first one survived two new fields being added to that column.
+	report(worst <= 1 + L.maxRungs(),
+		'a layout pass runs at most one placement plus ' + L.maxRungs() + ' shed rungs',
 		'worst ' + worst + ' placements on Net3-World');
+	// **THE CAP MUST REACH THE BOTTOM OF THE COLUMN, which is the defect Tom reported on
+	// 2026-09-08**: a node label sheds down to its ID plus ONE ranked value, so a reader with every
+	// ranked field switched on needs one rung fewer than there are ranked fields. A typed 4 against
+	// six fields stopped the cascade two values early and the labels it was shedding for stayed
+	// hidden, with nothing on screen saying why.
+	report(L.maxRungs() >= L.rankedNodeFields().length - 1,
+		'the rung cap reaches the last ranked value, however many the column holds',
+		L.rankedNodeFields().length + ' ranked fields, cap ' + L.maxRungs());
 	const layouts = rows.reduce(function (a, r) { return Math.max(a, r.m.layouts); }, 0);
 	// A rung is ONE forced layout, not one per label, because every write is done before any read.
 	// 97 nodes and 4 rungs would be ~400 if the batching were undone.

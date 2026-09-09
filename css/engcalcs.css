@@ -596,6 +596,38 @@ html[lang="zh"] .ec-welcome {
    condition here (.lpn-node-pending). Hidden until refreshScenarioMarks() adds .lpn-override,
    which is why every link can carry one at no visual cost. */
 .lpn-link-halo { stroke: none; pointer-events: none; }
+/* ---- THE GRAB BAND, AND IT IS NOT PART OF THE DRAWING (Tom's 2026-09-08 worklist) ----
+   A pipe ships two pixels wide and an SVG hit test is exactly the drawn stroke, so before this the
+   only way to reach a pipe with a mouse was to land on those two pixels. This is a wider,
+   completely invisible stroke UNDER the pipe carrying the same data-link, so nothing about the map
+   looks different and every existing dataset.link branch reads it as the pipe.
+
+   `pointer-events: visibleStroke` and NOT `stroke`, which is the difference between the two that
+   matters here: the bare values ignore `visibility` altogether, and an element that can be grabbed
+   while it cannot be seen is exactly the defect dev/lpn-spike/hidden-label-grab-harness.js exists
+   for. The `visible` prefix gates the hit on being visible; the `Stroke` half is what keeps the
+   band a LINE rather than the closed polygon a bent pipe's own points would enclose. `stroke:
+   none` would make the element unhittable by any value; `transparent` is a colour with no alpha,
+   which is what is wanted. --lpn-hit is published by refreshSymbolSizes() as LPN_LINK_HIT_PX screen pixels
+   converted to world units at the current zoom, so the band is the same size on the screen at
+   every scale. Round caps and joins so a bend has no notch in its band. */
+.lpn-link-hit {
+	fill: none; stroke: transparent; stroke-width: var(--lpn-hit, 12);
+	stroke-linecap: round; stroke-linejoin: round;
+	pointer-events: visibleStroke; cursor: pointer;
+}
+/* A pump or valve is a symbol drawn at the midpoint of a link that is often only a unit or two
+   long -- on Net3 it had to be zoomed into before it could be edited at all. This is a transparent
+   square over the symbol's own box, in the LINKS layer so a node still wins over it. `visible`
+   rather than `all` for the reason above: `all` would hit a square nobody can see. */
+.lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: pointer; }
+/* THE TAB STRIP WHILE A MODEL IS BEING PLACED (Tom's 2026-09-08 worklist). Switching projects mid-wizard
+   damaged both documents, so switchToTab(), closeTab() and newProject() refuse and say why. This is
+   the half that stops the reach: faded, and the cursor says the press will not do what it looks
+   like. Deliberately NOT `pointer-events: none` -- the press has to land, or the sentence that
+   explains the refusal is never said, and a control that silently does nothing teaches nothing. */
+.lpn-tabs-locked { opacity: .55; }
+.lpn-tabs-locked .lpn-tab, .lpn-tabs-locked .lpn-tab-btn { cursor: not-allowed; }
 /* ---- Scale-dependent visibility of GENERATED ANNOTATION (Task 331, 2026-08-14) ----
    Set by applyLabelVisibility() when the visible map is wider than settings.labelMaxWidth.
 
@@ -716,6 +748,18 @@ html[lang="zh"] .ec-welcome {
 }
 .lpn-area-hint > div { pointer-events: none; }
 .lpn-area-hint-note { font-weight: bold; margin-bottom: 2px; }
+/* The bubble's own "Show this" checkbox (Tom's 2026-09-08 worklist). A <label> rather than a <div>, so the
+   rule above does not make it inert -- the checkbox is the one thing in this panel that must take
+   a press, and the panel's own drag still works everywhere else. */
+.lpn-area-hint-show {
+	display: flex; align-items: center; gap: 4px;
+	margin-top: 5px; opacity: .8; cursor: pointer;
+}
+/* "Hide these titles" -- the link that rides on the page description it hides (Tom's 2026-09-08 worklist).
+   Sized well down from the <h2> it lives inside: it is an aside ON the heading, not a second
+   heading. It needs no print rule of its own, because the headings it sits in are already
+   d-print-none. */
+.lpn-hide-titles { font-size: .6em; font-weight: normal; white-space: nowrap; }
 /* A collapsible heading per type in the multi-properties box. Open by default and the reader
    closes what they are not using, never the other way round. */
 .lpn-multi-section { margin: 0 0 .5em; }
@@ -2214,6 +2258,18 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* **A TRANSIENT MARK ON THE ROW A LINK JUST SENT YOU TO** (Tom's 2026-09-08 worklist). Tom asked for the
+   Show page titles label "temporarily highlighted" when Hide these titles opens the box at it.
+   TRANSIENT is the whole rule: the class is taken off on a timer or on the first press inside the
+   box (clearPageTitlesFlash()), because a sticky mark on a settings row is state nobody asked for,
+   still shining next week at somebody who never used the link. A background tint and an outline
+   rather than a colour on the words: the row's name is already drawn at .8 opacity to match a unit
+   select, and recolouring it would make it read as a different KIND of row. */
+.lpn-set-row-flash {
+	background: #fff3cd;
+	outline: 2px solid #e8a33d;
+	border-radius: 3px;
+}
 /* **AND IT REDUCES GRACEFULLY** (Tom, 2026-08-19: "the width does not reduce gracefully"). Below
    the width that holds a name beside a full control column, the row stacks -- name, then control
    under it. A CONTAINER query, not a media query: what decides this is how far the user dragged

@@ -50,6 +50,18 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn e ? { x1: +e.getAttribute('x1'), y1: +e.getAttribute('y1'),\n" +
 	"\t\t\t\tx2: +e.getAttribute('x2'), y2: +e.getAttribute('y2') } : null; },\n" +
 	"\t\thasEls: function (id) { return !!labelEls[id]; },\n" +
+	// The three doors Tom's 2026-09-08 worklist had to answer for: what a press hands to selectFromHit(), what the
+	// property popup renders, and what the Tables pane lists.
+	"\t\ttextEl: function (id) { return labelEls[id] && labelEls[id].text; },\n" +
+	"\t\tselectFromHit: selectFromHit, selectedRef: selectedRef,\n" +
+	"\t\topenLabelPopup: openLabelPopup,\n" +
+	"\t\tpopupNow: function () { return currentPopup; },\n" +
+	"\t\tpopupFieldCount: function () { var f = document.getElementById('lpn_popup_fields');\n" +
+	"\t\t\treturn f ? f.children.length : -1; },\n" +
+	"\t\tnearLabelAtWorld: function (wx, wy, tolPx) { var p = worldToScreen(wx, wy),\n" +
+	"\t\t\thit = nearestLabelNearScreen(p.x, p.y, tolPx); return hit ? hit.id : null; },\n" +
+	"\t\ttextTableRows: function () { var spec = paneTableById('text');\n" +
+	"\t\t\treturn spec ? paneTableElements(spec).map(function (x) { return x.id; }) : null; },\n" +
 	"\t\tmoveNode: function (id, x, y) { var n = nodeById(id); n.x = x; n.y = y; updateNode(id); },\n" +
 	"\t\tinsertVertex: insertVertex,\n" +
 	"\t\tmoveVertex: function (linkId, i, x, y) {\n" +
@@ -320,6 +332,73 @@ console.log('\n--- 10. the `.inp` export reports the attachment rather than faki
 		JSON.stringify(out.differences));
 	const nodeRow = rows.find(r => /J1\s*$/.test(r));
 	ok('a NODE-anchored Text still names its node, unchanged', !!nodeRow, nodeRow);
+}
+
+// ================================================================================================
+// 11. IT CAN BE REACHED AND EDITED, THROUGH ALL THREE DOORS (Tom's 2026-09-08 worklist)
+// ================================================================================================
+//
+// Tom, 2026-09-08, of a Text that carried `anchorLink: "153"` on the Net3-World example: its
+// properties were NOT editable. That Text has since been deleted from the file, but a defect in
+// one object is a defect in the kind, so this section exists whether or not the object does.
+//
+// **WHAT IT ACTUALLY GUARDS IS A WRITE SEAM.** An anchored Text's `x`/`y` are an OFFSET from its
+// attachment point, not a position, so any path that reads `lb.x`/`lb.y` where it means "where the
+// words are" locates the note near the map ORIGIN -- which on a lat/lon drawing is the Gulf of
+// Guinea, and reads on screen as an object that simply cannot be clicked. textLabelPoint() is the
+// one seam that resolves it, and the three paths below are the three that would show it.
+//
+// **AND THE HONEST LIMIT, SAID OUT LOUD:** the DOM stub's elementsFromPoint() is a fixture, so
+// nothing here can answer what the browser's own hit test does on a geographic drawing. What it
+// does answer is that the page's own selection, popup and table paths all resolve a link-anchored
+// Text exactly as they resolve a free one. Driven headless on 2026-09-08, all three reached it.
+console.log('\n--- 11. selection, the property popup and the Tables pane all reach it ---');
+{
+	L.reset();
+	L.addNode('junction', 0, 0);
+	L.addNode('junction', 200, 0);
+	const link = L.getDoc().links.length ? L.getDoc().links[0].id : L.addLink('pipe', 'J1', 'J2').id;
+	L.buildDom();
+	// A MULTI-LINE Text, because that is what the reported object was ("2026-08-26" over "Break"):
+	// the glyphs then live in <tspan> children and a press lands on the tspan, which carries none
+	// of its parent's data-lbl. resolveLabelHit() is what puts that right, and a note with one line
+	// would never exercise it.
+	const lb = L.addText(100, -20, null, { link: link, t: 0.5 });
+	lb._text = '2026-08-26\nBreak';
+	L.buildDom();
+	ok('the note is attached to the pipe and drawn away from the origin',
+		lb.anchorLink === link && at(L.point(lb.id), 100, -20), show(L.point(lb.id)));
+
+	// DOOR 1: what a press hands to selectFromHit(). The element carries data-lbl and resolves to
+	// the Text, not to the pipe it is hanging off.
+	const el = L.textEl(lb.id);
+	ok('its element carries its own data-lbl', !!el && el.dataset.lbl === lb.id, el && el.dataset.lbl);
+	L.selectFromHit(el);
+	const sel = L.selectedRef();
+	ok('...and selecting from that element selects the Text',
+		!!sel && sel.kind === 'label' && sel.id === lb.id, JSON.stringify(sel));
+
+	// DOOR 2: the property popup. It renders at the label's RENDERED point, so a popup that opened
+	// at all is a popup that resolved the offset.
+	L.openLabelPopup(lb.id, 10, 10);
+	const now = L.popupNow();
+	ok('the property popup opens on it', !!now && now.kind === 'label' && now.id === lb.id,
+		JSON.stringify(now));
+	ok('...with its fields actually rendered, not an empty box', L.popupFieldCount() > 0,
+		L.popupFieldCount() + ' fields');
+
+	// DOOR 3: the Tables pane's Text table, which is where a note that cannot be clicked on the map
+	// has to be reachable from.
+	const rows = L.textTableRows();
+	ok('the Tables pane lists it', !!rows && rows.indexOf(lb.id) >= 0, JSON.stringify(rows));
+
+	// AND THE FINDER. nearestLabelNearScreen() measures to textLabelPoint(), never to lb.x/lb.y --
+	// this is the assertion that fails if that seam is ever bypassed.
+	ok('a press at the WORDS finds it', L.nearLabelAtWorld(100, -20, 14) === lb.id,
+		String(L.nearLabelAtWorld(100, -20, 14)));
+	ok('...and a press at the raw offset, near the map origin, finds nothing',
+		L.nearLabelAtWorld(lb.x, lb.y, 14) === null,
+		'offset ' + lb.x + ', ' + lb.y);
 }
 
 console.log('\n' + (fails ? fails + ' FAILURE(S)' : 'all checks passed'));

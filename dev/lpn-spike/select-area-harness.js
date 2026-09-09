@@ -89,6 +89,14 @@ const L = loadLoopedNetwork(
 	"\t\tsetLastPointer: function (t) { areaLastPointer = t; },\n" +
 	"\t\ttoggleList: toggleSelectionList,\n" +
 	"\t\thintBox: function () { return document.getElementById('lpn_area_hint'); }, wireAreaHint: wireAreaHint,\n" +
+	// The bubble's own "Show this" checkbox and the furniture key behind it (Tom's 2026-09-08 worklist).
+	"\t\thintShown: areaHintShown, setHintShown: setAreaHintShown,\n" +
+	"\t\thintShowBox: function () { var b = document.getElementById('lpn_area_hint');\n" +
+	"\t\t\tvar l = b && b.children.filter(function (c) { return c._tag === 'label'; })[0];\n" +
+	"\t\t\treturn l ? l.children.filter(function (c) { return c._tag === 'input'; })[0] : null; },\n" +
+	"\t\thintVisible: function () { var b = document.getElementById('lpn_area_hint');\n" +
+	"\t\t\treturn !!b && b.style.display !== 'none'; },\n" +
+	"\t\tserialize: serializeProject,\n" +
 	// The tables pane, which the multi-properties box takes its rows from.
 	"\t\tpaneTables: paneTables, paneTableById: paneTableById, renderPaneTable: renderPaneTable,\n" +
 	"\t\tpaneCellText: paneCellText, paneWriteCellText: paneWriteCellText,\n" +
@@ -686,6 +694,70 @@ console.log('\n--- the seams ---');
 	['select-window', 'select-lasso', 'select-polygon'].forEach((k) => {
 		report(icons.indexOf("'" + k + "'") >= 0, 'the ' + k + ' icon exists');
 	});
+}
+
+// ================================================================================================
+// THE BUBBLE CAN BE DISMISSED, AND IT IS FURNITURE (Tom's 2026-09-08 worklist)
+// ================================================================================================
+//
+// Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this'
+// checkbox."*
+//
+// **AND IT BELONGS TO THE BROWSER, NOT TO THE PROJECT.** Whether one reader still wants an
+// instruction they have read a hundred times is a fact about that reader; carried in the file it
+// would reach a colleague who has never used the tool and take the instruction away from them.
+// That is the rule CLAUDE.md states for every lpn_ setting, and a leak is invisible to whoever
+// writes it -- on their own machine the box behaves exactly as they left it.
+console.log('\n--- the bubble is dismissable, and the choice is the browser\'s ---');
+{
+	L.setMode('select');
+	L.setAreaShape('window');
+	report(L.hintVisible(), 'the bubble is showing while the tool is on');
+	const box = L.hintShowBox();
+	report(!!box && box.type === 'checkbox', 'it carries a checkbox of its own');
+	report(!!box && box.checked === true,
+		'...ticked, because it is the state the reader is looking at');
+	const words = L.hintText();
+	report(/Show this/.test(words), '...labelled in Tom\'s own words', words);
+
+	// UNCHECKING IT TAKES THE WHOLE BUBBLE, count line included. The count also goes to the notice
+	// box over the map, so nothing a reader asked for is lost -- what goes is the instruction.
+	box.checked = false;
+	(box._listeners.change || []).forEach((f) => f({}));
+	report(!L.hintShown(), 'unchecking it records the choice');
+	report(!L.hintVisible(), '...and the bubble goes at once, not on the next gesture');
+	L.setAreaShape('polygon');
+	report(!L.hintVisible(), '...and stays gone when the tool is picked up again');
+
+	// THE WAY BACK. A checkbox that hides the box it lives in cannot undo itself, so the switch has
+	// a second home in Settings, Map and page, Page -- the section whose note already says these
+	// are the browser's settings and not the project's.
+	const src = require('fs').readFileSync(
+		require('path').join(__dirname, '..', '..', 'js', 'looped-network.js'), 'utf8');
+	report(/pc\.lpn_settings_area_hint \|\| 'Show the selection help'/.test(src),
+		'Settings carries a row that turns it back on');
+	report(/row\(pageBody, pc\.lpn_settings_area_hint/.test(src),
+		'...under the Page sub-heading, beside the other setting this browser owns and this file does not');
+
+	L.setHintShown(true);
+	L.setAreaShape('window');
+	report(L.hintShown() && L.hintVisible(), 'and turning it back on brings the bubble back');
+
+	// **FURNITURE: serializeProject() MUST NEVER LEARN ABOUT IT.** Asserted on the real output of
+	// the real serializer with the setting at its NON-default value, because a key written only
+	// when it differs from the default is exactly the leak a default-valued check cannot see.
+	L.setHintShown(false);
+	const saved = JSON.stringify(L.serialize());
+	report(saved.indexOf('lpn_areahint') < 0 && saved.indexOf('areaHint') < 0,
+		'the saved project says nothing about it -- it is the browser\'s, not the document\'s',
+		saved.length + ' bytes of project JSON');
+	const KEY = /var AREA_HINT_KEY = '([a-z_]+)'/.exec(src);
+	report(!!KEY, 'the key has a name of its own', KEY && KEY[1]);
+	// Every storage access on this page sits inside a try: in a browser set to block site data the
+	// PROPERTY ACCESS itself throws, and this one is read while the toolbar is being used.
+	report(/function areaHintShown\(\)\s*\{\s*try \{/.test(src), '...read inside a try');
+	report(/function setAreaHintShown\([\s\S]{0,120}try \{/.test(src), '...and written inside one');
+	L.setHintShown(true);
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

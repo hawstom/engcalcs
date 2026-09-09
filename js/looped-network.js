@@ -1911,11 +1911,23 @@ var EngCalcs = EngCalcs || {};
 	//
 	// COST: one extra first-fit placement per rung, plus one write and one measurement for each
 	// label that sheds -- batched, every write then every read, so a rung costs one forced layout and
-	// not one per label. The cap is what bounds the worst case: a node label carries at most four
-	// ranked values, so four rungs is the deepest any single label can go, and a fifth could only be
-	// a different label starting its own cascade. Measured on Net3-World and on a 480-pipe grid in
-	// dev/lpn-spike/node-shed-harness.js.
-	var LPN_NODE_SHED_MAX_RUNGS = 4;
+	// not one per label. The cap is what bounds the worst case: the deepest any single label can go
+	// is one rung short of the number of RANKED values it can carry, and anything past that could
+	// only be a different label starting its own cascade. Measured on Net3-World and on a 480-pipe
+	// grid in dev/lpn-spike/node-shed-harness.js.
+	//
+	// **DERIVED, NEVER TYPED, AND THAT IS THE WHOLE FIX HERE** (Tom, 2026-09-08: node labels do not
+	// drop all the way down the way link labels do). It was a literal 4, correct on the day it was
+	// written against `{demand, pressure, elev, head}`. `demandActual` and `quality` were added to
+	// the same column afterwards and nobody came back to this number, so a reader who switched all
+	// six on got four rungs where six values need five -- the cascade stopped with two values still
+	// on the label, and the labels it was shedding for stayed hidden. **The link cascade has no cap
+	// at all** (`gone < order.length - 1`), which is exactly the asymmetry: a link label always
+	// reaches its last value and a node label did not. Nothing else about the two orders differs --
+	// both drop the value numbered 1 first.
+	function nodeShedMaxRungs() {
+		return Math.max(1, Object.keys(labelSettings.priority.node).length - 1);
+	}
 	// Back to full content, for the labels that are not already there. Cheap in the ordinary case:
 	// on a drawing where nothing shed last pass this is one scan and no DOM work at all.
 	function unshedNodeLabels(fsNow) {
@@ -1983,7 +1995,8 @@ var EngCalcs = EngCalcs || {};
 		var byId = {}, nodeOf = {}, rungs = 0;
 		nodeLabels.forEach(function (l) { byId[l.id] = l; });
 		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
-		while (rungs < LPN_NODE_SHED_MAX_RUNGS) {
+		var maxRungs = nodeShedMaxRungs();
+		while (rungs < maxRungs) {
 			var liveObs = { boxes: [], segments: [] }, dropped = [], recs = [], seen = {},
 				local = { boxes: [], segments: [] }, reach = 0, index;
 			placed.forEach(function (r) {
@@ -3798,6 +3811,26 @@ var EngCalcs = EngCalcs || {};
 	// second one on top of it, which is the real fix for "a pipe drawn near a junction but not
 	// snapped to it", the dominant map-editor user error.
 	var POINTER_REACH_PX = 14;
+	// **A PIPE IS TWO PIXELS WIDE AND THAT IS THE WHOLE OF WHY IT IS HARD TO CLICK** (ROADMAP Task
+	// 615; Tom, 2026-09-08: pipes and pumps are too hard to click on a PC without their label).
+	// `settings.linkWidth` ships at 2, so before this the only thing a mouse could land on was two
+	// pixels of stroke -- and the browser's hit test is exactly the drawn stroke, with no tolerance
+	// of any kind. Every finder on this page has a slop number; the pipe had none, because it was
+	// never found by a finder at all.
+	//
+	// **THE FIX IS ON THE GEOMETRY, NOT ON THE LABEL**, which is Tom's own framing and matters: a
+	// label is an ANSWER to "what is this pipe", and making the answer the only way to reach the
+	// question is what he was reporting. So every link carries an invisible hit stroke of its own
+	// (`.lpn-link-hit`), and a pump or valve carries a hit rect over its drawn symbol.
+	//
+	// **TOTAL WIDTH, so the slop is HALF of it on each side of the centreline.** 12 gives 6 px of
+	// pointer slop, deliberately less than POINTER_REACH_PX above: near a junction the node must
+	// stay the easier target, and a node's own disc is drawn over the links layer, so the band only
+	// ever wins where a press was NOT on the dot. It is not one of the reach numbers and must not be
+	// folded into them -- those answer "how near may a hand land", this one is the width of a mark
+	// on the drawing. A press inside the band still falls through to a PAN if it is a drag
+	// (wirePointerEvents() arms no drag for a link), so widening it costs no panning anywhere.
+	var LPN_LINK_HIT_PX = 12;
 	// The reach this gesture deserves. `pointerType` is the only honest source -- a device with
 	// both a mouse and a screen answers per press, where a media query answers once for the
 	// machine. A PEN is a pointer: it is precise, and it is what a surveyor marking up a map on a
@@ -4435,6 +4468,10 @@ var EngCalcs = EngCalcs || {};
 		var k = symbolFactor(), op = settings.symbolOpacity;
 		svg.style.setProperty('--lpn-sym', k);
 		svg.style.setProperty('--lpn-lw', linkStrokeWidth());
+		// The invisible grab band, in world units at this zoom -- a CONSTANT number of screen
+		// pixels, like every other tolerance on this page, so zooming out never makes a pipe
+		// harder to hit than it was and zooming in never turns the band into a wall.
+		svg.style.setProperty('--lpn-hit', LPN_LINK_HIT_PX / (state.s || 1));
 		// ONE SCREEN PIXEL, in world units. A leader is a rule pointing at something, not a symbol,
 		// so it must NOT scale off the symbol size: at the shipped 7px symbol that worked out at
 		// 0.49px, which the browser renders as a grey smudge, and at Symbol size 2 it was 0.14px.
@@ -5330,6 +5367,15 @@ var EngCalcs = EngCalcs || {};
 		var halo = el('polyline', {
 			points: linkPoints(l), fill: 'none', 'class': 'lpn-link-halo'
 		}, linksLayer);
+		// THE GRAB BAND (Tom's 2026-09-08 worklist) -- see LPN_LINK_HIT_PX. Its own element rather than a wider
+		// stroke on the pipe, because the pipe's stroke is the DRAWING: widening that is a visual
+		// change to every map, and the whole point here is that nothing looks different. In the
+		// LINKS layer, so a node's own circle still paints over it and still wins a press on the
+		// dot. It carries `data-link`, so every existing `t.dataset.link` branch reads it as the
+		// pipe with no second vocabulary anywhere.
+		var hit = el('polyline', {
+			points: linkPoints(l), fill: 'none', 'class': 'lpn-link-hit', 'data-link': l.id
+		}, linksLayer);
 		// A closed link is DASHED (Task 146.07). Without a visual, a closed pipe is identical to an
 		// open one on the map while carrying no water, which turns a one-click state into an
 		// invisible cause of a network that will not solve. Read through effective(), so a future
@@ -5369,8 +5415,23 @@ var EngCalcs = EngCalcs || {};
 		// rotate/flip rule). symbolG is the pivot, drawn in nodesLayer so a pump reads on top of every
 		// pipe it crosses; symbolSvg inside it is non-interactive, so clicking or dragging a pump
 		// still goes through `line`. A VALVE takes the identical path (Task 248 phase 2).
-		var symbolG = null, symbolSvg = null;
+		// **A PUMP'S CLICKABLE AREA IS ITS DRAWN EXTENT, NOT ITS LINK'S** (Tom's 2026-09-08 worklist). A pump link on
+		// Net3 is a few units long, so the band above is a few units long too and the thing a
+		// reader is actually aiming at -- the volute drawn at the midpoint -- was not hit-testable
+		// at all (`.lpn-link-symbol` is pointer-events: none, deliberately, so a press goes to the
+		// link). That is Tom's second report in the same breath: a pump on Net3 needs zooming in
+		// before it can be edited, and zooming in is what made the two-unit link long enough to
+		// hit. A square over the symbol's own box fixes both, at every zoom.
+		//
+		// **IN THE LINKS LAYER, NOT INSIDE symbolG**, which is the part that is easy to get wrong:
+		// symbolG lives in the nodes layer so a pump reads on top of every pipe it crosses, and a
+		// hit rect there would paint over the pump's own end nodes and steal their presses. Here it
+		// is under every node, exactly as the link band is.
+		var symbolG = null, symbolSvg = null, symbolHit = null;
 		if (l.type === 'pump' || l.type === 'valve') {
+			symbolHit = el('rect', {
+				'class': 'lpn-link-symbol-hit', 'data-link': l.id, x: 0, y: 0, width: 0, height: 0
+			}, linksLayer);
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
 			// **ONE DRAWING FOR MENU AND MAP AGAIN** (Tom, 2026-09-03, correcting his own earlier
 			// steer: *"I steered you wrong about the volute. Its snout length is only about 0.6-0.7
@@ -5394,11 +5455,16 @@ var EngCalcs = EngCalcs || {};
 					// hole in the pump.
 					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z' }, 'lpn-link-symbol-backdrop');
 				}
-			} else { symbolG.remove(); symbolG = null; }
+			} else {
+				// No drawing, so nothing to grab: the square goes with the symbol it traces.
+				symbolG.remove(); symbolG = null;
+				symbolHit.remove(); symbolHit = null;
+			}
 		}
 		linkEls[l.id] = {
-			line: line, halo: halo, handles: handles, arrows: arrows, text: text, tw: 8, leader: leader,
-			nudge: { x: 0, y: 0 }, lineCount: 1, symbolG: symbolG, symbolSvg: symbolSvg
+			line: line, halo: halo, hit: hit, handles: handles, arrows: arrows, text: text, tw: 8,
+			leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1,
+			symbolG: symbolG, symbolSvg: symbolSvg, symbolHit: symbolHit
 		};
 		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
 		layoutLinkLabel(l.id);
@@ -5419,6 +5485,18 @@ var EngCalcs = EngCalcs || {};
 		var size = pumpSymbolSize(l.type), half = size / 2;
 		le.symbolSvg.setAttribute('x', -half); le.symbolSvg.setAttribute('y', -half);
 		le.symbolSvg.setAttribute('width', size); le.symbolSvg.setAttribute('height', size);
+		// The grab square is the symbol's own box, so it grows and shrinks with the drawing and
+		// there is no second opinion anywhere about how big a pump is.
+		// **SPLIT EXACTLY AS symbolG/symbolSvg IS SPLIT: SIZE HERE, PLACE THERE.** A zoom or a
+		// symbol-size change runs resizePumpSymbol() and NOT positionPumpSymbol() -- the transform
+		// is a translate to the midpoint and does not depend on how big the symbol is -- so a
+		// square that took its corner from `mid - size/2` was stale from the first wheel notch,
+		// sitting off the pump by half the size difference. The corner is local to the translate.
+		if (le.symbolHit) {
+			le.symbolHit.setAttribute('x', -half); le.symbolHit.setAttribute('y', -half);
+			le.symbolHit.setAttribute('width', size);
+			le.symbolHit.setAttribute('height', size);
+		}
 	}
 	// The pump-orientation rule, verified over all 25 angles at 15-degree steps: rotate to point the
 	// discharge at the `to` node, and flip vertically first whenever the pipe runs west (dx < 0), or
@@ -5435,6 +5513,12 @@ var EngCalcs = EngCalcs || {};
 			flip = (b.x - a.x) < 0;
 		le.symbolG.setAttribute('transform',
 			'translate(' + mx + ',' + my + ') rotate(' + angle + ')' + (flip ? ' scale(1,-1)' : ''));
+		// The grab square rides the same midpoint and is AXIS-ALIGNED: the symbol's box is square,
+		// so rotating it would change nothing a reader can aim at and would put a second copy of
+		// the rotate/flip rule in the file. Its own corner is set by resizePumpSymbol().
+		if (le.symbolHit) {
+			le.symbolHit.setAttribute('transform', 'translate(' + mx + ',' + my + ')');
+		}
 	}
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
 	// straight run, so a bent pipe's arrows follow each segment's own direction.
@@ -5902,6 +5986,7 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id];
 		le.line.setAttribute('points', linkPoints(l));
 		if (le.halo) { le.halo.setAttribute('points', linkPoints(l)); }
+		if (le.hit) { le.hit.setAttribute('points', linkPoints(l)); }
 		layoutLinkLabel(id);
 		// **A TEXT ATTACHED TO THIS LINK FOLLOWS HERE, AND ONLY HERE** (Task 502). This is the one
 		// pass every reshaping goes through -- a node dragged (updateNode replays its incident
@@ -6096,6 +6181,8 @@ var EngCalcs = EngCalcs || {};
 		if (!le) { return; }
 		le.line.remove();
 		if (le.halo) { le.halo.remove(); }
+		if (le.hit) { le.hit.remove(); }
+		if (le.symbolHit) { le.symbolHit.remove(); }
 		le.handles.forEach(function (h) { h.remove(); });
 		le.arrows.forEach(function (a) { a.remove(); });
 		le.text.remove();
@@ -7788,6 +7875,13 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = georefBarEl('lpn_georef_bar');
 		if (!bar) { return; }
 		bar.style.display = georef ? 'block' : 'none';
+		// **AND THE TAB STRIP SAYS IT IS LOCKED** (Tom's 2026-09-08 worklist). The refusal is a sentence in the
+		// notice box, which is the part that teaches; this is the part that stops a reader reaching
+		// for the tab in the first place. A class on the strip, so nothing is created, destroyed or
+		// re-rendered to enter or leave the state -- and the tabs stay CLICKABLE, because a control
+		// that is greyed out and inert cannot explain itself.
+		var strip = document.getElementById('lpn_tabs');
+		if (strip && strip.classList) { strip.classList.toggle('lpn-tabs-locked', !!georef); }
 		if (!georef) { return; }
 		var detached = georefDetached();
 		// **THE STEP IS NAMED AND THE MODE IS NAMED.** Four keys here are English literals until the
@@ -7888,8 +7982,16 @@ var EngCalcs = EngCalcs || {};
 	// `38.106 -122.569`, `38,106 -122,569`, `38.106, -122.569` and `38,106, -122,569` all yield
 	// exactly two and all read correctly -- the last being what a decimal-comma locale makes of the
 	// tip's own example. `1,234.5 -122.5` yields THREE and is refused, which is the right answer for
-	// a thousands separator: no latitude has one. The example strings separate with a SPACE anyway,
-	// because it is unambiguous in every locale and needs no explaining.
+	// a thousands separator: no latitude has one.
+	//
+	// **A COMMA ALREADY SEPARATES THEM, AND THE THREE STRINGS NOW SAY SO** (Tom, 2026-09-08, asking
+	// for `lat,lon`). The rule above accepts `38,-122`, `38, -122`, `38.106,-122.569` and
+	// `38.106, -122.569` unchanged; what it refuses is the ONE shape a comma cannot settle,
+	// `38,122`, where two bare integers joined by a bare comma are indistinguishable from the single
+	// decimal number 38.122 in half of this suite's languages. Refusing that one is deliberate and is
+	// not a gap to close later: reading it as a pair is the silent-wrong-map failure this whole
+	// function exists to prevent, and a space or a decimal point tells us which was meant. The
+	// examples in the strings carry a decimal point for exactly that reason.
 	function parseLatLon(text) {
 		var nums = String(text || '').match(/[-+]?\d+(?:[.,]\d+)?/g);
 		if (!nums || nums.length !== 2) { return null; }
@@ -7903,11 +8005,11 @@ var EngCalcs = EngCalcs || {};
 	function goToLatLon() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!isGeoProject()) { return; }
-		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order', '');
+		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
 		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38 -122, with a space between them.');
+			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38.106, -122.569 or 38.106 -122.569.');
 			return;
 		}
 		goToPoint(ll);
@@ -8217,12 +8319,13 @@ var EngCalcs = EngCalcs || {};
 		// georefAskSize() carries its unit -- it names WHICH point is being answered for, which is
 		// what makes a mis-snapped pick visible before it is committed.
 		var typed = window.prompt(
-			(pc.lpn_goto_prompt || 'Latitude and longitude, in that order') + ' (' + node.id + ')', '');
+			(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space') +
+				' (' + node.id + ')', '');
 		if (typed === null) { georefTwoPointStop(); return; }
 		var ll = parseLatLon(typed);
 		if (!ll) {
 			// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
-			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38 -122, with a space between them.');
+			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38.106, -122.569 or 38.106 -122.569.');
 			return;
 		}
 		pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
@@ -8925,6 +9028,11 @@ var EngCalcs = EngCalcs || {};
 			started = areaDrawing(), key, text, was, r, at, m, note, line;
 		if (!box) { return; }
 		if (mode !== 'select-area') { box.style.display = 'none'; box.textContent = ''; return; }
+		// **DISMISSED MEANS GONE, INCLUDING THE COUNT LINE** (Tom's 2026-09-08 worklist). The count also goes to
+		// setNotice() over the map, so nothing a reader asked for is lost by switching this off --
+		// what goes is the instruction, which is the thing somebody who has used the tool a hundred
+		// times is switching off.
+		if (!areaHintShown()) { box.style.display = 'none'; box.textContent = ''; return; }
 		// A finger's window or lasso is press-drag-lift, so its sentences differ; the polygon
 		// taps either way. `areaLastPointer` is the last press the map saw, which is the best
 		// guess available before this gesture's own press arrives.
@@ -8943,6 +9051,19 @@ var EngCalcs = EngCalcs || {};
 		line.textContent = text + ' ' + (pc.lpn_area_hint_shift ||
 			'Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.');
 		box.appendChild(line);
+		// **THE 'Show this' CHECKBOX, AND ITS LABEL IS TOM'S OWN WORDING** (Tom's 2026-09-08 worklist).
+		// Checked, always: it is the state you are looking at, and the only act it offers is
+		// turning the bubble off. The way back is Settings, Map and page, Page -- named in the row
+		// there rather than in a sentence here, because a bubble explaining how to bring itself
+		// back is a bubble nobody can dismiss quietly.
+		var showLbl = document.createElement('label'), showBox = document.createElement('input');
+		showLbl.className = 'lpn-area-hint-show';
+		showBox.type = 'checkbox';
+		showBox.checked = true;
+		showBox.addEventListener('change', function () { setAreaHintShown(showBox.checked); });
+		showLbl.appendChild(showBox);
+		showLbl.appendChild(document.createTextNode(' ' + (pc.lpn_area_hint_show || 'Show this')));
+		box.appendChild(showLbl);
 		was = box.style.display;
 		box.style.display = '';
 		if (box.__lpnRaise) { box.__lpnRaise(); }
@@ -11325,7 +11446,9 @@ var EngCalcs = EngCalcs || {};
 				top = Math.max(chromeFloor(), findUserPos.top);
 				capPanelToRoomBelow(popup, top);
 				r = popup.getBoundingClientRect();
-				at = clampPanel(findUserPos.left, top, r.width, r.height,
+				// restoreBounds(), not clampPanel() (Tom's 2026-09-08 worklist): a corner the user dragged to keeps
+				// its overhang; the chrome floor and the 28 px sliver are all that is enforced.
+				at = restoreBounds(findUserPos.left, top, r.width, r.height,
 					window.innerWidth, window.innerHeight, chromeFloor());
 				popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 			} else if (anchorEl && anchorEl.getBoundingClientRect) {
@@ -17282,6 +17405,9 @@ var EngCalcs = EngCalcs || {};
 	// defaults: "New" clears the network, not your preferences, now that preferences live per
 	// project. The workflow it protects is set 8-inch/150/K=2 defaults, then draw.
 	function newProject(coords) {
+		// Making a project opens it, which is a project switch with an extra step -- and the
+		// wizard's state belongs to the document it started on. Same refusal, same reason.
+		if (georefBlocksProjectSwitch()) { return; }
 		saveToStorage();
 		flushOutgoingFile();
 		var inheritedSettings = JSON.parse(JSON.stringify(settings));
@@ -20181,8 +20307,30 @@ var EngCalcs = EngCalcs || {};
 		// the model (see refreshAllFromDocument()).
 		if (strip.getBoundingClientRect().height !== stripHeightBefore) { applyMapHeight(); }
 	}
+	// **THE STRIP IS LOCKED WHILE A MODEL IS BEING PLACED** (Tom's 2026-09-08 worklist:
+	// switching project tabs mid xy-to-lat/lon wizard is fatal to BOTH projects).
+	//
+	// The wizard holds live state about ONE document -- the untransformed source coordinates of
+	// every node, the backdrop's three original numbers, the undo snapshot taken before anything
+	// moved -- in a module-level `georef` that openProject() knows nothing about. Switch tabs and
+	// the new project is drawn under the old project's placement frame: the incoming drawing is
+	// transformed by a matrix derived from coordinates it never had, and finishing or cancelling
+	// then writes the source coordinates of the OUTGOING one over it. Two documents, one damaged
+	// each way.
+	//
+	// **THE CHEAP CORRECT FIX IS TO REFUSE, AND TO SAY SO.** Teaching the wizard to be per-project
+	// is a state-machine rewrite for a case with two named exits already on screen; a control that
+	// silently does nothing teaches nothing, so the refusal names the two commands that end it.
+	// One door -- every tab, the ≡ list and the close prompt all come through switchToTab().
+	function georefBlocksProjectSwitch() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!georefActive()) { return false; }
+		setNotice(pc.lpn_georef_tab_locked || 'Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
+		return true;
+	}
 	function switchToTab(id) {
 		if (id === library.openId) { return; }
+		if (georefBlocksProjectSwitch()) { return; }
 		openProject(id);
 		renderTabs();
 	}
@@ -21424,6 +21572,9 @@ var EngCalcs = EngCalcs || {};
 	function closeTab(id) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
 		if (!entry) { return; }
+		// Closing a tab is a project switch by another name -- it discards a document and opens
+		// whatever is left -- so it takes the same refusal. See georefBlocksProjectSwitch().
+		if (georefBlocksProjectSwitch()) { return; }
 		// THE ASTERISK DECIDES, alone. Do NOT add back a `!isFileProject(entry) && projectIsEmpty(id)`
 		// clause: it closes an empty browser project silently DESPITE its asterisk, so the mark says
 		// one thing and the behaviour does another. With baselines the asterisk is right.
@@ -21812,6 +21963,7 @@ var EngCalcs = EngCalcs || {};
 		wireSettingsBox();
 		wireLibraryBox();
 		wireAreaHint();
+		wireHideTitlesLink();
 		wireFireFlowBox();
 		wireEnergyBox();
 		wireScenarioCompareBox();
@@ -24774,6 +24926,69 @@ var EngCalcs = EngCalcs || {};
 		// changing -- the same class of event as a window resize, which has always called it.
 		applyMapHeight();
 	}
+	// ---- "Hide these titles", the link that rides on the headings (Tom's 2026-09-08 worklist) -------------
+	//
+	// Tom, 2026-09-08: *"Can the LPN main page titles have a link to 'Hide these titles'? And maybe
+	// that link opens up settings to the Map and page heading with the Show page titles label
+	// temporarily highlighted and the box newly unchecked?"* Built exactly as he described it, and
+	// the second half is the part that matters: the link is a one-way switch, so on its own it
+	// would teach a reader that the headings can go and nothing at all about getting them back.
+	// Throwing the switch AND opening the box at the row that holds it makes one gesture do both.
+	//
+	// **THE HIGHLIGHT IS TRANSIENT AND MUST STAY THAT WAY.** A sticky mark on a settings row is a
+	// second piece of state nobody asked for, still shining next week at somebody who never used
+	// this link. It goes on a timer, and any press inside the box takes it off early -- the reader
+	// has found the row, which is the whole job.
+	var pageTitlesRowEl = null;
+	var LPN_ROW_FLASH_MS = 4000;
+	var pageTitlesFlashTimer = null;
+	function clearPageTitlesFlash() {
+		if (pageTitlesFlashTimer) { clearTimeout(pageTitlesFlashTimer); pageTitlesFlashTimer = null; }
+		if (pageTitlesRowEl && pageTitlesRowEl.classList) {
+			pageTitlesRowEl.classList.remove('lpn-set-row-flash');
+		}
+	}
+	function flashPageTitlesRow() {
+		if (!pageTitlesRowEl || !pageTitlesRowEl.classList) { return; }
+		clearPageTitlesFlash();
+		pageTitlesRowEl.classList.add('lpn-set-row-flash');
+		pageTitlesFlashTimer = setTimeout(clearPageTitlesFlash, LPN_ROW_FLASH_MS);
+	}
+	function hideTitlesAndShowTheSwitch() {
+		setPageTitlesShown(false);
+		// AFTER the switch, because openSettingsBox() rebuilds the box and the checkbox is drawn
+		// from pageTitlesShown(): opened first, it would show ticked and then be wrong.
+		openSettingsBox('page');
+		flashPageTitlesRow();
+	}
+	function wireHideTitlesLink() {
+		var a = document.getElementById('lpn_hide_titles'), box;
+		if (a) {
+			a.addEventListener('click', function (e) { e.preventDefault(); hideTitlesAndShowTheSwitch(); });
+		}
+		box = setboxEl();
+		if (box) { box.addEventListener('pointerdown', clearPageTitlesFlash); }
+	}
+	// ---- Whether the selection bubble is shown at all (Tom's 2026-09-08 worklist) -------------------------
+	//
+	// Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this'
+	// checkbox."* FURNITURE, not project data, on the rule this page already runs on: whether one
+	// reader wants an instruction they have read a hundred times is a fact about that reader, and a
+	// colleague opening the file must not inherit it. So it is a localStorage sibling key and
+	// serializeProject() must never learn about it (lpn_furniture_check.php derives the list from
+	// the direct setItem() writes below, which is why this one is written here and not through
+	// writeJSON()).
+	//
+	// **SHOWN IS THE DEFAULT AND A BLOCKED STORAGE IS SHOWN**, which is the safe direction for a
+	// help bubble exactly as it is for the page titles above.
+	var AREA_HINT_KEY = 'lpn_areahint';
+	function areaHintShown() {
+		try { return localStorage.getItem(AREA_HINT_KEY) !== '0'; } catch (e) { return true; }
+	}
+	function setAreaHintShown(show) {
+		try { localStorage.setItem(AREA_HINT_KEY, show ? '1' : '0'); } catch (e) {}
+		updateAreaHint();
+	}
 
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
 	// rows below did not move between categories by being re-parented at run time -- each one is
@@ -24804,6 +25019,8 @@ var EngCalcs = EngCalcs || {};
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
 		// controls up down the panel; a flex row gives the words the slack, the control a right-hand
 		// column, and a long name two lines instead of a wider box.
+		// RETURNS THE LINE, so a caller that has to point at one row later can hold it rather than
+		// guess at lastChild. Every other caller ignores the value.
 		function row(target, labelText, input, tip, href) {
 			var line = document.createElement('label'), text = document.createElement('span');
 			line.className = 'lpn-set-row';
@@ -24811,6 +25028,7 @@ var EngCalcs = EngCalcs || {};
 			line.appendChild(text);
 			line.appendChild(input);
 			target.appendChild(line);
+			return line;
 		}
 		function note(target, text) {
 			var p = document.createElement('div');
@@ -25238,7 +25456,22 @@ var EngCalcs = EngCalcs || {};
 		titlesInput.type = 'checkbox';
 		titlesInput.checked = pageTitlesShown();
 		titlesInput.addEventListener('change', function () { setPageTitlesShown(titlesInput.checked); });
-		row(pageBody, pc.lpn_settings_show_titles || 'Show page titles', titlesInput, pc.lpn_settings_show_titles_tip);
+		// **HELD, because the Hide these titles link has to point AT this row** (Tom's 2026-09-08 worklist). The box
+		// is rebuilt on every open, so the element the link flashes has to be the one this build
+		// just made; a reference captured any earlier is stale by the time the box is on screen.
+		pageTitlesRowEl = row(pageBody, pc.lpn_settings_show_titles || 'Show page titles',
+			titlesInput, pc.lpn_settings_show_titles_tip);
+		// **THE WAY BACK FOR THE SELECTION BUBBLE** (Tom's 2026-09-08 worklist, which asked for a
+		// 'Show this' checkbox on the bubble itself). A checkbox that hides the box it lives in
+		// cannot undo itself, so the switch needs a second home that is still there afterwards --
+		// and this is the section whose note already says these settings are the browser's and not
+		// the project's, which is exactly what this one is.
+		var areaHintInput = document.createElement('input');
+		areaHintInput.type = 'checkbox';
+		areaHintInput.checked = areaHintShown();
+		areaHintInput.addEventListener('change', function () { setAreaHintShown(areaHintInput.checked); });
+		row(pageBody, pc.lpn_settings_area_hint || 'Show the selection help', areaHintInput,
+			pc.lpn_settings_area_hint_tip);
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
@@ -25661,7 +25894,10 @@ var EngCalcs = EngCalcs || {};
 		calc: 'lpn_set_sec_calc',
 		settings: 'lpn_set_sec_map',
 		units: 'lpn_set_sub_units',
-		time: 'lpn_set_sub_time'
+		time: 'lpn_set_sub_time',
+		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
+		// so the switch it just threw is the first thing on screen.
+		page: 'lpn_set_sub_page'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//
@@ -26066,10 +26302,15 @@ var EngCalcs = EngCalcs || {};
 			// remembered off-screen is a box that never comes back.
 			r = box.getBoundingClientRect();
 			home = setboxHomeCorner(r.width, r.height);
-			at = clampPanel(
-				setboxLayout.left === null ? home.left : setboxLayout.left,
-				setboxLayout.top === null ? home.top : setboxLayout.top,
-				r.width, r.height, window.innerWidth, window.innerHeight, floor);
+			// **A REMEMBERED CORNER IS RESTORED, A FIRST-TIME ONE IS PLACED** (Tom's 2026-09-08 worklist). The home
+			// corner has never been on screen, so it goes through clampPanel() and lands fully
+			// inside the window; a corner the user chose goes through restoreBounds() and keeps
+			// whatever overhang they left, down to the sliver that makes it grabbable again.
+			at = (setboxLayout.left === null || setboxLayout.top === null)
+				? clampPanel(home.left, home.top, r.width, r.height,
+					window.innerWidth, window.innerHeight, floor)
+				: restoreBounds(setboxLayout.left, setboxLayout.top, r.width, r.height,
+					window.innerWidth, window.innerHeight, floor);
 			box.style.left = at.left + 'px';
 			box.style.top = at.top + 'px';
 		});
@@ -26518,11 +26759,13 @@ var EngCalcs = EngCalcs || {};
 			box.style.top = top + 'px';
 			return;
 		}
-		// Clamped BEFORE it is capped: a corner remembered off the bottom of this window would
+		// Bounded BEFORE it is capped: a corner remembered off the bottom of this window would
 		// otherwise be capped to the zero room beneath it, and a zero-height box clamps anywhere.
-		at = clampPanel(layout.left, Math.max(floor, layout.top), r.width, r.height, window.innerWidth, window.innerHeight, floor);
+		// **restoreBounds(), NOT clampPanel()** (Tom's 2026-09-08 worklist): this is a corner the user chose, so the
+		// overhang they left is theirs and only the chrome floor and the 28 px sliver are enforced.
+		at = restoreBounds(layout.left, layout.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
 		h = capPanelToRoomBelow(box, at.top);
-		at = clampPanel(at.left, at.top, r.width, h, window.innerWidth, window.innerHeight, floor);
+		at = restoreBounds(at.left, at.top, r.width, h, window.innerWidth, window.innerHeight, floor);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 	}
@@ -28928,7 +29171,7 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	function openLibraryBox() {
-		var box = libBoxEl(), r, at, home, floor;
+		var box = libBoxEl(), r, at, floor;
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
@@ -28948,14 +29191,19 @@ var EngCalcs = EngCalcs || {};
 			r = box.getBoundingClientRect();
 			// **A REMEMBERED CORNER, ELSE THE ONE THE USER ALREADY KNOWS.** A null is not zero: it
 			// is "this has never been chosen", which keeps the home corner a FIRST-TIME rule rather
-			// than one that fights somebody who has moved the box. Either way the result goes
-			// through clampPanel(), so a corner left on a 32-inch monitor cannot open off the edge
-			// of a laptop -- and on a phone there is no corner to open at, because the box fills
-			// the window and this callback never runs.
-			home = (libboxLayout.left === null || libboxLayout.top === null)
-				? setboxHomeCorner(r.width, r.height)
-				: { left: libboxLayout.left, top: libboxLayout.top };
-			at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
+			// than one that fights somebody who has moved the box. Either way a corner left on a
+			// 32-inch monitor cannot open unreachable on a laptop -- clampPanel() for the home
+			// corner keeps the box wholly on screen, restoreBounds() for a remembered one keeps at
+			// least the 28 px sliver of its drag band. On a phone there is no corner to open at,
+			// because the box fills the window and this callback never runs.
+			// A first-time corner is PLACED (clampPanel: fully on screen); a remembered one is
+			// RESTORED (restoreBounds: the overhang is the user's) -- Tom's 2026-09-08 worklist.
+			at = (libboxLayout.left === null || libboxLayout.top === null)
+				? clampPanel(setboxHomeCorner(r.width, r.height).left,
+					setboxHomeCorner(r.width, r.height).top,
+					r.width, r.height, window.innerWidth, window.innerHeight, floor)
+				: restoreBounds(libboxLayout.left, libboxLayout.top,
+					r.width, r.height, window.innerWidth, window.innerHeight, floor);
 			box.style.left = at.left + 'px';
 			box.style.top = at.top + 'px';
 		});
@@ -29759,6 +30007,40 @@ var EngCalcs = EngCalcs || {};
 		return {
 			left: Math.max(LPN_DRAG_SLIVER - w, Math.min(left, vw - LPN_DRAG_SLIVER)),
 			top: Math.max(0, Math.min(top, vh - LPN_DRAG_SLIVER))
+		};
+	}
+	// **AND RESTORING A REMEMBERED CORNER KEEPS THE OVERHANG THE USER LEFT** (Tom's 2026-09-08 worklist;
+	// Tom, 2026-09-08: *"Report boxes, Settings, and reload: They all preserve except that they jump
+	// down, up, left, or right to fit inside the map. Overhangs are not preserved."*).
+	//
+	// This is the THIRD of the three rules and it sits between the other two. clampPanel() puts a
+	// box fully on screen and is still right for a box being placed somewhere it has never been --
+	// a first open, a popup opening beside an element, a panel under an anchor. dragBounds() is the
+	// live gesture and gives up almost everything, including the chrome floor, because a drag is
+	// happening in front of the user and nothing is being remembered yet. A RESTORE is neither: the
+	// position is one the user chose deliberately, on purpose, and moving it is the defect -- but it
+	// is being applied to a window that may not be the window it was chosen in.
+	//
+	// **THE MINIMUM THAT IS NOT GIVEN UP IS LPN_DRAG_SLIVER = 28 px OF THE BOX ON SCREEN**, stated
+	// here because it is the whole safety argument: the top 40 px of every one of these boxes is its
+	// drag band and it spans the full width, so 28 px surviving on any edge is 28 px of the band the
+	// box can be picked up by and dragged back. Below that a box parked off a 32-inch monitor and
+	// reopened on a laptop would be unreachable, with nothing on screen to say a box exists at all.
+	//
+	// **THE ONE FLOOR THAT DOES NOT MOVE IS THE TOP ONE.** `topMin` is the bottom of the chrome, and
+	// a restored box may not land under the menu bar, the toolbar or the tab strip: those paint
+	// above every panel, so a box beneath them is not merely untidy, it is unclickable -- which is
+	// Task 606's rule and it is unchanged. Tom's *"jumps downward"* in that report was this floor
+	// working and he accepted it; what he is reporting now is the other three edges.
+	//
+	// Pure, and evaluated in isolation by dev/lpn-spike/panel-cap-relax-harness.js, for the reason
+	// clampPanel() and dragBounds() both are: this is arithmetic that decides whether a box the user
+	// placed comes back where they placed it, or somewhere else.
+	function restoreBounds(left, top, w, h, vw, vh, topMin) {
+		var floor = (typeof topMin === 'number' && topMin > POPUP_EDGE) ? topMin : POPUP_EDGE;
+		return {
+			left: Math.max(LPN_DRAG_SLIVER - w, Math.min(left, vw - LPN_DRAG_SLIVER)),
+			top: Math.max(floor, Math.min(top, vh - LPN_DRAG_SLIVER))
 		};
 	}
 	// The bottom of the page chrome in viewport coordinates -- measured, not typed, because the strip

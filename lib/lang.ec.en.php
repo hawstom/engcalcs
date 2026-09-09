@@ -787,6 +787,10 @@ $ec_lang['lpn_area_hint_shift']='Hold Shift while selecting to keep the current 
 // taps and its own two sentences above.
 $ec_lang['lpn_area_hint_touch_start']='Press on the map and drag around what you want, then lift.';
 $ec_lang['lpn_area_hint_touch_go']='Drag around what you want, then lift to finish.';
+// The bubble's own dismissal (Tom, 2026-09-08: *"we better make the area help bubble
+// dismissable with a 'Show this' checkbox"*). His words, unchanged. The way back is the
+// Settings row below, because a checkbox that hides the box it sits in cannot undo itself.
+$ec_lang['lpn_area_hint_show']='Show this';
 $ec_lang['lpn_multi_title']='{n} selected';
 $ec_lang['lpn_multi_varies']='Various';
 $ec_lang['lpn_multi_applied']='Set {prop} on {n}.';
@@ -1160,11 +1164,14 @@ $ec_lang['lpn_georef_backdrop_unrotated']='The background image was moved and re
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='That file has no network in it, so there is nothing to place.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
+// Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
+// so the strip refuses and says which two commands end the wizard.
+$ec_lang['lpn_georef_tab_locked']='Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.';
 $ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_goto_tip']='Pan the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, with a space between them: 38 -122';
-$ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order';
-$ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38 -122, with a space between them.';
+$ec_lang['lpn_goto_tip']='Pan the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, separated by a comma or a space: 38.106, -122.569 or 38.106 -122.569';
+$ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order, separated by a comma or a space';
+$ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38.106, -122.569 or 38.106 -122.569.';
 $ec_lang['lpn_georef_goto']='Go to…';
 $ec_lang['lpn_georef_twopt']='Use two known points';
 // Edited by TGH 2026-09-07
@@ -2076,7 +2083,7 @@ $ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped 
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='The order in which properties are dropped when two node labels would overlap, starting with the lowest. When only one property is left and the labels still overlap, one of the labels is hidden: the lower demand, the pressure nearer the middle of the range, or the elevation or head more similar to neighbouring nodes.';
+$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first, and the ID is never dropped. When only the ID and one value are left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';
@@ -2151,6 +2158,13 @@ $ec_lang['lpn_tool_settings']='Settings';
 $ec_lang['lpn_settings_show_titles']='Show page titles';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_show_titles_tip']='Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map.';
+// The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
+// box at the row that holds it, so the way back is learned in the same gesture.
+$ec_lang['lpn_hide_titles']='Hide these titles';
+// The Settings row that turns the selection bubble back on. Its sibling checkbox lives in the
+// bubble and reads 'Show this'; this one has to name what it is talking about.
+$ec_lang['lpn_settings_area_hint']='Show the selection help';
+$ec_lang['lpn_settings_area_hint_tip']='Shows the bubble over the map that says what your next click will do while you are selecting an area.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a

@@ -1417,10 +1417,15 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	['openSettingsBox', 'openLibraryBox'].forEach((name) => {
 		const b = code(name);
 		const capAt = b.indexOf('capPanelToRoomBelow(');
-		// `at = clampPanel(`, not the bare name: the note above the cap explains the clamp's own
-		// arithmetic, and a plain indexOf would find the word in that sentence.
-		const clampAt = b.indexOf('at = clampPanel(');
-		ok(`...${name}() caps BEFORE it measures and places`, capAt > 0 && clampAt > capAt);
+		// **THE PLACEMENT IS A PAIR SINCE 2026-09-08**: a first-time corner is clamped fully on
+		// screen, a remembered one is restored with whatever overhang the user left it (Tom:
+		// *"Overhangs are not preserved"*). `restoreBounds(` is the half that is in BOTH openers,
+		// so it is what marks where the placement happens; `clampPanel(` alone would now find the
+		// first-time branch in one and the note above the cap in the other.
+		const placeAt = b.indexOf('restoreBounds(');
+		ok(`...${name}() caps BEFORE it measures and places`, capAt > 0 && placeAt > capAt);
+		ok(`...and a first-time corner is still clamped wholly on screen (${name})`,
+			/clampPanel\(/.test(b));
 		ok(`...and one measured floor serves both the cap and the clamp (${name})`,
 			/floor = chromeFloor\(\)/.test(b) && /capPanelToRoomBelow\(box, floor\)/.test(b) &&
 			/window\.innerHeight, floor\)/.test(b));

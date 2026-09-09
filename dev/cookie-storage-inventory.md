@@ -96,6 +96,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_cmpbox` | same | The same record for the Scenario comparison box (same ruling) |
 | `lpn_reportbox` | same | The same record for the EPANET run report box (same ruling) |
 | `lpn_show_titles` | same | Whether the page-title row is shown |
+| `lpn_areahint` | same | Whether the area-selection help bubble is shown over the map (Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this' checkbox."*). The same category as the row above it: a reading preference the visitor set deliberately, on this screen |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
 
 The first three are **exempt** — they hold the document the user made in order to give it back to

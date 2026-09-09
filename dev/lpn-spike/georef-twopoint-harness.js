@@ -51,6 +51,11 @@ const L = loadLoopedNetwork(
 	"\t\tgeorefStart: georefStart, georefAttach: georefAttach, georefDetach: georefDetach,\n" +
 	"\t\tgeorefGoTo: georefGoTo, georefFinish: georefFinish, georefCancel: georefCancel,\n" +
 	"\t\tgeorefState: function () { return georef; },\n" +
+	// Tom's 2026-09-08 worklist: what the coordinate parser accepts, and the tab strip the wizard locks.
+	"\t\tparseLatLon: parseLatLon,\n" +
+	"\t\tswitchToTab: switchToTab, tabsLocked: function () {\n" +
+	"\t\t\tvar t = document.getElementById('lpn_tabs');\n" +
+	"\t\t\treturn !!t && t.classList.contains('lpn-tabs-locked'); },\n" +
 	"\t\tgeorefWireBar: georefWireBar, georefRefreshBar: georefRefreshBar,\n" +
 	"\t\tgeorefPointerDown: georefPointerDown,\n" +
 	"\t\tviewState: function () { return state; },\n" +
@@ -291,6 +296,127 @@ console.log('\n--- and every sentence it says is a language key ---');
 	ok('the door reads its coordinate with parseLatLon() and reuses the Go to… prompt',
 		/parseLatLon\(typed\)/.test(door.slice(0, 3000)) &&
 		/pc\.lpn_goto_prompt/.test(door.slice(0, 3000)));
+}
+
+// ================================================================================================
+// GO TO ACCEPTS A COMMA (Tom's 2026-09-08 worklist)
+// ================================================================================================
+//
+// Tom, 2026-09-08, asked for `lat,lon`. The greedy-match rule already read every practical comma
+// form and only the three STRINGS said space; this pins the acceptance so a future tidy-up of that
+// regex cannot quietly narrow it, and pins the one shape that is refused ON PURPOSE.
+console.log('\n--- Go to: a comma separates them, and one shape is refused on purpose ---');
+{
+	const p = L.parseLatLon;
+	const at = (s, lat, lon) => {
+		const r = p(s);
+		return !!r && Math.abs(r.lat - lat) < 1e-9 && Math.abs(r.lon - lon) < 1e-9;
+	};
+	ok('a space alone', at('38.106 -122.569', 38.106, -122.569));
+	ok('a comma and a space -- what every map on Earth hands you', at('38.106, -122.569', 38.106, -122.569));
+	ok('a bare comma, no space', at('38.106,-122.569', 38.106, -122.569));
+	ok('a bare comma between two integers, second signed', at('38,-122', 38, -122));
+	ok('a comma and a space between two integers', at('38, 122', 38, 122));
+	ok('spaces around the comma', at('  38 , -122  ', 38, -122));
+	// THE DECIMAL COMMA, which is what half of this suite's languages write. A comma INSIDE a
+	// number binds tighter than a comma between two, so this is a European coordinate and not four.
+	ok('a decimal-comma locale\'s rendering of the same pair', at('38,106 -122,569', 38.106, -122.569));
+	ok('...and with a separating comma as well', at('38,106, -122,569', 38.106, -122.569));
+	// **THE ONE SHAPE THAT IS REFUSED, AND IT IS NOT A GAP TO CLOSE LATER.** Two bare integers
+	// joined by a bare comma are indistinguishable from the single decimal number 38.122 in a
+	// decimal-comma locale. Reading it as a pair is the silent-wrong-map failure the whole function
+	// exists to prevent; a space or a decimal point says which was meant, and the tip's own example
+	// carries a decimal point for exactly that reason.
+	ok('two bare integers on a bare comma are refused, being a decimal number in half our languages',
+		p('38,122') === null);
+	ok('a thousands separator makes three numbers and is refused', p('1,234.5 -122.5') === null);
+	ok('prose is refused', p('Petaluma, California') === null);
+	ok('a latitude past the pole is refused', p('91, 0') === null);
+	ok('a longitude past 180 is refused', p('38.106, -190') === null);
+
+	// THE THREE STRINGS NOW TEACH BOTH FORMS. A parser that accepts a comma while every sentence
+	// says space is a feature nobody can find, which is what Tom was reporting.
+	const lang = require('fs').readFileSync(
+		require('path').join(__dirname, '..', '..', 'lib', 'lang.ec.en.php'), 'utf8');
+	['lpn_goto_tip', 'lpn_goto_prompt'].forEach(function (k) {
+		const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='([^']*)'").exec(lang);
+		ok(k + ' names the comma as well as the space',
+			!!m && /comma/.test(m[1]) && /space/.test(m[1]), m && m[1]);
+	});
+	// The refusal SHOWS the two forms rather than describing them -- it is read by somebody whose
+	// last attempt failed, and an example is the shorter road back.
+	{
+		const m = new RegExp("\\$ec_lang\\['lpn_goto_bad'\\]='([^']*)'").exec(lang);
+		ok('lpn_goto_bad shows both a comma form and a space form',
+			!!m && /38\.106, -122\.569/.test(m[1]) && /38\.106 -122\.569/.test(m[1]), m && m[1]);
+	}
+	['lpn_goto_tip', 'lpn_goto_bad'].forEach(function (k) {
+		const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='([^']*)'").exec(lang);
+		ok(k + ' shows an example with a decimal point, which is what disambiguates the comma',
+			!!m && /38\.106/.test(m[1]), m && m[1]);
+	});
+}
+
+// ================================================================================================
+// THE TAB STRIP IS LOCKED WHILE THE WIZARD RUNS (Tom's 2026-09-08 worklist)
+// ================================================================================================
+//
+// Tom, 2026-09-08: switching project tabs mid xy-to-lat/lon wizard is fatal to BOTH projects.
+//
+// `georef` holds the untransformed source coordinates of every node, the backdrop's three original
+// numbers and the undo snapshot taken before anything moved -- all about ONE document, in a module
+// variable openProject() knows nothing about. Switch tabs and the incoming drawing is transformed
+// by a matrix derived from coordinates it never had; finish or cancel and the OUTGOING document's
+// source coordinates are written over it.
+console.log('\n--- the project tabs refuse to switch while a model is being placed ---');
+{
+	// **THE STRIP ITSELF, ADDED TO THE STUB HERE AND NOT IN lpn-dom-stub.js.** The real page always
+	// has #lpn_tabs; the shared stub does not, and giving it one would make renderTabs() build a
+	// strip in every harness that has never had one. This adds the element the page really has, in
+	// the one file that asks about it -- which is the opposite of a stub removing a coupling.
+	ensure('lpn_tabs');
+	if (L.georefState()) { L.georefCancel(); }
+	// The sections above finish the wizard, which makes this project geographic -- and georefStart()
+	// refuses a project that is already on lat/lon, correctly. Put the kind back so the wizard can
+	// be started again; nothing else in the document is touched.
+	L.getProject().coords = 'xy';
+	const before = notice();
+	L.georefStart();
+	ok('the wizard is running', !!L.georefState());
+	ok('...and the tab strip says so, so the reach stops before the press',
+		L.tabsLocked());
+	L.switchToTab('some-other-project');
+	ok('a tab press refuses rather than switching', !!L.georefState());
+	// **IT SAYS WHY.** A control that silently does nothing teaches nothing, and there is no way
+	// for a reader to guess that the wizard is what is holding them.
+	const said = notice();
+	ok('...and it says why, naming the two commands that end the wizard',
+		said !== before && /placement/i.test(said) && /Cancel/.test(said), said);
+
+	const src = require('fs').readFileSync(
+		require('path').join(__dirname, '..', '..', 'js', 'looped-network.js'), 'utf8');
+	// ONE DOOR, three callers. closeTab() discards a document and opens whatever is left, and
+	// newProject() opens the project it just made -- both are a project switch by another name.
+	// Comments blanked first: the note beside closeTab() names the function, and a name in a
+	// sentence is not a call site.
+	const bare = src.split('\n').filter(function (ln) { return !/^\s*\/\//.test(ln); }).join('\n');
+	const guards = (bare.match(/^\s*if \(georefBlocksProjectSwitch\(\)\)/gm) || []).length;
+	ok('the refusal is one function, called from every door that changes project', guards === 3,
+		guards + ' call sites (switchToTab, closeTab, newProject)');
+	['function switchToTab(', 'function closeTab(', 'function newProject(coords)'].forEach(function (f) {
+		const at = src.indexOf(f);
+		ok(f.replace('function ', '').replace('coords', '') + ' asks it', at >= 0 &&
+			src.slice(at, at + 700).indexOf('georefBlocksProjectSwitch()') >= 0);
+	});
+	// The tabs stay CLICKABLE: a control that is inert cannot explain itself.
+	const css = require('fs').readFileSync(
+		require('path').join(__dirname, '..', '..', 'css', 'engcalcs.css'), 'utf8');
+	const rule = /\.lpn-tabs-locked[^}]*\{([^}]*)\}/.exec(css);
+	ok('the locked strip is faded, never made inert', !!rule && !/pointer-events\s*:\s*none/.test(css.slice(css.indexOf('.lpn-tabs-locked'), css.indexOf('.lpn-tabs-locked') + 400)),
+		rule && rule[1].trim());
+
+	L.georefCancel();
+	ok('cancelling the wizard unlocks the strip', !L.tabsLocked());
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

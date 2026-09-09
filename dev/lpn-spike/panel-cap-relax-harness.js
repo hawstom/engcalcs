@@ -204,10 +204,95 @@ console.log('\n--- one seam, so no box is half-wired ---');
 		!/panel\.style\.maxHeight =/.test(body('relaxPanelCap')));
 	ok('...and releases through resetPanelHeight(), which clears the body with the panel',
 		/resetPanelHeight\(panel, body\)/.test(body('relaxPanelCap')));
-	// The opening rule is unchanged and Tom's "jumps downward" on reload is that rule working:
-	// clampPanel() floors a REOPENED box at the chrome, deliberately (Task 562's record).
-	ok('the opening clamp still floors a reopened box at the chrome',
+	// The chrome floor is unchanged and Tom's "jumps downward" on reload is that rule working
+	// (Task 562's record). Since Tom's 2026-09-08 worklist a first-time open clamps and a remembered corner
+	// restores, and BOTH are handed the same floor -- section 3 checks the restore half.
+	ok('a first-time open still clamps to the chrome floor',
 		/clampPanel\([^)]*floor\)/.test(body('openSettingsBox')));
+}
+
+// ============================================================================================
+// 3. A RESTORED BOX KEEPS THE OVERHANG THE USER LEFT (Tom's 2026-09-08 worklist)
+// ============================================================================================
+//
+// Tom, 2026-09-08: *"Report boxes, Settings, and reload: They all preserve except that they jump
+// down, up, left, or right to fit inside the map. Overhangs are not preserved."*
+//
+// There are THREE bounding rules on this page and the defect was that only two existed.
+// clampPanel() puts a box fully on screen and is right for a corner that has never been used;
+// dragBounds() gives up almost everything, including the chrome floor, because a drag is happening
+// in front of the reader. A RESTORE is neither, and was going through the first one -- so a box
+// deliberately parked hanging off an edge was hauled back in on every reload.
+//
+// **WHAT restoreBounds() DOES NOT GIVE UP, and this is the safety argument in one number:**
+// LPN_DRAG_SLIVER px of the box stay on screen on every edge. The top 40 px of these boxes is the
+// drag band and it spans the full width, so a surviving sliver is a piece of the handle. And the
+// TOP floor is the chrome's, unchanged from Task 606: a box under the menu bar is unclickable.
+//
+// Pure arithmetic, evaluated in isolation exactly as sections 1 and 2 evaluate the cap.
+console.log('\n--- a restored corner keeps its overhang, down to one grabbable sliver ---');
+{
+	const bounds = new Function(
+		'var POPUP_EDGE = ' + EDGE + ';\n' +
+		(js.match(/var LPN_DRAG_SLIVER = \d+;/) || ['var LPN_DRAG_SLIVER = 28;'])[0] + '\n' +
+		body('clampPanel') + '\n' + body('dragBounds') + '\n' + body('restoreBounds') + '\n' +
+		'return { clamp: clampPanel, drag: dragBounds, restore: restoreBounds,' +
+		'  sliver: LPN_DRAG_SLIVER };')();
+	const SLIVER = bounds.sliver;
+	ok('LPN_DRAG_SLIVER is read out of the file, never retyped here', SLIVER > 0, String(SLIVER));
+
+	const W = 400, H = 300, VW = 1200, VH = 900, FLOOR = 100;
+	// LEFT: a box parked hanging off the left edge comes back where it was.
+	ok('a left overhang survives the reload',
+		bounds.restore(-300, 300, W, H, VW, VH, FLOOR).left === -300,
+		String(bounds.restore(-300, 300, W, H, VW, VH, FLOOR).left));
+	ok('...where clampPanel() would have hauled it back on screen',
+		bounds.clamp(-300, 300, W, H, VW, VH, FLOOR).left === EDGE,
+		String(bounds.clamp(-300, 300, W, H, VW, VH, FLOOR).left));
+	// RIGHT.
+	ok('a right overhang survives too',
+		bounds.restore(1100, 300, W, H, VW, VH, FLOOR).left === 1100);
+	ok('...and clampPanel() would have moved it', bounds.clamp(1100, 300, W, H, VW, VH, FLOOR).left === VW - W - EDGE);
+	// BOTTOM -- the edge dragBounds() already lets a box hang off during the gesture.
+	ok('a bottom overhang survives, which is the edge a drag already allowed',
+		bounds.restore(100, 800, W, H, VW, VH, FLOOR).top === 800);
+	ok('...where clampPanel() pulled the box up by more than a third of its height',
+		bounds.clamp(100, 800, W, H, VW, VH, FLOOR).top === VH - H - EDGE);
+
+	// THE FLOOR THAT IS NOT GIVEN UP. Task 606's rule, unchanged: the chrome paints above every
+	// panel, so a box restored beneath it would be unclickable with nothing on screen saying why.
+	ok('the chrome floor still wins over a remembered top above it',
+		bounds.restore(100, 10, W, H, VW, VH, FLOOR).top === FLOOR,
+		String(bounds.restore(100, 10, W, H, VW, VH, FLOOR).top));
+	ok('...and dragBounds() deliberately does NOT hold that floor, which is why it is a third rule',
+		bounds.drag(100, 10, W, H, VW, VH).top === 10);
+
+	// AND THE BOX CAN ALWAYS BE GRABBED BACK. A corner remembered on a 32-inch monitor, reopened
+	// on a laptop, must leave a piece of the drag band on screen -- this is the only thing the
+	// restore refuses the user, and it is refused because the alternative is an invisible box.
+	ok('a corner remembered far off the left leaves exactly one sliver showing',
+		bounds.restore(-99999, 300, W, H, VW, VH, FLOOR).left === SLIVER - W,
+		String(bounds.restore(-99999, 300, W, H, VW, VH, FLOOR).left));
+	ok('...off the right, the same',
+		bounds.restore(99999, 300, W, H, VW, VH, FLOOR).left === VW - SLIVER);
+	ok('...off the bottom, the same',
+		bounds.restore(100, 99999, W, H, VW, VH, FLOOR).top === VH - SLIVER);
+	ok('a box wholly inside the window is not moved at all',
+		bounds.restore(310, 240, W, H, VW, VH, FLOOR).left === 310 &&
+		bounds.restore(310, 240, W, H, VW, VH, FLOOR).top === 240);
+
+	// WHICH CALLERS TAKE WHICH RULE. A first-time corner has never been on screen and is PLACED;
+	// a remembered one is RESTORED. Getting this backwards is silent: the box opens somewhere
+	// plausible either way.
+	ok('the Settings box restores a remembered corner and clamps its first-time home',
+		/restoreBounds\(setboxLayout\.left/.test(body('openSettingsBox')) &&
+		/clampPanel\(home\.left, home\.top/.test(body('openSettingsBox')));
+	ok('the report-shaped boxes restore theirs', /restoreBounds\(layout\.left/.test(body('placeBoxRemembered')));
+	ok('the Library box restores its own', /restoreBounds\(libboxLayout\.left/.test(body('openLibraryBox')));
+	ok('the Find box restores its own', /restoreBounds\(findUserPos\.left/.test(js));
+	// The opposite half: a panel being placed where it has never been still clamps.
+	ok('the property popup still CLAMPS -- it opens beside an element, not at a remembered corner',
+		/clampPanel\(sx, sy/.test(body('openPopupAt')) && !/restoreBounds/.test(body('openPopupAt')));
 }
 
 console.log('\n' + (fails ? fails + ' FAILURE(S)' : 'all checks passed'));

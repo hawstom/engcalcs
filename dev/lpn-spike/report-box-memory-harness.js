@@ -135,14 +135,35 @@ console.log('\n--- a box first opens centred, and then where it was dragged to -
 	B.restoreOpenBoxes();
 	ok('and the reload opens the box at that corner', B.el.ff().style.left === '150px' && B.el.ff().style.top === '200px',
 		B.el.ff().style.left + ',' + B.el.ff().style.top);
-	// A corner remembered on a bigger monitor, clamped by the opener itself.
+	// **A DRAGGED CORNER IS RESTORED WITH ITS OVERHANG, down to one grabbable sliver** (Tom,
+	// 2026-09-08: *"Report boxes, Settings, and reload: They all preserve except that they jump
+	// down, up, left, or right to fit inside the map. Overhangs are not preserved."*). This used to
+	// assert the box came back WHOLLY inside the window, which is what he was reporting: a box he
+	// had deliberately parked hanging off an edge was hauled back on every reload. placeBoxRemembered()
+	// now uses restoreBounds() instead of clampPanel(), and the ONE thing it will not give up is
+	// LPN_DRAG_SLIVER px of the box on screen -- enough of the full-width drag band to take hold of
+	// and pull it back. Read out of js/looped-network.js, never retyped.
+	const SLIVER = +(/var LPN_DRAG_SLIVER = (\d+);/.exec(
+		require('fs').readFileSync(require('path').join(__dirname, '..', '..', 'js', 'looped-network.js'), 'utf8')
+	) || [])[1];
+	ok('LPN_DRAG_SLIVER is read out of the page', SLIVER > 0, String(SLIVER));
 	global.localStorage.setItem(KEYS.energy, JSON.stringify({ left: 5000, top: 4000, w: null, h: null, open: true }));
 	const C = reload();
 	C.restoreOpenBoxes();
 	const e = C.el.energy();
-	ok('a corner off a 32-inch monitor is clamped back into this window',
-		C.isOpen.energy() && parseFloat(e.style.left) + 1000 <= 1200 + 1 && parseFloat(e.style.top) + 400 < 900,
+	const eL = parseFloat(e.style.left), eT = parseFloat(e.style.top);
+	ok('a corner off a 32-inch monitor still leaves a sliver of the drag band on this one',
+		C.isOpen.energy() && eL <= 1200 - SLIVER && eL + 1000 > 0 && eT <= 900 - SLIVER && eT >= 0,
 		e.style.left + ',' + e.style.top);
+	// And a corner that WAS on this screen is left exactly where it was, overhang and all: the box
+	// dragged to (150, 200) above came back at (150, 200), which is the assertion two above this.
+	global.localStorage.setItem(KEYS.cmp, JSON.stringify({ left: -300, top: 700, w: null, h: null, open: true }));
+	const D = reload();
+	D.restoreOpenBoxes();
+	const d = D.el.cmp();
+	ok('...and a deliberate overhang is kept rather than squared up',
+		parseFloat(d.style.left) === -300 && parseFloat(d.style.top) === 700,
+		d.style.left + ',' + d.style.top);
 }
 
 console.log('\n--- the resize observer stores the size, and only while the box is open ---');
