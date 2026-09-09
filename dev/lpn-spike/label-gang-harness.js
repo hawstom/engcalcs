@@ -204,14 +204,15 @@ function compare(file) {
 	// given as trial zero and must beat it strictly, so within ONE pass it cannot make a view worse
 	// -- and that is asserted directly by the fixtures.
 	//
-	// **IT IS ASSERTED OVER THE FOUR ZOOMS TOGETHER AND NOT ONE AT A TIME, and the reason is the
-	// convergence Task 436 records rather than a softened standard.** The zooms are read in
-	// sequence in one process, and shedAlignedForConflicts() seeds each pass from where the LAST
-	// layout put things: so a repair at the fit zoom changes what is shed at 2x, which changes the
-	// drawing the repair is then handed. A single view can therefore come out one pair worse while
-	// every earlier view came out better -- measured on Net3 (XY), where the gang route alone runs
-	// 15/8/5/1 to 12/9/3/1: one view up by one, the drawing down by four. Per-zoom rises are
-	// printed, because a growing list of them is the signal that something else is wrong.
+	// **IT IS ASSERTED OVER THE FOUR ZOOMS TOGETHER AND NOT ONE AT A TIME.** The zooms are read in
+	// sequence in one process, so what one view leaves on the elements is what the next one starts
+	// from; a single view coming out one pair worse while every earlier view came out better used to
+	// be a measured fact -- Net3 (XY) ran 15/8/5/1 to 12/9/3/1 under the gang route alone, one view
+	// up by one and the drawing down by four. **Since Task 539's stability work, no view rises on any
+	// example in any mode**, because the shed no longer seeds from the last layout
+	// (predictNodeLabelBoxes()). The aggregate form is kept anyway: it is the promise the repair
+	// actually makes, and per-zoom rises are still printed, because a list of them coming back is
+	// the signal that something upstream is remembering again.
 	let rose = [], worse = [];
 	MODES.slice(1).forEach(function (m) {
 		let sum = 0, base = 0;

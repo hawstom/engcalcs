@@ -179,8 +179,8 @@ function nodeDump() {
 		}).join('\n');
 }
 // `--dump <zoom>`: the placement of every label at one zoom, for diffing two code states from two
-// separate processes. shedAlignedForConflicts() converges ACROSS passes -- it seeds node labels
-// where the last layout put them -- so two runs in ONE process already disagree (Task 436).
+// separate processes -- one document per process, because a second one loaded into the same page
+// inherits the first one's measured widths and label state.
 if (process.argv[2] === '--dump') {
 	zoomTo(Number(process.argv[3]) || 12000);
 	const o = overprints();
@@ -245,9 +245,10 @@ console.log('\n--- an untouched drawing hides the same labels every time ---');
 // ---- 6. IT IS NOT A RATCHET --------------------------------------------------------------------
 // A flag that only ever goes true takes labels off the drawing permanently and nothing on screen
 // says why. **The set is compared by SIZE and by membership at one zoom, never for equality across
-// a zoom round trip:** shedAlignedForConflicts() seeds node labels where the LAST layout put them
-// and so converges across passes (Task 436), which makes an exact set the same distance either side
-// of a zoom a thing this pass never promised.
+// a zoom round trip:** a yield is decided against the labels drawn at THAT zoom, and what a link
+// label sheds changes with the scale, so an identical set the same distance either side of a zoom is
+// a thing this pass never promised. (What it DOES promise is that one view lays out the same way
+// every time; dev/lpn-spike/label-stability-harness.js is where that is held.)
 console.log('\n--- a label given up for one crowded moment comes back ---');
 {
 	zoomTo(12000);

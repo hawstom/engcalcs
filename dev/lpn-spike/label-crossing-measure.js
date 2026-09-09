@@ -25,10 +25,13 @@
 // see -- a bigger number about a drawing that does not exist. updateDataLeader() is the only place
 // the answer exists, and it writes it onto the element.
 //
-// **ONE EXAMPLE PER PROCESS, AND ONE MODE.** shedAlignedForConflicts() seeds node labels as
-// obstacles where the LAST layout placed them, so the pass converges ACROSS passes and two loads in
-// one process would contaminate each other (ROADMAP Task 436). Both callers spawn a child per
-// (example, mode) pair for that reason.
+// **ONE EXAMPLE PER PROCESS, AND ONE MODE.** A second document loaded into a page that already
+// holds one inherits its elements' measured widths and its label state, so two loads in one process
+// contaminate each other. Both callers spawn a child per (example, mode) pair for that reason.
+// (Until Task 539's stability work there was a second reason -- shedAlignedForConflicts() seeded
+// node labels where the LAST layout put them, so the pass carried state from one layout to the
+// next. It does not any more: predictNodeLabelBoxes() derives that seed from the drawing, and
+// label-stability-harness.js holds it.)
 
 'use strict';
 
@@ -37,7 +40,14 @@ const path = require('path');
 
 const EXAMPLES = path.join(__dirname, '../water-network-examples');
 
-async function measure(file, mode) {
+async function measure(file, mode, opts) {
+	opts = opts || {};
+	// **HOW MANY TIMES ONE UNTOUCHED VIEW IS RE-LAID-OUT.** One is the measurement every caller
+	// before Task 539's stability work wanted; more than one is the stability question, and the
+	// answer is a SIGNATURE per pass rather than a count -- a layout that swaps two labels keeps
+	// its count and is exactly the defect that hid behind counting (section 11 of
+	// dev/label-placement-algorithms.md).
+	const passes = Math.max(1, opts.passes || 1);
 	const stub = require('./lpn-dom-stub.js');
 	const { ROOT, loadLoopedNetwork, setUnitSet, settleEpanet, warmEpanet } = stub;
 	const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
@@ -212,14 +222,60 @@ async function measure(file, mode) {
 	doc.nodes.forEach(function (n) { cx += n.x; cy += n.y; });
 	cx /= doc.nodes.length; cy /= doc.nodes.length;
 
+	// **THE SIGNATURE IS THE LABEL SET AND WHERE EACH ONE SITS, not the count.** Two layouts with
+	// the same number of crossings are not the same drawing, and a reader watching four labels
+	// trade places sees a flicker the count cannot report.
+	//
+	// **TWELVE SIGNIFICANT FIGURES AND NOT A FIXED NUMBER OF DECIMALS.** A world unit is a foot on
+	// an XY drawing and a DEGREE on a geographic one, so rounding to a hundredth compares Net3-World
+	// to the nearest kilometer and calls every layout identical. Significant figures absorb a
+	// last-bit wobble in either.
+	function signature(pl) {
+		return pl.map(function (p) {
+			const b = p.boxes[0];
+			return p.id + '@' + b.cx.toPrecision(12) + ',' + b.cy.toPrecision(12)
+				+ (p.leader ? '+L' : '');
+		}).sort().join(' ');
+	}
+	// **HIDDEN IS COUNTED AGAINST WHAT THE DRAWING HAS TO SAY**, so the denominator is every label
+	// with text in it and the numerator is the ones no reader can see this pass. A fix that buys
+	// crossings by hiding labels shows up here and nowhere else.
+	function hiddenCount() {
+		let total = 0, hidden = 0;
+		doc.nodes.forEach(function (n) {
+			const h = nodeEls[n.id];
+			if (!h || h.empty || !h.text) { return; }
+			total++; if (!assemblyShown(h)) { hidden++; }
+		});
+		doc.links.forEach(function (l) {
+			const h = linkEls[l.id];
+			if (!h || h.empty || !h.text) { return; }
+			total++; if (!assemblyShown(h)) { hidden++; }
+		});
+		return { total: total, hidden: hidden };
+	}
+
 	const rows = [];
 	[1, 2, 4, 8].forEach(function (mult) {
 		if (!L.setView({ cx: cx, cy: cy, s: sFit * mult })) { return; }
-		repairMs = 0; repairCalls = 0; lastStats = null;
-		L.refreshLabelText();     // the page's own content-then-layout pass
-		const r = Collide.labelCrossings(placements());
+		const seen = [];
+		let first = null;
+		for (let i = 0; i < passes; i++) {
+			repairMs = 0; repairCalls = 0; lastStats = null;
+			const t0 = process.hrtime.bigint();
+			L.refreshLabelText();     // the page's own content-then-layout pass
+			const passMs = Number(process.hrtime.bigint() - t0) / 1e6;
+			const pl = placements();
+			const r = Collide.labelCrossings(pl);
+			const hc = hiddenCount();
+			seen.push({ sig: signature(pl), pairs: r.counts.pairs, drawn: pl.length,
+				hidden: hc.hidden, labels: hc.total, ms: passMs });
+			if (i === 0) { first = r; }
+		}
+		const r = first;
 		rows.push({ zoom: mult, s: sFit * mult, counts: r.counts,
 			repairMs: repairMs, repairCalls: repairCalls, repair: lastStats,
+			passes: seen,
 			pairs: r.pairs.map(function (p) { return p.join('|'); }),
 			gangs: r.gangs.map(function (g) { return g.join('+'); }) });
 	});

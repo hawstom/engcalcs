@@ -29,9 +29,9 @@
 // DOM: all of it is in ./label-crossing-measure.js, which does the measuring for this harness and
 // for label-gang-harness.js alike, so there is one measurement and not two.
 //
-// **ONE EXAMPLE PER PROCESS.** shedAlignedForConflicts() seeds node labels as obstacles where the
-// LAST layout placed them, so the pass converges ACROSS passes and two loads in one process would
-// contaminate each other (ROADMAP Task 436). The parent run spawns `--measure` once per file.
+// **ONE EXAMPLE PER PROCESS**, because a second document loaded into a page that already holds one
+// inherits its elements' measured widths and its label state. The parent run spawns `--measure`
+// once per file.
 //
 // **AND THE NUMBERS BELOW ARE NOW THE DRAWING AS IT SHIPS**, which since Task 539 phase two
 // means AFTER Collide.repairCrossingGangs() has moved the gangs it can. The before/after

@@ -673,32 +673,159 @@ var EngCalcs = EngCalcs || {};
 	// keeps its content, and a long pipe has the most room to give up later while still reading as
 	// "this pipe". It also makes the pass stable.
 	//
-	// **NODE LABELS ARE OBSTACLES HERE, AT THE POSITIONS THEY WERE ACTUALLY PLACED AT** -- the
+	// **NODE LABELS ARE OBSTACLES HERE, AT THE POSITIONS THEY ARE GOING TO BE PLACED AT** -- the
 	// conflict a reader meets most is a pipe label running the length of its own pipe colliding with
 	// the node labels at each end, not with another pipe label.
 	//
-	// **PLACED, not resting.** Seeding node labels at their RESTING offset sheds a value from 3 of 7
-	// links on the default example, including a pump's head loss (`readout-sign-harness.js` catches
-	// that by name), because it gives up numbers for collisions the placement pass is about to solve
-	// by MOVING the node label. On the very first pass that nudge is zero and this reads the resting
-	// position; it converges on the next refresh.
+	// **PLACED, not resting**, and the position comes from predictNodeLabelBoxes() rather than from
+	// the last layout (Task 539). Seeding node labels at their RESTING offset sheds a value from 3
+	// of 7 links on the default example, including a pump's head loss (`readout-sign-harness.js`
+	// catches that by name), because it gives up numbers for collisions the placement pass is about
+	// to solve by MOVING the node label. Reading the last layout instead is what oscillated: see
+	// predictNodeLabelBoxes().
+	// ONE AUTO-PLACED NODE LABEL AS A FIRST-FIT PARTICIPANT, and the geometry of it lives here
+	// rather than inside runLabelCollisionAvoidance() because TWO passes now need the same answer:
+	// that pass, which places the label for real, and predictNodeLabelBoxes() below, which tells the
+	// shed cascade where these labels are going before a single one has been placed. A second copy
+	// of this arithmetic would be a second opinion about where a label goes, and the two would drift.
+	//
+	// Its candidate ENDPOINTS are the four fixed corners TR, TL, BR, BL (Task 411), with the ones a
+	// pipe arrives through skipped by table lookup and a polar raster behind them for a node boxed
+	// in on all four. Both come from bearings in the local feature context, so they do not move when
+	// the user zooms. `sides` is the whole candidate set; there is no ring and no home.
+	//
+	// **THE CORNERS ARE THE SYMBOL'S; THE REACH BEHIND THEM HAS A FLOOR IN TEXT HEIGHTS** (Tom,
+	// 2026-09-01: *"When I set symbol size to 1 px, node label (uncrowded area) disappears."*).
+	// Every candidate here is derived from defaultLabelOffset(), which scales with the SYMBOL alone
+	// -- while the box being placed is sized by the TEXT, which does not. cardinalSides() defaults
+	// its polar reach to three times that offset, so at 1 px symbols the entire search lay within
+	// 4.7 world units of the node while the label it was placing was 11 units tall: nothing could
+	// lift the box off the node's own pipes, first-fit dropped it, and a label with room all round
+	// it vanished. Measured on three uncrowded nodes with every field on: all three dropped at 1 px,
+	// one at 2 px, none from 3 px up; with the floor, none at any size.
+	//
+	// **A FLOOR ON THE SEARCH, NOT ON THE RESTING OFFSET.** Making defaultLabelOffset() itself take
+	// max(symbolFactor, textFactor) -- the shape leaderThreshold() uses -- would move every label on
+	// every drawing at the shipped settings, 7.8 to 11.1 world units, to fix a case nobody meets
+	// there. The four corners still sit exactly where the symbol puts them and are still tried
+	// first, so nothing moves while they fit.
+	//
+	// **AND THE FLOOR IS DELIBERATELY LOW ENOUGH TO BE INACTIVE AT ORDINARY SETTINGS.** It bites
+	// only where 3 x hypot(offset) < the floor, which is symbolSize < 0.32 x textSize -- 1 to 3 px
+	// against the shipped 11 px text. A first draft floored the reach at the label's own box height
+	// instead; that fires for every multi-line label at the shipped sizes, and on Net3-World it
+	// re-placed labels far enough out that the shed cascade stopped running -- 19 labels shedding
+	// where node-shed-harness.js requires 30. Placing labels further from their nodes rather than
+	// shedding a value is a design change nobody asked for.
+	function nodeFirstFitSpec(n, ne, fs) {
+		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
+			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
+			sides = Collide.cardinalSides({ x: n.x, y: n.y }, d,
+				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
+		return { id: nodeLabelKey(n.id), anchor: { x: n.x, y: n.y }, home: nodeLabelBase(n),
+			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
+			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
+			lines: labelRowWidths(ne) };
+	}
+	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
+	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
+	// demand is. Ties break on id, so the order is total and stable -- an unstable order would
+	// rearrange the drawing for reasons nobody could see. Counted DOWN, because the ordinal is a
+	// drop order like the user's own column: the most salient label takes the highest number and is
+	// placed first (Task 445).
+	function rankNodeLabels(nodeLabels) {
+		nodeLabels.sort(function (a, b) {
+			var c = compareDropKeys(a.dropKey, b.dropKey);
+			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
+		});
+		nodeLabels.forEach(function (l, i) { l.priority = nodeLabels.length - i; delete l.dropKey; });
+		return nodeLabels;
+	}
+	// **WHERE THE NODE LABELS ARE GOING, ANSWERED FROM THE DRAWING ALONE (Task 539).**
+	//
+	// shedAlignedForConflicts() has to know which ground the node labels will stand on before it can
+	// decide how many values a pipe label gives up -- and until this existed it took that from where
+	// the LAST layout put them. That closed a loop: a node label moves, the pipe labels round it
+	// shed a different number of values, their boxes change width, the obstacles the next first-fit
+	// sees change, and the node label moves back. **Measured on Net3-World, five layouts of one
+	// untouched view alternated A B A B A with four labels trading places on every content pass, at
+	// an unchanged crossing count of 5** -- which is why counting never saw it, and why
+	// dev/lpn-spike/label-stability-harness.js asserts the layout and not the count.
+	//
+	// So the seed is a PREDICTION and not a memory: the same first-fit, over the same specs, in the
+	// same drop order, against the STATIC obstacles alone. That is a pure function of the drawing,
+	// so the whole pass is one, and a second layout of an untouched view reproduces the first byte
+	// for byte.
+	//
+	// **IT IS THE REAL PASS, RUN ON THE DRAWING'S OWN CONTENT.** The obstacles are the static ones
+	// plus the stationed pipe labels at FULL content, placed by the same placeStationedLabels(); the
+	// only thing it cannot know is how many values those labels are about to shed, which is the
+	// answer it is being asked for. Everything else -- the candidate sides, the drop order, the pad
+	// -- is what runLabelCollisionAvoidance() will do a moment later, which is why the great
+	// majority of labels land on the side it predicts.
+	//
+	// **AND A PREDICTED DROP RESERVES NOTHING.** A label the first-fit cannot place is not drawn, so
+	// reserving its ground would cost pipe labels their values for a label nobody sees -- the same
+	// ruling the old `hiddenDropped` test made, now decided inside this pass instead of remembered
+	// from the last one.
+	//
+	// The cost is one extra placeLabelsFirstFit() on a CONTENT pass and none on a drag frame: this
+	// runs where the shed runs.
+	function predictNodeLabelBoxes(fs) {
+		var specs = [], obs = staticObstacles(), stationed = [];
+		// **THE PIPE LABELS ARE IN THE PREDICTION, AT FULL CONTENT, and leaving them out costs
+		// labels.** A node label prefers a genuinely clear side and falls back on a yielding one
+		// only when it has no other (placeLabelsFirstFit()), so link boxes do steer it even though
+		// it outranks them. Predicting without them put node labels on sides the real pass then
+		// declines, the shed reserved the wrong ground, and 40 labels across the 28 measured views
+		// shed to nothing and hid -- 4 of Net1's 25 at the fit zoom. Full content is what makes this
+		// a fact about the DRAWING: how much a label sheds is the answer this whole pass is
+		// computing, so a prediction that waited for it would be the loop again.
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || le.empty || linkLabelTooShort(l, le)) { return; }
+			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) { stationed.push(l); }
+		});
+		placeStationedLabels(stationed, obs, fs);
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id];
+			// A dragged node label is the user's own placement and never enters the first-fit; it is
+			// seeded at the position the user gave it, by the caller.
+			if (!ne || ne.empty || n.lx !== undefined) { return; }
+			specs.push(nodeFirstFitSpec(n, ne, fs));
+		});
+		if (!specs.length) { return []; }
+		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), obs,
+			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
+	}
 	function shedAlignedForConflicts(fsNow, fs) {
 		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
 		// side, so testing with it calls two labels conflicting while 0.7 of a font size apart -- a
 		// reasonable margin for SLIDING a label along its pipe, and not for taking a number off the
 		// drawing. A shed is paid for in information, so it wants real overlap.
 		var obs = staticObstacles(), pad = 0;
+		// **THE NODE LABELS WHERE predictNodeLabelBoxes() SAYS THEY WILL BE DRAWN**, in the staircase
+		// the placement pass really reserves (Task 406) rather than the block round it -- claiming
+		// the empty ground to the right of a short row would cost a pipe label values nothing is
+		// standing on.
+		predictNodeLabelBoxes(fs).forEach(function (r) {
+			if (r.dropped) { return; }
+			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) {
+				b.kind = 'label';
+				obs.boxes.push(b);
+			});
+		});
+		// A DRAGGED NODE LABEL IS SEEDED WHERE THE USER PUT IT. It never enters the first-fit, so
+		// the prediction has nothing to say about it, and its own stored offset is already a fact
+		// about the document rather than about the last layout.
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
-			// **A DROPPED NODE LABEL IS NOT SEEDED, because it can no longer be dropped by a link.**
-			// `yields` means a node label takes that ground itself, so reserving it as well costs
-			// link labels values for a label that is not drawn.
-			if (!ne || ne.empty || ne.hiddenDropped) { return; }
+			if (!ne || ne.empty || n.lx === undefined) { return; }
 			// **THE SAME BOX THE PLACEMENT PASS BUILDS, hung on the same side.** A node label's text
 			// extends AWAY from its node, so one placed on the left occupies the ground left of its
 			// endpoint -- Collide.labelBoxAtEnd()'s rule. Building it always to the right tests a
 			// link label against ground nothing occupies, clearing a conflict that is really there.
-			var at = nodeLabelPos(n),
+			var at = nodeLabelBase(n),
 				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
 				b = Collide.boxFromRect({ x: at.x >= n.x ? at.x : at.x - w,
 					y: at.y - fs * 0.85, w: w, h: h });
@@ -2157,52 +2284,14 @@ var EngCalcs = EngCalcs || {};
 				lines: labelRowWidths(holder)
 			});
 		}
-		// One auto-placed node label, as a first-fit participant. Its candidate ENDPOINTS are the
-		// four fixed corners TR, TL, BR, BL (Task 411), with the ones a pipe arrives through skipped
-		// by table lookup and a polar raster behind them for a node boxed in on all four. Both come
-		// from bearings in the local feature context, so they do not move when the user zooms.
-		// `sides` is the whole candidate set; there is no ring and no home.
+		// One auto-placed node label, as a first-fit participant. The spec is nodeFirstFitSpec()'s,
+		// because predictNodeLabelBoxes() builds the same one; this is the bookkeeping round it.
 		function addNodeFirstFit(n, ne) {
-			var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
-				// **THE CORNERS ARE THE SYMBOL'S; THE REACH BEHIND THEM HAS A FLOOR IN TEXT
-				// HEIGHTS** (Tom, 2026-09-01: *"When I set symbol size to 1 px, node label
-				// (uncrowded area) disappears."*). Every candidate here is derived from
-				// defaultLabelOffset(), which scales with the SYMBOL alone -- while the box being
-				// placed is sized by the TEXT, which does not. cardinalSides() defaults its polar
-				// reach to three times that offset, so at 1 px symbols the entire search lay within
-				// 4.7 world units of the node while the label it was placing was 11 units tall:
-				// nothing could lift the box off the node's own pipes, first-fit dropped it, and a
-				// label with room all round it vanished. Measured on three uncrowded nodes with
-				// every field on: all three dropped at 1 px, one at 2 px, none from 3 px up; with
-				// the floor, none at any size.
-				//
-				// **A FLOOR ON THE SEARCH, NOT ON THE RESTING OFFSET.** Making defaultLabelOffset()
-				// itself take max(symbolFactor, textFactor) -- the shape leaderThreshold() uses --
-				// would move every label on every drawing at the shipped settings, 7.8 to 11.1 world
-				// units, to fix a case nobody meets there. The four corners still sit exactly where
-				// the symbol puts them and are still tried first, so nothing moves while they fit.
-				//
-				// **AND THE FLOOR IS DELIBERATELY LOW ENOUGH TO BE INACTIVE AT ORDINARY SETTINGS.**
-				// It bites only where 3 x hypot(offset) < the floor, which is symbolSize < 0.32 x
-				// textSize -- 1 to 3 px against the shipped 11 px text. A first draft floored the
-				// reach at the label's own box height instead; that fires for every multi-line
-				// label at the shipped sizes, and on Net3-World it re-placed labels far enough out
-				// that the shed cascade stopped running -- 19 labels shedding where
-				// node-shed-harness.js requires 30. Placing labels further from their nodes rather
-				// than shedding a value is a design change nobody asked for.
-				reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
-				sides = Collide.cardinalSides({ x: n.x, y: n.y }, d,
-					(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
 			ne.nudge = { x: 0, y: 0 };
 			ne.nudgeManual = false;
 			if (ne.empty) { return; }
 			holders[nodeLabelKey(n.id)] = ne;
-			nodeLabels.push({
-				id: nodeLabelKey(n.id), anchor: { x: n.x, y: n.y }, home: nodeLabelBase(n),
-				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
-				w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
-				lines: labelRowWidths(ne)
-			});
+			nodeLabels.push(nodeFirstFitSpec(n, ne, fs));
 		}
 		// **NODE LABELS TAKE THE FIRST-FIT NOW, NOT THE RING** (Task 398). A dragged one is the
 		// exception and keeps the ring: goal 1 gives it candidates along the ray through its own
@@ -2237,16 +2326,7 @@ var EngCalcs = EngCalcs || {};
 		// it can; when something has to go it is the link, yielding by SHEDDING values in
 		// shedAlignedForConflicts(), which has already run by the time this pass places anything.
 		placeStationedLabels(stationed, obs, fs);
-		// The lexicographic drop key becomes an ORDINAL here, so js/lpn-collide.js sees one number
-		// and never has to know what a demand is. Ties break on id, so the order is total and stable
-		// -- an unstable order would rearrange the drawing for reasons nobody could see.
-		nodeLabels.sort(function (a, b) {
-			var c = compareDropKeys(a.dropKey, b.dropKey);
-			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
-		});
-		// Counted DOWN, because the ordinal is a drop order like the user's own column: the most
-		// salient label takes the highest number and is placed first (Task 445).
-		nodeLabels.forEach(function (l, i) { l.priority = nodeLabels.length - i; delete l.dropKey; });
+		rankNodeLabels(nodeLabels);
 		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
 		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
 		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
@@ -34400,6 +34480,11 @@ var EngCalcs = EngCalcs || {};
 		// It runs HERE and not in placeStationedLabels() because of the clock: that pass runs on every
 		// frame of a drag, and shedding means rebuilding glyphs and forcing a layout, while this
 		// function runs when the CONTENT changes -- a solve, a toggle, a unit switch.
+		// **BACK TO FULL CONTENT BEFORE THE SHED READS THE NODE LABELS' WIDTHS** (Task 539).
+		// runLabelCollisionAvoidance() does this too and did it first, which put the node shed of
+		// the LAST pass inside the seed of this one -- one more memory in a pass that must be a
+		// function of the drawing. Cheap where nothing shed: one scan and no DOM work.
+		unshedNodeLabels(fsNow);
 		shedAlignedForConflicts(fsNow, effectiveFontSize());
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
