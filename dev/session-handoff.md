@@ -184,59 +184,50 @@ Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he 
   the only reason it was noticed. **Bound a scripted block replacement by LINE NUMBERS you have
   just printed, never by `index()` of the next heading you assume follows.**
 
-## 4. STATE — written 2026-09-08, fourth session, cut short by Tom's session limit
+## 4. STATE — written 2026-09-08, sixth session
 
-**Tom's 2026-09-08 message is the worklist and it is long.** It is reproduced in
-`dev/tom-2026-09-08-worklist.md`, item by item, with DONE / RUNNING / NOT STARTED against each.
-Read that file first; the rest of this section is the mechanics.
+**Tom's two 2026-09-08 messages are the worklist**, item by item in
+`dev/tom-2026-09-08-worklist.md` with DONE / RUNNING / NOT STARTED against each. Read that first.
 
-- **Both agent worktrees are merged, pushed and deleted** (checked 2026-09-08, fifth session:
-  `git worktree list` is bare, no branches remain). The lpn batch landed as `2cf99b07` and the
-  icon retry as `4fec808a`. The icons themselves still need Tom's eyes —
-  `dev/icon-preview/concepts-2026-09-08b.html` is a preview, not an approval.
+- **THE PARENT SITE hawsedc.com HAS NO CLONE AND NO ORIGIN. Production is the only copy**
+  (Tom, 2026-09-08). That is a single point of failure and it outranks the repository split he
+  asked about: get a second copy off that host, then give it an origin, then split it whenever.
+  **Its history is unvetted for secrets**, so a GitHub origin must be PRIVATE. He also cannot reach
+  it over SSH on port 22.
 - **AI commits carry `--author="Claude Code for Tom Haws <tom.haws@gmail.com>"`** (CLAUDE.md).
-- **Style guide is APA now, not Oxford.** `dev/language-strings.md` has the list.
-- **A translation sprint is authorized in Tom's words for this session** (*"Proceed with a
-  translation sprint whenever you deem it prudent"* and *"A full translation sprint is needed"*),
-  but a new session must re-confirm before spawning 26 agents: the authorization was given for
-  that conversation. 131 English keys changed and 77 are new since the last sync
-  (`detect_english_drift.php`). Sprint AFTER the second lpn batch lands, since it edits more English.
-- **Screenshot 0082.PNG is in `dev/screenshots/`** and is Tom's centerpiece (Task 612): it leads
-  `dev/screenshots/INDEX.md`, the landing page screenshots and the social card. Not done yet.
-- **`dev/positioning.md` §6 cites epanet-js as precedent for our LibreEPANET name.** Tom's
-  2026-09-08 ruling on the EPANET name (market researcher journal, second 2026-09-08 entry)
-  undercuts that precedent; ask him before editing.
-- **The lpn naming log call site is NOT in `js/looped-network.js` yet.** The logging agent's
-  report gave the one-liners: `EngCalcs.logNamingEvent('save')` after a successful save when
-  `!project.gallery`, `EngCalcs.logNamingEvent('rename')` after `renameProject()`, and
-  `project.gallery = ex.file` in `openExample()`. First job of the second lpn batch.
+- **Style guide is APA, not Oxford.** `dev/language-strings.md` has the list.
+- **THE TRANSLATION SPRINT IS AUTHORIZED IN THIS CONVERSATION AND IS GATED ON TOM'S READING, NOT
+  ON US.** `new_english_keys.php` says **61 still to read, 84 untranslated** after the second lpn
+  batch; `detect_english_drift.php` says 132 changed. Launching before he has read them is what
+  sprint 459 threw away. Read the count from the script, never from this line.
+- **Screenshot 0082.PNG is in `dev/screenshots/`** and is Tom's centerpiece (Task 612). NOT DONE.
+- **The favicon concepts are waiting on Tom's eyes, not on code**
+  (`dev/icon-preview/concepts-2026-09-08b.html` is a preview, not an approval).
+- **`dev/positioning.md` §6 cites epanet-js as precedent for our LibreEPANET name.** His 2026-09-08
+  ruling on the EPANET name undercuts that precedent; ask him before editing. The market
+  researcher re-verified the licence facts that day and the file is NOT stale: EPANET is public
+  domain, the epanetjs.com app is FSL-1.1-MIT, the toolkit we vendor is plain MIT. **New finding**:
+  the upstream repo now mixes MIT with FSL-1.1-MIT for post-fork contributions, and
+  `js/vendor/README.md`'s upgrade steps carry no licence re-check.
+- **DELETE THESE ONCE CHECKED — they were state and are now history.** The lpn naming beacon IS
+  wired (`d740aa20`, verified at `js/looped-network.js:18901` and :21386). Both agent worktrees are
+  gone. Task 266 is CLOSED on Tom's own browser pass.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-1. **Second lpn batch, one agent on the big file** (Opus is fine; Tom said so): naming-log call
-   site; pipes and pumps too hard to click on a PC without their label (hit tolerance on the
-   geometry, not the label); Esc clears selection in select mode if not already done; node
-   label drop order lowest-last like links, then reword `lpn_labels_priority_node_tip` like the
-   link tip; `lpn_goto_tip` and the Go-to parser accept `lat,lon` with a comma; verify
-   `lpn_georef_twopt_tip` no longer needs "press again to stop picking" (Tom removed it; if the
-   button does toggle, ask him to test); switching project tabs mid xy-to-lat/lon wizard is fatal
-   to both projects, so disable the switch during the wizard; rules: add two `[RULES]` to Net1's
-   example so Tom can test, and validate referenced assets when a rule is saved ("Passed: rule is
-   valid" / "Failed: Tank 26 not found"); Quality tolerance: the setting Tom flagged in
-   `dev/lpn-tip-copy-review.md` is EPANET's water-quality TOLERANCE (default 0.01), not a hydraulic
-   convergence, so relabel and retip, and delete the unread `lpn_settings_tolerance` if nothing
-   renders it; tank reaction order EXISTS in EPANET (`ORDER TANK`, toolkit `EN_TANKORDER`, not
-   in the GUI), so the tip should say so; a junction Source Quality editor (Source type, Source
-   quality, Time pattern) is missing from the junction popup though `lpn_source_*` keys exist;
-   audit `lpn_settings_emitter_exponent`, `lpn_time_menu`, `lpn_reaction_pipe_tip` (Tom cannot
-   find them in the UI) and the `lpn_inp_drop_*` family (all but `lpn_inp_drop_controls` are still
-   read by JS; delete only what nothing renders and say which).
-3. Task 611 library import from another project file; Task 599 time series; Task 592 CSV
-   junction import; Task 247 customers first slice. All on the big file, so sequential.
-4. Translation sprint (re-confirm with Tom), then `detect_english_drift.php --baseline-new`.
-5. Task 612 screenshot 0082 placement. CLAUDE.md's `web_manifest_check.php` table row still
-   describes the old `/app` ratchet, and `README.md:137` and `dev/hosting-layout.md` §3 predate
-   the canonical consolidation.
+1. **Tom's browser pass on the second lpn batch** (`c25b6410`) -- eight numbered checks were given
+   to him and none has been confirmed. The pipe/pump grab band is the one to hear about first: it
+   ships at `LPN_LINK_HIT_PX` = 12 screen px and the right width is a judgement only he can make.
+2. **Task 539 gang labels, at 100 with a deadline.** His sketch is `dev/label-placement-algorithms.md`
+   §9, verbatim; his own flag on it is that he waved his wand over finding `spot_prime` and wants to
+   be told if that part is hard. **Report back before building it.** The `utility-field-operator` was
+   asked on 2026-09-08 whether crossing leaders is even the right defect to spend the nine days on.
+3. Task 611 library import; Task 599 time series; Task 592 CSV junction import; Task 247 customers
+   first slice. **All on `js/looped-network.js`, so sequential** -- see §7.
+4. Translation sprint once he has read, then `detect_english_drift.php --baseline-new`.
+5. Task 612 screenshot placement. CLAUDE.md's `web_manifest_check.php` row still describes the old
+   `/app` ratchet, and `README.md:137` and `dev/hosting-layout.md` §3 predate the canonical
+   consolidation.
 
 ## 7. THINGS NOT TO DO
 
