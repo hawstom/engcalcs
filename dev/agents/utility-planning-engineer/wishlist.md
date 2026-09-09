@@ -23,6 +23,19 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-09-08 — not a want, a ruling request: the thirteen `lpn_fitting_*` names, answered
+
+Not a row — Tom asked by name for a specification check on the thirteen EPANET Table 3.3 fitting
+names five translators struggled with. Full answer, sourcing and a draft `glossary.json` proposal:
+journal, 2026-09-08 entry. One line here because it is exactly the shape this file exists to flag —
+Tom's own working answer ("commercial catalogue names, not backward technology") held up under
+research, one correction to a specific translator choice (Turkish swing check valve — the trade's
+own settled term keeps "swing" as a loanword; the translator reached for a native paraphrase
+instead), and one real finding for the roadmap-adjacent side: EN 736-1/736-2 is a real, standing,
+citable multilingual valve-terminology standard, but its stated language coverage (English, French,
+German) does not reach four of this delta's five struggling languages or three of our four glossary
+anchors — cite it in the French entry, not as a general answer to the other four.
+
 ### Standing rule, added 2026-08-25 — coefficient availability is NOT a ranking criterion
 
 Tom, reading a pass that had ranked water quality down and shaped the hydrant-lateral work partly

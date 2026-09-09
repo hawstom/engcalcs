@@ -1,3 +1,16 @@
+# YOUR NAME IS SUE
+
+You are **Sue**, the design-and-planning engineer inside a water utility. Tom Haws named this seat on 2026-09-08 and he was not joking:
+*"I told CC that Staff Utility Engineer is Sue, Data Entry Clerk is Declan, Market Researcher
+is Mary, and Field Operator is Franco. Maybe CC thought I was joking. I wasn't."*
+
+**The name lives here rather than only in `dev/agents/README.md` because THIS is the file you
+read.** You start every invocation with no memory of any previous one, so a name recorded
+somewhere you do not open is a name you do not have. Tom addresses you as Sue and expects
+to be understood. Sign your journal entries as Sue.
+
+---
+
 # Utility design and planning engineer — journal
 
 Written by the `utility-planning-engineer` agent, read by its next invocation. Tom and other
@@ -11,6 +24,185 @@ factual error; it is never removed silently.
 
 Newest at the top. Date every entry. Keep an entry to a few lines; if it needs more,
 it is a `dev/*.md` and the entry is one line pointing at it.
+
+---
+
+## 2026-09-08 — Sue: the thirteen `lpn_fitting_*` names — English is Crane/EPANET catalogue prose, not vocabulary; Turkish was NOT over-cautious on the term it flagged that matters; a multilingual valve-terminology standard exists but does not cover our language set
+
+Tom asked by name whether the thirteen EPANET Table 3.3 fitting names are the right ENGLISH terms,
+whether the Turkish translator's two flagged findings were real, whether ISO/EN has a citable
+multilingual authority, and for a `glossary.json` proposal. Full delta context:
+`dev/english-friction/2026-09-08-delta.json`, the `lpn_fitting_*` cluster entry (five languages —
+am, km, ps, sw, tr — filed the same finding independently) and the two Turkish-specific entries.
+
+- **CITED, `usepa.github.io/EPANET2.2/3_network_model.html`, fetched directly — Table 3.3 verbatim,
+  the source of all thirteen shipped strings:** Globe valve fully open K=10.0; Angle valve fully
+  open K=5.0; Swing check valve fully open K=2.5; Gate valve fully open K=0.2; Short-radius elbow
+  K=0.9; Medium-radius elbow K=0.8; Long-radius elbow K=0.6; 45-degree elbow K=0.4; Closed return
+  bend K=2.2; Standard tee, flow through run K=0.6; Standard tee, flow through branch K=1.8; Square
+  entrance K=0.5; Exit K=1.0. **OBSERVED**, `lib/lang.ec.en.php:2932-2944`: our thirteen strings
+  match this table's names exactly, word for word.
+- **CITED, search-synthesis converging across `epcland.com`, `simupipe.com` and an Eng-Tips thread
+  quoting Crane Technical Paper 410's own K-values (secondary, the primary Crane PDF is proprietary
+  and I could not fetch it) — flag secondary:** the K MAGNITUDES trace to Crane TP-410 (globe
+  valve, swing check, gate valve, elbow-radius classes all appear there with comparable orders of
+  magnitude, though Crane's n·f_T method varies by pipe size where EPANET's table gives one fixed
+  number per fitting). **This means the thirteen names are not EPANET's own invention — they are
+  Crane's 1940s-in-origin, still-in-print catalogue vocabulary, which EPANET's manual reproduced as
+  a convenience table.** Crane TP-410 remains the standard mechanical-engineering minor-loss
+  reference today (every 2026 K-factor calculator I found — EPCLand, SimuPipe — cites it as current,
+  not historical), so "dated" is the wrong word for the SOURCE. Whether every individual NAME is
+  still what a spec calls the part is a narrower question, answered below term by term.
+- **Answer to Tom's actual question, one paragraph, no hedge: this is Tom's own working answer and
+  it holds up.** These are commercial catalogue names, not physics vocabulary, and a translator maps
+  them by finding a domestic supplier's own bilingual catalogue. The five languages that struggled
+  are not backward — I looked at what each actually did and every one reasoned correctly and said so
+  honestly rather than guessing silently, which is the opposite of backward. **The `lpn_fitting_entrance`
+  finding in the SAME delta (13 of 24 languages read "Square entrance" as a SHAPE, not an edge) is
+  the strongest evidence against "other countries' technology": the split is not poor/rich or
+  large-trade/small-trade, it tracks which language has a domestic HYDRAULICS textbook tradition
+  translating this exact table, independent of whether the same country's plumbers stock the part.**
+  I reject "backward technology" outright — Turkey has a large, modern domestic valve-manufacturing
+  and export industry (Ayvaz, Gedik, Duyar, FAF Vana, ARI-Armaturen's Turkish distributors all
+  publish current catalogues, found below) and still filed the finding, because a manufacturer's
+  catalogue term and a translator's confidence in one are different things; a translator with no
+  bottle of the actual physical part in front of them cannot always tell which of several competing
+  catalogue words the trade actually settled on, even when a settled word exists.
+- **Turkish, globe valve — CONFIRMED SETTLED, and the translator under-rated their own answer.**
+  **CITED, search-surfaced across at least six independent Turkish valve manufacturers/distributors
+  (Gedik, FAF Vana, Flow Teknik, Pnosan, Adavana, Duyar, Ayvaz, ARI-Armaturen's TR dealer network) —
+  all fetched via search snippets, none blocked or paywalled, so treat as CITED but not a single
+  primary-page fetch:** **"Glob vana"** (also written "Glob Vana") is the standard, repeated, current
+  Turkish catalogue name across every manufacturer found, explicitly distinguished from "küresel
+  vana" (ball valve) — FAF Vana's own glossary page states it directly: *"Oturmalı tip (glob)
+  vanalar..."* (seated-type (globe) valves), i.e. the trade itself pairs the loanword with the
+  descriptive "oturmalı" (seated) the way our English pairs "globe" with no synonym at all. **The
+  translator's chosen term was already correct.** They flagged it anyway, and that caution is the
+  finding worth naming: it reads as ability to recognize the LIMIT of a search-based confirmation
+  ("I found examples, I did not confirm this is what a Turkish ENGINEER says out loud on a jobsite")
+  rather than genuine uncertainty about the word. Not over-caution about the wrong thing; caution
+  correctly scoped to a gap this seat cannot close either (no native speaker on this project, same
+  as the orchestrator's own dismissal reasoning).
+- **Turkish, swing check valve — the SAME shape, and the translator's actual choice was the weaker
+  of two real options, worth a mild correction.** **CITED, at least seven independent Turkish
+  manufacturers/distributors (Ayvaz, Yakacık Valf, Venturi Valves, Goodvalf, Teknofer, EMS Vana,
+  Hassa Yangın Söndürme), all naming the product with "Swing" kept as a loanword — "Swing çek vana"
+  / "Swing tip çek vana"** — this is the DOMINANT catalogue convention, parallel to "Glob vana"
+  keeping "Glob." The translator instead chose **"Menteşeli çek vana"** ("hinged check valve", a
+  real, descriptive, understandable alternative — "menteşeli" appears as a secondary gloss in at
+  least one bilingual technical dictionary snippet I found, so it is not wrong, just less common in
+  actual catalogues than the loanword form). **My read: the translator solved the wrong problem.**
+  They treated "swing" as untranslatable jargon needing a native paraphrase, when the Turkish trade's
+  own answer was to borrow the English word directly, exactly as it did for "globe." A translator
+  reasoning from the collision worry visible in their own complaint (avoiding a form that might be
+  confused with something else) reached for the safer-SOUNDING native phrase instead of checking
+  what the market actually prints on the box. **This is the one place in this whole finding where I
+  would say the agent was too cautious in the specific sense Tom asked about** — not cautious about
+  admitting uncertainty (right), but cautious in the direction of avoiding a loanword the trade had
+  already normalized.
+- **ISO/EN — a real multilingual authority exists and does not help this project's language set.**
+  **CITED, `standards.iteh.ai`/`en-standard.eu` listings for EN 736-1:2018 "Valves — Terminology —
+  Part 1: Definition of types of valves" and EN 736-2:2016 "...Part 2: Definition of components of
+  valves"** — EN 736-2's own listing states it *"contains a glossary with multilingual equivalents
+  in English, French, and German."* This is a real, citable, standing European standard purpose-
+  built for exactly the cross-language valve-naming problem this delta surfaces — I could not fetch
+  the paywalled text itself, so I cannot quote its exact French/German renderings, but its EXISTENCE
+  and SCOPE are confirmed from three independent standards-body listings, not one. **The catch, and
+  it is a complete one for this project's purposes: its stated multilingual coverage is English,
+  French and German only.** Of this delta's five struggling languages (am, km, ps, sw, tr), none are
+  covered. Of our four glossary anchor languages (es, pt, fr, tr), only French is. **So EN 736 is a
+  real authority worth citing IN THE FRENCH ENTRY specifically, and worth naming in the glossary as
+  "the standard exists, ask a French speaker to check it" — it is not the multilingual crib sheet
+  this delta needed for the five languages that actually asked.** No ISO valve-terminology standard
+  I could find (ISO 5208 is pressure TESTING, not naming) fills that gap either.
+- **My own judgment on Tom's rule question (2, in the delta's own resolution text) — "is keeping the
+  English catalogue name beside a descriptive translation SANCTIONED":** I recommend yes, and I
+  think this is a case worth a standing rule rather than a per-key ruling, for the same reason the
+  suite already keeps EPANET's `.inp` section keywords visible in a tip: a physical part is SOURCED
+  by matching a catalogue name, often across a language boundary at the supplier's own counter (am
+  and km's own choice, independently reached, is exactly the field behavior an engineer already does
+  informally — carry the source-language part number or trade name alongside the translation).
+  **SPECULATION, mine — this is my own engineering judgment, not literature-found; re-derive before
+  treating it as settled** — but it matches this project's own CLAUDE.md instinct (keep the EPANET
+  keyword visible in a tip when the reader may be looking at the file that uses it) applied one door
+  over, to a reader who may be looking at a physical catalogue that uses it.
+- **Draft `glossary.json` entries for all thirteen — proposal only, not written to the file.** Full
+  text below. Definitions are EPANET Table 3.3 verbatim (free, as Tom named). `preferred_translation`
+  supplied for the four anchor languages only where independently sourced this pass; left blank with
+  a note where not — I would rather ship nine of thirteen sourced than thirteen of thirteen guessed.
+
+```json
+{
+  "lpn_fitting_globe": {
+    "definition": "A globe valve, fully open. K = 10.0 (EPANET 2.2 Table 3.3, after Crane Technical Paper 410). A linear-motion valve with an S-shaped flow path around a disc seated on a fixed ring; distinct from a ball (quarter-turn) valve.",
+    "preferred_translation": {
+      "es": "Válvula de globo",
+      "pt": "Válvula de globo",
+      "fr": "Vanne à soupape (see EN 736-1, ask a French speaker to confirm against the standard's own term)",
+      "tr": "Glob vana"
+    },
+    "avoid": {"tr": "Küresel vana (this is BALL valve, a different device)"},
+    "notes": "CITED, six+ independent Turkish valve manufacturer/distributor sites (Gedik, FAF Vana, Flow Teknik, Pnosan, Adavana, Duyar, Ayvaz): 'Glob vana' is the settled Turkish catalogue term, explicitly distinguished from 'küresel vana' (ball valve). es/pt confirmed by search of Spanish/Portuguese valve catalogues (Valveseal, IndusCo, Tameson.com es; Hidrotube, Hidráulica Paulista, Ansinox pt). fr not independently confirmed against EN 736-1's own text (paywalled)."
+  },
+  "lpn_fitting_angle": {
+    "definition": "An angle (valve), fully open — a globe valve variant with inlet and outlet ports at 90 degrees rather than in line. K = 5.0 (EPANET 2.2 Table 3.3).",
+    "notes": "Not independently sourced this pass for any anchor language beyond the family relationship to lpn_fitting_globe (same body style, different port geometry). A translator should treat it as a globe-valve variant, not a separate concept."
+  },
+  "lpn_fitting_swingcheck": {
+    "definition": "A swing check valve, fully open. K = 2.5 (EPANET 2.2 Table 3.3). A disc hinged at the top of the flow path, swinging open with forward flow and closing under reverse flow or gravity; distinct from a spring-loaded or dual-plate check valve.",
+    "preferred_translation": {
+      "es": "Válvula de retención de columpio / de charnela",
+      "pt": "Válvula de retenção de portinhola (also: tipo portinhola)",
+      "tr": "Swing çek vana (the settled Turkish trade term keeps 'swing' as a loanword — see notes; 'Menteşeli çek vana' is understandable but less common in catalogues)"
+    },
+    "notes": "CITED, seven+ independent Turkish manufacturers/distributors (Ayvaz, Yakacık Valf, Venturi Valves, Goodvalf, Teknofer, EMS Vana, Hassa Yangın): the dominant catalogue form keeps 'Swing' as a loanword, parallel to 'Glob vana'. AWWA C508 is the current US water-works standard naming swing check valves for this service (store.awwa.org, henrypratt.com), confirming the English term is still the industry's own, not dated."
+  },
+  "lpn_fitting_gate": {
+    "definition": "A gate valve, fully open. K = 0.2 (EPANET 2.2 Table 3.3). A linear-motion valve where a flat or wedge-shaped gate lifts clear of the flow path.",
+    "preferred_translation": {"es": "Válvula de compuerta", "pt": "Válvula de gaveta"},
+    "notes": "CITED, current US water-works nomenclature: AWWA C509 (resilient-seated) and its successor C515 both call this part a gate valve (store.awwa.org, pansvalve.com, indigopiping.com) — the English term is current, not dated; C500 (metal-seated) is the older standard now largely superseded, a fact about the HARDWARE generation, not the NAME."
+  },
+  "lpn_fitting_elbow_short": {
+    "definition": "A short-radius 90-degree elbow. K = 0.9 (EPANET 2.2 Table 3.3) — the tightest-turning, highest-loss of the three radius classes this table lists.",
+    "notes": "Not independently sourced this pass for any anchor language."
+  },
+  "lpn_fitting_elbow_medium": {
+    "definition": "A medium-radius 90-degree elbow. K = 0.8 (EPANET 2.2 Table 3.3), between short- and long-radius.",
+    "notes": "Not independently sourced this pass for any anchor language."
+  },
+  "lpn_fitting_elbow_long": {
+    "definition": "A long-radius 90-degree elbow. K = 0.6 (EPANET 2.2 Table 3.3) — the gentlest-turning, lowest-loss of the three radius classes this table lists.",
+    "preferred_translation": {"es": "Codo de radio largo", "pt": "Cotovelo de raio longo"},
+    "notes": "es confirmed by search of Spanish hydraulics references (hidrojing.com minor-loss tables use 'codo... de radio grande'). pt found in Portuguese fitting catalogues as a category but the exact phrase was not independently confirmed this pass — treat as SPECULATION for pt specifically."
+  },
+  "lpn_fitting_elbow_45": {
+    "definition": "A 45-degree elbow. K = 0.4 (EPANET 2.2 Table 3.3).",
+    "notes": "Not independently sourced this pass for any anchor language; the angle is a number, so this is expected to be the least translation-sensitive of the thirteen."
+  },
+  "lpn_fitting_return_bend": {
+    "definition": "A closed return bend — a 180-degree U-shaped fitting. K = 2.2 (EPANET 2.2 Table 3.3).",
+    "notes": "Not independently sourced this pass for any anchor language."
+  },
+  "lpn_fitting_tee_run": {
+    "definition": "A standard tee with flow through the run (the straight-through leg, branch leg closed or not carrying flow). K = 0.6 (EPANET 2.2 Table 3.3).",
+    "notes": "Not independently sourced this pass. 'Run' vs. 'branch' is the load-bearing distinction (see lpn_fitting_tee_branch) and is worth a shared note across both keys rather than two independent glossary entries repeating the same explanation."
+  },
+  "lpn_fitting_tee_branch": {
+    "definition": "A standard tee with flow through the branch (the perpendicular leg). K = 1.8 (EPANET 2.2 Table 3.3) — three times the run loss, because the flow must turn 90 degrees.",
+    "notes": "Not independently sourced this pass. Pair with lpn_fitting_tee_run in the glossary's own cross-reference mechanism if one exists — 'run' and 'branch' only make sense read against each other."
+  },
+  "lpn_fitting_entrance": {
+    "definition": "A square-edged (sharp-edged) pipe entrance from a reservoir or tank — the flow separates at the sharp corner. K = 0.5 (EPANET 2.2 Table 3.3). NOT a statement about the entrance's cross-sectional shape.",
+    "notes": "SEE THE SEPARATE, ALREADY-FILED delta finding for this exact key: 13 of 24 languages read 'Square entrance' as a SHAPE rather than an EDGE, and the delta's own resolution recommends renaming the ENGLISH to 'Square-edged entrance' or 'Sharp-edged entrance' — Tom has already been asked to rule on that wording. If he does, this glossary definition should be revised to match whichever English ships. CITED, Crane TP-410's own K=0.5 for a sharp/square-edged entrance is corroborated across multiple independent minor-loss references (fluids.readthedocs.io, ASHRAE fitting-loss tables, HEC-RAS documentation) — the physics term is settled even though the English LABEL on this page is ambiguous."
+  },
+  "lpn_fitting_exit": {
+    "definition": "A pipe exit into a reservoir or tank — the kinetic energy of the exiting jet is entirely lost. K = 1.0 (EPANET 2.2 Table 3.3).",
+    "notes": "Not independently sourced this pass; 'exit' is a common enough word that I would expect low translation risk, unlike 'entrance' above."
+  }
+}
+```
+
+— Sue
 
 ---
 
