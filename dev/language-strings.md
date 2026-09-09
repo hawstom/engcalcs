@@ -187,6 +187,35 @@ quoting conventions; the widget word does the same job and survives translation.
 the label with the words already used for that label's own key. The shape is what makes that
 instruction actionable, so it is not optional decoration.
 
+### A CATALOGUE NAME MAY KEEP ITS ENGLISH, BESIDE THE TRANSLATION (Tom, 2026-09-08)
+
+Asked whether keeping the English catalogue name next to a descriptive translation is sanctioned for
+trade-catalogue terms, he ruled: ***"Yes!"***
+
+**The class this covers is narrow: a name a person orders a physical part by.** The thirteen fitting
+names in EPANET's Table 3.3 are the worked example -- globe valve, swing check valve, gate valve, the
+elbow radius classes, the tee run and branch. These are Crane Technical Paper 410's commercial
+vocabulary rather than physics, and a part gets sourced by matching that name across a language
+boundary at a supplier's counter. `Vali ya globu (Globe valve)` is therefore correct and complete,
+not a translator giving up.
+
+**It does NOT extend to physics or to ordinary interface words.** Head, flow, pressure, velocity and
+roughness have settled words in every engineering education on earth; carrying English beside them
+adds noise and nothing else. If you cannot say which supplier's catalogue a reader would match the
+word against, this rule does not apply.
+
+**PREFER THE TERM THE TRADE ACTUALLY PRINTS, over a native paraphrase that merely sounds safer.**
+Measured on this exact question 2026-09-08: seven or more Turkish manufacturers print `Swing çek
+vana`, keeping "swing" as a loanword exactly as they keep `Glob vana` -- and our translator wrote
+`Menteşeli çek vana` ("hinged check valve"), a real but less common alternative, because it felt more
+properly Turkish. **A translator's instinct to nativize is the failure mode here**, and the check is
+a supplier catalogue, not a dictionary.
+
+**EN 736-1 / EN 736-2, "Valves -- Terminology" (CEN), is the standing multilingual authority and its
+coverage is English, French and German ONLY.** Cite it in a French entry; it answers nothing for the
+languages that actually struggled. Full sourcing: `dev/agents/utility-planning-engineer/journal.md`,
+2026-09-08.
+
 ### `$ec_lang_syn` — synonyms and alternate expressions
 
 **It answers exactly one question, asked by a translator: "what other ways could this be said?" — and
