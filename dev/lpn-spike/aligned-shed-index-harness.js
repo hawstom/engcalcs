@@ -329,12 +329,12 @@ console.log('\n--- the drawing is the same drawing: indexed pass vs walked pass 
 }
 {
 	// **AND THE WHOLE PASS, DUMPED AND DIFFED, IN A FRESH PROCESS EACH WAY.** A fresh process is not
-	// fussiness: THIS PASS CONVERGES ACROSS PASSES. It seeds node labels as obstacles at the
-	// positions the last layout actually PLACED them at, so running it a second time in the same
-	// process starts from a different drawing -- measured here, two identical walk-backed runs
-	// back to back already disagree on one label. Comparing two backends inside one process
-	// therefore measures the sequencing, not the backend, and would have reported a defect that
-	// is not there.
+	// fussiness: a second document loaded into a page that already holds one inherits its elements'
+	// measured widths and its label state, so comparing two backends inside one process measures the
+	// sequencing and not the backend. (It used to be worse than that -- the pass seeded node labels
+	// where the LAST layout placed them, so two identical runs back to back already disagreed on a
+	// label. Task 539's predictNodeLabelBoxes() ended that, and
+	// dev/lpn-spike/label-stability-harness.js holds it.)
 	const child = require('child_process');
 	function dumpFrom(backend) {
 		return child.execFileSync(process.execPath, [__filename, '--dump', backend],

@@ -541,21 +541,25 @@ the block.
   - **ALL THREE PHASES ARE BUILT AND MEASURED; `dev/label-placement-algorithms.md` §8, §10 and §11
     hold the numbers.** Phase two moves (`Collide.repairCrossingGangs()`, both of his routes, both
     shipping); phase three hides one of every pair that survives (`Collide.shedCrossingSurvivors()`).
-    **Every measured view of every shipped example is at 0**, at a cost of 2 to 7 labels hidden per
-    view on the two Net3s and none at all on four of the seven drawings.
-  - **The only pairs left anywhere are ones where BOTH halves are the user's own** — 3 and 2 on
-    Elm-Street-Center, 1 on Net1, all hand-placed on both sides. An automatic pass may not hide a
-    hand-placed label, so that is the correct outcome and it is named by id in the harness.
-  - **A MEASUREMENT DEFECT WAS FOUND AND FIXED WITH IT, so §10's own table understated phase two:**
-    the harness read the first-fit's boxes beside the DOM's repaired leaders. Corrected, Net3-World
-    runs 43 → 21 over its four views rather than 43 → 31.
-  - **[H] THE GANG ROUTE OSCILLATES, AND IT SHIPPED WITH PHASE TWO** (§11d). Five passes over one
-    untouched view of Net3-World alternate between two layouts, A B A B A, so four labels swap places
-    on every content pass. `off` and `brute` are stable; only `gang` does it, and the count is 5 in
-    both states, which is why counting could not see it. **A flicker is worse than the crossing it
-    replaces**, so this is the next thing on this task, before `spot_prime`.
+    **Every measured view of every shipped example is at 0**, at a cost of 38 hidden labels across
+    the 28 views -- 1,715 drawn before the shed and 1,677 after -- and none at all on four of the
+    seven drawings.
+  - **The only pairs left anywhere are ones where BOTH halves are the user's own** -- two on
+    Elm-Street-Center at the fit zoom, one at 2x, one on Net1, all hand-placed on both sides. An
+    automatic pass may not hide a hand-placed label, so that is the correct outcome and it is named
+    by id in the harness.
+  - **IT ALSO SHIPPED FLICKERING, AND THAT IS FIXED (§11b).** One untouched view laid out A B A B A
+    at an unchanged count, so counting could not see it, and 14 of the 28 views did not settle --
+    with the repair switched off as well, so the oscillator was the placement pipeline and not the
+    gang route. `predictNodeLabelBoxes()` replaces the shed's memory of the last layout;
+    `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT, the shed's victims and not the
+    count. **All 28 views settle on the first pass now, in every repair mode measured.**
+  - **A MEASUREMENT DEFECT WAS FOUND AND FIXED WITH IT (§11d):** the harness read the first-fit's
+    boxes beside the DOM's repaired leaders, so every number §10 carried described a drawing that
+    did not exist and understated phase two.
   - **WHAT IS STILL OPEN IS HIS OWN FLAG, `spot_prime`** (§9b), and it is now a weaker case than it
-    was: nothing is left for a search for open ground to find. His call, on §10c and §11.
+    was: not one of the five residual pairs is a gang with free labels and open ground, which is the
+    only kind a search could fix. His call, on §10c and §11e.
 
 
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**

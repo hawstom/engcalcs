@@ -29,10 +29,12 @@
 //   7. IT COSTS WHAT IT CLAIMS TO COST. Placements, forced layouts and wall time, on Net3-World and
 //      on a 480-pipe grid, printed and bounded.
 //
-// **CROSS-BACKEND COMPARISONS GO IN SEPARATE PROCESSES.** shedAlignedForConflicts() seeds node
-// labels as obstacles where the LAST layout placed them, so this pass converges ACROSS passes and
-// two identical runs back to back in one process already disagree on a label or two. `--dump` is
-// for exactly that: run it twice from two checkouts and diff.
+// **CROSS-BACKEND COMPARISONS GO IN SEPARATE PROCESSES**, because a second document loaded into a
+// page that already holds one inherits its elements' measured widths and its label state. `--dump`
+// is for exactly that: run it twice from two checkouts and diff. (Two identical runs back to back
+// used to disagree on a label or two as well, because the shed seeded node labels where the LAST
+// layout put them; Task 539's predictNodeLabelBoxes() ended that, and
+// dev/lpn-spike/label-stability-harness.js holds it.)
 
 const fsmod = require('fs');
 const stub = require('./lpn-dom-stub.js');

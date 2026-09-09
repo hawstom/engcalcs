@@ -25,10 +25,13 @@
 // see -- a bigger number about a drawing that does not exist. updateDataLeader() is the only place
 // the answer exists, and it writes it onto the element.
 //
-// **ONE EXAMPLE PER PROCESS, AND ONE MODE.** shedAlignedForConflicts() seeds node labels as
-// obstacles where the LAST layout placed them, so the pass converges ACROSS passes and two loads in
-// one process would contaminate each other (ROADMAP Task 436). Both callers spawn a child per
-// (example, mode) pair for that reason.
+// **ONE EXAMPLE PER PROCESS, AND ONE MODE.** A second document loaded into a page that already
+// holds one inherits its elements' measured widths and its label state, so two loads in one process
+// contaminate each other. Both callers spawn a child per (example, mode) pair for that reason.
+// (Until Task 539's stability work there was a second reason -- shedAlignedForConflicts() seeded
+// node labels where the LAST layout put them, so the pass carried state from one layout to the
+// next. It does not any more: predictNodeLabelBoxes() derives that seed from the drawing, and
+// label-stability-harness.js holds it.)
 
 'use strict';
 
@@ -45,6 +48,13 @@ const EXAMPLES = path.join(__dirname, '../water-network-examples');
 // say what it COST. `shed` on each row is what it hid, which is the cost side of Tom's ruling.
 async function measure(file, mode, opts) {
 	opts = opts || {};
+	// **HOW MANY TIMES ONE UNTOUCHED VIEW IS RE-LAID-OUT.** One is the measurement every caller
+	// before Task 539's stability work wanted; more than one is the stability question, and the
+	// answer is a SIGNATURE per pass rather than a count -- a layout that swaps two labels keeps
+	// its count, and a shed that picks a different victim keeps the number it hides. Both are
+	// exactly the defects that hid behind counting (section 11 of
+	// dev/label-placement-algorithms.md).
+	const passes = Math.max(1, opts.passes || 1);
 	const stub = require('./lpn-dom-stub.js');
 	const { ROOT, loadLoopedNetwork, setUnitSet, settleEpanet, warmEpanet } = stub;
 	const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
@@ -240,42 +250,51 @@ async function measure(file, mode, opts) {
 	doc.nodes.forEach(function (n) { cx += n.x; cy += n.y; });
 	cx /= doc.nodes.length; cy /= doc.nodes.length;
 
-	// **THE STABILITY RUN: ONE VIEW, THE PASS OVER AND OVER, AND THE SAME LABELS HAVE TO GO EACH
-	// TIME.** A hide is the one thing this pass does that a reader cannot help noticing, so a shed
-	// that picked a different victim on each redraw would be a label blinking on a drawing nobody
-	// touched -- which is the failure every pass in js/lpn-collide.js is written to avoid, and which
-	// `shedCrossingSurvivors()`'s stated hide order exists to prevent. The FIRST pass is allowed to
-	// differ from the rest: shedAlignedForConflicts() seeds each pass from where the last layout put
-	// things, so the drawing converges ACROSS passes (Task 436) and the settled state is what a
-	// reader ever sees.
-	if (opts.stability) {
-		const seen = [];
-		for (let k = 0; k < (opts.stability > 1 ? opts.stability : 5); k++) {
-			shedHidden = []; shedResidual = [];
-			L.refreshLabelText();
-			const p = placements(), c = Collide.labelCrossings(p);
-			seen.push({ hidden: shedHidden.slice().sort().join(' '),
-				pairs: c.counts.pairs,
-				pairList: c.pairs.map(function (q) { return q.join('|'); }).sort().join(' '),
-				drawn: p.map(function (q) { return q.id; }).sort().join(' ') });
-		}
-		return { file: file, mode: mode, stability: seen };
+	// **THE SIGNATURE IS THE LABEL SET AND WHERE EACH ONE SITS, not the count.** Two layouts with
+	// the same number of crossings are not the same drawing, and a reader watching four labels
+	// trade places sees a flicker the count cannot report. A label the shed hid is not in the set at
+	// all, so a shed that changed its mind moves this too.
+	//
+	// **TWELVE SIGNIFICANT FIGURES AND NOT A FIXED NUMBER OF DECIMALS.** A world unit is a foot on
+	// an XY drawing and a DEGREE on a geographic one, so rounding to a hundredth compares Net3-World
+	// to the nearest kilometer and calls every layout identical. Significant figures absorb a
+	// last-bit wobble in either.
+	function signature(pl) {
+		return pl.map(function (p) {
+			const b = p.boxes[0];
+			return p.id + '@' + b.cx.toPrecision(12) + ',' + b.cy.toPrecision(12)
+				+ (p.leader ? '+L' : '');
+		}).sort().join(' ');
 	}
-
-	const rows = [];
-	[1, 2, 4, 8].forEach(function (mult) {
-		if (!L.setView({ cx: cx, cy: cy, s: sFit * mult })) { return; }
-		repairMs = 0; repairCalls = 0; lastStats = null;
-		shedMs = 0; shedHidden = []; shedResidual = [];
-		L.refreshLabelText();     // the page's own content-then-layout pass
-		const drawn = placements();
-		const r = Collide.labelCrossings(drawn);
-		// **LABEL ON LABEL IS A SEPARATE READING AND IS NOT A CROSSING.** Collide.labelCrossings()
-		// answers Tom's two triggers -- crossed leaders, and a label lying on somebody's leader -- and
-		// two labels printed on top of each other trips neither of them. He sent a screenshot of
-		// exactly that on 2026-09-09, so the number is taken here beside the crossings rather than
-		// inferred from them. Counted over the STAIRCASE on both sides (Task 406), unordered, once
-		// per pair.
+	// **HIDDEN IS COUNTED AGAINST WHAT THE DRAWING HAS TO SAY**, so the denominator is every label
+	// with text in it and the numerator is the ones no reader can see this pass. A fix that buys
+	// labels, or spends them, shows up here and nowhere else.
+	//
+	// **IT IS NOT THE SHED'S BILL, AND READING IT AS ONE OVERSTATES IT BY TWENTY TIMES.** Most of
+	// this number is link labels the VIEW does not draw -- shorter than their own pipe at this zoom,
+	// or off the screen -- which is why it falls as you zoom in. What Task 539's shed cost is the
+	// `shed` list on each pass, which names the labels it hid and is single figures.
+	function hiddenCount() {
+		let total = 0, hidden = 0;
+		doc.nodes.forEach(function (n) {
+			const h = nodeEls[n.id];
+			if (!h || h.empty || !h.text) { return; }
+			total++; if (!assemblyShown(h)) { hidden++; }
+		});
+		doc.links.forEach(function (l) {
+			const h = linkEls[l.id];
+			if (!h || h.empty || !h.text) { return; }
+			total++; if (!assemblyShown(h)) { hidden++; }
+		});
+		return { total: total, hidden: hidden };
+	}
+	// **LABEL ON LABEL IS A SEPARATE READING AND IS NOT A CROSSING.** Collide.labelCrossings()
+	// answers Tom's two triggers -- crossed leaders, and a label lying on somebody's leader -- and
+	// two labels printed on top of each other trips neither of them. He sent a screenshot of
+	// exactly that on 2026-09-09, so the number is taken here beside the crossings rather than
+	// inferred from them. Counted over the STAIRCASE on both sides (Task 406), unordered, once
+	// per pair.
+	function overlapPairs(drawn) {
 		const overlaps = [];
 		for (let a = 0; a < drawn.length; a++) {
 			for (let b = a + 1; b < drawn.length; b++) {
@@ -288,10 +307,39 @@ async function measure(file, mode, opts) {
 				if (hit) { overlaps.push(drawn[a].id + '|' + drawn[b].id); }
 			}
 		}
+		return overlaps;
+	}
+
+	const rows = [];
+	[1, 2, 4, 8].forEach(function (mult) {
+		if (!L.setView({ cx: cx, cy: cy, s: sFit * mult })) { return; }
+		let first = null, firstShed = [], firstResidual = [], firstOverlaps = [], firstShedMs = 0;
+		const seen = [];
+		for (let i = 0; i < passes; i++) {
+			repairMs = 0; repairCalls = 0; lastStats = null;
+			shedMs = 0; shedHidden = []; shedResidual = [];
+			const t0 = process.hrtime.bigint();
+			L.refreshLabelText();     // the page's own content-then-layout pass
+			const passMs = Number(process.hrtime.bigint() - t0) / 1e6;
+			const pl = placements();
+			const r = Collide.labelCrossings(pl);
+			const hc = hiddenCount();
+			// **THE SHED'S OWN VICTIMS, LISTED AND NOT COUNTED.** Hiding the same NUMBER of labels
+			// while choosing different ones is a blink on an untouched drawing, and it is the shape
+			// that hid behind counting once already.
+			seen.push({ sig: signature(pl), pairs: r.counts.pairs, drawn: pl.length,
+				hidden: hc.hidden, labels: hc.total, ms: passMs,
+				shed: shedHidden.slice().sort().join(' ') });
+			if (i === 0) {
+				first = r; firstShed = shedHidden.slice(); firstResidual = shedResidual.slice();
+				firstOverlaps = overlapPairs(pl); firstShedMs = shedMs;
+			}
+		}
+		const r = first;
 		rows.push({ zoom: mult, s: sFit * mult, counts: r.counts,
 			repairMs: repairMs, repairCalls: repairCalls, repair: lastStats,
-			shedMs: shedMs, shed: shedHidden, shedResidual: shedResidual,
-			overlaps: overlaps,
+			shedMs: firstShedMs, shed: firstShed, shedResidual: firstResidual,
+			overlaps: firstOverlaps, passes: seen,
 			pairs: r.pairs.map(function (p) { return p.join('|'); }),
 			gangs: r.gangs.map(function (g) { return g.join('+'); }) });
 	});

@@ -348,15 +348,20 @@ notch). Recomputing from full is what makes UNSHEDDING possible at all.
 **THE SHED IS THE GRACEFUL RUNG AND IT RUNS FIRST, BUT IT CANNOT BE THE ONLY ONE.**
 `shedAlignedForConflicts()` makes a link label give up values for the node labels around it *before*
 placement runs, which is the graceful form of the node-outranks-link ruling. It cannot be complete,
-and the reason is structural rather than a bug to hunt: it seeds node labels where the LAST layout
-put them, and where a node label ends up depends on the link boxes placement is about to commit. The
-two need each other's answer. On a first layout — a project opened, a zoom step, a solve — the link
-label therefore sheds for ground the node label does not take, and the ground it *does* take was
-never contested. Measured on `Net3-World` at a working zoom: **60 node label rows printed straight
-through an aligned pipe label, up to 28 px deep, with zero node-on-node and zero pipe-on-pipe** —
-the one-sided signature of a rule only one side obeys. Iterating the two passes does converge (two
-more full passes to zero, measured) and costs three times a pass Task 436 spent its whole budget
-making affordable.
+and the reason is structural rather than a bug to hunt: where a node label ends up depends on the
+link boxes placement is about to commit, and the shed has to decide before that. The two need each
+other's answer. So the link label sheds for ground the node label does not take, and the ground it
+*does* take was never contested. Measured on `Net3-World` at a working zoom: **60 node label rows
+printed straight through an aligned pipe label, up to 28 px deep, with zero node-on-node and zero
+pipe-on-pipe** — the one-sided signature of a rule only one side obeys. Iterating the two passes
+does converge (two more full passes to zero, measured) and costs three times a pass Task 436 spent
+its whole budget making affordable.
+
+*(Corrected 2026-09-09, Task 539: the shed used to answer the question by reading where the LAST
+layout put the node labels, and that was written here as the structural reason. It was also a loop,
+and 14 of 28 measured views never settled because of it. `predictNodeLabelBoxes()` answers it from
+the drawing instead — the same first-fit over the same specs against the static obstacles — so the
+gap above is now one pass wide and not a memory. `dev/label-placement-algorithms.md` §11b.)*
 
 **So the yielder has a terminal rung too: a link label whose ground a node label has just taken is
 HIDDEN** (`yieldStationedLabels()`, 2026-08-23). That is §2.2's survival order carried out rather
