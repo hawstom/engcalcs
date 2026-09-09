@@ -361,7 +361,21 @@ html[lang="zh"] .ec-welcome {
    thing that makes the open hand honest: an open hand that never closes is a promise the interface
    does not keep. The class is written by the pan handler that already exists, so nothing new
    decides when a pan is happening. */
-#lpn_canvas.lpn-panning, #lpn_canvas.lpn-panning * { cursor: grabbing; }
+/* **THE `*` HALF IS GONE, AND IT IS WHY THE POINTER CURSOR DISAPPEARED FROM THE WHOLE MAP** (Tom,
+   2026-09-08: *"My cursor is never turning into a pointer even though select (pointer) mode is on.
+   The phantom flicker is gone. But so is the pointer change at objects; it's always a pan/drag
+   mouse."*). `#lpn_canvas.lpn-panning *` is specificity (1,1,0) and every object cursor on this map
+   is (0,1,0) -- .lpn-node, .lpn-link, .lpn-link-hit, .lpn-link-symbol-hit, .lpn-vhandle,
+   .lpn-draglbl -- so while that class was on, NOTHING on the drawing could say what it was. And the
+   class is written by one handler and cleared by another that is guarded on the drag it is ending,
+   so a gesture whose drag was dropped somewhere else left the fist on for good, with no way back
+   short of a reload.
+
+   `cursor` is an inherited property, so the bare map still closes its hand: the canvas's own value
+   reaches every child that does not state one, which is every child except the six that mean
+   something. That is the rule the convention actually wants -- an object under the pointer says
+   what it is whether or not the map is moving. */
+#lpn_canvas.lpn-panning { cursor: grabbing; }
 /* Fading the BACKDROP is the counterpart of fading the symbols below: a busy, dark aerial or plan
    swallows a 0.5-wide pipe and a black flow arrow, and the standard answer everywhere else (AutoCAD
    image fade, QGIS layer transparency) is to knock the reference material back rather than thicken
@@ -586,7 +600,10 @@ html[lang="zh"] .ec-welcome {
 /* Every pipe's bends are legible while the mode is on, not only the selected one: Tom, 2026-09-01,
    *"We could tweak the behavior to enable vertices mode for all pipes if that's efficient."* It is
    -- they are all drawn already. */
-.lpn-vertexmode .lpn-link { cursor: crosshair; }
+/* The invisible grab band takes the mode's cursor too. Without it the 12 px ribbon around every
+   pipe says `pointer` while the 2 px pipe inside it says `crosshair`, and the ribbon is what the
+   pointer is actually over almost all of the time. */
+.lpn-vertexmode .lpn-link, .lpn-vertexmode .lpn-link-hit { cursor: crosshair; }
 /* ---- Scenarios: the audit halo and the inactive element (ROADMAP Task 184) ----
    AN OUTLINE, NEVER A FILL, and that is the whole reason a link gets a second element rather than
    a restyle: the pipe's own stroke IS the pipe, so recolouring it to mark an override would
@@ -628,6 +645,11 @@ html[lang="zh"] .ec-welcome {
    explains the refusal is never said, and a control that silently does nothing teaches nothing. */
 .lpn-tabs-locked { opacity: .55; }
 .lpn-tabs-locked .lpn-tab, .lpn-tabs-locked .lpn-tab-btn { cursor: not-allowed; }
+/* The same fade, for the two other doors out of a project while a model is being placed (Tom,
+   2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for consistency
+   and intuition."*). Faded, never `disabled`: the press still lands and still explains itself,
+   which is the tab strip's own rule three lines above. */
+.lpn-ctl-locked { opacity: .55; cursor: not-allowed; }
 /* ---- Scale-dependent visibility of GENERATED ANNOTATION (Task 331, 2026-08-14) ----
    Set by applyLabelVisibility() when the visible map is wider than settings.labelMaxWidth.
 

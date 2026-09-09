@@ -827,6 +827,19 @@ $ec_lang['lpn_field_text_flip']='Turn 180°';
 // A Text object may follow a junction, reservoir or tank, or a station along a pipe, pump or
 // valve (Task 502). This row names what it is following. OUR VOCABULARY: the element is a Text.
 $ec_lang['lpn_field_text_attached']='Attached asset';
+// **THE TIP CARRIES THE MISSING ROWS** (Tom, 2026-09-08: *"in its properties, there are no
+// alignment selectors. An old text does have alignment selectors."*). A Text placed near a node or
+// a pipe follows it, and an attached Text is not offered the two alignment rows (his own 2026-08-18
+// ruling: the leader decides). Nothing said so, so two Texts that look alike offered different
+// controls; this row already states the attachment, so it is where the consequence belongs.
+$ec_lang['lpn_field_text_attached_tip']='This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
+// **A JUNCTION'S OWN EMITTER, THE ROW THAT WAS MISSING** (Task 191; Tom, 2026-09-08: *"emitter
+// coeff. ... should be under Node properties."*). EPANET states the coefficient per junction and
+// the exponent once for the whole model, which is why only the second had a control.
+// runtime: units appended -- the page writes the flow and pressure unit tokens after the label, so
+// the value names no unit itself.
+$ec_lang['lpn_field_emitter']='Emitter coefficient';
+$ec_lang['lpn_field_emitter_tip']='An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
@@ -926,7 +939,10 @@ $ec_lang['lpn_ex_basic_si_title']='Basic network, L/s (SI)';
 $ec_lang['lpn_ex_basic_si_desc']='Start here. A reservoir, a pump and a small loop: the smallest arrangement that still works as a water network. Litres per second, with metres and millimetres.';
 $ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
 $ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minute, with feet and inches.';
-$ec_lang['lpn_ex_net1_title']='EPANET Net1';
+// **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
+// controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
+// from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
+$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='The smallest of EPANET’s own three sample networks: one reservoir, a pump and a single loop.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
@@ -1169,13 +1185,18 @@ $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the 
 $ec_lang['lpn_georef_tab_locked']='Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.';
 $ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_goto_tip']='Pan the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, separated by a comma or a space: 38.106, -122.569 or 38.106 -122.569';
+// **TOM'S OWN TWO SENTENCES, 2026-09-08**, replacing a longer pair and an explanation he struck:
+// *"The tip clarification is pointless IMO because nobody thinks that a single number is a
+// lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
+// examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
+// is actually reading.
+$ec_lang['lpn_goto_tip']='Pan the map to coordinates entered as lat lon or lat,lon.';
 $ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order, separated by a comma or a space';
-$ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38.106, -122.569 or 38.106 -122.569.';
+$ec_lang['lpn_goto_bad']='Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122';
 $ec_lang['lpn_georef_goto']='Go to…';
 $ec_lang['lpn_georef_twopt']='Use two known points';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_georef_twopt_tip']='Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The position, the scale and the rotation all follow from those two points.';
+$ec_lang['lpn_georef_twopt_tip']='Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The position, the scale, and the rotation all follow from those two points. Press again to cancel, or press Esc.';
 $ec_lang['lpn_georef_twopt_pick1']='Click a point on your drawing whose latitude and longitude you know.';
 $ec_lang['lpn_georef_twopt_pick2']='Now click a second known point, as far from the first one as you can.';
 $ec_lang['lpn_georef_twopt_same']='That is the point you picked first. Pick a different one.';
@@ -1201,7 +1222,10 @@ $ec_lang['lpn_pane_none']='This network has none of these yet.';
 // His own sentence would be FALSE today: panePasteAt() fills rows that already exist and cannot
 // create one, so the shipped sentence says what the table does. It also gets its own key rather than
 // joining lpn_pane_none, which six Library sections share and which create rows by an Add button.
-$ec_lang['lpn_pane_paste_note']='This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.';
+// **It names Help and no row under it** (Tom, 2026-09-08, ruling on the shipped wording): there
+// are two Help buttons, so "Help, Fix something" reads as a path a reader cannot follow from where
+// they are standing. Naming the menu alone is the part that is true from both of them.
+$ec_lang['lpn_pane_paste_note']='This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
 // What a filtered table says above its rows, so hidden rows always have a visible cause. {q} is the
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtered by {q}. Showing {n} of {all}.';
@@ -1599,7 +1623,7 @@ $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one directi
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 $ec_lang['lpn_inp_drop_patterns']='This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.';
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the run. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
-$ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
+$ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept, it is being solved, and each of them shows it in the Emitter coefficient box in its properties.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump refers to a curve that is not in the file. The pump came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by the power it draws, rather than by a curve. It came in with no curve, so it adds no head.';
@@ -2657,7 +2681,12 @@ $ec_lang['lpn_reaction_order_wall_tip']='1 means that wall reaction occurs accor
 $ec_lang['lpn_reaction_order_unstated']='Not stated';
 $ec_lang['lpn_reaction_order_zero']='0, zero order';
 $ec_lang['lpn_reaction_order_first']='1, first order';
-$ec_lang['lpn_reaction_limiting']='Limiting potential';
+// **EPANET'S OWN HELP SAYS "Limiting Concentration"** (Tom, 2026-09-08, having checked it:
+// *"Purge 'potential' from this subject."*). Three translators independently rendered the old
+// English as a concentration, against the words in front of them, which is what sent him to the
+// help. `Limiting Potential` is still the KEYWORD in an EPANET file's [REACTIONS] section and is
+// still written and read verbatim there; this is the label a person reads.
+$ec_lang['lpn_reaction_limiting']='Limiting concentration';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_limiting_tip']='A concentration the chemical moves toward instead of decaying to nothing or growing without end. The reaction slows as the water approaches it and stops there. Use consistent units. No limit if blank.';
 $ec_lang['lpn_reaction_rough_corr']='Roughness correlation';

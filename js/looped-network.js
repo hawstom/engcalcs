@@ -944,6 +944,35 @@ var EngCalcs = EngCalcs || {};
 		order.sort(function (a, b) { return nodeFieldRank(lines[a].field) - nodeFieldRank(lines[b].field); });
 		return order;
 	}
+	// **THE DROP COLUMN ORDERS WHAT YOU SEE, NOT ONLY WHAT YOU LOSE** (Tom, 2026-09-08: *"For links,
+	// but not nodes, drop order is also used to order display: 5 4 3 2 1. This is very cool and
+	// intuitive and should be done for nodes."*).
+	//
+	// **A LINK LABEL GOT THIS BY ACCIDENT AND A NODE LABEL DID NOT.** Both build their lines in a
+	// hard-coded semantic order; the link defaults happen to run 5 4 3 2 1 down the inputs and
+	// 9 8 7 6 down the results, so the column and the label already agreed, while the node order
+	// (ID, Demand, Base demand, Head, Pressure, Elevation, Quality) crosses its own ranks twice.
+	// Sorting here makes the agreement a RULE rather than a coincidence of two default tables, and
+	// it is what makes the column legible: the top line is the one that survives longest and the
+	// bottom line is the one about to go, so a reader watches the label shed from the bottom up.
+	//
+	// **THE ID LEADS AND IS NOT IN THE COLUMN AT ALL.** nodeFieldRank() answers -Infinity for an
+	// unranked field, which is right for shedding (give it up first) and exactly backwards here, so
+	// the display rank is its own function rather than a reuse: the ID is what the other values are
+	// ABOUT, it is never shed, and a label whose name migrated to the bottom would be unreadable.
+	// The empty placeholder line has no field either and rides along with it, harmlessly.
+	function nodeDisplayRank(field) {
+		var r = field && labelSettings.priority.node[field];
+		return typeof r === 'number' ? r : Infinity;
+	}
+	// Highest rank first. Array.prototype.sort has been stable since ES2019, so two lines that tie
+	// (the ID and the placeholder) keep the order they were built in.
+	function nodeDisplayOrder(lines) {
+		return lines.slice().sort(function (a, b) {
+			var ra = nodeDisplayRank(a.field), rb = nodeDisplayRank(b.field);
+			return ra === rb ? 0 : rb - ra;
+		});
+	}
 	// **THE SHED STARTS BEFORE THE HIDE DOES, AND WITHOUT THAT GAP THE CASCADE IS INVISIBLE.** If
 	// the shed fires at `width > length` and linkLabelTooShort() hides at `length < width` -- the
 	// same comparison -- the only band in which a reader could SEE a shed is too wide at N values and
@@ -7882,6 +7911,18 @@ var EngCalcs = EngCalcs || {};
 		// that is greyed out and inert cannot explain itself.
 		var strip = document.getElementById('lpn_tabs');
 		if (strip && strip.classList) { strip.classList.toggle('lpn-tabs-locked', !!georef); }
+		// **THE FILE MENU AND THE OPEN BUTTON FADE WITH THE STRIP** (Tom, 2026-09-08: *"I think the
+		// File menu and Open toolbar also must be disabled just for consistency and intuition."*).
+		// They are the other two doors that end this project, they take the same one refusal
+		// function, and so they take the same fade: a control that refuses without looking any
+		// different is a control the user presses again.
+		//
+		// FADED AND STILL CLICKABLE, which is the tab strip's own rule and the reason there is no
+		// `disabled` here: an inert button cannot say why it is inert, and saying why is the whole
+		// of what this does.
+		[fileMenuButton, openToolButton].forEach(function (b) {
+			if (b && b.classList) { b.classList.toggle('lpn-ctl-locked', !!georef); }
+		});
 		if (!georef) { return; }
 		var detached = georefDetached();
 		// **THE STEP IS NAMED AND THE MODE IS NAMED.** Four keys here are English literals until the
@@ -7986,14 +8027,32 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **A COMMA ALREADY SEPARATES THEM, AND THE THREE STRINGS NOW SAY SO** (Tom, 2026-09-08, asking
 	// for `lat,lon`). The rule above accepts `38,-122`, `38, -122`, `38.106,-122.569` and
-	// `38.106, -122.569` unchanged; what it refuses is the ONE shape a comma cannot settle,
-	// `38,122`, where two bare integers joined by a bare comma are indistinguishable from the single
-	// decimal number 38.122 in half of this suite's languages. Refusing that one is deliberate and is
-	// not a gap to close later: reading it as a pair is the silent-wrong-map failure this whole
-	// function exists to prevent, and a space or a decimal point tells us which was meant. The
-	// examples in the strings carry a decimal point for exactly that reason.
+	// `38.106, -122.569` unchanged.
+	//
+	// **`38,122` AND `38.122` ARE ACCEPTED AS A PAIR, ON TOM'S RULING** (2026-09-08: *"I disagree
+	// with rejecting int,int or int.int. Both are obvious. Accept them."*). They used to be refused
+	// and THE REASON FOR THAT REFUSAL IS STILL TRUE AND MUST NOT BE FORGOTTEN: in about half of this
+	// suite's 26 languages `38,122` IS the single number 38.122, so a decimal-comma reader who types
+	// one number lands 122 degrees east of where they meant, silently. What has changed is the
+	// answer, not the fact. A lone decimal number is not a coordinate at all -- a Go-to needs two --
+	// so the only reading that can do anything is the pair, and the refusal bought nothing but a
+	// message.
+	//
+	// **AND THE TIP DOES NOT EXPLAIN ANY OF THIS**, which is Tom's second ruling the same day and
+	// worth recording so it is not helpfully re-added: *"The tip clarification is pointless IMO
+	// because nobody thinks that a single number is a lat/lon."* `lpn_goto_bad` shows all three
+	// accepted shapes as examples instead, which is what somebody whose last attempt failed is
+	// actually reading.
+	//
+	// The split is deliberately NARROW: exactly one number in the whole box, of the shape
+	// integer-separator-integer, and nothing else typed around it. `1,234.5 -122.5` still yields
+	// three numbers and is still refused, which is still the right answer for a thousands separator.
 	function parseLatLon(text) {
-		var nums = String(text || '').match(/[-+]?\d+(?:[.,]\d+)?/g);
+		var raw = String(text || '').trim();
+		var nums = raw.match(/[-+]?\d+(?:[.,]\d+)?/g);
+		if (nums && nums.length === 1 && nums[0] === raw && /^[-+]?\d+[.,]\d+$/.test(raw)) {
+			nums = [raw.replace(/[.,]\d+$/, ''), raw.replace(/^[-+]?\d+[.,]/, '')];
+		}
 		if (!nums || nums.length !== 2) { return null; }
 		var lat = parseFloat(nums[0].replace(',', '.')), lon = parseFloat(nums[1].replace(',', '.'));
 		if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) { return null; }
@@ -8009,7 +8068,7 @@ var EngCalcs = EngCalcs || {};
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
 		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38.106, -122.569 or 38.106 -122.569.');
+			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
 			return;
 		}
 		goToPoint(ll);
@@ -8288,6 +8347,25 @@ var EngCalcs = EngCalcs || {};
 		georef.pick = null;
 		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
 	}
+	// **AND ESC PUTS THE TOOL DOWN, AT EITHER STEP** (Tom, 2026-09-08: *"Change to 'Press again to
+	// cancel'. Esc might be nice too at any step."*). The button was already a toggle and the tip
+	// now says so; this is the keyboard's half of the same one exit, and it reaches the same
+	// function, so there is no second idea about what cancelling a pick means.
+	//
+	// **IT CANNOT COLLIDE WITH ESCAPE'S OTHER MEANINGS, and the guard is what makes that true**
+	// rather than the ordering: `georef.pick` exists only between arming the tool and the second
+	// point landing, which is a state no other Escape handler on this page can be in. Capture
+	// phase and stopPropagation, the idiom the profile chooser's own Escape already uses, so a
+	// focused control in the placement bar cannot swallow the key first; and the propagation stops
+	// only on the press this actually consumed, so Escape means what it always meant the rest of
+	// the time.
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
+		if (!georef || !georef.pick) { return; }
+		georefTwoPointStop();
+		e.preventDefault();
+		e.stopPropagation();
+	}, true);
 	// The nearest NODE, in the model's own source coordinates. eachStoredPoint() visits every node
 	// first, in doc.nodes order, so georef.src[i] is doc.nodes[i] for i below that length -- the one
 	// place this file relies on that order outside georefWrite() itself.
@@ -8325,7 +8403,7 @@ var EngCalcs = EngCalcs || {};
 		var ll = parseLatLon(typed);
 		if (!ll) {
 			// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
-			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38.106, -122.569 or 38.106 -122.569.');
+			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
 			return;
 		}
 		pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
@@ -9059,7 +9137,14 @@ var EngCalcs = EngCalcs || {};
 		var showLbl = document.createElement('label'), showBox = document.createElement('input');
 		showLbl.className = 'lpn-area-hint-show';
 		showBox.type = 'checkbox';
-		showBox.checked = true;
+		// **READ FROM THE SEAM, NEVER ASSERTED** (Tom, 2026-09-08: *"Bug. Doesn't uncheck in
+		// Settings."*). It used to be a hard-coded `true`, which is true at this point in this
+		// function and is a second opinion about a state that already has an owner. The two
+		// controls disagreed the other way round: unticking here wrote storage and hid the bubble,
+		// and the Settings row -- built once, when the box was opened, and both boxes can be on
+		// screen at the same time -- went on showing a tick for a bubble that was gone.
+		showBox.checked = areaHintShown();
+		areaHintBubbleCheck = showBox;
 		showBox.addEventListener('change', function () { setAreaHintShown(showBox.checked); });
 		showLbl.appendChild(showBox);
 		showLbl.appendChild(document.createTextNode(' ' + (pc.lpn_area_hint_show || 'Show this')));
@@ -9093,6 +9178,15 @@ var EngCalcs = EngCalcs || {};
 	// it builds its button; before that (and in a harness that builds no toolbar) there is simply
 	// nothing to repaint.
 	var repaintAreaTool = null;
+	// The Open button on the toolbar and the File item on the menu bar, held for the placement lock
+	// (Task 145). Null until each strip is built, and in a harness that builds neither there is
+	// simply nothing to fade.
+	//
+	// **HELD, NOT LOOKED UP.** Both strips are rebuilt, so a getElementById() at lock time can
+	// reach a previous strip's element -- and the menu bar's ids are written from a variable
+	// (`b.id = m.id`), which is a shape dom_id_resolve_check.php cannot resolve and correctly
+	// reports. A reference is the honest answer to both.
+	var openToolButton = null, fileMenuButton = null;
 	function setSelectAreaShape(shape) {
 		if (LPN_AREA_SHAPES.indexOf(shape) < 0) { return false; }
 		selectAreaShape = shape;
@@ -13320,7 +13414,7 @@ var EngCalcs = EngCalcs || {};
 		// Shown when the table is empty too, where the limit is exactly what a reader needs to know.
 		note = document.createElement('p');
 		note.className = 'lpn-lib-note';
-		note.textContent = pc.lpn_pane_paste_note || 'This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.';
+		note.textContent = pc.lpn_pane_paste_note || 'This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
 		host.appendChild(note);
 		if (!rows.length) {
 			note = document.createElement('p');
@@ -15596,6 +15690,14 @@ var EngCalcs = EngCalcs || {};
 		// wiring the text-edit popup, 2026-07-30) -- addNode()/addLink() reach saveToStorage()
 		// via scheduleSolve(); a Text never triggers a solve, so nothing else was saving it.
 		saveToStorage();
+		// **AND IT WAS NOT IN THE TABLE EITHER, FOR THE SAME REASON AND THE SAME ONE LINE SHORT**
+		// (Tom, 2026-09-08: *"Adding a text doesn't immediately add to the Text table. I have to
+		// change tabs and back to see the new text."*). Every other add reaches the open pane
+		// through applySolveResult(), which is where the live pane hangs BECAUSE every edit
+		// schedules a solve; a Text schedules none, so its row simply never arrived. Called
+		// directly rather than by borrowing scheduleSolve() (which the Text DRAG does, for its
+		// debounce): there is nothing here to debounce and nothing to solve.
+		refreshPaneIfOpen();
 		return lb;
 	}
 	// ---- drawing and deleting inside a scenario (ROADMAP Task 184) ----
@@ -18363,7 +18465,7 @@ var EngCalcs = EngCalcs || {};
 			// no longer the same report as a whole clock that failed to load.
 			case 'head-pattern': return pc.lpn_inp_drop_head_pattern || 'These reservoirs rise and fall through the run. Their patterns came in whole, and the water level you see is the one for the moment the clock is showing.';
 			case 'patterns': return pc.lpn_inp_drop_patterns || 'This page did not read the demand patterns, because the part of it that runs an extended period simulation did not load. Every demand is the number written in the file.';
-			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
+			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept, it is being solved, and each of them shows it in the Emitter coefficient box in its properties.';
 			case 'pump-curve-reduced': return pc.lpn_inp_drop_curve_long || 'This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 			case 'pump-curve-missing': return pc.lpn_inp_drop_curve_missing || 'This pump refers to a curve that is not in the file. The pump came in with no curve, so it adds no head.';
 			// A SPEED AND A SCHEDULE ARE KEPT AND SOLVED (Task 248.02). Only constant POWER is still
@@ -19363,6 +19465,10 @@ var EngCalcs = EngCalcs || {};
 		setNotice((pc.lpn_status_reverted || 'Loaded {file} again from the disk.').replace('{file}', entry.fileName));
 	}
 	async function openFromFile() {
+		// The toolbar's Open button reaches here without passing the File menu, so the guard is
+		// owed at BOTH doors -- see openFileMenu(). Opening a file opens a project, which is the
+		// project switch georefBlocksProjectSwitch() exists to refuse.
+		if (georefBlocksProjectSwitch()) { return; }
 		var pc = EngCalcs.pageConfig || {};
 		if (!fileApiAvailable()) {
 			// **Say what this open really is, before it happens.** Without the File System Access API
@@ -20402,8 +20508,39 @@ var EngCalcs = EngCalcs || {};
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarIconIndex = [];
 	function setIconLabel(el, iconName, name, tip) {
+		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
+		// when I hover on the toolbar icon, one is our styled tip. The other is the browser tip.
+		// Only on this button."*).
+		//
+		// EngCalcs.initTips() hands every `.ec-help[title]` to Bootstrap, which MOVES the `title`
+		// attribute onto its own instance and takes it off the element -- that removal is the only
+		// reason a styled tip does not arrive with a native one under it. Writing `el.title` again
+		// afterwards puts a second, unmanaged title back on an element Bootstrap is already
+		// tipping, and the browser draws its own.
+		//
+		// **ONLY ONE BUTTON ON THE STRIP IS EVER REPAINTED, WHICH IS WHY ONLY ONE MISBEHAVED**: the
+		// area-select slot redraws itself every time the shape cycles (repaintAreaTool), long after
+		// initTips has run. Handled at the DOOR rather than at that call site, because the next
+		// repainting button will be written by somebody who has never read this.
+		//
+		// Disposing gives the attribute back and re-arming strips it again, so the machinery that
+		// decides trigger, long-press and click-to-hide stays in exactly one place.
+		var prior = window.bootstrap && window.bootstrap.Tooltip &&
+			window.bootstrap.Tooltip.getInstance ? window.bootstrap.Tooltip.getInstance(el) : null;
+		if (prior) { prior.dispose(); }
 		EngCalcs.setIconLabel(el, iconName, name, tip);
-		toolbarIconIndex.push({ icon: iconName, name: name, tip: tip });
+		if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
+		// **THE INDEX IS KEYED ON THE BUTTON, so a repaint replaces its row rather than adding
+		// one.** Help, What the toolbar icons mean is DERIVED from this list; before this, cycling
+		// the area tool three times listed the area button four times.
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === el) {
+				toolbarIconIndex[i] = { el: el, icon: iconName, name: name, tip: tip };
+				return;
+			}
+		}
+		toolbarIconIndex.push({ el: el, icon: iconName, name: name, tip: tip });
 	}
 	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
 	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
@@ -20870,6 +21007,13 @@ var EngCalcs = EngCalcs || {};
 		if (create && create.focus) { create.focus(); }
 	}
 	function openFileMenu(anchor) {
+		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
+		// 2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for
+		// consistency and intuition."*). Every row under here that matters ends in a project
+		// switch -- Open, Open example, Import, New -- and openFromFile() carries the guard of its
+		// own for the toolbar button and the keyboard, so this one is about the door rather than
+		// the deed: a menu that opens and then refuses every row is a menu that teaches nothing.
+		if (georefBlocksProjectSwitch()) { return; }
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
 		// **RECENT FILES GO LAST, BELOW EVERYTHING.** Not under Open… where thirty years of File
@@ -21479,6 +21623,7 @@ var EngCalcs = EngCalcs || {};
 			var b = document.createElement('button'), word;
 			b.type = 'button';
 			b.id = m.id;
+			if (m.id === 'lpn_menu_file') { fileMenuButton = b; }
 			b.className = 'lpn-menubar-item';
 			// **THE WORD IS IN AN ELEMENT OF ITS OWN, and that is the whole mechanism behind Task
 			// 486's fourth item** ("Hide the Menu text, leaving only icons"). EngCalcs.setLabel()
@@ -22180,6 +22325,10 @@ var EngCalcs = EngCalcs || {};
 		setIconLabel(openBtn, 'open', pc.lpn_file_open || 'Open…', pc.lpn_file_open_tip);
 		openBtn.addEventListener('click', function () { openFromFile(); });
 		fileGroup.appendChild(openBtn);
+		// Held so the placement lock can fade it, the way the toolbar already holds the area
+		// button's repainter: the strip is rebuilt, so a querySelector at lock time would be
+		// reaching for an element that may be a previous strip's.
+		openToolButton = openBtn;
 		var saveBtn = document.createElement('button');
 		saveBtn.type = 'button';
 		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', pc.lpn_file_save_tip);
@@ -22234,7 +22383,9 @@ var EngCalcs = EngCalcs || {};
 		// current -- otherwise the only way to find out is to drag and see what happens.
 		function paintAreaButton() {
 			setIconLabel(areaBtn, 'select-' + selectAreaShape, areaShapeLabel(), pc.lpn_tool_area_tip);
-			areaBtn.className += ' lpn-tool-more';
+			// ASSIGNED, not appended: setIconLabel() adds `ec-help` to whatever is already there, so
+			// `+=` on a button repainted on every shape change grew the class list without bound.
+			if (areaBtn.className.indexOf('lpn-tool-more') < 0) { areaBtn.className += ' lpn-tool-more'; }
 			areaBtn.dataset.tool = 'select-area';
 			areaBtn.dataset.shape = selectAreaShape;
 			areaBtn.setAttribute('aria-pressed', mode === 'select-area' ? 'true' : 'false');
@@ -22687,8 +22838,14 @@ var EngCalcs = EngCalcs || {};
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
 			}
-			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; setPanning(false); return; }
-			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; setPanning(false); }
+			// **THE HAND OPENS ON EVERY RELEASE, GUARDED BY NOTHING** (Tom, 2026-09-08). It used to
+			// be cleared only where a drag was being ended, so any path that dropped `drag` during
+			// the gesture left the class on, and with it the rule that took the cursor away from
+			// every object on the map. Clearing a class costs nothing and cannot be wrong: there is
+			// no pan in progress once a pointer has been released.
+			setPanning(false);
+			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
+			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
 			if (wasPan && !drag) { relayoutLabels(); }
 		}
 		svg.addEventListener('pointerup', endPointer);
@@ -22883,6 +23040,19 @@ var EngCalcs = EngCalcs || {};
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null,
 					nearLink ? { link: nearLink.link.id, t: nearLink.t } : null);
+				// **AND THE TOOL PUTS ITSELF DOWN, WHICH IS WHY A NEW TEXT COULD NOT BE DRAGGED**
+				// (Tom, 2026-09-08: *"I add a Text. It can't be dragged."*). pointerdown returns
+				// before it arms any drag while the mode still begins with `add-`, so the Text you
+				// had just placed was the one Text on the drawing you could not pick up -- until
+				// you noticed the toolbar was still holding the tool. Nothing was wrong with the
+				// element: an OLD Text behaved differently only because reaching one meant leaving
+				// the tool first.
+				//
+				// The branch three lines above already does exactly this when the tap lands on an
+				// existing Text, so this is the two halves of one gesture agreeing rather than a
+				// new rule. A Text is a one-shot placement, unlike a junction, where drawing ten in
+				// a row is the normal way to use the tool.
+				setMode('select');
 			}
 			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
@@ -23244,6 +23414,35 @@ var EngCalcs = EngCalcs || {};
 		age: 'lpn_u_age'
 	};
 	function resultUnit(q) { return LPN_RESULT_UNIT[q]; }
+	// **AN EMITTER COEFFICIENT IN THE UNITS ON SCREEN, AND BACK** (Task 191; Tom, 2026-09-08).
+	//
+	// The document holds it in the solver's own terms -- Q in m3/s, head in metres -- because it is
+	// a DERIVED quantity, flow per pressure^gamma, and this page has no selector for such a unit to
+	// store it in. That is js/lpn-inp.js's stated exception to the store-what-was-typed rule, and
+	// these two functions are the SAME line read forwards and backwards rather than a second
+	// opinion about it: the importer writes `C * qSI / pressSI^gamma`, where qSI is m3/s per flow
+	// unit and pressSI is metres per pressure unit, which is `1 / unitFactor()` for each of them.
+	//
+	// **BOTH SCALES MOVE, AND ONE OF THEM IS RAISED TO A POWER**, which is the whole reason this is
+	// two named functions and not an inline multiply at the one call site: getting the exponent on
+	// the wrong factor is a silent error of a few hundred percent in a number nobody can sanity
+	// check by eye.
+	//
+	// Zero, blank and a non-number all answer undefined, in both directions. Blank is what an
+	// ordinary junction says, and EPANET treats a zero coefficient as no emitter at all, so there
+	// is nothing to distinguish and nothing to store.
+	function emitterGamma() {
+		var g = settings.emitterExponent;
+		return (typeof g === 'number' && isFinite(g)) ? g : 0.5;
+	}
+	function emitterToDisplay(si) {
+		if (typeof si !== 'number' || !isFinite(si) || si <= 0) { return undefined; }
+		return si * unitFactor('lpn_u_flow') / Math.pow(unitFactor('lpn_u_pressure'), emitterGamma());
+	}
+	function emitterToStore(v) {
+		if (typeof v !== 'number' || !isFinite(v) || v <= 0) { return undefined; }
+		return v * Math.pow(unitFactor('lpn_u_pressure'), emitterGamma()) / unitFactor('lpn_u_flow');
+	}
 	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
 	// forever. Since Task 390 that is also the <option>'s own value -- a unit's identity is its NAME
@@ -25005,8 +25204,26 @@ var EngCalcs = EngCalcs || {};
 	function areaHintShown() {
 		try { return localStorage.getItem(AREA_HINT_KEY) !== '0'; } catch (e) { return true; }
 	}
+	// **ONE STATE, TWO CONTROLS, AND THIS IS THE SEAM THEY BOTH GO THROUGH** (Tom, 2026-09-08:
+	// *"Bug. Doesn't uncheck in Settings."*). The bubble's own 'Show this' and the Settings row at
+	// Map and page, Page are the same switch in two places, and both can be on screen at once.
+	//
+	// **A REBUILD IS NOT THE FIX HERE, THOUGH IT IS THIS PAGE'S USUAL ONE.** rebuildSettingsBox()
+	// deliberately makes the box a VIEW of `settings` rather than a copy, and calling
+	// rebuildSettingsFields() from here would keep the two in step -- at the price of tearing down
+	// and rebuilding every control in the box while the user's hand is on one of them, including
+	// the very row that just fired the change. So the mirror is two live references and nothing
+	// else. Writing an identical `checked` fires no change event, so neither control can drive the
+	// other round in a loop; a stale reference to a rebuilt row is a detached node and harmless.
+	var areaHintBubbleCheck = null, areaHintSettingsCheck = null;
+	function syncAreaHintChecks() {
+		var on = areaHintShown();
+		if (areaHintBubbleCheck && areaHintBubbleCheck.checked !== on) { areaHintBubbleCheck.checked = on; }
+		if (areaHintSettingsCheck && areaHintSettingsCheck.checked !== on) { areaHintSettingsCheck.checked = on; }
+	}
 	function setAreaHintShown(show) {
 		try { localStorage.setItem(AREA_HINT_KEY, show ? '1' : '0'); } catch (e) {}
+		syncAreaHintChecks();
 		updateAreaHint();
 	}
 
@@ -25489,6 +25706,7 @@ var EngCalcs = EngCalcs || {};
 		var areaHintInput = document.createElement('input');
 		areaHintInput.type = 'checkbox';
 		areaHintInput.checked = areaHintShown();
+		areaHintSettingsCheck = areaHintInput;
 		areaHintInput.addEventListener('change', function () { setAreaHintShown(areaHintInput.checked); });
 		row(pageBody, pc.lpn_settings_area_hint || 'Show the selection help', areaHintInput,
 			pc.lpn_settings_area_hint_tip);
@@ -26596,16 +26814,29 @@ var EngCalcs = EngCalcs || {};
 				// right edge is a one-way trip -- measured 2026-08-19: left 932 + 554 wide in a 1400
 				// window put the corner 86 px past the edge. Clamping here slides the box back the
 				// way a dragged one is clamped, which is the same promise in the other direction.
-				// The floor is the window's own margin rather than chromeFloor(): a box the user
-				// has deliberately dragged up over the page's header (Tom, 2026-09-01) must not be
-				// shoved back under the menu bar the next time it is resized. What this call is
-				// for is the growing case described above, and that is unaffected.
-				at = clampPanel(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight, 0);
+				//
+				// **restoreBounds(), NOT clampPanel(), AND THIS ONE LINE IS WHY "THEY STILL MOVE TO
+				// FIT" SURVIVED THE FIX THAT WAS MEANT TO END IT** (Tom, 2026-09-08: *"Nothing
+				// changed. They still move to fit."*). openSettingsBox() places the box at the
+				// remembered corner through restoreBounds() and keeps every overhang; the box has
+				// just gone from display:none (0 x 0) to its real size, so THIS OBSERVER FIRES ON
+				// EVERY OPEN, reads the corner that was restored a moment ago, and hauled it fully
+				// on screen with clampPanel(). The box landed where the user left it for one frame
+				// and then slid inside, which is exactly what he was watching.
+				//
+				// **AND IT WROTE THE CLAMPED CORNER BACK TO STORAGE**, which is worse than the
+				// visible jump: the overhang was destroyed on the FIRST open, before any reload, so
+				// no later fix to the restore path could bring back a number that was no longer
+				// there. Only the geometry the user produced is stored now -- the size, which is the
+				// thing this observer exists to catch.
+				//
+				// The growing case the clamp was written for is unaffected: a box grown off the
+				// right edge still comes back to a 28 px sliver, which is a piece of its full-width
+				// drag band and is the whole safety argument in dragBounds().
+				at = restoreBounds(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight, 0);
 				if (at.left !== Math.round(r.left) || at.top !== Math.round(r.top)) {
 					box.style.left = at.left + 'px';
 					box.style.top = at.top + 'px';
-					setboxLayout.left = at.left;
-					setboxLayout.top = at.top;
 				}
 				saveSetboxLayout();
 			}).observe(box);
@@ -26783,9 +27014,20 @@ var EngCalcs = EngCalcs || {};
 		// otherwise be capped to the zero room beneath it, and a zero-height box clamps anywhere.
 		// **restoreBounds(), NOT clampPanel()** (Tom's 2026-09-08 worklist): this is a corner the user chose, so the
 		// overhang they left is theirs and only the chrome floor and the 28 px sliver are enforced.
+		// **THE CAP IS MEASURED FROM THE CHROME FLOOR, NOT FROM WHERE THIS BOX LANDS** (Tom,
+		// 2026-09-08: *"Nothing changed. They still move to fit."*). Capping to the room below
+		// `at.top` shrinks any box whose BOTTOM overhangs, which is the same defect as sliding one
+		// sideways and reads on screen exactly the same way -- the box comes back smaller than the
+		// user made it, ending precisely at the window's edge, every reload. The floor is the most
+		// room a box on this page can ever have, so this still does the job it was written for
+		// (Task 606: a box taller than the whole viewport gets its scrolling body and keeps its
+		// resize grip reachable) and does nothing at all to a box that merely hangs low.
+		//
+		// The second restoreBounds() went with it: restoreBounds() never reads a height, so
+		// re-applying it to a capped one was a no-op that only looked like a second rule.
+		capPanelToRoomBelow(box, floor);
+		r = box.getBoundingClientRect();
 		at = restoreBounds(layout.left, layout.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
-		h = capPanelToRoomBelow(box, at.top);
-		at = restoreBounds(at.left, at.top, r.width, h, window.innerWidth, window.innerHeight, floor);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 	}
@@ -27603,7 +27845,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		rowFn(host, pc.lpn_reaction_order_wall || 'Wall reaction order', wallOrder,
 			pc.lpn_reaction_order_wall_tip);
-		coeffRow('limitingPotential', pc.lpn_reaction_limiting || 'Limiting potential',
+		coeffRow('limitingPotential', pc.lpn_reaction_limiting || 'Limiting concentration',
 			pc.lpn_reaction_limiting_tip);
 		coeffRow('roughnessCorrelation', pc.lpn_reaction_rough_corr || 'Roughness correlation',
 			pc.lpn_reaction_rough_corr_tip);
@@ -30944,6 +31186,32 @@ var EngCalcs = EngCalcs || {};
 				function () { return fireFlowOwn(n); },
 				function (v) { setProp(n, 'fireFlow', fireFlowStore(v)); },
 				fireFlowRunRequiredText(), pc.lpn_ff_required_node_tip, { el: n, prop: 'fireFlow' });
+			// **THE EMITTER COEFFICIENT, WHICH IS A JUNCTION'S AND NOT THE NETWORK'S** (Tom,
+			// 2026-09-08: *"lpn_settings_emitter_exponent is rendered: Yes. But emitter coeff. is
+			// not. It should be under Node properties."*). EPANET's `[EMITTERS]` is one row per
+			// junction and the exponent in `[OPTIONS]` is one number for the whole model, so the
+			// coefficient has always belonged here; js/lpn-inp.js has read, carried, solved and
+			// written it back since long before there was anywhere to see it, which is exactly what
+			// its own `emitters-not-editable` note said out loud.
+			//
+			// Blank-capable, and blank is the ordinary junction: an emitter is an EXTRA outflow
+			// that appears only where somebody modelled a sprinkler or a leak, and a 0 typed into
+			// every junction is a different document from one that says nothing.
+			//
+			// **IT IS THE ONE FIELD ON THIS PAGE WHOSE UNIT IS TWO UNITS**, so it is the one that
+			// cannot follow the store-what-was-typed rule: the coefficient is flow per
+			// pressure^gamma, there is no selector for such a thing, and js/lpn-inp.js therefore
+			// converted it to the solver's own terms on the way in and converts it back on the way
+			// out. Displaying it means undoing that same conversion, which is why it goes through
+			// the pair below rather than being handed to unitNumberFieldBlank(). See
+			// emitterToDisplay() for the arithmetic and for why it is the importer's line read
+			// backwards rather than a second opinion about it.
+			numberFieldBlank(fields,
+				(pc.lpn_field_emitter || 'Emitter coefficient') + ' (' +
+					unitLabel('lpn_u_flow') + '/' + unitLabel('lpn_u_pressure') + ')',
+				emitterToDisplay(effective(n, 'emitter')),
+				function (v) { setProp(n, 'emitter', emitterToStore(v)); refreshPopupIfOpen(); },
+				pc.lpn_field_emitter_tip, { el: n, prop: 'emitter' });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
@@ -32227,9 +32495,18 @@ var EngCalcs = EngCalcs || {};
 		// either -- so this row answers "which pipe is that leader going to", which is a real
 		// question on a map of parallel mains, and offers no control that would need a second one.
 		// Absent entirely on a free-floating Text: there is nothing to say.
+		// **AND IT SAYS WHY THE TWO ALIGNMENT ROWS ARE NOT THERE** (Tom, 2026-09-08: *"in its
+		// properties, there are no alignment selectors. An old text does have alignment
+		// selectors."*). Both Texts were behaving correctly: alignRow() above returns without
+		// drawing a row for an ATTACHED Text, on Tom's own 2026-08-18 ruling, and a Text placed
+		// near a node or a pipe is attached by that gesture. The two rows simply vanished, so the
+		// only thing to compare was two Texts that looked identical and offered different
+		// controls. The fact is on the row that already states the attachment.
 		if (textIsAnchored(lb)) {
 			readonlyField(fields, pc.lpn_field_text_attached || 'Attached asset',
-				lb.anchorNode || lb.anchorLink);
+				lb.anchorNode || lb.anchorLink,
+				pc.lpn_field_text_attached_tip ||
+					'This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.');
 		}
 		importNotesField(fields, lb);
 		tipsIn(fields);
@@ -33773,6 +34050,11 @@ var EngCalcs = EngCalcs || {};
 			// collision box) must know it is really empty rather than really one blank line.
 			ne.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
+			// **DISPLAY ORDER IS THE USER'S DROP COLUMN** (Tom, 2026-09-08). Applied to the FULL list
+			// and before it is banked, so the shed cascade and the drawn label are the one order:
+			// keptLines() preserves relative order, so a label sheds from the bottom of what is on
+			// the screen rather than from somewhere in the middle of it.
+			lines = nodeDisplayOrder(lines);
 			// **THE FULL LIST IS KEPT BESIDE THE DRAWN ONE, exactly as a link label's is** (Task
 			// 469). The node shed cascade starts from the whole label every time; shedding down from
 			// whatever survived last pass is a ratchet, and a label that gave up a value at one

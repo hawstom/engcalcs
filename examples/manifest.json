@@ -67,7 +67,7 @@
             "order": 0,
             "titleKey": "lpn_ex_net1_title",
             "descKey": "lpn_ex_net1_desc",
-            "title": "EPANET Net1",
+            "title": "EPANET Net1 plus rule-based controls",
             "description": "The smallest of EPANET’s own three sample networks: one reservoir, a pump and a single loop.",
             "system": "us",
             "coords": "xy",
