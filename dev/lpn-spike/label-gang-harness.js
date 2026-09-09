@@ -1,17 +1,28 @@
-// DOES THE GANG REPAIR ACTUALLY LOWER THE COUNT, AND WHICH OF THE TWO ROUTES LOWERS IT (ROADMAP
-// Task 539, phase two). Run with:
+// DOES THE REPAIR LOWER THE COUNT, WHICH ROUTE LOWERS IT, AND DOES THE FINAL SHED REACH ZERO
+// (ROADMAP Task 539, phases two and three). Run with:
 //
 //   node dev/lpn-spike/label-gang-harness.js
 //   node dev/lpn-spike/label-gang-harness.js --fixtures   (the pure cases alone, no examples)
 //   node dev/lpn-spike/label-gang-harness.js --full       (every example x every mode, the record)
-//   node dev/lpn-spike/label-gang-harness.js --measure <file.lwn> <mode>
+//   node dev/lpn-spike/label-gang-harness.js --measure <file.lwn> <mode> [--stability]
 //
-// **THE MEASUREMENT IS A COMPARISON AND NEEDS NO ABSOLUTE TARGET** (dev/label-placement-algorithms.md
-// section 8, finding 3: the crossing count is a fact about a VIEW, not about a drawing). So the same
-// example is measured at the same four zooms four times over -- with the repair off, with the brute
-// route alone, with the gang route alone, and with both, which is what ships -- and the columns are
-// put beside each other. Tom, 2026-09-08: *"We could scientifically try both approaches to see which
-// works better."*
+// A mode is a repair route ('off', 'brute', 'gang', 'both') optionally plus '+shed'.
+//
+// **THE TARGET IS ZERO, AND IT IS TOM'S** (2026-09-09: *"if there are crossing leaders we need to
+// hide one. The count has to get down to 0. We have to know what we are doing here, and not show
+// them if we can't show them beautifully."*). That SUPERSEDES the line that stood here, which said
+// the measurement was a comparison and needed no absolute target. It still is a comparison -- the
+// same example is measured at the same four zooms in five configurations, repair off, brute alone,
+// gang alone, both, and both plus the final shed, which is what ships -- but the last column is now
+// asserted at 0 rather than merely reported. Tom, 2026-09-08: *"We could scientifically try both
+// approaches to see which works better."*
+//
+// **AND THE COLUMN BESIDE IT IS THE COST, which is the number he needs in order to have ruled
+// well.** Zero crossings bought by hiding thirty labels may not be the trade anybody wants, so the
+// labels hidden per view are printed next to the count they bought and are asserted to stay within
+// a stated ceiling. A pair that survives even the shed is one where BOTH halves are the user's own
+// -- hand-placed labels and Text objects, which an automatic pass may never hide -- and it is named
+// rather than averaged away.
 //
 // **THE ASSERTION THAT MATTERS IS ON Net3-Novato-CA-World AT THE FIT ZOOM**, because that is the
 // drawing he marked five gangs on, and it is the one drawing where the strategy is allowed to be
@@ -22,9 +33,9 @@
 // every frame. Why that is asserted over the four zooms together rather than one at a time is in
 // compare(), and the answer is the cross-pass convergence, not a softened standard.
 //
-// **DEFAULT RUN IS ONE EXAMPLE, FOUR MODES; --full IS ALL SEVEN.** Each measurement is a whole page
-// load, a solve through the real EPANET engine and four layouts, so the full grid is 28 child
-// processes and about two minutes. That is the record, taken by hand and copied into
+// **DEFAULT RUN IS ONE EXAMPLE, FIVE MODES; --full IS ALL SEVEN.** Each measurement is a whole page
+// load, a solve through the real EPANET engine and four layouts, so the full grid is 35 child
+// processes and about three minutes. That is the record, taken by hand and copied into
 // dev/label-placement-algorithms.md; the suite pays for the one drawing the assertion is about.
 
 'use strict';
@@ -35,7 +46,8 @@ const { spawnSync } = require('child_process');
 const { measure, EXAMPLES } = require('./label-crossing-measure.js');
 
 const HERE = __dirname;
-const MODES = ['off', 'brute', 'gang', 'both'];
+const MODES = ['off', 'brute', 'gang', 'both', 'both+shed'];
+const SHIPPED = 'both+shed';
 const HEADLINE = 'Net3-Novato-CA-World.lwn';
 
 let checks = 0, failures = 0;
@@ -162,13 +174,89 @@ function runFixtures() {
 		report(once.stats.after === 0 && twice.stats.moved === 0,
 			'running it again moves nothing', JSON.stringify(twice.stats));
 	}
+
+	console.log('\n--- fixtures: the final shed, where nothing could be repaired ---');
+	{
+		// The same crossed pair as the first fixture, with neither label offered an alternative and
+		// the stack already dealt: nothing may MOVE, so the only remedy left is to hide one of them.
+		function ent(id, ax, ay, cx, cy, extra) {
+			const sp = spec(id, ax, ay, []);
+			const e = { id: id, boxes: Collide.labelLineBoxes(sp, { x: cx, y: cy }),
+				leader: seg(ax, ay, cx, cy), hideable: true, rank: 2 };
+			Object.keys(extra || {}).forEach(function (k) { e[k] = extra[k]; });
+			return e;
+		}
+		// (a) IT REACHES ZERO, and it hides exactly one of the two.
+		let r = Collide.shedCrossingSurvivors([ent('n:A', 0, 0, 30, 20), ent('n:B', 0, 20, 30, 0)], {});
+		report(r.before === 1 && r.after === 0 && r.hidden.length === 1,
+			'one crossed pair costs exactly one label', JSON.stringify(r.hidden));
+
+		// (b) **RANK DECIDES, AND IT OUTRANKS EVERY OTHER TERM.** The same pair with A named by a
+		// tank (rank 0) and B by a junction (rank 2): the junction goes, whichever way round the
+		// array is written. The reversed array is the whole assertion -- without a stated rule this
+		// is where "whichever came first" would show.
+		const tank = ent('n:A', 0, 0, 30, 20), junc = ent('n:B', 0, 20, 30, 0);
+		tank.rank = 0;
+		r = Collide.shedCrossingSurvivors([tank, junc], {});
+		const flipped = Collide.shedCrossingSurvivors([junc, tank], {});
+		report(r.hidden.join() === 'n:B' && flipped.hidden.join() === 'n:B',
+			'the tank label keeps its place and the junction label goes, in either array order',
+			JSON.stringify([r.hidden, flipped.hidden]));
+
+		// (c) **A HAND-PLACED LABEL IS NEVER HIDDEN BY AN AUTOMATIC PASS.** Make the junction the
+		// user's own and the answer reverses even though rank says otherwise, because hideability is
+		// a GATE and not a term on the ladder.
+		const held = ent('n:B', 0, 20, 30, 0);
+		held.hideable = false;
+		r = Collide.shedCrossingSurvivors([tank, held], {});
+		report(r.hidden.join() === 'n:A' && r.after === 0,
+			'a hand-placed label outranks the ladder: the automatic one goes', JSON.stringify(r.hidden));
+
+		// (d) **BOTH HALVES THE USER'S OWN: THE PAIR STANDS AND IS REPORTED.** Overruling the user
+		// is not on the ladder, so this is the one exit that does not reach zero -- Elm-Street-Center
+		// lives here, with 14 of its 18 node labels hand-placed.
+		const heldA = ent('n:A', 0, 0, 30, 20);
+		heldA.hideable = false;
+		r = Collide.shedCrossingSurvivors([heldA, held], {});
+		report(r.hidden.length === 0 && r.after === 1 && r.residual.length === 1,
+			'two hand-placed labels crossing are left alone and named', JSON.stringify(r.residual));
+
+		// (e) **DEGREE BUYS MORE THAN ONE PAIR AT A TIME.** One wide label with two foreign leaders
+		// lying across it, all three the same rank, and the two leaders parallel so they do not
+		// cross each other: the shared label is in two pairs and each leader in one. Hiding the
+		// shared one costs a single label and clears both, which is the greedy vertex cover this
+		// problem really is; hiding the other two would cost two labels for the same picture.
+		const wide = spec('n:H', 0, 10, [], 60);
+		const hub = { id: 'n:H', boxes: Collide.labelLineBoxes(wide, { x: 30, y: 10 }),
+				leader: seg(0, 10, 30, 10), hideable: true, rank: 2 },
+			up = { id: 'n:U', boxes: [], leader: seg(40, -20, 40, 40), hideable: true, rank: 2 },
+			dn = { id: 'n:D', boxes: [], leader: seg(70, -20, 70, 40), hideable: true, rank: 2 };
+		r = Collide.shedCrossingSurvivors([up, hub, dn], {});
+		report(r.before === 2 && r.after === 0 && r.hidden.join() === 'n:H',
+			'the label in two crossings goes, and one hide clears both',
+			JSON.stringify([r.before, r.hidden]));
+
+		// (f) **A HIDDEN LABEL KEEPS ITS RESERVATION: the pipe label under it does NOT come back.**
+		// A covered yielder is off the map before this pass starts and stays off, so hiding the node
+		// label standing on it cannot reveal it and cannot conjure a new crossing. Releasing it
+		// instead oscillates -- see coveredNow() in js/lpn-collide.js for the measurement.
+		const cover = ent('n:C', 0, 0, 30, 20, { covers: true }),
+			other = ent('n:O', 0, 20, 30, 0, { covers: true }),
+			under = { id: 'l:P', boxes: Collide.labelLineBoxes(spec('l:P', 0, 0, []), { x: 30, y: 20 }),
+				leader: null, hideable: true, rank: 3, yields: true };
+		r = Collide.shedCrossingSurvivors([cover, other, under], {});
+		report(r.after === 0 && r.hidden.indexOf('l:P') < 0,
+			'a covered pipe label stays covered as the labels over it go',
+			JSON.stringify([r.before, r.hidden, r.residual]));
+	}
+
 }
 
 // ================================================================================================
 // 2. ONE EXAMPLE, ONE MODE
 // ================================================================================================
-function runMode(file, mode) {
-	const run = spawnSync(process.execPath, [__filename, '--measure', file, mode],
+function runMode(file, mode, extra) {
+	const run = spawnSync(process.execPath, [__filename, '--measure', file, mode].concat(extra || []),
 		{ encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 120000, killSignal: 'SIGKILL' });
 	const line = (run.stdout || '').split('\n').find(function (l) { return l.indexOf('@@JSON@@') === 0; });
 	if (run.status !== 0 || !line) {
@@ -187,18 +275,31 @@ function compare(file) {
 		return null;
 	}
 	console.log('  ' + file + '   pairs (leader-leader + label-on-leader, unordered)');
-	console.log('    zoom      off    brute     gang     both      gangs moved (both)   repair ms/pass');
+	console.log('    zoom      off    brute     gang     both    +shed   labels hid   moved   ms/pass');
 	got.off.rows.forEach(function (row, i) {
 		const cell = function (m) {
 			const r = got[m].rows[i];
 			return String(r.counts.pairs).padStart(8);
 		};
-		const both = got.both.rows[i];
+		const both = got.both.rows[i], ship = got[SHIPPED].rows[i];
 		console.log('    x' + String(row.zoom).padEnd(4)
-			+ cell('off') + cell('brute') + cell('gang') + cell('both')
-			+ String((both.repair && both.repair.moved) || 0).padStart(15)
-			+ ' labels' + (both.repairCalls
-				? (both.repairMs / both.repairCalls).toFixed(2).padStart(14) : '   n/a'));
+			+ cell('off') + cell('brute') + cell('gang') + cell('both') + cell(SHIPPED)
+			+ String(ship.shed.length).padStart(13)
+			+ String((both.repair && both.repair.moved) || 0).padStart(8)
+			+ (both.repairCalls
+				? ((both.repairMs + ship.shedMs) / both.repairCalls).toFixed(2).padStart(10) : '   n/a'));
+		if (ship.shedResidual.length) {
+			console.log('           residual, nothing may hide either half: ' + ship.shedResidual.join(', '));
+		}
+	});
+	// **ZERO, AT EVERY MEASURED ZOOM, OR THE SURVIVOR IS NAMED.** The shed hides one of every pair
+	// that survives the repair, so the only way a pair can stand is that BOTH halves are the user's
+	// own -- a hand-placed label or a Text object. That is a correct outcome and not a shortfall
+	// (Elm-Street-Center carries 14 hand-placed node labels out of 18), so it passes and prints.
+	got[SHIPPED].rows.forEach(function (r) {
+		report(r.counts.pairs === r.shedResidual.length,
+			'x' + r.zoom + ' reaches 0 crossings, or every survivor is the user\'s own',
+			r.counts.pairs + ' pair(s), ' + r.shedResidual.length + ' of them hand-placed on both sides');
 	});
 	// **THE COUNT MAY NOT RISE OVER THE DRAWING, IN ANY MODE.** The repair scores the layout it was
 	// given as trial zero and must beat it strictly, so within ONE pass it cannot make a view worse
@@ -235,7 +336,8 @@ function compare(file) {
 async function main() {
 	const arg = process.argv[2];
 	if (arg === '--measure') {
-		const out = await measure(process.argv[3], process.argv[4] || 'both');
+		const out = await measure(process.argv[3], process.argv[4] || 'both',
+			{ stability: process.argv[5] === '--stability' ? 5 : 0 });
 		// EXIT EXPLICITLY, with the callback. See label-crossing-harness.js: the vendored EPANET
 		// engine leaves a handle open, a child that merely returns never exits, and the parent's
 		// spawnSync() then blocks until the timeout -- which reads as a slow machine, not a hang.
@@ -263,7 +365,56 @@ async function main() {
 	// THERE, the strategy is wrong and this harness says so rather than averaging it away.
 	if (head) {
 		const off = head.off.rows[0].counts.pairs, both = head.both.rows[0].counts.pairs;
-		report(both < off, HEADLINE + ' at the fit zoom: the count FALLS', off + ' -> ' + both + ' pairs');
+		report(both < off, HEADLINE + ' at the fit zoom: the repair alone LOWERS the count',
+			off + ' -> ' + both + ' pairs');
+		// **AND THE SHIPPED CONFIGURATION REACHES HIS NUMBER.** Net3-World has no hand-placed label
+		// on it, so there is no residual class here and the target is flat zero over all four views.
+		const ship = head[SHIPPED].rows;
+		report(ship.every(function (r) { return r.counts.pairs === 0; }),
+			HEADLINE + ': 0 crossings at every measured zoom',
+			ship.map(function (r) { return 'x' + r.zoom + ':' + r.counts.pairs; }).join(' '));
+		// The cost, held to a CEILING rather than to a number, because the shed is greedy over a
+		// graph that moves with the view and pinning an exact count would go red on any placement
+		// change that did not make the drawing worse. Measured 2026-09-09 -- see
+		// dev/label-placement-algorithms.md section 11 for the per-view figures this bounds.
+		const worst = ship.reduce(function (n, r) { return Math.max(n, r.shed.length); }, 0);
+		report(worst <= 12, HEADLINE + ': the shed stays cheap',
+			'worst view hides ' + worst + ' labels (ceiling 12)');
+	}
+	// **FIVE PASSES OVER ONE UNTOUCHED VIEW, AND IT FOUND A TWO-CYCLE THAT IS NOT THE SHED'S.**
+	// A hide is the most visible thing this pass does, so the shed's stated order is worth nothing
+	// unless a redraw gives the same answer -- and it does not, because THE LAYOUT UNDER IT
+	// alternates. Measured with the shed switched off and the crossing PAIRS listed rather than
+	// counted: `off` and `brute` repeat the same seven pairs five times, and `gang` alternates
+	// between two sets of five, A B A B A. `shedAlignedForConflicts()` seeds each pass from where
+	// the last layout put the node labels, so a gang move changes what the pipe labels round it shed,
+	// which changes the obstacles the next first-fit sees, which moves the gang back (Task 436's
+	// cross-pass convergence, failing to converge). **It shipped with phase two and this harness
+	// could not see it, because the count is 5 in both states.**
+	//
+	// So what is asserted here is what phase three OWNS -- the shed is a deterministic function of
+	// the layout it is handed, so it hides the same NUMBER on each pass and every pass is at zero --
+	// and the alternating sets are printed rather than hidden. See dev/label-placement-algorithms.md
+	// section 11d; the fix belongs to the gang route, not to the shed.
+	console.log('\n--- five passes over one untouched view ---');
+	const st = runMode(HEADLINE, SHIPPED, ['--stability']);
+	if (st.error || !st.stability) {
+		report(false, 'measured the stability run', st.error || 'no rows');
+	} else {
+		const settled = st.stability.slice(1),
+			nOf = function (p) { return p.hidden.split(' ').filter(Boolean).length; };
+		report(settled.every(function (p) { return nOf(p) === nOf(settled[0]); }),
+			HEADLINE + ': every redraw hides the same NUMBER of labels',
+			st.stability.map(nOf).join(' -> '));
+		report(settled.every(function (p) { return p.pairs === 0; }),
+			'...and every one of them is at 0 crossings',
+			st.stability.map(function (p) { return p.pairs; }).join(' -> '));
+		const distinct = st.stability.map(function (p) { return p.hidden; })
+			.filter(function (h, i, a) { return a.indexOf(h) === i; });
+		if (distinct.length > 1) {
+			console.log('    the layout under it alternates, so the SET does too: '
+				+ distinct.join('   /   '));
+		}
 	}
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);

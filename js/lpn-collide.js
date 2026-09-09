@@ -1808,6 +1808,112 @@ EngCalcs.lpnCollide = (function () {
 		return { results: out, stats: stats };
 	}
 
+	// ---- ROADMAP Task 539, phase three: WHERE A CROSSING SURVIVES, HIDE ONE OF THE TWO ----------
+	//
+	// **THE TARGET IS ZERO AND THE REMEDY OF LAST RESORT IS HIDING** (Tom, 2026-09-09: *"if there
+	// are crossing leaders we need to hide one. The count has to get down to 0. We have to know
+	// what we are doing here, and not show them if we can't show them beautifully."*). Phase two
+	// took Net3-World from 43 flagged pairs to 31 over its four views by MOVING labels; this pass
+	// runs after it and closes the remainder the only way that is left. It is not a failure mode:
+	// this page already sheds values, yields ground and drops labels it cannot place, so a hidden
+	// label is an existing idiom and the terminal rung of a cascade that has run out of rungs.
+	//
+	// **WHICH OF THE TWO GOES IS A STATED RULE, because the same label must go on every redraw.**
+	// Whichever-comes-first-in-the-array is a layout that flickers as you pan. The order, worst
+	// first, and each term earns its place:
+	//
+	//   1. HIDEABILITY IS A GATE, NOT A TERM. A hand-placed label is the user's own drawing and an
+	//      automatic pass may never hide it; a Text object is the user's own words. If only one of a
+	//      pair may be hidden, that one goes whatever the rest of this says. If NEITHER may be, the
+	//      pair stands and is reported as a residual -- overruling the user is not on the ladder.
+	//   2. `rank` -- how important the thing the label NAMES is, lowest kept longest. A reservoir or
+	//      a tank is what a reader navigates by and is one of a handful on a drawing; a pump or a
+	//      valve is the next thing they look for; a junction is one of hundreds; a pipe's numbers
+	//      are the most recoverable from its neighbours. The caller supplies it, because what a
+	//      label names is a fact about the document and this file knows nothing about hydraulics.
+	//   3. DEGREE, highest first -- how many flagged pairs this label is in. This is the cost side
+	//      of his ruling: hiding a label that is in three crossings buys three, and the greedy
+	//      choice by degree is the standard approximation to the minimum vertex cover this problem
+	//      really is. It sits BELOW rank on purpose: clearing a cluster of junction labels is worth
+	//      more than clearing it by hiding the one tank in it.
+	//   4. LEADER LENGTH, longest first -- the weakest attachment left. A label far from what it
+	//      names is the one whose association a reader is least sure of anyway.
+	//   5. The id, so the order is total. Nothing should reach here; without it, two identical
+	//      labels would be chosen by array order, which is the flicker term 1 exists to avoid.
+	//
+	// **THE YIELD RULE IS PART OF THE MODEL, because otherwise this counts labels nobody sees.** A
+	// stationed pipe label is drawn only while no node label stands on it, so the ones already
+	// covered are off the map before this pass starts and may not be half of a crossing. `covers`
+	// marks the entries that can hide a yielder (the node placements, which is what
+	// stationedYieldSet() reads); `yields` marks the ones that can be hidden by them. Unlike the
+	// repair one pass down, this does NOT have to re-ask it as it goes -- see coveredNow(), where a
+	// hidden label keeps its reservation and the reason that is not thrift.
+	//
+	// Entries are `{id, boxes, leader, hideable, rank, yields, covers}`. Terminates because every
+	// round hides one entry permanently and there are finitely many.
+	function shedCrossingSurvivors(entries, opts) {
+		opts = opts || {};
+		var live = (entries || []).slice(),
+			maxRounds = opts.maxRounds > 0 ? opts.maxRounds : live.length + 1,
+			hidden = {}, order = [], residual = [], before = 0, after = 0, rounds = 0, r;
+		function coveredNow(e) {
+			var j, o;
+			for (j = 0; j < live.length; j++) {
+				o = live[j];
+				// **A HIDDEN LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes
+				// this stable.** The label is not drawn, but the ground it stands on is still its
+				// own, so a yielding label under it does NOT come back when it goes. Releasing it
+				// instead was measured on Net3-World and produced a two-cycle -- five passes over an
+				// untouched drawing hid {185,199}, {184,205}, {185,199}, {184,205}, {185,199}, which
+				// on screen is a pair of labels blinking on a map nobody touched. It is the same
+				// ruling yieldStationedLabels() already makes for the same reason, and it also
+				// keeps the shed's coverage answer fixed for the whole run rather than per round.
+				if (o === e || !o.covers) { continue; }
+				if (labelsApart(o, e)) { continue; }
+				if (anyBoxOverlapAny(o.boxes, e.boxes)) { return true; }
+			}
+			return false;
+		}
+		function drawnNow() {
+			return live.filter(function (e) {
+				return !hidden[e.id] && (!e.yields || !coveredNow(e));
+			});
+		}
+		function leaderLen(e) {
+			return e.leader ? Math.hypot(e.leader.bx - e.leader.ax, e.leader.by - e.leader.ay) : 0;
+		}
+		function worse(a, b) {
+			if (a.rank !== b.rank) { return a.rank > b.rank; }
+			if (a.deg !== b.deg) { return a.deg > b.deg; }
+			if (a.len !== b.len) { return a.len > b.len; }
+			return a.id > b.id;
+		}
+		for (rounds = 0; rounds <= maxRounds; rounds++) {
+			var drawn = drawnNow(), deg = {}, pool, victim;
+			r = labelCrossings(drawn);
+			if (rounds === 0) { before = r.counts.pairs; }
+			after = r.counts.pairs;
+			residual = r.pairs;
+			if (!r.pairs.length) { break; }
+			r.pairs.forEach(function (p) {
+				deg[p[0]] = (deg[p[0]] || 0) + 1;
+				deg[p[1]] = (deg[p[1]] || 0) + 1;
+			});
+			pool = drawn.filter(function (e) { return e.hideable && deg[e.id]; });
+			// **EVERY REMAINING PAIR IS THE USER'S OWN, so it stands and is REPORTED.** This is the
+			// one exit that does not reach zero and it is the correct one: two hand-placed labels
+			// crossing is a drawing somebody made on purpose.
+			if (!pool.length) { break; }
+			pool.forEach(function (e) { e.deg = deg[e.id]; e.len = leaderLen(e); });
+			victim = pool[0];
+			pool.forEach(function (e) { if (worse(e, victim)) { victim = e; } });
+			hidden[victim.id] = true;
+			order.push(victim.id);
+		}
+		return { hidden: order, hiddenSet: hidden, residual: residual, rounds: rounds,
+			before: before, after: after };
+	}
+
 	return {
 		GOAL_WEIGHT: GOAL_WEIGHT,
 		ANGLE_TUNING: ANGLE_TUNING,
@@ -1844,7 +1950,8 @@ EngCalcs.lpnCollide = (function () {
 		effectiveScores: effectiveScores,
 		placeLabels: placeLabels,
 		labelCrossings: labelCrossings,
-		repairCrossingGangs: repairCrossingGangs
+		repairCrossingGangs: repairCrossingGangs,
+		shedCrossingSurvivors: shedCrossingSurvivors
 	};
 }());
 

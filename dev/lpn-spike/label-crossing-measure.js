@@ -37,7 +37,14 @@ const path = require('path');
 
 const EXAMPLES = path.join(__dirname, '../water-network-examples');
 
-async function measure(file, mode) {
+// **THE MODE IS TWO SWITCHES, NOT ONE, since Task 539 phase three.** The repair route is the part
+// before a '+' ('off', 'brute', 'gang', 'both', 'dry'); a '+shed' suffix lets the FINAL SHED run,
+// and without it Collide.shedCrossingSurvivors() is neutered so that it hides nothing. It has to be
+// switchable for the same reason the repair does: the shed drives every measured view to zero by
+// construction, so a table with it always on would report the same column four times and could not
+// say what it COST. `shed` on each row is what it hid, which is the cost side of Tom's ruling.
+async function measure(file, mode, opts) {
+	opts = opts || {};
 	const stub = require('./lpn-dom-stub.js');
 	const { ROOT, loadLoopedNetwork, setUnitSet, settleEpanet, warmEpanet } = stub;
 	const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
@@ -46,17 +53,29 @@ async function measure(file, mode) {
 	// only difference between two of them is which routes were allowed to generate a layout.**
 	// 'off' returns the first-fit's own result untouched, which is the drawing as it stood before
 	// Task 539 phase two and therefore the "before" column of every comparison.
+	const parts = String(mode).split('+'), repairMode = parts[0], useShed = parts.indexOf('shed') > 0;
 	let repairMs = 0, repairCalls = 0, lastStats = null;
+	let shedMs = 0, shedHidden = [], shedResidual = [];
+	const realShed = Collide.shedCrossingSurvivors;
+	Collide.shedCrossingSurvivors = function (entries, opts) {
+		const t0 = process.hrtime.bigint();
+		const out = useShed ? realShed.call(this, entries, opts)
+			: { hidden: [], hiddenSet: {}, residual: [], rounds: 0, before: 0, after: 0 };
+		shedMs += Number(process.hrtime.bigint() - t0) / 1e6;
+		shedHidden = out.hidden.slice();
+		shedResidual = out.residual.map(function (q) { return q.join('|'); });
+		return out;
+	};
 	const realRepair = Collide.repairCrossingGangs;
 	Collide.repairCrossingGangs = function (labels, placed, obs, opts) {
 		const t0 = process.hrtime.bigint();
 		let out;
-		if (mode === 'off') {
+		if (repairMode === 'off') {
 			out = { results: placed, stats: { gangs: 0, considered: 0, moved: 0, trials: 0,
 				brute: 0, gang: 0, before: 0, after: 0 } };
 		} else {
 			const o = Object.assign({}, opts);
-			if (mode === 'brute' || mode === 'gang') { o.strategies = [mode]; }
+			if (repairMode === 'brute' || repairMode === 'gang') { o.strategies = [repairMode]; }
 			// The closing count is opt-in in the pass itself, being a second sweep of the whole
 			// drawing for a number no decision reads. A harness comparing model with drawing wants it.
 			o.report = true;
@@ -65,11 +84,20 @@ async function measure(file, mode) {
 			// the stats say what the repair BELIEVED about it. That is the one way to ask whether
 			// the model and the measurement agree about the same picture, which is the question
 			// behind every surprise this pass has produced.
-			if (mode === 'dry') { out = { results: placed, stats: out.stats }; }
+			if (repairMode === 'dry') { out = { results: placed, stats: out.stats }; }
 		}
 		repairMs += Number(process.hrtime.bigint() - t0) / 1e6;
 		repairCalls++;
 		lastStats = out.stats;
+		// **THE REPAIR RETURNS A NEW ARRAY, so the node placements this harness reads have to be
+		// THAT one and not the first-fit's own.** repairCrossingGangs() copies the list and
+		// replaces the entries it moved, leaving placeLabelsFirstFit()'s result holding the boxes
+		// as they were before the move -- while the LEADERS below are read from the DOM and are
+		// therefore the moved ones. Measuring the two together describes a drawing that does not
+		// exist, and it is what made the phase-three shed report zero about a view with eight
+		// pairs on it (2026-09-09). It also carries the shed's own `dropped` marks, which are
+		// written onto this array.
+		lastFirstFit = out.results;
 		return out;
 	};
 
@@ -212,14 +240,58 @@ async function measure(file, mode) {
 	doc.nodes.forEach(function (n) { cx += n.x; cy += n.y; });
 	cx /= doc.nodes.length; cy /= doc.nodes.length;
 
+	// **THE STABILITY RUN: ONE VIEW, THE PASS OVER AND OVER, AND THE SAME LABELS HAVE TO GO EACH
+	// TIME.** A hide is the one thing this pass does that a reader cannot help noticing, so a shed
+	// that picked a different victim on each redraw would be a label blinking on a drawing nobody
+	// touched -- which is the failure every pass in js/lpn-collide.js is written to avoid, and which
+	// `shedCrossingSurvivors()`'s stated hide order exists to prevent. The FIRST pass is allowed to
+	// differ from the rest: shedAlignedForConflicts() seeds each pass from where the last layout put
+	// things, so the drawing converges ACROSS passes (Task 436) and the settled state is what a
+	// reader ever sees.
+	if (opts.stability) {
+		const seen = [];
+		for (let k = 0; k < (opts.stability > 1 ? opts.stability : 5); k++) {
+			shedHidden = []; shedResidual = [];
+			L.refreshLabelText();
+			const p = placements(), c = Collide.labelCrossings(p);
+			seen.push({ hidden: shedHidden.slice().sort().join(' '),
+				pairs: c.counts.pairs,
+				pairList: c.pairs.map(function (q) { return q.join('|'); }).sort().join(' '),
+				drawn: p.map(function (q) { return q.id; }).sort().join(' ') });
+		}
+		return { file: file, mode: mode, stability: seen };
+	}
+
 	const rows = [];
 	[1, 2, 4, 8].forEach(function (mult) {
 		if (!L.setView({ cx: cx, cy: cy, s: sFit * mult })) { return; }
 		repairMs = 0; repairCalls = 0; lastStats = null;
+		shedMs = 0; shedHidden = []; shedResidual = [];
 		L.refreshLabelText();     // the page's own content-then-layout pass
-		const r = Collide.labelCrossings(placements());
+		const drawn = placements();
+		const r = Collide.labelCrossings(drawn);
+		// **LABEL ON LABEL IS A SEPARATE READING AND IS NOT A CROSSING.** Collide.labelCrossings()
+		// answers Tom's two triggers -- crossed leaders, and a label lying on somebody's leader -- and
+		// two labels printed on top of each other trips neither of them. He sent a screenshot of
+		// exactly that on 2026-09-09, so the number is taken here beside the crossings rather than
+		// inferred from them. Counted over the STAIRCASE on both sides (Task 406), unordered, once
+		// per pair.
+		const overlaps = [];
+		for (let a = 0; a < drawn.length; a++) {
+			for (let b = a + 1; b < drawn.length; b++) {
+				let hit = false;
+				(drawn[a].boxes || []).forEach(function (p) {
+					(drawn[b].boxes || []).forEach(function (q) {
+						if (Collide.boxOverlapDepth(p, q) > 0) { hit = true; }
+					});
+				});
+				if (hit) { overlaps.push(drawn[a].id + '|' + drawn[b].id); }
+			}
+		}
 		rows.push({ zoom: mult, s: sFit * mult, counts: r.counts,
 			repairMs: repairMs, repairCalls: repairCalls, repair: lastStats,
+			shedMs: shedMs, shed: shedHidden, shedResidual: shedResidual,
+			overlaps: overlaps,
 			pairs: r.pairs.map(function (p) { return p.join('|'); }),
 			gangs: r.gangs.map(function (g) { return g.join('+'); }) });
 	});

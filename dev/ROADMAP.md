@@ -534,24 +534,28 @@ the block.
   "are the labels legible" but "would a person looking at this see an obvious fix we missed". The
   strategy and the name are his: *"can two nearby nodes be labeled as a gang in a direction that
   makes their leaders mutually clear each other's nodes?"*
-  - **PHASES ONE AND TWO ARE BUILT AND MEASURED; `dev/label-placement-algorithms.md` §8 AND §10 HOLD
-    THE NUMBERS.** Phase two is `Collide.repairCrossingGangs()`, a repair pass after every other
-    placement, with BOTH of the routes he asked for measured against each other by
-    `dev/lpn-spike/label-gang-harness.js`. **Net3-World, the drawing he marked five gangs on, goes
-    from 7 flagged pairs to 5 at the fit zoom and from 43 to 31 over four zooms**; Net3 (XY) 29 to
-    23. Elm-Street does not move because 14 of its 18 node labels are hand-placed, which is the
-    right answer.
-  - **The gang route — order the stack by the ANGLE of each label's node — is the whole of the gain
-    at his fit zoom** (7→5, against 7→7 for brute force alone). The routes fix different views and
-    neither dominates, so both ship.
-  - **WHAT IS OPEN IS HIS OWN FLAG: `spot_prime`** (§9b: *"I waved my wand over finding spot-prime;
-    if it's hard, let me know."*). It is deliberately NOT built. The stack is hung where the gang
-    already stands, so the pass needs no search for open ground — and that is what produced the
-    numbers above. **A search for open real estate is a much larger build and the case for it is now
-    a judgment about the remaining pairs, not about the strategy.** His call, on §10c.
-  - **Also open, and cheap to answer with the harness in place:** whether the remaining flagged
-    pairs are worth another pass, and whether he wants the dev control knobs re-opened (he
-    authorized it) to look at them.
+  - **THE TARGET IS ZERO AND THE LAST REMEDY IS HIDING, which is his ruling of 2026-09-09 and
+    supersedes the "a comparison needs no absolute target" line that stood here**: *"if there are
+    crossing leaders we need to hide one. The count has to get down to 0... not show them if we
+    can't show them beautifully."*
+  - **ALL THREE PHASES ARE BUILT AND MEASURED; `dev/label-placement-algorithms.md` §8, §10 and §11
+    hold the numbers.** Phase two moves (`Collide.repairCrossingGangs()`, both of his routes, both
+    shipping); phase three hides one of every pair that survives (`Collide.shedCrossingSurvivors()`).
+    **Every measured view of every shipped example is at 0**, at a cost of 2 to 7 labels hidden per
+    view on the two Net3s and none at all on four of the seven drawings.
+  - **The only pairs left anywhere are ones where BOTH halves are the user's own** — 3 and 2 on
+    Elm-Street-Center, 1 on Net1, all hand-placed on both sides. An automatic pass may not hide a
+    hand-placed label, so that is the correct outcome and it is named by id in the harness.
+  - **A MEASUREMENT DEFECT WAS FOUND AND FIXED WITH IT, so §10's own table understated phase two:**
+    the harness read the first-fit's boxes beside the DOM's repaired leaders. Corrected, Net3-World
+    runs 43 → 21 over its four views rather than 43 → 31.
+  - **[H] THE GANG ROUTE OSCILLATES, AND IT SHIPPED WITH PHASE TWO** (§11d). Five passes over one
+    untouched view of Net3-World alternate between two layouts, A B A B A, so four labels swap places
+    on every content pass. `off` and `brute` are stable; only `gang` does it, and the count is 5 in
+    both states, which is why counting could not see it. **A flicker is worse than the crossing it
+    replaces**, so this is the next thing on this task, before `spot_prime`.
+  - **WHAT IS STILL OPEN IS HIS OWN FLAG, `spot_prime`** (§9b), and it is now a weaker case than it
+    was: nothing is left for a search for open ground to find. His call, on §10c and §11.
 
 
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**

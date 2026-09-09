@@ -417,12 +417,15 @@ one sample and not two.
 
 ### 10a. The table. Pairs per view, every label field on, solved through EPANET
 
-Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it.
+Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it. **Re-measured
+2026-09-09 after §11c found the harness reading the first-fit's boxes beside the DOM's repaired
+leaders; the numbers that stood here described a drawing that did not exist and understated every
+route.**
 
 | drawing | off | brute | gang | both |
 |---|---|---|---|---|
-| Net3-Novato-CA-World | 7 / 19 / 12 / 5 | 7 / 16 / 8 / 4 | 5 / 18 / 10 / 3 | **5 / 16 / 8 / 2** |
-| Net3 (XY) | 15 / 8 / 5 / 1 | 15 / 6 / 5 / 0 | 12 / 9 / 3 / 1 | **12 / 8 / 3 / 0** |
+| Net3-Novato-CA-World | 7 / 19 / 12 / 5 | 7 / 12 / 8 / 4 | 5 / 10 / 9 / 3 | **5 / 8 / 6 / 2** |
+| Net3 (XY) | 15 / 8 / 5 / 1 | 15 / 6 / 4 / 0 | 8 / 7 / 2 / 1 | **8 / 6 / 1 / 0** |
 | Net2 | 5 / 0 / 0 / 0 | 4 / 0 / 0 / 0 | 5 / 0 / 0 / 0 | **4 / 0 / 0 / 0** |
 | Net1 | 1 / 1 / 0 / 0 | unchanged | unchanged | unchanged |
 | Elm-Street-Center | 5 / 3 / 1 / 1 | unchanged | unchanged | unchanged |
@@ -431,13 +434,14 @@ Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it
 **Five findings, and the third is the one that decided the design:**
 
 1. **The count falls on the drawing Tom marked.** Net3-World at the fit zoom goes 7 pairs to 5, and
-   over its four views 43 to 31. Net3 (XY) goes 29 to 23 over its four. That is the comparison §8
-   asked for and the strategy passes it.
+   over its four views 43 to 21. Net3 (XY) goes 29 to 15 over its four. That is the comparison §8
+   asked for and the strategy passes it. It is not enough for the target §11 records him setting,
+   which is why there is a §11.
 2. **The two routes fix different drawings, and neither dominates.** At the fit zoom of Net3-World
    the gang route alone takes 7 to 5 and the brute route alone takes 7 to 7; at 2x the brute route
-   alone takes 19 to 16 and the gang route alone takes it to 18. His intuition that geometry would
-   be "the better approach or a key to optimizing the brute force effort" is half-confirmed: on the
-   view he was looking at, geometry is the whole of the gain.
+   alone takes 19 to 12 and the gang route alone takes it to 10, and together they reach 8. His
+   intuition that geometry would be "the better approach or a key to optimizing the brute force
+   effort" is half-confirmed: on the view he was looking at, geometry is the whole of the gain.
 3. **THE MODEL AND THE DRAWING HAVE TO AGREE ABOUT WHAT IS ON THE MAP, and getting that wrong is
    worth more than either route.** The first working version RAISED Net3-World's fit-zoom count from
    7 to 9, because the repair counted pipe labels that `yieldStationedLabels()` was about to hide,
@@ -453,11 +457,15 @@ Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it
 4. **A hand-placed label is never touched, and that is why Elm-Street does not move.** 14 of its 18
    node labels carry `lx`, so they are the user's; the repair declines them all and its five flagged
    pairs stand. That is the correct answer, not a shortfall.
-5. **A view can come out one pair worse while the drawing comes out better** -- Net3 (XY) under the
-   gang route alone runs 15/8/5/1 to 12/9/3/1. The zooms are read in sequence and
+5. **A view CAN come out one pair worse while the drawing comes out better, and the harness is
+   written for that even though no measured view does it today.** The zooms are read in sequence and
    `shedAlignedForConflicts()` seeds each pass from where the last layout put things, so a repair at
-   one zoom changes what is shed at the next. The harness therefore asserts no rise over the four
-   views together, and prints the per-view rises rather than hiding them.
+   one zoom changes what is shed at the next. *(Corrected 2026-09-09: the example that stood here --
+   Net3 (XY) under the gang route running 15/8/5/1 to 12/9/3/1, one view up by one -- was the
+   §11c measurement defect and not the drawing. The re-measured run has no per-view rise anywhere.)*
+   The assertion stays over the four views together, because the mechanism is real and a per-view
+   assertion would go red on a change that improved the drawing; the per-view rises are printed
+   rather than hidden.
 
 ### 10b. What the scorer will not do, and the two costs
 
@@ -514,20 +522,174 @@ what a build would have to answer, so the decision is his and not a shrug.
    without breaking a rule. That is a different feature from the gang move -- it is an automatic
    text size -- and it should be judged on its own merits rather than ridden in on this task.
 
-**What the numbers say about whether it is worth it.** The pairs that remain after phase two are 5
-at the fit zoom of Net3-World and 12 on Net3 (XY). Of the ones inspected: some are Elm-Street's
-hand-placed labels, which nothing may move; some are a node label against a pipe label whose own
-position is fixed to its pipe. A `spot_prime` search would help the third kind -- a gang with no
-open ground within its own candidate reach -- and nobody has yet counted how many of the remainder
-are that kind. **That count is the cheap next measurement and it is the one to take before
-building anything**, because it is the difference between a feature and a search that finds nothing
-to do.
+**What the numbers say about whether it is worth it, and phase three weakened the case rather than
+strengthening it.** The pairs that remain after phase two are 5 at the fit zoom of Net3-World and 8
+on Net3 (XY); §11 drives all of them to zero by hiding one of each, at 2 to 7 labels a view. **So
+what a `spot_prime` search would now buy is not fewer crossings -- there are none -- but fewer
+HIDDEN LABELS**, which is a real gain and a much smaller one than the case this section was written
+against. Count what a search would actually recover before building it: how many of the labels §11
+hides had open ground within reach that the candidate list did not offer. That is the cheap next
+measurement, and it is the difference between a feature and a search that finds nothing to do.
 
-**Recommendation: stop here and show him the drawing.** His own test is "would a person looking at
-this see an obvious fix we missed", and that is a question for his eyes on a real view, not for
-another number. If he wants more after looking, the order that costs least first is: count the
-remaining pairs by kind; widen the candidate list the brute route already searches; and only then
-search for open ground.
+---
+
+## 11. What phase three built: the target is ZERO, and the last remedy is hiding (Task 539, 2026-09-09)
+
+Tom, reading §10's table: *"539: If I hear you right, 539 only cleaned up 12 of 43 leader conflicts.
+Is that right? If so, we have a long way to go, and my inclination is that if there are crossing
+leaders we need to hide one. The count has to get down to 0. We have to know what we are doing here,
+and not show them if we can't show them beautifully."*
+
+**That supersedes §10's framing.** Phase two was measured as a comparison against itself; phase three
+is measured against an absolute number he set. And the second half of his sentence is the principle:
+a hidden label is a deliberate, correct outcome here, not a failure. This page already sheds values
+off a label, yields ground between labels, and drops a label it cannot place — hiding is an existing
+idiom and this is the terminal rung of a cascade that has run out of rungs.
+
+`Collide.shedCrossingSurvivors()` in `js/lpn-collide.js` is the pass;
+`shedCrossingLabels()` in `js/looped-network.js` is the document half of it, running after
+`repairCrossingGangs()` and before the holders are written.
+
+### 11a. The hide-selection rule, and why each term is where it is
+
+**It has to be a STATED rule and not array order**, or the same drawing hides a different label on
+each redraw and the map flickers as you pan. Worst goes first:
+
+1. **Hideability is a GATE, not a term.** A hand-placed label is the user's own drawing; a Text
+   object is the user's own words. If one half of a pair may be hidden and the other may not, the
+   automatic one goes whatever the rest of this says. **If NEITHER may be, the pair stands** and is
+   reported — overruling the user is not on the ladder.
+2. **`rank`: how important the thing the label NAMES is**, lowest kept longest. Reservoir and tank 0,
+   pump and valve 1, junction 2, pipe 3. A reader navigates by the fixed-head vessels and there are
+   a handful of them; there are hundreds of junctions, and a pipe's flow is the most recoverable
+   from its neighbours. The caller supplies it, because what a label names is a fact about the
+   document and `js/lpn-collide.js` knows nothing about hydraulics.
+3. **Degree, highest first** — how many flagged pairs this label is in. This is the COST side of his
+   ruling: hiding a label that is in three crossings buys three, and greedy-by-degree is the standard
+   approximation to the minimum vertex cover this problem really is. **It sits below rank on
+   purpose**: clearing a cluster of junction labels is worth more than clearing it by hiding the one
+   tank in it.
+4. **Leader length, longest first** — the weakest attachment left. A label far from what it names is
+   the one whose association a reader is least sure of anyway.
+5. **The id**, so the order is total. Nothing should reach here; without it, two identical labels
+   would be chosen by array order, which is the flicker term 1 exists to avoid.
+
+The rejected ordering, so it is not re-proposed: **degree first.** It hides fewer labels — that is
+the whole of its case — and it pays for them by hiding the tank label in a cluster of junctions,
+which is the one label on that part of the map a reader was using to orient.
+
+**A HIDDEN LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes the pass stable.**
+A stationed pipe label is drawn only while no node label stands on it, so the covered ones are off
+the map before this pass starts and cannot be half of a crossing — that much is §10's third finding.
+The tempting next step is to let a hide RELEASE the ground, so the pipe label under a hidden node
+label comes back; **it was built that way first and it oscillated**, hiding `{185, 199}` and
+`{184, 205}` alternately over five passes on an untouched drawing. It is the same ruling
+`yieldStationedLabels()` already makes for the same reason, and it is why this hide is its own flag
+(`hiddenCrossed`) beside `hiddenDropped` rather than a fifth writer of it: a DROP says nowhere would
+fit and releases the ground; this says the label lost a crossing and keeps it.
+
+### 11b. The table. Pairs per view and labels hidden to get there, every field on, through EPANET
+
+Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it. `off/brute/gang/
+both` are §10's columns re-measured (see 11c — they moved); `+shed` is what ships.
+
+| drawing | off | both | **+shed** | labels hidden |
+|---|---|---|---|---|
+| Net3-Novato-CA-World | 7 / 19 / 12 / 5 | 5 / 8 / 6 / 2 | **0 / 0 / 0 / 0** | 4 / 7 / 6 / 2 |
+| Net3 (XY) | 15 / 8 / 5 / 1 | 8 / 6 / 1 / 0 | **0 / 0 / 0 / 0** | 6 / 5 / 1 / 0 |
+| Net2 | 5 / 0 / 0 / 0 | 4 / 0 / 0 / 0 | **0 / 0 / 0 / 0** | 3 / 0 / 0 / 0 |
+| Net1 | 1 / 1 / 0 / 0 | 1 / 1 / 0 / 0 | **1 / 0 / 0 / 0** | 0 / 1 / 0 / 0 |
+| Elm-Street-Center | 5 / 3 / 1 / 1 | 5 / 3 / 1 / 1 | **3 / 2 / 0 / 0** | 2 / 1 / 1 / 1 |
+| Basic example, either unit set | 0 throughout | 0 | **0** | 0 |
+
+**Four findings:**
+
+1. **Zero is reached on every measured view of every drawing except where the user's own labels are
+   both halves of the pair.** The residuals are named rather than averaged away: Elm-Street-Center
+   `n:J11|n:JF-ELM`, `n:J12|n:J13`, `n:J14|n:J4` at the fit zoom and two of those at 2x; Net1
+   `n:10|n:11` at the fit zoom. All six labels involved carry `lx` — Elm-Street has 14 hand-placed
+   node labels out of 18 and Net1 has 3 out of 11. **That is the user's drawing and we do not
+   overrule it.**
+2. **The cost is small, and that is the number he needs in order to have ruled well.** The worst view
+   on any drawing hides 7 labels, out of 98 drawn there; four of the seven examples hide none at any
+   zoom. Hiding thirty labels to remove five crossings would have been a finding against the ruling;
+   this is not that.
+3. **A hide is worth more than one pair on a crowded view.** Net3-World at 2x clears 8 pairs with 7
+   hides and at 4x clears 6 with 6, which is the degree term doing its work; the same view's repair
+   moved 20 labels to clear 11 pairs before it.
+4. **The cost in time is inside the phase-two budget.** The whole repair-plus-shed is 18-53 ms a pass
+   on Net3-World with every field on, against 19-58 ms measured for the repair alone in §10 — the
+   shed's own share is small because it runs only where a pair survived. Node with the DOM stub, so
+   indicative rather than a browser measurement, and it swings by a factor of four on a loaded
+   machine.
+
+### 11c. TWO MEASUREMENT DEFECTS FOUND, and §10's table understated phase two because of one of them
+
+Both were found by the phase-three assertion failing: the model said zero and the drawing said eight.
+That is §10's third finding stated as a method — **when the model and the drawing disagree, the
+measurement is the first suspect, not the pass.**
+
+- **The harness read the first-fit's boxes beside the DOM's repaired leaders.**
+  `repairCrossingGangs()` copies its placement list and replaces the entries it moved, so
+  `placeLabelsFirstFit()`'s own result still holds the boxes as they were BEFORE the move — while
+  the leaders `label-crossing-measure.js` reads come off the DOM and are the moved ones. Every
+  number in §10 was therefore taken on a drawing that does not exist. **Corrected, phase two is
+  better than §10 claimed: Net3-World runs 43 → 21 over its four views rather than 43 → 31**, and
+  Net3 (XY) 29 → 15 rather than 29 → 23.
+- **A Text object was reported as crossing itself.** `staticObstacles()` pushes a Text label's box
+  and its own callout line as two unrelated entries, and `labelCrossings()` excludes only a
+  placement's OWN leader — so every Text object with a callout counted as a pair, twice per view on
+  the Basic examples. Both now carry `textOwner` and `crossingForeigners()` merges them into one
+  placement, which is what they are on the map.
+
+### 11d. A TWO-CYCLE IN THE GANG ROUTE, found by asking for stability and NOT the shed's
+
+**Five passes over one untouched view of Net3-World, and the layout alternates A B A B A.** The shed
+then hides `{10, 185, 187, 199}` on the odd passes and `{10, 184, 187, 205}` on the even ones. On
+screen that is four labels swapping places on every content pass — a zoom step, an edit, a label
+toggle — which is the flicker every pass in `js/lpn-collide.js` is written to avoid, and it is worse
+than the crossing it replaces.
+
+**It is not the shed's and it shipped with phase two.** Measured with the shed switched off and the
+crossing PAIRS listed rather than counted: `off` repeats the same seven pairs five times, `brute`
+repeats the same seven, and **`gang` alternates between two sets of five**. The shed is a
+deterministic function of the layout it is handed and hides the same NUMBER every pass; what moves
+is underneath it.
+
+**The mechanism is Task 436's cross-pass coupling failing to converge.**
+`shedAlignedForConflicts()` seeds each pass's obstacles from where the LAST layout put the node
+labels, so a gang move changes how many values the pipe labels round it shed, which changes their
+box widths, which changes the obstacles the next first-fit sees, which moves the gang back. The
+drawn label SET is identical in both states — only the shed values and the node-label sides differ
+— which is why nothing caught it: **the crossing count is 5 in both states, and until this the
+harness compared counts.**
+
+**Do not fix it by making the shed sticky.** Remembering last pass's victims would hide the symptom
+in one pass and leave the labels underneath still swapping. Two candidate fixes, neither built and
+neither cheap: seed `shedAlignedForConflicts()` from the node labels' HOME positions rather than
+from the last layout, which decouples the two passes and moves every drawing; or damp the gang
+route so a re-deal must beat the layout by more than one pair, which trades some of phase two's gain
+for stability. **It is a Task 539 item and it is the next thing to take on this task.**
+
+### 11e. The cluster in his screenshot, and what could not be reproduced
+
+He sent Net3-Novato-CA-World at the fit zoom, upper left, around nodes 163/167/173/177/267, and
+described labels overlapping each other with leaders through them.
+
+- **The crossings there are gone.** Those ids are exactly where the surviving pairs were:
+  `n:187|n:267` at the fit zoom, `n:171|n:173` and `l:213|n:267` at 2x, `n:167|n:169` and
+  `l:213|n:267` at 4x, `n:171|n:173` and `l:177|n:161` at 8x. All of them are now 0.
+- **The labels-on-top-of-each-other half could NOT be reproduced headlessly, and that is worth
+  saying rather than claiming a fix.** `labelCrossings()` answers his two triggers and neither of
+  them is label-on-label, so the measurement now takes that count separately —
+  `label-crossing-measure.js` returns `overlaps` beside `counts` — and **it is zero on every view of
+  every example, before and after this pass.** The most likely reasons the picture differs are that
+  the harness renders at a fixed 1400x900 with every label field on, and that the DOM stub's glyph
+  advance is nominal rather than a real font metric; a wider window changes the fit scale and
+  therefore what sheds. **What he was looking at was the phase-two build, which still had 5 crossing
+  pairs at that zoom, and a leader running through a label reads as stacking.** If it still looks
+  stacked to him on the shipped build, the next measurement is the overlap count at his own window
+  size, not another placement change.
 
 ---
 

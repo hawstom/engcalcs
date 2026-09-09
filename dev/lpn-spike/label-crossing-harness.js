@@ -33,9 +33,13 @@
 // LAST layout placed them, so the pass converges ACROSS passes and two loads in one process would
 // contaminate each other (ROADMAP Task 436). The parent run spawns `--measure` once per file.
 //
-// **AND THE NUMBERS BELOW ARE NOW THE DRAWING AS IT SHIPS**, which since Task 539 phase two
-// means AFTER Collide.repairCrossingGangs() has moved the gangs it can. The before/after
-// comparison, and the two routes measured against each other, are label-gang-harness.js's.
+// **AND THE NUMBERS BELOW ARE THE DRAWING AS IT SHIPS**, which since Task 539 phase three means
+// after Collide.repairCrossingGangs() has moved the gangs it can AND Collide.shedCrossingSurvivors()
+// has hidden one half of whatever survived that. **So the count printed here is ZERO on every
+// drawing that carries no hand-placed label, and that is the point rather than a coincidence** (Tom,
+// 2026-09-09: *"The count has to get down to 0."*). A non-zero row here is one of two things and the
+// ids say which: both halves hand-placed, which the shed may never touch, or a defect. The
+// before/after comparison and the cost of the shed in labels hidden are label-gang-harness.js's.
 
 'use strict';
 
@@ -167,7 +171,7 @@ function runFixtures() {
 async function main() {
 	const arg = process.argv[2];
 	if (arg === '--measure') {
-		const out = await measure(process.argv[3], 'both');
+		const out = await measure(process.argv[3], 'both+shed');
 		// **EXIT EXPLICITLY. RETURNING HANGS THE WHOLE SUITE, AND IT DID.** A child that returns
 		// from main() exits only when the event loop drains, and this one has loaded the vendored
 		// EPANET engine through a dynamic import -- which leaves a handle open, so the process sits
