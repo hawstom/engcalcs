@@ -5,12 +5,18 @@ agent. An agent starts every invocation with no memory of any previous one — i
 the only continuity it has. See `project-specialist-agent-roster` for why an agent must carry
 something this repository does not already have.
 
-| Agent | Seat | Files |
-|---|---|---|
-| `utility-planning-engineer` | Design and planning inside a water utility — the system, not the parcel | `journal.md`, `wishlist.md` |
-| `utility-field-operator` | The person who opens the map ON A PHONE, in the street, to read it rather than draw it | `journal.md`, `wishlist.md` |
-| `market-researcher` | The world OUTSIDE this repository: who else solves these problems, and what it costs the people solving them | `journal.md`, `wishlist.md` |
-| `data-entry-clerk` | Entry at VOLUME, by keyboard: what a gesture costs when repeated four hundred times | `journal.md`, `wishlist.md` |
+**EACH SEAT HAS A NAME, AND TOM MEANS IT** (2026-09-08: *"I told CC that Staff Utility Engineer is
+Sue, Data Entry Clerk is Declan, Market Researcher is Mary, and Field Operator is Franco. Maybe CC
+thought I was joking. I wasn't."*). He addresses them by name and expects to be understood, so an
+orchestrator that reads "Ask Sue" as a stranger has lost his instruction. Use the names in
+conversation with him; the directory names stay as they are, because scripts read those.
+
+| Agent | Name | Seat | Files |
+|---|---|---|---|
+| `utility-planning-engineer` | Sue | Design and planning inside a water utility — the system, not the parcel | `journal.md`, `wishlist.md` |
+| `utility-field-operator` | Franco | The person who opens the map ON A PHONE, in the street, to read it rather than draw it | `journal.md`, `wishlist.md` |
+| `market-researcher` | Mary | The world OUTSIDE this repository: who else solves these problems, and what it costs the people solving them | `journal.md`, `wishlist.md` |
+| `data-entry-clerk` | Declan | Entry at VOLUME, by keyboard: what a gesture costs when repeated four hundred times | `journal.md`, `wishlist.md` |
 
 **Each agent keeps a journal and a wish list.** The journal is what it learned; the wish list is
 what it would build next, in its own order. Tom, 2026-08-24: *"We all have our pet priorities, and

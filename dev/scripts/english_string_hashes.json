@@ -749,7 +749,6 @@
                 "lpn_time_last",
                 "lpn_time_level",
                 "lpn_time_menu",
-                "lpn_time_menu_tip",
                 "lpn_time_next",
                 "lpn_time_no_engine",
                 "lpn_time_pattern_start",
@@ -3050,7 +3049,6 @@
         "lpn_time_last": "c5299a1a5e130853c2a1da9aa016c438c081e0a6",
         "lpn_time_level": "2acd312aaacd65e498c59f4407e0167feb048c2e",
         "lpn_time_menu": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
-        "lpn_time_menu_tip": "7ec818e38354e3d2f1e9002c6349793702783710",
         "lpn_time_next": "aaf8ed898a06fb6844e4de115541eccc70875afc",
         "lpn_time_no_engine": "77bb9c43b193df4090d4c1eea1663f7e3b2d1933",
         "lpn_time_no_period": "22868dbdfb350ceef9c7bfe0e39f7e20a4916613",
@@ -8817,10 +8815,6 @@
         "lpn_time_menu": {
             "words": 1,
             "ends_sentence": false
-        },
-        "lpn_time_menu_tip": {
-            "words": 13,
-            "ends_sentence": true
         },
         "lpn_time_next": {
             "words": 2,

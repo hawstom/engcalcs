@@ -640,6 +640,11 @@
             "on": "Name or description of the category.",
             "ruled": "2026-08-29"
         },
+        "lpn_field_emitter": {
+            "on": "Emitter coefficient",
+            "ruled": "2026-09-09",
+            "answer": "OK."
+        },
         "lpn_field_fittings": {
             "on": "Fittings list",
             "ruled": "2026-09-09",
