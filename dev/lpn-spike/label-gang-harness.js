@@ -4,7 +4,7 @@
 //   node dev/lpn-spike/label-gang-harness.js
 //   node dev/lpn-spike/label-gang-harness.js --fixtures   (the pure cases alone, no examples)
 //   node dev/lpn-spike/label-gang-harness.js --full       (every example x every mode, the record)
-//   node dev/lpn-spike/label-gang-harness.js --measure <file.lwn> <mode> [--stability]
+//   node dev/lpn-spike/label-gang-harness.js --measure <file.lwn> <mode> [passes]
 //
 // A mode is a repair route ('off', 'brute', 'gang', 'both') optionally plus '+shed'.
 //
@@ -305,14 +305,15 @@ function compare(file) {
 	// given as trial zero and must beat it strictly, so within ONE pass it cannot make a view worse
 	// -- and that is asserted directly by the fixtures.
 	//
-	// **IT IS ASSERTED OVER THE FOUR ZOOMS TOGETHER AND NOT ONE AT A TIME, and the reason is the
-	// convergence Task 436 records rather than a softened standard.** The zooms are read in
-	// sequence in one process, and shedAlignedForConflicts() seeds each pass from where the LAST
-	// layout put things: so a repair at the fit zoom changes what is shed at 2x, which changes the
-	// drawing the repair is then handed. A single view can therefore come out one pair worse while
-	// every earlier view came out better -- measured on Net3 (XY), where the gang route alone runs
-	// 15/8/5/1 to 12/9/3/1: one view up by one, the drawing down by four. Per-zoom rises are
-	// printed, because a growing list of them is the signal that something else is wrong.
+	// **IT IS ASSERTED OVER THE FOUR ZOOMS TOGETHER AND NOT ONE AT A TIME.** The zooms are read in
+	// sequence in one process, so what one view leaves on the elements is what the next one starts
+	// from; a single view coming out one pair worse while every earlier view came out better used to
+	// be a measured fact -- Net3 (XY) ran 15/8/5/1 to 12/9/3/1 under the gang route alone, one view
+	// up by one and the drawing down by four. **Since Task 539's stability work, no view rises on any
+	// example in any mode**, because the shed no longer seeds from the last layout
+	// (predictNodeLabelBoxes()). The aggregate form is kept anyway: it is the promise the repair
+	// actually makes, and per-zoom rises are still printed, because a list of them coming back is
+	// the signal that something upstream is remembering again.
 	let rose = [], worse = [];
 	MODES.slice(1).forEach(function (m) {
 		let sum = 0, base = 0;
@@ -337,7 +338,7 @@ async function main() {
 	const arg = process.argv[2];
 	if (arg === '--measure') {
 		const out = await measure(process.argv[3], process.argv[4] || 'both',
-			{ stability: process.argv[5] === '--stability' ? 5 : 0 });
+			{ passes: Number(process.argv[5]) || 1 });
 		// EXIT EXPLICITLY, with the callback. See label-crossing-harness.js: the vendored EPANET
 		// engine leaves a handle open, a child that merely returns never exits, and the parent's
 		// spawnSync() then blocks until the timeout -- which reads as a slow machine, not a hang.
@@ -381,40 +382,28 @@ async function main() {
 		report(worst <= 12, HEADLINE + ': the shed stays cheap',
 			'worst view hides ' + worst + ' labels (ceiling 12)');
 	}
-	// **FIVE PASSES OVER ONE UNTOUCHED VIEW, AND IT FOUND A TWO-CYCLE THAT IS NOT THE SHED'S.**
-	// A hide is the most visible thing this pass does, so the shed's stated order is worth nothing
-	// unless a redraw gives the same answer -- and it does not, because THE LAYOUT UNDER IT
-	// alternates. Measured with the shed switched off and the crossing PAIRS listed rather than
-	// counted: `off` and `brute` repeat the same seven pairs five times, and `gang` alternates
-	// between two sets of five, A B A B A. `shedAlignedForConflicts()` seeds each pass from where
-	// the last layout put the node labels, so a gang move changes what the pipe labels round it shed,
-	// which changes the obstacles the next first-fit sees, which moves the gang back (Task 436's
-	// cross-pass convergence, failing to converge). **It shipped with phase two and this harness
-	// could not see it, because the count is 5 in both states.**
-	//
-	// So what is asserted here is what phase three OWNS -- the shed is a deterministic function of
-	// the layout it is handed, so it hides the same NUMBER on each pass and every pass is at zero --
-	// and the alternating sets are printed rather than hidden. See dev/label-placement-algorithms.md
-	// section 11d; the fix belongs to the gang route, not to the shed.
+	// **FIVE PASSES OVER ONE UNTOUCHED VIEW, AND THE SHED HAS TO PICK THE SAME VICTIMS.**
+	// A hide is the most visible thing this pass does, so the shed's stated hide order is worth
+	// nothing unless a redraw gives the same answer. It gave two answers when phase three landed --
+	// `{10, 185, 187, 199}` and `{10, 184, 187, 205}` alternately, at an unchanged count of 5 pairs
+	// -- and the cause was not the shed: the GANG ROUTE under it two-cycled, because
+	// shedAlignedForConflicts() seeded each pass from where the last layout put the node labels.
+	// predictNodeLabelBoxes() ended that (section 11d). What is asserted here is the shed's own half,
+	// which is the SET it hides; the layout under it belongs to
+	// dev/lpn-spike/label-stability-harness.js, which reads every example at every zoom.
 	console.log('\n--- five passes over one untouched view ---');
-	const st = runMode(HEADLINE, SHIPPED, ['--stability']);
-	if (st.error || !st.stability) {
+	const st = runMode(HEADLINE, SHIPPED, ['5']);
+	if (st.error || !st.rows) {
 		report(false, 'measured the stability run', st.error || 'no rows');
 	} else {
-		const settled = st.stability.slice(1),
-			nOf = function (p) { return p.hidden.split(' ').filter(Boolean).length; };
-		report(settled.every(function (p) { return nOf(p) === nOf(settled[0]); }),
-			HEADLINE + ': every redraw hides the same NUMBER of labels',
-			st.stability.map(nOf).join(' -> '));
-		report(settled.every(function (p) { return p.pairs === 0; }),
+		const r0 = st.rows[0], sheds = r0.passes.map(function (p) { return p.shed; });
+		report(sheds.every(function (h) { return h === sheds[0]; }),
+			HEADLINE + ': every redraw hides the same labels',
+			sheds.map(function (h) { return '{' + (h || '-') + '}'; })
+				.filter(function (h, i, a) { return a.indexOf(h) === i; }).join('  /  '));
+		report(r0.passes.every(function (p) { return p.pairs === 0; }),
 			'...and every one of them is at 0 crossings',
-			st.stability.map(function (p) { return p.pairs; }).join(' -> '));
-		const distinct = st.stability.map(function (p) { return p.hidden; })
-			.filter(function (h, i, a) { return a.indexOf(h) === i; });
-		if (distinct.length > 1) {
-			console.log('    the layout under it alternates, so the SET does too: '
-				+ distinct.join('   /   '));
-		}
+			r0.passes.map(function (p) { return p.pairs; }).join(' -> '));
 	}
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);
