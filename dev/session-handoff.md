@@ -265,24 +265,159 @@ never from this line.
   `0.70324961`. `unit_factor_check.php` reads the PHP only. An edited emitter coefficient moves by
   ~4e-7; an untouched one is exact by pass-through.
 
+## 4b. THE 2026-09-09 ORCHESTRATION SESSION — five agents, everything pushed
+
+**Everything below is on `origin/master` through `f5ed6fdb` and `check_all.sh` is green, exit 0.**
+Read every count from its script, never from this line.
+
+### Tom's three instructions of the day, all built
+
+- **THREE MAP CURSORS, one sentence each** (his words: *"the move cursor has a huge hit box. We need
+  a cursor with an infinitesimal hitbox"*). Bare map `grab`; an object under Select `pointer`; any
+  placement tool or the area picker `crosshair` over the whole drawing. **`move` is now banned
+  anywhere under `#lpn_canvas`** -- the two things wearing it were the draggable label and the vertex
+  grip, the smallest targets on the map, so a ~24 px four-headed arrow with a centred hot spot was
+  covering exactly what it was aimed at. `delete` deliberately keeps `pointer`: that press acts on
+  the object under it. The class is derived from the mode string and written in ONE place, which is
+  what stops it sticking the way `lpn-panning` did.
+- **ONE TITLE BAR ON EVERY NON-HOGGING BOX**, and his hope that *"the list of non-hoggers is neatly
+  presented as an array"* is answered by there being NO list. All ten boxes are `padding: 40px ...`
+  with a `.lpn-setbox-title` already in them; only Properties had a visible bar because the divider
+  was `#lpn_popup::before`. The divider belongs to the class now and that rule is deleted.
+  `dev/lpn-spike/map-cursor-harness.js` holds both, and fails if a ninth tool is added without
+  someone deciding its cursor.
+- **THE `wt-wide-L` ICON SHIPPED** to the lpn Water menu and to both sibling sites' favicons. §5a
+  has the open half and the size measurement.
+
+### Task 539 gang labels: BUILT AND MEASURED, `spot_prime` NOT built
+
+`Collide.repairCrossingGangs()`, a repair pass after every other placement. Both of Tom's routes
+built and selectable so they could be compared rather than argued about. **Net3-World at the fit
+zoom: 7 pairs -> 5, and 43 -> 31 over its four views.** *(His intuition was right and it is
+measurable: the GANG route alone is the whole of that gain at the fit zoom -- 7->5 against brute's
+7->7 -- while at 2x it is brute that helps, which is why both ship.)*
+
+- **SCORING THE CROSSING COUNT FIRST MADE IT WORSE, and that is the finding to keep.** It let the
+  repair buy back what the first-fit had deliberately refused and **raised** Net3-World from 7 to 9.
+  It is a GATE plus a ranking now: a trial may not raise hard-obstacle blocking or label-on-label
+  above what the layout already had.
+- **`spot_prime` was reported on rather than built, as Tom asked.** The gain came from the half of
+  his sketch that needs no `spot_prime` at all -- a gang's existing slots are open ground the
+  first-fit already found. The blocker if it is ever wanted: **free space is a PER-VIEW quantity**,
+  since link labels appear, shed and yield with the zoom, so a tile-indexed precomputation describes
+  the DRAWING and not the view being labelled. And `text_size_largest_perfect_fit` is a separate
+  feature (automatic text sizing) that should be judged on its own. Full record:
+  `dev/label-placement-algorithms.md` §10.
+
+### Task 322 half B: the counting method found four rounded constants
+
+**`unit_factor_check.php` re-derives every `$ec_units` factor and had never read a line of
+JavaScript.** `js/lpn-inp.js` carried `CFS`, `MGD` and `PSI_M` as typed decimals and
+`js/lpn-solver.js` divided by a rounded `0.0283168466`. All four are derived expressions now and
+`js_constant_check.php` is a ratchet at zero.
+
+- **THE HANDOFF'S OPEN psi QUESTION IS ANSWERED: it was a DEFECT, not a deliberate difference.**
+  `PSI_M = 0.703070` was never EPANET's constant -- EPANET's `PSIperFT` implies 2.3079 ft/psi and
+  that literal implies 2.3067. It was simply the exact physical value typed to six places. The
+  correction moves it by 6e-7 and derives from the same `lbf` and `g` `lib/Units.lib.php` uses.
+- **ONE TOLERANCE WAS LOOSENED AND IT IS THE BATCH'S ONE JUDGEMENT CALL.** `validate.js`'s Net3
+  continuity bound went 1e-9 -> 5e-9 because the exact `lpnGradMin` moves the last iterate from
+  5.04e-10 to 1.32e-9. Checked before it was accepted: Net3 has no emitters so psi cannot be the
+  cause, Net1/Net2 stay at 1e-13, EPANET's own residual there is 3e-8, and heads are still held to
+  0.01 ft against EPANET. It is how far our iteration ran, not whether it is right.
+
+### `dev/browser-pass` is repaired: 1098/1098, 40/40 sections, exit 0, 807 s
+
+It was 26 of 40 sections red. **Every failure was a stale spec, not a product defect**, and 14 of
+them were specs pinning Tom's English. `Session.lang(key)` now reads `EngCalcs.pageConfig[key]` and
+**throws** on a missing key, so a silent `undefined` cannot turn a check into a check of nothing.
+
+- **[H] A REAL REACHABILITY REGRESSION, FROM TOM'S OWN OVERHANG RULING.** Boxes keeping their
+  overhang replaced `clampPanel()` with `restoreBounds()`. Measured: a 634 px Settings box at left
+  1200 in a 1400 px window puts its resize grip at **x = 1834, off the window**, unpressable until
+  the box is dragged back by its band. The check that used to prevent this said *"a box near the
+  right edge grows its own grabber off the window and can never be shrunk again"*. It IS recoverable,
+  so it is not broken -- the spec asserts the overhang AND the recovery, and notes the grabber. **He
+  has been told. Do not change it without him.**
+- **A HELPER DEFECT HAD BEEN LOOSENING EVERY GUARD IN THE SUITE.** `Session.nodeCount()` counted
+  `.lpn-symbols > *`, and the node grab band (`.lpn-node-hit`) doubled every junction, so every
+  "at least N nodes" guard had been passing at half strength.
+- **DO NOT PUT THE FULL SUITE IN `check_all.sh`.** 807 s against seconds for everything else;
+  thirteen minutes on every commit turns "run it before every commit" into "stop running it", which
+  is how it rotted. The unbuilt recommendation is `check_browser.sh` over
+  `boot menu place pane toolbar visibility` (~2 min), where 11 of the 14 rotted sections lived,
+  before any commit touching `js/looped-network.js`, `Looped-Network.php` or `lib/lang.ec.en.php`.
+- Noted, not fixed: the comment above `lpn_clean_map` in `lib/lang.ec.en.php` still argues for
+  *"Reduce map clutter"* against the value it now guards; a later wave-0 pass reversed it.
+
+### The harness wording ratchet: 199 pins -> 52
+
+The sweep §4 asked for. 111 became key reads, 27 became structural assertions (an ORDER, a COUNT, a
+pattern with `{placeholder}` left open), 18 are DECLARED exceptions keyed on file **and exact
+literal** with a written reason each -- and a declaration matching nothing now fails the check.
+
+- **FOUR ASSERTIONS WERE NAMING THE WRONG KEY AND PASSING ANYWAY**, which is exactly the failure the
+  exercise was for: `/nothing would change/` is in BOTH `lpn_push_no_change` and
+  `lpn_scenario_push_none`, and `/Connect to the internet/` in BOTH `lpn_engine_unavailable` and
+  `lpn_time_no_engine`. One leg was vacuous.
+- **The 52 that remain are all in `dev/browser-pass/`.** `msgRe(key)`/`langRe(key)` in the lpn-spike
+  harnesses are the pattern for the placeholder cases; `georef-twopoint-harness.js`'s `langValue()`
+  is the pattern for a file that loads no stub.
+
+### THE TRAP THIS SESSION MEASURED, and it is §3's trap in a new costume
+
+**A SUBAGENT RAN `git stash` AND SWEPT TWO OTHER SESSIONS' UNCOMMITTED WORK.** Not copy-aside this
+time -- a plain `git stash` run to get a clean tree for a green `check_all.sh`. Everything was
+recovered from `stash@{0}` and re-applied, and nothing was lost, but only because it was noticed
+within minutes.
+
+- **The rule that keeps three sessions safe in one directory is one line: `git commit <explicit
+  paths>`.** It commits your files and leaves everybody else's working tree alone. **Never `git
+  stash`, `git add -A`, `git checkout -- .` or `git reset`** -- and put that in every subagent brief,
+  because the agent that did it had read `CLAUDE.md`'s "stage explicit paths" rule and did not read
+  it as covering `stash`.
+- **A FAILING CHECK IN A FILE YOU DID NOT TOUCH IS ANOTHER SESSION MID-EDIT.** That is what provoked
+  it. Re-run, or run only the checks covering your own files. Do not clean the tree to get a green
+  run. `check_all.sh` reported different failing harness sets on three consecutive runs this session
+  and every one of them passed alone.
+
+
 ## 5. THE NEXT THINGS, in the order I would take them
 
-1. **Tom's browser re-test of the cursor**, with the pipe/pump grab band riding along -- he could not
-   judge the 12 px band without pointer feedback. Then the five things nobody has seen: top-edge
-   overhang, the Properties title bar, "Attached" in the Tables alignment cells, Go to keeping its
-   zoom, Save locked during the wizard.
-2. **His open decision on labels**: they claim 6.5% of the canvas with the `move` cursor, which is
-   the pan cross he complained about. One line to change, his call.
-3. **Sue's thirteen glossary entries** are drafted in her journal, four sourced and nine deliberately
-   left unsourced rather than guessed. Applying them is a decision, not a chore.
-4. **Task 539 gang labels, at 100 with his deadline.** His sketch is `dev/label-placement-algorithms.md`
-   §9 verbatim; Franco disagrees with the sizing and says the masked foreign leader is the dangerous
-   case. **Report back before building `spot_prime` -- he flagged it himself.**
-5. Task 611 library import; Task 599 time series; Task 592 CSV import; Task 247 customers. All on
-   `js/looped-network.js`, so sequential.
-6. A resync sprint for the 137 CHANGED keys, then `detect_english_drift.php --update`.
-7. **Task 612 screenshot placement.**
-8. **THE ICON IS DEPLOYED EXCEPT FOR THE MASKABLE PNGs, AND THAT ONE GAP IS A REAL OPEN QUESTION,
+**Rewritten 2026-09-09 at the end of a five-agent orchestration session. Items 1, 2 and 4 of the
+previous list are DONE and are recorded in §4b; what follows is what is actually left.**
+
+1. **THE CRITICAL PATH IS STILL TOM'S READING.** `friction_check.php` exits 1 on exactly THREE
+   entries and a sprint launches on nothing else: `lpn_fitting_entrance`, `lpn_reaction_limiting`,
+   `lpn_reaction_rough_corr`, all three in `dev/new-english-keys.md` under "Questions from the
+   translators". Plus 5 new keys awaiting an "OK" in the same file. **The first is the interesting
+   one and is an ENGLISH defect, not a translation one: 13 of 24 languages rendered "Square
+   entrance" as a SHAPE and 11 as a sharp EDGE, and only the edge is EPANET Table 3.3's meaning.**
+2. **Then ONE sprint, not two**: 137 CHANGED keys plus the day's new ones in a single payload, then
+   `detect_english_drift.php --baseline-new` and `--update`. The count has been 137 all day; nothing
+   this session added a key.
+3. **Show Tom a drawing for Task 539, not another number.** His own test is *"would a person looking
+   at this see an obvious fix we missed"*, which is his eyes on Net3-Novato-CA-World at the fit
+   zoom. `spot_prime` was NOT built and the report on it is §4b and
+   `dev/label-placement-algorithms.md` §10.
+4. **Two things he has been told about and has not ruled on:** the maskable-icon background (§5a
+   below, unchanged) and the Settings-box resize grabber that his own overhang change put off the
+   window (§4b).
+5. **Sue's thirteen glossary entries** are drafted in her journal, four sourced and nine deliberately
+   left unsourced rather than guessed. Applying them is a decision, not a chore. **Declan's Task 610
+   vertex-cell spec is now written** (`dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md`) and
+   unblocks that task whenever Tom wants it.
+6. Task 611 library import; Task 592 CSV/GPX survey import; Task 599 time series; Task 247 customers.
+   All on `js/looped-network.js`, so sequential, and 611 is the one to take first.
+7. **Task 612 screenshot placement**, still waiting on the file itself.
+8. **`check_browser.sh` has not been written and is the session's one unbuilt recommendation.** See
+   §4b: the full browser pass is 807 s and must NOT go in `check_all.sh`, but a six-section subset
+   is about two minutes and is where 11 of 14 rotted specs lived.
+
+## 5a. THE MASKABLE ICON BACKGROUND, still Tom's and still unasked-and-answered
+
+
+**THE ICON IS DEPLOYED EXCEPT FOR THE MASKABLE PNGs, AND THAT ONE GAP IS A REAL OPEN QUESTION,
    not a missing chore.** Tom chose `wt-wide-L` from `dev/icon-preview/concepts-2026-09-08b.html`
    and on 2026-09-09 asked for it *"as the favicon for LibreWaterNet.org and NotEPANET.org and as
    the Water menu icon for lpn."* All three shipped that day. **The concept is a STROKE GLYPH on
@@ -327,6 +462,10 @@ never from this line.
   backlog made it look.
 - Do not put four agents in `js/looped-network.js` at once. Two with named seams worked; the merge
   conflicts that did happen were all in the GENERATED `dev/new-english-keys.md`, which regenerates.
+- **Do not run `git stash`, `git add -A`, `git checkout -- .` or `git reset` in this working
+  directory, and say so in every subagent brief.** A subagent did it on 2026-09-09 and swept two
+  other sessions' uncommitted work; §4b has the recovery and the reason the existing rule did not
+  reach it.
 - Do not tell Tom a browser test that has not been run headlessly first. Three instructions this
   session were wrong — a file with no `[TIMES]` duration that could not show an energy report, a
   unit switch described as converting, and File > Open where the page says Import.
