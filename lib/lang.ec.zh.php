@@ -1037,7 +1037,6 @@ $ec_lang['lpn_field_valve_setting_drop_tip']='该阀门带走的压力。减压�
 $ec_lang['lpn_inp_drop_gpv_curve']='此阀门引用了一条不在文件中的水头损失曲线。该阀门已导入为无曲线，因此在您给它指定曲线之前将保持全开状态。';
 $ec_lang['template_share_manual']='复制此链接：';
 $ec_lang['lpn_time_menu']='时间';
-$ec_lang['lpn_time_menu_tip']='设置本管网运行的时长，并逐时刻推进查看。';
 $ec_lang['lpn_time_duration']='总运行时长';
 $ec_lang['lpn_time_hyd_step']='水力时间步长';
 $ec_lang['lpn_time_pattern_step']='模式时间步长';

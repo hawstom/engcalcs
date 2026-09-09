@@ -1114,7 +1114,6 @@ $ec_lang['lpn_field_lat']='Breite';
 $ec_lang['lpn_engine_minor_loss_note']='Hinweis: Mit dem EPANET-Löser fallen Einzel-(örtliche) Verluste etwas geringer aus als mit dem eingebauten Löser, da EPANET den Wert für die Erdbeschleunigung rundet.';
 $ec_lang['template_share_manual']='Diesen Link kopieren:';
 $ec_lang['lpn_time_menu']='Zeit';
-$ec_lang['lpn_time_menu_tip']='Legt fest, wie lange dieses Netz läuft, und ermöglicht das schrittweise Durchgehen.';
 $ec_lang['lpn_time_duration']='Gesamtlaufzeit';
 $ec_lang['lpn_time_hyd_step']='Hydraulischer Zeitschritt';
 $ec_lang['lpn_time_pattern_step']='Muster-Zeitschritt';

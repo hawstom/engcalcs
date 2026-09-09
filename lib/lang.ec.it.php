@@ -1113,7 +1113,6 @@ $ec_lang['lpn_field_lat']='Latitudine';
 $ec_lang['lpn_engine_minor_loss_note']='Nota: con il risolutore EPANET, le perdite concentrate (locali) risultano leggermente più basse rispetto al risolutore integrato, perché EPANET arrotonda il valore che usa per la gravità.';
 $ec_lang['template_share_manual']='Copia questo link:';
 $ec_lang['lpn_time_menu']='Tempo';
-$ec_lang['lpn_time_menu_tip']='Imposta per quanto tempo gira questa rete, e scorrila momento per momento.';
 $ec_lang['lpn_time_duration']='Durata totale della simulazione';
 $ec_lang['lpn_time_hyd_step']='Passo temporale idraulico';
 $ec_lang['lpn_time_pattern_step']='Passo temporale del modello';

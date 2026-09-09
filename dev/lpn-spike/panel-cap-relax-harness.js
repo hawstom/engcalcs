@@ -259,13 +259,33 @@ console.log('\n--- a restored corner keeps its overhang, down to one grabbable s
 	ok('...where clampPanel() pulled the box up by more than a third of its height',
 		bounds.clamp(100, 800, W, H, VW, VH, FLOOR).top === VH - H - EDGE);
 
-	// THE FLOOR THAT IS NOT GIVEN UP. Task 606's rule, unchanged: the chrome paints above every
-	// panel, so a box restored beneath it would be unclickable with nothing on screen saying why.
-	ok('the chrome floor still wins over a remembered top above it',
-		bounds.restore(100, 10, W, H, VW, VH, FLOOR).top === FLOOR,
+	// TOP -- **AND THIS REVERSES THE 2026-09-06 ACCEPTANCE OF THE CHROME FLOOR.** It used to assert
+	// the opposite of the line below: a remembered top above chromeFloor() was hauled down to it,
+	// Task 606's rule, and Tom accepted that. He changed his mind on 2026-09-08 (*"Everything is
+	// good now except the top. I can't leave anything outside the top of the map."*), so a restore
+	// now keeps a top overhang exactly as it keeps the other three. Do not restore the old
+	// assertion from the note beside it in js/looped-network.js -- that note says so too.
+	ok('a top overhang survives the reload, over the chrome',
+		bounds.restore(100, 10, W, H, VW, VH, FLOOR).top === 10,
 		String(bounds.restore(100, 10, W, H, VW, VH, FLOOR).top));
-	ok('...and dragBounds() deliberately does NOT hold that floor, which is why it is a third rule',
+	ok('...where clampPanel() would have pushed it below the chrome floor',
+		bounds.clamp(100, 10, W, H, VW, VH, FLOOR).top === FLOOR);
+	ok('...and it agrees with dragBounds(), which never held that floor either',
 		bounds.drag(100, 10, W, H, VW, VH).top === 10);
+	// **THE ONE THING THE TOP EDGE STILL REFUSES IS A NEGATIVE.** The drag band is the box's TOP
+	// 40 px and spans its width, so the left, right and bottom edges can give up all but the
+	// sliver and still leave a piece of it showing -- while a `top` above the window puts the whole
+	// band out of reach. Zero is the top edge's version of the sliver, and it is what dragBounds()
+	// has always enforced.
+	ok('a top remembered off the window comes back to the window edge, band intact',
+		bounds.restore(100, -200, W, H, VW, VH, FLOOR).top === 0,
+		String(bounds.restore(100, -200, W, H, VW, VH, FLOOR).top));
+	ok('...and a live drag refuses the same negative, so the two rules agree',
+		bounds.drag(100, -200, W, H, VW, VH).top === 0);
+	// The extra argument is ignored rather than honoured: restoreBounds() no longer takes a topMin
+	// at all, and passing one must not resurrect the floor by accident.
+	ok('restoreBounds() no longer reads a topMin, whatever a caller hands it',
+		bounds.restore(100, 10, W, H, VW, VH, 400).top === 10);
 
 	// AND THE BOX CAN ALWAYS BE GRABBED BACK. A corner remembered on a 32-inch monitor, reopened
 	// on a laptop, must leave a piece of the drag band on screen -- this is the only thing the

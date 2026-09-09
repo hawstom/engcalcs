@@ -882,6 +882,10 @@ $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the tank bottom elevation plus the water depth.';
 $ec_lang['lpn_close']='Close';
+// The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
+// 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
+// the element's id and its rename box, and the two are read one under the other.
+$ec_lang['lpn_popup_boxtitle']='Properties';
 $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';
 // The examples gallery (ROADMAP Task 314). lpn_empty_hint above is no longer rendered by the page
 // -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
@@ -1183,6 +1187,11 @@ $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the 
 // Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
 // so the strip refuses and says which two commands end the wizard.
 $ec_lang['lpn_georef_tab_locked']='Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.';
+// Saving during the wizard writes a document whose coordinates are half moved, so Save takes the
+// same refusal (Tom, 2026-09-08: *"Maybe the Save button should be disabled for consistency."*).
+// Its own sentence rather than the one above: the two commands that end the wizard are the same,
+// and "before you switch projects" is not true of a save.
+$ec_lang['lpn_georef_save_locked']='Finish the placement with the "Keep this placement" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.';
 $ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
 // Edited by TGH 2026-09-07
 // **TOM'S OWN TWO SENTENCES, 2026-09-08**, replacing a longer pair and an explanation he struck:
@@ -1225,6 +1234,12 @@ $ec_lang['lpn_pane_none']='This network has none of these yet.';
 // **It names Help and no row under it** (Tom, 2026-09-08, ruling on the shipped wording): there
 // are two Help buttons, so "Help, Fix something" reads as a path a reader cannot follow from where
 // they are standing. Naming the menu alone is the part that is true from both of them.
+// What the two alignment cells say for a Text that is attached to an asset. It is a STATE, not a
+// value: an attached text takes its alignment from the side of the leader it sits on, so the stored
+// centre/middle is not the answer and showing it read as a control that had stopped working. The
+// cell carries lpn_field_text_attached_tip, which is the property popup's own sentence for the same
+// rule.
+$ec_lang['lpn_pane_text_attached']='Attached';
 $ec_lang['lpn_pane_paste_note']='This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
 // What a filtered table says above its rows, so hidden rows always have a visible cause. {q} is the
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
@@ -2498,8 +2513,9 @@ $ec_lang['template_share_manual']='Copy this link:';
 // two-word phrase. Times are written the way EPANET writes them, so the tip has to say that a
 // plain number means hours.
 $ec_lang['lpn_time_menu']='Time';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_time_menu_tip']='Set the length of an extended period simulation, and step through it moment by moment.';
+// lpn_time_menu_tip was DELETED on 2026-09-08 (Tom: "Time menu tip: Delete."). It named the bottom
+// pane's Time tab, that tab is gone, and it had been supplied to pageConfig and read by nothing
+// since. Removed from all 27 language files and from the pageConfig supply in the same pass.
 $ec_lang['lpn_time_duration']='Total run time';
 $ec_lang['lpn_time_hyd_step']='Hydraulic time step';
 $ec_lang['lpn_time_pattern_step']='Pattern time step';

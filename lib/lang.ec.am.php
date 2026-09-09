@@ -1114,7 +1114,6 @@ $ec_lang['lpn_field_lat']='ኬክሮስ';
 $ec_lang['lpn_engine_minor_loss_note']='ማስታወሻ፦ የEPANET ፈታችን ሲጠቀሙ፣ ጥቃቅን (አካባቢያዊ) ኪሳራዎች ከአብሮ ከተሰራው ፈታች ትንሽ ያነሱ ይወጣሉ፣ ምክንያቱም EPANET ለስበት ኃይል የሚጠቀመውን ዋጋ ስለሚያጠጋጋ ነው።';
 $ec_lang['template_share_manual']='ይህን አገናኝ ቅዳ፦';
 $ec_lang['lpn_time_menu']='ጊዜ';
-$ec_lang['lpn_time_menu_tip']='ይህ መረብ ለምን ያህል ጊዜ እንደሚሮጥ ያስቀምጡ፣ በእያንዳንዱ ቅጽበትም በእርምጃ ይለፉበት።';
 $ec_lang['lpn_time_duration']='ጠቅላላ የመሮጫ ጊዜ';
 $ec_lang['lpn_time_hyd_step']='የሃይድሮሊክ ጊዜ ደረጃ';
 $ec_lang['lpn_time_pattern_step']='የስርዓት ጊዜ ደረጃ';

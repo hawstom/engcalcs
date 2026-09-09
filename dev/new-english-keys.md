@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read**, of 3 untranslated keys, of 1773 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read**, of 6 untranslated keys, of 1775 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -37,7 +37,7 @@ is the one you meant. "The first one" is a complete answer.
   2. an entrance whose cross-section is a square -- a statement about geometry
   **What this asks for:** which of the readings above you meant.
   *The proposal:* MEASURED ACROSS ALL 24 LANGUAGES THAT HAVE IT, AND THE MAJORITY READ IT WRONG. 13 of 24 rendered it as a SHAPE (ar, bg, bn, es, fa, he, hi, id, my, ps, sw, ur, zh -- 'square', 'square-shaped'); 11 rendered it as an EDGE (cs, de, fr, hr, it, pt, ro, ru, sr, tr, uk -- 'sharp-edged', 'sharp-angled', 'live arris'). Only one reading is what EPANET Table 3.3 means: a square-EDGED entrance, the one wh...
-  I don't see a proposal here. Aren't you supposed to propose a _syn entry?
+  @@ NEEDS RULING
 - **`lpn_reaction_limiting`**
   > Limiting concentration
   *The finding:* EPANET's own keyword is LIMITING POTENTIAL, a specific water-quality term (a concentration ceiling the reaction asymptotically approaches). Translated as 'Predelnaya kontsentratsiya' (limiting concentration) rather than a literal 'Predelnyy potentsial' because the tip describes it purely as a concentration and 'potentsial' alone reads as vague to a Russian engineer. The cost is keyword traceability: a reader cross-referencing an .inp file by keyword may not map the phrase back to LIMITING POTENTIAL.
@@ -45,7 +45,7 @@ is the one you meant. "The first one" is a complete answer.
   2. Limiting potential -- literal keyword match, less clear standing alone
   **What this asks for:** which of the readings above you meant.
   *The proposal:* TWO TRANSLATORS REACHED THE SAME PLACE INDEPENDENTLY, WHICH IS EVIDENCE ABOUT THE ENGLISH RATHER THAN ABOUT EITHER LANGUAGE. Hindi rendered it 'limiting concentration' too, on the same reasoning and without seeing the Russian finding. EPANET's manual does call the parameter a limiting CONCENTRATION in its own prose while the .inp keyword is LIMITING POTENTIAL, so the English here is EPANET's in...
-  I don't see a proposal here. Aren't you supposed to propose a _syn entry?
+  @@ NEEDS RULING
 - **`lpn_reaction_rough_corr`**
   > Roughness correlation
   *The finding:* 'Roughness correlation' -- 'correlation' here means a FUNCTIONAL relationship (wall reaction computed FROM roughness), not a statistical correlation. No settled Pashto term distinguishes the two senses; chose a general 'relationship' word.
@@ -53,16 +53,25 @@ is the one you meant. "The first one" is a complete answer.
   2. a statistical correlation, which would mislead
   **What this asks for:** which of the readings above you meant.
   *The proposal:* THIS IS AN ENGLISH AMBIGUITY, NOT ONLY A PASHTO ONE, and it is the same shape as lpn_fitting_entrance in this same sprint: an English word with a precise technical sense in one field (statistics) being used in its looser sense in another. EPANET computes a wall reaction coefficient AS A FUNCTION OF pipe roughness; nothing is correlated in the statistical sense. A reader who knows statistics is ...
-  I don't see a proposal here. Aren't you supposed to propose a _syn entry?
+  @@ NEEDS RULING
 
-## lpn_  (3, 3 to read @@ NEEDS RULING)
+## lpn_  (6, 5 to read @@ NEEDS RULING)
 
 - **`lpn_field_emitter`**
   > Emitter coefficient
-  OK.
+  _Ruled OK 2026-09-09._
 - **`lpn_field_emitter_tip`**
   > An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.
   @@ NEEDS RULING
 - **`lpn_field_text_attached_tip`**
   > This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
+  @@ NEEDS RULING
+- **`lpn_georef_save_locked`**
+  > Finish the placement with the "Keep this placement" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.
+  @@ NEEDS RULING
+- **`lpn_pane_text_attached`**
+  > Attached
+  @@ NEEDS RULING
+- **`lpn_popup_boxtitle`**
+  > Properties
   @@ NEEDS RULING

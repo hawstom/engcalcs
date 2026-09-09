@@ -1116,7 +1116,6 @@ $ec_lang['lpn_field_lat']='ទទឹង';
 $ec_lang['lpn_engine_minor_loss_note']='ចំណាំ៖ ជាមួយឧបករណ៍ដោះស្រាយ EPANET ការបាត់បង់មូលដ្ឋានចេញមកទាបជាងបន្តិចបំផុត បើប្រៀបធៀបនឹងឧបករណ៍ដោះស្រាយខាងក្នុង ព្រោះ EPANET បង្គត់តម្លៃទំនាញផែនដីដែលវាប្រើ។';
 $ec_lang['template_share_manual']='ចម្លងតំណនេះ៖';
 $ec_lang['lpn_time_menu']='ពេលវេលា';
-$ec_lang['lpn_time_menu_tip']='កំណត់រយៈពេលដំណើរការបណ្ដាញនេះ ហើយឈានទៅមុខម្ដងមួយភ្លែតៗ។';
 $ec_lang['lpn_time_duration']='រយៈពេលដំណើរការសរុប';
 $ec_lang['lpn_time_hyd_step']='ចន្លោះពេលធារាសាស្ត្រ';
 $ec_lang['lpn_time_pattern_step']='ចន្លោះពេលលំនាំ';

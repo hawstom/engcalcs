@@ -604,6 +604,9 @@ html[lang="zh"] .ec-welcome {
    pipe says `pointer` while the 2 px pipe inside it says `crosshair`, and the ribbon is what the
    pointer is actually over almost all of the time. */
 .lpn-vertexmode .lpn-link, .lpn-vertexmode .lpn-link-hit { cursor: crosshair; }
+/* The node's band takes the mode's cursor for the same reason the pipe's does: in vertices mode a
+   press on a node is not an edit of the node, so a `pointer` there would promise one. */
+.lpn-vertexmode .lpn-node-hit { cursor: crosshair; }
 /* ---- Scenarios: the audit halo and the inactive element (ROADMAP Task 184) ----
    AN OUTLINE, NEVER A FILL, and that is the whole reason a link gets a second element rather than
    a restyle: the pipe's own stroke IS the pipe, so recolouring it to mark an override would
@@ -638,6 +641,19 @@ html[lang="zh"] .ec-welcome {
    square over the symbol's own box, in the LINKS layer so a node still wins over it. `visible`
    rather than `all` for the reason above: `all` would hit a square nobody can see. */
 .lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: pointer; }
+/* **AND THE NODE'S OWN BAND, which is the half Task 615 did not do** (Tom, 2026-09-08: *"I get no
+   help from the mouse pointer. It's just a pan cross the entire time."*). A junction is 7 screen
+   pixels of drawn disc and nothing else, so `pointer` reached 0.2% of the map -- measured on the
+   example network at 23,821 sample points -- against 90.3% `grab` and 6.5% `move`, the last of
+   which is every draggable label lying in the topmost layer. The full measurement, and why there is
+   no race to find, is on LPN_NODE_HIT_PX in js/looped-network.js.
+
+   A transparent CIRCLE rather than a stroke, because a node is a point and not a line, and
+   `pointer-events: visible` for the reason .lpn-link-symbol-hit gives: `visiblePainted` would drop
+   a fill nobody painted, and `all` would hit the band while its node is hidden. `r` is written in
+   JS on every zoom, not by a var here, because it is the LARGER of the drawn radius and the slop --
+   a reservoir must not shrink to a junction's band. */
+.lpn-node-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: pointer; }
 /* THE TAB STRIP WHILE A MODEL IS BEING PLACED (Tom's 2026-09-08 worklist). Switching projects mid-wizard
    damaged both documents, so switchToTab(), closeTab() and newProject() refuse and say why. This is
    the half that stops the reach: faded, and the cursor says the press will not do what it looks
@@ -1205,7 +1221,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra
    class), so it wins the !important tie on specificity. */
-#lpn_canvas.regmode.regmode-node .lpn-node { cursor: pointer !important; }
+#lpn_canvas.regmode.regmode-node .lpn-node, #lpn_canvas.regmode.regmode-node .lpn-node-hit { cursor: pointer !important; }
 /* Popover dismiss control (Tom, 2026-07-31). Was a bottom "Close" button on all four lpn_
    popovers; in the Projects panel it sat directly beneath Open / Rename / Delete -- three buttons
    that all take a PROJECT as their object -- so "Close" read as "close the project" rather than
@@ -1857,6 +1873,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    .lpn-pane-num no longer carries an alignment of its own: on screen the position decides, and
    what "this column is figures" is still worth here is tabular figures. */
 .lpn-pane-table th.lpn-pane-num, .lpn-pane-table td.lpn-pane-num { font-variant-numeric: tabular-nums; }
+/* **A CELL STATING A RULE IS NOT A CELL HOLDING A VALUE** (Tom, 2026-09-08: *"center and middle
+   uneditable look like a bug."*). Every other plain cell on these tables is a RESULT or an
+   identity, and a number that reads like a number is right for both. This one says a word where the
+   column's other rows hold a choice, so it has to look like a different kind of thing: italic and
+   quieter, which is the ordinary typographic mark for "this is about the row, not in it". The tip
+   on it is the property popup's own sentence, so there is one explanation for the rule and not
+   two. */
+.lpn-pane-table td.lpn-pane-stated { font-style: italic; color: #555; }
 /* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, over three
    rounds of review ending in "round the final widths to nice numbers always": Minor loss 3em,
    Roughness 6em, Length 4.2em, Diameter 3em, and 3.5em for the tank, reservoir and junction
@@ -2018,6 +2042,22 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 .lpn-setbox-title {
 	position: absolute; top: 10px; left: 12px; font-weight: bold; pointer-events: none;
+}
+/* **THE PROPERTY POPUP'S DRAG BAND IS DELINEATED** (Tom, 2026-09-08: *"There is no visual title bar
+   depiction... a nice line delineating the title/drag bar would be nice."*). The band is the top
+   40px of padding and has been the only place this popup can be picked up by since it was written;
+   it looked identical to the body below it, so nothing said so.
+
+   A rule at the foot of the band rather than a background on it: the box is white and the other two
+   draggable boxes' bands are white, so tinting this one would make the property sheet the odd one
+   out in a set of three. `::before` rather than a wrapper element keeps the band a pure drag
+   surface -- `e.target` there is the popup itself, which is exactly what wirePopupDrag() tests --
+   and `pointer-events: none` is belt and braces on the same point. It runs the full width, under
+   the close X, because a rule that stopped short of the corner would read as an underline on the
+   word rather than as the bottom of a bar. */
+#lpn_popup::before {
+	content: ''; position: absolute; left: 0; right: 0; top: 39px;
+	border-top: 1px solid #ccc; pointer-events: none;
 }
 
 /* ---- THE NEW-PROJECT BOX (ROADMAP Task 477) --------------------------------------------------

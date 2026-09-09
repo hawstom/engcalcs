@@ -1094,7 +1094,6 @@ $ec_lang['lpn_time_pattern_start']='Horário de início do padrão';
 $ec_lang['lpn_time_pattern_step']='Passo de tempo do padrão';
 $ec_lang['lpn_time_hyd_step']='Passo de tempo hidráulico';
 $ec_lang['lpn_time_duration']='Duração total da simulação';
-$ec_lang['lpn_time_menu_tip']='Defina por quanto tempo esta rede é simulada e avance por ela momento a momento.';
 $ec_lang['lpn_time_menu']='Tempo';
 $ec_lang['template_share_manual']='Copie este link:';
 $ec_lang['lpn_tool_add_tank']='Tanque';

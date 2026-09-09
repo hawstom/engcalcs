@@ -157,6 +157,44 @@ exports.run = async function ({ browser, report }) {
 		});
 		report.eq(bare, 'grab', 'the bare map offers the open hand, so it reads as pannable');
 
+		// **AND A NODE SAYS `pointer` FOR MORE THAN ITS OWN SEVEN PIXELS** (Tom, 2026-09-08: *"I get
+		// no help from the mouse pointer. It's just a pan cross the entire time."*). Nothing was
+		// racing: measured on the example network at 23,821 sample points, 90.3% of the map computed
+		// `grab`, 6.5% `move` (the labels, in the topmost layer) and 3.2% `pointer`, of which the
+		// node discs were 0.2%. So the fight was AREA, and the node was the one object on this map
+		// with no invisible grab band -- the pipe had been given one the day before.
+		//
+		// **THIS IS THE ONE PLACE THE RESOLVED CURSOR IS REACHABLE.** dev/lpn-spike has no CSS
+		// engine, so its node-grab-band-harness.js can pin the mechanism and not the value; this
+		// walks outward from the dot and reads what the browser actually computes.
+		const reach = await a.page.evaluate(() => {
+			const c = document.querySelector('.lpn-node');
+			if (!c) { return null; }
+			const b = c.getBoundingClientRect();
+			const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+			// Four cardinals and the FURTHEST of them: this node's own label lies to one side of
+			// it, and a label is `move`, so a single-bearing walk measures where the label starts
+			// rather than where the band ends.
+			let best = 0;
+			for (const [dx, dy] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) {
+				let last = 0;
+				for (let d = 0; d <= 40; d++) {
+					const el = document.elementFromPoint(cx + dx * d, cy + dy * d);
+					if (!el) { break; }
+					if (getComputedStyle(el).cursor !== 'pointer') { break; }
+					last = d;
+				}
+				if (last > best) { best = last; }
+			}
+			return { disc: b.width / 2, reach: best };
+		});
+		report.ok(!!reach && reach.reach > reach.disc,
+			'a node says pointer further out than its own drawn disc, which is the grab band',
+			reach ? `disc ${reach.disc.toFixed(1)}px, pointer out to ${reach.reach}px` : 'no node');
+		report.ok(!!reach && reach.reach >= reach.disc + 5,
+			'...by about the slop a pipe already had, so the two targets do not disagree',
+			reach ? `slop ${(reach.reach - reach.disc).toFixed(1)}px` : 'no node');
+
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {
 		await a.close();

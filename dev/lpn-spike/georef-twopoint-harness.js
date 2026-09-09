@@ -449,15 +449,40 @@ console.log('\n--- the project tabs refuse to switch while a model is being plac
 	// Open example, Import and New all end in a project switch, so the menu refuses at its own
 	// door rather than opening and then refusing every row; openFromFile() carries the guard
 	// separately because the toolbar button reaches it without passing the menu.
-	const guards = (bare.match(/^\s*if \(georefBlocksProjectSwitch\(\)\)/gm) || []).length;
-	ok('the refusal is one function, called from every door that changes project', guards === 5,
-		guards + ' call sites (switchToTab, closeTab, newProject, openFileMenu, openFromFile)');
+	//
+	// **AND SAVE JOINED THEM ON 2026-09-08** (Tom: *"Maybe the Save button should be disabled for
+	// consistency."*). It is not a project switch, which is why it takes its own sentence -- a
+	// save during the wizard writes a document whose coordinates are half moved, because the
+	// placement frame is live and the source coordinates are held in `georef` rather than in the
+	// file. Same function, same fade, different reason and different words.
+	const guards = (bare.match(/^\s*if \(georefBlocksProjectSwitch\([\w.]*\)\)/gm) || []).length;
+	ok('the refusal is one function, called from every door that ends or writes the project',
+		guards === 6,
+		guards + ' call sites (switchToTab, closeTab, newProject, openFileMenu, openFromFile, saveCurrent)');
 	['function switchToTab(', 'function closeTab(', 'function newProject(coords)',
-		'function openFileMenu(', 'async function openFromFile('].forEach(function (f) {
+		'function openFileMenu(', 'async function openFromFile(', 'async function saveCurrent('].forEach(function (f) {
 		const at = src.indexOf(f);
 		ok(f.replace('function ', '').replace('async ', '').replace('coords', '') + ' asks it',
-			at >= 0 && src.slice(at, at + 900).indexOf('georefBlocksProjectSwitch()') >= 0);
+			at >= 0 && /georefBlocksProjectSwitch\(/.test(src.slice(at, at + 900)));
 	});
+	// **SAVE ASKS BEFORE ANY OF ITS OWN BRANCHES**, or the no-handle path would fall through to
+	// Save as and open a picker for a document that is still being placed.
+	{
+		const at = src.indexOf('async function saveCurrent(');
+		const body = src.slice(at, at + 900);
+		ok('...and Save asks before it can fall through to Save as',
+			body.indexOf('georefBlocksProjectSwitch(') < body.indexOf('saveAs()'));
+		ok('...with its own sentence rather than the project-switch one',
+			/georefBlocksProjectSwitch\(pc\.lpn_georef_save_locked\)/.test(body));
+	}
+	ok('the two sentences are both defined in English and are different',
+		(function () {
+			const lang = require('fs').readFileSync(
+				require('path').join(__dirname, '..', '..', 'lib', 'lang.ec.en.php'), 'utf8');
+			const a = (lang.match(/\$ec_lang\['lpn_georef_tab_locked'\]='([^']*)'/) || [])[1];
+			const b = (lang.match(/\$ec_lang\['lpn_georef_save_locked'\]='([^']*)'/) || [])[1];
+			return !!a && !!b && a !== b;
+		}()));
 	// The tabs stay CLICKABLE: a control that is inert cannot explain itself.
 	const css = require('fs').readFileSync(
 		require('path').join(__dirname, '..', '..', 'css', 'engcalcs.css'), 'utf8');
@@ -470,11 +495,10 @@ console.log('\n--- the project tabs refuse to switch while a model is being plac
 	ok('there is a fade class for the other two doors, and it does not make them inert',
 		/\.lpn-ctl-locked\s*\{[^}]*opacity/.test(css) &&
 		!/\.lpn-ctl-locked\s*\{[^}]*pointer-events\s*:\s*none/.test(css));
-	ok('...and the wizard toggles it on the held File menu button and the held Open button',
-		/fileMenuButton[\s\S]{0,200}lpn-ctl-locked/.test(src) &&
-		/openToolButton[\s\S]{0,200}lpn-ctl-locked/.test(src));
-	ok('...where the Open button is HELD by the toolbar, not looked up, because the strip is rebuilt',
-		/openToolButton = openBtn;/.test(src));
+	ok('...and the wizard toggles it on the held File menu, Open and Save buttons',
+		/fileMenuButton, openToolButton, saveToolButton\]\.forEach[\s\S]{0,200}lpn-ctl-locked/.test(src));
+	ok('...where each button is HELD by the toolbar, not looked up, because the strip is rebuilt',
+		/openToolButton = openBtn;/.test(src) && /saveToolButton = saveBtn;/.test(src));
 
 	L.georefCancel();
 	ok('cancelling the wizard unlocks the strip', !L.tabsLocked());

@@ -1119,7 +1119,6 @@ $ec_lang['lpn_field_lat']='अक्षांश';
 $ec_lang['lpn_engine_minor_loss_note']='नोट: EPANET सॉल्वर के साथ, स्थानीय (लघु) हानियाँ बिल्ट-इन सॉल्वर की तुलना में थोड़ी कम आती हैं, क्योंकि EPANET गुरुत्वाकर्षण के लिए जिस मान का उपयोग करता है उसे पूर्णांकित करता है।';
 $ec_lang['template_share_manual']='यह लिंक कॉपी करें:';
 $ec_lang['lpn_time_menu']='समय';
-$ec_lang['lpn_time_menu_tip']='तय करें कि यह नेटवर्क कितनी देर चलेगा, और इसे पल-पल करके देखें।';
 
 $ec_lang['lpn_time_duration']='कुल चलने का समय';
 $ec_lang['lpn_time_hyd_step']='हाइड्रॉलिक समय चरण';

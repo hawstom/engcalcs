@@ -1114,7 +1114,6 @@ $ec_lang['lpn_field_lat']='Zemljopisna širina';
 $ec_lang['lpn_engine_minor_loss_note']='Napomena: s EPANET rješavačem, manji (lokalni) gubici izlaze neznatno niži nego s ugrađenim rješavačem, jer EPANET zaokružuje vrijednost koju koristi za gravitaciju.';
 $ec_lang['template_share_manual']='Kopirajte ovu poveznicu:';
 $ec_lang['lpn_time_menu']='Vrijeme';
-$ec_lang['lpn_time_menu_tip']='Postavite koliko dugo ova mreža radi, i prolazite kroz nju trenutak po trenutak.';
 $ec_lang['lpn_time_duration']='Ukupno vrijeme rada';
 $ec_lang['lpn_time_hyd_step']='Hidraulički vremenski korak';
 $ec_lang['lpn_time_pattern_step']='Vremenski korak obrasca potražnje';

@@ -1122,7 +1122,6 @@ $ec_lang['lpn_field_lat']='Latitudo';
 $ec_lang['lpn_engine_minor_loss_note']='Kumbuka: kwa kitatuzi cha EPANET, upotevu wa ndani hutokea chini kidogo sana kuliko kwa kitatuzi kilichojengwa ndani, kwa sababu EPANET hurunda thamani inayoitumia kwa mvuto wa dunia.';
 $ec_lang['template_share_manual']='Nakili kiungo hiki:';
 $ec_lang['lpn_time_menu']='Muda';
-$ec_lang['lpn_time_menu_tip']='Panga muda gani mtandao huu unaendesha, na upitie hatua kwa hatua.';
 $ec_lang['lpn_time_duration']='Muda wote wa kuendesha';
 $ec_lang['lpn_time_hyd_step']='Hatua ya muda ya kihaidroliki';
 $ec_lang['lpn_time_pattern_step']='Hatua ya muda ya muundo';

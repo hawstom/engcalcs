@@ -1117,7 +1117,6 @@ $ec_lang['lpn_field_lat']='অক্ষাংশ';
 $ec_lang['lpn_engine_minor_loss_note']='লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।';
 $ec_lang['template_share_manual']='এই লিংকটি কপি করুন:';
 $ec_lang['lpn_time_menu']='সময়';
-$ec_lang['lpn_time_menu_tip']='এই নেটওয়ার্কটি কতক্ষণ চলবে তা নির্ধারণ করুন, এবং মুহূর্ত ধরে ধরে এগিয়ে যান।';
 
 $ec_lang['lpn_time_duration']='মোট চলার সময়';
 $ec_lang['lpn_time_hyd_step']='হাইড্রোলিক টাইম স্টেপ';

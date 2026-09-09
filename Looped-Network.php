@@ -606,6 +606,19 @@ echoHeader("EngCalcs", $html_title, "", false);
       // underneath and was read as a background pan). fixed is always viewport-relative, matching
       // clientX/clientY directly with no scroll math needed. ?>
 <div id="lpn_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<?php // **THE DRAG BAND IS NAMED AND DELINEATED** (Tom, 2026-09-08: *"There is no visual title bar
+	      // depiction. For a non-hog box like this I would expect a title bar with a title in it;
+	      // maybe the right title is 'Properties'. Or empty for now. But a nice line delineating the
+	      // title/drag bar would be nice."*). The 40px band at the top has been the drag surface
+	      // since this popup was written and looked like nothing at all, so the one place it can be
+	      // picked up by was the one place nothing said so.
+	      //
+	      // Same class and the same `pointer-events: none` as the Find box's and the Settings box's
+	      // own titles, deliberately: those two already solved this and a second idiom would be a
+	      // second thing to keep in step. The LINE is #lpn_popup::before in css/engcalcs.css.
+	      // #lpn_popup_title below is a different thing and stays where it is -- it names the
+	      // ELEMENT you opened (and holds its rename box), where this names the BOX. ?>
+	<div id="lpn_popup_boxtitle" class="lpn-setbox-title"><?=$ec_lang['lpn_popup_boxtitle']?></div>
 	<div class="lpn-popover-body">
 	<div id="lpn_popup_title"></div>
 	<div id="lpn_popup_fields"></div>
@@ -1329,6 +1342,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_tab_valves: <?=json_encode($ec_lang['lpn_pane_tab_valves'])?>,
 	lpn_pane_tab_tip: <?=json_encode($ec_lang['lpn_pane_tab_tip'])?>,
 	lpn_pane_none: <?=json_encode($ec_lang['lpn_pane_none'])?>,
+	lpn_pane_text_attached: <?=json_encode($ec_lang['lpn_pane_text_attached'])?>,
 	lpn_pane_paste_note: <?=json_encode($ec_lang['lpn_pane_paste_note'])?>,
 	lpn_pane_filter_note: <?=json_encode($ec_lang['lpn_pane_filter_note'])?>,
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
@@ -1337,7 +1351,6 @@ EngCalcs.pageConfig = {
 	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
 	lpn_pane_print_tip: <?=json_encode($ec_lang['lpn_pane_print_tip'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
-	lpn_time_menu_tip: <?=json_encode($ec_lang['lpn_time_menu_tip'])?>,
 	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,
 	lpn_time_hyd_step: <?=json_encode($ec_lang['lpn_time_hyd_step'])?>,
 	lpn_time_pattern_step: <?=json_encode($ec_lang['lpn_time_pattern_step'])?>,
@@ -1894,6 +1907,7 @@ EngCalcs.pageConfig = {
 	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
 	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,
 	lpn_georef_tab_locked: <?=json_encode($ec_lang['lpn_georef_tab_locked'])?>,
+	lpn_georef_save_locked: <?=json_encode($ec_lang['lpn_georef_save_locked'])?>,
 	lpn_goto_menu: <?=json_encode($ec_lang['lpn_goto_menu'])?>,
 	lpn_goto_tip: <?=json_encode($ec_lang['lpn_goto_tip'])?>,
 	lpn_goto_prompt: <?=json_encode($ec_lang['lpn_goto_prompt'])?>,

@@ -52,6 +52,21 @@ async function centre(a) {
 	const r = await canvasRect(a);
 	return readAt(a, r.x + r.w / 2, r.y + r.h / 2);
 }
+// **HOW CLOSE IS CLOSE ENOUGH, IN DEGREES, AT WHATEVER SCALE THE MAP IS AT** (Tom, 2026-09-08:
+// *"Goto should preserve the zoom factor."*). The arrival checks below used a fixed 0.002 deg, and
+// that only ever worked because Go to used to ZOOM to a kilometre-wide site: 0.002 deg is a couple
+// of pixels there and a fifth of a screen at the home view. Now the trip keeps whatever scale the
+// user was at, so the tolerance has to be a number of PIXELS rather than a number of degrees.
+// Read off the map itself, from two hovers on one row, so it needs no arithmetic about the
+// projection.
+async function degPerPx(a) {
+	const r = await canvasRect(a), y = r.y + r.h / 2;
+	const x1 = r.x + r.w * 0.25, x2 = r.x + r.w * 0.75;
+	const p1 = await readAt(a, x1, y), p2 = await readAt(a, x2, y);
+	if (p1.lon === undefined || p2.lon === undefined) { return NaN; }
+	return Math.abs(p2.lon - p1.lon) / (x2 - x1);
+}
+async function nearTol(a) { return Math.max((await degPerPx(a)) * 6, 1e-6); }
 // Type something into the Go to… prompt from the View menu and settle.
 async function goTo(a, typed) {
 	a.answerPromptWith(typed);
@@ -120,16 +135,40 @@ exports.run = async function ({ browser, report }) {
 		report.ok(rows.includes(GOTO_ROW), 'a lat/lon project offers it on the View menu');
 
 		// ---- it goes there ----------------------------------------------------------------------
+		// **AND THE SCALE IS THE ONE IT WAS**, which is now the whole of what Go to promises about
+		// zoom. Measured as degrees per screen pixel, off the coordinate readout, rather than out of
+		// a variable: the readout is what a person actually sees, and Mercator makes the number a
+		// function of latitude, so the two are compared through metresPerPx() below instead.
+		// **ZOOMED IN FIRST, and that is now load-bearing.** The arrival tolerance below is a number
+		// of PIXELS, so at the whole-world home view six pixels is a degree and a half and the check
+		// proves nothing. Ten wheel notches puts the map at a scale where six pixels is a fraction
+		// of a degree -- and it is also the state Tom's ruling is about, since somebody who has not
+		// zoomed has no zoom to preserve.
+		{
+			const r = await canvasRect(a);
+			for (let i = 0; i < 10; i++) { await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2); await a.page.mouse.wheel(0, -120); }
+			await a.settle(400);
+		}
+		// The Mercator scale, in degrees of longitude per screen pixel. NOT metresPerPx(): a metre
+		// per pixel is a function of latitude in this projection, so travelling from the equator to
+		// 38 N changes it by cos(lat) while the scale is perfectly preserved.
+		const dppBefore = await degPerPx(a);
 		await goTo(a, '38.106, -122.569');
+		let tol = await nearTol(a);
 		let at = await centre(a);
-		report.ok(at.lon !== undefined && Math.abs(at.lat - TARGET.lat) < 0.002 && Math.abs(at.lon - TARGET.lon) < 0.002,
+		report.ok(at.lon !== undefined && Math.abs(at.lat - TARGET.lat) < tol && Math.abs(at.lon - TARGET.lon) < tol,
 			'a pasted "38.106, -122.569" centres the map on it — LATITUDE FIRST, as every map hands it out',
-			at.text);
+			at.text + '  (within ' + tol.toFixed(6) + ' deg)');
+		const dppAfter = await degPerPx(a);
+		report.ok(isFinite(dppBefore) && isFinite(dppAfter) && within(dppAfter, dppBefore, 0.01),
+			'...at the scale it was already at (Tom, 2026-09-08: "Goto should preserve the zoom factor")',
+			dppBefore.toExponential(4) + ' -> ' + dppAfter.toExponential(4) + ' deg/px');
 
 		// ---- a space alone, from somewhere else entirely -----------------------------------------
 		await goTo(a, '51.5 -0.12');
+		tol = await nearTol(a);
 		at = await centre(a);
-		report.ok(at.lon !== undefined && Math.abs(at.lat - 51.5) < 0.002 && Math.abs(at.lon + 0.12) < 0.002,
+		report.ok(at.lon !== undefined && Math.abs(at.lat - 51.5) < tol && Math.abs(at.lon + 0.12) < tol,
 			'a space alone separates them', at.text);
 		report.eq(await a.notice(), '', '...and nothing is complained about');
 
@@ -141,12 +180,18 @@ exports.run = async function ({ browser, report }) {
 		const trap = await centre(a);
 		report.eq(await a.notice(), '',
 			'a decimal-comma rendering of the tip\'s own example is accepted, not refused');
-		report.ok(trap.lon !== undefined && Math.abs(trap.lat - 38.106) < 0.01 && Math.abs(trap.lon + 122.569) < 0.01,
+		const trapTol = Math.max(await nearTol(a), 0.01);
+		report.ok(trap.lon !== undefined && Math.abs(trap.lat - 38.106) < trapTol && Math.abs(trap.lon + 122.569) < trapTol,
 			'...and it lands where it names, not at 38 N 106 E half a world away',
 			trap.text);
 		// A thousands separator makes THREE numbers, and three cannot be read two ways either.
+		// **THE REFUSAL IS COMPARED WITH THE SHIPPED STRING, NEVER A PHRASE TYPED HERE.** These four
+		// lines asserted "one latitude and one longitude" and went red the day Tom reworded
+		// lpn_goto_bad (2026-09-08: *"The tip clarification is pointless IMO"*) -- a spec carrying
+		// its own copy of a sentence is a spec that fails on an edit nobody made a mistake in.
+		const REFUSED = await a.page.evaluate(() => EngCalcs.pageConfig.lpn_goto_bad);
 		await goTo(a, '1,234.5 -122.5');
-		report.has(await a.notice(), 'one latitude and one longitude',
+		report.eq(await a.notice(), REFUSED,
 			'a thousands separator is refused rather than half-read');
 
 		// ---- refusals say so --------------------------------------------------------------------
@@ -154,19 +199,19 @@ exports.run = async function ({ browser, report }) {
 		// raised first would still be on screen when the trap's "nothing was said" is read.
 		const before = await centre(a);
 		await goTo(a, 'Petaluma, California');
-		report.has(await a.notice(), 'one latitude and one longitude', 'prose is refused, in words');
+		report.eq(await a.notice(), REFUSED, 'prose is refused, in words');
 		let now = await centre(a);
 		report.ok(now.lat === before.lat && now.lon === before.lon,
 			'...and the map did not move', now.text);
 
 		await goTo(a, '91, 0');
-		report.has(await a.notice(), 'one latitude and one longitude',
+		report.eq(await a.notice(), REFUSED,
 			'a latitude past the pole is refused — 91 north does not exist');
 		now = await centre(a);
 		report.ok(now.lat === before.lat && now.lon === before.lon, '...and the map did not move');
 
 		await goTo(a, '38.106, -190');
-		report.has(await a.notice(), 'one latitude and one longitude', 'a longitude past 180 is refused');
+		report.eq(await a.notice(), REFUSED, 'a longitude past 180 is refused');
 
 		// ---- the second door: the placement bar --------------------------------------------------
 		// Same function, reached while a model is being placed — the moment a user most needs it,
@@ -192,7 +237,7 @@ exports.run = async function ({ browser, report }) {
 			});
 			const [chooser] = await Promise.all([
 				a.page.waitForEvent('filechooser'),
-				a.menuClick('Import xy to lat/lon…')
+				a.menuClick('Open an xy file on the map…')
 			]);
 			await chooser.setFiles({ name: 'goto.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
 		}

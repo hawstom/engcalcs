@@ -1116,7 +1116,6 @@ $ec_lang['lpn_field_lat']='عرض جغرافیایی';
 $ec_lang['lpn_engine_minor_loss_note']='نکته: با حل‌کنندهٔ EPANET، افت‌های موضعی اندکی کمتر از حل‌کنندهٔ درون‌ساخت به دست می‌آیند، چون EPANET مقداری را که برای شتاب گرانش به کار می‌برد، گرد می‌کند.';
 $ec_lang['template_share_manual']='این پیوند را کپی کنید:';
 $ec_lang['lpn_time_menu']='زمان';
-$ec_lang['lpn_time_menu_tip']='تعیین کنید این شبکه چقدر اجرا شود، و لحظه‌به‌لحظه در آن پیش بروید.';
 $ec_lang['lpn_time_duration']='کل مدت اجرا';
 $ec_lang['lpn_time_hyd_step']='گام زمانی هیدرولیکی';
 $ec_lang['lpn_time_pattern_step']='گام زمانی الگو';

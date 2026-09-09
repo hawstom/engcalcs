@@ -1115,7 +1115,6 @@ $ec_lang['lpn_field_lat']='Lintang';
 $ec_lang['lpn_engine_minor_loss_note']='Catatan: dengan penyelesai EPANET, kehilangan lokal (minor) muncul sedikit lebih rendah daripada dengan penyelesai bawaan, karena EPANET membulatkan nilai gravitasi yang digunakannya.';
 $ec_lang['template_share_manual']='Salin tautan ini:';
 $ec_lang['lpn_time_menu']='Waktu';
-$ec_lang['lpn_time_menu_tip']='Atur berapa lama jaringan ini berjalan, dan telusuri momen demi momen.';
 $ec_lang['lpn_time_duration']='Total waktu berjalan';
 $ec_lang['lpn_time_hyd_step']='Langkah waktu hidrolik';
 $ec_lang['lpn_time_pattern_step']='Langkah waktu pola';

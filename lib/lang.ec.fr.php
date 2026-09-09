@@ -1043,7 +1043,6 @@ $ec_lang['lpn_settings_wipe_btn']='Effacer tout sur cette page';
 $ec_lang['lpn_confirm_wipe']='Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d\'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.';
 $ec_lang['template_share_manual']='Copiez ce lien :';
 $ec_lang['lpn_time_menu']='Temps';
-$ec_lang['lpn_time_menu_tip']='Définir la durée de fonctionnement de ce réseau, et le parcourir instant par instant.';
 $ec_lang['lpn_time_duration']='Durée totale de simulation';
 $ec_lang['lpn_time_hyd_step']='Pas de temps hydraulique';
 $ec_lang['lpn_time_pattern_step']='Pas de temps de la courbe de modulation';

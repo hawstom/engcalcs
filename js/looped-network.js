@@ -3860,6 +3860,41 @@ var EngCalcs = EngCalcs || {};
 	// on the drawing. A press inside the band still falls through to a PAN if it is a drag
 	// (wirePointerEvents() arms no drag for a link), so widening it costs no panning anywhere.
 	var LPN_LINK_HIT_PX = 12;
+	// **AND A JUNCTION IS SEVEN PIXELS ACROSS, WHICH IS WHY THE POINTER NEVER SAYS ANYTHING** (Tom,
+	// 2026-09-08: *"The mouse is very unreliable to the point of rarely changing to an arrow and
+	// usually as a flicker"*, and *"I get no help from the mouse pointer. It's just a pan cross the
+	// entire time."*).
+	//
+	// **MEASURED, because two rounds of guessing at a race had already been spent on it.** A grid
+	// of 23,821 points over the example network in a 1398 x 798 canvas, each resolved through
+	// elementFromPoint() and getComputedStyle() in a real Chromium: **90.3% of the map computes
+	// `grab`, 6.5% computes `move`, and 3.2% computes `pointer` -- of which the node discs are
+	// 0.2%.** Nothing mutates while the pointer is over an object (0 DOM mutations in three
+	// stationary seconds and 0 across a 60-step wander), nothing writes `style.cursor` outside
+	// nudgeCursor(), and `lpn-panning` no longer reaches an object's own rule. **There is no race.
+	// The fight is AREA**: the labels lie in the topmost layer wearing `cursor: move` -- the
+	// four-headed arrow Tom himself named the "pan/drag cross" -- over twice the ground that
+	// everything saying `pointer` covers put together, and they are what you cross on the way to a
+	// node. Sweeping a mouse over that map, the cursor is `grab`, occasionally `move`, and lands on
+	// a 7 px disc for a frame. That frame is the flicker.
+	//
+	// **THE PIPE'S OWN FIX, APPLIED TO THE NODE.** The pipe got an invisible band the day
+	// before, for the same complaint in the same words; the node did not get one, and the node is
+	// the smaller target of the two. Same number, so the slop is the same 6 px on both, and the
+	// bands cannot disagree about which of two touching things you meant. The node's band is in the
+	// nodes layer, ABOVE the links layer, which is the precedence nodeOutranks() already states for
+	// a finger and the pipe band's own comment already assumes ("near a junction the node must stay
+	// the easier target").
+	//
+	// **RE-MEASURED AFTER IT LANDED:** the node's `pointer` share went 0.2% -> 0.8% and a junction's
+	// target 10 px across -> 22 px. The residual is the labels, and it was NOT changed on our own
+	// judgement: `move` is the standard cursor for a draggable thing, and a label at rest saying
+	// `grab` would be indistinguishable from the bare map it sits on.
+	//
+	// It is deliberately NOT POINTER_REACH_PX. That number answers "how near may a hand land and
+	// still mean this node" and is used by the finders AFTER a hit; this is the width of an
+	// invisible mark on the drawing, and giving it 14 would swallow every pipe end.
+	var LPN_NODE_HIT_PX = 12;
 	// The reach this gesture deserves. `pointerType` is the only honest source -- a device with
 	// both a mouse and a screen answers per press, where a media query answers once for the
 	// machine. A PEN is a pointer: it is precise, and it is what a surveyor marking up a map on a
@@ -4458,6 +4493,21 @@ var EngCalcs = EngCalcs || {};
 	// leader placement, hit-testing, staticObstacles(), the zoom-extent bbox. A reservoir is not
 	// visually a circle, so this is the CIRCUMSCRIBING radius (half its longer side): generous
 	// rather than tight, so no consumer clips the wide/short tank on any one side.
+	// The grab band's radius in WORLD units: **the drawn symbol PLUS the slop**, which is the pipe
+	// band's own arithmetic rather than a maximum of the two. `Math.max(disc, slop)` was tried
+	// first and MEASURED TO BUY NOTHING: `settings.symbolSize` on the example network draws a
+	// junction 10 screen px across, so a 12 px band is a 1 px ring and the node's share of the map
+	// went from 0.2% to 0.2%. A pipe's band is its 2 px mark plus about 5 px on each side; a node's
+	// is its disc plus the same, which takes a 10 px dot to a 22 px target -- 4.8x the area -- and
+	// gives a reservoir the identical slop rather than none.
+	//
+	// Still comfortably inside POINTER_REACH_PX (14, a radius), so a node's band cannot reach
+	// further than the number that answers "how near may a hand land and still mean this node".
+	// Screen pixels, like every other tolerance here, so zooming out never makes a node harder to
+	// reach than it was.
+	function nodeHitRadius(n) {
+		return nodeRadius(n) + (LPN_NODE_HIT_PX / 2) / (state.s || 1);
+	}
 	function nodeRadius(n) {
 		// **THE DRAWN EXTENT, NOT THE BOX** (2026-09-03). This used to be half the larger side of
 		// nodeSymbolSize(), which was right while the icon filled its box. It no longer does: a
@@ -4517,7 +4567,11 @@ var EngCalcs = EngCalcs || {};
 		var bop = settings.backdropOpacity;
 		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
 		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id]; if (ne) { ne.circle.setAttribute('r', nodeRadius(n)); }
+			var ne = nodeEls[n.id];
+			if (ne) { ne.circle.setAttribute('r', nodeRadius(n)); }
+			// The band is a SCREEN size, so it is re-derived on every zoom as well as on every
+			// symbol-size change -- the same reason --lpn-hit is republished above.
+			if (ne && ne.hit) { ne.hit.setAttribute('r', nodeHitRadius(n)); }
 			positionNodeSymbol(n.id);
 		});
 		doc.links.forEach(function (l) {
@@ -5328,6 +5382,13 @@ var EngCalcs = EngCalcs || {};
 	// box being taken into account -- see placeLegends().
 	function applyColorLegendPosition() { placeLegends(); }
 	function buildNodeEls(n) {
+		// **THE GRAB BAND FIRST, so the drawn disc paints over it** -- see LPN_NODE_HIT_PX. It
+		// carries the same `data-node`, so selectFromHit(), nodeOutranks() and every other reader of
+		// the dataset sees the node and there is no second vocabulary for "this is a junction".
+		var hit = el('circle', {
+			cx: n.x, cy: n.y, r: nodeHitRadius(n),
+			'class': 'lpn-node-hit', 'data-node': n.id
+		}, nodesLayer);
 		var circle = el('circle', {
 			cx: n.x, cy: n.y, r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
@@ -5376,7 +5437,7 @@ var EngCalcs = EngCalcs || {};
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
-		nodeEls[n.id] = { circle: circle, symbol: symbol, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		noteMeasuredWidth(nodeEls[n.id], tw);
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
@@ -6172,6 +6233,7 @@ var EngCalcs = EngCalcs || {};
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', n.x); ne.circle.setAttribute('cy', n.y);
+		if (ne.hit) { ne.hit.setAttribute('cx', n.x); ne.hit.setAttribute('cy', n.y); }
 		positionNodeSymbol(id);
 		layoutNodeLabel(id);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
@@ -7920,7 +7982,7 @@ var EngCalcs = EngCalcs || {};
 		// FADED AND STILL CLICKABLE, which is the tab strip's own rule and the reason there is no
 		// `disabled` here: an inert button cannot say why it is inert, and saying why is the whole
 		// of what this does.
-		[fileMenuButton, openToolButton].forEach(function (b) {
+		[fileMenuButton, openToolButton, saveToolButton].forEach(function (b) {
 			if (b && b.classList) { b.classList.toggle('lpn-ctl-locked', !!georef); }
 		});
 		if (!georef) { return; }
@@ -8058,9 +8120,6 @@ var EngCalcs = EngCalcs || {};
 		if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) { return null; }
 		return { lat: lat, lon: lon };
 	}
-	// About a kilometre across, which is a site rather than a city: arriving zoomed to the whole
-	// county would technically centre the view and leave you no better off than before.
-	var GOTO_SPAN_DEG = 0.01;
 	function goToLatLon() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!isGeoProject()) { return; }
@@ -8077,7 +8136,6 @@ var EngCalcs = EngCalcs || {};
 	// and then travels through here, so the size question, the zoom floor and the placement case
 	// are asked once rather than reimplemented beside them.
 	function goToPoint(ll) {
-		var w = (svg && svg.clientWidth) || 1000, want = w / GOTO_SPAN_DEG;
 		// **WHILE PLACING, IT ASKS THE SECOND HALF OF THE QUESTION TOO.** Tom, 2026-08-18: *"In the
 		// Go to... box, ask for lat/lon and approximate size of project area in project length
 		// units. Provide a default of either 1000m or 3000 ft."* That is the half we do NOT have --
@@ -8088,9 +8146,18 @@ var EngCalcs = EngCalcs || {};
 			var span = georefAskSize();
 			if (span > 0) { georefGoTo(ll, span); return; }
 		}
-		// KEEP the zoom when it is already closer than a site: someone who has lined up on a street
-		// corner and then types a coordinate wants to travel, not to be zoomed back out.
-		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: Math.max(state.s, Math.min(want, maxScale())) });
+		// **THE ZOOM IS THE USER'S AND GOING SOMEWHERE DOES NOT SPEND IT** (Tom, 2026-09-08:
+		// *"Goto should preserve the zoom factor. Otherwise good."*). This used to zoom IN to a
+		// site-sized span (a kilometre across) whenever the view was wider than that, on the
+		// argument that arriving zoomed to the whole county leaves you no better off. Half of that
+		// was already conceded -- a view CLOSER than a site was kept, because somebody lined up on
+		// a street corner wants to travel rather than be zoomed out -- and Tom has now settled the
+		// other half the same way. A scale is a decision the user made before they pressed this,
+		// and travelling is not a reason to overrule it.
+		//
+		// It is the ONE DOOR, so this governs the place-name search in js/lpn-search.js too, which
+		// is the same promise: type a name, keep your scale, arrive.
+		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: state.s });
 		georefDetachTick();
 	}
 
@@ -9186,7 +9253,7 @@ var EngCalcs = EngCalcs || {};
 	// reach a previous strip's element -- and the menu bar's ids are written from a variable
 	// (`b.id = m.id`), which is a shape dom_id_resolve_check.php cannot resolve and correctly
 	// reports. A reference is the honest answer to both.
-	var openToolButton = null, fileMenuButton = null;
+	var openToolButton = null, fileMenuButton = null, saveToolButton = null;
 	function setSelectAreaShape(shape) {
 		if (LPN_AREA_SHAPES.indexOf(shape) < 0) { return false; }
 		selectAreaShape = shape;
@@ -11537,13 +11604,17 @@ var EngCalcs = EngCalcs || {};
 				// **CAPPED BEFORE IT IS MEASURED, or the clamp works from a height the box will not
 				// have.** The top comes first because the cap depends on it: how much room there is
 				// below is a fact about where the box is going, not about the window.
-				top = Math.max(chromeFloor(), findUserPos.top);
-				capPanelToRoomBelow(popup, top);
+				// **NOT RAISED TO THE CHROME FLOOR ANY MORE** (Tom's 2026-09-08 worklist): the top overhang is
+				// the user's, exactly like the other three edges -- see restoreBounds(). The CAP is
+				// still measured from the floor, because how tall the box may be is a fact about the
+				// room this page has and not about how high the user parked it.
+				top = findUserPos.top;
+				capPanelToRoomBelow(popup, Math.max(chromeFloor(), top));
 				r = popup.getBoundingClientRect();
 				// restoreBounds(), not clampPanel() (Tom's 2026-09-08 worklist): a corner the user dragged to keeps
 				// its overhang; the chrome floor and the 28 px sliver are all that is enforced.
 				at = restoreBounds(findUserPos.left, top, r.width, r.height,
-					window.innerWidth, window.innerHeight, chromeFloor());
+					window.innerWidth, window.innerHeight);
 				popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 			} else if (anchorEl && anchorEl.getBoundingClientRect) {
 				openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
@@ -12897,6 +12968,24 @@ var EngCalcs = EngCalcs || {};
 		refreshLabelContent(id);
 		saveToStorage();
 	}
+	// **A CELL THAT CANNOT BE EDITED MUST NOT SHOW A VALUE THAT LOOKS TYPEABLE** (Tom, 2026-09-08:
+	// *"In Tables, should H & V alignment say 'attached' if attached? center and middle uneditable
+	// look like a bug."*). An anchored Text takes its alignment from the side of the leader it sits
+	// on, so the two rows are not offered in the property popup at all -- that is
+	// lpn_field_text_attached_tip, which shipped the day before -- and the TABLE, which has a cell
+	// for every column whether or not the row can use it, was rendering the stored default as a
+	// plain word. `center` in a cell you cannot change reads as a control that has stopped working,
+	// not as a rule. So the cell states the RULE instead, and carries the popup's own sentence as
+	// its tip.
+	function paneTextAttachedWord() {
+		var pc = EngCalcs.pageConfig || {};
+		return pc.lpn_pane_text_attached || 'Attached';
+	}
+	function paneTextAttachedTip() {
+		var pc = EngCalcs.pageConfig || {};
+		return pc.lpn_field_text_attached_tip ||
+			'This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
+	}
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -12921,6 +13010,7 @@ var EngCalcs = EngCalcs || {};
 				},
 				get: function (lb) { return lb.align || 'center'; },
 				plainFor: function (lb) { return textIsAnchored(lb); },
+				plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
 				set: function (lb, v) {
 					lb.align = v;   // base-write: justification is Base-owned, exactly as position and size are
 					textLabelRelayout(lb.id);
@@ -12933,6 +13023,7 @@ var EngCalcs = EngCalcs || {};
 				},
 				get: function (lb) { return lb.valign || 'middle'; },
 				plainFor: function (lb) { return textIsAnchored(lb); },
+				plainWord: paneTextAttachedWord, plainTip: paneTextAttachedTip,
 				set: function (lb, v) {
 					lb.valign = v;   // base-write: see align
 					textLabelRelayout(lb.id);
@@ -13285,6 +13376,10 @@ var EngCalcs = EngCalcs || {};
 	// identity reads verbatim. Two of these written separately is how a sheet in somebody's hand
 	// comes to round differently from the screen it was taken off.
 	function paneCellText(c, el) {
+		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
+		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
+		// decides what a cell says, so the screen, the refill and the printed sheet all say it.
+		if (c.plainWord && c.plainFor && c.plainFor(el)) { return c.plainWord(); }
 		var v = c.get(el);
 		// **A COLUMN MAY BE A YES/NO, A CHOICE OR A LINE OF TEXT** (Tom, 2026-09-08: the Text table
 		// and the Active column). A yes/no reads as 1 or 0 -- what a pasted sheet can carry and
@@ -13501,6 +13596,15 @@ var EngCalcs = EngCalcs || {};
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
 				if (!c.result) { td.textContent = paneCellText(c, el); }
+				// **AND IT SAYS, ON THE CELL, WHY IT IS NOT A BOX.** The class carries the styling
+				// that tells a reader at a glance that this is a state and not a value; the tip is
+				// the same sentence the property popup gives, so there is one explanation and not
+				// two. `ec-help` is what js/Calculators.lib.js wires the tap tooltip on, and
+				// initTipsIn() at the foot of renderPaneTable() picks it up.
+				if (c.plainWord && c.plainFor && c.plainFor(el)) {
+					td.className += ' lpn-pane-stated';
+					if (c.plainTip) { td.title = c.plainTip(); td.className += ' ec-help'; }
+				}
 				// Focusable but not in the tab order: End and Ctrl+End must be able to land on a
 				// read-only column, exactly as a spreadsheet's End does not skip a protected cell,
 				// while Tab still walks the boxes a person can actually type in.
@@ -15757,6 +15861,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
+		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
 		nodeEls[id].leader.remove();
 		if (nodeEls[id].symbol) { nodeEls[id].symbol.remove(); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
@@ -19266,6 +19371,10 @@ var EngCalcs = EngCalcs || {};
 	// File -> Save. Writes the file this project came from, and asks nothing.
 	async function saveCurrent() {
 		var pc = EngCalcs.pageConfig || {};
+		// **THE MODEL IS LOCKED WHILE IT IS BEING PLACED, AND THAT INCLUDES SAVING IT** (Tom's
+		// 2026-09-08 worklist). Before every other branch below, because each of them is a way of
+		// writing the document and the wizard's answer is the same to all of them.
+		if (georefBlocksProjectSwitch(pc.lpn_georef_save_locked)) { return; }
 		// Unreachable from the menu where the API is missing -- the row is disabled there -- but
 		// routed rather than left to fall through, so no future caller can make Save mean "download".
 		if (!fileApiAvailable()) { await saveAs(); return; }
@@ -20439,10 +20548,16 @@ var EngCalcs = EngCalcs || {};
 	// is a state-machine rewrite for a case with two named exits already on screen; a control that
 	// silently does nothing teaches nothing, so the refusal names the two commands that end it.
 	// One door -- every tab, the ≡ list and the close prompt all come through switchToTab().
-	function georefBlocksProjectSwitch() {
+	// **AND SAVE IS ONE OF THEM** (Tom, 2026-09-08: *"Maybe the Save button should be disabled for
+	// consistency."*). A save during the wizard writes a document whose coordinates are half moved
+	// -- the placement frame is live and the source coordinates are held in `georef`, not in the
+	// file -- so it is the same refusal for the same reason. It takes its OWN sentence rather than
+	// the switch one: the actionable half is identical, but "before you switch projects" is not
+	// true of a save, and a refusal that describes the wrong act teaches the wrong thing.
+	function georefBlocksProjectSwitch(reason) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!georefActive()) { return false; }
-		setNotice(pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
+		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
 	}
 	function switchToTab(id) {
@@ -22333,6 +22448,9 @@ var EngCalcs = EngCalcs || {};
 		saveBtn.type = 'button';
 		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', pc.lpn_file_save_tip);
 		saveBtn.addEventListener('click', function () { saveCurrent(); });
+		// Held for the placement lock, exactly as openToolButton above is: the strip is rebuilt, so
+		// a querySelector at lock time would be reaching into a previous strip's DOM.
+		saveToolButton = saveBtn;
 		fileGroup.appendChild(saveBtn);
 		// The picker still needs its listener even though its button has gone -- see wireBackdropMenu().
 		wireBackdropMenu();
@@ -26548,7 +26666,7 @@ var EngCalcs = EngCalcs || {};
 				? clampPanel(home.left, home.top, r.width, r.height,
 					window.innerWidth, window.innerHeight, floor)
 				: restoreBounds(setboxLayout.left, setboxLayout.top, r.width, r.height,
-					window.innerWidth, window.innerHeight, floor);
+					window.innerWidth, window.innerHeight);
 			box.style.left = at.left + 'px';
 			box.style.top = at.top + 'px';
 		});
@@ -26833,7 +26951,7 @@ var EngCalcs = EngCalcs || {};
 				// The growing case the clamp was written for is unaffected: a box grown off the
 				// right edge still comes back to a 28 px sliver, which is a piece of its full-width
 				// drag band and is the whole safety argument in dragBounds().
-				at = restoreBounds(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight, 0);
+				at = restoreBounds(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight);
 				if (at.left !== Math.round(r.left) || at.top !== Math.round(r.top)) {
 					box.style.left = at.left + 'px';
 					box.style.top = at.top + 'px';
@@ -27027,7 +27145,7 @@ var EngCalcs = EngCalcs || {};
 		// re-applying it to a capped one was a no-op that only looked like a second rule.
 		capPanelToRoomBelow(box, floor);
 		r = box.getBoundingClientRect();
-		at = restoreBounds(layout.left, layout.top, r.width, r.height, window.innerWidth, window.innerHeight, floor);
+		at = restoreBounds(layout.left, layout.top, r.width, r.height, window.innerWidth, window.innerHeight);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 	}
@@ -29465,7 +29583,7 @@ var EngCalcs = EngCalcs || {};
 					setboxHomeCorner(r.width, r.height).top,
 					r.width, r.height, window.innerWidth, window.innerHeight, floor)
 				: restoreBounds(libboxLayout.left, libboxLayout.top,
-					r.width, r.height, window.innerWidth, window.innerHeight, floor);
+					r.width, r.height, window.innerWidth, window.innerHeight);
 			box.style.left = at.left + 'px';
 			box.style.top = at.top + 'px';
 		});
@@ -30289,20 +30407,31 @@ var EngCalcs = EngCalcs || {};
 	// box can be picked up by and dragged back. Below that a box parked off a 32-inch monitor and
 	// reopened on a laptop would be unreachable, with nothing on screen to say a box exists at all.
 	//
-	// **THE ONE FLOOR THAT DOES NOT MOVE IS THE TOP ONE.** `topMin` is the bottom of the chrome, and
-	// a restored box may not land under the menu bar, the toolbar or the tab strip: those paint
-	// above every panel, so a box beneath them is not merely untidy, it is unclickable -- which is
-	// Task 606's rule and it is unchanged. Tom's *"jumps downward"* in that report was this floor
-	// working and he accepted it; what he is reporting now is the other three edges.
+	// **AND THE TOP EDGE OVERHANGS TOO. THIS SUPERSEDES THE 2026-09-06 ACCEPTANCE OF THE CHROME
+	// FLOOR** (Tom, 2026-09-08: *"Everything is good now except the top. I can't leave anything
+	// outside the top of the map."*). This function used to take a `topMin` -- the bottom of the
+	// chrome, Task 606's rule -- and refuse to restore a box above it; Tom accepted that on
+	// 2026-09-06 (*"jumps downward"* was that floor working) and has now changed his mind. **Do not
+	// restore the floor from that note**: the acceptance is spent, and the box being reachable is
+	// what the rule was protecting, not the chrome being uncovered.
+	//
+	// **THE FLOOR IS NOW ZERO, WHICH IS dragBounds()'s OWN FLOOR AND THE SAME SLIVER ARGUMENT.** A
+	// box's drag band is its TOP 40 px and spans the full width, so the left, right and bottom edges
+	// can give up everything but LPN_DRAG_SLIVER and still leave a piece of the band on screen --
+	// while a negative `top` puts the whole band above the window and there is nothing left to grab.
+	// So the top's version of "the sliver survives" is `top >= 0`, and that is what this enforces:
+	// the box may sit over the menu bar, the toolbar and the tab strip, which is the overhang Tom
+	// asked for, and it may not sit off the top of the window, which is the loss the sliver exists
+	// to prevent. The chrome paints above it, so the covered part is not clickable -- and the band
+	// is, which is all this rule ever owed.
 	//
 	// Pure, and evaluated in isolation by dev/lpn-spike/panel-cap-relax-harness.js, for the reason
 	// clampPanel() and dragBounds() both are: this is arithmetic that decides whether a box the user
 	// placed comes back where they placed it, or somewhere else.
-	function restoreBounds(left, top, w, h, vw, vh, topMin) {
-		var floor = (typeof topMin === 'number' && topMin > POPUP_EDGE) ? topMin : POPUP_EDGE;
+	function restoreBounds(left, top, w, h, vw, vh) {
 		return {
 			left: Math.max(LPN_DRAG_SLIVER - w, Math.min(left, vw - LPN_DRAG_SLIVER)),
-			top: Math.max(floor, Math.min(top, vh - LPN_DRAG_SLIVER))
+			top: Math.max(0, Math.min(top, vh - LPN_DRAG_SLIVER))
 		};
 	}
 	// The bottom of the page chrome in viewport coordinates -- measured, not typed, because the strip
@@ -30805,6 +30934,7 @@ var EngCalcs = EngCalcs || {};
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
 		nodeEls[newId].circle.setAttribute('data-node', newId);
+		if (nodeEls[newId].hit) { nodeEls[newId].hit.setAttribute('data-node', newId); }
 		doc.links.forEach(function (l) {
 			if (l.from === oldId) { l.from = newId; }
 			if (l.to === oldId) { l.to = newId; }

@@ -1095,7 +1095,6 @@ $ec_lang['lpn_color_mode_log']='Logarítmico';
 $ec_lang['lpn_color_mode_pressure']='Presión';
 $ec_lang['template_share_manual']='Copie este enlace:';
 $ec_lang['lpn_time_menu']='Tiempo';
-$ec_lang['lpn_time_menu_tip']='Defina cuánto tiempo funciona esta red, y recórrala momento a momento.';
 $ec_lang['lpn_tool_add_tank']='Depósito';
 $ec_lang['lpn_tool_add_valve']='Válvula';
 $ec_lang['lpn_tank_elev_tip']='Elevación del fondo del depósito. Las profundidades de agua en el depósito se miden hacia arriba desde aquí.';

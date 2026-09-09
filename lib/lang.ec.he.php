@@ -1113,7 +1113,6 @@ $ec_lang['lpn_field_lat']='קו רוחב';
 $ec_lang['lpn_engine_minor_loss_note']='הערה: עם פותר EPANET, אובדנים מקומיים (קטנים) יוצאים נמוכים במעט מאשר עם הפותר המובנה, משום ש-EPANET מעגל את הערך שהוא משתמש בו עבור כובד המשיכה.';
 $ec_lang['template_share_manual']='העתיקו קישור זה:';
 $ec_lang['lpn_time_menu']='זמן';
-$ec_lang['lpn_time_menu_tip']='קביעת משך ריצת רשת זו, וצעידה בה רגע אחר רגע.';
 $ec_lang['lpn_time_duration']='משך ריצה כולל';
 $ec_lang['lpn_time_hyd_step']='צעד זמן הידראולי';
 $ec_lang['lpn_time_pattern_step']='צעד זמן תבנית';

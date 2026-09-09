@@ -1112,7 +1112,6 @@ $ec_lang['lpn_field_lat']='Zeměpisná šířka';
 $ec_lang['lpn_engine_minor_loss_note']='Poznámka: s řešičem EPANET vycházejí místní ztráty nepatrně nižší než s vestavěným řešičem, protože EPANET zaokrouhluje hodnotu, kterou používá pro tíhové zrychlení.';
 $ec_lang['template_share_manual']='Zkopírujte tento odkaz:';
 $ec_lang['lpn_time_menu']='Čas';
-$ec_lang['lpn_time_menu_tip']='Nastavte, jak dlouho tato síť běží, a procházejte ji okamžik po okamžiku.';
 $ec_lang['lpn_time_duration']='Celková doba běhu';
 $ec_lang['lpn_time_hyd_step']='Hydraulický časový krok';
 $ec_lang['lpn_time_pattern_step']='Časový krok vzorce';

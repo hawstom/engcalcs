@@ -1120,7 +1120,6 @@ $ec_lang['lpn_engine_minor_loss_note']='ملاحظة: مع حلّال EPANET، �
 $ec_lang['template_share_manual']='انسخ هذا الرابط:';
 
 $ec_lang['lpn_time_menu']='الوقت';
-$ec_lang['lpn_time_menu_tip']='حدد مدة تشغيل هذه الشبكة، وتنقّل خلالها لحظة بلحظة.';
 $ec_lang['lpn_time_duration']='مدة التشغيل الكلية';
 $ec_lang['lpn_time_hyd_step']='خطوة الزمن الهيدروليكية';
 $ec_lang['lpn_time_pattern_step']='خطوة زمن النمط';

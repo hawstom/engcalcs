@@ -1114,7 +1114,6 @@ $ec_lang['lpn_field_lat']='عرض البلد';
 $ec_lang['lpn_engine_minor_loss_note']='یادونه: د EPANET حل کوونکي سره، ځایی (لوکل) ضیاع د جوړ شوي حل کوونکي په پرتله لږ ټیټه راځي، ځکه چې EPANET د جاذبې لپاره کارول شوی ارزښت مقرري کوي.';
 $ec_lang['template_share_manual']='دا لینک کاپي کړئ:';
 $ec_lang['lpn_time_menu']='وخت';
-$ec_lang['lpn_time_menu_tip']='ټاکئ چې دا شبکه څومره موده چلیږي، او شیبه په شیبه یې وګورئ.';
 $ec_lang['lpn_time_duration']='ټول د چلولو موده';
 $ec_lang['lpn_time_hyd_step']='هایدرولیکي وخت ګام';
 $ec_lang['lpn_time_pattern_step']='د نمونې وخت ګام';
