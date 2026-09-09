@@ -28,41 +28,41 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 ## lpn_  (85, 62 to read @@ NEEDS RULING)
 
 - **`lpn_area_hint_lasso_go`**
-  > Move to draw the outline, then click to close it.
-  @@ NEEDS RULING
+  > Move to draw the outline. Click to finish.
+  Edited to match polygon.
 - **`lpn_area_hint_lasso_start`**
   > Click to start the outline.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_hint_polygon_go`**
   > Click each corner. Double-click the last one to finish.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_hint_polygon_start`**
-  > Click the first corner of the shape. Double-click the last one to finish.
-  @@ NEEDS RULING
+  > Click to draw the polygon area. Double-click to finish.
+  Edited.
 - **`lpn_area_hint_shift`**
-  > Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.
-  @@ NEEDS RULING
+  > Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.
+  I edited this.
 - **`lpn_area_hint_show`**
   > Show this
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_hint_touch_go`**
   > Drag around what you want, then lift to finish.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_hint_touch_start`**
   > Press on the map and drag around what you want, then lift.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_hint_window_go`**
   > Click the opposite corner to finish.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_hint_window_start`**
   > Click one corner of the window.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_none`**
   > Nothing found in that area.
-  @@ NEEDS RULING
+  OK
 - **`lpn_area_selected`**
   > {n} selected.
-  @@ NEEDS RULING
+  OK
 - **`lpn_engine_needed_failed`**
   > The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.
   _Ruled 2026-09-07: There is that "and" construction again that is not best for an engineering software. I edited it._
@@ -71,10 +71,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled 2026-09-06: Tom's own sentence, written by him in the instruction that commissioned the feature: "we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches". Recorded because the words are his, not because anybody approved ours._
 - **`lpn_field_fittings`**
   > Fittings list
-  @@ NEEDS RULING
+  OK
 - **`lpn_field_fittings_tip`**
   > A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.
-  @@ NEEDS RULING
+  OK
 - **`lpn_field_pipetype`**
   > Pipe type
   _Ruled OK 2026-09-07._
@@ -92,70 +92,70 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-07._
 - **`lpn_fitting_add`**
   > Add a fitting
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_angle`**
   > Angle valve, fully open
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_elbow_45`**
   > 45 degree elbow
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_elbow_long`**
   > Long radius elbow
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_elbow_medium`**
   > Medium radius elbow
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_elbow_short`**
   > Short radius elbow
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_entrance`**
   > Square entrance
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_exit`**
   > Exit
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_gate`**
   > Gate valve, fully open
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_globe`**
   > Globe valve, fully open
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_k`**
   > Coefficient
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_name`**
   > Fitting
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_other`**
   > Other fitting
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_qty`**
   > Quantity
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_remove`**
   > Remove
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_return_bend`**
   > Closed return bend
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_swingcheck`**
   > Swing check valve, fully open
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_tee_branch`**
   > Standard tee, flow through branch
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_tee_run`**
   > Standard tee, flow through run
-  @@ NEEDS RULING
+  OK
 - **`lpn_fitting_total`**
   > Total minor (local) loss coefficient, k
-  @@ NEEDS RULING
+  OK
 - **`lpn_fittings_none`**
   > No fittings list selected
-  @@ NEEDS RULING
+  OK
 - **`lpn_georef_tab_locked`**
-  > Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.
-  @@ NEEDS RULING
+  > Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.
+  Edited
 - **`lpn_help_not_epanet`**
   > Not EPANET
   _Ruled OK 2026-09-07._
@@ -164,43 +164,43 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-07._
 - **`lpn_hide_titles`**
   > Hide these titles
-  @@ NEEDS RULING
+  OK
 - **`lpn_inp_export_flat_fittings`**
-  > The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes. What the file cannot hold is the list of elbows, valves and tees behind the total, so only your own project file records what made the number.
-  @@ NEEDS RULING
+  > An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.
+  Edited
 - **`lpn_inp_export_flat_heading`**
   > Saved {file}
-  @@ NEEDS RULING
+  OK
 - **`lpn_inp_export_flat_lead`**
-  > Every number in this project is in the file and none of them changed. What an EPANET file has no place for is this:
-  @@ NEEDS RULING
+  > The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:
+  Edited
 - **`lpn_inp_export_flat_types`**
   > {n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_fittings`**
   > Fittings
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_fittings_add`**
   > Add a fittings list
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_fittings_in_use`**
-  > This fittings list is used by {count} pipes: {ids}. Take it off them before deleting it.
-  @@ NEEDS RULING
+  > This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.
+  Edited
 - **`lpn_library_fittings_note`**
-  > Each project has its own fittings library. A fittings list holds fittings with a quantity for each one, and it adds up to a single minor loss coefficient. A pipe may refer to a list in its own properties, and a pipe type may refer to one as well. Editing a list here changes every pipe that refers to it.
-  @@ NEEDS RULING
+  > Each project has its own fittings library. A fittings list has fittings with a quantity for each one, and it adds up to a single minor loss coefficient. Both pipes and pipe types may refer to a list.
+  Edited
 - **`lpn_library_fittings_source`**
   > The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_fittings_tip`**
   > A fittings list is a set of fittings and their quantities that several pipes can refer to. It adds up to one minor loss coefficient.
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_fittings_unused`**
   > Nothing uses this fittings list.
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_fittings_used_by`**
   > Pipes using this fittings list
-  @@ NEEDS RULING
+  OK
 - **`lpn_library_pipetype_add`**
   > Add a pipe type
   _Ruled OK 2026-09-07._
@@ -227,16 +227,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-07._
 - **`lpn_multi_applied`**
   > Set {prop} on {n}.
-  @@ NEEDS RULING
+  OK
 - **`lpn_multi_no_fields`**
   > These have nothing that can be set together here.
-  @@ NEEDS RULING
+  OK
 - **`lpn_multi_title`**
   > {n} selected
-  @@ NEEDS RULING
+  OK
 - **`lpn_multi_varies`**
   > Various
-  @@ NEEDS RULING
+  OK
 - **`lpn_pane_filter_clear`**
   > Show all
   _Ruled OK 2026-09-07._
@@ -248,37 +248,37 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-07._
 - **`lpn_pane_paste_note`**
   > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.
-  @@ NEEDS RULING
+  OK
 - **`lpn_pane_pasted`**
   > Pasted {n} cells. {skipped} were not changed.
-  @@ NEEDS RULING
+  OK
 - **`lpn_pipetype_detach`**
   > Detach from pipe type
   _Ruled OK 2026-09-07._
 - **`lpn_pipetype_detach_tip`**
   > Copies the values this pipe reads from its type into the pipe itself and stops using the type. The pipe’s values don’t change now, and from now on you can edit these values here.
-  @@ NEEDS RULING
+  OK
 - **`lpn_pipetype_none`**
   > No pipe type selected
   _Ruled OK 2026-09-07._
 - **`lpn_settings_area_hint`**
   > Show the selection help
-  @@ NEEDS RULING
+  OK
 - **`lpn_settings_area_hint_tip`**
   > Shows the bubble over the map that says what your next click will do while you are selecting an area.
-  @@ NEEDS RULING
+  OK
 - **`lpn_tool_area_lasso`**
   > Select a lasso
-  @@ NEEDS RULING
+  OK
 - **`lpn_tool_area_polygon`**
   > Select a polygon
-  @@ NEEDS RULING
+  OK
 - **`lpn_tool_area_tip`**
-  > Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.
-  @@ NEEDS RULING
+  > Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.
+  Edited
 - **`lpn_tool_area_window`**
   > Select a window
-  @@ NEEDS RULING
+  OK.
 - **`lpn_tool_key_hint`**
   > Shortcut: press {key}.
   _Ruled OK 2026-09-07._
