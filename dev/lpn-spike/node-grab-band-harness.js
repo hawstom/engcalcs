@@ -277,8 +277,24 @@ console.log('\n--- the stylesheet half ---');
 		.replace(/\/\*[\s\S]*?\*\//g, '');
 	const rule = (css.match(/(?:^|\n)\.lpn-node-hit \{[^}]*\}/) || [''])[0];
 	ok('.lpn-node-hit has a rule of its own', !!rule, rule);
-	ok('...and it says pointer, which is what the whole complaint is about',
-		/cursor:\s*pointer/.test(rule));
+	// **THE BAND STOPPED SAYING `pointer` ON 2026-09-09, AND THAT IS THIS SECTION'S OWN ARGUMENT
+	// CARRIED ONE STEP FURTHER, not a retreat from it.** This harness exists because a junction is
+	// 7 screen pixels of drawn disc and the cursor almost never found it; the band fixed the REACH.
+	// But the band is 12 screen pixels wide at every zoom, so on a dense drawing at the fit zoom it
+	// is most of the canvas -- measured on the geographic Net3 example, 60.2% of the map computed
+	// `pointer` and the bare `<svg>` never appeared in a mid-line scan at all. Tom, that day:
+	// *"The cursor for the open map should be grab panning hand since that's all it can do. But
+	// it's a pointer finger ... we want the cursor to clearly become a pointer when pointing is
+	// appropriate, not all over the map."*
+	//
+	// So the band keeps its HIT and gives up its CURSOR: `cursor: inherit` shows whatever the canvas
+	// is saying, while `pointer-events` below is unchanged and the 12 px of reach this whole file
+	// was written to win is untouched. The FEEDBACK now lives on the drawn disc, which is asserted
+	// here too so it cannot quietly move onto nothing.
+	ok('...and it inherits the canvas cursor rather than claiming pointer over 12 px of map',
+		/cursor:\s*inherit/.test(rule));
+	ok('...while the DRAWN disc still says pointer, or the feedback moved onto nothing',
+		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*pointer/.test(css));
 	ok('...it is hittable, and by `visible` rather than `all` or `visiblePainted`',
 		/pointer-events:\s*visible\s*;/.test(rule), rule);
 	ok('...with a transparent fill, so it is reachable and cannot be seen',

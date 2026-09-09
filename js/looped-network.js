@@ -13214,7 +13214,7 @@ var EngCalcs = EngCalcs || {};
 	function paneTextAttachedTip() {
 		var pc = EngCalcs.pageConfig || {};
 		return pc.lpn_field_text_attached_tip ||
-			'This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
+			'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
 	}
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
@@ -32878,7 +32878,7 @@ var EngCalcs = EngCalcs || {};
 			readonlyField(fields, pc.lpn_field_text_attached || 'Attached asset',
 				lb.anchorNode || lb.anchorLink,
 				pc.lpn_field_text_attached_tip ||
-					'This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.');
+					'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.');
 		}
 		importNotesField(fields, lb);
 		tipsIn(fields);

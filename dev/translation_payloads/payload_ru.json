@@ -504,7 +504,7 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
+        "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
         "lpn_field_emitter": "Emitter coefficient",
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
@@ -512,7 +512,7 @@
         "lpn_pane_text_attached": "Attached"
     },
     "keys": {
-        "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
+        "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
         "lpn_field_emitter": "Emitter coefficient",
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
