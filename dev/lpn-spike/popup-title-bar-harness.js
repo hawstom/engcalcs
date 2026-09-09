@@ -86,16 +86,25 @@ console.log('\n--- the line ---');
 {
 	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8')
 		.replace(/\/\*[\s\S]*?\*\//g, '');
-	const rule = (css.match(/#lpn_popup::before \{[^}]*\}/) || [''])[0];
-	ok('#lpn_popup draws a rule at the foot of its band', !!rule, rule.replace(/\s+/g, ' '));
-	ok('...it is a border, not a background, so the band stays white like the other two boxes\'',
-		/border-top:\s*1px solid/.test(rule));
+	// **THE LINE MOVED FROM ONE BOX TO THE CLASS, 2026-09-09.** It was `#lpn_popup::before`, so
+	// exactly one of the ten non-hogging boxes had a bar you could see, and Tom asked for all of
+	// them: *"standard styling needs to be applied to all non-hogging windows/boxes."* The divider
+	// belongs to `.lpn-setbox-title` now -- every box is `padding: 40px ...` with that element in
+	// it, so there is no per-box rule and no list of boxes to keep in step. The full contract
+	// across every box is dev/lpn-spike/map-cursor-harness.js §3; this section holds the Properties
+	// popup's own half, which is what Tom asked for first.
+	const rule = (css.match(/\.lpn-setbox-title \{[^}]*\}/) || [''])[0];
+	ok('the title bar draws a rule at its foot', !!rule, rule.replace(/\s+/g, ' '));
+	ok('...it is a border, not a background, so every band stays white',
+		/border-bottom:\s*1px solid/.test(rule));
 	ok('...it spans the full width, so it reads as the bottom of a bar and not an underline',
 		/left:\s*0/.test(rule) && /right:\s*0/.test(rule));
-	ok('...it sits at the foot of the 40px band the popup pads out',
-		/top:\s*39px/.test(rule) && /padding:40px 8px 8px/.test(html));
+	ok('...it is the height of the 40px band the popup pads out',
+		/height:\s*39px/.test(rule) && /padding:40px 8px 8px/.test(html));
 	ok('...and it cannot take the pointer from the drag surface',
 		/pointer-events:\s*none/.test(rule));
+	ok('...and no per-box rule survives to draw a second one',
+		!/#lpn_popup::before/.test(css));
 }
 
 // ================================================================================================

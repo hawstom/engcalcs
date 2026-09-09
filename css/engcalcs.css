@@ -345,7 +345,7 @@ html[lang="zh"] .ec-welcome {
 
    **THERE WAS NEVER A RING AT 12 px. IT IS A GAP.** dev/browser-pass/specs/cursorflicker.js walks
    outward from a junction one pixel at a time and reads the cursor the browser actually computes:
-   the node's own circle ends at ~3.5 px, its LABEL (`.lpn-draglbl`, `cursor: move` -- the
+   the node's own circle ends at ~3.5 px, its LABEL (`.lpn-draglbl`, then `cursor: move` -- the
    four-headed arrow he called the pan/drag cross) begins at 9-13 px depending on bearing, and in
    between was bare canvas showing `default`. So a pointer crossing that strip read
    **pointer, default, move**, and his 12 px is simply where the placement pass had put that
@@ -582,7 +582,7 @@ html[lang="zh"] .ec-welcome {
    colour. */
 .lpn-vhandle {
 	fill: var(--lpn-map-ink); stroke: var(--lpn-map-ink);
-	stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move;
+	stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: pointer;
 }
 /* VERTICES MODE (Task 567): the bends of every pipe become GRIPS -- hollow, and a good deal bigger
    than the dot that merely says a bend is there. EPANET's own grip is a hollow square; a circle is
@@ -960,7 +960,15 @@ html[lang="zh"] .ec-welcome {
 
    `visible` rather than `visiblePainted` because the two are not the same promise: `visiblePainted`
    would also drop the gaps between the glyphs, and a finger is not aimed at the inside of an "8". */
-.lpn-draglbl { cursor: move; pointer-events: visible; }
+/* **`pointer`, NOT `move`, AND THE REASON IS THE GLYPH'S SIZE** (Tom, 2026-09-09: *"a move cursor
+   is being used to point at labels and assets. The problem with this is that the move cursor has a
+   huge hit box. We need a cursor with an infinitesimal hitbox."*). A four-headed arrow is ~24 px of
+   drawn cursor whose hot spot is at its centre, so on a map whose junction discs are 0.2% of the
+   canvas the pointer covers the very thing it is aimed at. `pointer` and `crosshair` both aim from a
+   1 px point and leave the target visible beside them. The label's AREA is a separate complaint of
+   his and is not addressed here -- draggable labels claim 6.5% of the canvas, measured over 23,821
+   sampled points, and shrink-wrapping their boxes is his open decision. */
+.lpn-draglbl { cursor: pointer; pointer-events: visible; }
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
@@ -1218,6 +1226,22 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    per-element cursor:pointer/move rules would still fire on hover, visually implying "this is
    clickable/draggable" when it must be fully ignored. */
 #lpn_canvas.regmode, #lpn_canvas.regmode * { cursor: crosshair !important; }
+/* **PLACEMENT AND AREA PICKING AIM AT A COORDINATE, SO THEY SAY `crosshair`** (Tom, 2026-09-09:
+   *"the placement and area picker (coordinates) a small crosshairs cursor. That gives us two
+   precise pointers in the area of our network, both with an infinitesimally small (1px)
+   hitbox."*). The three cursors this map now uses are one sentence each: the bare map is a hand
+   because you may drag it, an object under the select tool is a `pointer` because pressing it acts
+   on THAT object, and a tool that is about to put something at an (x, y) is a crosshair because the
+   coordinate is what the gesture means.
+
+   The `*` half is deliberate here and is not the trap `#lpn_canvas.lpn-panning *` was. That class
+   was written by one handler and cleared by another, so a dropped drag left it on for ever and
+   nothing on the map could say what it was; this one is written by setMode() alone, from the mode
+   the toolbar is showing as pressed, and leaving the tool clears it. While a placement tool IS
+   running, a `pointer` over a node would promise an edit the press is not going to perform -- the
+   same argument .lpn-vertexmode already makes over links. No `!important` needed: (1,1,0) beats
+   every object cursor's (0,1,0), which is what the regmode rule above predates. */
+#lpn_canvas.lpn-placemode, #lpn_canvas.lpn-placemode * { cursor: crosshair; }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra
    class), so it wins the !important tie on specificity. */
@@ -2023,9 +2047,6 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 			linear-gradient(315deg, transparent 0 8px, #999 8px 10px, transparent 10px 13px, #999 13px 15px, transparent 15px);
 	}
 }
-/* The title sits in the 40px drag band, left of the X. It is text, not a control, so it never
-   swallows a drag: `e.target` on a pointerdown here is the title, not the box -- hence
-   pointer-events:none, which hands the whole band back to the box's own drag handler. */
 /* **AND THE SAME THREE HEIGHTS IN dvh** (Tom, 2026-08-22: "The settings box and possibly other
    boxes needs to be height-limited for short screens"). It WAS limited -- to 96vh -- and on a phone
    that is the wrong 100%: vh counts the strip behind the retracting address bar, the same
@@ -2040,24 +2061,28 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 @supports (height: 100dvh) {
 	.lpn-setbox { height: min(46rem, 92dvh); min-height: min(18rem, 92dvh); max-height: 96dvh; }
 }
-.lpn-setbox-title {
-	position: absolute; top: 10px; left: 12px; font-weight: bold; pointer-events: none;
-}
-/* **THE PROPERTY POPUP'S DRAG BAND IS DELINEATED** (Tom, 2026-09-08: *"There is no visual title bar
-   depiction... a nice line delineating the title/drag bar would be nice."*). The band is the top
-   40px of padding and has been the only place this popup can be picked up by since it was written;
-   it looked identical to the body below it, so nothing said so.
+/* **EVERY NON-HOGGING BOX WEARS THE SAME TITLE BAR** (Tom, 2026-09-09: *"Every non-hogging box has
+   a drag bar or title bar. The title bar should have standard styling including a divider between
+   it and the rest of the box. Properties has it, but standard styling needs to be applied to all
+   non-hogging windows/boxes."* -- he named Settings, Libraries, Fire flow, Scenario comparison, the
+   EPANET report and the Pump energy report).
 
-   A rule at the foot of the band rather than a background on it: the box is white and the other two
-   draggable boxes' bands are white, so tinting this one would make the property sheet the odd one
-   out in a set of three. `::before` rather than a wrapper element keeps the band a pure drag
-   surface -- `e.target` there is the popup itself, which is exactly what wirePopupDrag() tests --
-   and `pointer-events: none` is belt and braces on the same point. It runs the full width, under
-   the close X, because a rule that stopped short of the corner would read as an underline on the
-   word rather than as the bottom of a bar. */
-#lpn_popup::before {
-	content: ''; position: absolute; left: 0; right: 0; top: 39px;
-	border-top: 1px solid #ccc; pointer-events: none;
+   It was one line of styling here and a SECOND, box-specific rule (`#lpn_popup::before`) drawing
+   the divider, so exactly one of the ten boxes had a bar you could see. The divider belongs to the
+   title, not to the popup: every one of these boxes is `padding: 40px 8px 8px`, the 40 px band IS
+   the drag surface, and `.lpn-setbox-title` is already inside all ten of them. So the band now
+   states its own full width and its own foot, and the per-box rule is gone -- his hope that "the
+   list of non-hoggers is neatly presented as an array" is answered by there being no list at all.
+
+   `pointer-events: none` is load-bearing and survives the change: `makePanelDraggable()` starts a
+   drag only when `e.target` is the panel itself, so a band that could become an event target would
+   be a title bar you cannot drag the box by, which is the opposite of the point. `height` plus
+   `box-sizing` rather than a bottom padding, so the rule lands at 39 px in every box whatever its
+   title wraps to -- a two-word title and a six-word one draw the same bar. */
+.lpn-setbox-title {
+	position: absolute; top: 0; left: 0; right: 0; height: 39px; box-sizing: border-box;
+	padding: 10px 12px 0; font-weight: bold; pointer-events: none;
+	border-bottom: 1px solid #ccc; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
 /* ---- THE NEW-PROJECT BOX (ROADMAP Task 477) --------------------------------------------------

@@ -15603,6 +15603,18 @@ var EngCalcs = EngCalcs || {};
 		// destroyed when the mode goes off, and a bend added while the mode is on gets the look for
 		// free from the same rule.
 		if (svg) { svg.classList.toggle('lpn-vertexmode', newMode === 'vertices'); }
+		// **THE PLACEMENT CURSOR IS THE SAME KIND OF CSS STATE** (Tom, 2026-09-09). A tool that is
+		// about to put something at a coordinate -- any add-*, and the area picker, whose whole
+		// output IS a coordinate ring -- says `crosshair` over the entire drawing. Derived from the
+		// mode string rather than listed, so the eighth add-* tool gets it without a second edit;
+		// `vertices` is deliberately NOT here because it already states its own rule per element,
+		// and `delete` is not, because a delete press acts on the OBJECT under it and `pointer` is
+		// the true thing to say. The class is written here and nowhere else, which is what keeps it
+		// from sticking the way `lpn-panning` once did.
+		if (svg) {
+			svg.classList.toggle('lpn-placemode',
+				newMode.indexOf('add-') === 0 || newMode === 'select-area');
+		}
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
 		updateAreaHint();

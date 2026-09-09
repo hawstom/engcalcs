@@ -613,10 +613,10 @@ echoHeader("EngCalcs", $html_title, "", false);
 	      // since this popup was written and looked like nothing at all, so the one place it can be
 	      // picked up by was the one place nothing said so.
 	      //
-	      // Same class and the same `pointer-events: none` as the Find box's and the Settings box's
-	      // own titles, deliberately: those two already solved this and a second idiom would be a
-	      // second thing to keep in step. The LINE is #lpn_popup::before in css/engcalcs.css.
-	      // #lpn_popup_title below is a different thing and stays where it is -- it names the
+	      // Same class and the same `pointer-events: none` as every other non-hogging box's title,
+	      // deliberately: since 2026-09-09 .lpn-setbox-title carries the band AND the line that
+	      // delineates it, so all ten boxes wear one bar and there is no per-box rule to keep in
+	      // step. #lpn_popup_title below is a different thing and stays where it is -- it names the
 	      // ELEMENT you opened (and holds its rename box), where this names the BOX. ?>
 	<div id="lpn_popup_boxtitle" class="lpn-setbox-title"><?=$ec_lang['lpn_popup_boxtitle']?></div>
 	<div class="lpn-popover-body">

@@ -62,7 +62,7 @@ console.log('--- an object under the pointer says what it is, panning or not ---
 		/#lpn_canvas\.lpn-panning\s*\{[^}]*cursor:\s*grabbing/.test(CSS));
 	// The six that mean something. Each is a bare class selector, so each keeps its own cursor.
 	[['.lpn-node', 'pointer'], ['.lpn-link', 'pointer'], ['.lpn-link-hit', 'pointer'],
-		['.lpn-link-symbol-hit', 'pointer'], ['.lpn-vhandle', 'move'], ['.lpn-draglbl', 'move']
+		['.lpn-link-symbol-hit', 'pointer'], ['.lpn-vhandle', 'pointer'], ['.lpn-draglbl', 'pointer']
 	].forEach(function (row) {
 		const re = new RegExp('\\' + row[0].replace('.', '.') + '[^{}]*\\{[^}]*cursor:\\s*' + row[1]);
 		ok(row[0] + ' still states cursor: ' + row[1], re.test(CSS));
