@@ -8,7 +8,7 @@
  * WHY THIS IS BLOCKING WHEN THE CHECK IT GUARDS IS A RATCHET. A ratchet that has gone blind prints
  * a SMALLER number than its baseline and exits 0, which reads as progress -- the same failure mode
  * that killed `js_fallback_string_selftest.php`'s first corpus guard. Narrow the literal regex by
- * one character here and the report says "12 pins against a baseline of 199, lower the baseline"
+ * one character here and the report says "12 pins against a baseline of 52, lower the baseline"
  * forever. The negative fixtures are the load-bearing half: anybody can write a scanner that finds
  * things, and this one has to keep NOT finding element ids, CSS classes and unit keywords.
  */
@@ -25,14 +25,15 @@ $EN = [
     'lpn_field_base_demand'        => 'Base demand',
     'lpn_run'                      => 'Run',
     'about_body_html'              => 'A suite of <b>free</b> hydraulic calculators for the world.',
+    'lpn_basemap_tip'              => 'Street map images from OpenStreetMap. Your network is drawn whether the street map is showing or not.',
 ];
 
-function ecHwCase(string $name, string $js, int $expect): void
+function ecHwCase(string $name, string $js, int $expect, string $rel = 'dev/lpn-spike/fixture.js'): void
 {
     global $fails, $n, $EN;
     $n++;
     $stats = [];
-    $got = ecHarnessWordingFindings(['dev/lpn-spike/fixture.js' => $js], $EN, $stats);
+    $got = ecHarnessWordingFindings([$rel => $js], $EN, $stats);
     if (count($got) !== $expect) {
         $fails[] = sprintf("%s\n      expected %d, got %d: %s", $name, $expect, count($got), json_encode($got));
     }
@@ -72,8 +73,27 @@ ecHwCase('a pin inside a LINE comment is documentation, which is where the recor
 ecHwCase('a pin inside a BLOCK comment',
     "/**\n * asserted 'No price of power is stated' once.\n */\ncheck(ok);\n", 0);
 
+// ---- 2b. The DECLARED exceptions -----------------------------------------------------------------
+// The exemption is keyed on the file AND the exact literal, so it must not leak in either
+// direction: an exemption that spread to every file would quietly retire the check. Driven through
+// a REAL declaration rather than a fixture one, because a declaration matching nothing in the tree
+// is itself a failure of the check (see the stale leg below).
+$declared = 'dev/lpn-spike/basemap-harness.js';
+$n++;
+if (!isset(EC_HARNESS_WORDING_EXCEPT[$declared]['the street map'])) {
+    $fails[] = "the exception this section drives ($declared, 'the street map') is no longer "
+        . 'declared, so the three cases under it prove nothing. Point them at another declaration.';
+}
+ecHwCase('a declared literal is turned away in the file it was declared for',
+    "report(what + ' tile carries no wordmark', ok);  // 'the street map'\ncheck(w === 'the street map');\n", 0,
+    $declared);
+ecHwCase('...and is NOT turned away in another file, which is what keying on the file is for',
+    "check(w === 'the street map');\n", 1);
+ecHwCase('...and an UNDECLARED pin in the declared file is still found',
+    "check(/did not converge/.test(status));\n", 1, $declared);
+
 // ---- 3. The corpus, by LIVE MUTATION -------------------------------------------------------------
-// The baseline is 199 and falling is allowed, so no assertion about the count can prove the scan
+// The baseline is 52 and falling is allowed, so no assertion about the count can prove the scan
 // still works. A temporary harness carrying one deliberate pin is written into dev/lpn-spike/, the
 // REAL check is run with --list over the REAL tree, and it must name that file. Removed on
 // shutdown as well as inline: a selftest that can leave a stray file where run_harnesses.sh globs
@@ -120,6 +140,13 @@ $clean = implode("\n", $out2);
 $n++;
 if ($code2 !== 0) {
     $fails[] = "corpus: the check exits $code2 on the tree it is guarding:\n      " . $clean;
+}
+// The exception table is LIVE on the real tree. Nothing else here can see the difference between
+// a table that exempts eighteen sites and one the scan never consults.
+$n++;
+if (!preg_match('/(\d+) declared correct as they stand/', $clean, $md) || (int) $md[1] < 1) {
+    $fails[] = 'corpus: the check reported no declared exceptions at all, so the table is being '
+        . 'read by nothing. ' . $clean;
 }
 $n++;
 if (!preg_match('/(\d+) literal\(s\) examined/', $clean, $m) || (int) $m[1] < 10000) {

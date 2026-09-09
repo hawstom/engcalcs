@@ -50,7 +50,7 @@ const SRC = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
 // evaluated, with a guard so only arithmetic is ever evaluated.
 function constOf(name) {
 	const m = SRC.match(new RegExp('\\b' + name + '\\s*=\\s*([^;,\\n]+)'));
-	if (!m) { throw new Error('could not read ' + name + ' out of js/looped-network.js'); }
+	if (!m) { throw new Error('no such constant in js/looped-network.js: ' + name); }
 	const expr = m[1].trim();
 	if (!/^[-+*/()0-9.eE\s]+$/.test(expr)) {
 		throw new Error(name + ' is not a numeric expression: ' + expr);

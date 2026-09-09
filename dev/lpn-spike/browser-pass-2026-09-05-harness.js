@@ -26,6 +26,9 @@
 
 const path = require('path');
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
@@ -161,8 +164,10 @@ function inputsUnder(node, out) {
 	// now, and the checkbox means the opposite of what it used to. Its POSITION in Tom's order is
 	// untouched, which is all this section asserts; the polarity is
 	// dev/lpn-spike/engine-checkbox-harness.js.
-	const WANT = ['Recalculate automatically', 'Use the built-in solver when possible', 'Friction method',
-		'Accuracy', 'Default demand pattern'];
+	// Named by KEY: the assertion is the ORDER of the five rows, which must survive any of them
+	// being reworded (dev/scripts/harness_wording_check.php).
+	const WANT = ['lpn_settings_auto_run', 'lpn_settings_engine_native', 'bpn_method',
+		'lpn_settings_accuracy', 'lpn_settings_default_pattern'].map(k => PC[k]);
 	const at = WANT.map(t => compText.indexOf(t));
 	ok('all five rows Tom ordered are in the Calculation pane', at.every(i => i >= 0),
 		WANT.map((t, i) => t + '=' + at[i]).join(' | '));

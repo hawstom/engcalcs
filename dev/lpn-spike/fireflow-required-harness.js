@@ -20,6 +20,9 @@
 // The network is the shipped gallery example, opened the way a visitor opens it.
 
 const { ROOT, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 require(ROOT + 'js/lpn-inp.js');
 
@@ -113,8 +116,8 @@ const RUN_GPM = 250;
 
 	console.log('\n--- it is wired where the other junction properties are ---');
 	const popup = textOf(L.popupFields(own.id));
-	ok('the property popup asks for it', popup.indexOf('Required fire flow') >= 0);
-	ok('in the project\'s flow unit', popup.indexOf('Required fire flow (gpm)') >= 0);
+	ok('the property popup asks for it', popup.indexOf(PC.lpn_ff_required) >= 0);
+	ok('in the project\'s flow unit', popup.indexOf(PC.lpn_ff_required + ' (gpm)') >= 0);
 	ok('the Junctions table has a column for it', L.paneCols().indexOf('fireFlow') >= 0,
 		L.paneCols().join(','));
 	// The pane cell hands back +'' === 0 for a blank, which must clear rather than store a zero.

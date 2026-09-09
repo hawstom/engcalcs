@@ -13,6 +13,18 @@ const fs = require('fs');
 const path = require('path');
 
 const src = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
+// The lock headings, read out of lib/lang.ec.en.php as PATTERNS with their {placeholders} left
+// open. This harness evals functions out of the page rather than loading the DOM stub, so there is
+// no pageConfig and the page falls back to its own English literals -- which
+// js_fallback_string_check.php holds byte-identical to these
+// (dev/scripts/harness_wording_check.php).
+const LANG_EN = fs.readFileSync(path.join(__dirname, '../../lib/lang.ec.en.php'), 'utf8');
+function langRe(key) {
+	const m = new RegExp("\\$ec_lang\\['" + key + "'\\]='((?:[^'\\\\]|\\\\.)*)';").exec(LANG_EN);
+	if (!m) { throw new Error('no such lang key: ' + key); }
+	return new RegExp(m[1].replace(/\\'/g, "'")
+		.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\{\w+\\\}/g, '.+?'));
+}
 
 function extract(name) {
 	const re = new RegExp('(?:async )?function ' + name + '\\s*\\(');
@@ -303,7 +315,7 @@ async function scenario(label, rows, openProjects, stampsOnRecord = []) {
 		report(/10 minutes/.test(neverSaved) && /not been saved|none of it/.test(neverSaved),
 			'lock dialog: edited but never saved says so', neverSaved);
 		const allSaved = lockHeadingText('ABC', { editedAt: now - 600000, savedAt: now - 60000 });
-		report(/10 minutes/.test(allSaved) && /saved to the file/.test(allSaved),
+		report(/10 minutes/.test(allSaved) && langRe('lpn_lock_open_heading_saved').test(allSaved),
 			'lock dialog: everything saved says so — this is the safe one to break', allSaved);
 		const justOpen = lockHeadingText('ABC', { editedAt: 0, savedAt: 0, lastActivity: Math.floor((now - 300000) / 1000) });
 		report(/5 minutes/.test(justOpen), 'lock dialog: nothing edited falls back to when we last heard from them',

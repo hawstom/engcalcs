@@ -34,6 +34,9 @@
 //     numbers and no reader could say which one the engine gets.
 
 const { ROOT, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
+// The control labels, read from the real lib/lang.ec.en.php the stub loads: what is asserted below
+// is the UNIT each label carries, not the label (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 require(ROOT + 'js/lpn-inp.js');
 
 const L = loadLoopedNetwork(
@@ -106,11 +109,11 @@ const pipe2 = L.addLink('pipe', jun.id, tank.id);
 head('1. The pipe pair is on all three screens, not just the popup');
 // =================================================================================================
 const linkPopup = textOf(L.popupLink(pipe.id));
-ok('the pipe popup still asks for both', linkPopup.indexOf('Bulk reaction coefficient') >= 0
-	&& linkPopup.indexOf('Wall reaction coefficient') >= 0);
-ok('the bulk one names its unit', linkPopup.indexOf('Bulk reaction coefficient (1/day)') >= 0);
+ok('the pipe popup still asks for both', linkPopup.indexOf(PC.lpn_reaction_bulk) >= 0
+	&& linkPopup.indexOf(PC.lpn_reaction_wall) >= 0);
+ok('the bulk one names its unit', linkPopup.indexOf(PC.lpn_reaction_bulk + ' (1/day)') >= 0);
 ok('and the wall one is a length per day, in the project\'s length unit',
-	linkPopup.indexOf('Wall reaction coefficient (ft/day)') >= 0);
+	linkPopup.indexOf(PC.lpn_reaction_wall + ' (ft/day)') >= 0);
 
 const pipeCols = L.paneCols('pipes');
 ok('the Pipes table has a column for each', pipeCols.indexOf('bulkCoeff') >= 0
@@ -154,8 +157,8 @@ ok('neither is a starting value nor a scenario push', L.pushShown('bulkCoeff') =
 head('3. The tank coefficient has a control, where the tank\'s other properties live');
 // =================================================================================================
 const tankPopup = textOf(L.popupNode(tank.id));
-ok('the tank popup asks for it', tankPopup.indexOf('Reaction coefficient') >= 0);
-ok('as a rate in 1/day', tankPopup.indexOf('Reaction coefficient (1/day)') >= 0);
+ok('the tank popup asks for it', tankPopup.indexOf(PC.lpn_reaction_tank) >= 0);
+ok('and states the rate per day', tankPopup.indexOf(PC.lpn_reaction_tank + ' (1/day)') >= 0);
 const tankCols = L.paneCols('tanks');
 ok('the Tanks table has a column for it', tankCols.indexOf('tankCoeff') >= 0, tankCols.join(','));
 ok('headed by the word without the tab\'s own noun repeated in it',

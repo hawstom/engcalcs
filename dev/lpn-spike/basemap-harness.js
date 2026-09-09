@@ -23,6 +23,10 @@
 // that the code is self-consistent.
 
 const { byId, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// The menu rows' own words, read from the real lib/lang.ec.en.php the stub loads. The teaser is
+// asserted to be named by the SAME STRING the menu row uses, so the key is the assertion and the
+// English is not (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 const L = loadLoopedNetwork(
 	"\t\ttileList: basemapTileList, zoomFor: tileZoomFor,\n" +
@@ -374,8 +378,8 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 		!/id="lpn_basemap_teaser"[^>]*>[^<]/.test(php));
 
 	const btn = byId.lpn_basemap_teaser;
-	global.EngCalcs.pageConfig.lpn_basemap_satellite_show = 'Show satellite images';
-	global.EngCalcs.pageConfig.lpn_basemap_satellite_hide = 'Hide satellite images';
+	// No pageConfig to seed: the stub already carries the real strings, and writing them here was
+	// a second copy of the language file that could disagree with it.
 	L.wireTeaser();
 
 	// A GRID PROJECT HAS NO SATELLITE ROW, and must have no teaser: satellite tiles are placed per
@@ -399,7 +403,8 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 	L.refreshTeaser();
 	ok('a geographic project with a token gets the teaser', btn.style.display === '');
 	ok('...named by the string the menu row uses, so nothing new was written',
-		btn.getAttribute('aria-label') === 'Show satellite images', btn.getAttribute('aria-label'));
+		btn.getAttribute('aria-label') === PC.lpn_basemap_satellite_show,
+		btn.getAttribute('aria-label'));
 	ok('...and it says it is a toggle that is currently off',
 		btn.getAttribute('aria-pressed') === 'false');
 
@@ -415,7 +420,7 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 	L.refreshTeaser();
 	ok('...and the tile then offers the STREET map, not "hide"',
 		btn.getAttribute('aria-pressed') === 'true' &&
-		btn.getAttribute('aria-label') === 'Show street map', btn.getAttribute('aria-label'));
+		btn.getAttribute('aria-label') === PC.lpn_basemap_show, btn.getAttribute('aria-label'));
 	ok('...and shows the other source, which is what a toggle\'s picture is for',
 		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-on') >= 0);
 	click();
@@ -423,7 +428,7 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 		L.basemapOn() && L.style() === 'osm', 'on=' + L.basemapOn() + ' style=' + L.style());
 	L.refreshTeaser();
 	ok('...leaving the teaser offering the images again',
-		btn.getAttribute('aria-label') === 'Show satellite images');
+		btn.getAttribute('aria-label') === PC.lpn_basemap_satellite_show);
 	L.setStyle('osm');
 }
 

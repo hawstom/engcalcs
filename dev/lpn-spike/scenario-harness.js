@@ -35,6 +35,9 @@
 // breaks is the MARKER, and the marker mutant above is the one that catches it.
 
 const { ROOT, setUnitSet, loadLoopedNetwork, ensure } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, for the same reason the note below gives
+// about lpn_scenario_base_value (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 const fs = require('fs');
 const path = require('path');
 function byId(id) { return ensure(id); }
@@ -251,7 +254,7 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 {
 	L.renderNodeFields(j2.id);
 	const txt = fieldsText();
-	ok('a scenario row offers the override marker', /Only in this scenario/.test(txt), txt);
+	ok('a scenario row offers the override marker', txt.indexOf(PC.lpn_scenario_override) >= 0, txt);
 	// Built from the LIVE lang string, never a hardcoded 'Base: '. That literal broke on 2026-08-14
 	// when lpn_scenario_base_value became 'Base scenario: {value}' -- and it would have broken
 	// identically in all 26 translations, which is the tell that the assertion was testing the
@@ -277,7 +280,8 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 
 	L.switchScenario('base');
 	L.renderNodeFields(j2.id);
-	ok('in Base there is no marker at all', !/Only in this scenario/.test(fieldsText()));
+	ok('in Base there is no marker at all',
+		fieldsText().indexOf(PC.lpn_scenario_override) < 0);
 	L.switchScenario(L.getScenarios()[1].id);
 }
 
@@ -521,7 +525,8 @@ console.log('\n--- the readout, the halos, and the guards ---');
 
 	lastAlert = null;
 	L.pushBaseToScenarios();
-	ok('a second push says there is nothing left to do', /nothing would change/.test(lastAlert || ''),
+	ok('a second push says there is nothing left to do',
+		String(lastAlert || '').indexOf(PC.lpn_scenario_push_none) >= 0,
 		JSON.stringify(lastAlert));
 }
 
@@ -560,7 +565,8 @@ console.log('\n--- the push, scoped to one element ---');
 	// link's value on its way past, and not ask a question the user could confirm out of habit.
 	lastAlert = null; confirmText = null;
 	L.pushBaseToScenarios(E.j1);
-	ok('a node push sees no link property to push', /nothing would change/.test(lastAlert || ''),
+	ok('a node push sees no link property to push',
+		String(lastAlert || '').indexOf(PC.lpn_scenario_push_none) >= 0,
 		JSON.stringify(lastAlert));
 	ok('...and asked nothing, so nothing could be confirmed by habit', confirmText === null);
 	ok('...and l2 STILL has its own value', !!scn.overrides[L.ovKey(E.l2)], JSON.stringify(scn.overrides));

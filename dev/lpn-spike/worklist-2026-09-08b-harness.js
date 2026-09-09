@@ -28,6 +28,9 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// The two names the real area button is painted with, read from the real lib/lang.ec.en.php the
+// stub loads rather than retyped here (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 let checks = 0, failures = 0;
 function ok(name, cond, extra) {
@@ -144,7 +147,7 @@ console.log('\n--- a toolbar button repainted after initTips() keeps one tip ---
 	btn.parentNode = holder;
 
 	L.resetToolbarIndex();
-	L.setIconLabel(btn, 'select-window', 'Select a window', 'Click on the map as instructed.');
+	L.setIconLabel(btn, 'select-window', PC.lpn_tool_area_window, 'Click on the map as instructed.');
 	ok('the button carries a title before the tips are wired', !!btn.title, JSON.stringify(btn.title));
 	ok('...and the .ec-help class that is the only selector initTips() wires',
 		btn.className.indexOf('ec-help') >= 0, btn.className);
@@ -154,13 +157,13 @@ console.log('\n--- a toolbar button repainted after initTips() keeps one tip ---
 
 	// THE REPAINT. Only the area-select slot is ever repainted, which is why only that button ever
 	// showed two tips -- and why the fix is at the door and not at that call site.
-	L.setIconLabel(btn, 'select-lasso', 'Select a lasso', 'Click on the map as instructed.');
+	L.setIconLabel(btn, 'select-lasso', PC.lpn_tool_area_lasso, 'Click on the map as instructed.');
 	ok('a repaint does not leave a raw title behind for the browser to draw',
 		!btn.title, JSON.stringify(btn.title));
 	ok('...and the tip is still armed, so the styled one survives the repaint',
 		!!fakeBootstrap.Tooltip.getInstance(btn));
 	ok('...carrying the NEW words, not the ones it was built with',
-		/Select a lasso/.test(fakeBootstrap.Tooltip.getInstance(btn)._title),
+		fakeBootstrap.Tooltip.getInstance(btn)._title.indexOf(PC.lpn_tool_area_lasso) >= 0,
 		fakeBootstrap.Tooltip.getInstance(btn)._title);
 
 	// **AND THE HELP LIST DOES NOT GROW.** Help, What the toolbar icons mean is DERIVED from this
@@ -168,7 +171,7 @@ console.log('\n--- a toolbar button repainted after initTips() keeps one tip ---
 	ok('the index holds one row per button, however often it is repainted',
 		L.toolbarIndex().length === 1, L.toolbarIndex().length + ' rows');
 	ok('...and it is the CURRENT icon and name', L.toolbarIndex()[0].icon === 'select-lasso' &&
-		L.toolbarIndex()[0].name === 'Select a lasso', JSON.stringify(L.toolbarIndex()[0].name));
+		L.toolbarIndex()[0].name === PC.lpn_tool_area_lasso, JSON.stringify(L.toolbarIndex()[0].name));
 
 	// The class list must not grow either: setIconLabel() appends `ec-help`, so a `+=` on a button
 	// repainted on every shape change grew it without bound.

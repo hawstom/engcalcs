@@ -23,6 +23,10 @@
 //      line, not a comma list (Tom, 2026-08-18).
 
 const { byId, setUnitSet, loadLoopedNetwork, unitSelects } = require('./lpn-dom-stub.js');
+// The dialog's own text, read from the real lib/lang.ec.en.php the stub loads -- the same reason
+// the options heading below has always been read from its key rather than retyped
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
@@ -136,8 +140,8 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	pickUnit('lpn_u_flow', 'ft3ps');
 	const lines = dialogLines();
 	ok('a project with content IS asked', dialogOpen());
-	ok('the title is Tom\'s: "This unit decides what your inputs mean"',
-		lines[0] === 'This unit decides what your inputs mean', lines[0]);
+	ok('the title is the one written for this question',
+		lines[0] === PC.lpn_units_warn_title, lines[0]);
 	// The lead names the unit CHOSEN, not the one still on the strip -- the select was put back
 	// while the question stands, so reading it would name the old unit and the sentence would be a lie.
 	// (The stub's option text is the unit's own name -- 'ft3ps' where the shipped select says 'cfs'
@@ -146,7 +150,7 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	// than hard-coding either spelling.)
 	const chosen = unitSelects.lpn_u_flow.options.find(o => o.value === 'ft3ps').textContent;
 	ok('the lead names the chosen unit and what it is the unit OF',
-		lines[1] === chosen + ' is the unit of what you enter for:', lines[1]);
+		lines[1] === PC.lpn_units_warn_lead.replace('{unit}', chosen), lines[1]);
 	// **ONE NAME PER LINE, NOT A COMMA LIST** (Tom, 2026-08-18).
 	const fieldLines = lines.slice(2, lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head));
 	ok('the fields it decides are listed', fieldLines.length >= 2, JSON.stringify(fieldLines));
@@ -159,15 +163,14 @@ const snapshot = () => JSON.stringify([L.getDoc(), L.getScenarios()]);
 	// read from the key rather than retyped here, so the next rewording is not a second failure.
 	ok('the options are headed', lines.indexOf(global.EngCalcs.pageConfig.lpn_units_options_head) >= 0, JSON.stringify(lines));
 	ok('Non-destructive says it leaves the inputs alone',
-		lines.some(l => /^Non-destructive: leaves every input as it is/.test(l)), JSON.stringify(lines));
-	ok('Destructive says it rewrites them and that it loses the originals',
-		lines.some(l => /^Destructive: rewrites every input/.test(l) && /loses the original inputs/.test(l)),
-		JSON.stringify(lines));
-	// The answer to Task 425's open question, said where the user is deciding rather than only in a
-	// code comment: the undo snapshot IS the backup, so the dialog has to promise it.
-	ok('...and that Undo puts them back', lines.some(l => /Undo puts them back/.test(l)));
+		lines.indexOf(PC.lpn_units_nondestructive_desc) >= 0, JSON.stringify(lines));
+	// Whole sentence, so what it costs AND the answer to Task 425's open question -- that the undo
+	// snapshot IS the backup -- are both promised where the user is deciding.
+	ok('Destructive says it rewrites them, loses the originals, and that Undo puts them back',
+		lines.indexOf(PC.lpn_units_destructive_desc) >= 0, JSON.stringify(lines));
 	ok('three buttons, Non-destructive first and Cancel last',
-		JSON.stringify(buttonLabels()) === JSON.stringify(['Non-destructive', 'Destructive', 'Cancel']),
+		JSON.stringify(buttonLabels()) === JSON.stringify(
+			[PC.lpn_units_nondestructive, PC.lpn_units_destructive, PC.lpn_cancel]),
 		JSON.stringify(buttonLabels()));
 	// Nothing has happened yet: the select is back on the old unit and the document is untouched.
 	ok('the unit is held at the old one while the question stands',

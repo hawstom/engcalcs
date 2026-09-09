@@ -15,6 +15,10 @@
 // The network is the shipped gallery example, opened the way a visitor opens it.
 
 const { byId, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
+// The strings this box shows, read from the real lib/lang.ec.en.php the stub loads. Asserting the
+// English as a literal here made a rewording -- which this project treats as free -- into a red
+// build in a file about fire flow (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 const L = loadLoopedNetwork(
@@ -144,6 +148,12 @@ function headCells(el) {
 	return n;
 }
 const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
+// The summary sentence as a PATTERN: the language file's own wording with its three counts left
+// open. What is being asserted is that all three modes are reported, which is a fact about the
+// page; the words around the numbers belong to lpn_ff_summary and may move without breaking this.
+const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
+	.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	.replace(/\\\{(?:clean|fire|design)\\\}/g, '\\d+'));
 
 (async function () {
 	// US units, so the numbers typed into the box below are the gpm and psi a person would type.
@@ -163,24 +173,23 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	L.openFireFlowBox();
 	ok('it is shown', byId.lpn_ff_box.style.display === 'flex', byId.lpn_ff_box.style.display);
 	const controls = textOf(byId.lpn_ff_controls);
-	ok('it asks for the required fire flow', controls.indexOf('Required fire flow') >= 0);
-	ok('it asks which junctions to test', controls.indexOf('Junctions to test') >= 0);
+	ok('it asks for the required fire flow', controls.indexOf(PC.lpn_ff_required) >= 0);
+	ok('it asks which junctions to test', controls.indexOf(PC.lpn_ff_scope) >= 0);
 	// Tom, 2026-09-02: *"Most software has the word Design, doesn't it? Should we put 'Design check
 	// (effect on system)'?"* -- the profession's word first, the plain gloss in the bracket.
 	ok('it offers the design scope as a set chosen before the run',
-		controls.indexOf('Design check (effect on system)') >= 0);
+		controls.indexOf(PC.lpn_ff_design) >= 0);
 	// **THE LOSS ACCOUNTING IS ON THE SCREEN** (Tom, 2026-08-25). Not a comment, not a code
 	// constant: the sentence a reader sees before they press Run.
 	// **THE LOSS ACCOUNTING IS A STATED METHOD, NOT A STATED ABSENCE** (Tom, 2026-08-30, reading the
 	// first wording: "It says that no losses are accounted for at the raw node."). It has to lead
 	// with what the tool DOES, and it still has to say what is left out.
-	ok('it says where the fire flow is drawn',
-		controls.indexOf('Fire flow is drawn at the junction itself') >= 0,
+	// One assertion for the whole sentence rather than three for its clauses: what this harness can
+	// hold is that the note REACHES THE SCREEN. Whether it leads with the method is a question about
+	// the string, and the string is Tom's to rule on in dev/new-english-keys.md.
+	ok('it says where the fire flow is drawn, in full',
+		controls.indexOf(PC.lpn_ff_accounting) >= 0,
 		'this is the one thing Tom asked to be explicit about');
-	ok('and that this is the method rather than an omission',
-		controls.indexOf('That is the method used here') >= 0);
-	ok('and it still names what is not modelled',
-		controls.indexOf('nozzle are not modelled') >= 0);
 	ok('and it says which engine will do the work, in the present tense',
 		controls.indexOf(' is used.') >= 0 &&
 		controls.indexOf('will be used') < 0);
@@ -245,8 +254,7 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// the junction count and that is correct. Counting the exclusive states here while the rows
 	// below name two modes each would have put a visible disagreement on one screen.
 	ok('the running tally counts the same failure modes the report does',
-		samples.some(x => /failed the fire flow/.test(x.tally) &&
-			/affected the rest of the system/.test(x.tally)),
+		samples.some(x => SUMMARY_RE.test(x.tally)),
 		JSON.stringify(samples.map(x => x.tally)));
 	// **THE DIALOG MUST BE IN FRONT OF THE BOX THAT LAUNCHED IT** (Tom, 2026-09-02: *"Run box: still
 	// invisible"*, after a first fix that raised it in the wrong place). Both boxes centre
@@ -274,7 +282,7 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	const report = textOf(byId.lpn_ff_report);
 	// **ONE TABLE, NOT TWO** (Tom, 2026-08-30). Both halves of the answer are on one row per
 	// junction, in this page's own words rather than the competitor's.
-	ok('there is one table under one heading', report.indexOf('Every junction tested') >= 0 &&
+	ok('there is one table under one heading', report.indexOf(PC.lpn_ff_report_all) >= 0 &&
 		report.indexOf('Available against required') < 0);
 	// **THE ORDER IS ASSERTED, NOT JUST THE PRESENCE** (Tom, 2026-09-02, giving the order he wanted
 	// to try once the terminology stopped fighting his intuition). The old version checked only that
@@ -283,8 +291,12 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// GIVE, then the collateral. `Available flow` and `Residual held` stay adjacent, which is Tom's
 	// 2026-09-01 ruling surviving the move: they are one reading, and a flow without the pressure it
 	// was held at is a number without its condition.
-	const wantOrder = ['Junction', 'Static pressure', 'Required flow', 'Pressure at required',
-		'Available flow', 'Residual held', 'Worst effect', 'Design limit', 'Runs', 'Failure modes'];
+	// Named by KEY, resolved through the language file: the assertion is about the ORDER of ten
+	// columns, and it must survive any of the ten being reworded.
+	const wantOrder = ['lpn_ff_col_junction', 'lpn_ff_col_static', 'lpn_ff_col_required',
+		'lpn_ff_col_atrequired', 'lpn_ff_col_available', 'lpn_ff_col_residual',
+		'lpn_ff_col_affected', 'lpn_ff_col_limit', 'lpn_ff_col_solves', 'lpn_ff_col_modes']
+		.map(function (k) { return PC[k]; });
 	let cursor = -1, inOrder = true;
 	wantOrder.forEach(function (h) {
 		const at = report.indexOf(h);
@@ -301,16 +313,15 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// running, which is AWWA M31's and NFPA 291's own definition, and measured on the Elm Street
 	// example the value equals the map's pressure at that junction to the last bit. A heading that
 	// does not say so leaves a reader to guess, so the tip is asserted rather than trusted.
-	const staticTh = headWithText(byId.lpn_ff_report, 'Static pressure');
+	const staticTh = headWithText(byId.lpn_ff_report, PC.lpn_ff_col_static);
 	ok('the Static pressure heading carries its definition', !!(staticTh && staticTh.title),
 		staticTh ? String(staticTh.title).slice(0, 40) : 'no such heading');
-	ok('...and it names the ordinary demands as still running',
-		!!(staticTh && staticTh.title.indexOf('ordinary demands still running') >= 0),
+	// ...and that it is THE definition, not some other tip: the whole of lpn_ff_col_static_tip.
+	ok('...and it is the tip written for this column',
+		!!(staticTh && staticTh.title === PC.lpn_ff_col_static_tip),
 		staticTh ? staticTh.title : '');
 	ok('the summary counts the two failure modes and the clean junctions',
-		report.indexOf('had nothing wrong') >= 0 &&
-		report.indexOf('failed the fire flow') >= 0 &&
-		report.indexOf('affected the rest of the system') >= 0);
+		SUMMARY_RE.test(report));
 	ok('the ISO credit limit travels with the numbers', report.indexOf('(ISO) credits') >= 0);
 	// The table has a heading row plus one row per junction, capped -- the example is well under
 	// the cap, so every junction is printed.
@@ -403,7 +414,7 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	// drawn, so js/lpn-fireflow.js never probes at the required flow and the available flow, the
 	// residual at it and the pressure at the required flow do not exist. A dash carried that alone.
 	ok('a junction that failed at rest says so instead of showing a bare dash',
-		blankText.indexOf('Static failed, so not checked') >= 0);
+		blankText.indexOf(PC.lpn_ff_static_failed) >= 0);
 	// **AND ITS DRAWDOWNS ARE STILL CHECKED, which is the thing Tom would not let go** (2026-09-02:
 	// *"What if I want a full system report, and node 99 doesn't need fire flow or barely fails, but
 	// some other nearby demand draws 99 down... Wouldn't I want to know that even though 99 failed
@@ -467,7 +478,7 @@ const MARKS = ['lpn-ff-pass', 'lpn-ff-fail', 'lpn-ff-design', 'lpn-ff-error'];
 	const off = L.run();
 	ok('with it off, nothing is checked', off.design === null);
 	ok('and the report says so rather than showing an empty table',
-		textOf(byId.lpn_ff_report).indexOf('was not checked in this run') >= 0);
+		textOf(byId.lpn_ff_report).indexOf(PC.lpn_ff_design_off_note) >= 0);
 	ok('no junction is in the design state', off.counts.design === 0, JSON.stringify(off.counts));
 	// The SAME network and the SAME requirement, with the scope back on: the design state has to
 	// come back, or the scope control is not doing anything.

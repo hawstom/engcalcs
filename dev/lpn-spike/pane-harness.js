@@ -23,6 +23,9 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -382,7 +385,7 @@ console.log('\n--- the Tables pane says what it is for ---');
 	L.renderTable('junctions');
 	const panel = document.getElementById(L.paneTableById('junctions').panel);
 	const shown = (panel.childNodes || []).map((c) => c.textContent || '').join(' ');
-	report(/pasting from a spreadsheet/.test(shown), 'and a rendered table really carries it');
+	report(shown.indexOf(PC.lpn_pane_paste_note) >= 0, 'and a rendered table really carries it');
 	// It must not have been folded into lpn_pane_none, which six Library sections share and where
 	// five of the six create rows by an Add button, not by paste.
 	const langEn = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');

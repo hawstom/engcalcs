@@ -30,6 +30,11 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const PC = global.EngCalcs.pageConfig;
+// The name this harness TYPES into the project and then reads back off the printed sheet. It is
+// the harness's own text, not the page's -- it happens to read like lpn_ex_elm_street_title, which
+// is why dev/scripts/harness_wording_check.php declares this one line an exception.
+const PROJECT_NAME = 'Elm Street Center';
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -119,7 +124,7 @@ L.plantResult({
 	headlosses: { [p1.id]: 1, [p2.id]: 1 },
 	heads: {}, pressures: {}
 });
-L.setProjectName('Elm Street Center');
+L.setProjectName(PROJECT_NAME);
 
 const TABLES = L.paneTables().map((t) => t.id);
 const cellsOf = (node) => (node ? node.children : []);
@@ -161,14 +166,14 @@ console.log('\n--- one printer, seven tables ---');
 console.log('\n--- the sheet says what it is ---');
 {
 	const s = sheetOf('pipes');
-	report(s.title === 'Elm Street Center', 'the project name is on the sheet', s.title);
+	report(s.title === PROJECT_NAME, 'the project name is on the sheet', s.title);
 	report(s.name === 'Pipes', '...and the table’s own name', s.name);
 	// The tab strip is the only place the second one is said on screen, and the tab strip is not on
 	// the paper. Read from the SAME key the tab reads, so a rename cannot leave the two disagreeing.
 	report(/lpn_pane_tab_pipes'\]='Pipes'/.test(en), '...taken from the tab’s own lang key');
 	L.setProjectName('Net3-World');
 	report(sheetOf('pipes').title === 'Net3-World', 'renaming the project renames the sheet');
-	L.setProjectName('Elm Street Center');
+	L.setProjectName(PROJECT_NAME);
 }
 
 // ---- 3. the headings are the screen's headings, units and all ---------------------------------
@@ -286,10 +291,10 @@ console.log('\n--- an empty table ---');
 	doc.links.length = 0;
 	const s = sheetOf('pumps');
 	report(!s.table, 'a table with no rows prints no table');
-	report(/none of these/.test(s.wrap.children.map((c) => c.textContent).join(' ')),
+	report(s.wrap.children.map((c) => c.textContent).join(' ').indexOf(PC.lpn_pane_none) >= 0,
 		'...it says the network has none of these yet',
 		s.wrap.children.map((c) => c.textContent).join(' '));
-	report(s.title === 'Elm Street Center' && s.name === 'Pumps',
+	report(s.title === PROJECT_NAME && s.name === 'Pumps',
 		'...and still says whose network and which table');
 	kept.forEach((l) => doc.links.push(l));
 	L.renderTable('pumps');

@@ -22,6 +22,9 @@
 // below, because each of them is a silent failure: nothing errors, the banner simply never returns.
 
 const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 const L = loadLoopedNetwork(
 	"\t\tsetLockUnavailable: setLockUnavailable,\n" +
@@ -96,7 +99,7 @@ console.log('\n--- what a dismissal dismisses, and what brings it back ---');
 	L.setLockError('full');
 	L.setLockUnavailable(true);
 	ok('a DIFFERENT fault says itself, even after a dismissal',
-		/run out of room/.test(bannerText() || ''), JSON.stringify(bannerText()));
+		String(bannerText() || '').indexOf(PC.lpn_lock_full_error) >= 0, JSON.stringify(bannerText()));
 
 	// LOCKING COMING BACK IS A STATE CHANGE, so it forgets the dismissal: if it breaks again, that
 	// is news. Without this a single Dismiss silences the rest of the session.

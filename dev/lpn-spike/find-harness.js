@@ -22,6 +22,16 @@
 // would throw away the zoom he set to read the drawing.
 
 const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// The report's own labels and refusals, read from the real lib/lang.ec.en.php the stub loads.
+// WHICH message the panel chose is the thing under test; its wording is the language file's
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
+// A refusal message as a PATTERN: the language file's own sentence with its {placeholders} left
+// open, since every one of them is filled with the word the reader actually typed.
+function msgRe(key) {
+	return new RegExp(PC[key].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+		.replace(/\\\{\w+\\\}/g, '.*?'));
+}
 const fs = require('fs');
 const ROOT = require('path').join(__dirname, '../../');
 
@@ -557,8 +567,9 @@ function panelLines(box) {
 	L.pressFind();
 	const rows = panelLines(L.resultsBox()).join(' | ');
 	ok('each row names the NARROWEST fault true of it',
-		rows.indexOf('No links') >= 0 && rows.indexOf('No open links') >= 0 &&
-		rows.indexOf('No link path to a source') >= 0 && rows.indexOf('No open path to a source') >= 0,
+		rows.indexOf(PC.lpn_find_conn_unlinked) >= 0 && rows.indexOf(PC.lpn_find_conn_noopen) >= 0 &&
+		rows.indexOf(PC.lpn_find_conn_nolinksource) >= 0 &&
+		rows.indexOf(PC.lpn_find_conn_noopensource) >= 0,
 		rows);
 
 	// A whole network, cleanly fed: the answer is none, and "none" is the good news the report was
@@ -833,27 +844,32 @@ function fire(el, type) { (el._listeners[type] || []).forEach(function (f) { f({
 	L.buildDom();
 	L.setState('pipe', 'diameter', 'gt', '8');
 	L.buildPanel();
-	function refuses(text, wants) {
+	// `wants` is the KEY of the refusal expected, so what is asserted is WHICH message came back.
+	// `echo` is the word the reader typed, which the message must hand back to them -- that one IS
+	// a literal, because it is the user's own text and not ours.
+	function refuses(text, wants, echo) {
 		L.type(text); L.pressFind();
 		const msg = panelLines(L.resultsBox()).join(' ');
-		ok('refused: ' + JSON.stringify(text), L.results().length === 0 && msg.indexOf(wants) >= 0, msg);
+		ok('refused: ' + JSON.stringify(text),
+			L.results().length === 0 && msgRe(wants).test(msg) &&
+			(echo === undefined || msg.indexOf(echo) >= 0), msg);
 	}
-	refuses('Pipe.Diamater greater than 8', 'Diamater');
-	refuses("Sausage.ID contains 'x'", 'Sausage');
-	refuses('Pipe Diameter greater than 8', 'dot');
-	refuses('Pipe.Diameter greater than', 'needs a value');
-	refuses('Pipe.Diameter contains 8', 'Not a condition');
-	refuses('(Pipe.Diameter greater than 8', 'never closed');
-	refuses('Pipe.Diameter greater than 8)', 'Nothing was expected');
-	refuses('Pipe.Diameter greater than 8 AND', 'There is nothing called');
-	refuses("Everything.ID contains 'x", 'no closing quote');
-	refuses('Everything.ID contains x', 'quotes');
-	refuses('Pipe.Diameter greater than 8 rubbish', 'Nothing was expected');
-	refuses(') AND Pipe.Diameter greater than 8', 'closes nothing');
+	refuses('Pipe.Diamater greater than 8', 'lpn_find_q_err_prop', 'Diamater');
+	refuses("Sausage.ID contains 'x'", 'lpn_find_q_err_scope', 'Sausage');
+	refuses('Pipe Diameter greater than 8', 'lpn_find_q_err_dot');
+	refuses('Pipe.Diameter greater than', 'lpn_find_q_err_value');
+	refuses('Pipe.Diameter contains 8', 'lpn_find_q_err_op');
+	refuses('(Pipe.Diameter greater than 8', 'lpn_find_q_err_close');
+	refuses('Pipe.Diameter greater than 8)', 'lpn_find_q_err_end');
+	refuses('Pipe.Diameter greater than 8 AND', 'lpn_find_q_err_scope');
+	refuses("Everything.ID contains 'x", 'lpn_find_q_err_quote_end');
+	refuses('Everything.ID contains x', 'lpn_find_q_err_quote');
+	refuses('Pipe.Diameter greater than 8 rubbish', 'lpn_find_q_err_end');
+	refuses(') AND Pipe.Diameter greater than 8', 'lpn_find_q_err_open');
 	// **AN EMPTY BOX IS NOT A SEARCH FOR EVERYTHING.** The controls' own empty-value rule ("contains
 	// nothing matches everything") is written `contains ''`, which IS a query. A blank box is not.
-	refuses('', 'empty');
-	refuses('   ', 'empty');
+	refuses('', 'lpn_find_q_err_empty');
+	refuses('   ', 'lpn_find_q_err_empty');
 	// The position is part of the report: "where" is half of what a person needs in order to fix it.
 	L.type('Pipe.Diamater greater than 8'); L.pressFind();
 	ok('...and the message says where', /character 6/.test(panelLines(L.resultsBox()).join(' ')),

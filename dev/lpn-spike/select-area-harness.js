@@ -25,6 +25,9 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { byId, ensure, setUnitSet, setHitTarget, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 require(path.join(ROOT, 'js', 'lpn-geom.js'));
 
 // The page's document-level keydown listeners (Escape lives there), recorded BEFORE the page is
@@ -529,7 +532,7 @@ console.log('\n--- properties for many ---');
 	const textRows = textSec.children.filter((c) => c._tag === 'label').map((r) => r.textContent || '');
 	report(/Size multiplier/.test(textRows.join('|')) && /Bold text/.test(textRows.join('|')) &&
 		/Horizontal alignment/.test(textRows.join('|')) && /Angle/.test(textRows.join('|')) &&
-		/Part of this network/.test(textRows.join('|')),
+		textRows.join('|').indexOf(PC.lpn_field_active) >= 0,
 		'with the words, size, alignments, Bold, angle and Active as rows', textRows.join(' | '));
 	const boldRow = textSec.children.filter((c) => c._tag === 'label' && /Bold text/.test(c.textContent || ''))[0];
 	const boldBox = boldRow.children.filter((c) => c._tag === 'input')[0];

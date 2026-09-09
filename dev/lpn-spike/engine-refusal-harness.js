@@ -31,6 +31,22 @@ require(path.join(ROOT, 'js', 'lpn-inp.js'));
 require(path.join(ROOT, 'js', 'lpn-epanet.js'));
 require(path.join(ROOT, 'js', 'lpn-time.js'));
 const { buildModel } = require('./net3-model.js');
+// The two status messages, read out of lib/lang.ec.en.php. This harness loads no DOM stub, so
+// there is no pageConfig and js/lpn-time.js falls back to its own English literals -- which
+// js_fallback_string_check.php holds byte-identical to these. What is under test is WHICH of the
+// two messages a failure produced, never how either is worded
+// (dev/scripts/harness_wording_check.php).
+const LANG_EN = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
+function lang(key) {
+	const m = new RegExp("\\$ec_lang\\['" + key + "'\\]='((?:[^'\\\\]|\\\\.)*)';").exec(LANG_EN);
+	if (!m) { throw new Error('no such lang key: ' + key); }
+	return m[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
+}
+// ...as a PATTERN, with any {placeholder} left open: lpn_time_no_engine names the moment it solved.
+function langRe(key) {
+	return new RegExp(lang(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+		.replace(/\\\{\w+\\\}/g, '.+?'));
+}
 
 let failures = 0;
 function check(ok, msg, detail) {
@@ -215,11 +231,11 @@ async function pageSection() {
 	EngCalcs.lpnTimeArrived();
 	EngCalcs.lpnTimeRunNow();
 	await wait(80);
-	check(/would not accept/.test(status), '(a) the user is told EPANET refused the network', status);
+	check(langRe('lpn_engine_refused').test(status), '(a) the user is told EPANET refused the network', status);
 	check(status.indexOf(WORDS) >= 0, '(b) ...in the engine\'s own words, so they can act on it');
 	check(/built-in solver/.test(status), '(c) ...and that the numbers on screen came from our solver');
 	check(natives > 0, 'and the built-in solver really was the one that produced them', String(natives));
-	check(!/Connect to the internet/.test(status),
+	check(!langRe('lpn_time_no_engine').test(status),
 		'and is NOT told to go online -- the engine is right here, and that is an hour wasted');
 	eq(EngCalcs.lpnTimeRunBoxState().phase, 'failed', 'the run box says the run did not happen');
 	check(EngCalcs.lpnTimeRunBoxState().open, '...and stays up to be read');
@@ -232,9 +248,9 @@ async function pageSection() {
 	status = '';
 	EngCalcs.lpnTimeRunNow();
 	await wait(80);
-	check(/Connect to the internet/.test(status),
+	check(langRe('lpn_time_no_engine').test(status),
 		'an unreachable engine still gets its own message, unchanged', status);
-	check(!/would not accept/.test(status), '...and is never reported as a refusal');
+	check(!langRe('lpn_engine_refused').test(status), '...and is never reported as a refusal');
 }
 
 (async function () {

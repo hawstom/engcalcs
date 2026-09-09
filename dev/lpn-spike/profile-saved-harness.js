@@ -30,6 +30,9 @@
 //      writes a generic "everything in doc" section, this is the line that fails.
 
 const { byId, setUnitSet, loadLoopedNetwork, ROOT } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-inp.js');
 
@@ -173,7 +176,7 @@ function click(el) { (el._listeners.click || []).forEach((fn) => fn({ preventDef
 	click(L.profileMenuBtn());
 	ok('pressing the arrow does NOT start a path', !L.profileState().draw);
 	ok('...and the menu says there is nothing saved yet',
-		L.menuRows().some((t) => /No saved paths/.test(t)), JSON.stringify(L.menuRows()));
+		L.menuRows().some((t) => t.indexOf(PC.lpn_profile_none_saved) >= 0), JSON.stringify(L.menuRows()));
 
 	L.profileState().from = id.A;
 	L.profileState().to = id.D;

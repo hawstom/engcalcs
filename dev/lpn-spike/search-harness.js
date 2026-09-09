@@ -97,7 +97,7 @@ const junk = EC.lpnSearchParse([
 	{ lat: 'north', lon: '-122', display_name: 'not a number' },
 	{ lat: '91', lon: '0', display_name: 'past the pole' },
 	{ lat: '38', lon: '181', display_name: 'past the antimeridian' },
-	{ lat: null, lon: null, display_name: 'nothing at all' },
+	{ lat: null, lon: null, display_name: 'neither coordinate supplied' },
 	{ display_name: 'no coordinate offered' },
 	null,
 	{ lat: '38.5', lon: '-122.5' }

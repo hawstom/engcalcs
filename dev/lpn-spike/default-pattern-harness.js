@@ -20,6 +20,9 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, byId, ensure, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 // The page's own load order. lpn-time.js must be here or every multiplier is read at t = 0 whatever
 // the transport says -- the stub-holds-the-coupling-constant failure dev/testing-notes.md names,
@@ -119,7 +122,7 @@ let patRow;
 	L.rebuildSettings();
 	const rows = settingsRows();
 	ok('the Settings box built some rows at all', rows.length > 0, rows.length + ' rows');
-	patRow = rows.filter(r => /Default demand pattern/.test(r.label))[0];
+	patRow = rows.filter(r => r.label.indexOf(PC.lpn_settings_default_pattern) >= 0)[0];
 	ok('...one of which is Default demand pattern', !!patRow,
 		rows.map(r => r.label.replace(/\s+/g, ' ').trim()).join(' | '));
 	ok('...drawn as a select, not a text box',
@@ -187,7 +190,7 @@ console.log('\n--- one row, one place ---');
 	ok('...and holds no default-pattern chooser of its own', sels.length === 0,
 		sels.length + ' select(s)');
 	const text = all(host).map(n => n.textContent || '').join(' ');
-	ok('...nor the words for one', !/Default demand pattern/.test(text));
+	ok('...nor the words for one', text.indexOf(PC.lpn_settings_default_pattern) < 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -210,7 +213,7 @@ console.log('\n--- and drawing it changes nothing ---');
 		JSON.stringify(doc) === before,
 		'patterns is now ' + JSON.stringify(doc.patterns));
 	ok('...and the row still built, offering the blank alone',
-		settingsRows().some(r => /Default demand pattern/.test(r.label)));
+		settingsRows().some(r => r.label.indexOf(PC.lpn_settings_default_pattern) >= 0));
 }
 
 // ---------------------------------------------------------------------------

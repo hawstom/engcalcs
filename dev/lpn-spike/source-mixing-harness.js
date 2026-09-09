@@ -21,6 +21,9 @@
 'use strict';
 
 const { ROOT, byId, setUnitSet, loadLoopedNetwork, NODE_ENGINE_URL } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
@@ -462,11 +465,11 @@ const SRC = sectionLines(FIXTURE);
 	ok('the tank popup asks how the tank mixes', tankPopup.indexOf('Mixing model') >= 0);
 	// 'Two-compartment mixing' since 2026-09-06, for the reason above: EPANET's own interface writes
 	// 'Two-Compartment', so the hyphen is EPANET's too.
-	ok('with EPANET\'s own four models', tankPopup.indexOf('Complete mixing') >= 0
-		&& tankPopup.indexOf('Two-compartment mixing') >= 0
-		&& tankPopup.indexOf('FIFO plug flow') >= 0 && tankPopup.indexOf('LIFO plug flow') >= 0);
+	ok('with EPANET\'s own four models', tankPopup.indexOf(PC.lpn_mixing_mixed) >= 0
+		&& tankPopup.indexOf(PC.lpn_mixing_2comp) >= 0
+		&& tankPopup.indexOf(PC.lpn_mixing_fifo) >= 0 && tankPopup.indexOf(PC.lpn_mixing_lifo) >= 0);
 	ok('and, this tank being two-compartment, for the fraction that only that model uses',
-		tankPopup.indexOf('Mixing fraction') >= 0);
+		tankPopup.indexOf(PC.lpn_mixing_fraction) >= 0);
 	ok('a tank on any other model is not asked for a fraction it cannot use',
 		textOf(L.popupNode('T1')).indexOf('Mixing fraction') < 0, L.nodeById('T1').mixingModel);
 

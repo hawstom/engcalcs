@@ -30,6 +30,9 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
@@ -226,7 +229,7 @@ console.log('\n4. The report no longer claims a loss for anything it keeps');
 	// The exact words Tom read and objected to. `discarded` never shipped; `left out` did, on the
 	// sentence that covered both water quality and pump energy cost.
 	ok('the report does not say anything was left out or discarded',
-		!/left out|discard|thrown away(?! )/i.test(notes.replace(/nothing in your file is thrown away/i, '')),
+		!/left out|discard|thrown away(?! )/i.test(notes.replace(PC.lpn_inp_report_lead, '')),
 		JSON.stringify((/[^.]*(left out|discard)[^.]*\./i.exec(notes) || [])[0]));
 	// Every subject gets a sentence of its own and none of them may read as a loss. The
 	// REASSURANCE is a different rule and it splits, on Tom's own ruling (2026-09-05, of the

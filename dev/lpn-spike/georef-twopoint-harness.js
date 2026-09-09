@@ -139,7 +139,7 @@ ok('step 2 shows the button', byId.lpn_georef_twopt.style.display === '',
 console.log('\n--- what it refuses ---');
 clickTwoPt();
 ok('the button arms the pick', !!L.georefState().pick);
-ok('...and says what to click', notice().indexOf('Click a point') === 0, notice());
+ok('...and says what to click', notice().indexOf(langValue('lpn_georef_twopt_pick1')) === 0, notice());
 
 // The English a notice must equal, read out of the language file the DOM stub already loads --
 // never retyped here. Two harnesses broke on 2026-09-08 by pinning a wording Tom had just changed.
@@ -181,7 +181,8 @@ pressNode(1);
 ok('a good first point is taken', L.georefState().pick.pts.length === 1);
 ok('...and the prompt named the node it snapped to',
 	promptSeen[promptSeen.length - 1].indexOf('(' + A.id + ')') > 0, promptSeen[promptSeen.length - 1]);
-ok('...and asks for the second one', notice().indexOf('second known point') > 0, notice());
+ok('...and asks for the second one',
+	notice().indexOf(langValue('lpn_georef_twopt_pick2')) >= 0, notice());
 promptQueue = ['38.2 -122.4'];
 pressNode(1);
 ok('the same point twice is refused by name',
@@ -194,7 +195,7 @@ promptQueue = [];   // the stub prompt answers null when the queue is empty
 pressNode(2);
 ok('cancelling the prompt disarms the pick', !L.georefState().pick);
 ok('...and the notice is step 2\'s own instructions again',
-	notice().indexOf('on the ground now') > 0, notice());
+	notice().indexOf(langValue('lpn_georef_adjust')) >= 0, notice());
 
 // ---------------------------------------------------------------------------
 // 3. The placement itself.
@@ -211,7 +212,7 @@ pressNode(0);
 promptQueue = ['38,1065 -122,548'];           // and a decimal COMMA, which most of our languages write
 pressNode(2);
 ok('two points finish the pick', !L.georefState().pick);
-ok('...and say so', notice().indexOf('two points you gave') > 0, notice());
+ok('...and say so', notice().indexOf(langValue('lpn_georef_twopt_done')) >= 0, notice());
 
 {
 	const n = doc.nodes;

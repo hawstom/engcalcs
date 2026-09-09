@@ -30,6 +30,9 @@
 
 const path = require('path');
 const { ROOT, NODE_ENGINE_URL, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-inp.js');
 // The clock, for section 6: it attaches the document's own [TIMES] to the model the way the page
@@ -474,8 +477,11 @@ const FIXTURE = [
 	delete chainPump._efficCurveId;
 	L.renderLinkFields('P1');
 	const noneText = (document.getElementById('lpn_popup_fields') || {}).textContent || '';
-	check(/no efficiency curve/.test(noneText) && /75%/.test(noneText),
-		`with no curve at all it names the network efficiency and its number: ${/no efficiency curve[^]{0,70}/.exec(noneText)}`);
+	// The whole sentence, with the network efficiency substituted in from the language file: the
+	// number is the assertion, the words around it are lpn_pump_effic_global's.
+	const wantEffic = PC.lpn_pump_effic_global.replace('{percent}', '75%');
+	check(noneText.indexOf(wantEffic) >= 0,
+		`with no curve at all it names the network efficiency and its number: ${JSON.stringify(wantEffic)}`);
 	// It still offers no boxes -- the answer to "this pump has no curve" is now the Curves library
 	// link beside the chooser, not a table appearing under it.
 	check(efficInputs().length === 0,

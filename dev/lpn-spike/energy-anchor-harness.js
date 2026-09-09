@@ -27,6 +27,10 @@
 const path = require('path');
 const fs = require('fs');
 const { ROOT, NODE_ENGINE_URL, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
+// The report's own sentences, read from the real lib/lang.ec.en.php the stub loads. WHICH of the
+// two price notes the page printed is the thing under test; the words it prints them in belong to
+// the language file (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-inp.js');
 
@@ -412,11 +416,13 @@ const EngCalcs = global.EngCalcs;
 		`the Energy section built its rows: ${(energyHost.children || []).length}`);
 	// "Peak demand charge" since 2026-09-04 (Tom, reading the new-key list: *"Why not 'Peak demand
 	// charge'?"* -- it is charged on the one highest moment, so the name says which moment).
-	check(/Pump efficiency/.test(labels) && /Price of power/.test(labels)
-		&& /Peak demand charge/.test(labels) && /Currency/.test(labels),
+	check(labels.indexOf(PC.lpn_energy_efficiency) >= 0 && labels.indexOf(PC.lpn_energy_price) >= 0
+		&& labels.indexOf(PC.lpn_energy_demand_charge) >= 0
+		&& labels.indexOf(PC.lpn_energy_currency) >= 0,
 	'and they are the efficiency, the price, the peak demand charge and the currency');
 	// **THE DISCLOSURE IS IN THE BOX**, not in a comment: there is no default price on this page.
-	check(/no price suggestions/.test(labels), 'with the note that this application offers no price suggestions');
+	check(labels.indexOf(PC.lpn_energy_price_note) >= 0,
+		'with the note that this application offers no price suggestions');
 	// A report with no run says so rather than showing zeros.
 	L.rebuildEnergyReport();
 	const reportHost = document.getElementById('lpn_energy_report');
@@ -424,8 +430,7 @@ const EngCalcs = global.EngCalcs;
 	// total run time", and asserting on the engine's name is what made this check a hostage to the
 	// wording rather than to the promise. The promise is that a report with no run tells the reader
 	// what to go and do, which is set a total run time and press Calculate.
-	check(/extended period simulation/.test(reportHost.textContent || '')
-		&& /Total run time/.test(reportHost.textContent || ''),
+	check((reportHost.textContent || '').indexOf(PC.lpn_energy_needs_run) >= 0,
 	'with no run in hand the report says it needs an extended period simulation and a run time');
 	// And with one, it draws the table. The summary is handed in through the one door the page
 	// reads it by, so this exercises the real path rather than a private hook.
@@ -470,6 +475,9 @@ const EngCalcs = global.EngCalcs;
 		L.rebuildEnergyReport();
 		return (document.getElementById('lpn_energy_report').textContent || '').replace(/\s+/g, ' ');
 	}
+	// Whether a given sentence is in the report. Named by KEY: the assertions below are about WHICH
+	// of the two price notes the page chose, never about how either is worded.
+	function hasNote(sentence, text) { return text.indexOf(sentence) >= 0; }
 	function freeSummary(price, charge, kw) {
 		return EngCalcs.lpnEnergySummary(
 			EngCalcs.lpnEnergyAccumulate(EngCalcs.lpnEnergyAccInit([pu.id]),
@@ -477,9 +485,9 @@ const EngCalcs = global.EngCalcs;
 			{ duration: 3600, demandCharge: charge });
 	}
 	const silent = reportTextWith({ globalEfficiency: 75, effic: {} }, undefined, freeSummary(0, 0));
-	check(/No price of power is stated/.test(silent),
+	check(hasNote(PC.lpn_energy_no_price, silent),
 		'a document that states no price at all still says so');
-	check(!/states a price of zero/.test(silent), 'and does not claim a zero it has not got');
+	check(!hasNote(PC.lpn_energy_price_zero, silent), 'and does not claim a zero it has not got');
 
 	// Net3's own [ENERGY], to the character: Global Efficiency 75, Global Price 0.0,
 	// Demand Charge 0.0. Read out of the file rather than retyped, so the case cannot drift from
@@ -490,15 +498,15 @@ const EngCalcs = global.EngCalcs;
 	check(n3energy.globalPrice === 0 && n3energy.demandCharge === 0,
 		'Net3 states both as zero, which is the case this section exists for');
 	const zero = reportTextWith(Object.assign({ effic: {} }, n3energy), undefined, freeSummary(0, 0));
-	check(/states a price of zero/.test(zero),
+	check(hasNote(PC.lpn_energy_price_zero, zero),
 		'a document stating zero says the file stated it');
-	check(!/No price of power is stated/.test(zero),
+	check(!hasNote(PC.lpn_energy_no_price, zero),
 		'and NEVER the sentence that was false on all three EPA networks');
 
 	// A demand charge stated as zero with no price at all is still a statement, and the same one.
 	const chargeOnly = reportTextWith({ globalEfficiency: 75, demandCharge: 0, effic: {} },
 		undefined, freeSummary(0, 0));
-	check(/states a price of zero/.test(chargeOnly),
+	check(hasNote(PC.lpn_energy_price_zero, chargeOnly),
 		'a peak demand charge of zero on its own is a stated zero too');
 
 	// **THE THIRD DOCUMENT IS THE ONE THAT CATCHES A LAZY FIX.** A priced network whose pumps drew
@@ -506,13 +514,13 @@ const EngCalcs = global.EngCalcs;
 	// merely swapped the two sentences would print one here, and it would still be false.
 	const idle = reportTextWith({ globalEfficiency: 75, globalPrice: 0.2, effic: {} },
 		undefined, freeSummary(0.2, 0, 0));
-	check(/Cost of energy/.test(idle) && !/No price of power is stated/.test(idle)
-		&& !/states a price of zero/.test(idle),
+	check(hasNote(PC.lpn_energy_total_energy_cost, idle) && !hasNote(PC.lpn_energy_no_price, idle)
+		&& !hasNote(PC.lpn_energy_price_zero, idle),
 	`a priced network whose pumps drew nothing gets no claim about its price at all: ${idle.slice(-90)}`);
 	// And a per-pump price is a stated price, through the same resolver every other one goes through
 	// -- so it must lift a document out of 'none' on its own.
 	const pumpPriced = reportTextWith({ globalEfficiency: 75, effic: {} }, 0.2, freeSummary(0.2, 0, 0));
-	check(!/No price of power is stated/.test(pumpPriced),
+	check(!hasNote(PC.lpn_energy_no_price, pumpPriced),
 		'and a price stated on the pump alone is still a price this network states');
 	L.setProp(pu, 'energyPrice', undefined);
 

@@ -26,6 +26,9 @@
 
 const path = require('path');
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 const L = loadLoopedNetwork(
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
@@ -298,7 +301,7 @@ head('6. THE POPUP: A DERIVED k IS DISABLED, A TYPED ONE IS EDITABLE');
 	function kBox() {
 		const fields = document.getElementById('lpn_popup_fields');
 		return walk(fields).filter((e) => e.tagName === 'INPUT'
-			&& /Minor \(local\) loss coefficient/.test((e.parentNode && e.parentNode.textContent) || ''))[0];
+			&& ((e.parentNode && e.parentNode.textContent) || '').indexOf(PC.lpn_field_km) >= 0)[0];
 	}
 	L.renderLinkFields('P2');
 	check(kBox() && kBox().disabled !== true, 'a typed k stays editable');
@@ -389,9 +392,10 @@ head('7. THE EXPORT ALERT: ONE MESSAGE PER KIND, AND SILENCE WHERE NEITHER HAPPE
 	clearDialog();
 	L.showInpExportFlattening(out.differences, 'net.inp');
 	said = dialogText();
-	check(/1 pipes here is added up from a fittings list/.test(said),
-		`the alert states the count: ${JSON.stringify(said)}`);
-	check(/exactly as it stands/.test(said), 'and says the total goes out untouched');
+	// The count is the assertion; the sentence it is counted in is lpn_inp_export_flat_fittings's,
+	// and is substituted in from the language file rather than retyped.
+	check(said.indexOf(PC.lpn_inp_export_flat_fittings.replace('{n}', '1')) >= 0,
+		`the alert states the count and that the total goes out untouched: ${JSON.stringify(said)}`);
 	check(!/pipe types/.test(said), 'and says nothing about pipe types, which did not flatten here');
 	// **THE SUM IS WHAT GOES OUT**, so nothing about the answers changes on the far side.
 	const p1row = out.inp.split('\n').filter((r) => /^\s*P1\t/.test(r))[0];

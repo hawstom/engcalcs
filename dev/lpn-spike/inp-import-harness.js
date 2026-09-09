@@ -17,6 +17,10 @@
 // Tom's browser passes are slow and tiring -- this runs the whole path in well under a second.
 
 const { ROOT, byId, setUnitSet, loadLoopedNetwork, GPM, FT } = require('./lpn-dom-stub.js');
+// The import report's own sentences, read from the real lib/lang.ec.en.php the stub loads. WHICH
+// difference the report named is the thing under test; the words it names it in belong to the
+// language file (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 const fs = require('fs');
 const path = require('path');
 
@@ -344,9 +348,9 @@ console.log('\n--- the report ---');
 	// whole is not one, and a report that still claimed the loss would be the page describing an
 	// older version of itself.
 	ok('it does NOT say the demands were added together -- they were not',
-		t.indexOf('more than one demand') < 0);
+		t.indexOf(PC.lpn_inp_drop_demands) < 0);
 	ok('it says the emitter is being solved but cannot be edited',
-		t.indexOf('sprinkler or leak coefficient') >= 0 && t.indexOf('J6') >= 0);
+		t.indexOf(PC.lpn_inp_drop_emitters) >= 0 && t.indexOf('J6') >= 0);
 	ok('no sentence is left as a bare code name', t.indexOf('valve-tcv') < 0);
 }
 
@@ -373,7 +377,7 @@ console.log('\n--- an LPS file ---');
 	ok('demand stays 5 l/s', near(doc.nodes[0]._demand, 5, 1e-9), doc.nodes[0]._demand);
 	ok('elevation stays 30 m', near(doc.nodes[0].elev, 30, 1e-9), doc.nodes[0].elev);
 	ok('nothing was left out of a file this simple',
-		dialogText().indexOf('Nothing was left out') >= 0);
+		dialogText().indexOf(PC.lpn_inp_report_clean) >= 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -408,7 +412,7 @@ console.log('\n--- a tank, in an LPS file ---');
 		near(tk.tankDiameter, 15, 1e-9), tk && tk.tankDiameter);
 	ok('THE PIPE ON THE TANK SURVIVED THE IMPORT', doc.links.length === 1 && doc.links[0].from === 'TK1',
 		doc.links.length + ' link(s)');
-	ok('nothing was reported as left out', dialogText().indexOf('Nothing was left out') >= 0);
+	ok('nothing was reported as left out', dialogText().indexOf(PC.lpn_inp_report_clean) >= 0);
 	// The document must be solvable straight off the import, with the tank as the only source --
 	// which is also the diagnostic that used to say "add a reservoir" and now accepts a tank.
 	const res = EngCalcs.lpnSolve(L.assembleModel());

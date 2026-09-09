@@ -31,6 +31,9 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
@@ -275,7 +278,8 @@ console.log('\n--- the report tells the user, and tells the truth ---');
 		!/Nothing on this page uses/i.test(kept), JSON.stringify(kept));
 	ok('...and no longer says a chemical is not worked out here',
 		!/chemical is not/i.test(kept), JSON.stringify(kept));
-	ok('...and says all three are used', /all three are used/i.test(kept), JSON.stringify(kept));
+	ok('...and says all three are used', kept.indexOf(PC.lpn_inp_drop_quality_options) >= 0,
+		JSON.stringify(kept));
 	// **THE HALF THAT WENT WRONG LAST TIME.** `lpn_inp_drop_rules` had to be rewritten the moment
 	// rules started being carried, because "left out" had become false and a user reading it would
 	// believe theirs were lost. The same sentence covered these settings until now.

@@ -249,10 +249,10 @@ console.log('\n--- a PRV, which the built-in solver does not switch ---');
 	L.runSolve();
 
 	ok('the fetch started for it', loads === 1, loads + ' fetches');
+	// Whole-string equality, so what the sentence says is lpn_engine_needed_loading's business and
+	// a rewording of it is not a red build here (dev/scripts/harness_wording_check.php).
 	ok('the banner is Tom\'s own sentence, and it is the shipped string',
 		banner() === PC.lpn_engine_needed_loading, JSON.stringify(banner()));
-	ok('...which says results are coming when the load finishes',
-		/Results will be available when completely loaded/.test(banner()), JSON.stringify(banner()));
 
 	L.rebuildSettingsFields();
 	const box = engineBox(L);
@@ -311,10 +311,8 @@ console.log('\n--- and when it cannot be fetched at all ---');
 	ok('the wait is on screen while it tries', banner() === PC.lpn_engine_needed_loading, JSON.stringify(banner()));
 	gate.rej(new Error('offline'));
 	await settle();
-	ok('a failure the reader IS subject to replaces it',
+	ok('a failure the reader IS subject to replaces it, whole',
 		banner() === PC.lpn_engine_needed_failed, JSON.stringify(banner()));
-	ok('...and it says the network cannot be solved without the engine',
-		/can only be solved by it/.test(banner()), JSON.stringify(banner()));
 	ok('...and still nothing was written to the one-shot notice', notice() === '', JSON.stringify(notice()));
 	ok('...and settings.engine is still the user\'s', L.settings().engine === 'native', L.settings().engine);
 }

@@ -150,7 +150,7 @@ const TESTS = [
 		pre: m => { node(m, 'E').emitter = 0.01; },
 		mutate: m => { node(m, 'E').emitter = 0; }
 	},
-	{ n: 'tank water level', base: TANK, kind: 'value', mutate: m => { node(m, 'T1').level = 2; node(m, 'T1').head = 62; } },
+	{ n: 'tank level', base: TANK, kind: 'value', mutate: m => { node(m, 'T1').level = 2; node(m, 'T1').head = 62; } },
 	{ n: 'tank floor elevation', base: TANK, kind: 'value', mutate: m => { node(m, 'T2').elev = 40; node(m, 'T2').head = 49; } },
 	{
 		// The pump curve is the one value the setters cannot copy from lpnToInp -- pushValues()

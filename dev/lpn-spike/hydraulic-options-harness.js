@@ -23,6 +23,9 @@
 const fs = require('fs');
 const path = require('path');
 const { ROOT, byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// The row labels, read from the real lib/lang.ec.en.php the stub loads. WHICH settings get a row
+// is the thing under test, so a row is named by its KEY (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
@@ -249,10 +252,11 @@ console.log('\n--- four rows, and the rest carried without one ---');
 			const span = (line.children || []).filter(c => c.tagName === 'SPAN')[0];
 			return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
 		});
-	['Accuracy', 'Demand multiplier', 'Specific gravity', 'Relative viscosity', 'Emitter exponent',
-		'Maximum trials', 'If it does not converge', 'Extra trials before reporting', 'Head error limit',
-		'Flow change limit', 'Damping starts at'].forEach(function (w) {
-		ok(w + ' has a row', labels.some(t => t.indexOf(w) === 0), labels.join(' | '));
+	['lpn_settings_accuracy', 'lpn_settings_demand_multiplier', 'lpn_settings_specific_gravity',
+		'lpn_settings_viscosity', 'lpn_settings_emitter_exponent', 'lpn_settings_trials',
+		'lpn_settings_unbalanced', 'lpn_settings_unbalanced_trials', 'lpn_settings_head_error',
+		'lpn_settings_flow_change', 'lpn_settings_damp_limit'].forEach(function (k) {
+		ok(k + ' has a row', labels.some(t => t.indexOf(PC[k]) === 0), labels.join(' | '));
 	});
 	// **AND "CONVERGENCE TOLERANCE" IS GONE** (Tom, 2026-08-28: *"Deprecate our 'Convergence
 	// tolerance' to use the EPANET setting"*). The two measured the same kind of thing — a sum of
@@ -289,7 +293,7 @@ console.log('\n--- four rows, and the rest carried without one ---');
 				return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
 			});
 		ok('...and the extra-trial count disappears under "report nothing"',
-			!after.some(t => t.indexOf('Extra trials before reporting') === 0), after.join(' | '));
+			!after.some(t => t.indexOf(PC.lpn_settings_unbalanced_trials) === 0), after.join(' | '));
 		set.hydraulics.unbalanced = 'continue';
 		set.hydraulics.unbalancedTrials = 12;
 	}

@@ -29,6 +29,16 @@
 // ever called at all.
 
 const { ROOT, byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// The page's own sentences, read from the real lib/lang.ec.en.php the stub loads
+// (dev/scripts/harness_wording_check.php). A message carrying {placeholders} is asserted as a
+// PATTERN with the numbers left open, because the numbers are what this harness is about.
+const PC = global.EngCalcs.pageConfig;
+function msgRe(key, fill) {
+	var t = PC[key];
+	Object.keys(fill || {}).forEach(function (k) { t = t.replace('{' + k + '}', fill[k]); });
+	return new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+		.replace(/\\\{\w+\\\}/g, '[^ ]+'));
+}
 
 let fails = 0;
 function ok(label, cond, detail) {
@@ -350,10 +360,19 @@ function runFill(answers) {
 	ok('...and writes no consent cookie', jar.value === '', jar.value);
 	ok('...and changes no elevation',
 		L.elev('J1') === 123.45 && L.elev('J2') === undefined && L.elev('J3') === undefined);
-	ok('the consent question names the host and what is sent',
-		/api\.mapbox\.com/.test(confirmTexts[0]) && /latitude and longitude/.test(confirmTexts[0]));
+	// Two different assertions, deliberately split. The first is about the PAGE: the whole
+	// disclosure reached the screen, whatever it says today. The second is about the STRING, and it
+	// reads the shipped string rather than a copy of it -- a consent gate that stops naming the
+	// host and what is sent is a privacy defect, not a rewording, so this one is MEANT to go red.
+	ok('the consent question reaches the reader whole',
+		confirmTexts[0].indexOf(PC.lpn_terrain_consent_1) >= 0 &&
+		confirmTexts[0].indexOf(PC.lpn_terrain_consent_4) >= 0, confirmTexts[0]);
+	ok('...and it names the host and what is sent',
+		/api\.mapbox\.com/.test(PC.lpn_terrain_consent_1) &&
+		/latitude and longitude/.test(PC.lpn_terrain_consent_1), PC.lpn_terrain_consent_1);
 	ok('...and says a refusal costs nothing else on the page',
-		/keeps working exactly as it does now/.test(confirmTexts[0]));
+		/keeps working exactly as it does now/.test(PC.lpn_terrain_consent_4),
+		PC.lpn_terrain_consent_4);
 
 	// ---- 5b. CANCELLING THE PLAN SENDS NOTHING EITHER ------------------------------------------
 	jar.value = '';
@@ -368,11 +387,17 @@ function runFill(answers) {
 	// check pinned to his old phrasing failed for no reason anybody cared about. What must never
 	// go missing is the resolution itself and the sentence that stops a reader trusting it.
 	ok('the plan states the ground resolution', /30 m/.test(confirmTexts[1]), confirmTexts[1]);
-	ok('...and that it is not a survey', /not a survey/.test(confirmTexts[1]));
+	// Same split again: that the accuracy note reached the plan is about the page; that it still
+	// refuses to be trusted as a survey is about lpn_terrain_accuracy, and is read off the shipped
+	// string. CLAUDE.md requires the accuracy to be stated IN THE INTERFACE.
+	ok('...and the accuracy note reaches the reader whole',
+		confirmTexts[1].indexOf(PC.lpn_terrain_accuracy) >= 0);
+	ok('...and it still says it is not a survey', /not a survey/.test(PC.lpn_terrain_accuracy));
 	ok('...and promises the one-step undo', /One Undo/.test(confirmTexts[1]));
 	ok('...and counts the nodes it will leave alone',
 		/1 node\(s\) already have an elevation/.test(confirmTexts[1]), confirmTexts[1]);
-	ok('...and counts the requests it is about to make', /request\(s\) to api\.mapbox\.com/.test(confirmTexts[1]));
+	ok('...and counts the requests it is about to make',
+		msgRe('lpn_terrain_requests').test(confirmTexts[1]), confirmTexts[1]);
 	// **AND NAMES THEM, IN BOTH DIRECTIONS** (2026-08-25). Tom: *"Elsewhere in lpn we are careful
 	// to list what we found. Add a way to indicate which nodes were edited or will be edited or
 	// both."* A count is a promise; a list is a promise a person can check against the drawing in
@@ -510,8 +535,11 @@ function runFill(answers) {
 	ok('a freshly drawn network has no blank elevations at all',
 		L.elev('J1') === 0 && L.elev('J2') === 0 && L.elev('J3') === 0);
 	await runFill([true]);
+	// The three nodes and the 0 they are still sitting at are the assertion; the sentence they are
+	// named in is lpn_terrain_confirm_default_1's, and is substituted in from it.
 	ok('the starting elevation is offered as its own question, naming the number',
-		/still at 0/.test(confirmTexts[0]) && /rather than one you typed/.test(confirmTexts[0]),
+		confirmTexts[0].indexOf(
+			PC.lpn_terrain_confirm_default_1.replace('{n}', '3').replace('{v}', '0')) >= 0,
 		confirmTexts[0]);
 	ok('...and it fills them once agreed', L.elev('J1') !== 0 && L.elev('J2') !== 0 && L.elev('J3') !== 0,
 		[L.elev('J1'), L.elev('J2'), L.elev('J3')].join(', '));
@@ -728,7 +756,7 @@ function runFill(answers) {
 		// The popup, built after a sample, must SHOW the number and offer to use it.
 		L.renderNode('J1');
 		const text = L.popupText();
-		ok('the popup states what the DEM said', /Mapbox DEM says/.test(text),
+		ok('the popup states what the DEM said', msgRe('lpn_elev_dem_said').test(text),
 			JSON.stringify(text.slice(0, 200)));
 		const btns = L.popupButtons().map(b => b.textContent);
 		ok('...and offers a Use button carrying the number',
@@ -766,7 +794,7 @@ function runFill(answers) {
 		// **READ WITHOUT RE-RENDERING BY HAND.** The line must appear because the sample's own
 		// callback called refreshPopupIfOpen(), which is the link a "does nothing" report is about.
 		ok('...and states the height without touching the elevation',
-			/Mapbox DEM says/.test(L.popupText()) && L.elev(nid) === 42,
+			msgRe('lpn_elev_dem_said').test(L.popupText()) && L.elev(nid) === 42,
 			L.elev(nid) + ' / ' + JSON.stringify(L.popupText().slice(0, 90)));
 		// Use writes it.
 		const useBtn = L.popupButtons().filter(b => /Use DEM/.test(b.textContent))[0];
@@ -791,7 +819,7 @@ function runFill(answers) {
 		ok('Use DEM with nothing sampled reads and then writes', tileRequests === 1 &&
 			typeof L.elev(nid2) === 'number' && L.elev(nid2) !== 77,
 			tileRequests + ' requests, elev ' + L.elev(nid2));
-		ok('...and says which height it used', /Mapbox DEM says/.test(L.popupText()),
+		ok('...and says which height it used', msgRe('lpn_elev_dem_said').test(L.popupText()),
 			JSON.stringify(L.popupText().slice(0, 90)));
 	}
 

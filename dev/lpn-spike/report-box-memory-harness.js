@@ -32,6 +32,9 @@
 'use strict';
 
 const { byId, ensure, loadLoopedNetwork, clearResizeObservers, flushResizeObservers } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads, so a rewording is not a red build here
+// (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 
 const INJECT =
 	"\t\tstubReports: function () { rebuildFireFlowReport = function () {}; buildFireFlowControls = function () {};\n" +
@@ -110,7 +113,8 @@ console.log('\n--- opened and never touched: the flag alone brings a box back --
 	B.restoreOpenBoxes();
 	NAMES.forEach((n) => ok(n + ': came back after a reload', B.isOpen[n]() === true, byId[IDS[n]].style.display));
 	ok('the run report came back with its own "no report yet" sentence inside, not empty',
-		/no run report yet/i.test(byId.lpn_rptbox_pre.textContent), byId.lpn_rptbox_pre.textContent);
+		byId.lpn_rptbox_pre.textContent.indexOf(PC.lpn_time_no_report) >= 0,
+		byId.lpn_rptbox_pre.textContent);
 	NAMES.forEach((n) => {
 		B.close[n]();
 		ok(n + ': closing stores open:false', stored(KEYS[n]).open === false);

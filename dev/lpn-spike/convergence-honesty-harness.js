@@ -156,6 +156,9 @@ async function epsSection() {
 function pageSection() {
 	console.log('\n---- 3. applySolveResult draws the numbers and leads with the warning ----');
 	const { loadLoopedNetwork } = require('./lpn-dom-stub.js');
+	// The two status messages, read from the real lib/lang.ec.en.php the stub loads: WHICH of them
+	// the page chose is the assertion (dev/scripts/harness_wording_check.php).
+	const PC = global.EngCalcs.pageConfig;
 	const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
 
 	const L = loadLoopedNetwork(
@@ -186,7 +189,8 @@ function pageSection() {
 	const solved = EngCalcs.lpnSolve(model, { tol: 1e-6 });
 	L.applySolveResult(solved);
 	check(solved.converged === true, 'the built-in solver converged on the shipped example');
-	check(status().indexOf('did not converge') < 0, 'and the status bar says nothing about convergence');
+	check(status().indexOf(PC.lpn_diag_not_converged_drawn) < 0,
+		'and the status bar says nothing about convergence');
 
 	// The same result, marked unconverged. Nothing else about it changes, so anything that differs
 	// downstream is attributable to this one flag.
@@ -198,9 +202,9 @@ function pageSection() {
 		'the results are KEPT -- the page has numbers to draw, which is the whole change');
 	check(L.lastSolveResult().heads !== undefined, 'and they are the full set');
 	const s = status();
-	check(s.indexOf('The solve did not converge.') === 0,
-		'the status bar LEADS with the warning, ahead of every other note', JSON.stringify(s.slice(0, 60)));
-	check(s.indexOf('Do not use them') >= 0, 'and says plainly not to use them');
+	check(s.indexOf(PC.lpn_diag_not_converged_drawn) === 0,
+		'the status bar LEADS with the whole warning, ahead of every other note',
+		JSON.stringify(s.slice(0, 60)));
 	// **"iterations", NOT "trials"** -- EPANET names the INPUT `EN_Option.Trials` and the REPORTED
 	// COUNT `EN_AnalysisStatistic.Iterations`, and this is the reported count. Tom asked whether the
 	// two words were standing in for it (2026-09-02); the toolkit's own enums answered.
@@ -213,12 +217,12 @@ function pageSection() {
 	// distinguishable from this one.
 	L.applySolveResult({ ok: false, issues: [], converged: false, iterations: 0 });
 	check(L.lastSolveResult() === null, 'a result with ok:false still discards');
-	check(status().indexOf('No solution was found') === 0,
+	check(status().indexOf(PC.lpn_diag_not_converged) === 0,
 		'and still says so with the original message', JSON.stringify(status().slice(0, 40)));
 
 	// Unknown is not a no. An engine too old to answer must not raise the warning.
 	L.applySolveResult(Object.assign({}, solved, { converged: null }));
-	check(status().indexOf('did not converge') < 0,
+	check(status().indexOf(PC.lpn_diag_not_converged_drawn) < 0,
 		'`converged: null` (the engine could not be asked) raises no warning');
 }
 
