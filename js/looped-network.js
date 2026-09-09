@@ -349,7 +349,10 @@ var EngCalcs = EngCalcs || {};
 		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, through
 		// the same visibility seam a too-short link label uses. `visibility` rather than `display`:
 		// the element keeps its box, so nothing downstream re-measures what is merely invisible.
-		setLabelAssemblyHidden(ne, !!ne.hiddenDropped);
+		// **TWO WAYS, AND THEY ARE DELIBERATELY NOT ONE FLAG:** `hiddenDropped` says nowhere would
+		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
+		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
+		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
 		repositionMultilineText(ne.text, org.x, org.y);
@@ -1148,9 +1151,11 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		// THREE WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
-		// still in conflict, or standing on ground a node label has just taken (yieldStationedLabels()).
-		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded);
+		// FOUR WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
+		// still in conflict, standing on ground a node label has just taken (yieldStationedLabels()),
+		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
+		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded
+			|| !!le.hiddenCrossed);
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
@@ -1397,6 +1402,14 @@ var EngCalcs = EngCalcs || {};
 					labelHAlign(lb), labelVAlign(lb), textLabelSvgAngle(lb),
 					effectiveFontSize(lb && lb.sizeMult));
 			b.kind = 'label';
+			// **THE BOX AND ITS OWN CALLOUT LINE ARE ONE OBJECT ON THE MAP, and a reader of this
+			// list has to be able to say so.** `linkOwner` already does that job for a stationed
+			// pipe label; a Text object had nothing, so crossingForeigners() handed the crossing
+			// passes a box and a leader that looked like two unrelated labels -- and every Text
+			// object with a callout then reported itself as a crossing with itself, twice per view
+			// on the Basic examples. labelCrossings() excludes a placement's OWN leader by
+			// construction; this is what lets it know which one that is.
+			b.textOwner = lb.id;
 			out.boxes.push(b);
 			if (!an) { return; }
 			// **THE OBSTACLE LEADER AND THE DRAWN LEADER ARE THE SAME SEGMENT, and they were not.**
@@ -1406,7 +1419,8 @@ var EngCalcs = EngCalcs || {};
 			// on watching a callout move: *"The leader moves. But its box model doesn't."* Both sides
 			// now ask textLeaderEnd(), which is the only place the answer exists.
 			var end = textLeaderEnd(lb, le, px, py);
-			out.segments.push({ ax: an.x, ay: an.y, bx: end.x, by: end.y, kind: 'leader' });
+			out.segments.push({ ax: an.x, ay: an.y, bx: end.x, by: end.y, kind: 'leader',
+				textOwner: lb.id });
 		});
 		doc.links.forEach(function (l) {
 			var pts = linkPointList(l), i;
@@ -1684,7 +1698,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		// Captured BEFORE the flip probes below, which re-run the whole pass and would leave
 		// `lastGangRepair` describing the probe rather than the drawing on screen.
-		var gang = lastGangRepair;
+		var gang = lastGangRepair, shed = lastCrossingShed;
 		var i, j, pairs = 0, onLeader = 0, travel = 0;
 		for (i = 0; i < drawn.length; i++) {
 			for (j = i + 1; j < drawn.length; j++) {
@@ -1708,6 +1722,10 @@ var EngCalcs = EngCalcs || {};
 				+ (panFlips === null ? '' : panFlips + ' flips under pan \u2022 ')
 				+ (gang ? gang.moved + ' gang-moved (' + gang.before + '\u2192' + gang.after
 					+ ' pairs) \u2022 ' : '')
+				// The final shed's own two numbers: what it hid, and what it could not reach because
+				// both halves of the pair are the user's own (Task 539 phase three).
+				+ (shed ? shed.hidden.length + ' hid (crossing) \u2022 '
+					+ shed.residual.length + ' left (hand-placed) \u2022 ' : '')
 				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '
 				+ (drawn.length ? (travel / drawn.length * (state.s || 1)).toFixed(1) : '0') + ' px';
@@ -2085,11 +2103,21 @@ var EngCalcs = EngCalcs || {};
 	// dev/lpn-spike/label-crossing-harness.js reads it. A Text object's callout LINE comes in as a
 	// leader segment with no box; it is carried separately because it can be crossed on its own.
 	function crossingForeigners(obs) {
-		var byLink = {}, out = [], i, b;
+		var byLink = {}, byText = {}, out = [], i, b, e;
 		for (i = 0; i < obs.boxes.length; i++) {
 			b = obs.boxes[i];
 			if (b.kind !== 'label') { continue; }
-			if (b.linkOwner === undefined) { out.push({ id: 't#' + i, boxes: [b] }); continue; }
+			if (b.linkOwner === undefined) {
+				// A Text object is ONE placement -- its box and its own callout line together, so
+				// that its own leader is excluded from its own box the way every other label's is.
+				// The id is the scenario override key, which is the suite's one stable name for an
+				// element across the three kinds, and going through ovKeyFor() is what keeps the
+				// prefix spelled in exactly one place (dev/scripts/scenario_seam_check.php).
+				e = { id: ovKeyFor('label', b.textOwner), boxes: [b], leader: null };
+				byText[b.textOwner] = e;
+				out.push(e);
+				continue;
+			}
 			if (!byLink[b.linkOwner]) { byLink[b.linkOwner] = []; }
 			byLink[b.linkOwner].push(b);
 		}
@@ -2113,9 +2141,10 @@ var EngCalcs = EngCalcs || {};
 			out.push({ id: linkLabelKey(id), boxes: byLink[id], yields: true });
 		});
 		for (i = 0; i < obs.segments.length; i++) {
-			if (obs.segments[i].kind === 'leader') {
-				out.push({ id: 'lead#' + i, boxes: [], leader: obs.segments[i] });
-			}
+			if (obs.segments[i].kind !== 'leader') { continue; }
+			e = byText[obs.segments[i].textOwner];
+			if (e) { e.leader = obs.segments[i]; continue; }
+			out.push({ id: 'lead#' + i, boxes: [], leader: obs.segments[i] });
 		}
 		return out;
 	}
@@ -2133,9 +2162,94 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// **THE FINAL SHED: WHERE A CROSSING SURVIVED EVERY REPAIR, ONE OF THE TWO LABELS GOES** (Task
+	// 539 phase three, Tom 2026-09-09: *"if there are crossing leaders we need to hide one. The
+	// count has to get down to 0. We have to know what we are doing here, and not show them if we
+	// can't show them beautifully."*). The rule for WHICH one is stated in
+	// Collide.shedCrossingSurvivors(); this function is the document half of it -- what a label
+	// names, whether the user placed it, and how it is actually hidden.
+	//
+	// **THE SET IT MEASURES IS THE DRAWN SET AND NOTHING ELSE**, assembled from the same four
+	// sources dev/lpn-spike/label-crossing-measure.js reads back off the page: node placements, the
+	// ring pass's free and dragged labels, the stationed pipe labels that reach the drawing as
+	// obstacles, and the user's Text objects. Leaving one out reports zero about a picture that has
+	// crossings in it.
+	function crossingShedRank(id) {
+		var bare = id.slice(2), x;
+		if (id.charAt(0) === 'n') {
+			x = nodeById(bare);
+			return (x && (x.type === 'reservoir' || x.type === 'tank')) ? 0 : 2;
+		}
+		x = linkById(bare);
+		return (x && (x.type === 'pump' || x.type === 'valve')) ? 1 : 3;
+	}
+	function shedCrossingLabels(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
+		var min = leaderThreshold(), entries = [], specs = {}, res;
+		// **CLEARED FOR EVERY LABEL ON EVERY PASS**, for yieldStationedLabels()'s own reason: a
+		// label hidden once must be back in contention next time, or the drawing only ever loses
+		// labels.
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id]; if (le) { le.hiddenCrossed = false; }
+		});
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (ne) { ne.hiddenCrossed = false; }
+		});
+		(nodeLabels || []).forEach(function (s) { specs[s.id] = s; });
+		(ringLabels || []).forEach(function (s) { specs[s.id] = s; });
+		function boxesOf(r) {
+			return (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []);
+		}
+		// A node placement's leader is rebuilt from the anchor and the endpoint, which is what
+		// updateDataLeader() draws; the ring pass returns its own, already in the same shape. Both
+		// are dropped below leaderThreshold(), because a leader the renderer does not draw cannot
+		// be crossed.
+		(nodePlaced || []).forEach(function (r) {
+			var s = specs[r.id], bs = boxesOf(r), g;
+			if (r.dropped || !s || !bs.length) { return; }
+			g = Math.hypot(r.x - s.anchor.x, r.y - s.anchor.y) > min
+				? Collide.segment(s.anchor.x, s.anchor.y, r.x, r.y, 'leader', r.id) : null;
+			entries.push({ id: r.id, boxes: bs, leader: g, covers: true,
+				hideable: !s.dragged, rank: crossingShedRank(r.id) });
+		});
+		(ringPlaced || []).forEach(function (r) {
+			var s = specs[r.id], bs = boxesOf(r), g = r.leader;
+			if (r.dropped || !bs.length) { return; }
+			if (g && Math.hypot(g.bx - g.ax, g.by - g.ay) <= min) { g = null; }
+			entries.push({ id: r.id, boxes: bs, leader: g,
+				hideable: !!s && !s.dragged, rank: crossingShedRank(r.id) });
+		});
+		// The stationed pipe labels and the Text objects. crossingForeigners() already draws the
+		// line the repair needs: a stationed label `yields` and carries a `l:<id>` key, a Text box
+		// and a Text callout line do not and are the user's own words, never ours to hide.
+		crossingForeigners(obs).forEach(function (f) {
+			var stationed = f.yields && f.id.charAt(0) === 'l';
+			entries.push({ id: f.id, boxes: f.boxes || [], leader: f.leader || null,
+				yields: !!f.yields, hideable: stationed,
+				rank: stationed ? crossingShedRank(f.id) : 0 });
+		});
+		res = Collide.shedCrossingSurvivors(entries, {});
+		// **IT IS A HIDE AND NOT A DROP, AND THE DIFFERENCE IS THE WHOLE OF THE PASS'S STABILITY.**
+		// The obvious wiring is the drop seam Task 398 already built -- mark the placement `dropped`
+		// and let the holder loop turn that into `hiddenDropped`. It oscillates: a dropped node
+		// label is not seeded as an obstacle by shedAlignedForConflicts() on the NEXT content pass,
+		// so the link labels round it stop shedding, the layout moves, and a different pair
+		// survives. Measured on Net3-World, five passes over an untouched drawing: {185,199},
+		// {184,205}, {185,199}, {184,205}, {185,199}. **So the label keeps its reservation and only
+		// its visibility goes** -- the same ruling yieldStationedLabels() already makes, and it is
+		// why this is its own flag beside `hiddenDropped` rather than a fifth writer of it.
+		res.hidden.forEach(function (id) {
+			var h = id.charAt(0) === 'n' ? nodeEls[id.slice(2)] : linkEls[id.slice(2)];
+			if (h) { h.hiddenCrossed = true; }
+		});
+		return res;
+	}
 	// What the last gang repair did, for a harness and for ?debug=labels to read. Not a decision
 	// input: nothing in the pass reads it back.
 	var lastGangRepair = null;
+	// What the last final shed did: the ids it hid, and any pair it could not reach (Task 539
+	// phase three). For ?debug=labels to print. Not a decision input: nothing in the pass reads it
+	// back.
+	var lastCrossingShed = null;
 	function runLabelCollisionAvoidance(shedNodes) {
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
 			obs = staticObstacles(), holders = {};
@@ -2307,6 +2421,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		nodePlaced = repaired.results;
 		lastGangRepair = repaired.stats;
+		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The
+		// repair moves what it can show an improvement for; this closes the remainder, which is the
+		// only rung left once moving has run out. It must run HERE, after both placements and before
+		// the holders are written, because a hide is a DROP and the drop seam is the loop below.
+		lastCrossingShed = shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs);
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
