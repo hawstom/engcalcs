@@ -62,16 +62,16 @@ is the one you meant. "The first one" is a complete answer.
   _Ruled OK 2026-09-09._
 - **`lpn_field_emitter_tip`**
   > An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.
-  @@ NEEDS RULING
+  OK
 - **`lpn_field_text_attached_tip`**
-  > This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
-  @@ NEEDS RULING
+  > This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
+  Edited.
 - **`lpn_georef_save_locked`**
   > Finish the placement with the "Keep this placement" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.
-  @@ NEEDS RULING
+  OK
 - **`lpn_pane_text_attached`**
   > Attached
-  @@ NEEDS RULING
+  OK
 - **`lpn_popup_boxtitle`**
   > Properties
-  @@ NEEDS RULING
+  OK
