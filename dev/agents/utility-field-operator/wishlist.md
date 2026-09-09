@@ -185,6 +185,44 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   what stops the accident from happening in the first place. I would ship the first as a quick
   patch regardless of what happens to the rest of Task 567.
 
+### 6. Task 539 (label gangs): the field-relevant defect is label-on-leader, not leader-crossing, and neither trigger sees my actual risk
+
+- **What I found, and full reasoning in the journal (2026-09-08):** the 76 label-on-leader
+  incidences (`dev/label-placement-algorithms.md` §8) are, by construction, a FOREIGN leader passing
+  under a label's box (**OBSERVED** `js/lpn-collide.js:1295-1296`, own leader is excluded), masked by
+  the halo so it looks like nothing is there rather than looking merely messy. That is closer to my
+  actual risk — misattributing a label by proximity, in the street — than the 9 crossed-leader cases,
+  which are visibly wrong and exactly the kind of thing a careful desktop reader (Tom's own test)
+  already catches. Neither trigger sees a third case I would actually make: a label sitting closer to
+  the WRONG node than its own in a tight cluster, below the leader-draw threshold, with no leader at
+  all to be wrong about.
+- **What: I want the gang-stacking route weighed against its phone cost before it is built, not
+  dropped.** Stacking several labels into one shared patch is a real desktop win and I have no better
+  fix to offer for the crossed-leader case. But stacking concentrates visual information into less
+  screen space, and on a phone (where text stays fixed in screen pixels regardless of node density,
+  **OBSERVED** `js/looped-network.js:24761-24762`) that plausibly reads as "one thing near one place"
+  before it reads as "four things I could trace if I had a mouse." **CITED**, this is not just my own
+  worry: an Esri Community idea thread ("Allow labels to be toggled on or off from Field Maps app")
+  is a field user asking for FEWER always-on labels on a small screen, and Field Maps' own documented
+  pattern is tap-a-feature-to-open-a-panel, not label-the-whole-map
+  (doc.arcgis.com/en/field-maps/ios/use-maps/capture.htm) — the industry answer to density on a small
+  screen is closer to "don't rely on labels" than "arrange more of them."
+- **Why ranked here and not higher:** this is a real, evidence-backed disagreement with a task Tom
+  sized at priority 100 with a deadline, but it is a disagreement about EMPHASIS within a task already
+  being built, not a call to stop it — the crossed-leader fan-out is unambiguously good on every
+  screen and costs my seat nothing. **If the 9-day budget is fixed, my order is: fan-out for crossed
+  leaders first, gang-stacking second, and measure the gang route's cost on a small screen before
+  shipping it as the default** — not because gang-stacking is wrong, but because its measured payoff
+  (§8's numbers) is entirely from a desktop-style whole-drawing read, and nothing has measured what it
+  costs a glancing phone read.
+- **Disagreement with the roadmap, stated once, per my brief:** I would not have raised this to 100
+  with a hard deadline on the evidence available to my seat — the number the task's own name centers
+  (crossed leaders, "leaders stop crossing," `dev/ROADMAP.md:554`) is the rarer and more
+  desktop-visible of the two measured defects, and the more field-relevant one (label-on-leader, which
+  HIDES a misattribution rather than showing one) is not what the priority bump's own language is
+  about. This is not a claim the task is misconceived — Tom's own test for it is fair — only that its
+  sizing does not match what my seat sees as the risk.
+
 ## Parked
 
 *(none yet)*

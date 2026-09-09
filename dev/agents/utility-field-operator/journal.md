@@ -395,3 +395,163 @@ Source: Vespucci, "Creating new objects" — https://vespucci.io/help/en/Creatin
 
 Full answer with the ranking Tom asked for: `dev/agents/utility-field-operator/wishlist.md`, row
 under 2026-09-01.
+
+## 2026-09-08 — Task 539 (label gangs): read from the street, and I disagree with the priority
+
+Tom raised Task 539 to 100 with a deadline (`dev/ROADMAP.md:585-590`, 2026-09-08). Asked to weigh
+in from this seat before phase two is built. I read `dev/label-placement-algorithms.md` §8-§9 and
+the code the two triggers run on, not just the prose.
+
+### Q1 — is crossing leaders the right defect, and is there a third failure mode
+
+**OBSERVED**, the two measured numbers are not measuring the same kind of risk. §8
+(`dev/label-placement-algorithms.md:312-316`) reports **9 leader-leader crossings against 76
+label-on-leader across 28 drawings.** I went to the code that produces the second number, because
+"a label sits on a leader" could mean two different things and only one of them is my problem.
+**OBSERVED** `js/lpn-collide.js:1295-1296`: *"Its OWN leader is excluded: it stops at the box's near
+edge by construction, so counting it would report the same constant on every drawing."* So every
+one of the 76 is a **foreign** leader — some OTHER node's leader — passing under a label's box.
+That is exactly my failure mode, not a cosmetic one: in the street I read a map the way I read a
+parts diagram, by proximity — nearest line to nearest label. A stranger's leader passing under my
+label, invisible because the halo masks it (§7, `dev/label-placement-algorithms.md:271-278`: *"Halos
+handle label-over-linework. Collision detection handles label-over-label"*), does not look wrong to
+me. It looks like nothing is there. If that hidden leader happens to terminate near my label instead
+of continuing on to its own node, or if my glance simply follows the wrong line out of a cluster, I
+attribute the label to the wrong asset and never know it. **Crossed leaders (9) are the case a
+careful reader catches by eye** — two lines visibly crossing is the kind of thing Tom's own test
+(*"would a person looking at this see an obvious fix we missed"*) is built to catch, and it is a
+desktop-legible defect. **Label-on-leader (76) is the case nobody catches, because the halo makes it
+invisible rather than merely ugly** — it is quieter and, for a person navigating by proximity rather
+than by tracing lines, plausibly more dangerous per incident, even though each individual case reads
+fine in isolation.
+
+**A third failure mode, not counted by either number: a label sitting closer to the WRONG node than
+to its own.** §5 (`dev/label-placement-algorithms.md:206-207`) names `leaderThreshold()` as ESRI's
+own leader tolerance — below it, no leader is drawn at all. In a tight valve cluster (my own actual
+working case — an intersection with three or four appurtenances close together, exactly the shape
+Task 539's own cluster D describes, `dev/ROADMAP.md:571-573`), a label that clears its own node by
+just enough to skip the leader can sit closer to a NEIGHBOR node than to its own, with nothing drawn
+to correct the impression. **SPECULATION, mine, re-derivable:** neither `leaderPairs` nor
+`labelOnLeader` sees this case at all, because there is no leader to cross or be crossed — the
+defect is proximity-without-connection, and the two triggers Tom named are both about LINES, not
+about which node a label is nearest. I did not find this measured anywhere in §8's table; it may be
+rare, but nothing in the harness would tell us either way, and it is the shape of error I would
+actually make standing at the cluster.
+
+**CITED**, this is a named objective in the literature, not just my own worry: a ScienceDirect paper
+titled "Towards unambiguous map labeling — Integer programming approach and heuristic algorithm"
+treats label ambiguity (which point a label refers to) as an explicit quality term alongside overlap,
+separate from legibility — confirming that "reads cleanly" and "reads as belonging to the right
+point" are two different properties a placement can satisfy independently
+(sciencedirect.com/science/article/abs/pii/S0957417417307649).
+
+**My answer:** label-on-leader is the more field-relevant number of the two measured ones, for the
+reason above (it hides rather than merely looks messy), and I would not have guessed that going in —
+I expected crossed leaders to be the scarier case, since that is the one a person notices. The
+literature's own ambiguity framing, and my own third failure mode, both point past what either
+trigger counts.
+
+### Q2 — does the gang idea survive on a phone
+
+**Partial disagreement, stated plainly.** Sorting a stack by angle-of-node so leaders fan out
+(§9a step 4, `dev/label-placement-algorithms.md:360-364`) is the right fix for the DESKTOP version of
+this problem — it is a real, traceable diagram once you have room to trace it. On a phone, at the
+zoom an operator like me actually uses in the street, I think it trades one problem for a worse one
+for MY task specifically, for three reasons:
+
+- **OBSERVED**, text is fixed in screen pixels, not scaled to node density: `js/looped-network.js:
+  24761-24762`, "text is in screen pixels because it is furniture of the view." A stack of three or
+  four labels therefore takes the SAME screen real estate on a 6-inch phone as on a 27-inch monitor.
+  On a monitor that stack sits in open space with room around it; on a phone at the same zoom it is
+  proportionally enormous and much likelier to itself now sit close to a fifth, ungang'd node —
+  reproducing my Q1 third failure mode one level up, on the stack rather than on a single label.
+- **A stack fanning out three or four leaders asks the reader to trace lines to disambiguate them.**
+  That is a fine desktop skill (a mouse, a screen, no sun) and a poor phone-in-the-street one — thin
+  lines under gloves, in glare, on a screen you're holding at arm's length, are exactly the condition
+  under which tracing "which of these four lines is mine" goes wrong. My own actual habit, and I'd
+  guess most field use, is NOT to read a stack and trace to the right leader — it is to glance at the
+  nearest text to the asset I'm standing at. A gang answers "does the diagram look right", which is
+  Tom's own test, and that test is judged by a person who has time to trace it. My test is "can I
+  tell which one is mine in under a second," and a stack of four is worse at that than four separate,
+  spread labels, even if it has fewer crossings.
+- **CITED**, and this is the sharpest external evidence I found: an Esri Community idea thread titled
+  "Allow labels to be toggled on or off from Field Maps app" argues the opposite direction from
+  gang-and-keep — that having labels visible on a small screen at all times is not practical, and
+  that Field Maps needs a way to turn them OFF rather than a way to arrange more of them more neatly
+  (community.esri.com/t5/arcgis-field-maps-ideas/allow-labels-to-be-toggled-on-or-off-from-field/
+  idi-p/1416032). That is a field user asking to see FEWER labels on a small screen, not better-
+  arranged ones — see Q3 and Q4.
+
+**Where I agree with the gang idea, not just disagree:** for the crossed-leader case specifically
+(the 9, the one a person notices by eye), fanning by angle is a clean, well-grounded fix and I have
+no better alternative to offer. My disagreement is about SCOPE, not about the geometry: build it, but
+do not expect it to help my phone reading, and watch that it does not make dense clusters (my actual
+working case) read as one thing about one place when they are three things about three places.
+
+### Q3 — what I actually need labelled, standing at a valve
+
+**OBSERVED**, I already answered a version of this on 2026-08-25
+(`dev/agents/utility-field-operator/wishlist.md:64-80`): the map, tap-to-select, and the property
+popup already answer "which asset is this" and "what is upstream" with no extra labeling needed —
+the drawing IS the topology, and a tap opens the one asset I care about. **What Task 539 is
+optimizing is the OTHER case — reading the whole drawing at once, unaided, which is Tom's own
+desktop test (would a person LOOKING AT THIS see the fix) and not my street test (can I find and
+confirm the one asset I'm standing at).** I do not need every node labelled at zoom-to-fit; I need
+the one node I am standing at to be unambiguous, and I already have a tool for that (tap, read the
+popup) that does not depend on label placement being good at all.
+
+**OBSERVED**, this project has already ruled once, deliberately, against thinning labels by view:
+Tom, 2026-08-19, quoted at `js/looped-network.js:24756-24758`: *"Always show labels, Zoom level,
+Current view, etc.: Remove that entire concept... now that we have good hiding and Thematic map."*
+Per-field hiding and Thematic mode are the sanctioned levers for reducing what shows, not zoom. I am
+not asking to relitigate that ruling — it is a real, already-considered decision, and per-field
+hiding does let a project be configured sparse — but I want to name, from this seat, that the sparse
+configuration is opt-in and per-project, not a phone default. **SPECULATION, mine:** if the honest
+field want is "only my selected asset and its immediate neighbors, labelled, on a small screen,"
+that is a Settings/Thematic-mode CONFIGURATION question a project owner could already answer today,
+not a missing feature — which makes it cheaper than either gang route, and outside Task 539's scope
+entirely. I raise it because it may be a better use of the time Task 539 is being sized against, not
+because I am asking for a new mechanism.
+
+### Q4 — external evidence: what mobile field tools actually do about density
+
+**CITED**, ArcGIS Field Maps' documented interaction model is tap-a-feature-open-a-panel, not
+read-labels-off-the-map: *"Tap a feature on the map to see its details in the panel, including any
+attachments, related records, or media"* and *"swiping the panel up allows you to view more
+information at once"* on a small screen (doc.arcgis.com/en/field-maps/ios/use-maps/capture.htm;
+doc.arcgis.com/en/field-maps/android/use-maps/quick-reference.htm). Esri's own flagship field product
+— the one my own 2026-08-25 research already found utilities running for isolation and condition
+work — answers density on a small screen not by placing more labels better, but by not relying on
+persistent labels at all: identity and detail live in a tap-triggered panel.
+
+**CITED**, the community idea thread above (Q2) is a field user explicitly asking for LESS
+always-on labeling on a small screen, not better-arranged labeling.
+
+**My reading of this evidence, stated plainly: the industry answer is closer to "tap the asset, read
+a panel" than to "label everything well," and `lpn_` already has the tap-and-popup half of that
+answer.** This reframes the question Task 539 is answering — it is solving "does the WHOLE drawing
+read cleanly, unaided, at a glance," which is a real and legitimate goal for the desktop use this
+project is built around first (CLAUDE.md: "Design this page for a pointer; then make a phone
+survivable" — this is a pointer-first page and I am not asking that to change), but it is not the
+question my seat's own workflow depends on the answer to. Gang labels well and my phone reading is
+unaffected either way, because I was never reading the whole drawing at once in the first place.
+
+### Verdict, and my disagreement with priority 100
+
+**I disagree with the priority, not with the goal.** The defect is real, Tom's own test for it
+(would a person see an obvious fix) is a fair test of what it is testing, and the geometry sketch in
+§9 is sound engineering for that test. But from this seat: **the number that should worry us more —
+label-on-leader, the one that hides misattribution rather than merely looking messy — is not the one
+Task 539's own framing centers (Tom's language is "leaders stop crossing," `dev/ROADMAP.md:554`,
+which is the 9-case, desktop-visible half), and neither trigger sees the "closer to the wrong node
+than to its own" case that is my actual working risk in a tight cluster.** And the gang remedy itself
+(stacking several labels into one shared patch) plausibly costs a phone reader something the desktop
+reader does not pay, for the exact reason it helps the desktop reader — more visual information
+packed into less space reads as "one thing" to a glancing eye before it reads as "four things I could
+trace if I had a mouse and no glare." I would not deprioritize the whole task — the crossed-leader
+half is a clean win with no phone-reading cost I can find — but I would not have sized this at 100
+with a hard deadline **from my seat's evidence**, and if the 9-day budget is real and fixed, I would
+spend it on (a) the crossed-leader fan-out, which is unambiguously good on every screen, before (b)
+the gang-stacking route, whose main measured payoff is a desktop screenshot and whose phone cost is
+untested. This is a genuine disagreement with the roadmap's sizing, not a claim the task is wrong to
+exist.
