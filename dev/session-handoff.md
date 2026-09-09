@@ -281,7 +281,26 @@ never from this line.
 5. Task 611 library import; Task 599 time series; Task 592 CSV import; Task 247 customers. All on
    `js/looped-network.js`, so sequential.
 6. A resync sprint for the 137 CHANGED keys, then `detect_english_drift.php --update`.
-7. Task 612 screenshot placement, and `wt-wide-long-walk-L` on the icon sheet.
+7. **Task 612 screenshot placement.**
+8. **THE ICON IS NOT DEPLOYED AND THE REASON IS A REAL OPEN QUESTION, not a missing chore.** Tom
+   chose `wt-wide-L` from `dev/icon-preview/concepts-2026-09-08b.html` (2026-09-09: *"I want icon 6
+   wt-wide-L deployed for now."*). **The concept is a STROKE GLYPH on transparent, drawn in
+   `currentColor` -- it has no background, no tile and no colour of its own**, which is what the
+   preview sheet shows on white and on black.
+   - **The existing `icons/icon.svg` is a blue rounded tile with the letters EC**, and an
+     orchestrator carried that tile over onto Tom's glyph without saying so, rendered it, and
+     showed it to him as his icon. He caught it immediately: *"I don't know what you are looking at.
+     Here's what I see. You are hallucinating badly."* **The deployment was reverted; nothing shipped.**
+   - **THE QUESTION TO ASK HIM, and it was never asked:** `icons/icon-192.png` and `icon-512.png` are
+     declared `purpose: "any maskable"` in `lib/WebManifest.lib.php`, so they need an opaque
+     background and a safe zone or Android crops them. A transparent stroke glyph cannot be a
+     maskable icon as it stands. **What background does he want behind it, if any?** That is a design
+     decision, his, and inventing one is what went wrong.
+   - Mechanics, so the next session does not rediscover them: the concept's paths are in that
+     preview file as `data-body`; there is no rasterizer on this machine, but
+     `dev/browser-pass/node_modules/playwright-core` renders an SVG to PNG at any size. Measured on
+     the glyph: it reads at 48 px and up and fills in below that, matching the sheet's own note --
+     and every use we ship is 192 px or larger, so that limit does not bite.
 
 ## 7. THINGS NOT TO DO
 
