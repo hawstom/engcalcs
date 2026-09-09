@@ -654,9 +654,14 @@ html[lang="zh"] .ec-welcome {
 }
 /* A pump or valve is a symbol drawn at the midpoint of a link that is often only a unit or two
    long -- on Net3 it had to be zoomed into before it could be edited at all. This is a transparent
-   square over the symbol's own box, in the LINKS layer so a node still wins over it. `visible`
-   rather than `all` for the reason above: `all` would hit a square nobody can see. */
-.lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: inherit; }
+   square over the symbol's own box, in the LINKS layer so a node still wins over it. A `visible`
+   family value rather than `all` for the reason above: `all` would hit a square nobody can see.
+
+   **`visibleFill` AND NOT `visible`, WHICH IS THE FIX FOR THE DEFECT BELOW.** `visible` hit-tests
+   the fill AND THE STROKE PERIMETER, and it does so regardless of the value of `stroke` -- so
+   `stroke: none` buys nothing, and with no `stroke-width` declared the perimeter is the initial
+   value, 1 USER UNIT. See .lpn-node-hit. */
+.lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visibleFill; cursor: inherit; }
 /* **AND THE NODE'S OWN BAND, which is the half Task 615 did not do** (Tom, 2026-09-08: *"I get no
    help from the mouse pointer. It's just a pan cross the entire time."*). A junction is 7 screen
    pixels of drawn disc and nothing else, so `pointer` reached 0.2% of the map -- measured on the
@@ -664,12 +669,35 @@ html[lang="zh"] .ec-welcome {
    which is every draggable label lying in the topmost layer. The full measurement, and why there is
    no race to find, is on LPN_NODE_HIT_PX in js/looped-network.js.
 
-   A transparent CIRCLE rather than a stroke, because a node is a point and not a line, and
-   `pointer-events: visible` for the reason .lpn-link-symbol-hit gives: `visiblePainted` would drop
-   a fill nobody painted, and `all` would hit the band while its node is hidden. `r` is written in
-   JS on every zoom, not by a var here, because it is the LARGER of the drawn radius and the slop --
-   a reservoir must not shrink to a junction's band. */
-.lpn-node-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: inherit; }
+   A transparent CIRCLE rather than a stroke, because a node is a point and not a line. `r` is
+   written in JS on every zoom, not by a var here, because it is the drawn radius PLUS the slop --
+   a reservoir must not shrink to a junction's band.
+
+   **`visibleFill`, AND THE WORD `visible` HERE WAS A REAL, MEASURED, USER-VISIBLE DEFECT**
+   (Tom, 2026-09-09: *"mouse behavior is unpredictable and mysterious, and this makes usage and
+   debugging confusing."*). `pointer-events: visible` hit-tests the fill AND THE STROKE PERIMETER,
+   and unlike `visiblePainted` it ignores the VALUES of `fill` and `stroke` -- so `stroke: none`
+   removes nothing from the hit region. Neither rule declared a `stroke-width`, so the perimeter
+   was the initial value: **1 USER UNIT, which on this page is one world unit and not one pixel.**
+
+   The excess reach is therefore exactly half the world scale, in screen pixels, and that is how
+   it was measured rather than argued (dev/browser-pass/specs/nodehit.js): on the XY Net3 example
+   at 23.01 px/unit a node's band answered document.elementFromPoint 11.47 px outside its own
+   getBoundingClientRect, which is 23.01/2 to three figures and is invisible. On the SAME network
+   as a geographic project the scale is 8,431 px/degree, so the perimeter was 4,215 screen pixels
+   wide: ONE node's invisible disc answered 42% of a 1398x798 canvas, up to 846 px outside its own
+   36 px box, and the bare <svg> never answered a single sample point anywhere on that canvas.
+   .lpn-link-symbol-hit reached 913 px the moment this one was fixed, which is why both moved.
+
+   `visibleFill` keeps everything the band was for: the `visible` prefix still gates the hit on the
+   element being visible, which is what stops a hidden node being grabbed (see .lpn-draglbl), and
+   the `Fill` half ignores `fill: transparent` exactly as `visible` did. It is .lpn-link-hit's own
+   `visibleStroke` for a shape that is a disc rather than a line, and the 12 px of pointer slop in
+   LPN_NODE_HIT_PX is untouched -- the reach that was fixed was never slop, it was a stroke.
+
+   Not `stroke-width: 0`, which measures identically: it leaves the wrong declaration standing and
+   makes the rule depend on a second property to be correct. */
+.lpn-node-hit { fill: transparent; stroke: none; pointer-events: visibleFill; cursor: inherit; }
 /* THE TAB STRIP WHILE A MODEL IS BEING PLACED (Tom's 2026-09-08 worklist). Switching projects mid-wizard
    damaged both documents, so switchToTab(), closeTab() and newProject() refuse and say why. This is
    the half that stops the reach: faded, and the cursor says the press will not do what it looks

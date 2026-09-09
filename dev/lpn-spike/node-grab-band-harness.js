@@ -295,8 +295,17 @@ console.log('\n--- the stylesheet half ---');
 		/cursor:\s*inherit/.test(rule));
 	ok('...while the DRAWN disc still says pointer, or the feedback moved onto nothing',
 		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*pointer/.test(css));
-	ok('...it is hittable, and by `visible` rather than `all` or `visiblePainted`',
-		/pointer-events:\s*visible\s*;/.test(rule), rule);
+	// **`visibleFill` AND NOT `visible`, AND THIS LINE USED TO PIN THE DEFECT.** `visible` hit-tests
+	// the fill AND THE STROKE PERIMETER, and unlike `visiblePainted` it ignores the VALUES of `fill`
+	// and `stroke` -- so this rule's `stroke: none` removed nothing, and with no `stroke-width`
+	// declared the perimeter was the initial value: ONE USER UNIT, which on this page is one WORLD
+	// unit. The band therefore reached half the world scale in screen pixels past its own disc --
+	// 11.5 px on the XY Net3 example, where nobody could see it, and 4,215 px on the same network as
+	// a geographic project, where ONE node answered 42% of the canvas. Measured, and now asserted, in
+	// dev/browser-pass/specs/nodehit.js. `visibleFill` keeps the `visible` prefix that gates the hit
+	// on the node being visible, and drops the perimeter that was never wanted.
+	ok('...it is hittable by its DISC alone -- `visibleFill`, not `visible`, `all` or `visiblePainted`',
+		/pointer-events:\s*visibleFill\s*;/.test(rule), rule);
 	ok('...with a transparent fill, so it is reachable and cannot be seen',
 		/fill:\s*transparent/.test(rule));
 	ok('vertices mode overrules it, the way it already overrules the pipe band',

@@ -95,13 +95,23 @@ ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.l
 // unchanged (the 6 px of slop that makes a 0.7-wide pipe clickable), `cursor: inherit` so the band
 // shows whatever the canvas is saying. A future edit that gives a band a cursor value of its own
 // fails here rather than being discovered on a dense drawing.
-[['.lpn-link-hit', 'visibleStroke'], ['.lpn-link-symbol-hit', 'visible'],
-	['.lpn-node-hit', 'visible']].forEach(function (row) {
+//
+// **THE TWO `visibleFill` ROWS WERE `visible` UNTIL 2026-09-09 AND THAT WAS THE DEFECT**, not a
+// style: `visible` hit-tests the fill AND THE STROKE PERIMETER and ignores the VALUE of `stroke`,
+// so with no `stroke-width` declared each band reached half the WORLD scale past its own shape --
+// 11.5 px on the XY Net3 example and 4,215 px on the same network as a geographic project.
+// dev/browser-pass/specs/nodehit.js has the measurement. The match below is an indexOf, so
+// `visible` would still pass against `visibleFill`; these rows are the exact strings for that
+// reason, and a plain `visible` on either would now fail the `visibleStroke`/`visibleFill` line it
+// is compared against.
+[['.lpn-link-hit', 'visibleStroke'], ['.lpn-link-symbol-hit', 'visibleFill'],
+	['.lpn-node-hit', 'visibleFill']].forEach(function (row) {
 	// Anchored at a line start: `.lpn-vertexmode .lpn-link-hit` is a DIFFERENT rule that correctly
 	// says crosshair, and an unanchored match finds it first and reads it as this one.
 	const re = new RegExp('(^|\\n)\\' + row[0] + '\\s*\\{([^}]*)\\}');
 	const m = re.exec(cssCode);
-	ok(row[0] + ' keeps its hit area', !!m && m[2].indexOf('pointer-events: ' + row[1]) >= 0);
+	ok(row[0] + ' keeps its hit area', !!m && new RegExp('pointer-events:\\s*' + row[1] + '\\s*;').test(m[2]),
+		m ? (/pointer-events:\s*([A-Za-z]+)/.exec(m[2]) || [])[1] : '(no rule)');
 	ok(row[0] + ' inherits the canvas cursor', !!m && /cursor:\s*inherit/.test(m[2]),
 		m ? (/cursor:\s*([a-z-]+)/.exec(m[2]) || [])[1] : '(no rule)');
 });
