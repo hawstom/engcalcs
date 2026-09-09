@@ -427,55 +427,61 @@ $ec_icons = array(
 	// question, and Tom chose the drop from six candidates drawn at true menu size (a water tower, a
 	// fire hydrant, and four drops).
 	//
-	// Filled at .18 with its own outline over it, which is the pair the Reservoir and Tank icons
-	// already use for a body of water — so the three read as one family rather than three authors.
-	//
-	// Written as CUBICS, never an `A` arc: the bowl is a circle of r = 6.2 about (12, 14.8) and the
-	// control offset is Kappa*r = 0.5523 * 6.2 = 3.42. That is not a style preference —
+	// Written as CUBICS, never an `A` arc. That is not a style preference —
 	// `dev/scripts/icon_ascii_preview.php` models M/L/H/V/C/Z only, so an arc silently renders as
 	// nonsense there and the one tool that measures at 17 px goes blind. Verify with
-	// `php dev/scripts/icon_ascii_preview.php water --size=17`, remembering it cannot show opacity:
-	// the fill reads as solid black in ASCII and as a pale tint in a browser.
+	// `php dev/scripts/icon_ascii_preview.php water --size=17`.
 	// **A TOWER, NOT A DROP** (Tom, 2026-08-25). The drop that shipped the day before lost against
 	// the View menu's eye: *"the water drop and the eye don't look different enough, especially with
 	// the association of tears and eyes."* Two almond-ish outlines one menu apart is a real
 	// collision, and the fix is a different SILHOUETTE rather than a better drop. He referenced
 	// commercial line icons for the SHAPE only; this is an original drawing, as everything here is.
 	//
-	// **AN ELLIPTICAL BULB TANK, FROM TOM'S OWN SKETCH** (2026-09-04, his "Aft. 1"): *"Maybe there
-	// is not enough space for double linework. Maybe Aft. 1 (elliptical tank) would be the best
-	// combination of iconic and easy to draw (few lines)."* What shipped before it was a box with a
-	// peaked roof, and at 17 px the roof line and the body's own top line were two strokes doing
-	// one job -- the double linework he names. An ellipse is ONE closed curve that already reads as
-	// a tank, so the icon lost a line and gained a silhouette. His stated fallback was the same
-	// peaked tower with a VERY LOW peak; it was not needed, and it is not kept as a second entry,
-	// because an icon nothing draws is an icon nobody maintains.
+	// **THE DRAWING IS `wt-wide-L`, CHOSEN OFF A PROOF SHEET** (Tom, 2026-09-09: *"I want to
+	// immediately implement wt-wide-L as the favicon for LibreWaterNet.org and NotEPANET.org and as
+	// the Water menu icon for lpn."*). The sheet is `dev/icon-preview/concepts-2026-09-08b.html`,
+	// which drew 22 candidates at 16, 24, 32 and 64 px on light and on dark; the glyph's own copy
+	// is `dev/icon-preview/wt-wide-L.svg`, and it is the same six paths that stand below.
+	//
+	// It replaces an ELLIPTICAL BULB on splayed legs, which was Tom's own earlier sketch and lost
+	// nothing on its merits -- the vessel simply became a wide cylinder with a domed crown and a
+	// dished floor, whose walls run all the way to the ground and are therefore also its legs. Two
+	// consequences worth knowing before anything is redrawn: there are no legs to splay any more,
+	// so the splay measurement that used to stand here is gone with them, and the crown is the
+	// widest clear field the drawing has, which is what the **L for Libre** at (9.4, 3.9) occupies.
+	//
+	// **THE L IS THE ONE FEATURE THAT DOES NOT MEET THE GAP BUDGET BELOW, AND IT SHIPPED ANYWAY
+	// BECAUSE THAT WAS TOM'S INSTRUCTION.** Its foot at y = 8.1 clears the catwalk at y = 9.85 by
+	// 1.75 units and its stem's top at y = 3.9 clears the crown by about 1.34, both under the ~2.5
+	// units a 2-wide stroke needs at 17 px -- so at menu size the crown fills with ink, exactly as
+	// the proof sheet's own note says (*"it holds from 32 up"*). Do not quietly re-space it: the
+	// letter's position is the thing he chose, and moving it is a question for him.
 	//
 	// **THREE THINGS CARRY OVER FROM THE PEAKED VERSION AND MUST SURVIVE ANY REDRAW:**
 	//   - **NO ROOF OVERHANG** (Tom, 2026-09-04): *"it shouldn't have roof overhangs like a
 	//     house"*. A water tower's roof is the top of the tank, not a gable on a building, and the
-	//     overhang was the one detail that made the old drawing read as a house on stilts. An
-	//     ellipse cannot grow one, which is half of why it wins.
+	//     overhang was the one detail that made the old drawing read as a house on stilts. A domed
+	//     crown springing from the wall lines cannot grow one, which is half of why it wins.
 	//   - **A RISER** (same sketch): *"Most water tanks have a pipeline coming from the middle of
 	//     the tank vertically to the ground. Some are nothing but this and a bulbous tank at the
 	//     top."* It is what makes the silhouette a water tower rather than a hut.
-	//   - **A CATWALK, WHICH IS WHAT THE CHORD AT y = 9.5 IS** (Tom, 2026-09-05, marking up a
-	//     render of the icon: *"This is a catwalk. so it should extend outside the ellipse because
-	//     it wraps around the outside of the tank."*). It was drawn as a WATERLINE, and that was
-	//     wrong for the same reason the riser below was: **this is an EXTERNAL elevation**, and a
-	//     water surface is a thing you can only see from inside. Read as a catwalk it is the same
-	//     one stroke doing the same job -- saying the bulb is a vessel somebody services rather
-	//     than a balloon -- and it is drawn as a straight chord because a second curve inside the
-	//     first smudges into it at 17 px. It runs x = 3.4 to 20.6 against the bulb's own 4.69 to
-	//     19.31 at that height: **the overhang is the whole point** and a chord ending on the
-	//     outline reads as a waterline again.
+	//   - **A CATWALK, WHICH IS WHAT THE STRAIGHT LINE AT y = 9.85 IS** (Tom, 2026-09-05, marking
+	//     up a render of the icon: *"This is a catwalk. so it should extend outside the ellipse
+	//     because it wraps around the outside of the tank."*). It was drawn as a WATERLINE, and
+	//     that was wrong for the same reason the riser below was: **this is an EXTERNAL
+	//     elevation**, and a water surface is a thing you can only see from inside. Read as a
+	//     catwalk it is the same one stroke doing the same job -- saying the vessel is a thing
+	//     somebody services rather than a balloon -- and it is drawn straight because a second
+	//     curve inside the first smudges into it at 17 px. It runs x = 2.2 to 21.8 against walls
+	//     at 3.1 and 20.9: **the overhang is the whole point** and a line ending on the outline
+	//     reads as a waterline again.
 	//
-	// **AND THE RISER STOPS AT THE BULB, BECAUSE THE VIEW IS EXTERNAL** (same markup: *"This is an
-	// external view. So the pipe should not extend into the tank."*). It ran to y = 13, which IS
-	// the bulb's underside -- but the set's shared `stroke-linecap="round"` put a 1.6-unit dome on
-	// top of it, and against an unfilled bulb that dome was a stub of pipe standing inside the
-	// vessel. It carries `stroke-linecap="butt"` now. The bottom moved 20.5 -> 21.4 in the same edit, because a butt end at
-	// 20.5 stopped a unit short of the ground the legs' round caps already reach.
+	// **AND THE RISER STOPS AT THE VESSEL, BECAUSE THE VIEW IS EXTERNAL** (same markup: *"This is
+	// an external view. So the pipe should not extend into the tank."*). It starts at y = 14.8,
+	// which IS the floor's lowest point -- but the set's shared `stroke-linecap="round"` would put
+	// a 1.6-unit dome on top of it, and against an unfilled vessel that dome is a stub of pipe
+	// standing inside the tank. It carries `stroke-linecap="butt"` now, and for the same reason its
+	// bottom runs a unit past the walls' round caps rather than stopping level with them.
 	//
 	// **THE RISER IS A PIPE AND IS DRAWN AS ONE** (Tom, 2026-09-04, after looking at the first
 	// elliptical draft: *"Try making the vertical visibly thicker/wider than the legs, and the legs
@@ -484,22 +490,16 @@ $ec_icons = array(
 	// hydrant's 1.6 ground line is the other. A riser the same weight as a leg reads as a third leg,
 	// which is precisely the shape the gap budget below is policing.
 	//
-	// **AND THE LEGS ARE NEARER VERTICAL, WHICH IS WHAT REAL TOWERS DO** -- his own observation, that
-	// many are built with plumb legs and the splay is a real-estate decision rather than a structural
-	// one. They ran to x = 5 and 19 and now run to 6 and 18: about 10 degrees off vertical instead of
-	// 17, which still reads as a splay and no longer as a tripod.
+	// **THE GAP BUDGET, RE-MEASURED ON THIS DRAWING.** The clear-gap rule stated below -- that a gap
+	// under about 2.5 units closes at 17 px -- is what every feature here is measured against. The
+	// vessel passes with room: the riser at x = 12 is 8.9 units from either wall, and the catwalk at
+	// y = 9.85 sits 4.95 units above the floor's lowest point at y = 14.8. The two failures are both
+	// the L's, and they are named above. Nothing else on this icon may get thicker without re-running
+	// these numbers.
 	//
-	// **THE GAP BUDGET, RE-MEASURED AFTER BOTH CHANGES.** The clear-gap rule stated below -- that a
-	// gap under about 2.5 units closes at 17 px -- is what this drawing had to pass, and a thicker
-	// riser spends against it. Tightest gap on the icon is at the TOP of the legs, where they leave
-	// the bulb at x = 7.5 and 16.5 against a riser at 12: 4.5 units centre to centre, less 1.6 of
-	// riser and 1 of leg, leaves 1.9 units of daylight, and it only widens downward. The waterline to
-	// the bulb's underside is 3.5 units (9.5 to 13). Both clear, and 1.9 is the number to re-check
-	// before anything on this icon gets thicker again.
-	//
-	// The bulb is an ellipse about (12, 8.5) with rx 7.5 and ry 4.5, written as CUBICS and never an
-	// `A` arc for the reason given above, so the control offsets are Kappa*r = 4.14 in x and 2.49
-	// in y. Verify with `php dev/scripts/icon_ascii_preview.php water --size=17`.
+	// The crown is a half-ellipse about (12, 6.05) with rx 8.9 and ry 3.65 and the floor a
+	// half-ellipse about (12, 9.85) with the same rx and ry 4.95, both written as CUBICS and never
+	// an `A` arc for the reason given above.
 	// **THE FAUCET LOST A DRAWING ATTEMPT, NOT AN ARGUMENT** (corrected 2026-08-25). What stood
 	// here read as a settled measurement: that a faucet needs a handle, a spout and a falling drip,
 	// "three fine features in one glyph", and therefore smudges at 17 px. Tom, asking for the
@@ -520,11 +520,12 @@ $ec_icons = array(
 	// faucet is not one of the things it models. The gap-budget correction above stands on its own
 	// merits and is the rule every icon here is measured against; it is no longer an invitation to
 	// redraw a faucet.
-	'water'      => '<path d="M4.5 8.5C4.5 6.01 7.86 4 12 4C16.14 4 19.5 6.01 19.5 8.5'
-		. 'C19.5 10.99 16.14 13 12 13C7.86 13 4.5 10.99 4.5 8.5Z"/>'
-		. '<path d="M3.4 9.5H20.6"/>'
-		. '<path stroke-width="3.2" stroke-linecap="butt" d="M12 13V21.4"/>'
-		. '<path d="M7.5 12.1L6 20.5"/><path d="M16.5 12.1L18 20.5"/>',
+	'water'      => '<path d="M3.1 6.05C3.1 3.75 5.8 2.4 12 2.4C18.2 2.4 20.9 3.75 20.9 6.05"/>'
+		. '<path d="M3.1 6.05V21.4M20.9 6.05V21.4"/>'
+		. '<path d="M3.1 9.85C3.1 12.58 7.08 14.8 12 14.8C16.92 14.8 20.9 12.58 20.9 9.85"/>'
+		. '<path d="M2.2 9.85H21.8"/>'
+		. '<path stroke-width="3.2" stroke-linecap="butt" d="M12 14.8V22.4"/>'
+		. '<path d="M9.4 3.9V8.1H13.6"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
 	//
