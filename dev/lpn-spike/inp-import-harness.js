@@ -20,6 +20,16 @@ const { ROOT, byId, setUnitSet, loadLoopedNetwork, GPM, FT } = require('./lpn-do
 const fs = require('fs');
 const path = require('path');
 
+// 1 psi of water column in metres, READ OUT OF js/lpn-inp.js rather than retyped. It was retyped
+// here as 0.703070 until 2026-09-09, which is the same rounded copy dev/scripts/js_constant_check.php
+// found in the module itself -- a second copy of a conversion constant is a second chance for the
+// two to disagree. emitter-harness.js reads it the same way.
+const PSI_M = (function () {
+	const src = fs.readFileSync(path.join(ROOT, 'js', 'lpn-inp.js'), 'utf8');
+	const IN = parseFloat(/\bIN = ([0-9.eE+-]+)/.exec(src)[1]);
+	return Function('IN', 'return (' + /var PSI_M = ([^;]+);/.exec(src)[1] + ');')(IN);
+}());
+
 // The page loads both readers before js/looped-network.js; do the same, onto the same EngCalcs.
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-net.js');
@@ -251,7 +261,7 @@ importText(usInp, 'import-cases.inp');
 	// solver's own SI terms, because there is no field on the page that could show it.
 	const j6 = nodes.find(n => n.id === 'J6');
 	ok('an emitter coefficient is kept, converted to the solver terms',
-		near(j6._emitter, 1.5 * GPM / Math.pow(0.703070, 0.5), 1e-12), j6._emitter);
+		near(j6._emitter, 1.5 * GPM / Math.pow(PSI_M, 0.5), 1e-12), j6._emitter);
 
 	ok('link vertices survive', links.find(l => l.id === 'P5').verts.length === 2);
 

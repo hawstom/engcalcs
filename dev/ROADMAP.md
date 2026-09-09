@@ -487,44 +487,20 @@ the block.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
-  recommendations."* Record, ranked list and the per-runner audit: `dev/enforceable-rules-survey.md`.
-  - **HALF A IS DONE.** 62 rules enforced, 4 left (rows 13, 14, 22, 23) and every one states why no
-    blocking `check_all.sh` entry can hold it: two are advisory at best, two are git hooks and
-    `check_all.sh` runs before a commit message exists. Three landed rows found the RULE was wrong
-    rather than the code, each only by trying to execute it.
-  - **HALF B IS NOT, AND THE 2026-09-06 PASS IS WHY.** Five rules had been classified into neither
-    column, and the one that matters was **in no document at all**: `js/*.js` writes every string
-    read as `pc.<key> || '<English literal>'`, so 892 uncontrolled second copies of
-    `lang.ec.en.php` ship and **199 already disagree** — including a sentence struck as false, two
-    that fall back to the empty string, and a control the language file calls `Calculate` and the
-    fallback calls `Run`. `pageconfig_check.php` guarantees the key is supplied, so none of it ever
-    renders and nothing had ever compared them. **Walked to ZERO the same day and the ratchet is now
-    absolute at 0** — 219 rewritten mechanically out of `$ec_lang` itself, so no wording judgement
-    entered the sweep, and two done by hand because they are read through an alias the sweep's regex
-    did not model. `js_fallback_string_check.php` now fails the build on the first one that drifts.
-    - **AND THE SELFTEST DIED OF SUCCESS ON THE SAME DAY, which is worth knowing before writing the
-      next ratchet.** Its corpus guard asserted "at least one drifted fallback exists", to stop a
-      blinded scan reading as progress — so fixing the defect broke the guard. Replaced by a LIVE
-      MUTATION: a temporary file with one deliberately wrong fallback is written into `js/`, the
-      real check is run over the real directory, and it must name that file. That proves the same
-      property and goes on proving it at zero.
-  - **THE TRANSFERABLE METHOD, and the reason this stays open:** re-reading `CLAUDE.md` cannot find
-    a rule nobody wrote down. Row 32 came from COUNTING a repeated construct in the source and
-    asking what writing it 892 times assumes.
-  - **THE METHOD RAN AGAIN ON 2026-09-06 AND PRODUCED FOUR MORE ROWS, 35-38, none of which came
-    from re-reading anything.** 35: 71 browser dialogs carry 37 keys and **999 values reached the
-    hardest plain-text sink in the suite** with rule B unable to see one -- a dialog does not
-    degrade a tag, it shows it. 36: the service worker's scope covered one of the two paths the
-    suite is now served at, and the failure has NO symptom in any browser. 37: six log writers all
-    obey a rule `CLAUDE.md` states and nothing held, where an unmarked row does not read as
-    unlabelled but JOINS the deduplicated people. 38: 25 new-tab links, 13 with `rel="noopener"`
-    and 12 without, **the tree having decided the same question twice in opposite directions**.
-  - **THREE OF THE FOUR ARE RATCHETS AT ZERO, AND THAT IS THE FINDING, NOT A DISAPPOINTMENT.** A
-    rule being FOLLOWED and enforced by nothing is invisible to every audit that looks for defects;
-    only counting the construct finds it. The one that was already violated (38) was violated
-    exactly half the time, which is what an unwritten rule looks like from the outside.
-  - **Row 13's own worst offender was this block**, at 201 lines against a 15-line cap, until it
-    was compressed on 2026-09-06.
+  recommendations."* Record, ranked list, per-runner audit: `dev/enforceable-rules-survey.md`.
+  - **HALF A IS DONE.** 78 enforced, 4 left (rows 13, 14, 22, 23), each stating why no blocking
+    `check_all.sh` entry can hold it. Three landed rows found the RULE wrong, not the code.
+  - **HALF B IS OPEN AND ITS METHOD IS NOT RE-READING.** Re-reading `CLAUDE.md` cannot find a rule
+    nobody wrote down. Row 32 came from COUNTING a construct and asking what writing it 892 times
+    assumes; rows 35-38, 40-44, 48-50 and 54-56 came the same way and none from re-reading.
+  - **A RATCHET AT ZERO IS THE FINDING.** A rule followed and enforced by nothing is invisible to
+    every audit that looks for defects. Where the tree HAD violated one it had usually decided the
+    question twice in opposite directions (rows 38, 44, 49) -- an unwritten rule from outside.
+  - **2026-09-09 gave rows 54-56:** 4 of 28 JS physical constants were rounded decimals, one of them
+    carried in `dev/session-handoff.md` as an open question rather than as a defect; 199 harnesses
+    pin English wording, so a rewording costs a red build in a file about hydraulics; and 28 of the
+    29 keys reaching the tip helpers' `title=""` were unbound by rule B.
+  - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
 - 25|348| **Sub-categories and paging in the examples gallery.** The grid is `auto-fit`, so both
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops

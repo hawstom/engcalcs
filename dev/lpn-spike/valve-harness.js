@@ -165,7 +165,11 @@ console.log('\n--- what the writer puts in [VALVES] ---');
 // trap and it has its own converter (valveSettingSI), so it gets its own assertions.
 console.log('\n--- a GPM (US) file ---');
 {
-	const IN = 0.0254, FT = 0.3048, PSI_M = 0.703070, GPM = 6.30901964e-5;
+	// DERIVED from the exact definitions, never typed off a calculator: PSI_M was a rounded
+	// 0.703070 here and in js/lpn-inp.js until dev/scripts/js_constant_check.php found it.
+	const IN = 0.0254, FT = 0.3048,
+		PSI_M = (4.4482216152605 / (IN * IN)) / (1000 * 9.80665),
+		GPM = 3.785411784e-3 / 60;
 	const inp = [
 		'[JUNCTIONS]', ' J1  100  50', ' J2  100  0', ' J3  100  0', ' J4  100  0', '',
 		'[RESERVOIRS]', ' R1  200', '',

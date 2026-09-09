@@ -355,8 +355,15 @@ function checkAgainstEpanet(name) {
 		`max ${fmt(worstFlow, 5)} gpm at ${worstFlowId}; ` +
 		`EPANET's own continuity residual is ${fmt(epaCont.worst, 5)} gpm at ${epaCont.worstId}`);
 
+	// The bound is 5e-9 m3/s, not 1e-9. It is a claim about how far our own iteration ran, NOT about
+	// correctness -- EPANET's own residual on the same network is 3e-8 m3/s, six times larger, and
+	// the heads above are held to 0.01 ft against its answer regardless. It was 1e-9 until
+	// 2026-09-09, when EngCalcs.lpnGradMin stopped being written as a rounded 0.0283168466 cubic
+	// foot and became the exact one: a change of 3 parts in ten billion moved Net3's last iterate
+	// and its residual with it, 5.04e-10 to 1.32e-9, while Net1 and Net2 stayed at 1e-13. A bound
+	// a hair above a measured value is a bound that fails on arithmetic noise.
 	const c = continuityResidual(model, result, 0.5);
-	report(c.worst < 1e-9, `${name}: continuity residual`, `max ${c.worst.toExponential(2)} m3/s`);
+	report(c.worst < 5e-9, `${name}: continuity residual`, `max ${c.worst.toExponential(2)} m3/s`);
 }
 
 // ---------------------------------------------------------------------------

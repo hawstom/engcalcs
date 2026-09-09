@@ -74,8 +74,15 @@ L.importInp({ name: 'import-cases.inp', _text: INP });
 // 1 psi of water column in metres, READ OUT OF js/lpn-inp.js rather than retyped: a second copy of
 // a conversion constant is a second chance for the two to disagree, which is the whole failure this
 // harness is about.
-const PSI_M = parseFloat(/var PSI_M = ([0-9.]+);/.exec(
-	fs.readFileSync(path.join(ROOT, 'js', 'lpn-inp.js'), 'utf8'))[1]);
+// (2026-09-09: it is an EXPRESSION there now, not a decimal -- dev/scripts/js_constant_check.php
+// found it typed as a rounded 0.703070 -- so the expression is evaluated rather than parsed. The
+// point is unchanged: the number comes from the module, never from a second copy typed here.)
+const PSI_M = (function () {
+	const src = fs.readFileSync(path.join(ROOT, 'js', 'lpn-inp.js'), 'utf8');
+	const IN = parseFloat(/\bIN = ([0-9.eE+-]+)/.exec(src)[1]);
+	const expr = /var PSI_M = ([^;]+);/.exec(src)[1];
+	return Function('IN', 'return (' + expr + ');')(IN);
+}());
 const doc = L.getDoc();
 const j6 = L.nodeById('J6');
 

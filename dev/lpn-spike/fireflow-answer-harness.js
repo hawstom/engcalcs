@@ -33,6 +33,15 @@ const BEFORE = {};
 Object.keys(NOW).forEach(k => { BEFORE[k] = NOW[k]; });
 new Function('require', 'module', 'exports',
 	baselineSrc)(function () { return BEFORE; }, { exports: BEFORE }, BEFORE);
+// THE BASELINE GETS TODAY'S CONSTANTS, because the claim is about the ALGORITHM. The baseline
+// source sets EngCalcs.lpnGradMin from its own literal, and on 2026-09-09 that literal stopped
+// being a rounded 0.0283168466 cubic foot and became the exact one (dev/scripts/js_constant_check.php).
+// A change of 3 parts in ten billion is not the dense-to-envelope rewrite this harness exists to
+// check, and leaving it in would make every future correction of a physical constant read as a
+// regression in the fire-flow sweep. lpnSolve reads it off the module at call time, so this is the
+// whole of the substitution.
+BEFORE.lpnGradMin = NOW.lpnGradMin;
+
 if (BEFORE.lpnSolve === NOW.lpnSolve) {
 	console.error('The baseline did not load its own lpnSolve, so both columns would be the ' +
 		'current code and every comparison would pass for the wrong reason.');

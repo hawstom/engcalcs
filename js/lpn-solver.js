@@ -43,7 +43,7 @@ EngCalcs.lpnG = EngCalcs.G;
 // converged past 6e-5, even though every other link had settled.
 //
 // Value matches EPANET's RQtol default of 1e-6 ft per cfs, converted to SI.
-EngCalcs.lpnGradMin = 1e-6 * 0.3048 / 0.0283168466;
+EngCalcs.lpnGradMin = 1e-6 * 0.3048 / (0.3048 * 0.3048 * 0.3048);
 
 // A separate, much smaller floor used only to keep a flow OUT of expressions that
 // are undefined at exactly zero: Q^(b-1) for a pump with b < 1, the Reynolds number

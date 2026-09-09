@@ -244,6 +244,12 @@ run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_
 # factors and EngCalcs.G use the same gravity.
 run_check "unit conversion factors"      blocking php dev/scripts/unit_factor_check.php
 run_check "coordinate order"             blocking php dev/scripts/coord_order_check.php
+# Task 322 half B, found by COUNTING js/*.js rather than by re-reading a rule. unit_factor_check.php
+# re-derives every $ec_units factor and has never read a line of JavaScript; js/*.js declared four
+# conversion constants as rounded decimals (two cubic feet, a million gallons a day, a psi of water)
+# and nothing compared the two halves in either direction. Ratchet at zero.
+run_check "js physical constants"        blocking php dev/scripts/js_constant_check.php
+run_check "js constant selftest"         blocking php dev/scripts/js_constant_selftest.php
 # Task 322. Four absolutes about unit families, all of which fail with a page that renders and
 # looks right: a family missing from a preset means one field ignores the us/si buttons while its
 # neighbours obey them. echoUnitSelect() checks this at render time, i.e. when somebody -- possibly
@@ -379,6 +385,11 @@ run_check "lpn harnesses ($LPN_HARNESS_N)"  blocking sh dev/scripts/run_harnesse
 # calculators (mpf, mtc). Same derived count as above -- never typed.
 CALC_HARNESS_N=$(ls dev/calc-spike/*harness*.js 2>/dev/null | wc -l | tr -d ' ')
 run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_calc_harnesses.sh
+# Task 322 half B. A harness that spells a shipped English string out as a literal turns a rewording
+# into a red build in a file about hydraulics -- three did on 2026-09-08 and 199 more can. Ratchet
+# at the measured baseline: the number may fall and may not rise.
+run_check "harness wording pins"         blocking php dev/scripts/harness_wording_check.php
+run_check "harness wording selftest"     blocking php dev/scripts/harness_wording_selftest.php
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "example folder"               advisory php dev/scripts/example_folder_check.php

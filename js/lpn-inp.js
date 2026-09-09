@@ -61,19 +61,32 @@
 		require(__dirname + '/lpn-fittings.js');
 	}
 
+	// The exact definitions, so every factor below is DERIVED rather than typed off a calculator.
+	// CLAUDE.md names the first three; the imperial gallon is exactly 4.54609 L by the 1985 Weights
+	// and Measures Act and is the one quantity here the suite does not otherwise define.
+	// (2026-09-09: CFS, MGD and PSI_M were rounded decimals -- 0.0283168466, 0.0438126364 and
+	// 0.703070 -- and nothing compared js/*.js with lib/Units.lib.php in either direction until
+	// dev/scripts/js_constant_check.php. The errors were parts in ten million and the reason to
+	// remove them is not the size: the suite has ONE definition of a foot, and a second one a few
+	// digits away is what makes two answers that ought to be identical disagree.)
+	var M3_PER_FT3 = 0.3048 * 0.3048 * 0.3048,
+		M3_PER_GAL = 3.785411784e-3,
+		M3_PER_IMP_GAL = 4.54609e-3,
+		SEC_PER_DAY = 86400;
+
 	// Flow unit keyword -> {toSI: m3/s per unit, system: 'us'|'si'}. The `system` is what fixes
 	// every OTHER unit in the file; EPANET has no way to mix them.
 	var FLOW_UNITS = {
-		CFS: { toSI: 0.0283168466, system: 'us' },
-		GPM: { toSI: 6.30901964e-5, system: 'us' },
-		MGD: { toSI: 0.0438126364, system: 'us' },
-		IMGD: { toSI: 0.0526168, system: 'us' },
-		AFD: { toSI: 0.0142764, system: 'us' },
-		LPS: { toSI: 0.001, system: 'si' },
-		LPM: { toSI: 1.66666667e-5, system: 'si' },
-		MLD: { toSI: 0.0115740741, system: 'si' },
-		CMH: { toSI: 2.77777778e-4, system: 'si' },
-		CMD: { toSI: 1.15740741e-5, system: 'si' }
+		CFS: { toSI: M3_PER_FT3, system: 'us' },
+		GPM: { toSI: M3_PER_GAL / 60, system: 'us' },
+		MGD: { toSI: 1e6 * M3_PER_GAL / SEC_PER_DAY, system: 'us' },
+		IMGD: { toSI: 1e6 * M3_PER_IMP_GAL / SEC_PER_DAY, system: 'us' },
+		AFD: { toSI: 43560 * M3_PER_FT3 / SEC_PER_DAY, system: 'us' },
+		LPS: { toSI: 1e-3, system: 'si' },
+		LPM: { toSI: 1e-3 / 60, system: 'si' },
+		MLD: { toSI: 1e3 / SEC_PER_DAY, system: 'si' },
+		CMH: { toSI: 1 / 3600, system: 'si' },
+		CMD: { toSI: 1 / SEC_PER_DAY, system: 'si' }
 	};
 
 	// Exported so a caller comparing our numbers with EPANET's own output has ONE table to read
@@ -81,9 +94,14 @@
 	EngCalcs.lpnInpFlowUnits = FLOW_UNITS;
 
 	var FT = 0.3048, IN = 0.0254, MM = 0.001;
-	// 1 psi of water column, in metres. Only used for emitters, which are the one place EPANET
-	// states a coefficient per unit of PRESSURE rather than per unit of head.
-	var PSI_M = 0.703070;
+	// 1 psi of water column, in metres, DERIVED from lbf = 4.4482216152605 N and g = 9.80665 the
+	// way lib/Units.lib.php derives $ec_units['psi'] from the same two numbers. Only used for
+	// emitters, which are the one place EPANET states a coefficient per unit of PRESSURE rather
+	// than per unit of head.
+	// (9.80665 is EngCalcs.G written out rather than read: this module loads before
+	// js/Calculators.lib.js in a Node harness, and it is DOM-free and load-order-free by design.
+	// dev/scripts/js_constant_check.php holds the two to the same value.)
+	var PSI_M = (4.4482216152605 / (IN * IN)) / (1000 * 9.80665);
 
 	// Sections we read. Anything else in the file is either irrelevant to a steady-state hydraulic
 	// solve (report/times/graphics settings) or a cut feature, and the cut ones are named in

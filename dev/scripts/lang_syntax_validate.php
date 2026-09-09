@@ -399,6 +399,29 @@ function plainTextBoundKeys(): array
         if (preg_match_all('/\$html_desc\s*=\s*\$ec_lang\[\'([^\']+)\'\]/', $c, $m)) {
             foreach ($m[1] as $k) { $keys[$k] = $rel . ' (meta description)'; }
         }
+
+        // PHP path 2: THE TIP HELPERS, which are the biggest title="" sink in the suite and were
+        // bound by nothing until 2026-09-09.
+        //
+        // Found by Task 322's counting method, exactly as the dialog and JS-attribute legs above
+        // were. `ecTipLabel($text, $tip)` and `ecLinkTipLabel($href, $text, $tip)` write the tip
+        // into title="" through htmlspecialchars(strip_tags($tip)) -- and the attribute scan cannot
+        // see it, because the attribute is written in lib/Calculators.lib.php with a VARIABLE while
+        // the key is named at 51 call sites in eight other files. 29 keys reached it and 28 of them
+        // were unbound. Zero carry a tag today across all 27 language files, which is what makes
+        // this a ratchet rather than a repair.
+        //
+        // strip_tags() is not an exemption here for the reason the docblock above gives: a tag in
+        // one of these values does not degrade, it VANISHES, and a tooltip missing half its
+        // sentence is a defect nobody can see from the page.
+        foreach ([['ecTipLabel', 1], ['ecLinkTipLabel', 2]] as $helper) {
+            foreach (callArguments($c, $helper[0]) as $parts) {
+                if (!isset($parts[$helper[1]])) { continue; }
+                if (preg_match_all('/\$ec_lang\[\'([^\']+)\'\]/', $parts[$helper[1]], $tm)) {
+                    foreach ($tm[1] as $k) { $keys[$k] = $rel . ' (' . $helper[0] . ' tip)'; }
+                }
+            }
+        }
     }
 
     // A pageConfig property name is NOT identical to its $ec_lang key -- the page PHP drops the
