@@ -397,23 +397,37 @@ exports.run = async function ({ browser, report }) {
 		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
 		await a.settle(200);
 
-		// ---- THE CREDITS ARE THE FOOTER (Tom: "It's a bit long for this place") ---------------
+		// ---- THE CREDITS ARE THE LAST SECTION (Tom: "It's a bit long for this place") ---------
+		//
+		// **IT IS A NAMED SECTION NOW, NOT A BARE FOOTER, and that is Tom's own 2026-09-06 change**
+		// ("Add a category of one at the bottom of lpn Settings for Credits, and put the Credits
+		// there"), not a regression. Both placements answer his 2026-08-19 complaint about three
+		// sentences of licence text standing between Map appearance and Page; a SECTION also earns a
+		// row in the index, so the acknowledgement can be found rather than scrolled to.
+		//
+		// What the two checks below therefore hold has moved by exactly one level, and not an inch
+		// further: the credits are still the LAST thing in the content pane, and still outside what
+		// the search filter hides — which a footer got for free and a section only gets by carrying
+		// `data-set-nofilter`. That flag is the whole reason this stayed a check: Apache-2.0 clause
+		// 2 wants the acknowledgement present in the software, and an ordinary section would vanish
+		// on any search but the word "credits", which is the licence broken by a text box.
 		const cred = await a.page.evaluate(() => {
 			const c = document.getElementById('lpn_set_ramp_credits'),
 				page = document.getElementById('lpn_set_sub_page'),
-				content = document.getElementById('lpn_setbox_content');
+				content = document.getElementById('lpn_setbox_content'),
+				sec = c && c.closest('.lpn-set-sec');
 			return c ? {
 				text: c.textContent.trim(),
-				parent: c.parentNode.id,
-				last: content.lastElementChild === c,
+				section: sec ? sec.id : null,
+				last: content.lastElementChild === sec,
 				belowPage: c.getBoundingClientRect().top > page.getBoundingClientRect().top,
-				inSection: !!c.closest('.lpn-set-sec')
+				nofilter: !!(sec && sec.hasAttribute('data-set-nofilter'))
 			} : null;
 		});
-		report.ok(!!cred && cred.last && cred.parent === 'lpn_setbox_content',
-			'the colour-scheme acknowledgement is the LAST thing in the content pane, not a row above Page',
-			cred && `${cred.parent}, last=${cred.last}`);
-		report.ok(!!cred && !cred.inSection && cred.belowPage,
+		report.ok(!!cred && cred.last && cred.section === 'lpn_set_sec_credits',
+			'the colour-scheme acknowledgement is the LAST section in the content pane, not a row above Page',
+			cred && `${cred.section}, last=${cred.last}`);
+		report.ok(!!cred && cred.nofilter && cred.belowPage,
 			'...below every section, so nothing has to be read past it — and outside what the search hides',
 			cred && cred.text.slice(0, 60));
 		report.has(cred && cred.text, 'Cynthia Brewer',

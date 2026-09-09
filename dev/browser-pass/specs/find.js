@@ -101,13 +101,22 @@ exports.run = async function ({ browser, report }) {
 			report.ok(after.open, 'selecting text by dragging out of the box leaves the box open');
 		}
 
-		// The three pull-downs and the value box are the whole control surface.
+		// The three pull-downs and the value box are the whole QUERY control surface.
+		//
+		// **THE FILTER ROW IS EXCLUDED, and that is Task 597 rather than a regression.** A fourth
+		// `<select>` — "Table to filter" — was added to the foot of #lpn_find_form on 2026-09-06,
+		// beside a Filter button. It is not part of the query: it says which pane table the found
+		// set is applied TO. Counting every select in the popup made this read `got 4, wanted 3`,
+		// and (below) made "the pull-downs go away" read `got 1, wanted 0` — the filter row stays,
+		// correctly, because a compound query still has a set to filter a table with. So both
+		// counts name `.lpn-find-filter` and step over it.
 		const controls = await a.page.evaluate(() => {
 			const p = document.getElementById('lpn_find_popup');
+			const q = (sel) => [...p.querySelectorAll(sel)].filter(e => !e.closest('.lpn-find-filter'));
 			return {
-				selects: p.querySelectorAll('select').length,
-				texts: p.querySelectorAll('input[type=text]').length,
-				buttons: p.querySelectorAll('#lpn_find_form button').length
+				selects: q('select').length,
+				texts: q('input[type=text]').length,
+				buttons: q('#lpn_find_form button').length
 			};
 		});
 		report.eq(controls.selects, 3, 'three pull-downs: what to search, which property, which condition');
@@ -175,7 +184,13 @@ exports.run = async function ({ browser, report }) {
 			// under it is drawn.
 			report.ok(q && q.tag === 'INPUT' && q.type === 'text', 'and it is an input, not a printed line',
 				q && (q.tag + '/' + q.type));
-			report.eq(q && q.hint, 'Expandable with AND, OR, and ()', 'Tom\'s tip is under it');
+			// **THE TIP IS ASKED OF THE LANGUAGE FILE, never copied here.** It was pinned as
+			// 'Expandable with AND, OR, and ()' until 2026-09-09, when the wave-0 pass reworded
+			// `lpn_find_query_hint` to 'Combine conditions with AND, OR and ()' and this line went
+			// red over a change that broke nothing. dev/session-handoff.md §4 names this shape as
+			// having already broken three harnesses; what the check is FOR is that the hint is
+			// drawn under the input at all.
+			report.eq(q && q.hint, await a.lang('lpn_find_query_hint'), 'Tom\'s tip is under it');
 		}
 
 		// **A COMPOUND QUERY, TYPED, IN A REAL BROWSER.** The set arithmetic is asserted against
@@ -188,7 +203,10 @@ exports.run = async function ({ browser, report }) {
 				const q = p.querySelector('.lpn-find-query');
 				q.value = "Everything.ID contains 'J' OR Everything.ID contains 'L'";
 				q.dispatchEvent(new Event('input', { bubbles: true }));
-				const selects = p.querySelectorAll('#lpn_find_form select').length;
+				// The query pull-downs only — see the note on `controls` above: the filter row's
+				// own select is not one of them and does not go away with them.
+				const selects = [...p.querySelectorAll('#lpn_find_form select')]
+					.filter(e => !e.closest('.lpn-find-filter')).length;
 				const aside = p.querySelector('.lpn-find-aside');
 				// **BY ID, NOT "the first button in the form".** With the controls set aside, the
 				// first button is the one that brings them BACK -- pressing that would restore the
@@ -198,7 +216,11 @@ exports.run = async function ({ browser, report }) {
 					aside: aside ? aside.textContent : null };
 			});
 			report.eq(compound.selects, 0, 'a query the controls cannot write takes the pull-downs off');
-			report.ok(compound.aside && /set aside/.test(compound.aside),
+			// **THE WORDS ARE THE LANGUAGE FILE'S.** This matched `/set aside/` against
+			// `lpn_find_q_aside` until the wave-0 pass reworded it to "The controls cannot express
+			// the query below, so they are hidden."; the check is that the panel SAYS SOMETHING
+			// where the controls were, not which words Tom chose for it.
+			report.eq(compound.aside && compound.aside.trim(), await a.lang('lpn_find_q_aside'),
 				'...and says why, where they were', compound.aside);
 			report.ok(/found/.test(compound.results), '...and the OR really runs',
 				compound.results.trim().slice(0, 60));

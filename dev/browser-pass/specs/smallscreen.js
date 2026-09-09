@@ -178,12 +178,17 @@ exports.run = async function ({ browser, report }) {
 		// ---- 3. THE PIPES TABLE HEADINGS -------------------------------------------------------
 		await a.page.click('#lpn_setbox_close');
 		await a.settle(300);
-		await a.menuClick('Tables', 'project');
+		await a.menuClick(await a.lang('lpn_tables_menu'), 'project');
 		await a.settle(700);
 		await a.page.click('#lpn_pane_tab_pipes');
 		await a.settle(500);
 		const th = await words(a.page, '#lpn_pane_pipes thead th .lpn-pane-sort');
-		report.ok(th.length === 10, 'the Pipes table has its ten headings', th.map(t => t.text).join('|'));
+		// **ELEVEN SINCE 2026-09-08, not ten:** `lpn_field_active` ("Part of this network", the
+		// scenario in/out column) joined the Pipes table. The count is deliberately exact rather
+		// than a floor — this whole section is about what happens to headings when the width is
+		// 360px, so a column arriving is precisely the event that should make somebody re-read the
+		// two checks under it, and ">= 10" would let one arrive unread.
+		report.ok(th.length === 11, 'the Pipes table has its eleven headings', th.map(t => t.text).join('|'));
 		const thSplit = th.filter(t => t.broken.length);
 		report.ok(thSplit.length === 0, 'no Pipes heading is broken mid-word',
 			thSplit.map(t => t.text + ' (' + t.broken.join(',') + ')').join(', '));
@@ -199,7 +204,7 @@ exports.run = async function ({ browser, report }) {
 		// while the pane gave it 344x115, so preserveAspectRatio fitted the drawing at 0.64 and
 		// every 10px label came out at 6.4px. The floor is gone (one user unit is one CSS pixel at
 		// every size) and a chart with less room now drops labels instead.
-		await a.menuClick('Profile', 'project');
+		await a.menuClick(await a.lang('lpn_profile_menu'), 'project');
 		await a.settle(1200);
 		const chart = await a.page.evaluate(() => {
 			const host = document.getElementById('lpn_profile_chart');

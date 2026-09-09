@@ -260,7 +260,12 @@ async function labelsHidden(a) {
 		document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'));
 }
 
-const ROW = 'Import xy to lat/lon…';
+// **THE ROW'S LABEL IS ASKED OF THE LANGUAGE FILE, never copied here.** It was pinned as
+// 'Import xy to lat/lon…' until 2026-09-09, and Tom's rewording of `lpn_file_import_geo` to
+// 'Open an xy file on the map…' made every check in this section throw at its first line — the
+// exact shape dev/session-handoff.md §4 names as having broken three harnesses. `a.lang()` reads
+// the value the page itself renders, so a rewording moves both ends at once.
+let ROW = null;
 
 // **THE TOOL STARTS FROM A FILE NOW (Task 447), never from the open project.** So a placement is:
 // take what is on screen as a project file, and open THAT as lat/lon -- which lands a new tab with
@@ -297,6 +302,7 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await answerConsent(a);
 		await a.dismissGallery();
+		ROW = await a.lang('lpn_file_import_geo');
 
 		// ---- 1. the command is findable ------------------------------------------------------
 		const row = await fileRow(a, ROW);
@@ -762,7 +768,7 @@ exports.run = async function ({ browser, report }) {
 			await a.settle(600);
 			// nodeCount() counts every drawn symbol, links included, so this is "the network is on the
 			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
-			report.ok(await a.nodeCount() >= 3, 'an EPANET file opens through Import xy to lat/lon… too',
+			report.ok(await a.nodeCount() >= 3, `an EPANET file opens through ${ROW} too`,
 				(await a.nodeCount()) + ' symbols drawn');
 			// **REINTERPRET, NOT PLACE — BUT IT IS A BUTTON NOW, NOT A GUESS** (Tom, 2026-08-21,
 			// importing EPA's own Net3: *"it put me at Step 2 in North Darfur"*). The range test used

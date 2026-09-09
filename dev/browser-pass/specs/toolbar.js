@@ -89,8 +89,17 @@ exports.run = async function ({ browser, report }) {
 		// doors are covered in specs/visibility.js and specs/labelcols.js.
 		report.ok(names.indexOf('Labels') < 0, 'no Labels button — the box it opened has its own',
 			names.join(' | '));
-		// Two doors, one implementation: this and View > Profile, which Tom kept.
-		report.ok(names.indexOf('Profile') >= 0, 'the profile has a door on the strip');
+		// **THE PROFILE'S DOOR IS THE WATER MENU, NOT THE STRIP, SINCE 2026-09-06.** Tom's own
+		// commit c4f195c0, "Four commands leave the toolbar", took the Profile button off it: the
+		// profile is something you READ beside the project rather than a drawing tool, and the
+		// strip is for tools. One door now, and it is the menu row — which is the half that never
+		// needed the other one. Asserted by KEY, because `lpn_profile_menu` names both.
+		const PROFILE = await a.lang('lpn_profile_menu');
+		report.ok(names.indexOf(PROFILE) < 0,
+			'the profile is NOT on the strip — it is read, not drawn', names.join(' | '));
+		const water = await a.menuRows('project');
+		report.ok(water.some(r => r.label === PROFILE),
+			'...and its one door is the Water menu row', water.map(r => r.label).join(' | '));
 
 		// **THE TIME TRANSPORT IS ON THE STRIP AT ALL TIMES.** This page has just been opened on an
 		// empty project with no duration, which is the state most visitors are in and exactly the
@@ -118,12 +127,18 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(200);
 		const rows = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_menu_list button')].map(b => b.textContent.trim()));
-		const guide = rows.find(r => /icon/i.test(r));
+		// **BY KEY, NOT BY A REGEX OVER TOM'S ENGLISH.** `/icon/i` matched the row while it read
+		// "What the toolbar icons mean"; the row is plain 'Toolbar' now and the regex found nothing,
+		// taking three checks down with it on a rename that broke no behaviour. A regex over
+		// visitor-facing English is a pinned literal in disguise — dev/session-handoff.md §4.
+		const ICONS = await a.lang('lpn_help_icons');
+		const guide = rows.find(r => r.replace('▸', '').trim() === ICONS);
 		report.ok(!!guide, 'Help offers a list of what the icons mean', rows.join(' | '));
-		await a.page.evaluate(() => {
-			const b = [...document.querySelectorAll('#lpn_menu_list button')].find(x => /icon/i.test(x.textContent));
+		await a.page.evaluate((label) => {
+			const b = [...document.querySelectorAll('#lpn_menu_list button')]
+				.find(x => x.textContent.replace('▸', '').trim() === label);
 			if (b) { b.click(); }
-		});
+		}, ICONS);
 		await a.settle(300);
 		// **THE GUIDE IS A FLY-OUT, so it is in the SECOND menu popup** (Task 441). As a level-0
 		// menu it re-opened on the Help button the parent menu was already anchored to, hit
@@ -134,7 +149,8 @@ exports.run = async function ({ browser, report }) {
 			[...document.querySelectorAll('#lpn_menu_list2 button')].map(b => b.textContent.trim()));
 		report.eq(guideRows.length, btns.length, 'and it lists exactly the buttons on the strip',
 			`${guideRows.length} rows vs ${btns.length} buttons`);
-		report.has(guideRows.join(' | '), 'Zoom to fit', 'naming them the way the toolbar names them');
+		report.has(guideRows.join(' | '), await a.lang('lpn_tool_zoom_extent'),
+			'naming them the way the toolbar names them');
 
 		report.ok(a.errors.length === 0, 'no uncaught JavaScript', a.errors.join(' | '));
 	} finally {

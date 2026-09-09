@@ -80,6 +80,23 @@ class Session {
 		await this.page.evaluate(() => new Promise(r => requestAnimationFrame(() => r())));
 	}
 
+	// ---- visitor-facing English, from the language file and never from a literal -------------
+	// **A SPEC THAT PINS TOM'S WORDING BREAKS EVERY TIME HE REWORDS A STRING**, and three harnesses
+	// in this tree have already done exactly that (dev/session-handoff.md §4). `lang.ec.en.php` is
+	// the one source of a shipped English string; the page hands it to JS through pageConfig, so a
+	// spec naming a menu row, a button or a notice asks for it by KEY.
+	//   const ROW = await a.lang('lpn_file_import_geo');
+	// It throws on a key the page does not supply, because a silent `undefined` would turn every
+	// assertion under it into a check of nothing.
+	async lang(key) {
+		const v = await this.page.evaluate((k) => (window.EngCalcs || {}).pageConfig ?
+			window.EngCalcs.pageConfig[k] : undefined, key);
+		if (typeof v !== 'string') {
+			throw new Error(`${this.name}: pageConfig has no string for "${key}" — is the page loaded?`);
+		}
+		return v;
+	}
+
 	// ---- the menu bar -----------------------------------------------------
 	async openMenu(which = 'file') {
 		await this.page.click(`#lpn_menu_${which}`);
@@ -344,8 +361,17 @@ class Session {
 	}
 	// How many elements the map is drawing. Read from the DOM rather than the page's own `doc`, which
 	// is inside a closure — and the DOM is what the user is looking at anyway.
+	//
+	// **`.lpn-node-hit` IS EXCLUDED, and that exclusion is the whole point of the selector.** The
+	// node grab band shipped 2026-09-09: buildNodeEls() now draws an invisible hit circle into
+	// nodesLayer BEFORE the drawn disc, so a bare `.lpn-symbols > *` counts every junction twice.
+	// It made §17 read `got 6, wanted 3` and — worse — silently loosened every guard written as
+	// "at least N", including drawL()'s own. A link's halo and hit band have been in linksLayer
+	// since long before this number was first written down, so they stay counted: this restores the
+	// figure the specs were anchored on rather than inventing a new one.
 	async nodeCount() {
-		return this.page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-symbols > *').length);
+		return this.page.evaluate(() => document.querySelectorAll(
+			'#lpn_canvas .lpn-symbols > *:not(.lpn-node-hit)').length);
 	}
 	// **BY ACCESSIBLE NAME, NOT BY TEXT.** The toolbar has been icons only since 2026-08-18
 	// (dev/toolbar-icons.md); the word is still on every button, as its aria-label, which is exactly
@@ -396,7 +422,9 @@ class Session {
 	// A lat/lon project: longitudes and latitudes, and a street map behind it.
 	async newGeoProject(system = 'us') { await this._newFromBox('geo', system); }
 	async _newFromBox(coords, system) {
-		await this.menuClick('New project…', 'file');
+		// By KEY: `lpn_file_new` names this row, and a spec helper is the worst place of all to pin
+		// Tom's English — a rewording there takes down every section that makes a project.
+		await this.menuClick(await this.lang('lpn_file_new'), 'file');
 		await this.page.waitForSelector('#lpn_new_panel', { state: 'visible' });
 		// The coordinate kind is a radio pair, and it gates the place-name field beside it.
 		await this.page.check(`#lpn_new_panel input[name="lpn_new_coords"][value="${coords}"]`);

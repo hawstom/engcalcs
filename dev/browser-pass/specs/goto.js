@@ -25,7 +25,9 @@ const { Session } = require('../lib/session');
 // The row's own label, in ONE place. It moved once already ("Go to latitude, longitude…" ->
 // "Go to a latitude and longitude…") when Wave 0's decimal-comma finding was answered, and a spec
 // that spells a label inline fails as a missing row rather than as a wording change.
-const GOTO_ROW = 'Go to a latitude and longitude…';
+// **THE ROW LABEL IS ASKED OF THE LANGUAGE FILE, never copied here** — dev/session-handoff.md §4.
+// Assigned once at the top of the run, before any menu is driven.
+let GOTO_ROW = null;
 
 exports.title = '18. Go to a latitude and longitude';
 
@@ -122,6 +124,7 @@ exports.run = async function ({ browser, report }) {
 		await a.page.route(/tile\.openstreetmap\.org/, (route) => route.abort());
 		await a.goto();
 		await a.dismissGallery();
+		GOTO_ROW = await a.lang('lpn_goto_menu');
 
 		// ---- where the row is, and is not -------------------------------------------------------
 		let rows = (await a.menuRows('map')).map(r => r.label);
@@ -228,7 +231,7 @@ exports.run = async function ({ browser, report }) {
 		await a.makeEdit();
 		await a.makeEdit();
 		// **THE WIZARD STARTS FROM A FILE (Task 447)**, so the drawing on screen is written out and
-		// opened again through File > Import xy to lat/lon… -- which lands it in a new tab, in step 1.
+		// opened again through File > the lat/lon row (`lpn_file_import_geo`) -- which lands it in a new tab, in step 1.
 		// The string read here is serializeProject()'s own output, not a spec's idea of our format.
 		{
 			const text = await a.page.evaluate(() => {
@@ -237,7 +240,7 @@ exports.run = async function ({ browser, report }) {
 			});
 			const [chooser] = await Promise.all([
 				a.page.waitForEvent('filechooser'),
-				a.menuClick('Open an xy file on the map…')
+				a.menuClick(await a.lang('lpn_file_import_geo'))
 			]);
 			await chooser.setFiles({ name: 'goto.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
 		}

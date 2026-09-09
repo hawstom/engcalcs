@@ -8,42 +8,52 @@ const { Session } = require('../lib/session');
 
 exports.title = '3. The File menu';
 
-// The list as it stands after Task 264 (New project… became a fly-out of templates), Task 314
-// (Open example… joined it, under Open rather than under New) and Task 447 (Convert to lat/lon…
-// became Import xy to lat/lon…, a third way to OPEN a file rather than a conversion of the open project,
-// and sits third because it is the fallback the two rows above it fall back TO). Recent files are
-// absent because there are none yet; that row group appears only when a file has been opened.
-const EXPECTED = ['New project…', 'Open…', 'Open example…', 'Import EPANET file…',
-	'Import xy to lat/lon…', 'Export EPANET file…',
-	'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
+// The ORDER as it stands after Task 264 (New project… became a fly-out of templates), Task 314
+// (Open example… joined it, under Open rather than under New) and Task 447 (the lat/lon row became
+// a third way to OPEN a file rather than a conversion of the open project, and sits third because
+// it is the fallback the two rows above it fall back TO). Recent files are absent because there are
+// none yet; that row group appears only when a file has been opened.
+//
+// **THE ROWS ARE NAMED BY KEY, NOT BY TOM'S WORDS.** This list held eleven English literals until
+// 2026-09-09; his rewording of `lpn_file_import_geo` from 'Import xy to lat/lon…' to 'Open an xy
+// file on the map…' would have failed it on a change that broke nothing — the shape
+// dev/session-handoff.md §4 records as having cost three harnesses. What this spec is actually
+// about is WHICH ROWS ARE THERE AND IN WHAT ORDER, so it asserts the keys' own values, resolved
+// from the page at run time.
+const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_inp',
+	'lpn_file_import_geo', 'lpn_file_export_inp',
+	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_saveall', 'lpn_file_revert', 'lpn_file_close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
 		await a.goto();
+		const EXPECTED = [];
+		for (const k of EXPECTED_KEYS) { EXPECTED.push(await a.lang(k)); }
 		const rows = await a.menuRows('file');
 		const labels = rows.map(r => r.label);
 
 		report.eq(JSON.stringify(labels), JSON.stringify(EXPECTED), 'every row is present, in order');
 
-		const by = (l) => rows.find(r => r.label === l) || {};
-		report.ok(by('Save all').disabled, 'Save all is greyed with nothing to save all of',
+		// By KEY throughout, for the reason above the list.
+		const by = (k) => rows.find(r => r.label === EXPECTED[EXPECTED_KEYS.indexOf(k)]) || {};
+		report.ok(by('lpn_file_saveall').disabled, 'Save all is greyed with nothing to save all of',
 			'present-but-greyed, not hidden: a row that comes and goes teaches nobody it exists');
-		report.ok(by('Revert').disabled, 'Revert is greyed with no file to revert to');
-		report.ok(!by('Save').disabled, 'Save is live — this browser can connect to a file');
-		report.ok(!by('Save as…').disabled, 'Save as is always live');
-		report.ok(!by('New project…').disabled && !by('Open…').disabled && !by('Close').disabled,
+		report.ok(by('lpn_file_revert').disabled, 'Revert is greyed with no file to revert to');
+		report.ok(!by('lpn_file_save').disabled, 'Save is live — this browser can connect to a file');
+		report.ok(!by('lpn_file_saveas').disabled, 'Save as is always live');
+		report.ok(!by('lpn_file_new').disabled && !by('lpn_file_open').disabled && !by('lpn_file_close').disabled,
 			'New, Open and Close are always live');
 		// **Task 447: this row is never greyed either.** Its predecessor converted the OPEN project
 		// and had to be greyed on a project already on the map; this one opens a FILE into a new tab,
 		// so nothing on screen can make it impossible.
-		report.ok(!by('Import xy to lat/lon…').disabled,
-			'Import xy to lat/lon… is always live — it opens a file, and always into a new tab');
+		report.ok(!by('lpn_file_import_geo').disabled,
+			'the lat/lon row is always live — it opens a file, and always into a new tab');
 		// **NO FLY-OUT ANY MORE, AND THAT IS TASK 477 RATHER THAN A REGRESSION.** Task 264 gave this
 		// row a fly-out of templates; Task 477 replaced it with the New-project BOX, because the
 		// fly-out's rows were the CROSS of two questions and a third would have made eight of them.
 		// This assertion still read `submenu` and had been failing since 2026-08-27.
-		report.ok(!by('New project…').submenu,
+		report.ok(!by('lpn_file_new').submenu,
 			'New project… opens the New-project box, not a fly-out',
 			'Task 477 retired the fly-out: four questions in one box, not four rows');
 
@@ -52,16 +62,23 @@ exports.run = async function ({ browser, report }) {
 		// it was clicked in was already open on — so the same-anchor toggle branch fired and closed
 		// the menu instead of listing anything. A browser check because the bug was invisible to
 		// every static one: the row existed, its handler existed, and the handler ran.
+		//
+		// **THE ROW IS FOUND BY KEY.** It was matched on `/icon/i` against the row's own English
+		// until 2026-09-09, when `lpn_help_icons` became plain 'Toolbar' — a word with no "icon" in
+		// it — and all four checks below went red on a rename that broke nothing. A regex over
+		// visitor English is a pinned literal wearing a disguise, and it is the shape
+		// dev/session-handoff.md §4 records.
+		const ICONS = await a.lang('lpn_help_icons');
 		const help = await a.menuRows('help');
-		const iconsRow = help.find(r => /icon/i.test(r.label));
+		const iconsRow = help.find(r => r.label === ICONS);
 		report.ok(!!iconsRow, 'Help carries the toolbar-icon guide', help.map(r => r.label).join(' | '));
 		report.ok(iconsRow && iconsRow.submenu, '...as a fly-out row, which is what makes it openable');
 		await a.openMenu('help');
-		await a.page.evaluate(() => {
+		await a.page.evaluate((label) => {
 			const row = [...document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')]
-				.find(b => /icon/i.test(b.textContent));
+				.find(b => b.textContent.replace('▸', '').trim() === label);
 			if (row) { row.click(); }
-		});
+		}, ICONS);
 		await a.settle(400);
 		const guide = await a.page.evaluate(() => ({
 			open: document.getElementById('lpn_menu_popup2').style.display === 'block',

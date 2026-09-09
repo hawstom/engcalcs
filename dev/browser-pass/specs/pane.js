@@ -28,13 +28,24 @@ exports.title = '17. Bottom pane: the asset tables';
 // end of the strip is where an odd one out belongs rather than the front, standing between the
 // reader and the six things that are alike. It is also what lets the Print button hold the leading
 // edge, since print acts on a TABLE.
-const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'profile'];
-// The six that are tables, which is TABS without its last entry. Named rather than sliced at each
+//
+// **TEXT JOINED THE STRIP ON 2026-09-08 (Task 266) and is a TABLE like the other six.** A Text
+// object is our name for what EPANET calls a Label, and it now has a pane table of its own, sitting
+// seventh — after the six asset types, before the odd one out. Eight tabs, seven of them tables.
+const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'profile'];
+// The tab labels BY KEY, in the same order, so a rewording of any of them moves both ends at once
+// rather than turning this spec red — dev/session-handoff.md §4. Read off the pane's own specs in
+// js/looped-network.js; Text borrows the toolbar's Add-text name, which is why it is not a
+// `lpn_pane_tab_*` key.
+const TAB_LABEL_KEYS = ['lpn_pane_tab_junctions', 'lpn_pane_tab_reservoirs', 'lpn_pane_tab_tanks',
+	'lpn_pane_tab_pipes', 'lpn_pane_tab_pumps', 'lpn_pane_tab_valves', 'lpn_tool_add_text',
+	'lpn_profile_menu'];
+// The ones that are tables, which is TABS without its last entry. Named rather than sliced at each
 // use, so "which tabs share the one tip" is stated once.
-const TABLE_TABS = TABS.slice(0, 6);
+const TABLE_TABS = TABS.slice(0, TABS.length - 1);
 // What Elm Street Center holds. Read off the example file, not off the page, so a table that
-// listed every element would fail rather than agree with itself.
-const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2 };
+// listed every element would fail rather than agree with itself. `text` is its 11 `labels`.
+const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2, text: 11 };
 
 // The strip as the user sees it: the tab buttons in order, and which panel is showing.
 async function strip(page) {
@@ -93,11 +104,13 @@ exports.run = async function ({ browser, report }) {
 		await a.toolbarClick('Bottom panel');
 		await a.settle(400);
 
-		// ---- 1. SEVEN TABS, in the toolbar's own Add order -------------------------------------
+		// ---- 1. EIGHT TABS, in the toolbar's own Add order -------------------------------------
 		const s0 = await strip(a.page);
-		report.eq(s0.ids.join(','), TABS.join(','), 'seven tabs, the six assets in Add order and then Profile');
-		report.eq(s0.labels.join(' | '),
-			'Junctions | Reservoirs | Tanks | Pipes | Pumps | Valves | Profile',
+		report.eq(s0.ids.join(','), TABS.join(','),
+			'eight tabs, the six assets in Add order, then Text, then Profile');
+		const wanted = [];
+		for (const k of TAB_LABEL_KEYS) { wanted.push(await a.lang(k)); }
+		report.eq(s0.labels.join(' | '), wanted.join(' | '),
 			'...and each is named by its own plural');
 		// **ONE PANEL PER TAB, NOT ONE ORDER.** The panels are in the MARKUP's order and the tabs are
 		// in the strip's, and since Task 511's re-read those two genuinely differ: the profile panel
@@ -109,7 +122,7 @@ exports.run = async function ({ browser, report }) {
 		// One tip serves all six tables — the translation budget was the design decision (Task 455).
 		// Profile is excluded by NAME rather than by position: it is a drawing, and its tip says so.
 		const tableTips = new Set(TABLE_TABS.map(id => s0.tips[s0.ids.indexOf(id)]));
-		report.ok(tableTips.size === 1, 'one tip is shared by all six table tabs', [...tableTips].join(' / '));
+		report.ok(tableTips.size === 1, 'one tip is shared by every table tab', [...tableTips].join(' / '));
 		report.ok([...tableTips][0] && [...tableTips][0].length > 10, '...and it is a real sentence', [...tableTips][0]);
 
 		// ---- 2. EVERY TAB OPENS ITS OWN PANEL, AND ONLY ITS OWN --------------------------------
@@ -139,7 +152,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(250);
 		const tanks = await table(a.page, 'tanks');
 		report.ok(tanks.rows === 0 && tanks.note.length > 5,
-			'a type this network has none of says so, in one message that serves all six', tanks.note);
+			'a type this network has none of says so, in one message that serves them all', tanks.note);
 
 		// ---- 4. A RESULT CELL IS NOT A TEXT BOX ------------------------------------------------
 		await a.page.click('#lpn_pane_tab_pipes');
