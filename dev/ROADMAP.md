@@ -531,39 +531,27 @@ the block.
   Tom, 2026-08-26, with a screenshot of two node labels whose leaders cross: *"This might be
   forgiveable if it looked difficult or impossible. But when it looks so easy (to a human) to
   resolve, it's embarrassing."* **That is the right test and it is the one to build against** — not
-  "are the labels legible" but "would a person looking at this see an obvious fix we missed".
-  - **His strategy, and the name is his:** *"can two nearby nodes be labeled as a gang in a
-    direction that makes their leaders mutually clear each other's nodes? Maybe we call this the
-    gang neighbor nodes strategy."* Three ingredients he lists: **(a)** knowledge of the most-open
-    sectors, **(b)** full awareness of the immediate vicinity of the labels, **(c)** parallel
-    leaders and/or label stacking.
-  - **What makes this different from every previous label pass** is that it optimises a PAIR (or a
-    small cluster) rather than one label at a time. `shedAlignedForConflicts()` places one label,
-    then treats it as an obstacle for the next — which is why two labels can each be locally
-    reasonable and jointly absurd. A gang move has to consider both placements together.
-  - **HIS OWN RULE, 2026-08-26:** *"Maybe it's as simple as, if two leaders cross or if a label
-    crosses a leader, try stacking their labels."* Two triggers, one remedy, and the second is the
-    one the first would miss.
-  - **He marked FIVE gangs on one screenshot of Net3-World** (A–E, 2026-08-26): four pairs of near
-    neighbours whose leaders splay apart, and one cluster near the reservoir where three labels
-    compete for the same open sector.
-  - **PHASE ONE IS BUILT AND THE NUMBERS ARE IN `dev/label-placement-algorithms.md` §8** —
-    `Collide.labelCrossings()` plus `dev/lpn-spike/label-crossing-harness.js`, measuring every
-    shipped example at four zooms. **Read §8 before designing phase two**, with the survey it sits
-    in: a crossing pair is the conflict-graph case §6 covers, and Task 400 parked that only for
-    lack of real-world feedback. The findings, one line each: Net3-World holds exactly five
-    node-label gangs at the fit zoom, four pairs and one triple, which is the shape Tom marked;
-    **9 leader-leader crossings against 76 label-on-leader across 28 measured drawings**, so the
-    cheap test alone would see a tenth of the problem; and the count is a fact about a VIEW, so
-    phase two is judged on one stated view before and after.
-  - Phase two is therefore a COMPARISON and needs no absolute target: stack a flagged gang,
-    re-measure the same view, and the count falls or the strategy is wrong.
-  - **RAISED TO 100 BY TOM, 2026-09-08, with a deadline and a method**: *"If we are going to try to
-    squeeze this distraction in before 17 Sep, It's now or never."* He sketched a geometry-aware
-    approach at length and offered brute force as the alternative, asking that both be tried. **His
-    sketch is recorded in full in `dev/label-placement-algorithms.md` §9** rather than here, per the
-    length rule; the one thing that belongs on this line is that **he authorized re-opening the dev
-    control knobs** if phase two needs them.
+  "are the labels legible" but "would a person looking at this see an obvious fix we missed". The
+  strategy and the name are his: *"can two nearby nodes be labeled as a gang in a direction that
+  makes their leaders mutually clear each other's nodes?"*
+  - **PHASES ONE AND TWO ARE BUILT AND MEASURED; `dev/label-placement-algorithms.md` §8 AND §10 HOLD
+    THE NUMBERS.** Phase two is `Collide.repairCrossingGangs()`, a repair pass after every other
+    placement, with BOTH of the routes he asked for measured against each other by
+    `dev/lpn-spike/label-gang-harness.js`. **Net3-World, the drawing he marked five gangs on, goes
+    from 7 flagged pairs to 5 at the fit zoom and from 43 to 31 over four zooms**; Net3 (XY) 29 to
+    23. Elm-Street does not move because 14 of its 18 node labels are hand-placed, which is the
+    right answer.
+  - **The gang route — order the stack by the ANGLE of each label's node — is the whole of the gain
+    at his fit zoom** (7→5, against 7→7 for brute force alone). The routes fix different views and
+    neither dominates, so both ship.
+  - **WHAT IS OPEN IS HIS OWN FLAG: `spot_prime`** (§9b: *"I waved my wand over finding spot-prime;
+    if it's hard, let me know."*). It is deliberately NOT built. The stack is hung where the gang
+    already stands, so the pass needs no search for open ground — and that is what produced the
+    numbers above. **A search for open real estate is a much larger build and the case for it is now
+    a judgment about the remaining pairs, not about the strategy.** His call, on §10c.
+  - **Also open, and cheap to answer with the harness in place:** whether the remaining flagged
+    pairs are worth another pass, and whether he wants the dev control knobs re-opened (he
+    authorized it) to look at them.
 
 
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**

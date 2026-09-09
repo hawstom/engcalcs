@@ -398,9 +398,136 @@ only once for the network"*.
 - **Settled**: both routes get built and measured against each other; §8's per-view crossing count
   is the measurement; the dev control knobs may be re-opened for the experiment.
 - **Not settled, and his own flag**: how `spot_prime` is found. Report back before building it.
-- **Not stated either way**: whether the geometry route replaces `shedAlignedForConflicts()` or
-  runs as a repair pass after it. The repair-pass shape is the cheaper experiment and preserves
-  every measurement in §8, so that is the one to try first unless he says otherwise.
+- **Not stated either way, and now decided**: it is a REPAIR PASS after `shedAlignedForConflicts()`
+  and after every other placement, which preserves every measurement in §8. See §10.
+
+---
+
+## 10. What phase two built, and what the two routes measure (Task 539, 2026-09-09)
+
+Both routes are built, both are measured, and they are one function:
+`Collide.repairCrossingGangs()` in `js/lpn-collide.js`, called from `runLabelCollisionAvoidance()`
+after every other placement pass. `dev/lpn-spike/label-gang-harness.js` runs a shipped example four
+times over -- repair off, brute alone, gang alone, both -- and prints the columns side by side;
+`dev/lpn-spike/label-crossing-measure.js` is the measurement both label harnesses share, so there is
+one sample and not two.
+
+**It is a REPAIR PASS, per §9d.** Nothing that placed a label before it changed, so every number in
+§8 is still the "off" column of the table below.
+
+### 10a. The table. Pairs per view, every label field on, solved through EPANET
+
+Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it.
+
+| drawing | off | brute | gang | both |
+|---|---|---|---|---|
+| Net3-Novato-CA-World | 7 / 19 / 12 / 5 | 7 / 16 / 8 / 4 | 5 / 18 / 10 / 3 | **5 / 16 / 8 / 2** |
+| Net3 (XY) | 15 / 8 / 5 / 1 | 15 / 6 / 5 / 0 | 12 / 9 / 3 / 1 | **12 / 8 / 3 / 0** |
+| Net2 | 5 / 0 / 0 / 0 | 4 / 0 / 0 / 0 | 5 / 0 / 0 / 0 | **4 / 0 / 0 / 0** |
+| Net1 | 1 / 1 / 0 / 0 | unchanged | unchanged | unchanged |
+| Elm-Street-Center | 5 / 3 / 1 / 1 | unchanged | unchanged | unchanged |
+| Basic example, either unit set | 0 throughout | 0 | 0 | 0 |
+
+**Five findings, and the third is the one that decided the design:**
+
+1. **The count falls on the drawing Tom marked.** Net3-World at the fit zoom goes 7 pairs to 5, and
+   over its four views 43 to 31. Net3 (XY) goes 29 to 23 over its four. That is the comparison §8
+   asked for and the strategy passes it.
+2. **The two routes fix different drawings, and neither dominates.** At the fit zoom of Net3-World
+   the gang route alone takes 7 to 5 and the brute route alone takes 7 to 7; at 2x the brute route
+   alone takes 19 to 16 and the gang route alone takes it to 18. His intuition that geometry would
+   be "the better approach or a key to optimizing the brute force effort" is half-confirmed: on the
+   view he was looking at, geometry is the whole of the gain.
+3. **THE MODEL AND THE DRAWING HAVE TO AGREE ABOUT WHAT IS ON THE MAP, and getting that wrong is
+   worth more than either route.** The first working version RAISED Net3-World's fit-zoom count from
+   7 to 9, because the repair counted pipe labels that `yieldStationedLabels()` was about to hide,
+   and moved good labels to clear conflicts no reader would ever see: 11 pairs in the model against
+   7 on the screen. Two corrections, in this order, and after both the model reproduces the drawn
+   count exactly on every view of Net3-World:
+   - a yielding label is on the map only while no node label is standing on it, asked PER TRIAL,
+     because a move that lifts a node label off a pipe label reveals it and a revealed label can be
+     crossed;
+   - `hiddenShort` is written at render time and describes the PREVIOUS layout. Reading it wrote off
+     60-odd pipe labels at the 2x zoom that this layout draws, and turned the over-count into an
+     under-count.
+4. **A hand-placed label is never touched, and that is why Elm-Street does not move.** 14 of its 18
+   node labels carry `lx`, so they are the user's; the repair declines them all and its five flagged
+   pairs stand. That is the correct answer, not a shortfall.
+5. **A view can come out one pair worse while the drawing comes out better** -- Net3 (XY) under the
+   gang route alone runs 15/8/5/1 to 12/9/3/1. The zooms are read in sequence and
+   `shedAlignedForConflicts()` seeds each pass from where the last layout put things, so a repair at
+   one zoom changes what is shed at the next. The harness therefore asserts no rise over the four
+   views together, and prints the per-view rises rather than hiding them.
+
+### 10b. What the scorer will not do, and the two costs
+
+- **A trial may not spend a hard overlap to buy a crossing.** A crossed leader is ugly; a number
+  printed on a node symbol or on another label is unreadable. Blocked and label-on-label are a
+  GATE at the layout's own level, and the crossing count is the ranking inside what that gate
+  allows. Ranked the other way round -- crossing first, overlaps as a mere cost -- the repair bought
+  back, one gang at a time, exactly what the first-fit had refused.
+- **BOTH ROUTES RUN ON EVERY PASS, DRAG FRAMES INCLUDED, and the cheaper split was tried and
+  reverted.** Giving a drag frame the gang route alone looks free -- it re-deals slots the first-fit
+  already found room for, so it costs a handful of layouts per gang -- but it cannot reproduce a
+  side the brute route chose, and `dev/lpn-spike/node-yield-harness.js` failed at once: 34 node
+  labels moved between a content pass and the frame after it. That harness holds the ruling that a
+  node label's place is a pure function of the drawing, and on screen the same thing is a label
+  springing back for the length of a drag and landing again on the way out.
+- **The measured cost on an idle machine is under 1 ms a pass on the small examples and 19-58 ms on
+  Net3-World with every field on**, against 25-90 ms for ONE of the four to six
+  `placeLabelsFirstFit()` calls that same pass already makes for the shed cascade. The first pass in
+  a process runs several times that and is the JIT, not the drawing. Both figures are Node with the
+  DOM stub, so they are indicative and not a browser measurement -- and on a loaded machine they
+  swing by a factor of four, which is worth knowing before anybody re-measures and panics. Three
+  things got the pass there from 2.3 s: score against the gang's own
+  neighborhood rather than the whole drawing (exact, because everything a member can reach is
+  inside its own radius); cache each label's boxes, its obstacle verdict and its leader length per
+  candidate endpoint, since nothing but the gang moves during a search; and put one circle round a
+  whole staircase before asking sixteen oriented-box questions about it.
+- **The cartesian product is bounded, and the bound is not a truncation.** Every combination while
+  there are at most 64 of them, and above that two rounds of one-member-at-a-time. Cutting the
+  odometer off at N would vary the first member and never the last, so the third label in a gang of
+  three would silently never be tried.
+
+### 10c. `spot_prime` is NOT built, and this is the report he asked for
+
+§9b is unbuilt by design: *"I waved my wand over finding spot-prime; if it's hard, let me know."*
+It is hard, but that is not the reason to stop. **The reason to stop is that phase two got its gain
+from the half of his sketch that needs no `spot_prime` at all** -- step 4, the angle ordering --
+because a gang's existing slots are open ground the first-fit has already found. Everything below is
+what a build would have to answer, so the decision is his and not a shrug.
+
+**What finding it would take, and the three things that make it a real build:**
+
+1. **Free space is a per-VIEW quantity, and his "once for the network" is where the sketch and §8
+   part company.** §8's third finding is that the crossing count is a fact about a view: link labels
+   appear, shed and vanish with the zoom, and a stationed label yields to a node label placed this
+   pass. So the obstacle field a `spot_prime` index would describe is not stable across zooms, and a
+   tile-indexed precomputation gives an index of the DRAWING, not of the view being labeled. It
+   would still be worth having -- it bounds where to look -- but it cannot be the answer on its own.
+2. **The search itself is the standard one and is not novel work**: largest empty rectangle over an
+   obstacle set, or the raster form Luboschik's particle-based labeling uses (§2), which is closer
+   to what this page could afford. His three extreme boxes per spot -- tallest skinny, widest squat,
+   biggest square -- are exactly the shape a rectangle search returns, so his framing is right.
+3. **`text_size_largest_perfect_fit` is the largest item in the sketch and is separable.** It is a
+   search over the whole drawing, at several text sizes, for the size at which every label places
+   without breaking a rule. That is a different feature from the gang move -- it is an automatic
+   text size -- and it should be judged on its own merits rather than ridden in on this task.
+
+**What the numbers say about whether it is worth it.** The pairs that remain after phase two are 5
+at the fit zoom of Net3-World and 12 on Net3 (XY). Of the ones inspected: some are Elm-Street's
+hand-placed labels, which nothing may move; some are a node label against a pipe label whose own
+position is fixed to its pipe. A `spot_prime` search would help the third kind -- a gang with no
+open ground within its own candidate reach -- and nobody has yet counted how many of the remainder
+are that kind. **That count is the cheap next measurement and it is the one to take before
+building anything**, because it is the difference between a feature and a search that finds nothing
+to do.
+
+**Recommendation: stop here and show him the drawing.** His own test is "would a person looking at
+this see an obvious fix we missed", and that is a question for his eyes on a real view, not for
+another number. If he wants more after looking, the order that costs least first is: count the
+remaining pairs by kind; widen the candidate list the brute route already searches; and only then
+search for open ground.
 
 ---
 
