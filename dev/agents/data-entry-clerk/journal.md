@@ -772,6 +772,48 @@ English — a sentence that was true of a plan and false of the product.**
    version before row creation by paste exists** — it is the sentence CLAUDE.md's own struck-claims
    section warns against writing before the code backs it.
 
+## Sixth invocation, 2026-09-09 — Task 610: the pipe-vertex cell format, on Tom's direct request
+
+Tom read my wishlist, said *"I am sympathetic"* to widening Task 186/610 for row creation, and set
+three conditions, one of which names this seat by name: *"pipe vertices need a stated cell format,
+which the `data-entry-clerk` must specify... before anything is built."* Full spec, with every
+citation, is in `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md` — this entry is the
+short version and the one finding worth flagging on its own.
+
+**OBSERVED, and the reason I did not ship the WKT-shaped format I started from:**
+`js/looped-network.js:29060-29071`, `libPasteCells()` — the function the journal already expected
+paste-IN to reuse — falls back to `t.split(/[\s,;]+/)` on any pasted LINE with no tab character in
+it. A clerk who copies ONLY the vertices column from their own spreadsheet (an ordinary thing to
+do) produces exactly that: no tabs, one column. A WKT-shaped cell (comma between points, space
+within a point) would be shredded by the very parser meant to read it. I picked a single `/`
+separator, flat list, pairs read positionally — outside `[\s,;]+`, outside the sign character `-`
+that a negative longitude collides with, and cheaper to type than the nested form besides. Full
+reasoning, including why I still cite WKT for its punctuation shape while overriding its axis
+order with CLAUDE.md's own lat/lon-is-public rule, is in the spec file.
+
+**One thing I flagged that was not asked for but bears on it directly:** a pasted geographic
+vertex needs the same `_xsrc`/`_ysrc` source-token marking `js/lpn-inp.js:1163-1174` already gives
+a `.inp`-imported one, for the same reason CLAUDE.md's own "ONLY THE USER TOUCHES A FILE'S
+NUMBERS" section states — a paste is the user's number exactly as much as a file's is, and
+`mercY`/`mercLat` is a real nonlinear projection, not a rounding nicety, so an unmarked pasted
+vertex will drift on the next open-and-resave the same way an unmarked `.inp` vertex used to.
+
+**On Tom's own two other conditions:** I endorse the Junction-table coordinate columns without
+reservation — it is the oldest gap this seat found, first invocation, 2026-09-04, and the vertex
+format has nothing to attach to without it. I endorse the paste-refusal condition too, but
+recommend the refusal fire on a validate-the-WHOLE-block pass BEFORE any row is written, all rows
+committing together or none — never a partial commit that stops mid-paste, because a half-created
+network with dangling pipe references costs a clerk far more to untangle than a full re-paste
+after fixing a spreadsheet. Reasoning, including why this differs from today's scalar-paste
+refusal (which is fine leaving a refused cell inert), is in the spec file's §2.2.
+
+**On Ctrl+Shift+PageUp/PageDn:** worth it, ranked where I already had it (behind range-copy,
+arrow-nav, paste-onto-existing-rows, Home/End — fourth invocation). One addition: it must restore
+each tab's own last selection state rather than resetting to cell A1, since the per-tab selection
+state the range-copy work already needs (fourth invocation) makes that free once it exists.
+
+— Declan
+
 **Placement, not just wording — flagging this since it changes what "the tip" even means here.**
 `lpn_pane_tab_tip` is a HOVER tip on the tab button itself (`title=`-shaped, reached the same way
 every other toolbar tip is). Given how low the discovery rate for a hover-only tip is on a strip

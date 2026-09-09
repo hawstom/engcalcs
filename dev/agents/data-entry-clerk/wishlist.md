@@ -216,3 +216,17 @@ this session whether that half changed; not re-checked). **Ranking unchanged** �
 still behind nothing I found reason to move it behind — but the size of the remaining gap is
 smaller than when I wrote the original entry, and a future invocation should re-verify the
 From/To and X/Y claim before repeating it, since the paste mechanism clearly moved since 2026-09-04.
+
+## UPDATE 2026-09-09 to item 1: Task 610 split out, gated on this seat's own cell-format spec — delivered
+
+Task 186 was split; the row-CREATION half is now Task 610, and Tom read this wishlist and wrote
+*"I am sympathetic,"* then set three conditions, one naming this seat directly: pipe-vertex cells
+need a stated format before anything is built. **Delivered in full**:
+`dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md` — the cell format (single `/`
+separator, flat list, lat/lon or x/y per project type per CLAUDE.md's coordinate-order rule, why
+a WKT-shaped nested format would be shredded by `libPasteCells()`'s own whitespace fallback on a
+vertex-only paste), my endorsement of the Junction-coordinate-columns condition (no reservation —
+it is the oldest gap I found, first invocation), and my recommendation on the ID/endpoint refusal
+condition: validate the whole pasted block before writing anything, refuse the whole paste on any
+row's failure, never a partial commit — the row-340-of-400 question the task asked me to answer.
+Journal, sixth invocation, has the short version and the reasoning.
