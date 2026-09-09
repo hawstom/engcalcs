@@ -184,50 +184,104 @@ Copy of this."* Do not start a second file, and do not rewrite a `RULE` line he 
   the only reason it was noticed. **Bound a scripted block replacement by LINE NUMBERS you have
   just printed, never by `index()` of the next heading you assume follows.**
 
-## 4. STATE — written 2026-09-08, sixth session
+## 4. STATE — written 2026-09-09, after a long orchestration session
 
-**Tom's two 2026-09-08 messages are the worklist**, item by item in
-`dev/tom-2026-09-08-worklist.md` with DONE / RUNNING / NOT STARTED against each. Read that first.
+**Everything below is on `origin/master` and the tree is green.** Read the counts from the scripts,
+never from this line.
 
-- **THE PARENT SITE hawsedc.com HAS NO CLONE AND NO ORIGIN. Production is the only copy**
-  (Tom, 2026-09-08). That is a single point of failure and it outranks the repository split he
-  asked about: get a second copy off that host, then give it an origin, then split it whenever.
-  **Its history is unvetted for secrets**, so a GitHub origin must be PRIVATE. He also cannot reach
-  it over SSH on port 22.
-- **AI commits carry `--author="Claude Code for Tom Haws <tom.haws@gmail.com>"`** (CLAUDE.md).
-- **Style guide is APA, not Oxford.** `dev/language-strings.md` has the list.
-- **THE TRANSLATION SPRINT IS AUTHORIZED IN THIS CONVERSATION AND IS GATED ON TOM'S READING, NOT
-  ON US.** `new_english_keys.php` says **61 still to read, 84 untranslated** after the second lpn
-  batch; `detect_english_drift.php` says 132 changed. Launching before he has read them is what
-  sprint 459 threw away. Read the count from the script, never from this line.
-- **Screenshot 0082.PNG is in `dev/screenshots/`** and is Tom's centerpiece (Task 612). NOT DONE.
-- **The favicon concepts are waiting on Tom's eyes, not on code**
-  (`dev/icon-preview/concepts-2026-09-08b.html` is a preview, not an approval).
-- **`dev/positioning.md` §6 cites epanet-js as precedent for our LibreEPANET name.** His 2026-09-08
-  ruling on the EPANET name undercuts that precedent; ask him before editing. The market
-  researcher re-verified the licence facts that day and the file is NOT stale: EPANET is public
-  domain, the epanetjs.com app is FSL-1.1-MIT, the toolkit we vendor is plain MIT. **New finding**:
-  the upstream repo now mixes MIT with FSL-1.1-MIT for post-fork contributions, and
-  `js/vendor/README.md`'s upgrade steps carry no licence re-check.
-- **DELETE THESE ONCE CHECKED — they were state and are now history.** The lpn naming beacon IS
-  wired (`d740aa20`, verified at `js/looped-network.js:18901` and :21386). Both agent worktrees are
-  gone. Task 266 is CLOSED on Tom's own browser pass.
+### The two repositories
+
+- **engcalcs is clean.** Five lpn batches landed, a 26-language sprint closed, and `check_all.sh`
+  passes. **5 English keys still to read, 6 untranslated, 137 CHANGED** -- that last number is
+  PRE-EXISTING drift needing a RESYNC sprint, not a delta, and no urgency was attached to it.
+- **THE PARENT SITE `hawsedc.com` WAS DOWN FOR WEEKS AND NOBODY KNEW.** Twelve pages in
+  `addon_html/hawsedc.com/gnu/` called `echoHawsEDCHeader()` while requiring `edc.lib.php`, which
+  loads engcalcs and does not define it. Fixed. **The lesson is not the bug, it is that nothing was
+  looking**, which is why `~/check.sh` now exists.
+- **`/home/jconstru` is NOT huge and NOT unbacked** -- 246 commits, 60 MB, a Bitbucket origin over
+  port 443. Tom asked about splitting it; **the answer is don't.** `addon_html/<domain>/` already
+  separates the sites, librewaternet.org and not-epanet.org are already their own repos, and npsge is
+  13 files. What made it look like a mess was 2,105 staged-but-uncommitted renames plus four
+  `.gitignore` rules pointing at pre-move paths. Both fixed.
+
+### The server, which is reachable now
+
+- **`ssh jconstru`** works from this machine (74.81.90.155 port **15554**, key auth, alias in
+  `~/.ssh/config`). Every other SSH port is firewalled.
+- **`~/check.sh`** fetches 613 URLs across 12 docroots and mails only on failure; cron 04:20 daily.
+  Run it by hand with `ssh jconstru 'sh ~/check.sh -v'`.
+- **CRON MAIL HAD BEEN DEAD FOR YEARS AND 800+ BOUNCES PROVE IT.** `minter.nocdirect.com` publishes
+  no SPF, so Gmail rejected every `MAILTO` message; the log-chain alarm could never have reached
+  him. **Pointing MAILTO at a forwarder does NOT fix it** -- measured -- because forwarding keeps the
+  original envelope sender. The fix is `~/cronmail.sh`, which sets `-f tom@hawsedc.com`; all four
+  jobs now pipe through it and Tom confirmed delivery.
+- **`git push` on that host is blocked by this session's sandbox.** Tom pushes.
+
+### Rulings Tom made this session — do not re-ask
+
+- **The four seats have NAMES and he was not joking**: Sue (utility-planning-engineer), Declan
+  (data-entry-clerk), Mary (market-researcher), Franco (utility-field-operator). **Each name is now
+  the first line of that agent's own journal**, because the journal is the only file it reads.
+- **A catalogue name may keep its English beside the translation** (`dev/language-strings.md`), and
+  **prefer what the trade prints over a nativized paraphrase** -- Turkish `Swing çek vana`, sourced
+  by Sue to seven manufacturers, replaced our `Menteşeli çek vana`.
+- **`$ec_lang_syn` IS NOT A COMMENTARY CHANNEL.** He caught an orchestrator putting prose right of
+  the pipe: *"I didn't intend _syn to be a dictionary, encyclopedia, or commentary."* The rule was
+  already written at `dev/language-strings.md:190` and says commentary uses a CLOSED TAG VOCABULARY.
+- **"Limiting potential" is purged**; EPANET's own help says Limiting Concentration. The `.inp`
+  keyword is untouched, because it is the file format.
+- **Net1 keeps its two rules and the gallery entry was renamed** so it stops claiming to be plain
+  EPA Net1.
+- **Go to accepts `38,122` and `38.122`**, overruling a refusal, and he rejected the tip
+  clarification: *"nobody thinks that a single number is a lat/lon."*
+- **Help wording is "use Help"**, bypassing the two-Help-buttons design flaw rather than encoding it.
+- **`wt-wide-long-walk` is the approved icon**, plus a wanted `wt-wide-long-walk-L`.
+
+### TRAPS MEASURED THIS SESSION — each cost real time
+
+- **THE HARVESTER WAS BLIND TO HIS RULINGS BECAUSE THE RULE TOLD YOU TO COMMIT THEM FIRST.**
+  `CLAUDE.md` says commit his marks verbatim before anything else; `harvest_english_rulings.php`
+  diffed against `HEAD`. Obeying the rule made the script report "nothing unharvested" about a file
+  full of his handwriting. **It takes `--baseline=HEAD~1` now**; use that immediately after
+  committing his marks. Two correct halves, one silent loss.
+- **THREE HARNESSES PINNED ENGLISH WORDING AS LITERALS AND BROKE ON HIS REWORDINGS.**
+  `fittings-harness.js` asserted `/none of them changed/`; `reaction-globals-harness.js` asserted
+  `/Limiting potential/i`; `dev/browser-pass/specs/goto.js` carried four copies of `lpn_goto_bad`.
+  **Assert against `EngCalcs.pageConfig.<key>`**, which the DOM stub loads from the real language
+  file. There are probably more: it is a countable construct and worth a sweep.
+- **FOUR BUGS SHIPPED WITH GREEN HARNESSES AND BROKEN BROWSERS** in one batch. Each time the stub
+  removed the coupling: `getBoundingClientRect()` returned a constant whatever was written to
+  `style.left`, so a box could never be found to be off-screen; no harness combined `addText()` with
+  an open pane; a ResizeObserver was never flushed. **Teach the stub the one physical relationship;
+  do not add assertions.**
+- **A FLICKERING CURSOR WAS AREA, NOT A RACE.** 23,821 sampled points: draggable labels claim 6.5%
+  of the canvas with `move` while everything saying `pointer` claims 3.2% and node discs just 0.2%.
+  Zero mutations, zero `style.cursor` writes. **Instrument before believing "the browser is slow."**
+- **`dev/browser-pass` IS NOT RUN BY `check_all.sh` AND HAS ROTTED** -- `find`, `pane`, `toolbar`,
+  `setbox`, `smallscreen`, `place` all carry stale expectations. Same shape as the site being down:
+  nothing was looking.
+- **TWO PRESSURE CONVERSIONS EXIST AND NOTHING COMPARES THEM.** `js/lpn-inp.js` has
+  `PSI_M = 0.703070` (EPANET's 2.3067 ft/psi, correct for the file) against `$ec_units`
+  `0.70324961`. `unit_factor_check.php` reads the PHP only. An edited emitter coefficient moves by
+  ~4e-7; an untouched one is exact by pass-through.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-1. **Tom's browser pass on the second lpn batch** (`c25b6410`) -- eight numbered checks were given
-   to him and none has been confirmed. The pipe/pump grab band is the one to hear about first: it
-   ships at `LPN_LINK_HIT_PX` = 12 screen px and the right width is a judgement only he can make.
-2. **Task 539 gang labels, at 100 with a deadline.** His sketch is `dev/label-placement-algorithms.md`
-   §9, verbatim; his own flag on it is that he waved his wand over finding `spot_prime` and wants to
-   be told if that part is hard. **Report back before building it.** The `utility-field-operator` was
-   asked on 2026-09-08 whether crossing leaders is even the right defect to spend the nine days on.
-3. Task 611 library import; Task 599 time series; Task 592 CSV junction import; Task 247 customers
-   first slice. **All on `js/looped-network.js`, so sequential** -- see §7.
-4. Translation sprint once he has read, then `detect_english_drift.php --baseline-new`.
-5. Task 612 screenshot placement. CLAUDE.md's `web_manifest_check.php` row still describes the old
-   `/app` ratchet, and `README.md:137` and `dev/hosting-layout.md` §3 predate the canonical
-   consolidation.
+1. **Tom's browser re-test of the cursor**, with the pipe/pump grab band riding along -- he could not
+   judge the 12 px band without pointer feedback. Then the five things nobody has seen: top-edge
+   overhang, the Properties title bar, "Attached" in the Tables alignment cells, Go to keeping its
+   zoom, Save locked during the wizard.
+2. **His open decision on labels**: they claim 6.5% of the canvas with the `move` cursor, which is
+   the pan cross he complained about. One line to change, his call.
+3. **Sue's thirteen glossary entries** are drafted in her journal, four sourced and nine deliberately
+   left unsourced rather than guessed. Applying them is a decision, not a chore.
+4. **Task 539 gang labels, at 100 with his deadline.** His sketch is `dev/label-placement-algorithms.md`
+   §9 verbatim; Franco disagrees with the sizing and says the masked foreign leader is the dangerous
+   case. **Report back before building `spot_prime` -- he flagged it himself.**
+5. Task 611 library import; Task 599 time series; Task 592 CSV import; Task 247 customers. All on
+   `js/looped-network.js`, so sequential.
+6. A resync sprint for the 137 CHANGED keys, then `detect_english_drift.php --update`.
+7. Task 612 screenshot placement, and `wt-wide-long-walk-L` on the icon sheet.
 
 ## 7. THINGS NOT TO DO
 
