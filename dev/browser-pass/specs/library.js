@@ -6,6 +6,14 @@
 // doesn't sound right to me. What we have now plus the lpn group (Libraries, Settings, Transport,
 // and Time selectors) seems like the right way to go."*
 //
+// **THE LIBRARIES BUTTON LEFT THE STRIP ON 2026-09-06, in Tom's own commit c4f195c0 ("Four commands
+// leave the toolbar") along with Save as…, Profile and Tables.** The box did not change; only its
+// door did, and the row was always there beside it. So the group checks below are now about what is
+// LEFT on the strip — Settings alone, then Calculate and the transport — and Tom's 2026-08-21
+// ordering (*"Settings Libraries | Profile Tables | Run"*) is asserted on the Water MENU, which is
+// the surface that still carries all of it. Everything from "THE BOX" down is unchanged except for
+// how the box is opened.
+//
 // **THE GROUP IS A DOM FACT AND THE ORDER IS A DOM FACT, so both are measured here rather than
 // asserted in a comment.** A group on this strip is one `.lpn-toolbar-group`, and the whole point
 // of it is that a narrow window wraps WHOLE groups: two adjacent groups look identical to one group
@@ -36,28 +44,43 @@ exports.run = async function ({ browser, report }) {
 					(c.getAttribute('aria-label') || c.textContent || '').trim())
 			}));
 		});
-		const net = strip.find((g) => g.items.indexOf('Libraries') >= 0);
-		report.ok(!!net, 'there is a group holding Libraries',
+		//
+		// **FOUR COMMANDS LEFT THE STRIP ON 2026-09-06, and Libraries was one of them.** Tom's own
+		// commit c4f195c0 took Save as…, Libraries, Profile and Tables off the toolbar: they are
+		// things you OPEN beside the project rather than tools you draw with, and each still has its
+		// menu row. So the group this section was written about — Settings then Libraries, followed
+		// by Profile | Tables — no longer exists, and the toolbar's water-network group is Settings
+		// alone. What survives of Tom's 2026-08-21 ordering is asserted where it now lives: the
+		// Water MENU, which is the surface he gave in the same line.
+		const LIB = await a.lang('lpn_library_menu');
+		const SET = await a.lang('lpn_tool_settings');
+		const net = strip.find((g) => g.items.indexOf(SET) >= 0);
+		report.ok(!!net, 'there is a group holding Settings',
 			JSON.stringify(strip.map((g) => g.items)));
+		report.ok(!!net && net.items.indexOf(LIB) < 0,
+			'...and Libraries is NOT on the strip — it is opened, not drawn',
+			net && net.items.join(' | '));
+		{
+			// The order Tom asked for, on the surface that still carries it: *"Settings Libraries |
+			// Profile Tables | Run"*. The separators are the request as much as the sequence — what
+			// the project IS, what you READ beside it, what you RUN on it.
+			const water = (await a.menuRows('project')).map((r) => r.label);
+			const PROF = await a.lang('lpn_profile_menu'), TAB = await a.lang('lpn_tables_menu');
+			report.ok(water.indexOf(LIB) >= 0, 'the Water menu carries Libraries', water.join(' | '));
+			report.ok(water.indexOf(PROF) >= 0, '...and Profile', water.join(' | '));
+			report.ok(water.indexOf(TAB) >= 0, '...and Tables', water.join(' | '));
+		}
+		// The strip's own remaining group is still checked: Settings sits alone in it and is not
+		// in the right-aligned end group.
+		report.ok(!!net && net.items.join(' | ') === SET,
+			'the water-network group is Settings, and only Settings', net && net.items.join(' | '));
+		report.ok(!!net && !net.end, 'it is not the right-aligned end group', net && String(net.end));
 		if (net) {
-			// **TOM'S ORDER, EXACTLY — AND IT IS THREE GROUPS, NOT ONE** (Task 511). He gave both
-			// surfaces in one line on 2026-08-21: *"Settings Libraries | Profile Tables | Run"*, and
-			// the separators are the request as much as the order is — what the project IS, what you
-			// READ beside it, what you RUN on it. This check asserted a single group in an older
-			// sequence (Libraries first, the transport folded in with it), which is the shape the
-			// strip had before it was made to mirror the Project menu.
-			//
-			// Written out rather than checked for membership: the order IS the request, and a set
-			// comparison would pass on a group holding the right controls in the wrong sequence.
-			report.eq(net.items.join(' | '), 'Settings | Libraries',
-				'the water-network group is Settings then Libraries, mirroring the Project menu');
-			report.ok(!net.end, 'it is not the right-aligned end group', String(net.end));
+			// What you RUN on the project is still a group of its own, immediately after it.
 			const after = strip.slice(net.i + 1).filter((g) => !g.end).map((g) => g.items.join(' | '));
-			report.eq(after[0], 'Profile | Tables',
-				'...followed by what you READ beside the project, in its own group');
-			report.ok(/^Calculate \| Step back \| Play \| Step forward \| Time \| Speed$/.test(after[1] || ''),
-				'...and then what you RUN on it: Calculate and the transport, again in their own group',
-				after[1]);
+			report.ok(/^Calculate \| Step back \| Play \| Step forward \| Time \| Speed$/.test(after[0] || ''),
+				'...followed by what you RUN on it: Calculate and the transport, in their own group',
+				after[0]);
 		}
 		// **THE GEAR LEFT THE END GROUP, AND FIND AND THE PANE TOGGLE DID NOT.** Tom moved one
 		// control, and a spec that only checked where Settings landed would not notice the other two
@@ -74,11 +97,13 @@ exports.run = async function ({ browser, report }) {
 		// two of it.
 		const allNames = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_toolbar button')].map((b) => b.getAttribute('aria-label') || ''));
-		report.eq(allNames.filter((n) => n === 'Settings').length, 1, 'exactly one Settings button');
-		report.eq(allNames.filter((n) => n === 'Libraries').length, 1, 'exactly one Libraries button');
+		report.eq(allNames.filter((n) => n === SET).length, 1, 'exactly one Settings button');
+		report.eq(allNames.filter((n) => n === LIB).length, 0,
+			'and no Libraries button at all — moving a control is the classic way to end up with two');
 
 		// ---- THE BOX --------------------------------------------------------------------------
-		await a.toolbarClick('Libraries');
+		// Through the Water menu row, which is the one door left since the button went.
+		await a.menuClick(LIB, 'project');
 		await a.settle(300);
 		const open = () => a.page.evaluate(() => {
 			const b = document.getElementById('lpn_library_box');
@@ -96,8 +121,8 @@ exports.run = async function ({ browser, report }) {
 			};
 		});
 		let st = await open();
-		report.ok(st.shown, 'the Libraries button opens the box');
-		report.eq(st.title, 'Libraries', 'the box is named the same as the button that opened it');
+		report.ok(st.shown, 'the Libraries menu row opens the box');
+		report.eq(st.title, LIB, 'the box is named the same as the row that opened it');
 		report.eq(st.index.join(' | '), 'Patterns | Curves | Controls',
 			'and its index is the three things the document already carries');
 		report.eq(st.current, 'Patterns', 'it opens on Patterns');
@@ -193,12 +218,14 @@ exports.run = async function ({ browser, report }) {
 		await a.page.keyboard.press('Escape');
 		await a.settle(200);
 		report.ok(!(await open()).shown, 'Escape closes it');
-		await a.toolbarClick('Libraries');
+		// The row TOGGLES, which is what the button used to do and what makes it one door rather
+		// than two.
+		await a.menuClick(LIB, 'project');
 		await a.settle(200);
-		await a.toolbarClick('Libraries');
+		await a.menuClick(LIB, 'project');
 		await a.settle(200);
-		report.ok(!(await open()).shown, 'and the button that opened it toggles it shut');
-		await a.toolbarClick('Libraries');
+		report.ok(!(await open()).shown, 'and the row that opened it toggles it shut');
+		await a.menuClick(LIB, 'project');
 		await a.settle(200);
 		await a.page.evaluate(() => document.getElementById('lpn_libbox_close').click());
 		await a.settle(200);
@@ -206,7 +233,7 @@ exports.run = async function ({ browser, report }) {
 
 		// The Edit menu is the second door, exactly as the Settings menu row is Settings' second.
 		const rows = (await a.menuRows('edit')).map((r) => r.label);
-		report.ok(rows.indexOf('Libraries') >= 0, 'Edit > Libraries is the second door', rows.join(' | '));
+		report.ok(rows.indexOf(LIB) >= 0, 'Edit > Libraries is the second door', rows.join(' | '));
 
 		report.ok(a.errors.length === 0, 'no uncaught JavaScript', a.errors.join(' | '));
 	} finally {

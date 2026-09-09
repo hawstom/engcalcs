@@ -13,13 +13,16 @@
 
 const { Session } = require('../lib/session');
 
-// **THE ROW NAMES THE ACT, SO ITS NAME FLIPS** -- "Hide map readouts" / "Show map
-// readouts". The label lives here once: a spec that typed "Clean map" inline broke the day
-// Wave 0 gave the control a name that says what it does.
-// The ON row was renamed "Reduce map clutter" (Task 438 Wave 0) -- what it does, not what it
-// removes, because a reader who has never noticed the readouts cannot want them hidden. The OFF
-// row kept the concrete wording, since by then the reader HAS seen them go.
-const CLEAN_ON = 'Reduce map clutter';
+// **THE ROW NAMES THE ACT, SO ITS NAME FLIPS**, and BOTH halves are asked of the language file.
+// This constant held the English twice over: "Clean map" first, then "Reduce map clutter" after a
+// wave-0 rename, and it broke on each — the second time on 2026-09-09, when a later wave-0 pass
+// settled the pair as `lpn_clean_map` / `lpn_clean_map_off` ("Hide map readouts" / "Show map
+// readouts") so the two rows use one vocabulary. What this spec is about is the FLIP and what the
+// row hides, neither of which is a set of words: dev/session-handoff.md §4.
+//
+// (Reported outward, not fixed here: the comment above `lpn_clean_map` in lib/lang.ec.en.php still
+// argues for "Reduce map clutter" against the value it now guards.)
+let CLEAN_ON = null, CLEAN_OFF = null;
 
 exports.title = '20. The clean map';
 
@@ -48,6 +51,8 @@ exports.run = async function ({ browser, report }) {
 	try {
 		await a.goto();
 		await a.dismissGallery();
+		CLEAN_ON = await a.lang('lpn_clean_map');
+		CLEAN_OFF = await a.lang('lpn_clean_map_off');
 		await a.makeEdit();
 
 		const before = await strip(a);
@@ -59,7 +64,8 @@ exports.run = async function ({ browser, report }) {
 
 		// ---- the View menu says what it will DO --------------------------------------------------
 		let row = await viewRow(a, CLEAN_ON);
-		report.ok(!!row, 'the View menu offers it', row && row.label);
+		report.ok(!!row, 'the View menu offers it', row ? row.label : `no row starting "${CLEAN_ON}"`);
+		if (!row) { throw new Error(`the Map menu has no "${CLEAN_ON}" row`); }
 		await a.menuClick(row.label, 'map');
 		await a.settle(300);
 		const clean = await strip(a);
@@ -74,8 +80,8 @@ exports.run = async function ({ browser, report }) {
 			'bare numbers that do not say what they are is a worse screenshot, not a better one');
 		report.eq(await a.nodeCount(), 1, 'the network is untouched — this is a readout mode, not a view');
 
-		row = await viewRow(a, 'Show map readouts');
-		report.ok(!!row, 'the row then reads "Show map readouts" — it states what it will do',
+		row = await viewRow(a, CLEAN_OFF);
+		report.ok(!!row, `the row then reads "${CLEAN_OFF}" — it states what it will do`,
 			'this menu has no checkmark column, so the label carries the state');
 		await a.menuClick(row.label, 'map');
 		await a.settle(300);
@@ -95,7 +101,7 @@ exports.run = async function ({ browser, report }) {
 			'a reload brings the readouts back — the mode is NOT stored, and could not be lost for good',
 			JSON.stringify(after));
 		report.ok(!!(await viewRow(a, CLEAN_ON)),
-			'...and the View row is back to "Hide map readouts"');
+			`...and the View row is back to "${CLEAN_ON}"`);
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {

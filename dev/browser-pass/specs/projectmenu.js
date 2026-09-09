@@ -31,8 +31,18 @@ exports.title = '35. The Project menu';
 // rows became a fly-out at the head of Water — Tom's own decision, and his reasoning was that
 // everything below it reads, configures or reports on what those rows put on the map. This list had
 // not followed, so the section failed on its second check for two days.
-const EXPECTED = ['Insert', 'Settings', 'Libraries', 'Profile', 'Tables', 'Scenarios', 'Calculate',
-	'EPANET run report'];
+//
+// **AND TWO MORE ROWS ARRIVED BEFORE 2026-09-09.** Fire flow analysis… came back off the
+// `fire-flow` branch, into the slot this comment reserved for it; and the single EPANET-run-report
+// row became a **Reports fly-out** holding the run report beside the pump-energy and
+// scenario-comparison reports, so the word "report" is said once over all three instead of once per
+// row. Both are the menu doing what this file already said it would.
+//
+// **NAMED BY KEY, NOT BY TOM'S ENGLISH** (dev/session-handoff.md §4). What this list is about is
+// which rows exist and in what order, and it broke on wording twice.
+const EXPECTED_KEYS = ['lpn_menu_insert', 'lpn_tool_settings', 'lpn_library_menu',
+	'lpn_profile_menu', 'lpn_tables_menu', 'lpn_scenario_menu', 'lpn_time_run',
+	'lpn_ff_menu', 'lpn_reports_menu'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -41,6 +51,8 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 
 		report.ok(await a.page.$('#lpn_menu_project'), 'the menu bar carries the Water item');
+		const EXPECTED = [];
+		for (const k of EXPECTED_KEYS) { EXPECTED.push(await a.lang(k)); }
 		const rows = await a.menuRows('project');
 		report.eq(JSON.stringify(rows.map(r => r.label)), JSON.stringify(EXPECTED),
 			'every row is present, in order');
@@ -49,7 +61,7 @@ exports.run = async function ({ browser, report }) {
 			JSON.stringify(rows));
 
 		// ---- the two doors that already had buttons ----------------------------------------------
-		await a.menuClick('Settings', 'project');
+		await a.menuClick(await a.lang('lpn_tool_settings'), 'project');
 		await a.settle(300);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
@@ -80,23 +92,29 @@ exports.run = async function ({ browser, report }) {
 		report.ok(stack.overBar, '...and the menu bar still paints on top of it',
 			'topmost element there is ' + stack.what);
 
-		await a.menuClick('Settings', 'project');
+		await a.menuClick(await a.lang('lpn_tool_settings'), 'project');
 		await a.settle(300);
 
-		await a.menuClick('Libraries', 'project');
+		await a.menuClick(await a.lang('lpn_library_menu'), 'project');
 		await a.settle(300);
 		report.ok(await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_library_box');
 			return !!b && b.style.display !== 'none';
 		}), 'Libraries opens the same box the toolbar book opens');
-		await a.menuClick('Libraries', 'project');
+		await a.menuClick(await a.lang('lpn_library_menu'), 'project');
 		await a.settle(300);
 
 		// ---- the report, with nothing to report --------------------------------------------------
 		//
 		// A fresh project has never been near the EPANET solver, so this is the state most first-time
 		// users will press it in. It must say why, and it must not put an empty box on screen.
-		await a.menuClick('EPANET run report', 'project');
+		//
+		// **IT IS A FLY-OUT ROW NOW**: Reports ▸ EPANET run. The row that used to say the whole
+		// sentence became one of three under a heading that says "report" once, so the click is two
+		// deep. The property under test — pressing it with no run behind you explains itself rather
+		// than opening an empty box — is untouched.
+		await a.menuClickSub(await a.lang('lpn_reports_menu'), await a.lang('lpn_reports_epanet'),
+			'project');
 		await a.settle(300);
 		const box = await a.page.evaluate(() => !!document.getElementById('lpn_runbox'));
 		const after = { box: box, notice: await a.notice() };

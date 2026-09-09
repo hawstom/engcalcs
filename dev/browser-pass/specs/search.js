@@ -19,8 +19,9 @@ const { Session } = require('../lib/session');
 
 exports.title = '29. Search by place name';
 
-const SEARCH_ROW = 'Search for a place by name…';
-const GOTO_ROW = 'Go to a latitude and longitude…';
+// **THE TWO ROW LABELS ARE ASKED OF THE LANGUAGE FILE at the top of the run, never copied here** —
+// dev/session-handoff.md §4, three harnesses lost to pinned English. Assigned in run().
+let SEARCH_ROW = null, GOTO_ROW = null;
 const GEOCODER = 'nominatim.openstreetmap.org';
 
 // Nominatim's own answer shape: lat and lon are STRINGS in jsonv2, which is the single most likely
@@ -39,12 +40,38 @@ async function canvasRect(a) {
 		return { x: b.x, y: b.y, w: b.width, h: b.height };
 	});
 }
-// Where the MIDDLE of the map is, read the way a user reads it — the same trick specs/goto.js uses.
+// Where the MIDDLE of the map is.
+//
+// **IT IS DERIVED FROM THE VIEW TRANSFORM, NOT READ OFF THE POINTER, AND THAT CHANGED ON
+// 2026-09-09.** It used to move the mouse to the canvas centre and parse the coordinate readout,
+// which was exact enough while `goToPoint()` ZOOMED IN to a site-sized span on arrival: at ~100,000
+// px per degree the half-pixel of pointer quantisation is 0.00001°. Tom settled the other half of
+// that argument on 2026-09-08 — *"Goto should preserve the zoom factor"* — so arriving now keeps
+// whatever scale the user was at, and at the home view's ~3.9 px per degree the SAME half-pixel is
+// a quarter of a degree. The three centring checks below failed by about 0.2° while the page was
+// doing exactly what he asked: the map is centred correctly, the RULER was the thing with a
+// resolution. (specs/goto.js met this first and answered it with a pixel-derived tolerance; here
+// the exact centre is cheaper than a tolerance, and cannot drift.)
+//
+// So the centre is computed the way the page computes it: the screen centre back through
+// `translate(tx,ty) scale(s)` on the drawing group, x straight out as a longitude (Mercator x IS
+// longitude, which is why nothing is done to it) and y through lpnGeom.mercLat(). Exact at any
+// zoom. The readout is still carried as `text`, so a failure prints what a user would have read.
 async function centre(a) {
 	const r = await canvasRect(a);
 	await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2);
 	await a.settle(150);
 	const text = await a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
+	const view = await a.page.evaluate(() => {
+		const g = document.querySelector('#lpn_canvas > g');
+		const b = document.getElementById('lpn_canvas').getBoundingClientRect();
+		const m = g && (g.getAttribute('transform') || '')
+			.match(/translate\(([-\d.e]+),([-\d.e]+)\)\s*scale\(([-\d.e]+)\)/);
+		if (!m) { return null; }
+		const wx = (b.width / 2 - +m[1]) / +m[3], wy = (b.height / 2 - +m[2]) / +m[3];
+		return { lat: window.EngCalcs.lpnGeom.mercLat(-wy), lon: wx };
+	});
+	if (view) { return { lat: view.lat, lon: view.lon, text }; }
 	// **LATITUDE FIRST, because the readout is PUBLIC ORDER** (Tom, 2026-08-24: *"It should be
 	// lat/lon everywhere... history says Lat/Lon"*; coord_order_check.php enforces it). This regex
 	// read longitude first until Task 511 and therefore matched nothing, so every check below got
@@ -81,6 +108,8 @@ exports.run = async function ({ browser, report }) {
 
 		await a.goto();
 		await a.dismissGallery();
+		SEARCH_ROW = await a.lang('lpn_search_menu');
+		GOTO_ROW = await a.lang('lpn_goto_menu');
 
 		// ---- 1. where the row is, and is not ---------------------------------------------------
 		let rows = (await a.menuRows('map')).map(r => r.label);
@@ -297,7 +326,7 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 		// The wizard starts from a FILE now (Task 447): the drawing on screen is written out and
-		// opened again through File > Import xy to lat/lon…, which lands it in a new tab, in step 1.
+		// opened again through File > the lat/lon row (`lpn_file_import_geo`), which lands it in a new tab, in step 1.
 		{
 			const text = await a.page.evaluate(() => {
 				const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
@@ -305,7 +334,7 @@ exports.run = async function ({ browser, report }) {
 			});
 			const [chooser] = await Promise.all([
 				a.page.waitForEvent('filechooser'),
-				a.menuClick('Import xy to lat/lon…')
+				a.menuClick(await a.lang('lpn_file_import_geo'))
 			]);
 			await chooser.setFiles({ name: 'search.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
 		}
@@ -318,6 +347,14 @@ exports.run = async function ({ browser, report }) {
 			const s = document.getElementById('lpn_georef_search'), g = document.getElementById('lpn_georef_goto');
 			return !!s && !!g && g.nextElementSibling === s;
 		}), '...immediately beside Go to…, because they answer the same need two ways');
+
+		// **THE PLACEMENT IS CANCELLED BEFORE ANYTHING ELSE IS DRIVEN**, and that is a product rule
+		// rather than tidiness: since 2026-09-08 the File menu, Open and Save are all LOCKED while a
+		// model is being placed, because switching projects mid-wizard damaged both documents. This
+		// spec walked from the bar straight into `newGeoProject()`, which opens the File menu, and
+		// threw after thirty seconds waiting for a popup the page was correctly refusing to open.
+		await a.page.click('#lpn_georef_cancel');
+		await a.settle(400);
 
 		// ---- 10. Clear everything means everything ---------------------------------------------
 		// The confirm on that button promises "all settings", and a stored yes is a setting by any

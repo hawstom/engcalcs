@@ -68,8 +68,13 @@ exports.run = async function ({ browser, report }) {
 		report.eq(inert.stops, 1, 'a project with no duration has exactly one reporting step');
 		report.eq(inert.offBtns, inert.nBtns, '...so step back, Play and step forward are DISABLED, not silently inert');
 		report.ok(inert.offSel, '...and so is the step selector');
-		report.ok(/no time period/i.test(inert.why) && /Settings/.test(inert.why),
-			'...and they say why, and where to fix it', inert.why);
+		// **THE SENTENCE IS THE LANGUAGE FILE'S, not a regex over Tom's words.** This matched
+		// `/no time period/i`; the wave-0 pass reworded `lpn_time_no_period` to say "no extended
+		// period simulation set" and the check went red on a rewording that broke nothing —
+		// dev/session-handoff.md §4. What is under test is that the disabled controls carry THAT
+		// sentence rather than their own names, which is a fact about the tip and not about English.
+		report.eq(inert.why, await a.lang('lpn_time_no_period'),
+			'...and they say why, and where to fix it');
 		report.ok(inert.runLive, 'but Calculate stays live — with no duration it is an ordinary recalculate');
 
 		// Net3 is the network with a duration, patterns, controls and three tanks in it.
