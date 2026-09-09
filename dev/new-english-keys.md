@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**61 still to read**, of 84 untranslated keys, of 1772 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**62 still to read**, of 85 untranslated keys, of 1770 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (84, 61 to read @@ NEEDS RULING)
+## lpn_  (85, 62 to read @@ NEEDS RULING)
 
 - **`lpn_area_hint_lasso_go`**
   > Move to draw the outline, then click to close it.
@@ -246,6 +246,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_filter_note`**
   > Filtered by {q}. Showing {n} of {all}.
   _Ruled OK 2026-09-07._
+- **`lpn_pane_paste_note`**
+  > This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help, Fix something to tell us.
+  @@ NEEDS RULING
 - **`lpn_pane_pasted`**
   > Pasted {n} cells. {skipped} were not changed.
   @@ NEEDS RULING

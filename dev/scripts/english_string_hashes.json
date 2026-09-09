@@ -2324,7 +2324,6 @@
         "lpn_inp_bad_file": "4c44d8c2fd5a6162a15695b4f671d271f01cd3c3",
         "lpn_inp_drop_anchor_missing": "be14b494800f5b6b5fca9fad536a5ded0740f958",
         "lpn_inp_drop_backdrop": "94e5a8aa28dfe204309465c4d1fe0c39dd33c6ff",
-        "lpn_inp_drop_controls": "bb9845faea60afb03073de8d11a92072525797f7",
         "lpn_inp_drop_curve_long": "d6226b38feaea5400b89e71773d7548a55a04dff",
         "lpn_inp_drop_curve_missing": "53bdcd63bbce2a7ae46b7977cd78b749a3dd19f5",
         "lpn_inp_drop_cv": "df7f7635a0fc09f8d0a6124430366e1a19429062",
@@ -2795,8 +2794,6 @@
         "lpn_settings_symbol_opacity": "60ff3b0e2ee09b63c828a1055c6f7ca7e5a817df",
         "lpn_settings_symbol_size": "ec71574dc2e78f8ebcb52306f70ea195db0f9ed4",
         "lpn_settings_text_size": "919bbf890af8d0fcbae2f6127168ffe7143f82cb",
-        "lpn_settings_tolerance": "21af42d2fcf017878991a4b5b02bd5960c7dcaf9",
-        "lpn_settings_tolerance_tip": "9a18019e913328e4de5832f1f6e9e4f4f86b39a6",
         "lpn_settings_trials": "5a8d8be7ae9d54f5ea819d0be94c961001e890e8",
         "lpn_settings_trials_tip": "34f16b6641a0d0a5c0d715c7d2064457cec53d0c",
         "lpn_settings_unbalanced": "27ba056f0f765da0566b04fba82aca6962a15b87",
@@ -6105,10 +6102,6 @@
             "words": 22,
             "ends_sentence": true
         },
-        "lpn_inp_drop_controls": {
-            "words": 27,
-            "ends_sentence": true
-        },
         "lpn_inp_drop_curve_long": {
             "words": 27,
             "ends_sentence": true
@@ -7988,14 +7981,6 @@
         "lpn_settings_text_size": {
             "words": 3,
             "ends_sentence": false
-        },
-        "lpn_settings_tolerance": {
-            "words": 2,
-            "ends_sentence": false
-        },
-        "lpn_settings_tolerance_tip": {
-            "words": 19,
-            "ends_sentence": true
         },
         "lpn_settings_trials": {
             "words": 2,

@@ -180,8 +180,12 @@ if ($dead) {
     echo "   Each of these is maintained in 27 language files and displayed on no page. Deleting one\n";
     echo "   retires 27 strings; keeping it means every future sprint translates it again.\n";
     echo "   CHECK BEFORE DELETING. Two kinds listed here are NOT debt:\n";
-    echo "     - held for a feature that is coming back: lpn_settings_emitter_exponent for Task 191,\n";
-    echo "       the eight lpn_profile_* for Task 509.\n";
+    // The emitter exponent used to be the worked example here, and it is not one any more: its row
+    // came back with Task 553 and it is rendered today. Left named, with what happened to it, so a
+    // reader does not go looking for an example that is no longer on the list.
+    echo "     - held for a feature that is coming back: the eight lpn_profile_* for Task 509.\n";
+    echo "       (lpn_settings_emitter_exponent was the other one and is RENDERED again since\n";
+    echo "       Task 553; it is off this list, which is what a returning feature looks like.)\n";
     echo "     - the CANONICAL WORDING other strings are checked against. lpn_geomap and lpn_xymap\n";
     echo "       are the two mode names; nothing prints them, and mode_name_check.php holds every\n";
     echo "       other string's prose to them. Deleting one breaks a check and lets one language\n";
