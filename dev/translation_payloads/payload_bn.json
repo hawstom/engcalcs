@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1767,
-        "delta_key_count": 93,
+        "expected_key_count": 1772,
+        "delta_key_count": 98,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -526,6 +526,7 @@
         "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
         "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
+        "lpn_area_hint_show": "Show this",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -538,6 +539,7 @@
         "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
+        "lpn_georef_tab_locked": "Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -548,6 +550,9 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
+        "lpn_hide_titles": "Hide these titles",
+        "lpn_settings_area_hint": "Show the selection help",
+        "lpn_settings_area_hint_tip": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
@@ -621,6 +626,7 @@
         "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
         "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
+        "lpn_area_hint_show": "Show this",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -633,6 +639,7 @@
         "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
+        "lpn_georef_tab_locked": "Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -643,6 +650,9 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
+        "lpn_hide_titles": "Hide these titles",
+        "lpn_settings_area_hint": "Show the selection help",
+        "lpn_settings_area_hint_tip": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
@@ -851,6 +861,22 @@
                 }
             }
         },
+        "lpn_area_hint_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "শীর্ষবিন্দুসমূহ",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "মুছুন",
+                    "english": "Delete"
+                }
+            }
+        },
         "lpn_multi_title": {
             "reason": "missing",
             "current_value": null,
@@ -1043,6 +1069,22 @@
                 }
             }
         },
+        "lpn_georef_tab_locked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_unavailable",
+                    "value": "বসানোর টুলটি লোড হয়নি। পৃষ্ঠাটি পুনরায় লোড করে আবার চেষ্টা করুন।",
+                    "english": "The placement tool did not load. Reload the page and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_goto_menu",
+                    "value": "একটি অক্ষাংশ ও দ্রাঘিমাংশে যান…",
+                    "english": "Go to a latitude and longitude…"
+                }
+            }
+        },
         "lpn_pane_filter_note": {
             "reason": "missing",
             "current_value": null,
@@ -1200,6 +1242,54 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "এই ভালভগুলো নিজে থেকেই খোলে ও বন্ধ হয়, এবং শুধুমাত্র EPANET সমাধানকারীই এগুলো গণনা করতে পারে। EPANET সমাধানকারী লোড করা যায়নি, তাই এই ফলাফলগুলো নেই:",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_hide_titles": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "পৃষ্ঠার শিরোনাম ও অঙ্কনের উপরের স্বাগত লাইনটি লুকিয়ে ফেলে, যাতে মানচিত্রের জন্য বেশি জায়গা থাকে। মুদ্রণ পরিবর্তিত হয় না।",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID উপসর্গ",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_area_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "পৃষ্ঠার শিরোনাম ও অঙ্কনের উপরের স্বাগত লাইনটি লুকিয়ে ফেলে, যাতে মানচিত্রের জন্য বেশি জায়গা থাকে। মুদ্রণ পরিবর্তিত হয় না।",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID উপসর্গ",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_area_hint_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "পৃষ্ঠার শিরোনাম ও অঙ্কনের উপরের স্বাগত লাইনটি লুকিয়ে ফেলে, যাতে মানচিত্রের জন্য বেশি জায়গা থাকে। মুদ্রণ পরিবর্তিত হয় না।",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID উপসর্গ",
+                    "english": "ID prefixes"
                 }
             }
         },

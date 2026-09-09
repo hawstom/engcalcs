@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1767,
-        "delta_key_count": 93,
+        "expected_key_count": 1772,
+        "delta_key_count": 98,
         "exempt_key_count": 41,
         "exempt_keys": [
             "calc_units_us",
@@ -534,6 +534,7 @@
         "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
         "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
+        "lpn_area_hint_show": "Show this",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -546,6 +547,7 @@
         "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
+        "lpn_georef_tab_locked": "Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -557,6 +559,9 @@
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
         "lpn_field_tag": "Tag",
+        "lpn_hide_titles": "Hide these titles",
+        "lpn_settings_area_hint": "Show the selection help",
+        "lpn_settings_area_hint_tip": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -629,6 +634,7 @@
         "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
         "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
+        "lpn_area_hint_show": "Show this",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -641,6 +647,7 @@
         "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
+        "lpn_georef_tab_locked": "Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -652,6 +659,9 @@
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
         "lpn_field_tag": "Tag",
+        "lpn_hide_titles": "Hide these titles",
+        "lpn_settings_area_hint": "Show the selection help",
+        "lpn_settings_area_hint_tip": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
         "lpn_reaction_order_bulk": "Bulk reaction order",
         "lpn_reaction_order_bulk_tip": "The exponent the concentration is raised to for reaction in the body of the water. Any real number is allowed. 1 is the default value and is used for most chlorine decay modelling. 0 makes the rate independent of how much chemical is there.",
         "lpn_reaction_order_tank": "Tank reaction order",
@@ -859,6 +869,22 @@
                 }
             }
         },
+        "lpn_area_hint_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Stützpunkte",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "Löschen",
+                    "english": "Delete"
+                }
+            }
+        },
         "lpn_multi_title": {
             "reason": "missing",
             "current_value": null,
@@ -1051,6 +1077,22 @@
                 }
             }
         },
+        "lpn_georef_tab_locked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_unavailable",
+                    "value": "Das Platzierungswerkzeug wurde nicht geladen. Laden Sie die Seite neu und versuchen Sie es erneut.",
+                    "english": "The placement tool did not load. Reload the page and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_goto_menu",
+                    "value": "Zu einer Breite und Länge gehen…",
+                    "english": "Go to a latitude and longitude…"
+                }
+            }
+        },
         "lpn_pane_filter_note": {
             "reason": "missing",
             "current_value": null,
@@ -1224,6 +1266,54 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_hide_titles": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "Blendet die Seitenüberschrift und die Begrüßungszeile über der Zeichnung aus, damit die Karte mehr Platz hat. Der Druck wird dadurch nicht verändert.",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID-Präfixe",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_area_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "Blendet die Seitenüberschrift und die Begrüßungszeile über der Zeichnung aus, damit die Karte mehr Platz hat. Der Druck wird dadurch nicht verändert.",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID-Präfixe",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_area_hint_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "Blendet die Seitenüberschrift und die Begrüßungszeile über der Zeichnung aus, damit die Karte mehr Platz hat. Der Druck wird dadurch nicht verändert.",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID-Präfixe",
+                    "english": "ID prefixes"
                 }
             }
         },

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1767,
-        "delta_key_count": 79,
+        "expected_key_count": 1772,
+        "delta_key_count": 84,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -524,6 +524,7 @@
         "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
         "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
+        "lpn_area_hint_show": "Show this",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -536,6 +537,7 @@
         "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
+        "lpn_georef_tab_locked": "Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -546,6 +548,9 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
+        "lpn_hide_titles": "Hide these titles",
+        "lpn_settings_area_hint": "Show the selection help",
+        "lpn_settings_area_hint_tip": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
         "lpn_library_pipetypes": "Pipe types",
         "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
         "lpn_library_pipetypes_note": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
@@ -605,6 +610,7 @@
         "lpn_area_hint_shift": "Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_hint_touch_start": "Press on the map and drag around what you want, then lift.",
         "lpn_area_hint_touch_go": "Drag around what you want, then lift to finish.",
+        "lpn_area_hint_show": "Show this",
         "lpn_multi_title": "{n} selected",
         "lpn_multi_varies": "Various",
         "lpn_multi_applied": "Set {prop} on {n}.",
@@ -617,6 +623,7 @@
         "lpn_tool_area_tip": "Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to keep the current selection: what the shape catches is added to it, or removed if it was already selected.",
         "lpn_area_selected": "{n} selected.",
         "lpn_area_none": "Nothing found in that area.",
+        "lpn_georef_tab_locked": "Finish the placement with the Keep this placement button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.",
         "lpn_pane_filter_note": "Filtered by {q}. Showing {n} of {all}.",
         "lpn_pane_filter_clear": "Show all",
         "lpn_pane_filter_none": "Nothing in this table matches the filter.",
@@ -627,6 +634,9 @@
         "lpn_find_filter_tip": "Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.",
         "lpn_engine_needed_loading": "Loading EPANET solver while you build. Results will be available when completely loaded.",
         "lpn_engine_needed_failed": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.",
+        "lpn_hide_titles": "Hide these titles",
+        "lpn_settings_area_hint": "Show the selection help",
+        "lpn_settings_area_hint_tip": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
         "lpn_library_pipetypes": "Pipe types",
         "lpn_library_pipetypes_tip": "A pipe type is a definition several pipes can refer to for their diameter, roughness and reaction coefficients. Editing the definition edits every pipe that uses it.",
         "lpn_library_pipetypes_note": "Each project has its own pipe type library. You may leave properties blank in a pipe type definition. For example, a pipe type that specifies a roughness and no diameter is okay. You attach pipe types to pipes in their properties editor. Editing a definition here changes every pipe that references it.",
@@ -806,6 +816,22 @@
             }
         },
         "lpn_area_hint_touch_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "ចំណុចកំណត់",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_delete",
+                    "value": "លុប",
+                    "english": "Delete"
+                }
+            }
+        },
+        "lpn_area_hint_show": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1013,6 +1039,22 @@
                 }
             }
         },
+        "lpn_georef_tab_locked": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_unavailable",
+                    "value": "ឧបករណ៍ដាក់ទីតាំងមិនបានផ្ទុកឡើយ។ សូមផ្ទុកទំព័រឡើងវិញ ហើយសាកល្បងម្ដងទៀត។",
+                    "english": "The placement tool did not load. Reload the page and try again."
+                },
+                "next_translated": {
+                    "key": "lpn_goto_menu",
+                    "value": "ទៅកាន់ទទឹង និងបណ្ដោយ…",
+                    "english": "Go to a latitude and longitude…"
+                }
+            }
+        },
         "lpn_pane_filter_note": {
             "reason": "missing",
             "current_value": null,
@@ -1170,6 +1212,54 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "វ៉ាល់ទាំងនេះបើក និងបិទដោយខ្លួនឯង ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ ឧបករណ៍ដោះស្រាយ EPANET មិនអាចផ្ទុកបានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់៖",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_hide_titles": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "លាក់ក្បាលទំព័រ និងបន្ទាត់ស្វាគមន៍ខាងលើគំនូរ ដើម្បីឲ្យផែនទីមានកន្លែងច្រើនជាង។ ការបោះពុម្ពមិនផ្លាស់ប្ដូរទេ។",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "បុព្វបទលេខសម្គាល់",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_area_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "លាក់ក្បាលទំព័រ និងបន្ទាត់ស្វាគមន៍ខាងលើគំនូរ ដើម្បីឲ្យផែនទីមានកន្លែងច្រើនជាង។ ការបោះពុម្ពមិនផ្លាស់ប្ដូរទេ។",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "បុព្វបទលេខសម្គាល់",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_area_hint_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_show_titles_tip",
+                    "value": "លាក់ក្បាលទំព័រ និងបន្ទាត់ស្វាគមន៍ខាងលើគំនូរ ដើម្បីឲ្យផែនទីមានកន្លែងច្រើនជាង។ ការបោះពុម្ពមិនផ្លាស់ប្ដូរទេ។",
+                    "english": "Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "បុព្វបទលេខសម្គាល់",
+                    "english": "ID prefixes"
                 }
             }
         },
