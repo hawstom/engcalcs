@@ -631,6 +631,20 @@
 			}
 		}
 	],
+	"rules": [
+		"RULE 1",
+		"IF SYSTEM CLOCKTIME >= 10 AM",
+		"AND SYSTEM CLOCKTIME < 2 PM",
+		"AND TANK 2 LEVEL ABOVE 133",
+		"THEN PUMP 9 STATUS IS CLOSED",
+		"PRIORITY 1",
+		"",
+		"RULE 2",
+		"IF SYSTEM CLOCKTIME >= 3 PM",
+		"AND TANK 2 LEVEL BELOW 120",
+		"THEN PUMP 9 STATUS IS OPEN",
+		"PRIORITY 1"
+	],
 	"inpSections": {
 		"ENERGY": [
 			" Global Efficiency  \t75",

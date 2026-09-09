@@ -129,7 +129,16 @@ const CURATED_ELEMENT = {
 // Top-level keys that are the DRAWING or the session rather than the model.
 const CURATED_TOP = {
 	format: 1, app: 1, v: 1, project: 1, view: 1, backdrop: 1, labels: 1, labelSettings: 1,
-	nextId: 1, origin: 1, scenarios: 1, profiles: 1, units: 1
+	nextId: 1, origin: 1, scenarios: 1, profiles: 1, units: 1,
+	// **`rules` IS THE ONE MODEL FIELD A SHIPPED EXAMPLE MAY STATE MORE OF THAN ITS SOURCE**, and
+	// it is exempted here only so the rule below can be STRICTER than the blanket compare rather
+	// than weaker. All three EPA sources open `[RULES]` and state nothing in it, so a blanket
+	// "match your source" test proves only that we ship none -- and Tom, 2026-09-08, asked for two
+	// on Net1 so the rule editor can be exercised from the gallery without writing a file first.
+	// EPA's own `Net1.inp` is not ours to edit, so the rules live on the curated project and are
+	// declared by name in section 5, where every line is asserted and every other example must
+	// still ship none.
+	rules: 1
 };
 
 function dump(v) { return JSON.stringify(v); }
@@ -314,6 +323,60 @@ PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 		'source ' + dump(srcNotes) + ' vs shipped ' + dump(backNotes));
 });
 done('the file\'s own characters come back');
+
+// ------------------------------------------------------------------------------------------------
+// 5. THE CURATED RULES ON Net1, LINE BY LINE -- and none anywhere else.
+// ------------------------------------------------------------------------------------------------
+//
+// Tom, 2026-09-08: two `[RULES]` on the Net1 example so the feature can be exercised. They are
+// CURATION -- EPA's Net1.inp opens the section and states nothing in it -- so they are exempted
+// from section 2's blanket compare, and this is what replaces that guard. It is TIGHTER: the lines
+// are asserted verbatim, every asset each rule names must be in the project, and every other
+// published example must still ship no rules at all.
+//
+// **WHY A CLOCKTIME BAND AND NOT A SECOND LEVEL BAND.** Net1's own [CONTROLS] already open the pump
+// below 110 ft and close it above 140, so a rule stating another level band would be two mechanisms
+// arguing about one pump and a reader could not tell which one answered. These two act between 110
+// and 140, where the simple controls do nothing at all, and each carries an AND -- which is what a
+// simple control cannot express and therefore the reason rules exist at all.
+// dev/lpn-spike/net1-rules-harness.js measures that they change the run.
+console.log('\n5. Net1 ships two curated rules, and nothing else ships any');
+const NET1_RULES = [
+	'RULE 1',
+	'IF SYSTEM CLOCKTIME >= 10 AM',
+	'AND SYSTEM CLOCKTIME < 2 PM',
+	'AND TANK 2 LEVEL ABOVE 133',
+	'THEN PUMP 9 STATUS IS CLOSED',
+	'PRIORITY 1',
+	'',
+	'RULE 2',
+	'IF SYSTEM CLOCKTIME >= 3 PM',
+	'AND TANK 2 LEVEL BELOW 120',
+	'THEN PUMP 9 STATUS IS OPEN',
+	'PRIORITY 1'
+];
+PUBLISHED.forEach((file) => {
+	const open = openShipped(file);
+	const want = file === 'Net1.lwn' ? NET1_RULES : [];
+	ok(file + ' ships exactly the rules declared for it',
+		dump(open.rules || []) === dump(want), dump(open.rules || []).slice(0, 300));
+	if (file !== 'Net1.lwn') { return; }
+	// Every id a rule names is an id the project has -- libReadRule()'s own question, asked of the
+	// shipped file rather than of a box somebody is typing in.
+	const ids = {};
+	(open.nodes || []).forEach((n) => { ids['node:' + n.id] = 1; });
+	(open.links || []).forEach((l) => { ids['link:' + l.id] = 1; });
+	const named = global.EngCalcs.lpnRuleParse(open.rules).filter((b) => b.name);
+	ok('...two rules, both of which the grammar reads', named.length === 2 && named.every((b) => b.ok),
+		JSON.stringify(named.map((b) => [b.name, b.ok])));
+	const dangling = [];
+	named.forEach((b) => {
+		b.nodes.forEach((id) => { if (!ids['node:' + id]) { dangling.push('node ' + id); } });
+		b.links.forEach((id) => { if (!ids['link:' + id]) { dangling.push('link ' + id); } });
+	});
+	ok('...and every asset they name is in the project', dangling.length === 0, dangling.join(', '));
+});
+done('the curated rules are the ones declared');
 
 console.log(fails ? '\n' + fails + ' FAILED of ' + checks : '\nall ' + checks + ' example-audit checks passed');
 process.exit(fails ? 1 : 0);
