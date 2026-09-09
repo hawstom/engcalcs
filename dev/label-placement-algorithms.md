@@ -289,7 +289,9 @@ before the remedy.
 **The two triggers are his**, same day: *"if two leaders cross or if a label crosses a leader, try
 stacking their labels."* `Collide.labelCrossings()` (`js/lpn-collide.js`) is exactly those two over
 the DRAWN labels, and `dev/lpn-spike/label-crossing-harness.js` runs it on every shipped example, one
-example per process because the aligned-shed pass converges across passes (Task 436).
+example per process, because a second document loaded into a page that already holds one inherits
+its elements' measured widths and its label state. (Until §11 there was a second reason: the shed
+seeded node labels from the last layout, so the pass carried state from one layout to the next.)
 
 Flagged pairs at zoom-to-fit and at 2x / 4x / 8x in from it, every label field on, solved through
 EPANET:
@@ -417,25 +419,27 @@ one sample and not two.
 
 ### 10a. The table. Pairs per view, every label field on, solved through EPANET
 
-Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it.
+Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it. **Re-measured
+2026-09-09 after §11**, which moved every drawing and so moved every cell here; the readings below
+are the current ones.
 
 | drawing | off | brute | gang | both |
 |---|---|---|---|---|
-| Net3-Novato-CA-World | 7 / 19 / 12 / 5 | 7 / 16 / 8 / 4 | 5 / 18 / 10 / 3 | **5 / 16 / 8 / 2** |
-| Net3 (XY) | 15 / 8 / 5 / 1 | 15 / 6 / 5 / 0 | 12 / 9 / 3 / 1 | **12 / 8 / 3 / 0** |
-| Net2 | 5 / 0 / 0 / 0 | 4 / 0 / 0 / 0 | 5 / 0 / 0 / 0 | **4 / 0 / 0 / 0** |
+| Net3-Novato-CA-World | 7 / 20 / 12 / 5 | 7 / 17 / 8 / 4 | 5 / 19 / 8 / 3 | **5 / 17 / 6 / 2** |
+| Net3 (XY) | 14 / 7 / 4 / 1 | 14 / 6 / 3 / 0 | 11 / 7 / 2 / 1 | **11 / 7 / 2 / 0** |
+| Net2 | 4 / 1 / 0 / 0 | 3 / 0 / 0 / 0 | 4 / 1 / 0 / 0 | **3 / 0 / 0 / 0** |
 | Net1 | 1 / 1 / 0 / 0 | unchanged | unchanged | unchanged |
-| Elm-Street-Center | 5 / 3 / 1 / 1 | unchanged | unchanged | unchanged |
+| Elm-Street-Center | 3 / 2 / 1 / 1 | unchanged | unchanged | unchanged |
 | Basic example, either unit set | 0 throughout | 0 | 0 | 0 |
 
 **Five findings, and the third is the one that decided the design:**
 
 1. **The count falls on the drawing Tom marked.** Net3-World at the fit zoom goes 7 pairs to 5, and
-   over its four views 43 to 31. Net3 (XY) goes 29 to 23 over its four. That is the comparison §8
+   over its four views 44 to 30. Net3 (XY) goes 26 to 20 over its four. That is the comparison §8
    asked for and the strategy passes it.
 2. **The two routes fix different drawings, and neither dominates.** At the fit zoom of Net3-World
    the gang route alone takes 7 to 5 and the brute route alone takes 7 to 7; at 2x the brute route
-   alone takes 19 to 16 and the gang route alone takes it to 18. His intuition that geometry would
+   alone takes 20 to 17 and the gang route alone takes it to 19. His intuition that geometry would
    be "the better approach or a key to optimizing the brute force effort" is half-confirmed: on the
    view he was looking at, geometry is the whole of the gain.
 3. **THE MODEL AND THE DRAWING HAVE TO AGREE ABOUT WHAT IS ON THE MAP, and getting that wrong is
@@ -451,13 +455,13 @@ Each cell is the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it
      60-odd pipe labels at the 2x zoom that this layout draws, and turned the over-count into an
      under-count.
 4. **A hand-placed label is never touched, and that is why Elm-Street does not move.** 14 of its 18
-   node labels carry `lx`, so they are the user's; the repair declines them all and its five flagged
-   pairs stand. That is the correct answer, not a shortfall.
-5. **A view can come out one pair worse while the drawing comes out better** -- Net3 (XY) under the
-   gang route alone runs 15/8/5/1 to 12/9/3/1. The zooms are read in sequence and
-   `shedAlignedForConflicts()` seeds each pass from where the last layout put things, so a repair at
-   one zoom changes what is shed at the next. The harness therefore asserts no rise over the four
-   views together, and prints the per-view rises rather than hiding them.
+   node labels carry `lx`, so they are the user's; the repair declines them all and its flagged
+   pairs stand in every mode. That is the correct answer, not a shortfall.
+5. **A view could come out one pair worse while the drawing came out better** -- Net3 (XY) under the
+   gang route alone ran 15/8/5/1 to 12/9/3/1, because the zooms are read in sequence and the shed
+   seeded each pass from where the last layout put things. The harness asserts no rise over the four
+   views together and prints the per-view rises rather than hiding them. **§11 ended the cause, and
+   the re-measurement is in this section's own table: no view rises on any example in any mode.**
 
 ### 10b. What the scorer will not do, and the two costs
 
@@ -528,6 +532,125 @@ this see an obvious fix we missed", and that is a question for his eyes on a rea
 another number. If he wants more after looking, the order that costs least first is: count the
 remaining pairs by kind; widen the candidate list the brute route already searches; and only then
 search for open ground.
+
+---
+
+## 11. The layout was not stable, and the count could not see it (Task 539, 2026-09-09)
+
+Phase two shipped with the drawing OSCILLATING. Five layouts of one untouched view of Net3-World, at
+the fit zoom, nothing touched between them, ran **A B A B A**: four labels traded places on every
+content pass -- a zoom step, an edit, a label toggle -- **at a crossing count of 5 in both states.**
+Every harness in this family counted pairs, so every one of them reported a fixed drawing while the
+screen jumped. **A flicker is worse than the crossing it replaces**, which is Tom's own standard for
+the task (*"not show them if we can't show them beautifully"*).
+
+### 11a. It was never only the gang route, and it was never only Net3-World
+
+The first diagnosis was that `Collide.repairCrossingGangs()`'s gang route was the oscillator, because
+at the fit zoom of Net3-World `off` and `brute` settle over five passes and `gang` does not.
+**Measured over all seven shipped examples at all four zooms, that is a fact about one view.** As
+shipped, master is unstable in **14 of the 28 views**, 7 of them true two-cycles: Net2 at the fit
+zoom and at 2x, Net3 (XY) at 2x and 8x, Net3-World at the fit zoom, 4x and 8x. And with the repair
+switched OFF ENTIRELY, Net3-World still fails to settle on all four of its views and still
+two-cycles at 8x.
+
+**So the oscillator is the placement pipeline itself and always was.** The gang route adds one more
+cycle at the fit zoom of Net3-World -- the view somebody happened to be looking at -- and is
+otherwise a passenger.
+
+### 11b. The mechanism: the shed pass remembered the last layout
+
+`shedAlignedForConflicts()` decides how many values a pipe label gives up by asking what it would
+collide with, and the biggest thing it collides with is the node labels at each end of its pipe. It
+had to know where those were going before any of them had been placed, so it read **where the LAST
+layout put them** -- `nodeLabelPos()`, which is the base offset plus the nudge the previous placement
+wrote onto the element.
+
+That closes a loop. A node label moves; the pipe labels round it shed a different number of values;
+their boxes change width; the obstacles the next first-fit sees change; the node label moves back.
+Three memories fed it, and all three had to go before the pass settled:
+
+1. the node label positions themselves (`nodeLabelPos()`);
+2. `ne.hiddenDropped` -- last pass's drops, used to decide which node labels reserve no ground;
+3. the node labels' own shed CONTENT, because `unshedNodeLabels()` ran inside
+   `runLabelCollisionAvoidance()`, which is after the shed, so the widths the shed measured were last
+   pass's.
+
+### 11c. The fix: predict, do not remember
+
+`predictNodeLabelBoxes()` (`js/looped-network.js`) answers the same question from the drawing alone:
+the same `nodeFirstFitSpec()`, in the same drop order, through the same `placeLabelsFirstFit()`,
+against the static obstacles plus the stationed pipe labels **at full content**. The one thing it
+cannot know is how many values those pipe labels are about to shed -- which is the answer it is being
+asked for, and the reason a prediction that waited for it would be the loop again. `unshedNodeLabels()`
+now runs before the shed as well, and a predicted DROP reserves nothing, which is finding 2 decided
+inside the pass instead of remembered from the last one.
+
+**The spec builder moved out of `runLabelCollisionAvoidance()` and is shared.** Two passes asking
+where a label goes must not be two opinions about it.
+
+**The other candidate fix was seeding from the labels' HOME positions**, which is the cheapest way to
+break the loop and was built and measured first. It converges just as completely and it costs
+labels: **40 fewer of the 1,695 drawn across the 28 views**, 9 of them on one view of Net3-World and
+4 of Net1's 25 at the fit zoom, because a home-seeded box reserves ground on the side the label is
+not going to take and pipe labels shed to nothing and hide for it. It also took the fit zoom of
+Net3-World from 5 flagged pairs to 8. The prediction costs one more `placeLabelsFirstFit()` and one
+more `placeStationedLabels()` per CONTENT pass -- never on a drag frame -- and that is inside the
+noise of a pass that already runs 500-1,900 ms on Net3-World under Node with the DOM stub.
+
+**A third fix was named and refused: making the shed STICKY** -- remembering last pass's victims. It
+hides the symptom in the shed and leaves the labels underneath still swapping.
+
+### 11d. What it measures, and the numbers
+
+`dev/lpn-spike/label-stability-harness.js` lays out ONE untouched view five times and compares the
+**layout**: every drawn label, where its first box sits to twelve significant figures, and whether it
+drew a leader. It prints the passes as letters -- `AAAAA` is settled, `ABBBB` is a one-step settle,
+`ABCBC` is the two-cycle -- so the diagnosis is in the result line. Two drawings run by default
+(Net3-World and Net2, one geographic and one XY, both two-cycling on master); `--full` is all seven.
+
+All 28 views, every label field on, solved through EPANET, both repair routes on. Zoom-to-fit, then
+2x, 4x and 8x in from it.
+
+| drawing | passes identical (master → now) | flagged pairs (master → now) | labels drawn (master → now) |
+|---|---|---|---|
+| Net3-Novato-CA-World | ABCBC / ABCCC / ABCDC / ABCDC → **AAAAA** x4 | 5·8 / 16 / 8 / 2·1 → **5 / 17 / 6 / 2** | 55/104/131/174 → **54/101/131/180** |
+| Net3 (XY) | ABCCC / ABCDC / ABCCC / ABCBC → **AAAAA** x4 | 12 / 8 / 4 / 0 → **11 / 7 / 2 / 0** | 75/117/155/186 → **72/116/163/197** |
+| Net2 | ABCDC / ABCBC / ABCCC / AAAAA → **AAAAA** x4 | 4 / 0 / 0 / 0 → **3 / 0 / 0 / 0** | 44/53/72/81 → **42/55/74/81** |
+| Elm-Street-Center | ABBBB / ABCCC / AAAAA / AAAAA → **AAAAA** x4 | 5 / 3 / 1 / 1 → **3 / 2 / 1 / 1** | 39/46/48/48 → **39/46/48/48** |
+| Net1 | AAAAA x4 | 1·2 / 1 / 0 / 0 → **1 / 1 / 0 / 0** | 25/27/27/27 → **25/27/27/27** |
+| Basic example, US units | ABBBB / AAAAA x3 | 0 throughout | 19/20/20/19 → **20/20/20/19** |
+| Basic example, SI units | AAAAA x4 | 0 throughout | 21/21/21/20 → unchanged |
+
+**Master's cells are the FIRST pass at each view** -- the layout a reader actually gets when they
+zoom. Where a later pass over the same untouched view settles on a different number, that difference
+IS the defect; `5·8` and `1·2` are the two states of a two-cycle, where master's count itself
+alternated, which is a second reason the count was the wrong instrument.
+
+**Three readings of that table:**
+
+1. **Every view settles on the first pass now**, on every shipped example at every measured zoom in
+   the shipped configuration, and on Net3-World in all four repair modes -- `off` included, which is
+   the point: the pipeline is what was cycling.
+2. **The crossing count did not have to be paid for it.** It falls in 7 views, rises in 1
+   (Net3-World at 2x, 16 to 17), and is unchanged in the other 20.
+3. **More labels are drawn, not fewer**: 1,715 against master's 1,695 across the 28 views, and the
+   worst view improves -- Net3-World at 8x draws 180 where master drew 174.
+
+### 11e. The count is NOT zero, and nothing here was going to make it zero
+
+Tom's standard for this task is zero flagged pairs. **The shipped drawing is not there and this work
+did not aim at it**: 5 pairs at the fit zoom of Net3-World, 17 at 2x, 11 on Net3 (XY). §10c is the
+report on what is left and its recommendation stands -- **count the remaining pairs BY KIND before
+building anything.** The small drawings are already that count, and they say what the kinds are:
+Elm-Street's three at the fit zoom are `n:J12|n:J13` and `n:J14|n:J4`, both pairs of HAND-PLACED
+labels that nothing may move, plus `l:20|n:J11`, a pipe label against a hand-placed one; its only
+pair at 4x and 8x is `l:9|n:J-TP`, a node label against a pipe label whose position is fixed to its
+pipe. Net1's one is `n:10|n:11`. **Not one of those five is a gang with free labels and open ground
+-- which is the only kind either route, or a `spot_prime` search, could ever fix.**
+
+**A stability fix that also drove the count to zero would have been a different feature wearing this
+one's clothes.**
 
 ---
 

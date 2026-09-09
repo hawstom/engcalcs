@@ -538,8 +538,8 @@ the block.
     THE NUMBERS.** Phase two is `Collide.repairCrossingGangs()`, a repair pass after every other
     placement, with BOTH of the routes he asked for measured against each other by
     `dev/lpn-spike/label-gang-harness.js`. **Net3-World, the drawing he marked five gangs on, goes
-    from 7 flagged pairs to 5 at the fit zoom and from 43 to 31 over four zooms**; Net3 (XY) 29 to
-    23. Elm-Street does not move because 14 of its 18 node labels are hand-placed, which is the
+    from 7 flagged pairs to 5 at the fit zoom and from 44 to 30 over four zooms**; Net3 (XY) 26 to
+    20. Elm-Street does not move because 14 of its 18 node labels are hand-placed, which is the
     right answer.
   - **The gang route — order the stack by the ANGLE of each label's node — is the whole of the gain
     at his fit zoom** (7→5, against 7→7 for brute force alone). The routes fix different views and
@@ -549,9 +549,14 @@ the block.
     already stands, so the pass needs no search for open ground — and that is what produced the
     numbers above. **A search for open real estate is a much larger build and the case for it is now
     a judgment about the remaining pairs, not about the strategy.** His call, on §10c.
+  - **PHASE TWO SHIPPED WITH THE DRAWING FLICKERING, AND THAT IS FIXED (2026-09-09, §11).** One
+    untouched view laid out A B A B A at an unchanged count, so counting could not see it, and 14 of
+    the 28 views did not settle. `predictNodeLabelBoxes()` replaces the shed's memory of the last
+    layout; `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and not the count.
   - **Also open, and cheap to answer with the harness in place:** whether the remaining flagged
     pairs are worth another pass, and whether he wants the dev control knobs re-opened (he
-    authorized it) to look at them.
+    authorized it) to look at them. **§11e counts the small drawings BY KIND: not one of their five
+    remaining pairs is a gang with free labels and open ground**, the only kind any route can fix.
 
 
 - 50|544| **[H] epanet-js is implicitly claiming to be EPANET, and we have now decided.**
