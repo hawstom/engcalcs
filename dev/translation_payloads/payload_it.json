@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1770,
-        "delta_key_count": 2,
-        "exempt_key_count": 37,
+        "expected_key_count": 1773,
+        "delta_key_count": 5,
+        "exempt_key_count": 36,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -20,7 +20,6 @@
             "bpn_method_dw",
             "bpn_method_manning",
             "bpn_id",
-            "lpn_ex_net1_title",
             "lpn_ex_net2_title",
             "lpn_ex_net3_title",
             "lpn_ex_net3_world_title",
@@ -521,14 +520,68 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
+        "lpn_field_emitter": "Emitter coefficient",
+        "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR"
     },
     "keys": {
+        "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and grows a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
+        "lpn_field_emitter": "Emitter coefficient",
+        "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR"
     },
     "key_context": {
+        "lpn_field_text_attached_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_attached",
+                    "value": "Elemento collegato",
+                    "english": "Attached asset"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "Quota",
+                    "english": "Elevation"
+                }
+            }
+        },
+        "lpn_field_emitter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_attached",
+                    "value": "Elemento collegato",
+                    "english": "Attached asset"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "Quota",
+                    "english": "Elevation"
+                }
+            }
+        },
+        "lpn_field_emitter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_attached",
+                    "value": "Elemento collegato",
+                    "english": "Attached asset"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "Quota",
+                    "english": "Elevation"
+                }
+            }
+        },
         "lpn_find_q_and": {
             "reason": "equal_to_english",
             "current_value": "AND",
