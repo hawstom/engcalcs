@@ -84,6 +84,31 @@ MAP_SELECTORS.forEach(function (sel) {
 const canvasMove = (cssCode.match(/#lpn_canvas[^{]*\{[^}]*cursor:\s*move\b/g) || []);
 ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.length));
 
+// **WHERE YOU MAY CLICK AND WHERE THE CURSOR CHANGES ARE TWO DIFFERENT AREAS** (Tom, 2026-09-09:
+// *"we want the cursor to clearly become a pointer when pointing is appropriate, not all over the
+// map"*). Each of the three invisible bands is 12 SCREEN pixels wide at every zoom, so on a dense
+// drawing at the fit zoom there is no bare map between two pipes -- every gap is a band. A band
+// saying `pointer` therefore made the whole canvas a pointer finger, and made moving from a gap
+// onto a real node change nothing, which is the "the cursor does not want to change" report.
+//
+// The band must keep its HIT and lose its CURSOR, and both halves are asserted: `pointer-events`
+// unchanged (the 6 px of slop that makes a 0.7-wide pipe clickable), `cursor: inherit` so the band
+// shows whatever the canvas is saying. A future edit that gives a band a cursor value of its own
+// fails here rather than being discovered on a dense drawing.
+[['.lpn-link-hit', 'visibleStroke'], ['.lpn-link-symbol-hit', 'visible'],
+	['.lpn-node-hit', 'visible']].forEach(function (row) {
+	// Anchored at a line start: `.lpn-vertexmode .lpn-link-hit` is a DIFFERENT rule that correctly
+	// says crosshair, and an unanchored match finds it first and reads it as this one.
+	const re = new RegExp('(^|\\n)\\' + row[0] + '\\s*\\{([^}]*)\\}');
+	const m = re.exec(cssCode);
+	ok(row[0] + ' keeps its hit area', !!m && m[2].indexOf('pointer-events: ' + row[1]) >= 0);
+	ok(row[0] + ' inherits the canvas cursor', !!m && /cursor:\s*inherit/.test(m[2]),
+		m ? (/cursor:\s*([a-z-]+)/.exec(m[2]) || [])[1] : '(no rule)');
+});
+// And the DRAWN things still say pointer, or the feedback moved off the band onto nothing.
+ok('the drawn pipe says pointer', /\.lpn-link \{[^}]*cursor:\s*pointer/.test(cssCode));
+ok('the drawn node says pointer', /\.lpn-node \{[^}]*cursor:\s*pointer/.test(cssCode));
+
 // The two grabbable things he named by hand, positively asserted -- a label and a vertex grip both
 // used to wear the four-headed arrow, and both are the smallest targets on the map.
 ok('a draggable label says pointer',

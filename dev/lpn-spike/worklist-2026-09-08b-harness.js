@@ -64,8 +64,14 @@ console.log('--- an object under the pointer says what it is, panning or not ---
 	ok('...while the canvas itself still closes its hand, which cursor inheritance carries',
 		/#lpn_canvas\.lpn-panning\s*\{[^}]*cursor:\s*grabbing/.test(CSS));
 	// The six that mean something. Each is a bare class selector, so each keeps its own cursor.
-	[['.lpn-node', 'pointer'], ['.lpn-link', 'pointer'], ['.lpn-link-hit', 'pointer'],
-		['.lpn-link-symbol-hit', 'pointer'], ['.lpn-vhandle', 'pointer'], ['.lpn-draglbl', 'pointer']
+	// **THE BANDS TAKE THE CANVAS'S CURSOR SINCE 2026-09-09, and that is not a weakening of this
+	// section.** Tom: *"we want the cursor to clearly become a pointer when pointing is appropriate,
+	// not all over the map."* A 12-screen-pixel band around every pipe IS the map at a fit zoom on a
+	// dense drawing, so `pointer` there answered his complaint by making the whole canvas a pointer
+	// finger. The hit area is unchanged -- `pointer-events` on all three bands is untouched -- and
+	// the FEEDBACK moved onto the drawn stroke and the drawn disc, which is what this row now holds.
+	[['.lpn-node', 'pointer'], ['.lpn-link', 'pointer'], ['.lpn-link-hit', 'inherit'],
+		['.lpn-link-symbol-hit', 'inherit'], ['.lpn-vhandle', 'pointer'], ['.lpn-draglbl', 'pointer']
 	].forEach(function (row) {
 		const re = new RegExp('\\' + row[0].replace('.', '.') + '[^{}]*\\{[^}]*cursor:\\s*' + row[1]);
 		ok(row[0] + ' still states cursor: ' + row[1], re.test(CSS));

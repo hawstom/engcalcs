@@ -631,16 +631,32 @@ html[lang="zh"] .ec-welcome {
    which is what is wanted. --lpn-hit is published by refreshSymbolSizes() as LPN_LINK_HIT_PX screen pixels
    converted to world units at the current zoom, so the band is the same size on the screen at
    every scale. Round caps and joins so a bend has no notch in its band. */
+/* **THE BAND IS WHERE YOU MAY CLICK; IT IS NOT WHERE THE CURSOR CHANGES** (Tom, 2026-09-09:
+   *"The cursor for the open map should be grab panning hand since that's all it can do. But it's a
+   pointer finger. This matters because we want the cursor to clearly become a pointer when pointing
+   is appropriate, not all over the map."*).
+
+   These invisible bands are 12 SCREEN pixels wide at every zoom, so on a drawing whose pipes run
+   20 px apart at the fit zoom there is no bare map left between them -- every gap is a band, and a
+   band said `pointer`. That is the whole of his report: the map was a pointer finger nearly
+   everywhere, and moving from a gap onto an actual node changed nothing, which is also why the
+   cursor "does not want to change" in two different browsers. It is not sluggishness and it is not
+   a race; it is area, the same answer the 23,821-point measurement gave for the previous round.
+
+   `cursor: inherit` rather than a value: the band takes whatever the canvas is saying, so the
+   6 px of pointer slop that makes a 0.7-wide pipe clickable survives untouched while the FEEDBACK
+   moves onto the thing you can see. Nothing about hit testing changes -- `pointer-events` is
+   unchanged on all three bands, and no finder reads a cursor. */
 .lpn-link-hit {
 	fill: none; stroke: transparent; stroke-width: var(--lpn-hit, 12);
 	stroke-linecap: round; stroke-linejoin: round;
-	pointer-events: visibleStroke; cursor: pointer;
+	pointer-events: visibleStroke; cursor: inherit;
 }
 /* A pump or valve is a symbol drawn at the midpoint of a link that is often only a unit or two
    long -- on Net3 it had to be zoomed into before it could be edited at all. This is a transparent
    square over the symbol's own box, in the LINKS layer so a node still wins over it. `visible`
    rather than `all` for the reason above: `all` would hit a square nobody can see. */
-.lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: pointer; }
+.lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: inherit; }
 /* **AND THE NODE'S OWN BAND, which is the half Task 615 did not do** (Tom, 2026-09-08: *"I get no
    help from the mouse pointer. It's just a pan cross the entire time."*). A junction is 7 screen
    pixels of drawn disc and nothing else, so `pointer` reached 0.2% of the map -- measured on the
@@ -653,7 +669,7 @@ html[lang="zh"] .ec-welcome {
    a fill nobody painted, and `all` would hit the band while its node is hidden. `r` is written in
    JS on every zoom, not by a var here, because it is the LARGER of the drawn radius and the slop --
    a reservoir must not shrink to a junction's band. */
-.lpn-node-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: pointer; }
+.lpn-node-hit { fill: transparent; stroke: none; pointer-events: visible; cursor: inherit; }
 /* THE TAB STRIP WHILE A MODEL IS BEING PLACED (Tom's 2026-09-08 worklist). Switching projects mid-wizard
    damaged both documents, so switchToTab(), closeTab() and newProject() refuse and say why. This is
    the half that stops the reach: faded, and the cursor says the press will not do what it looks
