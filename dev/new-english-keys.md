@@ -39,7 +39,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* MEASURED ACROSS ALL 24 LANGUAGES THAT HAVE IT, AND THE MAJORITY READ IT WRONG. 13 of 24 rendered it as a SHAPE (ar, bg, bn, es, fa, he, hi, id, my, ps, sw, ur, zh -- 'square', 'square-shaped'); 11 rendered it as an EDGE (cs, de, fr, hr, it, pt, ro, ru, sr, tr, uk -- 'sharp-edged', 'sharp-angled', 'live arris'). Only one reading is what EPANET Table 3.3 means: a square-EDGED entrance, the one wh...
   @@ NEEDS RULING
 - **`lpn_reaction_limiting`**
-  > Limiting potential
+  > Limiting concentration
   *The finding:* EPANET's own keyword is LIMITING POTENTIAL, a specific water-quality term (a concentration ceiling the reaction asymptotically approaches). Translated as 'Predelnaya kontsentratsiya' (limiting concentration) rather than a literal 'Predelnyy potentsial' because the tip describes it purely as a concentration and 'potentsial' alone reads as vague to a Russian engineer. The cost is keyword traceability: a reader cross-referencing an .inp file by keyword may not map the phrase back to LIMITING POTENTIAL.
   1. Limiting concentration -- clear meaning, weaker keyword traceability
   2. Limiting potential -- literal keyword match, less clear standing alone
