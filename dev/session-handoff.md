@@ -7,10 +7,11 @@ you can tell). Delete a state line once you have checked it and it is no longer 
 
 ---
 
-## 0. IF YOU READ ONE SECTION, READ §4c AND §5 — they are 2026-09-10 and the rest is older
+## 0. IF YOU READ ONE SECTION, READ §6 — it is 2026-09-10 and newer than everything else
 
-The file is append-only by design: §1-§3c are 2026-09-05 to 09-06, §4/§4b are 09-09, **§4c and §5
-are the current state.** Where an older section disagrees with §4c, §4c wins and says so.
+The file is append-only by design: §1-§3c are 2026-09-05 to 09-06, §4/§4b are 09-09, §4c and §5 are
+09-10 morning, and **§6 is the current state.** Where an older section disagrees with a newer one,
+the newer wins and says so.
 **Every count in here is stale by construction. Read counts from the scripts.**
 
 ---
@@ -585,3 +586,58 @@ that.**
 - Do not tell Tom a browser test that has not been run headlessly first. Three instructions this
   session were wrong — a file with no `[TIMES]` duration that could not show an energy report, a
   unit switch described as converting, and File > Open where the page says Import.
+
+---
+
+## 6. STATE — 2026-09-10, the icon-and-file-safety session. NEWER THAN §5; where they disagree, this wins
+
+**Everything is pushed. HEAD `69fb1e1f`, `git log --oneline origin/master..master` empty in all
+three repos** (`engcalcs`, `librewaternet.org` at `6e6cc8f`, `not-epanet.org` at `4c79fc4`).
+`check_all.sh` exit 0. Delete a line here once you have checked it.
+
+### Rulings Tom made this day — do not re-ask
+- **The water tower SHIPPED.** Favicon on both landing sites and the app page; the engraved mono
+  tower as the `lpn_` Water menu icon; `icon-192/512.png` and `icon.svg` as the app icons.
+  *"Favicon as it stands is my one true love."* **The L for Libre is GONE** (*"The L is gone."*) and
+  cannot return to this geometry -- zero legible letter pixels at 17 px AND 32 px.
+- **The shading follows the SOLID**, reconstructed by Tom in three sentences after losing his
+  sketch: cylinder wall takes a left-right band, CONE roof a radial highlight from the apex,
+  HEMISPHERE belly a downward darkening from the springline. Quoted verbatim in
+  `dev/icon-preview/ship-notes.md`, because nothing else corroborates them.
+- **The tab icon is the app page's alone.** *"Can it be just on that page for Engcalcs?"* Scoped in
+  `lib/HeadersFooters.lib.php`; the other 27 calculators fall back to hawsedc.com's own `.ico`.
+- **Task 624 approved and built** -- every scale fallback in `css/engcalcs.css` is now 0.
+- **DIVORCE THE APP FROM ENGCALCS CHROME (Task 625)**, his four embarrassments and his decision:
+  *"Bye bye engcalcs titles and navbar ... put language menu in our app chrome navbar."* **This is
+  the next real piece of work.** Read `dev/chrome-audit.md` before touching it.
+- **The dear file.** *"I suppose I need to start shepherding a dear file."* He has been testing only
+  with throwaway examples, so no file-loss path has ever been exercised by someone with stakes
+  (Task 623). Ask whether an odd project report was the dear file before assuming a throwaway.
+
+### TRAPS MEASURED THIS SESSION
+- **AN ICON CANNOT INVALIDATE ITS OWN CACHE (Task 620).** `CACHE_VERSION` is gone by design and
+  invalidation rides `?v=<filemtime>`, which `ecSwAssetUrl()` deliberately does not put on an image
+  -- while `ecSwAssetFiles()` precaches `icons/*`. So a changed icon reaches nobody who has already
+  loaded the app. Tom saw the new favicon on both landing sites and not on the app; Ctrl+F5 fixed it
+  for him and will not fix it for a visitor.
+- **A NEW HOST INHERITS NONE OF THE OLD HOST'S EXTERNAL CONFIG, AND THIS REPO CANNOT SEE IT.**
+  Satellite and DEM 403'd on librewaternet.org because the Mapbox token was URL-restricted to
+  hawsedc.com. Measured against the live endpoints; Tom added the URLs and it went 200. Same class
+  as the favicon 404 and the `ea-php56` default. **dev.hawsedc.com is now a third host** -- PHP 8.3
+  and the Mapbox URLs are done, and it is password-protected.
+- **BOTH BROWSER-PASS REDS THIS SESSION WERE STALE SPECS, NOT PRODUCT.** `search.js` matched the old
+  English of a button Tom renamed to "Start fresh" (`9aea17c5`); `mapscale.js` asserted the flat
+  12 px grab band that Task 618's WYSIWYG work split into `--lpn-hit` (drawn width, fine pointer)
+  and `--lpn-hit-coarse`. Both fixed to read `pageConfig`/behaviour; baseline lowered 52 -> 51.
+  **Suspect a pinned literal before suspecting the product.**
+- **`node run.js` needs more than 30 minutes on a loaded WSL2** -- a full run capped at 36 of 44
+  sections and `mapscale` is LAST, so it silently never ran. Check the section count, not just the
+  reds.
+
+### The one thing genuinely unresolved
+**The all-blue map (Task 624) is a RACE and neither Tom nor a machine can reproduce it.** A repro
+seeded with his own exported `localStorage` came back green on HEAD (2.8% ink against the ~44% the
+failure paints). The amplifier is fixed, so if it fires again the symptom is now pipes too thin to
+see rather than a blue wall -- **that is the same bug wearing a survivable face, and it should be
+reported, not shrugged at.** What it still needs is a CPU-throttled spec so first paint can beat
+`publishScaleSizes()`.

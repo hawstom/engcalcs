@@ -33,6 +33,31 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     three answers, and one of them did not see a water tower at all. Keep collecting; a fourth
     reader who does not see a tower is the signal that would reopen the drawing.
 
+- 100|625| **[H] Divorce the app page from EngCalcs chrome; give it its own.**
+  Tom, 2026-09-10, listing four embarrassments and then deciding: *"Bye bye engcalcs titles and
+  navbar. Divorce engcalcs completely and put language menu in our app chrome navbar."* On the
+  tagline being fussed over instead: *"That is straining at a gnat and swallowing a camel, the
+  titles as a whole."*
+  - **HIS FOUR, AND ONE DECISION SETTLES THREE.** (1) **Two Help menus** on one page -- the suite
+    navbar's (About / Install / Contact) and the app's (Walkthroughs / Notes on this page /
+    Toolbar). (2) The EngCalcs titles. (3) **Four bars of chrome**: tabs, toolbar, menu, EngCalcs.
+    (4) **Help > About is EngCalcs' About**, not the app's. Removing the suite navbar takes the
+    second Help and one bar with it, so (2) subsumes (1) and (3); (4) is then owed a new row.
+  - **THE SEO FEAR IS MEASURED AND IT IS SMALL** (his: *"I'm too honest to use LibreEPANET.org ...
+    So how is anybody going to find this project?"*). `dev/usage-data-log.md`, Search Console
+    2026-09-07: **`Looped-Network.php` is indexed and invisible -- 9 URL variants, 62 impressions,
+    2 clicks**, `?lang=en` at position 33.8, every "network" query zero clicks, against site totals
+    of 6,770 clicks. **The EngCalcs titles on that page earn about 2 clicks a quarter.** Deleting
+    them costs nothing measurable.
+  - **BUT REPLACE THE H1, DO NOT DELETE IT.** A page with no H1 is worse than one with its own, and
+    a divorce should end in an identity, not an absence: carry a LibreWaterNet H1, not an EngCalcs
+    one. Discovery here was never the page's own title -- it is the calculators that DO rank
+    linking to it, plus the people Tom reaches by hand. **Keep those inbound links; they are the
+    funnel.**
+  - **THE LANGUAGE SWITCHER MOVES, IT DOES NOT GO** (his instruction); hreflang and `ec_language`
+    still apply. Read `dev/chrome-audit.md` first: 314 px above the map (31.3%, not the two-thirds
+    claimed), 143 px of it title block, growing to 52.1% at 1366x768 where the H1 and H2 wrap.
+
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable
   history of prompts in the banner area**, with this one as a banner prompt reading
