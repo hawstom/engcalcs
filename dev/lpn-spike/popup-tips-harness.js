@@ -534,8 +534,17 @@ ok('no reset tip claims they must be used together',
 // cookie goes too: Looped-Network.php calls echoCookieScript() and the unit selects post through
 // EngCalcs.submitForm(), so unit choices round-trip through a cookie that localStorage wiping
 // cannot reach.
+//
+// **AND THE READING PREFERENCES GO TOO, which is the half that was false by one key until
+// 2026-09-09.** `lpn_areahint` was written the day the area help bubble became dismissable and was
+// never added to the doomed list, so Erase everything left the bubble dismissed;
+// dev/cookie-storage-inventory.md had already filed it beside `lpn_show_titles` as the same kind of
+// thing, so the document and the code disagreed and the document was right. Both are asserted here
+// BY NAME rather than by counting the list, because a count passes whatever is in it.
 localStorage.setItem('lpn_index', '{"projects":[]}');
 localStorage.setItem('lpn_project_pabc', '{}');
+localStorage.setItem('lpn_show_titles', '0');
+localStorage.setItem('lpn_areahint', '0');
 localStorage.setItem('unrelated_key', 'keep me');
 let expired = 0;
 EngCalcs.expireCookie = function () { expired++; };
@@ -544,6 +553,8 @@ ok('wipeAllStorage removes the index', localStorage.getItem('lpn_index') === nul
 ok('wipeAllStorage removes every project key', localStorage.getItem('lpn_project_pabc') === null);
 ok('wipeAllStorage leaves unrelated keys alone', localStorage.getItem('unrelated_key') === 'keep me');
 ok('wipeAllStorage expires the suite unit cookie', expired === 1, 'expireCookie calls=' + expired);
+ok('wipeAllStorage clears the page-titles preference', localStorage.getItem('lpn_show_titles') === null);
+ok('wipeAllStorage clears the area-hint preference', localStorage.getItem('lpn_areahint') === null);
 
 // --- 12. two message kinds, two homes -----------------------------------
 // A DIAGNOSTIC is a standing statement about the network and lives in the page (#lpn_status).

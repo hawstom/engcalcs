@@ -16759,7 +16759,14 @@ var EngCalcs = EngCalcs || {};
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY,
-			PAGE_TITLES_KEY];
+			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
+			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
+			// preference set deliberately on this screen, so the document and the code disagreed
+			// and the document was right: without it, Erase everything leaves the area-selection
+			// help bubble dismissed, and this button's promise of "exactly as a brand-new visitor
+			// would see it" was false by one key. That is the same defect the note above records
+			// for lpn_rpane and lpn_setbox, which is why this list keeps naming its own misses.
+			PAGE_TITLES_KEY, AREA_HINT_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -25598,8 +25605,20 @@ var EngCalcs = EngCalcs || {};
 	// second piece of state nobody asked for, still shining next week at somebody who never used
 	// this link. It goes on a timer, and any press inside the box takes it off early -- the reader
 	// has found the row, which is the whole job.
+	//
+	// **TWO MINUTES, NOT FOUR SECONDS** (Tom, 2026-09-09, watching a first-time user: *"we need to
+	// leave the Titles toggle highlight on longer. 2 minutes can go by very fast when you are
+	// shopping or learning."*). Four seconds is a confirmation flash and this is not one: the mark
+	// exists to be FOUND, by somebody who has just been dropped into a settings box they have never
+	// opened and has to read down it. A reader who looks away, reads the tip, scrolls the pane or
+	// simply thinks had lost the row before they looked back.
+	//
+	// It costs nothing to be generous here because the early exit does the real work -- the first
+	// press anywhere inside the box clears it, so anybody who has found the row stops seeing the
+	// mark immediately, and the only reader who watches it for the full two minutes is one who is
+	// still looking. That is the reader it is for.
 	var pageTitlesRowEl = null;
-	var LPN_ROW_FLASH_MS = 4000;
+	var LPN_ROW_FLASH_MS = 120000;
 	var pageTitlesFlashTimer = null;
 	function clearPageTitlesFlash() {
 		if (pageTitlesFlashTimer) { clearTimeout(pageTitlesFlashTimer); pageTitlesFlashTimer = null; }
