@@ -85,11 +85,13 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
   3. **A text halo of half the line spacing** -- *"just so that a multi-line label or text mouse as
      a single block; for a text size of 10, 3px (2.5) appears to be about right, and for 12px,
      3 px."* The point is to close the gaps BETWEEN rows so a stacked label is one target, not to
-     pad the outside. **He reports the PC text halo is still far too large: *"I am getting default
-     pointer 50 px away from any visible network artifact"*** -- which disagrees with the 0.0 px
-     measured outside each row box on 2026-09-09, so MEASURE IT AT HIS WINDOW SIZE before changing
-     anything. He also says *"in the wild, I think it's already perfect. I get no gap between text
-     lines."*
+     pad the outside. **THIS ONE IS PROBABLY ALREADY DONE.** He first reported *"default pointer
+     50 px away from any visible network artifact"* and RETRACTED it the same day -- *"50px label
+     halo was an obsolete report. You fixed it, I think."* -- so that reading predates the grab-shape
+     work of 2026-09-09 and is evidence of nothing outstanding. His verdict on the shipped behaviour
+     is *"in the wild, I think it's already perfect. I get no gap between text lines."* **So start by
+     measuring and expect to find nothing to do**; the half-line-spacing figure above is what to
+     build only if a gap turns up between rows at some text size.
   - **The two worked examples to read first**, both found and fixed 2026-09-09: `pointer-events:
     visible` hit-testing a stroke perimeter whose undeclared `stroke-width` defaulted to one WORLD
     unit (846 px of false reach on a geographic drawing), and SVG `<text>` hit geometry quantised to
