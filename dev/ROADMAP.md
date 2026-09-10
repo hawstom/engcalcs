@@ -266,6 +266,33 @@ the block.
   - Same class as the favicon 404 and the `ea-php56` default: **a second host does not inherit the
     first host's external configuration, and nothing inside this repository can see it.**
 
+- 75|623| **[H] File loss judged only by people whose files are throwaway.**
+  Tom, 2026-09-10, after a reload appeared to break the project he had open: *"I am merely testing
+  examples. But I also am trying to take file loss seriously in a way that I had not sufficiently
+  done previously ... I have been oblivious to file loss because everything is throwaway."*
+  - **THE MECHANISMS EXIST AND SOME ARE TESTED, which is why this is a blind spot and not a hole.**
+    `beforeunload` prompts on a dirty file project; closing a browser-only one says *"it is gone for
+    good"*; `writeOpenProjectToFile()` refuses with no handle and when read-only, so it can never
+    write our older copy over a colleague's newer file; `dev/lpn-spike/handle-restore-harness.js`
+    asserts the reconnect/pending/drop table. **What has never happened is somebody running these
+    paths with something to lose** -- the scale blind spot's shape, in another subject.
+  - **WHAT HE HIT WAS BY DESIGN AND THE STRING IS WHAT MISLEADS.** A reload cannot carry the
+    browser's write PERMISSION, so the handle returns `'prompt'`, the project warns
+    `lpn_file_needs_reopen`, ONE CLICK restores it, and a reload never writes the file. That string
+    says *"the connection to that file has been lost"* -- loss, rather than a permission the browser
+    drops on purpose. Cheapest item here, and it made a working page look broken.
+  - **THE ONE REAL GAP: the post-reload window.** While a handle is pending, edits autosave to
+    `localStorage` and the disk file silently falls behind, with nothing stating the divergence.
+  - **THE EXPOSURE IS BOUNDED, which is the answer to "has this been happening all along?"**
+    `dev/usage-data-log.md`'s REPEAT USE instrument fires when a browser left WORK behind -- on this
+    page, a saved project DOCUMENT. Looped-Network: **20 people shopped, 4 returned to their work**.
+    So the population that ever had a project to lose is order 20 in the measured window, and the 4
+    who came back FOUND it -- the row exists because the document was still there. Consenting
+    visitors only, so it is a sample and bounds the exposure rather than proving nothing was lost.
+  - **NEXT IS A SCENARIO LIST, NOT A FIX.** Enumerate how work is lost -- reload without
+    reconnecting, close without saving, storage evicted, quota exceeded mid-autosave, two tabs,
+    denied permission, a file moved under us -- rule each ACCEPTABLE or DEFECT, then build.
+
 - 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
   that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
