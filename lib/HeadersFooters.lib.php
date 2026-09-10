@@ -188,20 +188,44 @@ $og_image = CANONICAL_ORIGIN . '/engcalcs/' . $og_card;
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="apple-mobile-web-app-title" content="EngCalcs">
-	<?php // THE TAB ICON, AND IT IS THIS SUITE'S OWN BUSINESS EVEN AT '/app/' (2026-09-09).
-	      // Until today no page emitted rel="icon" at all, so every browser fell back to the
+	<?php // THE TAB ICON, AND IT IS THE LOOPED-NETWORK PAGE'S ALONE (2026-09-09, SCOPED 2026-09-10).
+	      // Until 2026-09-09 no page emitted rel="icon" at all, so every browser fell back to the
 	      // ORIGIN ROOT's /favicon.ico -- a file belonging to whichever site the suite is mounted
 	      // under. hawsedc.com happens to have one, so nothing looked broken there; librewaternet.org
 	      // has favicon.svg and no .ico, so https://librewaternet.org/app/ served a 404 and a blank
 	      // tab while the landing pages beside it showed the water tower. The landing site cannot fix
 	      // that: '/app/' is a rewrite onto Looped-Network.php out of a DIFFERENT DOCROOT, and its
 	      // relative <link rel="icon" href="favicon.svg"> is never emitted here.
-	      // Same six paths as the Water menu's wt-wide-L and as ~/webdev/librewaternet.org/favicon.svg,
-	      // byte-identical to the latter so the two sites cannot drift apart. NO '?v=' -- ecSwAssetUrl()
-	      // deliberately does not bust a query onto an icon, and sw_manifest_check.php diffs this
-	      // href against that list. The maskable PNGs in lib/WebManifest.lib.php are a separate
-	      // open question of Tom's (they need an opaque background); a tab icon needs none. ?>
+	      //
+	      // **IT IS EMITTED BY ONE PAGE, AND THE ONE PAGE IS WHY THE LINK EXISTS** (Tom, 2026-09-10,
+	      // asked where the new water-tower icon belonged: *"Can it be just on that page for
+	      // Engcalcs?"*). The tower is LIBREWATERNET'S mark, and hawsedc.com is an engineering firm
+	      // whose Manning and Darcy-Weisbach pages have no reason to fly it. Scoping costs the '/app/'
+	      // fix NOTHING, and that is the whole reason it is safe: **'/app/' IS Looped-Network.php**, a
+	      // rewrite rather than a second page, so SCRIPT_NAME under it names this script and the test
+	      // below is true on both mounts. ecSwMounts() declares those two and only those two, so the
+	      // other 27 calculators are reachable at hawsedc.com/engcalcs/ ALONE and fall back to that
+	      // origin's own /favicon.ico, which exists -- nobody gets the blank tab this link was added
+	      // to fix. Widening it again is a branding decision, not a bug fix.
+	      //
+	      // The page name is derived here rather than reused: the social-card block above computes the
+	      // same basename into $og_page and then UNSETS it (line 176) along with the rest of its
+	      // scratch variables, so reaching for it here is an undefined-variable warning and a link
+	      // that never renders. Found by rendering the page and counting the tag, which is the only
+	      // way this failure shows -- a missing <link> is a tab that silently falls back.
+	      // Same six paths as ~/webdev/librewaternet.org/favicon.svg, byte-identical to it so the two
+	      // sites cannot drift apart. NO '?v=' -- ecSwAssetUrl() deliberately does not bust a query
+	      // onto an icon, and sw_manifest_check.php diffs this href against that list. **That is also
+	      // why a changed icon does not reach a returning visitor**: cache invalidation here rides on
+	      // the filemtime query, an icon carries none, and CACHE_VERSION was removed on purpose -- so
+	      // the service worker serves the previous drawing until its site data is cleared. Found the
+	      // day this icon changed, when it appeared on both landing sites and not on the app.
+	      // The maskable PNGs in lib/WebManifest.lib.php are a separate open question of Tom's (they
+	      // need an opaque background); a tab icon needs none.
+	      $ec_tab_page = preg_replace('/\.php$/', '', basename((string)($_SERVER['SCRIPT_NAME'] ?? '')));
+	      if ($ec_tab_page === 'Looped-Network'): ?>
 	<link rel="icon" href="/engcalcs/icons/favicon.svg" type="image/svg+xml">
+	<?php endif; unset($ec_tab_page); ?>
 	<link rel="apple-touch-icon" href="/engcalcs/icons/icon-192.png">
 	<?php // Bootstrap 5.3.2, MIT, served from this site (ROADMAP Task 287). It used to come from
 	      // jsDelivr, which meant every page load told a third party the visitor's IP address and
