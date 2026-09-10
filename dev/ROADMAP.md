@@ -293,6 +293,27 @@ the block.
     reconnecting, close without saving, storage evicted, quota exceeded mid-autosave, two tabs,
     denied permission, a file moved under us -- rule each ACCEPTABLE or DEFECT, then build.
 
+- 75|624| **[H] The scale fallbacks turn any missed publish into a flooded canvas.**
+  Tom, 2026-09-10, with a screenshot: an all-blue map after opening the geographic Net3 example
+  beside an existing project. **NOT REPRODUCIBLE by either of us**, and a repro seeded with his own
+  exported `localStorage` (both projects, `openId` on the 35 KB Net3) came back GREEN on HEAD --
+  2.8% map ink against the ~44% the failure paints, every scale property published. So there is no
+  bad commit to bisect to; the window `88b750a0` narrowed on 2026-09-09 is still open, narrower.
+  - **THE MECHANISM IS KNOWN AND WRITTEN DOWN** (`dev/browser-pass/specs/mapscale.js`): every stroke
+    is screen pixels divided by `state.s` and handed to CSS as a custom property in WORLD units.
+    Miss the publish and CSS falls back to `var(--lpn-lw, 0.7)` and `var(--lpn-sym, 1)`, **which are
+    world units too** -- 4,535 px of pipe and a 77,745 px grab band at the Net3's 6,479 px per
+    degree. `--lpn-map-ink` is `#1a6faf`, and that is the blue in his screenshot: the flood is the
+    PIPES.
+  - **THE FIX IS NOT A REVERT, IT IS REMOVING THE AMPLIFIER.** A fallback whose failure mode is worse
+    than having no fallback is the defect, independent of whatever wins the race. At zero, the same
+    missed publish draws a pipe too thin to see -- noticed, reported, and recovered from by zooming
+    -- instead of a page that looks destroyed. Check every `var(--lpn-*, <n>)` in `css/engcalcs.css`
+    and ask what each number does at 6,479 px per degree before choosing it.
+  - **A RACE NEEDS A RACE TEST.** Rebuild the repro as a spec that throttles the CPU (CDP
+    `Emulation.setCPUThrottlingRate`) so first paint can beat `publishScaleSizes()`; without one,
+    this stays unreproducible and the guard only ever measures the happy path.
+
 - 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
   that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,

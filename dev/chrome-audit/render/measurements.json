@@ -1,0 +1,1402 @@
+{
+  "lpn": {
+    "1919x1002": {
+      "viewport": {
+        "name": "1919x1002",
+        "width": 1919,
+        "height": 1002
+      },
+      "titlesShown": true,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 56,
+          "bottom": 104,
+          "height": 48,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 112,
+          "bottom": 136,
+          "height": 24,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 152,
+          "bottom": 190.390625,
+          "height": 38.390625,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 199.390625,
+          "bottom": 231.390625,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 235.390625,
+          "bottom": 270.984375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 274.984375,
+          "bottom": 307.984375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 313.984375,
+          "bottom": 1000.984375,
+          "height": 687,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 822.390625,
+        "bottom": 1002,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1919x1002.png"
+    },
+    "1919x1002-titleshidden": {
+      "viewport": {
+        "name": "1919x1002",
+        "width": 1919,
+        "height": 1002
+      },
+      "titlesShown": false,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 57,
+          "bottom": 89,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 93,
+          "bottom": 128.59375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 132.59375,
+          "bottom": 165.59375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 171.59375,
+          "bottom": 1000.59375,
+          "height": 829,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 822.390625,
+        "bottom": 1002,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1919x1002-titleshidden.png"
+    },
+    "1920x1080": {
+      "viewport": {
+        "name": "1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "titlesShown": true,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 56,
+          "bottom": 104,
+          "height": 48,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 112,
+          "bottom": 136,
+          "height": 24,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 152,
+          "bottom": 190.390625,
+          "height": 38.390625,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 199.390625,
+          "bottom": 231.390625,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 235.390625,
+          "bottom": 270.984375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 274.984375,
+          "bottom": 307.984375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 313.984375,
+          "bottom": 1078.984375,
+          "height": 765,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 900.390625,
+        "bottom": 1080,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1920x1080.png"
+    },
+    "1920x1080-titleshidden": {
+      "viewport": {
+        "name": "1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "titlesShown": false,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 57,
+          "bottom": 89,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 93,
+          "bottom": 128.59375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 132.59375,
+          "bottom": 165.59375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 171.59375,
+          "bottom": 1078.59375,
+          "height": 907,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 900.390625,
+        "bottom": 1080,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1920x1080-titleshidden.png"
+    },
+    "1440x900": {
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "titlesShown": true,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 56,
+          "bottom": 152,
+          "height": 96,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 160,
+          "bottom": 184,
+          "height": 24,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 200,
+          "bottom": 276.78125,
+          "height": 76.78125,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 285.78125,
+          "bottom": 317.78125,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 321.78125,
+          "bottom": 357.375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 361.375,
+          "bottom": 394.375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 400.375,
+          "bottom": 898.375,
+          "height": 498,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 720.390625,
+        "bottom": 900,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1440x900.png"
+    },
+    "1440x900-titleshidden": {
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "titlesShown": false,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 57,
+          "bottom": 89,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 93,
+          "bottom": 128.59375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 132.59375,
+          "bottom": 165.59375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 171.59375,
+          "bottom": 898.59375,
+          "height": 727,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 720.390625,
+        "bottom": 900,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1440x900-titleshidden.png"
+    },
+    "1366x768": {
+      "viewport": {
+        "name": "1366x768",
+        "width": 1366,
+        "height": 768
+      },
+      "titlesShown": true,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 56,
+          "bottom": 152,
+          "height": 96,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 160,
+          "bottom": 184,
+          "height": 24,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "block",
+          "visible": true,
+          "top": 200,
+          "bottom": 276.78125,
+          "height": 76.78125,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 285.78125,
+          "bottom": 317.78125,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 321.78125,
+          "bottom": 357.375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 361.375,
+          "bottom": 394.375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 400.375,
+          "bottom": 766.375,
+          "height": 366,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 588.390625,
+        "bottom": 768,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1366x768.png"
+    },
+    "1366x768-titleshidden": {
+      "viewport": {
+        "name": "1366x768",
+        "width": 1366,
+        "height": 768
+      },
+      "titlesShown": false,
+      "rows": [
+        {
+          "key": "navbar",
+          "sel": "nav.navbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 0,
+          "bottom": 56,
+          "height": 56,
+          "text": "HawsEDC Calculators\n\t\t\tLibre Software\n\t\n\t\n\t\t\n\t\n\n\t\n\t\t\n\t\t\t\n\t\t\t\t\n\t\t\t\t\tHydraulics\t\t\t"
+        },
+        {
+          "key": "page_title",
+          "sel": "#ec-page-title",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Free Online Water Distribution Network Calculator with the EPANET Solver"
+        },
+        {
+          "key": "page_welcome",
+          "sel": "#ec-page-welcome",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Drop your fears at the door; love is spoken here. You are not ruining everything"
+        },
+        {
+          "key": "page_desc",
+          "sel": "#ec-page-desc",
+          "present": true,
+          "display": "none",
+          "visible": false,
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "text": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files"
+        },
+        {
+          "key": "menubar",
+          "sel": "#lpn_menubar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 57,
+          "bottom": 89,
+          "height": 32,
+          "text": "FileEditMapWaterHelp"
+        },
+        {
+          "key": "toolbar",
+          "sel": "#lpn_toolbar",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 93,
+          "bottom": 128.59375,
+          "height": 35.59375,
+          "text": "0:00  ·  00:000.5x1x2x4x"
+        },
+        {
+          "key": "tabs",
+          "sel": "#lpn_tabs",
+          "present": true,
+          "display": "flex",
+          "visible": true,
+          "top": 132.59375,
+          "bottom": 165.59375,
+          "height": 33,
+          "text": "+≡Project1▾×"
+        },
+        {
+          "key": "canvas",
+          "sel": "#lpn_canvas",
+          "present": true,
+          "display": "inline",
+          "visible": true,
+          "top": 171.59375,
+          "bottom": 766.59375,
+          "height": 595,
+          "text": ""
+        }
+      ],
+      "consent": {
+        "top": 588.390625,
+        "bottom": 768,
+        "height": 179.609375,
+        "position": "fixed"
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/lpn-1366x768-titleshidden.png"
+    }
+  },
+  "landing": {
+    "1919x1002": {
+      "viewport": {
+        "name": "1919x1002",
+        "width": 1919,
+        "height": 1002
+      },
+      "data": {
+        "stack": [
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet-bg",
+            "top": 0,
+            "bottom": 1002,
+            "height": 1002,
+            "text": ""
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet",
+            "top": 0,
+            "bottom": 5310.203125,
+            "height": 5310.203125,
+            "text": "LibreWaterNet\n\t\t\tNot EPANET\n\t\t\n\t\t\n\t\t\tOpen the app\n\t\t\tWho we need\n\t\t\tFeature list"
+          }
+        ],
+        "links": [
+          {
+            "text": "Not EPANET",
+            "href": "https://not-epanet.org",
+            "top": 22.390625,
+            "bottom": 49.84375,
+            "visible": true
+          },
+          {
+            "text": "Open the app",
+            "href": "https://librewaternet.org/app/",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Who we need",
+            "href": "#stakeholders",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Feature list",
+            "href": "features.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Screenshots",
+            "href": "screenshots.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "What exists",
+            "href": "#what",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Languages",
+            "href": "#languages",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Why",
+            "href": "#why",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Licence",
+            "href": "#licence",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Start a model now",
+            "href": "https://librewaternet.org/app/",
+            "top": 720.265625,
+            "bottom": 784.25,
+            "visible": true
+          },
+          {
+            "text": "See who we need",
+            "href": "#stakeholders",
+            "top": 797.046875,
+            "bottom": 847.984375,
+            "visible": true
+          },
+          {
+            "text": "Open an example",
+            "href": "https://librewaternet.org/app/?lpn_examples=1",
+            "top": 863.78125,
+            "bottom": 900.03125,
+            "visible": true
+          },
+          {
+            "text": "See it working",
+            "href": "screenshots.html",
+            "top": 885.03125,
+            "bottom": 900.03125,
+            "visible": true
+          },
+          {
+            "text": "eleven more, annotated",
+            "href": "screenshots.html",
+            "top": 800.75,
+            "bottom": 815.75,
+            "visible": true
+          }
+        ],
+        "h1": {
+          "present": true,
+          "visible": true,
+          "top": 249.21875,
+          "bottom": 425.8125,
+          "height": 176.59375,
+          "text": "Worldowned."
+        },
+        "h2": {
+          "present": true,
+          "visible": true,
+          "top": 1102.859375,
+          "bottom": 1140.171875,
+          "height": 37.3125,
+          "text": "Four kinds of person we are looking for"
+        }
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/landing-1919x1002.png"
+    },
+    "1920x1080": {
+      "viewport": {
+        "name": "1920x1080",
+        "width": 1920,
+        "height": 1080
+      },
+      "data": {
+        "stack": [
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet-bg",
+            "top": 0,
+            "bottom": 1080,
+            "height": 1080,
+            "text": ""
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet",
+            "top": 0,
+            "bottom": 5310.203125,
+            "height": 5310.203125,
+            "text": "LibreWaterNet\n\t\t\tNot EPANET\n\t\t\n\t\t\n\t\t\tOpen the app\n\t\t\tWho we need\n\t\t\tFeature list"
+          }
+        ],
+        "links": [
+          {
+            "text": "Not EPANET",
+            "href": "https://not-epanet.org",
+            "top": 22.390625,
+            "bottom": 49.84375,
+            "visible": true
+          },
+          {
+            "text": "Open the app",
+            "href": "https://librewaternet.org/app/",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Who we need",
+            "href": "#stakeholders",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Feature list",
+            "href": "features.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Screenshots",
+            "href": "screenshots.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "What exists",
+            "href": "#what",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Languages",
+            "href": "#languages",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Why",
+            "href": "#why",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Licence",
+            "href": "#licence",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Start a model now",
+            "href": "https://librewaternet.org/app/",
+            "top": 720.265625,
+            "bottom": 784.25,
+            "visible": true
+          },
+          {
+            "text": "See who we need",
+            "href": "#stakeholders",
+            "top": 797.046875,
+            "bottom": 847.984375,
+            "visible": true
+          },
+          {
+            "text": "Open an example",
+            "href": "https://librewaternet.org/app/?lpn_examples=1",
+            "top": 863.78125,
+            "bottom": 900.03125,
+            "visible": true
+          },
+          {
+            "text": "See it working",
+            "href": "screenshots.html",
+            "top": 885.03125,
+            "bottom": 900.03125,
+            "visible": true
+          },
+          {
+            "text": "eleven more, annotated",
+            "href": "screenshots.html",
+            "top": 800.75,
+            "bottom": 815.75,
+            "visible": true
+          }
+        ],
+        "h1": {
+          "present": true,
+          "visible": true,
+          "top": 249.21875,
+          "bottom": 425.8125,
+          "height": 176.59375,
+          "text": "Worldowned."
+        },
+        "h2": {
+          "present": true,
+          "visible": true,
+          "top": 1102.859375,
+          "bottom": 1140.171875,
+          "height": 37.3125,
+          "text": "Four kinds of person we are looking for"
+        }
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/landing-1920x1080.png"
+    },
+    "1440x900": {
+      "viewport": {
+        "name": "1440x900",
+        "width": 1440,
+        "height": 900
+      },
+      "data": {
+        "stack": [
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet-bg",
+            "top": 0,
+            "bottom": 900,
+            "height": 900,
+            "text": ""
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet",
+            "top": 0,
+            "bottom": 5309.546875,
+            "height": 5309.546875,
+            "text": "LibreWaterNet\n\t\t\tNot EPANET\n\t\t\n\t\t\n\t\t\tOpen the app\n\t\t\tWho we need\n\t\t\tFeature list"
+          }
+        ],
+        "links": [
+          {
+            "text": "Not EPANET",
+            "href": "https://not-epanet.org",
+            "top": 22.390625,
+            "bottom": 49.84375,
+            "visible": true
+          },
+          {
+            "text": "Open the app",
+            "href": "https://librewaternet.org/app/",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Who we need",
+            "href": "#stakeholders",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Feature list",
+            "href": "features.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Screenshots",
+            "href": "screenshots.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "What exists",
+            "href": "#what",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Languages",
+            "href": "#languages",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Why",
+            "href": "#why",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Licence",
+            "href": "#licence",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Start a model now",
+            "href": "https://librewaternet.org/app/",
+            "top": 719.609375,
+            "bottom": 783.59375,
+            "visible": true
+          },
+          {
+            "text": "See who we need",
+            "href": "#stakeholders",
+            "top": 796.390625,
+            "bottom": 847.328125,
+            "visible": true
+          },
+          {
+            "text": "Open an example",
+            "href": "https://librewaternet.org/app/?lpn_examples=1",
+            "top": 863.125,
+            "bottom": 899.375,
+            "visible": true
+          },
+          {
+            "text": "See it working",
+            "href": "screenshots.html",
+            "top": 884.375,
+            "bottom": 899.375,
+            "visible": true
+          },
+          {
+            "text": "eleven more, annotated",
+            "href": "screenshots.html",
+            "top": 800.09375,
+            "bottom": 815.09375,
+            "visible": true
+          }
+        ],
+        "h1": {
+          "present": true,
+          "visible": true,
+          "top": 249.21875,
+          "bottom": 425.15625,
+          "height": 175.9375,
+          "text": "Worldowned."
+        },
+        "h2": {
+          "present": true,
+          "visible": true,
+          "top": 1102.203125,
+          "bottom": 1139.515625,
+          "height": 37.3125,
+          "text": "Four kinds of person we are looking for"
+        }
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/landing-1440x900.png"
+    },
+    "1366x768": {
+      "viewport": {
+        "name": "1366x768",
+        "width": 1366,
+        "height": 768
+      },
+      "data": {
+        "stack": [
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet-bg",
+            "top": 0,
+            "bottom": 768,
+            "height": 768,
+            "text": ""
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "cls": "sheet",
+            "top": 0,
+            "bottom": 5304.515625,
+            "height": 5304.515625,
+            "text": "LibreWaterNet\n\t\t\tNot EPANET\n\t\t\n\t\t\n\t\t\tOpen the app\n\t\t\tWho we need\n\t\t\tFeature list"
+          }
+        ],
+        "links": [
+          {
+            "text": "Not EPANET",
+            "href": "https://not-epanet.org",
+            "top": 22.390625,
+            "bottom": 49.84375,
+            "visible": true
+          },
+          {
+            "text": "Open the app",
+            "href": "https://librewaternet.org/app/",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Who we need",
+            "href": "#stakeholders",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Feature list",
+            "href": "features.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Screenshots",
+            "href": "screenshots.html",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "What exists",
+            "href": "#what",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Languages",
+            "href": "#languages",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Why",
+            "href": "#why",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Licence",
+            "href": "#licence",
+            "top": 65.84375,
+            "bottom": 88.140625,
+            "visible": true
+          },
+          {
+            "text": "Start a model now",
+            "href": "https://librewaternet.org/app/",
+            "top": 714.578125,
+            "bottom": 778.5625,
+            "visible": true
+          }
+        ],
+        "h1": {
+          "present": true,
+          "visible": true,
+          "top": 249.21875,
+          "bottom": 420.125,
+          "height": 170.90625,
+          "text": "Worldowned."
+        },
+        "h2": {
+          "present": true,
+          "visible": true,
+          "top": 1097.171875,
+          "bottom": 1134.484375,
+          "height": 37.3125,
+          "text": "Four kinds of person we are looking for"
+        }
+      },
+      "screenshot": "/home/haws/webdev/hawsedc.subset/engcalcs/dev/chrome-audit/render/landing-1366x768.png"
+    }
+  }
+}
