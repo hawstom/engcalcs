@@ -21,13 +21,13 @@
 // for a shape that is a disc rather than a line. The 12 px of pointer slop (LPN_NODE_HIT_PX) is
 // untouched: what was fixed was never slop, it was a stroke.
 //
-// **WHAT IS REPORTED RATHER THAN ASSERTED, and it is a different mechanism.** Label text still
-// answers well outside its own box on a geographic project — 271 px at the fit zoom, and 0 px on
-// the XY example, so it is scale-proportional too but it is NOT stroke width: setting `stroke-width`
-// to 0 on `.lpn-lbl` changes it by nothing. It is Blink's own quantisation of text geometry under a
-// very large transform, it is the fault specs/geohit.js was written about, and `hitConfirmed()`
-// covers it for selection. It is measured here so the number is on the record and so that a future
-// fix has a before. See README on ASSERT versus REPORT.
+// **THE SECOND MECHANISM, REPORTED HERE AND NOW FIXED IN ITS OWN SPEC.** Label text answered
+// 271 px outside its own box on a geographic project and 0 px on the XY example -- scale
+// -proportional too, but NOT stroke width: setting `stroke-width` on `.lpn-lbl` changed it by
+// nothing. It is Blink laying SVG text out in its OWN LOCAL USER UNITS at LayoutUnit precision,
+// which at 8,431 px per unit is 132 screen pixels a quantum. The cure is a SHAPE rather than a
+// keyword -- the words hit-test nothing and `.lpn-lbl-hit` takes the press -- and specs/lblhit.js
+// owns it. What is left here is the number, still printed, because this is where it was measured.
 
 const { Session } = require('../lib/session');
 
@@ -227,7 +227,7 @@ exports.run = async function ({ browser, report }) {
 		// REPORTED, not asserted — a different mechanism, and not fixed. See the header.
 		const txt = Object.keys(s.by).filter(k => /^(text|tspan)\./.test(k));
 		const worstTxt = txt.reduce((m, k) => Math.max(m, s.by[k].max), 0);
-		report.note(`label text still answers up to ${worstTxt.toFixed(0)} px outside its own box here — Blink's own text quantisation at this scale, NOT stroke width, and hitConfirmed() covers it for selection (specs/geohit.js)`);
+			report.note(`label text answers up to ${worstTxt.toFixed(0)} px outside its own box here -- it was 271 px until specs/lblhit.js moved the grab area off the glyphs, and no text should answer at all now`);
 	} finally { await geo.close(); }
 
 	// ---- the XY project, which is where the same fault was 11 px and invisible -------------------

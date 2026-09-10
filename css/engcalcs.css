@@ -880,8 +880,8 @@ html[lang="zh"] .ec-welcome {
 }
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
-   property popup simply never opened. A leader is not a thing you can click -- a label's own text
-   (.lpn-draglbl) is the drag/click target -- so it has no business in hit testing. (The extrema
+   property popup simply never opened. A leader is not a thing you can click -- a label's own grab
+   shape (.lpn-lbl-hit) is the drag/click target -- so it has no business in hit testing. (The extrema
    badge needed the same rule and no longer exists to need it: Task 333 made the mark a
    text-decoration inside the label's own text.) */
 /* ONE SCREEN PIXEL, via --lpn-hair, not a fraction of the symbol size. A leader is a rule pointing
@@ -1003,16 +1003,35 @@ html[lang="zh"] .ec-welcome {
    pick up than it was.
 
    `visible` rather than `visiblePainted` because the two are not the same promise: `visiblePainted`
-   would also drop the gaps between the glyphs, and a finger is not aimed at the inside of an "8". */
+   would also drop the gaps between the glyphs, and a finger is not aimed at the inside of an "8".
+
+   **AND THE PROMISE IS NOW KEPT BY A SHAPE RATHER THAN BY THE WORDS** (Tom, 2026-09-09: *"Label
+   text answers hits up to 271 px: Yes! This is it! High priority task."*). An SVG text's hit
+   geometry is laid out in its own LOCAL user units at LayoutUnit precision, and on a geographic
+   project one of those is 132 screen pixels -- so `.lpn-draglbl` answered 271 px outside its own
+   box, covered 58% of the canvas and blanketed every node band on it. `.lpn-lbl-hit` below is the
+   target now, and `.lpn-lbl`'s own `pointer-events: none` is left to stand on the words. The gaps
+   between the glyphs are still grabbable, because the shape is the label's own ROW BOXES. Full
+   mechanism, and the three measurements that establish it is not the stroke width fixed the same
+   day in `.lpn-node-hit`: syncLabelHit() in js/looped-network.js. */
 /* **`pointer`, NOT `move`, AND THE REASON IS THE GLYPH'S SIZE** (Tom, 2026-09-09: *"a move cursor
    is being used to point at labels and assets. The problem with this is that the move cursor has a
    huge hit box. We need a cursor with an infinitesimal hitbox."*). A four-headed arrow is ~24 px of
    drawn cursor whose hot spot is at its centre, so on a map whose junction discs are 0.2% of the
    canvas the pointer covers the very thing it is aimed at. `pointer` and `crosshair` both aim from a
-   1 px point and leave the target visible beside them. The label's AREA is a separate complaint of
-   his and is not addressed here -- draggable labels claim 6.5% of the canvas, measured over 23,821
-   sampled points, and shrink-wrapping their boxes is his open decision. */
-.lpn-draglbl { cursor: pointer; pointer-events: visible; }
+   1 px point and leave the target visible beside them.
+
+   **THE CLASS IS WORN BY THE GRAB SHAPE AS WELL AS BY THE WORDS, AND THE CURSOR IS WHY.** A cursor
+   is computed from whatever element answered the hit test, and since the words answer none it would
+   be a dead declaration on the text alone. `.lpn-draglbl` says "this is a label you can take hold
+   of", which is true of both halves; no `pointer-events` here at all, so `.lpn-lbl`'s own `none`
+   stands on the text and `.lpn-lbl-hit`'s own value stands on the shape. */
+.lpn-draglbl { cursor: pointer; }
+/* THE LABEL'S OWN GRAB SHAPE -- one transparent <path>, one subpath per ROW of the label, built and
+   moved by syncLabelHit(). `visibleFill` for .lpn-node-hit's reason: `visible` would hit-test the
+   stroke perimeter as well, which with no `stroke-width` declared is 1 USER UNIT, and on this map
+   that is not one pixel. The `visible` prefix is what makes a label nobody can see un-grabbable. */
+.lpn-lbl-hit { fill: transparent; stroke: none; pointer-events: visibleFill; }
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per

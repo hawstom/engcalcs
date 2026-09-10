@@ -104,8 +104,15 @@ console.log('\n--- a press on a label nobody can see ---');
 	const doc = freshMap();
 	const id = L.addNode('junction', 200, 200).id;
 	const n = L.nodeById(id), ne = L.nodeEl(id);
-	const lbl = ne.text;
+	// **THE GRAB SHAPE, NOT THE WORDS.** A label is taken hold of by `.lpn-lbl-hit` -- see
+	// syncLabelHit(): an SVG text's hit geometry is laid out in its own local user units, so on a
+	// geographic project the words answered 271 px outside their own box and could not be the
+	// target. Pressing the <text> here would be pressing something the browser never offers.
+	const lbl = ne.lblHit;
 
+	ok('the node label has a grab shape, and it is not the words',
+		!!lbl && lbl !== ne.text && lbl.getAttribute('class').indexOf('lpn-lbl-hit') >= 0,
+		lbl && lbl.getAttribute('class'));
 	ok('the node label is a drag target to begin with',
 		lbl.classList.contains('lpn-draglbl') && lbl.dataset.nodelbl === id, lbl.dataset.nodelbl);
 
@@ -160,7 +167,7 @@ console.log('\n--- the thing underneath still answers ---');
 {
 	freshMap();
 	const id = L.addNode('junction', 200, 200).id;
-	const ne = L.nodeEl(id), lbl = ne.text, dot = ne.circle;
+	const ne = L.nodeEl(id), lbl = ne.lblHit, dot = ne.circle;
 
 	setHitTarget([lbl, dot]);
 	const top = L.mapHitAt(300, 180);
@@ -199,8 +206,16 @@ console.log('\n--- no map rule may ignore visibility ---');
 	while ((m = re.exec(code))) { bad.push(m[1]); }
 	ok('no declaration uses a visibility-ignoring pointer-events value', bad.length === 0,
 		bad.length ? bad.join(', ') + ' -- use `visible`, which is `all` gated on visibility' : 'none');
-	ok('the draggable-label rule says `visible`',
-		/\.lpn-draglbl\s*\{[^}]*pointer-events:\s*visible/.test(code));
+	// **THE RULE MOVED OFF THE WORDS AND ONTO THE SHAPE, and the promise is the same one.** A label
+	// is grabbed by `.lpn-lbl-hit` now -- one transparent path, one subpath per row -- because an
+	// SVG text's hit geometry is quantised in its own local user units and answered 271 px outside
+	// its own box on a geographic project (syncLabelHit() in js/looped-network.js). The `visible`
+	// prefix is still the whole of "a thing the user cannot see cannot be grabbed".
+	ok('the label grab shape says `visible`',
+		/\.lpn-lbl-hit\s*\{[^}]*pointer-events:\s*visible/.test(code));
+	ok('...and the words themselves hit-test nothing at all',
+		/\.lpn-lbl\s*\{[^}]*pointer-events:\s*none/.test(code)
+		&& !/\.lpn-draglbl\s*\{[^}]*pointer-events/.test(code));
 	// The unpainted reservoir/tank disc is the one place `all` was DELIBERATE, and `visible` keeps it
 	// working: unpainted is not invisible -- what the user sees there is the symbol drawn over it.
 	ok('the unpainted reservoir/tank hit disc is still a hit target',
