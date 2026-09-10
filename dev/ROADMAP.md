@@ -228,6 +228,25 @@ the block.
 
 # Tasks
 
+- 50|620| **[H] A changed icon never reaches a returning visitor.**
+  The precache cannot invalidate it. Found 2026-09-10, the day the water tower shipped: it appeared instantly on librewaternet.org and
+  not-epanet.org and NOT on the app. Tom: *"I see it at LWN and NOT, but not at lpn."* Ctrl+F5 fixed
+  it for him, which no ordinary visitor will do.
+  - **The cause is a deliberate design with one uncovered case.** `CACHE_VERSION` was removed on
+    purpose (`lib/ServiceWorker.lib.php`) and invalidation rides entirely on `?v=<filemtime>` in the
+    URL, so a changed file changes its own cache key and nothing has to be remembered. But
+    `ecSwAssetUrl()` deliberately puts no query on an image, because `<link rel="icon">` and
+    `manifest.json` name icons without one -- and `ecSwAssetFiles()` precaches
+    `icons/*.{svg,png,ico}` anyway. **An icon is therefore the one precached asset whose content can
+    change while its cache key cannot.** JS and CSS are fine; this is not a general cache bug.
+  - Two candidate fixes, and the second is probably right: bust `?v=` onto icon URLs at BOTH ends
+    (the pages and `ecSwAssetUrl()`, which `sw_manifest_check.php` already holds identical), or make
+    the generated worker's own bytes change when any precached asset's mtime does, so `install` re-runs
+    and `addAll` overwrites. The second fixes every icon at once and touches no public URL; check
+    whether `addAll` would then be served from the HTTP cache anyway.
+  - Nothing is broken today -- the icon on disk is correct and a new visitor sees it. This is about
+    the NEXT icon change, and about anything else precached that is named without a query.
+
 - 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
   that creates rows? ... I thought that the reasoning for not doing that was very good"*, then,
