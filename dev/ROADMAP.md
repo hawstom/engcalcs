@@ -3,59 +3,35 @@
 Open tasks for the EngCalcs hydraulic calculator suite. **Format: `Priority|ID| Description`.** One
 flat list, highest priority first, lowest ID first inside a band. `- 100|615| **[H] The water icon: keep experimenting, and record the votes.**
   Tom, 2026-09-09: *"Let's keep experimenting including your proof sheet suggestion and working the
-  users."* The concept sheet is `dev/icon-preview/concepts-2026-09-08b.html`; `wt-wide-L` is what
-  SHIPS today, as the `lpn_` Water menu icon and as the favicon on both sibling sites.
-  - **THE VOTES SO FAR, and they do not agree, which is the finding.** MAH, lay person, 29: likes
-    old-timey. PCW, senior civil engineer, 60+, no EPANET experience: likes `wt-tall-3`. MJH, civil
-    engineering designer and power user, 27: **read `wt-wide-L` as a lavatory SINK**, thought that
-    was fine, and preferred it to `wt-tall-3` or any old-timey tower. Three people, three answers,
-    and one of them does not see a water tower at all.
-  - **The sheet's own verdict on the shipped concept is `MENU ONLY`** -- *"At 16 the L foot lands on
-    the catwalk and the stem on the crown ... It holds from 32 up."* Both places it is used are
-    under 32 (a favicon is 16, the menu bar draws at ~17 px). Rendered at both it is crowded rather
-    than a scribble. Five concepts carry the verdict `FAVICON` and any of them is a one-line swap.
-  - **THE COLOR PROOF SHEET IS BUILT: `dev/icon-preview/concepts-2026-09-09-color.html`** (round 3,
-    `gen-concepts-color.js`, 12 candidates, 130 real PNGs at 16/32/48/192/512 on light and dark).
-    **His catwalk prediction is confirmed and is worse than a raster loss: on solid blue the middle
-    is gone at 512 too**, because the bar is the color of the body it crosses; every silver-on-sky
-    row keeps it at all five sizes. Verdicts and the measurement: `dev/icon-preview/README.md`.
-  - **ROUND 3b, 2026-09-10, and the front runner has a name.** Tom, reading that sheet:
-    *"I love the gradients at all scales ... I may be in love. Those two are positively nostalgic.
-    Very nice emotional appeal. ic-tall3-steel-overcast. I almost want to stick my neck out and
-    deploy it right now."* And on why it works: *"what makes this iconic is that sky is exactly part
-    of a water tower. No buildings in town are that high. No trees in town are that high. All you
-    see is tank and sky."* **The sky is the subject, not a plate.**
-  - **A REAL DEFECT HE FOUND AND NO CHECK COULD: every descender was truncated** -- *"They must hit
-    the bottom. Obviously we can't have this thang flying in the air."* Legs and risers stopped at
-    y 21.4 or 22.4 in a 24-unit frame. **The drawing, not the viewBox and not the fit.** Fixed at
-    the cause and measured on the BOTTOM ROW of each PNG: delta-L against the sky went from
-    0 / 0.7 / 0 / 0 / 0 to 69 / 177 / 190 / 190 / 190 at 16 / 32 / 48 / 192 / 512.
-    **That moved a verdict**: `ic-tall3-*` was MENU ONLY on the claim its legs and riser fuse at
-    16 px, and they do not -- the bottom row holds three separate runs with sky between them, so
-    the front runner and its plain-sky twin are **FAVICON**. Renamed on his instruction:
-    `ic-tall3fit-*` is `ic-wide3fit-*` (a WT-TALL-3 fitted to a square reads wide), and
-    `ic-mask-tall3fit-overcast` went with it.
-  - **A MONO MENU CANDIDATE EXISTS, ON THE SHEET, NOT DEPLOYED** (*"It would be extra nice if the
-    mono- menu icon could have a masterful pseudo-gradient touch for the cylinder"*). A menu icon is
-    a `currentColor` stroke on NO ground, so there is no fill to hold a gradient and nothing lighter
-    than paper to highlight with: the only move is engraving. Five tried at 16/17/24/32 on light and
-    dark; `ic-mono-hatch-lr` is the pick, a line on each limb leaving a bare band down the middle.
-    `ic-mono-weight` buys nothing at 17 px. `wt-wide-L` stays shipped.
-  - **ROUND 3c, 2026-09-10: THE TOWER HAS THREE SURFACES AND EVERY ROW SHADED THEM AS ONE.** Tom,
-    with two sketches: *"the gradient can't really continue to the top of the tank ... we may want
-    to make the entire 'roof' lighter (in the sun). Also, I suppose that the underside is darker."*
-    Four `-3surf-` rows, BESIDE the two he is choosing between rather than instead of them.
-    **His own *"It may be pointless for our purposes"* answers in two halves at two sizes:** the dark
-    UNDERSIDE works from 32 px (bowl against wall 68.8 / 66.5 / 72.2 / 72.8 at 32 / 48 / 192 / 512
-    against 10.1 / 9.9 / 1.9 / 1.4), and the sunlit ROOF needs 192 on his aspect, because a
-    1.5-unit cone under a 2-unit outline has no fill left; the FITTED aspect's 2-unit cone reads
-    from 32. **The silhouette worry did not happen** -- a sunlit roof is LIGHTER than the sky, so
-    roof-against-sky RISES. Numbers and the catwalk-probe caveat: `dev/icon-preview/README.md`.
-  - **NEXT: Tom picks a row.** The maskable question is answered on the same sheet (Tom, asked what
-    background he wanted behind a transparent stroke glyph: *"Make it look like the sky, cloudy if
-    that helps with contrast"*): `icons/icon-192.png` and `icon-512.png` are declared
-    `purpose: "any maskable"` and need an opaque ground and the 80% safe circle, which
-    `ic-mask-wide3fit-overcast` meets at 0.80 scale. Nothing ships until he chooses.
+  users."* **THE MARK SHIPPED 2026-09-10 and this task now carries only the votes and the one open
+  proportion question.** Drawings, measurements and every rejected round: `dev/icon-preview/README.md`
+  and `ship-notes.md`. Sheets: `concepts-2026-09-08b.html` (geometry), `concepts-2026-09-09-color.html`
+  (color), `render/ship/` and `render/app-icons/` (the shipped proofs).
+  - **What ships:** `icons/favicon.svg` (WT-TALL-3, silver on an overcast sky) on librewaternet.org,
+    not-epanet.org and the app page; the engraved mono tower as the `lpn_` Water menu icon; and
+    `icon-192/512.png` plus `icon.svg` as the installable app icons. Tom: *"Favicon as it stands is
+    my one true love."*
+  - **THE SHADING FOLLOWS THE SOLID, WHICH IS THE ONE IDEA WORTH KEEPING.** One light above, three
+    surfaces: the CYLINDER wall takes a left-right band, the CONE roof a radial highlight from the
+    apex, the HEMISPHERE belly a downward darkening from the springline. Round 3c had shaded all
+    three as if they were the wall. Tom supplied the correction in three sentences after losing his
+    sketch, and they are quoted verbatim in `ship-notes.md` because nothing else corroborates them.
+  - **THE L FOR LIBRE IS GONE** (Tom, 2026-09-10: *"The L is gone."*). It cannot sit on this
+    geometry: WT-TALL-3's crown is a 1.5-unit cone against WT-WIDE's 3.65-unit dome, and the letter
+    fuses into the outline with zero legible pixels at 17 px AND at 32. `render/ship/L-test.png`.
+  - **OPEN, AND THE ONLY THING OPEN: the app icon's legs are 21.5% longer relative to the tank than
+    the favicon draws them.** A maskable icon must keep its body inside a circle of 80% diameter
+    while Tom's own ruling says descenders reach the bottom, and those are mutually exclusive --
+    any point on the frame edge is >=12 units from center against a 9.6 safe radius. The body is
+    scaled 0.85 and the descenders run to the true edge, so both hold, at that proportion cost.
+    It reads as the same mark and is visibly leggier. Shipped on the coordinator's judgement and
+    flagged for Tom; the fallbacks are a smaller safe margin or a second shorter-legged tower.
+  - **THE VOTES, and they still do not agree, which is the finding.** MAH, lay person, 29: likes
+    old-timey. PCW, senior civil engineer, 60+, no EPANET experience: likes `wt-tall-3` -- the
+    aspect that shipped. MJH, civil engineering designer and power user, 27: **read `wt-wide-L` as a
+    lavatory SINK**, thought that was fine, and preferred it to any old-timey tower. Three people,
+    three answers, and one of them did not see a water tower at all. Keep collecting; a fourth
+    reader who does not see a tower is the signal that would reopen the drawing.
 
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable
