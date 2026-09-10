@@ -5,14 +5,59 @@ Scratch drawings for icons under consideration. Nothing here ships; a winner is 
 
 ## Water tower IN COLOR, round 3 (2026-09-09, revised 2026-09-10) -- CURRENT
 
-`node gen-concepts-color.js` writes 12 color candidates and 5 mono menu candidates (`ic-*.svg`),
-170 REAL PNGs under `render/color/` at 16 / 32 / 48 / 192 / 512 on a white and on a dark page ground
+`node gen-concepts-color.js` writes 16 color candidates and 5 mono menu candidates (`ic-*.svg`),
+210 REAL PNGs under `render/color/` at 16 / 32 / 48 / 192 / 512 on a white and on a dark page ground
 (the mono rows at 16 / 17 / 24 / 32), and
 `concepts-2026-09-09-color.html`, which shows every raster at 1:1 beside its verdict. The three
 contact sheets `render/color/sheet-color.png`, `blowup-color.png` and `blowup-color-dk.png` are the
 pictures the verdicts were judged on. Round 2 settled the GEOMETRY; every path here is round 2's,
 and the only new geometry is a closed body path per tower (round 2's own numbers, joined so there is
 something to fill) and the W in the one LW row, which is marked OURS on the sheet.
+
+**ROUND 3c, 2026-09-10: THE TOWER HAS THREE SURFACES AND WAS SHADED AS ONE.**
+
+Tom, with two annotated sketches: *"To be pedantic about the ic-tall variants with gradients, the
+gradient can't really continue to the top of the tank ... It may be pointless for our purposes, or we
+may want to make the entire 'roof' lighter (in the sun). Also, I suppose that the underside is
+darker."* It is lighting physics, not taste: a cylinder wall photographs as a left-right band and a
+CONE does not, the cone faces the sky and is the brightest thing on the tower, and the bowl underneath
+faces the ground and is the darkest.
+
+**Four new rows carry `-3surf-` and the two he is choosing between are untouched beside them** --
+he is choosing, and a three-surface tower is another candidate, not a correction. The wall's ramp is
+exactly as it was and now STOPS at the springline; the roof and the bowl are painted OVER the filled
+body on their own outlines, because three abutting fills would leave an antialiased hairline of page
+ground along each seam at 16 px.
+
+**HE ASKED THE RIGHT QUESTION HIMSELF -- "It may be pointless for our purposes" -- AND THE ANSWER HAS
+TWO HALVES AT TWO DIFFERENT SIZES.** `surfaceTones()` reads four bands of pixels on the same four
+center columns, one per surface plus the sky above the apex, counting a pixel only when neither it
+nor any of its eight neighbours is ink.
+
+- **The UNDERSIDE works from 32 px up, and at 16 px on the fitted aspect.** Bowl against wall
+  68.8 / 66.5 / 72.2 / 72.8 at 32 / 48 / 192 / 512 on `ic-tall3-3surf-overcast`, against
+  10.1 / 9.9 / 1.9 / 1.4 for its two-surface parent -- which is a parent with no underside at all.
+  **It is the bigger half of the treatment and the half that reaches the sizes that ship.**
+- **The ROOF on HIS OWN ASPECT needs 192 px.** The cone is 1.5 units deep and the outline stroke is
+  2 units wide, so at 16, 32 and 48 px there is not one pixel of roof fill clear of ink -- the cone
+  is its own outline. Roof against wall is 26.4 at 192 and 42.2 at 512, against 9.7 and 8.5.
+  On the FITTED aspect the cone is 2 units deep and the roof reads from 32 px
+  (16.4 / 14.3 / 35.6 / 40.7 against 5.8 / 2.0 / 0.6 / 0.2).
+- **THE SILHOUETTE WORRY DID NOT HAPPEN: a sunlit roof is LIGHTER than the sky, not nearer it.**
+  Roof against sky RISES -- 50.3 at 192 and 67.0 at 512 on the plain-sky row against 33.6 and 33.4
+  for its parent, and 28.9 / 45.5 against 12.2 / 11.9 on the overcast one, whose sky is the lighter
+  of the two. Below 192 the ink outline is holding the silhouette by itself on every row of this
+  sheet anyway.
+- **The one measured cost is the catwalk number, and it is mostly the probe.** It falls from 55.1 to
+  30.5 on his aspect at 16 px and from 58.6 to 23.0 on the fitted one, because `catwalkMiddle()`
+  compares the bar with the MEAN of the body two units above and below, and below it is now the dark
+  bowl; at 16 px those samples are one pixel apart and on the fitted row the "above" sample lands on
+  the bar itself. Read directly, the bar is still 46 luminance from the bowl beneath it at 16 px.
+  **The metric is left exactly as it was**, because every other row's verdict was set with it.
+  `ic-tall3-3surf-lift-overcast` is the drawing-side answer: the bowl darkens DOWNWARD from the bowl
+  line, which is the same top-lit scene rather than a second light, and it costs about 12 luminance
+  of underside (52.4 / 49.7 / 58.3 / 60.1).
+- Descenders, their three separate runs and every other row on the sheet are unchanged.
 
 **ROUND 3b, 2026-09-10, after Tom read the sheet.**
 
@@ -65,6 +110,10 @@ sizes** (delta-L 44-59 at 16 px, 89-162 from 32 up), because the bar is ink and 
 | `ic-tall3-steel-sky` | FAVICON | Re-measured after the descender fix: three separate descenders on the 16 px bottom row, catwalk delta-L 55. |
 | `ic-tall3-steel-overcast` | FAVICON | **THE FRONT RUNNER.** Best of his own aspect at 16: catwalk 55, feet 69, three descenders apart. |
 | `ic-tall3-silver-flat` | FAVICON | Control; the flat fill costs nothing at 16 and buys no cylinder above it. |
+| `ic-tall3-3surf-overcast` | FAVICON | ROUND 3c on the front runner. Underside from 32 px, roof only from 192. |
+| `ic-tall3-3surf-sky` | FAVICON | The plain-sky twin, and the row that shows the silhouette improving rather than dissolving. |
+| `ic-tall3-3surf-lift-overcast` | FAVICON | OURS: the bowl darkens downward from the bowl line, so the catwalk keeps a lighter surface under it. |
+| `ic-wide3fit-3surf-overcast` | FAVICON | The best row for the treatment -- a 2-unit cone, so the roof reads from 32 px, and it is the maskable geometry. |
 | `ic-wide-L-blue` | MENU ONLY | His solid-blue ask, exactly. The catwalk row above, and the letter still needs 32. |
 | `ic-wide-LW-blue` | RECORD ONLY | Two letters in a crown that struggles with one. The W is OURS. |
 | `ic-wide-L-blue-knockout` | MENU ONLY | OURS: the catwalk in the ground color, delta-L 47 at 16 against 0 without it. |

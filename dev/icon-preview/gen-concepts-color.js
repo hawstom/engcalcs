@@ -43,6 +43,19 @@
  *      for the cylinder." Five candidates at the foot of the sheet, at 16/17/24/32 in one ink on
  *      light and on dark. NOTHING IS DEPLOYED: wt-wide-L is still the shipped menu icon, and
  *      lib/Icons.lib.php, icons/ and both sibling repositories were not touched.
+ *
+ * ROUND 3c, 2026-09-10, and it is LIGHTING PHYSICS rather than taste. Tom, with two sketches:
+ *
+ *   "To be pedantic about the ic-tall variants with gradients, the gradient can't really continue
+ *    to the top of the tank ... It may be pointless for our purposes, or we may want to make the
+ *    entire 'roof' lighter (in the sun). Also, I suppose that the underside is darker."
+ *
+ * A tower has THREE surfaces and every row above shades them as ONE. A cylinder wall photographs as
+ * a left-right band and that is what the wall has and keeps; a CONE does not, and it faces the sky,
+ * so it is the brightest thing there; the bowl underneath faces the ground and is the darkest. Four
+ * new rows, BESIDE the two he is choosing between rather than instead of them, because this is a
+ * candidate and not a correction. surfaceTones() answers the question he asked himself -- whether it
+ * survives -- and the answer has two halves at two different sizes; see the sheet.
  */
 'use strict';
 var fs = require('fs');
@@ -78,7 +91,18 @@ var TALL3 = {
 			+ '<path d="M12 18.15V' + bot + '"/>';
 	},
 	tank: [7.95, 16.05, 3.7, 18.15], feet: [7.95, 12, 16.05],
-	catwalk: 13.55, probeX: 12, foot: 11.96
+	catwalk: 13.55, probeX: 12, foot: 11.96,
+	// THE THREE SURFACES (round 3c). The body above is ONE closed outline and takes ONE fill, which
+	// is what Tom's lighting note is about. Split at the two places the surface actually turns:
+	// the springline (y 3.7) where the cone starts, and the bowl line (y 14.15) where the wall ends.
+	roof: 'M7.95 3.7L12 2.2L16.05 3.7Z',
+	cyl: 'M7.95 3.7H16.05V14.15H7.95Z',
+	bowl: 'M7.95 14.15C7.95 16.36 9.76 18.15 12 18.15C14.24 18.15 16.05 16.36 16.05 14.15Z',
+	// The BANDS surfaceTones() reads, [x0, x1, y0, y1] in drawing units. All four are the same four
+	// columns about the center, so the wall's own left-right ramp is at the same phase in every one
+	// of them and the numbers are comparable. Each band spans its surface's FULL depth on those
+	// columns, ink included: what fraction of it is fill rather than outline is half the answer.
+	sample: { sky: [10, 14, 0.2, 1.2], roof: [10, 14, 2.4, 3.7], cyl: [10, 14, 5, 12], bowl: [10, 14, 14.9, 17.0] }
 };
 var TALL3FIT = {
 	body: 'M4.6 4L12 2L19.4 4V14C19.4 16.32 16.09 18.2 12 18.2C7.91 18.2 4.6 16.32 4.6 14Z',
@@ -90,7 +114,11 @@ var TALL3FIT = {
 			+ '<path stroke-width="3.2" stroke-linecap="butt" d="M12 18.2V' + bot + '"/>';
 	},
 	tank: [4.6, 19.4, 4, 18.2], feet: [4.6, 12, 19.4],
-	catwalk: 13.4, probeX: 12, foot: 11.96
+	catwalk: 13.4, probeX: 12, foot: 11.96,
+	roof: 'M4.6 4L12 2L19.4 4Z',
+	cyl: 'M4.6 4H19.4V14H4.6Z',
+	bowl: 'M4.6 14C4.6 16.32 7.91 18.2 12 18.2C16.09 18.2 19.4 16.32 19.4 14Z',
+	sample: { sky: [10, 14, 0.2, 1.0], roof: [10, 14, 2.2, 4.0], cyl: [10, 14, 5, 12], bowl: [10, 14, 14.9, 17.0] }
 };
 // WT-WIDE's crown carries the black letter, which is exactly where the center column would look for
 // a body baseline, so this one is sampled at x = 17: inside the tank at the catwalk and inside the
@@ -117,17 +145,41 @@ var LW_CROWN = '<path d="M7.4 3.9V7.7H10.1"/><path d="M11.5 3.9L12.6 7.7L13.9 5.
 // vertical band a third of the way in, and a second darker limb.
 var STEEL = [['0', '#6f767d'], ['0.18', '#9aa2a9'], ['0.36', '#eef1f3'], ['0.54', '#c2c8cd'],
 	['0.78', '#8b9299'], ['1', '#666d74']];
+// ROUND 3c, and it is a lighting correction rather than a taste one. Tom, 2026-09-10, with two
+// sketches: "the gradient can't really continue to the top of the tank ... we may want to make the
+// entire 'roof' lighter (in the sun). Also, I suppose that the underside is darker."
+//
+// A cylinder wall and a cone are not the same surface and cannot take the same ramp. The wall's
+// left-right band above is right for the wall and stays EXACTLY as it is; the cone faces the sky
+// and is the brightest thing on the tower; the bowl underneath faces the ground and is the darkest.
+// Both new ramps keep the wall's own stop positions, so the three surfaces are the same lighting
+// read at three exposures rather than three unrelated gradients.
+var ROOF = [['0', '#dfe4e8'], ['0.36', '#ffffff'], ['0.72', '#f2f5f7'], ['1', '#dbe1e6']];
+var BOWL = [['0', '#525960'], ['0.36', '#868d94'], ['0.72', '#6b7278'], ['1', '#4b5157']];
 var FLAT_SILVER = '#b3b9bf';
 var INK = '#232a30';
 var SKY_LIGHT = '#cfe6f7';
 var BLUE = '#1c62b9';
 
-function defs(id, kind, ground) {
+function ramp(id, stops) {
+	return '<linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="0">'
+		+ stops.map(function (p) { return '<stop offset="' + p[0] + '" stop-color="' + p[1] + '"/>'; }).join('')
+		+ '</linearGradient>';
+}
+function defs(id, kind, ground, surfaces) {
 	var s = '';
 	if (kind === 'steel') {
-		s += '<linearGradient id="g' + id + '" x1="0" y1="0" x2="1" y2="0">'
-			+ STEEL.map(function (p) { return '<stop offset="' + p[0] + '" stop-color="' + p[1] + '"/>'; }).join('')
-			+ '</linearGradient>';
+		s += ramp('g' + id, STEEL);
+		if (surfaces) { s += ramp('r' + id, ROOF) + ramp('b' + id, BOWL); }
+		if (surfaces === 'lift') {
+			// The measured cost of a dark underside, and its repair. The catwalk sits 0.6 units above
+			// the bowl line, so a bowl at one dark tone puts a dark surface directly under a dark bar
+			// and the bar loses its lower edge at 16 px. Lifting the TOP of the bowl is the same
+			// top-lit scene, not a second light: an underside is darkest where it faces the ground.
+			s += '<linearGradient id="l' + id + '" x1="0" y1="0" x2="0" y2="1">'
+				+ '<stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/>'
+				+ '<stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/></linearGradient>';
+		}
 	}
 	if (ground === 'sky') {
 		s += '<linearGradient id="s' + id + '" x1="0" y1="0" x2="0" y2="1">'
@@ -168,8 +220,17 @@ function draw(id, o) {
 	// The y a descender must be drawn to so that it lands ON the frame's bottom edge after this
 	// concept's own scale. See the geometry comment: 24 unscaled, 12 + 12/scale when scaled.
 	var bot = round2(o.scale && o.scale !== 1 ? 12 + 12 / o.scale : 24);
-	var inner = '<path d="' + g.body + '" fill="' + fill + '"/>'
-		+ '<g fill="none" stroke="' + o.stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+	var inner = '<path d="' + g.body + '" fill="' + fill + '"/>';
+	if (o.surfaces) {
+		// The whole body is filled with the WALL ramp first and the other two surfaces are painted
+		// OVER it, exactly on their own outlines. Three abutting fills would put an antialiased
+		// hairline of page ground along each seam at 16 px; an overlay cannot, because whatever the
+		// edge pixel blends with is the same tower underneath it.
+		inner += '<path d="' + g.roof + '" fill="url(#r' + id + ')"/>'
+			+ '<path d="' + g.bowl + '" fill="url(#b' + id + ')"/>';
+		if (o.surfaces === 'lift') { inner += '<path d="' + g.bowl + '" fill="url(#l' + id + ')"/>'; }
+	}
+	inner += '<g fill="none" stroke="' + o.stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
 		+ g.strokes(bot) + (o.letter || '') + '</g>';
 	if (o.walkKnockout) {
 		// OURS, offered as the repair for the very thing Tom predicted: the catwalk redrawn in the
@@ -180,7 +241,7 @@ function draw(id, o) {
 	if (o.scale && o.scale !== 1) {
 		inner = '<g transform="translate(12 12) scale(' + o.scale + ') translate(-12 -12)">' + inner + '</g>';
 	}
-	return defs(id, o.fill === 'steel' ? 'steel' : '', o.ground) + groundEl(id, o.ground) + inner;
+	return defs(id, o.fill === 'steel' ? 'steel' : '', o.ground, o.surfaces) + groundEl(id, o.ground) + inner;
 }
 
 // --------------------------------------------------------------------------------------------
@@ -223,6 +284,33 @@ add({ id: 'ic-tall3-silver-flat', title: 'wt-tall-3 as he drew it, FLAT silver (
 	why: 'Control for the row above, and it says what the fitted tower\'s control said: the flat fill costs nothing at 16 px and buys no cylinder above it. The gradient is a taste question.',
 	verdict: 'FAVICON',
 	o: { geo: TALL3, fill: FLAT_SILVER, stroke: INK, ground: 'sky' } });
+
+// ROUND 3c: the same two front-runner rows with the tower lit as THREE surfaces. They sit BESIDE
+// their parents rather than replacing them -- Tom is choosing between the two-surface rows, and this
+// is a candidate, not a correction.
+add({ id: 'ic-tall3-3surf-overcast', title: 'FRONT RUNNER lit as three surfaces: sunlit roof, wall band, dark underside',
+	ask: 'His lighting note, 2026-09-10: "the gradient can\'t really continue to the top of the tank ... we may want to make the entire roof lighter (in the sun). Also, I suppose that the underside is darker." The wall ramp is unchanged and now STOPS at the springline; the cone takes a near-white ramp and the bowl a dark one.',
+	why: 'THE ROOF AND THE UNDERSIDE DIE AT DIFFERENT SIZES, and that is the whole answer. The UNDERSIDE works from 32 px up -- bowl against wall 68.8 / 66.5 / 72.2 / 72.8 at 32 / 48 / 192 / 512, against 10.1 / 9.9 / 1.9 / 1.4 for its two-surface parent, which is the parent having no underside at all. The ROOF shows only at 192 and up: on this aspect the cone is 1.5 units deep and the outline is 2 units wide, so at 16, 32 and 48 px the band holds NOT ONE pixel of roof fill that is not touching ink, and roof against wall is 26.4 at 192 and 42.2 at 512 against 9.7 and 8.5. Descenders and their three separate runs are the parent\'s exactly.',
+	verdict: 'FAVICON',
+	o: { geo: TALL3, fill: 'steel', stroke: INK, ground: 'overcast', surfaces: true } });
+
+add({ id: 'ic-tall3-3surf-sky', title: 'Three surfaces, plain sky (the other half of the pair he is choosing between)',
+	ask: 'The same treatment on the plain-sky twin, because the pair is what he is choosing between and a lighting change has to be judged on both grounds.',
+	why: 'THE SILHOUETTE WORRY DID NOT HAPPEN, and it is this row that says so most clearly. A sunlit roof is LIGHTER than the sky rather than nearer it: roof against sky is 50.3 at 192 and 67.0 at 512, against 33.6 and 33.4 for the two-surface parent. On the overcast twin, whose sky is the lighter of the two, it is still 28.9 and 45.5 against 12.2 and 11.9. The lighter roof buys outline rather than spending it, and below 192 the ink outline is doing that job by itself anyway.',
+	verdict: 'FAVICON',
+	o: { geo: TALL3, fill: 'steel', stroke: INK, ground: 'sky', surfaces: true } });
+
+add({ id: 'ic-wide3fit-3surf-overcast', title: 'Three surfaces on the fitted tower (the maskable geometry)',
+	ask: 'The fitted aspect carries the maskable pair, and a maskable icon is 192 px and up -- the sizes where a three-surface reading has the most room. Its roof is 2 units tall at the center against 1.5 on his own aspect.',
+	why: 'THE BEST ROW FOR THE TREATMENT, because the cone has somewhere to be: 2 units deep at the center against 1.5, so 19 to 37 per cent of the roof band is clean fill at every size and the roof reads from 32 px -- roof against wall 16.4 / 14.3 / 35.6 / 40.7 at 32 / 48 / 192 / 512 against 5.8 / 2.0 / 0.6 / 0.2 for its parent. Its underside works at every size, 16 included (50.1). If the three-surface treatment is taken anywhere, it is taken here first: this geometry carries the maskable pair and a maskable icon is never seen below 192.',
+	verdict: 'FAVICON',
+	o: { geo: TALL3FIT, fill: 'steel', stroke: INK, ground: 'overcast', surfaces: true } });
+
+add({ id: 'ic-tall3-3surf-lift-overcast', title: 'Three surfaces, underside lifted at the bowl line',
+	ask: "OURS, and it is the repair for the one thing the dark underside measurably costs: the catwalk runs 0.6 units above the bowl line, so a bowl at one dark tone takes the bar's lower edge with it. The bowl darkens DOWNWARD from the bowl line here, which is the same top-lit scene rather than a second light.",
+	why: 'It does what it was drawn for and the effect is small: bowl against wall 52.4 / 49.7 / 58.3 / 60.1 where the unlifted row is 68.8 / 66.5 / 72.2 / 72.8, so the underside is still plainly an underside and the catwalk has a lighter surface to sit against. Read it beside its unlifted twin at 16 px and choose on taste; the measured difference at that size is one pixel of the bowl top.',
+	verdict: 'FAVICON',
+	o: { geo: TALL3, fill: 'steel', stroke: INK, ground: 'overcast', surfaces: 'lift' } });
 
 add({ id: 'ic-wide-L-blue', title: 'wt-wide-L, solid blue, black L, light sky-blue ground',
 	ask: 'His second ask, exactly: the shipped mark as solid blue with a black letter on a light sky-blue ground. THIS IS THE ROW HIS CATWALK PREDICTION IS ABOUT.',
@@ -434,6 +522,64 @@ function catwalkMiddle(file, geo, px, scale) {
 }
 
 /**
+ * ARE THE THREE SURFACES DISTINGUISHABLE IN THE ACTUAL PIXELS?
+ *
+ * Round 3c's whole question, and Tom raised it himself -- "It may be pointless for our purposes."
+ * Four points are read on the CENTER column, so the wall's own left-right ramp is at the same phase
+ * in every one of them: sky just above the apex, the cone, the wall at mid height, the bowl. Each is
+ * a mean over a box of about half a drawing unit, which is one pixel at 16 and 32 px and grows with
+ * the raster; at the small sizes the sample is whatever the rasterizer put there, INCLUDING the ink
+ * stroke, and that is the finding rather than a flaw in the method.
+ *
+ *   roofVsCyl -- the treatment's own payload: is the cone lighter than the wall below it?
+ *   roofVsSky -- the silhouette risk, and the specific way this change could make the icon worse.
+ *                A roof light enough to dissolve into the sky costs the tower its outline.
+ *   bowlVsCyl -- the underside.
+ *
+ * Same luminance difference on 0-255 and the same threshold of 26 the catwalk measurement uses.
+ */
+function surfaceTones(file, geo, px, scale, inkL) {
+	if (!geo.sample) { return null; }
+	var img = readPNG(file), k = px / 24, sc = scale || 1, ink = inkL === undefined ? 41 : inkL;
+	// AN ANTIALIASED EDGE PIXEL IS NOT THE SURFACE. The first version of this averaged every non-ink
+	// pixel in the band and the fringe dragged the mean by 30 to 50 luminance -- enough to make the
+	// three-surface row read DARKER than its two-surface parent at 192 px, which is the opposite of
+	// what the drawing does. A pixel is counted only if neither it nor any of its eight neighbors is
+	// ink, so what is averaged is surface that owns its whole pixel.
+	function isInk(x, y) { var L = lum(img, x, y); return L !== null && Math.abs(L - ink) <= 30; }
+	function touchesInk(x, y) {
+		for (var dy = -1; dy <= 1; dy++) { for (var dx = -1; dx <= 1; dx++) { if (isInk(x + dx, y + dy)) { return true; } } }
+		return false;
+	}
+	function band(b) {
+		// Every pixel whose CENTER falls in the band, split into outline and fill. A pixel within 30
+		// of the ink is outline; everything else is the surface showing through. `frac` is how much
+		// of the surface is fill at this size, and it is the number that decides whether a lighting
+		// treatment has anything to act on at all.
+		var x0 = Math.round((12 + (b[0] - 12) * sc) * k), x1 = Math.round((12 + (b[1] - 12) * sc) * k);
+		var y0 = Math.round((12 + (b[2] - 12) * sc) * k), y1 = Math.round((12 + (b[3] - 12) * sc) * k);
+		var sum = 0, n = 0, tot = 0;
+		for (var y = y0; y <= y1; y++) {
+			for (var x = x0; x <= x1; x++) {
+				var L = lum(img, x, y);
+				if (L === null) { continue; }
+				tot++;
+				if (!isInk(x, y) && !touchesInk(x, y)) { sum += L; n++; }
+			}
+		}
+		return { L: n ? sum / n : null, n: n, tot: tot, frac: tot ? Math.round(n / tot * 100) : 0 };
+	}
+	var s = geo.sample, sky = band(s.sky), roof = band(s.roof), cyl = band(s.cyl), bowl = band(s.bowl);
+	function d(a, b) { return (a.L === null || b.L === null) ? null : Math.round(Math.abs(a.L - b.L) * 10) / 10; }
+	return {
+		sky: sky.L === null ? null : Math.round(sky.L), roof: roof.L === null ? null : Math.round(roof.L),
+		cyl: cyl.L === null ? null : Math.round(cyl.L), bowl: bowl.L === null ? null : Math.round(bowl.L),
+		roofFill: roof.frac, bowlFill: bowl.frac, roofPx: roof.n,
+		roofVsCyl: d(roof, cyl), roofVsSky: d(roof, sky), bowlVsCyl: d(bowl, cyl)
+	};
+}
+
+/**
  * Does the cylinder shading SURVIVE at this size, and what does it buy?
  *
  * Sampled on one raster row at the tank's mid height (y = 11 units), across the whole icon; ink is
@@ -506,7 +652,7 @@ function descenderFeet(file, geo, px, scale) {
 
 // --------------------------------------------------------------------------------------------
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function sheet(meas, feet, mono) {
+function sheet(meas, feet, mono, tones) {
 	var CSS = 'body{margin:24px;font:14px/1.55 system-ui,sans-serif;color:#111;background:#fff;max-width:1440px}'
 		+ 'h1{font-size:20px}h2{font-size:16px;margin-top:30px}code{font:12px ui-monospace,monospace;background:#f0f0f0;padding:1px 3px}'
 		+ '.note{color:#333;max-width:78ch}table{border-collapse:collapse;width:100%;margin-top:10px}'
@@ -552,7 +698,28 @@ function sheet(meas, feet, mono) {
 			+ '<tr><th>descenders apart</th>' + SIZES.map(function (p) {
 				var r = f && f[p];
 				return '<td class="' + (r && r.runs >= 3 ? 'yes' : 'no') + '">' + (r ? r.runs : '-') + '</td>';
-			}).join('') + '</tr></table>';
+			}).join('') + '</tr></table>' + ttable(c);
+	}
+	// The three-surface measurement. Printed on every row that HAS a cone -- the two-surface parents
+	// included, because the question this round answers is what the treatment buys OVER them, and a
+	// column where the two rows print the same number is a size at which it buys nothing.
+	function ttable(c) {
+		var t = tones[c.id];
+		if (!t || !SIZES.some(function (p) { return t[p]; })) { return ''; }
+		function line(label, key, thr) {
+			return '<tr><th>' + label + '</th>' + SIZES.map(function (p) {
+				var r = t[p], v = r ? r[key] : null;
+				// null is not a small number: it means the band held no fill pixel at all at this
+				// size, which is the surface having been eaten by its own outline.
+				return '<td class="' + (v !== null && v >= thr ? 'yes' : 'no') + '">' + (v === null ? 'none' : v) + '</td>';
+			}).join('') + '</tr>';
+		}
+		return '<table class="m"><tr><th>px</th>' + SIZES.map(function (p) { return '<th>' + p + '</th>'; }).join('') + '</tr>'
+			+ line('roof v wall &Delta;L', 'roofVsCyl', 26)
+			+ line('roof v sky &Delta;L', 'roofVsSky', 26)
+			+ line('bowl v wall &Delta;L', 'bowlVsCyl', 26)
+			+ line('roof fill %', 'roofFill', 1)
+			+ '</table>';
 	}
 	function monoTable(c) {
 		var m = mono[c.id];
@@ -608,6 +775,8 @@ function sheet(meas, feet, mono) {
 	return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Water tower in color, round 3</title>'
 		+ '<style>' + CSS + '</style></head><body>\n'
 		+ '<h1>Water-tower brand mark in color, round 3 (2026-09-09, revised 2026-09-10)</h1>\n'
+		+ '<p class="note"><b>What changed in round 3c.</b> Four new rows carrying <code>-3surf-</code> in their names light the tower as THREE surfaces instead of one, which is Tom\'s lighting note of 2026-09-10. '
+		+ 'They sit BESIDE <code>ic-tall3-steel-overcast</code> and <code>ic-tall3-steel-sky</code>, which are unchanged: he is choosing between those two, and a three-surface tower is another candidate rather than a correction to them. See the section below.</p>\n'
 		+ '<p class="note"><b>What changed on 2026-09-10.</b> The descenders were truncated on every row and now reach the bottom edge, which is the first bullet below and which moved two verdicts. '
 		+ 'The three fitted-tower rows were renamed <code>ic-tall3fit-*</code> to <code>ic-wide3fit-*</code> on Tom\'s instruction, because a WT-TALL-3 fitted to a square frame reads WIDE; '
 		+ '<code>ic-mask-tall3fit-overcast</code> went with them as <code>ic-mask-wide3fit-overcast</code>, being the same geometry. The <code>ic-tall3-*</code> rows keep their name: they are his own aspect and they really are tall. '
@@ -625,6 +794,13 @@ function sheet(meas, feet, mono) {
 		+ '&Delta;L is the luminance difference (0-255) between the strongest row within half a stroke '
 		+ 'of the bar and the mean of the body rows 2 units either side. <b>Green is &Delta;L &ge; 26</b>, a tenth of the range, which is about where a difference '
 		+ 'stops being findable on a screen at arm\'s length. Red is a bar with no middle.</p>\n'
+		+ '<h2>The three surfaces, measured (round 3c)</h2>\n'
+		+ '<p class="note">Tom, 2026-09-10, with two sketches: <i>"the gradient can\'t really continue to the top of the tank ... we may want to make the entire roof lighter (in the sun). Also, I suppose that the underside is darker."</i> '
+		+ 'He is right, and it is a fact about surfaces rather than a preference: a cylinder wall photographs as a left-right band, a CONE does not, and the bowl underneath faces the ground. '
+		+ 'The four <code>-3surf-</code> rows stop the wall\'s ramp at the springline and give the cone and the bowl their own; <b>the wall\'s band is untouched</b>, and so is every row above them.</p>\n'
+		+ '<p class="note">He also asked the right question about it -- <i>"It may be pointless for our purposes"</i> -- so each of those rows carries a second table. Four bands of pixels are read on the same four center columns, one per surface plus the sky above the apex, '
+		+ 'and a pixel counts only if neither it nor any of its eight neighbours is ink: an antialiased edge pixel is not the surface, and averaging it in was enough to make the three-surface row read DARKER than its parent at 192 px. '
+		+ '<b>roof fill %</b> is how much of the roof band is clean fill at that size, and <code>none</code> on a &Delta;L row means there was no such pixel at all.</p>\n'
 		+ '<h2>What the rasters said</h2>\n'
 		+ '<ul class="note"><li><b>The catwalk answer, and it is not the one he expected.</b> On the solid-blue rows the middle is gone at EVERY size, 512 included, '
 		+ 'not just in the raster: a bar the same color as the body it crosses has nothing to be seen against. It is a color decision rather than a resolution one, '
@@ -641,6 +817,15 @@ function sheet(meas, feet, mono) {
 		+ 'because the legs stopped short of it.</li>'
 		+ '<li><b>On the sink reading, the ground and the fill do the work, not the outline.</b> The same WT-WIDE paths, silver on sky, read as a vessel outdoors; '
 		+ 'nothing was redrawn.</li>'
+		+ '<li><b>ROUND 3c: THE ROOF AND THE UNDERSIDE DIE AT DIFFERENT SIZES, and that is the finding.</b> '
+		+ 'The <b>underside</b> works from 32 px up on both aspects and at 16 px on the fitted one: bowl against wall 68.8 / 66.5 / 72.2 / 72.8 at 32 / 48 / 192 / 512 on <code>ic-tall3-3surf-overcast</code>, against 10.1 / 9.9 / 1.9 / 1.4 for its two-surface parent, which is a parent with no underside at all. '
+		+ 'The <b>roof</b> on his own aspect needs 192: the cone is 1.5 units deep and the outline stroke is 2 units wide, so at 16, 32 and 48 px there is not one pixel of roof fill clear of ink, and roof against wall is 26.4 at 192 and 42.2 at 512 against 9.7 and 8.5. '
+		+ 'On the FITTED aspect the cone is 2 units deep and the roof reads from 32 (16.4 / 14.3 / 35.6 / 40.7 against 5.8 / 2.0 / 0.6 / 0.2).</li>'
+		+ '<li><b>The silhouette worry did not happen: a sunlit roof is LIGHTER than the sky, not nearer it.</b> Roof against sky rises rather than falls -- 50.3 at 192 and 67.0 at 512 on the plain-sky row against 33.6 and 33.4 for its parent, and 28.9 / 45.5 against 12.2 / 11.9 on the overcast one, whose sky is the lighter of the two. '
+		+ 'Below 192 the ink outline is holding the silhouette by itself in every row on this sheet anyway.</li>'
+		+ '<li><b>The one thing a dark underside costs, and it is a probe artifact more than a loss.</b> The catwalk number falls on the 3surf rows (55.1 to 30.5 on his aspect at 16 px; 58.6 to 23.0 on the fitted one) because that measurement compares the bar with the MEAN of the body 2 units above and below it, and below it is now the dark bowl. '
+		+ 'At 16 px those two samples are one pixel apart, so on the fitted row the "above" sample lands on the bar itself. Read directly, the bar is still 46 luminance from the bowl beneath it at 16 px. '
+		+ 'The metric is left exactly as it was, because every other row\'s verdict was set with it; <code>ic-tall3-3surf-lift-overcast</code> is the drawing-side answer, darkening the bowl DOWNWARD from the bowl line, which is the same top-lit scene rather than a second light.</li>'
 		+ '<li><b>For the maskable pair we would put forward <code>ic-mask-wide3fit-overcast</code>:</b> it needs only 0.80 rather than 0.74, '
 		+ 'its ground is the cloudy sky he asked for, and it is the one candidate whose catwalk still has a middle after the crop.</li></ul>\n'
 		+ '<table><thead><tr><th>Concept</th><th>16 / 32 / 48 at 1:1 on light then dark, then 192 at 1:1 on both and 512</th>'
@@ -687,12 +872,12 @@ function findChromium() {
 	if (!exe) { throw new Error('No Chromium found; set CHROME_PATH or npx playwright install chromium'); }
 	var pw = require(path.join(here, '..', 'browser-pass', 'node_modules', 'playwright-core'));
 	var browser = await pw.chromium.launch({ executablePath: exe });
-	var meas = {}, feet = {}, mono = {};
+	var meas = {}, feet = {}, mono = {}, tones = {};
 	var ALL = [SHIPPED].concat(C);
 	var gks = Object.keys(GROUNDS);
 	for (var i = 0; i < ALL.length; i++) {
 		var c = ALL[i], safe = c.id.replace(/[^a-z0-9-]/gi, '_');
-		meas[c.id] = {}; feet[c.id] = {};
+		meas[c.id] = {}; feet[c.id] = {}; tones[c.id] = {};
 		for (var gi = 0; gi < gks.length; gi++) {
 			var gk = gks[gi];
 			var page = await browser.newPage({ viewport: { width: 700, height: 700 }, deviceScaleFactor: 1 });
@@ -709,6 +894,8 @@ function findChromium() {
 					catch (e) { meas[c.id][px] = null; }
 					try { feet[c.id][px] = descenderFeet(file, c.geo, px, c.o && c.o.scale); }
 					catch (e2) { feet[c.id][px] = null; }
+					try { tones[c.id][px] = surfaceTones(file, c.geo, px, c.o && c.o.scale); }
+					catch (e5) { tones[c.id][px] = null; }
 				}
 			}
 			await page.close();
@@ -785,9 +972,9 @@ function findChromium() {
 	}
 	await shot.close();
 	await browser.close();
-	fs.writeFileSync(path.join(here, 'concepts-2026-09-09-color.html'), sheet(meas, feet, mono));
+	fs.writeFileSync(path.join(here, 'concepts-2026-09-09-color.html'), sheet(meas, feet, mono, tones));
 	fs.writeFileSync(path.join(OUT, 'catwalk-measurements.json'),
-		JSON.stringify({ catwalk: meas, descenders: feet, mono: mono }, null, '\t') + '\n');
+		JSON.stringify({ catwalk: meas, descenders: feet, mono: mono, tones: tones }, null, '\t') + '\n');
 	console.log(C.length + ' color concepts and ' + M.length + ' mono menu candidates written; ' + (ALL.length * SIZES.length * 2 + M.length * MSIZES.length * 2) + ' PNGs rendered;'
 		+ ' concepts-2026-09-09-color.html regenerated');
 	ALL.forEach(function (c) {

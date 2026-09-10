@@ -224,6 +224,134 @@
 				"ok": true
 			}
 		},
+		"ic-tall3-3surf-overcast": {
+			"16": {
+				"delta": 30.5,
+				"bar": 69,
+				"body": 99,
+				"ok": true
+			},
+			"32": {
+				"delta": 121.1,
+				"bar": 41,
+				"body": 162,
+				"ok": true
+			},
+			"48": {
+				"delta": 123.1,
+				"bar": 41,
+				"body": 164,
+				"ok": true
+			},
+			"192": {
+				"delta": 126.1,
+				"bar": 41,
+				"body": 167,
+				"ok": true
+			},
+			"512": {
+				"delta": 127.1,
+				"bar": 41,
+				"body": 168,
+				"ok": true
+			}
+		},
+		"ic-tall3-3surf-sky": {
+			"16": {
+				"delta": 30.5,
+				"bar": 69,
+				"body": 99,
+				"ok": true
+			},
+			"32": {
+				"delta": 121.1,
+				"bar": 41,
+				"body": 162,
+				"ok": true
+			},
+			"48": {
+				"delta": 123.1,
+				"bar": 41,
+				"body": 164,
+				"ok": true
+			},
+			"192": {
+				"delta": 126.1,
+				"bar": 41,
+				"body": 167,
+				"ok": true
+			},
+			"512": {
+				"delta": 127.1,
+				"bar": 41,
+				"body": 168,
+				"ok": true
+			}
+		},
+		"ic-wide3fit-3surf-overcast": {
+			"16": {
+				"delta": 23,
+				"bar": 79,
+				"body": 102,
+				"ok": false
+			},
+			"32": {
+				"delta": 124.5,
+				"bar": 41,
+				"body": 165,
+				"ok": true
+			},
+			"48": {
+				"delta": 125.2,
+				"bar": 41,
+				"body": 166,
+				"ok": true
+			},
+			"192": {
+				"delta": 127.2,
+				"bar": 41,
+				"body": 168,
+				"ok": true
+			},
+			"512": {
+				"delta": 127.6,
+				"bar": 41,
+				"body": 169,
+				"ok": true
+			}
+		},
+		"ic-tall3-3surf-lift-overcast": {
+			"16": {
+				"delta": 31.1,
+				"bar": 75,
+				"body": 106,
+				"ok": true
+			},
+			"32": {
+				"delta": 121.6,
+				"bar": 41,
+				"body": 163,
+				"ok": true
+			},
+			"48": {
+				"delta": 129.6,
+				"bar": 41,
+				"body": 171,
+				"ok": true
+			},
+			"192": {
+				"delta": 135.1,
+				"bar": 41,
+				"body": 176,
+				"ok": true
+			},
+			"512": {
+				"delta": 135.7,
+				"bar": 41,
+				"body": 177,
+				"ok": true
+			}
+		},
 		"ic-wide-L-blue": {
 			"16": {
 				"delta": 0.8,
@@ -778,6 +906,214 @@
 					173.2
 				],
 				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-tall3-3surf-overcast": {
+			"16": {
+				"at": [
+					182.8,
+					125.9,
+					69.4
+				],
+				"min": 69.4,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					176.7,
+					189.5,
+					189.5
+				],
+				"min": 176.7,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-tall3-3surf-sky": {
+			"16": {
+				"at": [
+					167.2,
+					114.5,
+					63.4
+				],
+				"min": 63.4,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					161.6,
+					173,
+					173
+				],
+				"min": 161.6,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-wide3fit-3surf-overcast": {
+			"16": {
+				"at": [
+					138.9,
+					188.6,
+					113.2
+				],
+				"min": 113.2,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					189.5,
+					189.5,
+					189.5
+				],
+				"min": 189.5,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-tall3-3surf-lift-overcast": {
+			"16": {
+				"at": [
+					182.8,
+					125.9,
+					69.4
+				],
+				"min": 69.4,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					176.7,
+					189.5,
+					189.5
+				],
+				"min": 176.7,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
 				"runs": 3,
 				"ok": true
 			}
@@ -1625,6 +1961,732 @@
 					"net": 2
 				}
 			}
+		}
+	},
+	"tones": {
+		"wt-wide-L (ships today)": {
+			"16": null,
+			"32": null,
+			"48": null,
+			"192": null,
+			"512": null
+		},
+		"ic-wide3fit-steel-sky": {
+			"16": {
+				"sky": null,
+				"roof": 197,
+				"cyl": 184,
+				"bowl": 208,
+				"roofFill": 33,
+				"bowlFill": 33,
+				"roofPx": 3,
+				"roofVsCyl": 13,
+				"roofVsSky": null,
+				"bowlVsCyl": 24.2
+			},
+			"32": {
+				"sky": 175,
+				"roof": 208,
+				"cyl": 203,
+				"bowl": 205,
+				"roofFill": 19,
+				"bowlFill": 46,
+				"roofPx": 4,
+				"roofVsCyl": 5.8,
+				"roofVsSky": 33.9,
+				"bowlVsCyl": 2.7
+			},
+			"48": {
+				"sky": 175,
+				"roof": 206,
+				"cyl": 204,
+				"bowl": 206,
+				"roofFill": 27,
+				"bowlFill": 71,
+				"roofPx": 12,
+				"roofVsCyl": 2,
+				"roofVsSky": 31.8,
+				"bowlVsCyl": 1.2
+			},
+			"192": {
+				"sky": 175,
+				"roof": 208,
+				"cyl": 207,
+				"bowl": 207,
+				"roofFill": 37,
+				"bowlFill": 95,
+				"roofPx": 181,
+				"roofVsCyl": 0.6,
+				"roofVsSky": 33,
+				"bowlVsCyl": 0.1
+			},
+			"512": {
+				"sky": 175,
+				"roof": 208,
+				"cyl": 208,
+				"bowl": 208,
+				"roofFill": 37,
+				"bowlFill": 100,
+				"roofPx": 1252,
+				"roofVsCyl": 0.2,
+				"roofVsSky": 33.2,
+				"bowlVsCyl": 0
+			}
+		},
+		"ic-wide3fit-steel-overcast": {
+			"16": {
+				"sky": null,
+				"roof": 197,
+				"cyl": 184,
+				"bowl": 208,
+				"roofFill": 33,
+				"bowlFill": 33,
+				"roofPx": 3,
+				"roofVsCyl": 13,
+				"roofVsSky": null,
+				"bowlVsCyl": 24.2
+			},
+			"32": {
+				"sky": 196,
+				"roof": 208,
+				"cyl": 203,
+				"bowl": 205,
+				"roofFill": 19,
+				"bowlFill": 46,
+				"roofPx": 4,
+				"roofVsCyl": 5.8,
+				"roofVsSky": 12.4,
+				"bowlVsCyl": 2.7
+			},
+			"48": {
+				"sky": 196,
+				"roof": 206,
+				"cyl": 204,
+				"bowl": 206,
+				"roofFill": 27,
+				"bowlFill": 71,
+				"roofPx": 12,
+				"roofVsCyl": 2,
+				"roofVsSky": 10.2,
+				"bowlVsCyl": 1.2
+			},
+			"192": {
+				"sky": 196,
+				"roof": 208,
+				"cyl": 207,
+				"bowl": 207,
+				"roofFill": 37,
+				"bowlFill": 95,
+				"roofPx": 181,
+				"roofVsCyl": 0.6,
+				"roofVsSky": 11.6,
+				"bowlVsCyl": 0.1
+			},
+			"512": {
+				"sky": 196,
+				"roof": 208,
+				"cyl": 208,
+				"bowl": 208,
+				"roofFill": 37,
+				"bowlFill": 100,
+				"roofPx": 1252,
+				"roofVsCyl": 0.2,
+				"roofVsSky": 11.7,
+				"bowlVsCyl": 0
+			}
+		},
+		"ic-wide3fit-silver-flat": {
+			"16": {
+				"sky": null,
+				"roof": 184,
+				"cyl": 166,
+				"bowl": 184,
+				"roofFill": 33,
+				"bowlFill": 33,
+				"roofPx": 3,
+				"roofVsCyl": 18,
+				"roofVsSky": null,
+				"bowlVsCyl": 18
+			},
+			"32": {
+				"sky": 175,
+				"roof": 184,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 19,
+				"bowlFill": 46,
+				"roofPx": 4,
+				"roofVsCyl": 0,
+				"roofVsSky": 9.6,
+				"bowlVsCyl": 0
+			},
+			"48": {
+				"sky": 175,
+				"roof": 184,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 24,
+				"bowlFill": 69,
+				"roofPx": 11,
+				"roofVsCyl": 0,
+				"roofVsSky": 9.5,
+				"bowlVsCyl": 0
+			},
+			"192": {
+				"sky": 175,
+				"roof": 184,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 37,
+				"bowlFill": 95,
+				"roofPx": 181,
+				"roofVsCyl": 0,
+				"roofVsSky": 9.1,
+				"bowlVsCyl": 0
+			},
+			"512": {
+				"sky": 175,
+				"roof": 184,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 37,
+				"bowlFill": 100,
+				"roofPx": 1250,
+				"roofVsCyl": 0,
+				"roofVsSky": 9.2,
+				"bowlVsCyl": 0
+			}
+		},
+		"ic-tall3-steel-sky": {
+			"16": {
+				"sky": null,
+				"roof": null,
+				"cyl": 198,
+				"bowl": null,
+				"roofFill": 0,
+				"bowlFill": 0,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 175,
+				"roof": null,
+				"cyl": 198,
+				"bowl": 208,
+				"roofFill": 0,
+				"bowlFill": 21,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 10.1
+			},
+			"48": {
+				"sky": 175,
+				"roof": null,
+				"cyl": 195,
+				"bowl": 205,
+				"roofFill": 0,
+				"bowlFill": 42,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 9.9
+			},
+			"192": {
+				"sky": 175,
+				"roof": 209,
+				"cyl": 199,
+				"bowl": 201,
+				"roofFill": 10,
+				"bowlFill": 84,
+				"roofPx": 41,
+				"roofVsCyl": 9.7,
+				"roofVsSky": 33.6,
+				"bowlVsCyl": 1.9
+			},
+			"512": {
+				"sky": 175,
+				"roof": 208,
+				"cyl": 200,
+				"bowl": 201,
+				"roofFill": 9,
+				"bowlFill": 90,
+				"roofPx": 229,
+				"roofVsCyl": 8.5,
+				"roofVsSky": 33.4,
+				"bowlVsCyl": 1.4
+			}
+		},
+		"ic-tall3-steel-overcast": {
+			"16": {
+				"sky": null,
+				"roof": null,
+				"cyl": 198,
+				"bowl": null,
+				"roofFill": 0,
+				"bowlFill": 0,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 196,
+				"roof": null,
+				"cyl": 198,
+				"bowl": 208,
+				"roofFill": 0,
+				"bowlFill": 21,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 10.1
+			},
+			"48": {
+				"sky": 196,
+				"roof": null,
+				"cyl": 195,
+				"bowl": 205,
+				"roofFill": 0,
+				"bowlFill": 42,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 9.9
+			},
+			"192": {
+				"sky": 197,
+				"roof": 209,
+				"cyl": 199,
+				"bowl": 201,
+				"roofFill": 10,
+				"bowlFill": 84,
+				"roofPx": 41,
+				"roofVsCyl": 9.7,
+				"roofVsSky": 12.2,
+				"bowlVsCyl": 1.9
+			},
+			"512": {
+				"sky": 197,
+				"roof": 208,
+				"cyl": 200,
+				"bowl": 201,
+				"roofFill": 9,
+				"bowlFill": 90,
+				"roofPx": 229,
+				"roofVsCyl": 8.5,
+				"roofVsSky": 11.9,
+				"bowlVsCyl": 1.4
+			}
+		},
+		"ic-tall3-silver-flat": {
+			"16": {
+				"sky": null,
+				"roof": null,
+				"cyl": 166,
+				"bowl": null,
+				"roofFill": 0,
+				"bowlFill": 0,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 175,
+				"roof": null,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 0,
+				"bowlFill": 25,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 0
+			},
+			"48": {
+				"sky": 175,
+				"roof": null,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 0,
+				"bowlFill": 44,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 0
+			},
+			"192": {
+				"sky": 175,
+				"roof": 184,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 10,
+				"bowlFill": 84,
+				"roofPx": 40,
+				"roofVsCyl": 0,
+				"roofVsSky": 8.9,
+				"bowlVsCyl": 0
+			},
+			"512": {
+				"sky": 175,
+				"roof": 184,
+				"cyl": 184,
+				"bowl": 184,
+				"roofFill": 9,
+				"bowlFill": 90,
+				"roofPx": 227,
+				"roofVsCyl": 0,
+				"roofVsSky": 9,
+				"bowlVsCyl": 0
+			}
+		},
+		"ic-tall3-3surf-overcast": {
+			"16": {
+				"sky": null,
+				"roof": null,
+				"cyl": 211,
+				"bowl": null,
+				"roofFill": 0,
+				"bowlFill": 0,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 196,
+				"roof": null,
+				"cyl": 198,
+				"bowl": 130,
+				"roofFill": 0,
+				"bowlFill": 21,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 68.8
+			},
+			"48": {
+				"sky": 196,
+				"roof": null,
+				"cyl": 195,
+				"bowl": 128,
+				"roofFill": 0,
+				"bowlFill": 40,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 66.5
+			},
+			"192": {
+				"sky": 197,
+				"roof": 226,
+				"cyl": 199,
+				"bowl": 127,
+				"roofFill": 11,
+				"bowlFill": 83,
+				"roofPx": 42,
+				"roofVsCyl": 26.4,
+				"roofVsSky": 28.9,
+				"bowlVsCyl": 72.2
+			},
+			"512": {
+				"sky": 197,
+				"roof": 242,
+				"cyl": 200,
+				"bowl": 127,
+				"roofFill": 9,
+				"bowlFill": 90,
+				"roofPx": 232,
+				"roofVsCyl": 42.2,
+				"roofVsSky": 45.5,
+				"bowlVsCyl": 72.8
+			}
+		},
+		"ic-tall3-3surf-sky": {
+			"16": {
+				"sky": null,
+				"roof": null,
+				"cyl": 211,
+				"bowl": null,
+				"roofFill": 0,
+				"bowlFill": 0,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 175,
+				"roof": null,
+				"cyl": 198,
+				"bowl": 130,
+				"roofFill": 0,
+				"bowlFill": 21,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 68.8
+			},
+			"48": {
+				"sky": 175,
+				"roof": null,
+				"cyl": 195,
+				"bowl": 128,
+				"roofFill": 0,
+				"bowlFill": 40,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 66.5
+			},
+			"192": {
+				"sky": 175,
+				"roof": 226,
+				"cyl": 199,
+				"bowl": 127,
+				"roofFill": 11,
+				"bowlFill": 83,
+				"roofPx": 42,
+				"roofVsCyl": 26.4,
+				"roofVsSky": 50.3,
+				"bowlVsCyl": 72.2
+			},
+			"512": {
+				"sky": 175,
+				"roof": 242,
+				"cyl": 200,
+				"bowl": 127,
+				"roofFill": 9,
+				"bowlFill": 90,
+				"roofPx": 232,
+				"roofVsCyl": 42.2,
+				"roofVsSky": 67,
+				"bowlVsCyl": 72.8
+			}
+		},
+		"ic-wide3fit-3surf-overcast": {
+			"16": {
+				"sky": null,
+				"roof": 197,
+				"cyl": 184,
+				"bowl": 134,
+				"roofFill": 33,
+				"bowlFill": 17,
+				"roofPx": 3,
+				"roofVsCyl": 13,
+				"roofVsSky": null,
+				"bowlVsCyl": 50.1
+			},
+			"32": {
+				"sky": 196,
+				"roof": 219,
+				"cyl": 203,
+				"bowl": 129,
+				"roofFill": 19,
+				"bowlFill": 46,
+				"roofPx": 4,
+				"roofVsCyl": 16.4,
+				"roofVsSky": 23,
+				"bowlVsCyl": 74.2
+			},
+			"48": {
+				"sky": 196,
+				"roof": 219,
+				"cyl": 204,
+				"bowl": 128,
+				"roofFill": 29,
+				"bowlFill": 62,
+				"roofPx": 13,
+				"roofVsCyl": 14.3,
+				"roofVsSky": 22.6,
+				"bowlVsCyl": 76.2
+			},
+			"192": {
+				"sky": 196,
+				"roof": 243,
+				"cyl": 207,
+				"bowl": 129,
+				"roofFill": 37,
+				"bowlFill": 94,
+				"roofPx": 183,
+				"roofVsCyl": 35.6,
+				"roofVsSky": 46.6,
+				"bowlVsCyl": 78.2
+			},
+			"512": {
+				"sky": 196,
+				"roof": 249,
+				"cyl": 208,
+				"bowl": 129,
+				"roofFill": 37,
+				"bowlFill": 99,
+				"roofPx": 1255,
+				"roofVsCyl": 40.7,
+				"roofVsSky": 52.2,
+				"bowlVsCyl": 78.6
+			}
+		},
+		"ic-tall3-3surf-lift-overcast": {
+			"16": {
+				"sky": null,
+				"roof": null,
+				"cyl": 198,
+				"bowl": null,
+				"roofFill": 0,
+				"bowlFill": 0,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 196,
+				"roof": null,
+				"cyl": 198,
+				"bowl": 146,
+				"roofFill": 0,
+				"bowlFill": 21,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 52.4
+			},
+			"48": {
+				"sky": 196,
+				"roof": null,
+				"cyl": 195,
+				"bowl": 145,
+				"roofFill": 0,
+				"bowlFill": 40,
+				"roofPx": 0,
+				"roofVsCyl": null,
+				"roofVsSky": null,
+				"bowlVsCyl": 49.7
+			},
+			"192": {
+				"sky": 197,
+				"roof": 226,
+				"cyl": 199,
+				"bowl": 141,
+				"roofFill": 11,
+				"bowlFill": 83,
+				"roofPx": 42,
+				"roofVsCyl": 26.4,
+				"roofVsSky": 28.9,
+				"bowlVsCyl": 58.3
+			},
+			"512": {
+				"sky": 197,
+				"roof": 242,
+				"cyl": 200,
+				"bowl": 140,
+				"roofFill": 9,
+				"bowlFill": 90,
+				"roofPx": 232,
+				"roofVsCyl": 42.2,
+				"roofVsSky": 45.5,
+				"bowlVsCyl": 60.1
+			}
+		},
+		"ic-wide-L-blue": {
+			"16": null,
+			"32": null,
+			"48": null,
+			"192": null,
+			"512": null
+		},
+		"ic-wide-LW-blue": {
+			"16": null,
+			"32": null,
+			"48": null,
+			"192": null,
+			"512": null
+		},
+		"ic-wide-L-blue-knockout": {
+			"16": null,
+			"32": null,
+			"48": null,
+			"192": null,
+			"512": null
+		},
+		"ic-wide-steel-sky": {
+			"16": null,
+			"32": null,
+			"48": null,
+			"192": null,
+			"512": null
+		},
+		"ic-mask-wide3fit-overcast": {
+			"16": {
+				"sky": 95,
+				"roof": 166,
+				"cyl": 180,
+				"bowl": null,
+				"roofFill": 67,
+				"bowlFill": 0,
+				"roofPx": 4,
+				"roofVsCyl": 14,
+				"roofVsSky": 70.7,
+				"bowlVsCyl": null
+			},
+			"32": {
+				"sky": 200,
+				"roof": 208,
+				"cyl": 201,
+				"bowl": 204,
+				"roofFill": 20,
+				"bowlFill": 60,
+				"roofPx": 2,
+				"roofVsCyl": 7,
+				"roofVsSky": 8.5,
+				"bowlVsCyl": 3.2
+			},
+			"48": {
+				"sky": 200,
+				"roof": 208,
+				"cyl": 204,
+				"bowl": 204,
+				"roofFill": 21,
+				"bowlFill": 50,
+				"roofPx": 6,
+				"roofVsCyl": 4.8,
+				"roofVsSky": 8.1,
+				"bowlVsCyl": 0
+			},
+			"192": {
+				"sky": 201,
+				"roof": 208,
+				"cyl": 207,
+				"bowl": 207,
+				"roofFill": 35,
+				"bowlFill": 92,
+				"roofPx": 122,
+				"roofVsCyl": 0.6,
+				"roofVsSky": 6.7,
+				"bowlVsCyl": 0.2
+			},
+			"512": {
+				"sky": 201,
+				"roof": 208,
+				"cyl": 208,
+				"bowl": 208,
+				"roofFill": 37,
+				"bowlFill": 100,
+				"roofPx": 785,
+				"roofVsCyl": 0.2,
+				"roofVsSky": 7.2,
+				"bowlVsCyl": 0
+			}
+		},
+		"ic-mask-wide-L-blue": {
+			"16": null,
+			"32": null,
+			"48": null,
+			"192": null,
+			"512": null
 		}
 	}
 }

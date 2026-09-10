@@ -41,6 +41,16 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     than paper to highlight with: the only move is engraving. Five tried at 16/17/24/32 on light and
     dark; `ic-mono-hatch-lr` is the pick, a line on each limb leaving a bare band down the middle.
     `ic-mono-weight` buys nothing at 17 px. `wt-wide-L` stays shipped.
+  - **ROUND 3c, 2026-09-10: THE TOWER HAS THREE SURFACES AND EVERY ROW SHADED THEM AS ONE.** Tom,
+    with two sketches: *"the gradient can't really continue to the top of the tank ... we may want
+    to make the entire 'roof' lighter (in the sun). Also, I suppose that the underside is darker."*
+    Four `-3surf-` rows, BESIDE the two he is choosing between rather than instead of them.
+    **His own *"It may be pointless for our purposes"* answers in two halves at two sizes:** the dark
+    UNDERSIDE works from 32 px (bowl against wall 68.8 / 66.5 / 72.2 / 72.8 at 32 / 48 / 192 / 512
+    against 10.1 / 9.9 / 1.9 / 1.4), and the sunlit ROOF needs 192 on his aspect, because a
+    1.5-unit cone under a 2-unit outline has no fill left; the FITTED aspect's 2-unit cone reads
+    from 32. **The silhouette worry did not happen** -- a sunlit roof is LIGHTER than the sky, so
+    roof-against-sky RISES. Numbers and the catwalk-probe caveat: `dev/icon-preview/README.md`.
   - **NEXT: Tom picks a row.** The maskable question is answered on the same sheet (Tom, asked what
     background he wanted behind a transparent stroke glyph: *"Make it look like the sky, cloudy if
     that helps with contrast"*): `icons/icon-192.png` and `icon-512.png` are declared
