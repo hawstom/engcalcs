@@ -64,7 +64,7 @@
         "template_feedback": "Can you suggest better wording or anything else? Do you want to help or to learn to create tools like these? Please contact me.",
         "template_printable_title": "Printable Title",
         "template_printable_subtitle": "Printable Subtitle",
-        "consent_body": "May we keep one digit in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.",
+        "consent_body": "May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.",
         "consent_accept": "Allow this",
         "consent_accept_all": "Allow all",
         "consent_decline": "Refuse all",
