@@ -1148,7 +1148,15 @@ var EngCalcs = EngCalcs || {};
 		var v = hidden ? 'hidden' : '';
 		if (le.text) { le.text.style.visibility = v; }
 		if (le.leader) { le.leader.style.visibility = v; }
-		(le.repeats || []).forEach(function (r) { r.text.style.visibility = v; });
+		// **THE GRAB SHAPE HIDES WITH THE WORDS, AND THAT IS THE WHOLE OF "a thing the user cannot
+		// see cannot be grabbed" IN THIS DESIGN.** `.lpn-lbl-hit` is `visibleFill`, so its own
+		// `visibility` is what gates it -- and it is a SIBLING of the text rather than a child, so
+		// it inherits nothing and has to be told here.
+		if (le.lblHit) { le.lblHit.style.visibility = v; }
+		(le.repeats || []).forEach(function (r) {
+			r.text.style.visibility = v;
+			if (r.lblHit) { r.lblHit.style.visibility = v; }
+		});
 	}
 	// The extra renderings of a long pipe's label. Grown and shrunk IN PLACE rather than rebuilt:
 	// the count changes on every zoom step, and rebuilding a chain of elements per frame is how a
@@ -1160,9 +1168,10 @@ var EngCalcs = EngCalcs || {};
 		while (le.repeats.length > n) {
 			var gone = le.repeats.pop();
 			gone.text.remove();
+			if (gone.lblHit) { gone.lblHit.remove(); }
 		}
 		while (le.repeats.length < n) {
-			le.repeats.push({
+			var part = {
 				// EVERY COPY IS PICKABLE -- same `data-linklbl` and `.lpn-draglbl` as the original,
 				// so grabbing any of them drags THE label and there is no magic copy to learn. NOT
 				// "only the UPSTREAM label is draggable": upstream is a SOLVE RESULT, so a reversing
@@ -1176,7 +1185,11 @@ var EngCalcs = EngCalcs || {};
 					style: 'font-size:' + effectiveFontSize() + 'px'
 				}, labelsLayer),
 				side: 'right', empty: false
-			});
+			};
+			// The primary's holder banks the widths -- a repeat is the same words said again, so it
+			// is the same shape, and measuring it a second time would be a second answer.
+			part.lblHit = attachLabelHit(part.text, le, labelsLayer, true);
+			le.repeats.push(part);
 		}
 	}
 	// A repeat's glyphs, rebuilt only when the primary's content actually changed. refreshLabelText()
@@ -2720,6 +2733,110 @@ var EngCalcs = EngCalcs || {};
 			// initial textContent assignment, which has no setAttribute.
 			if (child.nodeType === 1 && child.getAttribute('x') != null) { child.setAttribute('x', x); }
 		}
+		// The one seam a label's POSITION goes through, so the grab shape below cannot be left
+		// behind by a mover that forgot about it.
+		syncLabelHit(textEl, x, y);
+	}
+	// ---- A LABEL IS GRABBED BY AN EXPLICIT SHAPE, NEVER BY ITS OWN GLYPHS (Tom, 2026-09-09, on
+	// being shown the measurement: *"Label text answers hits up to 271 px: Yes! This is it! High
+	// priority task."*) -----------------------------------------------------------------------
+	//
+	// **AN SVG TEXT'S HIT GEOMETRY IS LAID OUT IN ITS OWN LOCAL USER UNITS, AT LayoutUnit
+	// PRECISION -- AND ON A GEOGRAPHIC MAP ONE OF THOSE IS 132 SCREEN PIXELS.** A label's font-size
+	// is a pixel size divided by the scale (effectiveFontSize()), so at 8,431 px per degree the
+	// glyphs are 0.0013 user units tall while Blink lays text out on a 1/64-user-unit grid. The text
+	// therefore answers document.elementFromPoint over a region quantised to that grid: MEASURED on
+	// the lat/lon Net3 example at zoom-to-fit, up to 271 px outside its own getBoundingClientRect,
+	// with label text covering 58% of a 1398x798 canvas and NOT ONE of the 97 node bands the topmost
+	// answer anywhere on it.
+	//
+	// **IT IS NOT THE STROKE, WHICH IS THE FAULT ONE DAY OLDER** (`.lpn-node-hit`, specs/nodehit.js):
+	// setting `stroke-width` on `.lpn-lbl` changes this by nothing. Three measurements pin it, all
+	// at the same 8,431 px/unit and all in dev/browser-pass/specs/lblhit.js:
+	//   * a <rect> and a <path> of the label's OWN box, in the same layer   -> 0 px outside
+	//   * the same words drawn in a group scaled to screen pixels           -> 0 px outside
+	//   * the XY drawing at 23 px/unit, where one LayoutUnit is 0.36 px     -> under 2 px
+	// So it is text layout, and it is a constant number of USER units -- which is exactly why the
+	// XY control reads zero and no explanation that ignores the scale can be right.
+	//
+	// THE CURE IS A SHAPE. The words stop hit-testing at all (`.lpn-lbl` is `pointer-events: none`
+	// and `.lpn-draglbl` no longer overrides it) and a transparent <path> carrying the same
+	// data-nodelbl/data-linklbl/data-lbl/data-repeat takes the press, exactly as `.lpn-node-hit`
+	// does for a junction. ONE PATH PER LABEL, one subpath per ROW: a stacked label's rows have
+	// different widths and one box round all of them claims the empty ground beside every short row
+	// -- which is Tom's *"maybe we will make their hitbox more aggressively shrink-wrapped"*, taken
+	// from the per-row widths noteRowWidths() already banks.
+	//
+	// **IT IS WIDER THAN THE GLYPHS AND THAT IS DELIBERATE**, and it is the promise `visible` used
+	// to make: the gaps between the letters are grabbable, because a finger is not aimed at the
+	// inside of an "8". What it is not is the ground either side of the words.
+	//
+	// Nothing is measured here. Every quantity is read off the element the browser has already laid
+	// out, or off the pixel widths banked at the last content change, so a zoom costs no getBBox --
+	// which is the bargain refreshFontSizes() states at length.
+	function labelHitRowCount(textEl) {
+		var i, c, n = 0;
+		for (i = 0; i < textEl.childNodes.length; i++) {
+			c = textEl.childNodes[i];
+			if (c.nodeType === 1 && c.getAttribute && c.getAttribute('x') != null) { n++; }
+		}
+		return n || 1;
+	}
+	function syncLabelHit(textEl, x, y) {
+		var hit = textEl && textEl.lpnHit;
+		if (!hit) { return; }
+		var hold = textEl.lpnHold || null,
+			s = state.s || 1,
+			fs = parseFloat(textEl.style && textEl.style.fontSize) || effectiveFontSize(),
+			lh = fs * 1.2,
+			rowsPx = (hold && hold.rowWPx && hold.rowWPx.length) ? hold.rowWPx : null,
+			wPx = (hold && (hold.twPx || hold.widthPx)) || 0,
+			n = rowsPx ? rowsPx.length : labelHitRowCount(textEl),
+			hAlign = textEl.getAttribute('text-anchor') || 'start',
+			db = textEl.getAttribute('dominant-baseline'),
+			vAlign = db === 'hanging' ? 'hanging' : (db === 'central' ? 'middle' : 'baseline'),
+			wMax = rowsPx ? Math.max.apply(null, rowsPx) / s : wPx / s,
+			box, d = '', i, rw, rx, ry, tr;
+		// An EMPTY label has no words to grab. Its banked width is whatever it last said, so
+		// without this a label the toggles just emptied would keep a phantom box on the map.
+		if (!(wMax > 0) || !String(textEl.textContent || '').length) { hit.setAttribute('d', ''); return; }
+		box = Geom.labelBoxAt(x, y, wMax, Geom.dataLabelBoxHeight(n, fs, lh), hAlign, vAlign, fs);
+		for (i = 0; i < n; i++) {
+			rw = rowsPx ? rowsPx[i] / s : wMax;
+			if (!(rw > 0)) { rw = wMax; }
+			// The SAME anchor convention, per row -- Geom.labelBoxAt() is the one place it is
+			// interpreted, so a grab box can never disagree with the collision box about which edge
+			// a label is justified on.
+			rx = Geom.labelBoxAt(x, 0, rw, 0, hAlign, 'hanging', fs).x;
+			ry = box.y + i * lh;
+			d += 'M' + rx + ',' + ry + 'h' + rw + 'v' + lh + 'h' + (-rw) + 'Z';
+		}
+		hit.setAttribute('d', d);
+		// A rotated label (an aligned link label, a turned Text) is turned about the same point by
+		// the same transform: copied rather than recomputed, so there is one rotation and not two.
+		tr = textEl.getAttribute('transform');
+		if (tr) { hit.setAttribute('transform', tr); } else { hit.removeAttribute('transform'); }
+	}
+	// Builds one label part's grab path and ties the three facts together: which element it belongs
+	// to, which holder banks its widths, and the identity every `t.dataset.*` branch already reads.
+	// `annotation` says whether it hides with generated annotation -- true for a data label, false
+	// for the user's own Text, which is authored content (see annotationEl()).
+	function attachLabelHit(textEl, hold, parent, annotation) {
+		// `lpn-draglbl` as well: the class means "a label you can take hold of", and it is what
+		// carries the cursor -- which is computed from whatever element ANSWERED the hit test.
+		var attrs = { 'class': 'lpn-lbl-hit lpn-draglbl', d: '' }, k, keys = ['data-nodelbl', 'data-linklbl', 'data-lbl', 'data-repeat'];
+		// `!= null`, which is BOTH null and undefined: the browser's getAttribute() answers null for
+		// an absent attribute and the harness stub answers undefined, and copying `undefined` here
+		// writes the STRING "undefined" into the dataset, which every `t.dataset.lbl !== undefined`
+		// branch in this file then reads as a real label id.
+		for (k = 0; k < keys.length; k++) {
+			var av = textEl.getAttribute(keys[k]);
+			if (av != null) { attrs[keys[k]] = av; }
+		}
+		var h = (annotation ? annotationEl : el)('path', attrs, parent);
+		textEl.lpnHit = h;
+		textEl.lpnHold = hold;
+		return h;
 	}
 	// Network-wide max/min of a field's values, skipping undefined. null when fewer than 3 defined
 	// values exist -- with 1 or 2 members "the max" and "the min" are not a finding.
@@ -5748,6 +5865,8 @@ var EngCalcs = EngCalcs || {};
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
 		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		// The words are not the target; this is (see syncLabelHit).
+		nodeEls[n.id].lblHit = attachLabelHit(text, nodeEls[n.id], labelsLayer, true);
 		noteMeasuredWidth(nodeEls[n.id], tw);
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
@@ -5866,6 +5985,8 @@ var EngCalcs = EngCalcs || {};
 			leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1,
 			symbolG: symbolG, symbolSvg: symbolSvg, symbolHit: symbolHit
 		};
+		// The words are not the target; this is (see syncLabelHit).
+		linkEls[l.id].lblHit = attachLabelHit(text, linkEls[l.id], labelsLayer, true);
 		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
 		layoutLinkLabel(l.id);
 		paintLinkColor(l.id);   // a rebuilt element starts black; give it its colour immediately
@@ -6197,6 +6318,11 @@ var EngCalcs = EngCalcs || {};
 			t = a ? 'rotate(' + a.toFixed(3) + ' ' + px + ' ' + py + ')' : null;
 		if (!le.text) { return; }
 		if (t) { le.text.setAttribute('transform', t); } else { le.text.removeAttribute('transform'); }
+		// **AFTER, NOT BEFORE**: updateLabelGeometry() positions the words and then turns them, so
+		// the grab shape copied at repositionMultilineText() time carried the PREVIOUS rotation.
+		if (le.lblHit) {
+			if (t) { le.lblHit.setAttribute('transform', t); } else { le.lblHit.removeAttribute('transform'); }
+		}
 	}
 	// AXIS-ALIGNED bounding box of a rotated box, turned about the same point the SVG transform
 	// turns it about. An APPROXIMATION: a 45-degree label claims more room than its glyphs occupy,
@@ -6319,6 +6445,9 @@ var EngCalcs = EngCalcs || {};
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w };
+		// el(), not annotationEl(): a Text object is authored content and never hides with generated
+		// annotation. Its grab shape must not either, or it would be pickable when its words are not.
+		labelEls[lb.id].lblHit = attachLabelHit(text, labelEls[lb.id], labelsLayer, false);
 		noteTextWidth(labelEls[lb.id], w);
 		applyTextLabelRotation(lb, labelEls[lb.id], px, py);
 		// The two indexes are what make an anchored Text follow: updateNode() replays one and
@@ -6587,8 +6716,9 @@ var EngCalcs = EngCalcs || {};
 		le.handles.forEach(function (h) { h.remove(); });
 		le.arrows.forEach(function (a) { a.remove(); });
 		le.text.remove();
+		if (le.lblHit) { le.lblHit.remove(); }
 		le.leader.remove();
-		(le.repeats || []).forEach(function (r) { r.text.remove(); });
+		(le.repeats || []).forEach(function (r) { r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
 		if (le.symbolG) { le.symbolG.remove(); }
 	}
 	function rebuildLink(l) {
@@ -16184,6 +16314,7 @@ var EngCalcs = EngCalcs || {};
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
+		if (nodeEls[id].lblHit) { nodeEls[id].lblHit.remove(); }
 		nodeEls[id].leader.remove();
 		if (nodeEls[id].symbol) { nodeEls[id].symbol.remove(); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
@@ -16433,6 +16564,7 @@ var EngCalcs = EngCalcs || {};
 		if (isSelected('label', id)) { deselectOne('label', id); }   // see deleteLink()
 		if (le.leader) { le.leader.remove(); }
 		le.text.remove();
+		if (le.lblHit) { le.lblHit.remove(); }
 		delete labelEls[id];
 		if (lb.anchorNode && labelsByAnchor[lb.anchorNode]) {
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
@@ -25451,7 +25583,9 @@ var EngCalcs = EngCalcs || {};
 			// MEMBERSHIP, and nothing else: a label switched OFF in this scenario is not there at
 			// all (Task 407).
 			var gone = !isActive(lb);
-			[le.text, le.leader].forEach(function (e) {
+			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
+			// of the words, so nothing hides it by inheritance.
+			[le.text, le.leader, le.lblHit].forEach(function (e) {
 				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
 			});
 		});
