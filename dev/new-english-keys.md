@@ -41,7 +41,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-09._
 - **`lpn_map_unmeasurable`**
   > This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.
-  @@ NEEDS RULING
+  OK
 - **`lpn_pane_text_attached`**
   > Attached
   _Ruled OK 2026-09-09._
