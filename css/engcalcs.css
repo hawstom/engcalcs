@@ -433,7 +433,7 @@ html[lang="zh"] .ec-welcome {
 	   wash cannot be used here: a pipe passing under a junction would show through it. */
 	fill: var(--lpn-map-bg, #fff);
 	fill: color-mix(in srgb, currentColor var(--lpn-shade, 18%), var(--lpn-map-bg, #fff));
-	stroke: currentColor; stroke-width: calc(0.14 * var(--lpn-sym, 1));
+	stroke: currentColor; stroke-width: calc(0.14 * var(--lpn-sym, 0));
 	cursor: default;
 }
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
@@ -559,7 +559,21 @@ html[lang="zh"] .ec-welcome {
    cursor is a solid pointer, and using others is partly or even mostly eye candy."*
    The bare map keeps `grab` and a placement tool keeps `crosshair`; those two say what a PRESS will
    do, which is the distinction worth a glyph. */
-.lpn-link { stroke: var(--lpn-map-ink); stroke-width: var(--lpn-lw, 0.7); cursor: default; }
+/* **A SCALE FALLBACK IS ZERO, AND THAT IS DELIBERATE** (ROADMAP Task 624, Tom 2026-09-10).
+   Every size below is a figure in SCREEN pixels divided by `state.s` and published by
+   publishScaleSizes() as an inline custom property in WORLD units. The fallback beside each `var()`
+   is therefore world units too -- and a world-unit fallback is only ever right at ONE scale. It used
+   to read `var(--lpn-lw, 0.7)`, which is a sane pipe on an XY project at about 1 px per unit and
+   **4,535 px of pipe on the lat/lon Net3 at 6,479 px per degree**: a canvas covered in one colour
+   with nothing on it that can be reached. Tom hit exactly that, twice, and neither of us could
+   reproduce it on demand -- it is a race against the first publish, not a broken commit.
+   **The race is not fixed here; the AMPLIFIER is.** At zero, a missed publish draws a pipe too thin
+   to see -- noticed, reported, recovered from by zooming -- instead of a page that looks destroyed.
+   A fallback whose failure mode is worse than having no fallback is not a safety net.
+   `--lpn-nhit`, `--lpn-symhit` and `--lpn-symhit-coarse` already read 0 for this reason; these five
+   are the ones that were missed. Do not restore a non-zero number to any of them: there is no value
+   that is both visible at 1 px per unit and harmless at 6,479. */
+.lpn-link { stroke: var(--lpn-map-ink); stroke-width: var(--lpn-lw, 0); cursor: default; }
 /* Black with its symbol (2026-08-14) -- the pump's polyline and its circle are one mark. */
 .lpn-link-pump { stroke: var(--lpn-map-ink); }
 /* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
@@ -572,7 +586,7 @@ html[lang="zh"] .ec-welcome {
    out. Colour is deliberately unchanged: a closed pipe is still the same pipe, and recolouring it
    would collide with the per-field label colours (lpnFieldColors). */
 .lpn-link-closed {
-	stroke-dasharray: calc(2.571 * var(--lpn-lw, 0.7)) calc(2 * var(--lpn-lw, 0.7));
+	stroke-dasharray: calc(2.571 * var(--lpn-lw, 0)) calc(2 * var(--lpn-lw, 0));
 }
 /* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
    until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
@@ -598,7 +612,7 @@ html[lang="zh"] .ec-welcome {
    colour. */
 .lpn-vhandle {
 	fill: var(--lpn-map-ink); stroke: var(--lpn-map-ink);
-	stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: default;
+	stroke-width: calc(0.25 * var(--lpn-sym, 0)); cursor: default;
 }
 /* VERTICES MODE (Task 567): the bends of every pipe become GRIPS -- hollow, and a good deal bigger
    than the dot that merely says a bend is there. EPANET's own grip is a hollow square; a circle is
@@ -609,9 +623,9 @@ html[lang="zh"] .ec-welcome {
    The whole mode is one class on the canvas, so nothing is created or destroyed to enter or leave
    it, and a bend added while it is on is styled by the same rule with no extra code. */
 .lpn-vertexmode .lpn-vhandle {
-	r: calc(1.5 * var(--lpn-sym, 1));
+	r: calc(1.5 * var(--lpn-sym, 0));
 	fill: var(--lpn-map-bg, #fff);
-	stroke-width: calc(0.4 * var(--lpn-sym, 1));
+	stroke-width: calc(0.4 * var(--lpn-sym, 0));
 }
 /* Every pipe's bends are legible while the mode is on, not only the selected one: Tom, 2026-09-01,
    *"We could tweak the behavior to enable vertices mode for all pipes if that's efficient."* It is
@@ -664,7 +678,7 @@ html[lang="zh"] .ec-welcome {
    moves onto the thing you can see. Nothing about hit testing changes -- `pointer-events` is
    unchanged on all three bands, and no finder reads a cursor. */
 .lpn-link-hit {
-	fill: none; stroke: transparent; stroke-width: var(--lpn-hit, 3);
+	fill: none; stroke: transparent; stroke-width: var(--lpn-hit, 0);
 	stroke-linecap: round; stroke-linejoin: round;
 	pointer-events: visibleStroke; cursor: inherit;
 }
@@ -674,7 +688,7 @@ html[lang="zh"] .ec-welcome {
    this zoom; `pointer: coarse` is the PRIMARY pointer, so a laptop with a touchscreen and a mouse
    is still a mouse. */
 @media (pointer: coarse) {
-	.lpn-link-hit { stroke-width: var(--lpn-hit-coarse, 12); }
+	.lpn-link-hit { stroke-width: var(--lpn-hit-coarse, 0); }
 }
 /* A pump or valve is a symbol drawn at the midpoint of a link that is often only a unit or two
    long -- on Net3 it had to be zoomed into before it could be edited at all. This is a transparent
@@ -851,16 +865,16 @@ html[lang="zh"] .ec-welcome {
    FIRST of the four ring rules that follow, deliberately: override, selection and the pending mark
    are all statements about what you are DOING and each of them overrides this, which is a statement
    about what was calculated. */
-.lpn-node.lpn-ff-pass { stroke: #2e7d32; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
-.lpn-node.lpn-ff-fail { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 1)); stroke-dasharray: 0.6 0.6; }
-.lpn-node.lpn-ff-design { stroke: #ef6c00; stroke-width: calc(0.5 * var(--lpn-sym, 1)); stroke-dasharray: 1.6 0.8; }
-.lpn-node.lpn-ff-error { stroke: #888; stroke-width: calc(0.5 * var(--lpn-sym, 1)); stroke-dasharray: 0.3 0.9; }
-.lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
+.lpn-node.lpn-ff-pass { stroke: #2e7d32; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
+.lpn-node.lpn-ff-fail { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 0.6 0.6; }
+.lpn-node.lpn-ff-design { stroke: #ef6c00; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 1.6 0.8; }
+.lpn-node.lpn-ff-error { stroke: #888; stroke-width: calc(0.5 * var(--lpn-sym, 0)); stroke-dasharray: 0.3 0.9; }
+.lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
 /* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
    around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both
    overridden and mid-pipe-draw shows the pending ring -- that one is about what your next click
    does, and it is the more urgent of the two. */
-.lpn-node.lpn-override { stroke: #e8a33d; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+.lpn-node.lpn-override { stroke: #e8a33d; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
 /* SELECTED: the subject of the next command (ROADMAP Task 415, setSelection() in
    js/looped-network.js). Blue, and it is not spending the map's colour budget on the model: red
    says condition, amber says override, and both are statements about the DOCUMENT, while this one
@@ -871,8 +885,8 @@ html[lang="zh"] .ec-welcome {
    Both rules sit AFTER their .lpn-override twin (selection is the thing you are acting on now) and
    BEFORE .lpn-node-pending (mid-pipe-draw is about what your next click does, which is more
    urgent still). */
-.lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
-.lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+.lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
+.lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
 .lpn-lbl.lpn-selected { fill: #1976d2; }
 /* NOT IN THIS NETWORK: drawn, but out of the model (see isActive() in js/looped-network.js). Faded
    rather than hidden, because the whole point of the inactive/active pair is to see both at once --
@@ -887,17 +901,17 @@ html[lang="zh"] .ec-welcome {
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
-.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+.lpn-node.lpn-node-pending { stroke: #d32f2f; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
 /* Dashed line from the first-picked node to the live pointer, same context (add-pipe/add-pump
    mode) -- shown/hidden and repositioned entirely from JS (rubberBandEl in looped-network.js). */
-.lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-sym, 1)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
+.lpn-rubberband { stroke: #d32f2f; stroke-width: calc(0.4 * var(--lpn-sym, 0)); stroke-dasharray: 1.2 1; pointer-events: none; fill: none; }
 /* The select-area marquee (Task 266). Blue rather than the rubber band's red, because the rubber
    band says "a pipe will be drawn here" and this says "these are the ones I mean" -- two shapes
    that both follow the pointer and must never be mistaken for each other. A faint wash inside it,
    so a lasso reads as an enclosure rather than as a scribble; pointer-events off, or the shape
    being drawn would swallow the hit tests of everything under it. */
 .lpn-marquee {
-	stroke: #0645ad; stroke-width: calc(0.35 * var(--lpn-sym, 1)); stroke-dasharray: 1.2 1;
+	stroke: #0645ad; stroke-width: calc(0.35 * var(--lpn-sym, 0)); stroke-dasharray: 1.2 1;
 	fill: #0645ad; fill-opacity: .08; pointer-events: none;
 }
 /* **THE DISCLOSURE TRIANGLE** (Task 266). It says "this control holds more than it shows", which
@@ -980,7 +994,7 @@ html[lang="zh"] .ec-welcome {
    size and 0.14px if you turned symbols down -- which is why Tom reported "no leaders" while
    looking at them (2026-08-15). A leader that cannot be seen is worse than none: the label it
    belongs to then reads as floating free of the network. */
-.lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0.1); pointer-events: none; }
+.lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0); pointer-events: none; }
 /* A LABEL THE USER HAS JUST PLACED SAYS SO, AND THEN STOPS SAYING IT (Tom, 2026-08-15, after
    discovering he had dragged a label without meaning to: "put a timed box or highlight on dragged
    labels for about a minute, maybe fading, maybe dashed, maybe animated so it's obviously
@@ -1050,12 +1064,12 @@ html[lang="zh"] .ec-welcome {
    frame of the fade would be a black ring that then vanishes when the animation lets go. */
 .lpn-node.lpn-just-dragged { animation-name: lpn-just-moved-node; }
 @keyframes lpn-just-moved-node {
-	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
-	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
-	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
-	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
-	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; animation-timing-function: linear; }
-	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 1)); paint-order: stroke fill; }
+	0%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
+	4%   { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
+	8%   { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
+	12%  { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
+	16%  { stroke: rgba(212, 0, 0, 1); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; animation-timing-function: linear; }
+	100% { stroke: rgba(212, 0, 0, 0); stroke-width: calc(3 * var(--lpn-sym, 0)); paint-order: stroke fill; }
 }
 /* BOTH of them, and the node one by name: `.lpn-node.lpn-just-dragged` above outranks the shorthand
    reset below, so a reader who honours prefers-reduced-motion would still get the blinking ring. */

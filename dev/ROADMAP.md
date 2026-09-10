@@ -305,11 +305,14 @@ the block.
     world units too** -- 4,535 px of pipe and a 77,745 px grab band at the Net3's 6,479 px per
     degree. `--lpn-map-ink` is `#1a6faf`, and that is the blue in his screenshot: the flood is the
     PIPES.
-  - **THE FIX IS NOT A REVERT, IT IS REMOVING THE AMPLIFIER.** A fallback whose failure mode is worse
-    than having no fallback is the defect, independent of whatever wins the race. At zero, the same
-    missed publish draws a pipe too thin to see -- noticed, reported, and recovered from by zooming
-    -- instead of a page that looks destroyed. Check every `var(--lpn-*, <n>)` in `css/engcalcs.css`
-    and ask what each number does at 6,479 px per degree before choosing it.
+  - **THE AMPLIFIER IS GONE, 2026-09-10, on Tom's approval.** All five scale fallbacks in
+    `css/engcalcs.css` now read 0 -- `--lpn-sym` (19 sites), `--lpn-lw` (5), `--lpn-hit`,
+    `--lpn-hit-coarse`, `--lpn-hair` -- joining `--lpn-nhit`, `--lpn-symhit` and
+    `--lpn-symhit-coarse`, which already did and are why the principle was not new. A missed publish
+    now draws a pipe too thin to see instead of a page that looks destroyed. **There is no value that
+    is both visible at 1 px per unit and harmless at 6,479, so do not restore a number**; the reason
+    is written at the site. Invisible on the happy path: pipe still 6.000 px, ink 3.6%, 101/101
+    across `mapscale`, `geo` and `color`. **The RACE is untouched and still unreproduced.**
   - **A RACE NEEDS A RACE TEST.** Rebuild the repro as a spec that throttles the CPU (CDP
     `Emulation.setCPUThrottlingRate`) so first paint can beat `publishScaleSizes()`; without one,
     this stays unreproducible and the guard only ever measures the happy path.
