@@ -945,6 +945,9 @@ $ec_lang['lpn_wrong_btn']='Something wrong here?';
 $ec_lang['lpn_wrong_tip']='Use this link to tell us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have typed, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
 $ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
+// Stands while the fault stands, rather than expiring like every other notice on the map: it
+// reports a page that cannot lay itself out, which is true until a measurement recovers.
+$ec_lang['lpn_map_unmeasurable']='This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
 // reason: a string that is not in a lang file is a string no translator will ever see. The manifest
 // carries the English as a fallback for an example that has no keys yet, so a new example still

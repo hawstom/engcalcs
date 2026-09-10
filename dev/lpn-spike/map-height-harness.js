@@ -159,7 +159,7 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			// The canvas box as of the previous call. Seeded to the starting box, which is what the
 			// page's own boot does: the first applyMapHeight() records it and re-centres nothing.
 			lastMapBox = env.lastBox === undefined ? { w: 1400, h: env.h0 } : env.lastBox;
-		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized', 'placeLegends',
+		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized', 'placeLegends', 'noteMapUnmeasurable',
 			extract('viewportHeight') + '\n' +
 			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 			extract('applyMapHeight') +
@@ -171,7 +171,13 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 			function () { /* the deferred-fit hook; nothing to defer in here */ },
 			// A resize moves the edges the legends dodge, so applyMapHeight() re-places them. Nothing
 			// here has a legend; the stub exists so the call has something to be.
-			function () { /* placeLegends */ });
+			function () { /* placeLegends */ },
+			// **THE CANVAS-CANNOT-BE-MEASURED MESSAGE** (MJH, 2026-09-09). Every canvas in here has a
+			// real box, so this is only ever called with `false` -- the stub exists so the call has
+			// something to be, exactly like placeLegends above. The message itself is asserted in
+			// dev/lpn-spike/scale-publish-harness.js, which drives the whole module rather than a
+			// slice of it.
+			function () { /* noteMapUnmeasurable */ });
 		return { h: svg._h, state: state, transforms: transforms };
 	}
 	// The canvas is 600 tall and the window has room for 682. Growing it by 82 must show 41 more at

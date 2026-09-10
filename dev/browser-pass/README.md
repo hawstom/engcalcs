@@ -50,9 +50,11 @@ a difference nothing has yet measured. Reach for Firefox when a report names one
 
 **One thing Gecko did find that Chromium cannot**, with site data blocked
 (`dom.storage.enabled: false`): the service-worker registration in `lib/HeadersFooters.lib.php`
-raises an UNCAUGHT `SecurityError` on every page load. The wide-scope `register()` has a `.catch()`
-and the narrow-scope fallback inside it does not. One line, not fixed here, and it is exactly the
-privacy-hardened visitor this suite is written for.
+raised an UNCAUGHT `SecurityError` on every page load, because the wide-scope `register()` had a
+`.catch()` and the narrow-scope fallback inside it did not. **Fixed 2026-09-09**: both promises are
+caught, and the whole block sits in a `try`, since where site data is blocked the property access
+itself can throw before any method is reached. An offline suite is not available in that browser
+either way; the page works, and it must not shout about it.
 
 ## §25's two timing bounds fail on a slow machine, and that is not a regression
 
@@ -164,6 +166,27 @@ whole pass run green against somebody else's files, and one of them did.
 docroot is fetched back and compared before the browser is launched. Only our own server can serve
 it. A mismatch throws, naming the port, the docroot and what answered instead — the failure that
 used to be silent is now the loudest thing in the run.
+
+## The fourth runner in here: `measure-probe.js` (MJH, 2026-09-09)
+
+```
+node dev/browser-pass/measure-probe.js            # every scenario, in Gecko
+node dev/browser-pass/measure-probe.js baseline   # one of them
+node dev/browser-pass/measure-probe.js --chromium
+```
+
+Not part of `run.js`, and it asserts nothing. It opens the lat/lon Net3 example under a series of
+DEGRADED measurement APIs -- `getScreenCTM()` returning null and returning the identity, a zero
+`getBoundingClientRect()`, zero `clientWidth`/`clientHeight`, a throwing `getBBox()`, a zero
+`getComputedTextLength()`, a `ResizeObserver` that never fires, and blocked site data in each of its
+three shapes -- and prints the canvas box, the world transform, the four scale-derived custom
+properties, the tile zooms, a 5x5 grid of hit tests, whether an edit lands, and the dominant colours
+of a real screenshot. **`lib/png.js` is what makes the last one possible**: this tree has no image
+library at all, so a claim about pixels was previously unanswerable here.
+
+It exists because a user report is a claim about an ENVIRONMENT, and the only honest way to accept
+or reject one is to build the environment. Its own header carries what it found, what it ruled out,
+and the thirty-second console snippet to send to a user who can reproduce something we cannot.
 
 ## The third runner in here: `fieldgrid-layout.js` (ROADMAP Task 478)
 

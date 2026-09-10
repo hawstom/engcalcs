@@ -952,8 +952,20 @@ function patchHitContains() {
  * anything out: overriding a page internal from here would remove the coupling the harness exists
  * to test (dev/testing-notes.md).
  */
-function loadLoopedNetwork(injectSource, preludeSource) {
+// `mutate` is for a harness whose subject is a LINE OF THIS FILE rather than a behaviour: it is
+// handed the real source and returns a changed copy, so the harness can prove that its own
+// assertion goes red when the repair is taken out. A check that passes by finding nothing is the
+// shape that has already died of success in this tree once (js_fallback_string_check.php), and a
+// harness asserting a property the page happens to have is the same failure one layer down. Use it
+// ONLY to break something on purpose; a mutation that does not change the source throws, because a
+// substitution that silently matched nothing would make the live mutation a live nothing.
+function loadLoopedNetwork(injectSource, preludeSource, mutate) {
 	let src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	if (mutate) {
+		const before = src;
+		src = mutate(src);
+		if (src === before) { throw new Error('loadLoopedNetwork: the mutation changed nothing'); }
+	}
 	const marker = "\tdocument.addEventListener('DOMContentLoaded'";
 	if (src.indexOf(marker) < 0) { throw new Error('injection marker not found'); }
 	src = src.replace(marker, (preludeSource ? preludeSource + '\n' : '') + '\tglobal.__LPN = {\n' + injectSource + '\n\t};\n' + marker);
