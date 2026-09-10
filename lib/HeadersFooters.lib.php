@@ -188,6 +188,20 @@ $og_image = CANONICAL_ORIGIN . '/engcalcs/' . $og_card;
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
 	<meta name="apple-mobile-web-app-title" content="EngCalcs">
+	<?php // THE TAB ICON, AND IT IS THIS SUITE'S OWN BUSINESS EVEN AT '/app/' (2026-09-09).
+	      // Until today no page emitted rel="icon" at all, so every browser fell back to the
+	      // ORIGIN ROOT's /favicon.ico -- a file belonging to whichever site the suite is mounted
+	      // under. hawsedc.com happens to have one, so nothing looked broken there; librewaternet.org
+	      // has favicon.svg and no .ico, so https://librewaternet.org/app/ served a 404 and a blank
+	      // tab while the landing pages beside it showed the water tower. The landing site cannot fix
+	      // that: '/app/' is a rewrite onto Looped-Network.php out of a DIFFERENT DOCROOT, and its
+	      // relative <link rel="icon" href="favicon.svg"> is never emitted here.
+	      // Same six paths as the Water menu's wt-wide-L and as ~/webdev/librewaternet.org/favicon.svg,
+	      // byte-identical to the latter so the two sites cannot drift apart. NO '?v=' -- ecSwAssetUrl()
+	      // deliberately does not bust a query onto an icon, and sw_manifest_check.php diffs this
+	      // href against that list. The maskable PNGs in lib/WebManifest.lib.php are a separate
+	      // open question of Tom's (they need an opaque background); a tab icon needs none. ?>
+	<link rel="icon" href="/engcalcs/icons/favicon.svg" type="image/svg+xml">
 	<link rel="apple-touch-icon" href="/engcalcs/icons/icon-192.png">
 	<?php // Bootstrap 5.3.2, MIT, served from this site (ROADMAP Task 287). It used to come from
 	      // jsDelivr, which meant every page load told a third party the visitor's IP address and
