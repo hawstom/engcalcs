@@ -10,7 +10,7 @@ that disagreement is most of what a seat is for. No agent edits the roadmap.
    design (Task 618) — and is a real, named convention in AutoCAD (`SELECTIONPREVIEW`) and Figma
    ("Highlight layers on hover"), not a novelty. See journal, 2026-09-10.
 
-2. **Ask Tom, not build: does the small corner arrow on `select-window`/`select-lasso`/
+2. **CLOSED 2026-09-10 by Tom, answered NO.** **Ask Tom, not build: does the small corner arrow on `select-window`/`select-lasso`/
    `select-polygon` (`lib/Icons.lib.php:283,292-294`) promise `default`, or is it a generic
    "this is a mouse action" badge?** Their actual mode cursor is `crosshair`
    (`js/looped-network.js:16157-16159`; `css/engcalcs.css:1321`), which either needs the corner

@@ -279,3 +279,48 @@ than silently decided, and belongs to him. **What I CAN say without his input: t
 real and narrow.** It binds the four select-family icons to each other and to their own cursors; it
 says nothing about, and should not be extended to, the asset/action icons, which correctly depict
 the thing rather than the pointer and would be actively wrong if forced to match a cursor instead.
+
+---
+
+## 2026-09-10 — TOM RULED, AND THREE OF MY OPEN QUESTIONS ARE CLOSED
+
+**The cursor question is SETTLED and the shipped state stands.** His own summary, and it is the
+sentence to quote rather than paraphrase: *"I am feeling really good about the conventionality of
+where we are headed: menus are pointer, map is grab, select menu depicts a default, and select is
+default, which is precise, serious, and consummately functional."* So: Rank 1 confirmed, and the
+hybrid is now a DECISION rather than an accumulation.
+
+**On my own first finding, which he neither accepted nor dismissed but reframed:** *"Pointer is
+perfect for the menus. Very real-world based for finger and button."* The chrome/canvas split I
+reported as an inconsistency is his intent -- a menu row is a button and a finger presses buttons;
+a junction disc is a target and an arrow aims at targets. **Two cursors, two kinds of thing.** My
+observation was correct and my reading of it as tension was not.
+
+**Question 2 is answered NO, and the answer is better than the question.** I asked whether the three
+area-select icons' arrow corner should be repainted to a crosshair. Tom: *"vertex and everything
+else is not a place for depicting a cursor. So your question kind of falls on a deaf suite."*
+**The icon-depicts-its-cursor idea is not a suite-wide rule and must not become one** -- `select` is
+the only tool whose subject IS a cursor, so it is the only icon that can depict one. Every other
+icon depicts the THING (a junction, a valve, a vertex), which is a different and correct taxonomy.
+Do not re-open this as a consistency sweep.
+
+- **He would extend the alignment if a case existed, and none does:** *"If there were any other
+  opportunities, I would strongly support making them aligned as is select."* So the principle is
+  real and its population is one.
+- CITED-adjacent, from him: *"at epanet-js icon and cursor are not aligned."* Worth knowing that
+  we are ahead of the comparator on this one point rather than behind it.
+
+**The Pan tool I costed stays unbuilt and unrecommended.** Nothing he said asks for it, and the
+tension it would resolve he has now declared resolved in the other direction.
+
+**One correction to a number I used.** I described the link band as 12 px throughout. Tom: *"Note
+that 12px here is just an example. The band may be as small as 3px lower limit (yet to be
+programmed?). It follows its graphics (already live)."* The band tracks the DRAWN width, and the
+3 px floor is Task 618 item 2 and is not built yet. Any future argument of mine that leans on
+"12 px of invisible band" is leaning on a stale figure.
+
+**Touch is explicitly out of scope and he gave the reason.** *"A finger is not a mouse! Leave touch
+alone, and I may test that. But on a phone, zoom in is the answer. You can't see through your
+finger."* **Zooming is the phone's precision instrument, not a bigger hit target** -- that is a
+design position worth holding on to, and it means a coarse pointer keeps its generous targets and
+nothing on a phone should ever depend on a cursor.
