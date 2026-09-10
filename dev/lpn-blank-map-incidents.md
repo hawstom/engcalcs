@@ -184,3 +184,52 @@ the document and part of `docSignature()`, so whatever wrote it also marked the 
 over the bad one. The table above is all that survives of it; there is no way back to the state.
 **Capture `view` before touching anything on the next one.**
 
+---
+
+## 2026-09-10 -- it recurred on a reload, and THIS ONE IS SOLVED
+
+**Captured live, with the fixture saved:** `dev/lpn-spike/net3-world-bad-view.lwn`, Tom's own
+Net3-Novato-CA-World, the first reproducible specimen of this bug. **Capture the LIVE TRANSFORM as
+well as the stored view** -- the stored view says what the document claims, the transform says what
+the screen is doing, and the first occurrence was lost for want of the second.
+
+```
+storedView    {cx: 835.390625, cy: -4957.78125, s: 5.322222222222222}
+liveTransform translate(-4140.688888888889,-26424.28888888889) scale(5.322222222222222)
+canvas        1918 x 365      symbolsOnScreen  x -4139  y -26252  w 1  h 0     drawn 677
+coords geo    origin {0,0}    nodes x -122.6076..-122.5111  y 38.0645..38.1287
+```
+
+**THREE EXACT IDENTITIES, and they close it.** Derived geo origin is
+`floor(-122.607554 x 128)/128 = -122.609375`, so in the local frame:
+
+| quantity | value | equals |
+|---|---|---|
+| `s` | 5.322222222222222 | `1916/360` -- `minScale()`, the "whole world fits" floor |
+| `cx` local | **958.000000** | `w/2` -- half the canvas width, IN PIXELS |
+| `cy` local | **4999.000000** | `h/2` for a 9998 px tall SVG, IN PIXELS |
+
+A real local coordinate here is about 0.05 degrees. These are pixels.
+
+**THE LINE IS `defaultViewForCoords()`** (`js/looped-network.js:7239`): `if (isGeoProject()) {
+return geoHomeView(); }` and otherwise `{cx: w/2, cy: h/2, s: 1}`, which is correct for an XY grid
+and nonsense for degrees. `isGeoProject()` reads `project.coords`, and `project` is still the
+PREVIOUS project's while a geographic one arrives, so the geographic document takes the grid
+branch. `s: 1` is then raised by `applyView()`'s clamp to `minScale()`, which is exactly the stored
+number. Reached from `if (!doc.nodes.length) { applyView(defaultViewForCoords()); return; }`.
+
+**THE COMMENT DIRECTLY ABOVE THAT LINE FIXES THE OPPOSITE DIRECTION ONLY** -- "a blank XY tab made
+after a lat/lon one was drawn through a geographic transform" -- so geo-after-XY was never closed.
+**Which makes this Task 624's original report as well**: *"an all-blue map after opening the
+geographic Net3 example beside an existing project."* One bug; 624's fallback fix changed its face
+from a blue wall to a blank page, exactly as that task predicted.
+
+**Why it survives a reload:** `view` is document state, so the autosave writes the bad camera and
+every boot restores it. Zoom to fit cures it and the next boot re-creates it, which is what made it
+look intermittent.
+
+**What the earlier entry got wrong, for the record:** it proposed the corrupted view came from a
+copy of a sibling tab's view. It did not -- it was computed, correctly, by the wrong branch.
+
+Owned by ROADMAP Task 629.
+
