@@ -58,7 +58,7 @@ const L = loadLoopedNetwork(
 	"\t\tnodeEl: function (id) { return nodeEls[id]; },\n" +
 	"\t\tnodesLayer: function () { return nodesLayer; },\n" +
 	"\t\tlinksLayer: function () { return linksLayer; },\n" +
-	"\t\tnodeHitRadius: nodeHitRadius, nodeRadius: nodeRadius,\n" +
+	"\t\tnodeRadius: nodeRadius, nodeHitSilhouette: nodeHitSilhouette,\n" +
 	"\t\trefreshSymbolSizes: refreshSymbolSizes,\n" +
 	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
 	"\t\tapplyDrag: function () { if (drag && dragDirty) { applyDrag(); dragDirty = false; } },\n" +
@@ -148,42 +148,65 @@ console.log('\n--- the band is a constant number of screen pixels ---');
 	L.setScale(1);
 	L.refreshSymbolSizes();
 	const at1 = Number(ne.hit.getAttribute('r')), disc1 = L.nodeRadius(n);
-	// **THE DISC PLUS THE SLOP, NOT THE LARGER OF THE TWO.** `Math.max()` was the first shape and
-	// measured to buy nothing: on the example network a junction draws 10 screen px across, so a
-	// 12 px band was a 1 px ring and the node's share of the map went 0.2% -> 0.2%. Disc-plus-slop
-	// takes the same dot to 22 px, which is 4.8x the area.
-	ok('the band is the drawn disc PLUS half of LPN_NODE_HIT_PX',
-		Math.abs(at1 - (disc1 + HIT / 2)) < 1e-9, at1 + ' = ' + disc1 + ' + ' + (HIT / 2));
-	ok('...so it is strictly bigger than the disc, whatever the symbol size',
-		at1 > disc1, at1 + ' > ' + disc1);
+	// **THE SLOP IS A STROKE ROUND THE DRAWN SHAPE SINCE 2026-09-10, NOT A BIGGER SHAPE** (Task
+	// 618). A junction's band is geometrically what it always was -- the disc plus half of
+	// LPN_NODE_HIT_PX in every direction -- but the two halves are now written separately, because
+	// only a stroke can follow an outline that is not a circle. So `r` is the DRAWN radius and the
+	// slop is `--lpn-nhit`, published on the element in its own units.
+	function slopPx(el, scale) { return Number(el.style.getPropertyValue('--lpn-nhit')) * scale; }
+	ok('the band circle is exactly the drawn disc', Math.abs(at1 - disc1) < 1e-9, at1 + ' vs ' + disc1);
+	ok('...and the slop rides its stroke, LPN_NODE_HIT_PX wide, so it reaches half that past the ink',
+		Math.abs(slopPx(ne.hit, 1) - HIT) < 1e-9, String(slopPx(ne.hit, 1)));
 	ok('...and still inside POINTER_REACH_PX, so it cannot out-reach the node finder',
 		HIT / 2 < Number((src.match(/var POINTER_REACH_PX = (\d+);/) || [])[1]),
 		(HIT / 2) + ' < ' + (src.match(/var POINTER_REACH_PX = (\d+);/) || [])[1]);
 
 	L.setScale(4);
 	L.refreshSymbolSizes();
-	const at4 = Number(ne.hit.getAttribute('r')), disc4 = L.nodeRadius(n);
-	ok('zoomed in four times the SLOP is a quarter of the world units it was',
-		Math.abs((at4 - disc4) * 4 - HIT / 2) < 1e-6, String((at4 - disc4) * 4));
+	ok('zoomed in four times the slop is a quarter of the world units it was',
+		Math.abs(slopPx(ne.hit, 4) - HIT) < 1e-6, String(slopPx(ne.hit, 4)));
 	ok('...which is the same number of screen pixels, which is the promise',
-		Math.abs((at4 - disc4) * 4 - (at1 - disc1)) < 1e-6);
+		Math.abs(slopPx(ne.hit, 4) - HIT) < 1e-6 &&
+		Math.abs(Number(ne.hit.style.getPropertyValue('--lpn-nhit')) * 4 - HIT) < 1e-6);
 
 	L.setScale(0.01);
 	L.refreshSymbolSizes();
 	ok('zoomed far out the slop grows in world units rather than vanishing',
-		Number(ne.hit.getAttribute('r')) - L.nodeRadius(n) > at1 - disc1,
-		String(Number(ne.hit.getAttribute('r')) - L.nodeRadius(n)));
+		Number(ne.hit.style.getPropertyValue('--lpn-nhit')) > HIT,
+		ne.hit.style.getPropertyValue('--lpn-nhit'));
 
-	// A vessel is drawn much bigger than a junction and gets the IDENTICAL slop -- which is the
-	// half `Math.max()` would have given it none of.
+	// ============================================================================================
+	// **A VESSEL'S BAND IS ITS OWN OUTLINE AND NOT THE CIRCLE THAT CONTAINS IT** (Tom, 2026-09-10:
+	// *"I can visually trace the outline of the reservoir's halo, and if I am not mistaken, it is
+	// circular. Fix that."*, and *"Tank is not clean; it's a circle too."*). Before this the band
+	// was one `<circle>` per node at nodeRadius() + 6 px, and nodeRadius() of a reservoir is the
+	// radius that CONTAINS its triangle -- so the corners answered too. The shape is read out of
+	// the file's own table rather than retyped, and compared with lib/Icons.lib.php by
+	// symbol-backdrop-harness.js, which owns that half.
 	L.setScale(1);
-	const rid = L.addNode('reservoir', 400, 400).id;
-	L.refreshSymbolSizes();
-	const rne = L.nodeEl(rid), rn = L.nodeById(rid);
-	ok('a reservoir keeps its own drawn extent and gains the same slop',
-		Math.abs(Number(rne.hit.getAttribute('r')) - (L.nodeRadius(rn) + HIT / 2)) < 1e-9 &&
-		L.nodeRadius(rn) > disc1,
-		rne.hit.getAttribute('r') + ' vs drawn ' + L.nodeRadius(rn));
+	['reservoir', 'tank'].forEach(function (type) {
+		const vid = L.addNode(type, type === 'tank' ? 500 : 400, 400).id;
+		L.refreshSymbolSizes();
+		const vne = L.nodeEl(vid), vn = L.nodeById(vid);
+		ok('a ' + type + '\'s band is a PATH, not a circle round the symbol',
+			String(vne.hit.tagName).toLowerCase() === 'path' && vne.hit.getAttribute('r') == null,
+			String(vne.hit.tagName));
+		ok('...and its outline is the one the symbol is drawn from',
+			vne.hit.getAttribute('d') === L.nodeHitSilhouette(vn), vne.hit.getAttribute('d'));
+		ok('...placed on the node, in the symbol\'s own box',
+			/^translate\(/.test(vne.hit.getAttribute('transform') || '') &&
+			/scale\(/.test(vne.hit.getAttribute('transform') || ''),
+			vne.hit.getAttribute('transform'));
+		// The slop is in the path's LOCAL units, inside that scale -- so the screen figure is what
+		// has to come back out, and a junction and a reservoir must agree on it or one of them is
+		// easier to hit than the other for no reason a reader could see.
+		const k = (/scale\(([-\d.e+]+)/.exec(vne.hit.getAttribute('transform') || '') || [])[1];
+		ok('...and its slop is the SAME number of screen pixels a junction gets',
+			Math.abs(Number(vne.hit.style.getPropertyValue('--lpn-nhit')) * Number(k) - HIT) < 1e-9,
+			String(Number(vne.hit.style.getPropertyValue('--lpn-nhit')) * Number(k)));
+		ok('...while the drawn radius the rest of the page reads is unchanged',
+			L.nodeRadius(vn) > disc1, String(L.nodeRadius(vn)));
+	});
 }
 
 // ================================================================================================
@@ -295,17 +318,38 @@ console.log('\n--- the stylesheet half ---');
 		/cursor:\s*inherit/.test(rule));
 	ok('...while the DRAWN disc still carries the object cursor, or the feedback moved onto nothing',
 		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*default/.test(css));
-	// **`visibleFill` AND NOT `visible`, AND THIS LINE USED TO PIN THE DEFECT.** `visible` hit-tests
-	// the fill AND THE STROKE PERIMETER, and unlike `visiblePainted` it ignores the VALUES of `fill`
-	// and `stroke` -- so this rule's `stroke: none` removed nothing, and with no `stroke-width`
-	// declared the perimeter was the initial value: ONE USER UNIT, which on this page is one WORLD
-	// unit. The band therefore reached half the world scale in screen pixels past its own disc --
-	// 11.5 px on the XY Net3 example, where nobody could see it, and 4,215 px on the same network as
-	// a geographic project, where ONE node answered 42% of the canvas. Measured, and now asserted, in
-	// dev/browser-pass/specs/nodehit.js. `visibleFill` keeps the `visible` prefix that gates the hit
-	// on the node being visible, and drops the perimeter that was never wanted.
-	ok('...it is hittable by its DISC alone -- `visibleFill`, not `visible`, `all` or `visiblePainted`',
-		/pointer-events:\s*visibleFill\s*;/.test(rule), rule);
+	// **`visible` WITH A DECLARED STROKE-WIDTH, WHICH IS NOT THE 2026-09-09 DEFECT COMING BACK.**
+	// That defect was `pointer-events: visible` with NO `stroke-width` at all: the perimeter then
+	// takes the initial value, ONE USER UNIT, which on this page is one WORLD unit -- 11.5 px of
+	// invisible reach on the XY Net3 example and 4,215 px on the same network as a geographic
+	// project, where one node answered 42% of the canvas. It was fixed with `visibleFill`, which
+	// drops the stroke from the hit test entirely.
+	//
+	// Task 618 needs the stroke BACK, because a stroke is the only thing that can put a constant
+	// slop round an outline that is not a circle -- and it is safe now for the reason it was never
+	// safe before: syncNodeHit() DECLARES the width, in the element's own units, on every zoom, and
+	// the stylesheet's fallback is ZERO. So a publish that never runs shrinks the band to bare ink
+	// rather than growing it to a wall. Both halves are asserted, because either alone is the bug.
+	// **A POINTER GETS NO SLOP AT ALL SINCE 2026-09-10** (Tom: *"No slop for nodes."*), so the base
+	// rule declares ZERO and the 12 px this file measures is published for a COARSE pointer only.
+	// Both halves are asserted: a base rule that carried the variable would put the skirt back on
+	// every desktop, and a missing media rule would take it off every phone.
+	const coarse = (css.match(/@media \(pointer: coarse\) \{\s*\.lpn-node-hit \{[^}]*\}/) || [''])[0];
+	const nhw = /stroke-width:\s*0\s*;/.test(rule) && /stroke-width:\s*var\(--lpn-nhit,\s*0\)/.test(coarse);
+	ok('...it is hittable by its fill AND its stroke -- `visible`, not `visibleFill`',
+		/pointer-events:\s*visible\s*;/.test(rule), rule);
+	ok('...with NO slop on a pointer, and the 12 px skirt kept for a coarse one',
+		nhw, rule + coarse);
+	const js = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
+	ok('...and the file that publishes it does so in the element\'s own units, every zoom',
+		/hit\.style\.setProperty\('--lpn-nhit'/.test(js) &&
+		(js.match(/--lpn-nhit/g) || []).length >= 2);
+	// The other half of the same halo: the unpainted disc under a reservoir used to be
+	// `pointer-events: visible` in its own right, so it answered over the circle that circumscribes
+	// the symbol whatever `.lpn-node-hit` was shaped like.
+	ok('...and the unpainted vessel disc no longer answers the pointer at all',
+		/\.lpn-node-reservoir, \.lpn-node-tank \{[^}]*pointer-events:\s*none/.test(css),
+		(css.match(/\.lpn-node-reservoir, \.lpn-node-tank \{[^}]*\}/) || [''])[0]);
 	ok('...with a transparent fill, so it is reachable and cannot be seen',
 		/fill:\s*transparent/.test(rule));
 	ok('vertices mode overrules it, the way it already overrules the pipe band',

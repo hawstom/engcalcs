@@ -4308,6 +4308,11 @@ var EngCalcs = EngCalcs || {};
 	// on the drawing. A press inside the band still falls through to a PAN if it is a drag
 	// (wirePointerEvents() arms no drag for a link), so widening it costs no panning anywhere.
 	var LPN_LINK_HIT_PX = 12;
+	// **AND THAT NUMBER IS A FINGER'S SINCE 2026-09-10.** Tom, ruling on Task 618: *"No slop for
+	// nodes. Slop for labels and to enforce a lower limit of 3 px for link lines."* A pointer gets
+	// the pipe's own drawn width instead, floored here -- one extra pixel on each side of a 1 px
+	// line -- so a mark 2 px wide answers over 3 and nothing answers where nothing is drawn.
+	var LPN_LINK_HIT_FLOOR_PX = 3;
 	// **AND A JUNCTION IS SEVEN PIXELS ACROSS, WHICH IS WHY THE POINTER NEVER SAYS ANYTHING** (Tom,
 	// 2026-09-08: *"The mouse is very unreliable to the point of rarely changing to an arrow and
 	// usually as a flicker"*, and *"I get no help from the mouse pointer. It's just a pan cross the
@@ -4343,6 +4348,15 @@ var EngCalcs = EngCalcs || {};
 	// still mean this node" and is used by the finders AFTER a hit; this is the width of an
 	// invisible mark on the drawing, and giving it 14 would swallow every pipe end.
 	var LPN_NODE_HIT_PX = 12;
+	// **A PUMP AND A VALVE ARE BIG, SO THEIR GRAB SHAPE IS NEARLY BARE INK** (Task 618, Tom:
+	// *"everything would have a hit area that exactly matches what you see aka WYSIWYG"*, with a
+	// forgiving margin only where a target is small or thin). A volute is drawn 20-35 screen pixels
+	// across on Net3 at zoom to fit, so 2 px on each side is all a mouse needs -- and unlike a node,
+	// this shape sits OVER its own end nodes, so every pixel of skirt is taken from them.
+	// The coarse figure is for the hand that cannot see what it is covering; touchNodeOver() still
+	// hands a finger the nearby node, so the skirt costs a node nothing on that device.
+	var LPN_SYMBOL_HIT_PX = 4;
+	var LPN_SYMBOL_HIT_COARSE_PX = 24;
 	// The reach this gesture deserves. `pointerType` is the only honest source -- a device with
 	// both a mouse and a screen answers per press, where a media query answers once for the
 	// machine. A PEN is a pointer: it is precise, and it is what a surveyor marking up a map on a
@@ -4926,6 +4940,31 @@ var EngCalcs = EngCalcs || {};
 	// carry their own proportions since 2026-09-02, so stretching them would distort a triangle
 	// nobody asked to be distorted.
 	var JUNCTION_UNIT_W = 2 * JUNCTION_R;
+	// **THE SILHOUETTE OF EACH OVERLAY SYMBOL, IN THE ICON'S OWN 24-UNIT FRAME, AND IT IS THE ONE
+	// TABLE.** Each of these traces the outline of the matching path in lib/Icons.lib.php -- KEEP IT
+	// IN SYNC WITH THAT FILE. It does two jobs that used to be written out twice: the opaque backdrop
+	// that stops a pipe showing through the symbol (prependSymbolBackdrop()), and the invisible grab
+	// shape that answers the pointer (buildNodeEls() / buildLinkEls()).
+	//
+	// **THE GRAB SHAPE IS THE SILHOUETTE BECAUSE OF WHAT A CIRCUMSCRIBING ONE DID** (Tom,
+	// 2026-09-10, with Thematic map on and no labels: *"I can visually trace the outline of the
+	// reservoir's halo, and if I am not mistaken, it is circular. Fix that."*, and *"Tank is not
+	// clean; it's a circle too."*). Every node type had the same `<circle class="lpn-node-hit">` at
+	// nodeRadius() + 6 px, and nodeRadius() of a reservoir or a tank is the radius of the circle
+	// that CONTAINS the symbol -- so the band claimed all four corners the drawing does not use.
+	// MEASURED on the XY Net3 example at zoom to fit (dev/browser-pass/specs/nodehit.js): a
+	// reservoir drew 7-8 px of ink on every bearing and answered the pointer at a flat 14 px on all
+	// sixteen, and the same node on the geographic copy drew 11-12 and answered 17. A junction IS a
+	// disc, so its circular band was always WYSIWYG and is untouched -- Tom, in the same reading:
+	// *"Junctions are clean."*
+	var SYMBOL_SILHOUETTE = {
+		reservoir: 'M3.5 5.5H20.5L12 20Z',
+		tank: 'M4 6.5H20V17.5H4Z',
+		// The pump's whole volute, tail included, and the valve's two triangles -- see the notes in
+		// buildLinkEls() for why the tail is inside the outline and the waist is not filled across.
+		pump: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z',
+		valve: 'M3 3v18l9-9zM21 3v18l-9-9z'
+	};
 	var RESERVOIR_HALF_W = 1.9878;
 	var RESERVOIR_HALF_H = 1.9878;
 	var TANK_HALF_W = 2.1120;
@@ -4941,20 +4980,48 @@ var EngCalcs = EngCalcs || {};
 	// leader placement, hit-testing, staticObstacles(), the zoom-extent bbox. A reservoir is not
 	// visually a circle, so this is the CIRCUMSCRIBING radius (half its longer side): generous
 	// rather than tight, so no consumer clips the wide/short tank on any one side.
-	// The grab band's radius in WORLD units: **the drawn symbol PLUS the slop**, which is the pipe
-	// band's own arithmetic rather than a maximum of the two. `Math.max(disc, slop)` was tried
-	// first and MEASURED TO BUY NOTHING: `settings.symbolSize` on the example network draws a
-	// junction 10 screen px across, so a 12 px band is a 1 px ring and the node's share of the map
-	// went from 0.2% to 0.2%. A pipe's band is its 2 px mark plus about 5 px on each side; a node's
-	// is its disc plus the same, which takes a 10 px dot to a 22 px target -- 4.8x the area -- and
-	// gives a reservoir the identical slop rather than none.
+	// **THE SLOP IS A STROKE ROUND THE DRAWN SHAPE, NOT A BIGGER SHAPE** -- which is the whole of
+	// how a band can be forgiving and still be WYSIWYG. `pointer-events: visible` hit-tests the fill
+	// AND the stroke, so a band drawn as the symbol's own silhouette with a stroke LPN_NODE_HIT_PX
+	// wide answers everywhere the ink is plus 6 px in every direction, following the outline round
+	// every corner instead of collapsing to the circle that contains it. A junction's band is the
+	// same construction on a circle and is therefore geometrically identical to the disc of
+	// nodeRadius() + 6 px it replaced.
+	//
+	// **THE STROKE-WIDTH IS DECLARED, IN THE ELEMENT'S OWN UNITS, AND THAT IS NOT OPTIONAL.** An
+	// undeclared one is 1 USER UNIT, which on a geographic drawing is 4,215 screen pixels of
+	// invisible reach -- the defect specs/nodehit.js was written for, one day older than this one.
+	// So syncNodeHit() publishes `--lpn-nhit` on the element itself and css/engcalcs.css falls back
+	// to ZERO, which fails to the shrink-wrapped shape rather than to a wall.
 	//
 	// Still comfortably inside POINTER_REACH_PX (14, a radius), so a node's band cannot reach
 	// further than the number that answers "how near may a hand land and still mean this node".
 	// Screen pixels, like every other tolerance here, so zooming out never makes a node harder to
 	// reach than it was.
-	function nodeHitRadius(n) {
-		return nodeRadius(n) + (LPN_NODE_HIT_PX / 2) / (state.s || 1);
+	//
+	// A `<path>` for a node whose symbol has a silhouette, a `<circle>` for one drawn as a disc; the
+	// path rides a transform into the symbol's own box, exactly as positionNodeSymbol() places the
+	// drawing, so there is one opinion about where a reservoir is.
+	function nodeHitSilhouette(n) {
+		return (n && (n.type === 'reservoir' || n.type === 'tank')) ? SYMBOL_SILHOUETTE[n.type] : null;
+	}
+	function syncNodeHit(n, hitEl) {
+		var ne = nodeEls[n.id],
+			hit = hitEl || (ne && ne.hit),
+			s = state.s || 1, box, kx, ky;
+		if (!hit) { return; }
+		if (String(hit.tagName || '').toLowerCase() === 'path') {
+			box = nodeSymbolSize(n);
+			kx = box.w / 24; ky = box.h / 24;
+			hit.setAttribute('transform',
+				'translate(' + (n.x - box.w / 2) + ',' + (n.y - box.h / 2) + ') scale(' + kx + ',' + ky + ')');
+			// Local units: the path lives inside that scale, so a screen pixel is 1 / (s * kx) of one.
+			hit.style.setProperty('--lpn-nhit', LPN_NODE_HIT_PX / (s * kx));
+			return;
+		}
+		hit.setAttribute('cx', n.x); hit.setAttribute('cy', n.y);
+		hit.setAttribute('r', nodeRadius(n));
+		hit.style.setProperty('--lpn-nhit', LPN_NODE_HIT_PX / s);
 	}
 	function nodeRadius(n) {
 		// **THE DRAWN EXTENT, NOT THE BOX** (2026-09-03). This used to be half the larger side of
@@ -5028,7 +5095,15 @@ var EngCalcs = EngCalcs || {};
 		// The invisible grab band, in world units at this zoom -- a CONSTANT number of screen
 		// pixels, like every other tolerance on this page, so zooming out never makes a pipe
 		// harder to hit than it was and zooming in never turns the band into a wall.
-		svg.style.setProperty('--lpn-hit', LPN_LINK_HIT_PX / s);
+		// **A POINTER GETS THE PIPE'S OWN WIDTH WITH A 3 px FLOOR; A FINGER KEEPS THE 12** (Tom,
+		// 2026-09-10, ruling on Task 618: *"No slop for nodes. Slop for labels and to enforce a
+		// lower limit of 3 px for link lines."*, and the day before, on the floor itself: *"a lower
+		// limit that is not very large because WYSIWYG is important ... a lower limit of 3px (one
+		// extra on each side of a 1-px link) might be appreciated."*). `settings.linkWidth` ships at
+		// 2, so a mouse now aims at 3 px where it had 12 -- which is the whole point: what you can
+		// click is what you can see. The stylesheet picks which of these two the device gets.
+		svg.style.setProperty('--lpn-hit', Math.max(settings.linkWidth, LPN_LINK_HIT_FLOOR_PX) / s);
+		svg.style.setProperty('--lpn-hit-coarse', LPN_LINK_HIT_PX / s);
 		// ONE SCREEN PIXEL, in world units. A leader is a rule pointing at something, not a symbol,
 		// so it must NOT scale off the symbol size: at the shipped 7px symbol that worked out at
 		// 0.49px, which the browser renders as a grey smudge, and at Symbol size 2 it was 0.14px.
@@ -5053,7 +5128,7 @@ var EngCalcs = EngCalcs || {};
 			if (ne) { ne.circle.setAttribute('r', nodeRadius(n)); }
 			// The band is a SCREEN size, so it is re-derived on every zoom as well as on every
 			// symbol-size change -- the same reason --lpn-hit is republished above.
-			if (ne && ne.hit) { ne.hit.setAttribute('r', nodeHitRadius(n)); }
+			if (ne && ne.hit) { syncNodeHit(n); }
 			positionNodeSymbol(n.id);
 		});
 		doc.links.forEach(function (l) {
@@ -5867,10 +5942,13 @@ var EngCalcs = EngCalcs || {};
 		// **THE GRAB BAND FIRST, so the drawn disc paints over it** -- see LPN_NODE_HIT_PX. It
 		// carries the same `data-node`, so selectFromHit(), nodeOutranks() and every other reader of
 		// the dataset sees the node and there is no second vocabulary for "this is a junction".
-		var hit = el('circle', {
-			cx: n.x, cy: n.y, r: nodeHitRadius(n),
-			'class': 'lpn-node-hit', 'data-node': n.id
-		}, nodesLayer);
+		// A DISC for a node drawn as a disc, the symbol's own OUTLINE for one that is not -- see
+		// syncNodeHit(), which sets the geometry and the slop for both.
+		var sil = nodeHitSilhouette(n);
+		var hit = sil
+			? el('path', { d: sil, 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer)
+			: el('circle', { 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer);
+		syncNodeHit(n, hit);
 		var circle = el('circle', {
 			cx: n.x, cy: n.y, r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
@@ -5889,16 +5967,11 @@ var EngCalcs = EngCalcs || {};
 			// Default preserveAspectRatio ("xMidYMid meet") letterboxes the square icon inside that
 			// box; "none" stretches it to fill, which is the point of the independent width/height.
 			symbol.setAttribute('preserveAspectRatio', 'none');
-			// The opaque backdrop matches the symbol's own silhouette from lib/Icons.lib.php -- KEEP
-			// IT IN SYNC with that path. A rect over a domed tank leaves its corners outside the
-			// outline and a pipe appears to stop short of the tank instead of running behind it.
-			if (n.type === 'tank') {
-				prependSymbolBackdrop(symbol, 'rect', { x: 4, y: 6.5, width: 16, height: 11 }, 'lpn-node-symbol-backdrop');
-			} else {
-				// A TRIANGLE, because a rectangle behind one leaves its corners outside the outline
-				// and the pipe appears to stop short of the reservoir instead of running behind it.
-				prependSymbolBackdrop(symbol, 'path', { d: 'M3.5 5.5H20.5L12 20Z' }, 'lpn-node-symbol-backdrop');
-			}
+			// The opaque backdrop matches the symbol's own silhouette from lib/Icons.lib.php, and
+			// takes it from the SAME TABLE the grab shape does. A TRIANGLE for the reservoir,
+			// because a rectangle behind one leaves its corners outside the outline and the pipe
+			// appears to stop short of the reservoir instead of running behind it.
+			prependSymbolBackdrop(symbol, 'path', { d: SYMBOL_SILHOUETTE[n.type] }, 'lpn-node-symbol-backdrop');
 			nodesLayer.appendChild(symbol);
 		}
 		// Leader+text go in labelsLayer, the topmost layer, so this label is never covered by a
@@ -5995,17 +6068,28 @@ var EngCalcs = EngCalcs || {};
 		// at all (`.lpn-link-symbol` is pointer-events: none, deliberately, so a press goes to the
 		// link). That is Tom's second report in the same breath: a pump on Net3 needs zooming in
 		// before it can be edited, and zooming in is what made the two-unit link long enough to
-		// hit. A square over the symbol's own box fixes both, at every zoom.
+		// hit. A grab shape over the symbol's own drawing fixes both, at every zoom.
 		//
-		// **IN THE LINKS LAYER, NOT INSIDE symbolG**, which is the part that is easy to get wrong:
-		// symbolG lives in the nodes layer so a pump reads on top of every pipe it crosses, and a
-		// hit rect there would paint over the pump's own end nodes and steal their presses. Here it
-		// is under every node, exactly as the link band is.
+		// **INSIDE symbolG, WHICH IS WHERE THE DRAWING IS, AND THAT IS THE FIX FOR "NO PRESENCE"**
+		// (Tom, 2026-09-10: *"Valve has some funny business afoot. It is hidden from the mouse"*,
+		// then *"I forgot to do detailed pump volute observations! They are identical to valve. No
+		// wonder! There is no presence!"*). The square was in the LINKS layer, deliberately, so a
+		// node would win over it -- and on Net3 at zoom to fit a pump sits between two nodes whose
+		// own bands are 14 px discs, so the bands covered the volute completely. MEASURED before the
+		// fix, by clicking the middle of the drawn volute: the square was the right size (24.6 px)
+		// and centred, and it was the SECOND element in the stack under `.lpn-node-hit`, on both
+		// pumps in the XY example and third under TWO node bands in the geographic one. Every click
+		// selected a reservoir or a junction. So the rect always had a size and could never win.
+		//
+		// **HIT ORDER FOLLOWS PAINT ORDER, and that is the rule that replaces the old one.** The
+		// volute is DRAWN over its end nodes -- symbolG is in the nodes layer and links are built
+		// after nodes -- so what a reader sees on top is what a press must reach. The old worry that
+		// this steals a node's press is answered by the shape rather than by the layer: the grab
+		// shape is now the symbol's OWN OUTLINE (SYMBOL_SILHOUETTE) rather than a square round it,
+		// so it claims only the ground the pump covers. A FINGER still gives the node precedence
+		// wherever it is near one -- that is touchNodeOver(), unchanged, and it reads data-link.
 		var symbolG = null, symbolSvg = null, symbolHit = null;
 		if (l.type === 'pump' || l.type === 'valve') {
-			symbolHit = el('rect', {
-				'class': 'lpn-link-symbol-hit', 'data-link': l.id, x: 0, y: 0, width: 0, height: 0
-			}, linksLayer);
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
 			// **ONE DRAWING FOR MENU AND MAP AGAIN** (Tom, 2026-09-03, correcting his own earlier
 			// steer: *"I steered you wrong about the volute. Its snout length is only about 0.6-0.7
@@ -6020,19 +6104,25 @@ var EngCalcs = EngCalcs || {};
 				// still be visible running through. The pump's thin discharge tail gets no backdrop --
 				// a line crossing a pipe reads as two lines crossing.
 				if (l.type === 'valve') {
-					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M3 3v18l9-9zM21 3v18l-9-9z' }, 'lpn-link-symbol-backdrop');
+					prependSymbolBackdrop(symbolSvg, 'path', { d: SYMBOL_SILHOUETTE.valve }, 'lpn-link-symbol-backdrop');
 				} else {
 					// **THE WHOLE VOLUTE NOW, TAIL INCLUDED.** The old backdrop traced the casing only,
 					// on the argument that a thin discharge line crossing a pipe reads as two lines
 					// crossing. The discharge is a filled body in this drawing rather than a line, so
 					// that argument no longer applies and a pipe showing through it would read as a
 					// hole in the pump.
-					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M9 7H22.5V13H15A6 6 0 1 1 9 7Z' }, 'lpn-link-symbol-backdrop');
+					prependSymbolBackdrop(symbolSvg, 'path', { d: SYMBOL_SILHOUETTE.pump }, 'lpn-link-symbol-backdrop');
 				}
+				// The grab shape, LAST so nothing of the drawing is over it, and the symbol's own
+				// outline so it claims only what a reader can see. resizePumpSymbol() puts it into
+				// the icon's 24-unit frame and sets its slop; symbolG's own transform rotates it
+				// with the drawing, so the rotate/flip rule is still written once.
+				symbolHit = el('path', {
+					d: SYMBOL_SILHOUETTE[l.type], 'class': 'lpn-link-symbol-hit', 'data-link': l.id
+				}, symbolG);
 			} else {
-				// No drawing, so nothing to grab: the square goes with the symbol it traces.
+				// No drawing, so nothing to grab: the grab shape goes with the symbol it traces.
 				symbolG.remove(); symbolG = null;
-				symbolHit.remove(); symbolHit = null;
 			}
 		}
 		linkEls[l.id] = {
@@ -6061,17 +6151,24 @@ var EngCalcs = EngCalcs || {};
 		var size = pumpSymbolSize(l.type), half = size / 2;
 		le.symbolSvg.setAttribute('x', -half); le.symbolSvg.setAttribute('y', -half);
 		le.symbolSvg.setAttribute('width', size); le.symbolSvg.setAttribute('height', size);
-		// The grab square is the symbol's own box, so it grows and shrinks with the drawing and
-		// there is no second opinion anywhere about how big a pump is.
+		// The grab shape is the symbol's own outline in the same box, so it grows and shrinks with
+		// the drawing and there is no second opinion anywhere about how big a pump is.
 		// **SPLIT EXACTLY AS symbolG/symbolSvg IS SPLIT: SIZE HERE, PLACE THERE.** A zoom or a
-		// symbol-size change runs resizePumpSymbol() and NOT positionPumpSymbol() -- the transform
-		// is a translate to the midpoint and does not depend on how big the symbol is -- so a
-		// square that took its corner from `mid - size/2` was stale from the first wheel notch,
-		// sitting off the pump by half the size difference. The corner is local to the translate.
+		// symbol-size change runs resizePumpSymbol() and NOT positionPumpSymbol(), so everything
+		// that depends on the SIZE has to be written here; the placement rides symbolG's own
+		// transform, which is why nothing below is a midpoint.
+		//
+		// **TWO SLOPS, AND THE STYLESHEET PICKS ONE BY POINTER** (Task 618). A volute is 20+ screen
+		// pixels of ink, so a mouse needs no reach to speak of and 2 px on each side is antialiasing
+		// and the tail's thin waist; a FINGER is not a mouse, and on a coarse pointer the shape
+		// keeps a 12 px skirt, which is at least the old square. Local units, because the path is
+		// inside the scale below -- and DECLARED, never left to the initial 1 user unit, which on a
+		// geographic drawing is thousands of screen pixels (specs/nodehit.js).
 		if (le.symbolHit) {
-			le.symbolHit.setAttribute('x', -half); le.symbolHit.setAttribute('y', -half);
-			le.symbolHit.setAttribute('width', size);
-			le.symbolHit.setAttribute('height', size);
+			var k = size / 24, sc = (state.s || 1) * k;
+			le.symbolHit.setAttribute('transform', 'translate(' + (-half) + ',' + (-half) + ') scale(' + k + ')');
+			le.symbolHit.style.setProperty('--lpn-symhit', LPN_SYMBOL_HIT_PX / sc);
+			le.symbolHit.style.setProperty('--lpn-symhit-coarse', LPN_SYMBOL_HIT_COARSE_PX / sc);
 		}
 	}
 	// The pump-orientation rule, verified over all 25 angles at 15-degree steps: rotate to point the
@@ -6089,12 +6186,9 @@ var EngCalcs = EngCalcs || {};
 			flip = (b.x - a.x) < 0;
 		le.symbolG.setAttribute('transform',
 			'translate(' + mx + ',' + my + ') rotate(' + angle + ')' + (flip ? ' scale(1,-1)' : ''));
-		// The grab square rides the same midpoint and is AXIS-ALIGNED: the symbol's box is square,
-		// so rotating it would change nothing a reader can aim at and would put a second copy of
-		// the rotate/flip rule in the file. Its own corner is set by resizePumpSymbol().
-		if (le.symbolHit) {
-			le.symbolHit.setAttribute('transform', 'translate(' + mx + ',' + my + ')');
-		}
+		// The grab shape is a CHILD of symbolG, so it takes that rotate and flip for nothing: the
+		// pointer meets the volute at the angle it is drawn at, and the rotate/flip rule is still
+		// written exactly once. Its own box is set by resizePumpSymbol().
 	}
 	// Midpoint and local tangent angle of every segment, walking a->verts->b -- one entry per
 	// straight run, so a bent pipe's arrows follow each segment's own direction.
@@ -6671,12 +6765,32 @@ var EngCalcs = EngCalcs || {};
 	// the same 2 for every hand, and widening it would not make anything easier to hit -- it would
 	// make a bogus hit believable.
 	var HIT_SLOP_PX = 2;
+	// **AND getBoundingClientRect() ON AN SVG SHAPE IS ITS GEOMETRY BOX, WITH THE STROKE LEFT OUT.**
+	// MEASURED in Chromium on the XY Net3 example (dev/browser-pass/boxprobe): a node band drawn at
+	// r = 0.1738 world units on a 23.01 px/unit drawing reports an 8 x 8 px rect -- exactly its
+	// 4 px radius -- while carrying a declared 12 px stroke. So every band whose SLOP is a stroke
+	// answers up to half that stroke outside its own box, and confirming against the bare box would
+	// throw the slop away: a pipe's 6 px was already being truncated to HIT_SLOP_PX here, silently,
+	// and Task 618's node and symbol shapes would have been truncated the same way.
+	//
+	// It is the element's OWN declared width, converted through its OWN screen transform, so it
+	// cannot be a licence: a band that reaches further than the stroke it declares is still refused,
+	// which is the whole of what this guard was written for.
+	function strokeReachPx(t) {
+		var cs = window.getComputedStyle ? window.getComputedStyle(t) : null,
+			w = cs ? parseFloat(cs.strokeWidth) : 0, m, k;
+		if (!(w > 0)) { return 0; }
+		m = t.getScreenCTM ? t.getScreenCTM() : null;
+		k = m ? Math.hypot(m.a, m.b) : (state.s || 1);
+		return (w * k) / 2;
+	}
 	function hitConfirmed(t, cx, cy) {
 		if (!t || !t.getBoundingClientRect) { return false; }
 		var r = t.getBoundingClientRect();
 		if (!(r.width > 0 || r.height > 0)) { return false; }
-		return cx >= r.left - HIT_SLOP_PX && cx <= r.right + HIT_SLOP_PX &&
-			cy >= r.top - HIT_SLOP_PX && cy <= r.bottom + HIT_SLOP_PX;
+		var pad = HIT_SLOP_PX + strokeReachPx(t);
+		return cx >= r.left - pad && cx <= r.right + pad &&
+			cy >= r.top - pad && cy <= r.bottom + pad;
 	}
 	// **THE TOPMOST BELIEVABLE THING UNDER THE POINTER, WHICH IS WHY IT IS THE PLURAL CALL.**
 	// elementFromPoint() answers with the top of the stack and nothing else, so rejecting a bogus
@@ -6727,7 +6841,7 @@ var EngCalcs = EngCalcs || {};
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', n.x); ne.circle.setAttribute('cy', n.y);
-		if (ne.hit) { ne.hit.setAttribute('cx', n.x); ne.hit.setAttribute('cy', n.y); }
+		if (ne.hit) { syncNodeHit(n); }
 		positionNodeSymbol(id);
 		layoutNodeLabel(id);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
