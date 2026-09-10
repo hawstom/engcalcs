@@ -3,6 +3,40 @@
 Scratch drawings for icons under consideration. Nothing here ships; a winner is copied into
 `lib/Icons.lib.php`, which is the one geometry table (the menu and the map both read it).
 
+## App icons: icon-192.png / icon-512.png / icon.svg, 2026-09-10 -- THESE SHIP
+
+`node gen-app-icons.js` renders `icons/icon-192.png`, `icons/icon-512.png` and `icons/icon.svg` IN
+PLACE, straight from `icons/favicon.svg` (untouched) -- the last open item on ROADMAP Task 615. All
+three used to be either blank (`#1a6faf` squares, no glyph) or a stale "EC" wordmark unrelated to the
+tower (`icon.svg` -- caught by the coordinator: it IS live, `lib/WebManifest.lib.php:123`, and a
+`sizes: "any"` SVG is often preferred over a PNG by an installer). 192 (`purpose: "any"`, never
+cropped) is the favicon's own full-bleed framing at 1.0 scale, unaffected by anything below.
+
+**Three coordinator review rounds, each catching something the render already showed.** (1) 0.75 was
+tried first and was wrong -- it accounted for a leg's path COORDINATE (12.665 units from center) but
+not the 1-unit overshoot its `stroke-linecap="round"` actually draws (13.616 units), so the rendered
+foot landed just outside the 9.6-unit safe circle and sheared off diagonally. (2) Fixed by scaling
+the WHOLE tower to 0.85 -- which cleared the safe circle but dragged the descenders' endpoint from
+`y=24` up to `y=22.20`, a visible 1.80-unit sky gap under every foot even in the plain UNCROPPED
+square (38px at 512) -- Tom's own struck "flying in the air" defect, reinstated smaller. A claim
+that the legs "ran flush to the bottom edge" was written before that number was checked; it was
+false. (3) **SHIPPED: stop scaling the tower as one object.** The BODY (roof, wall, catwalk, bowl)
+is scaled 0.85 about the frame center, keeping its stated 10.2%-margin clearance inside the 9.6-unit
+safe circle; the DESCENDERS (both legs, the riser) are drawn separately, attached to the scaled
+body's own edge and run straight to `y=24` -- the favicon's own true frame edge -- at the body's
+scaled stroke weight, so there is no visible seam. Sky gap under a leg, uncropped: **0 units,
+exactly**. Cropped to the circle, the legs cross the ring and keep going, the clean grounded-and-cut
+read. **The cost, measured and flagged rather than assumed away**: the legs are now 21.5% longer
+relative to the wall than the favicon draws them (leg-to-wall ratio 1.145 shipped vs. 0.943 on the
+plain favicon) -- rendered directly beside the unmodified favicon in the proof sheet's last row, it
+still reads as the same mark but visibly leggier, and that judgement is left for Tom rather than
+decided here. A uniform-scale candidate (0.65, everything including leg tips inside the circle) was
+rendered too, for comparison, and is not shipped -- it floats with open sky on every side of the feet
+even uncropped. Proof, including actual CSS `clip-path` crops of the real renders (not a drawn
+approximation), every distance printed before rendering, and the favicon-side-by-side proportion
+check: `render/app-icons/`, principally `proof.png`. Full writeup and the exact per-point distances:
+`ship-notes.md`, "Addendum, 2026-09-10" section.
+
 ## Water tower IN COLOR, round 3 (2026-09-09, revised 2026-09-10) -- CURRENT
 
 `node gen-concepts-color.js` writes 16 color candidates and 5 mono menu candidates (`ic-*.svg`),

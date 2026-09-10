@@ -269,3 +269,137 @@ tower's own silhouette at their intended heights.
 Proof: `render/ship/clouds-addendum-sheet.png` (final file at all four menu sizes, light and dark,
 plus the no-clouds/with-clouds comparison and the rejected bird). Raw candidates and measurements:
 `render/ship/cl-*.svg`, `render/ship/clouds-measurements.json`.
+
+## Addendum, 2026-09-10: the three app icons (Task 615's last open item)
+
+`icons/icon-192.png`, `icons/icon-512.png` and `icons/icon.svg` all used to be either blank
+(the two PNGs, solid `#1a6faf`, no glyph) or a stale mark (`icon.svg`, an "EC" wordmark unrelated
+to the shipped tower). They are what `manifest.json`'s generator (`lib/WebManifest.lib.php`) offers
+for "add to home screen"; all three are now rendered or regenerated off the shipped favicon
+(`icons/favicon.svg`, the tower Tom called "my one true love") through
+`dev/icon-preview/gen-app-icons.js` — same Chromium pipeline as `gen-ship.js`, nothing hand-drawn,
+and `icons/favicon.svg` itself is never touched. **Three rounds of coordinator review corrected this
+in sequence, each catching something the render itself already showed** — recorded below in full
+because each correction changed the actual geometry shipped, not just the wording.
+
+**`icons/icon.svg` was not dead.** `lib/WebManifest.lib.php:123` lists it as a THIRD manifest icon
+(`sizes: "any", type: "image/svg+xml", purpose: "any maskable"`), and a `sizes: "any"` SVG is
+frequently PREFERRED by an installer over a fixed-size PNG — so shipping only the two PNGs would
+have left an installed app showing the old "EC" wordmark regardless. It is regenerated from the same
+transform as `icon-512.png`, described below, and its old `rx="80"` baked-in corner rounding is
+removed: a maskable icon must not pre-round its own corners, because the PLATFORM does the rounding,
+and a square that is already rounded gets rounded a second time, showing the page background
+through the gap at each corner.
+
+**The safe-zone problem, plainly, for someone who has not heard the term before.** `icon-512.png`
+and `icon.svg` are both declared `purpose: "any maskable"`. A phone's home screen is allowed to CROP
+a maskable icon into whatever shape it uses that day — a circle, a rounded square, a squircle — and
+the only promise a maskable icon gets in return is that a circle covering the middle 80% of it will
+always survive, whichever shape actually gets used. So anything that MATTERS has to fit entirely
+inside that circle, or a corner of the shape being used that day could shave it off. `icon-192.png`
+carries no such promise (`purpose: "any"`) and is never cropped, so it keeps the favicon's own
+full-bleed framing exactly as shipped, unaffected by anything below.
+
+**Round 1 error: the round stroke cap.** The favicon's outline strokes carry
+`stroke-linecap="round"` at width 2, so every open line — including both legs and the riser — has
+ink extending 1 unit PAST its own coordinate, invisible on the favicon only because the 24-unit
+viewBox happens to clip it there. A leg's coordinate is `(7.95, 24)`, 12.665 units from center; its
+true inked tip is `(7.95, 25)`, 13.616 units out. The first render used scale 0.75, landing that tip
+at 10.21 — outside the 9.6-unit safe circle — which sheared each foot off at a shallow diagonal.
+Caught by the coordinator re-reading `icon-512-masked.png`, the same file the first pass had already
+produced and described incorrectly.
+
+**Round 2 error: scaling the tower as ONE object.** The obvious fix — shrink the WHOLE tower by
+0.85 about the frame center — clears the safe circle, but it also drags the descenders' endpoint
+from `y=24` up to `y=22.20`: **1.80 units of visible sky under every foot, 7.5% of the icon's
+height, 38px at 512, even in the plain UNCROPPED square**, which is Tom's own struck "flying in the
+air" defect, smaller but genuinely present — and present specifically on the platforms that treat a
+maskable icon as `any` and show it uncropped, which a `purpose: "any maskable"` declaration commits
+to supporting both ways. The claim "the legs run flush to the bottom edge" was written into this
+file before that number was checked; it was false, and the coordinator caught it by measuring the
+proof sheet's own "(b) GROUNDED" panel rather than trusting its caption.
+
+**The tension is real and has no scale-only answer, which is worth stating plainly rather than
+re-deriving per attempt.** Any point sitting on the frame's true edge (`y=24` in a 24-unit frame) is,
+by construction, at least 12 units from the frame's center (the frame is 24 units square, so its
+center-to-edge distance is exactly half that), and the safe circle's radius is only 9.6 (40% of the
+frame). A descender that touches the exact edge can therefore never be inside the guaranteed-safe
+zone — on this icon or on any maskable icon at all. "Hits the bottom" (Tom's ruling on the favicon
+itself) and "wholly inside the safe zone" are mutually exclusive for a descender by the spec's own
+math, not by anything particular to this drawing.
+
+**Round 3, SHIPPED: stop scaling the tower as one object.** The safe zone is a fact about the BODY
+(roof, wall, catwalk, bowl); Tom's ruling is a fact about the DESCENDERS (the two legs, the riser).
+Treated as two different problems rather than one shared scale:
+
+- the BODY is scaled by 0.85 about the frame center, exactly as in round 2, keeping its stated
+  10.2%-margin clearance inside the safe circle;
+- the DESCENDERS are drawn OUTSIDE that scale group, starting at the scaled body's own attachment
+  point (so there is no visible seam at the join) and running straight down to `y=24`, the frame's
+  TRUE edge — the exact coordinate `favicon.svg` itself draws to. Their stroke-width is set to
+  match the body's own scaled weight (`2 × 0.85 = 1.7`) so a leg reads as the same line as the wall
+  above it, not a thicker or thinner one.
+
+That gets everything both rules ask for, at once, verified by rendering rather than assumed:
+**uncropped, the legs reach the true bottom edge with a sky gap of exactly 0 units** (`favicon.svg`'s
+own coordinate); **cropped to the circle, the legs cross the ring and keep going** (the clean
+grounded-and-cut read chosen over floating back in round 2); **the body keeps its full margin inside
+the guaranteed zone regardless of what the legs do**, because the two are no longer the same
+transform.
+
+**Every distance for what shipped** (center `(12,12)`, safe radius `9.6`, all in the favicon's
+24-unit frame; body scale 0.85, descenders run to `y=24`):
+
+| point | distance from center | vs. 9.6 safe radius |
+|---|---|---|
+| roof apex `(12, 2.2)` | 8.330 | inside, margin 1.270 (13.2%) |
+| roof/wall shoulder, fill vertex `(7.95, 3.7)` | 7.850 | inside, margin 1.750 (18.2%) |
+| roof/wall shoulder, **stroke cap** `(7.95, 2.7)` | 8.622 | inside, margin 0.978 (10.2%) — the tightest body point |
+| catwalk end, stroke cap `(6.1, 13.55)` | 5.185 | inside |
+| bowl low pole `(12, 18.15)` | 5.227 | inside |
+| leg endpoint, attached at `(8.5575, 13.8275)`, running to `(8.5575, 24)` | 12.484 | bleeds by 2.884 |
+| leg **stroke cap** `(8.5575, 24.85)` | 13.303 | bleeds by 3.703 |
+| riser endpoint `(12, 24)` | 12.000 | bleeds by 2.400 |
+| riser **stroke cap** `(12, 24.85)` | 12.850 | bleeds by 3.250 |
+| **sky gap under a leg, uncropped square** | **0.000 units, 0px** | reaches the true edge exactly |
+
+**The cost, measured rather than assumed, per the coordinator's own instruction not to just pick.**
+The legs are now proportionally longer relative to the tank than `favicon.svg` draws them: leg-to-
+wall length ratio is 1.145 shipped against 0.943 on the plain favicon, the leg **21.5% longer,
+relative to the wall, than the favicon draws it** — because the body shrank 15% and the legs did
+not shrink at all. Rendered side by side at matching scale
+(`render/app-icons/proof.png`, "Proportion check" row; also
+`render/app-icons/favicon-at-512-for-comparison.png` beside `icon-512.png` directly): **the tower
+still reads as the same mark — same roof, same tank, same catwalk, same three-legs-and-a-riser
+silhouette — but the legs are visibly longer and thinner relative to the tank than on the favicon,
+giving it a leggier, more spindly stance than the stockier tripod the favicon draws.** That is a
+real, visible difference on close comparison, not a rounding error invisible at normal viewing
+distance, and it is a judgement call rather than a defect: **flagged here for Tom rather than
+decided unilaterally**, per the coordinator's instruction. If the leggier stance reads wrong to him,
+the fallback is not a smaller number — it is accepting a smaller margin on the safe circle (closer
+to the 10.2% figure above) to shorten the legs back down, or accepting a shorter riser/leg pair drawn
+independently of the favicon's own proportions specifically for the maskable pair. Not attempted
+here without his read first.
+
+**192 and 512/`icon.svg` are framed differently on purpose, independent of the above.** 192 keeps
+the favicon's own full-bleed framing at scale 1.0 (the same file, just rendered bigger); 512 and
+`icon.svg` use the split body/descender treatment. That is a real choice, not an oversight: a 192
+"any" icon is never cropped, so shrinking it to match the maskable pair's safe-zone margin would
+only make the mark smaller at the one size where nothing forces that — worse legibility bought for
+a symmetry nobody looking at either icon in isolation would notice, since they are never shown side
+by side.
+
+**All three files are opaque** (the two PNGs are RGB, no alpha channel; the SVG's sky rect is a
+full-bleed opaque gradient) — there is nothing for transparency to do here, matching the
+pre-existing blank PNGs and the `type: image/png` / `image/svg+xml` declarations.
+
+**Checks**: `php dev/scripts/web_manifest_check.php` passes — all three icons measured (the two PNGs
+against their declared pixel sizes, `icon.svg` needing no pixel check since it declares `sizes:
+"any"`), for both mounts. Full `sh dev/scripts/check_all.sh` passes at exit 0 (all blocking checks);
+the only NOTE-level advisories (stale Task citations, English-string drift on unrelated
+`lpn_`/`bpn_` keys, key-hygiene candidates) predate this change and are untouched by it.
+
+Files: `dev/icon-preview/gen-app-icons.js` (generator — computes and prints every distance above,
+including the leg-to-wall ratio, before rendering anything); `dev/icon-preview/render/app-icons/proof.png`
+(icon-192 unchanged; the REJECTED all-shrink candidate ringed and cropped; the SHIPPED split-transform
+candidate ringed and cropped; and a same-frame proportion comparison against the plain favicon).
