@@ -192,3 +192,90 @@ bare map) that I had ranked worst on the strength of the pan affordance alone. *
 a genuine two-sided question and not a settled one:** the tool icon argues the whole MODE is an
 arrow; the map argues the bare canvas is a thing you drag. Both are true, and nobody has measured
 which the reader actually needs.
+
+### 2026-09-10, same day — resolving the tension: does it move the ranking?
+
+**No. Rank 1 (leave the shipped hybrid alone) still stands, but the SUPPORT under it changed, and
+that repair is worth stating plainly rather than leaving the tension open.**
+
+CITED (Adobe Community threads on Illustrator's Selection tool, read 2026-09-10 — "the cursor
+changes from the black arrow to the black arrow with a bounding box icon" when hovering a
+selection, while the toolbar BUTTON itself never changes): **a tool's toolbar icon is read
+industry-wide as a LABEL for the tool, not a literal, invariant promise about the on-canvas
+cursor at every location.** Illustrator's own Selection icon — the direct ancestor of this
+suite's arrow-with-tail glyph — already tolerates its live cursor differing from its toolbar
+picture depending on what is under it. If the icon fully governed the cursor, Illustrator would
+be violating its own convention constantly; it is not, because nobody reads it that way.
+
+CITED (Adobe, "Pan across the canvas with the Hand tool," helpx.adobe.com, read 2026-09-10):
+**Photoshop does not ask its Move tool's own icon/cursor to cover panning at all — panning is a
+SEPARATE, named tool (Hand), with its own icon, reached by its own key or a held spacebar.** That
+is the clean way to keep a tool's icon honest: give the second job its own tool rather than
+overload one icon with two meanings.
+
+**`lpn_` has not done that, and that is the load-bearing fact.** OBSERVED: there is no Pan tool, no
+spacebar-to-pan, in `js/looped-network.js` — click-drag on the bare canvas under Select IS the pan
+gesture, with no separate affordance anywhere on the page. So the Select icon was never going to be
+able to keep its promise everywhere no matter which cursor is chosen: `default` keeps the promise
+where a target exists (already true, already shipped, unaffected by this) and breaks it on the
+84.5%-of-canvas bare map where the actual behaviour (pan) lives and has no other signal at all;
+`grab` does the reverse, and only on the part of the canvas that has nothing to aim at, i.e. nowhere
+the imprecision his own complaint was about (a 20 px hand hiding a 7 px target) can bite. Given the
+icon cannot be kept fully honest either way — this page overloaded one tool with two jobs and gave
+it one icon — the imprecision should fall where nothing is being aimed at, not on top of the thing
+the reader is trying to click. **The corrected reasoning still points at Rank 1.** The Illustrator
+citation says the industry doesn't expect an icon to be a literal cursor contract in the first
+place; the Photoshop citation says the honest fix for "one icon, two jobs" is a second tool, which
+is a real fifth candidate — costed below, not recommended for now — rather than picking whichever
+cursor loses less.
+
+**A genuinely new, cheap option this correction surfaces and Tom did not ask about:** a dedicated
+Pan tool (its own toolbar/menu entry, `default` restored to the whole of Select including the bare
+map, `grab`/`grabbing` moved to the new tool alone) would resolve the tension outright and matches
+Photoshop's own answer exactly. Cost is real, not zero, unlike a CSS-value swap: one new toolbar or
+menu slot, one new translated label in 27 languages, and a `space`-to-pan convenience most users of
+this genre expect alongside it if the dedicated tool exists at all — plus training a return visitor
+who has already learned "drag the empty map to pan" that the gesture now lives one tool over. Not
+worth it for a 16 September demonstration; noted in the wish list, ranked below the hover-highlight,
+for the same reason Rank 1 above stands: the shipped state already answers the actual complaint
+(imprecision aimed at small targets) and this would only be buying icon literalism nobody has
+reported missing.
+
+### Does "icon depicts cursor" generalize to a suite-wide rule, checked across every `lpn_` tool
+
+OBSERVED, `lib/Icons.lib.php`: two families of tool icon exist on this page and they are NOT held
+to the same promise.
+
+- **Asset/action icons depict the THING, never a cursor** — `junction` is a solid dot (what a
+  junction looks like on the map), `reservoir`/`tank`/`pump`/`valve` are the asset's own symbol,
+  `text` is a T, `del` (the Delete tool) is a trash can, `vertices` is a zigzag with two grip
+  squares (what a bend looks like once you can grab it). **None of these is a picture of a
+  pointer, so none of them makes the promise Tom's correction is about**, and their mode cursors
+  (`crosshair` while placing, `default`/`crosshair` split across grip and band in vertices mode)
+  are free to be whatever the aiming problem calls for without contradicting the icon. This is the
+  larger and older set, and it is not in question.
+- **The select FAMILY — and only this family — depicts a cursor**: `select` is a slanted
+  arrow-with-tail; `select-window`, `select-lasso`, `select-polygon` (`lib/Icons.lib.php:283,
+  292-294`) each pair the SAME small arrow-cursor glyph in a corner with a dashed shape (rect,
+  lasso, polygon). By the principle Tom named, all four owe the reader `default`.
+  - **`select` keeps that promise on an object** (2026-09-09 ruling, unaffected).
+  - **`select-window`/`select-lasso`/`select-polygon` do NOT.** OBSERVED,
+    `js/looped-network.js:16157-16159`: all three area-select tools set `mode = 'select-area'`,
+    which flips `.lpn-placemode` on, and `css/engcalcs.css:1321` makes that whole mode
+    `cursor: crosshair` — the same rule and the same reasoning ("aiming at a coordinate, 1 px
+    hitbox") that governs the add-* placement tools. **Their icon promises an arrow and their
+    mode delivers a crosshair, and this is a real inconsistency nobody had found before this
+    correction, independent of the bare-canvas question.**
+
+**Is that a rule to hold or a coincidence not to read into?** I read it as a real finding but do
+NOT read the small corner arrow as unambiguously a "cursor promise" the way the bare `select`
+icon is — the code comment on it (`lib/Icons.lib.php:291-292`, "the little pointer in the corner
+of each says the ring is something you draw") reads as using the pointer glyph to mark the icon as
+an ACTION you perform with the mouse (as opposed to a static shape), which is a plausible, different
+job from "this is what your cursor will look like." I cannot verify which reading Tom intended
+without asking him, and a wrong guess here is cheap to get wrong in either direction (repaint one
+icon corner, or leave it), so I am not resolving it — it is a genuine open question, named rather
+than silently decided, and belongs to him. **What I CAN say without his input: the principle is
+real and narrow.** It binds the four select-family icons to each other and to their own cursors; it
+says nothing about, and should not be extended to, the asset/action icons, which correctly depict
+the thing rather than the pointer and would be actively wrong if forced to match a cursor instead.
