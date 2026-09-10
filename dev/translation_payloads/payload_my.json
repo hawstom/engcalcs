@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1775,
-        "delta_key_count": 9,
+        "expected_key_count": 1776,
+        "delta_key_count": 10,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -521,6 +521,7 @@
         "lpn_field_emitter": "Emitter coefficient",
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
+        "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_field_tag": "Tag",
@@ -532,6 +533,7 @@
         "lpn_field_emitter": "Emitter coefficient",
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
+        "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_field_tag": "Tag",
@@ -600,6 +602,22 @@
                     "key": "lpn_empty_hint",
                     "value": "ဥပမာတစ်ခု ဖွင့်ရန် ဖိုင် > ပရောဂျက်အသစ် ကိုသုံးပါ။ သို့မဟုတ် ကိရိယာဘားမှ ရေကန်၊ ဆက်စပ်နေရာနှင့် ပိုက်လိုင်း ထည့်ခြင်းဖြင့် စတင်ပါ။",
                     "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                }
+            }
+        },
+        "lpn_map_unmeasurable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_example_opened",
+                    "value": "{name} ကို ဖွင့်ပြီးပါပြီ။ ၎င်းသည် သင့်ကိုယ်ပိုင်မိတ္တူဖြစ်သည် - ဖိုင် > အမည်ပေးသိမ်းရန် ဖြင့် သိမ်းဆည်းပါ။",
+                    "english": "Opened {name}. It is your copy: save it with File, Save as."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_basic_si_title",
+                    "value": "အခြေခံ ကွန်ရက်၊ L\/s (SI)",
+                    "english": "Basic network, L\/s (SI)"
                 }
             }
         },
