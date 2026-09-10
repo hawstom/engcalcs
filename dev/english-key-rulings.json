@@ -1236,6 +1236,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_map_unmeasurable": {
+            "on": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+            "ruled": "2026-09-10",
+            "answer": "OK"
+        },
         "lpn_menu_map": {
             "on": "Map",
             "ruled": "2026-08-29"

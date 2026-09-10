@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read**, of 7 untranslated keys, of 1776 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 7 untranslated keys, of 1776 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (7, 1 to read @@ NEEDS RULING)
+## lpn_  (7, all ruled)
 
 - **`lpn_field_emitter`**
   > Emitter coefficient
@@ -41,7 +41,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-09._
 - **`lpn_map_unmeasurable`**
   > This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.
-  OK
+  _Ruled OK 2026-09-10._
 - **`lpn_pane_text_attached`**
   > Attached
   _Ruled OK 2026-09-09._
