@@ -51,7 +51,7 @@ const INJECT =
 	"\t\tarmMapSizing: armMapSizing, refreshSymbolSizes: refreshSymbolSizes,\n" +
 	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tsvg: function () { return svg; }, world: function () { return world; },\n" +
-	"\t\tLINK_HIT_PX: LPN_LINK_HIT_PX\n";
+	"\t\tLINK_HIT_PX: LPN_LINK_HIT_PX, LINK_HIT_FLOOR_PX: LPN_LINK_HIT_FLOOR_PX\n";
 
 // **THE CANVAS HAS A SIZE, AND WITHOUT ONE THERE IS NO BUG TO SEE.** currentView() answers null on
 // an unsized canvas, so a harness that left it unsized would exercise none of the view code and
@@ -83,6 +83,7 @@ function props(L) {
 		sym: st.getPropertyValue('--lpn-sym'),
 		lw: st.getPropertyValue('--lpn-lw'),
 		hit: st.getPropertyValue('--lpn-hit'),
+		hitCoarse: st.getPropertyValue('--lpn-hit-coarse'),
 		hair: st.getPropertyValue('--lpn-hair')
 	};
 }
@@ -101,7 +102,8 @@ function seamHolds(L, s) {
 	return {
 		p: p,
 		lw: +p.lw === set.linkWidth / s,
-		hit: +p.hit === L.LINK_HIT_PX / s,
+		hit: +p.hit === Math.max(set.linkWidth, L.LINK_HIT_FLOOR_PX) / s,
+		hitCoarse: +p.hitCoarse === L.LINK_HIT_PX / s,
 		hair: +p.hair === 1 / s,
 		sym: +p.sym > 0 && isFinite(+p.sym),
 		transform: worldTransform(L).indexOf('scale(' + s + ')') >= 0
@@ -117,7 +119,12 @@ console.log('\n--- the stroke sizes ride the transform ---');
 	const GEO_S = 6478.7497871167825;
 	const r = seamHolds(L, GEO_S);
 	ok('moving the scale and calling setTransform() publishes --lpn-lw', r.lw, r.p.lw);
+	// **TWO BANDS SINCE TOM'S RULING OF 2026-09-10** (*"No slop for nodes. Slop for labels and to
+	// enforce a lower limit of 3 px for link lines."*): a POINTER aims at the pipe's own drawn width
+	// with a 3 px floor, a FINGER keeps the 12 px band, and the stylesheet picks by pointer type.
+	// Both are published here, and both have to ride the same seam or one device gets a stale one.
 	ok('...and --lpn-hit', r.hit, r.p.hit);
+	ok('...and --lpn-hit-coarse', r.hitCoarse, r.p.hitCoarse);
 	ok('...and --lpn-hair', r.hair, r.p.hair);
 	ok('...and --lpn-sym', r.sym, r.p.sym);
 	ok('...and the world layer really is at that scale', r.transform, worldTransform(L));
@@ -232,6 +239,7 @@ console.log('\n--- with the repair taken out, section 1 must go red ---');
 	const r = seamHolds(M, 6478.7497871167825);
 	ok('the mutated page does NOT publish --lpn-lw on a transform', !r.lw, r.p.lw || '(unset)');
 	ok('...nor --lpn-hit', !r.hit, r.p.hit || '(unset)');
+	ok('...nor --lpn-hit-coarse', !r.hitCoarse, r.p.hitCoarse || '(unset)');
 	// **WHAT IT LEAVES BEHIND IS A STALE VALUE, NOT AN ABSENT ONE, AND THAT IS THE FAITHFUL SHAPE.**
 	// init() publishes once at the boot scale of 1, so the mutated page carries 2 and 12 WORLD units
 	// into a view at 6,478 px per degree. The stylesheet's own fallbacks (0.7 and 12) are the same
@@ -239,8 +247,10 @@ console.log('\n--- with the repair taken out, section 1 must go red ---');
 	// thousands of screen pixels across, which is the map MJH could not click on.
 	ok('...and what it leaves behind is a width of thousands of screen pixels',
 		+r.p.lw * 6478.7497871167825 > 4000, Math.round(+r.p.lw * 6478.7497871167825) + ' px');
+	// The stale grab band is the COARSE one now: --lpn-hit carries the pipe's 3 px floor in world
+	// units and --lpn-hit-coarse the 12, and either is thousands of screen pixels at this scale.
 	ok('...and a grab band of tens of thousands',
-		+r.p.hit * 6478.7497871167825 > 40000, Math.round(+r.p.hit * 6478.7497871167825) + ' px');
+		+r.p.hitCoarse * 6478.7497871167825 > 40000, Math.round(+r.p.hitCoarse * 6478.7497871167825) + ' px');
 	ok('...while the world layer is at the geographic scale regardless', r.transform, worldTransform(M));
 }
 

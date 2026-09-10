@@ -216,10 +216,17 @@ console.log('\n--- no map rule may ignore visibility ---');
 	ok('...and the words themselves hit-test nothing at all',
 		/\.lpn-lbl\s*\{[^}]*pointer-events:\s*none/.test(code)
 		&& !/\.lpn-draglbl\s*\{[^}]*pointer-events/.test(code));
-	// The unpainted reservoir/tank disc is the one place `all` was DELIBERATE, and `visible` keeps it
-	// working: unpainted is not invisible -- what the user sees there is the symbol drawn over it.
-	ok('the unpainted reservoir/tank hit disc is still a hit target',
-		/\.lpn-node-reservoir[^{]*\{[^}]*pointer-events:\s*visible/.test(code));
+	// **THE UNPAINTED RESERVOIR/TANK DISC IS NO LONGER A HIT TARGET AT ALL** (Task 618, 2026-09-10).
+	// It was the one place `all` had been deliberate, and `visible` kept it working on the argument
+	// that unpainted is not invisible -- what a reader sees there is the symbol drawn over it. What
+	// that missed is the SHAPE: the disc is the circle that CONTAINS a triangle, so it answered in
+	// all four corners the drawing does not use, and Tom traced exactly that halo by eye. The band
+	// beside it (`.lpn-node-hit`) carries the same `data-node` and is the symbol's own outline, so
+	// nothing that reads the dataset can tell the difference and the corners are gone.
+	ok('the unpainted reservoir/tank disc answers no press of its own',
+		/\.lpn-node-reservoir[^{]*\{[^}]*pointer-events:\s*none/.test(code));
+	ok('...while the band that replaced it is still gated on visibility',
+		/\.lpn-node-hit\s*\{[^}]*pointer-events:\s*visible/.test(code));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');

@@ -13,7 +13,7 @@
 // **THE FIX IS ON THE GEOMETRY, NOT ON THE LABEL**, which is Tom's own framing and is the thing
 // this file is really guarding: a label is the ANSWER to "what is this pipe", and making the answer
 // the only route to the question is the defect. So a link carries an invisible `.lpn-link-hit`
-// stroke and a pump or valve carries a `.lpn-link-symbol-hit` square over its drawn extent.
+// stroke and a pump or valve carries a `.lpn-link-symbol-hit` shape over its drawn extent.
 //
 // **WHY IT IS NOT A SECTION OF touch-radius-harness.js.** That file's whole thesis is ONE KNOB PER
 // HAND -- one number for a finger, one for a pointer, across every object. This is not one of those
@@ -43,8 +43,13 @@ const L = loadLoopedNetwork(
 	"\t\tnodesLayer: function () { return nodesLayer; },\n" +
 	"\t\tsvgEl: function () { return svg; },\n" +
 	"\t\tlinkHitPx: function () { return LPN_LINK_HIT_PX; },\n" +
+	"\t\tlinkHitFloorPx: function () { return LPN_LINK_HIT_FLOOR_PX; },\n" +
+	"\t\tlinkWidthSetting: function () { return settings.linkWidth; },\n" +
 	"\t\tpointerReachPx: function () { return POINTER_REACH_PX; },\n" +
 	"\t\tpumpSymbolSize: pumpSymbolSize,\n" +
+	"\t\tsymbolSilhouette: function () { return SYMBOL_SILHOUETTE; },\n" +
+	"\t\tsymbolHitPx: function () { return LPN_SYMBOL_HIT_PX; },\n" +
+	"\t\tsymbolHitCoarsePx: function () { return LPN_SYMBOL_HIT_COARSE_PX; },\n" +
 	"\t\trefreshSymbolSizes: refreshSymbolSizes,\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
 	"\t\tupdateNode: updateNode,\n" +
@@ -109,14 +114,23 @@ console.log('\n--- 2. the band is a constant number of SCREEN pixels ---');
 // A world-unit band would be enormous zoomed out and invisible zoomed in, which is the argument
 // every other tolerance on this page already makes. --lpn-hit is published with --lpn-lw.
 {
-	const px = L.linkHitPx();
+	// **TWO WIDTHS SINCE 2026-09-10, AND THE STYLESHEET PICKS ONE BY POINTER** (Tom's ruling on
+	// Task 618: *"No slop for nodes. Slop for labels and to enforce a lower limit of 3 px for link
+	// lines."*). A POINTER gets the pipe's own drawn width with a 3 px floor -- WYSIWYG, one extra
+	// pixel each side of a 1 px line -- and a FINGER keeps the 12 px band this file was written for.
+	const px = L.linkHitPx(), floor = L.linkHitFloorPx();
 	ok('LPN_LINK_HIT_PX is a real number, read from the page', px > 0, String(px));
+	ok('...and so is the pointer floor, which is much smaller', floor > 0 && floor < px, String(floor));
+	const drawn = Math.max(L.linkWidthSetting(), floor);
 	[1, 4, 250].forEach(function (s) {
 		L.setScale(s);
 		L.refreshSymbolSizes();
 		const w = parseFloat(L.svgEl().style.getPropertyValue('--lpn-hit'));
-		ok('at scale ' + s + ' the band is ' + px + ' screen px wide', near(w * s, px, 1e-9),
-			(w * s).toFixed(6) + ' px');
+		const wc = parseFloat(L.svgEl().style.getPropertyValue('--lpn-hit-coarse'));
+		ok('at scale ' + s + ' a pointer aims at the drawn width, floored: ' + drawn + ' px',
+			near(w * s, drawn, 1e-9), (w * s).toFixed(6) + ' px');
+		ok('at scale ' + s + ' a finger still gets ' + px + ' screen px', near(wc * s, px, 1e-9),
+			(wc * s).toFixed(6) + ' px');
 	});
 	L.setScale(4);
 	L.refreshSymbolSizes();
@@ -129,34 +143,34 @@ console.log('\n--- 3. a pump\'s clickable area is its DRAWN EXTENT ---');
 // midpoint is wider than that, and before this it was not hit-testable at all.
 {
 	const le = L.linkEls(PUMP), hit = le && le.symbolHit;
-	ok('a pump has a hit square', !!hit);
+	ok('a pump has a grab shape', !!hit);
 	ok('...classed .lpn-link-symbol-hit', hit && String(hit.getAttribute('class')).indexOf('lpn-link-symbol-hit') >= 0);
 	ok('...carrying the pump\'s own data-link', hit && hit.dataset.link === PUMP, hit && hit.dataset.link);
+	// **IT IS THE VOLUTE'S OWN OUTLINE SINCE 2026-09-10, NOT A SQUARE ROUND IT** (Task 618). The
+	// square is what let this element live in the LINKS layer: a box round a pump covers its own end
+	// nodes, so it had to be under them -- and being under them was why it never won a hit at all.
+	// The shape is read out of the file's own SYMBOL_SILHOUETTE table, which symbol-backdrop-harness.js
+	// holds against lib/Icons.lib.php.
+	ok('...and it is a PATH, the symbol\'s own outline', hit && String(hit.tagName).toLowerCase() === 'path',
+		hit && String(hit.tagName));
+	ok('...tracing the pump icon exactly, so it claims only what a reader can see',
+		hit && hit.getAttribute('d') === L.symbolSilhouette().pump, hit && hit.getAttribute('d'));
 	const size = L.pumpSymbolSize('pump');
+	// It sits in the icon's own 24-unit frame, so its box IS the symbol's box: the scale is the
+	// only number, and it is the drawn size over 24.
+	const frame = function () {
+		const t = String(hit.getAttribute('transform') || '');
+		const tr = /translate\(([-\d.e]+),([-\d.e]+)\)/.exec(t), sc = /scale\(([-\d.e]+)\)/.exec(t);
+		return (tr && sc) ? { x: +tr[1], y: +tr[2], k: +sc[1] } : null;
+	};
+	const f0 = frame();
 	ok('...sized to the symbol the page actually draws, never to a number of its own',
-		hit && near(+hit.getAttribute('width'), size) && near(+hit.getAttribute('height'), size),
-		hit && hit.getAttribute('width') + ' x ' + hit.getAttribute('height') + ' against ' + size);
-	// The midpoint is read out of the DOCUMENT, never retyped: addNode() places a node from the
-	// caller's coordinates through the page's own conversion, and a harness that assumed otherwise
-	// would be asserting against its own arithmetic.
-	const mid = function () {
-		const a = L.getDoc().nodes.filter(function (n) { return n.id === R1; })[0],
-			b = L.getDoc().nodes.filter(function (n) { return n.id === J1; })[0];
-		return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-	};
-	// Placed by a TRANSLATE and cornered locally, exactly as symbolG/symbolSvg are -- see
-	// resizePumpSymbol(). Read back the way the browser would resolve it.
-	const centre = function () {
-		const m = /translate\(([-\d.e]+),([-\d.e]+)\)/.exec(String(hit.getAttribute('transform')) || '');
-		if (!m) { return null; }
-		return { x: +m[1] + +hit.getAttribute('x') + +hit.getAttribute('width') / 2,
-			y: +m[2] + +hit.getAttribute('y') + +hit.getAttribute('height') / 2 };
-	};
-	const m0 = mid(), c0 = centre();
-	ok('...centred on the link\'s midpoint', c0 && near(c0.x, m0.x) && near(c0.y, m0.y),
-		c0 ? c0.x + ', ' + c0.y : String(hit.getAttribute('transform')));
+		f0 && near(f0.k * 24, size, 1e-9), f0 ? (f0.k * 24) + ' against ' + size : String(hit.getAttribute('transform')));
+	ok('...cornered on the symbol\'s own box, so the outline lands over the drawing',
+		f0 && near(f0.x, -size / 2, 1e-9) && near(f0.y, -size / 2, 1e-9),
+		f0 ? f0.x + ', ' + f0.y : 'no transform');
 	// **THIS IS THE ZOOM REPORT IN ARITHMETIC.** The symbol is wider than the link it sits on, so
-	// the square is the only thing on this pump a reader can reach without zooming in.
+	// the grab shape is the only thing on this pump a reader can reach without zooming in.
 	const linkLen = Math.hypot(
 		L.getDoc().nodes.filter(function (n) { return n.id === R1; })[0].x -
 			L.getDoc().nodes.filter(function (n) { return n.id === J1; })[0].x,
@@ -164,37 +178,76 @@ console.log('\n--- 3. a pump\'s clickable area is its DRAWN EXTENT ---');
 			L.getDoc().nodes.filter(function (n) { return n.id === J1; })[0].y);
 	ok('...and it is WIDER than the pump link itself, which is the report', size > linkLen,
 		size.toFixed(2) + ' units across a ' + linkLen.toFixed(2) + '-unit link');
-	// IN THE LINKS LAYER, not inside symbolG. symbolG is in the nodes layer so a pump reads over
-	// every pipe it crosses; a hit square there would paint over the pump's own end nodes.
-	ok('the square is in the LINKS layer, so it cannot steal the pump\'s own end nodes',
-		inLayer(hit, L.linksLayer()));
-	ok('...while the drawn symbol stays in the nodes layer, where it reads over the pipework',
-		inLayer(le.symbolG, L.nodesLayer()));
-	ok('a plain pipe gets no square at all', !L.linkEls(PIPE).symbolHit);
 
-	// It FOLLOWS. Moving an end node runs positionPumpSymbol() through updateNode(); a square left
-	// behind would be an invisible grab area sitting where the pump used to be.
+	// **INSIDE symbolG, WHICH IS THE FIX FOR "NO PRESENCE"** (Tom, 2026-09-10: *"Valve has some
+	// funny business afoot. It is hidden from the mouse"*, then the same of the pump: *"There is no
+	// presence!"*). It was in the links layer on the argument that a node must win over it, and on
+	// Net3 at zoom to fit that is exactly what happened -- MEASURED in a real Chromium: the square
+	// was the right size and centred, and it was the SECOND element in the stack under
+	// `.lpn-node-hit` on both pumps, third under TWO node bands on the geographic copy, and every
+	// click on a volute selected a reservoir or a junction. Hit order follows PAINT order now: the
+	// volute is drawn over its end nodes, so it answers over them, and the outline above is what
+	// keeps that honest. A FINGER still gets the node, through touchNodeOver().
+	ok('the grab shape is inside the symbol\'s own group, where the drawing is',
+		inLayer(hit, le.symbolG));
+	ok('...which is in the nodes layer, where a pump reads over the pipework',
+		inLayer(le.symbolG, L.nodesLayer()));
+	ok('a plain pipe gets no grab shape at all', !L.linkEls(PIPE).symbolHit);
+
+	// It FOLLOWS, and for nothing: symbolG carries the translate to the midpoint and the rotate, so
+	// a child of it cannot be left behind by a move. That is the whole reason positionPumpSymbol()
+	// no longer writes a second transform.
+	const gTranslate = function () {
+		const m = /translate\(([-\d.e]+),([-\d.e]+)\)/.exec(String(le.symbolG.getAttribute('transform')) || '');
+		return m ? { x: +m[1], y: +m[2] } : null;
+	};
+	const mid = function () {
+		const a = L.getDoc().nodes.filter(function (n) { return n.id === R1; })[0],
+			b = L.getDoc().nodes.filter(function (n) { return n.id === J1; })[0];
+		return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+	};
+	const m0 = mid();
+	ok('the symbol group sits on the link\'s midpoint', gTranslate() && near(gTranslate().x, m0.x) && near(gTranslate().y, m0.y),
+		JSON.stringify(gTranslate()));
 	L.getDoc().nodes.filter(function (n) { return n.id === J1; })[0].x += 40;
 	L.updateNode(J1);
 	const m1 = mid();
-	ok('moving an end node takes the square with the symbol',
-		centre() && near(centre().x, m1.x) && !near(m1.x, m0.x),
-		hit.getAttribute('transform') + ' for a midpoint now at ' + m1.x.toFixed(2));
+	ok('moving an end node takes the grab shape with the symbol, through one transform',
+		gTranslate() && near(gTranslate().x, m1.x) && !near(m1.x, m0.x),
+		le.symbolG.getAttribute('transform') + ' for a midpoint now at ' + m1.x.toFixed(2));
 
-	// **A ZOOM RE-SIZES THE SYMBOL AND DOES NOT RE-PLACE IT**, because the translate does not
-	// depend on how big the symbol is (refreshSymbolSizes() calls resizePumpSymbol() alone). So the
-	// square's corner has to be LOCAL to that translate. It was `mid - size/2` for one build of
-	// this harness, and it drifted off the pump by half the size difference on the first wheel
-	// notch -- silently, because a hit area draws nothing.
+	// **A ZOOM RE-SIZES THE SYMBOL AND DOES NOT RE-PLACE IT** (refreshSymbolSizes() calls
+	// resizePumpSymbol() alone), so everything that depends on the SIZE has to be written there --
+	// including the slop, which is a stroke in the path's own local units.
 	L.setScale(40);
 	L.refreshSymbolSizes();
-	const zoomed = L.pumpSymbolSize('pump');
+	const zoomed = L.pumpSymbolSize('pump'), f1 = frame();
 	ok('a zoom really does change the symbol\'s size', !near(zoomed, size),
 		size.toFixed(3) + ' -> ' + zoomed.toFixed(3));
-	ok('...and the square is still centred on the pump after it',
-		centre() && near(centre().x, m1.x) && near(centre().y, m1.y) &&
-			near(+hit.getAttribute('width'), zoomed),
-		centre() ? centre().x + ', ' + centre().y : 'no transform');
+	ok('...and the grab shape is resized with it, still on the pump',
+		f1 && near(f1.k * 24, zoomed, 1e-9) && near(f1.x, -zoomed / 2, 1e-9) &&
+			gTranslate() && near(gTranslate().x, m1.x),
+		f1 ? (f1.k * 24).toFixed(4) : 'no transform');
+
+	// **TWO SLOPS, PUBLISHED HERE AND CHOSEN BY THE STYLESHEET** (Task 618). A volute is 20+ screen
+	// pixels of ink, so a mouse gets 2 px on each side and a FINGER gets 12; the media query is in
+	// css/engcalcs.css and this is the half that has to be a constant number of SCREEN pixels at
+	// every zoom, like every other tolerance on this page.
+	[1, 4, 250].forEach(function (s) {
+		L.setScale(s);
+		L.refreshSymbolSizes();
+		const k = frame().k, sc = s * k;
+		ok('at scale ' + s + ' the pointer slop is ' + L.symbolHitPx() + ' screen px of stroke',
+			near(parseFloat(hit.style.getPropertyValue('--lpn-symhit')) * sc, L.symbolHitPx(), 1e-9),
+			(parseFloat(hit.style.getPropertyValue('--lpn-symhit')) * sc).toFixed(6));
+		ok('...and a finger\'s is ' + L.symbolHitCoarsePx(),
+			near(parseFloat(hit.style.getPropertyValue('--lpn-symhit-coarse')) * sc, L.symbolHitCoarsePx(), 1e-9),
+			(parseFloat(hit.style.getPropertyValue('--lpn-symhit-coarse')) * sc).toFixed(6));
+	});
+	// A volute is a big mark and must not be given a node's reach: the slop it gets is deliberately
+	// smaller, because unlike a node's band this shape sits OVER its own end nodes.
+	ok('...and a mouse\'s slop is smaller than a node band\'s, because this shape sits over nodes',
+		L.symbolHitPx() < L.linkHitPx(), L.symbolHitPx() + ' < ' + L.linkHitPx());
 	L.setScale(4);
 	L.refreshSymbolSizes();
 }

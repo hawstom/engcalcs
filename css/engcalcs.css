@@ -444,7 +444,14 @@ html[lang="zh"] .ec-welcome {
    `visible`, not `all`: unpainted is not the same as invisible -- what the user sees here is the
    tank symbol drawn over this disc -- and `all` would also make the disc grabbable if anything ever
    set `visibility: hidden` on it. See the note on `.lpn-draglbl` for the defect that produced. */
-.lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: visible; }
+/* **AND IT IS NOT A HIT TARGET, WHICH IS HALF OF THE HALO TOM TRACED** (2026-09-10). This circle is
+   unpainted for a reservoir and a tank -- the symbol over it is the drawing -- and `pointer-events:
+   visible` made its full disc answer the pointer REGARDLESS of `fill: none`, at the radius that
+   circumscribes the symbol. So the round halo had two sources and moving `.lpn-node-hit` off a
+   circle would have fixed only one. `.lpn-node-hit` carries the same `data-node` and is built first,
+   so nothing that reads the dataset can tell the difference; `.lpn-node-pending`'s red ring, the
+   selection ring and the value colour still draw on THIS element, which is all it is for now. */
+.lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: none; }
 /* The tank/pump overlay symbols themselves (looped-network.js buildMapIconSvg()) -- purely
    visual, never a click target; the interactive element is always the plain node circle or link
    polyline underneath. `color` is the currentColor the icon paths read for both stroke and the
@@ -657,9 +664,17 @@ html[lang="zh"] .ec-welcome {
    moves onto the thing you can see. Nothing about hit testing changes -- `pointer-events` is
    unchanged on all three bands, and no finder reads a cursor. */
 .lpn-link-hit {
-	fill: none; stroke: transparent; stroke-width: var(--lpn-hit, 12);
+	fill: none; stroke: transparent; stroke-width: var(--lpn-hit, 3);
 	stroke-linecap: round; stroke-linejoin: round;
 	pointer-events: visibleStroke; cursor: inherit;
+}
+/* **A FINGER KEEPS THE 12 px BAND; A POINTER GETS THE PIPE'S OWN WIDTH WITH A 3 px FLOOR** (Tom,
+   2026-09-10, ruling on Task 618: *"No slop for nodes. Slop for labels and to enforce a lower limit
+   of 3 px for link lines."*). Both numbers are published by publishScaleSizes() in world units at
+   this zoom; `pointer: coarse` is the PRIMARY pointer, so a laptop with a touchscreen and a mouse
+   is still a mouse. */
+@media (pointer: coarse) {
+	.lpn-link-hit { stroke-width: var(--lpn-hit-coarse, 12); }
 }
 /* A pump or valve is a symbol drawn at the midpoint of a link that is often only a unit or two
    long -- on Net3 it had to be zoomed into before it could be edited at all. This is a transparent
@@ -670,7 +685,30 @@ html[lang="zh"] .ec-welcome {
    the fill AND THE STROKE PERIMETER, and it does so regardless of the value of `stroke` -- so
    `stroke: none` buys nothing, and with no `stroke-width` declared the perimeter is the initial
    value, 1 USER UNIT. See .lpn-node-hit. */
-.lpn-link-symbol-hit { fill: transparent; stroke: none; pointer-events: visibleFill; cursor: inherit; }
+/* **THE SHAPE IS THE SYMBOL'S OWN OUTLINE, AND THE SLOP IS A STROKE ROUND IT** (Task 618, Tom
+   2026-09-10: *"There is no presence!"* of a pump volute, and the same of a valve). It was a square
+   over the symbol's box, in the links layer under every node band, and on Net3 at zoom to fit the
+   two end nodes' bands covered it completely -- the square was the right size and never won a
+   single hit. It is a <path> inside the symbol's own group now, so it is drawn where the volute is
+   drawn, rotated with it, and it claims only the ground the drawing covers.
+
+   `visible` rather than `visibleFill` because the SLOP IS THE STROKE: the width is DECLARED, in the
+   element's own units, by resizePumpSymbol() -- which is the whole difference from the 2026-09-09
+   defect, where an undeclared width meant the initial 1 USER UNIT and 846 px of invisible reach on a
+   geographic drawing. The fallback here is ZERO, so a missing publish shrinks the shape to bare ink
+   instead of growing it to a wall. */
+.lpn-link-symbol-hit {
+	fill: transparent; stroke: transparent; stroke-width: var(--lpn-symhit, 0);
+	stroke-linejoin: round; stroke-linecap: round;
+	pointer-events: visible; cursor: inherit;
+}
+/* A FINGER IS NOT A MOUSE (Task 618, and dev/toolbar-icons.md's 44 px argument). The shape is the
+   same; the skirt is 12 px on each side instead of 2. `pointer: coarse` is the PRIMARY pointer, so
+   a laptop with a touchscreen and a mouse is still a mouse -- the same reading .lpn-node-hit takes,
+   and the two must agree or one device gets a node's rules and a pump's from different worlds. */
+@media (pointer: coarse) {
+	.lpn-link-symbol-hit { stroke-width: var(--lpn-symhit-coarse, 0); }
+}
 /* **AND THE NODE'S OWN BAND, which is the half Task 615 did not do** (Tom, 2026-09-08: *"I get no
    help from the mouse pointer. It's just a pan cross the entire time."*). A junction is 7 screen
    pixels of drawn disc and nothing else, so `pointer` reached 0.2% of the map -- measured on the
@@ -706,7 +744,33 @@ html[lang="zh"] .ec-welcome {
 
    Not `stroke-width: 0`, which measures identically: it leaves the wrong declaration standing and
    makes the rule depend on a second property to be correct. */
-.lpn-node-hit { fill: transparent; stroke: none; pointer-events: visibleFill; cursor: inherit; }
+/* **AND IT IS THE SYMBOL'S OWN OUTLINE SINCE 2026-09-10, NOT A CIRCLE ROUND IT** (Tom, with
+   Thematic map on: *"I can visually trace the outline of the reservoir's halo, and if I am not
+   mistaken, it is circular. Fix that."*, and *"Tank is not clean; it's a circle too."*). Every node
+   type had one <circle> at nodeRadius() + 6 px, and nodeRadius() of a reservoir or a tank is the
+   radius that CONTAINS the symbol -- so a triangle's band answered in all four corners it does not
+   draw. A junction IS a disc, so its band was always WYSIWYG and is geometrically unchanged.
+
+   THE SLOP IS THE STROKE, which is what lets one construction serve both: `pointer-events: visible`
+   hit-tests the fill and the stroke, so the band is the drawn shape plus LPN_NODE_HIT_PX / 2 in
+   every direction, round every corner. `stroke-width` is DECLARED -- syncNodeHit() publishes
+   `--lpn-nhit` on the element in ITS OWN units -- and the fallback is ZERO, which fails to
+   shrink-wrapped rather than to the initial 1 USER UNIT that produced 846 px of invisible reach on
+   a geographic drawing (specs/nodehit.js). Not `visibleFill`, which would drop the slop entirely. */
+/* **AND A POINTER GETS NO SLOP AT ALL, WHICH IS TOM'S OWN RULING** (2026-09-10, on Task 618: *"No
+   slop for nodes. Slop for labels and to enforce a lower limit of 3 px for link lines."*). The band
+   is then exactly the ink: a junction's 7 px disc, a reservoir's triangle, a tank's rectangle. The
+   12 px skirt LPN_NODE_HIT_PX publishes is kept for a COARSE pointer only -- a finger cannot see
+   what it is covering, and dev/toolbar-icons.md's 44 px argument still holds there. He did not rule
+   on touch and this is the conservative reading of that silence.
+   `pointer: coarse` is the PRIMARY pointer: a laptop with a touchscreen and a mouse is a mouse. */
+.lpn-node-hit {
+	fill: transparent; stroke: transparent; stroke-width: 0;
+	stroke-linejoin: round; pointer-events: visible; cursor: inherit;
+}
+@media (pointer: coarse) {
+	.lpn-node-hit { stroke-width: var(--lpn-nhit, 0); }
+}
 /* THE TAB STRIP WHILE A MODEL IS BEING PLACED (Tom's 2026-09-08 worklist). Switching projects mid-wizard
    damaged both documents, so switchToTab(), closeTab() and newProject() refuse and say why. This is
    the half that stops the reach: faded, and the cursor says the press will not do what it looks

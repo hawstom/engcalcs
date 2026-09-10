@@ -111,10 +111,16 @@ console.log('\n--- the map symbol and its backdrop are one shape ---');
 	// which is why it must trace the icon exactly rather than merely cover it -- a bounding box
 	// would blank the pipe on both sides of the waist and read as a rectangle, not a valve. It is
 	// written as the two triangles concatenated.
-	const bd = editorSrc.match(/prependSymbolBackdrop\(symbolSvg, 'path', \{ d: '([^']*)' \}/);
-	ok('the valve map symbol still gets a backdrop path', !!bd);
+	// **THE OUTLINE MOVED INTO ONE TABLE ON 2026-09-10** (Task 618): the same shape is now the
+	// invisible GRAB shape as well as the backdrop, so it is `SYMBOL_SILHOUETTE.valve` and the two
+	// call sites read it rather than each carrying a literal. What has to stay true is unchanged --
+	// the valve's patch traces the icon's own two triangles and not a box round them.
+	const bd = editorSrc.match(/prependSymbolBackdrop\(symbolSvg, 'path', \{ d: SYMBOL_SILHOUETTE\.valve \}/);
+	const tblBlk = editorSrc.match(/var SYMBOL_SILHOUETTE = \{[\s\S]*?\n\t\};/);
+	const tbl = tblBlk && tblBlk[0].match(/valve:\s*'([^']*)'/);
+	ok('the valve map symbol still gets a backdrop path, from the shared table', !!bd);
 	ok('...tracing exactly the icon\'s own two triangles',
-		!!bd && bd[1] === outlines.join(''), bd ? bd[1] : '(none)');
+		!!tbl && tbl[1] === outlines.join(''), tbl ? tbl[1] : '(none)');
 }
 
 // ---- 3. THE FLOW ARROWS, ON THE DRAWING ------------------------------------------------------
