@@ -74,6 +74,16 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     survives a reload (it should not, on the furniture-versus-project rule); and whether a prompt
     can carry an action, which is what would make *"Use Settings..."* a link rather than a
     sentence. Answer those before building.
+  - **IT HAPPENED AGAIN WITH A SECOND READER, AND THIS TIME THE NOTICE MATTERED.** Tom testing with
+    KDH, 2026-09-10: *"He didn't notice the banner about the DEM server being disconnected. I did.
+    But it wasn't up long enough. I suggest a minute or two."* Two readers, two sessions, two
+    different notices missed -- MJH's suggestion arriving twice from different directions is the
+    finding, not the individual misses.
+  - **THE NUMBER IS `STATUS_NOTICE_MS = 8000`** (`js/looped-network.js:34386`), one global timeout.
+    **Do not simply raise it**: the same seam carries routine confirmations, and a two-minute
+    confirmation is noise where a two-minute FAILURE is a rescue. Duration by severity means
+    `setNotice()` takes one and the `seam.notice()` bridge `js/lpn-terrain.js` calls must carry it
+    -- a shared write seam, so a designed change and not a constant edit.
 
 - 75|617| **A basemap the reader can tone down, and a menu of tile styles.**
   Tom, 2026-09-09: *"Let's make a task to play with some additional selectors for the user including
@@ -133,6 +143,10 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     reach). `dev/browser-pass/specs/nodehit.js` and `specs/lblhit.js` are the measuring instruments;
     do not build a third.
   - Not decided: whether the link floor should be absolute or a multiple of the drawn width.
+  - **CONFIRMED BY A FIRST-TIME READER.** Tom testing with KDH, 2026-09-10: *"He noticed and was
+    reassured about grab to default cursor, though he said it was hard to get a pointer. There was a
+    good reason. Things on the map are small."* The cursor change is WORKING and was welcomed; the
+    difficulty is ACQUISITION, which is the "node fat" item above reached independently.
 
 - 25|619| **[H] The map cursor reverts to an arrow on Chrome at fractional display scaling.**
   Tom, 2026-09-10, on Windows at 125%: *"Stop mouse, then move about 1px down. Cursor changes to
@@ -246,6 +260,35 @@ the block.
     whether `addAll` would then be served from the HTTP cache anyway.
   - Nothing is broken today -- the icon on disk is correct and a new visitor sees it. This is about
     the NEXT icon change, and about anything else precached that is named without a query.
+
+- 25|621| **[H] A command search: KDH went looking for one.**
+  Tom testing with KDH, 2026-09-10: *"In searching for fire flow, he said, 'I need to do some kind
+  of search.'"* The Settings search already exists and Tom is happy with it; this is that idea
+  widened to every command.
+  - **TOM NAMED THE OBSTACLE HIMSELF AND IT IS THE WHOLE TASK:** *"The main obstacle is the need for
+    a UI location, which in turn is another thing to find. So it may not be practical."* A search
+    box that has to be found is a menu with extra steps. The escape from that is a KEY rather than a
+    location -- the industry idiom is Ctrl+K / slash -- but a keystroke is invisible to exactly the
+    first-time reader who needed the search, so a discoverable affordance and an undiscoverable one
+    are both half an answer.
+  - Filed as a maybe-someday on his own framing. Decide the location question before any code.
+
+- 50|622| **[H] A refused terrain lookup is reported as an unreachable one.**
+  The message says "You may be offline" when we reached the service and it refused us. Found 2026-09-10 while diagnosing KDH's report that DEM and satellite were down at
+  librewaternet.org/app. They were: the Mapbox token is URL-restricted to hawsedc.com, so every
+  tile and every elevation lookup from the other host returns **403 Forbidden**. Measured against
+  the live endpoints -- hawsedc.com 200, www.hawsedc.com 200, librewaternet.org 403,
+  not-epanet.org 403; OSM 200 everywhere, which is why the street map kept working.
+  - **The account fix is Tom's and is outside this repo** (Mapbox → Tokens → URL restrictions).
+    Nothing here needs to change for the outage itself.
+  - **The DEFECT here is the message.** `lpn_terrain_failed` reads *"We could not reach the terrain
+    service, so no elevation was changed. You may be offline."* We reached it; it refused us, and
+    the sentence sends the reader to look at their own connection. `js/lpn-terrain.js:492` already
+    throws `{kind: 'http', status: res.status}`, so a 4xx is distinguishable from a network error
+    with no new plumbing -- only the message is missing. Refused and unreachable want different
+    sentences, and only one of them mentions being offline.
+  - Same class as the favicon 404 and the `ea-php56` default: **a second host does not inherit the
+    first host's external configuration, and nothing inside this repository can see it.**
 
 - 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste
