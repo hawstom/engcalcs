@@ -94,6 +94,35 @@ exports.run = async function ({ browser, report }) {
 		report.ok(opened, 'the examples gallery offers Net3');
 		await a.settle(1500);
 
+		// **READ BEFORE ANYTHING ELSE IS TOUCHED, and that position is the whole check** (2026-09-09).
+		// Tom sat a colleague in front of the map on his first sitting; he opened this card, reached
+		// for the play controls, and the tip told him the project had no extended period simulation.
+		// Net3 states 24 hours. The strip is built once, over the empty startup document, and
+		// nothing redrew it when a project ARRIVED -- so it kept the inert state asserted a few
+		// lines above, for the life of the page.
+		//
+		// This spec opened Net3 and read the step selector throughout, and stayed green, because it
+		// read it AFTER editing the duration -- and a settings edit redraws the strip. So the
+		// assertion is not new; its POSITION is. Nothing between the card and this read.
+		const arrived = await a.page.evaluate(() => {
+			const ids = ['step-back', 'play', 'step-fwd'];
+			const btns = [...document.querySelectorAll('#lpn_toolbar button')]
+				.filter(b => ids.includes(b.getAttribute('data-icon')));
+			const sel = document.getElementById('lpn_time_step');
+			return {
+				stops: sel ? sel.options.length : -1,
+				live: btns.filter(b => !b.disabled).length, nBtns: btns.length,
+				selLive: !!(sel && !sel.disabled),
+				why: sel ? (sel.title || '') : ''
+			};
+		});
+		report.eq(arrived.stops, 25, 'opening Net3 gives the transport its 25 reporting stops at once');
+		report.eq(arrived.live, arrived.nBtns, '...and step back, Play and step forward are live');
+		report.ok(arrived.selLive, '...and so is the step selector');
+		report.ok(arrived.why !== await a.lang('lpn_time_no_period'),
+			'...and the tip does not tell the user this project has no extended period simulation',
+			arrived.why);
+
 		// **THE TAB IS GONE, PANEL AND ALL.** The pane is opened and its whole tab strip read: a
 		// removal has to be checked on the strip the user actually sees, not by asking whether one
 		// id happens to be absent.
