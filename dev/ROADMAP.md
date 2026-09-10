@@ -151,6 +151,20 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     possible except Chrome.** That one observation is worth more than every sweep below it, and it
     cost him a single visit to another page. Reach for it earlier next time: when a defect will not
     reproduce in the harness, ask whether somebody else's page shows it too.
+  - **THE FRACTIONAL-RATIO HYPOTHESIS IS ALSO REFUTED, BY MEASUREMENT.** A sweep at device pixel
+    ratios 1 / 1.25 / 1.5 / 2, walking ONE DEVICE PIXEL at a time on eight bearings from a junction,
+    a reservoir and a pump, found **zero phantoms and zero slits at every ratio** on the Basic
+    example; on geographic Net3 the few one-pixel runs were the DECLARED 2 px symbol slop and were
+    **most numerous at ratio 1**, the opposite of the prediction. Hidden labels answered **0 of
+    108,009** probes over their own boxes. The mechanism rules it out too: `elementFromPoint` is
+    what the cursor resolves from and Blink computes it in CSS-relative LayoutUnits, so the ratio is
+    not in that arithmetic.
+  - **AND THAT NAMES WHY NO HEADLESS TEST CAN EVER REACH THIS.** A Windows mouse delivers its
+    position in PHYSICAL device pixels and Chrome divides by the scale factor before the page sees
+    anything; Playwright injects through CDP in CSS pixels, so that division never happens in the
+    harness. **If the artefact lives in that input path it is unreachable from here by construction**
+    -- which is consistent with everything: it needs a real mouse, a real Windows scale factor, and
+    it happens on somebody else's site too.
   - Also searched and clean: 1.4 M samples at 1 px across XY Basic, XY Net3 and geographic Net3 at
     four zooms in Chromium AND Firefox; 1.6 M more at 0.25 px; radial walks at 0.2 px out to 700 px.
     Every hit shape measured constant in screen pixels across zooms, so nothing of ours is stale or

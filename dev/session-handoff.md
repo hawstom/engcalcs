@@ -7,6 +7,14 @@ you can tell). Delete a state line once you have checked it and it is no longer 
 
 ---
 
+## 0. IF YOU READ ONE SECTION, READ §4c AND §5 — they are 2026-09-10 and the rest is older
+
+The file is append-only by design: §1-§3c are 2026-09-05 to 09-06, §4/§4b are 09-09, **§4c and §5
+are the current state.** Where an older section disagrees with §4c, §4c wins and says so.
+**Every count in here is stale by construction. Read counts from the scripts.**
+
+---
+
 ## 1. THE CRITICAL PATH IS TOM'S READING, NOT YOUR BUILDING
 
 **Tom, 2026-09-05: *"If we can implement it and have some serious review and translation before
@@ -382,37 +390,136 @@ within minutes.
   and every one of them passed alone.
 
 
+## 4c. THE 2026-09-10 SESSION — Tom tested by hand all day; everything is pushed
+
+**All three repositories are pushed and `check_all.sh` is green.** Read every count from its script.
+`dev/new-english-keys.md`: **0 still to read.** `friction_check.php`: **exit 0** -- the sprint gate is
+CLEAR for the first time in weeks. English drift: **139 CHANGED, 7 NEW**, awaiting a resync sprint
+Tom has NOT yet authorized.
+
+### His rulings this day — do not re-litigate
+
+- **THE MAP CURSOR IS SETTLED AND THE SHIPPED HYBRID STANDS.** His own summary: *"menus are pointer,
+  map is grab, select menu depicts a default, and select is default, which is precise, serious, and
+  consummately functional."* Bare map `grab`, an object under Select `default`, any placement tool
+  or the area picker `crosshair`.
+- **NO SLOP FOR NODES.** *"No slop for nodes. Slop for labels and to enforce a lower limit of 3 px
+  for link lines."* A node's hit area IS its drawn ink on a fine pointer; a coarse pointer keeps a
+  12 px skirt round the same shape, which he did NOT rule on and may overrule.
+- **A NODE OUTRANKS A LINK SYMBOL, and that policy is not to be changed** (*"Somebody has to win.
+  There's no compelling reason to change the standing policy that it's the nodes."*). A merge broke
+  it silently and it is restored by a dedicated `linkSymbolLayer` between links and nodes, so a
+  symbol is above every pipe and below every node BY CONSTRUCTION.
+- **EXACTLY TWO ICONS DEPICT A CURSOR AND EACH NOW DEPICTS ITS OWN**: `select` is arrow-and-arrow,
+  `select-area` is crosshair-and-crosshair. **It is NOT a suite-wide rule** -- *"vertex and
+  everything else is not a place for depicting a cursor. So your question kind of falls on a deaf
+  suite."* Every other icon depicts the THING and owes no promise. Do not open a consistency sweep.
+- **A PAN TOOL IS REJECTED OUTRIGHT** (*"Strongly opposed. Simply unnecessary and wasted prime real
+  estate. And not 2026-like."*). Reasoning kept in Ida's wish list so it is not reinvented.
+- **"Start fresh"** replaced "Erase everything on this page"; `lpn_confirm_wipe` restates the label.
+  He refused "Clear cache" and the reason generalises: it is the most familiar phrase and it is a
+  LIE, because this deletes saved projects.
+- **The consent banner says "cookie"** (*"That is the word people know."*). Verified true before
+  writing: it IS a cookie holding one base-32 digit per page. **No `EC_CONSENT_VERSION` bump** --
+  nothing stored moved. `$ec_lang_syn['consent_body']` updated with his written approval.
+- **IDA IS THE INTERFACE DESIGNER**, named 2026-09-10, fifth seat. Her subject is visual HIERARCHY.
+  Standing brief: **diagnose and rank, never redesign.**
+
+### What shipped
+
+- **Task 618 hit areas, his own five-row acceptance table, all true now.** Reservoir and tank had
+  TWO circular hoggers (the band AND the unpainted `.lpn-node` disc, which carried
+  `pointer-events: visible` in its own right). Pump and valve were HOLES: the rect had a size and
+  `visibleFill` did answer, but it sat under `nodesLayer` and the end nodes' discs took every press
+  -- clicking a volute selected `node Lake`. Hit shapes are the drawn silhouette now.
+- **The cursor on the ink.** `.lpn-node-hit` and `.lpn-link-symbol-hit` carried `cursor: inherit`
+  from when they were slop; once they became the ink they told the reader the map was pannable while
+  they pointed at an asset. **The rule: the shape that IS the ink carries the object cursor; only
+  slop inherits.** `.lpn-link-hit` is still slop and still inherits.
+- **`pointer-events: visible` is back and is SAFE ONLY because every stroke width is now DECLARED
+  with a ZERO fallback.** The 846 px defect was an UNDECLARED width defaulting to one world unit.
+  Never restore `visible` on a shape without a declared width.
+- Task 539 stands at **zero crossings on every example at every measured zoom**, layout identical
+  over five passes. Tom, on a screenshot of a clean gang column: *"we are in a pretty good place
+  now. We can try harder after EWB."*
+- The suite nav went absolute (`nav_link_absolute_check.php`), the language menu now keeps you at
+  `/app/`, every page emits its own favicon, the Titles highlight runs 120 s, and Erase everything
+  clears `lpn_areahint`.
+
+### TRAPS MEASURED THIS DAY
+
+- **I RELAYED AN EXPLANATION THAT CONTRADICTED HIS DIRECT OBSERVATION, TWICE.** He said he had
+  zoomed in with no node on the map; I twice passed on "the node discs covered the volute". **When a
+  user's own measurement rules out a mechanism, the mechanism is dead** -- do not repeat it because
+  an agent measured it somewhere else.
+- **FOUR WRONG HYPOTHESES IN ONE EVENING** on the cursor-arrow report: stale scale, hidden labels,
+  a symbol-size lattice, fractional-DPR seams. Each cost him a knock-down. **Generating theories
+  faster than evidence is the failure**; the instrument settled it in one paste.
+- **WHEN A DEFECT WILL NOT REPRODUCE IN THE HARNESS, ASK WHETHER SOMEBODY ELSE'S PAGE SHOWS IT.**
+  Tom checked epanetjs.com and it does the same thing, which eliminated every shared cause in one
+  observation. See Task 619.
+- **AND SOME THINGS ARE UNREACHABLE FROM THE HARNESS BY CONSTRUCTION, WHICH IS WORTH KNOWING BEFORE
+  SPENDING A DAY.** A Windows mouse delivers its position in PHYSICAL device pixels and Chrome
+  divides by the scale factor before the page sees anything; Playwright injects through CDP in CSS
+  pixels, so that division never happens in `dev/browser-pass`. **No headless run at any
+  `deviceScaleFactor` can exercise the OS input path.** Task 619 is the worked example: four
+  hypotheses and roughly 3 M samples died against a mechanism the instrument cannot see.
+- **A LOGGER THAT CATCHES A CONTROL AND MISSES THE PHENOMENON IS THE FINDING**, not a broken logger.
+
+
 ## 5. THE NEXT THINGS, in the order I would take them
 
-**Rewritten 2026-09-09 at the end of a five-agent orchestration session. Items 1, 2 and 4 of the
-previous list are DONE and are recorded in §4b; what follows is what is actually left.**
+**Rewritten 2026-09-10. EWB IS 16 SEPTEMBER AND TOM'S OWN PLAN GOVERNS:** *"4 days of bugs, then 2
+days of translation, not earlier."* Translation freeze **14 Sep**; he keeps the right to tweak
+English until then. He explicitly declined an earlier sprint. **Nothing below is a reason to break
+that.**
 
-1. **THE CRITICAL PATH IS STILL TOM'S READING.** `friction_check.php` exits 1 on exactly THREE
-   entries and a sprint launches on nothing else: `lpn_fitting_entrance`, `lpn_reaction_limiting`,
-   `lpn_reaction_rough_corr`, all three in `dev/new-english-keys.md` under "Questions from the
-   translators". Plus 5 new keys awaiting an "OK" in the same file. **The first is the interesting
-   one and is an ENGLISH defect, not a translation one: 13 of 24 languages rendered "Square
-   entrance" as a SHAPE and 11 as a sharp EDGE, and only the edge is EPANET Table 3.3's meaning.**
-2. **Then ONE sprint, not two**: 137 CHANGED keys plus the day's new ones in a single payload, then
-   `detect_english_drift.php --baseline-new` and `--update`. The count has been 137 all day; nothing
-   this session added a key.
-3. **Show Tom a drawing for Task 539, not another number.** His own test is *"would a person looking
-   at this see an obvious fix we missed"*, which is his eyes on Net3-Novato-CA-World at the fit
-   zoom. `spot_prime` was NOT built and the report on it is §4b and
-   `dev/label-placement-algorithms.md` §10.
-4. **Two things he has been told about and has not ruled on:** the maskable-icon background (§5a
-   below, unchanged) and the Settings-box resize grabber that his own overhang change put off the
-   window (§4b).
-5. **Sue's thirteen glossary entries** are drafted in her journal, four sourced and nine deliberately
-   left unsourced rather than guessed. Applying them is a decision, not a chore. **Declan's Task 610
-   vertex-cell spec is now written** (`dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md`) and
-   unblocks that task whenever Tom wants it.
-6. Task 611 library import; Task 592 CSV/GPX survey import; Task 599 time series; Task 247 customers.
-   All on `js/looped-network.js`, so sequential, and 611 is the one to take first.
-7. **Task 612 screenshot placement**, still waiting on the file itself.
-8. **`check_browser.sh` has not been written and is the session's one unbuilt recommendation.** See
-   §4b: the full browser pass is 807 s and must NOT go in `check_all.sh`, but a six-section subset
-   is about two minutes and is where 11 of 14 rotted specs lived.
+1. **THE SPRINT GATE IS CLEAR AND THE SPRINT IS NOT AUTHORIZED.** 0 keys to read,
+   `friction_check.php` exit 0, 139 CHANGED + 7 NEW awaiting a resync. **Earliest sensible date is
+   13 Sep.** Propose, confirm, launch -- never infer authorization. 26 languages, 20 concurrent.
+2. **Bugs only until the freeze**, and only ones a real person hit. Three people tested this week:
+   PCW, MJH and Tom. Their reports are in Tasks 615, 616, 618 and 619.
+3. **Task 612 screenshot 0082** still waits on the file itself.
+4. **Two things he has been told about and has not ruled on:** the maskable icon background (§5a)
+   and the Settings-box resize grabber his own overhang change put off the window (§4b).
+
+### After EWB — the lull he asked for, in the order he raised them
+
+5. **`dev/label-placement-dictionary.md` is a REVIEW DRAFT waiting for him.** 26 entries, a 10-item
+   decision list at the end. **He asked for it to be cut shorter** (*"it's a dictionary, not an
+   encyclopedia ... have mercy on the poor, slow, tired human reader"*) -- that trim is owed and is
+   not done. His own terms to adopt: **right-of-way** (between two labels), **needy/wealthy**
+   (replacing the undefined "high order"), **interesting** (the umbrella over the salience rules).
+   The one place the draft argues with him: **"stacked" should keep its cartographic meaning of
+   MULTI-LINE**, because that is Maplex's, and the group of labels needs a different word.
+6. **The free-space model, which is HIS design and better than what is built.** *"a simple 'No
+   vacancy here' fill-in-the-slots model"*, filled clerically as labels land, carried between zooms
+   with an area-wise scale factor, used as a HINT (*"not a prime place to look at this time"*) with
+   the exact test still run before anything commits. Today the tiles index OBSTACLES only; nobody
+   has ever asked them where there is ROOM.
+7. **Right-of-way is used for two jobs that want OPPOSITE orders, and he re-derived this himself.**
+   Fitting wants the most CRAMPED first (choose while choices exist); dropping wants the least
+   IMPORTANT first. One salience ordinal does both. **Nothing measures congestion at all today.**
+   The experiment is cheap: place in salience order, place in most-constrained order, count what
+   drops.
+8. **745 DOM writes per wheel notch on Net3, where a handful would do.** Sizes that are the same
+   formula for every element of a kind can be CSS expressions over one posted number, the way
+   `--lpn-sym` and `--lpn-lw` already are; positions and rotations are genuinely per-element and
+   must stay. **The poison is that `r`-as-a-CSS-property is SVG2** and degrades silently on old
+   browsers -- `.lpn-vertexmode .lpn-vhandle` already documents that. Measure with `specs/perf.js`
+   before and after.
+9. **Ida's four-bar chrome diagnosis**, her standing brief, still unstarted: suite chrome, menu bar,
+   toolbar, tab strip. Two of three testers never saw the menus. **Diagnose and rank, never
+   redesign.** Her wish list also holds the hover-highlight (AutoCAD `SELECTIONPREVIEW`, Figma
+   "Highlight layers on hover") and her 617 basemap answer: a two-option select in Settings > Map
+   appearance, NOT a sixth widget in the lower-left corner, which is already the busiest overlay.
+10. **Task 615, the icon.** `wt-wide-L` ships; `ic-tall3-steel-overcast` is his front runner and
+    measures FAVICON at 16 px since the descender fix. Sheet:
+    `dev/icon-preview/concepts-2026-09-09-color.html`. Three votes, three answers, one of whom sees
+    a lavatory sink.
+11. Task 611 library import; 592 CSV/GPX survey import; 599 time series; 247 customers -- all in
+    `js/looped-network.js`, so sequential.
+
 
 ## 5a. THE MASKABLE ICON BACKGROUND, still Tom's and still unasked-and-answered
 
