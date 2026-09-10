@@ -44,5 +44,18 @@ that disagreement is most of what a seat is for. No agent edits the roadmap.
      about every cursor state, and `grab` on the bare map is correct because that is where nothing
      is being aimed at. See journal, 2026-09-10.
 
+4. **Task 617 -- a basemap-style `<select>` in Settings > Map appearance, not a new on-canvas
+   control.** Two options to start (`Full color` / `Muted`), same widget family as the legend-
+   position rows already there, wired to a `filter:` on `.lpn-basemap`
+   (`dev/basemap-styling-options.md`'s own free recipe). Zero canvas cost, zero risk to the
+   non-dismissible OSM/Mapbox credit (separate DOM, checked directly). **Costed against Tom's own
+   sketch of a lower-left expando, which I do not recommend as a first move**: `#lpn_map_footer`
+   is already the busiest overlay on the page -- five widgets, already wraps on a narrow window,
+   and the one strip `zoomExtent()` reserves canvas against -- so a sixth item there is a real tax
+   on the drawing surface for a decision that is closer in kind to "where the legend sits" than to
+   "click to pan." If a corner affordance is wanted later, extend the EXISTING satellite-teaser
+   tile with a caret rather than adding a new independent widget next to it. See journal,
+   2026-09-10.
+
 *(The four-bar chrome diagnosis Tom's brief opens with — suite chrome, menus, toolbar, tab strip —
 is still unstarted; this list will carry that ranking once it exists.)*

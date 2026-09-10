@@ -342,3 +342,147 @@ alone, and I may test that. But on a phone, zoom in is the answer. You can't see
 finger."* **Zooming is the phone's precision instrument, not a bigger hit target** -- that is a
 design position worth holding on to, and it means a coarse pointer keeps its generous targets and
 nothing on a phone should ever depend on a cursor.
+
+---
+
+## 2026-09-10 — Task 617: where does a basemap-style control go
+
+Tom's sketch: *"put some expando choices at lower left with an arrow to replace the simple
+'switch to the other one' UI"* — a disclosure widget (a small arrow/caret that opens a short
+list of choices, the same family as a `<select>` but drawn as a popover rather than a native
+control) at the corner where the current basemap toggle lives. Routed to me because it is a
+chrome-PLACEMENT question, not a CSS-filter question — `dev/basemap-styling-options.md` already
+settles the cheaper-of-three-routes question (start with a CSS `filter:`, free, no new host, no
+consent gate, `dev/basemap-styling-options.md:36-46`) and Task 617 is now about where the
+control that picks the filter lives.
+
+### Vocabulary, taught as asked
+
+- **Disclosure control / caret / expando** — a small arrow that, on press, reveals a short
+  list without navigating away; the thing Tom sketched. Distinct from a **popover** (the
+  revealed panel itself) and from a native **`<select>`** (same job, browser-drawn, no
+  disclosure animation to design).
+  **A `<select>` IS already this page's convention for "pick one of a short enumerated list
+  of display choices."** OBSERVED, `js/looped-network.js:25310` `legendPositionOptions()` — a
+  seven-item list (`off`, four corners plus two middles) feeding one `<select>` in Settings,
+  reused for BOTH legends. A basemap-style picker with 2-4 options is the same shape of
+  decision the suite already solved once; it does not need a new widget invented for it.
+- **Corner** vs. **strip** vs. **band**: this page's own code comments already distinguish
+  them, and I use their words. A *corner* is a fixed point (bottom-right, owned outright by
+  `#lpn_basemap_credit`). A *strip*/*band* is `#lpn_map_footer` — left-packed, flex-wrapping,
+  currently five items wide, and the thing `zoomExtent()` **reserves canvas against**
+  (`overlayReserve('lpn_map_footer')`, OBSERVED `Looped-Network.php:399`) — so growing it by
+  one control is not free the way it looks; it is a literal tax on drawing area, machine-
+  measured by the page's own reservation call.
+
+### OBSERVED: what is actually parked in that corner today, checked before recommending anything
+
+`#lpn_map_footer` (`Looped-Network.php:402`), bottom-left, already holds, left to right: the
+40×40 satellite-teaser tile (`lpn_basemap_teaser`, the CURRENT "switch to the other one" UI
+Tom wants to replace), the scenario-status button, the units/mode readout, the coordinate
+readout, and the one-tap grievance link (`lpn_wrong_btn`). Five widgets in one row that
+**"already wraps on a narrow window" by the comment's own words** (`Looped-Network.php:423`,
+`css/engcalcs.css:2657 area comment`). This is not an empty corner waiting for a sixth
+control — it is the single busiest overlay on the page, and it is already the one the small-
+screen breakpoint has to reckon with.
+
+`#lpn_basemap_credit` (`Looped-Network.php:471`) owns bottom-right outright and is **not
+dismissible** — required by the OSM tile usage policy and Mapbox's licence terms whenever a
+tile is on screen. It is a separate corner, separate DOM, and CANNOT move to make room for
+anything else.
+
+The two legends (`#lpn_labels_legend`, `.lpn-color-legend`) are USER-REPOSITIONABLE to any of
+six spots including `bottom-left` and `middle-left` (OBSERVED, `js/looped-network.js:25310-25318`).
+So bottom-left is not merely crowded by default furniture — a reader who has moved a legend
+there can collide a SEVENTH thing into the same 40px-tall band. The corner is already
+contested, not spare.
+
+**Settings > Map (`#lpn_set_sec_map`, `Looped-Network.php:795`) already has a "Map appearance"
+subsection** holding exactly this category of decision — the two legend positions and the
+colour-thematic mode live there today, at zero canvas cost, as ordinary `<select>` rows. This
+is the free room 617's own costing document implies but does not name: the corner costs
+reserved canvas on every window size; the Settings row costs nothing and is already open to
+this exact kind of choice.
+
+### Attribution risk, checked directly
+
+The filter lands on `.lpn-basemap` (`css/engcalcs.css:389`, the tile-image wrapper), and
+`#lpn_basemap_credit` is separately positioned DOM, `bottom:4px;right:...`, outside that
+element and outside `#lpn_map_footer` (`Looped-Network.php:471`). **A style picker in EITHER
+location — Settings or a corner control — cannot touch the credit**, because neither proposal
+under discussion restyles anything but the tile layer itself. This was already the finding in
+`dev/basemap-styling-options.md` ("attribution is separate DOM that a filter on the tile layer
+beneath it does not touch"); checking the actual markup confirms it rather than merely citing
+the prior doc. No design below endangers the credit.
+
+### The ranked design
+
+**Rank 1 — Settings > Map > Map appearance gets one more row: a basemap-style `<select>`,
+same widget as the legend-position rows beside it.** Minimum viable option set: `Full color`
+(default) / `Muted`. Wired to one CSS custom property or class on `.lpn-basemap`
+(`filter: grayscale(60%) contrast(.9)`, per `dev/basemap-styling-options.md`'s own recipe) —
+no new corner, no new bar, no canvas reserved, nothing for `zoomExtent()` to learn about. It
+sits beside the legend-position controls it already resembles, so a reader who has found one
+finds the other by the same habit. **This is the cheapest version, and it is also the RIGHT
+version for a display preference the reader sets once and rarely revisits — not every
+setting deserves a standing on-canvas control, and this one is closer in kind to "legend goes
+top-right" than to "click to pan," which is exactly the test that already sorts this page's
+existing controls between Settings and the canvas.** New strings: the section already exists,
+so this is ~1 label + N option words, not a new subsystem.
+
+**Rank 2 — if a corner affordance is still wanted, extend the EXISTING teaser rather than
+adding a new independent widget.** The teaser tile is already the "switch to the other one"
+UI Tom named; a small caret badge on its own corner (a few px, not a new flex child) opening a
+tiny popover of 2-3 basemap-style swatches keeps the row's footprint growing by a corner
+mark rather than a sixth full control. This is real canvas cost, just smaller than a new
+item, and it needs its own interaction pass (press-and-hold vs. a visible caret vs. a
+long-press) that is design work, not a settings row — worth an hour, not urgent, and NOT the
+thing to build before 16 September.
+
+**Rank 3, and my verdict on his own sketch — do not build a THIRD, separate expando at
+lower-left.** As literally sketched (an independent new control, distinct from the teaser,
+with its own disclosure arrow, parked in the same corner) it becomes a sixth item in a strip
+that already wraps at narrow widths and that the page's own zoom-to-fit math already treats
+as a canvas cost. It also duplicates a job the teaser already halfway does (a basemap-style
+switcher living next to a basemap-style switcher) rather than extending it — two controls for
+one decision is the exact shape `js/looped-network.js:25303-25306`'s own comment warns against
+for the legend dropdown ("A checkbox beside the dropdown would be two controls for one
+choice"). **His instinct about WHICH corner (the teaser's own neighborhood) is right if a
+corner control is built at all — his instinct that it should be a NEW, separate widget rather
+than a caret on the thing already there is the part to correct.**
+
+### Menu vs. toggle — the option count that changes the answer
+
+At **2 options** (full color / muted) this is a **toggle**, not a menu, and a disclosure arrow
+overstates it — the picture-swaps-on-press convention the teaser tile already uses (pressed
+state shows the OTHER option, `css/engcalcs.css:2675`) is the right shape, not a caret. A
+disclosure arrow earns its keep at **3+ options** (e.g., normal / muted / a future dark-map
+variant), where "press to see a short list" genuinely differs from "press to flip." Given 617
+opens with exactly one new option (muted), **start as a toggle-shaped `<select>` with two
+values, not a menu with an arrow** — the arrow is a cost to pay only once a third option is
+real, and paying it now would be building UI for a menu that has one item in it.
+
+### Phone
+
+Nothing in the 640px block hides `#lpn_map_footer` or `#lpn_basemap_credit`
+(`css/engcalcs.css:3119-3121` names only page titles, navbar, toolbar-minus-transport, and
+menu-bar words as what goes — the footer strip is untouched and therefore still present, still
+reserved-against, at the size where reserved canvas is scarcest). A corner control costs MORE
+exactly where the surface is smallest, which is the strongest argument yet for Rank 1: the
+Settings box already collapses into the existing responsive side-index at this width
+(`css/engcalcs.css:3175` the `.lpn-setbox-index` phone rule) and adding one row there costs
+nothing extra on a phone that a new on-canvas control would not also cost on desktop, and then
+some.
+
+### If this turns out to depend on the four-bar chrome diagnosis
+
+It does not. This question is answered entirely by where FREE room already exists
+(Settings) versus where canvas is already reserved and contested (`#lpn_map_footer`), which is
+settled without touching the suite-chrome/menu/toolbar/tab-strip question my standing brief
+opens with. Noted per the scope instruction and not started.
+
+**Cheapest version I would accept if only the cheapest could ship before 16 September: Rank 1
+alone** — one `<select>` row in Settings > Map appearance, two options, the CSS filter from
+`dev/basemap-styling-options.md`. No new corner, no new strings beyond a label and two option
+words, no risk to attribution, and it is discoverable exactly as well as the legend-position
+control sitting next to it already is.

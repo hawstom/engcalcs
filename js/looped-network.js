@@ -16,7 +16,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer, debugBoxLayer;
+	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
@@ -6090,7 +6090,12 @@ var EngCalcs = EngCalcs || {};
 		// wherever it is near one -- that is touchNodeOver(), unchanged, and it reads data-link.
 		var symbolG = null, symbolSvg = null, symbolHit = null;
 		if (l.type === 'pump' || l.type === 'valve') {
-			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
+			// `|| nodesLayer` is for the spike harnesses that build their own layer stack by hand and
+			// know nothing of this one; on the real page linkSymbolLayer always exists. A harness
+			// that falls back gets the OLD parent, so any harness asserting node-over-symbol
+			// precedence must drive buildDom() rather than hand-rolling layers -- symbol-backdrop
+			// and valve-arrow both do.
+			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, linkSymbolLayer || nodesLayer);
 			// **ONE DRAWING FOR MENU AND MAP AGAIN** (Tom, 2026-09-03, correcting his own earlier
 			// steer: *"I steered you wrong about the volute. Its snout length is only about 0.6-0.7
 			// * the width of the body, not 1.0, more like the menu icon than I knew."*). A second
@@ -22796,6 +22801,24 @@ var EngCalcs = EngCalcs || {};
 		// Classed so the symbol-opacity setting can fade both symbol layers as ONE drawing -- see
 		// the .lpn-symbols rule in css/engcalcs.css.
 		linksLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
+		// **A PUMP OR VALVE SYMBOL PAINTS OVER EVERY PIPE AND UNDER EVERY NODE, AND IT NEEDS ITS OWN
+		// LAYER TO DO BOTH** (Tom, 2026-09-10: *"Somebody has to win. There's no compelling reason to
+		// change the standing policy that it's the nodes. Changing that will just confuse us."*).
+		//
+		// The symbol has always had to sit above the links, or a pump reads underneath the pipes it
+		// crosses. It used to get that by living in `nodesLayer` -- which worked while its GRAB SHAPE
+		// was a separate rect down in `linksLayer`, because the two questions were answered by two
+		// elements in two places. Once the grab shape moved inside the symbol group so it could ride
+		// the pump's rotate and flip for free, that stopped being true: nodes are built before links
+		// (see the loops in buildAll), so a symbol group appended to `nodesLayer` lands AFTER every
+		// node, and later is on top. For a MOUSE, whose precedence is nothing but paint order, the
+		// volute began beating the junction sitting on it.
+		//
+		// One layer between the two answers both: above every pipe, below every node, by
+		// construction rather than by anybody remembering. `touchNodeOver()` is the finger's
+		// separate rule and is unaffected -- it reads `nodeOutranks()` and is deliberately touch-only
+		// (a pointer can see what it is over and move three pixels; a finger covers the target).
+		linkSymbolLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		nodesLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		// EVERY LABEL'S TEXT AND LEADER LIVES IN THIS ONE SHARED LAYER, never appended alongside the
 		// element it belongs to, so ALL labels sit above ALL node/link symbols. Building each label
