@@ -501,12 +501,30 @@ $ec_icons = array(
 	//     shadow does in engraving, because a hemisphere's underside is uniformly the darkest surface
 	//     and a mid-tone MASS is its correct one-ink reading. This is the one place in this file where
 	//     the gap budget is broken deliberately, and this paragraph is the reason.
-	//   - **CLOUDS WERE DRAWN, MEASURED AND REJECTED** (his *"maybe clouds"*). There are 2.2 units of
-	//     headroom between the frame top and the cone's apex, and a stroke-only mark in that space
-	//     cannot separate from its own antialiasing: at 16 and 17 px two shallow cubics read as a
-	//     formless smudge in the corner. Legible at 24-32, which is not where a menu icon is judged.
-	//     `dev/icon-preview/render/ship/ship-menu-belly-clouds@17-lt.png`. Do not re-propose without
-	//     a 17 px raster.
+	//   - **THE CLOUDS ARE IN THE FLANKS, AND THE FIRST ATTEMPT FAILED BY MEASURING THE WRONG GAP.**
+	//     They were drawn in the 2.2 units of HEADROOM above the cone's apex, read as a formless
+	//     smudge at 16 and 17 px, and were rejected. Tom sent them back by pointing at the space that
+	//     is actually empty (2026-09-10: *"There is a lot of free/waste width on the menu icon. Can
+	//     Ida figure out how to evoke clouds or a bird or two in the sky?"*): WT-TALL-3 is a narrow
+	//     tower, its ink spans x 6.95 to 17.05 and the catwalk's caps reach 6.1 and 17.9, so each
+	//     flank holds ~6.95 clear units running the FULL HEIGHT of the frame. That is the largest
+	//     empty region on the glyph, and it is why the width read as wasted.
+	//   - **THEY NOD TO THE FAVICON'S OWN SKY, WHICH IS WHAT HE ASKED FOR** (*"The same clouds as the
+	//     favicon would be amazing if there is a way to give a nod to them."*). `ship-favicon.svg`
+	//     draws three blurred ellipses; the two that clear the tank sit at **y = 5.5 and y = 9**, and
+	//     those are the two heights used here. The asymmetry is deliberate and is his sky, not a
+	//     tidier symmetric pair -- a symmetric variant was drawn (`cl-high`) and measures the same.
+	//   - **A FLAT BAND, NEVER AN OUTLINED PUFF** (*"This is not a cartoon. This looks real and out of
+	//     a western movie."*). The favicon's ellipses are `rx` 5.5-8 against `ry` under 2 -- stratus
+	//     lying in bands, and that flatness is most of why that sky reads as real. With no fill
+	//     available the honest translation is an OPEN two-bump wave, not a closed loop: a closed
+	//     outline is the cartoon cloud he is warning against. Ink clears the antialiasing noise floor
+	//     by 3-8x at 16/17/24/32 px on light and dark alike, and stays clear of the catwalk row --
+	//     height separation is what stops a flank mark reading as a second catwalk or a horizon.
+	//   - **A BIRD WAS DRAWN AND DOES NOT RESOLVE** (his *"or a bird or two"*). The two-stroke gull is
+	//     one undifferentiated blob at 17, 24 AND 32 px -- not a resolution problem that a bigger icon
+	//     fixes at any size this suite draws. `dev/icon-preview/render/ship/clouds-addendum-sheet.png`
+	//     carries the raster. Do not re-propose without one.
 	//
 	// **THREE THINGS CARRIED OVER FROM EVERY EARLIER VERSION AND MUST SURVIVE ANY REDRAW:**
 	//   - **NO ROOF OVERHANG** (Tom, 2026-09-04): *"it shouldn't have roof overhangs like a house"*.
@@ -560,7 +578,10 @@ $ec_icons = array(
 		. '<path stroke-width="0.8" stroke-linecap="butt" d="M10.5 14.5V16.6"/>'
 		. '<path stroke-width="0.85" stroke-linecap="butt" d="M12 14.5V17.1"/>'
 		. '<path stroke-width="0.8" stroke-linecap="butt" d="M13.5 14.5V16.6"/>'
-		. '<path stroke-width="0.7" stroke-linecap="butt" d="M14.9 14.5V15.7"/>',
+		. '<path stroke-width="0.7" stroke-linecap="butt" d="M14.9 14.5V15.7"/>'
+		// The sky: open stratus bands in the flanks, at the favicon's own two cloud heights.
+		. '<path stroke-width="0.6" d="M1 5.5C1.92 4.95 2.38 4.95 3.3 5.5C4.22 4.95 4.68 4.95 5.6 5.5"/>'
+		. '<path stroke-width="0.6" d="M18.4 9C19.32 8.5 19.78 8.5 20.7 9C21.62 8.5 22.08 8.5 23 9"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
 	//

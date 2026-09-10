@@ -192,3 +192,80 @@ being cited as evidence that no `A` command broke the parser.
 - **Whether `ship-favicon.svg`'s exact gradient stop values want a designer's second pass** once seen
   on an actual browser tab rather than a PNG — the measurements say the treatment is sound; taste on
   the precise stop colors was not re-litigated here.
+
+## Addendum, same session: clouds reopened
+
+Both drawings deployed and Tom loved them, then reopened the menu glyph:
+
+> "There is a lot of free/waste width on the menu icon. Can Ida figure out how to evoke clouds or a
+> bird or two in the sky? This is not a cartoon. This looks real and out of a western movie. So we
+> need to keep with that."
+> "The same clouds as the favicon would be amazing if there is a way to give a nod to them."
+
+**Why the first trial failed and this one does not.** The first cloud trial (main section above)
+tested the 2.2 units of headroom above the cone's apex, and there genuinely is nothing to be done in
+2.2 units. Tom was pointing at the FLANKS: wall ink spans x 6.95-8.95 (left) / 15.05-17.05 (right),
+the catwalk's round cap reaches x 6.1-17.9 but ONLY at y=13.55, and everything else in the 24-unit
+frame is clear — roughly 6.95 units on each side, full height. That is the space this addendum uses.
+
+**Deliverable: `dev/icon-preview/ship-water-menu-clouds.svg`.** The shipped `ship-water-menu.svg`
+geometry (wall hatch + belly ink, both untouched) plus two flattened open waves, one per flank:
+
+```
+M1 5.5C1.92 4.95 2.38 4.95 3.3 5.5C4.22 4.95 4.68 4.95 5.6 5.5      (left,  stroke-width 0.6)
+M18.4 9C19.32 8.5 19.78 8.5 20.7 9C21.62 8.5 22.08 8.5 23 9         (right, stroke-width 0.6)
+```
+
+**The nod, exactly.** `ship-favicon.svg`'s three sky ellipses are `cx=6 cy=5.5 rx=6 ry=1.7` (left),
+`cx=18.5 cy=9 rx=5.5 ry=1.5` (right), `cx=11 cy=19.5 rx=8 ry=1.9` (low, behind the legs). The menu
+clouds sit at the SAME two heights, `y=5.5` and `y=9` — literally the nod he asked for, translated
+from filled ellipses behind the tank (not available in one ink with no fill) to open strokes beside
+it. The third, low ellipse has no flank equivalent — the flanks below the catwalk are legs and open
+ground, not sky, so it is not carried across; noted rather than silently dropped.
+
+**Shape, not just position, matters for the "not a cartoon" instruction.** A closed loop or a stroked
+oval reads as an outlined puff — the cartoon he is warning off. An open two-bump wave with no fill is
+the one-ink equivalent of a WIDE, FLAT stratus band (the favicon's own `ry` under 2 against `rx` of
+5.5-8) rather than a cumulus outline, and it is drawn exactly that flat: 4.6 units wide, 0.5-0.55
+units of bump.
+
+**The catwalk trap, measured rather than assumed.** A new probe (`flankInk()` in
+`gen-ship-clouds.js`) reads each flank as a box and reports the strongest row's run count and pixel
+count. The control (`cl-none`, the shipped no-clouds file) shows 0-2 stray pixels from antialiasing
+bleed at every size — that is the noise floor. The shipped candidate (`cl-nod`) clears it by 3-8x:
+
+| px | left flank px (control → clouds) | right flank px (control → clouds) |
+|---|---|---|
+| 16 | 1 → 5 | 0 → 3 |
+| 17 | 2 → 6 | 1 → 5 |
+| 24 | 2 → 6 (2 runs, i.e. broken/wavy) | 0 → 5 |
+| 32 | 2 → 8 (2 runs) | 1 → 7 |
+
+Both clouds sit well clear of the catwalk row in every raster examined (proof:
+`render/ship/nod-vs-high.png`, `render/ship/clouds-addendum-sheet.png`) — at no size does either
+mark align with, extend, or get mistaken for the y=13.55 bar; they are visibly higher, visibly
+lighter (antialiased mid-tone against the catwalk's solid ink), and visibly broken into 1-2 short
+runs rather than one continuous bar. I also tried a second candidate (`cl-high`, both clouds pushed
+to a single higher, symmetric height) to see whether more separation from the catwalk reads better;
+it measures almost identically and looks slightly more like a deliberate frame ornament than weather
+— the asymmetric nod height, being literally what he asked to see again, is the one shipped.
+
+**A bird — tested, rejected, with the raster.** The classic two-stroke gull (`M x0 y C ... C ... x1
+y`, one shallow cubic bump each side, 2.2 units wide, 0.55 tall, 0.55-wide stroke) never resolves
+into a recognizable shape at ANY size tested, 16 through 32px — it stays a single soft blob the whole
+way (`render/ship/clouds-addendum-sheet.png`, "Rejected" row; raw frames `cl-bird-only@*.png`). At
+32px it is still one undifferentiated smudge, not two legible strokes; the shape needs roughly the
+same 4.6-unit span the clouds use before the two bumps separate, and at that span in this location it
+would read as a third cloud, not a bird. **Measured no, at every size this deliverable is judged at.**
+Left out.
+
+**Constraints checked again for this file specifically**: `fill="none"`, `stroke="currentColor"`, no
+ground, `M/C` only in the new paths (confirmed with `grep -o ' A[0-9 .,-]*'`, empty), sub-2 stroke
+widths (0.6 on both cloud strokes) stated here and in the file's own comment-equivalent (the
+`ship-notes.md` entry, since SVG has no first-class comment convention this suite relies on).
+`icon_ascii_preview.php --geom=... --size=17` ran clean and shows both wisps sitting outside the
+tower's own silhouette at their intended heights.
+
+Proof: `render/ship/clouds-addendum-sheet.png` (final file at all four menu sizes, light and dark,
+plus the no-clouds/with-clouds comparison and the rejected bird). Raw candidates and measurements:
+`render/ship/cl-*.svg`, `render/ship/clouds-measurements.json`.

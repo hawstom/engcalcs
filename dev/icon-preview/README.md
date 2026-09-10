@@ -201,6 +201,21 @@ and an ink blob at 17px, the tank's clear interior being 4.2 pixels there. **The
 along onto this geometry at menu size**, and which of the three ways around that (no letter, a
 WIDE-geometry menu icon beside a TALL favicon, or accepting the letter from 32px up) is Tom's call.
 
+**ADDENDUM, same day, after both drawings deployed.** Both went live (favicon on all three hosts,
+`water` glyph in `lib/Icons.lib.php`) and Tom reopened the menu glyph's clouds question, having
+loved the result: *"There is a lot of free/waste width on the menu icon. Can Ida figure out how to
+evoke clouds or a bird or two in the sky? This is not a cartoon... The same clouds as the favicon
+would be amazing."* **The first trial tested the wrong part of the frame** — the 2.2 units of
+headroom above the cone's apex, where nothing survives. He was pointing at the FLANKS: roughly 6.95
+clear units on each side of the tank, full height, empty but for the catwalk's cap at one single row
+(y=13.55). `dev/icon-preview/ship-water-menu-clouds.svg` adds two flattened open waves there — no
+fill, no closed loop, so no cartoon outline — at the SAME two heights as `ship-favicon.svg`'s own sky
+ellipses (y=5.5 left, y=9 right), which is the nod exactly. Measured 3-8x the antialiasing noise
+floor at every menu size (16-32px), on both a light and a dark row, and nowhere close to the catwalk
+row in any raster examined. A two-stroke gull was drawn and measured too and stays a single
+unresolved blob at every size up to 32px — rejected, with the raster. Full numbers and both rejected
+candidates: `dev/icon-preview/ship-notes.md`, "Addendum" section.
+
 ## Water tower candidates, round 2 (2026-09-08b) — the geometry round
 
 `node gen-concepts-b.js` writes every candidate `.svg` (24-unit viewBox, single `currentColor`
