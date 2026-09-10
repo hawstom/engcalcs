@@ -103,8 +103,29 @@ function main(array $argv): int
             $who = $e['source'] === 'translator'
                 ? 'translator' . ($e['lang'] !== null ? " ({$e['lang']})" : '')
                 : 'wave 0';
-            $mark = $e['disposition'] === 'refer-to-human' ? 'AWAITING HUMAN' : 'OPEN';
+            // **A FINDING HE HAS ALREADY ANSWERED IS NOT AWAITING HIM, AND SAYING SO COST HIM A
+            // SECOND READING** (2026-09-09). `harvest_english_rulings.php --apply` writes his words
+            // into `human_answer` and deliberately does NOT choose a disposition, because which of
+            // english/intent/glossary/dismissed a ruling lands in is a judgement. Nothing said so:
+            // the entry kept `refer-to-human`, this report kept printing AWAITING HUMAN, the key
+            // went back onto `dev/new-english-keys.md`, and Tom answered the same three questions
+            // twice -- *"You lost my previous answers. We already figured out _syn entries for
+            // these."* His answers were on disk the whole time; the ledger did not know it.
+            //
+            // So an open entry that CARRIES an answer is a different state with a different owner,
+            // and it is named. It still blocks a sprint -- an undispositioned finding has no
+            // resolution recorded and the gate is right to hold -- but the work it is waiting on is
+            // OURS, not his, and nobody should ask him again.
+            $answered = trim((string) $e['human_answer']) !== '';
+            if ($e['disposition'] === 'refer-to-human') {
+                $mark = $answered ? 'AWAITING DISPOSITION (he has answered)' : 'AWAITING HUMAN';
+            } else {
+                $mark = 'OPEN';
+            }
             echo "  {$mark}: {$e['key']} [{$who}] — {$e['complaint']}\n";
+            if ($answered) {
+                echo "       he said: \"" . trim((string) $e['human_answer']) . "\"\n";
+            }
         }
     }
 
@@ -176,6 +197,9 @@ function readEntries(string $file, string $sprint, int &$malformed): ?array
             'complaint' => $e['complaint'],
             'disposition' => $e['disposition'],
             'resolution' => $e['resolution'] ?? '',
+            // Carried so the report can tell "he has not answered" from "he HAS answered and nobody
+            // dispositioned it" -- see the AWAITING DISPOSITION note below.
+            'human_answer' => $e['human_answer'] ?? '',
         ];
     }
 

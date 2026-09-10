@@ -21,39 +21,9 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (3 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
-
-### from sprint 2026-09-08-delta
-
-- **`lpn_fitting_entrance`**
-  > Square entrance
-  *The finding:* 'Square entrance' is ambiguous between a squared/sharp-edged pipe entrance (the hydraulic sense, contrasted with a rounded or bell-mouth entrance) and an entrance that is square in SHAPE. Chose the geometric-square reading.
-  1. a sharp-edged entrance -- the hydraulic sense, EPANET Table 3.3's meaning
-  2. an entrance whose cross-section is a square -- a statement about geometry
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* MEASURED ACROSS ALL 24 LANGUAGES THAT HAVE IT, AND THE MAJORITY READ IT WRONG. 13 of 24 rendered it as a SHAPE (ar, bg, bn, es, fa, he, hi, id, my, ps, sw, ur, zh -- 'square', 'square-shaped'); 11 rendered it as an EDGE (cs, de, fr, hr, it, pt, ro, ru, sr, tr, uk -- 'sharp-edged', 'sharp-angled', 'live arris'). Only one reading is what EPANET Table 3.3 means: a square-EDGED entrance, the one wh...
-  You lost my previous answers. We already figured out _syn entries for this.
-- **`lpn_reaction_limiting`**
-  > Limiting concentration
-  *The finding:* EPANET's own keyword is LIMITING POTENTIAL, a specific water-quality term (a concentration ceiling the reaction asymptotically approaches). Translated as 'Predelnaya kontsentratsiya' (limiting concentration) rather than a literal 'Predelnyy potentsial' because the tip describes it purely as a concentration and 'potentsial' alone reads as vague to a Russian engineer. The cost is keyword traceability: a reader cross-referencing an .inp file by keyword may not map the phrase back to LIMITING POTENTIAL.
-  1. Limiting concentration -- clear meaning, weaker keyword traceability
-  2. Limiting potential -- literal keyword match, less clear standing alone
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* TWO TRANSLATORS REACHED THE SAME PLACE INDEPENDENTLY, WHICH IS EVIDENCE ABOUT THE ENGLISH RATHER THAN ABOUT EITHER LANGUAGE. Hindi rendered it 'limiting concentration' too, on the same reasoning and without seeing the Russian finding. EPANET's manual does call the parameter a limiting CONCENTRATION in its own prose while the .inp keyword is LIMITING POTENTIAL, so the English here is EPANET's in...
-  You lost my previous answers. We already figured out _syn entries for this.
-- **`lpn_reaction_rough_corr`**
-  > Roughness correlation
-  *The finding:* 'Roughness correlation' -- 'correlation' here means a FUNCTIONAL relationship (wall reaction computed FROM roughness), not a statistical correlation. No settled Pashto term distinguishes the two senses; chose a general 'relationship' word.
-  1. a functional relationship
-  2. a statistical correlation, which would mislead
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* THIS IS AN ENGLISH AMBIGUITY, NOT ONLY A PASHTO ONE, and it is the same shape as lpn_fitting_entrance in this same sprint: an English word with a precise technical sense in one field (statistics) being used in its looser sense in another. EPANET computes a wall reaction coefficient AS A FUNCTION OF pipe roughness; nothing is correlated in the statistical sense. A reader who knows statistics is ...
-  You lost my previous answers. We already figured out _syn entries for this.
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
 ## lpn_  (6, all ruled)
 

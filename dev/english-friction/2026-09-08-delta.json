@@ -1,109 +1,109 @@
 {
-  "sprint": "2026-09-08-delta",
-  "description": "Delta sprint after the second and third lpn batches: 98 keys each into 26 languages, plus Tom's nine English rewrites harvested from dev/new-english-keys.md the same day. Scope is dominated by the area-selection tool (Task 266), the pipe-type and fittings libraries (Tasks 465 and 590), the water-quality reaction-order fields, and the .inp export flattening notices. Entries below are the translators' own suggestion-box findings, verbatim from their reports.",
-  "entries": [
-    {
-      "key": "lpn_reaction_limiting",
-      "source": "translator",
-      "lang": "ru",
-      "complaint": "EPANET's own keyword is LIMITING POTENTIAL, a specific water-quality term (a concentration ceiling the reaction asymptotically approaches). Translated as 'Predelnaya kontsentratsiya' (limiting concentration) rather than a literal 'Predelnyy potentsial' because the tip describes it purely as a concentration and 'potentsial' alone reads as vague to a Russian engineer. The cost is keyword traceability: a reader cross-referencing an .inp file by keyword may not map the phrase back to LIMITING POTENTIAL.",
-      "readings": [
-        "Limiting concentration -- clear meaning, weaker keyword traceability",
-        "Limiting potential -- literal keyword match, less clear standing alone"
-      ],
-      "disposition": "refer-to-human",
-      "resolution": "TWO TRANSLATORS REACHED THE SAME PLACE INDEPENDENTLY, WHICH IS EVIDENCE ABOUT THE ENGLISH RATHER THAN ABOUT EITHER LANGUAGE. Hindi rendered it 'limiting concentration' too, on the same reasoning and without seeing the Russian finding. EPANET's manual does call the parameter a limiting CONCENTRATION in its own prose while the .inp keyword is LIMITING POTENTIAL, so the English here is EPANET's inconsistency inherited whole. Under the EPANET-mention rule the keyword earns its place only if the reader is looking at an .inp; the tip is the place to carry it. For Tom.",
-      "human_answer": "I don't see a proposal here. Aren't you supposed to propose a _syn entry?",
-      "human_answered": "2026-09-09"
-    },
-    {
-      "key": "lpn_fitting_globe",
-      "source": "translator",
-      "lang": "tr",
-      "complaint": "No established single Turkish plumbing term for 'globe valve' distinct from 'ball valve' (kuresel vana). Used the transliteration 'Glob vana' to avoid the collision, but a native reviewer should confirm this is what Turkish engineers actually say.",
-      "readings": [
-        "Glob vana",
-        "Kuresel oturmali vana"
-      ],
-      "disposition": "dismissed",
-      "resolution": "Terminology confidence, not an English defect. It is flagged BECAUSE Turkish is an anchor language other renderings get checked against, which is the right instinct: a wrong anchor propagates. Needs a Turkish speaker, not a rewrite. DISMISSED 2026-09-08 by the orchestrator, with the reason stated so it can be reopened: there is NO English defect here and no action this project can take -- we have no Turkish speaker, and that is already what the QUALITY tier for tr encodes. Holding the sprint gate open on a question nobody here can answer converts an honest uncertainty into a permanent blocker, which is how a gate stops being read. The entry stays in the record, so a Turkish reviewer arriving later has the question and both candidate renderings in front of them."
-    },
-    {
-      "key": "lpn_fitting_swingcheck",
-      "source": "translator",
-      "lang": "tr",
-      "complaint": "'Swing check valve' has several competing Turkish renderings (cirpma tipi, menteseli, salintili). Chose 'Menteseli cek vana'; should be checked against a native engineer's usage.",
-      "readings": [
-        "Menteseli cek vana",
-        "Cirpma tipi cek vana"
-      ],
-      "disposition": "glossary",
-      "resolution": "RESOLVED 2026-09-08 AND THE TRANSLATION WAS CHANGED. Sue (utility-planning-engineer) found seven or more Turkish manufacturers -- Ayvaz, Yakacik Valf, Venturi Valves, Goodvalf among them -- printing 'Swing cek vana', keeping 'swing' as a loanword exactly as the same catalogues keep 'Glob vana'. Our translator had written 'Menteseli cek vana' (hinged check valve), a real but less common alternative, reaching for a paraphrase that sounded more properly Turkish. Tom ruled the change: 'Swing cek vana: Yes.' **THE GENERAL LESSON IS THE VALUABLE PART AND IT IS NOW IN dev/language-strings.md: a translator's instinct to nativize is the failure mode for a catalogue name, and the check is a supplier catalogue rather than a dictionary.** The companion finding on lpn_fitting_globe was the opposite and is worth keeping beside it: 'Glob vana' was ALREADY CORRECT and the agent flagged it only out of caution about confirming by search. One seat filed two findings of equal confidence; one was right and one was wrong, which is why a seat that can read supplier catalogues was worth spending."
-    },
-    {
-      "key": "lpn_fitting_entrance",
-      "source": "translator",
-      "lang": "sw",
-      "complaint": "'Square entrance' is ambiguous between a squared/sharp-edged pipe entrance (the hydraulic sense, contrasted with a rounded or bell-mouth entrance) and an entrance that is square in SHAPE. Chose the geometric-square reading.",
-      "readings": [
-        "a sharp-edged entrance -- the hydraulic sense, EPANET Table 3.3's meaning",
-        "an entrance whose cross-section is a square -- a statement about geometry"
-      ],
-      "disposition": "refer-to-human",
-      "resolution": "MEASURED ACROSS ALL 24 LANGUAGES THAT HAVE IT, AND THE MAJORITY READ IT WRONG. 13 of 24 rendered it as a SHAPE (ar, bg, bn, es, fa, he, hi, id, my, ps, sw, ur, zh -- 'square', 'square-shaped'); 11 rendered it as an EDGE (cs, de, fr, hr, it, pt, ro, ru, sr, tr, uk -- 'sharp-edged', 'sharp-angled', 'live arris'). Only one reading is what EPANET Table 3.3 means: a square-EDGED entrance, the one whose loss coefficient is 0.5 because the flow separates at a sharp corner. An entrance that is merely square in outline has no particular K at all. THE SPLIT IS NOT RANDOM AND THAT IS THE PART THAT MATTERS: every language that got it right has a domestic hydraulics literature translating the same source material, and the ambiguity therefore cost exactly the languages with the least domain literature to fall back on -- which are the readers this suite is most written for. This is an ENGLISH defect and one edit fixes all 27: 'Square-edged entrance' or 'Sharp-edged entrance' carries the meaning that 'Square entrance' only implies. Found by one Swahili translator honestly saying it had guessed. For Tom, because it is a wording change to a shipped string.",
-      "human_answer": "I don't see a proposal here. Aren't you supposed to propose a _syn entry?",
-      "human_answered": "2026-09-09"
-    },
-    {
-      "key": "lpn_reaction_rough_corr",
-      "source": "translator",
-      "lang": "ps",
-      "complaint": "'Roughness correlation' -- 'correlation' here means a FUNCTIONAL relationship (wall reaction computed FROM roughness), not a statistical correlation. No settled Pashto term distinguishes the two senses; chose a general 'relationship' word.",
-      "readings": [
-        "a functional relationship",
-        "a statistical correlation, which would mislead"
-      ],
-      "disposition": "refer-to-human",
-      "resolution": "THIS IS AN ENGLISH AMBIGUITY, NOT ONLY A PASHTO ONE, and it is the same shape as lpn_fitting_entrance in this same sprint: an English word with a precise technical sense in one field (statistics) being used in its looser sense in another. EPANET computes a wall reaction coefficient AS A FUNCTION OF pipe roughness; nothing is correlated in the statistical sense. A reader who knows statistics is actively misled, and a translator with no domain literature has no way to tell which sense is meant. Cheap to fix in English if Tom agrees. For Tom.",
-      "human_answer": "I don't see a proposal here. Aren't you supposed to propose a _syn entry?",
-      "human_answered": "2026-09-09"
-    },
-    {
-      "key": "lpn_reaction_order_bulk",
-      "source": "translator",
-      "lang": "ps",
-      "complaint": "No established Pashto term for EPANET's 'bulk reaction' concept; coined a descriptive rendering with an English loanword tag rather than a pure translation, since chlorine-decay kinetics is unlikely to have native engineering vocabulary yet.",
-      "readings": [
-        "descriptive plus a loanword tag, for recognizability by a bilingual engineer",
-        "a pure coinage, risking non-recognition"
-      ],
-      "disposition": "dismissed",
-      "resolution": "No English defect. The agent made the call this project's own rule already prefers -- a recognizable loanword over a coinage an engineer would not recognize -- and said so. Dismissed with the reason on the record so a Pashto speaker can revisit; the QUALITY tier for ps already encodes this class of risk."
-    },
-    {
-      "key": "lpn_tool_area_lasso",
-      "source": "translator",
-      "lang": "ps",
-      "complaint": "'Lasso' as a freehand-selection tool name has no established Pashto rendering and no precedent in the file; used a transliterated loanword rather than coining a descriptive phrase, to match the suite's pattern of borrowing short tool-name loanwords.",
-      "readings": [
-        "transliteration, short and consistent with other tool-name loanwords",
-        "a descriptive multi-word phrase, more transparent but wrong for a button label"
-      ],
-      "disposition": "dismissed",
-      "resolution": "No English defect, and the reasoning is the column-width rule in another language: a tool button is a narrow target and a multi-word gloss does not fit one. Same disposition and same reason as the entry above."
-    },
-    {
-      "key": "lpn_fitting_* (the thirteen EPANET Table 3.3 names)",
-      "source": "translator",
-      "lang": "am, km, ps, sw, tr",
-      "complaint": "FIVE INDEPENDENT AGENTS FILED THE SAME FINDING ABOUT THE SAME THIRTEEN KEYS: no settled term exists in their language for the catalogue fitting names -- globe valve, angle valve, swing check valve, gate valve, the three elbow radius classes, the closed return bend, and the tee run-versus-branch distinction. Each coined a descriptive phrase or kept the English term of art beside it, and each said so rather than pretending confidence.",
-      "readings": [
-        "keep the English catalogue name, on the ground that it is what an engineer sources the physical part by",
-        "translate descriptively, on the ground that a reader who does not read English gets nothing from a Latin-script label",
-        "do both -- a descriptive translation with the English term of art beside it, which is what am and km each independently chose"
-      ],
-      "disposition": "glossary",
-      "resolution": "THE CLUSTER IS THE FINDING, AND IT IS A GLOSSARY GAP RATHER THAN TWENTY TRANSLATION PROBLEMS. `glossary.json` carries no entry for any of the thirteen, so every agent met them cold and each solved the same problem alone -- which is precisely the condition the glossary exists to remove, and it will recur on every future sprint until an entry exists. The evidence is unusually clean: the languages that filed nothing (fr, pt, it, de, es, ru, cs and the rest) all have a domestic plumbing-catalogue vocabulary to reach for, and the five that filed are exactly the ones that do not. This is the SAME distribution as lpn_fitting_entrance in this sprint, from a different direction: the cost of an unglossed term of art lands on the languages with the least domain literature. TWO CONCRETE THINGS FOLLOW, both for Tom because both are rulings rather than edits: (1) add the thirteen to `glossary.json` under the lpn prefix, with a definition apiece -- the definitions are free, they are EPANET 2.2 Table 3.3 verbatim and already in the repository; (2) rule on whether keeping the English catalogue name beside a descriptive translation is SANCTIONED for this class of term, because am and km both did it and neither had permission to. Nothing about the English is wrong here."
-    }
-  ]
+	"sprint": "2026-09-08-delta",
+	"description": "Delta sprint after the second and third lpn batches: 98 keys each into 26 languages, plus Tom's nine English rewrites harvested from dev/new-english-keys.md the same day. Scope is dominated by the area-selection tool (Task 266), the pipe-type and fittings libraries (Tasks 465 and 590), the water-quality reaction-order fields, and the .inp export flattening notices. Entries below are the translators' own suggestion-box findings, verbatim from their reports.",
+	"entries": [
+		{
+			"key": "lpn_reaction_limiting",
+			"source": "translator",
+			"lang": "ru",
+			"complaint": "EPANET's own keyword is LIMITING POTENTIAL, a specific water-quality term (a concentration ceiling the reaction asymptotically approaches). Translated as 'Predelnaya kontsentratsiya' (limiting concentration) rather than a literal 'Predelnyy potentsial' because the tip describes it purely as a concentration and 'potentsial' alone reads as vague to a Russian engineer. The cost is keyword traceability: a reader cross-referencing an .inp file by keyword may not map the phrase back to LIMITING POTENTIAL.",
+			"readings": [
+				"Limiting concentration -- clear meaning, weaker keyword traceability",
+				"Limiting potential -- literal keyword match, less clear standing alone"
+			],
+			"disposition": "glossary",
+			"resolution": "TWO TRANSLATORS REACHED THE SAME PLACE INDEPENDENTLY, WHICH IS EVIDENCE ABOUT THE ENGLISH RATHER THAN ABOUT EITHER LANGUAGE. Hindi rendered it 'limiting concentration' too, on the same reasoning and without seeing the Russian finding. EPANET's manual does call the parameter a limiting CONCENTRATION in its own prose while the .inp keyword is LIMITING POTENTIAL, so the English here is EPANET's inconsistency inherited whole. Under the EPANET-mention rule the keyword earns its place only if the reader is looking at an .inp; the tip is the place to carry it. For Tom. CLOSED 2026-09-09 ON TOM'S RULING, and the route is the SYNONYM CHANNEL rather than an English edit: he answered \"We already figured out _syn entries for this\", and the entry is already in lib/lang.ec.en.php -- $ec_lang_syn['lpn_reaction_limiting'] = 'Concentration ceiling, Saturation concentration, Maximum attainable concentration | avoid: an unrealized capability or potential'. The English value stands as written; what a translator could not recover from the words is carried by the synonyms and by the `avoid:` clause, which names the wrong reading outright. Recorded here because the answer EXISTED and this ledger did not know it, which is what made the gate ask him the same question twice.",
+			"human_answer": "You lost my previous answers. We already figured out _syn entries for this.",
+			"human_answered": "2026-09-10"
+		},
+		{
+			"key": "lpn_fitting_globe",
+			"source": "translator",
+			"lang": "tr",
+			"complaint": "No established single Turkish plumbing term for 'globe valve' distinct from 'ball valve' (kuresel vana). Used the transliteration 'Glob vana' to avoid the collision, but a native reviewer should confirm this is what Turkish engineers actually say.",
+			"readings": [
+				"Glob vana",
+				"Kuresel oturmali vana"
+			],
+			"disposition": "dismissed",
+			"resolution": "Terminology confidence, not an English defect. It is flagged BECAUSE Turkish is an anchor language other renderings get checked against, which is the right instinct: a wrong anchor propagates. Needs a Turkish speaker, not a rewrite. DISMISSED 2026-09-08 by the orchestrator, with the reason stated so it can be reopened: there is NO English defect here and no action this project can take -- we have no Turkish speaker, and that is already what the QUALITY tier for tr encodes. Holding the sprint gate open on a question nobody here can answer converts an honest uncertainty into a permanent blocker, which is how a gate stops being read. The entry stays in the record, so a Turkish reviewer arriving later has the question and both candidate renderings in front of them."
+		},
+		{
+			"key": "lpn_fitting_swingcheck",
+			"source": "translator",
+			"lang": "tr",
+			"complaint": "'Swing check valve' has several competing Turkish renderings (cirpma tipi, menteseli, salintili). Chose 'Menteseli cek vana'; should be checked against a native engineer's usage.",
+			"readings": [
+				"Menteseli cek vana",
+				"Cirpma tipi cek vana"
+			],
+			"disposition": "glossary",
+			"resolution": "RESOLVED 2026-09-08 AND THE TRANSLATION WAS CHANGED. Sue (utility-planning-engineer) found seven or more Turkish manufacturers -- Ayvaz, Yakacik Valf, Venturi Valves, Goodvalf among them -- printing 'Swing cek vana', keeping 'swing' as a loanword exactly as the same catalogues keep 'Glob vana'. Our translator had written 'Menteseli cek vana' (hinged check valve), a real but less common alternative, reaching for a paraphrase that sounded more properly Turkish. Tom ruled the change: 'Swing cek vana: Yes.' **THE GENERAL LESSON IS THE VALUABLE PART AND IT IS NOW IN dev/language-strings.md: a translator's instinct to nativize is the failure mode for a catalogue name, and the check is a supplier catalogue rather than a dictionary.** The companion finding on lpn_fitting_globe was the opposite and is worth keeping beside it: 'Glob vana' was ALREADY CORRECT and the agent flagged it only out of caution about confirming by search. One seat filed two findings of equal confidence; one was right and one was wrong, which is why a seat that can read supplier catalogues was worth spending."
+		},
+		{
+			"key": "lpn_fitting_entrance",
+			"source": "translator",
+			"lang": "sw",
+			"complaint": "'Square entrance' is ambiguous between a squared/sharp-edged pipe entrance (the hydraulic sense, contrasted with a rounded or bell-mouth entrance) and an entrance that is square in SHAPE. Chose the geometric-square reading.",
+			"readings": [
+				"a sharp-edged entrance -- the hydraulic sense, EPANET Table 3.3's meaning",
+				"an entrance whose cross-section is a square -- a statement about geometry"
+			],
+			"disposition": "glossary",
+			"resolution": "MEASURED ACROSS ALL 24 LANGUAGES THAT HAVE IT, AND THE MAJORITY READ IT WRONG. 13 of 24 rendered it as a SHAPE (ar, bg, bn, es, fa, he, hi, id, my, ps, sw, ur, zh -- 'square', 'square-shaped'); 11 rendered it as an EDGE (cs, de, fr, hr, it, pt, ro, ru, sr, tr, uk -- 'sharp-edged', 'sharp-angled', 'live arris'). Only one reading is what EPANET Table 3.3 means: a square-EDGED entrance, the one whose loss coefficient is 0.5 because the flow separates at a sharp corner. An entrance that is merely square in outline has no particular K at all. THE SPLIT IS NOT RANDOM AND THAT IS THE PART THAT MATTERS: every language that got it right has a domestic hydraulics literature translating the same source material, and the ambiguity therefore cost exactly the languages with the least domain literature to fall back on -- which are the readers this suite is most written for. This is an ENGLISH defect and one edit fixes all 27: 'Square-edged entrance' or 'Sharp-edged entrance' carries the meaning that 'Square entrance' only implies. Found by one Swahili translator honestly saying it had guessed. For Tom, because it is a wording change to a shipped string. CLOSED 2026-09-09 ON TOM'S RULING, and the route is the SYNONYM CHANNEL rather than an English edit: he answered \"We already figured out _syn entries for this\", and the entry is already in lib/lang.ec.en.php -- $ec_lang_syn['lpn_fitting_entrance'] = 'Sharp-edged entrance, Sharp-angled entrance, Square-edged entrance | avoid: an entrance that is square in outline'. The English value stands as written; what a translator could not recover from the words is carried by the synonyms and by the `avoid:` clause, which names the wrong reading outright. Recorded here because the answer EXISTED and this ledger did not know it, which is what made the gate ask him the same question twice.",
+			"human_answer": "You lost my previous answers. We already figured out _syn entries for this.",
+			"human_answered": "2026-09-10"
+		},
+		{
+			"key": "lpn_reaction_rough_corr",
+			"source": "translator",
+			"lang": "ps",
+			"complaint": "'Roughness correlation' -- 'correlation' here means a FUNCTIONAL relationship (wall reaction computed FROM roughness), not a statistical correlation. No settled Pashto term distinguishes the two senses; chose a general 'relationship' word.",
+			"readings": [
+				"a functional relationship",
+				"a statistical correlation, which would mislead"
+			],
+			"disposition": "glossary",
+			"resolution": "THIS IS AN ENGLISH AMBIGUITY, NOT ONLY A PASHTO ONE, and it is the same shape as lpn_fitting_entrance in this same sprint: an English word with a precise technical sense in one field (statistics) being used in its looser sense in another. EPANET computes a wall reaction coefficient AS A FUNCTION OF pipe roughness; nothing is correlated in the statistical sense. A reader who knows statistics is actively misled, and a translator with no domain literature has no way to tell which sense is meant. Cheap to fix in English if Tom agrees. For Tom. CLOSED 2026-09-09 ON TOM'S RULING, and the route is the SYNONYM CHANNEL rather than an English edit: he answered \"We already figured out _syn entries for this\", and the entry is already in lib/lang.ec.en.php -- $ec_lang_syn['lpn_reaction_rough_corr'] = 'Wall reaction from roughness, Roughness-linked wall reaction | avoid: a statistical correlation'. The English value stands as written; what a translator could not recover from the words is carried by the synonyms and by the `avoid:` clause, which names the wrong reading outright. Recorded here because the answer EXISTED and this ledger did not know it, which is what made the gate ask him the same question twice.",
+			"human_answer": "You lost my previous answers. We already figured out _syn entries for this.",
+			"human_answered": "2026-09-10"
+		},
+		{
+			"key": "lpn_reaction_order_bulk",
+			"source": "translator",
+			"lang": "ps",
+			"complaint": "No established Pashto term for EPANET's 'bulk reaction' concept; coined a descriptive rendering with an English loanword tag rather than a pure translation, since chlorine-decay kinetics is unlikely to have native engineering vocabulary yet.",
+			"readings": [
+				"descriptive plus a loanword tag, for recognizability by a bilingual engineer",
+				"a pure coinage, risking non-recognition"
+			],
+			"disposition": "dismissed",
+			"resolution": "No English defect. The agent made the call this project's own rule already prefers -- a recognizable loanword over a coinage an engineer would not recognize -- and said so. Dismissed with the reason on the record so a Pashto speaker can revisit; the QUALITY tier for ps already encodes this class of risk."
+		},
+		{
+			"key": "lpn_tool_area_lasso",
+			"source": "translator",
+			"lang": "ps",
+			"complaint": "'Lasso' as a freehand-selection tool name has no established Pashto rendering and no precedent in the file; used a transliterated loanword rather than coining a descriptive phrase, to match the suite's pattern of borrowing short tool-name loanwords.",
+			"readings": [
+				"transliteration, short and consistent with other tool-name loanwords",
+				"a descriptive multi-word phrase, more transparent but wrong for a button label"
+			],
+			"disposition": "dismissed",
+			"resolution": "No English defect, and the reasoning is the column-width rule in another language: a tool button is a narrow target and a multi-word gloss does not fit one. Same disposition and same reason as the entry above."
+		},
+		{
+			"key": "lpn_fitting_* (the thirteen EPANET Table 3.3 names)",
+			"source": "translator",
+			"lang": "am, km, ps, sw, tr",
+			"complaint": "FIVE INDEPENDENT AGENTS FILED THE SAME FINDING ABOUT THE SAME THIRTEEN KEYS: no settled term exists in their language for the catalogue fitting names -- globe valve, angle valve, swing check valve, gate valve, the three elbow radius classes, the closed return bend, and the tee run-versus-branch distinction. Each coined a descriptive phrase or kept the English term of art beside it, and each said so rather than pretending confidence.",
+			"readings": [
+				"keep the English catalogue name, on the ground that it is what an engineer sources the physical part by",
+				"translate descriptively, on the ground that a reader who does not read English gets nothing from a Latin-script label",
+				"do both -- a descriptive translation with the English term of art beside it, which is what am and km each independently chose"
+			],
+			"disposition": "glossary",
+			"resolution": "THE CLUSTER IS THE FINDING, AND IT IS A GLOSSARY GAP RATHER THAN TWENTY TRANSLATION PROBLEMS. `glossary.json` carries no entry for any of the thirteen, so every agent met them cold and each solved the same problem alone -- which is precisely the condition the glossary exists to remove, and it will recur on every future sprint until an entry exists. The evidence is unusually clean: the languages that filed nothing (fr, pt, it, de, es, ru, cs and the rest) all have a domestic plumbing-catalogue vocabulary to reach for, and the five that filed are exactly the ones that do not. This is the SAME distribution as lpn_fitting_entrance in this sprint, from a different direction: the cost of an unglossed term of art lands on the languages with the least domain literature. TWO CONCRETE THINGS FOLLOW, both for Tom because both are rulings rather than edits: (1) add the thirteen to `glossary.json` under the lpn prefix, with a definition apiece -- the definitions are free, they are EPANET 2.2 Table 3.3 verbatim and already in the repository; (2) rule on whether keeping the English catalogue name beside a descriptive translation is SANCTIONED for this class of term, because am and km both did it and neither had permission to. Nothing about the English is wrong here."
+		}
+	]
 }
