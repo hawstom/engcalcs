@@ -144,6 +144,13 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     which is the control proving it was firing. `elementFromPoint` returns the same element and the
     computed cursor stays `grab` at the pixel and the instant the arrow is painted. **Chrome is
     drawing a cursor that disagrees with its own computed style.**
+  - **AND IT REPRODUCES ON epanetjs.com's MAP, which settles it** (Tom, 2026-09-10: *"It does the
+    same thing at the epanetjs.com map. They don't have a default cursor on their map, but it
+    changes to one anyway."*). A different site, a different codebase, a different rendering stack,
+    and the same behaviour on the same browser at the same display scale. **No shared cause is
+    possible except Chrome.** That one observation is worth more than every sweep below it, and it
+    cost him a single visit to another page. Reach for it earlier next time: when a defect will not
+    reproduce in the harness, ask whether somebody else's page shows it too.
   - Also searched and clean: 1.4 M samples at 1 px across XY Basic, XY Net3 and geographic Net3 at
     four zooms in Chromium AND Firefox; 1.6 M more at 0.25 px; radial walks at 0.2 px out to 700 px.
     Every hit shape measured constant in screen pixels across zooms, so nothing of ours is stale or
