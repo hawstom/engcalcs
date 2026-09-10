@@ -152,6 +152,55 @@ is plainly in the pixels.
 | `ic-mono-weight` | MENU OK | +1 / 0 / +3 / +4 | Wall weight alone, and it buys nothing at the size that decides: 1.4 and 2.9 units are one pixel apart at 17 px. Its thin left wall also costs descender contrast (feet 30 against 50). |
 | `ic-mono-broken` | RECORD ONLY | +1 / +2 / +2 / +2 | Highest at 17 px and still turned down: from 24 up the dashes read as a BREAK in the tank wall. Kept because somebody will propose it again. |
 
+## Water tower, round 3d, 2026-09-10 — SHIPPED, radial roof and hemisphere bowl
+
+Tom chose `ic-tall3-steel-overcast` as the favicon, asked for the cleaned-up shading and the mono
+menu glyph to be finished, and then corrected round 3c three times in a row, mid-task, because the
+lost sketch could still be described even though it could not be found. **The record for it is now
+three short messages, quoted verbatim, since nothing else will ever corroborate them** (he confirmed
+the original is gone for good: *"I don't have my sketch any more"*):
+
+1. *"just some radial lighting on the roof and some darkening of the belly."*
+2. *"Well, it's a cylindrical tank. So obviously the roof is a cone."*
+3. *"And of course the belly is a hemisphere."*
+
+Round 3c had put a LINEAR left-right ramp on the roof (the wall's own axis, borrowed) and a flat
+left-right tone on the bowl. Both were the wrong solid: a cone's highlight is a spot falling off
+outward from a point near the apex, and a hemisphere lit from above is brightest at its springline
+and darkens downward with a CURVED terminator. Neither takes a band, neither takes one flat tone.
+**One correction, worth noting for its own sake: round 2's prose calls WT-TALL-3's roof "a straight
+gable" throughout, and that word came from reading the SILHOUETTE, which cannot tell a cone from a
+gable — in elevation they are the same triangle. He has now said cone. The correction is about the
+OBJECT; round 2's own history is left as it was written, since it is an accurate account of what the
+outline showed at the time.**
+
+**What shipped, in `dev/agents/interface-designer/` output (not deployed by this agent):**
+`dev/icon-preview/ship-favicon.svg` and `dev/icon-preview/ship-water-menu.svg`. Both `radialGradient`s
+on the favicon use `gradientUnits="userSpaceOnUse"` rather than the default box-relative unit — the
+roof's own bounding box is 8.1 units wide by 1.5 tall, and a box-relative gradient would squash into
+an ellipse with no physical reading. **Radial cost nothing measurable over linear at any size that
+ships** (roof v wall ΔL 26.1 v 26.4 at 192px, 41.7 v 42.2 at 512px — noise; below 192 neither
+treatment has a clear roof-fill pixel on this aspect, the cone being 1.5 units under a 2-unit
+outline), so it is a strict improvement rather than a trade. **The hemisphere bowl beat the flat one
+on every axis measured, including the one round 3c's `-lift-` hack existed to protect**: catwalk ΔL
+rose from 30.5 to 33.4 at 16px and stayed 4-6 points ahead at every size, because a springline-centered
+radial keeps the area under the catwalk lighter than a flat fill without a second gradient stacked on
+top. Round 3c reached for `-lift-` not knowing the belly was a hemisphere; the physically correct
+shape protects the same metric on its own, and better. Full numbers, what was rejected along the way,
+and the dark-ground/dark-chrome check: `dev/icon-preview/ship-notes.md`.
+
+The mono menu glyph adds ink under the bowl line to the round-3 PICK (`ic-mono-hatch-lr`'s wall
+hatch, unchanged) and leaves the roof bare, per the three-surface reading collapsed to one ink: the
+lightest surface gets none, the darkest gets the most. Clouds were drawn and tested at all four menu
+sizes and rejected — they read as a formless smudge at 16 and 17px, the sizes a menu row actually
+draws, for want of headroom (2.2 units between the frame top and the roof's apex). **The L question
+is now answered with a number rather than an opinion**: WT-TALL-3's crown is 1.5 units tall against
+WT-WIDE's dome at 3.65, and an L rendered into it fuses completely into the outline at both 17px and
+32px — a rendering problem, not a resolution one. Drawn into the body instead, it is legible at 32px
+and an ink blob at 17px, the tank's clear interior being 4.2 pixels there. **The letter cannot come
+along onto this geometry at menu size**, and which of the three ways around that (no letter, a
+WIDE-geometry menu icon beside a TALL favicon, or accepting the letter from 32px up) is Tom's call.
+
 ## Water tower candidates, round 2 (2026-09-08b) — the geometry round
 
 `node gen-concepts-b.js` writes every candidate `.svg` (24-unit viewBox, single `currentColor`

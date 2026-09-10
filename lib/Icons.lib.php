@@ -450,110 +450,117 @@ $ec_icons = array(
 	// A rolled set of plan sheets was the right drawing for a menu meaning "the document" and says
 	// nothing about water, so the glyph followed the name.
 	//
-	// **A DROP, WHICH WAS REJECTED ONCE AND IS NOT SNEAKING PAST THAT RULING.** The rejection below
-	// is real and stands — for an icon that had to mean PROJECT. A menu called Water is a different
-	// question, and Tom chose the drop from six candidates drawn at true menu size (a water tower, a
-	// fire hydrant, and four drops).
-	//
-	// Written as CUBICS, never an `A` arc. That is not a style preference —
-	// `dev/scripts/icon_ascii_preview.php` models M/L/H/V/C/Z only, so an arc silently renders as
-	// nonsense there and the one tool that measures at 17 px goes blind. Verify with
-	// `php dev/scripts/icon_ascii_preview.php water --size=17`.
-	// **A TOWER, NOT A DROP** (Tom, 2026-08-25). The drop that shipped the day before lost against
-	// the View menu's eye: *"the water drop and the eye don't look different enough, especially with
-	// the association of tears and eyes."* Two almond-ish outlines one menu apart is a real
-	// collision, and the fix is a different SILHOUETTE rather than a better drop. He referenced
-	// commercial line icons for the SHAPE only; this is an original drawing, as everything here is.
-	//
-	// **THE DRAWING IS `wt-wide-L`, CHOSEN OFF A PROOF SHEET** (Tom, 2026-09-09: *"I want to
-	// immediately implement wt-wide-L as the favicon for LibreWaterNet.org and NotEPANET.org and as
-	// the Water menu icon for lpn."*). The sheet is `dev/icon-preview/concepts-2026-09-08b.html`,
-	// which drew 22 candidates at 16, 24, 32 and 64 px on light and on dark; the glyph's own copy
-	// is `dev/icon-preview/wt-wide-L.svg`, and it is the same six paths that stand below.
-	//
-	// It replaces an ELLIPTICAL BULB on splayed legs, which was Tom's own earlier sketch and lost
-	// nothing on its merits -- the vessel simply became a wide cylinder with a domed crown and a
-	// dished floor, whose walls run all the way to the ground and are therefore also its legs. Two
-	// consequences worth knowing before anything is redrawn: there are no legs to splay any more,
-	// so the splay measurement that used to stand here is gone with them, and the crown is the
-	// widest clear field the drawing has, which is what the **L for Libre** at (9.4, 3.9) occupies.
-	//
-	// **THE L IS THE ONE FEATURE THAT DOES NOT MEET THE GAP BUDGET BELOW, AND IT SHIPPED ANYWAY
-	// BECAUSE THAT WAS TOM'S INSTRUCTION.** Its foot at y = 8.1 clears the catwalk at y = 9.85 by
-	// 1.75 units and its stem's top at y = 3.9 clears the crown by about 1.34, both under the ~2.5
-	// units a 2-wide stroke needs at 17 px -- so at menu size the crown fills with ink, exactly as
-	// the proof sheet's own note says (*"it holds from 32 up"*). Do not quietly re-space it: the
-	// letter's position is the thing he chose, and moving it is a question for him.
-	//
-	// **THREE THINGS CARRY OVER FROM THE PEAKED VERSION AND MUST SURVIVE ANY REDRAW:**
-	//   - **NO ROOF OVERHANG** (Tom, 2026-09-04): *"it shouldn't have roof overhangs like a
-	//     house"*. A water tower's roof is the top of the tank, not a gable on a building, and the
-	//     overhang was the one detail that made the old drawing read as a house on stilts. A domed
-	//     crown springing from the wall lines cannot grow one, which is half of why it wins.
-	//   - **A RISER** (same sketch): *"Most water tanks have a pipeline coming from the middle of
-	//     the tank vertically to the ground. Some are nothing but this and a bulbous tank at the
-	//     top."* It is what makes the silhouette a water tower rather than a hut.
-	//   - **A CATWALK, WHICH IS WHAT THE STRAIGHT LINE AT y = 9.85 IS** (Tom, 2026-09-05, marking
-	//     up a render of the icon: *"This is a catwalk. so it should extend outside the ellipse
-	//     because it wraps around the outside of the tank."*). It was drawn as a WATERLINE, and
-	//     that was wrong for the same reason the riser below was: **this is an EXTERNAL
-	//     elevation**, and a water surface is a thing you can only see from inside. Read as a
-	//     catwalk it is the same one stroke doing the same job -- saying the vessel is a thing
-	//     somebody services rather than a balloon -- and it is drawn straight because a second
-	//     curve inside the first smudges into it at 17 px. It runs x = 2.2 to 21.8 against walls
-	//     at 3.1 and 20.9: **the overhang is the whole point** and a line ending on the outline
-	//     reads as a waterline again.
-	//
-	// **AND THE RISER STOPS AT THE VESSEL, BECAUSE THE VIEW IS EXTERNAL** (same markup: *"This is
-	// an external view. So the pipe should not extend into the tank."*). It starts at y = 14.8,
-	// which IS the floor's lowest point -- but the set's shared `stroke-linecap="round"` would put
-	// a 1.6-unit dome on top of it, and against an unfilled vessel that dome is a stub of pipe
-	// standing inside the tank. It carries `stroke-linecap="butt"` now, and for the same reason its
-	// bottom runs a unit past the walls' round caps rather than stopping level with them.
-	//
-	// **THE RISER IS A PIPE AND IS DRAWN AS ONE** (Tom, 2026-09-04, after looking at the first
-	// elliptical draft: *"Try making the vertical visibly thicker/wider than the legs, and the legs
-	// splayed just a little less."*). It carries `stroke-width="3.2"` against the set's own 2, which
-	// is one of only two places in this file where a path overrides the wrapper's weight -- the
-	// hydrant's 1.6 ground line is the other. A riser the same weight as a leg reads as a third leg,
-	// which is precisely the shape the gap budget below is policing.
-	//
-	// **THE GAP BUDGET, RE-MEASURED ON THIS DRAWING.** The clear-gap rule stated below -- that a gap
-	// under about 2.5 units closes at 17 px -- is what every feature here is measured against. The
-	// vessel passes with room: the riser at x = 12 is 8.9 units from either wall, and the catwalk at
-	// y = 9.85 sits 4.95 units above the floor's lowest point at y = 14.8. The two failures are both
-	// the L's, and they are named above. Nothing else on this icon may get thicker without re-running
-	// these numbers.
-	//
-	// The crown is a half-ellipse about (12, 6.05) with rx 8.9 and ry 3.65 and the floor a
-	// half-ellipse about (12, 9.85) with the same rx and ry 4.95, both written as CUBICS and never
-	// an `A` arc for the reason given above.
-	// **THE FAUCET LOST A DRAWING ATTEMPT, NOT AN ARGUMENT** (corrected 2026-08-25). What stood
-	// here read as a settled measurement: that a faucet needs a handle, a spout and a falling drip,
-	// "three fine features in one glyph", and therefore smudges at 17 px. Tom, asking for the
-	// hydrant below: *"I can't believe you summarily rejected the idea of a faucet. A fire hydrant
-	// will be more intricate than a faucet."* He is right, and the hydrant settles it from the
-	// other side -- bonnet, barrel, two side nozzles, a pumper nozzle and a base flange is FIVE
-	// features to the faucet's three, and it measures clean at 17 px with every gap open.
-	//
-	// So the honest record is that ONE faucet was drawn and THAT DRAWING smudged. Feature count was
-	// never the reason and must not be quoted as one again. **What decides legibility at 17 px is
-	// CLEAR GAP, not feature count**: 17/24 of a unit is 0.71 px, and a 2-unit stroke eats one unit
-	// either side of every line, so any gap left under about 2.5 units closes. Give a feature that
-	// room and it survives; deny it and one feature is enough to fail.
+	// **A DROP, WHICH WAS REJECTED ONCE AND IS NOT SNEAKING PAST THAT RULING.** The rejection above
+	// is real and stands -- for an icon that had to mean PROJECT. A menu called Water is a different
+	// question, and Tom chose a tower from six candidates drawn at true menu size (a water tower, a
+	// fire hydrant, and four drops). **A TOWER, NOT A DROP** (Tom, 2026-08-25): the drop lost against
+	// the View menu's eye -- *"the water drop and the eye don't look different enough, especially
+	// with the association of tears and eyes."* Two almond-ish outlines one menu apart is a real
+	// collision, and the fix is a different SILHOUETTE rather than a better drop.
 	//
 	// **NO FAUCET IS WANTED, AND THAT IS SETTLED** (Tom, 2026-08-26): *"Actually, the tank is very
 	// idiomatic to this tool, so I am happy with it. We don't have faucet assets."* The reason is
 	// vocabulary, not legibility -- this suite draws reservoirs, tanks, pumps and valves, and a
-	// faucet is not one of the things it models. The gap-budget correction above stands on its own
-	// merits and is the rule every icon here is measured against; it is no longer an invitation to
-	// redraw a faucet.
-	'water'      => '<path d="M3.1 6.05C3.1 3.75 5.8 2.4 12 2.4C18.2 2.4 20.9 3.75 20.9 6.05"/>'
-		. '<path d="M3.1 6.05V21.4M20.9 6.05V21.4"/>'
-		. '<path d="M3.1 9.85C3.1 12.58 7.08 14.8 12 14.8C16.92 14.8 20.9 12.58 20.9 9.85"/>'
-		. '<path d="M2.2 9.85H21.8"/>'
-		. '<path stroke-width="3.2" stroke-linecap="butt" d="M12 14.8V22.4"/>'
-		. '<path d="M9.4 3.9V8.1H13.6"/>',
+	// faucet is not one of the things it models.
+	//
+	// Written as CUBICS, never an `A` arc. That is not a style preference --
+	// `dev/scripts/icon_ascii_preview.php` models M/L/H/V/C/Z only, so an arc silently renders as
+	// nonsense there and the one tool that measures at 17 px goes blind. Verify with
+	// `php dev/scripts/icon_ascii_preview.php water --size=17`.
+	//
+	// **THE DRAWING IS WT-TALL-3, ENGRAVED** (Tom, 2026-09-10: *"Implement an appropriate version of
+	// it with some ink to represent the shading and maybe clouds for our Water menu icon."*). It
+	// REPLACES `wt-wide-L`, which shipped here from 2026-09-09 and is kept in
+	// `dev/icon-preview/wt-wide-L.svg`. The proof sheets are `dev/icon-preview/concepts-2026-09-08b.html`
+	// (geometry) and `concepts-2026-09-09-color.html` (color); this glyph's own copy is
+	// `dev/icon-preview/ship-water-menu.svg` and the measurements are in `dev/icon-preview/ship-notes.md`.
+	//
+	// **THE L FOR LIBRE IS GONE, AND IT IS NOT AN OVERSIGHT.** WT-WIDE's dome is 3.65 units tall and
+	// held the letter; WT-TALL-3's crown is a CONE 1.5 units tall, and the body's clear interior is
+	// 6 units, which is 4.2 pixels at the 17 px (1.05em) a menu row draws at. Rendered rather than
+	// argued: in the crown the L fuses into the cone's outline with ZERO legible letter pixels at
+	// 17 px AND at 32 px -- a structural failure a bigger icon does not fix -- and in the body it is
+	// an ink blob at 17 px, legible only from 32. `dev/icon-preview/render/ship/L-test.png` is the
+	// evidence. Do not re-add it to this geometry without re-rendering that test.
+	//
+	// **THE THREE SURFACES ARE THE SHADING, AND IN ONE INK THAT MEANS INK ONLY ON THE DARK ONES**
+	// (Tom, 2026-09-10, reconstructing a lost sketch in three messages: *"just some radial lighting
+	// on the roof and some darkening of the belly"*; *"it's a cylindrical tank. So obviously the roof
+	// is a cone"*; *"And of course the belly is a hemisphere."*). One light above, three solids, three
+	// behaviours: the CYLINDER wall takes a left-right band, the CONE roof a radial highlight from
+	// the apex outward, the HEMISPHERE belly a downward darkening from the springline. `EC_ICON_OPEN_TAG`
+	// draws every icon `fill="none" stroke="currentColor"` on NO ground, so there is no fill to hold a
+	// gradient and **nothing can be made lighter than the paper** -- the only move is to ADD ink on the
+	// shadow limbs. That is engraving, and it is why the roof carries no ink at all: the lightest
+	// surface gets none and the darkest gets the most.
+	//   - **The wall hatch is one line left, two right, bare band between** (`ic-mono-hatch-lr`, the
+	//     round-3 pick of five tried at 16/17/24/32 on light and dark). Net grade +3 / +1 / +2 / +3
+	//     against a plain wall.
+	//   - **The belly is FIVE strokes packed UNDER the 2.5-unit gap floor ON PURPOSE.** They are not
+	//     meant to stay five readable lines; they are meant to FUSE into a mass, the way a hatched
+	//     shadow does in engraving, because a hemisphere's underside is uniformly the darkest surface
+	//     and a mid-tone MASS is its correct one-ink reading. This is the one place in this file where
+	//     the gap budget is broken deliberately, and this paragraph is the reason.
+	//   - **CLOUDS WERE DRAWN, MEASURED AND REJECTED** (his *"maybe clouds"*). There are 2.2 units of
+	//     headroom between the frame top and the cone's apex, and a stroke-only mark in that space
+	//     cannot separate from its own antialiasing: at 16 and 17 px two shallow cubics read as a
+	//     formless smudge in the corner. Legible at 24-32, which is not where a menu icon is judged.
+	//     `dev/icon-preview/render/ship/ship-menu-belly-clouds@17-lt.png`. Do not re-propose without
+	//     a 17 px raster.
+	//
+	// **THREE THINGS CARRIED OVER FROM EVERY EARLIER VERSION AND MUST SURVIVE ANY REDRAW:**
+	//   - **NO ROOF OVERHANG** (Tom, 2026-09-04): *"it shouldn't have roof overhangs like a house"*.
+	//     A water tower's roof is the top of the tank, not a gable on a building, and the overhang was
+	//     the one detail that made an early drawing read as a house on stilts.
+	//   - **A RISER** (same sketch): *"Most water tanks have a pipeline coming from the middle of the
+	//     tank vertically to the ground."* It is what makes the silhouette a water tower rather than
+	//     a hut.
+	//   - **A CATWALK, WHICH IS WHAT THE STRAIGHT LINE AT y = 13.55 IS** (Tom, 2026-09-05: *"This is a
+	//     catwalk. so it should extend outside the ellipse because it wraps around the outside of the
+	//     tank."*). It runs x = 7.1 to 16.9 against walls at 7.95 and 16.05: **the overhang is the
+	//     whole point** and a line ending on the outline reads as a waterline, which is a thing you can
+	//     only see from INSIDE a vessel this drawing is outside of.
+	//
+	// **EVERY DESCENDER REACHES y = 24, AND THAT IS A DEFECT TOM FOUND BY EYE THAT NO CHECK COULD**
+	// (2026-09-10, on the color sheet: *"all these descenders (leg and pipe) are truncated. They must
+	// hit the bottom. Obviously we can't have this thang flying in the air."*). Legs and risers used to
+	// stop at y 21.4 or 22.4 inside a 24-unit frame. It was the DRAWING, not the viewBox and not a clip.
+	//
+	// **THE RISER IS AT LEG WEIGHT HERE, WHICH REVERSES THE WIDE DRAWING'S RULE, AND BOTH ARE RIGHT.**
+	// `wt-wide-L` carried `stroke-width="3.2"` because its riser stood 8.9 units from either wall with
+	// nothing between, and at leg weight it read as a third leg. On WT-TALL-3 the riser sits 4.05 units
+	// from each leg and is Tom's OWN weight -- he drew this aspect that way and round 2 recorded it --
+	// and thickening it closes a gap that is already the tightest thing on the glyph. **A consequence
+	// worth knowing before anybody "fixes" it: this riser needs no `stroke-linecap="butt"`.** The wide
+	// drawing needed one because a 3.2-wide round cap domed 1.6 units up past a 2-wide floor stroke and
+	// left a 0.6-unit stub of pipe standing INSIDE the tank, which Tom struck (*"This is an external
+	// view. So the pipe should not extend into the tank."*). Here riser and bowl outline are the same
+	// 2 units, so the cap's dome reaches y = 17.15 and the bowl's own ink reaches y = 17.15: flush, and
+	// nothing protrudes. That ruling is not repealed -- it is satisfied by the weights.
+	//
+	// **THE GAP BUDGET, RE-MEASURED ON THIS DRAWING.** 17/24 of a unit is 0.71 px and a 2-unit stroke
+	// eats a unit either side, so a clear gap under about 2.5 units closes at icon size. Riser to leg
+	// is 4.05; the catwalk at y = 13.55 sits 4.6 above the bowl's low point at 18.15. The belly hatch
+	// breaks the budget on purpose and says so above. **One measured oddity, and it is the base
+	// geometry rather than anything the engraving added:** at exactly 17 px the two legs and the riser
+	// touch into ONE run on the bottom row (they are three separate runs at 16, 24 and 32). Their own
+	// contrast is unaffected -- the weakest is 50 delta-L against the paper -- so they read as solid
+	// legs sharing a pixel, not as a blur. Identical on the un-engraved row, so do not chase it here.
+	'water'      => '<path d="M7.95 3.7L12 2.2L16.05 3.7"/>'
+		. '<path d="M7.95 3.7V24M16.05 3.7V24"/>'
+		. '<path d="M7.95 14.15C7.95 16.36 9.76 18.15 12 18.15C14.24 18.15 16.05 16.36 16.05 14.15"/>'
+		. '<path d="M7.1 13.55H16.9"/>'
+		. '<path d="M12 18.15V24"/>'
+		// The cylinder hatch: one line on the lit limb, two on the shadow limb, bare band between.
+		. '<path stroke-width="0.6" stroke-linecap="butt" d="M9.5 6.2V14.6"/>'
+		. '<path stroke-width="0.75" stroke-linecap="butt" d="M13.5 5.6V15.4"/>'
+		. '<path stroke-width="0.75" stroke-linecap="butt" d="M14.6 6.4V14.6"/>'
+		// The hemisphere belly: five strokes fanning from the springline, packed to FUSE into a mass.
+		. '<path stroke-width="0.7" stroke-linecap="butt" d="M9.1 14.5V15.7"/>'
+		. '<path stroke-width="0.8" stroke-linecap="butt" d="M10.5 14.5V16.6"/>'
+		. '<path stroke-width="0.85" stroke-linecap="butt" d="M12 14.5V17.1"/>'
+		. '<path stroke-width="0.8" stroke-linecap="butt" d="M13.5 14.5V16.6"/>'
+		. '<path stroke-width="0.7" stroke-linecap="butt" d="M14.9 14.5V15.7"/>',
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
 	//

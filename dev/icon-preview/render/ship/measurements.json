@@ -1,0 +1,930 @@
+{
+	"fav": {
+		"ship-fav-linear-flat": {
+			"16": {
+				"catwalk": {
+					"delta": 30.5,
+					"bar": 69,
+					"body": 99,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						182.8,
+						125.9,
+						69.4
+					],
+					"min": 69.4,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": null,
+					"roof": null,
+					"cyl": 211,
+					"bowl": null,
+					"roofFill": 0,
+					"bowlFill": 0,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": null
+				}
+			},
+			"32": {
+				"catwalk": {
+					"delta": 121.1,
+					"bar": 41,
+					"body": 162,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						176.7,
+						189.5,
+						189.5
+					],
+					"min": 176.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 198,
+					"bowl": 130,
+					"roofFill": 0,
+					"bowlFill": 21,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 68.8
+				}
+			},
+			"48": {
+				"catwalk": {
+					"delta": 123.1,
+					"bar": 41,
+					"body": 164,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 195,
+					"bowl": 128,
+					"roofFill": 0,
+					"bowlFill": 40,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 66.5
+				}
+			},
+			"192": {
+				"catwalk": {
+					"delta": 126.1,
+					"bar": 41,
+					"body": 167,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 226,
+					"cyl": 199,
+					"bowl": 127,
+					"roofFill": 11,
+					"bowlFill": 83,
+					"roofVsCyl": 26.4,
+					"roofVsSky": 28.9,
+					"bowlVsCyl": 72.2
+				}
+			},
+			"512": {
+				"catwalk": {
+					"delta": 127.1,
+					"bar": 41,
+					"body": 168,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 242,
+					"cyl": 200,
+					"bowl": 127,
+					"roofFill": 9,
+					"bowlFill": 90,
+					"roofVsCyl": 42.2,
+					"roofVsSky": 45.5,
+					"bowlVsCyl": 72.8
+				}
+			}
+		},
+		"ship-fav-linear-hemisphere": {
+			"16": {
+				"catwalk": {
+					"delta": 33.4,
+					"bar": 72,
+					"body": 105,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						182.8,
+						125.9,
+						69.4
+					],
+					"min": 69.4,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": null,
+					"roof": null,
+					"cyl": 211,
+					"bowl": null,
+					"roofFill": 0,
+					"bowlFill": 0,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": null
+				}
+			},
+			"32": {
+				"catwalk": {
+					"delta": 123.1,
+					"bar": 41,
+					"body": 164,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						176.7,
+						189.5,
+						189.5
+					],
+					"min": 176.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 198,
+					"bowl": 136,
+					"roofFill": 0,
+					"bowlFill": 21,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 62.7
+				}
+			},
+			"48": {
+				"catwalk": {
+					"delta": 128,
+					"bar": 41,
+					"body": 169,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 195,
+					"bowl": 134,
+					"roofFill": 0,
+					"bowlFill": 40,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 60.9
+				}
+			},
+			"192": {
+				"catwalk": {
+					"delta": 131.6,
+					"bar": 41,
+					"body": 173,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 226,
+					"cyl": 199,
+					"bowl": 130,
+					"roofFill": 11,
+					"bowlFill": 83,
+					"roofVsCyl": 26.4,
+					"roofVsSky": 28.9,
+					"bowlVsCyl": 69.1
+				}
+			},
+			"512": {
+				"catwalk": {
+					"delta": 132.1,
+					"bar": 41,
+					"body": 173,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 242,
+					"cyl": 200,
+					"bowl": 129,
+					"roofFill": 9,
+					"bowlFill": 90,
+					"roofVsCyl": 42.2,
+					"roofVsSky": 45.5,
+					"bowlVsCyl": 70.5
+				}
+			}
+		},
+		"ship-fav-radial-flat": {
+			"16": {
+				"catwalk": {
+					"delta": 30.5,
+					"bar": 69,
+					"body": 99,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						182.8,
+						125.9,
+						69.4
+					],
+					"min": 69.4,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": null,
+					"roof": null,
+					"cyl": 211,
+					"bowl": null,
+					"roofFill": 0,
+					"bowlFill": 0,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": null
+				}
+			},
+			"32": {
+				"catwalk": {
+					"delta": 121.1,
+					"bar": 41,
+					"body": 162,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						176.7,
+						189.5,
+						189.5
+					],
+					"min": 176.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 198,
+					"bowl": 130,
+					"roofFill": 0,
+					"bowlFill": 21,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 68.8
+				}
+			},
+			"48": {
+				"catwalk": {
+					"delta": 123.1,
+					"bar": 41,
+					"body": 164,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 195,
+					"bowl": 128,
+					"roofFill": 0,
+					"bowlFill": 40,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 66.5
+				}
+			},
+			"192": {
+				"catwalk": {
+					"delta": 126.1,
+					"bar": 41,
+					"body": 167,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 225,
+					"cyl": 199,
+					"bowl": 127,
+					"roofFill": 11,
+					"bowlFill": 83,
+					"roofVsCyl": 26.1,
+					"roofVsSky": 28.7,
+					"bowlVsCyl": 72.2
+				}
+			},
+			"512": {
+				"catwalk": {
+					"delta": 127.1,
+					"bar": 41,
+					"body": 168,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 242,
+					"cyl": 200,
+					"bowl": 127,
+					"roofFill": 9,
+					"bowlFill": 90,
+					"roofVsCyl": 41.7,
+					"roofVsSky": 45,
+					"bowlVsCyl": 72.8
+				}
+			}
+		},
+		"ship-fav-radial-hemisphere": {
+			"16": {
+				"catwalk": {
+					"delta": 33.4,
+					"bar": 72,
+					"body": 105,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						182.8,
+						125.9,
+						69.4
+					],
+					"min": 69.4,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": null,
+					"roof": null,
+					"cyl": 211,
+					"bowl": null,
+					"roofFill": 0,
+					"bowlFill": 0,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": null
+				}
+			},
+			"32": {
+				"catwalk": {
+					"delta": 123.1,
+					"bar": 41,
+					"body": 164,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						176.7,
+						189.5,
+						189.5
+					],
+					"min": 176.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 198,
+					"bowl": 136,
+					"roofFill": 0,
+					"bowlFill": 21,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 62.7
+				}
+			},
+			"48": {
+				"catwalk": {
+					"delta": 128,
+					"bar": 41,
+					"body": 169,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 196,
+					"roof": null,
+					"cyl": 195,
+					"bowl": 134,
+					"roofFill": 0,
+					"bowlFill": 40,
+					"roofVsCyl": null,
+					"roofVsSky": null,
+					"bowlVsCyl": 60.9
+				}
+			},
+			"192": {
+				"catwalk": {
+					"delta": 131.6,
+					"bar": 41,
+					"body": 173,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 225,
+					"cyl": 199,
+					"bowl": 130,
+					"roofFill": 11,
+					"bowlFill": 83,
+					"roofVsCyl": 26.1,
+					"roofVsSky": 28.7,
+					"bowlVsCyl": 69.1
+				}
+			},
+			"512": {
+				"catwalk": {
+					"delta": 132.1,
+					"bar": 41,
+					"body": 173,
+					"ok": true
+				},
+				"feet": {
+					"at": [
+						189.7,
+						189.7,
+						189.7
+					],
+					"min": 189.7,
+					"runs": 3,
+					"ok": true
+				},
+				"tones": {
+					"sky": 197,
+					"roof": 242,
+					"cyl": 200,
+					"bowl": 129,
+					"roofFill": 9,
+					"bowlFill": 90,
+					"roofVsCyl": 41.7,
+					"roofVsSky": 45,
+					"bowlVsCyl": 70.5
+				}
+			}
+		}
+	},
+	"men": {
+		"ship-menu-wall-only": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 0
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						87
+					],
+					"min": 87,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 3
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 1
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 2
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 2,
+					"ink": "dk"
+				}
+			}
+		},
+		"ship-menu-belly": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 1
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						87
+					],
+					"min": 87,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 2
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 3
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 3
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 2,
+					"ink": "dk"
+				}
+			}
+		},
+		"ship-menu-belly-clouds": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 1
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						87
+					],
+					"min": 87,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 2
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 3
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "dk"
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt"
+				},
+				"bowl": {
+					"grade": 3
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 2,
+					"ink": "dk"
+				}
+			}
+		}
+	},
+	"controlGrade": {
+		"16": 5,
+		"17": 3,
+		"24": 2,
+		"32": 3
+	}
+}
