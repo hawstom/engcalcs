@@ -82,8 +82,22 @@ $ec_lang['template_printable_subtitle']='Printable Subtitle';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-// Edited by TGH 2026-09-07
-$ec_lang['consent_body']='May we keep one digit in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.';
+// Edited by TGH 2026-09-07; the word "cookie" approved by TGH 2026-09-09.
+// **IT SAYS "COOKIE" BECAUSE THAT IS THE WORD PEOPLE KNOW** (Tom, 2026-09-09, watching a
+// first-time reader: *"We should use the word 'cookie'. 'May we save a one-digit cookie...?' That
+// is the word people know."*). "One digit in this browser" was accurate and taught nobody what was
+// being asked; a reader who has met a hundred cookie banners knows instantly what this one is
+// about, and can then notice that this one is asking for far less than the others did.
+//
+// **AND IT IS STILL LITERALLY TRUE, which is the only reason the word is allowed here.** What is
+// stored IS a cookie, and it holds one base-32 digit per page visited -- five bits, maximum 31.
+// The arithmetic is in lib/config.inc.php beside the bits themselves. If that ever stops being one
+// digit, this sentence is the thing that has to change first.
+//
+// NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
+// moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
+// has already answered, for no change they could act on.
+$ec_lang['consent_body']='May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.';
 // Edited by TGH 2026-09-07
 $ec_lang_syn['consent_body']='May we keep (store, save, put) one digit in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.';
 $ec_lang['consent_accept']='Allow this';

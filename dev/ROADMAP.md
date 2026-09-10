@@ -1,7 +1,90 @@
 # Roadmap
 
 Open tasks for the EngCalcs hydraulic calculator suite. **Format: `Priority|ID| Description`.** One
-flat list, highest priority first, lowest ID first inside a band. `# Reference` at the foot holds the
+flat list, highest priority first, lowest ID first inside a band. `- 100|615| **[H] The water icon: keep experimenting, and record the votes.**
+  Tom, 2026-09-09: *"Let's keep experimenting including your proof sheet suggestion and working the
+  users."* The concept sheet is `dev/icon-preview/concepts-2026-09-08b.html`; `wt-wide-L` is what
+  SHIPS today, as the `lpn_` Water menu icon and as the favicon on both sibling sites.
+  - **THE VOTES SO FAR, and they do not agree, which is the finding.** MAH, lay person, 29: likes
+    old-timey. PCW, senior civil engineer, 60+, no EPANET experience: likes `wt-tall-3`. MJH, civil
+    engineering designer and power user, 27: **read `wt-wide-L` as a lavatory SINK**, thought that
+    was fine, and preferred it to `wt-tall-3` or any old-timey tower. Three people, three answers,
+    and one of them does not see a water tower at all.
+  - **The sheet's own verdict on the shipped concept is `MENU ONLY`** -- *"At 16 the L foot lands on
+    the catwalk and the stem on the crown ... It holds from 32 up."* Both places it is used are
+    under 32 (a favicon is 16, the menu bar draws at ~17 px). Rendered at both it is crowded rather
+    than a scribble. Five concepts carry the verdict `FAVICON` and any of them is a one-line swap.
+  - **NEXT: a proof sheet of `wt-tall-3` in colour**, per Tom's own direction -- galvanized-steel
+    silver fill, possibly a cylinder lighting gradient, on a sky blue ground, overcast or wispy for
+    light clouds. He predicts the catwalk loses its middle in the raster; measure that rather than
+    argue it. Render at 16/32/48/192/512 on light and dark.
+  - **This also answers the maskable question** (Tom, asked what background he wanted behind a
+    transparent stroke glyph: *"Make it look like the sky, cloudy if that helps with contrast"*).
+    `icons/icon-192.png` and `icon-512.png` are declared `purpose: "any maskable"` and need an
+    opaque ground and a safe zone or Android crops them. Nothing has been built for that yet.
+
+- 100|616| **[H] Visual feedback: a prompt history in the banner area.**
+  MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable
+  history of prompts in the banner area**, with this one as a banner prompt reading
+  *"Titles hidden. Use Settings..."*. Tom: *"Maybe we keep these perspectives in an evolving
+  roadmap task for Icon and for Visual feedback."*
+  - **THE HIGHLIGHT ITSELF IS NOT THE PROBLEM AND WAS ALREADY LENGTHENED.** It ran for 4 seconds;
+    Tom, watching PCW: *"2 minutes can go by very fast when you are shopping or learning."* It is
+    120 s now, cleared early by the first press inside the box. MJH still did not see it, which is
+    the evidence that a transient mark on a row somebody is not looking at is the wrong instrument.
+  - **What the page has today is one `setNotice()` line that is replaced by the next one.** So a
+    message that arrives while the reader is looking elsewhere is gone with no trace, and there is
+    nowhere to look it up. A history makes every notice recoverable and costs no new storage if it
+    lives in memory for the session.
+  - Open questions, none decided: whether the history is per session or per project; whether it
+    survives a reload (it should not, on the furniture-versus-project rule); and whether a prompt
+    can carry an action, which is what would make *"Use Settings..."* a link rather than a
+    sentence. Answer those before building.
+
+- 75|617| **A basemap the reader can tone down, and a menu of tile styles.**
+  Tom, 2026-09-09: *"Let's make a task to play with some additional selectors for the user including
+  some that are understated such as you suggest. FWIW, we are non-commercial."* Full costing of every
+  route, with named services and their terms: `dev/basemap-styling-options.md`.
+  - **START WITH A CSS FILTER, because it is free in every sense that matters here.**
+    `grayscale(60%) contrast(0.9)` on the tile layer is a display-time transform: nothing new is
+    fetched, nothing cached, nothing redistributed, no new host, no consent gate, no `privacy.php`
+    paragraph. Attribution is separate DOM, so the credit stays bright while the map recedes. No
+    authority was found either way on whether a filter touches the OSM tile policy, whose concerns
+    are serving, caching, bulk download and visible attribution.
+  - **Second cheapest is a Mapbox Studio raster style on the token already declared** -- same host
+    as satellite and terrain, so it is a peer of the existing satellite row rather than a fifth
+    purpose: no new gate, no new cookie, ~3 keys.
+  - **A NEW TILE HOST IS THE EXPENSIVE ONE and the non-commercial point does not settle it.** Every
+    free tier is framed non-commercial AND reserves classification, and nobody has asked any of them
+    whether a free GPL public tool qualifies. Price under this suite's own rule: a new gate cookie,
+    a version constant, a `wipeAllStorage()` hook, a `privacy.php` paragraph, the "four third-party
+    requests" count becoming five in three files at once, and ~5 English keys, so ~130 translated
+    strings. `consent_body` is NOT touched; each feature asks its own question.
+  - **MapLibre GL JS is not worth it**: ~750 KB gzipped, a WebGL dependency under
+    `vendor_integrity_check.php`, and a second canvas with its own projection state fighting the one
+    opinion about Mercator that `js/looped-network.js` owns.
+
+- 75|618| **[H] WYSIWYG hit areas: what you can click is what you can see.**
+  Tom, 2026-09-09, on the corrected map: *"On the PC with a default cursor, precision is high.
+  Ideally, everything would have a hit area that exactly matches what you see aka WYSIWYG ... Of
+  course things like text and flow arrows should have a forgiving blob-ish mask rather than being
+  stingy or pedantic about 'You didn't click me'."*
+  - **The principle and its exception are both his and they are not in tension**: a thing you can
+    SEE should be clickable everywhere it is drawn and nowhere else; a thing that is small, thin or
+    awkward to hit gets a deliberate, declared margin around it. The engineering name for that
+    margin is a hit slop or a hit halo, and this page already has two -- `LPN_NODE_HIT_PX` and
+    `LPN_LINK_HIT_PX`, both 12 screen pixels.
+  - **PIPES ARE THE HARD CASE AND HE SAID SO.** A pipe is drawn 0.7 units wide, which at most zooms
+    is 1-3 screen pixels; an exact hit area would be unclickable. So the pipe keeps a halo and the
+    task is to make it HONEST rather than to remove it.
+  - Two defects of this exact class were already found and fixed on 2026-09-09 and are the worked
+    examples: `pointer-events: visible` hit-testing a stroke perimeter whose undeclared
+    `stroke-width` defaulted to one WORLD unit (846 px of false reach on a geographic drawing), and
+    label text answering hits far outside its own box. Read those before designing anything.
+  - Not decided: whether the halo should shrink as the drawn width grows, so a fat pipe at a deep
+    zoom stops claiming ground the reader can see is empty.
+
+# Reference` at the foot holds the
 standing prose that is not a task.
 
 | Priority | Means |
