@@ -14,14 +14,16 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     the catwalk and the stem on the crown ... It holds from 32 up."* Both places it is used are
     under 32 (a favicon is 16, the menu bar draws at ~17 px). Rendered at both it is crowded rather
     than a scribble. Five concepts carry the verdict `FAVICON` and any of them is a one-line swap.
-  - **NEXT: a proof sheet of `wt-tall-3` in colour**, per Tom's own direction -- galvanized-steel
-    silver fill, possibly a cylinder lighting gradient, on a sky blue ground, overcast or wispy for
-    light clouds. He predicts the catwalk loses its middle in the raster; measure that rather than
-    argue it. Render at 16/32/48/192/512 on light and dark.
-  - **This also answers the maskable question** (Tom, asked what background he wanted behind a
-    transparent stroke glyph: *"Make it look like the sky, cloudy if that helps with contrast"*).
-    `icons/icon-192.png` and `icon-512.png` are declared `purpose: "any maskable"` and need an
-    opaque ground and a safe zone or Android crops them. Nothing has been built for that yet.
+  - **THE COLOR PROOF SHEET IS BUILT: `dev/icon-preview/concepts-2026-09-09-color.html`** (round 3,
+    `gen-concepts-color.js`, 12 candidates, 130 real PNGs at 16/32/48/192/512 on light and dark).
+    **His catwalk prediction is confirmed and is worse than a raster loss: on solid blue the middle
+    is gone at 512 too**, because the bar is the color of the body it crosses; every silver-on-sky
+    row keeps it at all five sizes. Verdicts and the measurement: `dev/icon-preview/README.md`.
+  - **NEXT: Tom picks a row.** The maskable question is answered on the same sheet (Tom, asked what
+    background he wanted behind a transparent stroke glyph: *"Make it look like the sky, cloudy if
+    that helps with contrast"*): `icons/icon-192.png` and `icon-512.png` are declared
+    `purpose: "any maskable"` and need an opaque ground and the 80% safe circle, which
+    `ic-mask-tall3fit-overcast` meets at 0.80 scale. Nothing ships until he chooses.
 
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable

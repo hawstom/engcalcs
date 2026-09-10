@@ -3,7 +3,48 @@
 Scratch drawings for icons under consideration. Nothing here ships; a winner is copied into
 `lib/Icons.lib.php`, which is the one geometry table (the menu and the map both read it).
 
-## Water tower candidates, round 2 (2026-09-08b) — CURRENT
+## Water tower IN COLOR, round 3 (2026-09-09) -- CURRENT
+
+`node gen-concepts-color.js` writes 12 color candidates (`ic-*.svg`), 130 REAL PNGs under
+`render/color/` at 16 / 32 / 48 / 192 / 512 on a white and on a dark page ground, and
+`concepts-2026-09-09-color.html`, which shows every raster at 1:1 beside its verdict. The three
+contact sheets `render/color/sheet-color.png`, `blowup-color.png` and `blowup-color-dk.png` are the
+pictures the verdicts were judged on. Round 2 settled the GEOMETRY; every path here is round 2's,
+and the only new geometry is a closed body path per tower (round 2's own numbers, joined so there is
+something to fill) and the W in the one LW row, which is marked OURS on the sheet.
+
+**What it answers, all three from Tom on 2026-09-09.** Galvanized-steel silver with a cylinder
+lighting gradient on a sky-blue ground, overcast or wispy; `wt-wide-L` as solid blue with a black LW
+on a light sky-blue ground; and what ground a MASKABLE icon carries (*"Make it look like the sky,
+cloudy if that helps with contrast"*). Flat-silver controls sit beside every gradient row, because a
+gradient that survives 512 and dies at 32 is worth knowing about first.
+
+**THE CATWALK'S MIDDLE IS MEASURED, NOT ARGUED.** He predicted the color tweak is *"lossy in the
+raster respect because the catwalk loses its middle"*. Each PNG is decoded in Node and sampled on a
+column inside the tank: the luminance difference between the bar and the body rows two units either
+side, on 0-255, with 26 (a tenth of the range) as the floor. **He is right about the solid-blue
+mark and it is worse than he thought: the middle is gone at every size, 512 included** (delta-L 0.8 /
+0.4 / 0.7 / 0.7 / 0.0), because a bar the same color as the body it crosses has nothing to be seen
+against. That is a color decision, not a raster one, and only a second color fixes it -- the
+`ic-wide-L-blue-knockout` row, which is OURS. **Every silver-on-sky row keeps its middle at all five
+sizes** (delta-L 44-59 at 16 px, 89-162 from 32 up), because the bar is ink and the body is silver.
+
+| Candidate | Verdict | Why |
+|---|---|---|
+| `ic-tall3fit-steel-sky` | FAVICON | His main ask. Tank, catwalk, legs and riser all separate at 16. |
+| `ic-tall3fit-steel-overcast` | FAVICON | Same, with the wisps. The row to prefer if the ground must also work maskable. |
+| `ic-tall3fit-silver-flat` | FAVICON | The control: flat is not worse at 16, so the gradient is a taste question. |
+| `ic-tall3-steel-sky` | MENU ONLY | His own aspect still costs 16 px; the legs and riser fuse inside three pixel columns. |
+| `ic-tall3-steel-overcast` | MENU ONLY | As above; the cloud behind the legs makes the fused block slightly worse. |
+| `ic-tall3-silver-flat` | MENU ONLY | Control; the gradient is not what costs this variant its 16 px. |
+| `ic-wide-L-blue` | MENU ONLY | His solid-blue ask, exactly. The catwalk row above, and the letter still needs 32. |
+| `ic-wide-LW-blue` | RECORD ONLY | Two letters in a crown that struggles with one. The W is OURS. |
+| `ic-wide-L-blue-knockout` | MENU ONLY | OURS: the catwalk in the ground color, delta-L 47 at 16 against 0 without it. |
+| `ic-wide-steel-sky` | FAVICON | The sink question: the FILL and the GROUND move the reading with no path changed. |
+| `ic-mask-tall3fit-overcast` | FAVICON | The maskable one to put forward: 0.80 scale into the 80% safe circle, cloudy sky, catwalk intact. |
+| `ic-mask-wide-L-blue` | MENU ONLY | Needs 0.74, and carries its parent's catwalk loss into the icon Android crops. |
+
+## Water tower candidates, round 2 (2026-09-08b) — the geometry round
 
 `node gen-concepts-b.js` writes every candidate `.svg` (24-unit viewBox, single `currentColor`
 stroke, the suite's own open tag) and `concepts-2026-09-08b.html`, which shows each at 16, 24, 32
