@@ -465,6 +465,15 @@ Tom has NOT yet authorized.
   `deviceScaleFactor` can exercise the OS input path.** Task 619 is the worked example: four
   hypotheses and roughly 3 M samples died against a mechanism the instrument cannot see.
 - **A LOGGER THAT CATCHES A CONTROL AND MISSES THE PHENOMENON IS THE FINDING**, not a broken logger.
+- **`collide-harness.js` CARRIES A LOAD-SENSITIVE TIMING ASSERTION AND IT IS BLOCKING.** "the pass
+  is linear" measured **1.07x / 1.15x / 1.23x** run alone and **2.11x** while a full `check_all.sh`
+  was loading the machine, where it fails. Same class the README already records for `perf.js`, but
+  that one is in `dev/browser-pass` and this one BLOCKS a commit. **A red there is environmental
+  until proven otherwise -- re-run it alone before believing it.** Worth making load-proof.
+- **DO NOT CHAIN `check_all.sh` AND `git push` WITH `;`.** Done here on 2026-09-10: the suite
+  printed a FAIL, the push ran anyway, and it was only caught by reading the output afterwards. The
+  failure was a flake, so nothing was harmed, which is exactly why the habit survives. Read the
+  result, THEN push.
 
 
 ## 5. THE NEXT THINGS, in the order I would take them
