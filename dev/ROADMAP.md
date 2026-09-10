@@ -49,11 +49,15 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     2 clicks**, `?lang=en` at position 33.8, every "network" query zero clicks, against site totals
     of 6,770 clicks. **The EngCalcs titles on that page earn about 2 clicks a quarter.** Deleting
     them costs nothing measurable.
-  - **BUT REPLACE THE H1, DO NOT DELETE IT.** A page with no H1 is worse than one with its own, and
-    a divorce should end in an identity, not an absence: carry a LibreWaterNet H1, not an EngCalcs
-    one. Discovery here was never the page's own title -- it is the calculators that DO rank
-    linking to it, plus the people Tom reaches by hand. **Keep those inbound links; they are the
-    funnel.**
+  - **NO H1 AT ALL. TOM OVERRULED THE ADVICE TO REPLACE IT, 2026-09-10, AND HE IS RIGHT.** This
+    bullet used to read "replace the H1, do not delete it". His argument: *"app.epanetjs.com has
+    no h1. I think the paradigm here must be that this is not a storefront page."* **Verified the
+    same day: the served HTML of `app.epanetjs.com` contains no `<h1>`.** The rule that a page
+    needs one is a rule about DOCUMENTS, and the divorce is precisely what makes this not a
+    document -- librewaternet.org is the storefront and carries the headings; `/app/` is the
+    application. Applying a storefront rule to an app shell is how the four embarrassments got
+    there. Discovery was never this page's own title: it is the calculators that DO rank, linking
+    in, plus the people Tom reaches by hand. **Keep those inbound links; they are the funnel.**
   - **THE LANGUAGE SWITCHER MOVES, IT DOES NOT GO** (his instruction); hreflang and `ec_language`
     still apply. Read `dev/chrome-audit.md` first: 314 px above the map (31.3%, not the two-thirds
     claimed), 143 px of it title block, growing to 52.1% at 1366x768 where the H1 and H2 wrap.
