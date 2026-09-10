@@ -64,25 +64,39 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     `vendor_integrity_check.php`, and a second canvas with its own projection state fighting the one
     opinion about Mercator that `js/looped-network.js` owns.
 
-- 75|618| **[H] WYSIWYG hit areas: what you can click is what you can see.**
+- 100|618| **WYSIWYG hit areas: what you can click is what you can see.**
   Tom, 2026-09-09, on the corrected map: *"On the PC with a default cursor, precision is high.
   Ideally, everything would have a hit area that exactly matches what you see aka WYSIWYG ... Of
   course things like text and flow arrows should have a forgiving blob-ish mask rather than being
-  stingy or pedantic about 'You didn't click me'."*
-  - **The principle and its exception are both his and they are not in tension**: a thing you can
-    SEE should be clickable everywhere it is drawn and nowhere else; a thing that is small, thin or
-    awkward to hit gets a deliberate, declared margin around it. The engineering name for that
-    margin is a hit slop or a hit halo, and this page already has two -- `LPN_NODE_HIT_PX` and
-    `LPN_LINK_HIT_PX`, both 12 screen pixels.
-  - **PIPES ARE THE HARD CASE AND HE SAID SO.** A pipe is drawn 0.7 units wide, which at most zooms
-    is 1-3 screen pixels; an exact hit area would be unclickable. So the pipe keeps a halo and the
-    task is to make it HONEST rather than to remove it.
-  - Two defects of this exact class were already found and fixed on 2026-09-09 and are the worked
-    examples: `pointer-events: visible` hit-testing a stroke perimeter whose undeclared
-    `stroke-width` defaulted to one WORLD unit (846 px of false reach on a geographic drawing), and
-    label text answering hits far outside its own box. Read those before designing anything.
-  - Not decided: whether the halo should shrink as the drawn width grows, so a fat pipe at a deep
-    zoom stops claiming ground the reader can see is empty.
+  stingy or pedantic about 'You didn't click me'."* Then, after using it: *"Spoiler alert, I think
+  we may be golden now except for node fat."* **HIS THREE PRIORITIES, IN HIS ORDER:**
+  1. **`visiblePainted` for node and link SYMBOLS on a PC** -- *"that's probably non-negotiable."*
+     This is the "node fat" item: a junction's hit area is a 12 screen-pixel disc
+     (`LPN_NODE_HIT_PX`) around a 7 px drawn dot, and on a pointer device he wants the drawn shape
+     itself. `@media (pointer: fine)` is the mechanism; a coarse pointer KEEPS the band, because a
+     finger is not a mouse and `dev/toolbar-icons.md`'s 44 px argument still holds there.
+     `.lpn-node-symbol, .lpn-link-symbol { pointer-events: none }` has to change for a symbol to be
+     hittable at all.
+  2. **A link's hit area matches its own drawn width**, with a small floor. *"a lower limit that is
+     not very large because WYSIWYG is important; but contextual cursor changes the argument; I
+     really like what I see right now, which is no lower limit, though a lower limit of 3px (one
+     extra on each side of a 1-px link) might be appreciated."* So: track `--lpn-lw`, floor at 3 px,
+     against today's flat 12 (`LPN_LINK_HIT_PX`).
+  3. **A text halo of half the line spacing** -- *"just so that a multi-line label or text mouse as
+     a single block; for a text size of 10, 3px (2.5) appears to be about right, and for 12px,
+     3 px."* The point is to close the gaps BETWEEN rows so a stacked label is one target, not to
+     pad the outside. **He reports the PC text halo is still far too large: *"I am getting default
+     pointer 50 px away from any visible network artifact"*** -- which disagrees with the 0.0 px
+     measured outside each row box on 2026-09-09, so MEASURE IT AT HIS WINDOW SIZE before changing
+     anything. He also says *"in the wild, I think it's already perfect. I get no gap between text
+     lines."*
+  - **The two worked examples to read first**, both found and fixed 2026-09-09: `pointer-events:
+    visible` hit-testing a stroke perimeter whose undeclared `stroke-width` defaulted to one WORLD
+    unit (846 px of false reach on a geographic drawing), and SVG `<text>` hit geometry quantised to
+    Blink's 1/64 user unit, which at 8,431 px per unit is a 131.7 px quantum (271 px of false
+    reach). `dev/browser-pass/specs/nodehit.js` and `specs/lblhit.js` are the measuring instruments;
+    do not build a third.
+  - Not decided: whether the link floor should be absolute or a multiple of the drawn width.
 
 # Reference` at the foot holds the
 standing prose that is not a task.
