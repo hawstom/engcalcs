@@ -310,8 +310,13 @@ Do not re-open this as a consistency sweep.
 - CITED-adjacent, from him: *"at epanet-js icon and cursor are not aligned."* Worth knowing that
   we are ahead of the comparator on this one point rather than behind it.
 
-**The Pan tool I costed stays unbuilt and unrecommended.** Nothing he said asks for it, and the
-tension it would resolve he has now declared resolved in the other direction.
+**The Pan tool I costed is REJECTED OUTRIGHT, not merely unrecommended** (Tom, 2026-09-10:
+*"Strongly opposed. Simply unnecessary and wasted prime real estate. And not 2026-like."*). Three
+objections, each sufficient alone: not needed, costs the scarcest real estate on the page, and is a
+dated idiom. **My reasoning to it was sound and my conclusion was wrong**, which is worth keeping:
+I reached a real 1990s modal-tool answer to a 2026 direct-manipulation question, and the tell was
+that the tension it resolved was one nobody had reported. Ask whether a complaint exists before
+costing a cure for it.
 
 **One correction to a number I used.** I described the link band as 12 px throughout. Tom: *"Note
 that 12px here is just an example. The band may be as small as 3px lower limit (yet to be

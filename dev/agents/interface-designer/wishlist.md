@@ -19,14 +19,21 @@ that disagreement is most of what a seat is for. No agent edits the roadmap.
    preview. I could not settle which on my own; below the hover-highlight because it is
    cosmetic-precision, not a reported confusion. See journal, 2026-09-10.
 
-3. **A dedicated Pan tool** (own toolbar/menu slot, `default` restored across the whole of Select
-   including the bare map, `grab`/`grabbing` moved onto the new tool alone), matching Photoshop's
-   own separation of Move from Hand. Real cost, not a CSS swap: a new toolbar or menu slot, one
-   label in 27 languages, and probably a `space`-to-pan convenience to go with it. Ranked last —
-   it resolves an icon-literalism tension nobody has actually reported as confusing, on a page
-   where "drag the empty map to pan" already works and is already understood (`grab` is the same
-   convention every web map ships with). Not recommended before 16 September; recorded so it is
-   not silently reinvented as a fix for a complaint that has not occurred. See journal, 2026-09-10.
+3. **REJECTED 2026-09-10 BY TOM, and it is not to be re-proposed.** *"Pan tool: Strongly opposed.
+   Simply unnecessary and wasted prime real estate. And not 2026-like."* Three separate objections
+   and each one stands on its own: it is not NEEDED (dragging the empty map already pans, and that
+   is the convention every web map ships with), it COSTS the scarcest thing the page has (a toolbar
+   slot on a strip whose wrapping is already the reason it hides on a phone), and it is DATED --
+   a modal Pan tool is a 1990s desktop idiom that direct manipulation replaced.
+   - **Kept here rather than deleted, because it was reasoned to twice and would be reached again.**
+     It arrived as the clean resolution of an icon-literalism tension: `select`'s icon depicts an
+     arrow while Select mode also owns the pan gesture, so splitting the gesture onto its own tool
+     would make the icon literally true. Photoshop's own Move/Hand separation is the precedent.
+     **That reasoning is sound and the conclusion is still wrong**, because the tension it resolves
+     is one nobody has reported as confusing and the cure costs more than the disease.
+   - What Tom settled instead: the Select icon is a LABEL for the tool, not a pixel-exact promise
+     about every cursor state, and `grab` on the bare map is correct because that is where nothing
+     is being aimed at. See journal, 2026-09-10.
 
 *(The four-bar chrome diagnosis Tom's brief opens with — suite chrome, menus, toolbar, tab strip —
 is still unstarted; this list will carry that ranking once it exists.)*
