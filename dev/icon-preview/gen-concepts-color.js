@@ -29,6 +29,20 @@
  * page ground, decodes them back in Node, and MEASURES the thing Tom predicted -- whether the
  * catwalk still has a middle where it crosses the tank. Nothing here ships; a winner is a hand copy
  * into lib/Icons.lib.php and icons/.
+ *
+ * ROUND 3b, 2026-09-10, after Tom read the sheet. Three things, and the first is a defect:
+ *
+ *   1. "One major bug is that all these descenders (leg and pipe) are truncated. They must hit the
+ *      bottom. Obviously we can't have this thang flying in the air." They did, they do now, and
+ *      the fix is in the drawing -- see the geometry block. Measured on the BOTTOM ROW of every
+ *      raster by descenderFeet(), not in the vector.
+ *   2. "You called wide tall." The three fitted-tower rows are ic-wide3fit-* now, and the maskable
+ *      one that shares their geometry went with them. The ic-tall3-* rows keep their name: they are
+ *      his own aspect, and they really are tall. ic-wide-* is WT-WIDE and is untouched.
+ *   3. "It would be extra nice if the mono- menu icon could have a masterful pseudo-gradient touch
+ *      for the cylinder." Five candidates at the foot of the sheet, at 16/17/24/32 in one ink on
+ *      light and on dark. NOTHING IS DEPLOYED: wt-wide-L is still the shipped menu icon, and
+ *      lib/Icons.lib.php, icons/ and both sibling repositories were not touched.
  */
 'use strict';
 var fs = require('fs');
@@ -41,24 +55,41 @@ var GROUNDS = { lt: '#ffffff', dk: '#1e1e1e' };
 
 // --------------------------------------------------------------------------------------------
 // Round 2's geometry. Bodies are the same numbers closed into a fillable outline. probeX is the
-// column the catwalk measurement samples on; foot is the radius of the farthest drawn point from
-// the frame center, which is what sets a maskable scale.
+// column the catwalk measurement samples on; foot is the radius of the leg foot as round 2 drew it,
+// which is where the maskable scales below came from.
+//
+// THE DESCENDERS ARE A PARAMETER, and that is the round-3 fix. Round 2 drew every leg and riser to
+// a hard-coded y of 21.4 or 22.4 inside a 24-unit frame, so the tower ENDED IN MID-AIR with 1.6 to
+// 2.6 units of empty ground under it -- Tom, reading the sheet: "all these descenders (leg and pipe)
+// are truncated. They must hit the bottom. Obviously we can't have this thang flying in the air."
+// It was the DRAWING, not the viewBox and not the fit: nothing ever clipped these paths, they simply
+// stopped short. So every leg and riser now takes its bottom y from the caller, and the caller
+// passes the y that lands on the frame's bottom edge AFTER the concept's own scale -- 24 when the
+// glyph is drawn 1:1, and 12 + 12/scale for the maskable rows, which is 27 at 0.80 and 28.2 at 0.74.
+// A maskable icon is MEANT to bleed to the edge; only the tank has to stay inside the safe circle,
+// and a leg tip cropped by Android's mask is the bleed working rather than content being lost.
 var TALL3 = {
 	body: 'M7.95 3.7L12 2.2L16.05 3.7V14.15C16.05 16.36 14.24 18.15 12 18.15C9.76 18.15 7.95 16.36 7.95 14.15Z',
-	strokes: '<path d="M7.95 3.7L12 2.2L16.05 3.7"/>'
-		+ '<path d="M7.95 3.7V21.4M16.05 3.7V21.4"/>'
-		+ '<path d="M7.95 14.15C7.95 16.36 9.76 18.15 12 18.15C14.24 18.15 16.05 16.36 16.05 14.15"/>'
-		+ '<path d="M7.1 13.55H16.9"/>'
-		+ '<path d="M12 18.15V21.4"/>',
+	strokes: function (bot) {
+		return '<path d="M7.95 3.7L12 2.2L16.05 3.7"/>'
+			+ '<path d="M7.95 3.7V' + bot + 'M16.05 3.7V' + bot + '"/>'
+			+ '<path d="M7.95 14.15C7.95 16.36 9.76 18.15 12 18.15C14.24 18.15 16.05 16.36 16.05 14.15"/>'
+			+ '<path d="M7.1 13.55H16.9"/>'
+			+ '<path d="M12 18.15V' + bot + '"/>';
+	},
+	tank: [7.95, 16.05, 3.7, 18.15], feet: [7.95, 12, 16.05],
 	catwalk: 13.55, probeX: 12, foot: 11.96
 };
 var TALL3FIT = {
 	body: 'M4.6 4L12 2L19.4 4V14C19.4 16.32 16.09 18.2 12 18.2C7.91 18.2 4.6 16.32 4.6 14Z',
-	strokes: '<path d="M4.6 4L12 2L19.4 4"/>'
-		+ '<path d="M4.6 4V21.4M19.4 4V21.4"/>'
-		+ '<path d="M4.6 14C4.6 16.32 7.91 18.2 12 18.2C16.09 18.2 19.4 16.32 19.4 14"/>'
-		+ '<path d="M2.8 13.4H21.2"/>'
-		+ '<path stroke-width="3.2" stroke-linecap="butt" d="M12 18.2V22.4"/>',
+	strokes: function (bot) {
+		return '<path d="M4.6 4L12 2L19.4 4"/>'
+			+ '<path d="M4.6 4V' + bot + 'M19.4 4V' + bot + '"/>'
+			+ '<path d="M4.6 14C4.6 16.32 7.91 18.2 12 18.2C16.09 18.2 19.4 16.32 19.4 14"/>'
+			+ '<path d="M2.8 13.4H21.2"/>'
+			+ '<path stroke-width="3.2" stroke-linecap="butt" d="M12 18.2V' + bot + '"/>';
+	},
+	tank: [4.6, 19.4, 4, 18.2], feet: [4.6, 12, 19.4],
 	catwalk: 13.4, probeX: 12, foot: 11.96
 };
 // WT-WIDE's crown carries the black letter, which is exactly where the center column would look for
@@ -67,11 +98,14 @@ var TALL3FIT = {
 var WIDE = {
 	body: 'M3.1 6.05C3.1 3.75 5.8 2.4 12 2.4C18.2 2.4 20.9 3.75 20.9 6.05V9.85'
 		+ 'C20.9 12.58 16.92 14.8 12 14.8C7.08 14.8 3.1 12.58 3.1 9.85Z',
-	strokes: '<path d="M3.1 6.05C3.1 3.75 5.8 2.4 12 2.4C18.2 2.4 20.9 3.75 20.9 6.05"/>'
-		+ '<path d="M3.1 6.05V21.4M20.9 6.05V21.4"/>'
-		+ '<path d="M3.1 9.85C3.1 12.58 7.08 14.8 12 14.8C16.92 14.8 20.9 12.58 20.9 9.85"/>'
-		+ '<path d="M2.2 9.85H21.8"/>'
-		+ '<path stroke-width="3.2" stroke-linecap="butt" d="M12 14.8V22.4"/>',
+	strokes: function (bot) {
+		return '<path d="M3.1 6.05C3.1 3.75 5.8 2.4 12 2.4C18.2 2.4 20.9 3.75 20.9 6.05"/>'
+			+ '<path d="M3.1 6.05V' + bot + 'M20.9 6.05V' + bot + '"/>'
+			+ '<path d="M3.1 9.85C3.1 12.58 7.08 14.8 12 14.8C16.92 14.8 20.9 12.58 20.9 9.85"/>'
+			+ '<path d="M2.2 9.85H21.8"/>'
+			+ '<path stroke-width="3.2" stroke-linecap="butt" d="M12 14.8V' + bot + '"/>';
+	},
+	tank: [3.1, 20.9, 2.4, 14.8], feet: [3.1, 12, 20.9],
 	catwalk: 9.85, probeX: 17, foot: 12.94
 };
 var L_CROWN = '<path d="M9.4 3.9V8.1H13.6"/>';
@@ -122,6 +156,8 @@ function groundEl(id, ground) {
 	return '<rect x="0" y="0" width="24" height="24" fill="' + ground + '"/>';
 }
 
+function round2(n) { return Math.round(n * 100) / 100; }
+
 /**
  * One concept's SVG body (everything inside the <svg>), at the 24-unit frame.
  * o: {geo, fill:'steel'|flat color, stroke, ground, letter, scale, walkKnockout}
@@ -129,9 +165,12 @@ function groundEl(id, ground) {
 function draw(id, o) {
 	var g = o.geo;
 	var fill = o.fill === 'steel' ? 'url(#g' + id + ')' : o.fill;
+	// The y a descender must be drawn to so that it lands ON the frame's bottom edge after this
+	// concept's own scale. See the geometry comment: 24 unscaled, 12 + 12/scale when scaled.
+	var bot = round2(o.scale && o.scale !== 1 ? 12 + 12 / o.scale : 24);
 	var inner = '<path d="' + g.body + '" fill="' + fill + '"/>'
 		+ '<g fill="none" stroke="' + o.stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-		+ g.strokes + (o.letter || '') + '</g>';
+		+ g.strokes(bot) + (o.letter || '') + '</g>';
 	if (o.walkKnockout) {
 		// OURS, offered as the repair for the very thing Tom predicted: the catwalk redrawn in the
 		// ground color where it crosses the body, so the bar keeps a middle inside a solid fill.
@@ -149,19 +188,19 @@ function draw(id, o) {
 var C = [];
 function add(c) { c.svg = draw(c.id, c.o); c.geo = c.o.geo; C.push(c); }
 
-add({ id: 'ic-tall3fit-steel-sky', title: 'wt-tall-3-fit, galvanized gradient, plain sky',
+add({ id: 'ic-wide3fit-steel-sky', title: 'wt-tall-3-fit (reads WIDE), galvanized gradient, plain sky',
 	ask: 'His main ask: wt-tall-3 in silver with a cylinder lighting gradient on a sky-blue ground. Fitted aspect, which round 2 measured as the only tall variant that survives 16 px.',
 	why: 'Holds at 16: tank, catwalk, two legs and the riser all still separate. The catwalk keeps its middle at every size (dL 59 at 16, 162 at 32), because the bar is ink and the body is silver, so nothing about it depends on resolution. The gradient survives too -- the bright band is still 2 pixel columns at 16.',
 	verdict: 'FAVICON',
 	o: { geo: TALL3FIT, fill: 'steel', stroke: INK, ground: 'sky' } });
 
-add({ id: 'ic-tall3fit-steel-overcast', title: 'wt-tall-3-fit, galvanized gradient, overcast sky',
+add({ id: 'ic-wide3fit-steel-overcast', title: 'wt-tall-3-fit (reads WIDE), galvanized gradient, overcast sky',
 	ask: 'The same with the wispy/overcast treatment he raised twice as a contrast aid. Three blurred white bands, deliberately low contrast.',
 	why: "Same reading as the plain sky at every size. The wisps cost nothing at 16 (they are below the tank's own contrast) and are the row to prefer if the ground has to work as a maskable background as well.",
 	verdict: 'FAVICON',
 	o: { geo: TALL3FIT, fill: 'steel', stroke: INK, ground: 'overcast' } });
 
-add({ id: 'ic-tall3fit-silver-flat', title: 'wt-tall-3-fit, FLAT silver, plain sky (control)',
+add({ id: 'ic-wide3fit-silver-flat', title: 'wt-tall-3-fit (reads WIDE), FLAT silver, plain sky (control)',
 	ask: 'The control for the gradient. A gradient that survives 512 and dies at 32 is worth knowing about before anybody falls in love with it.',
 	why: "Holds at 16, and this is the control's answer: the flat fill is not worse at 16 -- it is very slightly BETTER separated from the sky, because the gradient's dark left limb sits nearer the sky's own value. The gradient buys a real cylinder from 32 up and costs nothing below it, so it is a taste question rather than a legibility one.",
 	verdict: 'FAVICON',
@@ -169,20 +208,20 @@ add({ id: 'ic-tall3fit-silver-flat', title: 'wt-tall-3-fit, FLAT silver, plain s
 
 add({ id: 'ic-tall3-steel-sky', title: 'wt-tall-3 as he drew it, galvanized gradient, plain sky',
 	ask: 'His own aspect, 9.8 units wide. Round 2 filed this RECORD ONLY in monochrome; color is the question of whether a filled body rescues it.',
-	why: "His aspect is 9.8 units wide, and color does not buy that back: at 16 px the two legs and the riser are inside 3 pixel columns and fuse into a block, exactly as round 2 measured in monochrome. The tank itself reads from 32. Better than round 2's RECORD ONLY, because the filled body gives the silhouette something to be.",
-	verdict: 'MENU ONLY',
+	why: "RE-MEASURED AFTER THE DESCENDER FIX, AND THE VERDICT MOVED. Round 3 filed this MENU ONLY on the claim that at 16 px the two legs and the riser fall inside three pixel columns and fuse into a block. They do not, and now that the descenders run to the frame's edge there is a bottom row to read them on: at 16 px it holds THREE separate runs -- left leg, riser, right leg at columns 4-5, 7-8 and 10-11, with pure sky between them -- because the drawing puts them 4 units apart, not 3 pixels. Before the fix that row was sky from side to side, which is what the old reading was looking at. Catwalk dL 55 at 16, feet dL 63.",
+	verdict: 'FAVICON',
 	o: { geo: TALL3, fill: 'steel', stroke: INK, ground: 'sky' } });
 
 add({ id: 'ic-tall3-steel-overcast', title: 'wt-tall-3 as he drew it, gradient, overcast sky',
 	ask: 'His aspect with the cloud treatment.',
-	why: 'As above. The cloud band behind the legs makes the fused block slightly worse at 16, being the one place the ground has structure of its own.',
-	verdict: 'MENU ONLY',
+	why: 'THE FRONT RUNNER, and re-measured after the descender fix like the row above: FAVICON, not MENU ONLY. Its numbers are the best of his own aspect at 16 px -- catwalk dL 55, feet dL 69 at the weakest of the three, three separate descenders on the bottom row. The low cloud band sits BEHIND the legs and, being blurred and light, raises their contrast against the ground rather than competing with them.',
+	verdict: 'FAVICON',
 	o: { geo: TALL3, fill: 'steel', stroke: INK, ground: 'overcast' } });
 
 add({ id: 'ic-tall3-silver-flat', title: 'wt-tall-3 as he drew it, FLAT silver (control)',
 	ask: 'Control for the row above.',
-	why: 'As above; the control shows the gradient is not what is costing this variant its 16 px.',
-	verdict: 'MENU ONLY',
+	why: 'Control for the row above, and it says what the fitted tower\'s control said: the flat fill costs nothing at 16 px and buys no cylinder above it. The gradient is a taste question.',
+	verdict: 'FAVICON',
 	o: { geo: TALL3, fill: FLAT_SILVER, stroke: INK, ground: 'sky' } });
 
 add({ id: 'ic-wide-L-blue', title: 'wt-wide-L, solid blue, black L, light sky-blue ground',
@@ -213,7 +252,7 @@ add({ id: 'ic-wide-steel-sky', title: 'wt-wide, no letter, galvanized gradient, 
 // The maskable pair. The safe zone is the inner 80% circle: radius 9.6 about (12,12) in this frame.
 // The scale each needs is 9.6 divided by the radius of its own farthest drawn point, which is a leg
 // foot in both cases -- 11.96 for the fitted tower, 12.94 for WT-WIDE.
-add({ id: 'ic-mask-tall3fit-overcast', title: 'MASKABLE: wt-tall-3-fit, gradient, overcast, 0.80 scale',
+add({ id: 'ic-mask-wide3fit-overcast', title: 'MASKABLE: wt-tall-3-fit (reads WIDE), gradient, overcast, 0.80 scale',
 	ask: 'Opaque ground, glyph scaled 0.80 so its farthest point (a leg foot at radius 11.96) lands at 9.57, inside the 9.6 safe circle. Android crops anything outside it.',
 	why: 'The maskable candidate. Only 192 and 512 matter here and both are clean; it is on the sheet at 16 as well so the same drawing can be judged as a favicon. At 0.80 the mark loses a fifth of its linear size, which is the price of the safe zone and is why the FITTED tower rather than his own aspect is the one to mask.',
 	verdict: 'FAVICON',
@@ -221,7 +260,7 @@ add({ id: 'ic-mask-tall3fit-overcast', title: 'MASKABLE: wt-tall-3-fit, gradient
 
 add({ id: 'ic-mask-wide-L-blue', title: 'MASKABLE: wt-wide-L blue, light sky, 0.74 scale',
 	ask: 'The shipped mark made maskable: WT-WIDE reaches radius 12.94 at a leg foot, so it needs 0.74 rather than 0.80.',
-	why: 'Needs 0.74, so it loses a quarter of its size, and it carries the catwalk loss of its parent row into the one icon Android will crop as well. Both costs land on the same drawing.',
+	why: 'Needs 0.74, so it loses a quarter of its size, and it carries the catwalk loss of its parent row into the one icon Android will crop as well. Both costs land on the same drawing. Its feet number is the one red descender on the sheet and it is NOT a truncation: at 0.74 a leg is 1.5 units wide and lands on half a pixel at 16 px, so the bottom row samples mostly sky. It is 106 at 32 and 137 from 48 up, and only 192 and 512 are what a maskable icon is for.',
 	verdict: 'MENU ONLY',
 	o: { geo: WIDE, fill: BLUE, stroke: BLUE, ground: SKY_LIGHT, letter: L_CROWN.replace('<path', '<path stroke="#000"'), scale: 0.74 } });
 
@@ -231,13 +270,86 @@ var SHIPPED = { id: 'wt-wide-L (ships today)', title: 'Monochrome stroke, transp
 	why: 'Its interior is empty, so the catwalk has a middle at every size by construction; that is the baseline the filled rows lose.',
 	verdict: 'MENU ONLY',
 	svg: '<g fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-		+ WIDE.strokes + L_CROWN + '</g>',
+		+ WIDE.strokes(24) + L_CROWN + '</g>',
 	// The shipped mark is a currentColor stroke on a transparent ground, so on a dark ground the
 	// REAL one inverts. Drawing the dark strip in #111 would put a black mark on a black page and
 	// invite a conclusion about a picture nobody will ever see.
 	svgDk: '<g fill="none" stroke="#e8e8e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-		+ WIDE.strokes + L_CROWN + '</g>',
+		+ WIDE.strokes(24) + L_CROWN + '</g>',
 	geo: WIDE, shipped: true };
+
+// --------------------------------------------------------------------------------------------
+// MONO MENU CANDIDATES (round 3b). Tom: "I would love to show that to PCW and MAH ... It would be
+// extra nice if the mono- menu icon could have a masterful pseudo-gradient touch for the cylinder."
+//
+// A MENU ICON CANNOT CARRY A SKY. lib/Icons.lib.php draws every one through EC_ICON_OPEN_TAG --
+// fill="none", stroke="currentColor", stroke-width 2, on no ground at all -- which is what lets the
+// row's own color drive the glyph and greys it for free when the row is disabled. So there is no
+// fill to put a gradient in, and no paper to make lighter than paper: in a stroke-only glyph the
+// ONLY move available is to ADD ink on the shadow limb and leave the bright band bare. That is
+// engraving, and it is what these five rows try at the size that decides it, about 17 px (1.05em).
+//
+// The tank of WT-TALL-3 -- the front runner's own aspect -- spans x 7.95 to 16.05 with 2-unit walls,
+// so the CLEAR interior is 8.95 to 15.05: six units, which is 4.2 pixels at 17 px. Everything below
+// has to happen inside those four pixels, and the measurement under each row says whether it did.
+var MSIZES = [16, 17, 24, 32];
+var MONO_INK = { lt: '#111111', dk: '#e8e8e8' };
+var M = [];
+function addMono(c) { M.push(c); }
+function monoSVG(extra, ink, walls) {
+	var w = walls || {};
+	var g = '<g fill="none" stroke="' + ink + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+	// The tank walls are drawn separately from the rest when a row varies their weight.
+	var rest = '<path d="M7.95 3.7L12 2.2L16.05 3.7"/>'
+		+ '<path d="M7.95 14.15C7.95 16.36 9.76 18.15 12 18.15C14.24 18.15 16.05 16.36 16.05 14.15"' 
+		+ (w.bowl ? ' stroke-width="' + w.bowl + '"' : '') + '/>'
+		+ '<path d="M7.1 13.55H16.9"/>'
+		+ '<path d="M12 18.15V24"/>'
+		+ '<path' + (w.left ? ' stroke-width="' + w.left + '"' : '') + ' d="M7.95 3.7V24"/>'
+		+ '<path' + (w.right ? ' stroke-width="' + w.right + '"' : '') + ' d="M16.05 3.7V24"/>';
+	return g + rest + (extra || '') + '</g>';
+}
+function hatch(x, width, y0, y1, dash) {
+	return '<path stroke-width="' + width + '" stroke-linecap="butt"'
+		+ (dash ? ' stroke-dasharray="' + dash + '"' : '') + ' d="M' + x + ' ' + y0 + 'V' + y1 + '"/>';
+}
+
+addMono({ id: 'ic-mono-plain', title: 'CONTROL: wt-tall-3 stroked, no shading',
+	ask: 'The control. Round 2\'s wt-tall-3 as a menu icon would be drawn, with the descenders now reaching the bottom edge and nothing else added.',
+	verdict: 'MENU OK',
+	why: 'The control, and what every row below is read against: a bare tank already scores 2 grade columns at 16 and 17 px from antialiasing alone, which is why each row reports its NET. Nothing here suggests a cylinder; the tank is a rectangle with a dome on it.',
+	extra: function () { return ''; } });
+
+addMono({ id: 'ic-mono-hatch2', title: 'Two hatch lines on the shadow limb',
+	ask: 'Engraving\'s own answer: two thin verticals inside the right third, leaving the bright band bare paper. 0.75 wide at x 13.5 and 14.6.',
+	verdict: 'MENU OK',
+	why: 'The hatch survives, but not as a hatch. By 24 and 32 px both lines have MERGED into the right wall, so what the reader gets is a heavier right limb with a mid-tone edge rather than two engraved lines: net +1 at 17 px, +2 at 32. One-sided, so the tank reads as lit from the left rather than as round.',
+	extra: function () { return hatch(13.5, 0.75, 5.6, 15.4) + hatch(14.6, 0.75, 6.4, 14.6); } });
+
+addMono({ id: 'ic-mono-hatch-lr', title: 'One line left limb, two right (full cylinder)',
+	ask: 'The same with a lighter line on the far LEFT limb as well, so the bare band sits between two shaded edges rather than against one. This is the shape a cylinder actually photographs.',
+	verdict: 'PICK',
+	why: 'THE ONE TO SHOW. A light line on the left limb and two on the right leaves a bare band down the middle, which is the only place a highlight can come from in a stroke-only glyph -- there is no paper lighter than paper. Net +1 at 17 px and +3 at both 16 and 32, and the mid-tone lands on BOTH limbs, which is what makes the reading round rather than merely shaded. The same net on the dark ground, so a menu row of either colour gets the same drawing.',
+	extra: function () { return hatch(9.5, 0.6, 6.2, 14.6) + hatch(13.5, 0.75, 5.6, 15.4) + hatch(14.6, 0.75, 6.4, 14.6); } });
+
+addMono({ id: 'ic-mono-weight', title: 'No interior line: asymmetric wall weight',
+	ask: 'Curvature by WEIGHT alone -- a 1.4 left wall against a 2.9 right wall and a heavier bowl. Nothing is added inside the tank, so nothing can fuse inside it.',
+	verdict: 'MENU OK',
+	why: 'Curvature by wall weight alone, and it is the row that fails AT THE SIZE THAT DECIDES: net 0 at 17 px. A 1.4-unit wall and a 2.9-unit wall are about one pixel apart at menu size, so the asymmetry only appears from 24 up (net +3 and +4). It is also the one row whose thin left wall costs descender contrast -- feet dL 30 at 17 against 50 for the others.',
+	walls: { left: 1.4, right: 2.9, bowl: 2.6 },
+	extra: function () { return ''; } });
+
+addMono({ id: 'ic-mono-broken', title: 'Broken shadow line, plus a heavier right wall',
+	ask: 'His "broken highlight line" read as a shadow: one dashed vertical at x 14.2, with the right wall thickened to 2.6 so the shading survives if the dashes do not.',
+	verdict: 'RECORD ONLY',
+	why: 'The highest net at 17 px (+2) and still the row to turn down: from 24 up the dashes separate cleanly enough to read as a BREAK in the tank wall rather than as shading, which is a defect the reader has to explain away. Kept because it is the literal reading of a broken highlight line and somebody will propose it again.',
+	walls: { right: 2.6 },
+	extra: function () { return hatch(14.2, 0.9, 5.8, 15.2, '2.4 1.6'); } });
+
+M.forEach(function (c) {
+	c.svg = monoSVG(c.extra(), MONO_INK.lt, c.walls);
+	c.svgDk = monoSVG(c.extra(), MONO_INK.dk, c.walls);
+});
 
 // --------------------------------------------------------------------------------------------
 function svgFile(body) {
@@ -245,6 +357,7 @@ function svgFile(body) {
 		+ ' aria-hidden="true" focusable="false">' + body + '</svg>\n';
 }
 C.forEach(function (c) { fs.writeFileSync(path.join(here, c.id + '.svg'), svgFile(c.svg)); });
+M.forEach(function (c) { fs.writeFileSync(path.join(here, c.id + '.svg'), svgFile(c.svg)); });
 
 // --------------------------------------------------------------------------------------------
 // A minimal PNG reader. The rasters are the evidence, so the measurement decodes the FILES that go
@@ -320,9 +433,80 @@ function catwalkMiddle(file, geo, px, scale) {
 	return { delta: Math.round(best * 10) / 10, bar: Math.round(bestL), body: Math.round(base), ok: best >= 26 };
 }
 
+/**
+ * Does the cylinder shading SURVIVE at this size, and what does it buy?
+ *
+ * Sampled on one raster row at the tank's mid height (y = 11 units), across the whole icon; ink is
+ * |luminance - paper|, and every number below is read against the darkest pixel on that row.
+ *
+ * THE FIRST METRIC WRITTEN HERE MEASURED THE WRONG THING and is recorded so it is not re-tried: it
+ * looked for ink strictly BETWEEN the two ink runs, on the assumption that a surviving hatch is a
+ * third run. It is not. At 32 px the hatch at x = 13.5 renders at half ink and touches the right
+ * wall, so it joins that run and the between-runs gap is bare paper -- the metric read 0 for a
+ * shading that is plainly there in the pixels. What a stroke-only cylinder actually produces is a
+ * TONAL STEP on the shadow limb, so that is what is counted now.
+ *   grade -- columns whose ink is intermediate, 0.15 to 0.70 of the row's darkest. A bare tank has
+ *            none: both walls saturate. Each one is a pixel of genuine mid-tone, which is the whole
+ *            of what a pseudo-gradient can be in one ink. 1 or more at 17 px is the pass.
+ *   mass  -- right ink run width minus left, in pixels. What a varied-weight row buys instead of a
+ *            mid-tone: the limb is not shaded, it is heavier.
+ *   runs  -- separate ink runs on the row. 2 is the normal reading; 3 means a hatch stayed clear of
+ *            its wall, which needs more room than a menu icon has.
+ */
+function cylinderProfile(file, ink) {
+	var img = readPNG(file), px = img.w;
+	var y = Math.round(11 / 24 * px), paper = lum(img, 0, y), row = [];
+	for (var x = 0; x < px; x++) { row.push(Math.abs(lum(img, x, y) - paper)); }
+	var maxInk = Math.max.apply(null, row) || 1;
+	var thr = 26, runs = [], cur = null, grade = 0;
+	for (var i = 0; i < row.length; i++) {
+		var f = row[i] / maxInk;
+		if (f >= 0.15 && f <= 0.70) { grade++; }
+		if (row[i] >= thr) { if (!cur) { cur = { a: i, b: i }; runs.push(cur); } cur.b = i; }
+		else { cur = null; }
+	}
+	var mass = 0;
+	if (runs.length >= 2) {
+		var L = runs[0], R = runs[runs.length - 1];
+		mass = (R.b - R.a + 1) - (L.b - L.a + 1);
+	}
+	return { runs: runs.length, grade: grade, mass: mass, ink: ink };
+}
+
+// --------------------------------------------------------------------------------------------
+/**
+ * DO THE DESCENDERS REACH THE BOTTOM ROW OF THE RASTER?
+ *
+ * This is the round-3 fix measured in the PNGs rather than in the vector, which is what Tom asked
+ * for. The bottom row of pixels is sampled at each of the three descender columns -- left leg,
+ * riser, right leg -- and compared with the GROUND at the same row, read at x = 0 (sky on a color
+ * row, paper on a mono one). A descender that stops short leaves ground at its own column, so its
+ * delta is ~0; one that reaches the edge is drawn there and its delta is the stroke's own contrast.
+ * `min` is the weakest of the three, and it is the number that decides.
+ */
+function descenderFeet(file, geo, px, scale) {
+	var img = readPNG(file), sc = scale || 1, k = px / 24, y = px - 1;
+	var ground = lum(img, 0, y), out = [];
+	for (var i = 0; i < geo.feet.length; i++) {
+		var col = Math.round((12 + (geo.feet[i] - 12) * sc) * k);
+		col = Math.min(px - 1, Math.max(0, col));
+		var L = lum(img, col, y);
+		out.push(Math.round(Math.abs(L - ground) * 10) / 10);
+	}
+	// And on the same row, how many SEPARATE descenders are there? Round 2 filed his own WT-TALL-3
+	// aspect MENU ONLY on the belief that its two legs and its riser fuse at 16 px. They are three
+	// runs on the bottom row, so that belief is measured false; see the row's own note.
+	var runs = 0, inRun = false;
+	for (var x = 0; x < px; x++) {
+		var d = Math.abs(lum(img, x, y) - ground);
+		if (d >= 26) { if (!inRun) { runs++; inRun = true; } } else { inRun = false; }
+	}
+	return { at: out, min: Math.min.apply(null, out), runs: runs, ok: Math.min.apply(null, out) >= 26 };
+}
+
 // --------------------------------------------------------------------------------------------
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function sheet(meas) {
+function sheet(meas, feet, mono) {
 	var CSS = 'body{margin:24px;font:14px/1.55 system-ui,sans-serif;color:#111;background:#fff;max-width:1440px}'
 		+ 'h1{font-size:20px}h2{font-size:16px;margin-top:30px}code{font:12px ui-monospace,monospace;background:#f0f0f0;padding:1px 3px}'
 		+ '.note{color:#333;max-width:78ch}table{border-collapse:collapse;width:100%;margin-top:10px}'
@@ -334,12 +518,13 @@ function sheet(meas) {
 		+ '.strip{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}.strip img{display:inline-block;margin-right:6px;vertical-align:bottom}'
 		+ 'td.f{font-size:12.5px;color:#222;max-width:40ch}td.f i{color:#555}'
 		+ '.v{font:11px ui-monospace,monospace;padding:1px 5px;border-radius:3px;white-space:nowrap}'
-		+ '.v.favicon{background:#dff0d8;color:#2a5d1e}.v.menu{background:#fdf3d0;color:#6b5300}.v.record{background:#f3d9d9;color:#7a2020}'
+		+ '.v.favicon{background:#dff0d8;color:#2a5d1e}.v.menu{background:#fdf3d0;color:#6b5300}.v.record{background:#f3d9d9;color:#7a2020}.v.pick{background:#cfe8c6;color:#1e4a14;font-weight:700}'
 		+ '.m{font:11.5px ui-monospace,monospace;border-collapse:collapse;margin-top:6px}'
 		+ '.m td,.m th{border:1px solid #ddd;padding:2px 5px;text-align:right}.m th{color:#555}'
 		+ '.no{color:#a11}.yes{color:#2a5d1e}tr.cur{background:#fffbe6}ul.note li{margin:5px 0}'
 		+ '.big{margin:10px 0 0;display:flex;align-items:flex-start;gap:8px}'
 		+ '.big em{font-size:11px;color:#666;font-style:normal;align-self:flex-end}'
+		+ 'img.z{image-rendering:pixelated;margin-right:6px}'
 		+ '.mine{background:#eef4ff;border-left:3px solid #6b8fd6;padding:2px 6px}';
 	function png(c, px, g, shown) {
 		return '<img src="render/color/' + c.id.replace(/[^a-z0-9-]/gi, '_') + '@' + px + '-' + g + '.png" width="'
@@ -353,13 +538,65 @@ function sheet(meas) {
 			+ '<span class="lt">' + png(c, 512, 'lt', 256) + '</span><em>512, shown at 256</em></div>';
 	}
 	function mtable(c) {
-		var m = meas[c.id];
+		var m = meas[c.id], f = feet[c.id];
 		if (!m) { return ''; }
 		return '<table class="m"><tr><th>px</th>' + SIZES.map(function (p) { return '<th>' + p + '</th>'; }).join('') + '</tr>'
-			+ '<tr><th>&Delta;L</th>' + SIZES.map(function (p) {
+			+ '<tr><th>catwalk &Delta;L</th>' + SIZES.map(function (p) {
 				var r = m[p];
 				return '<td class="' + (r && r.ok ? 'yes' : 'no') + '">' + (r ? r.delta : '-') + '</td>';
+			}).join('') + '</tr>'
+			+ '<tr><th>feet &Delta;L (min)</th>' + SIZES.map(function (p) {
+				var r = f && f[p];
+				return '<td class="' + (r && r.ok ? 'yes' : 'no') + '">' + (r ? r.min : '-') + '</td>';
+			}).join('') + '</tr>'
+			+ '<tr><th>descenders apart</th>' + SIZES.map(function (p) {
+				var r = f && f[p];
+				return '<td class="' + (r && r.runs >= 3 ? 'yes' : 'no') + '">' + (r ? r.runs : '-') + '</td>';
 			}).join('') + '</tr></table>';
+	}
+	function monoTable(c) {
+		var m = mono[c.id];
+		if (!m) { return ''; }
+		return '<table class="m"><tr><th>px</th>' + MSIZES.map(function (p) { return '<th>' + p + '</th>'; }).join('') + '</tr>'
+			+ '<tr><th>ink runs</th>' + MSIZES.map(function (p) {
+				var r = m[p] && m[p].lt;
+				return '<td>' + (r ? r.runs : '-') + '</td>';
+			}).join('') + '</tr>'
+			+ '<tr><th>net grade (lt)</th>' + MSIZES.map(function (p) {
+				var r = m[p] && m[p].lt;
+				return '<td class="' + (r && r.net >= 1 ? 'yes' : 'no') + '">' + (r ? (r.net > 0 ? '+' : '') + r.net : '-') + '</td>';
+			}).join('') + '</tr>'
+			+ '<tr><th>net grade (dk)</th>' + MSIZES.map(function (p) {
+				var r = m[p] && m[p].dk;
+				return '<td class="' + (r && r.net >= 1 ? 'yes' : 'no') + '">' + (r ? (r.net > 0 ? '+' : '') + r.net : '-') + '</td>';
+			}).join('') + '</tr>'
+			+ '<tr><th>mass px</th>' + MSIZES.map(function (p) {
+				var r = m[p] && m[p].lt;
+				return '<td>' + (r ? r.mass : '-') + '</td>';
+			}).join('') + '</tr>'
+			+ '<tr><th>feet &Delta;L</th>' + MSIZES.map(function (p) {
+				var r = m[p] && m[p].feet;
+				return '<td class="' + (r && r.ok ? 'yes' : 'no') + '">' + (r ? r.min : '-') + '</td>';
+			}).join('') + '</tr></table>';
+	}
+	function monoRow(c) {
+		function mpng(px, g) {
+			return '<img src="render/color/' + c.id + '@' + px + '-' + g + '.png" width="' + px + '" height="' + px + '" alt="' + px + ' px">';
+		}
+		function mstrip(g) {
+			return '<span class="' + g + '">' + MSIZES.map(function (p) { return mpng(p, g); }).join('') + '</span>';
+		}
+		function zoom(g) {
+			return '<span class="' + g + '">' + MSIZES.map(function (p) {
+				return '<img class="z" src="render/color/' + c.id + '@' + p + '-' + g + '.png" width="' + (p * 6)
+					+ '" height="' + (p * 6) + '" alt="' + p + ' px at 6x">';
+			}).join('') + '</span>';
+		}
+		return '<tr><td class="n"><b>' + esc(c.id) + '</b><span>' + esc(c.title) + '</span></td>'
+			+ '<td><div class="strip">' + mstrip('lt') + mstrip('dk') + '</div>'
+			+ '<div class="big">' + zoom('lt') + '</div><div class="big">' + zoom('dk') + '</div></td>'
+			+ '<td class="f"><b class="v ' + c.verdict.split(' ')[0].toLowerCase() + '">' + esc(c.verdict) + '</b> '
+			+ esc(c.ask) + (c.why ? ' <i>' + esc(c.why) + '</i>' : '') + monoTable(c) + '</td></tr>';
 	}
 	function row(c, cur) {
 		return '<tr' + (cur ? ' class="cur"' : '') + '><td class="n"><b>' + esc(c.id) + '</b><span>' + esc(c.title) + '</span></td>'
@@ -370,7 +607,11 @@ function sheet(meas) {
 	var ALL = [SHIPPED].concat(C);
 	return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Water tower in color, round 3</title>'
 		+ '<style>' + CSS + '</style></head><body>\n'
-		+ '<h1>Water-tower brand mark in color, round 3 (2026-09-09)</h1>\n'
+		+ '<h1>Water-tower brand mark in color, round 3 (2026-09-09, revised 2026-09-10)</h1>\n'
+		+ '<p class="note"><b>What changed on 2026-09-10.</b> The descenders were truncated on every row and now reach the bottom edge, which is the first bullet below and which moved two verdicts. '
+		+ 'The three fitted-tower rows were renamed <code>ic-tall3fit-*</code> to <code>ic-wide3fit-*</code> on Tom\'s instruction, because a WT-TALL-3 fitted to a square frame reads WIDE; '
+		+ '<code>ic-mask-tall3fit-overcast</code> went with them as <code>ic-mask-wide3fit-overcast</code>, being the same geometry. The <code>ic-tall3-*</code> rows keep their name: they are his own aspect and they really are tall. '
+		+ 'And there is a new section at the foot of the page, five MONO menu candidates.</p>\n'
 		+ '<p class="note">Round 2 settled the geometry; this sheet answers the color question and the maskable one. '
 		+ 'Every path is round 2\'s, unchanged: the only new geometry is a closed body path per tower (round 2\'s own numbers, joined so there is '
 		+ 'something to fill) and the W in the one LW row, which no scan of the sketch can supply and which is marked '
@@ -392,17 +633,35 @@ function sheet(meas) {
 		+ 'The 16 px number is a third of the 32 px one, which is antialiasing thinning a 1.3 px bar, but it stays well over the threshold.</li>'
 		+ '<li><b>The gradient is safe.</b> The flat-silver controls are not better at 16 px in any measurable way and not visibly better either; '
 		+ 'the gradient starts paying from 32 up. Choose it on taste, not on legibility.</li>'
-		+ '<li><b>His own WT-TALL-3 aspect still costs 16 px</b>, in color as in monochrome: the two legs and the riser fall inside three pixel columns and fuse. '
-		+ 'The fitted tower is the one that holds.</li>'
+		+ '<li><b>THE DESCENDERS WERE TRUNCATED, AND THAT IS FIXED.</b> Every leg and riser stopped at y 21.4 or 22.4 inside a 24-unit frame, so the tower hung in mid-air with two units of empty ground beneath it. '
+		+ 'It was the drawing, not the viewBox and not the fit. Measured in the PNGs at the three descender columns on the BOTTOM ROW of each raster, on <code>ic-tall3-steel-overcast</code>: '
+		+ '&Delta;L against the sky was <b>0 / 0.7 / 0 / 0 / 0</b> at 16 / 32 / 48 / 192 / 512 before, and <b>69 / 177 / 190 / 190 / 190</b> after. Every row now carries that number.</li>'
+		+ '<li><b>His own WT-TALL-3 aspect is FAVICON, and the earlier reading was wrong.</b> It was filed MENU ONLY because the two legs and the riser were said to fall inside three pixel columns and fuse. '
+		+ 'They are 4 units apart, and the bottom row of the 16 px raster holds THREE separate runs with pure sky between them. What the old reading was looking at was a bottom row that was sky from side to side, '
+		+ 'because the legs stopped short of it.</li>'
 		+ '<li><b>On the sink reading, the ground and the fill do the work, not the outline.</b> The same WT-WIDE paths, silver on sky, read as a vessel outdoors; '
 		+ 'nothing was redrawn.</li>'
-		+ '<li><b>For the maskable pair we would put forward <code>ic-mask-tall3fit-overcast</code>:</b> it needs only 0.80 rather than 0.74, '
+		+ '<li><b>For the maskable pair we would put forward <code>ic-mask-wide3fit-overcast</code>:</b> it needs only 0.80 rather than 0.74, '
 		+ 'its ground is the cloudy sky he asked for, and it is the one candidate whose catwalk still has a middle after the crop.</li></ul>\n'
 		+ '<table><thead><tr><th>Concept</th><th>16 / 32 / 48 at 1:1 on light then dark, then 192 at 1:1 on both and 512</th>'
 		+ '<th>Verdict, and the catwalk measurement</th></tr></thead><tbody>\n'
 		+ row(ALL[0], true) + '\n' + ALL.slice(1).map(function (c) { return row(c); }).join('\n')
+		+ '</tbody></table>\n'
+		+ '<h2>The mono menu candidates</h2>\n'
+		+ '<p class="note">Tom: <i>"It would be extra nice if the mono- menu icon could have a masterful pseudo-gradient touch for the cylinder."</i> '
+		+ 'A menu icon is drawn by <code>lib/Icons.lib.php</code> as <code>fill="none" stroke="currentColor"</code> on NO ground, which is what lets the row\'s color drive it and greys it for free when the row is disabled. '
+		+ 'So there is no fill to hold a gradient and no way to make anything lighter than the paper: the only move is to ADD ink on the shadow limb and leave the bright band bare, which is engraving. '
+		+ 'These five are rendered at <b>16 / 17 / 24 / 32</b> -- the menu bar draws at about 17 px (1.05em) -- in one ink, on a light page and on a dark one, because a menu row is either. '
+		+ '<b>Nothing here is deployed.</b> <code>wt-wide-L</code> stays the shipped menu icon.</p>\n'
+		+ '<p class="note">The tank of WT-TALL-3 has a clear interior of six units, which is <b>4.2 pixels at 17 px</b>, and everything a shading trick does has to happen inside them. '
+		+ 'One raster row at the tank\'s mid height is decoded and read across: <b>runs</b> is the number of separate ink runs on it (2 is a bare tank, so 3 or more means something inside is still separate from both walls); '
+		+ '<b>net grade</b> is the number of columns at an INTERMEDIATE ink, 0.15 to 0.70 of the row\'s darkest, MINUS the control\'s count at the same size -- a mid-tone pixel is the whole of what a pseudo-gradient can be in one ink, and the control is subtracted because a bare 2-unit wall on 1.4 pixels already makes two of them by antialiasing alone; '
+		+ '<b>mass</b> is the right ink run\'s width minus the left\'s, in pixels, which is what a varied-weight row buys instead of a mid-tone. <b>feet &Delta;L</b> is the descender measurement again.</p>\n'
+		+ '<table><thead><tr><th>Concept</th><th>16 / 17 / 24 / 32 at 1:1, light then dark</th><th>Verdict, and the cylinder measurement</th></tr></thead><tbody>\n'
+		+ M.map(function (c) { return monoRow(c); }).join('\n')
 		+ '</tbody></table>\n<p class="note">Verdicts read the same as round 2: <b>FAVICON</b> holds at 16 px, <b>MENU ONLY</b> is a real drawing that needs 32, '
-		+ '<b>RECORD ONLY</b> is kept because it is on the record, not because anything would ship it.</p>\n'
+		+ '<b>RECORD ONLY</b> is kept because it is on the record, not because anything would ship it. '
+		+ 'The mono section uses its own two: <b>PICK</b> is the row to put in front of PCW and MAH, <b>MENU OK</b> is a drawing that works and buys less.</p>\n'
 		+ '</body></html>\n';
 }
 
@@ -428,12 +687,12 @@ function findChromium() {
 	if (!exe) { throw new Error('No Chromium found; set CHROME_PATH or npx playwright install chromium'); }
 	var pw = require(path.join(here, '..', 'browser-pass', 'node_modules', 'playwright-core'));
 	var browser = await pw.chromium.launch({ executablePath: exe });
-	var meas = {};
+	var meas = {}, feet = {}, mono = {};
 	var ALL = [SHIPPED].concat(C);
 	var gks = Object.keys(GROUNDS);
 	for (var i = 0; i < ALL.length; i++) {
 		var c = ALL[i], safe = c.id.replace(/[^a-z0-9-]/gi, '_');
-		meas[c.id] = {};
+		meas[c.id] = {}; feet[c.id] = {};
 		for (var gi = 0; gi < gks.length; gi++) {
 			var gk = gks[gi];
 			var page = await browser.newPage({ viewport: { width: 700, height: 700 }, deviceScaleFactor: 1 });
@@ -448,11 +707,56 @@ function findChromium() {
 				if (gk === 'lt') {
 					try { meas[c.id][px] = catwalkMiddle(file, c.geo, px, c.o && c.o.scale); }
 					catch (e) { meas[c.id][px] = null; }
+					try { feet[c.id][px] = descenderFeet(file, c.geo, px, c.o && c.o.scale); }
+					catch (e2) { feet[c.id][px] = null; }
 				}
 			}
 			await page.close();
 		}
 	}
+	// The mono menu candidates, at the four sizes a menu row and a favicon actually use, on a light
+	// page and on a dark one -- a menu row is either, and the glyph is currentColor, so the SAME
+	// drawing has to work in both inks.
+	for (var mi = 0; mi < M.length; mi++) {
+		var mc = M[mi], msafe = mc.id;
+		mono[mc.id] = {};
+		for (var mg = 0; mg < gks.length; mg++) {
+			var mgk = gks[mg];
+			var mpage = await browser.newPage({ viewport: { width: 400, height: 400 }, deviceScaleFactor: 1 });
+			for (var ms = 0; ms < MSIZES.length; ms++) {
+				var mpx = MSIZES[ms];
+				await mpage.setContent('<!DOCTYPE html><html><head><meta charset="utf-8"><style>'
+					+ 'html,body{margin:0;padding:0;background:' + GROUNDS[mgk] + '}#t{width:' + mpx + 'px;height:' + mpx + 'px;line-height:0}'
+					+ '</style></head><body><div id="t"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + mpx
+					+ '" height="' + mpx + '">' + (mgk === 'dk' ? mc.svgDk : mc.svg) + '</svg></div></body></html>');
+				var mfile = path.join(OUT, msafe + '@' + mpx + '-' + mgk + '.png');
+				await (await mpage.$('#t')).screenshot({ path: mfile });
+				if (!mono[mc.id][mpx]) { mono[mc.id][mpx] = {}; }
+				try { mono[mc.id][mpx][mgk] = cylinderProfile(mfile, mgk); } catch (e3) { mono[mc.id][mpx][mgk] = null; }
+				if (mgk === 'lt') {
+					try { mono[mc.id][mpx].feet = descenderFeet(mfile, TALL3, mpx, 1); } catch (e4) { mono[mc.id][mpx].feet = null; }
+				}
+			}
+			await mpage.close();
+		}
+	}
+
+	// GRADE IS ONLY MEANINGFUL AGAINST THE CONTROL. A bare tank already produces intermediate
+	// columns at 16 and 17 px, because a 2-unit wall lands on 1.4 pixels and the rasterizer puts the
+	// remainder somewhere: ic-mono-plain scores 2 at both. So each row also carries `net`, its grade
+	// minus the control's at the same size, which is the mid-tone the SHADING actually bought.
+	var base = mono['ic-mono-plain'];
+	for (var bi = 0; bi < M.length; bi++) {
+		var bid = M[bi].id;
+		for (var bs = 0; bs < MSIZES.length; bs++) {
+			var bpx = MSIZES[bs];
+			['lt', 'dk'].forEach(function (g) {
+				var r = mono[bid][bpx][g], b0 = base[bpx][g];
+				if (r && b0) { r.net = r.grade - b0.grade; }
+			});
+		}
+	}
+
 	// The two contact sheets, in round 2's shape: an overview at the sizes that matter, and a
 	// nearest-neighbor blow-up of the 16 and 32 px rasters, which is where a verdict is decided.
 	var ALLIDS = ALL.map(function (c) { return { id: c.id, safe: c.id.replace(/[^a-z0-9-]/gi, '_'), verdict: c.verdict }; });
@@ -481,9 +785,10 @@ function findChromium() {
 	}
 	await shot.close();
 	await browser.close();
-	fs.writeFileSync(path.join(here, 'concepts-2026-09-09-color.html'), sheet(meas));
-	fs.writeFileSync(path.join(OUT, 'catwalk-measurements.json'), JSON.stringify(meas, null, '\t') + '\n');
-	console.log(C.length + ' color concepts written; ' + (ALL.length * SIZES.length * 2) + ' PNGs rendered;'
+	fs.writeFileSync(path.join(here, 'concepts-2026-09-09-color.html'), sheet(meas, feet, mono));
+	fs.writeFileSync(path.join(OUT, 'catwalk-measurements.json'),
+		JSON.stringify({ catwalk: meas, descenders: feet, mono: mono }, null, '\t') + '\n');
+	console.log(C.length + ' color concepts and ' + M.length + ' mono menu candidates written; ' + (ALL.length * SIZES.length * 2 + M.length * MSIZES.length * 2) + ' PNGs rendered;'
 		+ ' concepts-2026-09-09-color.html regenerated');
 	ALL.forEach(function (c) {
 		console.log('  ' + c.id + '  ' + SIZES.map(function (p) {

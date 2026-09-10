@@ -1,418 +1,1630 @@
 {
-	"wt-wide-L (ships today)": {
-		"16": {
-			"delta": 105.5,
-			"bar": 195,
-			"body": 90,
-			"ok": true
+	"catwalk": {
+		"wt-wide-L (ships today)": {
+			"16": {
+				"delta": 105.5,
+				"bar": 195,
+				"body": 90,
+				"ok": true
+			},
+			"32": {
+				"delta": 217,
+				"bar": 17,
+				"body": 234,
+				"ok": true
+			},
+			"48": {
+				"delta": 238,
+				"bar": 17,
+				"body": 255,
+				"ok": true
+			},
+			"192": {
+				"delta": 238,
+				"bar": 17,
+				"body": 255,
+				"ok": true
+			},
+			"512": {
+				"delta": 238,
+				"bar": 17,
+				"body": 255,
+				"ok": true
+			}
 		},
-		"32": {
-			"delta": 217,
-			"bar": 17,
-			"body": 234,
-			"ok": true
+		"ic-wide3fit-steel-sky": {
+			"16": {
+				"delta": 58.6,
+				"bar": 79,
+				"body": 138,
+				"ok": true
+			},
+			"32": {
+				"delta": 161.7,
+				"bar": 41,
+				"body": 203,
+				"ok": true
+			},
+			"48": {
+				"delta": 163.4,
+				"bar": 41,
+				"body": 204,
+				"ok": true
+			},
+			"192": {
+				"delta": 166.4,
+				"bar": 41,
+				"body": 207,
+				"ok": true
+			},
+			"512": {
+				"delta": 167.1,
+				"bar": 41,
+				"body": 208,
+				"ok": true
+			}
 		},
-		"48": {
-			"delta": 238,
-			"bar": 17,
-			"body": 255,
-			"ok": true
+		"ic-wide3fit-steel-overcast": {
+			"16": {
+				"delta": 58.6,
+				"bar": 79,
+				"body": 138,
+				"ok": true
+			},
+			"32": {
+				"delta": 161.7,
+				"bar": 41,
+				"body": 203,
+				"ok": true
+			},
+			"48": {
+				"delta": 163.4,
+				"bar": 41,
+				"body": 204,
+				"ok": true
+			},
+			"192": {
+				"delta": 166.4,
+				"bar": 41,
+				"body": 207,
+				"ok": true
+			},
+			"512": {
+				"delta": 167.1,
+				"bar": 41,
+				"body": 208,
+				"ok": true
+			}
 		},
-		"192": {
-			"delta": 238,
-			"bar": 17,
-			"body": 255,
-			"ok": true
+		"ic-wide3fit-silver-flat": {
+			"16": {
+				"delta": 54.1,
+				"bar": 184,
+				"body": 130,
+				"ok": true
+			},
+			"32": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			},
+			"48": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			},
+			"192": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			},
+			"512": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			}
 		},
-		"512": {
-			"delta": 238,
-			"bar": 17,
-			"body": 255,
-			"ok": true
+		"ic-tall3-steel-sky": {
+			"16": {
+				"delta": 55.1,
+				"bar": 187,
+				"body": 132,
+				"ok": true
+			},
+			"32": {
+				"delta": 157.1,
+				"bar": 41,
+				"body": 198,
+				"ok": true
+			},
+			"48": {
+				"delta": 160.1,
+				"bar": 41,
+				"body": 201,
+				"ok": true
+			},
+			"192": {
+				"delta": 165.1,
+				"bar": 41,
+				"body": 206,
+				"ok": true
+			},
+			"512": {
+				"delta": 166.3,
+				"bar": 41,
+				"body": 207,
+				"ok": true
+			}
+		},
+		"ic-tall3-steel-overcast": {
+			"16": {
+				"delta": 55.1,
+				"bar": 187,
+				"body": 132,
+				"ok": true
+			},
+			"32": {
+				"delta": 157.1,
+				"bar": 41,
+				"body": 198,
+				"ok": true
+			},
+			"48": {
+				"delta": 160.1,
+				"bar": 41,
+				"body": 201,
+				"ok": true
+			},
+			"192": {
+				"delta": 165.1,
+				"bar": 41,
+				"body": 206,
+				"ok": true
+			},
+			"512": {
+				"delta": 166.3,
+				"bar": 41,
+				"body": 207,
+				"ok": true
+			}
+		},
+		"ic-tall3-silver-flat": {
+			"16": {
+				"delta": 54.1,
+				"bar": 184,
+				"body": 130,
+				"ok": true
+			},
+			"32": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			},
+			"48": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			},
+			"192": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			},
+			"512": {
+				"delta": 143.2,
+				"bar": 41,
+				"body": 184,
+				"ok": true
+			}
+		},
+		"ic-wide-L-blue": {
+			"16": {
+				"delta": 0.8,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"32": {
+				"delta": 0.4,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"48": {
+				"delta": 0.7,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"192": {
+				"delta": 0.7,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"512": {
+				"delta": 0,
+				"bar": 0,
+				"body": 89,
+				"ok": false
+			}
+		},
+		"ic-wide-LW-blue": {
+			"16": {
+				"delta": 0.8,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"32": {
+				"delta": 0.4,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"48": {
+				"delta": 0.7,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"192": {
+				"delta": 0.7,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"512": {
+				"delta": 0,
+				"bar": 0,
+				"body": 89,
+				"ok": false
+			}
+		},
+		"ic-wide-L-blue-knockout": {
+			"16": {
+				"delta": 46.6,
+				"bar": 183,
+				"body": 136,
+				"ok": true
+			},
+			"32": {
+				"delta": 118.5,
+				"bar": 208,
+				"body": 89,
+				"ok": true
+			},
+			"48": {
+				"delta": 136.9,
+				"bar": 226,
+				"body": 89,
+				"ok": true
+			},
+			"192": {
+				"delta": 136.9,
+				"bar": 226,
+				"body": 89,
+				"ok": true
+			},
+			"512": {
+				"delta": 136.9,
+				"bar": 226,
+				"body": 89,
+				"ok": true
+			}
+		},
+		"ic-wide-steel-sky": {
+			"16": {
+				"delta": 44,
+				"bar": 116,
+				"body": 72,
+				"ok": true
+			},
+			"32": {
+				"delta": 89.1,
+				"bar": 41,
+				"body": 130,
+				"ok": true
+			},
+			"48": {
+				"delta": 101.1,
+				"bar": 41,
+				"body": 142,
+				"ok": true
+			},
+			"192": {
+				"delta": 103.1,
+				"bar": 41,
+				"body": 144,
+				"ok": true
+			},
+			"512": {
+				"delta": 103.1,
+				"bar": 41,
+				"body": 144,
+				"ok": true
+			}
+		},
+		"ic-mask-wide3fit-overcast": {
+			"16": {
+				"delta": 45.4,
+				"bar": 155,
+				"body": 110,
+				"ok": true
+			},
+			"32": {
+				"delta": 160.1,
+				"bar": 41,
+				"body": 201,
+				"ok": true
+			},
+			"48": {
+				"delta": 162.4,
+				"bar": 41,
+				"body": 203,
+				"ok": true
+			},
+			"192": {
+				"delta": 165.7,
+				"bar": 41,
+				"body": 207,
+				"ok": true
+			},
+			"512": {
+				"delta": 166.4,
+				"bar": 41,
+				"body": 207,
+				"ok": true
+			}
+		},
+		"ic-mask-wide-L-blue": {
+			"16": {
+				"delta": 2.4,
+				"bar": 88,
+				"body": 91,
+				"ok": false
+			},
+			"32": {
+				"delta": 0.5,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"48": {
+				"delta": 0.8,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"192": {
+				"delta": 0.8,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			},
+			"512": {
+				"delta": 0.7,
+				"bar": 89,
+				"body": 89,
+				"ok": false
+			}
 		}
 	},
-	"ic-tall3fit-steel-sky": {
-		"16": {
-			"delta": 58.6,
-			"bar": 79,
-			"body": 138,
-			"ok": true
+	"descenders": {
+		"wt-wide-L (ships today)": {
+			"16": {
+				"at": [
+					175,
+					238,
+					143
+				],
+				"min": 143,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					238,
+					238,
+					238
+				],
+				"min": 238,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					238,
+					238,
+					238
+				],
+				"min": 238,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					238,
+					238,
+					238
+				],
+				"min": 238,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					238,
+					238,
+					238
+				],
+				"min": 238,
+				"runs": 3,
+				"ok": true
+			}
 		},
-		"32": {
-			"delta": 161.7,
-			"bar": 41,
-			"body": 203,
-			"ok": true
+		"ic-wide3fit-steel-sky": {
+			"16": {
+				"at": [
+					126.5,
+					172.1,
+					103.3
+				],
+				"min": 103.3,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					173,
+					173,
+					173
+				],
+				"min": 173,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
 		},
-		"48": {
-			"delta": 163.4,
-			"bar": 41,
-			"body": 204,
-			"ok": true
+		"ic-wide3fit-steel-overcast": {
+			"16": {
+				"at": [
+					138.9,
+					188.6,
+					113.2
+				],
+				"min": 113.2,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					189.5,
+					189.5,
+					189.5
+				],
+				"min": 189.5,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			}
 		},
-		"192": {
-			"delta": 166.4,
-			"bar": 41,
-			"body": 207,
-			"ok": true
+		"ic-wide3fit-silver-flat": {
+			"16": {
+				"at": [
+					126.5,
+					172.1,
+					103.3
+				],
+				"min": 103.3,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					173,
+					173,
+					173
+				],
+				"min": 173,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
 		},
-		"512": {
-			"delta": 167.1,
-			"bar": 41,
-			"body": 208,
-			"ok": true
+		"ic-tall3-steel-sky": {
+			"16": {
+				"at": [
+					167.2,
+					114.5,
+					63.4
+				],
+				"min": 63.4,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					161.6,
+					173,
+					173
+				],
+				"min": 161.6,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-tall3-steel-overcast": {
+			"16": {
+				"at": [
+					182.8,
+					125.9,
+					69.4
+				],
+				"min": 69.4,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					176.7,
+					189.5,
+					189.5
+				],
+				"min": 176.7,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-tall3-silver-flat": {
+			"16": {
+				"at": [
+					167.2,
+					114.5,
+					63.4
+				],
+				"min": 63.4,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					161.6,
+					173,
+					173
+				],
+				"min": 161.6,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-wide-L-blue": {
+			"16": {
+				"at": [
+					101.5,
+					136.9,
+					82.8
+				],
+				"min": 82.8,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-wide-LW-blue": {
+			"16": {
+				"at": [
+					101.5,
+					136.9,
+					82.8
+				],
+				"min": 82.8,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-wide-L-blue-knockout": {
+			"16": {
+				"at": [
+					101.5,
+					136.9,
+					82.8
+				],
+				"min": 82.8,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-wide-steel-sky": {
+			"16": {
+				"at": [
+					126.4,
+					172.1,
+					103.2
+				],
+				"min": 103.2,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					173,
+					173,
+					173
+				],
+				"min": 173,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					173.2,
+					173.2,
+					173.2
+				],
+				"min": 173.2,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-mask-wide3fit-overcast": {
+			"16": {
+				"at": [
+					111.3,
+					160.8,
+					90.5
+				],
+				"min": 90.5,
+				"runs": 3,
+				"ok": true
+			},
+			"32": {
+				"at": [
+					189.5,
+					189.5,
+					181.7
+				],
+				"min": 181.7,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					189.7,
+					189.7,
+					189.7
+				],
+				"min": 189.7,
+				"runs": 3,
+				"ok": true
+			}
+		},
+		"ic-mask-wide-L-blue": {
+			"16": {
+				"at": [
+					13.6,
+					107.9,
+					121
+				],
+				"min": 13.6,
+				"runs": 3,
+				"ok": false
+			},
+			"32": {
+				"at": [
+					136.9,
+					136.9,
+					105.8
+				],
+				"min": 105.8,
+				"runs": 3,
+				"ok": true
+			},
+			"48": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"192": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			},
+			"512": {
+				"at": [
+					136.9,
+					136.9,
+					136.9
+				],
+				"min": 136.9,
+				"runs": 3,
+				"ok": true
+			}
 		}
 	},
-	"ic-tall3fit-steel-overcast": {
-		"16": {
-			"delta": 58.6,
-			"bar": 79,
-			"body": 138,
-			"ok": true
+	"mono": {
+		"ic-mono-plain": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 0,
+					"ink": "lt",
+					"net": 0
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						87
+					],
+					"min": 87,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 0,
+					"ink": "dk",
+					"net": 0
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 0,
+					"ink": "lt",
+					"net": 0
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 0,
+					"ink": "dk",
+					"net": 0
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 0,
+					"mass": 0,
+					"ink": "lt",
+					"net": 0
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 0,
+					"mass": 0,
+					"ink": "dk",
+					"net": 0
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 0,
+					"mass": 0,
+					"ink": "lt",
+					"net": 0
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 0,
+					"mass": 0,
+					"ink": "dk",
+					"net": 0
+				}
+			}
 		},
-		"32": {
-			"delta": 161.7,
-			"bar": 41,
-			"body": 203,
-			"ok": true
+		"ic-mono-hatch2": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 4,
+					"mass": 2,
+					"ink": "lt",
+					"net": 2
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						87
+					],
+					"min": 87,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 4,
+					"mass": 2,
+					"ink": "dk",
+					"net": 2
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt",
+					"net": 1
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk",
+					"net": 1
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 1,
+					"mass": 2,
+					"ink": "lt",
+					"net": 1
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 1,
+					"mass": 2,
+					"ink": "dk",
+					"net": 1
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 3,
+					"ink": "lt",
+					"net": 2
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 3,
+					"ink": "dk",
+					"net": 2
+				}
+			}
 		},
-		"48": {
-			"delta": 163.4,
-			"bar": 41,
-			"body": 204,
-			"ok": true
+		"ic-mono-hatch-lr": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "lt",
+					"net": 3
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						87
+					],
+					"min": 87,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 5,
+					"mass": 1,
+					"ink": "dk",
+					"net": 3
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt",
+					"net": 1
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk",
+					"net": 1
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "lt",
+					"net": 2
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "dk",
+					"net": 2
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt",
+					"net": 3
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 2,
+					"ink": "dk",
+					"net": 3
+				}
+			}
 		},
-		"192": {
-			"delta": 166.4,
-			"bar": 41,
-			"body": 207,
-			"ok": true
+		"ic-mono-weight": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt",
+					"net": 1
+				},
+				"feet": {
+					"at": [
+						177,
+						158,
+						158
+					],
+					"min": 158,
+					"runs": 2,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk",
+					"net": 1
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 1,
+					"ink": "lt",
+					"net": 0
+				},
+				"feet": {
+					"at": [
+						30,
+						50,
+						238
+					],
+					"min": 30,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 2,
+					"ink": "dk",
+					"net": 0
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 2,
+					"ink": "lt",
+					"net": 3
+				},
+				"feet": {
+					"at": [
+						154,
+						238,
+						238
+					],
+					"min": 154,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 2,
+					"ink": "dk",
+					"net": 3
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 4,
+					"mass": 2,
+					"ink": "lt",
+					"net": 4
+				},
+				"feet": {
+					"at": [
+						126,
+						238,
+						238
+					],
+					"min": 126,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 4,
+					"mass": 2,
+					"ink": "dk",
+					"net": 4
+				}
+			}
 		},
-		"512": {
-			"delta": 167.1,
-			"bar": 41,
-			"body": 208,
-			"ok": true
-		}
-	},
-	"ic-tall3fit-silver-flat": {
-		"16": {
-			"delta": 54.1,
-			"bar": 184,
-			"body": 130,
-			"ok": true
-		},
-		"32": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		},
-		"48": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		},
-		"192": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		},
-		"512": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		}
-	},
-	"ic-tall3-steel-sky": {
-		"16": {
-			"delta": 55.1,
-			"bar": 187,
-			"body": 132,
-			"ok": true
-		},
-		"32": {
-			"delta": 157.1,
-			"bar": 41,
-			"body": 198,
-			"ok": true
-		},
-		"48": {
-			"delta": 160.1,
-			"bar": 41,
-			"body": 201,
-			"ok": true
-		},
-		"192": {
-			"delta": 165.1,
-			"bar": 41,
-			"body": 206,
-			"ok": true
-		},
-		"512": {
-			"delta": 166.3,
-			"bar": 41,
-			"body": 207,
-			"ok": true
-		}
-	},
-	"ic-tall3-steel-overcast": {
-		"16": {
-			"delta": 55.1,
-			"bar": 187,
-			"body": 132,
-			"ok": true
-		},
-		"32": {
-			"delta": 157.1,
-			"bar": 41,
-			"body": 198,
-			"ok": true
-		},
-		"48": {
-			"delta": 160.1,
-			"bar": 41,
-			"body": 201,
-			"ok": true
-		},
-		"192": {
-			"delta": 165.1,
-			"bar": 41,
-			"body": 206,
-			"ok": true
-		},
-		"512": {
-			"delta": 166.3,
-			"bar": 41,
-			"body": 207,
-			"ok": true
-		}
-	},
-	"ic-tall3-silver-flat": {
-		"16": {
-			"delta": 54.1,
-			"bar": 184,
-			"body": 130,
-			"ok": true
-		},
-		"32": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		},
-		"48": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		},
-		"192": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		},
-		"512": {
-			"delta": 143.2,
-			"bar": 41,
-			"body": 184,
-			"ok": true
-		}
-	},
-	"ic-wide-L-blue": {
-		"16": {
-			"delta": 0.8,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"32": {
-			"delta": 0.4,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"48": {
-			"delta": 0.7,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"192": {
-			"delta": 0.7,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"512": {
-			"delta": 0,
-			"bar": 0,
-			"body": 89,
-			"ok": false
-		}
-	},
-	"ic-wide-LW-blue": {
-		"16": {
-			"delta": 0.8,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"32": {
-			"delta": 0.4,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"48": {
-			"delta": 0.7,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"192": {
-			"delta": 0.7,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"512": {
-			"delta": 0,
-			"bar": 0,
-			"body": 89,
-			"ok": false
-		}
-	},
-	"ic-wide-L-blue-knockout": {
-		"16": {
-			"delta": 46.6,
-			"bar": 183,
-			"body": 136,
-			"ok": true
-		},
-		"32": {
-			"delta": 118.5,
-			"bar": 208,
-			"body": 89,
-			"ok": true
-		},
-		"48": {
-			"delta": 136.9,
-			"bar": 226,
-			"body": 89,
-			"ok": true
-		},
-		"192": {
-			"delta": 136.9,
-			"bar": 226,
-			"body": 89,
-			"ok": true
-		},
-		"512": {
-			"delta": 136.9,
-			"bar": 226,
-			"body": 89,
-			"ok": true
-		}
-	},
-	"ic-wide-steel-sky": {
-		"16": {
-			"delta": 44,
-			"bar": 116,
-			"body": 72,
-			"ok": true
-		},
-		"32": {
-			"delta": 89.1,
-			"bar": 41,
-			"body": 130,
-			"ok": true
-		},
-		"48": {
-			"delta": 101.1,
-			"bar": 41,
-			"body": 142,
-			"ok": true
-		},
-		"192": {
-			"delta": 103.1,
-			"bar": 41,
-			"body": 144,
-			"ok": true
-		},
-		"512": {
-			"delta": 103.1,
-			"bar": 41,
-			"body": 144,
-			"ok": true
-		}
-	},
-	"ic-mask-tall3fit-overcast": {
-		"16": {
-			"delta": 45.4,
-			"bar": 155,
-			"body": 110,
-			"ok": true
-		},
-		"32": {
-			"delta": 160.1,
-			"bar": 41,
-			"body": 201,
-			"ok": true
-		},
-		"48": {
-			"delta": 162.4,
-			"bar": 41,
-			"body": 203,
-			"ok": true
-		},
-		"192": {
-			"delta": 165.7,
-			"bar": 41,
-			"body": 207,
-			"ok": true
-		},
-		"512": {
-			"delta": 166.4,
-			"bar": 41,
-			"body": 207,
-			"ok": true
-		}
-	},
-	"ic-mask-wide-L-blue": {
-		"16": {
-			"delta": 2.4,
-			"bar": 88,
-			"body": 91,
-			"ok": false
-		},
-		"32": {
-			"delta": 0.5,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"48": {
-			"delta": 0.8,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"192": {
-			"delta": 0.8,
-			"bar": 89,
-			"body": 89,
-			"ok": false
-		},
-		"512": {
-			"delta": 0.7,
-			"bar": 89,
-			"body": 89,
-			"ok": false
+		"ic-mono-broken": {
+			"16": {
+				"lt": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "lt",
+					"net": 1
+				},
+				"feet": {
+					"at": [
+						230,
+						158,
+						135
+					],
+					"min": 135,
+					"runs": 2,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 3,
+					"mass": 1,
+					"ink": "dk",
+					"net": 1
+				}
+			},
+			"17": {
+				"lt": {
+					"runs": 2,
+					"grade": 4,
+					"mass": 2,
+					"ink": "lt",
+					"net": 2
+				},
+				"feet": {
+					"at": [
+						81,
+						50,
+						238
+					],
+					"min": 50,
+					"runs": 1,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 4,
+					"mass": 2,
+					"ink": "dk",
+					"net": 2
+				}
+			},
+			"24": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 3,
+					"ink": "lt",
+					"net": 2
+				},
+				"feet": {
+					"at": [
+						226,
+						238,
+						238
+					],
+					"min": 226,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 3,
+					"ink": "dk",
+					"net": 2
+				}
+			},
+			"32": {
+				"lt": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 3,
+					"ink": "lt",
+					"net": 2
+				},
+				"feet": {
+					"at": [
+						222,
+						238,
+						238
+					],
+					"min": 222,
+					"runs": 3,
+					"ok": true
+				},
+				"dk": {
+					"runs": 2,
+					"grade": 2,
+					"mass": 3,
+					"ink": "dk",
+					"net": 2
+				}
+			}
 		}
 	}
 }

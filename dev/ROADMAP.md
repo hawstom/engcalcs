@@ -19,11 +19,33 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     **His catwalk prediction is confirmed and is worse than a raster loss: on solid blue the middle
     is gone at 512 too**, because the bar is the color of the body it crosses; every silver-on-sky
     row keeps it at all five sizes. Verdicts and the measurement: `dev/icon-preview/README.md`.
+  - **ROUND 3b, 2026-09-10, and the front runner has a name.** Tom, reading that sheet:
+    *"I love the gradients at all scales ... I may be in love. Those two are positively nostalgic.
+    Very nice emotional appeal. ic-tall3-steel-overcast. I almost want to stick my neck out and
+    deploy it right now."* And on why it works: *"what makes this iconic is that sky is exactly part
+    of a water tower. No buildings in town are that high. No trees in town are that high. All you
+    see is tank and sky."* **The sky is the subject, not a plate.**
+  - **A REAL DEFECT HE FOUND AND NO CHECK COULD: every descender was truncated** -- *"They must hit
+    the bottom. Obviously we can't have this thang flying in the air."* Legs and risers stopped at
+    y 21.4 or 22.4 in a 24-unit frame. **The drawing, not the viewBox and not the fit.** Fixed at
+    the cause and measured on the BOTTOM ROW of each PNG: delta-L against the sky went from
+    0 / 0.7 / 0 / 0 / 0 to 69 / 177 / 190 / 190 / 190 at 16 / 32 / 48 / 192 / 512.
+    **That moved a verdict**: `ic-tall3-*` was MENU ONLY on the claim its legs and riser fuse at
+    16 px, and they do not -- the bottom row holds three separate runs with sky between them, so
+    the front runner and its plain-sky twin are **FAVICON**. Renamed on his instruction:
+    `ic-tall3fit-*` is `ic-wide3fit-*` (a WT-TALL-3 fitted to a square reads wide), and
+    `ic-mask-tall3fit-overcast` went with it.
+  - **A MONO MENU CANDIDATE EXISTS, ON THE SHEET, NOT DEPLOYED** (*"It would be extra nice if the
+    mono- menu icon could have a masterful pseudo-gradient touch for the cylinder"*). A menu icon is
+    a `currentColor` stroke on NO ground, so there is no fill to hold a gradient and nothing lighter
+    than paper to highlight with: the only move is engraving. Five tried at 16/17/24/32 on light and
+    dark; `ic-mono-hatch-lr` is the pick, a line on each limb leaving a bare band down the middle.
+    `ic-mono-weight` buys nothing at 17 px. `wt-wide-L` stays shipped.
   - **NEXT: Tom picks a row.** The maskable question is answered on the same sheet (Tom, asked what
     background he wanted behind a transparent stroke glyph: *"Make it look like the sky, cloudy if
     that helps with contrast"*): `icons/icon-192.png` and `icon-512.png` are declared
     `purpose: "any maskable"` and need an opaque ground and the 80% safe circle, which
-    `ic-mask-tall3fit-overcast` meets at 0.80 scale. Nothing ships until he chooses.
+    `ic-mask-wide3fit-overcast` meets at 0.80 scale. Nothing ships until he chooses.
 
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable

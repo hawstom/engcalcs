@@ -3,15 +3,43 @@
 Scratch drawings for icons under consideration. Nothing here ships; a winner is copied into
 `lib/Icons.lib.php`, which is the one geometry table (the menu and the map both read it).
 
-## Water tower IN COLOR, round 3 (2026-09-09) -- CURRENT
+## Water tower IN COLOR, round 3 (2026-09-09, revised 2026-09-10) -- CURRENT
 
-`node gen-concepts-color.js` writes 12 color candidates (`ic-*.svg`), 130 REAL PNGs under
-`render/color/` at 16 / 32 / 48 / 192 / 512 on a white and on a dark page ground, and
+`node gen-concepts-color.js` writes 12 color candidates and 5 mono menu candidates (`ic-*.svg`),
+170 REAL PNGs under `render/color/` at 16 / 32 / 48 / 192 / 512 on a white and on a dark page ground
+(the mono rows at 16 / 17 / 24 / 32), and
 `concepts-2026-09-09-color.html`, which shows every raster at 1:1 beside its verdict. The three
 contact sheets `render/color/sheet-color.png`, `blowup-color.png` and `blowup-color-dk.png` are the
 pictures the verdicts were judged on. Round 2 settled the GEOMETRY; every path here is round 2's,
 and the only new geometry is a closed body path per tower (round 2's own numbers, joined so there is
 something to fill) and the W in the one LW row, which is marked OURS on the sheet.
+
+**ROUND 3b, 2026-09-10, after Tom read the sheet.**
+
+- **THE DESCENDERS WERE TRUNCATED ON EVERY ROW.** He caught it: *"One major bug is that all these
+  descenders (leg and pipe) are truncated. They must hit the bottom. Obviously we can't have this
+  thang flying in the air."* Every leg and riser stopped at y 21.4 or 22.4 inside a 24-unit frame,
+  so the tower hung with two units of empty ground under it. **It was the DRAWING, not the viewBox
+  and not the fit** -- nothing ever clipped those paths, they simply stopped short. The bottom y is
+  a parameter now, and the caller passes the value that lands on the frame's edge after the row's
+  own scale: 24 unscaled, `12 + 12/scale` for the two maskable rows. Measured in the PNGs on the
+  BOTTOM ROW at the three descender columns, on `ic-tall3-steel-overcast`: delta-L against the sky
+  was **0 / 0.7 / 0 / 0 / 0** at 16 / 32 / 48 / 192 / 512 before and **69 / 177 / 190 / 190 / 190**
+  after. Every row carries that number on the sheet.
+- **THE FITTED TOWER READS WIDE, so it is named that.** Tom: *"You called wide tall."*
+  `ic-tall3fit-*` is `ic-wide3fit-*`, and `ic-mask-tall3fit-overcast` went with it as
+  `ic-mask-wide3fit-overcast`, being the same geometry. The `ic-tall3-*` rows keep their name: they
+  are his own aspect and they really are tall. `ic-wide-*` is WT-WIDE and is untouched.
+- **HIS OWN ASPECT IS FAVICON, and the round-3 verdict was wrong.** `ic-tall3-*` was filed MENU ONLY
+  on the claim that its two legs and its riser fall inside three pixel columns and fuse at 16 px.
+  They are 4 units apart, and the bottom row of the 16 px raster holds THREE separate runs with pure
+  sky between them. What that reading was looking at was a bottom row that was sky from side to
+  side, because the legs stopped short of it. **`ic-tall3-steel-overcast` is the front runner**
+  (Tom: *"I may be in love. Those two are positively nostalgic."*), and it now measures catwalk
+  delta-L 55 and feet delta-L 69 at 16 px.
+- **FIVE MONO MENU CANDIDATES**, at the foot of the sheet. See below. **Nothing is deployed:**
+  `wt-wide-L` is still the shipped menu icon, and `lib/Icons.lib.php`, `icons/` and both sibling
+  repositories were not touched.
 
 **What it answers, all three from Tom on 2026-09-09.** Galvanized-steel silver with a cylinder
 lighting gradient on a sky-blue ground, overcast or wispy; `wt-wide-L` as solid blue with a black LW
@@ -31,18 +59,49 @@ sizes** (delta-L 44-59 at 16 px, 89-162 from 32 up), because the bar is ink and 
 
 | Candidate | Verdict | Why |
 |---|---|---|
-| `ic-tall3fit-steel-sky` | FAVICON | His main ask. Tank, catwalk, legs and riser all separate at 16. |
-| `ic-tall3fit-steel-overcast` | FAVICON | Same, with the wisps. The row to prefer if the ground must also work maskable. |
-| `ic-tall3fit-silver-flat` | FAVICON | The control: flat is not worse at 16, so the gradient is a taste question. |
-| `ic-tall3-steel-sky` | MENU ONLY | His own aspect still costs 16 px; the legs and riser fuse inside three pixel columns. |
-| `ic-tall3-steel-overcast` | MENU ONLY | As above; the cloud behind the legs makes the fused block slightly worse. |
-| `ic-tall3-silver-flat` | MENU ONLY | Control; the gradient is not what costs this variant its 16 px. |
+| `ic-wide3fit-steel-sky` | FAVICON | His main ask. Tank, catwalk, legs and riser all separate at 16. |
+| `ic-wide3fit-steel-overcast` | FAVICON | Same, with the wisps. The row to prefer if the ground must also work maskable. |
+| `ic-wide3fit-silver-flat` | FAVICON | The control: flat is not worse at 16, so the gradient is a taste question. |
+| `ic-tall3-steel-sky` | FAVICON | Re-measured after the descender fix: three separate descenders on the 16 px bottom row, catwalk delta-L 55. |
+| `ic-tall3-steel-overcast` | FAVICON | **THE FRONT RUNNER.** Best of his own aspect at 16: catwalk 55, feet 69, three descenders apart. |
+| `ic-tall3-silver-flat` | FAVICON | Control; the flat fill costs nothing at 16 and buys no cylinder above it. |
 | `ic-wide-L-blue` | MENU ONLY | His solid-blue ask, exactly. The catwalk row above, and the letter still needs 32. |
 | `ic-wide-LW-blue` | RECORD ONLY | Two letters in a crown that struggles with one. The W is OURS. |
 | `ic-wide-L-blue-knockout` | MENU ONLY | OURS: the catwalk in the ground color, delta-L 47 at 16 against 0 without it. |
 | `ic-wide-steel-sky` | FAVICON | The sink question: the FILL and the GROUND move the reading with no path changed. |
-| `ic-mask-tall3fit-overcast` | FAVICON | The maskable one to put forward: 0.80 scale into the 80% safe circle, cloudy sky, catwalk intact. |
+| `ic-mask-wide3fit-overcast` | FAVICON | The maskable one to put forward: 0.80 scale into the 80% safe circle, cloudy sky, catwalk intact. |
 | `ic-mask-wide-L-blue` | MENU ONLY | Needs 0.74, and carries its parent's catwalk loss into the icon Android crops. |
+
+### The mono menu candidates (2026-09-10)
+
+Tom: *"I would love to show that to PCW and MAH ... It would be extra nice if the mono- menu icon
+could have a masterful pseudo-gradient touch for the cylinder."*
+
+**A MENU ICON CANNOT CARRY A SKY, and that is the constraint the whole section is built around.**
+`lib/Icons.lib.php` draws every one through `EC_ICON_OPEN_TAG` -- `fill="none"`,
+`stroke="currentColor"`, width 2, on no ground at all -- which is what lets the row's own color
+drive the glyph and greys it for free when the row is disabled. So there is no fill to hold a
+gradient and **no way to make anything lighter than the paper**: the only move available is to ADD
+ink on the shadow limb and leave the bright band bare. That is engraving. The tank of WT-TALL-3 has
+a clear interior of six units, which is **4.2 pixels at the 17 px (1.05em) a menu row draws at**, and
+every trick below has to happen inside them.
+
+Measured on one raster row at the tank's mid height. **`net grade`** is the number of columns at an
+intermediate ink (0.15 to 0.70 of the row's darkest) MINUS the control's count at the same size --
+a mid-tone pixel is the whole of what a pseudo-gradient can be in one ink, and the control is
+subtracted because a bare 2-unit wall on 1.4 pixels already makes two of them by antialiasing alone.
+**The first metric written here measured the wrong thing** and the script records why: it looked for
+a third ink RUN inside the tank, on the assumption that a surviving hatch is separate from its wall.
+It is not -- at 32 px the hatch merges into the right wall -- so the metric read 0 for shading that
+is plainly in the pixels.
+
+| Candidate | Verdict | net grade at 16 / 17 / 24 / 32 | Why |
+|---|---|---|---|
+| `ic-mono-plain` | MENU OK | 0 / 0 / 0 / 0 | The control. No cylinder at all: a rectangle with a dome. |
+| `ic-mono-hatch2` | MENU OK | +2 / +1 / +1 / +2 | Two verticals in the right third. They merge into the right wall by 24 px, so it reads lit from the left rather than round. |
+| `ic-mono-hatch-lr` | **PICK** | +3 / +1 / +2 / +3 | **The one to show.** One line left, two right, bare band down the middle. Mid-tone on BOTH limbs, and identical on the dark ground. |
+| `ic-mono-weight` | MENU OK | +1 / 0 / +3 / +4 | Wall weight alone, and it buys nothing at the size that decides: 1.4 and 2.9 units are one pixel apart at 17 px. Its thin left wall also costs descender contrast (feet 30 against 50). |
+| `ic-mono-broken` | RECORD ONLY | +1 / +2 / +2 / +2 | Highest at 17 px and still turned down: from 24 up the dashes read as a BREAK in the tank wall. Kept because somebody will propose it again. |
 
 ## Water tower candidates, round 2 (2026-09-08b) — the geometry round
 
