@@ -70,8 +70,13 @@ console.log('--- an object under the pointer says what it is, panning or not ---
 	// dense drawing, so `pointer` there answered his complaint by making the whole canvas a pointer
 	// finger. The hit area is unchanged -- `pointer-events` on all three bands is untouched -- and
 	// the FEEDBACK moved onto the drawn stroke and the drawn disc, which is what this row now holds.
-	[['.lpn-node', 'pointer'], ['.lpn-link', 'pointer'], ['.lpn-link-hit', 'inherit'],
-		['.lpn-link-symbol-hit', 'inherit'], ['.lpn-vhandle', 'pointer'], ['.lpn-draglbl', 'pointer']
+	// **`default` ON THE DRAWN THINGS SINCE 2026-09-09** -- Tom, having used the corrected map:
+	// *"I prefer default over pointer at the labels and assets. It's more precise."* The complaint
+	// this section was written for was that an object said NOTHING different from the bare map; it
+	// still says something different (`grab` is the map, `default` is a thing), and the arrow hides
+	// less of a 7 px disc than the hand did.
+	[['.lpn-node', 'default'], ['.lpn-link', 'default'], ['.lpn-link-hit', 'inherit'],
+		['.lpn-link-symbol-hit', 'inherit'], ['.lpn-vhandle', 'default'], ['.lpn-draglbl', 'default']
 	].forEach(function (row) {
 		const re = new RegExp('\\' + row[0].replace('.', '.') + '[^{}]*\\{[^}]*cursor:\\s*' + row[1]);
 		ok(row[0] + ' still states cursor: ' + row[1], re.test(CSS));

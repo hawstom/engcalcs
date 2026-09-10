@@ -434,7 +434,7 @@ html[lang="zh"] .ec-welcome {
 	fill: var(--lpn-map-bg, #fff);
 	fill: color-mix(in srgb, currentColor var(--lpn-shade, 18%), var(--lpn-map-bg, #fff));
 	stroke: currentColor; stroke-width: calc(0.14 * var(--lpn-sym, 1));
-	cursor: pointer;
+	cursor: default;
 }
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
    stroke:none hides the circle itself; `pointer-events: visible` keeps its full disc
@@ -543,7 +543,16 @@ html[lang="zh"] .ec-welcome {
    map from here on means something: condition today (.lpn-node-pending's red, the override amber),
    value tomorrow (Task 327). This is the state Tom named as the thing EPANET makes hard: "a pipe to
    show as black while showing values from the model on the map". */
-.lpn-link { stroke: var(--lpn-map-ink); stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
+/* **`default`, NOT `pointer`, ON AN ASSET AND ON A LABEL** (Tom, 2026-09-09, having used the
+   corrected map: *"I prefer default over pointer at the labels and assets. It's more precise."*).
+   The finger's hot spot sits at the tip of a drawn hand about 20 px across; the arrow's sits at the
+   tip of an arrow that tapers to nothing, so it hides less of what it is aimed at -- and on this map
+   the thing being aimed at is a 7 px junction disc. He also gave the fallback if this ever gets
+   fiddly again: *"it would be perfectly fine to revert to a default cursor everywhere. The default
+   cursor is a solid pointer, and using others is partly or even mostly eye candy."*
+   The bare map keeps `grab` and a placement tool keeps `crosshair`; those two say what a PRESS will
+   do, which is the distinction worth a glyph. */
+.lpn-link { stroke: var(--lpn-map-ink); stroke-width: var(--lpn-lw, 0.7); cursor: default; }
 /* Black with its symbol (2026-08-14) -- the pump's polyline and its circle are one mark. */
 .lpn-link-pump { stroke: var(--lpn-map-ink); }
 /* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
@@ -582,7 +591,7 @@ html[lang="zh"] .ec-welcome {
    colour. */
 .lpn-vhandle {
 	fill: var(--lpn-map-ink); stroke: var(--lpn-map-ink);
-	stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: pointer;
+	stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: default;
 }
 /* VERTICES MODE (Task 567): the bends of every pipe become GRIPS -- hollow, and a good deal bigger
    than the dot that merely says a bend is there. EPANET's own grip is a hollow square; a circle is
@@ -1012,7 +1021,7 @@ html[lang="zh"] .ec-welcome {
    1 px point and leave the target visible beside them. The label's AREA is a separate complaint of
    his and is not addressed here -- draggable labels claim 6.5% of the canvas, measured over 23,821
    sampled points, and shrink-wrapping their boxes is his open decision. */
-.lpn-draglbl { cursor: pointer; pointer-events: visible; }
+.lpn-draglbl { cursor: default; pointer-events: visible; }
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per

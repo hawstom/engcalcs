@@ -293,8 +293,8 @@ console.log('\n--- the stylesheet half ---');
 	// here too so it cannot quietly move onto nothing.
 	ok('...and it inherits the canvas cursor rather than claiming pointer over 12 px of map',
 		/cursor:\s*inherit/.test(rule));
-	ok('...while the DRAWN disc still says pointer, or the feedback moved onto nothing',
-		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*pointer/.test(css));
+	ok('...while the DRAWN disc still carries the object cursor, or the feedback moved onto nothing',
+		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*default/.test(css));
 	// **`visibleFill` AND NOT `visible`, AND THIS LINE USED TO PIN THE DEFECT.** `visible` hit-tests
 	// the fill AND THE STROKE PERIMETER, and unlike `visiblePainted` it ignores the VALUES of `fill`
 	// and `stroke` -- so this rule's `stroke: none` removed nothing, and with no `stroke-width`

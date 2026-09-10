@@ -115,16 +115,22 @@ ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.l
 	ok(row[0] + ' inherits the canvas cursor', !!m && /cursor:\s*inherit/.test(m[2]),
 		m ? (/cursor:\s*([a-z-]+)/.exec(m[2]) || [])[1] : '(no rule)');
 });
-// And the DRAWN things still say pointer, or the feedback moved off the band onto nothing.
-ok('the drawn pipe says pointer', /\.lpn-link \{[^}]*cursor:\s*pointer/.test(cssCode));
-ok('the drawn node says pointer', /\.lpn-node \{[^}]*cursor:\s*pointer/.test(cssCode));
+// **AND THE DRAWN THINGS SAY `default`, WHICH IS TOM'S OWN PREFERENCE MEASURED AGAINST THE SAME
+// COMPLAINT** (2026-09-09, having used the corrected map: *"I prefer default over pointer at the
+// labels and assets. It's more precise."*). A finger's hot spot sits at the tip of a hand about
+// 20 px wide; an arrow tapers to nothing at its own hot spot, so it hides less of a 7 px junction
+// disc. The band must still not be the thing carrying it, which is what the rows above hold.
+ok('the drawn pipe says default', /\.lpn-link \{[^}]*cursor:\s*default/.test(cssCode));
+ok('the drawn node says default', /\.lpn-node \{[^}]*cursor:\s*default/.test(cssCode));
 
 // The two grabbable things he named by hand, positively asserted -- a label and a vertex grip both
-// used to wear the four-headed arrow, and both are the smallest targets on the map.
-ok('a draggable label says pointer',
-	/\.lpn-draglbl\s*\{[^}]*cursor:\s*pointer\b/.test(cssCode));
-ok('a vertex grip says pointer',
-	/\.lpn-vhandle\s*\{[^}]*cursor:\s*pointer\b/.test(cssCode));
+// used to wear the four-headed arrow, and both are the smallest targets on the map. They say
+// `default` since 2026-09-09, for the reason on the drawn pipe above; what matters here is that
+// neither has gone back to `move`, which the list further up holds absolutely.
+ok('a draggable label says default',
+	/\.lpn-draglbl\s*\{[^}]*cursor:\s*default\b/.test(cssCode));
+ok('a vertex grip says default',
+	/\.lpn-vhandle\s*\{[^}]*cursor:\s*default\b/.test(cssCode));
 
 console.log('\n-- 2. which modes wear the placement cursor, driven through setMode() --');
 
