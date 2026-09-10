@@ -224,8 +224,23 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
       // One attribute, no new string, and no visual change; `dir` is deliberately NOT set here,
       // because an RTL name inside an LTR menu row would re-align the whole row (see
       // dev/hyphenation-finding.md, which is where this came up). ?>
+<?php // **THE ROW POINTS AT THE PAGE'S CANONICAL ADDRESS, NOT AT ITS SCRIPT** (Tom, 2026-09-10,
+      // having switched language on the app and landed somewhere else: *"This from the language menu
+      // works. But is it what we want?"*). It was `$_SERVER['PHP_SELF']`, and **under the `/app/`
+      // rewrite that is the SCRIPT and not the address anybody typed** -- so switching language at
+      // `librewaternet.org/app/` moved the reader to `/engcalcs/Looped-Network.php?lang=xx`, which
+      // renders correctly and is not where they were. Every visit after that is off the canonical
+      // address, and a language switch is the one control a reader uses on their FIRST visit.
+      //
+      // This is the same trap Task 479.01 already fixed for `<link rel="canonical">`, hreflang and
+      // `og:url`, all of which read `ecCanonicalPath()`; the language menu was simply never brought
+      // along. It is a DECLARATION and never an inference for the reason recorded there: a rewrite
+      // is not invertible, and `REQUEST_URI` is client-supplied, so reversing one would let an
+      // arbitrary URL nominate itself. A page with no declared pretty URL gets its own script path
+      // back unchanged, which is what all 27 other pages want. ?>
+<?php $ec_lang_switch_path = ecCanonicalPath(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : ''); ?>
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
-					<a class="dropdown-item" lang="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
+					<a class="dropdown-item" lang="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($ec_lang_switch_path, ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>
 				</div>
 			</li>
