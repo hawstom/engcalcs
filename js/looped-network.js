@@ -17049,7 +17049,7 @@ var EngCalcs = EngCalcs || {};
 	// is the rule for every command that appears in both a menu and a control.
 	function wipeEverything() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_wipe || 'Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.')) { return; }
+		if (!window.confirm(pc.lpn_confirm_wipe || 'Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.')) { return; }
 		wipeAllStorage();
 		window.location.reload();
 	}
@@ -26800,7 +26800,7 @@ var EngCalcs = EngCalcs || {};
 		wipeBtn.style.marginLeft = '4px';
 		// The second of this command's two render sites; the menu row is the other. Both wear the
 		// warning triangle, because it is the same dangerous command either way.
-		setLabel(wipeBtn, 'wipe', pc.lpn_settings_wipe_btn || 'Erase everything on this page');
+		setLabel(wipeBtn, 'wipe', pc.lpn_settings_wipe_btn || 'Start fresh');
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);

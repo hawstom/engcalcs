@@ -161,6 +161,12 @@ run_check "suite ships its own assets"   blocking php dev/scripts/standalone_ass
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
 run_check "canonical path override"      blocking php dev/scripts/canonical_path_check.php
 run_check "canonical path selftest"      blocking php dev/scripts/canonical_path_selftest.php
+# The suite nav rides onto every page including the one served at the /app/ rewrite, where a
+# RELATIVE href resolves against /app/ and 404s. The markup is identical on both hosts, so nothing
+# in this repository could see it and Tom found it by clicking. Born at zero, guarded by a live
+# mutation because a ratchet that has never been red is worth nothing.
+run_check "suite nav links absolute"     blocking php dev/scripts/nav_link_absolute_check.php
+run_check "suite nav links selftest"     blocking php dev/scripts/nav_link_absolute_selftest.php
 # Task 322 rows 11 and 12. FOUR third-party requests, all opt-in, each behind its own gate -- and
 # every cookie, localStorage key and IndexedDB store a shipped file writes is written down. The
 # second found two that were not, in the file whose only claim is that it is complete. Neither

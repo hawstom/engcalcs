@@ -2514,8 +2514,18 @@ $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
 $ec_lang['lpn_settings_color_equal_counts']='Equal counts';
 $ec_lang['lpn_settings_color_no_values']='There are no values to work from yet. Solve the network first.';
 $ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
-$ec_lang['lpn_settings_wipe_btn']='Erase everything on this page';
-$ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.';
+// **"Start fresh", the nuclear option named as one** (Tom, 2026-09-09, after weighing "Restart app",
+// "Clear cache", "Clear app" and "Flush cache": *"We want something that sounds like the nuclear
+// option. And we give fair warning after clicking, so a long name isn't necessary."*).
+// **"Clear cache" was the tempting one and it is the one to refuse**: it is the most familiar phrase
+// of the set and it is a lie here. This deletes the visitor's SAVED PROJECTS, and everybody who has
+// ever cleared a browser cache has done so expecting to lose nothing. A word that reads as safe on a
+// control that is not safe is how somebody's work gets destroyed. "Restart app" fails more mildly in
+// the same direction: a restart is something you recover FROM, not something that takes your files.
+// The name is short because lpn_confirm_wipe below does the explaining, which is also why it does
+// not have to say "on this page".
+$ec_lang['lpn_settings_wipe_btn']='Start fresh';
+$ec_lang['lpn_confirm_wipe']='Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.';
 
 // Share this calculation (ROADMAP Task 228). template_share_link and template_share_copied were
 // RETIRED in Task 438 Wave 0: the duplicate control under the Printable Title is gone, the

@@ -197,8 +197,16 @@ function ecMenuRows(string $php): array
     }
     foreach ($mm as $m) {
         $el = $m[1];
-        // A leading slash is an absolute path into the parent site, not a page of this suite.
-        if (!preg_match('/href="([^"\/][^"]*\.php)"/', $el, $h)) { continue; }
+        // **THE HREF CARRIES THE MOUNT SINCE 2026-09-09, AND THE PAGE NAME IS WHAT THIS WANTS.**
+        // The nav's links were relative (`Manning-Pipe-Flow.php`) and were dead at the `/app/`
+        // rewrite, which resolves them against `/app/`. They now carry a short-echo of EC_SW_BASE in
+        // front of the file name (`nav_link_absolute_check.php` holds that; the literal is not
+        // written in this comment because a PHP close tag ends the file even inside a `//` line, and
+        // that is exactly how this comment broke the parser once). The match takes the FILE NAME off the end
+        // either way, so it reads the menu the same before and after and would read it the same again
+        // if the mount were ever spelled differently. A bare leading slash with no PHP echo in front
+        // of it is still an absolute path into the PARENT site and is still not a page of this suite.
+        if (!preg_match('/href="(?:<\?=[A-Za-z0-9_]+\?>)?([^"\/][^"]*\.php)"/', $el, $h)) { continue; }
         $descKey = null;
         $textKey = null;
         if (preg_match('/title="<\?=\$ec_lang\[\'([A-Za-z0-9_]+)\'\]\?>"/', $el, $t)) {

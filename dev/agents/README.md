@@ -17,6 +17,16 @@ conversation with him; the directory names stay as they are, because scripts rea
 | `utility-field-operator` | Franco | The person who opens the map ON A PHONE, in the street, to read it rather than draw it | `journal.md`, `wishlist.md` |
 | `market-researcher` | Mary | The world OUTSIDE this repository: who else solves these problems, and what it costs the people solving them | `journal.md`, `wishlist.md` |
 | `data-entry-clerk` | Declan | Entry at VOLUME, by keyboard: what a gesture costs when repeated four hundred times | `journal.md`, `wishlist.md` |
+| `interface-designer` | *unnamed* | VISUAL HIERARCHY and the frame around the content: what a reader notices first, second and never | `journal.md`, `wishlist.md` |
+
+**THE FIFTH SEAT WAS FILLED 2026-09-09 AND TOM HAS NOT NAMED IT.** The `interface-designer` was
+hired the day PCW and MJH, in separate sessions, both failed to see the menu bar, and MAH read it
+as belonging to the site rather than to the application. Tom: *"There are four lines of arguable
+chrome, HawsEDC, menus, toolbar, and tabs. And a good designer would know exactly what to do. I
+don't know what to do."* **It carries what nobody here has ever carried: a judgement about
+LAYOUT** -- this suite's working guide is 900 lines about correctness and almost nothing about
+attention. Its standing brief is to DIAGNOSE and rank, never to redesign, because a redesign before
+the 16 September demonstration is the distraction Tom named himself. **Ask him for a name.**
 
 **Each agent keeps a journal and a wish list.** The journal is what it learned; the wish list is
 what it would build next, in its own order. Tom, 2026-08-24: *"We all have our pet priorities, and

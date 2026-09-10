@@ -82,6 +82,18 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
     global $ec_lang, $language_settings;
 ?>
 
+<?php // **EVERY LINK IN THIS BAR IS ABSOLUTE FROM THE ORIGIN, AND THAT IS NOT TIDINESS** (Tom,
+      // 2026-09-09, looking at librewaternet.org: *"1st and 3rd items (Hawsedc Calculators and
+      // Hydraulics) and Help don't even work at LibreWaterNet.org, which is embarrassment we forgot
+      // to check."*). They were RELATIVE, which is correct at `hawsedc.com/engcalcs/Whatever.php`
+      // and wrong everywhere else: `/app/` is a REWRITE onto Looped-Network.php, so a relative
+      // `Manning-Pipe-Flow.php` resolves against `/app/` and 404s, and so does `index.php`. Nothing
+      // could see it -- the markup is identical on both hosts and only the base differs.
+      //
+      // EC_SW_BASE is the declared canonical mount and its own comment already says every absolute
+      // path in the source names it; the favicon link does the same. It stays a PATH rather than a
+      // full URL so the bar never sends a reader to the other host, and it is the base mount rather
+      // than the current one because `/app/` serves exactly one page and none of these live there. ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-light d-print-none">
 	<?php // ONE flex item, not two (Tom, 2026-08-09, third pass): "I still see it floating
 	      // rightward/center instead of leftward against 'HawsEDC Calculators' when the window is
@@ -92,7 +104,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 	      // Wrapping the two in one element makes them a single item that the space-between rule
 	      // cannot split. ?>
 	<span class="ec-brandgroup">
-	<a class="navbar-brand" href="index.php"><?=$ec_lang['menu_brand']?></a>
+	<a class="navbar-brand" href="<?=EC_SW_BASE?>index.php"><?=$ec_lang['menu_brand']?></a>
 	<?php // Task 244 (Tom, 2026-08-09), placed OUTSIDE .navbar-collapse deliberately.
 	      // It first shipped as the top item of the collapsing nav list, and Tom's browser
 	      // review rejected that: "I think it would be better for 'Libre Software' not to
@@ -118,31 +130,31 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<?=$ec_lang['menu_main_hydraulics']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown-calc">
-					<a class="dropdown-item" href="Manning-Pipe-Flow.php" title="<?=$ec_lang['mpf_main_desc']?>"><?=$ec_lang['mpf_main_menu']?></a>
-					<a class="dropdown-item" href="Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a>
-					<a class="dropdown-item" href="Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
-					<a class="dropdown-item" href="Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a>
-					<a class="dropdown-item" href="Branched-Network.php" title="<?=$ec_lang['bpn_main_desc']?>"><?=$ec_lang['bpn_main_menu']?></a>
-					<a class="dropdown-item" href="Looped-Network.php" title="<?=$ec_lang['lpn_main_desc']?>"><?=$ec_lang['lpn_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Pipe-Flow.php" title="<?=$ec_lang['mpf_main_desc']?>"><?=$ec_lang['mpf_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Branched-Network.php" title="<?=$ec_lang['bpn_main_desc']?>"><?=$ec_lang['bpn_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Looped-Network.php" title="<?=$ec_lang['lpn_main_desc']?>"><?=$ec_lang['lpn_main_menu']?></a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
-					<a class="dropdown-item" href="Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
-					<a class="dropdown-item" href="Rock-Chute.php" title="<?=$ec_lang['rc_main_desc']?>"><?=$ec_lang['rc_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Rock-Chute.php" title="<?=$ec_lang['rc_main_desc']?>"><?=$ec_lang['rc_main_menu']?></a>
 					<div class="dropdown-divider"></div>
-										<a class="dropdown-item" href="Micro-Hydro-Power.php" title="<?=$ec_lang['mhp_main_desc']?>"><?=$ec_lang['mhp_main_menu']?></a>
+										<a class="dropdown-item" href="<?=EC_SW_BASE?>Micro-Hydro-Power.php" title="<?=$ec_lang['mhp_main_desc']?>"><?=$ec_lang['mhp_main_menu']?></a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="Orifice.php" title="<?=$ec_lang['or_main_desc']?>"><?=$ec_lang['or_main_menu']?></a>
-					<a class="dropdown-item" href="Orifice-Drain-Time.php" title="<?=$ec_lang['odt_main_desc']?>"><?=$ec_lang['odt_main_menu']?></a>
-					<a class="dropdown-item" href="Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
-					<a class="dropdown-item" href="Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Orifice.php" title="<?=$ec_lang['or_main_desc']?>"><?=$ec_lang['or_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Orifice-Drain-Time.php" title="<?=$ec_lang['odt_main_desc']?>"><?=$ec_lang['odt_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
 					<div class="dropdown-divider"></div>
 					<?php // Irrigation.php is deliberately absent from this menu (Task 232, 2026-08-08).
 					      // Every other item here is a calculator; that page is a card index pointing
 					      // back at this very dropdown, so as a plain "Irrigation" entry it read as a
 					      // calculator and wasn't one. The page still exists and is still in the
 					      // sitemap -- only the menu entry is gone. ?>
-					<a class="dropdown-item" href="Canal-Seepage.php" title="<?=$ec_lang['cs_main_desc']?>"><?=$ec_lang['cs_main_menu']?></a>
-					<a class="dropdown-item" href="Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Canal-Seepage.php" title="<?=$ec_lang['cs_main_desc']?>"><?=$ec_lang['cs_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
 				</div>
 			</li>
 		</ul>
@@ -187,9 +199,9 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<?=ecIcon('help')?><?=$ec_lang['menu_help']?>
 				</a>
 				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-help">
-					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
-					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
-					<a class="dropdown-item" href="contact.php"><?=$ec_lang['contact_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>About.php"><?=$ec_lang['about_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Install.php"><?=$ec_lang['install_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>contact.php"><?=$ec_lang['contact_main_menu']?></a>
 					<?php // Walkthroughs USED TO BE HERE and was moved into the Looped Network page's own
 					      // Help menu on 2026-08-13 (Tom: "the walkthrough is a little incongruous").
 					      // The post covers that one calculator, so among these suite-wide items the
