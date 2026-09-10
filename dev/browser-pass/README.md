@@ -29,6 +29,33 @@ violate.** Open work belongs in `dev/ROADMAP.md`, read by someone deciding what 
 suite is read by someone asking whether anything broke. When the fix lands, the report becomes an
 assertion — which is what happened here.
 
+## §41's island hunt, and a report it could not reproduce
+
+Tom, 2026-09-10, on an invisible 1 px border he had traced by hand: *"You have no idea how
+painstaking it is to find an invisible line 1px wide even once, much less many times."* §41 now
+reproduces his settings -- the Basic example, symbol size 100 px, link line thickness 30 px,
+Thematic map on -- and walks outward from a junction, a reservoir and a pump one pixel at a time on
+eight bearings, at three zooms, with the wheel anchored on each object in turn so it stays under the
+pointer. It fails on a PHANTOM (an invisible hit band that is the whole of a run of two pixels or
+fewer) and on a SLIT (a hairline run whose two neighbours are the same element).
+
+**It found nothing, and the search that says so is worth recording so nobody repeats it.** 1.4
+million samples over the whole canvas at 1 px on the XY Basic example, the XY Net3 and the
+geographic Net3, at four zooms, in Chromium and in Playwright's Firefox; a 1.6-million-sample
+sub-pixel raster at 0.25 px over a 400 x 400 window round one junction at 2.66x; and radial walks at
+0.2 px steps out to 700 px. Every hit shape's width in SCREEN pixels is constant across zooms on
+both an XY and a geographic drawing -- `.lpn-node-hit` 0, `.lpn-link-symbol-hit` 4,
+`.lpn-link-hit` 30 -- so the stale-scale explanation ("a multiplication of pixels and map units") is
+measured and refuted here rather than argued about. What is left unexplained is a real user
+observation, and the honest reading is that something about his environment -- device pixel ratio,
+browser, or a zoom the wheel cannot reach -- is not in this runner.
+
+Because that section now passes by finding nothing, which is the shape that has already died of
+success in this suite once, it ends by PLANTING one: a transparent circle round a junction,
+`visibleStroke` with a one-screen-pixel stroke, so its interior answers nothing and its outline
+answers as an invisible ring the drawing does not show. The walk must name it, and must stop naming
+it when it is removed.
+
 ## Gecko is reachable now, and §42 is why it was needed
 
 `node run.js` drives Chromium and only Chromium. On 2026-09-09 a user report named LibreWolf

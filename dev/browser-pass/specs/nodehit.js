@@ -479,6 +479,199 @@ exports.inkVsHit = inkVsHit;
 exports.clickSymbols = clickSymbols;
 exports.example = example;
 
+// ---- TOM'S OWN SETUP, AND THE 1 px ISLAND HUNT (2026-09-10) ----------------------------------
+//
+// He found an invisible border by hand and said what that costs: *"You have no idea how
+// painstaking it is to find an invisible line 1px wide even once, much less many times."* So this
+// is the machine, and it reproduces his settings exactly -- the Basic example, **Symbol size
+// 100 px, Link line thickness 30 px, Thematic map on** -- then walks outward one pixel at a time
+// on eight bearings from a junction, a reservoir and a pump, at three zooms, reading the element
+// the browser hits and the cursor that element computes.
+//
+// **WHAT IT ASSERTS IS TWO SHAPES OF ISLAND, NAMED SO THEY CAN BE WRONG:**
+//   * a PHANTOM -- an invisible hit band (`.lpn-node-hit`, `.lpn-link-hit`, `.lpn-link-symbol-hit`,
+//     `.lpn-lbl-hit`) that is the topmost answer for two pixels or fewer. Those elements draw
+//     nothing, so anywhere one of them is the whole of a run is a cursor change with no ink under
+//     it, which is Tom's report exactly.
+//   * a SLIT -- a run of two pixels or fewer whose two neighbours are the SAME element, i.e. a
+//     hairline cut through one object's own answer.
+// A run of bare map between two DIFFERENT objects that touch is neither, and is deliberately not
+// failed: that is two drawn things abutting, and the arithmetic of a curve against a polygon
+// leaves one or two pixels of ground between them. It is printed.
+//
+// **THREE ZOOMS, BECAUSE THE SIGNATURE WAS ZOOM-DEPENDENT.** Tom, on the offset he measured:
+// *"its offset from the link in px increases as I zoom in ... 4 widths away from the link.
+// Zoomed out, it may be only 1/2 width away."* An offset that moves while the drawn object does
+// not is a length in WORLD units where a screen one was meant, so a single-zoom sweep would have
+// found one island and said nothing about its cause. The wheel is anchored ON the object, so the
+// object stays under the pointer and the walk starts from the same ink at every zoom.
+//
+// **MEASURED 2026-09-10 AND FOUND NOTHING**, which is why the mutation below exists: 1.4 million
+// samples over the whole canvas at 1 px on the XY Basic, the XY Net3 and the geographic Net3, at
+// four zooms, in Chromium AND in Playwright's Firefox, plus a 1.6-million-sample sub-pixel raster
+// at 0.25 px over a 400 x 400 window round one junction at 2.66x -- no phantom and no slit
+// anywhere. A check that passes by finding nothing is the shape that has already died of success
+// in this suite once, so the last section injects a real one and requires this walk to name it.
+const TOM_SYMBOL_PX = 100, TOM_LINK_PX = 30;
+const HIT_ONLY = ['lpn-node-hit', 'lpn-link-hit', 'lpn-link-symbol-hit', 'lpn-lbl-hit'];
+const ISLAND_PX = 2;
+
+// A Settings row is found by its own language KEY, never by its English (harness_wording_check.php).
+async function setSettingNumber(a, label, value) {
+	const got = await a.page.evaluate(([label, v]) => {
+		for (const r of document.querySelectorAll('#lpn_setbox_content .lpn-set-row')) {
+			if (r.textContent.indexOf(label) < 0) { continue; }
+			const inp = r.querySelector('input[type=number]');
+			if (!inp) { continue; }
+			inp.value = String(v);
+			inp.dispatchEvent(new Event('change', { bubbles: true }));
+			return true;
+		}
+		return false;
+	}, [label, value]);
+	if (!got) { throw new Error(`no Settings number row saying "${label}"`); }
+}
+async function setSettingCheck(a, label, on) {
+	const got = await a.page.evaluate(([label, v]) => {
+		for (const r of document.querySelectorAll('#lpn_setbox_content .lpn-set-row')) {
+			if (r.textContent.indexOf(label) < 0) { continue; }
+			const inp = r.querySelector('input[type=checkbox]');
+			if (!inp) { continue; }
+			if (inp.checked !== v) { inp.click(); }
+			return true;
+		}
+		return false;
+	}, [label, on]);
+	if (!got) { throw new Error(`no Settings checkbox row saying "${label}"`); }
+}
+async function applyTomSetup(a) {
+	await a.toolbarClick('Settings');
+	await a.settle(400);
+	await setSettingNumber(a, await a.lang('lpn_settings_symbol_size'), TOM_SYMBOL_PX);
+	await a.settle(250);
+	await setSettingNumber(a, await a.lang('lpn_settings_link_width'), TOM_LINK_PX);
+	await a.settle(250);
+	await setSettingCheck(a, await a.lang('lpn_settings_color_thematic'), true);
+	await a.settle(400);
+	// The box lies over the canvas, and a popover swallows every probe under it.
+	await a.page.keyboard.press('Escape');
+	await a.settle(250);
+	await a.page.evaluate(() => {
+		const b = document.querySelector('#lpn_setbox .lpn-popover-close');
+		if (b) { b.click(); }
+	});
+	await a.settle(600);
+}
+
+// The drawn centre of the object of this kind nearest the middle of the canvas.
+async function spotOf(a, kind) {
+	return a.page.evaluate((kind) => {
+		const svg = document.getElementById('lpn_canvas');
+		const b = svg.getBoundingClientRect();
+		const sel = kind === 'pump' || kind === 'valve' ? '.lpn-link-symbol-' + kind : '.lpn-node-' + kind;
+		let best = null;
+		[...svg.querySelectorAll(sel)].forEach((n) => {
+			const r = n.getBoundingClientRect();
+			if (!(r.width > 0) || r.x < b.x || r.right > b.right || r.y < b.y || r.bottom > b.bottom) { return; }
+			const cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+			const d = Math.hypot(cx - (b.x + b.width / 2), cy - (b.y + b.height / 2));
+			if (!best || d < best.d) { best = { x: cx, y: cy, d: d, id: n.dataset.node || n.dataset.link || kind }; }
+		});
+		return best;
+	}, kind);
+}
+// The wheel is anchored at the pointer, so zooming ON the object leaves it where it was.
+async function zoomOn(a, at, notches) {
+	await a.page.mouse.move(at.x, at.y);
+	for (let i = 0; i < notches; i++) { await a.page.mouse.wheel(0, -100); await a.page.waitForTimeout(45); }
+	await a.settle(800);
+}
+
+// One bearing, one pixel at a time: the element the browser hits and the cursor it computes.
+// `document.elementFromPoint` is the same hit test the cursor is resolved from, which is what lets
+// this answer the question at all.
+async function walkRuns(a, at, upto) {
+	return a.page.evaluate(([at, upto]) => {
+		const B = [[1, 0, 'E'], [0.7071, 0.7071, 'SE'], [0, 1, 'S'], [-0.7071, 0.7071, 'SW'],
+			[-1, 0, 'W'], [-0.7071, -0.7071, 'NW'], [0, -1, 'N'], [0.7071, -0.7071, 'NE']];
+		const svg = document.getElementById('lpn_canvas');
+		const box = svg.getBoundingClientRect();
+		const name = (el) => {
+			if (!el) { return '(nothing)'; }
+			if (el === svg) { return 'bare map'; }
+			if (!svg.contains(el)) { return 'off the map: ' + (el.id || el.tagName.toLowerCase()); }
+			const cls = (el.getAttribute('class') || '').trim().split(/\s+/).filter((c) => /^lpn-/.test(c));
+			return el.tagName.toLowerCase() + (cls.length ? '.' + cls.join('.') : '')
+				+ (el.dataset && (el.dataset.node || el.dataset.link) ? ' [' + (el.dataset.node || el.dataset.link) + ']' : '');
+		};
+		const out = [];
+		B.forEach(([dx, dy, bearing]) => {
+			const runs = [];
+			for (let d = 0; d <= upto; d++) {
+				const x = at.x + dx * d, y = at.y + dy * d;
+				if (x < box.x || y < box.y || x > box.right || y > box.bottom) { break; }
+				const el = document.elementFromPoint(x, y);
+				const k = name(el) + '|' + (el ? getComputedStyle(el).cursor : '(none)');
+				const last = runs[runs.length - 1];
+				if (last && last.k === k) { last.to = d; continue; }
+				runs.push({ k: k, from: d, to: d, el: name(el), cursor: el ? getComputedStyle(el).cursor : '(none)',
+					cls: el && el.getAttribute ? (el.getAttribute('class') || '') : '' });
+			}
+			out.push({ bearing: bearing, runs: runs });
+		});
+		return out;
+	}, [at, upto]);
+}
+
+// The two island shapes, plus the abutments, which are printed and never failed.
+function islandsIn(walk, where) {
+	const phantom = [], slit = [], abut = [];
+	walk.forEach(({ bearing, runs }) => {
+		runs.forEach((r, i) => {
+			const w = r.to - r.from + 1;
+			if (w > ISLAND_PX || i === 0 || i === runs.length - 1) { return; }
+			// Page furniture lying over the canvas -- the tab strip, the toolbar, the form itself --
+			// is not the map and its own borders are not islands in it.
+			if ([r, runs[i - 1], runs[i + 1]].some((x) => x.el.indexOf('off the map') === 0)) { return; }
+			const line = `${where} ${bearing} ${r.from}-${r.to}px (${w}) ${r.cursor} <${r.el}> between <${runs[i - 1].el}> and <${runs[i + 1].el}>`;
+			if (HIT_ONLY.some((c) => (' ' + r.cls + ' ').indexOf(' ' + c + ' ') >= 0)) { phantom.push(line); return; }
+			if (runs[i - 1].k === runs[i + 1].k) { slit.push(line); return; }
+			abut.push(line);
+		});
+	});
+	return { phantom, slit, abut };
+}
+
+// **EACH TYPE IS ZOOMED ON IN ITS OWN RIGHT, AND THAT IS NOT TIDINESS.** A wheel anchored on a
+// junction throws the reservoir and the pump off the canvas within a few notches, so one zoom
+// sequence for the whole set measures the junction at three scales and the other two at one -- and
+// a check that quietly stops asking is this suite's own named failure. So the view is re-fitted per
+// type and the wheel is put over THAT object.
+async function huntIslands(a, report, where, kinds, upto, notches) {
+	let phantom = [], slit = [], abut = 0;
+	for (const kind of kinds) {
+		if (notches) {
+			await a.toolbarClick('Zoom to fit');
+			await a.settle(700);
+			const seed = await spotOf(a, kind);
+			if (seed) { await zoomOn(a, seed, notches); }
+		}
+		const at = await spotOf(a, kind);
+		if (!at) { report.note(`${where}: no ${kind} inside the canvas -- not walked`); continue; }
+		const walk = await walkRuns(a, at, upto);
+		walk.forEach(({ bearing, runs }) => {
+			report.note(`${where} ${kind} ${at.id} ${bearing}: ` + runs
+				.map((r) => `${r.from}-${r.to}px ${r.cursor} <${r.el}>`).join(' | '));
+		});
+		const f = islandsIn(walk, `${where} ${kind} ${at.id}`);
+		phantom = phantom.concat(f.phantom);
+		slit = slit.concat(f.slit);
+		abut += f.abut.length;
+		f.abut.forEach((l) => report.note('   two objects touch, one or two pixels of map between them: ' + l));
+	}
+	return { phantom, slit, abut };
+}
+
 exports.run = async function ({ browser, report }) {
 	// ---- the geographic project, which is where it was user-visible -----------------------------
 	const geo = await example(browser, 'lat/lon');
@@ -581,4 +774,54 @@ exports.run = async function ({ browser, report }) {
 			clicks.map(c => c.type).join(', ') || 'none');
 		assertSymbolClicks(report, WHERE, clicks);
 	} finally { await elm.close(); }
+// ---- TOM'S 2026-09-10 SETUP: THE 1 px ISLAND HUNT -------------------------------------------
+	const tom = await example(browser, { key: 'lpn_ex_basic_us_title' });
+	try {
+		await applyTomSetup(tom);
+		for (const notches of [0, 6, 12]) {
+			const where = `100/30 thematic, ${notches} wheel notches in`;
+			const f = await huntIslands(tom, report, where, ['junction', 'reservoir', 'pump'], 320, notches);
+			report.ok(f.phantom.length === 0, `${where}: no invisible band is the whole of a run`,
+				f.phantom.length ? f.phantom.join(' ;; ') : `none on eight bearings, ${f.abut} abutments printed`);
+			report.ok(f.slit.length === 0, `${where}: nothing cuts a hairline slit through one object's answer`,
+				f.slit.length ? f.slit.join(' ;; ') : 'none on eight bearings');
+		}
+
+		// **A LIVE MUTATION, BECAUSE THIS SECTION PASSES BY FINDING NOTHING.** It plants exactly the
+		// thing Tom described -- one transparent circle round a junction, `visibleStroke` with a
+		// one-screen-pixel stroke, so its INTERIOR answers nothing and its OUTLINE answers as an
+		// invisible ring at a radius the drawing does not show. The walk must name it, and must stop
+		// naming it when it is taken away.
+		await tom.toolbarClick('Zoom to fit');
+		await tom.settle(700);
+		const seed = await spotOf(tom, 'junction');
+		const planted = await tom.page.evaluate((id) => {
+			const svg = document.getElementById('lpn_canvas');
+			const g = svg.querySelector('g');
+			const m = (g.getAttribute('transform') || '').match(/scale\(([-\d.e+]+)\)/);
+			const s = m ? +m[1] : 1;
+			const c = svg.querySelector('.lpn-node[data-node="' + CSS.escape(id) + '"]');
+			if (!c) { return false; }
+			const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			ring.setAttribute('class', 'lpn-node-hit');
+			ring.setAttribute('id', 'lpn_mutation_ring');
+			ring.setAttribute('cx', c.getAttribute('cx'));
+			ring.setAttribute('cy', c.getAttribute('cy'));
+			ring.setAttribute('r', (+c.getAttribute('r')) + 60 / s);
+			ring.setAttribute('style', 'pointer-events:visibleStroke;fill:none;stroke:transparent;stroke-width:' + (1 / s));
+			g.appendChild(ring);
+			return true;
+		}, seed && seed.id);
+		report.ok(planted, 'the mutation ring was planted round a junction');
+		const withRing = islandsIn(await walkRuns(tom, seed, 320), 'mutation');
+		report.ok(withRing.phantom.length > 0, 'the walk NAMES a planted one-pixel invisible ring',
+			withRing.phantom.length ? withRing.phantom[0] : 'it found nothing, so this section proves nothing');
+		await tom.page.evaluate(() => {
+			const r = document.getElementById('lpn_mutation_ring');
+			if (r) { r.remove(); }
+		});
+		const without = islandsIn(await walkRuns(tom, seed, 320), 'mutation removed');
+		report.ok(without.phantom.length === 0, '...and stops naming it the moment it is taken away',
+			without.phantom.length ? without.phantom.join(' ;; ') : 'clean');
+	} finally { await tom.close(); }
 };
