@@ -29,6 +29,31 @@ violate.** Open work belongs in `dev/ROADMAP.md`, read by someone deciding what 
 suite is read by someone asking whether anything broke. When the fix lands, the report becomes an
 assertion — which is what happened here.
 
+## Gecko is reachable now, and §42 is why it was needed
+
+`node run.js` drives Chromium and only Chromium. On 2026-09-09 a user report named LibreWolf
+(`dev/browser-pass/specs/areadrag.js` carries it), so **Playwright's own Firefox 153 was installed**
+-- `npx playwright-core install firefox`, about 108 MB, cached in `~/.cache/ms-playwright` beside
+the Chromium this runner already uses. It is the engine LibreWolf is, and a spec can be driven
+through it in a few lines: `playwright.firefox.launch({ executablePath: <that binary> })` in place
+of `env.launchBrowser()`, with everything else in `lib/` unchanged -- the PHP server, the sentinel,
+`Session`, the pickers. LibreWolf's own hardening is `firefoxUserPrefs`:
+`privacy.resistFingerprinting`, its `letterboxing`, `privacy.trackingprotection.enabled`,
+`network.cookie.cookieBehavior: 5`.
+
+**It answered the question it was installed for, in the negative, and that was worth the download.**
+The whole select-area gesture matrix behaves identically in Gecko and in Blink, hardened and plain,
+before the fix and after it -- so the report's own attribution to a browser was wrong, and two
+engine-independent defects were what a user was actually meeting. `run.js` is deliberately NOT
+made dual-engine on the strength of one investigation: that doubles a thirteen-minute pass to buy
+a difference nothing has yet measured. Reach for Firefox when a report names one, the way this did.
+
+**One thing Gecko did find that Chromium cannot**, with site data blocked
+(`dom.storage.enabled: false`): the service-worker registration in `lib/HeadersFooters.lib.php`
+raises an UNCAUGHT `SecurityError` on every page load. The wide-scope `register()` has a `.catch()`
+and the narrow-scope fallback inside it does not. One line, not fixed here, and it is exactly the
+privacy-hardened visitor this suite is written for.
+
 ## §25's two timing bounds fail on a slow machine, and that is not a regression
 
 **Measured 2026-09-06 in this WSL2 checkout, with other work running beside it:** the 736-element

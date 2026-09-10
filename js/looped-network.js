@@ -9431,6 +9431,22 @@ var EngCalcs = EngCalcs || {};
 	// erratic with a mouse. Decided by pointerType, never by screen width.
 	var areaTouchDrag = null;
 	var areaTouchStart = null;
+	// **A PRESS THAT OPENED A RING AND THEN TRAVELLED IS A MARQUEE, AND IT ENDS ON THE RELEASE.**
+	// Where the press that opened the ring went down, in CLIENT coordinates, or null. This is the
+	// pointer's half of the finger's `areaTouchStart` and it exists because the click-and-rubber-band
+	// gesture had no answer at all for a press-drag-release -- the gesture every other drawing
+	// program uses for a marquee, and the one a user reaches for first. Reported by MJH,
+	// 2026-09-09 (*"won't select area"* / *"area select broke the project"*), reproduced in Gecko
+	// AND in Blink: the release did nothing, so the ring stayed OPEN and went on following the
+	// pointer across the whole map with the gesture long over, and the user's next ordinary click
+	// anywhere committed a ring from a corner they had forgotten -- selecting a large part of the
+	// network they never framed and opening the multi-element property editor over it, one
+	// keystroke away from a mass edit or a mass delete.
+	// **CLICK-AND-RUBBER-BAND IS UNTOUCHED** (Tom, 2026-09-07): a press that does NOT travel is
+	// still a click, and still starts or finishes the ring on the way DOWN. This only gives the
+	// release a meaning it did not have, and only for the press that opened the ring -- a polygon
+	// is a vertex per press by nature and keeps its double-click ending.
+	var areaPressAt = null;
 	var areaLastPointer = 'mouse';    // pointerType of the last press on the map; picks the bubble's sentence
 	var LPN_AREA_SHAPES = ['window', 'lasso', 'polygon'];
 	function selectAreaShapeNext() {
@@ -9456,7 +9472,10 @@ var EngCalcs = EngCalcs || {};
 		selectAreaEl.style.display = '';
 		selectAreaEl.setAttribute('points', pts.map(function (p) { return p.x + ',' + p.y; }).join(' '));
 	}
-	function areaCancel() { areaRing = null; areaLive = null; areaTouchDrag = null; paintAreaMarquee(); updateAreaHint(); }
+	function areaCancel() {
+		areaRing = null; areaLive = null; areaTouchDrag = null; areaPressAt = null;
+		paintAreaMarquee(); updateAreaHint();
+	}
 	/**
 	 * **THE BUBBLE SAYS WHAT THE NEXT CLICK WILL DO** (Task 266, Tom 2026-09-07). It changes as the
 	 * gesture progresses, which is the whole reason it is not another line in the mode hint: before
@@ -9526,6 +9545,17 @@ var EngCalcs = EngCalcs || {};
 		showLbl.appendChild(showBox);
 		showLbl.appendChild(document.createTextNode(' ' + (pc.lpn_area_hint_show || 'Show this')));
 		box.appendChild(showLbl);
+		// **THE BUBBLE NEVER STANDS BETWEEN A READER AND THE CLICK IT IS TELLING THEM TO MAKE.**
+		// It opens CENTRED on the map and takes presses, because makePanelDraggable() needs one --
+		// so while a ring is open, the click that closes it lands on the panel and is simply eaten:
+		// nothing happens, the ring survives, and the next click anywhere commits a ring from a
+		// corner the user had given up on. MEASURED 2026-09-09 on a 1440x900 window: the panel is
+		// 242x93 px over a 1438x499 map, 3.1% of it, and every pixel of that 3.1% is the middle,
+		// which is where a network is and where a marquee is closed. So it goes inert for exactly
+		// as long as a ring is open, and is draggable again the moment the ring ends. Its own
+		// checkbox is unreachable for that moment, which is the right way round: the ring is a
+		// gesture in progress and turning the bubble off is not.
+		box.style.pointerEvents = started ? 'none' : 'auto';
 		was = box.style.display;
 		box.style.display = '';
 		if (box.__lpnRaise) { box.__lpnRaise(); }
@@ -9659,6 +9689,23 @@ var EngCalcs = EngCalcs || {};
 			areaCancel();
 			return true;
 		}
+		areaLive = { x: w.x, y: w.y };
+		commitArea();
+		return true;
+	}
+	// **THE RELEASE OF A PRESS-DRAG-RELEASE, ON A POINTER.** The finger's version above cancels a
+	// press that went nowhere, because on touch the press IS the whole gesture; here a press that
+	// went nowhere is an ordinary click and has already done its work on the way down, so it is
+	// left exactly alone. What must not survive is a press that opened a ring and then travelled:
+	// before this, the release meant nothing and the ring outlived the gesture that drew it.
+	// `areaPressAt.started` is what keeps the second click of a click-and-rubber-band out of here --
+	// that press COMMITTED the ring rather than opening one, so there is nothing left to end.
+	function areaPointerUp(e, w) {
+		var from = areaPressAt;
+		if (!from || from.id !== e.pointerId) { return false; }
+		areaPressAt = null;
+		if (!from.started || !areaDrawing() || selectAreaShape === 'polygon') { return false; }
+		if (Math.hypot(e.clientX - from.x, e.clientY - from.y) < tapMovePx(e)) { return false; }
 		areaLive = { x: w.x, y: w.y };
 		commitArea();
 		return true;
@@ -23148,6 +23195,9 @@ var EngCalcs = EngCalcs || {};
 				// pointer, and a polygon on either, by clicks. pointerType, never screen width.
 				areaLastPointer = e.pointerType || 'mouse';
 				if (e.pointerType === 'touch' && areaTouchDown(e, screenToWorld(e.clientX, e.clientY))) { return; }
+				// Recorded BEFORE the press, because `started` is the question "did this press open
+				// the ring", and after areaPress() has run there is no way left to ask it.
+				areaPressAt = { id: e.pointerId, x: e.clientX, y: e.clientY, started: !areaDrawing() };
 				areaPress(screenToWorld(e.clientX, e.clientY), !!e.shiftKey);
 				return;
 			}
@@ -23251,12 +23301,19 @@ var EngCalcs = EngCalcs || {};
 			}
 			dragDirty = true;
 		});
-		function endPointer(e) {
+		function endPointer(e, cancelled) {
 			pointers.delete(e.pointerId);
 			// The lift that ends a finger's ring (Task 266, Tom 2026-09-08). Before anything else,
 			// because nothing else on this page owns that finger: select-area arms no `drag`.
-			if (mode === 'select-area' && areaTouchDrag !== null) {
-				areaTouchUp(e, screenToWorld(e.clientX, e.clientY));
+			if (mode === 'select-area') {
+				// **A CANCELLED POINTER ENDS THE RING WITHOUT SELECTING ANYTHING.** The browser has
+				// taken the gesture away, so the release never says where the user meant to stop --
+				// and a ring committed at wherever the pointer happened to be is exactly the
+				// unasked-for selection this whole repair is about. The finger's own path is
+				// deliberately left as it shipped.
+				if (areaTouchDrag !== null) { areaTouchUp(e, screenToWorld(e.clientX, e.clientY)); }
+				else if (cancelled) { areaPressAt = null; if (areaDrawing()) { areaCancel(); } }
+				else { areaPointerUp(e, screenToWorld(e.clientX, e.clientY)); }
 			}
 			// A PAN CHANGES WHICH REPEATED LABELS ARE WORTH DRAWING, so the cull is re-run when the
 			// pan finishes -- not on every frame of it, which would rebuild elements at 60 Hz for a
@@ -23288,8 +23345,8 @@ var EngCalcs = EngCalcs || {};
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
 			if (wasPan && !drag) { relayoutLabels(); }
 		}
-		svg.addEventListener('pointerup', endPointer);
-		svg.addEventListener('pointercancel', endPointer);
+		svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
+		svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
 
 		svg.addEventListener('dblclick', function (e) {
 			// Cancel a pending "open the link popup" from the first tap (see below) -- otherwise

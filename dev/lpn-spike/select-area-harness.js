@@ -128,6 +128,9 @@ const L = loadLoopedNetwork(
 	// a move is a move, and the harness supplies world coordinates because screenToWorld() is the
 	// only thing between it and a real one.
 	"\t\tpress: function (x, y, shift) { return areaPress({ x: x, y: y }, !!shift); },\n" +
+	// The page's own screen-to-world, so a section driving the REAL pointer listeners can put a
+	// junction where a client point will actually land instead of assuming the two are the same.
+	"\t\tscreenToWorld: screenToWorld,\n" +
 	"\t\tmove: function (x, y) { return areaMove({ x: x, y: y }); },\n" +
 	"\t\tdrawing: areaDrawing, ringNow: areaRingPoints,\n" +
 	"\t\thintText: function () { var b = document.getElementById('lpn_area_hint');\n" +
@@ -824,6 +827,124 @@ console.log('\n--- the bubble\'s "Show this" and the Settings row are one switch
 	report(/showBox\.checked = areaHintShown\(\);/.test(src2),
 		'the bubble reads its own state from the seam, never a hard-coded true');
 	L.setHintShown(true);
+}
+
+// ---- 20. THE RING NEVER OUTLIVES THE GESTURE THAT DREW IT (MJH, 2026-09-09) --------------------
+//
+// **THE USER REPORT.** Tom, 2026-09-09, relaying his son MJH: *"His LibreWolf browser won't select
+// area. Area select broke the project."* Reproduced headlessly in a real Gecko AND in a real
+// Chromium (`dev/browser-pass/specs/areadrag.js`), and it turned out not to be a browser
+// difference at all: a press-drag-release -- the marquee gesture of every other drawing program,
+// and the one a hand reaches for first -- had NO meaning on the release. So the ring stayed open
+// and went on following the pointer across the map with the gesture long over, and the user's next
+// ordinary click anywhere COMMITTED it: a rectangle from a corner they had given up on to wherever
+// they had just clicked, selecting a large part of the network they never framed and opening the
+// multi-element property editor over it. Nothing in the document was written -- a selection is not
+// an edit -- but the next keystroke into that box, or the Delete key, would have been written to
+// all of it.
+//
+// Everything here goes through the REAL pointer listeners rather than areaPress()/areaMove(),
+// because the defect was not in either of those: it was that pointerup reached neither.
+console.log('\n--- a press-drag-release ends the ring, and nothing outlives the gesture ---');
+{
+	const svgEl = byId.lpn_canvas;
+	function fireSvg(type, e) {
+		setHitTarget(null);   // bare map: the whole gesture is the ring
+		(svgEl._listeners[type] || []).slice().forEach((fn) => fn(e));
+	}
+	const at = (x, y, extra) => Object.assign(
+		{ pointerId: 21, clientX: x, clientY: y, target: svgEl, button: 0, pointerType: 'mouse' }, extra || {});
+	// Where those client points actually are in the document, asked of the page rather than assumed.
+	const A = { cx: 400, cy: 120 }, B = { cx: 460, cy: 180 };
+	const wA = L.screenToWorld(A.cx, A.cy), wB = L.screenToWorld(B.cx, B.cy);
+	const inside = [
+		L.addNode('junction', (wA.x + wB.x) / 2, (wA.y + wB.y) / 2),
+		L.addNode('junction', wA.x + (wB.x - wA.x) * 0.25, wA.y + (wB.y - wA.y) * 0.75)
+	];
+	// Far away, so a ring that ran away has something to catch that a correct one never would.
+	const outside = L.addNode('junction', wA.x + 5000, wA.y + 5000);
+
+	function drag(from, to, kind) {
+		L.clearSelection(); L.closePopup();
+		fireSvg('pointerdown', at(from.cx, from.cy));
+		fireSvg('pointermove', at((from.cx + to.cx) / 2, (from.cy + to.cy) / 2));
+		fireSvg('pointermove', at(to.cx, to.cy));
+		fireSvg(kind || 'pointerup', at(to.cx, to.cy));
+	}
+
+	L.setAreaShape('window');
+	report(L.mode() === 'select-area', 'the area tool is on');
+	drag(A, B);
+	report(!L.drawing(), 'a press-drag-release ENDS the ring rather than leaving it open');
+	report(!L.marqueeShown(), '...and the marquee comes off the map');
+	report(L.selectionCount() === 2, '...having selected exactly what the drag framed',
+		String(L.selectionCount()));
+	report(!L.isSelected('node', outside.id), '...and nothing outside it');
+
+	// **THE RUNAWAY, WHICH IS THE HALF THAT COULD DAMAGE A DOCUMENT.** After the release, an
+	// ordinary pointer move must not still be drawing, and an ordinary click must not commit.
+	fireSvg('pointermove', at(A.cx + 4000, A.cy + 4000));
+	report(!L.drawing(), 'a mouse move after the gesture draws nothing');
+	report(!L.isSelected('node', outside.id),
+		'...and a far-away junction the abandoned ring would have swallowed is untouched');
+
+	// **CLICK-AND-RUBBER-BAND IS UNTOUCHED** (Tom, 2026-09-07). A press that does not travel is
+	// still a click and still does its work on the way DOWN, so the ring it opens survives the
+	// release and waits for the second click.
+	L.clearSelection(); L.closePopup();
+	fireSvg('pointerdown', at(A.cx, A.cy));
+	fireSvg('pointerup', at(A.cx, A.cy));
+	report(L.drawing(), 'a click with no travel still OPENS a ring that survives the release');
+	fireSvg('pointermove', at(B.cx, B.cy));
+	fireSvg('pointerdown', at(B.cx, B.cy));
+	fireSvg('pointerup', at(B.cx, B.cy));
+	report(!L.drawing() && L.selectionCount() === 2, '...and the second click finishes it',
+		String(L.selectionCount()));
+
+	// A CANCELLED POINTER SELECTS NOTHING. The browser took the gesture away, so the release never
+	// says where the user meant to stop, and a ring committed at wherever the pointer happened to
+	// be is the unasked-for selection this whole section is about.
+	drag(A, B, 'pointercancel');
+	report(!L.drawing(), 'a pointercancel mid-drag ends the ring');
+	report(L.selectionCount() === 0, '...without selecting anything', String(L.selectionCount()));
+
+	// The polygon is a vertex per press by nature and keeps its double-click ending, so a drag
+	// there adds a vertex and leaves the ring open on purpose.
+	L.clearSelection();
+	L.setAreaShape('polygon');
+	drag(A, B);
+	report(L.drawing(), 'a polygon ring is still open after a drag, as it must be');
+	report(L.selectionCount() === 0, '...and nothing was selected by the release',
+		String(L.selectionCount()));
+	L.setAreaShape('window');
+}
+
+// ---- 21. THE BUBBLE NEVER SWALLOWS THE CLICK THAT CLOSES A RING --------------------------------
+//
+// The second road to the same runaway, and the one that most likely looked browser-specific to
+// MJH because it depends on the window size. The instruction bubble opens CENTRED on the map and
+// takes pointer events, because makePanelDraggable() needs the press -- so the click that closes a
+// ring landed on the panel and was simply eaten: nothing happened, the ring survived, and the next
+// click anywhere committed it. MEASURED in a real Gecko at 1440x900: the panel is 242 x 93 px over
+// a 1438 x 499 map, 3.1% of it, and every pixel of that 3.1% is the middle -- which is where a
+// network is, and where a marquee is closed.
+console.log('\n--- the bubble goes inert while a ring is open ---');
+{
+	L.clearSelection(); L.closePopup();
+	L.setAreaShape('window');
+	const box = L.hintBox();
+	report(!!box && L.hintVisible(), 'the bubble is showing');
+	report(!L.drawing() && box.style.pointerEvents === 'auto',
+		'with no ring open it takes presses, so it can be dragged out of the way',
+		String(box.style.pointerEvents));
+	L.press(0, 0);
+	report(L.drawing() && box.style.pointerEvents === 'none',
+		'the moment a ring is open it stops taking presses, so the closing click reaches the map',
+		String(box.style.pointerEvents));
+	L.press(10, 10);
+	report(!L.drawing() && box.style.pointerEvents === 'auto',
+		'...and it is draggable again as soon as the ring ends', String(box.style.pointerEvents));
+	L.setMode('select');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
