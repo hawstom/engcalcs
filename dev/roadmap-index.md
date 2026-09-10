@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**56 open tasks.** Next (100): 9 · Soon (75): 7 · Someday (50): 15 · Maybe (25): 8 · Parked (5): 17
+**57 open tasks.** Next (100): 9 · Soon (75): 7 · Someday (50): 15 · Maybe (25): 9 · Parked (5): 17
 
 ## 100 — Next (9)
 
@@ -49,7 +49,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 610 — [H] · Paste that CREATES table rows: gated on the data-entry clerk's own spec.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 
-## 25 — Maybe (8)
+## 25 — Maybe (9)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
@@ -59,6 +59,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 487 — The suite only works when its URL path is `/engcalcs/`.
 - ! Task 607 — A moving picture of drawing a pipe -- Task 178's phase 2, extracted on close.
 - Task 613 — [H] · "Note" instead of "Text" for the free-text map object.
+- ! Task 619 — [H] · The map cursor reverts to an arrow on Chrome at fractional display scaling.
 
 ## 5 — Parked (17)
 
@@ -84,5 +85,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-50 of 56 titles are within 4–12 words. `!` marks the rest;
+50 of 57 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

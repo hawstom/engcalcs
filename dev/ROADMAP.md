@@ -134,6 +134,33 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     do not build a third.
   - Not decided: whether the link floor should be absolute or a multiple of the drawn width.
 
+- 25|619| **[H] The map cursor reverts to an arrow on Chrome at fractional display scaling.**
+  Tom, 2026-09-10, on Windows at 125%: *"Stop mouse, then move about 1px down. Cursor changes to
+  default."* Reproducible for him at will, gone at 100%, different distances at 150%, absent on a
+  second laptop. Chrome 152.0.7977.83.
+  - **IT IS NOT IN THE DOM, AND THAT IS THE FINDING.** A live logger polling
+    `elementFromPoint` + `getComputedStyle` on every animation frame caught **none** of ten
+    deliberate changes -- while catching an ordinary console-to-map transition in the same session,
+    which is the control proving it was firing. `elementFromPoint` returns the same element and the
+    computed cursor stays `grab` at the pixel and the instant the arrow is painted. **Chrome is
+    drawing a cursor that disagrees with its own computed style.**
+  - Also searched and clean: 1.4 M samples at 1 px across XY Basic, XY Net3 and geographic Net3 at
+    four zooms in Chromium AND Firefox; 1.6 M more at 0.25 px; radial walks at 0.2 px out to 700 px.
+    Every hit shape measured constant in screen pixels across zooms, so nothing of ours is stale or
+    scale-dependent. It reproduces with the **network deleted**, so no drawn object is involved.
+  - **WE ALREADY HAD PRIOR EVIDENCE AND NOBODY CONNECTED IT.** `nudgeCursor()` in
+    `js/looped-network.js` reasserts the cursor every 200 ms during the backdrop wizard, and its own
+    comment says it "works around a real Chrome cursor-caching quirk". Same defect class, found
+    independently, months earlier.
+  - **NOT RECOMMENDED: a map-wide nudge.** The wizard's version lasts seconds; doing it for the
+    session means forcing a style recalculation several times a second on the page's hot path, to
+    buy a cursor glyph for the subset of visitors at fractional scaling. A narrower version -- nudge
+    only while the pointer is moving over the canvas -- is the option if he ever wants one.
+  - Priority 25 because it is cosmetic and not ours. **Recorded so it is not hunted again**: it cost
+    a full evening of hand-testing and four wrong hypotheses of mine before the logger settled it.
+    `dev/browser-pass/specs/nodehit.js` carries the phantom/slit sweep and a live mutation, so a
+    real geometry regression would still be caught.
+
 # Reference` at the foot holds the
 standing prose that is not a task.
 
