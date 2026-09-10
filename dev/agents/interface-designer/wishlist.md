@@ -57,5 +57,28 @@ that disagreement is most of what a seat is for. No agent edits the roadmap.
    tile with a caret rather than adding a new independent widget next to it. See journal,
    2026-09-10.
 
+5. **Task 625 (post-divorce, three bars) -- unify menu-bar/toolbar paint before anything else.**
+   Same background band, zero gap, hairline divider, no DOM merge. MEASURED (real Chromium render,
+   not estimate): menu-bar ink 401px, toolbar ink 1,260px, combined 1,660px against 1,364-1,918px
+   of available row at the three viewports this project already treats as reference points -- a
+   literal one-row merge is provably unsafe below roughly 1,750px, so I do NOT recommend it as the
+   default move despite Tom's own wide-screen qualifier being right as far as it goes. Full
+   ranking and the width numbers: `dev/app-chrome-postdivorce-recommendations.md`.
+6. **Same task -- Language menu, last position, right of Help, same 27-row widget the suite navbar
+   already has.** Reuses `all_language_settings` and the globe icon; no new component. Secondary
+   win, not a discoverability fix on its own -- it forces the traffic that WANTS language switching
+   through the one row that most needs it, but does not by itself put new eyes on that row.
+7. **Same task -- do NOT relocate transport to the menu bar.** Corrected a premise in my own brief
+   first: transport is already on the TOOLBAR (`js/looped-network.js:23270+`), not the bottom pane.
+   It is a persistent, stateful control and belongs with the toolbar's other mode-like instruments;
+   a menu row cannot host Play/Pause without inventing a new interaction pattern nothing else on
+   the page uses. The unify-paint fix above already carries the "drive people to the menu bar"
+   intent without this cost.
+8. **Same task -- Help menu gains one row, Install app, and keeps the label "Help" exactly** (the
+   standing ruling that visitor copy says "use Help" only holds if one menu owns that name). About
+   and Contact are already covered; About's CONTENT (not its chrome) needs to stop describing
+   EngCalcs once the suite navbar is gone, which is Tom's call, not mine.
+
 *(The four-bar chrome diagnosis Tom's brief opens with — suite chrome, menus, toolbar, tab strip —
-is still unstarted; this list will carry that ranking once it exists.)*
+is answered for the three that remain after the divorce; see item 5 series above and
+`dev/app-chrome-postdivorce-recommendations.md`.)*

@@ -240,7 +240,9 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
     share". The analysis is EPANET's **Source trace** on EPANET's **Trace node**; the number it
     reports is a **Source share**, a percentage. Two things, two words, and the tip ties them.
 - **EXTENDED-PERIOD SIMULATION SHIPPED 2026-08-18, THROUGH THE EPANET ENGINE ONLY** (`js/lpn-time.js`).
-  Tanks fill and drain, demands follow patterns, the bottom pane scrubs the frames; checked against
+  Tanks fill and drain, demands follow patterns, the TOOLBAR's transport scrubs the frames (it
+  mounts into `lpn_toolbar_run`, not a bottom pane -- this line said bottom pane until 2026-09-10
+  and sent a design brief off on the wrong control); checked against
   all 25 steps of EPA's own `Net3.rpt` to 0.005 ft over 2,425 head comparisons
   (`dev/lpn-spike/eps-net3-harness.js`). **The built-in solver has no time dimension and is not
   getting one** — with EPANET unreachable the page solves one instant and says so. Patterns on a

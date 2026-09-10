@@ -486,3 +486,56 @@ alone** — one `<select>` row in Settings > Map appearance, two options, the CS
 `dev/basemap-styling-options.md`. No new corner, no new strings beyond a label and two option
 words, no risk to attribution, and it is discoverable exactly as well as the legend-position
 control sitting next to it already is.
+
+---
+
+## 2026-09-10 — Task 625: the three bars after the divorce
+
+Tom asked for me by name on two items inside the divorce (suite navbar/titles gone; menu bar,
+toolbar, tab strip remain) and posed four questions plus asked which one thing I'd do first. Full
+answer, with the MEASURED width numbers behind it, is `dev/app-chrome-postdivorce-recommendations.md`;
+this entry is the compressed version for future-me.
+
+**A — merge menu bar and toolbar into one row?** MEASURED (real Chromium render via
+`dev/browser-pass/lib/env.js`, not estimated): menu bar ink 401px, toolbar ink 1,260px (its own
+`contentWidth` looked identical to the row width at first pass — that's `.lpn-toolbar-end`'s
+`margin-left: auto`, `css/engcalcs.css:1257`, pushing the last group to the edge, not real content;
+had to sum group widths + gaps directly to get the true 1,260). Combined ≈1,660px against
+1,364–1,918px of row at the three viewports this project already treats as reference points. **A
+literal merge is provably unsafe below ~1750px** — most laptops. Tom's own qualifier ("if you're
+talking about a single row on a wide screen, I agree") is right as far as it goes, but "wide screen"
+excludes 1440 and 1366 by measurement, not by hedge. Recommended instead: unify the two rows'
+PAINT (same background, no gap, hairline divider) with zero DOM change and zero width risk — this
+is also my answer to E (the one thing first) because it is the actual fix for "the eye stops at the
+toolbar and doesn't continue up," which is the real content of the original PCW/MJH finding, without
+betting a width-gated merge before 16 September.
+
+**B — Language on the menu bar.** Last position, right of Help — matches the suite navbar's own
+existing order ("Help sits ahead of the language picker," `lib/Menus.lib.php:192`). Same 27-row
+widget the navbar already has (`all_language_settings`, native-script names, no new component). Said
+plainly that this is a secondary win, not a discoverability fix by itself: it forces people who
+already want to switch languages through the menu bar, but does not put new eyes on the row for
+people who weren't looking for it.
+
+**C — Transport on the menu bar, to "drive people to the menu bar."** Corrected the brief's own
+premise first: transport already left the bottom pane and lives on the TOOLBAR
+(`js/looped-network.js:23270+`, mounted via `EngCalcs.lpnTimeMountToolbar`), not where the task
+description said. Recommended against moving it to the menu bar — it's a persistent, stateful
+control (play/pause/scrub) and the menu bar is a fire-once command surface; hosting Play there means
+either the menu has to stay open while it runs (new interaction pattern, nothing else on the page
+does this) or pressing Play closes the menu mid-action. Said plainly: relocating transport is the
+wrong lever for the stated goal; the goal is served by A's paint-unify instead.
+
+**D — Help menu revamp.** Kept the top-level label exactly "Help" — `dev/session-handoff.md:246`,
+"Help wording is 'use Help'," which only holds with one menu owning that name. About and Contact are
+already absorbed (`Help > Fix something` already replaces a separate Contact row on purpose, per the
+existing comment at `js/looped-network.js:22098`). Proposed adding one row, `Install app` (opens
+`Install.php`), grouped with Screenshot gallery / Not EPANET rather than near the top — same "about
+the software, not about finishing the task" logic the existing separators already draw. Flagged that
+About's CONTENT still needs to stop describing EngCalcs once the navbar is gone — a writing decision,
+Tom's, not chrome.
+
+**Method note for next time:** `dev/chrome-audit.md`'s own toolbar/menu numbers were row HEIGHTS,
+not content widths — fine for the earlier stacking question, not enough for "does one row fit." A
+quick throwaway Playwright probe (not committed, scratchpad only) answered the width question in
+about five minutes; worth reaching for again rather than estimating from button counts.
