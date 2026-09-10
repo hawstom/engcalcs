@@ -56,6 +56,47 @@ success in this suite once, it ends by PLANTING one: a transparent circle round 
 answers as an invisible ring the drawing does not show. The walk must name it, and must stop naming
 it when it is removed.
 
+## The device pixel ratio sweep, and the variable it ruled out
+
+Tom bisected his own environment, which is the one thing this runner could not do for him: *"I don't
+get the flicker on another laptop I have."*, Chrome 152 on Windows, *"Windows scale 125%. Issue goes
+away when I change to 100%. Distances change if I go to 150%."* **125% is device pixel ratio 1.25 and
+is the out-of-the-box setting on a great many laptops**, so if it reached the cursor it would reach a
+large share of real visitors rather than one developer. `Session.open()` therefore takes a third
+argument that reaches `browser.newContext()`, and §41 ends by running the island hunt at **1, 1.25,
+1.5 and 2**, walking **one DEVICE pixel at a time** -- 0.8 CSS px at 1.25, which are the only
+positions a real pointer can occupy there and which a walk at 1 px samples none of.
+
+**The prediction was that islands appear at the fractional ratios and not at the integer ones. It did
+not hold, and the negative is sharp rather than vague.** The runs are the same at all four: the same
+elements, in the same order, at the same distances to within the sampling step, no phantom and no
+slit at any of them on the Basic example under Tom's own settings (symbol 100 px, link 30 px,
+Thematic map on), and the geographic Net3's own findings are identical at every ratio including 1.
+`document.elementFromPoint` is what the cursor is
+resolved from, and Blink computes it in LayoutUnits, which are CSS-relative -- the ratio is not in
+that arithmetic at all.
+
+Three measurements from the same sitting, kept so nobody repeats them:
+
+- **A hidden label's grab shape does not leak a hit at a fractional ratio.** `.lpn-lbl-hit` is
+  `visibility: hidden` plus `pointer-events: visibleFill` in Thematic map, and it answered **0 of
+  108,009** probes over its own box at 1.25, and zero at 1, 1.5 and 2. Relying on `visibility` to
+  make a shape unhittable is sound here, measured rather than argued.
+- **There is no uniform halo.** A walk compared against a REAL screenshot (`lib/png.js` reads the
+  pixels) puts the ink FURTHER out than the hit answer on the median bearing at every ratio and
+  every zoom, from a junction, a reservoir and a pump alike.
+- **The geographic Net3 at those settings does produce one- and two-pixel runs of
+  `.lpn-link-symbol-hit`, and they are the DECLARED 2 px slop** (`BAND_SLOP_PX`, Tom's own ruling of
+  2026-09-10), identical at every ratio including 1. That is why the sweep asserts on the Basic
+  example and reports the rest.
+
+**What is left, said plainly: the OS input path, and it is not reachable from here.** The sweep
+emulates the ratio the way a page sees it -- `window.devicePixelRatio` really is 1.25 -- but drives
+the mouse through CDP in CSS pixels. A Windows mouse delivers a position in physical device pixels
+and Chrome divides it by the scale factor before anything on the page sees it. **If the artefact
+lives there it is not ours**, and no headless run can reach it. Saying so is a result; a speculative
+patch would not be.
+
 ## Gecko is reachable now, and §42 is why it was needed
 
 `node run.js` drives Chromium and only Chromium. On 2026-09-09 a user report named LibreWolf

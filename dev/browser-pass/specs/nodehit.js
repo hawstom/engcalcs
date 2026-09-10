@@ -35,8 +35,10 @@ exports.title = '41. An invisible hit band answers only where it is drawn';
 
 // Open one gallery example and fit it. A FRESH session name every time: a Session profile persists
 // between runs, and a profile that has already waved the gallery away never opens it again.
-async function example(browser, match) {
-	const a = await Session.open(browser, 'nodehit-' + String(match.key || match).replace(/\W+/g, ''));
+// `extra` reaches browser.newContext(), which is the only place `deviceScaleFactor` can be set.
+async function example(browser, match, extra) {
+	const a = await Session.open(browser, 'nodehit-' + String(match.key || match).replace(/\W+/g, '')
+		+ (extra && extra.deviceScaleFactor ? '-dpr' + String(extra.deviceScaleFactor).replace('.', '_') : ''), extra);
 	await a.goto();
 	// A card can be asked for by LANGUAGE KEY, which is how a spec names a shipped string without
 	// pinning its English (harness_wording_check.php).
@@ -590,8 +592,13 @@ async function zoomOn(a, at, notches) {
 // One bearing, one pixel at a time: the element the browser hits and the cursor it computes.
 // `document.elementFromPoint` is the same hit test the cursor is resolved from, which is what lets
 // this answer the question at all.
-async function walkRuns(a, at, upto) {
-	return a.page.evaluate(([at, upto]) => {
+// **`step` IS ONE DEVICE PIXEL, WHICH AT A FRACTIONAL RATIO IS A FRACTIONAL CSS ONE.** At device
+// pixel ratio 1.25 -- Windows' own 125% display scaling -- the only positions a real pointer can
+// occupy are multiples of 0.8 CSS px, and a walk at 1 samples none of them but the whole ones. So
+// the step is passed in, and a run's width is counted in SAMPLES rather than in CSS pixels, which
+// keeps ISLAND_PX meaning "one or two of the pixels the screen actually has".
+async function walkRuns(a, at, upto, step) {
+	return a.page.evaluate(([at, upto, step]) => {
 		const B = [[1, 0, 'E'], [0.7071, 0.7071, 'SE'], [0, 1, 'S'], [-0.7071, 0.7071, 'SW'],
 			[-1, 0, 'W'], [-0.7071, -0.7071, 'NW'], [0, -1, 'N'], [0.7071, -0.7071, 'NE']];
 		const svg = document.getElementById('lpn_canvas');
@@ -607,20 +614,21 @@ async function walkRuns(a, at, upto) {
 		const out = [];
 		B.forEach(([dx, dy, bearing]) => {
 			const runs = [];
-			for (let d = 0; d <= upto; d++) {
+			for (let i = 0; i * step <= upto; i++) {
+				const d = i * step;
 				const x = at.x + dx * d, y = at.y + dy * d;
 				if (x < box.x || y < box.y || x > box.right || y > box.bottom) { break; }
 				const el = document.elementFromPoint(x, y);
 				const k = name(el) + '|' + (el ? getComputedStyle(el).cursor : '(none)');
 				const last = runs[runs.length - 1];
-				if (last && last.k === k) { last.to = d; continue; }
-				runs.push({ k: k, from: d, to: d, el: name(el), cursor: el ? getComputedStyle(el).cursor : '(none)',
+				if (last && last.k === k) { last.to = d; last.n++; continue; }
+				runs.push({ k: k, from: d, to: d, n: 1, el: name(el), cursor: el ? getComputedStyle(el).cursor : '(none)',
 					cls: el && el.getAttribute ? (el.getAttribute('class') || '') : '' });
 			}
 			out.push({ bearing: bearing, runs: runs });
 		});
 		return out;
-	}, [at, upto]);
+	}, [at, upto, step || 1]);
 }
 
 // The two island shapes, plus the abutments, which are printed and never failed.
@@ -628,12 +636,12 @@ function islandsIn(walk, where) {
 	const phantom = [], slit = [], abut = [];
 	walk.forEach(({ bearing, runs }) => {
 		runs.forEach((r, i) => {
-			const w = r.to - r.from + 1;
+			const w = r.n || (r.to - r.from + 1);
 			if (w > ISLAND_PX || i === 0 || i === runs.length - 1) { return; }
 			// Page furniture lying over the canvas -- the tab strip, the toolbar, the form itself --
 			// is not the map and its own borders are not islands in it.
 			if ([r, runs[i - 1], runs[i + 1]].some((x) => x.el.indexOf('off the map') === 0)) { return; }
-			const line = `${where} ${bearing} ${r.from}-${r.to}px (${w}) ${r.cursor} <${r.el}> between <${runs[i - 1].el}> and <${runs[i + 1].el}>`;
+			const line = `${where} ${bearing} ${r.from.toFixed(2)}-${r.to.toFixed(2)}px (${w} sample${w === 1 ? '' : 's'}) ${r.cursor} <${r.el}> between <${runs[i - 1].el}> and <${runs[i + 1].el}>`;
 			if (HIT_ONLY.some((c) => (' ' + r.cls + ' ').indexOf(' ' + c + ' ') >= 0)) { phantom.push(line); return; }
 			if (runs[i - 1].k === runs[i + 1].k) { slit.push(line); return; }
 			abut.push(line);
@@ -647,7 +655,7 @@ function islandsIn(walk, where) {
 // sequence for the whole set measures the junction at three scales and the other two at one -- and
 // a check that quietly stops asking is this suite's own named failure. So the view is re-fitted per
 // type and the wheel is put over THAT object.
-async function huntIslands(a, report, where, kinds, upto, notches) {
+async function huntIslands(a, report, where, kinds, upto, notches, step, quiet) {
 	let phantom = [], slit = [], abut = 0;
 	for (const kind of kinds) {
 		if (notches) {
@@ -658,19 +666,90 @@ async function huntIslands(a, report, where, kinds, upto, notches) {
 		}
 		const at = await spotOf(a, kind);
 		if (!at) { report.note(`${where}: no ${kind} inside the canvas -- not walked`); continue; }
-		const walk = await walkRuns(a, at, upto);
-		walk.forEach(({ bearing, runs }) => {
-			report.note(`${where} ${kind} ${at.id} ${bearing}: ` + runs
-				.map((r) => `${r.from}-${r.to}px ${r.cursor} <${r.el}>`).join(' | '));
-		});
+		const walk = await walkRuns(a, at, upto, step);
+		if (!quiet) {
+			walk.forEach(({ bearing, runs }) => {
+				report.note(`${where} ${kind} ${at.id} ${bearing}: ` + runs
+					.map((r) => `${r.from.toFixed(2)}-${r.to.toFixed(2)}px ${r.cursor} <${r.el}>`).join(' | '));
+			});
+		}
 		const f = islandsIn(walk, `${where} ${kind} ${at.id}`);
 		phantom = phantom.concat(f.phantom);
 		slit = slit.concat(f.slit);
 		abut += f.abut.length;
-		f.abut.forEach((l) => report.note('   two objects touch, one or two pixels of map between them: ' + l));
+		if (!quiet) { f.abut.forEach((l) => report.note('   two objects touch, one or two pixels of map between them: ' + l)); }
 	}
 	return { phantom, slit, abut };
 }
+
+// ---- THE DEVICE PIXEL RATIO SWEEP, AND WHAT IT MEASURED (2026-09-10) ------------------------
+//
+// Tom bisected the environment himself, which is the one thing this runner could not do for him:
+// *"I don't get the flicker on another laptop I have."* / Chrome 152 on Windows / *"Windows scale
+// 125%. Issue goes away when I change to 100%. Distances change if I go to 150%."* So the variable
+// named was a FRACTIONAL device pixel ratio -- 125% is 1.25, and it is the out-of-the-box setting
+// on a great many laptops rather than an exotic one.
+//
+// Playwright can set it: `deviceScaleFactor` on the CONTEXT, which is why `Session.open()` grew a
+// third argument. The prediction under test was that islands appear at 1.25 and 1.5 and not at 1
+// or 2, because a fractional ratio puts an element's edges between device pixels while an integer
+// one does not.
+//
+// **THE PREDICTION DID NOT HOLD, AND THE NEGATIVE RESULT IS SHARP RATHER THAN VAGUE.** Walking at
+// ONE DEVICE PIXEL -- 0.8 CSS px at 1.25, the only positions a real pointer can occupy there -- the
+// runs are the SAME at 1, 1.25, 1.5 and 2: the same elements, in the same order, at the same
+// distances to within the sampling step. On the Basic example under Tom's own settings there is no
+// phantom and no slit at any ratio; on the GEOGRAPHIC Net3 at those settings there are one- and
+// two-pixel runs of `.lpn-link-symbol-hit`, and they are the DECLARED 2 px slop (BAND_SLOP_PX,
+// Tom's own ruling of 2026-09-10) appearing at the edge of a volute -- present at ratio 1 exactly
+// as at 1.25, which is the whole point. `document.elementFromPoint` is what the cursor is resolved
+// from and Blink computes it in LayoutUnits, which are CSS-relative, so the ratio is not in that
+// arithmetic at all. Two further measurements from the same sitting, both
+// worth not repeating: a hidden label's grab shape (`.lpn-lbl-hit`, `visibility: hidden` plus
+// `pointer-events: visibleFill`) answered ZERO of 108,009 probes over its own box at 1.25 and zero
+// at every other ratio, so `visibility` does not leak a hit at a fractional ratio; and a walk
+// compared against a REAL SCREENSHOT (`lib/png.js`) put no uniform halo round anything -- the ink
+// reaches further than the hit answer on the median bearing at every ratio and every zoom.
+//
+// **WHAT THAT LEAVES, SAID PLAINLY.** The sweep below emulates the ratio the way a page sees it
+// (`window.devicePixelRatio` really is 1.25) and drives the mouse through CDP in CSS pixels. What
+// it cannot drive is the OS INPUT PATH -- a Windows mouse delivers a position in physical device
+// pixels and Chrome divides it by the scale factor before anything on this page sees it. If the
+// artefact lives there, it is not reachable from a headless run at all, and it is not ours. This
+// section therefore REPORTS the four ratios side by side and asserts only what the tree is
+// expected to hold (no phantom, no slit), which is README's rule about asserting versus reporting.
+const DPR_SWEEP = [1, 1.25, 1.5, 2];
+async function dprSweep(browser, report, card, where) {
+	const rows = [];
+	for (const dpr of DPR_SWEEP) {
+		const a = await example(browser, card, { deviceScaleFactor: dpr });
+		try {
+			// **THE SWEEP MUST PROVE IT VARIED THE THING IT NAMES.** A `deviceScaleFactor` that
+			// silently did not apply would give four identical runs and read as a clean result,
+			// which is this suite's own named failure shape.
+			const got = await a.page.evaluate(() => window.devicePixelRatio);
+			await applyTomSetup(a);
+			let phantom = [], slit = [], abut = 0;
+			for (const notches of [0, 12]) {
+				const f = await huntIslands(a, report, `${where} dpr ${dpr}, ${notches} notches`,
+					['junction', 'reservoir', 'pump'], 320, notches, 1 / dpr, true);
+				phantom = phantom.concat(f.phantom);
+				slit = slit.concat(f.slit);
+				abut += f.abut;
+			}
+			rows.push({ dpr, got, phantom, slit, abut });
+		} finally { await a.close(); }
+	}
+	return rows;
+}
+
+// The 1 px island machine, exported so a DPR sweep can drive it without re-running the section.
+exports.applyTomSetup = applyTomSetup;
+exports.huntIslands = huntIslands;
+exports.walkRuns = walkRuns;
+exports.islandsIn = islandsIn;
+exports.spotOf = spotOf;
+exports.zoomOn = zoomOn;
 
 exports.run = async function ({ browser, report }) {
 	// ---- the geographic project, which is where it was user-visible -----------------------------
@@ -824,4 +903,30 @@ exports.run = async function ({ browser, report }) {
 		report.ok(without.phantom.length === 0, '...and stops naming it the moment it is taken away',
 			without.phantom.length ? without.phantom.join(' ;; ') : 'clean');
 	} finally { await tom.close(); }
+
+	// ---- THE SAME HUNT AT FOUR DEVICE PIXEL RATIOS -----------------------------------------------
+	// See the header block above dprSweep() for what this measured and what it rules out. The rows
+	// are printed side by side because the comparison IS the result: four ratios, one answer.
+	// NOT `sweep`: that is this file's own grid-sweep function, and a `const` of the same name
+	// shadows it for the whole of this function -- including the call twenty lines above it.
+	const dprRows = await dprSweep(browser, report, { key: 'lpn_ex_basic_us_title' }, 'basic');
+	report.note('the island hunt at four device pixel ratios, walking one DEVICE pixel at a time:');
+	report.note('   ratio   page says   phantom   slit   abutments');
+	dprRows.forEach((r) => report.note(
+		`   ${String(r.dpr).padEnd(7)} ${String(r.got).padEnd(11)} ${String(r.phantom.length).padStart(7)} ${String(r.slit.length).padStart(6)} ${String(r.abut).padStart(11)}`));
+	dprRows.forEach((r) => {
+		report.ok(r.got === r.dpr, `device pixel ratio ${r.dpr} really was applied`,
+			`window.devicePixelRatio is ${r.got}`);
+		report.ok(r.phantom.length === 0, `dpr ${r.dpr}: no invisible band is the whole of a run`,
+			r.phantom.length ? r.phantom.join(' ;; ') : `none on eight bearings at two zooms, ${r.abut} abutments`);
+		report.ok(r.slit.length === 0, `dpr ${r.dpr}: nothing cuts a hairline slit through one object's answer`,
+			r.slit.length ? r.slit.join(' ;; ') : 'none on eight bearings at two zooms');
+	});
+	// **THE FOUR RATIOS MUST AGREE, WHICH IS THE ACTUAL FINDING AND NOT A BY-PRODUCT.** If a future
+	// change makes a fractional ratio behave differently from an integer one, that is exactly the
+	// class of defect Tom reported and this is the line that would say so.
+	const shapes = dprRows.map((r) => `${r.phantom.length}/${r.slit.length}`);
+	report.ok(shapes.every((x) => x === shapes[0]),
+		'a fractional device pixel ratio finds the same islands an integer one does',
+		shapes.map((x, i) => `${DPR_SWEEP[i]}: ${x}`).join(', '));
 };

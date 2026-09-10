@@ -32,8 +32,13 @@ class Session {
 	// (a full-window drawing surface; see CLAUDE.md on not reasoning about it from a phone).
 	static VIEWPORT = { width: 1400, height: 1200 };
 
-	static async open(browser, name) {
-		const context = await browser.newContext({ viewport: Session.VIEWPORT });
+	// **`extra` REACHES newContext AND NOTHING ELSE.** It exists for one property that cannot be set
+	// after a context is made and that no assertion in here could otherwise reach:
+	// `deviceScaleFactor`. Windows' out-of-the-box 125% display scaling is device pixel ratio 1.25,
+	// and a headless run at 1 is blind to every artefact of a FRACTIONAL ratio -- which is what a
+	// 1.4-million-sample island hunt could not reproduce (specs/nodehit.js).
+	static async open(browser, name, extra) {
+		const context = await browser.newContext(Object.assign({ viewport: Session.VIEWPORT }, extra || {}));
 		await context.addInitScript(INIT_SCRIPT);
 		const page = await context.newPage();
 		const s = new Session(context, page, name);
