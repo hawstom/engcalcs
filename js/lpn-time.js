@@ -1569,7 +1569,13 @@
 			// switched off is shared. Restoring rather than clearing, so a re-enabled control does
 			// not come back mute.
 			if (!c.dataset.tipWhenLive) { c.dataset.tipWhenLive = c.title || ''; }
-			c.title = why || c.dataset.tipWhenLive;
+			// **THROUGH setTipText(), NEVER A BARE `title` WRITE.** These three buttons are born
+			// over the empty startup document, so they are born carrying the no-period sentence;
+			// initTips() caches it into data-bs-original-title and blanks the attribute, and a
+			// plain `c.title = 'Play'` then changes nothing the reader can see. That is the defect
+			// Tom reported as "It's always there. I have never seen any other tip."
+			if (EC.setTipText) { EC.setTipText(c, why || c.dataset.tipWhenLive); }
+			else { c.title = why || c.dataset.tipWhenLive; }
 		});
 	}
 

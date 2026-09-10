@@ -7,6 +7,15 @@ rendering it with Chromium through `dev/browser-pass/lib/env.js` (marked MEASURE
 `/tmp/.../scratchpad/measure_widths2.js`, not committed — a throwaway probe, not a new harness). No
 shipped file touched.
 
+**CORRECTED 2026-09-10, after Tom's ruling — see §F at the foot of this file before reading §A/§E
+below as current.** He agreed with B, C, D and the fifth item on discoverability wording, but
+challenged the "unify paint" recommendation: *"Do you mean just pushing them closer together?
+There is no line. They already look like a set."* He was right, and the CSS proves it — the
+paint is already unified (`css/engcalcs.css:1337-1338` vs `:1218-1225`, one shared hover treatment
+by explicit design comment) — so §A/§E's diagnosis was answering a problem that does not exist.
+§F re-diagnoses and replaces §E as "the one thing first." §A/§E are kept below, struck through in
+substance rather than deleted, per this project's own correction convention.
+
 **Baseline this builds on:** `dev/chrome-audit.md` (2026-09-10, mine) already measured the four-bar
 page at four viewports and found the menu bar 32px tall, the toolbar 36px, a 4px gap between them —
 merging the two rows recovers "roughly 36–40px" and was ranked #4 of 5, below the title-block fixes
@@ -220,7 +229,15 @@ Nth row exactly as they handle the current ones.
 
 ---
 
-## E. If only one change — the unify-without-merging paint fix (§A, option 1)
+## E. SUPERSEDED BY §F — kept for the record, not current advice
+
+The "unify paint, add a hairline" recommendation below was wrong on the facts: the CSS already
+unifies the two rows' paint and, by explicit design comment, deliberately withholds the raised/
+bordered look specifically so the menu bar would NOT read as competing chrome. Adding a hairline
+would have introduced the one visual seam the current design goes out of its way to avoid. See §F
+for the re-diagnosis and the current "if only one" answer.
+
+## E (original text, superseded) — the unify-without-merging paint fix (§A, option 1)
 
 **Same background band, zero gap, a hairline divider between menu bar and toolbar — no DOM merge, no
 new breakpoint, and it is a CSS change to two existing rows.**
@@ -246,3 +263,139 @@ menu bar, cheap, reuses existing widget) → A-2 (responsive merge, real enginee
 demo) → C (rejected as framed; the paint fix in E already carries the discoverability intent legally
 available to it) → A-1-as-literal-merge (rejected outright below ~1750px, which is most of this
 project's own reference viewports).
+
+---
+
+## F. Re-diagnosis, 2026-09-10, after Tom's ruling — what actually starves the menu bar
+
+### A. Was my #1 in substance "delete the 4px margin"?
+
+**No — smaller than that, and I was wrong to rank it first for a different reason: there was
+nothing to build.** MEASURED/OBSERVED, `css/engcalcs.css:1336-1338` vs `:1218-1225`:
+
+```
+#lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
+.lpn-menubar-item { background: none; border: 1px solid transparent; ...; }
+.lpn-menubar-item:hover { background: #def; border-color: #9bd; }
+
+#lpn_toolbar { ...; border-bottom: 1px solid #d6d6d6; padding-bottom: 4px; margin-bottom: 4px; }
+#lpn_toolbar button:not(.lpn-transport-btn) { background: none; border: 1px solid transparent; ... }
+#lpn_toolbar button:not(.lpn-transport-btn):hover { background: #def; border-color: #9bd; }
+```
+
+Identical hover colors, identical at-rest invisibility (no border, no background on either row),
+and the comment directly above the menu-bar rule states the intent in words: *"Flat text buttons,
+because a menu bar that looks like a row of push-buttons reads as a second toolbar"*
+(`css/engcalcs.css:1260`). The ONLY rule that creates any visual break at all is the toolbar's own
+`border-bottom`, which sits BELOW the toolbar — dividing it from the tab strip, not from the menu
+bar above it. Between the two bars Tom asked about there is 4px of margin and nothing else. **My
+#1 was not "delete a margin," it was "notice that the thing I was recommending is already true."**
+There is no substance left to rank — not a small change, a non-change. Retracted, not merely
+re-ranked.
+
+### B. Would a hairline divider have cut against my own stated goal?
+
+**Yes, directly, and I should have caught this from the CSS comment alone before proposing it.**
+`css/engcalcs.css:1260`'s own words — a menu bar with borders "reads as a second toolbar" — is
+exactly the outcome a hairline would produce: two visually distinct instruments where the
+project's own design intent is one. A hairline does not buy anything the current no-line grouping
+doesn't already have; it actively manufactures the "two rows" read Tom says he does not see and
+does not want. There is no narrower case for it worth keeping — withdrawn outright, not
+downgraded.
+
+### C. The real question: if the paint is already unified, what IS pulling every eye to the toolbar?
+
+Re-diagnosed from measured numbers rather than from the two candidates in the coordinator's
+message, one of which turns out not to hold up:
+
+**Ruled out: "menu items are invisible at rest" (`background:none; border:transparent` until
+hover).** OBSERVED above — this is true of BOTH rows, in the same values, by the same design
+decision. It cannot be what makes the menu bar specifically lose the contest, because the toolbar
+buttons share the identical at-rest non-affordance and still win.
+
+**Ruled out, mostly: "the menu bar is text-only."** OBSERVED, `js/looped-network.js:22440`
+(`setLabel(b, m.icon, '')`) — every top-level menu item already carries an icon at desktop widths,
+not just text; `.lpn-menubar-word` only disappears below the 640px breakpoint
+(`css/engcalcs.css:3205`). The menu bar is icon+word, not word-only, today.
+
+**What actually holds up, MEASURED:**
+
+1. **Icon size.** Menu-bar icons are `.ec-icon` at its base `1.05em` (`css/engcalcs.css:249`).
+   Toolbar icons are explicitly upsized to `1.35em` (`css/engcalcs.css:1225`,
+   `#lpn_toolbar button .ec-icon`) — 29% larger per glyph.
+2. **Icon count and density.** 5 menu-bar items (each one icon) against 22 toolbar buttons (each
+   one icon) — MEASURED, same render pass as §A. Over four times the number of discrete glyphs in
+   the second row.
+3. **Ink width, already measured in §A.** 401px of menu-bar content against 1,260px of toolbar
+   content — roughly **3.1x** the horizontal mass, on a row directly beneath it, at the same
+   left edge.
+4. **The toolbar drops its words entirely, by ruling, at every width — not just under 640px.**
+   OBSERVED, `css/engcalcs.css:1206-1213`'s own comment quoting Tom, 2026-08-20: *"toolbars have
+   icons, not buttons... no 'button' paradigm"* — the toolbar is icon-only ALWAYS, which is also
+   why its icons could be grown to 1.35em with no competing word to make room for. The menu bar
+   keeps its word at every width except the phone breakpoint. So the two rows are not just
+   different in size and count — they are two different, well-established GENRES of chrome:
+   a dense grid of uniform glyph-only buttons is the visual grammar of an application's tool
+   palette (Word's ribbon, Photoshop's tool well, AutoCAD's toolbars — CITED as the familiar
+   comparison class, not sourced to one manufacturer); a row of small icon-plus-word items is the
+   visual grammar of a website's navigation list or a breadcrumb — which is the SAME grammar the
+   dying suite navbar used directly above it, and precisely matches MAH's own misreading, that the
+   menu bar "belonged to the site rather than the application." **That is the strongest single
+   piece of evidence for this diagnosis: a real reader's own words already named the genre
+   confusion.**
+
+**So the re-diagnosis: the cause is not a paint disjunction between the two rows (there isn't
+one) — it is a visual-salience and genre imbalance WITHIN an already-unified strip.** Four
+independent multipliers (smaller icons, 4x fewer of them, 3.1x less ink, and a genre — labeled
+nav-style items — that this project's own comment history associates with a website rather than
+an application) all point the same direction, and none of them is fixed by touching the seam
+between the rows, because there is no seam.
+
+### Revised recommendation — what would actually move the needle, ranked
+
+Real design work, not a redraw — offered as diagnosis-and-direction per the brief, not as a spec:
+
+1. **Grow the menu-bar icons to match the toolbar's 1.35em.** Cheapest of the four levers — one
+   size number, no new strings, no layout risk (icons are already there, just smaller). Alone,
+   this does not fix the 4x count / 3.1x ink gap, so treat it as a floor, not the fix.
+2. **The count and ink gap (4x / 3.1x) cannot be closed by matching sizes — the toolbar's
+   advantage is structural (22 real tools vs. 5 real menu categories), and manufacturing fake
+   icons to pad the menu bar's width would be decoration, not information.** This is the reason I
+   am not proposing a design that tries to make the two rows visually EQUAL in weight. A menu bar
+   naming five categories is correctly smaller than a toolbar naming twenty-two tools; parity is
+   not the right target.
+3. **Given that parity is not achievable or desirable, the lever that is left is genre, not
+   size: make the menu bar read as "part of the application's tool surface" rather than
+   "a navigation list," independent of how much ink it occupies.** This is the one worth Tom's
+   attention before 16 September, and it is a smaller ask than either the literal merge or a
+   hairline: the menu bar's icons are already the same icon family, same stroke weight, same
+   `currentColor` treatment as the toolbar's — the genre cue that is missing is that the toolbar
+   is ALWAYS icon-only (no word ever competes with the glyph for attention) while the menu bar is
+   never icon-only above 640px. A menu bar is conventionally words in nearly every desktop
+   application (File, Edit, View) specifically because "File" has no reliable universal icon —
+   so I am not recommending dropping the words. What I AM flagging: this is a genuine, judgement-
+   level tension between two real conventions (menu bars are words; this page's toolbar is icons)
+   and worth one direct question to Tom rather than a unilateral pick — it is exactly the kind of
+   call his brief reserves for him, not for a paint tweak I can make alone.
+4. **The instrument most likely to work without touching any of the above: meet the eye where it
+   already lands, instead of trying to outcompete it.** The Hide-titles highlight failed twice
+   because it marked a row nobody was looking at (`dev/ROADMAP.md` Task 616's own record — 4s,
+   then 120s, MJH still missed it). The toolbar is where the eye demonstrably already goes first.
+   A first-visit cue that begins AT the toolbar — the row people actually look at — and visually
+   points or connects upward to the menu bar (rather than trying to make the menu bar itself
+   brighter) works with the measured behavior instead of against it. This is the one candidate on
+   this list that does not ask the menu bar to win an attention contest it structurally cannot
+   win by 4x fewer, 3.1x narrower, smaller icons.
+
+**Revised "if only one change": item 4 — a one-time cue anchored at the toolbar (where attention
+already lands) that points to the menu bar, rather than any change to the menu bar's own paint or
+size.** It is the only item in this re-diagnosis that does not require picking a side in the
+words-vs-icons genre tension (item 3), does not ask for a size/count parity that would be
+decorative rather than informative (item 2), and directly answers the mechanism the evidence
+actually shows — MJH and PCW's eyes go to the toolbar and stop; meet them there. Cost: a small,
+first-visit-only UI addition (not a redesign of standing chrome), reusing the "notice" mechanism
+this page already has rather than inventing a new one, and explicitly informed by the ONE
+documented failure of a similar idea (highlighting a row nobody was looking at) so as not to
+repeat it. Still advice, not a build — the exact shape (an arrow, a pulsing edge, a one-line
+banner anchored at the toolbar's top edge) is a follow-up question worth Tom's five minutes before
+anyone writes CSS for it.

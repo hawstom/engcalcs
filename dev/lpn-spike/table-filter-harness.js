@@ -20,7 +20,7 @@
 // in every locale, so a fixture that needed a particular one would be asserting the ICU tables
 // rather than our code.
 
-const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, setUnitSet, loadLoopedNetwork, visibleTip } = require('./lpn-dom-stub.js');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
@@ -287,7 +287,7 @@ console.log('\n--- the button in the panel ---');
 	ok('the panel carries a filter button', !!L.filterButton());
 	ok('...and its tip is on .ec-help, where initTips() can reach it on a touch screen',
 		String(L.filterButton().className).indexOf('ec-help') >= 0 &&
-		String(L.filterButton().title).length > 0, L.filterButton().className);
+		visibleTip(L.filterButton()).length > 0, L.filterButton().className);
 	L.type('Pipe.Diameter above 8');
 	L.pressFilter();
 	ok('pressing it filters the table the scope names',

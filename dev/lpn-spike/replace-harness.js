@@ -73,14 +73,18 @@ const L = loadLoopedNetwork(
 	// until 2026-09-02, and it started answering with the Query label\'s tip the moment that label
 	// got one -- so this file failed on a change that had nothing to do with it. The heading is
 	// found the same way headingText() finds it, and the tip is looked for INSIDE that.
+	// **tipOf(), NOT `.title`.** Once initTips() has armed a tooltip Bootstrap holds the text in
+	// data-bs-original-title and the attribute is blank, so `.title` reads '' here (2026-09-10).
 	"\t\theadingTip: function () { var head = null, h = null;\n" +
+	"\t\t\tfunction tipOf(e) { var t = e.getAttribute && e.getAttribute('data-bs-original-title');\n" +
+	"\t\t\t\treturn (t == null ? (e.title || '') : t); }\n" +
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
 	"\t\t\t\tif (!head && c.style && c.style.fontWeight === 'bold') { head = c; } walk(c); }); })(document.getElementById('lpn_find_form'));\n" +
 	"\t\t\tif (!head) { return null; }\n" +
-	"\t\t\tif (head.className === 'ec-help' && head.title) { return head.title; }\n" +
+	"\t\t\tif (head.className === 'ec-help' && tipOf(head)) { return tipOf(head); }\n" +
 	"\t\t\t(function walk(e) { (e.children || []).forEach(function (c) {\n" +
-	"\t\t\t\tif (!h && c.className === 'ec-help' && c.title) { h = c; } walk(c); }); })(head);\n" +
-	"\t\t\treturn h ? h.title : null; },\n" +
+	"\t\t\t\tif (!h && c.className === 'ec-help' && tipOf(c)) { h = c; } walk(c); }); })(head);\n" +
+	"\t\t\treturn h ? tipOf(h) : null; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +

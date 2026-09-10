@@ -732,7 +732,33 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 // (see example-draw-fixture.js); the page emits them into pageConfig, so the harness must too, read
 // from the real lang file rather than restated here.
 global.EngCalcs = {
-  pageConfig: {}, initTips: () => {},
+  pageConfig: {},
+  // **initTips() MUST ACTUALLY ARM A TOOLTIP, because arming is what caches the title.** It was
+  // `() => {}`, which made the whole Bootstrap title-cache invisible to every harness -- see the
+  // _StubTooltip note below. Walks rather than querySelectorAll(), which this stub answers [] for.
+  initTips: (root) => {
+    const start = root || global.document.body;
+    (function walk(n) {
+      if (!n) { return; }
+      if (String(n.className || '').indexOf('ec-help') >= 0 && n.title) {
+        global.bootstrap.Tooltip.getOrCreateInstance(n);
+      }
+      (n.children || []).forEach(walk);
+    }(start));
+  },
+  // The real one lives in js/Calculators.lib.js; mirrored here because the stub does not load that
+  // file whole. Same three steps -- dispose, write, re-arm -- so a harness sees what a reader sees.
+  setTipText: (el, text) => {
+    if (!el) { return; }
+    const want = text || '';
+    let have = el.getAttribute ? el.getAttribute('data-bs-original-title') : null;
+    if (have == null) { have = el.title || ''; }
+    if (have === want) { return; }
+    const prior = global.bootstrap.Tooltip.getInstance(el);
+    if (prior) { prior.dispose(); }
+    el.title = want;
+    if (prior) { global.EngCalcs.initTips(el.parentNode || el); }
+  },
   unitSets: LPN_UNIT_PRESETS,
   // Task 390: the browser gets this table from echoHTMLHead(), straight out of lib/Units.lib.php.
   // Here it comes from the same file, read above -- NEVER a retyped set of constants, for exactly
@@ -753,7 +779,44 @@ global.EngCalcs = {
     if (global.EngCalcs.pageCalculator) { global.EngCalcs.pageCalculator(); }
   }
 };
-global.bootstrap = global.window.bootstrap = { Tooltip: { getInstance: () => null, getOrCreateInstance: () => ({ hide() {}, dispose() {} }) } };
+// **A TOOLTIP THAT CACHES ITS TITLE, BECAUSE THE REAL ONE DOES AND THAT IS THE WHOLE BUG.**
+// This was `{ getInstance: () => null, getOrCreateInstance: () => ({hide(){}, dispose(){}}) }` --
+// a stub that removed the coupling, exactly the trap dev/testing-notes.md warns about. Bootstrap
+// moves `title` into `data-bs-original-title` on construction and BLANKS the attribute, so any
+// later `el.title = '...'` is invisible to the reader. With the no-op above, every harness
+// asserting `el.title` passed while the page displayed a stale sentence for the life of the page
+// (2026-09-10, the transport's player buttons). One physical relationship, taught here: what the
+// READER sees is the cache, and only dispose() gives the attribute back.
+const _tips = new Map();
+class _StubTooltip {
+  constructor(el) {
+    this.el = el;
+    // Bootstrap's _fixTitle: stash the attribute, then empty it.
+    el.setAttribute('data-bs-original-title', el.title || '');
+    el.title = '';
+    _tips.set(el, this);
+  }
+  // WHAT THE READER ACTUALLY GETS. Harnesses assert this, never el.title.
+  shownText() { return this.el.getAttribute('data-bs-original-title') || ''; }
+  hide() {}
+  dispose() {
+    this.el.title = this.el.getAttribute('data-bs-original-title') || '';
+    this.el.removeAttribute('data-bs-original-title');
+    _tips.delete(this.el);
+  }
+}
+global.bootstrap = global.window.bootstrap = {
+  Tooltip: {
+    getInstance: (el) => _tips.get(el) || null,
+    getOrCreateInstance: (el) => _tips.get(el) || new _StubTooltip(el)
+  }
+};
+// What a reader sees on an element, tooltip or not -- the one question a tip harness should ask.
+function visibleTip(el) {
+  if (!el) { return ''; }
+  const t = _tips.get(el);
+  return t ? t.shownText() : (el.title || '');
+}
 
 // ---- the two label builders, READ OUT OF js/Calculators.lib.js ------------------------------
 // **NOT RESTATED, for the reason bootstrap.js gives about EngCalcs.G** -- a second copy drifts
@@ -982,4 +1045,5 @@ function loadLoopedNetwork(injectSource, preludeSource, mutate) {
 }
 
 module.exports = { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
-	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet, flushResizeObservers, clearResizeObservers };
+	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet, flushResizeObservers, clearResizeObservers,
+	visibleTip };

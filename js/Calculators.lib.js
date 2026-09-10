@@ -32,6 +32,44 @@ function ecTipIsControl(el) {
 function ecCanHover() {
 	return !window.matchMedia || window.matchMedia('(hover: hover)').matches;
 }
+/**
+ * Change a tip that is ALREADY ON SCREEN, and have the reader see the new one.
+ *
+ * **A `title` WRITE IS NOT A TIP CHANGE ONCE BOOTSTRAP HAS TAKEN THE ELEMENT OVER.** Tooltip
+ * construction moves `title` into `data-bs-original-title` and blanks the attribute, so a later
+ * `el.title = 'Play'` sets an attribute nothing reads: the tooltip keeps rendering the text it
+ * cached, for the life of the page.
+ *
+ * **It shipped, it was reported, and every harness was green through all of it** (2026-09-10).
+ * The map editor's transport is born over the empty startup document, so its three player buttons
+ * are born carrying "This project has no extended period simulation set"; initTips() cached that;
+ * the project then arrived and renderTransport() restored `title` to "Play". Tom, on the result:
+ * *"It's always there. I have never seen any other tip."* His own console probe read
+ * `title: "Play"` off the very button that was displaying the other sentence -- which is exactly
+ * why the harnesses passed. They assert the attribute; the reader sees the cache.
+ *
+ * js/looped-network.js solved this once at its setIconLabel wrapper and said in a comment that
+ * "the next repainting button will be written by somebody who has never read this". This is that
+ * button. Same remedy -- dispose, write, re-arm -- so the machinery deciding trigger, long-press
+ * and click-to-hide stays in exactly one place.
+ *
+ * Cheap to call on a render loop: it returns untouched when the visible text already agrees.
+ */
+EngCalcs.setTipText = function (el, text) {
+	'use strict';
+	if (!el) { return; }
+	var want = text || '';
+	// What the READER currently gets: the cache once Bootstrap owns it, the attribute before that.
+	// `== null` catches both a browser's null and a DOM stub's undefined.
+	var have = el.getAttribute ? el.getAttribute('data-bs-original-title') : null;
+	if (have == null) { have = el.title || ''; }
+	if (have === want) { return; }
+	var Tip = window.bootstrap && window.bootstrap.Tooltip;
+	var prior = (Tip && Tip.getInstance) ? Tip.getInstance(el) : null;
+	if (prior) { prior.dispose(); }
+	el.title = want;
+	if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
+};
 EngCalcs.initTips = function (root) {
 	var canHover = ecCanHover();
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {

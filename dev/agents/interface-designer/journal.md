@@ -539,3 +539,47 @@ Tom's, not chrome.
 not content widths — fine for the earlier stacking question, not enough for "does one row fit." A
 quick throwaway Playwright probe (not committed, scratchpad only) answered the width question in
 about five minutes; worth reaching for again rather than estimating from button counts.
+
+---
+
+## 2026-09-10 — Task 625, correction: the paint was already unified and I missed it
+
+Tom agreed with items 2 (Language), 3 (transport routing — "I strongly agree about re-routing"),
+4 (Help menu) and 5's wording, but challenged item 1, the one I'd ranked first: *"Do you mean just
+pushing them closer together? There is no line. They already look like a set."* He was right, and
+checking the CSS directly proved it rather than merely settling it by authority.
+
+**What I got wrong.** I diagnosed "the eye stops at the toolbar and never looks up" and reached for
+a paint fix (unify background, add a hairline) without first checking whether the paint was already
+unified. It was: `css/engcalcs.css:1337-1338` (menu-bar item) and `:1218-1225` (toolbar button)
+share the identical at-rest style (`background: none; border: 1px solid transparent`) and identical
+hover colors, and the comment sitting directly above the menu-bar rule (`css/engcalcs.css:1260`)
+states the intent in so many words: *"Flat text buttons, because a menu bar that looks like a row
+of push-buttons reads as a second toolbar."* My "add a hairline" idea would have built the exact
+thing that comment says not to build. **Lesson to keep: when a diagnosis implies "these two things
+don't match," check the stylesheet before proposing the fix — the mismatch may already be a
+deliberate absence, in which case the fix is aimed at the wrong layer.**
+
+**Re-diagnosis, done properly this time — read the actual numbers before naming a cause.** Ruled
+out two candidates by checking them directly rather than assuming: at-rest invisibility is shared by
+both rows equally (not a menu-bar-specific defect), and the menu bar is NOT text-only — it already
+carries an icon per item at desktop widths (`setLabel(b, m.icon, '')`,
+`js/looped-network.js:22440`), only losing the word below 640px. What held up under measurement:
+menu-bar icons are 1.05em against the toolbar's 1.35em (`css/engcalcs.css:249` vs `:1225`); 5 items
+against 22; 401px of ink against 1,260px (same render pass as the earlier width probe). And a
+genre argument I would not have reached without a real tester's own words: the toolbar is
+icon-ONLY at every width by explicit ruling (`css/engcalcs.css:1206-1213`, quoting Tom, 2026-08-20,
+"toolbars have icons, not buttons"), which is the visual grammar of an application's tool palette;
+the menu bar keeps icon+word, which is the visual grammar of a website's nav list — and MAH
+independently described the menu bar as belonging to "the site," which is exactly that genre
+confusion, named by a real reader before I had a theory for it.
+
+**Revised answer, if only one change:** not a menu-bar paint or size change at all. Meeting the
+eye where the measured behavior shows it already lands — a first-visit cue anchored AT the
+toolbar, pointing up — rather than trying to make the menu bar win an attention contest it
+structurally cannot win against a row with 4x the icons and 3x the ink. Explicitly informed by the
+one instrument this project already tried and watched fail for a related reason: the Hide-titles
+highlight, which marked a row nobody was looking at and stayed missed even at 120 seconds. Full
+detail: `dev/app-chrome-postdivorce-recommendations.md` §F (appended, correction kept rather than
+overwritten — §A/§E marked superseded in place, not deleted, per the project's own convention that
+a correction substitutes the reasoning and keeps the rejected alternative visible).

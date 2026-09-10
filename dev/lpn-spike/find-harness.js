@@ -21,7 +21,7 @@
 // It also asserts the thing Tom will notice first: Find PANS and does not ZOOM. Choosing a scale
 // would throw away the zoom he set to read the drawing.
 
-const { byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, setUnitSet, loadLoopedNetwork, visibleTip } = require('./lpn-dom-stub.js');
 // The report's own labels and refusals, read from the real lib/lang.ec.en.php the stub loads.
 // WHICH message the panel chose is the thing under test; its wording is the language file's
 // (dev/scripts/harness_wording_check.php).
@@ -1028,8 +1028,12 @@ console.log('\n--- the Query label carries a real, wired tip ---');
 	}
 	const helps = walk(form, []);
 	ok('the Find form has at least one .ec-help label', helps.length > 0, helps.length);
-	const q = helps.filter(function (h) { return /query|same search/i.test(String(h.title || '')); })[0];
-	ok('...and one of them carries the query tip', !!q, q && String(q.title).slice(0, 40));
+// **READ THE TIP THE READER GETS, NOT `el.title`.** Once initTips() has armed a tooltip,
+// Bootstrap has moved the text into data-bs-original-title and BLANKED the attribute, so a
+// `.title` assertion here is asserting the empty string (2026-09-10; the stub used to hide
+// this by never arming anything). visibleTip() answers what is actually displayed.
+	const q = helps.filter(function (h) { return /query|same search/i.test(visibleTip(h)); })[0];
+	ok('...and one of them carries the query tip', !!q, q && visibleTip(q).slice(0, 40));
 	if (q) {
 		const glyph = (q.children || []).filter(function (c) {
 			return c.classList && c.classList.contains('ec-tip');

@@ -217,5 +217,45 @@ ok('...and the strip is live on it', step.children.length === 25 && !step.disabl
 	step.children.length + ' rows, disabled=' + step.disabled);
 ok('...with no false no-period sentence', step.title !== PC.lpn_time_no_period);
 
+// ============================================================================================
+// 7. WHAT THE READER SEES -- the Bootstrap title cache (Tom, 2026-09-10)
+// ============================================================================================
+// **THE ATTRIBUTE WAS ALWAYS RIGHT AND THE READER ALWAYS SAW THE WRONG SENTENCE.** Sections 1-6
+// assert `el.title`. Bootstrap moves `title` into `data-bs-original-title` when a tooltip is
+// armed and BLANKS the attribute, so a later `el.title = 'Play'` changes nothing on screen. The
+// strip is born over the empty startup document carrying the no-period sentence, initTips() arms
+// it there, and the sentence then outlived every project for the life of the page.
+//
+// Tom: "It's always there. I have never seen any other tip." His console probe read
+// `title: "Play"` off the button that was displaying the other sentence -- both true at once, and
+// the reason six earlier hypotheses died.
+//
+// THE ORDER IS THE WHOLE TEST: arm the tips while the strip is inert, exactly as the page does.
+console.log('\n--- 7. the tip the READER gets, after tips were armed on the inert strip ---');
+{
+	// Back to the inert state (section 3's shape), then arm the tips there -- which is the page's
+	// own order: the strip is born over a document with no clock and initTips() runs on it.
+	const bare = net3();
+	bare.times = null;
+	L.applySaved(bare);
+	L.refreshAllFromDocument();
+	global.EngCalcs.initTips(toolbar);
+
+	const armed = players.map((b) => stub.visibleTip(b));
+	ok('with no project, the reader is told there is no extended period simulation',
+		armed.every((t) => t === PC.lpn_time_no_period), JSON.stringify(armed[1] || '').slice(0, 50));
+
+	L.applySaved(net3());
+	L.refreshAllFromDocument();
+
+	players.forEach((b, i) => {
+		const seen = stub.visibleTip(b);
+		ok('player[' + i + '] SHOWS its own tip once Net3 has arrived, not the no-period sentence',
+			seen !== PC.lpn_time_no_period && seen.length > 0, JSON.stringify(seen).slice(0, 50));
+	});
+	ok('...and the step selector too',
+		stub.visibleTip(step) !== PC.lpn_time_no_period, JSON.stringify(stub.visibleTip(step)).slice(0, 40));
+}
+
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILURE(S)');
 process.exit(fails === 0 ? 0 : 1);

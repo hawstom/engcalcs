@@ -58,6 +58,29 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     application. Applying a storefront rule to an app shell is how the four embarrassments got
     there. Discovery was never this page's own title: it is the calculators that DO rank, linking
     in, plus the people Tom reaches by hand. **Keep those inbound links; they are the funnel.**
+  - **IDA'S PLAN IS `dev/app-chrome-postdivorce-recommendations.md`; TOM RULED ON IT 2026-09-10.**
+    **Approved:** Help gains one row, `Install app`, and KEEPS the exact label "Help" (visitor copy
+    says "use Help", which needs one menu owning the name); Language last, right of Help, reusing
+    the suite navbar's existing 27-row widget (*"I strongly agree about re-routing"*); a
+    responsive merge above ~1750 px, after the demo; transport STAYS on the toolbar (*"It's not
+    conventional, mainly"*).
+  - **HER "DO THIS FIRST" -- unify the two bars by paint -- IS CHALLENGED AND THE CSS BACKS TOM.**
+    *"Do you mean just pushing them closer together? There is no line. They already look like a
+    set."* Measured: `#lpn_menubar` has no background and no border, and the only hairline in the
+    region is `#lpn_toolbar`'s `border-bottom`, which divides the TOOLBAR from the TAB STRIP. The
+    two bars already sit on one background separated by 4 px of margin. **So the paint is already
+    unified and cannot be the cause of "the eye stops at the toolbar and never looks up"** -- the
+    live candidates are 1,260 px of saturated icon ink against 401 px of plain text, and menu
+    items that are `background: none; border: 1px solid transparent` until hover, so they do not
+    read as controls at rest. Re-diagnosis requested.
+  - **NO ALWAYS-MERGED ROW. MEASURED, THEN CONFIRMED BY EYE.** Menu-bar ink 401 px + toolbar ink
+    1,260 px = ~1,660 px, against 1,918 / 1,438 / 1,364 px of row at this project's three
+    reference viewports: it fits at 1920 and is 220 and 296 px short at 1440 and 1366. Tom,
+    shown the numbers: *"True. I can see that visually. It would be tight."* The toolbar's
+    bounding box LIES -- `.lpn-toolbar-end`'s `margin-left: auto` stretches it to the full row --
+    so measure ink, never the box.
+  - **TRANSPORT IS ON THE TOOLBAR, NOT IN A BOTTOM PANE** (`lpn_toolbar_run`). CLAUDE.md said
+    bottom pane until 2026-09-10 and sent a design brief off on the wrong control.
   - **THE LANGUAGE SWITCHER MOVES, IT DOES NOT GO** (his instruction); hreflang and `ec_language`
     still apply. Read `dev/chrome-audit.md` first: 314 px above the map (31.3%, not the two-thirds
     claimed), 143 px of it title block, growing to 52.1% at 1366x768 where the H1 and H2 wrap.

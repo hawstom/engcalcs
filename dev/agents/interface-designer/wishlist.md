@@ -57,13 +57,27 @@ that disagreement is most of what a seat is for. No agent edits the roadmap.
    tile with a caret rather than adding a new independent widget next to it. See journal,
    2026-09-10.
 
-5. **Task 625 (post-divorce, three bars) -- unify menu-bar/toolbar paint before anything else.**
-   Same background band, zero gap, hairline divider, no DOM merge. MEASURED (real Chromium render,
-   not estimate): menu-bar ink 401px, toolbar ink 1,260px, combined 1,660px against 1,364-1,918px
-   of available row at the three viewports this project already treats as reference points -- a
-   literal one-row merge is provably unsafe below roughly 1,750px, so I do NOT recommend it as the
-   default move despite Tom's own wide-screen qualifier being right as far as it goes. Full
-   ranking and the width numbers: `dev/app-chrome-postdivorce-recommendations.md`.
+5. **SUPERSEDED 2026-09-10 -- Tom caught this one and the CSS backs him.** Original entry read
+   "unify menu-bar/toolbar paint before anything else, same background, hairline divider." Tom:
+   *"Do you mean just pushing them closer together? There is no line. They already look like a
+   set."* He was right: `css/engcalcs.css:1337-1338` and `:1218-1225` already share one hover
+   treatment by explicit design comment ("a menu bar that looks like a row of push-buttons reads
+   as a second toolbar," `css/engcalcs.css:1260`) -- there was no seam to close and a hairline
+   would have manufactured the exact "two rows" read the design already avoids. Re-diagnosed in
+   §F of `dev/app-chrome-postdivorce-recommendations.md`: the real gap is visual salience WITHIN
+   an already-unified strip -- toolbar icons at 1.35em vs menu-bar icons at 1.05em, 22 toolbar
+   glyphs vs 5, 1,260px of toolbar ink vs 401px of menu-bar ink (measured, same render pass), and
+   a genre mismatch (icon-only grid reads as a tool palette; icon+word reads as a nav list, which
+   is literally what one tester, MAH, said the menu bar looked like it belonged to -- "the site,"
+   not the app). **Revised "if only one": a first-visit cue anchored AT the toolbar, where the
+   eye already lands, pointing up to the menu bar** -- not a menu-bar paint or size change, which
+   would either be decorative (chasing parity with a 22-tool row) or force a words-vs-icons
+   genre call that's Tom's to make, not mine to default. MEASURED (real Chromium render, not
+   estimate): menu-bar ink 401px, toolbar ink 1,260px, combined 1,660px against 1,364-1,918px of
+   available row at the three viewports this project already treats as reference points -- a
+   literal one-row merge is still provably unsafe below roughly 1,750px, so that half of the
+   original entry stands. Full ranking and the width numbers:
+   `dev/app-chrome-postdivorce-recommendations.md`.
 6. **Same task -- Language menu, last position, right of Help, same 27-row widget the suite navbar
    already has.** Reuses `all_language_settings` and the globe icon; no new component. Secondary
    win, not a discoverability fix on its own -- it forces the traffic that WANTS language switching

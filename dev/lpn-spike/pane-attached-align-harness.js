@@ -23,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
-const { byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, ensure, setUnitSet, loadLoopedNetwork, visibleTip } = require('./lpn-dom-stub.js');
 
 let fails = 0;
 function ok(name, cond, extra) {
@@ -103,8 +103,8 @@ console.log('\n--- built and refilled through the same one function ---');
 			ok(k + ': ...marked as a stated rule rather than a value',
 				(tds[k].className || '').indexOf('lpn-pane-stated') >= 0, tds[k].className);
 			ok(k + ': ...and carrying the property popup\'s OWN sentence, not a second one',
-				tds[k].title === L.pc().lpn_field_text_attached_tip,
-				(tds[k].title || '').slice(0, 40));
+				visibleTip(tds[k]) === L.pc().lpn_field_text_attached_tip,
+				visibleTip(tds[k]).slice(0, 40));
 			ok(k + ': ...reachable on a touch screen, which is what ec-help wires',
 				(tds[k].className || '').indexOf('ec-help') >= 0);
 			tds[k].textContent = 'wiped';
