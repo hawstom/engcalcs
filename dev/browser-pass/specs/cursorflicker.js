@@ -129,13 +129,22 @@ exports.run = async function ({ browser, report }) {
 		for (const [dx, dy, name] of dirs) {
 			const r = runs(await walk(a, n, dx, dy, 40));
 			console.log(`      ${name}: ` + r.map(show).join(' | '));
-			// **THE SIGNATURE**: a `default` run with a non-default, non-canvas run on BOTH sides.
-			// A default run that simply continues to the edge is the bare map and is correct.
-			for (let i = 1; i < r.length - 1; i++) {
-				if (r[i].cursor !== 'default') { continue; }
-				const before = r[i - 1], after = r[i + 1];
-				if (before.cursor !== 'default' && after.cursor !== 'default') {
-					sandwiches.push(`${name} ${show(r[i])} between ${before.cursor} and ${after.cursor}`);
+			// **THE SIGNATURE MOVED WHEN `default` STOPPED MEANING "NOTHING CLAIMS THIS"**
+			// (2026-09-09). Task 569's defect was bare canvas showing `default` because nothing
+			// there carried a cursor rule, so a `default` band between two meaningful ones named the
+			// culprit. Since Tom's ruling that day -- *"I prefer default over pointer at the labels
+			// and assets. It's more precise."* -- `default` is a DELIBERATE object cursor, and a
+			// label sitting in open map is now exactly grab / default / grab. That reading is
+			// correct and asserting against it would fail on a working page.
+			//
+			// So the signature is now about the ELEMENT, not the value: the bare canvas showing
+			// anything other than the open hand. `#lpn_canvas` is the only element that can be the
+			// bare map, which makes this a sharper test than the old one rather than a weaker one --
+			// the old shape could not have told a wrongly-inheriting object from a deliberate one.
+			for (let i = 0; i < r.length; i++) {
+				const isCanvas = r[i].id === 'lpn_canvas';
+				if (isCanvas && r[i].cursor !== 'grab' && r[i].cursor !== 'grabbing') {
+					sandwiches.push(`${name} bare map says ${r[i].cursor} at ${show(r[i])}`);
 				}
 			}
 		}
@@ -146,7 +155,7 @@ exports.run = async function ({ browser, report }) {
 		// now says `grab`, so a band of `default` between two meaningful cursors would be a
 		// REGRESSION rather than a known state, and that is exactly what an assertion is for.
 		report.ok(sandwiches.length === 0,
-			'no band of default cursor is sandwiched between two meaningful ones',
+			'the bare map says the open hand everywhere it shows through',
 			sandwiches.length ? sandwiches.join(' ;; ') : 'none on eight bearings');
 		// **AND THE HAND IS OPEN ON THE BARE MAP.** Asserted separately from the sandwich test
 		// because they can fail for different reasons: the test above would still pass if the
@@ -181,19 +190,37 @@ exports.run = async function ({ browser, report }) {
 				for (let d = 0; d <= 40; d++) {
 					const el = document.elementFromPoint(cx + dx * d, cy + dy * d);
 					if (!el) { break; }
-					if (getComputedStyle(el).cursor !== 'pointer') { break; }
+					// Anything that is not the bare map's own `grab` counts as an object cursor,
+					// so a change of preference between `pointer` and `default` does not break this.
+					const cur = getComputedStyle(el).cursor;
+					if (cur === 'grab' || cur === 'grabbing' || cur === 'auto') { break; }
 					last = d;
 				}
 				if (last > best) { best = last; }
 			}
 			return { disc: b.width / 2, reach: best };
 		});
-		report.ok(!!reach && reach.reach > reach.disc,
-			'a node says pointer further out than its own drawn disc, which is the grab band',
-			reach ? `disc ${reach.disc.toFixed(1)}px, pointer out to ${reach.reach}px` : 'no node');
-		report.ok(!!reach && reach.reach >= reach.disc + 5,
-			'...by about the slop a pipe already had, so the two targets do not disagree',
-			reach ? `slop ${(reach.reach - reach.disc).toFixed(1)}px` : 'no node');
+		// **THE BAND NO LONGER CARRIES THE CURSOR, AND THAT REVERSED THIS PAIR OF ASSERTIONS**
+		// (2026-09-09). They were written when `.lpn-node-hit` said `pointer`, so the invisible
+		// 12 px band showed the finger and the reach ran past the drawn disc. Tom then found the
+		// consequence on a dense drawing: the band is 12 SCREEN pixels at every zoom, so at a fit
+		// zoom every gap between two pipes IS a band and the whole canvas was a pointer finger.
+		// *"we want the cursor to clearly become a pointer when pointing is appropriate, not all
+		// over the map."* The bands took `cursor: inherit`; the HIT area is unchanged and is held
+		// by specs/nodehit.js, which is where the 12 px slop is now asserted.
+		//
+		// So what this walk measures is the DRAWN disc, and the property worth holding is that the
+		// object cursor stops at the edge of what a reader can see -- the WYSIWYG rule. It is
+		// `default` rather than `pointer` since the same day, on his preference (*"I prefer default
+		// over pointer at the labels and assets. It's more precise."*), which is why the walk below
+		// asks for "not the map's own cursor" rather than naming a value: this spec should not have
+		// to be edited again the next time he changes his mind about which glyph.
+		report.ok(!!reach && reach.reach > 0,
+			'a node carries an object cursor over the disc a reader can actually see',
+			reach ? `disc ${reach.disc.toFixed(1)}px, object cursor out to ${reach.reach}px` : 'no node');
+		report.ok(!!reach && reach.reach <= reach.disc + 2,
+			'...and it STOPS there, rather than running out over the invisible grab band',
+			reach ? `overrun ${(reach.reach - reach.disc).toFixed(1)}px` : 'no node');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

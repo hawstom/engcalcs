@@ -1034,11 +1034,12 @@ html[lang="zh"] .ec-welcome {
    is computed from whatever element answered the hit test, and since the words answer none it would
    be a dead declaration on the text alone. `.lpn-draglbl` says "this is a label you can take hold
    of", which is true of both halves; no `pointer-events` here at all, so `.lpn-lbl`'s own `none`
-   stands on the text and `.lpn-lbl-hit`'s own value stands on the shape. */
-   **AND THE VALUE IS `default`, WHICH THIS BRANCH PREDATES** (Tom, 2026-09-09, on the corrected
-   map: *"I prefer default over pointer at the labels and assets. It's more precise."*). An arrow
-   tapers to nothing at its own hot spot; a finger's hot spot sits at the tip of a hand about 20 px
-   across, which on this map covers the label it is aimed at. */
+   stands on the text and `.lpn-lbl-hit`'s own value stands on the shape.
+
+   **AND THE VALUE IS `default`** (Tom, 2026-09-09, on the corrected map: *"I prefer default over
+   pointer at the labels and assets. It's more precise."*). An arrow tapers to nothing at its own hot
+   spot; a finger's hot spot sits at the tip of a hand about 20 px across, which on this map covers
+   the label it is aimed at. */
 .lpn-draglbl { cursor: default; }
 /* THE LABEL'S OWN GRAB SHAPE -- one transparent <path>, one subpath per ROW of the label, built and
    moved by syncLabelHit(). `visibleFill` for .lpn-node-hit's reason: `visible` would hit-test the
