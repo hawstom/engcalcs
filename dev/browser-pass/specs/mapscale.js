@@ -122,8 +122,16 @@ exports.run = async function ({ browser, report }) {
 		report.ok(d.linkPx > 0.5 && d.linkPx < 20,
 			'a pipe is drawn at a few SCREEN pixels, not at world units times the scale',
 			d.linkPx && d.linkPx.toFixed(3) + ' px');
-		report.ok(d.bandPx === null || Math.abs(d.bandPx - 12) < 0.1,
-			"...and a pipe's grab band is the 12 px it is meant to be",
+		// **THE BAND IS THE PIPE'S OWN WIDTH ON A POINTER, WITH A 3 px FLOOR** (Tom, 2026-09-10,
+		// ruling on Task 618: *"No slop for nodes. Slop for labels and to enforce a lower limit of
+		// 3 px for link lines."*). It used to be a flat 12, and this line asserted that number until
+		// the WYSIWYG work (2466c032) split it in two: `--lpn-hit` is the drawn width on a fine
+		// pointer, and the 12 moved to `--lpn-hit-coarse`, behind `@media (pointer: coarse)`. This
+		// pass runs a fine pointer, so 12 here would be the COARSE band leaking onto a mouse.
+		// Still a band, not a number: what is being checked is that the figure is in SCREEN pixels
+		// at all -- the world-unit fallback is 77,745 px, three orders of magnitude away.
+		report.ok(d.bandPx === null || (d.bandPx >= 2.9 && d.bandPx < 20),
+			"...and a pipe's grab band is the pipe's own width, floored at 3 screen px",
 			d.bandPx === null ? '(no band element)' : d.bandPx.toFixed(2) + ' px');
 		// The stylesheet's own fallbacks, which is what these numbers are protecting against. The
 		// arithmetic is stated so a future change to either end cannot make the note false quietly.

@@ -372,9 +372,16 @@ exports.run = async function ({ browser, report }) {
 		a.answerConfirmsWith(true);
 		await a.toolbarClick('Settings');
 		await a.settle(300);
+		// **THE LABEL IS READ, NOT TYPED** (dev/scripts/harness_wording_check.php). This matched
+		// /Erase everything on this page/ and went red the day Tom renamed the button to "Start
+		// fresh" (9aea17c5) -- nothing broke, the spec had pinned the English. The key is the one
+		// the page itself renders from, so the next rename costs nothing here.
 		const wiped = await a.page.evaluate(() => {
+			const pc = (window.EngCalcs && window.EngCalcs.pageConfig) || {};
+			const want = pc.lpn_settings_wipe_btn;
+			if (!want) { return false; }
 			const b = Array.from(document.querySelectorAll('#lpn_settings_box button'))
-				.find(x => /Erase everything on this page/.test(x.textContent));
+				.find(x => x.textContent.indexOf(want) !== -1);
 			if (b) { b.click(); }
 			return !!b;
 		});
