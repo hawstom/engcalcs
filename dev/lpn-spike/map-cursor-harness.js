@@ -108,8 +108,10 @@ ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.l
 // its volute. So each of those two rows carries a SECOND pattern here: the width it must declare,
 // with a zero fallback, which is what makes the keyword safe. Either half alone is the bug, so
 // neither may be dropped.
-[['.lpn-link-hit', 'visibleStroke'], ['.lpn-link-symbol-hit', 'visible', /stroke-width:\s*var\(--lpn-symhit,\s*0\)/],
-	['.lpn-node-hit', 'visible', /stroke-width:\s*0\s*;/]].forEach(function (row) {
+// The FOURTH slot is the cursor each shape must carry -- see the note below the hit-area assertion.
+[['.lpn-link-hit', 'visibleStroke', null, 'inherit'],
+	['.lpn-link-symbol-hit', 'visible', /stroke-width:\s*var\(--lpn-symhit,\s*0\)/, 'default'],
+	['.lpn-node-hit', 'visible', /stroke-width:\s*0\s*;/, 'default']].forEach(function (row) {
 	// Anchored at a line start: `.lpn-vertexmode .lpn-link-hit` is a DIFFERENT rule that correctly
 	// says crosshair, and an unanchored match finds it first and reads it as this one.
 	const re = new RegExp('(^|\\n)\\' + row[0] + '\\s*\\{([^}]*)\\}');
@@ -118,7 +120,17 @@ ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.l
 		!!m && new RegExp('pointer-events:\\s*' + row[1] + '\\s*;').test(m[2]) &&
 		(!row[2] || row[2].test(m[2])),
 		m ? (/pointer-events:\s*([A-Za-z]+)/.exec(m[2]) || [])[1] : '(no rule)');
-	ok(row[0] + ' inherits the canvas cursor', !!m && /cursor:\s*inherit/.test(m[2]),
+	// **THE SHAPE THAT IS THE INK CARRIES THE OBJECT CURSOR; THE ONE THAT IS SLOP INHERITS**
+	// (Tom, 2026-09-10, at 100 px symbols: *"Reservoir and Pump cursor is a grab except for a single
+	// pixel at its anchor point"*). While these were oversized invisible bands, `inherit` was right:
+	// what they covered was mostly map, and the canvas's own `grab` reaching them was the honest
+	// answer. Since Task 618 the node and symbol shapes ARE the drawn silhouette and the drawn symbol
+	// beside them is `pointer-events: none`, so they are the topmost hit target over a vessel, a pump
+	// or a valve -- and `inherit` told the reader the map was pannable while they pointed at an asset.
+	// `.lpn-link-hit` is different and keeps `inherit`: it is still a band AROUND the pipe rather than
+	// the pipe, and `.lpn-link` carries `default` for the ink itself.
+	ok(row[0] + ' carries cursor: ' + row[3],
+		!!m && new RegExp('cursor:\\s*' + row[3] + '\\s*;').test(m[2]),
 		m ? (/cursor:\s*([a-z-]+)/.exec(m[2]) || [])[1] : '(no rule)');
 });
 // **AND THE DRAWN THINGS SAY `default`, WHICH IS TOM'S OWN PREFERENCE MEASURED AGAINST THE SAME

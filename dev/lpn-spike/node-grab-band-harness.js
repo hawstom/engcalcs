@@ -314,8 +314,16 @@ console.log('\n--- the stylesheet half ---');
 	// is saying, while `pointer-events` below is unchanged and the 12 px of reach this whole file
 	// was written to win is untouched. The FEEDBACK now lives on the drawn disc, which is asserted
 	// here too so it cannot quietly move onto nothing.
-	ok('...and it inherits the canvas cursor rather than claiming pointer over 12 px of map',
-		/cursor:\s*inherit/.test(rule));
+	// **IT CARRIES `default` SINCE 2026-09-10, AND THAT IS THIS SECTION'S ARGUMENT COMPLETING, not
+	// reversing.** The complaint here was that a band claiming `pointer` over 12 px of map made the
+	// whole canvas a pointer finger; `inherit` fixed that while the band was SLOP. Task 618 made the
+	// band the drawn silhouette and made the drawn vessel `pointer-events: none`, so this shape is
+	// now the topmost hit target over a reservoir or a tank -- and `inherit` then told the reader the
+	// map was pannable while they pointed at an asset (Tom, at 100 px symbols: *"Reservoir and Pump
+	// cursor is a grab except for a single pixel at its anchor point"*). Ink carries the object
+	// cursor; slop inherits. `.lpn-link-hit` is still slop and still inherits.
+	ok('...and it carries the object cursor, because the band IS the ink now',
+		/cursor:\s*default/.test(rule));
 	ok('...while the DRAWN disc still carries the object cursor, or the feedback moved onto nothing',
 		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*default/.test(css));
 	// **`visible` WITH A DECLARED STROKE-WIDTH, WHICH IS NOT THE 2026-09-09 DEFECT COMING BACK.**

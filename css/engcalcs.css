@@ -697,10 +697,19 @@ html[lang="zh"] .ec-welcome {
    defect, where an undeclared width meant the initial 1 USER UNIT and 846 px of invisible reach on a
    geographic drawing. The fallback here is ZERO, so a missing publish shrinks the shape to bare ink
    instead of growing it to a wall. */
+/* **AND IT SAYS `default`, BECAUSE IT IS NOW THE INK** (Tom, 2026-09-10, testing at 100 px symbols:
+   *"Reservoir and Pump cursor is a grab except for a single pixel at its anchor point"*). These
+   shapes wore `cursor: inherit` from the days when they were oversized invisible bands that had no
+   business claiming the pointer -- the canvas's own `grab` reached them and that was correct, because
+   what they covered was mostly map. Since Task 618 they ARE the drawn silhouette, and the drawn
+   symbol beside them is `pointer-events: none`, so the topmost hit target over a reservoir, a tank,
+   a pump or a valve is this shape and the reader was told the map was pannable while pointing at an
+   asset. A junction and a pipe never showed it because `.lpn-node` and `.lpn-link` are hit targets
+   in their own right and carry `default` themselves. */
 .lpn-link-symbol-hit {
 	fill: transparent; stroke: transparent; stroke-width: var(--lpn-symhit, 0);
 	stroke-linejoin: round; stroke-linecap: round;
-	pointer-events: visible; cursor: inherit;
+	pointer-events: visible; cursor: default;
 }
 /* A FINGER IS NOT A MOUSE (Task 618, and dev/toolbar-icons.md's 44 px argument). The shape is the
    same; the skirt is 12 px on each side instead of 2. `pointer: coarse` is the PRIMARY pointer, so
@@ -764,9 +773,18 @@ html[lang="zh"] .ec-welcome {
    what it is covering, and dev/toolbar-icons.md's 44 px argument still holds there. He did not rule
    on touch and this is the conservative reading of that silence.
    `pointer: coarse` is the PRIMARY pointer: a laptop with a touchscreen and a mouse is a mouse. */
+/* **AND IT SAYS `default`, BECAUSE IT IS NOW THE INK** (Tom, 2026-09-10, testing at 100 px symbols:
+   *"Reservoir and Pump cursor is a grab except for a single pixel at its anchor point"*). This shape
+   wore `cursor: inherit` from the days when it was an oversized invisible band with no business
+   claiming the pointer -- the canvas's own `grab` reached it and that was right, because what it
+   covered was mostly map. Since Task 618 it IS the drawn silhouette, and the drawn vessel beside it
+   is `pointer-events: none`, so over a reservoir or a tank the topmost hit target is this shape and
+   the reader was told the map was pannable while pointing at an asset. A JUNCTION never showed it,
+   which is why the report named only the vessels: `.lpn-node` is a hit target in its own right and
+   carries `default` itself. */
 .lpn-node-hit {
 	fill: transparent; stroke: transparent; stroke-width: 0;
-	stroke-linejoin: round; pointer-events: visible; cursor: inherit;
+	stroke-linejoin: round; pointer-events: visible; cursor: default;
 }
 @media (pointer: coarse) {
 	.lpn-node-hit { stroke-width: var(--lpn-nhit, 0); }

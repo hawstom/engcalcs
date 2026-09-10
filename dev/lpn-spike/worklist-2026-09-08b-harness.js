@@ -76,7 +76,7 @@ console.log('--- an object under the pointer says what it is, panning or not ---
 	// still says something different (`grab` is the map, `default` is a thing), and the arrow hides
 	// less of a 7 px disc than the hand did.
 	[['.lpn-node', 'default'], ['.lpn-link', 'default'], ['.lpn-link-hit', 'inherit'],
-		['.lpn-link-symbol-hit', 'inherit'], ['.lpn-vhandle', 'default'], ['.lpn-draglbl', 'default']
+		['.lpn-link-symbol-hit', 'default'], ['.lpn-vhandle', 'default'], ['.lpn-draglbl', 'default']
 	].forEach(function (row) {
 		const re = new RegExp('\\' + row[0].replace('.', '.') + '[^{}]*\\{[^}]*cursor:\\s*' + row[1]);
 		ok(row[0] + ' still states cursor: ' + row[1], re.test(CSS));
