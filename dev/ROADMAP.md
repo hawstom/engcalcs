@@ -317,7 +317,74 @@ the block.
   - **NEXT IS A SCENARIO LIST, NOT A FIX.** Enumerate how work is lost -- reload without
     reconnecting, close without saving, storage evicted, quota exceeded mid-autosave, two tabs,
     denied permission, a file moved under us -- rule each ACCEPTABLE or DEFECT, then build.
+  - **OCCURRENCES ARE RECORDED IN `dev/lpn-blank-map-incidents.md`, one dated entry each.** A second
+    one was reported 2026-09-10 and is UNCLASSIFIED: the console showed no `looped-network.js`
+    error at all, so an uncaught exception during `init()` is excluded for that occurrence, and no
+    storage state was captured before the tab was closed. `dev/scripts/lpn-forensics.js` is the
+    read-only console paste that answers the scenario list in one go -- run it on the next
+    specimen BEFORE closing the tab.
 
+
+- 95|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
+  Reproduced 13/13 by `dev/lpn-spike/blank-map-harness.js`. **A gap BETWEEN two branches:**
+  `initLibrary()` returns null when the open project's stored document does not parse, but its
+  last act before reading is `if (!indexEntry(library.openId)) { library.openId =
+  library.projects[0].id; }` -- so at `init()`'s `else if (!indexEntry(library.openId))` the entry
+  EXISTS, and neither branch runs. Nothing applied, nothing created, **nothing thrown**. The tab
+  strip renders the name from the index over an empty `doc`.
+  - **THE LOSS IS THE AUTOSAVE, NOT THE CORRUPTION.** At the blank-map moment the user's bytes are
+    still on disk and are the only copy; `saveToStorage()` then writes the empty
+    `serializeProject()` over that key on the solve debounce. Tom saw exactly this state and it
+    held: *"The project is still in storage. But the map is blank."*
+  - `adoptOrphans()` drops an entry whose key is ABSENT (`getItem(...) !== null`), so a PRESENT
+    unparseable key walks past the filter and fails later at `JSON.parse`.
+  - **The fix is a third state, not a wider `else`.** Unreadable is not "first visit" -- creating a
+    fresh project there overwrites the bytes too. It must refuse to autosave over a document it
+    could not read and say so; `setStorageError()` is the existing seam. Never repair silently.
+  - **NO KNOWN OCCURRENCE, and it was filed believing it had one.** Tom's 2026-09-10 document
+    parses, holds 97 nodes and 119 links, and 677 symbols were in the DOM. **Do not cite this as
+    the cause of any incident.**
+
+- 95|628| **[H] A restored view is never checked against the model it must show.**
+  Tom, 2026-09-10, after a machine restart: *"Zoom to fit restores it all. It's a zoom mistake!"*
+  Full measurement in `dev/lpn-blank-map-incidents.md`. His stored view was
+  `{cx: 835.390625, cy: -4957.78125, s: 5.322222222222222}` on a geographic Net3.
+  - **THE SCALE ALONE MADE IT INVISIBLE.** `s` is px per degree; at 5.322 that document's
+    0.0965 x 0.082 degree extent draws **0.51 x 0.44 px**. Invisible even perfectly centred.
+  - **AND THE CENTRE WAS OUTSIDE THE WORLD IN BOTH AXES.** `mercY()` is 0 at the equator and +-180
+    at the cut-off, so cy -4957.78 is 27x outside it; `mercLat()` saturates at exactly -90, which
+    is the latitude his status bar showed. cx 835.39 is likewise past longitude's +-180.
+  - **NOTHING VALIDATES A VIEW ON THE WAY IN.** `applySaved()` installs whatever the document
+    states. A view that cannot intersect the model's own extent, or a scale that draws the whole
+    network under a pixel, is arithmetically detectable at load -- and the fix is Zoom to fit,
+    which is exactly what recovered it by hand.
+  - **THE USER CANNOT TELL THIS FROM LOST WORK.** Tom: *"a blank map is equally fatal as a lost
+    project. User doesn't know the difference."* Severity is loss-grade whatever the cause.
+  - **HOW THE VIEW GOT THERE IS NOT ESTABLISHED** and the specimen is spent -- Zoom to fit
+    autosaved the good view over it. It matches neither shipped Net3's saved view, so not a
+    straight copy of a sibling tab's; two Net3 examples that differ in frame and are identical in
+    node count (97/119) is still the first place to look.
+
+- 60|626| **A refused beacon is retried like an offline one, 20 times.**
+  `EngCalcs._sendOrQueue()` (`js/Calculators.lib.js`) queues on `!resp.ok` as well as on a thrown
+  fetch. A 4xx is not a connectivity failure -- the server read the payload and refused it -- and
+  the flush re-sends `record.params` VERBATIM, so the retry is byte-identical and so is the
+  refusal. One malformed beacon becomes 20 rejections: `flushQueue()` runs on every `online` AND
+  every `DOMContentLoaded`, so it is one per page load until `_QUEUE_MAX_ATTEMPTS` drops it.
+  Original design, shipped with Task 119 (`ce5533df`), never revisited.
+  - **THE SYMPTOM IS A CONSOLE ERROR ON A PAGE THAT DID NOTHING WRONG, DAYS LATER**, which costs
+    out of all proportion to the lost analytics row. Found 2026-09-10 in the console of a
+    work-loss specimen, where the only suite error was a `log-human-view.php` 400 and it took a
+    live fetch of both mounts to prove the page in front of us could not have sent it
+    (`dev/lpn-blank-map-incidents.md`). **A fossil in the log is worse than a silence:** it is the
+    first thing an investigator reaches for.
+  - **The fix is one condition; the judgement is where to cut it.** Retry a throw, a 5xx and a
+    429; drop a 4xx. That loses one event, which is the right price.
+  - Still unanswered: which page ever queued an EMPTY `page`. 400 fires on `$page === ''` alone,
+    and the app page emits `cookieName='Looped-Network'` on both mounts. Task 206 fixed this class
+    once for `contact.php`; any page loading `js/Calculators.lib.js` that calls neither
+    `echoCookieScript()` nor `echoPageNameScript()` still sends an empty name. **That set is
+    enumerable and nothing enumerates it** -- a check is the right shape.
 - 75|624| **[H] The scale fallbacks turn any missed publish into a flooded canvas.**
   Tom, 2026-09-10, with a screenshot: an all-blue map after opening the geographic Net3 example
   beside an existing project. **NOT REPRODUCIBLE by either of us**, and a repro seeded with his own
@@ -341,6 +408,9 @@ the block.
   - **A RACE NEEDS A RACE TEST.** Rebuild the repro as a spec that throttles the CPU (CDP
     `Emulation.setCPUThrottlingRate`) so first paint can beat `publishScaleSizes()`; without one,
     this stays unreproducible and the guard only ever measures the happy path.
+  - **A 2026-09-10 BLANK MAP WAS FILED HERE AND WAS NOT THIS** -- 677 symbols drawn, healthy
+    strokes, a corrupted `view` (Task 628). The misfile was natural, since this task PREDICTED a
+    blank map as its own face. **A missed publish cannot move a camera:** check `view` first.
 
 - 50|610| **[H] Paste that CREATES table rows: gated on the data-entry clerk's own spec.**
   Split out of Task 186 at its close (2026-09-08). Tom, the same day: *"Why would we want a paste

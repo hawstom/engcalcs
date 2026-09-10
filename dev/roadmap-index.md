@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**63 open tasks.** Next (100): 10 · Soon (75): 9 · Someday (50): 17 · Maybe (25): 10 · Parked (5): 17
+**66 open tasks.** Next (100): 10 · Soon (75): 9 · Someday (50): 17 · Maybe (25): 10 · Parked (5): 17 · priority 95 (95): 2 · priority 60 (60): 1
 
 ## 100 — Next (10)
 
@@ -22,6 +22,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 618 — WYSIWYG hit areas: what you can click is what you can see.
 - Task 625 — [H] · Divorce the app page from EngCalcs chrome; give it its own.
 
+## 95 — Priority 95 (2)
+
+- Task 627 — [H] · An unreadable document leaves a named tab, then autosave destroys it.
+- Task 628 — [H] · A restored view is never checked against the model it must show.
+
 ## 75 — Soon (9)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
@@ -33,6 +38,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 617 — A basemap the reader can tone down, and a menu of tile styles.
 - Task 623 — [H] · File loss judged only by people whose files are throwaway.
 - Task 624 — [H] · The scale fallbacks turn any missed publish into a flooded canvas.
+
+## 60 — Priority 60 (1)
+
+- Task 626 — A refused beacon is retried like an offline one, 20 times.
 
 ## 50 — Someday (17)
 
@@ -91,5 +100,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-56 of 63 titles are within 4–12 words. `!` marks the rest;
+59 of 66 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
