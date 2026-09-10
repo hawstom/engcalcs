@@ -288,10 +288,38 @@ $ec_icons = array(
 	// dashed line encloses the same amount of the box in all three, so what a reader notices is the
 	// SHAPE OF THE RING and nothing else. Dashed, because that is what a marquee looks like on
 	// every drawing surface anybody has used, and because a solid rectangle here would read as the
-	// tank symbol. The little pointer in the corner of each says the ring is something you draw.
-	'select-window'  => '<rect x="3" y="5.5" width="15" height="12" stroke-dasharray="3 2.4"/><path d="M16 14v7l1.9-1.8 1.5 3.1 1.3-.6-1.4-3 2.2-.3z" fill="currentColor" stroke="none"/>',
-	'select-lasso'   => '<path d="M11 4.5c5.5 0 9 2.6 9 5.6s-3.5 5.6-9 5.6-9-2.6-9-5.6c0-1.7 1.1-3.2 3-4.2" stroke-dasharray="3 2.4"/><path d="M14 14v7l1.9-1.8 1.5 3.1 1.3-.6-1.4-3 2.2-.3z" fill="currentColor" stroke="none"/>',
-	'select-polygon' => '<path d="M3 9.5L9.5 3.5L19 6L16 15.5L6.5 16.5Z" stroke-dasharray="3 2.4"/><path d="M14 14v7l1.9-1.8 1.5 3.1 1.3-.6-1.4-3 2.2-.3z" fill="currentColor" stroke="none"/>',
+	// tank symbol. The little mark beside each ring says it is something you DRAW.
+	//
+	// **THAT MARK IS A TINY CURSOR DEPICTION, AND IT NOW DEPICTS THE RIGHT ONE** (Ida found it,
+	// 2026-09-10; Tom: *"Nice catch, Ida. Nice fit and finish."* and, on the framing, *"it's not
+	// the corners Ida noticed. It's a tiny cursor depiction."*). It was the same arrow used by
+	// `select` above -- so all four icons promised the DEFAULT cursor, while these three actually
+	// run `crosshair` in their mode (`#lpn_canvas.lpn-placemode`, since `select-area` is a
+	// placement gesture). An icon that draws a cursor is making a promise about what the pointer
+	// will look like, and three of the four were making the wrong one.
+	//
+	// **TWO TOOLS DEPICT A CURSOR, AND EACH NOW DEPICTS ITS OWN** (Tom, 2026-09-10, correcting a
+	// claim that `select` was the only one: *"No. We just said that the area select has a tiny
+	// cursor. So there are two. And we are in the process of aligning the area select button with
+	// its cursor as crosshair-crosshair."*). So: `select` is arrow-and-arrow, `select-area` is
+	// crosshair-and-crosshair, and the pair is the whole population.
+	//
+	// **IT IS NOT A SUITE-WIDE RULE AND MUST NOT BECOME ONE** (the same day, on whether every
+	// tool's icon should depict its cursor: *"vertex and everything else is not a place for
+	// depicting a cursor. So your question kind of falls on a deaf suite."*). Every other icon in
+	// this file depicts the THING -- a junction, a valve, a bend -- which is a different and
+	// correct taxonomy, and no promise about a cursor is made or owed. **The rule binds an icon
+	// that CHOOSES to draw a cursor, and nothing else**: draw one and you have promised it; draw
+	// the thing instead and you have promised nothing. That is why this cost three path edits and
+	// not a sweep.
+	//
+	// A plain cross rather than the conventional gapped crosshair: the toolbar draws at ~17 px, so
+	// the whole 24-unit mark is about 6 screen pixels and a centre gap would close up. Stroked at
+	// 1.8 against EC_ICON_OPEN_TAG's 2, so the cursor mark stays lighter than the ring it sits
+	// beside and the ring is still what a reader notices first.
+	'select-window'  => '<rect x="3" y="5.5" width="15" height="12" stroke-dasharray="3 2.4"/><path d="M18.5 15.5v7M15 19h7" stroke-width="1.7"/>',
+	'select-lasso'   => '<path d="M11 4.5c5.5 0 9 2.6 9 5.6s-3.5 5.6-9 5.6-9-2.6-9-5.6c0-1.7 1.1-3.2 3-4.2" stroke-dasharray="3 2.4"/><path d="M16.5 15.5v7M13 19h7" stroke-width="1.7"/>',
+	'select-polygon' => '<path d="M3 9.5L9.5 3.5L19 6L16 15.5L6.5 16.5Z" stroke-dasharray="3 2.4"/><path d="M16.5 15.5v7M13 19h7" stroke-width="1.7"/>',
 
 	// Vertices mode (Task 567). A bent line with HOLLOW SQUARE grips on its bends, which is exactly
 	// what the mode puts on the map -- EPANET's own grip shape, and the one symbol on this map that

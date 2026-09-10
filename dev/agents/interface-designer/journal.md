@@ -296,11 +296,24 @@ reported as an inconsistency is his intent -- a menu row is a button and a finge
 a junction disc is a target and an arrow aims at targets. **Two cursors, two kinds of thing.** My
 observation was correct and my reading of it as tension was not.
 
-**Question 2 is answered NO, and the answer is better than the question.** I asked whether the three
+**Question 2 was answered NO and then REVERSED the same day, and both halves matter.** Tom's first
+answer was to the general principle; on seeing what I had actually found he wrote *"Nice catch, Ida.
+Nice fit and finish."* and the three marks were repainted to crosshairs. **His framing correction is
+the reusable part:** *"it's not the corners Ida noticed. It's a tiny cursor depiction."* What made
+them wrong was never where the mark sat -- it was that a drawing of a cursor is a PROMISE about what
+the pointer will look like, and three of the four select icons were making the wrong one. The
+general answer below still stands and is why this did NOT become a sweep.
+
+**The general principle is answered NO, and the answer is better than the question.** I asked whether the three
 area-select icons' arrow corner should be repainted to a crosshair. Tom: *"vertex and everything
 else is not a place for depicting a cursor. So your question kind of falls on a deaf suite."*
-**The icon-depicts-its-cursor idea is not a suite-wide rule and must not become one** -- `select` is
-the only tool whose subject IS a cursor, so it is the only icon that can depict one. Every other
+**The icon-depicts-its-cursor idea is not a suite-wide rule and must not become one.** TWO tools
+depict a cursor, not one -- Tom, correcting me: *"No. We just said that the area select has a tiny
+cursor. So there are two. And we are in the process of aligning the area select button with its
+cursor as crosshair-crosshair."* `select` is arrow-and-arrow; `select-area` is now
+crosshair-and-crosshair; that pair is the whole population. **The rule binds an icon that CHOOSES to
+draw a cursor and nothing else** -- draw one and you have promised it, draw the thing instead and
+you have promised nothing. Every other
 icon depicts the THING (a junction, a valve, a vertex), which is a different and correct taxonomy.
 Do not re-open this as a consistency sweep.
 
