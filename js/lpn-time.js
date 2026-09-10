@@ -825,6 +825,23 @@
 	 * The cost measurement starts again from nothing, because it was a measurement of a different
 	 * network. The flag is consumed by the solve js/looped-network.js schedules immediately after
 	 * this, so nothing is started from here.
+	 *
+	 * **AND IT REDRAWS THE STRIP, WHICH IS THE ONE SEAM THAT SAYS "THIS IS ANOTHER PROJECT NOW"**
+	 * (2026-09-09, found by Tom's colleague on his first sitting with the map: he opened Net3 from
+	 * the gallery, reached for the play controls, and the tip told him the project had no extended
+	 * period simulation). It was false. Net3 states a 24-hour duration, lpnReportTimes() gives 25
+	 * stops, and the DOCUMENT was fine -- applySaved() had installed doc.times correctly. What was
+	 * stale was the toolbar: the strip is built once, by wireToolbar() over the empty startup
+	 * document, and every state change after that goes through renderTransport(). Nothing called it
+	 * when a project ARRIVED, so the three player controls and the step selector kept the one-stop,
+	 * disabled state they were born in, for the life of the page.
+	 *
+	 * renderPanel() rather than renderTransport(), because the Calculate button was stale for the
+	 * same reason: settings.autoRun is PROJECT data, so opening a project that has it off left the
+	 * button hidden. One call fixes both, and this function is the one place every arrival already
+	 * passes through -- the gallery, File > Import, a tab switch and the boot path all reach it.
+	 * The strip does not exist yet on the boot path; renderTransport() returns at its first line
+	 * there and wireToolbar()'s own render, a few lines later, draws the arrived document.
 	 */
 	EC.lpnTimeArrived = function () {
 		cancelIdleRun();
@@ -833,6 +850,7 @@
 		state.runSig = null;
 		state.t = 0;
 		state.wanted = true;
+		renderPanel();
 	};
 
 	/**
@@ -1509,17 +1527,22 @@
 	};
 
 	function renderTransport() {
-		var stops, sig, i;
+		var stops, labels, sig, i;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
-		sig = stops.join(',');
-		// Rebuilt only when the reporting grid itself changed -- an edit to the duration or to the
-		// report step. Rebuilding on every solve would close the list under a user who had it open.
+		labels = stops.map(stepText);
+		// **THE KEY IS WHAT WOULD BE DRAWN, not the stop list that feeds it.** Rebuilt only when
+		// the rows themselves changed -- an edit to the duration, to the report step, or to the
+		// clock time at the start; rebuilding on every solve would close the list under a user who
+		// had it open. It was `stops.join(',')` until 2026-09-09, and that misses a project that
+		// states the SAME reporting grid from a different hour: every row keeps the clock time of
+		// the project before it, which is a wrong number rather than a missing one.
+		sig = labels.join('|');
 		if (ui.sig !== sig) {
 			ui.sig = sig;
 			ui.step.textContent = '';
-			stops.forEach(function (t, k) {
-				ui.step.appendChild(el('option', { value: String(k) }, stepText(t)));
+			labels.forEach(function (text, k) {
+				ui.step.appendChild(el('option', { value: String(k) }, text));
 			});
 		}
 		i = stops.indexOf(state.t);
