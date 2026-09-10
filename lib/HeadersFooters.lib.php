@@ -345,15 +345,29 @@ if ($ec_footer_left !== '') { echo '<div class="left d-print-none">' . $ec_foote
 // and if that header does not arrive the registration is REJECTED OUTRIGHT. So the wide ask
 // falls back to the narrow one: a misconfigured host loses '/app' rather than losing offline
 // support on every page of the suite, which is the worse failure and the silent one.
-if ('serviceWorker' in navigator) {
-  var ecSwScope = <?=json_encode(ecSwScope(), JSON_UNESCAPED_SLASHES)?>;
-  navigator.serviceWorker.register('/engcalcs/sw.php', { scope: ecSwScope })
-    .catch(function () {
-      if (ecSwScope !== <?=json_encode(EC_SW_BASE, JSON_UNESCAPED_SLASHES)?>) {
-        navigator.serviceWorker.register('/engcalcs/sw.php', { scope: <?=json_encode(EC_SW_BASE, JSON_UNESCAPED_SLASHES)?> });
-      }
-    });
-}
+//
+// **BOTH REGISTRATIONS CARRY A .catch(), AND THE INNER ONE DID NOT UNTIL 2026-09-09.** With site
+// data blocked -- which is a setting, not private browsing, and is exactly the visitor this suite is
+// written for -- register() rejects with a SecurityError. The outer rejection was handled; the
+// fallback inside it was not, so every page load in that browser raised an UNCAUGHT SecurityError.
+// Found in Gecko with dom.storage.enabled false; Chromium does not produce it, which is why nothing
+// here had seen it. An offline suite is not available in that browser either way, and that is the
+// browser's decision to have made: the page works, and it must not shout about it.
+// The try is the same rule the storage accesses in js/ already follow: where site data is blocked
+// the PROPERTY ACCESS can throw before any method is reached, and a throw on this line would take
+// the rest of the footer's script with it.
+try {
+  if ('serviceWorker' in navigator) {
+    var ecSwScope = <?=json_encode(ecSwScope(), JSON_UNESCAPED_SLASHES)?>;
+    navigator.serviceWorker.register('/engcalcs/sw.php', { scope: ecSwScope })
+      .catch(function () {
+        if (ecSwScope !== <?=json_encode(EC_SW_BASE, JSON_UNESCAPED_SLASHES)?>) {
+          navigator.serviceWorker.register('/engcalcs/sw.php', { scope: <?=json_encode(EC_SW_BASE, JSON_UNESCAPED_SLASHES)?> })
+            .catch(function () { /* no offline suite in this browser; nothing a reader can act on */ });
+        }
+      });
+  }
+} catch (ecSwErr) { /* site data blocked: no offline suite, and the page is unaffected */ }
 </script>
 </body>
 </html>

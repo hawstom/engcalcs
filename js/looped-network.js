@@ -4007,7 +4007,28 @@ var EngCalcs = EngCalcs || {};
 		e.setAttribute('class', (cls ? cls + ' ' : '') + 'lpn-annotation');
 		return e;
 	}
+	// **A VIEW IS THREE NUMBERS AND ALL THREE HAVE TO BE NUMBERS.** `scale(NaN)` and `scale(0)` are
+	// not views: SVG drops an unparseable transform whole, so the world layer silently falls back to
+	// the identity and every hit test on the page then resolves against a transform nobody chose.
+	// Zero is worse than NaN, because it parses: the drawing collapses to a point and the strokes
+	// below divide by it.
+	function viewNumbersUsable() {
+		return isFinite(state.tx) && isFinite(state.ty) && isFinite(state.s) && state.s > 0;
+	}
 	function setTransform() {
+		// **A BAD MEASUREMENT MUST NEVER BECOME A TRANSFORM** (MJH, 2026-09-09). Refusing HOLDS THE
+		// PREVIOUS GOOD VIEW, which is the one choice of the three that keeps the map editable: a
+		// fallback scale would move the drawing under a user who did nothing, and laying nothing out
+		// at all leaves a blank canvas. Every route back in -- a resize, a wheel notch, a fit -- runs
+		// through here again, so a measurement that recovers is picked up with nothing to reset.
+		if (!viewNumbersUsable()) { noteMapUnmeasurable(true); return; }
+		noteMapUnmeasurable(false);
+		// **THE STROKE SIZES RIDE THE TRANSFORM, and that is the whole of the 2026-09-09 repair.**
+		// See publishScaleSizes(): a scale that reaches the world layer without them following it
+		// paints the map as one solid colour and makes every pipe's invisible grab band cover the
+		// canvas. Published BEFORE the attribute is written, so there is not even one frame in
+		// which the two disagree.
+		publishScaleSizes();
 		world.setAttribute('transform', 'translate(' + state.tx + ',' + state.ty + ') scale(' + state.s + ')');
 		// THE ONE SEAM FOR "THE VIEW MOVED". Every pan and every zoom in this file goes through
 		// setTransform(), so the basemap has exactly one place to learn that the visible window
@@ -4970,18 +4991,52 @@ var EngCalcs = EngCalcs || {};
 	// zoom path (onZoomChanged), and a zoom changes no value, no break and no legend -- yet the
 	// repaint it triggered was measured at 120 breaksFor() calls per wheel notch on Net3 (Task 446).
 	// The callers that DO change values call refreshValueColors() themselves.
-	function refreshSymbolSizes() {
-		var k = symbolFactor(), op = settings.symbolOpacity;
-		svg.style.setProperty('--lpn-sym', k);
+	// **THE FOUR SCALE-DERIVED SIZES THE STYLESHEET DRAWS WITH, AND THE ONE PLACE THEY ARE WRITTEN.**
+	//
+	// Every stroke on this map is a figure in SCREEN PIXELS divided by state.s and handed to CSS as a
+	// custom property in WORLD units. `css/engcalcs.css` carries a fallback for each -- `var(--lpn-sym, 1)`,
+	// `var(--lpn-lw, 0.7)`, `var(--lpn-hit, 12)` -- and **those fallbacks are world units too**. On an
+	// XY project, where state.s is about 1, they are the sizes they look like. On a GEOGRAPHIC one
+	// they are multiplied by thousands of pixels per degree. MEASURED on the lat/lon Net3 example at
+	// 6,479 px per degree, with the properties simply absent: pipes 4,535 px wide, a select-area ring
+	// whose border alone is 2,267 px, and a 77,000 px invisible grab band around every pipe. The map
+	// is then a solid sheet of one colour, the marquee is scaled by four orders of magnitude, and 17
+	// of 25 probe points across the canvas answer `lpn-link-hit` instead of the map -- so nothing can
+	// be selected, moved or edited. That is the whole of MJH's 2026-09-09 report in one mechanism,
+	// and dev/lpn-spike/scale-publish-harness.js pins it.
+	//
+	// **SO THE PUBLISH RIDES setTransform(), which is already "the one seam for the view moved".**
+	// It used to hang off onZoomChanged(), five statements downstream through applyLabelVisibility()
+	// and refreshFontSizes() -- the most measurement-dependent code on the page -- and behind
+	// applyView()'s `state.s !== lastLayoutScale` guard. A scale could therefore reach the world
+	// layer with the strokes still sized for a different one, or for none. Now it cannot.
+	//
+	// `force` is for the two settings that change these numbers without changing the scale: symbol
+	// size and link width. Everything else is guarded on the scale, so a pan costs nothing.
+	var lastPublishedScale = null;
+	function publishScaleSizes(force) {
+		if (!svg || !svg.style) { return; }
+		var s = state.s;
+		// A scale that is not a positive finite number produces "NaN" or "Infinity" in the property,
+		// which CSS drops -- and dropping it is what puts the world-unit fallback back in force. So
+		// the last good numbers are left standing instead, the same choice setTransform() makes.
+		if (!(s > 0) || !isFinite(s)) { return; }
+		if (!force && s === lastPublishedScale) { return; }
+		lastPublishedScale = s;
+		svg.style.setProperty('--lpn-sym', symbolFactor());
 		svg.style.setProperty('--lpn-lw', linkStrokeWidth());
 		// The invisible grab band, in world units at this zoom -- a CONSTANT number of screen
 		// pixels, like every other tolerance on this page, so zooming out never makes a pipe
 		// harder to hit than it was and zooming in never turns the band into a wall.
-		svg.style.setProperty('--lpn-hit', LPN_LINK_HIT_PX / (state.s || 1));
+		svg.style.setProperty('--lpn-hit', LPN_LINK_HIT_PX / s);
 		// ONE SCREEN PIXEL, in world units. A leader is a rule pointing at something, not a symbol,
 		// so it must NOT scale off the symbol size: at the shipped 7px symbol that worked out at
 		// 0.49px, which the browser renders as a grey smudge, and at Symbol size 2 it was 0.14px.
-		svg.style.setProperty('--lpn-hair', 1 / (state.s || 1));
+		svg.style.setProperty('--lpn-hair', 1 / s);
+	}
+	function refreshSymbolSizes() {
+		var k = symbolFactor(), op = settings.symbolOpacity;
+		publishScaleSizes(true);
 		// Symbols only, never labels: the point is to see the backdrop THROUGH the network while
 		// placing it against an aerial or a plan, and fading the numbers at the same time defeats
 		// the reason you are looking at both together.
@@ -25334,7 +25389,16 @@ var EngCalcs = EngCalcs || {};
 		// ancestor, or a call before first layout. Doing nothing leaves the last good height in
 		// place, which is strictly better than replacing it with an answer derived from zeros.
 		var before = svg.getBoundingClientRect();
-		if (!before.width && !before.height) { return; }
+		if (!before.width && !before.height) {
+			// **AND ONCE THE PAGE HAS SETTLED, A ZERO BOX IS A FAULT RATHER THAN A MOMENT.** Before
+			// that it is ordinary -- a hidden tab, an ancestor still display:none -- and saying
+			// anything would be alarming a reader about the page loading. After it, the map will
+			// never acquire a height, no fit will ever be answered, and the reader is looking at a
+			// drawing surface that cannot work with nothing to tell them why.
+			if (document.readyState === 'complete') { noteMapUnmeasurable(true); }
+			return;
+		}
+		noteMapUnmeasurable(false);
 		// Measure with the CURRENT height already applied, then apply the answer. flowBelowMap()
 		// reads scrollHeight, which includes the canvas itself, so the two cancel -- but only if
 		// nothing else moved in between, which is why this is one statement and not a loop.
@@ -34188,6 +34252,32 @@ var EngCalcs = EngCalcs || {};
 		if (!el) { return; }
 		el.textContent = text || '';
 		el.style.display = text ? 'block' : 'none';
+	}
+	// **WHEN THIS PAGE CANNOT MEASURE ITSELF, IT SAYS SO** (MJH, 2026-09-09). A map that is silently
+	// unusable cost one user a whole session: the drawing was intact, the menus worked, and nothing
+	// on the canvas could be touched, with no message anywhere to act on. The two ways it happens are
+	// a canvas whose box comes back as zero after the page has settled, and a view whose numbers are
+	// not numbers; both mean the same thing to a reader, so they share one sentence.
+	//
+	// **NOT setNotice(), WHICH EXPIRES.** This is a standing statement about the state of the page,
+	// true until the measurement recovers, and it clears itself the moment one does. It is also
+	// RE-SHOWN rather than shown once: any ordinary notice landing in the same slot takes it away on
+	// that notice's own eight-second timer, and a message about a page that is still broken must not
+	// be cleared by something else finishing.
+	var mapUnmeasurable = false;
+	function noteMapUnmeasurable(bad) {
+		var pc = EngCalcs.pageConfig || {}, el, words;
+		if (!bad) {
+			if (!mapUnmeasurable) { return; }
+			mapUnmeasurable = false;
+			showNotice('');
+			return;
+		}
+		words = pc.lpn_map_unmeasurable || 'This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.';
+		mapUnmeasurable = true;
+		el = document.getElementById('lpn_map_notice');
+		if (el && el.textContent === words) { return; }
+		showNotice(words);
 	}
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }

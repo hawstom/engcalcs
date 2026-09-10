@@ -403,6 +403,28 @@ class Session {
 		const btn = await this.page.$('#lpn_examples_pane button.lpn-examples-blank');
 		if (btn) { await btn.click(); await this.settle(200); }
 	}
+	// **THE FRONT DOOR: the wall of example cards a first-time visitor lands on.** `title` is matched
+	// against the card's own heading, which comes from the language file, so a spec names an example
+	// the way the manifest does rather than by position -- the order is a manifest field and one
+	// example moving would silently make a spec check a different network.
+	//
+	// It VERIFIES that the example landed, for the reason makeEdit() does: an example that fails to
+	// open leaves the wall up, and every assertion after it would be about an empty canvas.
+	async openExampleCard(title) {
+		const cards = await this.page.$$('#lpn_examples_pane .lpn-example-card');
+		const seen = [];
+		for (const c of cards) {
+			const t = ((await c.$eval('.lpn-example-title', e => e.textContent)) || '').trim();
+			seen.push(t);
+			if (t !== title) { continue; }
+			await c.click();
+			await this.settle(1500);
+			const n = await this.nodeCount();
+			if (!n) { throw new Error(`${this.name}: "${title}" was clicked and nothing was drawn`); }
+			return n;
+		}
+		throw new Error(`${this.name}: no "${title}" card on the wall — it holds ${JSON.stringify(seen)}`);
+	}
 	// File ▸ New project… — which opens the NEW-PROJECT BOX.
 	//
 	// **IT WAS A FLY-OUT OF FOUR TEMPLATES UNTIL TASK 477 (2026-08-27), AND THIS DID NOT FOLLOW.**

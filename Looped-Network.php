@@ -1204,6 +1204,7 @@ EngCalcs.pageConfig = {
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
+	lpn_map_unmeasurable: <?=json_encode($ec_lang['lpn_map_unmeasurable'])?>,
 	lpn_wrong_thanks: <?=json_encode($ec_lang['lpn_wrong_thanks'])?>,
 	lpn_field_text_align: <?=json_encode($ec_lang['lpn_field_text_align'])?>,
 	lpn_field_text_align_left: <?=json_encode($ec_lang['lpn_field_text_align_left'])?>,
