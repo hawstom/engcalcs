@@ -26170,16 +26170,37 @@ var EngCalcs = EngCalcs || {};
 		if (el) { el.style.display = 'none'; }
 		try { localStorage.setItem(MENU_CUE_KEY, '0'); } catch (e) {}
 	}
-	// Anchored to the TOOLBAR's top edge and pointing up, which is the whole design. Left-aligned
-	// with the menu bar's own first item rather than centred, so the arrow has something to land on.
+	// Anchored to the TOOLBAR's top edge and pointing up, which is the whole design.
+	//
+	// **THE ARROW LANDS ON File, NOT ON THE MARK AND NOT ON Water** (Tom, 2026-09-11, asking the
+	// right question). The mark is IDENTITY, not a command, and the sentence says every command is
+	// in the menus above -- pointing at the mark would aim it at the one item that holds none.
+	// Water is this page's own menu and the most interesting one, but singling it out contradicts
+	// "every", and a reader who follows the arrow to Water has been told the bar is one menu wide.
+	// File is the first COMMAND menu and the start of the reading order, so the arrow points at
+	// where the row begins and the eye continues along it.
 	function showMenuCue() {
 		var el = document.getElementById('lpn_menu_cue'), bar = document.getElementById('lpn_menubar'),
+			arrow = el && el.querySelector ? el.querySelector('.lpn-menu-cue-arrow') : null,
 			txt = document.getElementById('lpn_menu_cue_text'), pc = EngCalcs.pageConfig || {};
 		if (!el || !bar || menuCueDone()) { return; }
 		// Nothing to point at yet: the bar is built after this file loads.
 		if (!bar.children || !bar.children.length) { return; }
 		if (txt) { txt.textContent = pc.lpn_menu_cue || 'Every command is in the menus above.'; }
 		el.style.display = '';
+		// Measured, not assumed: the mark's width depends on the icon and the bar's own gap, and a
+		// hardcoded offset would drift the first time either changes. Falls back to no indent if
+		// the bar has not been laid out yet, which is correct rather than wrong-by-a-guess.
+		// `fileMenuButton`, not getElementById: buildMenuBar() already holds the button, and the id
+		// is assigned computedly (`b.id = m.id`) so a lookup by name is invisible to
+		// dom_id_resolve_check.php -- which said so.
+		var file = fileMenuButton;
+		if (file && arrow && file.getBoundingClientRect && bar.getBoundingClientRect) {
+			var fr = file.getBoundingClientRect(), br = bar.getBoundingClientRect();
+			if (fr.width > 0) {
+				el.style.marginLeft = Math.max(0, fr.left - br.left + (fr.width / 2) - 10) + 'px';
+			}
+		}
 	}
 	var AREA_HINT_KEY = 'lpn_areahint';
 	function areaHintShown() {
