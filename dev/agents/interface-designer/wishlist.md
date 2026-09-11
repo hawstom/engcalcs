@@ -124,8 +124,10 @@ is answered for the three that remain after the divorce; see item 5 series above
     in both directions; the one-sentence bridge gets the benefit at near-zero cost. See
     `dev/help-menu-mastermind.md` §2.
 
-13. **THE NEW THING — a way back to LibreWaterNet.org: a mono icon-only link at the FAR LEFT of
-    the menu bar, before File, not at upper right as Tom first proposed.** Convention (VS Code,
+13. **SUPERSEDED 2026-09-11 — the LINK affordance was wrong; see item 16.** Position (far left,
+    before File, mono) still stands. Original text kept for the record: a way back to
+    LibreWaterNet.org: a mono icon-only link at the FAR LEFT of the menu bar, before File, not at
+    upper right as Tom first proposed. Convention (VS Code,
     Figma, Docs) puts a product's own mark at far left, where the read starts; upper right on
     this page is already the utility zone (Help, Language) — the wrong neighborhood for "leave
     the document." Mono, not the colored favicon: color is for contexts where standing out is the
@@ -147,3 +149,16 @@ is answered for the three that remain after the divorce; see item 5 series above
     `ext()` — this is the only route that lets a reader with an unsaved project look at the
     mission page without risking it. One string, reuse the `water` icon to tie it visually to the
     mark. See `dev/help-menu-mastermind.md` §6.
+
+16. **Convert the way-back mark from a link to a menu button, ranked above 14/15 — those two are
+    now superseded by this.** Tom named the mismatch: far left, inside the command row, is the
+    Apple-menu position, and two of my own three cited precedents (Figma, VS Code) open a menu
+    there, not a link — I shipped the third's (Docs') affordance at the first two's position.
+    Zero new strings: `<button>` + `openMenu()`, the same mechanism as its five siblings. Contents,
+    Apple-menu shape — About, Learn more at LibreWaterNet.org (ext) // Install, Privacy notice,
+    Terms of use, Cookie settings // Leave for LibreWaterNet.org (same-tab, the mark's old
+    behavior, now one row instead of the whole click). All four of §6's Help additions (Install,
+    the merged legal/About band, the ext LibreWaterNet.org row) move OUT of Help into this menu —
+    Help returns to seven rows of task-learning content only, which is the actual fix to the
+    scope-creep complaint, not a row-count trim. Cost worth naming: the way back goes from one
+    click to two. See `dev/help-menu-mastermind.md` §8.

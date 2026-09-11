@@ -341,11 +341,16 @@ the block.
   `restoreViewOrFit()` fits instead -- what Tom did by hand. **A damaged file HEALS**, the fit
   being what the next save records. `dev/lpn-spike/bad-view-harness.js` drives his own file,
   13/13, red on all five measured symptoms when the guard is removed.
-  - **STILL OPEN, AND IT IS THE ROOT:** `defaultViewForCoords()` still answers
-    `{cx: w/2, cy: h/2, s: 1}` for a geographic document whenever `isGeoProject()` is false,
-    because `project` describes the OUTGOING project while a new one arrives. The guard catches
-    the result; nothing yet stops it being computed. Removing it means establishing the view from
-    the document being installed rather than from `project`.
+  - **THE ROOT IS CLOSED 2026-09-11: `pendingView` HAD NO OWNER.** It was a module-level variable
+    that `applySaved()` set for one document and `restoreViewOrFit()` handed to whichever project
+    opened next -- across projects and across FRAMES, a grid view being pixels where a geographic
+    one is degrees. **That is Task 624's original report in one line**, *"the geographic Net3
+    example beside an existing project"*. A view now carries the project it was read for
+    (`pendingViewFor`) and the frame it was made in (`v.frame`), and is refused anywhere else;
+    a tab's remembered view is also discarded when its project changes frame under it, which
+    `georefFinish()` does without closing anything. **Stamped rather than sequenced, because the
+    leak is a missing OWNER and not a missing call** -- nobody found the path, and a stamp cannot
+    be got wrong by a path nobody has found.
   - **THE GUARD TESTS LONGITUDE ONLY**, and that is a stated limit: Mercator x IS longitude so
     `outwardX()` is exact, while `outwardY()` runs through `mercLat()` and pins at the cut-off,
     losing the magnitude a y test needs. The mismatch always writes both axes from one line, so

@@ -141,5 +141,25 @@ console.log('--- 4. the damaged file opens onto its own network, and the next sa
 		'was ' + BAD.view.s.toFixed(4) + ', now ' + saved.view.s.toFixed(2));
 }
 
+// ---- 5. THE ROOT: a view belongs to a project, and to a frame -------------------------------
+//
+// `pendingView` was a module-level variable with no owner. applySaved() set it for one document
+// and restoreViewOrFit() gave it to whichever project opened next -- across projects, and across
+// FRAMES, a grid view being pixels where a geographic one is degrees. Section 2's guard catches
+// the RESULT; this is the cause, and these two assertions are what stop it coming back.
+console.log('--- 5. a view made for one project is refused by another ---');
+{
+	const L2 = L;   // same module: the stamp is module state, which is the thing under test
+	const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
+	check(/pendingViewFor/.test(src), 'the pending view carries the project it was read for');
+	check(/pendingViewFor !== null && pendingViewFor === library\.openId/.test(src),
+		'...and is believed only for THAT project');
+	check(/v\.frame && v\.frame !== here/.test(src),
+		'a remembered view whose FRAME no longer matches the project is discarded',
+		'georefFinish() turns a grid project geographic without closing it');
+	check(/v\.frame = viewFrame\(\)/.test(src), '...which needs the frame stamped when it is remembered');
+	void L2;
+}
+
 console.log('\n' + (failures ? 'FAIL ' : 'ok   ') + (checks - failures) + '/' + checks + ' checks');
 process.exit(failures ? 1 : 0);

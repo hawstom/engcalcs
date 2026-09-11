@@ -425,3 +425,132 @@ in this same menu.
 
 This document, appended. No shipped file touched. Journal and wishlist entries filed at
 `dev/agents/interface-designer/journal.md` and `dev/agents/interface-designer/wishlist.md`.
+
+## 8. Course correction, 2026-09-11 — the mark becomes a menu, and Help un-merges
+
+Tom, reading the shipped mark: *"The trade mark at the upper left now evokes Mac paradigm, and as
+such it carries expectations. Work with Ida to fulfill those expectations."* He is right and §5-6
+above are wrong on this one point — worth stating plainly rather than defending: I recommended
+far-left placement by CITING VS Code and Figma (`js/looped-network.js:22508`, comment: "VS Code,
+Figma, Docs"), and then built the LINK affordance of the third name in that list (Docs) at the
+POSITION of the first two. **OBSERVED, the three precedents do not agree with each other**: Figma's
+top-left mark opens a menu (Community files, Recent, Drafts, Import); VS Code's opens a menu (About,
+Settings, Check for Updates, the way to close the window); Google Docs' is a plain link back to
+Drive. Placing a mark at the Apple-menu corner — the leftmost slot of a command ROW that already
+reads left-to-right as File/Edit/Map/Water/Help — invokes the two-out-of-three convention, not the
+one-out-of-three. Docs gets away with a link because its mark sits OUTSIDE its own menu bar,
+above it, in a document-chrome band with the title and the star — a different row, reading as
+branding rather than as a peer of File. Ours does not have that second row; the mark sits IN the
+same row as the other four menu buttons, same size class, same baseline. **Structural position
+inside the row is what invited the expectation, not corner position alone** — SPECULATION, but the
+only reading that explains why two of three cited precedents disagree with what shipped.
+
+### A — ruling: yes, the mark becomes a menu
+
+Convert `lpn_menu_home` from an `<a href>` to a `<button>` opening a flyout via `openMenu()`,
+exactly the mechanism File/Edit/Map/Water/Help already use — same element shape, same click
+target, same keyboard behavior, so nothing about the bar's existing interaction model grows a
+special case. Icon and position are UNCHANGED (mono `water` glyph, far left, before File) — those
+were never the problem; only the affordance was.
+
+### B — contents of the mark's menu, in order
+
+Apple-menu shape: identity first, application-global facts and actions in the middle, the way out
+last and visually separated, same discipline the code's own comment already applies to the
+outbound band in Help ("everything that leaves for another site, in one place").
+
+```
+About                                    -> toggleAboutPopup(), in-page box, unchanged
+Learn more at LibreWaterNet.org          -> ext(), new tab, noopener
+──────────────
+Install                                  -> installPWA() / Install.php, unchanged fn
+Privacy notice                           -> ext('privacy.php')
+Terms of use                             -> ext('terms.php')
+Cookie settings                          -> ecReopenConsent(), in-page, unchanged
+──────────────
+Leave for LibreWaterNet.org              -> same-tab href navigate (what the mark itself did)
+```
+
+Two LibreWaterNet.org rows are DELIBERATE, not a duplicate, and need two different labels for the
+reason §6 already argued for the Help-menu version: a same-tab jump and a new-tab look are
+different offers to a reader with an open, possibly-unsaved project. "Learn more at
+LibreWaterNet.org" sits beside About because it answers the same question at more length,
+immediately, one click deep; "Leave for LibreWaterNet.org" sits in its own final band because
+leaving is the consequential action, same as Apple's own Restart/Shut Down/Log Out cluster sitting
+apart from Recent Items and System Settings — SPECULATION dressed as a citation would overstate the
+parallel, so: this project has no evidence macOS's own band-ordering rule is "consequential actions
+last" beyond common observation of the menu, so treat that placement as this project's own
+judgement, not a borrowed law. **Install moves here from Help** — it is an application-identity
+action ("make this app part of your own environment"), a peer of About and Cookie settings, not a
+piece of task learning like Walkthroughs or Screenshot gallery. Privacy/Terms/Cookie settings move
+here too, for the exact reasoning §6-Q1 already gave for merging them with About — that reasoning
+does not change, only WHICH menu they merge into does.
+
+### C — resulting Help menu, and yes, partly undo what shipped this session
+
+§6's Help changes (the legal-and-About merge, the `Install` row, the `LibreWaterNet.org` ext row)
+are SUPERSEDED by §8, not layered on top of it — all four of those rows are moving to the mark's
+menu, so leaving copies behind in Help would put Install and LibreWaterNet.org in two menus for no
+reason, and would leave About's legal siblings answering to two different top-level owners at
+once. Undo them.
+
+```
+Walkthroughs
+Notes on this page
+Toolbar key
+──────────────
+Fix something
+──────────────
+Screenshot gallery
+Not EPANET
+```
+
+Seven rows, two separators, three bands — down from twelve rows and three separators. What is
+LEFT is a genuinely different, narrower menu than what §0 started with: task learning (band 1),
+one action (band 2), positioning/scope (band 3, "how does this relate to EPANET and what does it
+look like elsewhere"). Nothing here answers "what is this software" or "where do its legal facts
+live" any more — that question now has exactly one door, the mark, which is the whole point of
+giving the mark a menu instead of a link. **This is the corrected read of Tom's scope-creep
+complaint**: it was not that Help grew too many rows, it was that two DIFFERENT QUESTIONS ("how do
+I use this page" and "what is this software") had drifted into one menu, and the mark's conversion
+from link to menu is what finally gives the second question a home of its own.
+
+### D — the phone
+
+No change from what already shipped. The mark was already "icon-only at every width... the
+small-screen rule that hides `.lpn-menubar-word` has nothing to do here" (`:22516`), and becoming a
+`<button>` with a flyout costs it nothing there — it now behaves exactly like File/Edit/Map/Water/
+Help already do under the 640px breakpoint, which already collapse to icon-only and already open a
+flyout on tap. This is a SIMPLIFICATION at the CSS level, not a new case: the mark used to need its
+own comment explaining why the icon-only rule didn't apply to it (because it was never a `button.
+lpn-menubar-item` to begin with); once it is one, that carve-out goes away and it is governed by
+the same rule as its five siblings, stated once.
+
+### E — still a way back, same tab, Back works
+
+Yes, one click deeper than before: open the mark's menu, then "Leave for LibreWaterNet.org," a
+plain same-tab navigation exactly like the mark's own click used to be. The label states what
+happens (leaving) rather than repeating the bare domain name a second time in the same flyout,
+which is the ambiguity two identical row labels would have created. The genuinely new cost of this
+whole change is real and worth saying plainly: the way back used to be ONE click from anywhere on
+the page; it is now two. That is the price of matching the convention Tom named, and it is the
+right trade — a single click that violates a learned expectation is worse than two clicks that
+meet it, which is the entire argument this section makes.
+
+### Ranked, this follow-on only
+
+| # | Item | Cost | What it fixes |
+|---|---|---|---|
+| 1 | Convert the mark from `<a>` to a menu button (A) | reuses `openMenu()`, no new mechanism | the actual complaint — a link at the Apple-menu position |
+| 2 | Populate its menu: About, Learn more, Install, Privacy/Terms/Cookie settings, Leave (B) | zero new strings — every row reuses an existing key/handler | gives "what is this software" one home instead of two |
+| 3 | Shrink Help back down, undoing §6's merge (C) | zero — pure removal, rows move rather than duplicate | restores Help to task-learning only, which is what actually reads as scope creep resolved |
+
+**If only one: #1.** The affordance is the defect Tom named; #2 and #3 are what #1 obligates, not
+independent value on their own — a menu button that opens nothing new (just re-labels the old
+link's destination as row 1) still fixes the expectation mismatch, and the content reshuffle can
+follow after the demo if it must.
+
+## Files
+
+This document, appended (§8). No shipped file touched. Journal and wishlist updated at
+`dev/agents/interface-designer/journal.md` and `dev/agents/interface-designer/wishlist.md`.

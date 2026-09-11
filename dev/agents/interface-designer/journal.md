@@ -727,3 +727,45 @@ stops it being `ext('About.php')` and makes it mechanically identical to Notes/C
 
 Full reasoning, exact row orders and the two-item ranked table: `dev/help-menu-mastermind.md` §6-7.
 No shipped file touched.
+
+## 2026-09-11 — Correction: the way-back mark must be a menu, not a link
+
+Tom, on the shipped mark: *"The trade mark at the upper left now evokes Mac paradigm, and as such
+it carries expectations. Work with Ida to fulfill those expectations."* He is right, and it is my
+own error, worth naming rather than smoothing over: I cited VS Code, Figma and Docs together for
+far-left PLACEMENT (`js/looped-network.js:22508`), then shipped Docs' AFFORDANCE (a plain link) at
+the position two of those three precedents use for a menu. **OBSERVED**: Figma's and VS Code's
+top-left marks both open menus; Docs' is a link, but its mark sits in a title band above its own
+menu bar, not inside the command row. Ours sits IN the row, as a peer of File/Edit/Map/Water/Help —
+that structural position is what invites the Apple-menu expectation, not the corner alone.
+
+**Ruling: convert `lpn_menu_home` to a `<button>` opening a flyout via `openMenu()`** — same
+mechanism, same interaction model as its five siblings. Icon and position (mono `water` glyph, far
+left, before File) are unchanged; only the affordance changes.
+
+**Contents, Apple-menu shape** (identity first, app-global middle, the way out last, separated):
+About → Learn more at LibreWaterNet.org (ext) // Install → Privacy notice → Terms of use → Cookie
+settings // Leave for LibreWaterNet.org (same-tab href, what the mark itself used to do). All six
+rows reuse existing keys and handlers — zero new strings.
+
+**Help un-merges — my 2026-09-11 earlier entry (the legal+About merge, Install, the ext
+LibreWaterNet.org row) is SUPERSEDED, not layered on.** Those four rows move OUT of Help into the
+mark's new menu; leaving copies in both places would put Install and the site link in two menus
+for no reason. Resulting Help: Walkthroughs, Notes on this page, Toolbar key // Fix something //
+Screenshot gallery, Not EPANET — seven rows, two separators, down from twelve and three. **This is
+the actual fix to Tom's scope-creep complaint**: it was never row count, it was two different
+questions ("how do I use this page" vs. "what is this software") sharing one menu. Giving the mark
+a menu is what finally gives the second question its own door.
+
+**Phone: no change.** The mark was already icon-only at every width with its own carve-out comment
+explaining why the small-screen word-hiding rule didn't apply to it (it wasn't a
+`button.lpn-menubar-item`). Once it is one, the carve-out is unnecessary — it inherits the same
+640px behavior as File/Edit/Map/Water/Help, which is a simplification, not a new case.
+
+**Cost worth stating plainly: the way back goes from one click to two** (open the mark's menu,
+then Leave for LibreWaterNet.org). That is the price of the convention Tom is pointing at, and it
+is the right trade — a one-click affordance that breaks a learned expectation is worse than a
+two-click one that meets it.
+
+Full reasoning, the exact row orders and the ranked table: `dev/help-menu-mastermind.md` §8. No
+shipped file touched.

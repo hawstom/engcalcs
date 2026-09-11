@@ -7235,17 +7235,40 @@ var EngCalcs = EngCalcs || {};
 	// Per TAB, in memory only, and deliberately not in the library index: this is where you were
 	// looking a moment ago, which is a fact about this browsing session rather than about the
 	// project. The file carries its own copy for the next time it is opened cold.
-	var tabViews = {}, pendingView = null;
+	// **A VIEW BELONGS TO A PROJECT AND TO A COORDINATE FRAME, AND IS REFUSED ANYWHERE ELSE**
+	// (ROADMAP Task 629, root fix 2026-09-11). `pendingView` was a module-level variable with no
+	// owner: applySaved() set it for one document and restoreViewOrFit() handed it to whichever
+	// project opened next. A path that sets it without reaching the consumer therefore leaks a
+	// camera across projects -- and across FRAMES, since a grid view is pixels and a geographic
+	// one is degrees. That is Task 624's original report in one sentence, *"the geographic Net3
+	// example beside an existing project"*, and it is how Tom's Net3-Novato came to hold
+	// {cx: w/2, cy: h/2} in a field that holds longitude.
+	//
+	// Stamped rather than carefully sequenced, because the leak is a missing OWNER and not a
+	// missing call: a stamp cannot be got wrong by a path nobody has found yet, which matters
+	// here because nobody has found it. `applyView()`'s reachability guard still stands behind
+	// this; it catches the symptom, and this removes the cause.
+	//
+	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
+	// index and never reaches a file, so no stored document learns a field.
+	var tabViews = {}, pendingView = null, pendingViewFor = null;
+	function viewFrame() { return isGeoProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
-		if (v && library.openId) { tabViews[library.openId] = v; }
+		if (v && library.openId) { v.frame = viewFrame(); tabViews[library.openId] = v; }
 	}
 	// Where a project open goes instead of straight to a fit. The in-memory view wins over the
 	// file's: it is the more recent answer to the same question, and it is the one the user was
 	// looking at thirty seconds ago.
 	function restoreViewOrFit() {
-		var v = tabViews[library.openId] || pendingView;
+		var here = viewFrame(), v = tabViews[library.openId] || null;
+		// A tab's remembered view is its own, but the project may have CHANGED frame under it --
+		// georefFinish() turns a grid project geographic without closing it.
+		if (v && v.frame && v.frame !== here) { v = null; }
+		// The pending view is believed only for the project it was read for.
+		if (!v && pendingViewFor !== null && pendingViewFor === library.openId) { v = pendingView; }
 		pendingView = null;
+		pendingViewFor = null;
 		if (validView(v)) {
 			if (!mapSized) { pendingRestore = v; fitWhenSized = true; return; }
 			if (applyView(v)) { return; }
@@ -17856,6 +17879,7 @@ var EngCalcs = EngCalcs || {};
 		// Consumed once, by the restoreViewOrFit() at the end of refreshAllFromDocument(). A file
 		// written before this existed has none, and gets a fit exactly as it always did.
 		pendingView = validView(saved.view) ? saved.view : null;
+		pendingViewFor = pendingView ? library.openId : null;
 		// **A RESERVOIR WITH NO ELEVATION KEEPS HAVING NO ELEVATION** (Task 390). Back-filling one
 		// equal to the head writes a number nobody typed into a field labelled as the user's, and
 		// reads as a water surface sitting on its own ground at exactly zero pressure -- which is
@@ -18380,6 +18404,7 @@ var EngCalcs = EngCalcs || {};
 			// first geographic project opens at whatever the last grid project's transform was,
 			// which on a lon/lat document is the middle of the Atlantic at an arbitrary scale.
 			pendingView = geoHomeView();
+			pendingViewFor = pendingView ? id : null;   // the project being born, not the one leaving
 		}
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
