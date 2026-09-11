@@ -149,6 +149,16 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/positioning.md` | How `lpn_` is positioned against epanet-js; LibreEPANET.org. **Authority for every public claim, this repo's and the landing page's alike** |
 | `dev/librewaternet-landing.md` | The landing page left this repo 2026-08-24; where it went and what stayed |
 
+### PUSH THE SIBLING SITES TOO, ALWAYS (Tom, 2026-09-11)
+
+**`git push` is part of finishing work in `~/webdev/librewaternet.org` and `~/webdev/not-epanet.org`
+exactly as it is here**, and no longer waits for Tom. His words: *"push lwn and make a note that I
+expect you always to push lwn and the other sibling site."* This SUPERSEDES the standing "both site
+repositories are committed and NOT pushed, deliberately -- a push publishes" that
+`dev/session-handoff.md` records from 2026-09-06; he has changed his mind, and the reason it was
+ever true (copy that had to be read before it went public) is served by his reading the commit, not
+by the work sitting on a shelf. The only exception is his saying so for a particular change.
+
 ### The sibling repository: `~/webdev/librewaternet.org`
 
 The Claude Code project stays rooted HERE and drives both. **The catch is that the other

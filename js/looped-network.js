@@ -7372,19 +7372,26 @@ var EngCalcs = EngCalcs || {};
 	// file, has no href, and cannot be written as one -- it lives on `project.basemap`, never on
 	// `backdrop.href`, exactly so the two cannot be confused.
 	//
-	// **THE DISPLAY IS STILL UNPROJECTED, AND THE TILES ARE PLACED SO THAT THIS IS NOT A LIE.** A
-	// tile is a square in Web Mercator; this document is longitude/latitude drawn straight (see
-	// dev/geographic-projects.md section 3 -- Web Mercator must not become the document's coordinate
-	// system). So each tile is placed at ITS OWN lon/lat rectangle, which is exact on the x axis
-	// (Mercator x is linear in longitude) and computed by the inverse Mercator on the y axis, and
-	// the raster is stretched linearly inside that box (preserveAspectRatio="none"). The only error
-	// is the departure of the inverse Mercator from its own chord ACROSS ONE TILE: |f''|h^2/8, which
-	// at latitude 45 is 0.03 px at zoom 12 and falls as h^2. It is below a pixel for every zoom a
-	// network is drawn at, so the map and the pipes register.
-	// What it does NOT fix is that the whole drawing, basemap included, is stretched east-west by
-	// 1/cos(latitude) -- the standing limitation of an unprojected display. The honest fix is a
-	// projection seam at every point where a coordinate becomes a drawn position, which is its own
-	// piece of work; it is not needed to make the tiles line up.
+	// **THE DISPLAY IS PROJECTED, AND A TILE IS THEREFORE A SQUARE IN THE DRAWING FRAME.**
+	//
+	// **THIS COMMENT SAID THE OPPOSITE UNTIL 2026-09-11 AND IT WAS DESCRIBING CODE THAT NO LONGER
+	// EXISTED.** It read "THE DISPLAY IS STILL UNPROJECTED", said the drawing was "stretched
+	// east-west by 1/cos(latitude) -- the standing limitation of an unprojected display", and
+	// called the projection seam "its own piece of work". That seam SHIPPED as Task 145 on
+	// 2026-08-24. Tom, reading a review that caught it: *"We need to make sure that our comments
+	// match our code."* MEASURED by dev/lpn-spike/mercator-harness.js section 7 -- a square on the
+	// ground draws with aspect **1.00000** at 0, 33.4, 38, 50 and 60 degrees, against the 2.000 an
+	// unprojected frame gives at 60. The stretch is ZERO. Do not restore the old text.
+	//
+	// The frame: x IS longitude and y is mercY(lat) expressed in degrees OF LONGITUDE, so both
+	// axes share one unit, the view transform stays a uniform scale, a junction is a circle and a
+	// pipe's stroke is one width. The FILE is still longitude and latitude and is never projected
+	// (dev/geographic-projects.md section 3); outwardY/inwardY are the whole boundary.
+	//
+	// So a Web Mercator tile is a square here and is placed as one. The only error left is the
+	// departure of the projection from its own chord ACROSS ONE TILE: |f''|h^2/8, which at latitude
+	// 45 is 0.03 px at zoom 12 and falls as h^2 -- below a pixel at every zoom a network is drawn
+	// at, so the map and the pipes register.
 	var basemapLayer = null, basemapEls = {}, basemapTimer = null;
 	// **TWO SOURCES, AND THEY ARE NOT EQUIVALENT** (ROADMAP Task 452). Tom, 2026-08-19: "epanetjs
 	// uses OpenStreet with MapBox and serves satellite imagery. Add that."
@@ -7612,8 +7619,12 @@ var EngCalcs = EngCalcs || {};
 			// alone -- the tile usage policy asks for a real one, and the browser sends it.
 			basemapEls[t.key] = el('image', {
 				href: t.url, x: t.px, y: t.py, width: t.pw, height: t.ph,
-				// The tile box is NOT square in this unprojected frame -- it is 1 : cos(latitude) --
-				// so the raster must stretch to fill it rather than be letterboxed.
+				// **THE TILE BOX IS SQUARE** -- this frame is projected (see the basemap note above),
+				// so a Web Mercator tile keeps its own proportions here. This said "NOT square in
+				// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
+				// the frame as it was before Task 145. `none` is kept deliberately all the same:
+				// it makes the raster fill the box the arithmetic computed rather than letting the
+				// renderer letterbox on a sub-pixel rounding difference at a tile seam.
 				preserveAspectRatio: 'none', crossorigin: 'anonymous',
 				'class': 'lpn-basemap-tile'
 			}, basemapLayer);
@@ -26173,8 +26184,8 @@ var EngCalcs = EngCalcs || {};
 	// Anchored to the TOOLBAR's top edge and pointing up, which is the whole design.
 	//
 	// **THE ARROW LANDS ON File, NOT ON THE MARK AND NOT ON Water** (Tom, 2026-09-11, asking the
-	// right question). The mark is IDENTITY, not a command, and the sentence says every command is
-	// in the menus above -- pointing at the mark would aim it at the one item that holds none.
+	// right question). The mark is IDENTITY, not a command, and the sentence sends the reader to
+	// the menus -- pointing at the mark would aim it at the one item that holds none.
 	// Water is this page's own menu and the most interesting one, but singling it out contradicts
 	// "every", and a reader who follows the arrow to Water has been told the bar is one menu wide.
 	// File is the first COMMAND menu and the start of the reading order, so the arrow points at
@@ -26186,7 +26197,7 @@ var EngCalcs = EngCalcs || {};
 		if (!el || !bar || menuCueDone()) { return; }
 		// Nothing to point at yet: the bar is built after this file loads.
 		if (!bar.children || !bar.children.length) { return; }
-		if (txt) { txt.textContent = pc.lpn_menu_cue || 'Every command is in the menus above.'; }
+		if (txt) { txt.textContent = pc.lpn_menu_cue || 'Start with the menus above. Use the toolbar for quick access.'; }
 		el.style.display = '';
 		// Measured, not assumed: the mark's width depends on the icon and the bar's own gap, and a
 		// hardcoded offset would drift the first time either changes. Falls back to no indent if

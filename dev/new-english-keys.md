@@ -46,7 +46,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.
   _Ruled OK 2026-09-10._
 - **`lpn_menu_cue`**
-  > Every command is in the menus above.
+  > Start with the menus above. Use the toolbar for quick access.
   @@ NEEDS RULING
 - **`lpn_pane_text_attached`**
   > Attached
