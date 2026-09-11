@@ -117,42 +117,40 @@ console.log('\n-- the Help menu rows --');
 		'both go through ext(), so neither can navigate this tab away from a dirty project');
 	report(/pc\.lpn_help_notes/.test(body), 'Notes');
 	report(/pc\.lpn_help_fix/.test(body), 'Fix something');
-	report(/pc\.about_main_menu/.test(body), 'About');
+	// About is the MARK's first row now, not Help's last (Task 625) -- identity belongs behind
+	// the product mark, which is the whole point of the Apple-menu position.
+	{
+		const mk = src.slice(src.indexOf('function openMarkMenu'));
+		const mkBody = mk.slice(0, mk.indexOf('\n\tfunction ', 10));
+		report(/pc\.about_main_menu/.test(mkBody), "About, in the mark's menu");
+		report(/toggleAboutPopup/.test(mkBody), '...opening the in-page box, not About.php');
+		report(mkBody.indexOf('pc.about_main_menu') < mkBody.indexOf('pc.install_main_menu'),
+			'...first, where identity goes');
+	}
 	// "Fix something" REPLACED Contact rather than joining it. Both go to contact.php, and
 	// lib/Calculators.lib.php records what two links to one destination do to each other: they
 	// "halve each other's weight rather than doubling the invitation".
 	report(!/pc\.contact_main_menu/.test(body),
 		'and Contact is gone, so two rows do not compete for one destination');
 
-	// **THE ORDER IS STILL A SPECIFICATION, AND IT IS A NEW ONE** (2026-09-11). Tom's numbered
-	// list of 2026-09-06 put the legal block in the middle and the two site-leaving rows below
-	// it; this replaces that, on his own two questions -- *"can Privacy, Terms, Cookies go in the
-	// bottom section with about"* and *"Should 'Front page' be near 'Not EPANET'?"* -- answered by
-	// Ida in dev/help-menu-mastermind.md §6-7 and accepted.
+	// **TWO MENUS NOW, AND THAT IS THE SPECIFICATION** (2026-09-11, Tom: *"The trade mark at the
+	// upper left now evokes Mac paradigm, and as such it carries expectations."*). Help answers
+	// "how do I use this page"; the mark at the far left answers "what is this software". They
+	// shared one menu for about an hour this session and that was the scope creep he named.
 	//
-	// WHAT MOVED AND WHY, so a future session does not restore the old list from the old comment:
-	//   * The legal rows joined About in ONE band. Once About became an in-page box it shares the
-	//     subject AND the mechanic of those rows -- Cookie settings already toggles in place -- so
-	//     the two bands were one genre. Task 286 wants the notice findable, never a given band.
-	//   * The outbound rows -- Install, Screenshot gallery, Not EPANET -- moved ABOVE that band,
-	//     and LibreWaterNet.org joined them. Task 596's position for Not EPANET stays reversed.
-	// `LibreWaterNet.org` is a literal, not a `pc.` key: a proper noun needs no translation, which
-	// is why it is matched on its text below rather than on a key name.
+	// This replaces the numbered list of 2026-09-06 AND the single-menu order shipped earlier
+	// today. Do not restore either from an older comment.
 	const order = ['lpn_help_walkthroughs', 'lpn_help_notes', 'lpn_help_icons', 'lpn_help_fix',
-		'install_main_menu', 'lpn_help_screenshots', 'lpn_help_not_epanet'];
+		'lpn_help_screenshots', 'lpn_help_not_epanet'];
 	const at = order.map(k => body.indexOf('pc.' + k));
-	report(at.every(i => i >= 0), 'every row Tom numbered is in the menu');
-	// The outbound band ends with the site itself, and the legal-plus-About band follows it whole.
-	const lwnAt = body.indexOf("'LibreWaterNet.org'");
-	const tailAt = ['privacy_link', 'terms_link', 'consent_settings_link', 'about_main_menu']
-		.map(k => body.indexOf('pc.' + k));
-	report(lwnAt > at[at.length - 1], 'the site row closes the outbound band, after Not EPANET');
-	report(tailAt.every(i => i > lwnAt), 'and the legal rows and About stand together below it');
-	report(tailAt.every((v, i) => i === 0 || v > tailAt[i - 1]),
-		'with About last, where every Help menu in the world puts it');
-	report(at.every((v, i) => i === 0 || v > at[i - 1]),
-		'and they stand in the order he numbered them',
-		order.filter((k, i) => i > 0 && at[i] < at[i - 1]).join(', ') || 'in order');
+	report(at.every(i => i >= 0), 'every row Help kept is in Help');
+	report(at.every((v, i) => i === 0 || v > at[i - 1]), 'and they stand in that order');
+	// What LEFT Help must not still be in it, or the two menus offer the same thing twice.
+	['about_main_menu', 'install_main_menu', 'privacy_link', 'terms_link', 'consent_settings_link']
+		.forEach(function (k) {
+			report(body.indexOf('pc.' + k) < 0, 'Help no longer carries ' + k);
+		});
+	report(body.indexOf("'LibreWaterNet.org'") < 0, 'nor the site link, which is the mark\'s own');
 	// The query string is part of the destination, not noise: ?from= is how formmail.php learns
 	// which calculator somebody was on, and this page is the one that cannot be inferred from a
 	// referrer. Matched loosely on the path so a later parameter does not turn this red, then
@@ -162,7 +160,8 @@ console.log('\n-- the Help menu rows --');
 	report(dests.length === 1 && /\?from=Looped-Network/.test(dests[0]),
 		'and it names this page, so the e-mail can say where it came from', dests[0] || '(none)');
 	// About last, where every other Help menu in the world puts it.
-	report(body.indexOf('about_main_menu') > body.indexOf('lpn_help_fix'), 'About is last');
+	// About left Help for the mark's menu, where identity belongs; it is asserted there instead.
+	report(body.indexOf('about_main_menu') < 0, 'About is NOT a Help row any more');
 	// Notes is the one row that does not leave the page, so it must NOT be an ext().
 	// Matched on the KEY and the handler, never on the fallback English between them: Wave 0
 	// renamed that fallback to 'Notes on this page' (2026-08-17) and a literal match turned red
@@ -220,10 +219,14 @@ console.log('\n-- and the notice it dropped is reachable twice over --');
 {
 	// Task 286 required the notice to be FINDABLE and withdrawal to be as easy as consent. Dropping
 	// the footer row is only legitimate while BOTH of these hold, so they are asserted together.
-	const help = src.slice(src.indexOf('function openHelpMenu'));
-	const menu = help.slice(0, help.indexOf('\n\tfunction ', 10));
+	// **THEY MOVED TO THE MARK'S MENU 2026-09-11 AND THE REQUIREMENT MOVED WITH THEM** (Task 625).
+	// Task 286 wants the notice FINDABLE and withdrawal as easy as consent; it never named Help.
+	// The mark is the leftmost item of the menu bar, so this is still one press from the bar --
+	// assert where they ARE, rather than deleting a legal guard because its band was renamed.
+	const mark = src.slice(src.indexOf('function openMarkMenu'));
+	const menu = mark.slice(0, mark.indexOf('\n\tfunction ', 10));
 	report(/pc\.privacy_link/.test(menu) && /pc\.terms_link/.test(menu) && /pc\.consent_settings_link/.test(menu),
-		'the Help menu carries privacy, terms and cookie settings');
+		"the mark's menu carries privacy, terms and cookie settings");
 	const gal = src.slice(src.indexOf('function renderExamplesGallery'));
 	const pane = gal.slice(0, gal.indexOf('\n\tfunction ', 10));
 	report(/lpn-examples-legal/.test(pane) && /ec-consent-reopen/.test(pane),

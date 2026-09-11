@@ -457,17 +457,24 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 console.log('\n--- 4. the menu bar drops to icons ---');
 {
 	const items = menubar.children;
-	// FIVE since 2026-08-27: File, Edit, Map, Water, Help. Insert was deleted and its asset rows are
-	// a submenu of Water (Task 543).
-	// SIX, not five: the Language menu joined the bar when the suite navbar took its picker away
-	// (Task 625). Insert went in 2026-08-27 and its rows are a submenu of Water.
-	ok('the real menu bar was built', items.length === 6, items.length + ' menus');
+	// SEVEN: the LibreWaterNet mark, File, Edit, Map, Water, Help, Language. Insert went in
+	// 2026-08-27 and its rows are a submenu of Water (Task 543); Language arrived when the suite
+	// navbar took its picker away and the mark when the leftmost slot had to stop being a link
+	// (Task 625).
+	ok('the real menu bar was built', items.length === 7, items.length + ' menus');
 	items.forEach((b) => {
 		const name = b.el.getAttribute('aria-label');
 		const word = b.children.filter((c) => c.cls.indexOf('lpn-menubar-word') >= 0)[0];
 		const icon = b.children.filter((c) => c.tag === 'svg' || c.tag === 'g')[0];
 		ok(b.id + ' carries its name as an aria-label', !!name && name.length > 0);
 		ok('...' + b.id + ' has the word in an element a rule can reach', !!word);
+		// **THE MARK IS THE ONE ITEM WITH NO WORD, AT ANY WIDTH**, so its accessible name comes
+		// from `aria` rather than from the word -- there is nothing to agree with. Every other item
+		// must still say the same thing twice, which is what stops a menu going mute on a phone.
+		if (b.id === 'lpn_menu_home') {
+			ok('...' + b.id + ' is icon-only and names itself', word.el.textContent === '' && name.length > 0);
+			return;
+		}
 		ok('...' + b.id + ' says the same thing in both', !!word && word.el.textContent === name);
 		ok('...' + b.id + ' has an icon to survive on', !!icon);
 		if (word) {

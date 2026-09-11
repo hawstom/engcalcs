@@ -723,7 +723,17 @@ console.log('\n--- Settings panel stays in sync ---');
   const PC = EngCalcs.pageConfig;
   L.buildMenuBar();
   const bar = byId.lpn_menubar;
-  const fileBtn = bar.children[0];
+  // **BY ID, NOT BY POSITION.** This was `bar.children[0]`, which stopped being File on
+  // 2026-09-11 when the LibreWaterNet mark took the leftmost slot (Task 625) -- the Apple-menu
+  // position, which had to become a menu of its own. A positional grab makes every harness a
+  // hostage to the bar's order; the id is what the page itself uses.
+  const fileBtn = (function () {
+    for (var i = 0; i < bar.children.length; i++) {
+      if (bar.children[i].id === 'lpn_menu_file') { return bar.children[i]; }
+    }
+    return null;
+  }());
+  ok('the File menu button is on the bar', !!fileBtn);
   function fire(el, target) {
     let stopped = false;
     const ev = { currentTarget: el, target: target || el, stopPropagation() { stopped = true; } };

@@ -1335,14 +1335,13 @@ html[lang="zh"] .ec-welcome {
 nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 #lpn_menubar { display: flex; gap: 2px; margin-bottom: 4px; }
 .lpn-menubar-item { background: none; border: 1px solid transparent; font: inherit; padding: 3px 10px; cursor: pointer; }
-/* THE HOME MARK (Task 625). An <a> sharing .lpn-menubar-item's box so it sits on the baseline the
-   menu words sit on, plus the three things an anchor does not inherit from a <button>: the text
-   colour, the underline, and the line-height that would otherwise push the bar taller than its
-   buttons. A hair of space after it separates the product mark from the commands without drawing
-   a rule -- the bar deliberately has no dividers (see the note above #lpn_menubar). */
-.lpn-menubar-mark { color: inherit; text-decoration: none; line-height: 1; display: inline-flex;
-	align-items: center; margin-right: 6px; }
-.lpn-menubar-mark:hover { background: #def; border-color: #9bd; }
+/* THE HOME MARK (Task 625). Now an ordinary .lpn-menubar-item button -- it became a MENU when Tom
+   pointed out that the leftmost slot is the Apple-menu position and carries that expectation -- so
+   it inherits the bar's own paint, hover and 640px collapse and needs none of its own. All that is
+   left is a hair of space separating the product mark from the commands, without a rule: the bar
+   deliberately has no dividers (see the note above #lpn_menubar). The anchor rules that used to be
+   here went with the <a>. */
+.lpn-menubar-mark { margin-right: 6px; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }
 /* ---- Project tab strip (ROADMAP Task 211) ----
    Sits directly ON TOP OF THE MAP, below the toolbar (revised 2026-08-04 after seeing the first

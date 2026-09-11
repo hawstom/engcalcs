@@ -22138,6 +22138,46 @@ var EngCalcs = EngCalcs || {};
 			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
 		});
 	}
+	// **THE MARK'S MENU: identity first, application-level facts next, the way out last.** That is
+	// the Apple menu's shape, which is the expectation the position creates (Task 625, Ida's
+	// ruling 2026-09-11). Every row was in Help an hour before this and moved here whole -- leaving
+	// copies behind would put Install and the site in two menus at once and give About's legal
+	// siblings two owners.
+	//
+	// **ONE LibreWaterNet.org ROW, NOT TWO, AND THAT IS A DEVIATION FROM IDA'S RULING.** She asked
+	// for "Learn more at ..." in a new tab beside a separated "Leave for ..." in this one, on the
+	// ground that they are different offers. They are -- but this file already has a decided case:
+	// Contact was REMOVED from Help beside Fix something because, in lib/Calculators.lib.php's own
+	// words, two links to one destination "halve each other's weight rather than doubling the
+	// invitation". Two rows naming the same site, one sentence apart, is that case exactly. The
+	// row that survives is the one Tom asked for -- the way back -- so it is same-tab, separated,
+	// in the Quit position. Her two labels would also have been two NEW strings days before a
+	// translation freeze, where the bare domain needs no translation at all.
+	function openMarkMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
+		openMenu(anchor, [
+			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup },
+			{ separator: true },
+			{ icon: 'install', label: pc.install_main_menu || 'Install',
+				fn: function () {
+					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
+					window.open('Install.php', '_blank', 'noopener');
+				} },
+			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
+			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
+			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
+				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
+			{ separator: true },
+			// **SAME TAB, and it is the whole reason the mark exists** (Tom: *"No way to get back to
+			// LibreWaterNet.org from the map."*). Back then works, which a new tab destroys. The
+			// trip is two clicks now rather than one -- the price of matching the convention, and
+			// the right price: a one-click affordance that violates a learned expectation is worse
+			// than a two-click one that meets it.
+			{ icon: 'water', label: 'LibreWaterNet.org',
+				fn: function () { window.location.href = EngCalcs.lwnSiteUrl || '/'; } }
+		]);
+	}
 	function openHelpMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
@@ -22164,41 +22204,17 @@ var EngCalcs = EngCalcs || {};
 
 			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php?from=Looped-Network') },
 			{ separator: true },
-			// **THE OUTBOUND BAND: everything that leaves for another site, in one place.**
-			{ icon: 'install', label: pc.install_main_menu || 'Install',
-				fn: function () {
-					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
-					window.open('Install.php', '_blank', 'noopener');
-				} },
+			// **HELP IS "HOW DO I USE THIS PAGE", AND NOTHING ELSE NOW** (Task 625, 2026-09-11).
+			// Install, the legal rows, About and the site link all moved to the mark's menu at the
+			// far left. That was Tom's scope-creep complaint answered at the root: it was never
+			// the row count -- twelve rows is normal for the genre -- it was TWO QUESTIONS sharing
+			// one menu. "How do I use this page" and "what is this software" now have a door each.
+			// Seven rows and two separators, down from twelve and three.
+			//
+			// These two stay because they answer the first question sideways: they are the places
+			// a reader goes to see this page being used and to see what it is not.
 			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
-			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
-			// **NOT REDUNDANT WITH THE HOME MARK, AND THE DIFFERENCE IS THE TAB** (Ida, 2026-09-11,
-			// answering Tom's *"Should 'Front page' be near 'Not EPANET'?"*). The mark at the far
-			// left is a plain SAME-TAB anchor, for a reader who is genuinely leaving. Every row in
-			// this band uses ext(), which opens a new tab with `noopener`, so somebody mid-task can
-			// look at the mission page without putting an open project through `beforeunload`.
-			// Two different offers. **Labelled with the site name rather than "Front page"**: a
-			// proper noun needs no translation, and "Front page" would read as a synonym for the
-			// About row one band below.
-			{ icon: 'info', label: 'LibreWaterNet.org', fn: ext(EngCalcs.lwnSiteUrl || '/') },
-			{ separator: true },
-			// **ONE BAND FOR FACTS ABOUT THE SOFTWARE** (Ida, 2026-09-11, on Tom's *"can Privacy,
-			// Terms, Cookies go in the bottom section with about"*). Once About became an in-page
-			// box it shares both the SUBJECT and the MECHANIC of the legal rows -- Cookie settings
-			// already toggles a box in place -- so these were two bands of one genre. Task 286
-			// wants the notice FINDABLE and withdrawal as easy as consent; it never named a band,
-			// and this is the conventional About-at-the-bottom slot.
-			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
-			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
-			// NOT ext(): this reopens the banner in place. window.ecReopenConsent is exported by
-			// lib/Consent.lib.php so the two lines of "unhide and scroll" are not copied here.
-			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
-				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
-			// About last, where every other Help menu in the world puts it. **AN IN-PAGE BOX, NOT
-			// A LINK** (Task 625): it used to open About.php, the EngCalcs SUITE's About and the
-			// fourth of Tom's four embarrassments -- a page about a calculator suite, reached from
-			// an application that has left it.
-			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
+			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) }
 		]);
 	}
 
@@ -22525,38 +22541,20 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
 		if (!bar) { return; }
 		bar.innerHTML = '';
-		// **THE WAY HOME, AT THE FAR LEFT, BEFORE File** (Task 625; Tom: *"No way to get back to
-		// LibreWaterNet.org from the map"*, and Ida's ranked first build).
+		// **THE MARK AT THE FAR LEFT IS A MENU, NOT A LINK** (Task 625; Tom, 2026-09-11: *"The trade
+		// mark at the upper left now evokes Mac paradigm, and as such it carries expectations."*).
+		// It shipped as a same-tab anchor and that was wrong: the leftmost slot of a menu bar is
+		// the Apple-menu position, and a mark there OPENS SOMETHING. Ida named three precedents
+		// for the placement -- Figma, VS Code, Docs -- and two of her own three open menus; Docs
+		// is a link, but its mark sits in a title band ABOVE its menu bar rather than inside the
+		// command row. Ours sits INSIDE the row, same size class and baseline as File..Help, and
+		// that structural position is what invites the reading. A click that navigated away was
+		// doing something the slot does not promise.
 		//
-		// **FAR LEFT IS THE CONVENTION AND IT IS NOT A PREFERENCE.** Every application a reader
-		// has used puts the product mark in the top-left corner -- VS Code, Figma, Docs -- and
-		// this bar's right-hand end is already the utility zone, holding Help and now Language.
-		// Tom first said "upper right before the menus" and corrected himself to left on being
-		// shown the convention; do not move it back.
-		//
-		// **MONO, NOT COLOURED.** Ida measured the menu bar at 401 px of ink against the toolbar's
-		// 1,260 px and diagnosed that the eye already stops at the toolbar and never looks up. A
-		// coloured mark here would be a second salience problem bought to cure the first; it takes
-		// `currentColor` like every other glyph on the bar.
-		//
-		// **AN ANCHOR, NOT A BUTTON**, because it goes somewhere: middle-click, copy link address
-		// and open-in-new-tab all work, which is what a reader expects of a product mark and what
-		// a button silently refuses. Same tab on a plain click, so Back is the way back.
-		//
-		// Icon-only at every width, so the small-screen rule that hides `.lpn-menubar-word` has
-		// nothing to do here. The name is the domain, which needs no translation and therefore no
-		// key -- the same reasoning the suite's own Hydraulics menu row uses.
-		if (EngCalcs.lwnSiteUrl) {
-			var home = document.createElement('a');
-			home.id = 'lpn_menu_home';
-			home.className = 'lpn-menubar-item lpn-menubar-mark ec-help';
-			home.href = EngCalcs.lwnSiteUrl;
-			setLabel(home, 'water', '');
-			home.setAttribute('aria-label', 'LibreWaterNet.org');
-			home.title = 'LibreWaterNet.org';
-			bar.appendChild(home);
-		}
+		// Mono, icon-only, far left, before File -- none of that changed. Only the affordance.
 		[
+			{ id: 'lpn_menu_home', icon: 'water', label: '', aria: 'LibreWaterNet.org',
+				cls: 'lpn-menubar-mark', tip: 'LibreWaterNet.org', open: openMarkMenu },
 			{ id: 'lpn_menu_file', icon: 'file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
 			// A PUSH PIN, not the eye (Tom, 2026-08-27). The eye said "look at this"; this menu is
@@ -22619,10 +22617,13 @@ var EngCalcs = EngCalcs || {};
 			word.setAttribute('class', 'lpn-menubar-word');
 			word.textContent = m.label;
 			b.appendChild(word);
-			b.setAttribute('aria-label', m.label);
+			// `aria` for an item with no word of its own -- the home mark is icon-only at every
+			// width, so m.label is '' and the accessible name has to come from somewhere.
+			b.setAttribute('aria-label', m.aria || m.label);
 			// Same wiring a menu ROW's tip gets in openMenu(): the title goes on the click target
 			// itself and .ec-help is what initTips() looks for, without which the tip is unreachable
 			// on touch. The class is appended rather than assigned -- 'lpn-menubar-item' is above.
+			if (m.cls) { b.className += ' ' + m.cls; }
 			if (m.tip) { b.title = m.tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function (e) { e.stopPropagation(); m.open(e.currentTarget); });
 			bar.appendChild(b);
