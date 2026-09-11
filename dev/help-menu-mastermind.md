@@ -275,3 +275,153 @@ for now.
 
 This document. No shipped file changed. Journal and wishlist entries filed at
 `dev/agents/interface-designer/journal.md` and `dev/agents/interface-designer/wishlist.md`.
+
+---
+
+## 6. Follow-on, 2026-09-11 — the merge question and the "Front page" question
+
+Two things changed since §0–5 above and both bear on what follows. **OBSERVED**,
+`js/looped-network.js:22490-22520`: the way-back mark shipped exactly as ranked — far left,
+before File, mono (`currentColor`), a plain `<a href="...">` (`EngCalcs.lwnSiteUrl`), **same tab**
+on a plain click ("Same tab on a plain click, so Back is the way back," per the code's own
+comment). And Tom is now building an **About popup** as an in-page box (site name, a personal
+line, GPL v3, his copyright, deploy date and commit SHA) — mechanically identical to how *Notes on
+this page* and *Cookie settings* already behave, and no longer an `ext('About.php')` outbound
+link. That second fact is what makes both questions answerable cleanly: About stops being "one of
+the three outbound informational rows" and becomes "an in-page fact box," the same genre as two
+rows already in the menu.
+
+### Q1 — merge Privacy/Terms/Cookie settings with About?
+
+**Yes, merge, and yes it reads better — not merely no-worse.** OBSERVED, `:22142-22183`: today's
+legal band and About sit in different bands for a reason that no longer holds — the code comment
+at `:22182` says "About last, where every other Help menu in the world puts it," which was already
+gesturing at the same genre (self-referential software facts) without acting on it, because About
+used to leave the page (`ext('About.php')`) while Cookie settings stayed in it
+(`window.ecReopenConsent`) — different mechanics, so keeping them apart was defensible. Once About
+is also an in-page reveal, all four rows share both properties that matter: **subject** (facts
+*about this software*, not a task and not somewhere else) and, for three of the four, **mechanic**
+(Cookie settings and About both toggle a box in place; Privacy and Terms still navigate out, which
+Fix something and Not EPANET already do too, so a band mixing "stays" and "leaves" items is not a
+new pattern here — the current legal band already mixes them).
+
+**Does it weaken findability (Task 286)?** No — Task 286 requires the notice be reachable and
+withdrawal as easy as consent; it says nothing about which band. Position in the flyout barely
+moves: Privacy notice/Terms of use/Cookie settings currently sit third of four bands; merged, they
+sit fourth of four (the *last* band, where About already conventionally sits) — one click into
+Help either way, no new nesting, no accordion. If anything this is a slightly *more* conventional
+home: "legal + about" living together at the bottom of a Help menu is the shape of Slack's,
+Discord's and most Electron apps' own About/Legal grouping — CITED as an observed convention, not
+sourced to one document.
+
+**Exact resulting order** (band 3 and band 4 merge into one; nothing else in §0's order moves):
+
+```
+Walkthroughs
+Notes on this page
+Toolbar key
+──────────────
+Fix something
+──────────────
+Install
+Screenshot gallery
+Not EPANET
+──────────────
+Privacy notice
+Terms of use
+Cookie settings
+About
+```
+
+Four bands become three separators (was four) — a small reduction in visual segmentation for the
+same eleven-to-twelve rows (row count settled below, §8).
+
+### Q2 — should a "Front page" row exist near Not EPANET, now that the mark exists?
+
+**Judge the redundancy question on what the mark actually does, not on the fact that it exists.**
+My own §5 rejected a Help row *as the way back* because it inherits Help's proven discoverability
+ceiling (two of three test subjects never found the menu bar the mark now lives on) — that
+argument is still correct and is not reopened here. But "is a Help row redundant with the mark"
+is a different question from "is a Help row useless," and the mark's own shipped behavior answers
+it: **the mark is same-tab.** `:22506`, restated in the code's own comment: "Same tab on a plain
+click, so Back is the way back." That is the right choice for the mark — an anchor that behaves
+like every other product mark, middle-click and copy-link-address included — but it means clicking
+it **leaves the open project**, recoverable only by however reliably the browser's back-forward
+cache restores a canvas-and-state-heavy page, which this repository has no measurement of and
+should not assume.
+
+**So the mark and a Help row are not the same offer.** The mark says *I am done, take me home*.
+Every other outbound Help row (Screenshot gallery, Not EPANET, Walkthroughs) says *let me look at
+that without losing what I have open* — each already uses `ext()`, a new tab with `noopener`,
+specifically so a reader mid-task can check something and come back to a live document. A row
+pointing at LibreWaterNet.org in that same `ext()` pattern is not a second route to an identical
+action; it is the ONLY route that lets a reader with unsaved work see the mission page without
+gambling on bfcache. **Recommendation: add it, in the `ext()` band with Screenshot gallery and Not
+EPANET, not because of discoverability (the mark still wins that argument for the reader who is
+genuinely leaving) but because it is the one thing the mark structurally cannot offer: a look
+without a risk.**
+
+**Not "Front page."** Two reasons. First, it invites confusion with the row now sitting one band
+below it in the merged menu (§1): "About" already answers "what is this software," and "Front
+page" reads like a synonym for the same question, not for "why does this exist" — the two pages
+this project has already ruled are different registers (§2 above). Second, "front page" is a
+newspaper metaphor this suite does not otherwise reach for, where every neighboring row instead
+states either an action (*Install*, *Fix something*) or a destination-and-payoff (*Screenshot
+gallery*, *Not EPANET*). **Recommend the label be the site name itself: `LibreWaterNet.org`** — a
+proper noun needs no translation, which is the exact reasoning the mark's own tip already uses
+("the name is the domain, which needs no translation," `:22509`), and stating the destination
+plainly is what a reader scanning the band actually needs, more than a metaphor would tell them.
+Icon: reuse `water`, the same glyph as the mark and the Project/Water menu — the one place in this
+menu where repeating an icon is a feature, not a collision, because it visually ties the row to
+the mark it is standing in for.
+
+### Exact resulting order, Q1 and Q2 together
+
+```
+Walkthroughs
+Notes on this page
+Toolbar key
+──────────────
+Fix something
+──────────────
+Install
+Screenshot gallery
+Not EPANET
+LibreWaterNet.org
+──────────────
+Privacy notice
+Terms of use
+Cookie settings
+About
+```
+
+### 7. Unprompted — is the menu now shorter or longer than it should be?
+
+**Longer by one row (eleven to twelve), and still the right size.** About's move from an outbound
+link to an in-page box does not shrink the menu — it was always going to cost exactly one row
+either way, the same as Notes on this page and Cookie settings already do; only its *mechanic*
+changed, not its presence. The mark did not remove a row either, because §5 never put the way-back
+capability IN Help to begin with — it was ranked as the menu-bar item precisely so Help would not
+have to carry it. The one net addition is `LibreWaterNet.org` itself (§Q2), for the reason above:
+it is not a duplicate of the mark, it is the no-risk variant of the same trip. §0's own yardstick
+still holds at twelve: Word, Figma and VS Code's own Help menus commonly run to twelve to fifteen
+rows across three to five bands, so this is still "normal for the genre," and the band merge (four
+separators down to three) actually reduces the menu's visual segmentation while the row count ticks
+up by one — the two numbers are moving in opposite directions, which is itself mild evidence nothing
+here is spiraling.
+
+**Ranked cost of this follow-on, same table shape as §0's:**
+
+| # | Item | Cost | What it fixes / buys |
+|---|---|---|---|
+| 1 | Merge legal band into the About band (Q1) | zero — reorders existing rows, no new string | one fewer separator; genre-consistent band now that About is in-page |
+| 2 | Add `LibreWaterNet.org` row, `ext()`, in the Install/Screenshot/Not EPANET band (Q2) | one string, one row | the no-risk look at the mission page the same-tab mark cannot offer |
+
+Both are cheap; neither is urgent against 16 September, but neither risks anything either — the
+merge is a pure reorder and the new row is one key in the pattern already used twenty times over
+in this same menu.
+
+## Files
+
+This document, appended. No shipped file touched. Journal and wishlist entries filed at
+`dev/agents/interface-designer/journal.md` and `dev/agents/interface-designer/wishlist.md`.

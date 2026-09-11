@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 7 untranslated keys, of 1776 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read**, of 8 untranslated keys, of 1777 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (7, all ruled)
+## lpn_  (8, 1 to read @@ NEEDS RULING)
 
+- **`lpn_about_license`**
+  > Licensed under the GNU General Public License v3.0 or later.
+  @@ NEEDS RULING
 - **`lpn_field_emitter`**
   > Emitter coefficient
   _Ruled OK 2026-09-09._

@@ -1130,6 +1130,40 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	</div>
 </div>
 
+<?php // **THE ABOUT BOX** (ROADMAP Task 625; Tom, 2026-09-11: *"a simple popup like Notes that acts
+      // like most programs"*). It REPLACES Help > About's old link to About.php, which was the
+      // EngCalcs suite's About and the fourth of his four embarrassments -- a page about a
+      // calculator suite, opened from an application that is no longer part of it.
+      //
+      // In-page rather than a link, because an About box should not tear down the workspace to
+      // answer "what is this". Same furniture as the Notes popup deliberately: one kind of box,
+      // one close button, one scrolling body.
+      //
+      // **THE DEDICATION IS IN ENGLISH ON PURPOSE AND IS NOT A LANGUAGE KEY.** It is the author's
+      // own words -- a distillation of the mission paragraph already in `about_body_html` -- and
+      // an author's dedication is conventionally left in the original language. Keying it would
+      // send it to 26 translators as ordinary prose, and "you are not ruining everything" is the
+      // kind of sentence that survives translation least well. The factual lines around it carry
+      // the weight, which is what stops the box reading as unserious to somebody deciding whether
+      // to trust this for a submitted report.
+      //
+      // **THE VERSION IS DERIVED, NOT DECLARED** -- see ecDeployIdentity(). A website has no
+      // release to number, and what a bug report actually needs is which code answered. ?>
+<div id="lpn_about_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:30rem">
+	<button type="button" id="lpn_about_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+<?php // ONE TITLE BAR ON EVERY NON-HOGGING BOX (2026-09-09). The class carries the band and the
+      // divider; the 40px top padding above is the room it sits in. ?>
+	<div id="lpn_about_boxtitle" class="lpn-setbox-title"><?=$ec_lang['about_main_menu']?></div>
+	<div class="lpn-popover-body">
+		<h2>LibreWaterNet.org</h2>
+		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
+		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
+<?php   $ec_build = ecDeployIdentity();
+        if ($ec_build['date'] !== '' || $ec_build['sha'] !== '') : ?>
+		<p class="lpn-about-build"><?=htmlspecialchars(trim($ec_build['date'] . ' · ' . $ec_build['sha']))?></p>
+<?php   endif; ?>
+	</div>
+</div>
 <div id="lpn_notes_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:44rem">
 	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">

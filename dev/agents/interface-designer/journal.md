@@ -694,3 +694,36 @@ the whole thing:
   twice.
 
 All CITED/OBSERVED/SPECULATION tags are in the full document. No shipped file touched.
+
+---
+
+## 2026-09-11 — Help menu follow-on: merge legal band with About, and name the mission row
+
+Two questions from Tom, both answered in `dev/help-menu-mastermind.md` §6-7. OBSERVED first: the
+way-back mark shipped exactly as ranked (`js/looped-network.js:22490-22520`) and is a **same-tab**
+plain anchor — "Same tab on a plain click, so Back is the way back" is the code's own words. About
+is being rebuilt as an in-page box (site name, personal line, GPL, copyright, deploy SHA), which
+stops it being `ext('About.php')` and makes it mechanically identical to Notes/Cookie settings.
+
+- **Q1, merge Privacy/Terms/Cookie settings with About: yes.** Once About is in-page, all four
+  share the genre "facts about this software," and the legal band's own comment already half-said
+  this ("About last, where every other Help menu... puts it"). Task 286 asks for findable and
+  easy-to-withdraw, not for a particular band — position barely moves (band 3 of 4 to band 4 of
+  4), and "legal + about" together at the bottom is a genuinely common shape (Slack, Discord,
+  most Electron apps), not a novelty.
+- **Q2, a row near Not EPANET pointing at LibreWaterNet.org: yes, but not because of
+  discoverability.** My own §5 argument against a Help row for the WAY BACK still holds — Help
+  inherits the proven ceiling (2/3 testers never found the menu bar). But the mark is same-tab,
+  and every other outbound Help row is `ext()` (new tab, noopener) specifically so a reader
+  mid-task can look without losing an open, unsaved project. Those are different offers: the mark
+  says "I'm leaving," a Help row would say "let me check without the risk." That's the actual
+  argument for adding it — not "redundant route, do it anyway," but "the one thing the mark
+  structurally cannot offer." Named it `LibreWaterNet.org` (the site name, no translation needed,
+  same reasoning the mark's own tip already uses) rather than Tom's "Front page," which risks
+  reading as a synonym for the About row now sitting one band below it.
+- **Net effect on menu length: eleven rows to twelve, still normal for the genre** (Word/Figma/
+  VS Code all run 12-15). Bands go from four to three separators (the merge), which is a real
+  simplification even though the row count ticks up by one.
+
+Full reasoning, exact row orders and the two-item ranked table: `dev/help-menu-mastermind.md` §6-7.
+No shipped file touched.

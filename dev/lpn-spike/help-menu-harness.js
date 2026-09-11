@@ -124,18 +124,32 @@ console.log('\n-- the Help menu rows --');
 	report(!/pc\.contact_main_menu/.test(body),
 		'and Contact is gone, so two rows do not compete for one destination');
 
-	// **THE ORDER IS TOM'S OWN, given as a numbered list on 2026-09-06**, so it is a
-	// specification and not a layout preference: Walkthroughs, Notes, Toolbar, Fix, the legal
-	// block, Screenshot gallery, Not EPANET, About. Asserted as POSITIONS of each key in the
-	// function body rather than as a rendered list, because openMenu() is the thing that renders
-	// and this harness reads source. The two site-leaving rows moved BELOW the legal block, which
-	// reverses where Task 596 put Not EPANET -- assert it so a future session restoring 596's
-	// wording does not silently restore its position too.
+	// **THE ORDER IS STILL A SPECIFICATION, AND IT IS A NEW ONE** (2026-09-11). Tom's numbered
+	// list of 2026-09-06 put the legal block in the middle and the two site-leaving rows below
+	// it; this replaces that, on his own two questions -- *"can Privacy, Terms, Cookies go in the
+	// bottom section with about"* and *"Should 'Front page' be near 'Not EPANET'?"* -- answered by
+	// Ida in dev/help-menu-mastermind.md §6-7 and accepted.
+	//
+	// WHAT MOVED AND WHY, so a future session does not restore the old list from the old comment:
+	//   * The legal rows joined About in ONE band. Once About became an in-page box it shares the
+	//     subject AND the mechanic of those rows -- Cookie settings already toggles in place -- so
+	//     the two bands were one genre. Task 286 wants the notice findable, never a given band.
+	//   * The outbound rows -- Install, Screenshot gallery, Not EPANET -- moved ABOVE that band,
+	//     and LibreWaterNet.org joined them. Task 596's position for Not EPANET stays reversed.
+	// `LibreWaterNet.org` is a literal, not a `pc.` key: a proper noun needs no translation, which
+	// is why it is matched on its text below rather than on a key name.
 	const order = ['lpn_help_walkthroughs', 'lpn_help_notes', 'lpn_help_icons', 'lpn_help_fix',
-		'privacy_link', 'terms_link', 'consent_settings_link',
-		'lpn_help_screenshots', 'lpn_help_not_epanet', 'about_main_menu'];
+		'install_main_menu', 'lpn_help_screenshots', 'lpn_help_not_epanet'];
 	const at = order.map(k => body.indexOf('pc.' + k));
 	report(at.every(i => i >= 0), 'every row Tom numbered is in the menu');
+	// The outbound band ends with the site itself, and the legal-plus-About band follows it whole.
+	const lwnAt = body.indexOf("'LibreWaterNet.org'");
+	const tailAt = ['privacy_link', 'terms_link', 'consent_settings_link', 'about_main_menu']
+		.map(k => body.indexOf('pc.' + k));
+	report(lwnAt > at[at.length - 1], 'the site row closes the outbound band, after Not EPANET');
+	report(tailAt.every(i => i > lwnAt), 'and the legal rows and About stand together below it');
+	report(tailAt.every((v, i) => i === 0 || v > tailAt[i - 1]),
+		'with About last, where every Help menu in the world puts it');
 	report(at.every((v, i) => i === 0 || v > at[i - 1]),
 		'and they stand in the order he numbered them',
 		order.filter((k, i) => i > 0 && at[i] < at[i - 1]).join(', ') || 'in order');

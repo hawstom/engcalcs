@@ -1849,13 +1849,26 @@ $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
 $ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
+// The About box's one translatable sentence (Task 625). The LICENCE NAME itself is deliberately
+// inside it in English: the FSF asks that "GNU General Public License" not be translated, and a
+// translated licence name is a different licence as far as a reader checking it is concerned.
+$ec_lang['lpn_about_license']='Licensed under the GNU General Public License v3.0 or later.';
 $ec_lang['lpn_notes_1_term']='How it is solved';
 // **IT NAMED THE WRONG SOLVER** (Tom, 2026-09-10: *"Wrong facts."*). It said every moment "is
 // solved with the global gradient algorithm", which describes the BUILT-IN solver -- and Task 605
 // retired that one from view: EPANET is the default and the built-in one answers only when EPANET
 // cannot be fetched. dev/lpn-spike/eps-net3-harness.js reproduces EPA's own published 24-hour
 // Net3 report at all 25 reporting steps.
-$ec_lang['lpn_notes_1_def']='The EPANET solver works this network out. Set a total run time and every reporting step is calculated in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back. Without the internet connection needed to fetch it the first time, a built-in solver answers instead, for one moment only, with every tank at its starting level.';
+// **THE FALLBACK SENTENCE LEFT THIS NOTE 2026-09-11** (Tom: *"I am not sure that mentioning the
+// EPANET solver being unavailable for download makes sense ... the case for the note is
+// vanishingly small."*). His premise is not quite right -- the app IS offline-capable, so a
+// returning visitor with the page cached and the engine not cached is a real state, and Task 608
+// shrank it further by fetching the engine before anybody is waiting. But the conclusion holds on
+// a better reason: **the reader is already told, at the moment it happens, by
+// lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
+// failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
+// sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
+$ec_lang['lpn_notes_1_def']='The EPANET solver works this network out. Set a total run time and every reporting step is calculated in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back.';
 $ec_lang['lpn_notes_2_term']='What it does not do';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting

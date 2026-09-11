@@ -123,6 +123,57 @@ define('EC_LWN_APP_URL', CANONICAL_ORIGIN_DEFAULT . '/app/');
 // *"No way to get back to LibreWaterNet.org from the map."*
 define('EC_LWN_SITE_URL', CANONICAL_ORIGIN_DEFAULT . '/');
 
+/**
+ * Which code is actually running on this host: the deploy time and the commit.
+ *
+ * **A WEBSITE HAS NO VERSION NUMBER AND STILL NEEDS A BUILD IDENTITY** (Tom, 2026-09-11: *"We
+ * don't have a version number since we are a website unless we should introduce one."*). Two
+ * measured arguments from one day, both for this:
+ *   - The blank-map hunt burned seven hypotheses with "which commit are you running?" unanswerable.
+ *   - His "the EngCalcs navbar is still on my phone" was production sitting NINE commits behind,
+ *     found only by curling the live site and then reading the checkout over ssh.
+ *
+ * **DERIVED, NEVER DECLARED, so it cannot drift from the truth.** There is nothing to bump and no
+ * build step: deployment is `git pull`, so the checkout time IS the deploy time -- CLAUDE.md
+ * records that a pull does not preserve mtimes, which is a nuisance for cache busting and exactly
+ * what is wanted here -- and `.git` holds the commit. A semantic version would be a second thing
+ * to remember and a second thing to be wrong.
+ *
+ * Everything is best-effort: a deploy made by unpacking an archive has no `.git`, and the answer
+ * is then the date alone. `.git` is blocked over HTTP by a RedirectMatch in .htaccess, which does
+ * not touch a read from disk.
+ *
+ * @return array{sha:string,date:string}  either may be '' when it cannot be determined.
+ */
+function ecDeployIdentity() {
+    $root = dirname(__DIR__);
+    $out = array('sha' => '', 'date' => '');
+    $stamp = @filemtime(__FILE__);
+    if ($stamp) { $out['date'] = gmdate('Y-m-d H:i', $stamp) . ' UTC'; }
+    $head = @file_get_contents($root . '/.git/HEAD');
+    if ($head === false) { return $out; }
+    $head = trim($head);
+    $sha = false;
+    if (strpos($head, 'ref: ') === 0) {
+        $ref = substr($head, 5);
+        $sha = @file_get_contents($root . '/.git/' . $ref);
+        if ($sha === false) {
+            // Packed by `git gc`, so the loose ref file is gone and the sha is in one table.
+            $packed = @file_get_contents($root . '/.git/packed-refs');
+            if ($packed !== false
+                && preg_match('/^([0-9a-f]{40})\s+' . preg_quote($ref, '/') . '$/m', $packed, $m)) {
+                $sha = $m[1];
+            }
+        }
+    } else {
+        $sha = $head;   // a detached HEAD is the sha itself
+    }
+    if (is_string($sha) && preg_match('/^[0-9a-f]{7,40}/', trim($sha), $m)) {
+        $out['sha'] = substr($m[0], 0, 8);
+    }
+    return $out;
+}
+
 $ec_canonical_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
 if (($ec_colon = strpos($ec_canonical_host, ':')) !== false) {
     $ec_canonical_host = substr($ec_canonical_host, 0, $ec_colon);

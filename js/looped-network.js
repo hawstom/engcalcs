@@ -21299,7 +21299,7 @@ var EngCalcs = EngCalcs || {};
 	// away, and that is exactly what membership here would do. Both get the property popup's
 	// chrome instead: a drag surface and an X. Settings LEFT this list with Task 441, when it
 	// stopped being a pull-down.
-	var VIEW_POPOVERS = ['lpn_notes_popup'];
+	var VIEW_POPOVERS = ['lpn_notes_popup', 'lpn_about_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
 	// OPENED a popover must not also be read as a click away from it (Task 372). Exempting the whole
@@ -22139,38 +22139,7 @@ var EngCalcs = EngCalcs || {};
 
 			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php?from=Looped-Network') },
 			{ separator: true },
-			// **THE LEGAL ROW LIVES HERE BECAUSE THIS PAGE HAS NO FOOTER.** Task 286 requires the
-			// notice to be FINDABLE and withdrawal to be as easy as consent; it never required a
-			// particular piece of furniture. epanet-js reaches the same answer, carrying the legal
-			// links in its splash panel's sidebar. Also mirrored in the examples gallery, which is
-			// what a first-time visitor sees: the gallery is absent once you have a network and the
-			// menu is absent until you open it.
-
-			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
-			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
-			// NOT ext(): this reopens the banner in place. window.ecReopenConsent is exported by
-			// lib/Consent.lib.php so the two lines of "unhide and scroll" are not copied here, free
-			// to drift from the banner they operate.
-			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
-				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
-			{ separator: true },
-			// **THE ORDER OF THIS MENU IS TOM'S OWN, 2026-09-06**, given as a numbered list: the
-			// two rows that leave for another SITE sit below the legal block rather than at the
-			// top. Task 596 had put Not EPANET above that separator; this supersedes it.
-			// **THE INSTALL DOOR, WHICH MOVED RATHER THAN WENT** (Task 625). It used to be the suite
-			// navbar's `#ec-install-btn` plus a Help > Install.php row, and the divorce took the
-			// navbar with both. Ida's ranked advice put one row here, beside the other two that
-			// leave for somewhere else.
-			//
-			// **IT PROMPTS WHEN THE BROWSER WILL LET IT AND EXPLAINS WHEN IT WILL NOT.** The
-			// deferred `beforeinstallprompt` event is captured on EngCalcs itself
-			// (js/Calculators.lib.js), not on the button that is now gone, so the native prompt is
-			// still reachable; Install.php is the answer everywhere that never fires one, which is
-			// every iOS browser and every already-installed window. One row, because a visitor
-			// wanting to install does not care which of those two they are.
-			//
-			// Reuses `install_main_menu`, already written and already in 26 languages, rather than
-			// minting a string days before a translation freeze.
+			// **THE OUTBOUND BAND: everything that leaves for another site, in one place.**
 			{ icon: 'install', label: pc.install_main_menu || 'Install',
 				fn: function () {
 					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
@@ -22178,9 +22147,33 @@ var EngCalcs = EngCalcs || {};
 				} },
 			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
+			// **NOT REDUNDANT WITH THE HOME MARK, AND THE DIFFERENCE IS THE TAB** (Ida, 2026-09-11,
+			// answering Tom's *"Should 'Front page' be near 'Not EPANET'?"*). The mark at the far
+			// left is a plain SAME-TAB anchor, for a reader who is genuinely leaving. Every row in
+			// this band uses ext(), which opens a new tab with `noopener`, so somebody mid-task can
+			// look at the mission page without putting an open project through `beforeunload`.
+			// Two different offers. **Labelled with the site name rather than "Front page"**: a
+			// proper noun needs no translation, and "Front page" would read as a synonym for the
+			// About row one band below.
+			{ icon: 'info', label: 'LibreWaterNet.org', fn: ext(EngCalcs.lwnSiteUrl || '/') },
 			{ separator: true },
-			// About last, where every other Help menu in the world puts it.
-			{ icon: 'info', label: pc.about_main_menu || 'About', fn: ext('About.php') }
+			// **ONE BAND FOR FACTS ABOUT THE SOFTWARE** (Ida, 2026-09-11, on Tom's *"can Privacy,
+			// Terms, Cookies go in the bottom section with about"*). Once About became an in-page
+			// box it shares both the SUBJECT and the MECHANIC of the legal rows -- Cookie settings
+			// already toggles a box in place -- so these were two bands of one genre. Task 286
+			// wants the notice FINDABLE and withdrawal as easy as consent; it never named a band,
+			// and this is the conventional About-at-the-bottom slot.
+			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
+			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
+			// NOT ext(): this reopens the banner in place. window.ecReopenConsent is exported by
+			// lib/Consent.lib.php so the two lines of "unhide and scroll" are not copied here.
+			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
+				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
+			// About last, where every other Help menu in the world puts it. **AN IN-PAGE BOX, NOT
+			// A LINK** (Task 625): it used to open About.php, the EngCalcs SUITE's About and the
+			// fourth of Tom's four embarrassments -- a page about a calculator suite, reached from
+			// an application that has left it.
+			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
 		]);
 	}
 
@@ -22224,13 +22217,46 @@ var EngCalcs = EngCalcs || {};
 		closeViewPopovers();
 		popup.style.display = 'block';
 		raisePanel(popup);   // centred, not dragged, so it is raised where it becomes visible
-		var h = fitPanelToViewport(popup);
+		// **CAPPED TO THE ROOM BELOW WHERE IT LANDS, NOT TO THE WHOLE VIEWPORT** (Tom, 2026-09-11:
+		// *"Notes is too large for my laptop and my phone. It scrolls, but its bottom is off the
+		// map."*). fitPanelToViewport() caps to `innerHeight - 2 * POPUP_EDGE`, which is right only
+		// for a box free to sit anywhere; this one is then floored at chromeFloor(), so a box taller
+		// than the room UNDER the chrome fits the viewport, gets pushed down past the menu bar, and
+		// hangs off the bottom by exactly the height of the chrome -- with the end of the prose
+		// below the fold rather than below a scrollbar, which is why scrolling did not reach it.
+		//
+		// The note above capPanelToRoomBelow() describes this defect in general terms and the Find
+		// box was fixed for it; the Notes popup was simply never brought along. Choose the top from
+		// the natural height, then cap to what is genuinely left below that top.
+		var natural = fitPanelToViewport(popup);
+		var top = Math.max(chromeFloor(), (window.innerHeight - natural) / 2);
+		capPanelToRoomBelow(popup, top);
 		var pr = popup.getBoundingClientRect();
 		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
-		popup.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		popup.style.top = top + 'px';
 	}
 	function closeNotesPopup() { hidePanel(document.getElementById('lpn_notes_popup')); }
+	// The About box. Same shape as the Notes popup on purpose -- centred, capped to the room below
+	// the chrome, one close button -- because this page should have one kind of box and not two.
+	function toggleAboutPopup() {
+		var popup = document.getElementById('lpn_about_popup');
+		if (!popup) { return; }
+		if (popup.style.display === 'block') { closeAboutPopup(); return; }
+		closeMenu();
+		closeViewPopovers();
+		popup.style.display = 'block';
+		raisePanel(popup);
+		var natural = fitPanelToViewport(popup);
+		var top = Math.max(chromeFloor(), (window.innerHeight - natural) / 2);
+		capPanelToRoomBelow(popup, top);
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
+		popup.style.top = top + 'px';
+	}
+	function closeAboutPopup() { hidePanel(document.getElementById('lpn_about_popup')); }
 	function wireNotesPopup() {
+		var ax = document.getElementById('lpn_about_close');
+		if (ax) { ax.addEventListener('click', closeAboutPopup); }
 		var x = document.getElementById('lpn_notes_close');
 		if (x) { x.addEventListener('click', closeNotesPopup); }
 	}

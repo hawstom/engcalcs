@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1776,
-        "delta_key_count": 7,
+        "expected_key_count": 1777,
+        "delta_key_count": 8,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_imgd",
@@ -533,7 +533,8 @@
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
-        "lpn_pane_text_attached": "Attached"
+        "lpn_pane_text_attached": "Attached",
+        "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "keys": {
         "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
@@ -542,7 +543,8 @@
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
-        "lpn_pane_text_attached": "Attached"
+        "lpn_pane_text_attached": "Attached",
+        "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "key_context": {
         "lpn_field_text_attached_tip": {
@@ -654,6 +656,22 @@
                     "key": "lpn_pane_paste_note",
                     "value": "Esta tabela é destinada a inserir valores colando de uma planilha em linhas que já existem. Se ela não atender às suas necessidades, use Ajuda, Corrigir algo para nos contar.",
                     "english": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us."
+                }
+            }
+        },
+        "lpn_about_license": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "Não salvo. O armazenamento do navegador está cheio ou indisponível, então suas alterações recentes serão perdidas ao fechar esta aba.",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Como é calculado",
+                    "english": "How it is solved"
                 }
             }
         }

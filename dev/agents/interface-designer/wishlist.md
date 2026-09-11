@@ -135,3 +135,15 @@ is answered for the three that remain after the divorce; see item 5 series above
     Help row inherits Help's own proven discoverability ceiling and a "way back" cannot afford
     that. If only one Help/way-back item ships before the demo, this is it. See
     `dev/help-menu-mastermind.md` §5.
+
+14. **Merge the Help menu's legal band into the About band, now that About is becoming an
+    in-page box.** Pure reorder — no new string, one fewer separator. Privacy notice/Terms of
+    use/Cookie settings move down to join About as one final band; nothing about Task 286's
+    findability requirement is weakened by the move. See `dev/help-menu-mastermind.md` §6.
+
+15. **Add one Help row, `LibreWaterNet.org`, in the Install/Screenshot gallery/Not EPANET band —
+    not named "Front page."** Not a discoverability fix (the far-left mark still wins that
+    argument); it exists because the mark is same-tab and every other outbound Help row is
+    `ext()` — this is the only route that lets a reader with an unsaved project look at the
+    mission page without risking it. One string, reuse the `water` icon to tie it visually to the
+    mark. See `dev/help-menu-mastermind.md` §6.
