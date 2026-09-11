@@ -352,27 +352,25 @@ the block.
     specimen BEFORE closing the tab.
 
 
-- 100|629| **[H] A geographic project can open on the XY default view, in pixels.**
-  Tom's blank map, 2026-09-10, diagnosed from a live capture and his saved file
-  (`dev/lpn-spike/net3-world-bad-view.lwn`, the first reproducible specimen). **THREE EXACT
-  IDENTITIES NAME IT.** Stored view `{cx: 835.390625, cy: -4957.78125, s: 5.322222222222222}` on
-  a geographic Net3, canvas 1916 px wide:
-  - `cx` in the local frame is **958.000000 = w/2** and `cy` is **4999.000000 = h/2** (an SVG
-    9998 px tall, unsized and sizing to content). PIXELS in a field that holds DEGREES.
-  - `s` is `1` from the same line, raised by `applyView()`'s clamp to `minScale() = w/360 =
-    5.322222222222222` -- the "whole world fits" floor, matching the stored value exactly.
-  - **THE LINE IS `defaultViewForCoords()`**: `if (isGeoProject()) { return geoHomeView(); }` then
-    `return { cx: w/2, cy: h/2, s: 1 }`. `isGeoProject()` reads `project.coords`, and `project` is
-    still the PREVIOUS project's while a geographic one is arriving -- so it takes the grid branch.
-    Reached from `if (!doc.nodes.length) { applyView(defaultViewForCoords()); return; }`.
-  - **THE COMMENT ABOVE THAT LINE FIXES THE OPPOSITE DIRECTION ONLY** -- "a blank XY tab made
-    after a lat/lon one" -- so geo-after-XY was left open. **That is also Task 624's original
-    report** (*"opening the geographic Net3 example beside an existing project"*): the all-blue map
-    and the blank map are one bug, and 624's amplifier fix is what changed its face.
-  - **IT PERSISTS AND RECURS**: `view` is document state, so autosave writes the bad camera and
-    every reload restores it. Zoom to fit cures it; the next boot re-creates it. 677 symbols draw
-    at **1 x 0 px** off-screen while legends (screen-fixed) and tables (document-fed) survive,
-    which is what makes it read as lost work. `dev/lpn-blank-map-incidents.md`.
+- 60|629| **[H] GUARDED: a geographic project opening on the XY default view, in pixels.**
+  **THE SEAM IS FIXED AND THE ROOT IS NOT REMOVED.** `applyView()` refuses a geographic camera
+  showing no pixel of the Earth (`viewIsReachable()`); `false` already meant "nothing usable", so
+  `restoreViewOrFit()` fits instead -- what Tom did by hand. **A damaged file HEALS**, the fit
+  being what the next save records. `dev/lpn-spike/bad-view-harness.js` drives his own file,
+  13/13, red on all five measured symptoms when the guard is removed.
+  - **STILL OPEN, AND IT IS THE ROOT:** `defaultViewForCoords()` still answers
+    `{cx: w/2, cy: h/2, s: 1}` for a geographic document whenever `isGeoProject()` is false,
+    because `project` describes the OUTGOING project while a new one arrives. The guard catches
+    the result; nothing yet stops it being computed. Removing it means establishing the view from
+    the document being installed rather than from `project`.
+  - **THE GUARD TESTS LONGITUDE ONLY**, and that is a stated limit: Mercator x IS longitude so
+    `outwardX()` is exact, while `outwardY()` runs through `mercLat()` and pins at the cut-off,
+    losing the magnitude a y test needs. The mismatch always writes both axes from one line, so
+    longitude sees every case of it -- but a y-only bad view would pass.
+  - **IT WAS FIRST WRITTEN CALLING `cartesianY()` AND `local-origin-harness.js` CAUGHT IT**, which
+    is the argument for that census. The `outwardX()` count moved 19 -> 20 with a reason.
+  - The three exact identities that named it, the live capture and Tom's own file:
+    `dev/lpn-blank-map-incidents.md`. **Also Task 624's original report** -- one bug, two faces.
 
 - 95|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
   Reproduced 13/13 by `dev/lpn-spike/blank-map-harness.js`. **A gap BETWEEN two branches:**

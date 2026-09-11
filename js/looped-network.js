@@ -7175,12 +7175,45 @@ var EngCalcs = EngCalcs || {};
 		if (isFinite(v.w) && isFinite(v.h) && v.w > 0 && v.h > 0) { return true; }
 		return isFinite(v.s) && v.s > 0;
 	}
+	// **A VIEW OF SOMEWHERE THAT IS NOT ON EARTH IS REFUSED** (ROADMAP Task 629). The Mercator
+	// world is 360 drawing units square, so a geographic view whose centre is further outside it
+	// than the canvas is wide shows not one pixel of the planet -- there is nothing to look at and
+	// the map is blank. No magic bound: the test is literally "is any of the world on screen".
+	//
+	// **THIS IS A FRAME MISMATCH, NOT A CORRUPT NUMBER.** `defaultViewForCoords()` answers
+	// `{cx: w/2, cy: h/2, s: 1}` in PIXELS, which is right for an XY grid and meaningless in
+	// degrees; it takes that branch whenever `isGeoProject()` is false, and `project` still
+	// describes the OUTGOING project while a geographic one is arriving. Tom's Net3-Novato came
+	// back from storage centred on (958, 4999) -- exactly half his canvas in each axis -- with the
+	// scale clamped up to minScale(), the whole-world floor. 677 symbols drew at 1 x 0 px, 26,000
+	// px off screen, and because `view` is document state the autosave then kept it: every reload
+	// restored it and only Zoom to fit cured it. Fixture: dev/lpn-spike/net3-world-bad-view.lwn.
+	//
+	// Refusing here rather than repairing the number honours the one seam rule: applyView() is
+	// where every view arrives, and `false` already means "nothing usable", so restoreViewOrFit()
+	// falls through to the fit it would have done had the document carried no view at all. A view
+	// is OURS, not the user's data (see unprojectStoredGeo's note), so declining one rewrites
+	// nothing they typed -- and the next save records the good view, so a damaged file heals.
+	// **THROUGH outwardX(), NOT cartesianY().** Those four converters are the whole boundary
+	// between the drawing frame and the world, and local-origin-harness.js COUNTS cartesianY()'s
+	// call sites precisely so a third reader cannot appear -- this guard was written as one and
+	// that harness caught it. Longitude carries the test on its own: Mercator x IS longitude, so
+	// outwardX() is exact and unsaturated, while outwardY() runs through mercLat() and pins at the
+	// cut-off, which throws away the magnitude a y-axis test would need. That is a real limit and
+	// not an oversight -- but the frame mismatch this guards always writes BOTH axes together
+	// (cx = w/2 and cy = h/2 from the same line), so longitude sees every case of it. Tom's was
+	// 835 degrees east.
+	function viewIsReachable(v, sc, w, h) {
+		if (!isGeoProject() || !isFinite(sc) || sc <= 0) { return true; }
+		return Math.abs(outwardX(v.cx)) - 180 <= (w / 2) / sc;
+	}
 	function applyView(v) {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
 		if (!validView(v) || !w || !h) { return false; }
 		sc = isFinite(v.s) ? v.s : Math.min(w / v.w, h / v.h);
 		sc = Math.max(minScale(), Math.min(maxScale(), sc));
+		if (!viewIsReachable(v, sc, w, h)) { return false; }
 		state.s = sc;
 		state.tx = w / 2 - sc * v.cx;
 		state.ty = h / 2 - sc * v.cy;

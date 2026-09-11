@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**67 open tasks.** Next (100): 11 · Soon (75): 9 · Someday (50): 17 · Maybe (25): 10 · Parked (5): 17 · priority 95 (95): 2 · priority 60 (60): 1
+**67 open tasks.** Next (100): 10 · Soon (75): 9 · Someday (50): 17 · Maybe (25): 10 · Parked (5): 17 · priority 60 (60): 2 · priority 95 (95): 2
 
-## 100 — Next (11)
+## 100 — Next (10)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
@@ -21,7 +21,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 616 — [H] · Visual feedback: a prompt history in the banner area.
 - Task 618 — WYSIWYG hit areas: what you can click is what you can see.
 - Task 625 — [H] · Divorce the app page from EngCalcs chrome; give it its own.
-- Task 629 — [H] · A geographic project can open on the XY default view, in pixels.
 
 ## 95 — Priority 95 (2)
 
@@ -40,9 +39,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 623 — [H] · File loss judged only by people whose files are throwaway.
 - Task 624 — [H] · The scale fallbacks turn any missed publish into a flooded canvas.
 
-## 60 — Priority 60 (1)
+## 60 — Priority 60 (2)
 
 - Task 626 — A refused beacon is retried like an offline one, 20 times.
+- Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 
 ## 50 — Someday (17)
 

@@ -278,7 +278,12 @@ console.log('\n--- one home for the concept ---');
 	// replace reading the DEM. It states the outward-x-is-longitude boundary ONCE for both, which is
 	// the alternative to each door stating it again. Task 497's own two sites are unchanged: those
 	// functions decide their own lists from the document.
-	ok('outwardX has one definition and eighteen call sites', count(/outwardX\(/g) === 19, count(/outwardX\(/g));
+	// **TASK 629 ADDED ONE SITE, AND IT IS A GUARD RATHER THAN A CONVERSION.** viewIsReachable()
+	// asks whether any of the Mercator world is on screen before applyView() accepts a camera, and
+	// it reaches for LONGITUDE because Mercator x IS longitude, so outwardX() is exact where
+	// outwardY() saturates at the cut-off. It was first written calling cartesianY() directly and
+	// THIS FILE CAUGHT IT -- which is the whole argument for counting these.
+	ok('outwardX has one definition and nineteen call sites', count(/outwardX\(/g) === 20, count(/outwardX\(/g));
 	ok('outwardY has one definition and nineteen call sites', count(/outwardY\(/g) === 20, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
