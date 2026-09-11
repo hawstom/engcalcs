@@ -646,3 +646,51 @@ and the "what you'll actually see in the app" view are both on the table rather 
 in for the other. Generators: `gen-arms-review.js`, `gen-arms-incontext.js`, same directory,
 reusing the Chromium/playwright-core pipeline `gen-ship-clouds.js` already established. Nothing
 shipped; `lib/Icons.lib.php` untouched.
+
+---
+
+## 2026-09-10 — Help, masterminded, and the LibreWaterNet way-back designed
+
+Tom asked for me by name to mastermind Help ("It's a bit out of control, and maybe Ida needs to
+mastermind it") and to design the new thing: a way back to LibreWaterNet.org from the app.
+Full answer: `dev/help-menu-mastermind.md`. Summary, so a cold session does not have to re-read
+the whole thing:
+
+- **Help is not out of control in ROW COUNT** (11 rows, 4 bands, normal for the genre) — it is
+  out of control in two specific rows being wrong on the merits, both of which Tom named
+  correctly himself.
+- **`lpn_notes_1/2_term`** ("How it is solved" / "Not modeled") are OBSOLETE as Notes-popup
+  entries not because the facts are wrong but because they are the wrong GENRE for that popup —
+  product-scope statements sitting among task-context notes (pump curve, saving, color bands).
+  They belong in the About rewrite Task 625 already owes (About's body,
+  `lib/lang.ec.en.php:543`, is still entirely suite-wide). Retire from Notes, fold into About.
+- **LibreWaterNet.org should NOT become About, and About should NOT point there instead of
+  itself** — read the actual site (`~/webdev/librewaternet.org/index.html` etc.): it's a mission/
+  recruiting page ("World owned.", "Four kinds of person we are looking for"), tuned by its own
+  CLAUDE.md to invite strangers, not answer "what is this software" to someone already mid-task.
+  Register mismatch in both directions. Cheap bridge instead: one outbound sentence from About's
+  own rewritten body.
+- **Help > Toolbar: not redundant, genuinely load-bearing** (it's the icon-only toolbar's missing
+  legend, per `dev/toolbar-icons.md` — the one place icon+name+tip appear together for a user who
+  won't hover or can't). The defect is the LABEL, not the row: "Toolbar" reads as a control over
+  the toolbar, not a legend. Tom's own proposed rename, "Toolbar key," is exactly right and costs
+  one string.
+- **Search help: right idea, wrong time.** Would eventually displace Toolbar key and partly
+  Notes, but is real feature work — deferred past 16 September, not scoped here as instructed.
+- **The way-back mark: recommended mono icon-only link at the FAR LEFT of the menu bar, before
+  File** — not upper right as Tom proposed. Convention (VS Code, Figma, Docs) puts the product
+  mark at far left because that's where the read starts and where "go home" is learned; upper
+  right on THIS page is already the utility zone (Help, Language) his own recent work built,
+  which is the wrong neighborhood for "leave the document." Mono, not colored — color is for
+  contexts where standing out is the job (the favicon, "my one true love," in a tab or share
+  card); here it would just re-create the salience-imbalance problem already diagnosed between
+  menu bar and toolbar, a second time, against the mark's own neighbors. Costs ~40-50px against a
+  measured 401px/1,364-1,918px menu-bar budget — comfortable. A Help row is the fallback of last
+  resort: free in pixels, but inherits Help's own proven discoverability ceiling (two of three
+  test subjects never found the menu bar at all), which is the one thing a "way back" cannot
+  afford to inherit.
+- **If only one: the way-back mark.** It's the only genuinely new capability asked for, and the
+  only candidate that doesn't inherit a discoverability problem this project has already measured
+  twice.
+
+All CITED/OBSERVED/SPECULATION tags are in the full document. No shipped file touched.

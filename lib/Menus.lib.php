@@ -135,7 +135,18 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a>
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Branched-Network.php" title="<?=$ec_lang['bpn_main_desc']?>"><?=$ec_lang['bpn_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Looped-Network.php" title="<?=$ec_lang['lpn_main_desc']?>"><?=$ec_lang['lpn_main_menu']?></a>
+<?php // **THE MAP IS A DIFFERENT PRODUCT ON A DIFFERENT SITE NOW** (Task 625, Tom 2026-09-10:
+      // *"Change it to LibreWaterNet.org as label and link to it without a link back"*). The
+      // label is the SITE, not the calculator, because that is where the reader is going.
+      //
+      // **THE TEXT IS A LITERAL AND DELIBERATELY NOT A LANGUAGE KEY.** A domain name is the same
+      // in every language, so a key holding it would be byte-identical to English in 26 files --
+      // which lang_syntax_validate.php fails the build on -- while leaving it out of those files
+      // means a translation sprint is invited to translate a domain. `lpn_main_menu` still holds
+      // "Water Supply Network" and is now read by nothing; that is Tom's call to delete.
+      //
+      // Same tab: Back is the way back, and EC_LWN_APP_URL's own note says why. ?>
+					<a class="dropdown-item" href="<?=EC_LWN_APP_URL?>" title="<?=$ec_lang['lpn_main_desc']?>">LibreWaterNet.org</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>

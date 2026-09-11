@@ -68,7 +68,20 @@ const EC_NON_CALCULATOR_PAGES = [
  * on purpose (Task 232) before it was retired, so the shape recurs. Keeping it out silently is the
  * defect; keeping it out with a sentence here is a decision.
  */
-const EC_MENU_EXEMPT_CALCULATORS = [];
+const EC_MENU_EXEMPT_CALCULATORS = [
+    // **THE DIVORCE, AND THE ONE CASE THIS CHECK'S PREMISE DOES NOT COVER** (ROADMAP Task 625,
+    // Tom 2026-09-10: *"Change it to LibreWaterNet.org as label and link to it"*). The suite's
+    // Hydraulics menu no longer names a calculator here -- it names the SITE the map moved to, and
+    // links out to EC_LWN_APP_URL. So this page is unmenued in the literal sense while being the
+    // most reachable page in the tree: it is librewaternet.org's whole front door, it is the
+    // `/app/` mount, and eight calculators' "See also" lines point at it.
+    //
+    // The finding this check exists for is "an unmenued calculator renders perfectly and no
+    // visitor can reach it". That premise is false here and only here, which is what a declaration
+    // is for. **If the app is ever served ONLY from this suite again, delete this line** -- the
+    // check should go back to failing.
+    'Looped-Network.php' => 'reached at librewaternet.org/app/, the site the Hydraulics menu now links to (Task 625)',
+];
 
 /** Prefixes whose menu entry is `<prefix>_menu` because they predate the `*_main_menu` convention. */
 const EC_LEGACY_MENU_KEY_PREFIXES = ['mi', 'mtc', 'wi'];

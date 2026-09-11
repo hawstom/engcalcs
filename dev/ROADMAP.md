@@ -51,6 +51,17 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     key and its row highlight; a checkbox that hides nothing is the embarrassment this removes.
     Erase everything still clears `lpn_show_titles` by literal. `page-titles-harness.js` is gone;
     `small-screen-harness.js` and `map-height-harness.js` lost the sections that measured it.
+  - **EMBARRASSMENT 1 CLOSED 2026-09-10:** the suite's Hydraulics menu and all eight "See also"
+    lines now read **LibreWaterNet.org** and link to `EC_LWN_APP_URL`, same tab, no link back --
+    Back is the way back, and a new tab destroys it. The label is a LITERAL, not a key: a domain
+    is the same in every language, so a key holding it would be byte-identical to English in 26
+    files and fail the build. `lpn_main_menu` ("Water Supply Network") is now read by nothing.
+    `Looped-Network.php` is declared in `EC_MENU_EXEMPT_CALCULATORS` -- that check's premise is
+    "no visitor can reach it", which is false for the page that IS librewaternet.org's front door.
+  - **THE MENU ICON LOST ITS CLOUDS 2026-09-10** and the favicon keeps its own; the fault was
+    placement, not weight, and Tom's own area-not-line idea was rendered and does not help.
+    **The favicon is SETTLED and emphatic** -- *"It's perfect. I am in love."* One colleague gave
+    it a thumbs up and another took it for his home town's water tower.
   - **STILL OPEN:** Help > About still points at EngCalcs' `About.php`, which is Tom's fourth
     embarrassment and needs the app's own words -- his call, not a mechanical edit. The
     `lpn_settings_show_titles*` and `lpn_hide_titles` keys are now unread in all 27 files and are

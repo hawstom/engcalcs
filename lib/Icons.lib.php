@@ -578,10 +578,25 @@ $ec_icons = array(
 		. '<path stroke-width="0.8" stroke-linecap="butt" d="M10.5 14.5V16.6"/>'
 		. '<path stroke-width="0.85" stroke-linecap="butt" d="M12 14.5V17.1"/>'
 		. '<path stroke-width="0.8" stroke-linecap="butt" d="M13.5 14.5V16.6"/>'
-		. '<path stroke-width="0.7" stroke-linecap="butt" d="M14.9 14.5V15.7"/>'
-		// The sky: open stratus bands in the flanks, at the favicon's own two cloud heights.
-		. '<path stroke-width="0.6" d="M1 5.5C1.92 4.95 2.38 4.95 3.3 5.5C4.22 4.95 4.68 4.95 5.6 5.5"/>'
-		. '<path stroke-width="0.6" d="M18.4 9C19.32 8.5 19.78 8.5 20.7 9C21.62 8.5 22.08 8.5 23 9"/>',
+		. '<path stroke-width="0.7" stroke-linecap="butt" d="M14.9 14.5V15.7"/>',
+	// **NO CLOUDS ON THIS GLYPH, AND THE FAVICON KEEPS ITS OWN** (Tom, 2026-09-10: *"the clouds
+	// don't work so great on the menu icon ... Remove the clouds"*). Two open stratus bands used to
+	// sit in the flanks here, at the favicon's own two cloud heights.
+	//
+	// **THE FAULT WAS PLACEMENT, NOT WEIGHT** (Ida, measured on real renders at 16/17/24/32 px,
+	// `dev/icon-preview/render/arms-review/`). They sat at shoulder height, one per side, roughly
+	// mirrored, beside a vertical silhouette whose roof already reads as a head and whose legs read
+	// as legs -- so gestalt completed them as ARMS whatever they were drawn like. His own second
+	// idea, making them AREA rather than LINE, was rendered and tested and does not help: area
+	// versus line is a value change and "arms" is a position problem. Raising them off the shoulder
+	// axis was tried too and is still marginal at menu size. Do not re-add them in any of those
+	// three forms.
+	//
+	// **AND THE FAVICON IS NOT THE SAME CASE, WHICH IS WHY IT IS UNTOUCHED.** There the clouds are
+	// filled ellipses sitting BEHIND the tank as sky; this glyph has no ground to fill, so the same
+	// idea could only become flanking strokes. Tom on the favicon, the same day: *"It's perfect. I
+	// am in love."* -- one colleague gave it a thumbs up and another took it for his home town's
+	// water tower. Settled; the two marks diverge on this one point and that is deliberate.
 
 	// FIRE HYDRANT -- drawn for Water > Fire flow at a hydrant (ROADMAP Task 530).
 	//

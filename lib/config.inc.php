@@ -108,6 +108,17 @@ $ec_canonical_origins = Array(
 );
 define('CANONICAL_ORIGIN_DEFAULT', 'https://librewaternet.org');
 
+// **WHERE THE SUITE SENDS SOMEBODY WANTING THE MAP** (ROADMAP Task 625, Tom 2026-09-10: *"Change
+// it to LibreWaterNet.org as label and link to it without a link back"*). A FULL URL and not a
+// path, because after the divorce this is a different product on a different site -- and because
+// the app's only address is the `/app/` rewrite, which exists on that host alone: a root-relative
+// `/app/` is dead on hawsedc.com, which is the same trap ecLanguageSwitchPath() exists for.
+//
+// **SAME TAB, NO `target="_blank"`.** The browser Back button is the path back and a new tab
+// destroys it. This suite reserves a new tab for genuine side-trips -- the licence, the screenshot
+// gallery, Not EPANET -- and the app is the destination, not a side-trip.
+define('EC_LWN_APP_URL', CANONICAL_ORIGIN_DEFAULT . '/app/');
+
 $ec_canonical_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
 if (($ec_colon = strpos($ec_canonical_host, ':')) !== false) {
     $ec_canonical_host = substr($ec_canonical_host, 0, $ec_colon);

@@ -103,3 +103,35 @@ is answered for the three that remain after the divorce; see item 5 series above
    geometry. Diagnosed 2026-09-10: the "arms" read is a shoulder-height mirrored-flank placement
    problem, not fixed by switching line to area (tested, still reads as stubs). See journal,
    2026-09-10.
+
+10. **Rename `lpn_help_icons` from "Toolbar" to "Toolbar key."** One string
+    (`lib/lang.ec.en.php:1157`). Fixes a real mislabeling — the row is a legend for the icon-only
+    toolbar, not a control over it — without touching its mechanism (`iconGuideRows()`, already
+    derived from `toolbarIconIndex`). Tom's own proposed name; I agree with it. See
+    `dev/help-menu-mastermind.md` §3.
+
+11. **Retire `lpn_notes_1_term`/`_def` and `lpn_notes_2_term`/`_def` from the `lpn_` Notes popup;
+    fold their substance ("how it is solved," "what is not modeled") into the About rewrite Task
+    625 already owes.** They are correct facts in the wrong genre of popup — product-scope
+    statements sitting among task-context notes. About's body is still entirely suite-wide
+    (`lib/lang.ec.en.php:543`) and needs exactly this kind of sentence once it describes the app
+    rather than the suite. See `dev/help-menu-mastermind.md` §1.
+
+12. **Add one outbound sentence from a rewritten `About.php` to LibreWaterNet.org — do not repoint
+    Help > About there, and do not rework LibreWaterNet.org into an About page.** Read the actual
+    site: it's a mission/recruiting page, tuned by its own CLAUDE.md to invite strangers over
+    several screens, not to answer "what is this" to someone already mid-task. Register mismatch
+    in both directions; the one-sentence bridge gets the benefit at near-zero cost. See
+    `dev/help-menu-mastermind.md` §2.
+
+13. **THE NEW THING — a way back to LibreWaterNet.org: a mono icon-only link at the FAR LEFT of
+    the menu bar, before File, not at upper right as Tom first proposed.** Convention (VS Code,
+    Figma, Docs) puts a product's own mark at far left, where the read starts; upper right on
+    this page is already the utility zone (Help, Language) — the wrong neighborhood for "leave
+    the document." Mono, not the colored favicon: color is for contexts where standing out is the
+    job (a tab, a share card); here it would recreate the menu-bar/toolbar salience imbalance
+    already diagnosed, a second time, against its own neighbors. ~40-50px against a measured
+    401px/1,364-1,918px menu-bar budget. Ranked above a Help-menu row for the same row, because a
+    Help row inherits Help's own proven discoverability ceiling and a "way back" cannot afford
+    that. If only one Help/way-back item ships before the demo, this is it. See
+    `dev/help-menu-mastermind.md` §5.
