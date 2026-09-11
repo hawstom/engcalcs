@@ -313,6 +313,7 @@ if ($type === "EngCalcsApp") :
 	}
 ?>
 EngCalcs.languages = <?=json_encode($ec_app_langs, JSON_UNESCAPED_UNICODE)?>;
+EngCalcs.lwnSiteUrl = <?=json_encode(EC_LWN_SITE_URL)?>;
 EngCalcs.langSwitchPath = <?=json_encode(ecLanguageSwitchPath(
 	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
 	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''))?>;

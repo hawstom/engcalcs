@@ -1154,7 +1154,13 @@ $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window.';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
-$ec_lang['lpn_help_icons']='Toolbar';
+// **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
+// The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
+// strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
+// strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
+// it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
+// key?"* The row earns its place; only the label was lying about what it is.
+$ec_lang['lpn_help_icons']='Toolbar key';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
 $ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';

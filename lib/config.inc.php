@@ -118,6 +118,10 @@ define('CANONICAL_ORIGIN_DEFAULT', 'https://librewaternet.org');
 // destroys it. This suite reserves a new tab for genuine side-trips -- the licence, the screenshot
 // gallery, Not EPANET -- and the app is the destination, not a side-trip.
 define('EC_LWN_APP_URL', CANONICAL_ORIGIN_DEFAULT . '/app/');
+// The SITE, not the app: where the map's own home mark goes (Task 625). A reader standing in the
+// application who wants to know what this project is has nowhere to go without it -- Tom:
+// *"No way to get back to LibreWaterNet.org from the map."*
+define('EC_LWN_SITE_URL', CANONICAL_ORIGIN_DEFAULT . '/');
 
 $ec_canonical_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
 if (($ec_colon = strpos($ec_canonical_host, ':')) !== false) {

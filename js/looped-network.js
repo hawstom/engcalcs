@@ -22129,7 +22129,7 @@ var EngCalcs = EngCalcs || {};
 			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
 			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
 			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
+			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar key', submenu: iconGuideRows },
 			{ separator: true },
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
 			// reports actually received are a wrong word or a bad number, and "Fix something" invites
@@ -22474,6 +22474,37 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
 		if (!bar) { return; }
 		bar.innerHTML = '';
+		// **THE WAY HOME, AT THE FAR LEFT, BEFORE File** (Task 625; Tom: *"No way to get back to
+		// LibreWaterNet.org from the map"*, and Ida's ranked first build).
+		//
+		// **FAR LEFT IS THE CONVENTION AND IT IS NOT A PREFERENCE.** Every application a reader
+		// has used puts the product mark in the top-left corner -- VS Code, Figma, Docs -- and
+		// this bar's right-hand end is already the utility zone, holding Help and now Language.
+		// Tom first said "upper right before the menus" and corrected himself to left on being
+		// shown the convention; do not move it back.
+		//
+		// **MONO, NOT COLOURED.** Ida measured the menu bar at 401 px of ink against the toolbar's
+		// 1,260 px and diagnosed that the eye already stops at the toolbar and never looks up. A
+		// coloured mark here would be a second salience problem bought to cure the first; it takes
+		// `currentColor` like every other glyph on the bar.
+		//
+		// **AN ANCHOR, NOT A BUTTON**, because it goes somewhere: middle-click, copy link address
+		// and open-in-new-tab all work, which is what a reader expects of a product mark and what
+		// a button silently refuses. Same tab on a plain click, so Back is the way back.
+		//
+		// Icon-only at every width, so the small-screen rule that hides `.lpn-menubar-word` has
+		// nothing to do here. The name is the domain, which needs no translation and therefore no
+		// key -- the same reasoning the suite's own Hydraulics menu row uses.
+		if (EngCalcs.lwnSiteUrl) {
+			var home = document.createElement('a');
+			home.id = 'lpn_menu_home';
+			home.className = 'lpn-menubar-item lpn-menubar-mark ec-help';
+			home.href = EngCalcs.lwnSiteUrl;
+			setLabel(home, 'water', '');
+			home.setAttribute('aria-label', 'LibreWaterNet.org');
+			home.title = 'LibreWaterNet.org';
+			bar.appendChild(home);
+		}
 		[
 			{ id: 'lpn_menu_file', icon: 'file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
