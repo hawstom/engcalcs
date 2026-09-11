@@ -287,7 +287,6 @@ console.log('--- the chrome this pass touches is still where the pass thinks it 
 const SRC = {
 	title: elFromSource('lib/HeadersFooters.lib.php', 'id="ec-page-title"', 'the page h1'),
 	welcome: elFromSource('lib/HeadersFooters.lib.php', 'id="ec-page-welcome"', 'the welcome line'),
-	desc: elFromSource('Looped-Network.php', 'id="ec-page-desc"', 'the page description'),
 	navbar: elFromSource('lib/Menus.lib.php', 'class="navbar navbar-expand-lg', 'the HawsEDC navbar'),
 	brand: elFromSource('lib/Menus.lib.php', 'class="navbar-brand"', 'the navbar brand'),
 	libre: elFromSource('lib/Menus.lib.php', 'class="ec-nav-libre"', 'the Libre Software mark')
@@ -358,13 +357,11 @@ ok('...and its 24-hour clock, so this is an extended-period run', STOPS.length =
 // The page as the browser assembles it.
 const html = node('html');
 const body = node('body', '', [], html);
-const navbar = fromSrc(SRC.navbar, body);
-const brandgroup = node('span', '', ['ec-brandgroup'], navbar);
-const brand = fromSrc(SRC.brand, brandgroup);
-const libre = fromSrc(SRC.libre, brandgroup);
-const h1 = fromSrc(SRC.title, body);
-const welcome = fromSrc(SRC.welcome, body);
-const desc = fromSrc(SRC.desc, body);
+// **THE APP BODY CARRIES NO SUITE CHROME AT ALL** (Task 625, 2026-09-10). It used to be built
+// here with the navbar, the brand, the Libre mark, the h1, the welcome line and the page
+// description, so the phone pass could assert each one was hidden or shrunk below 640px. The page
+// emits none of them at any width now. The OTHER fifteen calculators' body below still does, and
+// it still asserts that none of this leaked onto them -- which is the half that can still break.
 const menubar = adopt(stub.byId.lpn_menubar, body);
 const toolbar = adopt(stub.byId.lpn_toolbar, body);
 node('svg', 'lpn_canvas', [], body);
@@ -419,25 +416,12 @@ function bothWays(label, n, ids) {
 	ok('...' + label + ' is UNTOUCHED on the desktop', !hiddenAt(RULES, n, WIDE, ids));
 }
 
-console.log('\n--- 1. the page titles ---');
-bothWays('the page h1', h1, DOC_IDS);
-bothWays('the welcome line', welcome, DOC_IDS);
-bothWays('the page description', desc, DOC_IDS);
-
-console.log('\n--- 2. the navbar is COLLAPSED, not hidden (Tom: "hide or at least collapse") ---');
-// Hiding it outright would take the language picker and the other fifteen calculators off the
-// phone, which are the only routes to either. So the assertion is that its HEIGHT goes and it
-// itself stays -- and that is a different question from display:none, asked differently.
-ok('the navbar itself is still there on a small screen', !hiddenAt(RULES, navbar, SMALL, DOC_IDS));
-ok('...with its vertical padding taken away',
-	declaredAt(RULES, navbar, SMALL, DOC_IDS, 'padding-top') === '0' &&
-	declaredAt(RULES, navbar, SMALL, DOC_IDS, 'padding-bottom') === '0');
-ok('...and nothing of the sort on the desktop',
-	declaredAt(RULES, navbar, WIDE, DOC_IDS, 'padding-top') === null);
-ok('the brand is shrunk, not removed', !hiddenAt(RULES, brand, SMALL, DOC_IDS) &&
-	declaredAt(RULES, brand, SMALL, DOC_IDS, 'font-size') !== null);
-ok('...and is its full size on the desktop', declaredAt(RULES, brand, WIDE, DOC_IDS, 'font-size') === null);
-bothWays('the Libre Software wordmark', libre, DOC_IDS);
+// **SECTIONS 1 AND 2 WENT WITH THE DIVORCE** (Task 625, 2026-09-10). They asserted that the h1,
+// the welcome line and the page description were hidden below 640px, and that the suite navbar
+// was collapsed rather than removed so the phone kept its language picker. The app page emits
+// neither the headings nor the navbar at ANY width now, and the language picker moved into the
+// app's own menu bar -- so both assertions were about markup that no longer exists. The concern
+// they protected is untouched and is asserted below: what may never be hidden at any width.
 
 console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 {
@@ -475,7 +459,9 @@ console.log('\n--- 4. the menu bar drops to icons ---');
 	const items = menubar.children;
 	// FIVE since 2026-08-27: File, Edit, Map, Water, Help. Insert was deleted and its asset rows are
 	// a submenu of Water (Task 543).
-	ok('the real menu bar was built', items.length === 5, items.length + ' menus');
+	// SIX, not five: the Language menu joined the bar when the suite navbar took its picker away
+	// (Task 625). Insert went in 2026-08-27 and its rows are a submenu of Water.
+	ok('the real menu bar was built', items.length === 6, items.length + ' menus');
 	items.forEach((b) => {
 		const name = b.el.getAttribute('aria-label');
 		const word = b.children.filter((c) => c.cls.indexOf('lpn-menubar-word') >= 0)[0];
@@ -1036,8 +1022,14 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	const jsSrc = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
 	const jsQuery = /matchMedia\('\(max-width:\s*(\d+)px\)'\)/.exec(jsSrc);
 	ok('js/looped-network.js decides "small screen" with a max-width media query', !!jsQuery);
-	const titleRule = RULES.find((r) => /#ec-page-title/.test(r.sel) && r.media.some((m) => /max-width/.test(m)));
-	const cssPx = titleRule && /max-width:\s*(\d+)px/.exec(titleRule.media.join(' '));
+	// **ANCHORED ON THE TOOLBAR RULE, NOT THE PAGE-TITLE ONE** (Task 625). It used to read Tom's
+	// item 1, the `#ec-page-title` rule that started the phone pass; the divorce deleted that rule
+	// with the markup, and a `find()` returning undefined would have made this check pass by
+	// measuring nothing had the assertion been written the other way round. Item 3, the toolbar
+	// collapse, is now the first rule in the block and is the app's own chrome, so it cannot go
+	// the same way without somebody noticing.
+	const firstRule = RULES.find((r) => /#lpn_toolbar/.test(r.sel) && r.media.some((m) => /max-width/.test(m)));
+	const cssPx = firstRule && /max-width:\s*(\d+)px/.exec(firstRule.media.join(' '));
 	ok('...at the same breakpoint the phone pass itself lives at',
 		!!(jsQuery && cssPx && jsQuery[1] === cssPx[1]),
 		'js ' + (jsQuery && jsQuery[1]) + ' vs css ' + (cssPx && cssPx[1]));

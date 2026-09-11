@@ -3154,26 +3154,10 @@ tr.lpn-ff-error { background: #f2f2f2; }
    selected here. */
 @media (max-width: 640px) {
 
-	/* 1. THE PAGE TITLES. The h1, the welcome line and the page description -- the same three ids
-	   the "Show page titles" preference already takes away (Task 289), so a phone simply gets that
-	   preference's answer without having to find the switch. Above the breakpoint the preference
-	   still governs and this rule is not in play. */
-	html:has(#lpn_canvas) #ec-page-title,
-	html:has(#lpn_canvas) #ec-page-welcome,
-	html:has(#lpn_canvas) #ec-page-desc { display: none; }
-
-	/* 2. THE NAVBAR IS COLLAPSED, NOT HIDDEN, and Tom's own wording allows either ("hide or at
-	   least collapse"). Bootstrap has already folded it to one row here -- brand, Libre mark,
-	   hamburger -- and what is behind that hamburger is the only route on the page to the other
-	   fifteen calculators AND to the language picker, which on a 27-language suite is not a thing
-	   to take away from the one device where a reader is most likely to be in their own country.
-	   So the height goes and the routes stay: the bar's own vertical padding to nothing, the brand
-	   to body size, and the "Libre Software" wordmark away (it already goes at 400px suite-wide --
-	   this brings that forward on this page only, where the row is competing with a drawing
-	   surface). Measured against Bootstrap's defaults this is most of the bar's height. */
-	html:has(#lpn_canvas) .navbar { padding-top: 0; padding-bottom: 0; }
-	html:has(#lpn_canvas) .navbar-brand { font-size: 1rem; padding-top: 0.1rem; padding-bottom: 0.1rem; }
-	html:has(#lpn_canvas) .ec-nav-libre { display: none; }
+	/* 1 AND 2 ARE GONE WITH THE DIVORCE (Task 625, 2026-09-10). This block used to hide the h1,
+	   the welcome line and the page description on a phone, and to shrink the suite navbar. The
+	   app page emits none of those at any width now, so both rules styled nothing. What SURVIVES
+	   below is everything that is the app's own chrome. */
 
 	/* 3. THE TOOLBAR KEEPS THE TRANSPORT AND NOTHING ELSE. `.lpn-transport-btn` is the class
 	   js/lpn-time.js puts on the three player controls and only on them, so this is the same line

@@ -6,42 +6,18 @@ $html_desc = $ec_lang['lpn_main_desc'];
 // That box names a calculation and puts the name in the URL, which is exactly right for a
 // form-and-an-answer page and meaningless here: an lpn project is saved to a FILE or to the browser
 // library, and File > Save is the control that does it.
-echoHeader("EngCalcs", $html_title, "", false);
+// **"EngCalcsApp": THE SUITE NAVBAR AND THE H1/WELCOME BLOCK ARE SUPPRESSED** (Task 625). This
+// page has its own menu bar, toolbar and tab strip; the suite's navbar made a fourth, carried a
+// SECOND Help menu, and its Install and language picker are the two doors that moved rather than
+// went (Help > Install app, and the Language menu, both built in js/looped-network.js).
+echoHeader("EngCalcsApp", $html_title, "", false);
 ?>
-<h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?>
-<?php // THE LINK RIDES ON THE THING IT HIDES (Tom's 2026-09-08 worklist: *"Can the LPN main page
-      // titles have a link to 'Hide these titles'?"*). Inside the <h2>, so it goes away with the
-      // headings and cannot become a control pointing at nothing. It is a plain link with NO title
-      // attribute: js/Calculators.lib.js activates a tap tooltip only on a help wrapper, so a tip
-      // parked here would simply navigate on a touch (link_title_check.php). The explanation is in
-      // the Settings row it opens, which is the second half of what he asked for. ?>
- <a id="lpn_hide_titles" class="lpn-hide-titles" href="#"><?=$ec_lang['lpn_hide_titles']?></a></h2>
-<script>
-// ROADMAP Task 289. PLACEMENT IS LOAD-BEARING: this runs AFTER the three elements it hides, so
-// getElementById can find them. It first ran before the <h2>, which parses below it, so the page
-// description reappeared on every reload while the heading and welcome line hid correctly -- a
-// null return from getElementById looks exactly like success. Fixed 2026-08-12; dev/lpn-spike/
-// page-titles-harness.js now fails if this block is ever moved above an element it names.
-//
-// Inline and immediate rather than from js/looped-network.js at DOMContentLoaded, because the
-// preference is paint-critical: reading it later means somebody who turned the titles off watches
-// them flash on every load, on the page the setting exists to give room to. The DOMContentLoaded
-// pass below is a BACKSTOP, not the mechanism -- it costs nothing when the first pass worked and
-// it means a future reordering degrades to a flash instead of to silence.
-(function () {
-	function applyStoredTitleVisibility() {
-		try {
-			if (localStorage.getItem('lpn_show_titles') !== '0') { return; }
-			['ec-page-title', 'ec-page-welcome', 'ec-page-desc'].forEach(function (id) {
-				var el = document.getElementById(id);
-				if (el) { el.style.display = 'none'; }
-			});
-		} catch (e) { /* storage blocked -- titles stay visible, which is the safe direction */ }
-	}
-	applyStoredTitleVisibility();
-	document.addEventListener('DOMContentLoaded', applyStoredTitleVisibility);
-}());
-</script>
+<?php // **NO PAGE TITLES HERE ANY MORE** (Task 625). The h2 description, the "Hide these titles"
+      // link and the inline visibility script that used to stand here are gone with the suite
+      // chrome, and so is the Settings row that toggled them: a control that hides nothing is
+      // worse than no control. $html_desc still feeds <meta name="Description"> and og:description
+      // from echoHTMLHead(), which is where a search engine reads it -- nothing about discovery
+      // depended on the words being painted over the map. ?>
 
 <?php
 // The "View printable" wiring that used to sit here has been REMOVED (2026-08-06). It was copied
@@ -2017,6 +1993,9 @@ EngCalcs.pageConfig = {
 	lpn_ff_err_unknown: <?=json_encode($ec_lang['lpn_ff_err_unknown'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_not_epanet: <?=json_encode($ec_lang['lpn_help_not_epanet'])?>,
+<?php // Help > Install, the door that moved off the suite navbar with the divorce (Task 625).
+      // The suite's own key, already translated, rather than a new string before the freeze. ?>
+	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
 	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already

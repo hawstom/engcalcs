@@ -33,57 +33,29 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     three answers, and one of them did not see a water tower at all. Keep collecting; a fourth
     reader who does not see a tower is the signal that would reopen the drawing.
 
-- 100|625| **[H] Divorce the app page from EngCalcs chrome; give it its own.**
-  Tom, 2026-09-10, listing four embarrassments and then deciding: *"Bye bye engcalcs titles and
-  navbar. Divorce engcalcs completely and put language menu in our app chrome navbar."* On the
-  tagline being fussed over instead: *"That is straining at a gnat and swallowing a camel, the
-  titles as a whole."*
-  - **HIS FOUR, AND ONE DECISION SETTLES THREE.** (1) **Two Help menus** on one page -- the suite
-    navbar's (About / Install / Contact) and the app's (Walkthroughs / Notes on this page /
-    Toolbar). (2) The EngCalcs titles. (3) **Four bars of chrome**: tabs, toolbar, menu, EngCalcs.
-    (4) **Help > About is EngCalcs' About**, not the app's. Removing the suite navbar takes the
-    second Help and one bar with it, so (2) subsumes (1) and (3); (4) is then owed a new row.
-  - **THE SEO FEAR IS MEASURED AND IT IS SMALL** (his: *"I'm too honest to use LibreEPANET.org ...
-    So how is anybody going to find this project?"*). `dev/usage-data-log.md`, Search Console
-    2026-09-07: **`Looped-Network.php` is indexed and invisible -- 9 URL variants, 62 impressions,
-    2 clicks**, `?lang=en` at position 33.8, every "network" query zero clicks, against site totals
-    of 6,770 clicks. **The EngCalcs titles on that page earn about 2 clicks a quarter.** Deleting
-    them costs nothing measurable.
-  - **NO H1 AT ALL. TOM OVERRULED THE ADVICE TO REPLACE IT, 2026-09-10, AND HE IS RIGHT.** This
-    bullet used to read "replace the H1, do not delete it". His argument: *"app.epanetjs.com has
-    no h1. I think the paradigm here must be that this is not a storefront page."* **Verified the
-    same day: the served HTML of `app.epanetjs.com` contains no `<h1>`.** The rule that a page
-    needs one is a rule about DOCUMENTS, and the divorce is precisely what makes this not a
-    document -- librewaternet.org is the storefront and carries the headings; `/app/` is the
-    application. Applying a storefront rule to an app shell is how the four embarrassments got
-    there. Discovery was never this page's own title: it is the calculators that DO rank, linking
-    in, plus the people Tom reaches by hand. **Keep those inbound links; they are the funnel.**
-  - **IDA'S PLAN IS `dev/app-chrome-postdivorce-recommendations.md`; TOM RULED ON IT 2026-09-10.**
-    **Approved:** Help gains one row, `Install app`, and KEEPS the exact label "Help" (visitor copy
-    says "use Help", which needs one menu owning the name); Language last, right of Help, reusing
-    the suite navbar's existing 27-row widget (*"I strongly agree about re-routing"*); a
-    responsive merge above ~1750 px, after the demo; transport STAYS on the toolbar (*"It's not
-    conventional, mainly"*).
-  - **HER "DO THIS FIRST" -- unify the two bars by paint -- IS CHALLENGED AND THE CSS BACKS TOM.**
-    *"Do you mean just pushing them closer together? There is no line. They already look like a
-    set."* Measured: `#lpn_menubar` has no background and no border, and the only hairline in the
-    region is `#lpn_toolbar`'s `border-bottom`, which divides the TOOLBAR from the TAB STRIP. The
-    two bars already sit on one background separated by 4 px of margin. **So the paint is already
-    unified and cannot be the cause of "the eye stops at the toolbar and never looks up"** -- the
-    live candidates are 1,260 px of saturated icon ink against 401 px of plain text, and menu
-    items that are `background: none; border: 1px solid transparent` until hover, so they do not
-    read as controls at rest. Re-diagnosis requested.
-  - **NO ALWAYS-MERGED ROW. MEASURED, THEN CONFIRMED BY EYE.** Menu-bar ink 401 px + toolbar ink
-    1,260 px = ~1,660 px, against 1,918 / 1,438 / 1,364 px of row at this project's three
-    reference viewports: it fits at 1920 and is 220 and 296 px short at 1440 and 1366. Tom,
-    shown the numbers: *"True. I can see that visually. It would be tight."* The toolbar's
-    bounding box LIES -- `.lpn-toolbar-end`'s `margin-left: auto` stretches it to the full row --
-    so measure ink, never the box.
-  - **TRANSPORT IS ON THE TOOLBAR, NOT IN A BOTTOM PANE** (`lpn_toolbar_run`). CLAUDE.md said
-    bottom pane until 2026-09-10 and sent a design brief off on the wrong control.
-  - **THE LANGUAGE SWITCHER MOVES, IT DOES NOT GO** (his instruction); hreflang and `ec_language`
-    still apply. Read `dev/chrome-audit.md` first: 314 px above the map (31.3%, not the two-thirds
-    claimed), 143 px of it title block, growing to 52.1% at 1366x768 where the H1 and H2 wrap.
+- 60|625| **[H] BUILT: the app page divorced from EngCalcs chrome. Remainder below.**
+  **SHIPPED 2026-09-10.** `echoHeader("EngCalcsApp", ...)` is a new type: the eight-character
+  prefix test still gives it engcalcs.css, Cookies.lib.js and Calculators.lib.js, and it suppresses
+  `echoEngCalcsMenu()` and the H1/welcome block. The page's own `<h2 id="ec-page-desc">`, the
+  "Hide these titles" link and the inline visibility script went with them. **NO H1 at all**, on
+  Tom's ruling. The other 15 calculators are untouched -- verified by rendering both.
+  - **THE TWO DOORS MOVED RATHER THAN WENT.** Help gained **Install** (prompts natively when
+    `beforeinstallprompt` fired, else opens Install.php; reuses the translated `install_main_menu`
+    rather than minting a string before the freeze), and the **Language** menu is now last on the
+    app menu bar, right of Help, per Ida. Its 27 rows come from `EngCalcs.languages`, emitted for
+    this page only, and each row carries its own `lang` -- which needed new support in `openMenu()`,
+    since it silently ignored the attribute. **The href is `ecCanonicalPath()`, never
+    `location.pathname`**: under the `/app/` rewrite that is the script, and Tom landed on the
+    other host's script path from the navbar's own picker on 2026-09-10.
+  - **THE PAGE-TITLE TOGGLE IS DELETED, not stranded** -- 92 lines, its Settings row, its storage
+    key and its row highlight; a checkbox that hides nothing is the embarrassment this removes.
+    Erase everything still clears `lpn_show_titles` by literal. `page-titles-harness.js` is gone;
+    `small-screen-harness.js` and `map-height-harness.js` lost the sections that measured it.
+  - **STILL OPEN:** Help > About still points at EngCalcs' `About.php`, which is Tom's fourth
+    embarrassment and needs the app's own words -- his call, not a mechanical edit. The
+    `lpn_settings_show_titles*` and `lpn_hide_titles` keys are now unread in all 27 files and are
+    his call to delete. Ida's remaining ranked items are the responsive merge above ~1750 px and
+    her first-visit cue at the toolbar (`dev/app-chrome-postdivorce-recommendations.md`).
 
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable

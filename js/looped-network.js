@@ -17152,7 +17152,11 @@ var EngCalcs = EngCalcs || {};
 			// help bubble dismissed, and this button's promise of "exactly as a brand-new visitor
 			// would see it" was false by one key. That is the same defect the note above records
 			// for lpn_rpane and lpn_setbox, which is why this list keeps naming its own misses.
-			PAGE_TITLES_KEY, AREA_HINT_KEY];
+			// **'lpn_show_titles' IS A LITERAL BECAUSE NOTHING WRITES IT ANY MORE** (Task 625). The
+			// page-title toggle went with the titles; a browser that used it before still carries
+			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
+			// Erasing a key we no longer write is the one direction that is always safe.
+			'lpn_show_titles', AREA_HINT_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -21449,6 +21453,11 @@ var EngCalcs = EngCalcs || {};
 			// A menu row is its own click target, so the tip goes straight on it as a title matched to
 			// .ec-help for touch -- the same pattern the toolbar buttons use.
 			if (r.tip) { b.title = r.tip; b.className += ' ec-help'; }
+			// **A ROW WHOSE TEXT IS NOT IN THIS PAGE'S LANGUAGE HAS TO SAY SO** (Task 625). The
+			// language menu's rows are each written in their own language, so without this a screen
+			// reader pronounces all 27 with the current page's phonetics -- the same reason the
+			// suite navbar's picker sets it. No `dir`: an RTL name would re-align an LTR row.
+			if (r.lang) { b.lang = r.lang; }
 			b.disabled = !!r.disabled;
 			if (r.submenu) {
 				// The universal marker for "there is more this way". Directional, so it wants a
@@ -22148,12 +22157,59 @@ var EngCalcs = EngCalcs || {};
 			// **THE ORDER OF THIS MENU IS TOM'S OWN, 2026-09-06**, given as a numbered list: the
 			// two rows that leave for another SITE sit below the legal block rather than at the
 			// top. Task 596 had put Not EPANET above that separator; this supersedes it.
+			// **THE INSTALL DOOR, WHICH MOVED RATHER THAN WENT** (Task 625). It used to be the suite
+			// navbar's `#ec-install-btn` plus a Help > Install.php row, and the divorce took the
+			// navbar with both. Ida's ranked advice put one row here, beside the other two that
+			// leave for somewhere else.
+			//
+			// **IT PROMPTS WHEN THE BROWSER WILL LET IT AND EXPLAINS WHEN IT WILL NOT.** The
+			// deferred `beforeinstallprompt` event is captured on EngCalcs itself
+			// (js/Calculators.lib.js), not on the button that is now gone, so the native prompt is
+			// still reachable; Install.php is the answer everywhere that never fires one, which is
+			// every iOS browser and every already-installed window. One row, because a visitor
+			// wanting to install does not care which of those two they are.
+			//
+			// Reuses `install_main_menu`, already written and already in 26 languages, rather than
+			// minting a string days before a translation freeze.
+			{ icon: 'install', label: pc.install_main_menu || 'Install',
+				fn: function () {
+					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
+					window.open('Install.php', '_blank', 'noopener');
+				} },
 			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) },
 			{ separator: true },
 			// About last, where every other Help menu in the world puts it.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: ext('About.php') }
 		]);
+	}
+
+	// **ONE ROW PER LANGUAGE, AND EACH DECLARES ITS OWN** (Task 625). The rows come from
+	// `EngCalcs.languages`, emitted by echoHTMLHead() for this page alone, so there is one list and
+	// not a second copy of `$all_language_settings` written in JavaScript.
+	//
+	// **THE HREF IS THE PAGE'S CANONICAL ADDRESS AND IS COMPUTED IN PHP.** Never `location.pathname`
+	// here: under the `/app/` rewrite that is the script, and a switch built from it moves the
+	// reader off `librewaternet.org/app/` onto the other host's script path. Tom hit that on
+	// 2026-09-10 with the navbar's own picker; `ecCanonicalPath()` is the fix and it is a
+	// DECLARATION, because a rewrite is not invertible.
+	//
+	// `lang` on each row for the reason the navbar states: the name is written in its own language,
+	// so without it a screen reader pronounces all 27 with this page's phonetics. No `dir` -- an
+	// RTL name would re-align an LTR row.
+	function openLangMenu(anchor) {
+		var path = String(EngCalcs.langSwitchPath || ''),
+			rows = (EngCalcs.languages || []).map(function (l) {
+				return {
+					label: l.name,
+					lang: l.code,
+					// No tick on the current row: the menu BUTTON already carries this language's
+					// own name, which is what the navbar's picker did too, so a marker inside would
+					// say the same thing twice.
+					fn: function () { window.location.href = path + '?lang=' + encodeURIComponent(l.code); }
+				};
+			});
+		openMenu(anchor, rows);
 	}
 
 	// The Notes, revealed. Centred rather than hung off the menu button, because this is a column of
@@ -22448,7 +22504,15 @@ var EngCalcs = EngCalcs || {};
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
 			// the home for the things that currently have none -- EPANET solver notes, keyboard
 			// shortcuts, "report a problem".
-			{ id: 'lpn_menu_help', icon: 'help', label: pc.lpn_menu_help || 'Help', open: openHelpMenu }
+			{ id: 'lpn_menu_help', icon: 'help', label: pc.lpn_menu_help || 'Help', open: openHelpMenu },
+			// **THE LANGUAGE PICKER MOVED HERE WHEN THE SUITE NAVBAR WENT** (Task 625, Tom: *"put
+			// language menu in our app chrome navbar"*). LAST, right of Help, which is Ida's ranked
+			// advice and where every navbar in this suite already put it.
+			//
+			// Its label is the CURRENT language's own name, exactly as the navbar's was, so the
+			// control says which language you are in before it says what it does.
+			{ id: 'lpn_menu_lang', icon: 'globe',
+				label: EngCalcs.langCurrentName || 'Language', open: openLangMenu }
 		].forEach(function (m) {
 			var b = document.createElement('button'), word;
 			b.type = 'button';
@@ -22967,7 +23031,6 @@ var EngCalcs = EngCalcs || {};
 		wireSettingsBox();
 		wireLibraryBox();
 		wireAreaHint();
-		wireHideTitlesLink();
 		wireFireFlowBox();
 		wireEnergyBox();
 		wireScenarioCompareBox();
@@ -25980,98 +26043,13 @@ var EngCalcs = EngCalcs || {};
 	// tabs had no horizontal room; it is the wrong one inside a two-pane box whose left pane IS the
 	// navigation. Tom, 2026-08-18: "No need ever to collapse; just scroll/jump to your section."
 
-	// ---- Page-title visibility (ROADMAP Task 289) ----
-	// THE FIRST SETTING ON THIS PAGE THAT IS NOT PART OF THE PROJECT. Whether the heading above the
-	// drawing is showing is about the window the person is sitting in front of, and carrying it
-	// inside a project file would make a colleague opening your work inherit your screen preference.
-	// It lives in localStorage, per browser, and serializeProject() must never learn about it. The
-	// label says "Saved in this calculator": the distinction that matters is project vs
-	// everywhere-else, not localStorage vs a file.
-	var PAGE_TITLES_KEY = 'lpn_show_titles';
-	function pageTitlesShown() {
-		try { return localStorage.getItem(PAGE_TITLES_KEY) !== '0'; } catch (e) { return true; }
-	}
-	function applyPageTitles(show) {
-		// The h2 page description goes with them (Tom, 2026-08-12): with the box unchecked he wants
-		// the calculator's own toolbar to sit directly under the site navbar, and a lone subtitle
-		// floating where the heading used to be is worse than either state.
-		['ec-page-title', 'ec-page-welcome', 'ec-page-desc'].forEach(function (id) {
-			var el = document.getElementById(id);
-			// Not display:none -- these are already d-print-none, and hiding them for the screen
-			// must not change what a print does.
-			if (el) { el.style.display = show ? '' : 'none'; }
-		});
-	}
-	function setPageTitlesShown(show) {
-		try { localStorage.setItem(PAGE_TITLES_KEY, show ? '1' : '0'); } catch (e) {}
-		applyPageTitles(show);
-		// **AND THE MAP TAKES THE ROOM BACK** (Tom, 2026-08-23: *"When I toggle the page titles, the
-		// height of the map doesn't respond. Turning them off creates an empty space (gap) below the
-		// map that doesn't resolve until a page reload."*). applyMapHeight() sizes the canvas from
-		// `body.bottom - svg.bottom`, and hiding three headings moves the svg up without changing
-		// that stored height -- so the gap is the height the headings used to occupy, still being
-		// reserved by a number nobody recalculated.
-		//
-		// This does NOT contradict the standing "no applyMapHeight() here" note on opening a project.
-		// That one says the bottom of the map does not depend on the MODEL. This is the ENVIRONMENT
-		// changing -- the same class of event as a window resize, which has always called it.
-		applyMapHeight();
-	}
-	// ---- "Hide these titles", the link that rides on the headings (Tom's 2026-09-08 worklist) -------------
-	//
-	// Tom, 2026-09-08: *"Can the LPN main page titles have a link to 'Hide these titles'? And maybe
-	// that link opens up settings to the Map and page heading with the Show page titles label
-	// temporarily highlighted and the box newly unchecked?"* Built exactly as he described it, and
-	// the second half is the part that matters: the link is a one-way switch, so on its own it
-	// would teach a reader that the headings can go and nothing at all about getting them back.
-	// Throwing the switch AND opening the box at the row that holds it makes one gesture do both.
-	//
-	// **THE HIGHLIGHT IS TRANSIENT AND MUST STAY THAT WAY.** A sticky mark on a settings row is a
-	// second piece of state nobody asked for, still shining next week at somebody who never used
-	// this link. It goes on a timer, and any press inside the box takes it off early -- the reader
-	// has found the row, which is the whole job.
-	//
-	// **TWO MINUTES, NOT FOUR SECONDS** (Tom, 2026-09-09, watching a first-time user: *"we need to
-	// leave the Titles toggle highlight on longer. 2 minutes can go by very fast when you are
-	// shopping or learning."*). Four seconds is a confirmation flash and this is not one: the mark
-	// exists to be FOUND, by somebody who has just been dropped into a settings box they have never
-	// opened and has to read down it. A reader who looks away, reads the tip, scrolls the pane or
-	// simply thinks had lost the row before they looked back.
-	//
-	// It costs nothing to be generous here because the early exit does the real work -- the first
-	// press anywhere inside the box clears it, so anybody who has found the row stops seeing the
-	// mark immediately, and the only reader who watches it for the full two minutes is one who is
-	// still looking. That is the reader it is for.
-	var pageTitlesRowEl = null;
-	var LPN_ROW_FLASH_MS = 120000;
-	var pageTitlesFlashTimer = null;
-	function clearPageTitlesFlash() {
-		if (pageTitlesFlashTimer) { clearTimeout(pageTitlesFlashTimer); pageTitlesFlashTimer = null; }
-		if (pageTitlesRowEl && pageTitlesRowEl.classList) {
-			pageTitlesRowEl.classList.remove('lpn-set-row-flash');
-		}
-	}
-	function flashPageTitlesRow() {
-		if (!pageTitlesRowEl || !pageTitlesRowEl.classList) { return; }
-		clearPageTitlesFlash();
-		pageTitlesRowEl.classList.add('lpn-set-row-flash');
-		pageTitlesFlashTimer = setTimeout(clearPageTitlesFlash, LPN_ROW_FLASH_MS);
-	}
-	function hideTitlesAndShowTheSwitch() {
-		setPageTitlesShown(false);
-		// AFTER the switch, because openSettingsBox() rebuilds the box and the checkbox is drawn
-		// from pageTitlesShown(): opened first, it would show ticked and then be wrong.
-		openSettingsBox('page');
-		flashPageTitlesRow();
-	}
-	function wireHideTitlesLink() {
-		var a = document.getElementById('lpn_hide_titles'), box;
-		if (a) {
-			a.addEventListener('click', function (e) { e.preventDefault(); hideTitlesAndShowTheSwitch(); });
-		}
-		box = setboxEl();
-		if (box) { box.addEventListener('pointerdown', clearPageTitlesFlash); }
-	}
+	// **PAGE TITLES ARE GONE, AND SO IS THE SWITCH THAT HID THEM** (Task 625, 2026-09-10).
+	// Task 289's visibility toggle, its `lpn_show_titles` key, the "Hide these titles" link and
+	// the two-minute row highlight that pointed at it all lived here. The app page no longer
+	// emits `ec-page-title`, `ec-page-welcome` or `ec-page-desc` at all, so the control hid
+	// nothing -- and a checkbox that does nothing is the embarrassment the divorce removes,
+	// not a harmless leftover. The `lpn_settings_show_titles*` and `lpn_hide_titles` language
+	// keys are now unread in all 27 files and are Tom's call to delete, never a bulk sweep.
 	// ---- Whether the selection bubble is shown at all (Tom's 2026-09-08 worklist) -------------------------
 	//
 	// Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this'
@@ -26573,15 +26551,6 @@ var EngCalcs = EngCalcs || {};
 		// every setting back, the other empties the calculator entirely -- and a foot of actions
 		// under no heading at all was the last thing in the box with no answer to "where am I".
 		note(pageBody, pc.lpn_settings_page_note || 'Saved in this calculator, not in the project.');
-		var titlesInput = document.createElement('input');
-		titlesInput.type = 'checkbox';
-		titlesInput.checked = pageTitlesShown();
-		titlesInput.addEventListener('change', function () { setPageTitlesShown(titlesInput.checked); });
-		// **HELD, because the Hide these titles link has to point AT this row** (Tom's 2026-09-08 worklist). The box
-		// is rebuilt on every open, so the element the link flashes has to be the one this build
-		// just made; a reference captured any earlier is stale by the time the box is on screen.
-		pageTitlesRowEl = row(pageBody, pc.lpn_settings_show_titles || 'Show page titles',
-			titlesInput, pc.lpn_settings_show_titles_tip);
 		// **THE WAY BACK FOR THE SELECTION BUBBLE** (Tom's 2026-09-08 worklist, which asked for a
 		// 'Show this' checkbox on the bubble itself). A checkbox that hides the box it lives in
 		// cannot undo itself, so the switch needs a second home that is still there afterwards --

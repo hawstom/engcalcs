@@ -13,6 +13,18 @@ function echoHeader($type="normal", $html_title = "", $html_head = "", $show_nam
     case "engcalcs":
             echoHTMLHead("EngCalcs", $html_title, $html_head, $show_name_field);
       break;
+    // **THE APP PAGE IS NOT A CALCULATOR PAGE AND STOPPED WEARING ITS CHROME** (ROADMAP Task 625,
+    // Tom 2026-09-10: *"Bye bye engcalcs titles and navbar."*). Same suite: the prefix test below
+    // is eight characters, so this type still gets engcalcs.css, Cookies.lib.js and
+    // Calculators.lib.js. What it does NOT get is echoEngCalcsMenu() and the H1/welcome block.
+    //
+    // **NO H1 AT ALL, AND THAT IS DELIBERATE.** Tom overruled the advice to carry a LibreWaterNet
+    // one: *"app.epanetjs.com has no h1. I think the paradigm here must be that this is not a
+    // storefront page."* Verified against that site the same day. librewaternet.org is the
+    // storefront and carries the headings; this is the application.
+    case "engcalcsapp":
+            echoHTMLHead("EngCalcsApp", $html_title, $html_head, $show_name_field);
+      break;
   }
 }
 /****************************************************************************************************************/
@@ -253,14 +265,19 @@ if (substr($type, 0, 8) === "EngCalcs") {
 <script src="/engcalcs/js/Cookies.lib.js?v=<?=filemtime(__DIR__.'/../js/Cookies.lib.js')?>"></script>
 <script src="/engcalcs/js/Calculators.lib.js?v=<?=filemtime(__DIR__.'/../js/Calculators.lib.js')?>"></script>
 <?php
-echoEngCalcsMenu($html_title, $show_name_field, $calc_name);
+// The app page carries its own chrome and none of the suite's (Task 625). Its language switcher is
+// the one thing that MOVED rather than went -- js/looped-network.js builds it into the app menu
+// bar -- so hreflang and ec_language are untouched by this.
+if ($type !== "EngCalcsApp") { echoEngCalcsMenu($html_title, $show_name_field, $calc_name); }
 endif;
 ?>
+<?php if ($type !== "EngCalcsApp") : ?>
 <?php // The ids are what ROADMAP Task 289's "Show page titles" toggle hides on Looped-Network.
       // Given here rather than found by tag name so the toggle cannot start hiding some other
       // page's first heading if this markup ever moves. Harmless everywhere else. ?>
 <h1 id="ec-page-title" class="d-print-none"><?=$html_title?></h1>
 <p id="ec-page-welcome" class="d-print-none ec-welcome"><?=$ec_lang['template_welcome']?></p>
+<?php endif; ?>
 <script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;
 <?php // The single source of icon geometry, shared with PHP's ecIcon() (Task 231). JS-built
       // chrome builds its <svg> from these same strings; a path redrawn in JS would be a
@@ -271,7 +288,32 @@ EngCalcs.iconOpenTag = <?=json_encode(EC_ICON_OPEN_TAG)?>;
       // <select>'s option value is 'ft'; this table is the only thing that turns that into
       // 3.280839895013123. ONE source of truth -- lib/Units.lib.php -- shared by PHP and JS,
       // never a second set of constants retyped in a .js file. ?>
-EngCalcs.unitFactors = <?=json_encode($GLOBALS['ec_units'])?>;</script>
+EngCalcs.unitFactors = <?=json_encode($GLOBALS['ec_units'])?>;<?php
+// **THE LANGUAGE SWITCHER'S DATA, FOR THE PAGE THAT HAS NO NAVBAR TO PUT IT IN** (Task 625, Tom:
+// *"put language menu in our app chrome navbar"*). Emitted only for the app type, because every
+// other page still has echoEngCalcsMenu()'s own picker and a second copy would be two lists to
+// keep in step.
+//
+// **THE PATH IS THE PAGE'S CANONICAL ADDRESS, NOT ITS SCRIPT**, which is the whole reason this is
+// computed in PHP rather than read off `location` in JS. Under the `/app/` rewrite `SCRIPT_NAME`
+// is `Looped-Network.php`, so a switch built from it moves the reader off `librewaternet.org/app/`
+// and onto the other host's script path -- Tom hit exactly that on 2026-09-10 and it is the same
+// trap Task 479.01 fixed for canonical, hreflang and og:url. `ecCanonicalPath()` is a DECLARATION:
+// a rewrite is not invertible and REQUEST_URI is client-supplied, so it is never inferred.
+//
+// Each row carries its own `lang` code for the same reason the navbar's does: the name is written
+// in its own language, so without it a screen reader pronounces every one with this page's
+// phonetics. `dir` is deliberately not set -- an RTL name would re-align an LTR row.
+if ($type === "EngCalcsApp") :
+	$ec_app_langs = array();
+	foreach ($GLOBALS['all_language_settings'] as $code => $lang) {
+		$ec_app_langs[] = array('code' => $code, 'name' => $lang['LANGNAME']);
+	}
+?>
+EngCalcs.languages = <?=json_encode($ec_app_langs, JSON_UNESCAPED_UNICODE)?>;
+EngCalcs.langSwitchPath = <?=json_encode(ecCanonicalPath(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : ''))?>;
+EngCalcs.langCurrentName = <?=json_encode(isset($GLOBALS['language_settings']['LANGNAME']) ? $GLOBALS['language_settings']['LANGNAME'] : $html_lang, JSON_UNESCAPED_UNICODE)?>;
+<?php endif; ?></script>
 <?php
 }
 /****************************************************************************************************************/
