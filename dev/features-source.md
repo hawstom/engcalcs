@@ -47,7 +47,6 @@ have something to generate; the wording is his call, not ours.
 - 79| One button returns a page to a worked example that passes, so nothing is ever a blank form.
 - 39, 80, 228| Name a calculation and copy a link to it; the link carries your inputs, and nothing is shared unless you share it.
 - 422, 425| Changing an input unit asks first, and says plainly that it reinterprets the numbers you typed rather than converting them.
-- 2| Install it from the browser you already have, and every calculator keeps working with no network at all.
 
 ## Drawing a water network
 
@@ -125,4 +124,5 @@ have something to generate; the wording is his call, not ours.
 - 7, 15, 22, 34| Twenty-seven languages, and every word is evaluated for translation: the network model and the two Manning calculators go into all of them, the rest of the suite into Spanish, Portuguese, French, and Turkish, and every calculator is findable by name in every language while it waits its turn.
 - 244| Free software under the GNU GPL, source in the open.
 - 4, 37| It installs on a desktop or a phone as an app of its own, icon and all.
+- 2| Open it once with a connection and it keeps working with none: the whole thing is stored by your browser as you go.
 - 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
