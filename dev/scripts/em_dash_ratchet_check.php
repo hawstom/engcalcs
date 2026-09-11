@@ -40,7 +40,7 @@ require_once __DIR__ . '/lang_parse.inc.php';
  * The measured count on 2026-09-01, the day the advisory was restored. LOWER THIS when strings are
  * fixed; never raise it. Raising it is the one edit that makes this script pointless.
  */
-const EC_EM_DASH_BASELINE = 59;
+const EC_EM_DASH_BASELINE = 57;   // 59 -> 57 on 2026-09-10: the two false Notes were rewritten (Task 625).
 
 const EC_EM_DASH = "\u{2014}";
 

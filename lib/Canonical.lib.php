@@ -62,6 +62,49 @@ function ecCanonicalPaths() {
 }
 
 /**
+ * The absolute URL a page served at its SCRIPT path should be redirected to, or null for "stay".
+ *
+ * **THE APACHE-LEVEL REDIRECT IS A LOOP AND THAT IS WHY THIS IS IN PHP** (Tom, 2026-09-10, asking
+ * the right question: *"do we safely put a redirect on the page, or is that circular?"*).
+ * librewaternet.org's own .htaccess carries `RewriteRule ^app/?$ /engcalcs/Looped-Network.php [L]`
+ * -- an INTERNAL rewrite. A `Redirect` or `RewriteRule` matching that script path would therefore
+ * fire on the rewritten request as well: `/app/` becomes the script, the script redirects to
+ * `/app/`, and the browser gives up after twenty hops. **Never put this in .htaccess.**
+ *
+ * Here it cannot loop BY CONSTRUCTION, because the test is the address the visitor actually asked
+ * for: served at `/app/` it returns null and nothing happens. Same discriminator as
+ * ecLanguageSwitchPath(), and the output is again one of two server-known strings.
+ *
+ * **AND IT FIRES ONLY ON A DECLARED HOST.** dev.hawsedc.com and a local checkout fall through
+ * CANONICAL_ORIGIN's whitelist to the default origin -- harmless for a canonical tag, fatal here,
+ * because a developer testing at `/engcalcs/Looped-Network.php` would be thrown to production.
+ * `$hostDeclared` is EC_CANONICAL_HOST_DECLARED and is the whole of that guard.
+ *
+ * Pure, so the selftest can drive every host shape without a web server.
+ *
+ * @param string $scriptName    $_SERVER['SCRIPT_NAME'].
+ * @param string $requestUri    $_SERVER['REQUEST_URI'], query string and all.
+ * @param bool   $hostDeclared  EC_CANONICAL_HOST_DECLARED.
+ * @param string $origin        CANONICAL_ORIGIN.
+ * @return string|null          absolute URL to 301 to, or null to serve the page.
+ */
+function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $origin) {
+    if (!$hostDeclared) { return null; }
+    $script = (string)$scriptName;
+    $pretty = ecCanonicalPath($script);
+    // No pretty URL declared for this page: its script path IS its address. Nothing to move to.
+    if ($pretty === $script) { return null; }
+    // Already being served at the pretty address -- the rewritten request. This is the line that
+    // makes a loop impossible.
+    if (ecLanguageSwitchPath($script, $requestUri) === $pretty) { return null; }
+    // Carry the query string, because ?lang=xx is the commonest way this URL is held.
+    $query = '';
+    $cut = strpos((string)$requestUri, '?');
+    if ($cut !== false) { $query = substr((string)$requestUri, $cut); }
+    return $origin . $pretty . $query;
+}
+
+/**
  * Where a LANGUAGE SWITCH on this page should point, on the host actually serving it.
  *
  * **A CANONICAL ADDRESS AND A NAVIGATION LINK ARE DIFFERENT QUESTIONS, and conflating them was a

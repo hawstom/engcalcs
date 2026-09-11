@@ -130,9 +130,45 @@ foreach ($switchCases as [$name, $script, $req, $want]) {
     }
 }
 
+// ---- ecCanonicalRedirectTarget(): one address for the app, and NO LOOP ---------------------
+//
+// **THE LOOP IS THE WHOLE REASON THIS IS IN PHP** (Tom, 2026-09-10: *"do we safely put a redirect
+// on the page, or is that circular?"*). librewaternet.org carries
+// `RewriteRule ^app/?$ /engcalcs/Looped-Network.php [L]`, an INTERNAL rewrite, so an .htaccess
+// redirect on that script path fires on the rewritten request too and bounces `/app/` back to
+// itself for ever. Fixture 3 below is that exact request and must always answer "serve the page".
+//
+// Fixture 5 is the other one that matters: an UNDECLARED host is dev.hawsedc.com or a local
+// checkout, and moving a developer to production would be the worst kind of helpful.
+$O = 'https://librewaternet.org';
+$redirectCases = [
+    ['the script path on a declared host moves to the pretty address',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true, $O . '/app/'],
+    ['...carrying its query string, because ?lang= is how this URL is held',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php?lang=es', true, $O . '/app/?lang=es'],
+    ['THE REWRITTEN REQUEST IS SERVED, NEVER REDIRECTED -- this is the loop guard',
+        '/engcalcs/Looped-Network.php', '/app/', true, null],
+    ['...and so is the bare form that 301s to it at the web server',
+        '/engcalcs/Looped-Network.php', '/app', true, null],
+    ['AN UNDECLARED HOST NEVER MOVES ANYBODY -- dev and localhost',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', false, null],
+    ['a page with no pretty URL is never redirected',
+        '/engcalcs/Manning-Pipe-Flow.php', '/engcalcs/Manning-Pipe-Flow.php', true, null],
+];
+foreach ($redirectCases as [$name, $script, $req, $declared, $want]) {
+    $got = ecCanonicalRedirectTarget($script, $req, $declared, $O);
+    if ($got !== $want) {
+        $fails++;
+        echo "  FAIL $name\n        wanted " . var_export($want, true)
+            . ', got ' . var_export($got, true) . "\n";
+    } else {
+        echo "  ok   $name\n";
+    }
+}
+
 if ($fails) {
     echo "\n$fails fixture(s) failed. canonical_path_check.php's reach has moved.\n";
     echo "The defect it guards is invisible on every page and shows up only in a search index.\n";
     exit(1);
 }
-echo "\nCanonical-path selftest OK -- " . (count($cases) + count($switchCases)) . " fixtures, both directions.\n";
+echo "\nCanonical-path selftest OK -- " . (count($cases) + count($switchCases) + count($redirectCases)) . " fixtures, both directions.\n";

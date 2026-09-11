@@ -1844,18 +1844,24 @@ $ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
 $ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
 $ec_lang['lpn_notes_1_term']='How it is solved';
-// EXTENDED-PERIOD SIMULATION SHIPS (Task 248), so this note no longer says the page cannot run
-// over time. What survives from the old wording is the ONE limit that is still real and still
-// surprising: the built-in solver does a single moment and holds every tank at its starting
-// level, so a whole run needs the EPANET solver. dev/lpn-spike/eps-net3-harness.js reproduces
-// EPA's own published 24-hour Net3 report at all 25 reporting steps.
-$ec_lang['lpn_notes_1_def']='Each moment is solved with the global gradient algorithm. Set a total run time and every reporting step is calculated in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back.';
-$ec_lang['lpn_notes_2_term']='Not modeled';
-// VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
-// the honest half of it: the valves are all modeled now, but the three that open and close on
-// their own are solved by the EPANET solver and not by the built-in solver. That is a real
-// thing for a reader to know -- it is why such a network needs the engine downloaded once.
-$ec_lang['lpn_notes_2_def']='Water quality chemistry is not modeled; water age and source trace are. Throttle valves are solved, and so are the valves that set their own position (PRV, PSV, FCV).';
+// **IT NAMED THE WRONG SOLVER** (Tom, 2026-09-10: *"Wrong facts."*). It said every moment "is
+// solved with the global gradient algorithm", which describes the BUILT-IN solver -- and Task 605
+// retired that one from view: EPANET is the default and the built-in one answers only when EPANET
+// cannot be fetched. dev/lpn-spike/eps-net3-harness.js reproduces EPA's own published 24-hour
+// Net3 report at all 25 reporting steps.
+$ec_lang['lpn_notes_1_def']='The EPANET solver works this network out. Set a total run time and every reporting step is calculated in turn: tanks fill and drain, demands follow their patterns, and the toolbar plays the run back. Without the internet connection needed to fetch it the first time, a built-in solver answers instead, for one moment only, with every tank at its starting level.';
+$ec_lang['lpn_notes_2_term']='What it does not do';
+// **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
+// facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
+// concentration all ship -- see lpn_quality_chemical and the lpn_reaction_* keys below. The note
+// had not been read since the water-quality work landed, and it was telling every visitor in 27
+// languages that a feature they can see on the screen does not exist.
+//
+// **THE TERM IS NOW "What it does not do", AND WHAT GOES IN IT IS TOM'S CALL.** Naming an
+// omission is a public claim about scope, and this file's history says those go wrong in the
+// confident direction; the one omission stated here is the one nothing in this tree implements
+// or claims to. Do not lengthen the list without him.
+$ec_lang['lpn_notes_2_def']='Water quality is modeled: water age, source trace, and a chemical that reacts in the pipe walls and in the body of the water. Surge and water hammer are not: every answer here is for water already flowing steadily, not for the pressure wave when a valve slams.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

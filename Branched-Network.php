@@ -11,7 +11,7 @@ echoHeader("EngCalcs", $html_title, "");
 ?>
 <h2><?=$ec_lang['bpn_main_desc']?></h2>
 <p class="collapse show d-print-none" id="relatedCalcs">
-	<?=$ec_lang['ec_related_calcs']?> <a href="<?=EC_LWN_APP_URL?>">LibreWaterNet.org</a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
+	<?=$ec_lang['ec_related_calcs']?> <a href="<?=EC_LWN_APP_URL?>">LWN</a> <a data-bs-toggle="collapse" href="#relatedCalcs" aria-expanded="true" aria-controls="relatedCalcs"><?=$ec_lang['view_hide_line']?></a>
 </p>
 <?php
 echoCalculatorForm(

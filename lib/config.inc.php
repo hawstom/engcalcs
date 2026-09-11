@@ -129,6 +129,12 @@ if (substr($ec_canonical_host, 0, 4) === 'www.') {
 define('CANONICAL_ORIGIN', isset($ec_canonical_origins[$ec_canonical_host])
     ? $ec_canonical_origins[$ec_canonical_host]
     : CANONICAL_ORIGIN_DEFAULT);
+// **WAS THIS HOST ACTUALLY DECLARED, or did it fall through to the default?** For a canonical tag
+// the difference does not matter -- an undeclared host still nominates the right address. For
+// anything that MOVES A VISITOR it matters absolutely: dev.hawsedc.com and a local checkout are
+// not in the array above, and a redirect that could not tell them apart from hawsedc.com would
+// send every developer to production. ecCanonicalRedirectTarget() is gated on this.
+define('EC_CANONICAL_HOST_DECLARED', isset($ec_canonical_origins[$ec_canonical_host]));
 unset($ec_canonical_host, $ec_colon);
 
 // Language demand log — stored in log/ at the project root, blocked from HTTP by log/.htaccess.

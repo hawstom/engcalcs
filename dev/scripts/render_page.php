@@ -72,7 +72,16 @@ if ($__rp_lang !== '') { $_COOKIE['ec_language'] = $__rp_lang; }
 // read a parameter of their own, such as contact.php's ?from=.
 if ($__rp_query !== '') { parse_str($__rp_query, $_GET); }
 $_SERVER['QUERY_STRING']   = $__rp_query;
-$_SERVER['REQUEST_URI']    = ($__rp_uri !== '' ? $__rp_uri : '/engcalcs/' . $__rp_page)
+// **THE DEFAULT URI IS THE ADDRESS THE PAGE IS ACTUALLY SERVED AT, WHICH FOR A PRETTY URL IS THE
+// PRETTY URL** (Task 625, 2026-09-10). It used to be the script path unconditionally, and once
+// Looped-Network.php began 301ing its script path to `/app/` on a declared host, every renderer
+// in the tree got an empty page and a Location header instead of a document. The redirect is
+// right and the model was wrong: on a declared host that script path is never served, so a
+// renderer asking for it was emulating a request nobody can make. `--uri` still overrides, which
+// is how a caller asks for the un-rewritten address on purpose.
+require_once __DIR__ . '/../../lib/Canonical.lib.php';
+$__rp_default_uri = ecCanonicalPath('/engcalcs/' . $__rp_page);
+$_SERVER['REQUEST_URI']    = ($__rp_uri !== '' ? $__rp_uri : $__rp_default_uri)
                            . ($__rp_query !== '' ? '?' . $__rp_query : '');
 $_SERVER['SCRIPT_NAME']    = '/engcalcs/' . $__rp_page;
 $_SERVER['SERVER_NAME']    = $__rp_host;

@@ -1,5 +1,21 @@
 <?php
 require_once('lib/base.inc.php');
+// **ONE ADDRESS FOR THE APP, AND THE MOVE HAPPENS HERE RATHER THAN IN .htaccess** (Task 625, Tom
+// 2026-09-10: *"hawsedc.com/engcalcs/Looped-Network.php: 301. I agree."*). An Apache rule on this
+// script path would LOOP: librewaternet.org rewrites `/app/` onto this file internally, so the
+// rule would fire on the rewritten request and bounce it straight back. ecCanonicalRedirectTarget()
+// tests the address the visitor actually asked for, so it cannot; and it is gated on a DECLARED
+// host, so dev.hawsedc.com and a local checkout are never moved. BEFORE echoHeader(), because a
+// redirect after one byte of output is not a redirect.
+$ec_app_move = ecCanonicalRedirectTarget(
+	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
+	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '',
+	EC_CANONICAL_HOST_DECLARED, CANONICAL_ORIGIN);
+if ($ec_app_move !== null && (!isset($_SERVER['REQUEST_METHOD'])
+		|| $_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'HEAD')) {
+	header('Location: ' . $ec_app_move, true, 301);
+	exit;
+}
 $html_title = $ec_lang['lpn_main_title'];
 $html_desc = $ec_lang['lpn_main_desc'];
 // **NO "Save this calculation" BOX ON THIS PAGE** (Tom, 2026-08-18). The fourth argument hides it.
