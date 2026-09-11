@@ -1852,6 +1852,10 @@ $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable,
 // The About box's one translatable sentence (Task 625). The LICENCE NAME itself is deliberately
 // inside it in English: the FSF asks that "GNU General Public License" not be translated, and a
 // translated licence name is a different licence as far as a reader checking it is concerned.
+// The one-time cue that points from the toolbar up to the menu bar (Task 625). Says where the
+// menus ARE rather than what they contain: a reader who has not noticed the row does not need a
+// list of it, they need to look up once.
+$ec_lang['lpn_menu_cue']='Every command is in the menus above.';
 $ec_lang['lpn_about_license']='Licensed under the GNU General Public License v3.0 or later.';
 $ec_lang['lpn_notes_1_term']='How it is solved';
 // **IT NAMED THE WRONG SOLVER** (Tom, 2026-09-10: *"Wrong facts."*). It said every moment "is

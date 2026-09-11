@@ -95,6 +95,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_energybox` | same | The same record for the Pump energy report box (same ruling) |
 | `lpn_cmpbox` | same | The same record for the Scenario comparison box (same ruling) |
 | `lpn_reportbox` | same | The same record for the EPANET run report box (same ruling) |
+| `lpn_menucue` | same | Whether the one-time "the menus are above" cue has been retired. Set once, when the reader opens any menu or closes the cue (Task 625) |
 | `lpn_show_titles` | same | **LEGACY, no longer written** (Task 625, 2026-09-10). The app page emits no titles, so the toggle went with them. Still listed because browsers that used it still hold it, and Erase everything still deletes it by literal |
 | `lpn_areahint` | same | Whether the area-selection help bubble is shown over the map (Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this' checkbox."*). The same category as the row above it: a reading preference the visitor set deliberately, on this screen |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |

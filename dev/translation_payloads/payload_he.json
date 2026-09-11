@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1777,
-        "delta_key_count": 8,
+        "expected_key_count": 1778,
+        "delta_key_count": 9,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -516,6 +516,7 @@
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_menu_cue": "Every command is in the menus above.",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "keys": {
@@ -526,6 +527,7 @@
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_menu_cue": "Every command is in the menus above.",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "key_context": {
@@ -638,6 +640,22 @@
                     "key": "lpn_pane_paste_note",
                     "value": "טבלה זו מיועדת להזנת ערכים באמצעות הדבקה מגיליון אלקטרוני לתוך שורות שכבר קיימות. אם היא אינה עונה על הצרכים שלכם, השתמשו ב\"עזרה, תיקון בעיה\" כדי לספר לנו.",
                     "english": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us."
+                }
+            }
+        },
+        "lpn_menu_cue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "לא נשמר. אחסון הדפדפן מלא או לא זמין, כך שהשינויים האחרונים שלכם יאבדו כשתסגרו כרטיסייה זו.",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "כיצד זה נפתר",
+                    "english": "How it is solved"
                 }
             }
         },

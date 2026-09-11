@@ -1342,6 +1342,24 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    deliberately has no dividers (see the note above #lpn_menubar). The anchor rules that used to be
    here went with the <a>. */
 .lpn-menubar-mark { margin-right: 6px; }
+/* THE MENU CUE (Task 625). Sits in the flow BETWEEN the two bars, hard against the toolbar's top
+   edge, with an arrow aimed at the bar above -- it starts where the eye lands and points up,
+   rather than trying to make the menu bar outshine 22 icons it cannot outshine. Deliberately quiet
+   (no shadow, no saturated fill): it must be noticed once, not compete forever. Removed from the
+   flow entirely when retired, so it costs no headroom on the page whose headroom is the point. */
+.lpn-menu-cue { display: flex; align-items: center; gap: .4em;
+	font-size: 12px; line-height: 1.3; margin: 0 0 3px; padding: 2px 6px;
+	border: 1px solid #9bd; border-radius: 3px; background: #eef6fd; color: #12211f;
+	width: fit-content; max-width: 100%; }
+.lpn-menu-cue-arrow { color: #0645ad; font-size: 10px; }
+.lpn-menu-cue-x { background: none; border: 0; font-size: 15px; line-height: 1;
+	padding: 0 0 0 .3em; cursor: pointer; color: inherit; opacity: .7; }
+.lpn-menu-cue-x:hover { opacity: 1; }
+@media (max-width: 640px) { .lpn-menu-cue { font-size: 11px; } }
+/* The About box leads with the same mark that opened it (Task 625). Sized to the heading rather
+   than to .ec-icon's 1.05em base, so the glyph and the name read as one lockup. */
+.lpn-about-name { display: flex; align-items: center; gap: .45em; }
+.lpn-about-name .ec-icon { width: 1.5em; height: 1.5em; flex: none; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }
 /* ---- Project tab strip (ROADMAP Task 211) ----
    Sits directly ON TOP OF THE MAP, below the toolbar (revised 2026-08-04 after seeing the first

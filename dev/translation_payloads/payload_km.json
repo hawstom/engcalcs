@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1777,
-        "delta_key_count": 8,
+        "expected_key_count": 1778,
+        "delta_key_count": 9,
         "exempt_key_count": 30,
         "exempt_keys": [
             "u_imgd",
@@ -521,6 +521,7 @@
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_menu_cue": "Every command is in the menus above.",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "keys": {
@@ -531,6 +532,7 @@
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_menu_cue": "Every command is in the menus above.",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "key_context": {
@@ -643,6 +645,22 @@
                     "key": "lpn_pane_paste_note",
                     "value": "តារាងនេះមានបំណងសម្រាប់បញ្ចូលតម្លៃដោយបិទភ្ជាប់ពីសៀវភៅបញ្ជីអេឡិចត្រូនិកទៅជួរដេកដែលមានស្រាប់រួចហើយ។ ប្រសិនបើវាមិនសមនឹងតម្រូវការរបស់អ្នកទេ សូមប្រើ ជំនួយ, ជួសជុលអ្វីមួយ ដើម្បីប្រាប់យើង។",
                     "english": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us."
+                }
+            }
+        },
+        "lpn_menu_cue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "មិនបានរក្សាទុកទេ។ ទំហំផ្ទុករបស់កម្មវិធីរុករកពេញ ឬមិនអាចប្រើបាន ដូច្នេះការផ្លាស់ប្ដូរថ្មីៗរបស់អ្នកនឹងបាត់ នៅពេលអ្នកបិទផ្ទាំងនេះ។",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "របៀបដែលវាត្រូវបានដោះស្រាយ",
+                    "english": "How it is solved"
                 }
             }
         },

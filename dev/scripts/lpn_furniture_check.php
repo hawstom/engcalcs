@@ -110,6 +110,10 @@ function ecJsFunctionBody(string $js, string $name): ?string
  * The four CLAUDE.md names, plus the two it does not.
  */
 const EC_LPN_FURNITURE = [
+    // **WHETHER ONE READER HAS FOUND THE MENU BAR IS A FACT ABOUT THAT READER** (Task 625). The
+    // cue retires when they open any menu; a colleague opening the same file has not found it yet
+    // and must still be shown it, which is exactly why this cannot ride in the project.
+    'lpn_menucue'     => 'whether the one-time cue pointing up at the menu bar has been retired',
     'lpn_pane'        => 'height and open tab of the bottom pane',
     'lpn_rpane'       => 'width of the right pane',
     'lpn_setbox'      => 'position and size of the Settings box',

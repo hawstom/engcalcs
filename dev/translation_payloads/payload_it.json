@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1777,
-        "delta_key_count": 10,
+        "expected_key_count": 1778,
+        "delta_key_count": 11,
         "exempt_key_count": 36,
         "exempt_keys": [
             "calc_units_us",
@@ -529,6 +529,7 @@
         "lpn_pane_text_attached": "Attached",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_menu_cue": "Every command is in the menus above.",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "keys": {
@@ -541,6 +542,7 @@
         "lpn_pane_text_attached": "Attached",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_menu_cue": "Every command is in the menus above.",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "key_context": {
@@ -685,6 +687,22 @@
                     "key": "lpn_find_q_aside",
                     "value": "I controlli non possono esprimere la ricerca qui sotto, quindi sono nascosti.",
                     "english": "The controls cannot express the query below, so they are hidden."
+                }
+            }
+        },
+        "lpn_menu_cue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "Non salvato. Lo spazio di archiviazione del browser è pieno o non disponibile, quindi le modifiche recenti andranno perse alla chiusura di questa scheda.",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Come viene risolto",
+                    "english": "How it is solved"
                 }
             }
         },

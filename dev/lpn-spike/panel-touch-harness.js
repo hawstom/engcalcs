@@ -194,6 +194,10 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
 		[/selectAreaEl\.style\.display = 'none'; return;/, 'the select-area marquee on the map (Task 266)'],
 		[/box\.style\.display = 'none'; box\.textContent = '';/, 'the select-area instruction bubble, which holds no control'],
+		[/el\.style\.display = 'none'; \}\n\t\ttry \{ localStorage\.setItem\(MENU_CUE_KEY/,
+			'the one-time menu cue (Task 625): a line of text and a dismiss button, with no drag, '
+			+ 'no resize, no stored geometry and nothing focusable to trap -- hidePanel() exists '
+			+ 'for boxes that have those, and it would also write a layout record this has none of'],
 		[/el\.style\.display = 'none';\n\t}/, 'hidePanel() itself']
 	];
 	const lines = code.split('\n');

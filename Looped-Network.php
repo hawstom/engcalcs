@@ -139,6 +139,28 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // real menu bar above it that argument stops paying for itself, because the strip then sits
 	      // in the middle of the chrome instead of against the thing it names. ?>
 	<div class="d-print-none" id="lpn_menubar"></div>
+<?php // **THE MENU CUE: it starts where the eye already is and points UP** (Ida's re-diagnosis,
+      // dev/app-chrome-postdivorce-recommendations.md section F item 4). Two of three testers never
+      // found the menu bar. It is not a paint problem -- both rows are painted identically, which
+      // is the thing she retracted -- it is salience and genre: 5 items against 22, 401 px of ink
+      // against 1,260, 1.05em icons against 1.35em, and a labelled nav-style row sitting under an
+      // icon-only tool palette. MAH named it unprompted: the menu bar "belonged to the site".
+      //
+      // **PARITY IS NOT THE TARGET.** Five categories SHOULD be smaller than twenty-two tools, and
+      // padding the bar with invented glyphs would be decoration. So this does not try to make the
+      // menu bar louder. It meets the reader where they are looking.
+      //
+      // **AND IT DOES NOT REPEAT THE ONE DOCUMENTED FAILURE.** The Hide-titles highlight was missed
+      // at four seconds AND at 120 (Task 616) because it marked a row nobody was looking at. This
+      // is anchored to the TOOLBAR's top edge -- the row the evidence says the eye reaches first --
+      // and its arrow points at the bar above.
+      //
+      // Placed in markup rather than built in JS so the id resolves and the string is translated
+      // like every other; shown, positioned and retired by js/looped-network.js. ?>
+	<div class="d-print-none lpn-menu-cue" id="lpn_menu_cue" style="display:none" role="note">
+		<span class="lpn-menu-cue-arrow" aria-hidden="true">▲</span><span id="lpn_menu_cue_text"></span>
+		<button type="button" id="lpn_menu_cue_x" class="lpn-menu-cue-x" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	</div>
 	<div class="d-print-none" id="lpn_toolbar"></div>
 	<div class="d-print-none" id="lpn_tabs"></div>
 	<?php // Lock banner (Task 195 Phase 2). Empty and hidden until either someone else holds the lock
@@ -1155,7 +1177,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // divider; the 40px top padding above is the room it sits in. ?>
 	<div id="lpn_about_boxtitle" class="lpn-setbox-title"><?=$ec_lang['about_main_menu']?></div>
 	<div class="lpn-popover-body">
-		<h2>LibreWaterNet.org</h2>
+<?php   // The mark itself opens the box, so the box shows the mark: the reader's eye lands on the
+        // thing they pressed. ecIcon() is the one door to the geometry (icon_name_check.php). ?>
+		<h2 class="lpn-about-name"><?=ecIcon('water')?>LibreWaterNet.org</h2>
 		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
 <?php   $ec_build = ecDeployIdentity();
@@ -2046,6 +2070,7 @@ EngCalcs.pageConfig = {
 <?php // Help > Install, the door that moved off the suite navbar with the divorce (Task 625).
       // The suite's own key, already translated, rather than a new string before the freeze. ?>
 	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
+	lpn_menu_cue: <?=json_encode($ec_lang['lpn_menu_cue'])?>,
 	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
 	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
