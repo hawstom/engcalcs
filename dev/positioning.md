@@ -260,6 +260,32 @@ community norms, not copyright. "LibreEPANET" reads descriptively, the way "epan
 is why it is safe. A courtesy note to OpenWaterAnalytics before launch is cheap insurance — in the
 register of `dev/outreach-owa-post.md` (a real question, not an announcement).
 
+### EPANET++ — two domains registered 2026-09-11, and Tom's reason for preferring them
+
+**He registered `epanet-plus-plus.org` and `epanetpp.org`, and the reasoning is the point.** His
+words, and they overturn nothing above except which EPANET-bearing name he would lead with:
+
+> *"I earlier registered libreepanet.org, but I felt that it was a disingenuous name, not because
+> it was wrong to trade on the epanet name, but because we are not more libre than epanet. With
+> EPANET++, I have no such concern since we really are an extension of EPANET with scenarios, fire
+> flow, libraries, and more to come. And the EPANET name is important for the kind of users who
+> have not been using WaterCAD etc."*
+
+- **THE OBJECTION TO `LibreEPANET` IS AN HONESTY OBJECTION, NOT A LEGAL ONE**, and it is his own.
+  §2's whole case is the GPL-versus-FSL contrast against **epanet-js**; against **EPANET itself**
+  there is no libre contrast to draw, because EPA's EPANET is public domain. A name whose first
+  claim is "more free than EPANET" is a claim we cannot support, and he saw it before anybody
+  asked. The legal and moral standing recorded above is untouched -- this is about what the WORD
+  asserts.
+- **`EPANET++` ASSERTS SOMETHING WE CAN SHOW**: an extension of EPANET. Scenarios, fire flow, the
+  libraries and what follows are the evidence, and they are all shipped and demonstrable rather
+  than promised.
+- **AND THE EPANET WORD EARNS ITS PLACE ON REACH, NOT ON BORROWED CREDIT** -- it is how the
+  engineers who never bought WaterCAD know what this is.
+- **NOTHING CHANGES BEFORE HIS EWB MEETING (16 September).** His instruction: *"We will worry about
+  this after my EWB meeting."* LibreWaterNet.org remains the front door and the app's own name; do
+  not put EPANET++ on a page, in a string, or in a commit message until he reopens it.
+
 ### The gate: launch waits on Task 248
 
 Tom's ruling, 2026-08-14: the rebranded site waits until **tanks, valves and extended-period
