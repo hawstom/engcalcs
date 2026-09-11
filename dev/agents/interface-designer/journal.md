@@ -583,3 +583,66 @@ highlight, which marked a row nobody was looking at and stayed missed even at 12
 detail: `dev/app-chrome-postdivorce-recommendations.md` §F (appended, correction kept rather than
 overwritten — §A/§E marked superseded in place, not deleted, per the project's own convention that
 a correction substitutes the reasoning and keeps the rejected alternative visible).
+
+---
+
+## The "clouds read like arms" complaint on the shipped `water` menu glyph, 2026-09-10
+
+Tom, on the shipped menu icon (`lib/Icons.lib.php`'s `water` entry, the two flank-stroke clouds
+added in the same-day addendum recorded in `dev/icon-preview/ship-notes.md`): *"I think that the
+clouds don't work so great on the menu icon. The solution could be to remove them or make them less
+like arms by making more of it (area vs line)."*
+
+**A. Diagnosis — placement/gestalt, not stroke-weight, and not primarily a value problem.**
+OBSERVED (`dev/icon-preview/render/arms-review/arms-review.png`, rendered from the exact path data
+copied verbatim out of `lib/Icons.lib.php`'s `water` entry at 16/17/24/32px, light and dark, blown
+up 12x nearest-neighbor): the two cloud strokes sit at x 1-5.6 (left) and 18.4-23 (right), y 5.5 and
+9 — flanking the tank at roughly shoulder height, one per side, near-mirrored. That is exactly the
+visual grammar of a body silhouette with two things sticking out from its sides at the top: roof =
+head, wall = torso, legs = legs, and a mark on each flank at shoulder height completes as arms
+whether or not it individually looks cloud-like. It is a SILHOUETTE-COMPLETION problem, not a
+rendering-quality one. Compounding it: at 0.6 stroke-width the mark is also near the antialiasing
+floor at 16-17px (OBSERVED in the same render: both flank marks are a faint gray smudge, not a
+legible "cloud" shape at all at real menu size), so the reading has nothing clearly cloud-shaped to
+compete against the shoulder-height/mirrored-position cue, and the ambiguous cue wins.
+
+**B. His two proposals, judged.** (1) Remove the clouds — the geometry to revert to already exists
+and was already tested clean: `dev/icon-preview/ship-water-menu.svg`, the file shipped one step
+before the addendum. Zero-cost, reversible, one-line edit (delete the two trailing `<path>` calls
+in the `water` entry). (2) Area not line — tested directly
+(`dev/icon-preview/render/arms-review/arms-review.png`, "PROPOSAL 2" row: same footprint, drawn as
+a filled lens instead of a stroked wave). **It does not fix the complaint** — it is still two
+mirrored marks at shoulder height, and filling them gives the mass MORE presence, if anything
+reading closer to short solid stubs than the fainter line version did. Area vs line is a VALUE
+question; "arms" is a POSITION/orientation question, and changing value without moving position
+does not touch the cause. **A third option was tried and only partly helps**: moving both marks up
+to the same height above the roof/shoulder line, off the torso axis (`arms-review.png`, "OPTION 3"
+row) — reads a little more like a hat brim or wings than arms, but is still faint and marginal at
+16-17px and sits close to the exact headroom `ship-notes.md` already measured as unusable (2.2
+units above the cone apex) for a different attempt. Not a clean win.
+
+**C. Differs by size, and differs by icon.** The clouds get slightly more legible from 24-32px up
+(more pixels to separate the wave shape from noise) but the shoulder-height/mirrored-flank
+positioning is unchanged at every size, so the "arms" reading does not go away with size the way a
+pure legibility problem would. **The favicon's clouds do not have this problem for a structural
+reason, not a size one**: they are filled ellipses sitting BEHIND/BELOW the tank as sky fill, not
+flanking marks beside a bare silhouette — an entirely different composition that a stroke-only,
+no-fill-behind menu glyph (`EC_ICON_OPEN_TAG`: `fill="none"`, no ground) cannot reproduce. The "nod"
+Tom asked for when he reopened this (*"the same clouds as the favicon would be amazing"*) cannot
+actually be the same clouds, because the favicon's version is a background fill and the menu glyph
+has no background to fill. **Recommendation: let the menu icon diverge from the favicon on this one
+point** — drop the clouds at menu size (Proposal 1), keep them on the favicon, which he has already
+ruled settled (*"my one true love"*). The menu icon's job is one-glance recognition in a strip of
+other one-ink glyphs; the favicon's job is a bigger, standalone mark with room for atmosphere. They
+were never obligated to carry the identical decoration for that reason alone.
+
+**D. What was shown, not described.** Two real render sheets, both real Chromium rasters of the
+exact path data (SHIPPED copied verbatim, not re-derived), never an invented mockup:
+`dev/icon-preview/render/arms-review/arms-review.png` (16/17/24/32px, light+dark, 12x nearest-
+neighbor blow-up, 4 rows: shipped / no-clouds / area-clouds / raised-clouds) and
+`dev/icon-preview/render/arms-review/arms-incontext.png` (the same four candidates at native 1x
+inside a mock `.lpn-menu-row`, 14px text, 1.05em icon, light and dark bar) — so the diagnostic view
+and the "what you'll actually see in the app" view are both on the table rather than one standing
+in for the other. Generators: `gen-arms-review.js`, `gen-arms-incontext.js`, same directory,
+reusing the Chromium/playwright-core pipeline `gen-ship-clouds.js` already established. Nothing
+shipped; `lib/Icons.lib.php` untouched.

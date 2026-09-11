@@ -238,7 +238,13 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
       // is not invertible, and `REQUEST_URI` is client-supplied, so reversing one would let an
       // arbitrary URL nominate itself. A page with no declared pretty URL gets its own script path
       // back unchanged, which is what all 27 other pages want. ?>
-<?php $ec_lang_switch_path = ecCanonicalPath(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : ''); ?>
+<?php // **ecLanguageSwitchPath(), NOT ecCanonicalPath().** The canonical answers what this page
+      // CLAIMS to be and is `/app/` on every host; this answers where a link can actually GO on
+      // the host serving the request, and `/app/` exists only on librewaternet.org. Using the
+      // canonical here 404'd on hawsedc.com, on dev and on a local checkout (Tom, 2026-09-10). ?>
+<?php $ec_lang_switch_path = ecLanguageSwitchPath(
+	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
+	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''); ?>
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
 					<a class="dropdown-item" lang="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($ec_lang_switch_path, ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>

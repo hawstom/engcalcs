@@ -62,6 +62,46 @@ function ecCanonicalPaths() {
 }
 
 /**
+ * Where a LANGUAGE SWITCH on this page should point, on the host actually serving it.
+ *
+ * **A CANONICAL ADDRESS AND A NAVIGATION LINK ARE DIFFERENT QUESTIONS, and conflating them was a
+ * 404** (Tom, 2026-09-10: *"Changing language on local or on dev is a 404."*). ecCanonicalPath()
+ * answers "what address does this page CLAIM as its identity", and for Looped-Network.php that is
+ * `/app/` on every host, because identity is a property of the page and not of the server that
+ * happens to be answering. But `/app/` is a rewrite that exists ONLY on librewaternet.org, so a
+ * link built from it is dead on hawsedc.com, on dev.hawsedc.com and on a local checkout -- which
+ * is every host a developer ever looks at, and one of the two the public uses.
+ *
+ * The language switcher is the control most likely to be pressed on a FIRST visit, so sending it
+ * to a 404 anywhere is expensive. It has now been wrong in both directions inside one day: it used
+ * `$_SERVER['PHP_SELF']` until 2026-09-10, which moved a reader off `/app/` onto the other host's
+ * script path, and the repair to ecCanonicalPath() then 404'd everywhere else.
+ *
+ * **THE TEST USES REQUEST_URI AND THE OUTPUT NEVER DOES.** CLAUDE.md forbids letting a
+ * client-supplied URL nominate an address, and that rule is kept: this compares the request path
+ * against a DECLARED pretty path and returns one of two server-known strings -- the declaration
+ * itself, or SCRIPT_NAME. Nothing the client sent is ever echoed, so a forged Host or path can
+ * choose between two safe answers and cannot introduce a third.
+ *
+ * @param string $scriptName  $_SERVER['SCRIPT_NAME'].
+ * @param string $requestUri  $_SERVER['REQUEST_URI'], query string and all.
+ * @return string             root-anchored path that EXISTS on the host serving this request.
+ */
+function ecLanguageSwitchPath($scriptName, $requestUri) {
+    $script = (string)$scriptName;
+    $pretty = ecCanonicalPath($script);
+    // No pretty URL declared for this page: its script path is its only address anywhere.
+    if ($pretty === $script) { return $script; }
+    $reqPath = (string)$requestUri;
+    $cut = strpos($reqPath, '?');
+    if ($cut !== false) { $reqPath = substr($reqPath, 0, $cut); }
+    // Served AT the pretty address: stay on it. Both forms, because '/app' is a real URL a visitor
+    // is handed and it 301s to '/app/' -- the same pair ecSwMounts() matches.
+    if ($reqPath === $pretty || $reqPath === rtrim($pretty, '/')) { return $pretty; }
+    return $script;
+}
+
+/**
  * The canonical PATH for a script, pretty URL or not.
  *
  * @param string $scriptName  $_SERVER['SCRIPT_NAME'], or a '/engcalcs/<page>' path.

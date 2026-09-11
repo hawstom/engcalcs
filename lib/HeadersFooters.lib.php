@@ -298,8 +298,10 @@ EngCalcs.unitFactors = <?=json_encode($GLOBALS['ec_units'])?>;<?php
 // computed in PHP rather than read off `location` in JS. Under the `/app/` rewrite `SCRIPT_NAME`
 // is `Looped-Network.php`, so a switch built from it moves the reader off `librewaternet.org/app/`
 // and onto the other host's script path -- Tom hit exactly that on 2026-09-10 and it is the same
-// trap Task 479.01 fixed for canonical, hreflang and og:url. `ecCanonicalPath()` is a DECLARATION:
-// a rewrite is not invertible and REQUEST_URI is client-supplied, so it is never inferred.
+// trap Task 479.01 fixed for canonical, hreflang and og:url. **But the canonical is not the whole
+// answer either**: `/app/` exists only on librewaternet.org, so a link built from it 404s on
+// hawsedc.com, on dev and locally. ecLanguageSwitchPath() keeps the two questions apart -- what
+// this page CLAIMS to be, and where a link can actually GO on the host answering right now.
 //
 // Each row carries its own `lang` code for the same reason the navbar's does: the name is written
 // in its own language, so without it a screen reader pronounces every one with this page's
@@ -311,7 +313,9 @@ if ($type === "EngCalcsApp") :
 	}
 ?>
 EngCalcs.languages = <?=json_encode($ec_app_langs, JSON_UNESCAPED_UNICODE)?>;
-EngCalcs.langSwitchPath = <?=json_encode(ecCanonicalPath(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : ''))?>;
+EngCalcs.langSwitchPath = <?=json_encode(ecLanguageSwitchPath(
+	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
+	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''))?>;
 EngCalcs.langCurrentName = <?=json_encode(isset($GLOBALS['language_settings']['LANGNAME']) ? $GLOBALS['language_settings']['LANGNAME'] : $html_lang, JSON_UNESCAPED_UNICODE)?>;
 <?php endif; ?></script>
 <?php

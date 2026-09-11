@@ -96,3 +96,10 @@ that disagreement is most of what a seat is for. No agent edits the roadmap.
 *(The four-bar chrome diagnosis Tom's brief opens with — suite chrome, menus, toolbar, tab strip —
 is answered for the three that remain after the divorce; see item 5 series above and
 `dev/app-chrome-postdivorce-recommendations.md`.)*
+
+9. **Menu-icon clouds: remove them (Proposal 1), keep the favicon's.** Not a build item so much as
+   a one-line edit ready when Tom confirms: delete the two trailing `<path>` cloud strokes from the
+   `water` entry in `lib/Icons.lib.php`, restoring `dev/icon-preview/ship-water-menu.svg`'s
+   geometry. Diagnosed 2026-09-10: the "arms" read is a shoulder-height mirrored-flank placement
+   problem, not fixed by switching line to area (tested, still reads as stubs). See journal,
+   2026-09-10.

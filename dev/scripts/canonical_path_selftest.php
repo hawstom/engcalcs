@@ -93,9 +93,46 @@ foreach ($cases as [$name, $args, $want]) {
     }
 }
 
+// ---- ecLanguageSwitchPath(): where a language link may actually GO -------------------------
+//
+// **THIS HAS NOW BEEN WRONG IN BOTH DIRECTIONS INSIDE ONE DAY, 2026-09-10.** It used PHP_SELF,
+// which moved a reader off `librewaternet.org/app/` onto the other host's script path; the repair
+// pointed it at ecCanonicalPath(), which is `/app/` on EVERY host and therefore a 404 on
+// hawsedc.com, on dev.hawsedc.com and on a local checkout -- Tom hit that within the hour.
+//
+// A canonical address is what a page CLAIMS; a link is where a reader can GO. The behaviour below
+// is the whole of that distinction, and the forged-path case is the reason the test may read
+// REQUEST_URI while the output never does.
+require_once __DIR__ . '/../../lib/Canonical.lib.php';
+$switchCases = [
+    ['the app page served at its script path keeps the script path',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php?lang=es', '/engcalcs/Looped-Network.php'],
+    ['the app page served at its pretty address keeps the pretty address',
+        '/engcalcs/Looped-Network.php', '/app/', '/app/'],
+    ['...including the bare form a visitor is handed, before the 301',
+        '/engcalcs/Looped-Network.php', '/app', '/app/'],
+    ['...and a query string on the request does not confuse it',
+        '/engcalcs/Looped-Network.php', '/app/?lang=fr', '/app/'],
+    ['a page with no pretty URL always gets its own script path',
+        '/engcalcs/Manning-Pipe-Flow.php', '/engcalcs/Manning-Pipe-Flow.php', '/engcalcs/Manning-Pipe-Flow.php'],
+    ['A FORGED REQUEST PATH CANNOT CHOOSE A THIRD ANSWER',
+        '/engcalcs/Looped-Network.php', '/evil/../app/', '/engcalcs/Looped-Network.php'],
+    ['...nor can an absolute URL in the request line',
+        '/engcalcs/Looped-Network.php', 'https://elsewhere.example/app/', '/engcalcs/Looped-Network.php'],
+];
+foreach ($switchCases as [$name, $script, $req, $want]) {
+    $got = ecLanguageSwitchPath($script, $req);
+    if ($got !== $want) {
+        $fails++;
+        echo "  FAIL $name\n        wanted '$want', got '$got'\n";
+    } else {
+        echo "  ok   $name\n";
+    }
+}
+
 if ($fails) {
     echo "\n$fails fixture(s) failed. canonical_path_check.php's reach has moved.\n";
     echo "The defect it guards is invisible on every page and shows up only in a search index.\n";
     exit(1);
 }
-echo "\nCanonical-path selftest OK -- " . count($cases) . " fixtures, both directions.\n";
+echo "\nCanonical-path selftest OK -- " . (count($cases) + count($switchCases)) . " fixtures, both directions.\n";
