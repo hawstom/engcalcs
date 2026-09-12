@@ -4,13 +4,28 @@
 `php dev/scripts/generate_features.php`, which also proves every ID cited here is a task the closed
 ledger actually holds.
 
-## Why this file exists at all
+## What this list is, and what it is not
 
-A closed-ledger line is written for a developer re-resolving a `Task N` citation: it names files,
-functions, measured deltas and the alternative that was rejected. A features list is read by
-somebody deciding whether to open the page. Those are different sentences about the same event, and
-no script turns the first into the second. So the ledger supplies the PROOF that something shipped,
-and this file supplies the WORDS.
+**It is not a list of what we finished.** That list is the closed ledger, and its public home, when
+there is one, is a "Completed issues" area of a published roadmap (Tom, 2026-09-12). Writing the
+two in one place is what produced the first draft of this file: 64 rows, one per closed task,
+several of them about our own furniture — a draggable property box, a searchable Settings panel, a
+menu reorganization, a Help menu — which read, in his words, as an *"in-house 'done, yay' vibe"*.
+
+**It is a list of what a reader can do**, written for somebody who has never opened the page and is
+deciding whether to. The test on every sentence here:
+
+> Would somebody choosing between this and something else be worse off not knowing it?
+
+A line about how our controls are arranged fails that test. So does an apology for a box being
+long. Seven such lines were cut on 2026-09-12 and their IDs are simply uncited, which the generator
+allows and counts.
+
+**And one salient point gets one home.** The second defect in that first draft was scattering: the
+single question *"where does my work live and how does it get in and out"* was answered across five
+headings, so a reader had to read the whole page to assemble it. The heading order below follows
+the order somebody meets the software — what it is, what they can bring to it, drawing, solving,
+time, the analyses, reading it, scenarios, and only then where it all lives.
 
 ## How to edit
 
@@ -22,107 +37,91 @@ One line per feature, under a `##` area heading:
 
 `<ids>` is one or more closed task IDs, comma-separated. Every one must exist in
 `dev/roadmap-closed-ids.md` at priority 0, and no ID may be cited by two features — the generator
-fails on either. Adding a feature is one line; retiring one is deleting that line.
+fails on either. A closed ID cited by nothing is fine and expected. Merge freely: the unit of this
+list is a capability, not a task, so one line may carry six IDs.
 
 House rules that apply to the sentences here exactly as they apply anywhere else, because these are
 public claims: `dev/positioning.md` is the authority, "a phone" and never "your phone", no
 completeness claim against EPANET, our own element vocabulary (a **Text** object is EPANET's Label),
-and never the words "PC application".
+never the words "PC application", APA spelling, and no em dash.
 
-**The prose below is a first pass and awaits Tom's edit.** It was drafted so the generator would
-have something to generate; the wording is his call, not ours.
+**Two headings are load-bearing for the sibling site** and cannot be renamed or restructured without
+editing `~/webdev/librewaternet.org/tools/build-features.php` to match: that builder skips
+`## The calculators` wholesale (LibreWaterNet does not advertise the calculator suite), and it moves
+the line whose ID set is exactly `486` into its own honest-edges note, so that line stays solo.
 
 ---
 
-## The calculators
+## The network model
 
-- 13| Manning pipe flow solves in both directions: the flow from a depth, and the depth from a flow.
-- 52, 65| Every pipe and channel page checks the velocity it just computed and says when it is too fast or too slow.
-- 6, 12| Orifice flow, and the time a tank takes to drain through one.
-- 16| Micro-hydropower, from gross head and penstock losses to the power a small site can actually deliver.
-- 29, 38| Canal seepage and conveyance efficiency, including whether lining the canal pays for itself.
-- 30| Rock chute sizing by the Robinson method.
-- 11| Sketches drawn to scale from your own numbers, so you can see the section you just described.
-- 31| A tip on every input saying what the number is, in the language of the page.
-- 79| One button returns a page to a worked example that passes, so nothing is ever a blank form.
-- 39, 80, 228| Name a calculation and copy a link to it; the link carries your inputs, and nothing is shared unless you share it.
-- 422, 425| Changing an input unit asks first, and says plainly that it reinterprets the numbers you typed rather than converting them.
+- 146| A looped water network solved in the page by the global gradient method, with nothing to install.
+- 451, 419| Or solved by EPANET 2.3.5 itself, the EPA's own engine compiled into the page, and where the two engines disagree the page tells you by how much.
+- 467| Answers follow your edits as you make them, and on a network large enough for that to drag, you can turn it off.
 
-## Drawing a water network
+## Starting from what you already have
 
-- 146.02| A drawing toolbar (junction, reservoir, tank, pipe, pump, valve and text), placed by clicking the map.
-- 146.08, 447| Many named projects, saved in your own browser, each open in its own tab.
-- 344| The property box is a window you can drag out of your way, not a panel that owns an edge of the screen.
+- 196, 483| Opens EPANET `.inp` files, takes the part it supports, and files a note on the element concerned for every difference rather than dropping it quietly.
+- 314, 257, 454| Net1, Net2, Net3, Elm Street Center and a Net3 placed on the world, each one click away.
+- 145| Draw in latitude and longitude over a street map or satellite imagery, with the same tools you use anywhere else.
+- 476| An x/y network you already have can be placed on the world, then moved, scaled and rotated onto its real ground.
+- 276| Your own site plan or aerial photograph under the drawing, scaled by picking two points on it or by typing the size of a pixel.
+- 437| Type a place name and the map goes there, if you turn that on.
+- 497| Ground elevations read from terrain data and typed into the document, never replacing a number you already have without your having asked for exactly that.
+
+## Drawing the network
+
+- 146.02| Junction, reservoir, tank, pipe, pump, valve and text, placed by clicking the map.
 - 345| ID prefixes you choose, with Apply to all for when you change your mind.
 - 353, 420, 389| Find elements by any property, jump straight to one by ID, and set a property across everything the search found.
-- 540| Or type the search out yourself, with AND, OR and brackets, when what you are looking for is more than the pull-downs can say, in the words of your own language.
-- 352, 360| The File menu remembers your recent projects, and the map remembers where you were looking.
-- 253| One toggle clears the readouts off the map when you want the drawing and nothing else.
-- 543| The menus follow the work: everything about the water system is under Water, and everything drawn behind and around it is under Map, so a control is found by name rather than hunted for.
-- 557| A long Settings box is searchable and indexed: type a word and only the rows that mention it stay, or jump straight to any section from the list beside them.
-- 530| Fire flow analysis for the whole system in one press: every junction tested against the flow your code requires, what it can actually deliver at the residual you set, and what drawing that flow does to everything around it.
+- 540| Or write the search out yourself, with AND, OR and brackets, in the words of your own language.
+
+## Over time
+
+- 248.01, 423, 410| Extended-period simulation: tanks fill and drain, demands follow their patterns, and a transport bar plays the run or steps to any moment in it.
+- 248.02| Patterns on a reservoir head and on a pump's speed, beside the demand patterns.
+- 248.03, 460| Rule-based controls in EPANET's own words, read, written and edited beside the patterns and curves a run needs, with every level, pressure and flow in a rule put into the units your project is showing.
+- 450| A run reports its progress as it goes and hands you the engine's own report of it at the end.
+- 448| Color limits hold still across a run, so a color means the same thing at every step.
+
+## What else it will tell you
+
+- 530| Fire flow for the whole system in one press: every junction tested against the flow your code requires, what it can actually deliver at the residual you set, and what drawing that flow does to everything around it.
 - 566| Water quality over a run: how old the water reaching a point is, how much of it came from a source you name, and how a chemical residual decays as it travels, with the reaction coefficients yours to state rather than ours to guess.
 - 566.01| What the pumps cost: how long each one ran, the power it drew, the energy it used and the money that came to, including the demand charge on the highest power drawn at any one moment.
-- 276| A picture of your own under the drawing, a site plan or an aerial, scaled by picking two points on it or by typing the size of a pixel.
-- 250| A Help menu specific to this calculator.
-- 486| And although you of course prefer working on your PC, it works also on a phone in tall mode.
+- 409, 433, 506, 510| Profiles: click along the map to choose the path, see ground, hydraulic grade and the pressure between them, and save the path with the project under a name you give it.
 
-## Solving it
+## Reading the answers
 
-- 146| A looped network solved by the global gradient method, in the page, with no install and no upload.
-- 451| Or solved by the EPANET 2.3.5 engine itself, compiled into the page and named by version where you can see it.
-- 419| Standard gravity throughout, and where the two engines disagree the page tells you by how much.
-- 467| Answers follow your edits as you make them, and if a big network makes that slow, it is a project setting you can turn off.
-
-## Time
-
-- 248.01, 423, 410| Extended-period simulation: tanks fill and drain, demands follow their patterns, and a bar along the bottom plays the run or steps to any moment in it.
-- 248.02| Patterns on a reservoir head and on a pump's speed, beside the demand patterns.
-- 460| A Libraries box holding the patterns and curves a run needs.
-- 248.03| Rule-based controls, in EPANET's own words: read them, write them, and edit them in the Libraries box. Every level, pressure and flow in a rule is put into the units your project is showing.
-- 450| A Run button (optional, since answers can follow your edits instead) shows real progress, a completion report, and the engine's own report of the run.
-- 448| Colour limits hold still across a run, so a colour means the same thing at every step.
-
-## Files and EPANET
-
-- 196| Opens EPANET `.inp` files, takes the part it supports, and reports every difference instead of dropping it quietly.
-- 483| An import note is filed on the element it concerns, and you read it in that element's own property box.
-- 281| Writes `.inp` files back out. Every value you did not edit comes back exactly as it went in, character for character.
-- 246| Projects are `.lwn` files: JSON inside, on your own disk, readable without us.
-- 314, 257, 454| An examples library that opens Net1, Net2, Net3, Elm Street Center and a Net3 placed on the world, in one click.
-
-## The map and the world
-
-- 145| A geographic project is drawn in latitude and longitude over a street map or satellite imagery, with the same drawing tools.
-- 476| An existing x/y network can be placed on the world, moved, scaled and rotated onto its real ground.
-- 437| Type a place name and the map goes there, if you turn that on.
-- 497| Ground elevations read from terrain data and typed into the document (as each node is drawn, or over a set you found), never replacing a number without your having asked for exactly that.
-
-## Labels and lettering
-
-- 397, 398, 399, 469| Labels place themselves. Where there is no room, a label sheds values in the order you chose instead of disappearing whole.
-- 146.01, 383| Any label can be dragged where you want it, and it keeps a leader back to what it names.
-- 329| Pipe labels lie along their pipe, the way a map draws a street name.
-- 333, 336| Prefixes, suffixes and a separator you choose, with a link's values on one line.
-- 337, 342| A Text object takes several lines, bold, and a rotation that can match a pipe.
-- 376| Lettering is haloed, so it stays readable over the drawing underneath it.
+- 434, 455| A table for each kind of part: junctions, reservoirs, tanks, pipes, pumps and valves.
+- 384, 327| Color the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 color ramps.
+- 397, 398, 399, 469, 146.01, 383| Labels place themselves, keep a leader back to what they name if you drag them elsewhere, and where there is no room shed values in the order you chose instead of disappearing whole.
+- 329, 333, 336| Pipe labels lie along their pipe the way a map draws a street name, with prefixes, suffixes and a separator you choose.
+- 337, 342, 376| A Text object takes several lines, bold, and a rotation that can match a pipe, and all lettering is haloed so it stays readable over the drawing underneath.
 - 331, 362| Text, symbols and pipes are three independent screen sizes, so a drawing reads the same at every zoom.
-
-## Reading the results
-
-- 434, 455| A table for each kind of part in the bottom pane: junctions, reservoirs, tanks, pipes, pumps and valves.
-- 384, 327| Colour the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 colour ramps.
-- 409, 433, 506| Profiles. Click along the map to choose the path, and see ground, hydraulic grade and the pressure between them.
-- 510| A profile path is saved with the project under a name you give it, and a project holds as many of them as you draw.
 
 ## Scenarios
 
 - 201, 407, 412, 512| Change a few properties without disturbing the network they belong to, switch between those scenarios, and see at a glance which elements carry an override.
 
-## Language, licence, and privacy
+## Where your work lives
+
+- 246| A project is a `.lwn` file: JSON inside, on your own disk, readable without us.
+- 146.08, 447, 352, 360| As many projects as you like, each open in its own tab and saved in your own browser as you work, with the File menu remembering the recent ones and each reopening where you were looking.
+- 281| Writes EPANET `.inp` files back out, and every value you did not edit comes back exactly as it went in, character for character.
+- 2, 4, 37| Open it once with a connection and it keeps working with none, and it installs on a desktop or a phone as an app of its own, icon and all.
+- 486| And although you of course prefer working on your PC, it works also on a phone in tall mode.
+
+## The calculators
+
+- 13, 52, 65| Manning pipe flow solves in both directions, the flow from a depth and the depth from a flow, and every pipe and channel page says when the velocity it just computed is too fast or too slow.
+- 6, 12, 16, 30| Orifice flow, the time a tank takes to drain through one, micro-hydropower from gross head and penstock losses to the power a small site can deliver, and rock chute sizing by the Robinson method.
+- 29, 38| Canal seepage and conveyance efficiency, including whether lining the canal pays for itself.
+- 11, 31| Sketches drawn to scale from your own numbers, and a tip on every input saying what the number is.
+- 39, 80, 228| Name a calculation and copy a link to it; the link carries your inputs, and nothing is shared unless you share it.
+- 422, 425| Changing an input unit asks first, and says plainly that it reinterprets the numbers you typed rather than converting them.
+
+## Language, license, and privacy
 
 - 7, 15, 22, 34| Twenty-seven languages, and every word is evaluated for translation: the network model and the two Manning calculators go into all of them, the rest of the suite into Spanish, Portuguese, French, and Turkish, and every calculator is findable by name in every language while it waits its turn.
 - 244| Free software under the GNU GPL, source in the open.
-- 4, 37| It installs on a desktop or a phone as an app of its own, icon and all.
-- 2| Open it once with a connection and it keeps working with none: the whole thing is stored by your browser as you go.
 - 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
