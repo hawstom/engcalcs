@@ -6730,6 +6730,25 @@ var EngCalcs = EngCalcs || {};
 	function buildDom() {
 		var i;
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
+		// **THE SYMBOL LAYER IS THE FOURTH ONE AND IT WAS NOT BEING EMPTIED** (Tom, 2026-09-12:
+		// *"I drew two junctions and a pump on a blank Project1 map. Then I closed the project
+		// without saving. The pump symbol remained. I can drag it around. I can't edit it or
+		// delete it even if I Delete the network."*).
+		//
+		// A pump and a valve draw their volute into `linkSymbolLayer` rather than into
+		// `linksLayer`, so that the drawing sits over every pipe it crosses and so a press lands
+		// on what the reader can see. That layer is created ONCE in init() and this function
+		// emptied the other three, so every pump and valve symbol ever built outlived the
+		// document it belonged to. The per-link delete path was never at fault -- removeLinkEls()
+		// takes the symbol with it -- which is why this survived: it only shows on a WHOLESALE
+		// rebuild, which is what closing a project, opening one, and Delete network all do.
+		//
+		// The ghost is worse than a smudge. Its grab silhouette is still hit-testable, so it
+		// answers the pointer, while its `data-link` names an id no document holds -- so it looks
+		// draggable and refuses every edit, which is indistinguishable from the page being
+		// broken. Guarded because the spike harnesses that hand-roll their layer stack have no
+		// such layer; those fall back to nodesLayer, which IS emptied above.
+		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		labelsByLinkAnchor = {};
 		for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
