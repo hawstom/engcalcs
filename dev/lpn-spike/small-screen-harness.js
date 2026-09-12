@@ -457,28 +457,17 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 console.log('\n--- 4. the menu bar drops to icons ---');
 {
 	const items = menubar.children;
-	// SEVEN: the LibreWaterNet mark, File, Edit, Map, Water, Help, Language. Insert went in
-	// 2026-08-27 and its rows are a submenu of Water (Task 543); Language arrived when the suite
-	// navbar took its picker away and the mark when the leftmost slot had to stop being a link
-	// (Task 625).
-	ok('the real menu bar was built', items.length === 7, items.length + ' menus');
+	// SIX: File, Edit, Map, Water, Help, Language. Insert went in 2026-08-27 and its rows are a
+	// submenu of Water (Task 543); Language arrived when the suite navbar took its picker away
+	// (Task 625). **A seventh, a LibreWaterNet mark at the far left, existed for one day and was
+	// withdrawn** -- Tom, on the whole experiment: *"it was ill-advised"*. The way home is a Help
+	// row now. See buildMenuBar()'s note before adding anything to the left of File.
+	ok('the real menu bar was built', items.length === 6, items.length + ' menus');
 	items.forEach((b) => {
 		const name = b.el.getAttribute('aria-label');
 		const word = b.children.filter((c) => c.cls.indexOf('lpn-menubar-word') >= 0)[0];
 		const icon = b.children.filter((c) => c.tag === 'svg' || c.tag === 'g')[0];
 		ok(b.id + ' carries its name as an aria-label', !!name && name.length > 0);
-		// **THE HOME MARK IS THE ONE ITEM WITH NO WORD AT ANY WIDTH, AND IT IS NOT A MENU.** It is
-		// an <a> to librewaternet.org, built outside the menu array, so it has no
-		// `.lpn-menubar-word` at all -- the span exists on the MENUS so a stylesheet can hide the
-		// word below 640px while `aria-label` keeps the button named. The mark needs neither: it
-		// is icon-only by design and its aria-label carries the whole name at every width. The
-		// rule this guard protects -- a menu must not go mute on a phone -- is untouched for the
-		// six that are menus.
-		if (b.id === 'lpn_menu_home') {
-			ok('...' + b.id + ' is an icon-only link that names itself',
-				b.tag === 'a' && !word && name.length > 0, b.tag + ' / ' + JSON.stringify(name));
-			return;
-		}
 		ok('...' + b.id + ' has the word in an element a rule can reach', !!word);
 		ok('...' + b.id + ' says the same thing in both', !!word && word.el.textContent === name);
 		ok('...' + b.id + ' has an icon to survive on', !!icon);

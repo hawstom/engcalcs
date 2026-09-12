@@ -230,3 +230,19 @@ it is the oldest gap I found, first invocation), and my recommendation on the ID
 condition: validate the whole pasted block before writing anything, refuse the whole paste on any
 row's failure, never a partial commit — the row-340-of-400 question the task asked me to answer.
 Journal, sixth invocation, has the short version and the reasoning.
+
+## 6. Projected-CRS entry, ranked LOW, against Tom's direct request 2026-09-11
+
+Full review: `dev/coordinate-entry-clerk-review.md`, journal seventh invocation. Tom asked me
+directly whether to build UTM-then-more or the whole library at once. My answer: **proj4js, not
+hand-rolled UTM**, if this is built at all — UTM cannot extend to State Plane's own projection
+families without a rewrite, and proj4js already is the extensible, EPSG-keyed library. State Plane,
+not UTM, is what I would actually expect handed to me in US utility work (CITED in the review file),
+which agrees with Tom's own worry.
+
+**Ranked below everything else on this list that touches volume entry directly** — a CRS picker
+saves at most a per-session unit-conversion step; there is no typed-coordinate entry surface of any
+kind today (item 1/610's still-open half), so a projected-CRS mode would be built on top of a
+feature that does not exist yet. No urgency, per Tom's own framing (a development branch, not a
+near-term ship) — I agree with that framing from my own seat, more strongly than I expected to
+before writing the review.

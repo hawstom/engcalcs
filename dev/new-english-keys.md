@@ -42,14 +42,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_georef_save_locked`**
   > Finish the placement with the "Keep this placement" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.
   _Ruled OK 2026-09-09._
+- **`lpn_help_welcome`**
+  > Welcome page
+  @@ NEEDS RULING
 - **`lpn_map_unmeasurable`**
   > This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.
   _Ruled OK 2026-09-10._
 - **`lpn_menu_cue`**
   > Start with the menus above. Use the toolbar for quick access.
-  @@ NEEDS RULING
-- **`lpn_menu_home_tip`**
-  > Welcome page, LibreWaterNet.org
   @@ NEEDS RULING
 - **`lpn_pane_text_attached`**
   > Attached

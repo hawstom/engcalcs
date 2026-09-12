@@ -127,6 +127,11 @@ console.log('\n-- the Help menu rows --');
 	report(/pc\.about_main_menu/.test(body), 'About, in Help');
 	report(/toggleAboutPopup/.test(body), '...opening the in-page box, not About.php');
 	report(!/function openMarkMenu/.test(src), 'and the mark has no menu of its own any more');
+	// **THE WAY HOME IS A HELP ROW, AND THE FAR-LEFT MARK IS GONE ENTIRELY** (Tom, 2026-09-11:
+	// *"it was ill-advised"*). Asserted in both directions so the experiment cannot quietly
+	// return: the row must exist, and nothing may be built to the left of File.
+	report(/pc\.lpn_help_welcome/.test(body), 'a Welcome page row, in the top group');
+	report(!/lpn_menu_home/.test(src), '...and no product mark at the far left of the bar');
 	// "Fix something" REPLACED Contact rather than joining it. Both go to contact.php, and
 	// lib/Calculators.lib.php records what two links to one destination do to each other: they
 	// "halve each other's weight rather than doubling the invitation".

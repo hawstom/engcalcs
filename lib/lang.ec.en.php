@@ -1855,12 +1855,15 @@ $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable,
 // menus ARE rather than what they contain: a reader who has not noticed the row does not need a
 // list of it, they need to look up once.
 $ec_lang['lpn_menu_cue']='Start with the menus above. Use the toolbar for quick access.';
-// The tip on the product mark at the far left of the menu bar (Task 625). **THE WORDS AND THE
-// DOMAIN ARE ONE STRING, not a phrase joined to a proper noun at render time** -- composing a
-// label from fragments is what broke the original word-level design in gendered, word-order and
-// RTL languages, and a translator needs to see where the name sits in their own sentence.
-// Nielsen Norman on a logo link: it should carry worded text and not the picture alone.
-$ec_lang['lpn_menu_home_tip']='Welcome page, LibreWaterNet.org';
+// **THE WAY HOME IS A HELP ROW NOW** (Tom, 2026-09-11). This was `lpn_menu_home_tip`, the tip on
+// a product mark at the far left of the menu bar; the mark is gone and the row replaced it, on
+// his instruction: *"Help menu to include Welcome Page ... as last item in top group."* The key
+// was never translated, having lived for less than a day, so renaming it costs nothing.
+//
+// The DOMAIN is not in the label: a Help row sits among other rows that name what they do, and
+// "Welcome page" is what this one does. The address belongs in the browser's status bar, where a
+// link's destination is already shown.
+$ec_lang['lpn_help_welcome']='Welcome page';
 $ec_lang['lpn_about_license']='Licensed under the GNU General Public License v3.0 or later.';
 $ec_lang['lpn_notes_1_term']='How it is solved';
 // **IT NAMED THE WRONG SOLVER** (Tom, 2026-09-10: *"Wrong facts."*). It said every moment "is

@@ -127,7 +127,19 @@ console.log('\n--- a click in open space is a bend, not an abandonment ---');
 	ok('...carrying both bends, in the order they were picked',
 		l.verts.length === 2 && l.verts[0].x === 200 && l.verts[0].y === 300
 			&& l.verts[1].x === 400 && l.verts[1].y === 300, JSON.stringify(l.verts));
-	ok('...and the drawing is over', L.pendingFrom() === null && L.pendingVerts().length === 0);
+	// **THE TOOL CARRIES ON FROM THE NODE IT REACHED** (Tom, 2026-09-11: *"It might be good to
+	// have the pipe tool continue from the last node."*). This asserted `pendingFrom() === null`
+	// until then -- drawing a run of five pipes cost five presses on junctions already under the
+	// pointer. The bends DO clear: they belonged to the leg just committed.
+	//
+	// **THE COST IS REAL AND IS THE POLYLINE CONTRACT**: a click on any OTHER node now draws
+	// another pipe, so a disconnected run must be started with Escape first. Tom named the ways
+	// out when he asked for this -- Escape, or another tool -- so they are the contract, not an
+	// omission. Everything below therefore abandons explicitly between sub-tests.
+	ok('...and the tool continues from the node it reached', L.pendingFrom() === b, L.pendingFrom());
+	ok('...with the finished leg\'s bends cleared', L.pendingVerts().length === 0,
+		JSON.stringify(L.pendingVerts()));
+	L.setMode('select'); L.setMode('add-pipe');   // end the run, as a user would with Escape
 }
 
 // ---------------------------------------------------------------------------
@@ -195,6 +207,10 @@ console.log('\n--- the drawing leaves nothing behind ---');
 	click(100, 100); click(500, 100);
 	ok('the next pipe drawn is straight', doc.links.length === 1 && doc.links[0].verts.length === 0,
 		JSON.stringify(doc.links[0] && doc.links[0].verts));
+	// **END THE RUN, as a user must.** The tool continues from the node it reached (2026-09-11),
+	// so without this the next click below would draw a second pipe back to the first node --
+	// which it silently did while this line was missing, and is the one cost of the change.
+	esc();
 
 	// Changing tool mid-drawing abandons it too, for the same reason and through the same door.
 	click(100, 100);

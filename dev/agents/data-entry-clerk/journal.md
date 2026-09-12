@@ -834,3 +834,38 @@ toward pasting, the same way the Curves note already does).
 both OBSERVED against the current file, line-cited. The "pointer tool first" convention claim is
 SPECULATION, marked as such above. The Help-item phrasing convention is OBSERVED (grepped and
 quoted). Nothing here is CITED — no external source was needed for either question.
+
+## Seventh invocation, 2026-09-11 — Tom asked for me by name on projected coordinate systems
+
+Full answer: `dev/coordinate-entry-clerk-review.md`. Short version, against
+`dev/map-projection-decision.md` and `dev/map-coordinate-mathematics.md` §6.
+
+**OBSERVED**, re-confirmed from my own first invocation: there is still no typed-coordinate entry
+path anywhere in `js/looped-network.js` today — `addNode(type, x, y)` still has only a canvas
+pointer caller, and the popup's coordinate fields are still read-only spans. A projected-CRS entry
+mode would be an enhancement to a feature that does not exist yet.
+
+**CITED**: State Plane has 124 zones today and SPCS2022 raises that to 953
+(https://gisgeography.com/state-plane-coordinate-system-spcs/,
+https://www.coordinately.org/learn/nsrs-modernization); NATRF2022 is in public beta now and shifts
+NAD83(2011) by 3.5-4 ft in Texas alone (same coordinately.org source, and
+https://beta.ngs.noaa.gov/NATRF2022/). A wrong-zone pick is almost always silent — adjacent zones
+are deliberately similar in magnitude on purpose, which is the property that makes State Plane
+convenient and a wrong pick undetectable by inspection.
+
+**My recommendation, stated plainly**: proj4js, not hand-rolled UTM. UTM-alone cannot extend to
+State Plane's different projection families (Lambert Conformal Conic in some states, Transverse
+Mercator in others) without a rewrite of the whole approach; proj4js already is the extensible
+library, EPSG-keyed, at the cost of a real runtime dependency the mathematics report already
+flagged honestly. Building UTM first does not save the larger design cost, it spends it twice —
+which is, I believe, exactly the trap Tom's own words describe.
+
+**My own ranking, stated once more and unchanged in shape from every previous ranking in this
+file**: no urgency, agreeing with Tom's own framing, and I would put Task 610/186's still-open half
+(typed X/Y, row creation via paste) and the market-researcher's CSV/GPX import ahead of this for
+volume entry specifically — same order-of-magnitude argument I have made before (a CRS picker saves
+at most a per-session unit-conversion step; row creation removes a per-element round trip, 400
+times). Fine as a development branch, per Tom's own framing of the ask; not a near-term build for my
+seat's own case.
+
+— Declan

@@ -79,13 +79,55 @@ file written in UTM stays in UTM; nothing is reprojected on open and save. Three
 systems then coexist -- Pseudo-Mercator, a projected CRS, and arbitrary XY -- and an existing file
 keeps whichever it already has.
 
+### The contradiction Declan found, and its resolution
+
+**`dev/map-coordinate-mathematics.md` §6.2/§6.4 concludes the opposite of the section above**, and
+he caught it: it says storing a projected CRS as the document's frame violates "only the user
+touches a file's numbers", because `E,N <-> lon/lat` is a lossy round trip, and that it is LESS
+accurate than what `geodesicMeters()` already delivers. Its recommendation is **entry and display
+only**. The section above wants the drawing frame to BE the projected plane. Both were written the
+same day, by me, from different halves of the problem.
+
+**THEY ARE RECONCILED BY ASKING WHOSE NUMBERS THEY ARE.** The rule is not "never hold eastings";
+it is that we never rewrite what the user supplied.
+
+- **A document AUTHORED in State Plane and STORED in State Plane round-trips nothing.** The user
+  typed eastings, the file holds eastings, the drawing frame is that plane. There is no
+  conversion, so there is no loss, and the mathematics report's objection does not reach it.
+- **CONVERTING an existing lon/lat document into a projected CRS is what it forbids**, and it is
+  right. That rewrites every coordinate the user has. **Do not offer it as a Settings switch.**
+- **The drawing frame is DERIVED from whatever the document already stores**, never chosen
+  independently of it. A lon/lat document keeps drawing in Web Mercator exactly as today.
+
+So the document gains a **CRS it declares**, not a CRS it is converted into, and the three
+coordinate systems coexist because a file keeps the one it was born with.
+
 ### The one thing to settle before anybody builds it
 
-**proj4js, or UTM alone?** UTM alone is a few hundred lines and covers most engineering work.
-proj4js is thousands of CRSs, is what the browser GIS world actually uses, and is a real runtime
-dependency on a page that vendors only the EPANET engine today. The mathematics report costs the
-CRS options; it does not cost this choice, and this choice is the one that decides the size of the
-work.
+**SETTLED: proj4js, not hand-rolled UTM** (Declan, `dev/coordinate-entry-clerk-review.md`,
+2026-09-11), and the reason is decisive and technical rather than a matter of scope:
+
+> **State Plane is not a parameter change on UTM's formula.** It is different PROJECTION FAMILIES
+> zone by zone -- Lambert Conformal Conic in some states, Transverse Mercator in others. Building
+> UTM first spends the design cost twice rather than saving it.
+
+That is exactly the trap Tom feared (*"I don't know a clean way to move incrementally from
+UTM-only to the whole library"*) and it confirms his instinct not to ship UTM alone. proj4js is
+EPSG-keyed and already the extensible thing.
+
+**THE SCALE OF THE ZONE PROBLEM, measured rather than assumed**: 124 State Plane zones today,
+**953 under SPCS2022**; NAD27 and NAD83 both still in live use, and NATRF2022 in public beta,
+shifting NAD83(2011) by 3.5 to 4 ft in Texas alone. **A wrong-zone pick is almost always SILENT**,
+because adjacent zones are deliberately similar in magnitude -- so is a missing false-easting,
+which shifts a whole batch by one constant and stays internally consistent.
+
+### AND IT IS NOT THE NEXT THING TO BUILD
+
+**There is no typed-coordinate entry surface at all today.** `addNode(type, x, y)` has one caller,
+the canvas pointer, and the property popup's coordinate fields are read-only spans. A CRS picker
+would be built on a feature that does not exist. Declan ranks Task 610/186's open half -- typed
+X/Y and row creation by paste -- and the CSV/GPX survey import ahead of it for anybody working at
+volume, and Tom has already said there is no urgency.
 
 ## His test case, which is the acceptance test
 

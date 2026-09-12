@@ -22172,6 +22172,16 @@ var EngCalcs = EngCalcs || {};
 			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
 			// strip itself (toolbarIconIndex), so a button added later is in it already.
 			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar key', submenu: iconGuideRows },
+			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
+			// include Welcome Page ... as last item in top group"*). It replaces the whole
+			// far-left-mark experiment -- see buildMenuBar() for how that went and why it will not
+			// be retried with a tower.
+			//
+			// `ext()`, so it opens a new tab with `noopener`: a reader looking up what this
+			// software IS should not put an open project through `beforeunload` to do it. That is
+			// the same reasoning every other outbound row in this menu already follows.
+			{ icon: 'info', label: pc.lpn_help_welcome || 'Welcome page',
+				fn: ext(EngCalcs.lwnSiteUrl || 'https://librewaternet.org/') },
 			{ separator: true },
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
 			// reports actually received are a wrong word or a bad number, and "Fix something" invites
@@ -22535,40 +22545,25 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
 		if (!bar) { return; }
 		bar.innerHTML = '';
-		// **THE MARK IS A LINK, AND THE MAC-MENU EXPERIMENT IS OVER** (Task 625; Ida's reversal
-		// 2026-09-11, on Tom's *"we are chasing our tail ... Press Ida on this circular shoving
-		// match."*). It was a link, became a menu when the Apple-menu position seemed to demand
-		// one, and is a link again. Three findings closed it:
+		// **THERE IS NO MARK AT THE FAR LEFT, AND THE BAR STARTS WITH File** (Tom, 2026-09-11,
+		// closing this out: *"I can't remember why we went down this road ... But it was
+		// ill-advised."*).
 		//
-		//   * **macOS HAS TWO SLOTS AND WE MERGED THEM.** The Apple menu is one thing; a separate
-		//     BOLD APP-NAME menu holds About and Preferences. We drew one glyph like the first and
-		//     gave it the second's contents. Apple's own HIG separates them, and VS Code -- the
-		//     cross-platform case -- puts About in HELP on Windows and Linux, keeping the app-menu
-		//     pattern for macOS alone.
-		//   * **NOBODY WOULD HAVE FOUND IT.** Two of three testers never saw the menu bar when it
-		//     was words; an icon-only item at its front does not win that back, it just moves the
-		//     legal rows and About behind the same blind spot.
-		//   * **THESE USERS ARE ON WINDOWS.** A left-corner brand MENU is a convention they do not
-		//     have, and Tom is explicit about not confusing them with one.
+		// **HOW IT HAPPENED, since he asked for the reminder:** he wanted a way back to
+		// librewaternet.org from the map; Ida proposed a mono tower at the far left, on the
+		// placement convention Figma and VS Code use; the slot then turned out to carry the
+		// Apple-menu expectation, so it became a menu; that collided with the Water menu's own
+		// tower; and the menu was then reverted to a link on evidence that Windows users have no
+		// such convention. Three reversals for a route that Help can hold in one row.
 		//
-		// So the mark keeps the job a logo link actually does -- go home -- and Help keeps the job
-		// of holding commands. A browser tab and a URL bar already supply the identity that a
-		// native app's bold menu exists to provide.
+		// **THE TOWER BELONGS TO THE WATER MENU** (*"The blue water tower is very pretty. But I
+		// think it needs to be used for the Water menu"*), which is where it was before any of
+		// this, and `plan` goes back to being unused. The way home is Help > Welcome page.
 		//
-		// **THE TIP CARRIES WORDS, NOT JUST THE PICTURE** (Nielsen Norman on logo links), which is
-		// why `lpn_menu_home_tip` exists and says "Welcome page" before it says the domain.
-		if (EngCalcs.lwnSiteUrl) {
-			var pcHome = EngCalcs.pageConfig || {};
-			var home = document.createElement('a');
-			home.id = 'lpn_menu_home';
-			home.className = 'lpn-menubar-item lpn-menubar-mark ec-help';
-			home.href = EngCalcs.lwnSiteUrl;
-			setLabel(home, 'water', '');
-			var homeTip = pcHome.lpn_menu_home_tip || 'Welcome page, LibreWaterNet.org';
-			home.setAttribute('aria-label', homeTip);
-			home.title = homeTip;
-			bar.appendChild(home);
-		}
+		// **IF A MARK EVER RETURNS IT IS A HOME ICON, NOT THE TOWER** -- his own words: *"if we
+		// have anything, it could be a home icon to lead to our Welcome/Front/SEO page."* He notes
+		// epanet-js has the slot and spends it on New project while calling it Home. Do not
+		// reintroduce the tower there.
 		[
 			{ id: 'lpn_menu_file', icon: 'file', label: pc.lpn_tool_file || 'File', open: openFileMenu },
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
@@ -22593,21 +22588,11 @@ var EngCalcs = EngCalcs || {};
 				// deliberately still `lpn_menu_project`, and a fallback repeating the old label is
 				// the one place the rename did not reach. It shows only where pageConfig failed to
 				// supply the key, which is precisely when nobody is watching.
-				// **'plan', NOT 'water', AND THE COLLISION IS WHY** (Tom, 2026-09-11: *"Our Mac-style
-				// app icon is now the same as our Map menu."*). The home mark took the tower when
-				// it became the leftmost item, and two identical towers in a seven-item bar is one
-				// glyph doing two jobs. Ida ruled the MENU changes, not the mark: the tower is the
-				// product identity and the bar's only uniqueness signal once `.lpn-menubar-word`
-				// is hidden below 640px, where every item is a glyph and shape is all that is left.
-				// Weight alone -- solid mark against stroke menus, the Apple trick -- was rendered
-				// and rejected: at 17px two towers of different weight are still the tower twice.
-				//
-				// `plan` was THIS MENU'S OWN ICON before the Task 523 rename and has been drawn
-				// and unused since; Tom on it then: *"We really came out victorious with our Plan
-				// icon. But it looks like now we need to change it."* `settings` and `library` are
-				// disqualified for appearing as ROWS inside this same menu, which would repeat the
-				// defect one level down. No new geometry, no new strings.
-				id: 'lpn_menu_project', icon: 'plan', label: pc.lpn_menu_project || 'Water',
+				// **THE TOWER, AND IT NEVER SHOULD HAVE LEFT.** It went to `plan` for one day while
+				// a product mark at the far left held the tower and the two collided; the mark is
+				// gone (see buildMenuBar's note) and the collision with it. Tom on the interval:
+				// *"Plan by Water menu: It's not bad, but it's not helpful."*
+				id: 'lpn_menu_project', icon: 'water', label: pc.lpn_menu_project || 'Water',
 				tip: pc.lpn_menu_project_tip, open: openProjectBarMenu
 			},
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
@@ -24108,7 +24093,24 @@ var EngCalcs = EngCalcs || {};
 						saveUndoSnapshot();
 						logLpnFirstAction('element');
 						addLink(mode.slice('add-'.length), pendingLinkFrom, hitId, pendingLinkVerts);
-						setPendingLinkFrom(null);
+						// **THE TOOL CARRIES ON FROM THE NODE IT JUST REACHED** (Tom, 2026-09-11:
+						// *"It might be good to have the pipe tool continue from the last node."*).
+						// It used to clear, so drawing a run of five pipes cost five presses on
+						// interior junctions that were already under the pointer -- the second
+						// press of each pair doing nothing but re-saying where the last one ended.
+						// Polyline continuation is what every CAD and GIS editor does with a line
+						// tool, and it is what EPANET's own editor does.
+						//
+						// **THE WAYS OUT WERE ALREADY BUILT AND ARE THE ONES HE NAMED**: Escape
+						// (the handler above, which consumes the key only when there is something
+						// to abandon), and choosing another tool (setMode() calls
+						// setPendingLinkFrom(null) on the way out). Nothing new is needed to stop,
+						// which is why this is one line rather than a mode.
+						//
+						// A pipe DRAWN is a pipe committed -- addLink() has already run and the
+						// undo snapshot is taken -- so carrying on never puts the previous pipe at
+						// risk, and Escape abandons only the leg not yet drawn.
+						setPendingLinkFrom(hitId);
 					}
 					// A second press on the from-node itself is neither a bend nor a link: a
 					// zero-length self-loop is not a thing the solver models, and reading it as a
