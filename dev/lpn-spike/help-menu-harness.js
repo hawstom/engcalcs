@@ -102,18 +102,20 @@ console.log('\n-- the Help menu rows --');
 	// Walkthroughs -- a key, an ext(), a new tab -- and both are asserted on their DESTINATION as
 	// well as their key, because the whole value of either row is the host it reaches. The
 	// screenshots page was live, annotated and reachable from nothing for weeks; the gateway site
-	// is the one place dev/positioning.md now permits a competitor name in a menu item, and that
-	// permission covers not-epanet.org and nowhere else.
-	report(/pc\.lpn_help_screenshots/.test(body), 'Screenshot gallery');
-	report(/pc\.lpn_help_not_epanet/.test(body), 'Not EPANET');
-	report(/LPN_SCREENSHOTS_URL/.test(body) && /librewaternet\.org\/screenshots\.html/.test(src),
-		'and the screenshots row reaches the live page, not a repository path');
-	report(/LPN_NOT_EPANET_URL/.test(body) && /https:\/\/not-epanet\.org/.test(src),
-		'and the gateway row reaches not-epanet.org, the one host that permission covers');
+	// **THE Not EPANET ROW IS GONE, AND SO IS THE SITE** (Tom, 2026-09-11). He retired
+	// not-epanet.org on the same test that struck LibreEPANET -- a name may claim only what it
+	// can support, and "Not" claims a contrast: *"it does not survive my standard, and it is
+	// dead weight ... the best way to resolve the tension is to delete Not-EPANET immediately
+	// and to bless Luke Butler and Iterating Inc."* Its research lives at
+	// librewaternet.org/credits.html and /disclosures.html. Asserted as an ABSENCE, because a
+	// row pointing at a dead host is worse than no row, and because third_party_request_check.php
+	// no longer declares that host at all.
+	report(!/lpn_help_not_epanet/.test(body), 'no Not EPANET row: the site it pointed at is retired');
+	report(!/LPN_NOT_EPANET_URL/.test(src), '...and the URL constant went with it');
 	// EVERY outward row opens a NEW TAB, and that is not stylistic: init()'s beforeunload guard
 	// prompts whenever a file project is dirty, so navigating this tab would meet a browser
 	// "Leave site?" dialog mid-edit.
-	report(/ext\(LPN_SCREENSHOTS_URL\)/.test(body) && /ext\(LPN_NOT_EPANET_URL\)/.test(body),
+	report(/ext\(LPN_SCREENSHOTS_URL\)/.test(body),
 		'both go through ext(), so neither can navigate this tab away from a dirty project');
 	report(/pc\.lpn_help_notes/.test(body), 'Notes');
 	report(/pc\.lpn_help_fix/.test(body), 'Fix something');
@@ -141,7 +143,7 @@ console.log('\n-- the Help menu rows --');
 	// This replaces the numbered list of 2026-09-06 AND the single-menu order shipped earlier
 	// today. Do not restore either from an older comment.
 	const order = ['lpn_help_walkthroughs', 'lpn_help_notes', 'lpn_help_icons', 'lpn_help_fix',
-		'lpn_help_screenshots', 'lpn_help_not_epanet'];
+		'lpn_help_screenshots'];
 	const at = order.map(k => body.indexOf('pc.' + k));
 	report(at.every(i => i >= 0), 'every row Help kept is in Help');
 	report(at.every((v, i) => i === 0 || v > at[i - 1]), 'and they stand in that order');
@@ -286,7 +288,7 @@ console.log('\n-- the map fits the window instead of guessing 72% of it --');
 }
 
 console.log('\n-- the strings exist --');
-['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank', 'lpn_help_screenshots', 'lpn_help_not_epanet'].forEach(function (k) {
+['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank', 'lpn_help_screenshots'].forEach(function (k) {
 	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
 });
 {

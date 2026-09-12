@@ -22119,7 +22119,13 @@ var EngCalcs = EngCalcs || {};
 	// rebuking of name dropping while all the while invoking the EPANET name for SEO."* The row
 	// says where the link GOES and does not restate the site's argument, and nothing here may
 	// imply EPA affiliation, sponsorship or review.
-	var LPN_NOT_EPANET_URL = 'https://not-epanet.org/';
+	// **not-epanet.org IS RETIRED AND ITS ROW IS GONE** (Tom, 2026-09-11). He built it as a
+	// reaction to epanetjs.com and then applied to it the same test that struck LibreEPANET --
+	// a name may claim only what it can support, and "Not" claims a contrast: *"it does not
+	// survive my standard, and it is dead weight ... I am guilty of judging epanetjs. And
+	// probably the best way to resolve the tension is to delete Not-EPANET immediately and to
+	// bless Luke Butler and Iterating Inc."* The research it carried is not lost -- it is
+	// librewaternet.org/credits.html and /disclosures.html now. Do not re-add the row or the URL.
 	// The annotated screenshots, maintained in the LibreWaterNet repository (ROADMAP Task 178
 	// phase 1). Tom, 2026-08-25: *"What points at the live screenshots page? I expected Help, but
 	// that doesn't."* Nothing did -- the page was live, annotated and unreachable from the software
@@ -22224,8 +22230,7 @@ var EngCalcs = EngCalcs || {};
 			//
 			// These two stay because they answer the first question sideways: they are the places
 			// a reader goes to see this page being used and to see what it is not.
-			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
-			{ icon: 'help', label: pc.lpn_help_not_epanet || 'Not EPANET', fn: ext(LPN_NOT_EPANET_URL) }
+			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) }
 		]);
 	}
 

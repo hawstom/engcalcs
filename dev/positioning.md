@@ -260,6 +260,33 @@ community norms, not copyright. "LibreEPANET" reads descriptively, the way "epan
 is why it is safe. A courtesy note to OpenWaterAnalytics before launch is cheap insurance — in the
 register of `dev/outreach-owa-post.md` (a real question, not an announcement).
 
+### not-epanet.org IS RETIRED, 2026-09-11 — and it was Tom's own test that retired it
+
+**He applied to his own site the standard he set for LibreEPANET, and it failed.** His words:
+
+> *"it does not survive my standard, and it is dead weight ... Frankly, Not-EPANET.org was
+> reactionary to epanetjs.com ... I am guilty of judging epanetjs. And probably the best way to
+> resolve the tension is to delete Not-EPANET immediately and to bless Luke Butler and Iterating
+> Inc."*
+
+- **THE TEST IS THE SAME ONE, APPLIED TWICE.** A name may claim only what the project can show.
+  `LibreEPANET` claimed to be more free than a public-domain program; **`Not-EPANET` claims a
+  CONTRAST**, and defines the project by what it is not. `EPANET++` survives both readings because
+  an increment is something we can demonstrate.
+- **THE RESEARCH SURVIVES AND THE REACTION DOES NOT.** The claims ledger and the About-EPANET page
+  were the valuable half; they are `librewaternet.org/disclosures.html` and `/credits.html` now,
+  on his renaming (*"Honesty becomes Disclosures and Gratitude becomes Credits"*). The sister
+  wordmark that Task 591 put on both front pages went with the site.
+- **WHAT IS GONE FROM THE CODE:** the app's Help row, `LPN_NOT_EPANET_URL`, the page's
+  `lpn_help_not_epanet` supply, and the host's declaration in `third_party_request_check.php`.
+  `lpn_help_not_epanet` is now an unread key in 27 files; deleting it is Tom's call.
+- **WHAT IS NOT DONE HERE AND IS HIS:** the DNS, the hosting and the registration itself, plus the
+  `~/webdev/not-epanet.org` repository, which is untouched so the writing has a home until he says
+  otherwise. **Do not point a live page at that host in the meantime.**
+- **AND THE POINT WAS NEVER THE DOMAIN.** He said what the resolution actually is: *"bless Luke
+  Butler and Iterating Inc."* Divergence in free software is not betrayal. If a future session is
+  asked about epanet-js, that is the register: accurate and generous, per §1.
+
 ### EPANET++ — two domains registered 2026-09-11, and Tom's reason for preferring them
 
 **He registered `epanet-plus-plus.org` and `epanetpp.org`, and the reasoning is the point.** His

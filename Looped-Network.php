@@ -2066,7 +2066,6 @@ EngCalcs.pageConfig = {
 	lpn_ff_err_not_junction: <?=json_encode($ec_lang['lpn_ff_err_not_junction'])?>,
 	lpn_ff_err_unknown: <?=json_encode($ec_lang['lpn_ff_err_unknown'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
-	lpn_help_not_epanet: <?=json_encode($ec_lang['lpn_help_not_epanet'])?>,
 <?php // Help > Install, the door that moved off the suite navbar with the divorce (Task 625).
       // The suite's own key, already translated, rather than a new string before the freeze. ?>
 	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
