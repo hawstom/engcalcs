@@ -1086,6 +1086,7 @@
         "lpn_status_closed_empty": "Closed {closed}. Started a new empty project.",
         "lpn_storage_full": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_notes_1_term": "How it is solved",
@@ -1780,7 +1781,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1778,
+    "count": 1779,
     "active_prefixes": [
         "about",
         "bpn",

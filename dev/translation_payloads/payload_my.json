@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1778,
-        "delta_key_count": 13,
+        "expected_key_count": 1779,
+        "delta_key_count": 14,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -525,6 +525,7 @@
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_tag": "Tag",
@@ -540,6 +541,7 @@
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_tag": "Tag",
@@ -660,6 +662,22 @@
             }
         },
         "lpn_menu_cue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "မသိမ်းရသေးပါ။ ဘရောက်ဇာသိုလှောင်ခန်း ပြည့်နေခြင်း (သို့) မရရှိနိုင်ခြင်းကြောင့်၊ ဤတဲ့ဘ်ကို ပိတ်လိုက်သောအခါ သင့်လတ်တလော ပြောင်းလဲမှုများ ပျောက်ဆုံးသွားပါလိမ့်မည်။",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "မည်သို့ ဖြေရှင်းသည်",
+                    "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_about_credits": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

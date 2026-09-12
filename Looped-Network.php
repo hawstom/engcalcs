@@ -1199,9 +1199,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
         // favicon does not reach a visitor who has loaded the app before. Fix that at
         // ecSwAssetUrl(), for all icons at once, not by versioning one <img> and breaking the
         // precache to do it. ?>
-		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" />LibreWaterNet.org</h2>
+<?php   // **THE NAME IS A LINK BECAUSE SOMEBODY TRIED TO CLICK IT** (MAH, browsing 2026-09-11,
+        // relayed by Tom: *"He clicked LibreWaterNet.org in About. Maybe that can be a link to
+        // Welcome on a new tab."*). A domain shown in an About box reads as clickable whatever we
+        // intended, and the cheapest answer to a reader doing the reasonable thing is to let it
+        // work. New tab, `rel="noopener"`: About is a side-trip, and a reader who opened it to
+        // find out what this is should not lose an open project to read more. ?>
+		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=EC_LWN_SITE_URL?>" target="_blank" rel="noopener">LibreWaterNet.org</a></h2>
 		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
+<?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
+        // this one can finally honour: librewaternet.org/credits.html is the About-EPANET page
+        // that survived not-epanet.org, and naming what this is built on belongs here. ?>
+		<p><a href="<?=EC_LWN_SITE_URL?>credits.html" target="_blank" rel="noopener"><?=$ec_lang['lpn_about_credits']?></a></p>
 <?php   $ec_build = ecDeployIdentity();
         if ($ec_build['date'] !== '' || $ec_build['sha'] !== '') : ?>
 		<p class="lpn-about-build"><?=htmlspecialchars(trim($ec_build['date'] . ' · ' . $ec_build['sha']))?></p>

@@ -1863,6 +1863,10 @@ $ec_lang['lpn_menu_cue']='Start with the menus above. Use the toolbar for quick 
 // The DOMAIN is not in the label: a Help row sits among other rows that name what they do, and
 // "Welcome page" is what this one does. The address belongs in the browser's status bar, where a
 // link's destination is already shown.
+// The About box's second link (MAH, browsing on 2026-09-11, relayed by Tom: *"I noticed that
+// About often has a 'Credits' link."* He is right, and this one has somewhere real to point --
+// librewaternet.org/credits.html, which is the About-EPANET page that survived not-epanet.org).
+$ec_lang['lpn_about_credits']='Credits';
 $ec_lang['lpn_help_welcome']='Welcome page';
 $ec_lang['lpn_about_license']='Licensed under the GNU General Public License v3.0 or later.';
 $ec_lang['lpn_notes_1_term']='How it is solved';
