@@ -67,10 +67,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_time_pause_tip`**
-  > Pause animation.
+  > Pause animation
   @@ NEEDS RULING
 - **`lpn_time_play_tip`**
-  > Play animation.
+  > Play animation
   @@ NEEDS RULING
 - **`lpn_time_runbox_hide`**
   > Do not show this box again

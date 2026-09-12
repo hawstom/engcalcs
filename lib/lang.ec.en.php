@@ -1240,7 +1240,7 @@ $ec_lang['lpn_georef_twopt_done']='The model now sits on the two points you gave
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='Bottom panel';
-$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile and a table for each kind of part.';
+$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile and a table for each kind of asset.';
 $ec_lang['lpn_pane_resize']='Drag to make the panel taller or shorter';
 $ec_lang['lpn_pane_tab_junctions']='Junctions';
 $ec_lang['lpn_pane_tab_reservoirs']='Reservoirs';
@@ -1309,7 +1309,7 @@ $ec_lang['lpn_menu_project']='Water';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Everything about water network modeling is here in one place, except the animation play controls.';
 $ec_lang['lpn_tables_menu']='Tables';
-$ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the parts in this network. There is one table for each kind of part, and you can sort it and edit it there.';
+$ec_lang['lpn_tables_menu_tip']='Open the panel below the map on a table of the assets in this network. There is one table for each kind of asset, and you can sort it and edit it there.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
 // toolbar button, which is the one that goes away.
@@ -1375,7 +1375,7 @@ $ec_lang['lpn_find_btn']='Find';
 // button ... with a selector for which table."
 $ec_lang['lpn_find_filter_btn']='Filter in current table';
 $ec_lang['lpn_find_filter_table']='Table to filter';
-$ec_lang['lpn_find_filter_tip']='Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
+$ec_lang['lpn_find_filter_tip']='Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
 // The conditions read as the middle of a sentence: "ID contains 12", "Pressure below 20".
 // Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE
 // (Task 438 Wave 0): a finite verb has to agree with the property noun chosen in the select above
@@ -2595,13 +2595,13 @@ $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the extended period simulation.';
 $ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.';
-$ec_lang['lpn_time_slider']='Time';
+$ec_lang['lpn_time_slider']='Elapsed simulation time';
 $ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.';
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';
-$ec_lang['lpn_time_play_tip']='Play animation.';
-$ec_lang['lpn_time_pause_tip']='Pause animation.';
+$ec_lang['lpn_time_play_tip']='Play animation';
+$ec_lang['lpn_time_pause_tip']='Pause animation';
 $ec_lang['lpn_time_pause']='Pause';
 $ec_lang['lpn_time_next']='Step forward';
 $ec_lang['lpn_time_last']='Go to the end';
@@ -2640,7 +2640,7 @@ $ec_lang['lpn_time_run_report_copied']='Copied';
 $ec_lang['lpn_time_run_report_tip']='What the EPANET solver itself printed about the last run: whether it converged, and anything it warned about. It is the solver’s own text, not ours.';
 
 $ec_lang['lpn_time_speed']='Speed';
-$ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
+$ec_lang['lpn_time_speed_tip']='Playback speed';
 
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,

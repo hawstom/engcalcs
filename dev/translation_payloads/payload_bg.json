@@ -523,8 +523,8 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
-        "lpn_time_play_tip": "Play animation.",
-        "lpn_time_pause_tip": "Pause animation.",
+        "lpn_time_play_tip": "Play animation",
+        "lpn_time_pause_tip": "Pause animation",
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
@@ -542,8 +542,8 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
-        "lpn_time_play_tip": "Play animation.",
-        "lpn_time_pause_tip": "Pause animation.",
+        "lpn_time_play_tip": "Play animation",
+        "lpn_time_pause_tip": "Pause animation",
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
