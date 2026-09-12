@@ -86,13 +86,14 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 ## Extended period simulations
 
 - 248.01, 423, 410, 248.02| Extended-period simulation following patterns for demands, reservoir head, and pump speed.
-- 248.03, 460| EPANET-style rule-based controls.
+- 248.03| EPANET-style rule-based controls.
+- 460, 586, 587| Pump, efficiency, head loss, and tank volume curves, defined once in the Libraries box beside the patterns and rules and stated by reference, so a manufacturer's curve keeps every point it was published with and a tank fills on its real shape.
 - 450| EPANET run report.
 - 448| Color limits constant through a simulation, so a color means the same thing at every step.
 - 566| Water quality: age, share from a source, chemical decay.
 - 566.01| Pump energy cost: Run length, power use, and cost including peak demand charge.
 
-## Premium features
+## Premium features included for everybody
 
 <!-- **"PREMIUM" IS DELIBERATE AND IS NOT A PRICE.** Tom, 2026-09-12, asked directly whether the
      heading reads as a paid tier on a page that says there is nothing to buy: *"These are the
@@ -103,6 +104,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 - 530| Fire flow failure and collateral (design) failure analysis.
 - 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
+- 465| Pipe types: one "150 mm PVC" definition that hundreds of pipes point at, so editing the definition edits every pipe that uses it. Detach one pipe when it needs to be the exception.
+- 590| Fittings: a pipe's minor loss summed from named fittings and their quantities, seeded from EPANET's own thirteen-row table and editable, because the real coefficient depends on size and make.
 
 
 ## The calculators

@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-37 features, citing 90 of the 554 closed task IDs. The other 464 are
+40 features, citing 94 of the 554 closed task IDs. The other 460 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 134 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -48,16 +48,19 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 ## Extended period simulations
 
 - Extended-period simulation following patterns for demands, reservoir head, and pump speed. <!-- 248.01, 423, 410, 248.02 -->
-- EPANET-style rule-based controls. <!-- 248.03, 460 -->
+- EPANET-style rule-based controls. <!-- 248.03 -->
+- Pump, efficiency, head loss, and tank volume curves, defined once in the Libraries box beside the patterns and rules and stated by reference, so a manufacturer's curve keeps every point it was published with and a tank fills on its real shape. <!-- 460, 586, 587 -->
 - EPANET run report. <!-- 450 -->
 - Color limits constant through a simulation, so a color means the same thing at every step. <!-- 448 -->
 - Water quality: age, share from a source, chemical decay. <!-- 566 -->
 - Pump energy cost: Run length, power use, and cost including peak demand charge. <!-- 566.01 -->
 
-## Premium features
+## Premium features included for everybody
 
 - Fire flow failure and collateral (design) failure analysis. <!-- 530 -->
 - Scenarios: override management and report, scenario comparison report. <!-- 201, 407, 412, 512 -->
+- Pipe types: one "150 mm PVC" definition that hundreds of pipes point at, so editing the definition edits every pipe that uses it. Detach one pipe when it needs to be the exception. <!-- 465 -->
+- Fittings: a pipe's minor loss summed from named fittings and their quantities, seeded from EPANET's own thirteen-row table and editable, because the real coefficient depends on size and make. <!-- 590 -->
 
 ## The calculators
 
