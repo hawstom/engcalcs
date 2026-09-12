@@ -139,38 +139,69 @@ define('EC_LWN_SITE_URL', CANONICAL_ORIGIN_DEFAULT . '/');
  * what is wanted here -- and `.git` holds the commit. A semantic version would be a second thing
  * to remember and a second thing to be wrong.
  *
+ * **THE DATE COMES FROM THE REF THE SHA CAME FROM, so the two are one fact and not two.** It read
+ * `filemtime(__FILE__)` until 2026-09-12, which is a DIFFERENT question -- when did this one file
+ * last change -- and a pull only touches the files it changed. So the date froze on
+ * 2026-09-11 18:47 UTC, the last time config.inc.php itself moved, while the sha beside it went on
+ * advancing with every deploy. Tom read the pair and reasonably concluded nothing was deploying:
+ * *"the SHA updates but the date is stuck on the 11th"*. A readout somebody uses to decide whether
+ * a pull landed is the worst possible place for a number that looks plausible and is stale.
+ *
+ * `.git/refs/heads/<branch>` is rewritten by every fast-forward, and `.git/logs/HEAD` is appended
+ * on every HEAD movement and survives `git gc` packing the refs away, so the NEWEST of the two is
+ * "when did this checkout last move". **`.git/FETCH_HEAD` is deliberately not consulted**: a bare
+ * `git fetch` rewrites it without deploying anything, which would report a deploy that never
+ * happened -- measured on this account the same day, 8 minutes apart from the real one.
+ *
  * Everything is best-effort: a deploy made by unpacking an archive has no `.git`, and the answer
  * is then the date alone. `.git` is blocked over HTTP by a RedirectMatch in .htaccess, which does
  * not touch a read from disk.
  *
  * @return array{sha:string,date:string}  either may be '' when it cannot be determined.
  */
-function ecDeployIdentity() {
-    $root = dirname(__DIR__);
+function ecDeployIdentity($root = null) {
+    if ($root === null) { $root = dirname(__DIR__); }
+    $git = $root . '/.git';
     $out = array('sha' => '', 'date' => '');
-    $stamp = @filemtime(__FILE__);
-    if ($stamp) { $out['date'] = gmdate('Y-m-d H:i', $stamp) . ' UTC'; }
-    $head = @file_get_contents($root . '/.git/HEAD');
-    if ($head === false) { return $out; }
-    $head = trim($head);
-    $sha = false;
-    if (strpos($head, 'ref: ') === 0) {
-        $ref = substr($head, 5);
-        $sha = @file_get_contents($root . '/.git/' . $ref);
-        if ($sha === false) {
-            // Packed by `git gc`, so the loose ref file is gone and the sha is in one table.
-            $packed = @file_get_contents($root . '/.git/packed-refs');
-            if ($packed !== false
-                && preg_match('/^([0-9a-f]{40})\s+' . preg_quote($ref, '/') . '$/m', $packed, $m)) {
-                $sha = $m[1];
+    // Every file whose mtime marks "this checkout's HEAD last moved". Collected rather than picked,
+    // because which one records it depends on whether the refs have been packed.
+    $stamps = array();
+    $head = @file_get_contents($git . '/HEAD');
+    if ($head !== false) {
+        $head = trim($head);
+        $sha = false;
+        if (strpos($head, 'ref: ') === 0) {
+            $ref = substr($head, 5);
+            $refPath = $git . '/' . $ref;
+            $sha = @file_get_contents($refPath);
+            if ($sha !== false) {
+                $stamps[] = @filemtime($refPath);   // rewritten by every fast-forward
+            } else {
+                // Packed by `git gc`, so the loose ref file is gone and the sha is in one table.
+                // Its mtime is when gc ran, which is also the last time this ref can have moved --
+                // a later move would have written the loose file back.
+                $packed = @file_get_contents($git . '/packed-refs');
+                if ($packed !== false
+                    && preg_match('/^([0-9a-f]{40})\s+' . preg_quote($ref, '/') . '$/m', $packed, $m)) {
+                    $sha = $m[1];
+                    $stamps[] = @filemtime($git . '/packed-refs');
+                }
             }
+        } else {
+            $sha = $head;                       // a detached HEAD is the sha itself
+            $stamps[] = @filemtime($git . '/HEAD');
         }
-    } else {
-        $sha = $head;   // a detached HEAD is the sha itself
+        if (is_string($sha) && preg_match('/^[0-9a-f]{7,40}/', trim($sha), $m)) {
+            $out['sha'] = substr($m[0], 0, 8);
+        }
+        // The reflog: appended on every HEAD movement, and loose even when the refs are packed.
+        $stamps[] = @filemtime($git . '/logs/HEAD');
     }
-    if (is_string($sha) && preg_match('/^[0-9a-f]{7,40}/', trim($sha), $m)) {
-        $out['sha'] = substr($m[0], 0, 8);
-    }
+    $stamps = array_filter($stamps);            // drops the false a missing file returns
+    // The last resort is this file's own mtime -- the old behaviour, and still the best answer for
+    // a deploy unpacked from an archive, which has no `.git` to ask.
+    $stamp = $stamps ? max($stamps) : @filemtime(__FILE__);
+    if ($stamp) { $out['date'] = gmdate('Y-m-d H:i', $stamp) . ' UTC'; }
     return $out;
 }
 

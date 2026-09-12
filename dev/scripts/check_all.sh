@@ -169,6 +169,7 @@ run_check "suite nav links absolute"     blocking php dev/scripts/nav_link_absol
 run_check "suite nav links selftest"     blocking php dev/scripts/nav_link_absolute_selftest.php
 run_check "js page urls absolute"        blocking php dev/scripts/js_page_url_check.php
 run_check "js page urls selftest"        blocking php dev/scripts/js_page_url_selftest.php
+run_check "deploy identity selftest"     blocking php dev/scripts/deploy_identity_selftest.php
 # Task 322 rows 11 and 12. FOUR third-party requests, all opt-in, each behind its own gate -- and
 # every cookie, localStorage key and IndexedDB store a shipped file writes is written down. The
 # second found two that were not, in the file whose only claim is that it is complete. Neither
