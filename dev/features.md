@@ -59,8 +59,8 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 - Fire flow failure and collateral (design) failure analysis. <!-- 530 -->
 - Scenarios: override management and report, scenario comparison report. <!-- 201, 407, 412, 512 -->
-- Pipe types: one "150 mm PVC" definition that hundreds of pipes point at, so editing the definition edits every pipe that uses it. Detach one pipe when it needs to be the exception. <!-- 465 -->
-- Fittings: a pipe's minor loss summed from named fittings and their quantities, seeded from EPANET's own thirteen-row table and editable, because the real coefficient depends on size and make. <!-- 590 -->
+- Pipe types library: attached a library reference to keep a pipe in sync with the library. <!-- 465 -->
+- Fittings library: attach fittings references to pipes and library pipe types. <!-- 590 -->
 
 ## The calculators
 

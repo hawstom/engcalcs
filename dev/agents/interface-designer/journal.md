@@ -898,3 +898,71 @@ following a citation same-tab (Back restores scroll position), so I did not over
 same-tab state — flagged for behavioural evidence (do readers come back?) rather than a guess.
 
 Full report: `dev/agents/interface-designer/link-target-ruling.md`. No shipped file touched.
+
+## 2026-09-12 — LibreWaterNet's invite buttons: the one-line fix is right; four more things ranked
+
+Tom's own screenshot: the WRITE TO US / OPEN AN ISSUE ON GITHUB pair at the bottom of
+`#stakeholders`, dark mode, pencil-on-water at **1.22:1** (`style.css:507`, OBSERVED). He is
+fixing it himself with `background: transparent`; I was asked only to read the surrounding file
+and rank what else is wrong, not to touch it. No shipped file touched, in either repo.
+
+**Ranked findings**, computed by hand from the declared hex tokens (WCAG relative-luminance
+formula), OBSERVED against `style.css`:
+
+1. **His fix is correct and sufficient for the acute defect.** Resting state becomes pencil
+   `#E0745A` on paper `#10151A` at 5.88:1 (his own number); hover (`.invite .btn:hover`, unchanged)
+   is paper text on pencil fill, which I computed at **5.96:1** — both clear AA (4.5:1), neither
+   AAA (7:1), and the hover state needed no additional check because nobody had verified it before.
+
+2. **The deeper discomfort is glare, not contrast, and is a separate, smaller finding.**
+   `.btn`/`.btn-go`/`.btn-primary` fill with `var(--water)`, and dark mode's `--water` is a LIGHT
+   tint (`#6FA8DC`) because that same token also has to work as body-text-on-dark for links and
+   headings. I computed the resulting light-blue-plate-with-dark-text contrast at **7.27:1** —
+   that pairing is not a contrast defect, it exceeds AAA. The discomfort, if any, is a bright
+   saturated rectangle sitting in a near-black field (CITED: Material Design's dark-theme
+   guidance desaturates a brand accent used as a large fill and reserves the vivid tint for text —
+   the two jobs want different colors, and this file gives them one token doing both). Minimal
+   fix if Tom wants it: a second token, `--water-fill`, that STAYS the light-mode blue
+   (`#1B5FA8`) in dark mode too, used only for solid button backgrounds; `--water` itself stays
+   untouched for text/links/headings, which is already correct. One new token, three background
+   declarations changed, zero string cost. Ranked below the invite fix because nobody circled
+   these two buttons and the math says they are not broken, only bright.
+
+3. **Five button classes for what is functionally two.** `.btn-primary` is byte-identical to
+   `.btn` (both `background: var(--water); color: var(--paper)`) — dead duplication. `.btn-go` is
+   a size variant wearing its own color declarations it does not need. Recommend collapsing to
+   `.btn` (solid) and `.btn-ghost` (outline/transparent) as the only two WEIGHTS, with `.btn-go`
+   kept only as a combinable size modifier (`class="btn btn-go"`) and `.btn-primary` deleted in
+   favor of plain `.btn` at its two call sites. **The invite pair should be ghost, not solid**:
+   they are a matched, equal-weight ask (write to us / open an issue), and the page already has
+   true primary CTAs elsewhere ("Start a model now", "Open the app") — a solid pencil button here
+   would compete with those for attention it does not need. Concretely, drop the bespoke
+   `.invite .btn` override and instead apply the existing `.btn-ghost` class at both markup
+   sites, narrowing to just the accent color: `.invite .btn-ghost{color:var(--pencil)}` /
+   `.invite .btn-ghost:hover{background:var(--pencil);color:var(--paper);border-color:var(--pencil)}`.
+
+4. **Pencil is overused past "sparing accent."** The file's own header comment (line 25-26) says
+   pencil appears "only on the disclaimer rule and on a correction mark" — it is currently doing
+   at least eight jobs: `.invite` border + label, `.disclaimer` border + label, the wordmark's
+   "not", every plain-link `:hover` (`a:hover{color:var(--pencil)}`), the feature-list drafting
+   ticks, `.count a` and `.level a` (ordinary navigation, not caution), and now (before his fix)
+   two buttons. Recommend narrowing back to genuinely cautionary content — `.disclaimer` is the
+   clear keep; `.invite`'s border/label is arguable, since asking for volunteers is not a warning,
+   and freeing it there would let pencil mean one thing again. `a:hover` and `.count a`/`.level a`
+   should probably be `--water`, matching the plain `a{color:var(--water)}` rule they are
+   currently exceptions to.
+
+5. **Found in passing, not asked for: `--ink-soft` is referenced once and defined nowhere.**
+   `style.css:396`, `.actions-note{color:var(--ink-soft)}` — sits directly under the two hero
+   buttons ("Start a model now" / "See who we need"), in the same visual neighborhood as the
+   screenshot. No `--ink-soft` token exists in either the light or dark `:root` block; on an
+   inherited property like `color`, an undefined custom property falls back to the inherited
+   value rather than erroring, so the line reads full-strength `--ink` rather than the muted
+   secondary tone its own name promises — free one-line fix, `var(--ink-2)`, the token used
+   everywhere else on the site for this exact job. `--water-2` is the mirror defect (defined,
+   never consumed) — harmless, since nothing reads it, but worth naming since it is declared
+   as though something does.
+
+No shipped file touched in `librewaternet.org` or `engcalcs`. Full ranked answer given directly
+to Tom in conversation; not duplicated into a `dev/*.md` file here since the subject file lives in
+the sibling repository and this journal is the record of judgment, not of the target prose.

@@ -104,8 +104,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 - 530| Fire flow failure and collateral (design) failure analysis.
 - 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
-- 465| Pipe types: one "150 mm PVC" definition that hundreds of pipes point at, so editing the definition edits every pipe that uses it. Detach one pipe when it needs to be the exception.
-- 590| Fittings: a pipe's minor loss summed from named fittings and their quantities, seeded from EPANET's own thirteen-row table and editable, because the real coefficient depends on size and make.
+- 465| Pipe types library: attached a library reference to keep a pipe in sync with the library.
+- 590| Fittings library: attach fittings references to pipes and library pipe types.
 
 
 ## The calculators
