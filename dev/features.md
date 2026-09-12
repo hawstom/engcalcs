@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-40 features, citing 94 of the 554 closed task IDs. The other 460 are
+41 features, citing 95 of the 554 closed task IDs. The other 459 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 134 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -40,6 +40,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links. <!-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383 -->
 - Find, replace, goto elements including complex queries in your language. <!-- 353, 420, 389, 540 -->
 - Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves. <!-- 434, 455 -->
+- Group edit assets three different ways: Find and replace, Select area, and spreadsheet edit Tables. <!-- 266 -->
 - Network coloring: three to seven ranges, eight ways of choosing where the breaks fall, and 41 color ramps. <!-- 384, 327 -->
 - Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets. <!-- 337, 342, 376 -->
 - Independent size settings for text, symbol, and pipes. <!-- 331, 362 -->

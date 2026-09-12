@@ -78,6 +78,7 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links.
 - 353, 420, 389, 540| Find, replace, goto elements including complex queries in your language.
 - 434, 455| Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves.
+- 266| Group edit assets three different ways: Find and replace, Select area, and spreadsheet edit Tables.
 - 384, 327| Network coloring: three to seven ranges, eight ways of choosing where the breaks fall, and 41 color ramps.
 - 337, 342, 376| Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets.
 - 331, 362| Independent size settings for text, symbol, and pipes.
