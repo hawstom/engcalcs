@@ -11790,7 +11790,7 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Show only the parts that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
+			'Show only the assets that match this query in one of the tables below the map. The drawing is not changed and nothing is deleted.';
 		btn.textContent = pc.lpn_find_filter_btn || 'Filter in current table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
@@ -21640,6 +21640,41 @@ var EngCalcs = EngCalcs || {};
 			? { popup: document.getElementById('lpn_menu_popup2'), list: document.getElementById('lpn_menu_list2') }
 			: { popup: document.getElementById('lpn_menu_popup'), list: document.getElementById('lpn_menu_list') };
 	}
+	// **A MENU'S OWN TIP MUST NOT COVER THE MENU** (Tom, 2026-09-12, on the Water pull-down: *"its
+	// tip opens and obscures my view of the menu items ... it's the only menu that has a tip. But
+	// it's an important tip. Maybe it can disable while the menu is open."* His own fix, adopted.)
+	//
+	// The tip is a native `title` on the button, so the browser draws it near the POINTER a moment
+	// after the hover settles -- and the pull-down opens directly under that same button, which is
+	// exactly where the tooltip lands. The two are fighting for one patch of screen and the tooltip
+	// wins, because the browser paints it above the page. Nothing in CSS can reach it.
+	//
+	// **PARKED, NOT DELETED.** The tip is the answer to "what is a Water menu", which is the
+	// question somebody has before they open it and never after -- so the attribute goes back the
+	// moment the menu closes, and Task 499.02's reason for having it at all is untouched. It also
+	// silences the TAP tooltip for the same interval, which is the same defect on a phone:
+	// initTips() arms `.ec-help[title]`, and with no title there is nothing to arm.
+	//
+	// **PER LEVEL, because the fly-out closes without the pull-down.** A submenu row's tip is parked
+	// when its fly-out opens and restored when that fly-out shuts, while the menu-bar button's stays
+	// parked underneath -- one shared list would hand the Water button its tooltip back while its
+	// own menu was still standing open.
+	var tipParked = [null, null];
+	function parkAnchorTip(anchor, level) {
+		var i = level ? 1 : 0;
+		unparkAnchorTip(i);
+		if (!anchor || !anchor.title) { return; }
+		tipParked[i] = { el: anchor, title: anchor.title };
+		anchor.removeAttribute('title');
+	}
+	// Restored only if nothing has since given the element a title of its own: a menu row is rebuilt
+	// on every open, so the element parked a moment ago may be one nothing is looking at any more.
+	function unparkAnchorTip(i) {
+		var p = tipParked[i];
+		if (!p) { return; }
+		tipParked[i] = null;
+		if (p.el && !p.el.title) { p.el.title = p.title; }
+	}
 	function openMenu(anchor, rows, level) {
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
@@ -21649,6 +21684,7 @@ var EngCalcs = EngCalcs || {};
 			closeSubMenu();   // a new pull-down never inherits the previous one's fly-out
 			closeViewPopovers();
 		}
+		parkAnchorTip(anchor, level);
 		list.innerHTML = '';
 		rows.forEach(function (r) {
 			if (r.hidden) { return; }
@@ -21777,10 +21813,12 @@ var EngCalcs = EngCalcs || {};
 	function closeSubMenu() {
 		cancelSubClose();
 		hidePanel(document.getElementById('lpn_menu_popup2'));
+		unparkAnchorTip(1);
 	}
 	function closeMenu() {
 		hidePanel(document.getElementById('lpn_menu_popup'));
 		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
+		unparkAnchorTip(0);
 		openMenuAnchor = null;
 	}
 	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
