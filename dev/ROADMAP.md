@@ -1330,6 +1330,22 @@ headline: **Manning is won and needs nothing** (position 1, 25% then 27.9% CTR),
 sewer-slope cluster converts at 1%, and at 1.7% on the second export. That non-conversion is
 **Task 614**; Tasks 155 and 158 are the other open search-reach ones.
 
+- 40|632| **Animation speed control for the transport.**
+  Tom, 2026-09-12: *"Animation speed: We should add a control. Put on roadmap."* The transport
+  plays a run at one fixed rate today. A long period run crawls and a short one is over before it
+  reads.
+
+- 60|633| **The project tab strip, and whether it could collapse into the toolbar.**
+  Tom, 2026-09-12, reasoned himself to the status quo in one paragraph and it is recorded so
+  nobody reopens it cold: *"Maybe we don't need the Project tabs bar ... it could be a powerful
+  idea to gain another chrome bar's worth of map height ... We also would be pressed to show the
+  current project/file name somewhere, and I don't know where unless before the mode message,
+  which is not standard convention. The tab paradigm is ubiquitous. What we have now is highly
+  standard. I think I talked myself into the status quo."* **The value named is high (one whole
+  bar of map height) and the blocker named is real (nowhere standard to put the current file
+  name), so this is open rather than closed.** Anything that reopens it has to answer the file
+  name question first. He suggested the interface designer could noodle it.
+
 ## Completed
 
 **Closed IDs live in `dev/roadmap-closed-ids.md`**, one line each so a cited `Task N` still resolves;

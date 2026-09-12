@@ -361,6 +361,9 @@
 	 * reports without being prompted.
 	 */
 	EC.LPN_TIME_SLOW_MS = 1000;
+	// The status-line stand-in for the run box, and how long it stands.
+	EC.LPN_TIME_DONE_CODE = 'timedone';
+	EC.LPN_TIME_DONE_MS = 8000;
 
 	/**
 	 * EVERY STRING THIS FILE SHOWS, in one place, and read through an explicit `pageConfig.<key>`
@@ -416,7 +419,8 @@
 			// ---- the run box (Task 450) ----
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
 			// already the sentence the status bar uses for exactly this moment.
-			runDone: pageConfig.lpn_time_run_done || 'The run finished. Reporting times: {frames}. Time taken: {secs} s.',
+			runDone: pageConfig.lpn_time_run_done || 'The run finished. Reporting time steps: {frames}. Time taken: {secs} s.',
+			runBoxHide: pageConfig.lpn_time_runbox_hide || 'Do not show this box again',
 			runFailed: pageConfig.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.',
 			// ---- a REFUSED run (Task 471) ----
 			// **THREE SENTENCES, BECAUSE THERE ARE THREE FACTS AND THEY ARE NOT THE SAME FACT.**
@@ -657,13 +661,22 @@
 	 * **IT NAMES THE SWITCH RATHER THAN OFFERING A BUTTON**, because the status bar is text
 	 * (setStatus writes textContent) and a sentence a user can act on beats a control this bar
 	 * cannot carry. Task 467 keeps the clickable version open.
+	 *
+	 * **IT CARRIES ITS OWN STATUS CODE so the page can take it back** (Tom, 2026-09-12: *"When I
+	 * uncheck Recalculate automatically, any banner about calc time and how to do what I just did
+	 * should disappear. As is, it never disappears until I hit calculate."*). Advice that outlives
+	 * the thing it advises is worse than no advice: it tells you to do what you have just done,
+	 * and the only way to make it stop is the calculation it was complaining about. The host
+	 * dismisses it by code -- see clearSlowAdvice() in js/looped-network.js -- which is why the
+	 * string cannot be cleared by matching its text: it carries a measured number.
 	 */
+	EC.LPN_TIME_SLOW_CODE = 'timeslow';
 	function adviseIfSlow() {
 		var S = strings(), secs;
 		if (!host || !autoRunAllowed()) { return; }
 		if (state.lastRunMs === null || state.lastRunMs <= EC.LPN_TIME_SLOW_MS) { return; }
 		secs = (state.lastRunMs / 1000).toFixed(1);
-		host.status(S.runSlowAdvice.replace('{secs}', secs));
+		host.status(S.runSlowAdvice.replace('{secs}', secs), EC.LPN_TIME_SLOW_CODE);
 	}
 	function cancelIdleRun() {
 		if (state.idle) { clearTimeout(state.idle); state.idle = null; }
@@ -1130,7 +1143,7 @@
 	// That keeps this whole feature inside this file: js/looped-network.js needs no new element, no
 	// new id and no new call site for it.
 
-	var boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 },
+	var boxState = { open: false, suppressed: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 },
 		boxReport = '',
 		boxUi = null;
 	// **THE LAST RUN'S REPORT OUTLIVES THE BOX, and is kept whether or not a box was ever shown.**
@@ -1141,8 +1154,18 @@
 	// report of some older run that did have a box.
 	var lastReport = '', lastReportMs = 0, lastReportFrames = 0;
 
+	/**
+	 * **TURNED OFF MEANS NEVER SHOWN, not shown and then hidden** (Tom, 2026-09-12). The state is
+	 * still kept -- boxDone() needs the frame count and the milliseconds to say them in the status
+	 * line -- so `open` is the only thing that changes, and every reader of it already knows what
+	 * a shut box means.
+	 */
+	function boxSuppressed() {
+		return !!(host && host.runBoxHidden && host.runBoxHidden());
+	}
 	function boxStart(token) {
-		boxState = { open: true, phase: 'running', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: token };
+		boxState = { open: true, suppressed: boxSuppressed(), phase: 'running', fraction: 0,
+			frames: 0, ms: 0, reportLength: 0, message: '', token: token };
 		boxReport = '';
 		renderBox(true);
 	}
@@ -1164,6 +1187,19 @@
 		boxState.ms = ms;
 		boxReport = (run && run.report) || '';
 		boxState.reportLength = boxReport.length;
+		// **WITH THE BOX OFF, THE SAME SENTENCE GOES TO THE STATUS LINE AND THEN LEAVES** (Tom,
+		// 2026-09-12: *"just see the time steps and run time in the banner briefly"*). The same
+		// string, so there is one wording and one translation; the box is what was obnoxious, not
+		// the fact. It expires on its own because nothing else would take it back: a run that
+		// finishes while nobody is editing leaves the page quiet, and a report of a finished run
+		// standing an hour later reads as a report of the CURRENT state of the model.
+		if (boxState.suppressed) {
+			if (host && host.status) {
+				host.status(boxMessage(strings()), EC.LPN_TIME_DONE_CODE);
+				if (host.expireStatus) { host.expireStatus(EC.LPN_TIME_DONE_CODE, EC.LPN_TIME_DONE_MS); }
+			}
+			return;
+		}
 		renderBox(true);
 	}
 	// `message` overrides the generic "the run did not finish" -- a REFUSAL knows more than that and
@@ -1174,10 +1210,18 @@
 		boxState.message = message || '';
 		boxReport = '';
 		boxState.reportLength = 0;
+		// **A FAILURE IS NEVER SUPPRESSED, and never expires either.** Turning the box off asks not
+		// to be told how a run is GOING; it does not ask not to be told that one did not happen.
+		// The status line keeps it until the next solve replaces it, which is what that line is
+		// for -- unlike the completion summary above, which is old news within the minute.
+		if (boxState.suppressed) {
+			if (host && host.status) { host.status(boxMessage(strings())); }
+			return;
+		}
 		renderBox(true);
 	}
 	function boxHide() {
-		boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 };
+		boxState = { open: false, suppressed: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 };
 		boxReport = '';
 		renderBox(true);
 	}
@@ -1195,7 +1239,7 @@
 	if (typeof document !== 'undefined' && document.addEventListener) {
 		document.addEventListener('keydown', function (e) {
 			var t, tag;
-			if (!boxState.open) { return; }
+			if (!boxState.open || boxState.suppressed) { return; }
 			if (e.key !== 'Enter' && e.key !== 'Escape' && e.key !== 'Esc') { return; }
 			t = e.target || {};
 			tag = (t.tagName || '').toUpperCase();
@@ -1225,7 +1269,7 @@
 	function renderBox(full) {
 		var S, pct;
 		if (typeof document === 'undefined' || !document.body) { return; }
-		if (!boxState.open) {
+		if (!boxState.open || boxState.suppressed) {
 			if (boxUi && boxUi.root && boxUi.root.parentNode) { boxUi.root.parentNode.removeChild(boxUi.root); }
 			boxUi = null;
 			return;
@@ -1247,6 +1291,7 @@
 		// absent rather than empty -- offering a report and then showing an empty box would be a
 		// worse answer than not offering one.
 		boxUi.report.style.display = boxReport ? '' : 'none';
+		boxUi.hide.style.display = boxState.phase === 'running' ? 'none' : '';
 	}
 
 	function buildBox(S) {
@@ -1269,7 +1314,20 @@
 			// how far a run has got. It has a draggable, sizeable box of its own now, built in
 			// js/looped-network.js with the other five, so this file keeps the TEXT and offers the
 			// way in. The copy control went with it, to the title bar where it cannot scroll away.
-			report = el('button', { type: 'button', 'class': 'lpn-runbox-reportbtn' }, S.runReport);
+			report = el('button', { type: 'button', 'class': 'lpn-runbox-reportbtn' }, S.runReport),
+			// **THE OFF SWITCH IS IN THE THING IT SWITCHES OFF** (Tom, 2026-09-12: *"I want to be
+			// able to hide it forever"*). A preference about a box is easiest to express while
+			// the box is in front of you being annoying; Settings carries the same checkbox for
+			// turning it back ON, which is the direction you cannot ask for from here.
+			hideWrap = el('label', { 'class': 'lpn-runbox-hide' }),
+			hideBox = el('input', { type: 'checkbox' });
+		hideWrap.appendChild(hideBox);
+		hideWrap.appendChild(document.createTextNode(' ' + S.runBoxHide));
+		hideBox.addEventListener('change', function () {
+			if (!hideBox.checked) { return; }
+			if (host && host.setRunBoxHidden) { host.setRunBoxHidden(true); }
+			boxHide();
+		});
 		report.addEventListener('click', function (ev) {
 			ev.preventDefault();
 			if (EC.lpnOpenRunReportBox) { EC.lpnOpenRunReportBox(); }
@@ -1283,7 +1341,8 @@
 		root.appendChild(msg);
 		root.appendChild(bar);
 		root.appendChild(report);
-		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, x: x };
+		root.appendChild(hideWrap);
+		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, x: x, hide: hideWrap };
 	}
 
 	/**

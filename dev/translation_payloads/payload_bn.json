@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1779,
-        "delta_key_count": 12,
+        "expected_key_count": 1782,
+        "delta_key_count": 15,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -527,6 +527,9 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
         "lpn_reaction_per_day": "1\/day"
     },
     "keys": {
@@ -541,6 +544,9 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
         "lpn_reaction_per_day": "1\/day"
     },
     "key_context": {
@@ -717,6 +723,54 @@
                     "key": "lpn_notes_1_term",
                     "value": "এটি কীভাবে সমাধান করা হয়",
                     "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_time_runbox_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "চালানো শেষ হয়েছে। প্রতিবেদনের সময়সমূহ: {frames}। ব্যয়িত সময়: {secs} সেকেন্ড।",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "চালানো শেষ হয়নি, তাই পরের সময়গুলোর কোনো ফলাফল নেই।",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "চালানো শেষ হয়েছে। প্রতিবেদনের সময়সমূহ: {frames}। ব্যয়িত সময়: {secs} সেকেন্ড।",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "চালানো শেষ হয়নি, তাই পরের সময়গুলোর কোনো ফলাফল নেই।",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "চালানো শেষ হয়েছে। প্রতিবেদনের সময়সমূহ: {frames}। ব্যয়িত সময়: {secs} সেকেন্ড।",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "চালানো শেষ হয়নি, তাই পরের সময়গুলোর কোনো ফলাফল নেই।",
+                    "english": "The run did not finish, so there are no results for the later times."
                 }
             }
         },

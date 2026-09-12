@@ -2626,7 +2626,10 @@ $ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
 // borrowed rather than re-keyed.
-$ec_lang['lpn_time_run_done']='The run finished. Reporting times: {frames}. Time taken: {secs} s.';
+$ec_lang['lpn_time_run_done']='The run finished. Reporting time steps: {frames}. Time taken: {secs} s.';
+$ec_lang['lpn_time_runbox_hide']='Do not show this box again';
+$ec_lang['lpn_settings_runbox']='Show the run progress box';
+$ec_lang['lpn_settings_runbox_tip']='A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
 $ec_lang['lpn_time_run_report']='EPANET run report';
 $ec_lang['lpn_time_run_report_copy']='Copy';

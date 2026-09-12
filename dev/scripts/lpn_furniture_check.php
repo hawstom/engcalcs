@@ -125,6 +125,10 @@ const EC_LPN_FURNITURE = [
     'lpn_energybox'   => 'position, size and openness of the Pump energy report',
     'lpn_cmpbox'      => 'position, size and openness of the Scenario comparison box',
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
+    // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
+    // whether somebody wants a progress dialog in front of them while a run goes is a fact about
+    // the person at the screen. A colleague opening the file would otherwise inherit the answer.
+    'lpn_runbox'      => 'whether the run progress box is shown at all, for this browser',
     'lpn_show_titles' => 'whether the page titles above the map are shown -- a reading preference '
                        . 'on this screen, and the four small-screen items of Task 486 turn it off',
     // The selection bubble's own "Show this" checkbox (Tom, 2026-09-08). Same side of the line as

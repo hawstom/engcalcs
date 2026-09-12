@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1779,
-        "delta_key_count": 14,
+        "expected_key_count": 1782,
+        "delta_key_count": 17,
         "exempt_key_count": 33,
         "exempt_keys": [
             "u_imgd",
@@ -529,6 +529,9 @@
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_tag": "Tag",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day"
     },
@@ -545,6 +548,9 @@
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_tag": "Tag",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
         "lpn_reaction_per_day": "1\/day",
         "lpn_reaction_day": "day"
     },
@@ -738,6 +744,54 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Tag သည် ဖိအားဇုန် (သို့) အလုပ်အမိန့်စာ ကဲ့သို့ သင်လိုသလို မည်သည့်အဓိပ္ပါယ်မဆို ဆောင်နိုင်သည်။ ဤနေရာ (သို့) EPANET ရှိ မည်သည့် တွက်ချက်မှုမျှ ၎င်းကို မဖတ်ပါ။ Tag သည် စကားလုံးတစ်လုံးသာ ဖြစ်ရမည် - EPANET သည် ကွက်လပ်ပထမဆုံးတွင် ဖတ်ရှုမှု ရပ်တန့်သောကြောင့်၊ သင်ရိုက်နေစဉ် ကွက်လပ်ကို ငြင်းပယ်မည်။ ၎င်းကို EPANET ဖိုင်ထဲသို့ သယ်ဆောင်ပြီး ထုတ်ဆောင်သည်။",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_time_runbox_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "လည်ပတ်မှု ပြီးဆုံးပါပြီ။ အစီရင်ခံချိန်များ - {frames}။ ကြာချိန် - {secs} စက္ကန့်။",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "လည်ပတ်မှု မပြီးဆုံးခဲ့သောကြောင့်၊ နောက်ပိုင်းချိန်များအတွက် ရလဒ် မရှိပါ။",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "လည်ပတ်မှု ပြီးဆုံးပါပြီ။ အစီရင်ခံချိန်များ - {frames}။ ကြာချိန် - {secs} စက္ကန့်။",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "လည်ပတ်မှု မပြီးဆုံးခဲ့သောကြောင့်၊ နောက်ပိုင်းချိန်များအတွက် ရလဒ် မရှိပါ။",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "လည်ပတ်မှု ပြီးဆုံးပါပြီ။ အစီရင်ခံချိန်များ - {frames}။ ကြာချိန် - {secs} စက္ကန့်။",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "လည်ပတ်မှု မပြီးဆုံးခဲ့သောကြောင့်၊ နောက်ပိုင်းချိန်များအတွက် ရလဒ် မရှိပါ။",
+                    "english": "The run did not finish, so there are no results for the later times."
                 }
             }
         },

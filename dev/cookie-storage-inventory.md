@@ -95,6 +95,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_energybox` | same | The same record for the Pump energy report box (same ruling) |
 | `lpn_cmpbox` | same | The same record for the Scenario comparison box (same ruling) |
 | `lpn_reportbox` | same | The same record for the EPANET run report box (same ruling) |
+| `lpn_runbox` | same | Whether the run progress box is shown at all (Tom, 2026-09-12: *"The run report box is, to me, obnoxious. I want to be able to hide it forever and just see the time steps and run time in the banner briefly."*). Written only when it is OFF, so a browser that has never touched it holds nothing. The same category as the two rows below: a reading preference the visitor set deliberately, on this screen |
 | `lpn_menucue` | same | Whether the one-time "the menus are above" cue has been retired. Set once, when the reader opens any menu or closes the cue (Task 625) |
 | `lpn_show_titles` | same | **LEGACY, no longer written** (Task 625, 2026-09-10). The app page emits no titles, so the toggle went with them. Still listed because browsers that used it still hold it, and Erase everything still deletes it by literal |
 | `lpn_areahint` | same | Whether the area-selection help bubble is shown over the map (Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this' checkbox."*). The same category as the row above it: a reading preference the visitor set deliberately, on this screen |

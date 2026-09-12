@@ -17190,7 +17190,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', AREA_HINT_KEY, MENU_CUE_KEY];
+			'lpn_show_titles', AREA_HINT_KEY, MENU_CUE_KEY, LPN_RUNBOX_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -26916,9 +26916,21 @@ var EngCalcs = EngCalcs || {};
 			// Turning it ON is a request for an up-to-date answer, so give one rather than waiting
 			// for the next edit. Turning it OFF asks for nothing, and costs nothing.
 			if (settings.autoRun) { scheduleSolve(); }
+			clearSlowAdvice();
 			saveToStorage();
 		});
 		row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip);
+		// **THE ONE FURNITURE ROW IN THIS BOX, and it says so in its own tip** (Tom, 2026-09-12).
+		// Every other row here writes `settings`, which is PROJECT data and rides in
+		// serializeProject(). This one writes a browser key and must never touch `settings`: see
+		// LPN_RUNBOX_KEY for why the answer belongs to the screen rather than to the network. It
+		// is here because this is where a reader looks for "stop doing that during a run", and a
+		// second settings home for one checkbox would be worse than the exception.
+		var runBoxInput = document.createElement('input');
+		runBoxInput.type = 'checkbox';
+		runBoxInput.checked = !runBoxHidden;
+		runBoxInput.addEventListener('change', function () { setRunBoxHidden(!runBoxInput.checked); });
+		row(compBody, pc.lpn_settings_runbox || 'Show the run progress box', runBoxInput, pc.lpn_settings_runbox_tip);
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when EPANET is simply what solves.
@@ -34626,6 +34638,38 @@ var EngCalcs = EngCalcs || {};
 		syncStatusBoxVisibility();
 	}
 
+	/**
+	 * **TAKE THE SLOW-RUN ADVICE BACK THE MOMENT IT STOPS BEING TRUE** (Tom, 2026-09-12: *"When I
+	 * uncheck Recalculate automatically, any banner about calc time and how to do what I just did
+	 * should disappear. As is, it never disappears until I hit calculate."*).
+	 *
+	 * js/lpn-time.js writes that sentence when a run passes EC.LPN_TIME_SLOW_MS, and it names the
+	 * switch: turn off Recalculate automatically. Doing so left the sentence standing, so the bar
+	 * went on telling the user to do the thing they had just done, and the only act that rewrote
+	 * it was the recalculation the advice existed to stop.
+	 *
+	 * **DISMISSED BY CODE, NEVER BY MATCHING THE TEXT** -- the string carries a measured number
+	 * and is translated into 26 languages, so any comparison against it is wrong in 26 of them.
+	 * `statusWrongCode` already holds what the bar is currently saying and why; this asks it.
+	 * Anything else in the bar is somebody else's message and is left alone.
+	 */
+	/**
+	 * Take a status message back after `ms`, but only if it is still the one that asked. Any
+	 * later message has a different code and is somebody else's, so this expires nothing it did
+	 * not put there. Used by the run summary when the run box is turned off; a diagnostic about
+	 * the MODEL never expires, because it stays true until the model changes.
+	 */
+	function expireStatus(code, ms) {
+		setTimeout(function () {
+			if (statusWrongCode === code) { setStatus(''); }
+		}, ms);
+	}
+
+	function clearSlowAdvice() {
+		var code = (EngCalcs.LPN_TIME_SLOW_CODE || 'timeslow');
+		if (statusWrongCode === code) { setStatus(''); }
+	}
+
 	// ---- The engine-difference notes, which expire on a clock of their own ----
 	//
 	// **TWO MINUTES, THEN IT FADES AND GOES** (Tom, 2026-09-05, of the gravity note: *"Give it a
@@ -36954,6 +36998,39 @@ var EngCalcs = EngCalcs || {};
 		hidePanel(rptBoxEl());
 		rememberBoxOpen(rptboxLayout, saveRptboxLayout, false);
 	}
+	/**
+	 * **THE RUN PROGRESS BOX CAN BE TURNED OFF FOR GOOD** (Tom, 2026-09-12: *"The run report box
+	 * is, to me, obnoxious. I want to be able to hide it forever and just see the time steps and
+	 * run time in the banner briefly."*).
+	 *
+	 * **FURNITURE, so it lives in the BROWSER and never in serializeProject()** -- whether somebody
+	 * wants a progress dialog in front of them is a fact about the person at the screen, not about
+	 * the network, and a colleague opening the file must not inherit the answer. Owned here rather
+	 * than in js/lpn-time.js, where the box is built, for two reasons: every other furniture key on
+	 * this page is written here and `lpn_furniture_check.php` derives its roster from this file
+	 * alone, so a key written over there is a key no check can see; and that file reaches nothing on
+	 * this page except through the host seam, which is the rule it has kept since it was written.
+	 *
+	 * **NOTHING IS LOST WHEN IT IS OFF.** The finished run says the same sentence in the status
+	 * line, the engine's report is still on Reports > EPANET run, and the Settings row below turns
+	 * the box back on. A dismissal with no way back is a trap, not a preference.
+	 */
+	var LPN_RUNBOX_KEY = 'lpn_runbox';
+	var runBoxHidden = false;
+	function loadRunBoxPref() {
+		try { runBoxHidden = localStorage.getItem(LPN_RUNBOX_KEY) === 'off'; } catch (e) {}
+	}
+	function setRunBoxHidden(on) {
+		runBoxHidden = !!on;
+		// Written only when it is OFF, so a browser that has never touched this carries no key at
+		// all and the default lives in one place -- here -- rather than in a stored 'on'.
+		try {
+			if (runBoxHidden) { localStorage.setItem(LPN_RUNBOX_KEY, 'off'); }
+			else { localStorage.removeItem(LPN_RUNBOX_KEY); }
+		} catch (e) {}
+	}
+	loadRunBoxPref();
+
 	var LPN_RPTBOX_KEY = 'lpn_reportbox';
 	var rptboxLayout = newBoxLayout();
 	function saveRptboxLayout() {
@@ -37242,7 +37319,17 @@ var EngCalcs = EngCalcs || {};
 			// about `settings` and must not learn. `!== false` rather than a truth test, so a
 			// project saved before this setting existed reads as ON -- which is what it did.
 			autoRun: function () { return settings.autoRun !== false; },
-			setAutoRun: function (on) { settings.autoRun = !!on; saveToStorage(); rebuildSettingsFields(); }
+			// The run box's own preference, handed over like every other line of this seam.
+			// js/lpn-time.js builds the box and knows nothing about where the answer is kept.
+			runBoxHidden: function () { return runBoxHidden; },
+			expireStatus: expireStatus,
+			setRunBoxHidden: function (on) { setRunBoxHidden(on); rebuildSettingsFields(); },
+			setAutoRun: function (on) {
+				settings.autoRun = !!on;
+				clearSlowAdvice();
+				saveToStorage();
+				rebuildSettingsFields();
+			}
 		});
 	}
 	// **THE WHOLE SEAM TO js/lpn-search.js** (Task 437). One call, at script scope, so the placement

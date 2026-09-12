@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read**, of 11 untranslated keys, of 1779 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read**, of 14 untranslated keys, of 1782 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (11, 4 to read @@ NEEDS RULING)
+## lpn_  (14, 7 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -60,3 +60,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_popup_boxtitle`**
   > Properties
   _Ruled OK 2026-09-09._
+- **`lpn_settings_runbox`**
+  > Show the run progress box
+  @@ NEEDS RULING
+- **`lpn_settings_runbox_tip`**
+  > A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_time_runbox_hide`**
+  > Do not show this box again
+  @@ NEEDS RULING

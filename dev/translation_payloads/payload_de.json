@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1779,
-        "delta_key_count": 12,
+        "expected_key_count": 1782,
+        "delta_key_count": 15,
         "exempt_key_count": 40,
         "exempt_keys": [
             "calc_units_us",
@@ -535,7 +535,10 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
-        "lpn_field_tag": "Tag"
+        "lpn_field_tag": "Tag",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
     },
     "keys": {
         "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
@@ -549,7 +552,10 @@
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
-        "lpn_field_tag": "Tag"
+        "lpn_field_tag": "Tag",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
     },
     "key_context": {
         "lpn_field_text_attached_tip": {
@@ -741,6 +747,54 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_time_runbox_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "Der Lauf ist abgeschlossen. Berichtszeitpunkte: {frames}. Benötigte Zeit: {secs} s.",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "Der Lauf wurde nicht abgeschlossen, daher gibt es keine Ergebnisse für die späteren Zeitpunkte.",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "Der Lauf ist abgeschlossen. Berichtszeitpunkte: {frames}. Benötigte Zeit: {secs} s.",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "Der Lauf wurde nicht abgeschlossen, daher gibt es keine Ergebnisse für die späteren Zeitpunkte.",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "Der Lauf ist abgeschlossen. Berichtszeitpunkte: {frames}. Benötigte Zeit: {secs} s.",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "Der Lauf wurde nicht abgeschlossen, daher gibt es keine Ergebnisse für die späteren Zeitpunkte.",
+                    "english": "The run did not finish, so there are no results for the later times."
                 }
             }
         }

@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**69 open tasks.** Next (100): 9 · Soon (75): 9 · Someday (50): 18 · Maybe (25): 10 · Parked (5): 17 · priority 60 (60): 3 · priority 70 (70): 1 · priority 95 (95): 2
+**71 open tasks.** Next (100): 9 · Soon (75): 9 · Someday (50): 18 · Maybe (25): 10 · Parked (5): 17 · priority 60 (60): 4 · priority 70 (70): 1 · priority 95 (95): 2 · priority 40 (40): 1
 
 ## 100 — Next (9)
 
@@ -42,11 +42,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 - Task 630 — [H] · The map shows lat/lon as xy, and that is the problem.
 
-## 60 — Priority 60 (3)
+## 60 — Priority 60 (4)
 
 - Task 625 — [H] · BUILT: the app page divorced from EngCalcs chrome. Remainder below.
 - Task 626 — A refused beacon is retried like an offline one, 20 times.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
+- Task 633 — The project tab strip, and whether it could collapse into the toolbar.
 
 ## 50 — Someday (18)
 
@@ -68,6 +69,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
+
+## 40 — Priority 40 (1)
+
+- Task 632 — Animation speed control for the transport.
 
 ## 25 — Maybe (10)
 
@@ -106,5 +111,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-62 of 69 titles are within 4–12 words. `!` marks the rest;
+64 of 71 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

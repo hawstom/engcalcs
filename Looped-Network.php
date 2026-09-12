@@ -1458,6 +1458,7 @@ EngCalcs.pageConfig = {
 <?php   // The run box (Task 450). Three new strings; `lpn_time_running` above says what it says
         // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
+	lpn_time_runbox_hide: <?=json_encode($ec_lang['lpn_time_runbox_hide'])?>,
 	lpn_time_run_failed: <?=json_encode($ec_lang['lpn_time_run_failed'])?>,
 	lpn_time_run_fell_back: <?=json_encode($ec_lang['lpn_time_run_fell_back'])?>,
 	lpn_time_run_report: <?=json_encode($ec_lang['lpn_time_run_report'])?>,
@@ -2019,6 +2020,8 @@ EngCalcs.pageConfig = {
 	lpn_run_menu_tip: <?=json_encode($ec_lang['lpn_run_menu_tip'])?>,
 	lpn_settings_auto_run: <?=json_encode($ec_lang['lpn_settings_auto_run'])?>,
 	lpn_settings_auto_run_tip: <?=json_encode($ec_lang['lpn_settings_auto_run_tip'])?>,
+	lpn_settings_runbox: <?=json_encode($ec_lang['lpn_settings_runbox'])?>,
+	lpn_settings_runbox_tip: <?=json_encode($ec_lang['lpn_settings_runbox_tip'])?>,
 	lpn_time_run_slow: <?=json_encode($ec_lang['lpn_time_run_slow'])?>,
 	<?php // Fire flow, the whole-system sweep (Task 530). js/looped-network.js reads every one of
 	      // these through its `pc` alias, so dev/scripts/pageconfig_check.php holds this list

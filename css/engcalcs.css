@@ -3007,8 +3007,13 @@ html:has(#lpn_canvas) { overflow: hidden; }
    raisePanel() writes a higher number inline as boxes are touched; this is the floor. Still below
    the registration bar (3000), which must outrank everything while a click sequence is in
    progress. */
+/* **BOTTOM RIGHT, NOT BOTTOM LEFT** (Tom, 2026-09-12: *"The run report obscures the status and
+   scenario area."*). Bottom left is where the map's own footer overlay sits -- the scale, the
+   scenario name, the mode line's neighbours -- and a 26rem fixed box dropped on top of them hid
+   exactly the two readouts a person checks after a run. The bottom right holds only the basemap
+   credit, one small line, and `bottom` clears it. */
 .lpn-runbox {
-	position: fixed; left: 1em; bottom: 1em; z-index: 1200;
+	position: fixed; right: 1em; bottom: 2.2em; z-index: 1200;
 	box-sizing: border-box; width: 26rem; max-width: calc(100vw - 2em);
 	padding: 0.5em 0.75em 0.6em; border: 1px solid #ccc; border-radius: 4px;
 	background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); font-size: 0.9em;
@@ -3033,6 +3038,12 @@ html:has(#lpn_canvas) { overflow: hidden; }
    of its own now (.lpn-rptbox-pre, above), and what is left here is one button that opens it.
    Quiet by default: it is an offer beside a progress bar, not a command competing with the box's
    close button. */
+/* The off switch, quietest thing in the box: it is an offer, and it is permanent, so it must not
+   compete with the close X for the press that means "not now". */
+.lpn-runbox-hide {
+	display: block; margin-top: 0.5em; font-size: .85em; color: #555; cursor: pointer;
+}
+.lpn-runbox-hide input { margin-right: 0.15em; vertical-align: baseline; }
 .lpn-runbox-reportbtn {
 	margin-top: 0.4em; font: inherit; font-size: .85em;
 	padding: 1px 8px; cursor: pointer; background: none; border: 1px solid var(--rule, #999);

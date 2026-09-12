@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1779,
-        "delta_key_count": 11,
+        "expected_key_count": 1782,
+        "delta_key_count": 14,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -519,7 +519,10 @@
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
-        "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
+        "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
     },
     "keys": {
         "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
@@ -532,7 +535,10 @@
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
-        "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
+        "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_time_runbox_hide": "Do not show this box again",
+        "lpn_settings_runbox": "Show the run progress box",
+        "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
     },
     "key_context": {
         "lpn_field_text_attached_tip": {
@@ -708,6 +714,54 @@
                     "key": "lpn_notes_1_term",
                     "value": "כיצד זה נפתר",
                     "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_time_runbox_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "ההרצה הסתיימה. זמני דיווח: {frames}. זמן שחלף: {secs} שנ׳.",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "ההרצה לא הסתיימה, ולכן אין תוצאות לזמנים המאוחרים יותר.",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "ההרצה הסתיימה. זמני דיווח: {frames}. זמן שחלף: {secs} שנ׳.",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "ההרצה לא הסתיימה, ולכן אין תוצאות לזמנים המאוחרים יותר.",
+                    "english": "The run did not finish, so there are no results for the later times."
+                }
+            }
+        },
+        "lpn_settings_runbox_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "ההרצה הסתיימה. זמני דיווח: {frames}. זמן שחלף: {secs} שנ׳.",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_failed",
+                    "value": "ההרצה לא הסתיימה, ולכן אין תוצאות לזמנים המאוחרים יותר.",
+                    "english": "The run did not finish, so there are no results for the later times."
                 }
             }
         }
