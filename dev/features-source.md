@@ -94,6 +94,13 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Premium features
 
+<!-- **"PREMIUM" IS DELIBERATE AND IS NOT A PRICE.** Tom, 2026-09-12, asked directly whether the
+     heading reads as a paid tier on a page that says there is nothing to buy: *"These are the
+     features others charge thousands of dollars for. They have been called premium for decades,
+     and now we are giving them away for free."* The word names what this class of capability
+     costs everywhere ELSE, which is the whole point of the section. Do not re-flag it. -->
+
+
 - 530| Fire flow failure and collateral (design) failure analysis.
 - 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
 
