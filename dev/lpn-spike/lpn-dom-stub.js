@@ -733,6 +733,12 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 // from the real lang file rather than restated here.
 global.EngCalcs = {
   pageConfig: {},
+  // **THE GLOBALS echoHTMLHead() EMITS FOR THE APP PAGE, AND ONLY FOR IT.** The home mark at the
+  // far left of the menu bar is built behind `if (EngCalcs.lwnSiteUrl)`, so without this the stub
+  // renders a bar with no mark and every count is one short -- which is exactly how
+  // small-screen-harness.js went red on 2026-09-11 for a bar that was correct. Same value the
+  // page emits (EC_LWN_SITE_URL); the language menu needs no stub because it is unconditional.
+  lwnSiteUrl: 'https://librewaternet.org/',
   // **initTips() MUST ACTUALLY ARM A TOOLTIP, because arming is what caches the title.** It was
   // `() => {}`, which made the whole Bootstrap title-cache invisible to every harness -- see the
   // _StubTooltip note below. Walks rather than querySelectorAll(), which this stub answers [] for.

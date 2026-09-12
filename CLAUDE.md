@@ -21,6 +21,15 @@ uncommitted; silence means commit and push.
 
 - **Work directly on `master`.** No feature branches — the project is small enough for one branch,
   and per-task branches accumulated as stale refs.
+- **TWO NAMED EXCEPTIONS, APPROVED 2026-09-11: `customers` and `projections`.** Tom asked twice
+  about a "don't work on master" paradigm and the answer to the general question is still no --
+  what bit this tree was CONCURRENT SESSIONS IN ONE DIRECTORY, and a branch does not help, because
+  both sessions still share the checkout. A worktree does, and is already allowed below. But these
+  two are the shape a branch is actually for: **large, speculative, and abandonable**. Task 247
+  (Customers) and Task 630 (Projections) may each be dropped after a week's work, and Projections
+  can touch the coordinate seam that every geographic document depends on. **The condition is that
+  each is MERGED OR KILLED, never left to rot** -- a stale ref is the failure the no-branches rule
+  exists to prevent, and it is prevented by deleting the branch, not by never making one.
 - **Stage explicit paths. Never `git add -A`** — Tom runs concurrent sessions in the same working
   directory, and a broad add commits their in-progress work under your message.
 - **Report the push state unabridged and unprompted:** the commit SHA, and that

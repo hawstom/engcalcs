@@ -40,7 +40,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ## 70 — Priority 70 (1)
 
-- Task 630 — [H] · The map's own honesty: a scale bar, and what projection we offer.
+- Task 630 — [H] · The map shows lat/lon as xy, and that is the problem.
 
 ## 60 — Priority 60 (3)
 

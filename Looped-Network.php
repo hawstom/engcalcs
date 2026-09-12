@@ -2089,6 +2089,7 @@ EngCalcs.pageConfig = {
 <?php // Help > Install, the door that moved off the suite navbar with the divorce (Task 625).
       // The suite's own key, already translated, rather than a new string before the freeze. ?>
 	install_main_menu: <?=json_encode($ec_lang['install_main_menu'])?>,
+	lpn_menu_home_tip: <?=json_encode($ec_lang['lpn_menu_home_tip'])?>,
 	lpn_menu_cue: <?=json_encode($ec_lang['lpn_menu_cue'])?>,
 	lpn_help_screenshots: <?=json_encode($ec_lang['lpn_help_screenshots'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,

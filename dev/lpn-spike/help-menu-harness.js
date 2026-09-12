@@ -119,16 +119,14 @@ console.log('\n-- the Help menu rows --');
 		'both go through ext(), so neither can navigate this tab away from a dirty project');
 	report(/pc\.lpn_help_notes/.test(body), 'Notes');
 	report(/pc\.lpn_help_fix/.test(body), 'Fix something');
-	// About is the MARK's first row now, not Help's last (Task 625) -- identity belongs behind
-	// the product mark, which is the whole point of the Apple-menu position.
-	{
-		const mk = src.slice(src.indexOf('function openMarkMenu'));
-		const mkBody = mk.slice(0, mk.indexOf('\n\tfunction ', 10));
-		report(/pc\.about_main_menu/.test(mkBody), "About, in the mark's menu");
-		report(/toggleAboutPopup/.test(mkBody), '...opening the in-page box, not About.php');
-		report(mkBody.indexOf('pc.about_main_menu') < mkBody.indexOf('pc.install_main_menu'),
-			'...first, where identity goes');
-	}
+	// **ABOUT IS BACK IN HELP, AND THE MARK IS A LINK AGAIN** (Ida's reversal, 2026-09-11). It
+	// spent an hour in a menu hanging off the product mark; macOS keeps About in a BOLD APP-NAME
+	// menu separate from the Apple menu, we had merged the two, and VS Code settles the
+	// cross-platform case by putting About in Help on Windows and Linux. Asserted as an in-page
+	// box, never a link to the suite's About.php.
+	report(/pc\.about_main_menu/.test(body), 'About, in Help');
+	report(/toggleAboutPopup/.test(body), '...opening the in-page box, not About.php');
+	report(!/function openMarkMenu/.test(src), 'and the mark has no menu of its own any more');
 	// "Fix something" REPLACED Contact rather than joining it. Both go to contact.php, and
 	// lib/Calculators.lib.php records what two links to one destination do to each other: they
 	// "halve each other's weight rather than doubling the invitation".
@@ -143,16 +141,21 @@ console.log('\n-- the Help menu rows --');
 	// This replaces the numbered list of 2026-09-06 AND the single-menu order shipped earlier
 	// today. Do not restore either from an older comment.
 	const order = ['lpn_help_walkthroughs', 'lpn_help_notes', 'lpn_help_icons', 'lpn_help_fix',
-		'lpn_help_screenshots'];
+		'install_main_menu', 'lpn_help_screenshots', 'privacy_link', 'terms_link',
+		'consent_settings_link', 'about_main_menu'];
 	const at = order.map(k => body.indexOf('pc.' + k));
 	report(at.every(i => i >= 0), 'every row Help kept is in Help');
 	report(at.every((v, i) => i === 0 || v > at[i - 1]), 'and they stand in that order');
-	// What LEFT Help must not still be in it, or the two menus offer the same thing twice.
+	// Everything the mark's menu had borrowed is back where it started.
 	['about_main_menu', 'install_main_menu', 'privacy_link', 'terms_link', 'consent_settings_link']
 		.forEach(function (k) {
-			report(body.indexOf('pc.' + k) < 0, 'Help no longer carries ' + k);
+			report(body.indexOf('pc.' + k) >= 0, 'Help carries ' + k + ' again');
 		});
-	report(body.indexOf("'LibreWaterNet.org'") < 0, 'nor the site link, which is the mark\'s own');
+	// **Not EPANET STAYS OUT.** Ida's ruling listed it among the rows Help got back, written
+	// without knowing Tom retired not-epanet.org the same day. A row to a dead host is worse
+	// than no row.
+	report(!/lpn_help_not_epanet/.test(body) && !/LPN_NOT_EPANET_URL/.test(src),
+		'and Not EPANET does not come back with them');
 	// The query string is part of the destination, not noise: ?from= is how formmail.php learns
 	// which calculator somebody was on, and this page is the one that cannot be inferred from a
 	// referrer. Matched loosely on the path so a later parameter does not turn this red, then
@@ -162,8 +165,7 @@ console.log('\n-- the Help menu rows --');
 	report(dests.length === 1 && /\?from=Looped-Network/.test(dests[0]),
 		'and it names this page, so the e-mail can say where it came from', dests[0] || '(none)');
 	// About last, where every other Help menu in the world puts it.
-	// About left Help for the mark's menu, where identity belongs; it is asserted there instead.
-	report(body.indexOf('about_main_menu') < 0, 'About is NOT a Help row any more');
+	report(body.indexOf('about_main_menu') > body.indexOf('lpn_help_fix'), 'About is last');
 	// Notes is the one row that does not leave the page, so it must NOT be an ext().
 	// Matched on the KEY and the handler, never on the fallback English between them: Wave 0
 	// renamed that fallback to 'Notes on this page' (2026-08-17) and a literal match turned red
@@ -221,14 +223,14 @@ console.log('\n-- and the notice it dropped is reachable twice over --');
 {
 	// Task 286 required the notice to be FINDABLE and withdrawal to be as easy as consent. Dropping
 	// the footer row is only legitimate while BOTH of these hold, so they are asserted together.
-	// **THEY MOVED TO THE MARK'S MENU 2026-09-11 AND THE REQUIREMENT MOVED WITH THEM** (Task 625).
-	// Task 286 wants the notice FINDABLE and withdrawal as easy as consent; it never named Help.
-	// The mark is the leftmost item of the menu bar, so this is still one press from the bar --
-	// assert where they ARE, rather than deleting a legal guard because its band was renamed.
-	const mark = src.slice(src.indexOf('function openMarkMenu'));
-	const menu = mark.slice(0, mark.indexOf('\n\tfunction ', 10));
+	// **THEY WENT TO THE MARK'S MENU FOR AN HOUR AND CAME BACK** (Task 625, 2026-09-11). Task 286
+	// wants the notice FINDABLE and withdrawal as easy as consent; it never named a menu, and Help
+	// is where this page has no footer to put them. Asserted here again, which is where they
+	// started and where they now are.
+	const help2 = src.slice(src.indexOf('function openHelpMenu'));
+	const menu = help2.slice(0, help2.indexOf('\n\tfunction ', 10));
 	report(/pc\.privacy_link/.test(menu) && /pc\.terms_link/.test(menu) && /pc\.consent_settings_link/.test(menu),
-		"the mark's menu carries privacy, terms and cookie settings");
+		'the Help menu carries privacy, terms and cookie settings');
 	const gal = src.slice(src.indexOf('function renderExamplesGallery'));
 	const pane = gal.slice(0, gal.indexOf('\n\tfunction ', 10));
 	report(/lpn-examples-legal/.test(pane) && /ec-consent-reopen/.test(pane),

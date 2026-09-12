@@ -826,3 +826,38 @@ thing, which is the only test that matters at that width.
 moves.** Zero new strings, zero new icon geometry — `plan` is deleted from nothing (Icons.lib.php
 kept it exactly for a day like this), and the one call site (`js/looped-network.js:22599`) is a
 one-word edit. No shipped file touched by me; this is advice pending Tom's word.
+
+## 2026-09-11 — Halt called: the Mac-paradigm mark is scrapped, not patched
+
+Tom: *"we are chasing our tail. Is the answer to scrap the Mac paradigm notion and throw its
+items back under Help?"* Yes. Traced the circle to its own start: step 2 (my ruling, far-left
+mark) cited VS Code/Figma/Docs for PLACEMENT; step 3 shipped Docs' link affordance at the other
+two's menu position; Tom caught the mismatch; step 4 converted the mark to a menu, which then
+collided icons with the Water menu; step 5 patched the icon. Each step was locally reasonable and
+the whole sequence was still wrong, because it never asked the prior question: can a web page's
+top-left slot do the job Mac's Apple-menu-plus-app-menu pair does. It cannot, and does not need
+to — a browser tab already carries the app's identity for free, which is the one thing a native
+app's bold app-name menu exists to supply.
+
+**CITED, not remembered, per Tom's explicit ask**: Apple's own HIG
+(https://developer.apple.com/design/human-interface-guidelines/the-menu-bar) and consumer
+explainers (iBoysoft, MakeUseOf) confirm Mac has TWO leftmost slots, not one — system Apple menu,
+then a bold app-name menu, and the distinction is unobvious enough that beginner guides exist to
+teach it to Mac owners themselves. VS Code's own docs (code.visualstudio.com) confirm the
+About-lives-in-the-app-menu pattern is Mac-ONLY: "On Windows and Linux: Help > About. On macOS:
+Code > About Visual Studio Code" — the same cross-platform software puts it in Help everywhere
+else. NN/g (nngroup.com/articles/homepage-links) recommends a logo carry BOTH an icon link and
+worded text, never the icon alone, which answers Tom's "Welcome page" question directly: yes,
+word it.
+
+**Ruling: `lpn_menu_home` reverts from `<button>`/`openMenu()` back to a plain same-tab `<a>`** —
+undoing my own Task 625 conversion, keeping the icon and far-left position from step 2 (never in
+question). Help gets back everything the mark's menu had absorbed: About, Install, Privacy,
+Terms of use, Cookie settings — twelve rows, three separators, the exact shape §6 already
+measured against Word/Figma/VS Code. The Water menu's `plan` icon (step 5) stays — it solves a
+different, independent problem (two identical tower glyphs on one bar) and is not part of what
+gets undone. Full four-question answer and the ranked table: `dev/help-menu-mastermind.md` §9.
+
+No shipped file touched. This is advice pending Tom's word, same as every prior entry in this
+file — but stated as plainly as the ask required: three of my own rulings from earlier the same
+day are wrong and the fourth (the Water menu icon) stands on its own.

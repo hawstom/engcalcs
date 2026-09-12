@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1777,
-        "delta_key_count": 10,
+        "expected_key_count": 1778,
+        "delta_key_count": 11,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -524,6 +524,7 @@
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_menu_home_tip": "Welcome page, LibreWaterNet.org",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_reaction_per_day": "1\/day"
     },
@@ -536,6 +537,7 @@
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_menu_home_tip": "Welcome page, LibreWaterNet.org",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_reaction_per_day": "1\/day"
     },
@@ -653,6 +655,22 @@
             }
         },
         "lpn_menu_cue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "সংরক্ষিত হয়নি। ব্রাউজার সংরক্ষণাগার পূর্ণ বা অনুপলব্ধ, তাই এই ট্যাব বন্ধ করলে আপনার সাম্প্রতিক পরিবর্তনগুলো হারিয়ে যাবে।",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "এটি কীভাবে সমাধান করা হয়",
+                    "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_menu_home_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

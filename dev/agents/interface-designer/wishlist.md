@@ -162,3 +162,23 @@ is answered for the three that remain after the divorce; see item 5 series above
     Help returns to seven rows of task-learning content only, which is the actual fix to the
     scope-creep complaint, not a row-count trim. Cost worth naming: the way back goes from one
     click to two. See `dev/help-menu-mastermind.md` §8.
+
+17. **SUPERSEDES 16 — the Mac-paradigm mark-as-menu is scrapped, not patched.** Tom called the
+    whole sequence circular and was right; step 2 (this list's own #13) was where it started.
+    Revert `lpn_menu_home` to a plain same-tab link (icon and far-left position unchanged, both
+    correct from the start); delete `openMarkMenu()` and its five rows rather than leave them
+    unused. Help gets back everything item 16 pulled out of it: About, Install, Privacy notice,
+    Terms of use, Cookie settings — twelve rows, three separators, the shape item 14/§6 already
+    measured against Word/Figma/VS Code as normal for the genre. Reword the mark's tip from the
+    bare domain to something naming the destination ("Welcome page — LibreWaterNet.org"), per
+    NN/g's own recommendation that a logo-link carry words as well as an icon. See
+    `dev/help-menu-mastermind.md` §9 for the full CITED reasoning (Apple HIG, VS Code's own
+    Windows/Linux-vs-Mac About placement, NN/g on homepage links).
+
+18. **Independent of item 17 — the Water menu's icon (`plan`, replacing `water`) stands on its
+    own and is not reverted.** It solves a different problem (two identical tower glyphs on one
+    bar, not the mark's menu-vs-link affordance) and stays even though the mark reverts to a
+    link. Post-demo, low priority: consider a water-network-specific glyph (pipe-and-junction,
+    distinct from the `pipe` asset icon two levels down) if the "plan reads as generic project,
+    not water" mismatch still nags after 16 September — not urgent, and not worth a fourth icon
+    change before the demo.

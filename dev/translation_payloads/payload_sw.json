@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 1777,
-        "delta_key_count": 9,
+        "expected_key_count": 1778,
+        "delta_key_count": 10,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -524,6 +524,7 @@
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_menu_home_tip": "Welcome page, LibreWaterNet.org",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "keys": {
@@ -535,6 +536,7 @@
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
+        "lpn_menu_home_tip": "Welcome page, LibreWaterNet.org",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later."
     },
     "key_context": {
@@ -651,6 +653,22 @@
             }
         },
         "lpn_menu_cue": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "Haijahifadhiwa. Hifadhi ya kivinjari imejaa au haipatikani, hivyo mabadiliko yako ya hivi karibuni yatapotea ukifunga kichupo hiki.",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Jinsi linavyotatuliwa",
+                    "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_menu_home_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

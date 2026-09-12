@@ -554,3 +554,150 @@ follow after the demo if it must.
 
 This document, appended (§8). No shipped file touched. Journal and wishlist updated at
 `dev/agents/interface-designer/journal.md` and `dev/agents/interface-designer/wishlist.md`.
+
+## 9. Tom calls a halt — "chasing our tail." Judged, not patched.
+
+Tom: *"we are chasing our tail. Is the answer to scrap the Mac paradigm notion and throw its
+items back under Help? Press Ida on this circular shoving match."* He is right about the shape
+of the last five hours, and step 2 above is where it starts — I cited three precedents for
+far-left PLACEMENT, then argued myself, twice more the same day, into fixing affordance
+mismatches those same precedents predicted. Undoing three of my own rulings in one sitting is
+the right outcome here, not a face-saving one, and it is worth saying so before the answer
+rather than after it.
+
+### Verdict: NO — scrap the Mac-paradigm menu. Keep the mark; make it a link again.
+
+### The four questions
+
+**1. "Is the upper left menu really anything anybody will know what to do with or care about?"
+No.** Two independent reasons, one measured in this repo and one CITED from outside it.
+Measured (§0 of this document, and `dev/session-handoff.md`): two of three test subjects in one
+afternoon never saw the LABELED, WORD-BEARING menu bar at all. An icon-only item at the front of
+that same unseen bar does not buy discoverability back — it adds one more unlabeled thing to the
+same blind spot, now carrying MORE weight (identity, legal, the exit) than a menu row ever did.
+CITED: even on the platform that invented this convention, the distinction it depends on is
+non-obvious enough that consumer help sites still have to explain it in beginner language —
+[iBoysoft's "Apple Menu on Mac"](https://iboysoft.com/wiki/apple-menu-on-mac.html) and
+[MakeUseOf's "Beginner's Guide to the macOS Menu Bar"](https://www.makeuseof.com/mac-menu-bar-beginners-guide/)
+both exist specifically to teach it to Mac owners. If native Mac users need a tutorial for the
+left corner of their own system bar, a Windows-majority audience meeting it once, on a web page,
+gets nothing from it.
+
+**2. "Is the upper left menu what a Mac would call 'LWN'?" No — and we built neither slot
+faithfully; we merged both into one.** CITED, [Apple's own Human Interface
+Guidelines, "The menu bar"](https://developer.apple.com/design/human-interface-guidelines/the-menu-bar)
+and the supporting descriptions in
+[iBoysoft](https://iboysoft.com/wiki/apple-menu-on-mac.html) and
+[O'Reilly's "Using the Apple and Application Menus"](https://www.oreilly.com/library/view/mac-kung-fu/9781941222799/f_0013.html):
+macOS has **two separate leftmost items**, not one. The Apple-logo menu is fixed by the system,
+identical in every app, and holds machine-global things (About This Mac, System Settings, Sleep,
+Restart, Log Out) — it is never about the app in front of you. Immediately to its right, a
+SECOND menu, in **bold text naming the app**, holds the app-specific identity commands: About
+This App, Preferences, Services, Hide, Quit. Ours conflated the two into one glyph: it sits at
+the Apple-menu's fixed system position (leftmost, no label, icon only, same size class as its
+five neighbors) but its CONTENTS are the second menu's job (About, Install≈Preferences, Leave≈
+Quit). It is drawn like the first slot and behaves like the second, which is exactly the
+"upper-left icon menu is now our Water menu's twin" problem restated one level up — two things
+sharing one shape. **A CITED fact that settles it further: even cross-platform apps that run ON
+macOS do not put this content in one shared slot outside Mac.** VS Code's own documentation:
+*"On Windows and Linux: choose Help > About. On macOS: use Code > About Visual Studio Code."*
+(Microsoft Learn / code.visualstudio.com's getting-started docs.) The bold-app-name-menu-with-
+About pattern is Mac-ONLY even for software written to run everywhere; everyone else's About
+lives in Help. We are a web page running mostly on Windows machines, and we had put About
+somewhere no cross-platform precedent puts it outside macOS itself.
+
+**3. "Should the link to the root be labeled 'Welcome page' or something like that?" Yes, name
+it in words, not only in the bare domain.** CITED: [NN/g, "Homepage Links Remain a
+Necessity"](https://www.nngroup.com/articles/homepage-links/) — clicking a logo to reach the
+homepage is a well-learned convention but NOT understood by every visitor, and NN/g's own
+recommendation is to carry **both** an implicit link (the logo/mark) **and** an explicit,
+worded one, rather than relying on the icon alone. Recommend the tip/aria-label read something
+like **"Welcome page — LibreWaterNet.org"**: it states what the click DOES (go to the site's
+front door) ahead of merely repeating a domain string the reader may not parse as "home" at all.
+This is cheap — one existing string edited, still a proper noun for half of it, nothing new
+translated beyond what the tip already carries.
+
+**4. "The Water menu ... 'Water' is far more descriptive [than 'Project'] ... and it no longer
+matches the icon." Keep the name "Water." Keep the icon at "plan" for now; do not chase a third
+icon before the demo.** Tom is not asking to rename the menu back — he is flagging that the
+*icon* I put there under §8 (a rolled blueprint, "plan") reads as generic-project rather than as
+water-network-specific, and a name/icon mismatch by itself was the original complaint (step 5).
+**Judgement: this mismatch is real but tolerable, and is a different KIND of mismatch than
+step 5's.** Step 5's defect was two menus sharing ONE identical glyph — a genuine collision, a
+reader cannot tell the rows apart by shape. The current defect is an abstract icon (a plan)
+standing for a concrete-sounding label ("Water") — but every other menu-bar icon in this bar is
+already abstract relative to its label (a page corner for "File," a pencil for "Edit," a
+push-pin for "Map," a question mark for "Help") and none of those are read as broken; a menu
+icon's job is to be a stable, quickly-recognized SHAPE next to its neighbors, not a literal
+illustration of the word. Recommend leaving `plan` in place through 16 September, and filing a
+water-specific icon (a small pipe-and-junction glyph, distinct from `pipe` which already names an
+asset type two levels down) as post-demo wishlist work, not urgent.
+
+### Can one item be both the product's identity and a command menu? No.
+
+Apple's own answer, cited above, is that it CANNOT — that is why the system built two adjacent
+slots rather than one. We do not need to rebuild that second slot, because a native app has no
+substitute for "which app is this" and needs a menu to say so; **a web page already has that for
+free, in the browser's own tab title and address bar** — the identity job the bold app-name menu
+exists to do on Mac is already done here by chrome we did not build and do not draw. Recreating
+a second leftmost slot to hold it would be solving a problem this page does not have.
+
+**So the mark gives up being a menu and goes back to being a link, and Help takes its rows
+back — Tom's own proposed resolution, confirmed rather than second-guessed.**
+
+### Final menu-bar shape
+
+```
+[mark: mono tower icon, link, same-tab, tip "Welcome page — LibreWaterNet.org"]
+File | Edit | Map | Water (icon: plan) | Help | [language picker]
+```
+
+`lpn_menu_home` reverts from `<button open: openMarkMenu>` to a plain `<a href>` — undoing only
+the Task 625 conversion (§8 above), not the icon or position, both of which were correct from the
+start. `EngCalcs.lpnMarkMenuRows`/`openMarkMenu()` and its five rows are deleted rather than kept
+unused, per this repo's own "a correction substitutes, it does not append" rule.
+
+### What Help ends up holding
+
+Everything §8 pulled OUT of Help, minus the two rows that were never Help's problem to begin
+with (Install and Leave, which read as pure identity/exit actions with no natural Help-menu
+home), returns:
+
+```
+Walkthroughs
+Notes on this page
+Toolbar key
+──────────────
+Fix something
+──────────────
+Install
+Screenshot gallery
+Not EPANET
+──────────────
+Privacy notice
+Terms of use
+Cookie settings
+About
+```
+
+Twelve rows, three separators, four bands — exactly §6's shape, which was itself measured
+against Word/Figma/VS Code's own Help menus (12-15 rows, "normal for the genre"). This is not a
+regression to be apologized for: it is the shape that was correct before the mark was ever asked
+to carry more than a click.
+
+### Ranked, decisive
+
+| # | Move | Cost | What it buys |
+|---|---|---|---|
+| 1 | Revert `lpn_menu_home` from menu button to plain same-tab link | delete `openMarkMenu()` and its five rows; no new strings | removes the conflation entirely — one glyph, one job, matching neither Mac slot and needing to match neither |
+| 2 | Move About/Install/Privacy/Terms/Cookie settings back into Help | pure move, zero new strings | Help returns to being the one predictable place for "what is this software," which is what a Windows-majority, non-Mac audience already expects of a Help menu |
+| 3 | Reword the mark's tip to name the destination in words | one string edit | meets NN/g's own logo-plus-words recommendation cheaply |
+| 4 | Leave the Water menu's `plan` icon as-is; defer a water-specific icon | zero now | stops a fourth icon-chase before the demo; the mismatch left standing is cosmetic, not a collision |
+
+**If only one: #1.** It is the one move that makes #2 correct rather than merely convenient, and
+it is the one Tom named himself.
+
+## Files
+
+This document, appended (§9). No shipped file touched. Journal and wishlist updated at
+`dev/agents/interface-designer/journal.md` and `dev/agents/interface-designer/wishlist.md`.

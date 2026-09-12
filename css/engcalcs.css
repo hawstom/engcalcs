@@ -1355,7 +1355,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-menu-cue-x { background: none; border: 0; font-size: 15px; line-height: 1;
 	padding: 0 0 0 .3em; cursor: pointer; color: inherit; opacity: .7; }
 .lpn-menu-cue-x:hover { opacity: 1; }
-@media (max-width: 640px) { .lpn-menu-cue { font-size: 11px; } }
+/* **NOT ON A PHONE AT ALL** (Tom, 2026-09-11: *"Menus cue: Do not show on phone."*). It shipped
+   merely smaller here, which was the wrong instinct: below this breakpoint the menu bar is already
+   icon-only and the toolbar already keeps nothing but the transport, so the two rows the cue
+   mediates between are a handful of glyphs a thumb's width apart -- there is no attention contest
+   left to referee. What there IS is the scarcest headroom on any screen we serve, and a strip of
+   prose spending it to explain a bar the reader can see all of is the opposite of the trade this
+   cue exists to make. `display: none`, not a size tweak. */
+@media (max-width: 640px) { html:has(#lpn_canvas) .lpn-menu-cue { display: none; } }
 /* The About box leads with the same mark that opened it (Task 625). Sized to the heading rather
    than to .ec-icon's 1.05em base, so the glyph and the name read as one lockup. */
 .lpn-about-name { display: flex; align-items: center; gap: .45em; }

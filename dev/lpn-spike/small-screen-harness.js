@@ -467,14 +467,19 @@ console.log('\n--- 4. the menu bar drops to icons ---');
 		const word = b.children.filter((c) => c.cls.indexOf('lpn-menubar-word') >= 0)[0];
 		const icon = b.children.filter((c) => c.tag === 'svg' || c.tag === 'g')[0];
 		ok(b.id + ' carries its name as an aria-label', !!name && name.length > 0);
-		ok('...' + b.id + ' has the word in an element a rule can reach', !!word);
-		// **THE MARK IS THE ONE ITEM WITH NO WORD, AT ANY WIDTH**, so its accessible name comes
-		// from `aria` rather than from the word -- there is nothing to agree with. Every other item
-		// must still say the same thing twice, which is what stops a menu going mute on a phone.
+		// **THE HOME MARK IS THE ONE ITEM WITH NO WORD AT ANY WIDTH, AND IT IS NOT A MENU.** It is
+		// an <a> to librewaternet.org, built outside the menu array, so it has no
+		// `.lpn-menubar-word` at all -- the span exists on the MENUS so a stylesheet can hide the
+		// word below 640px while `aria-label` keeps the button named. The mark needs neither: it
+		// is icon-only by design and its aria-label carries the whole name at every width. The
+		// rule this guard protects -- a menu must not go mute on a phone -- is untouched for the
+		// six that are menus.
 		if (b.id === 'lpn_menu_home') {
-			ok('...' + b.id + ' is icon-only and names itself', word.el.textContent === '' && name.length > 0);
+			ok('...' + b.id + ' is an icon-only link that names itself',
+				b.tag === 'a' && !word && name.length > 0, b.tag + ' / ' + JSON.stringify(name));
 			return;
 		}
+		ok('...' + b.id + ' has the word in an element a rule can reach', !!word);
 		ok('...' + b.id + ' says the same thing in both', !!word && word.el.textContent === name);
 		ok('...' + b.id + ' has an icon to survive on', !!icon);
 		if (word) {

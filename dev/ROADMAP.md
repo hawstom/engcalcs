@@ -34,39 +34,27 @@ flat list, highest priority first, lowest ID first inside a band. `- 100|615| **
     reader who does not see a tower is the signal that would reopen the drawing.
 
 - 60|625| **[H] BUILT: the app page divorced from EngCalcs chrome. Remainder below.**
-  **SHIPPED 2026-09-10.** `echoHeader("EngCalcsApp", ...)` is a new type: the eight-character
-  prefix test still gives it engcalcs.css, Cookies.lib.js and Calculators.lib.js, and it suppresses
-  `echoEngCalcsMenu()` and the H1/welcome block. The page's own `<h2 id="ec-page-desc">`, the
-  "Hide these titles" link and the inline visibility script went with them. **NO H1 at all**, on
-  Tom's ruling. The other 15 calculators are untouched -- verified by rendering both.
-  - **THE TWO DOORS MOVED RATHER THAN WENT.** Help gained **Install** (prompts natively when
-    `beforeinstallprompt` fired, else opens Install.php; reuses the translated `install_main_menu`
-    rather than minting a string before the freeze), and the **Language** menu is now last on the
-    app menu bar, right of Help, per Ida. Its 27 rows come from `EngCalcs.languages`, emitted for
-    this page only, and each row carries its own `lang` -- which needed new support in `openMenu()`,
-    since it silently ignored the attribute. **The href is `ecCanonicalPath()`, never
-    `location.pathname`**: under the `/app/` rewrite that is the script, and Tom landed on the
-    other host's script path from the navbar's own picker on 2026-09-10.
-  - **THE PAGE-TITLE TOGGLE IS DELETED, not stranded** -- 92 lines, its Settings row, its storage
-    key and its row highlight; a checkbox that hides nothing is the embarrassment this removes.
-    Erase everything still clears `lpn_show_titles` by literal. `page-titles-harness.js` is gone;
-    `small-screen-harness.js` and `map-height-harness.js` lost the sections that measured it.
-  - **EMBARRASSMENT 1 CLOSED 2026-09-10:** the suite's Hydraulics menu and all eight "See also"
-    lines now read **LibreWaterNet.org** and link to `EC_LWN_APP_URL`, same tab, no link back --
-    Back is the way back, and a new tab destroys it. The label is a LITERAL, not a key: a domain
-    is the same in every language, so a key holding it would be byte-identical to English in 26
-    files and fail the build. `lpn_main_menu` ("Water Supply Network") is now read by nothing.
-    `Looped-Network.php` is declared in `EC_MENU_EXEMPT_CALCULATORS` -- that check's premise is
-    "no visitor can reach it", which is false for the page that IS librewaternet.org's front door.
-  - **THE MENU ICON LOST ITS CLOUDS 2026-09-10** and the favicon keeps its own; the fault was
-    placement, not weight, and Tom's own area-not-line idea was rendered and does not help.
-    **The favicon is SETTLED and emphatic** -- *"It's perfect. I am in love."* One colleague gave
-    it a thumbs up and another took it for his home town's water tower.
-  - **STILL OPEN:** Help > About still points at EngCalcs' `About.php`, which is Tom's fourth
-    embarrassment and needs the app's own words -- his call, not a mechanical edit. The
-    `lpn_settings_show_titles*` and `lpn_hide_titles` keys are now unread in all 27 files and are
-    his call to delete. Ida's remaining ranked items are the responsive merge above ~1750 px and
-    her first-visit cue at the toolbar (`dev/app-chrome-postdivorce-recommendations.md`).
+  **SHIPPED AND DEPLOYED 2026-09-11.** `echoHeader("EngCalcsApp", ...)` suppresses the suite navbar
+  and the H1/welcome block, keeping the CSS and JS. **NO H1 at all**, on Tom's ruling
+  (*"app.epanetjs.com has no h1 ... this is not a storefront page"*, verified). Install and the
+  Language picker MOVED rather than went; the other 15 calculators are untouched. The Hydraulics
+  menu and all eight "See also" lines now read LibreWaterNet.org, same tab, and
+  `Looped-Network.php` is declared in `EC_MENU_EXEMPT_CALCULATORS` -- that check's premise, "no
+  visitor can reach it", is false for the page that IS librewaternet.org's front door.
+  - **THE MENU BAR IS SETTLED. DO NOT REOPEN IT.** The far-left tower went link -> Mac-style menu
+    -> link in one day and Tom called it (*"we are chasing our tail"*). It is a LINK, tipped
+    "Welcome page, LibreWaterNet.org"; Help holds the commands. Three citable reasons, not
+    remembered ones: macOS has TWO slots (Apple menu, and a separate bold app-name menu holding
+    About) and we merged them; VS Code puts About in HELP on Windows and Linux; and two of three
+    testers never found the menu bar at all. These users are on Windows. Full citations:
+    `dev/help-menu-mastermind.md` §9. **Not EPANET did NOT come back with Help's other rows** --
+    that ruling was written before not-epanet.org was retired, and the harness asserts its absence.
+  - **STILL OPEN AND HIS:** the About box's words are written but `About.php` (the SUITE's about,
+    for the other 15 calculators) still says what it always did. Ida's remaining items are the
+    responsive merge above ~1750 px and her first-visit cue's real-world verdict -- the cue is
+    BUILT, hidden below 640 px on his instruction, and unvalidated by eye.
+  - Measurements behind all of it: `dev/chrome-audit.md`,
+    `dev/app-chrome-postdivorce-recommendations.md`, `dev/help-menu-mastermind.md`.
 
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable
@@ -360,23 +348,21 @@ the block.
   - The three exact identities that named it, the live capture and Tom's own file:
     `dev/lpn-blank-map-incidents.md`. **Also Task 624's original report** -- one bug, two faces.
 
-- 70|630| **[H] The map's own honesty: a scale bar, and what projection we offer.**
-  Tom, 2026-09-11, at high latitude: *"longitude lines are still parallel and latitude lines are
-  straight as reported by the coordinates tracker, which cannot work ... a more local projection
-  like any UTM zone is needed."* Backed by `dev/map-coordinate-review.md` and
-  `dev/map-coordinate-mathematics.md`.
-  - **THE SCALE BAR IS THE WHOLE OF THE FIRST RANK, AND THE NUMBER SAYS WHY.** Every geodetic term
-    in the system is under **350 ppm**; reading a distance off the picture with no bar is
-    **198,000 ppm** (`sec φ - 1`: 19.8% at Phoenix, 100% at 60N). 500x the worst geodesy. Tom:
-    *"It's a lie at larger latitudes."* -- which is the argument FOR one computed at the view's own
-    latitude, not against. Formula and the Leaflet/OpenLayers/Google conventions: mathematics §5.3.
-  - **A PROJECTION CHOICE IS A SEPARATE AND BIGGER QUESTION** (his: *"We may have to require or
-    offer Standard projection (including UTM) as an option along with lat/lon and arbitrary xy"*).
-    Weigh it against "ONLY THE USER TOUCHES A FILE'S NUMBERS": a stored CRS change rewrites
-    coordinates, an ENTRY/DISPLAY CRS does not. Mathematics §6 costs all three.
-  - **HIS TEST CASE IS THE ACCEPTANCE TEST**: a north east-west pipe is correctly SHORTER than a
-    south one, which he accepts. What is not defensible is the readout at 89.99, and that nothing
-    on screen names the projection in force.
+- 70|630| **[H] The map shows lat/lon as xy, and that is the problem.**
+  Tom, 2026-09-11, testing at high latitude: *"We don't treat them as xy for length calculations.
+  But we show them as xy. And that's a problem."* Meridians are drawn parallel where on the ground
+  they converge, so a screen rectangle is not a ground rectangle and a true ground square draws as
+  a donut segment. **`sec φ - 1` is 19.8% at Phoenix and 100% at 60N** -- about 150x the
+  ellipsoidal effect the mathematics report found, which is a different phenomenon and must not be
+  offered as an answer to this one.
+  - **THE DECISION RECORD IS `dev/map-projection-decision.md`**, including his own architecture --
+    store easting/northing in a stated CRS, let the drawing frame BE that plane, and need the
+    projection only when talking to tiles and the geocoder -- and the one question that sizes the
+    work: proj4js or UTM alone. Measurements: `dev/map-coordinate-review.md` and
+    `dev/map-coordinate-mathematics.md`.
+  - **A SCALE BAR IS A MITIGATION, NOT THE FIX**, and he corrected me when I said otherwise: it
+    makes one number honest at one latitude while the scale varies down the view. Rank it below
+    projections.
   - Corrections the mathematics found, each with its own line in that report: the Sterbenz comment
     (wrong twice over), `maxScale()` unclamped by extent (28 px of float32 drift at scope),
     `geo-precision-harness`'s exactness claim (true in Novato, false in Nairobi), and `lenAuto`
@@ -387,7 +373,9 @@ the block.
   - **THE LABEL-ZOOM SETTING MAY HAVE BEEN CUT TOO FAST.** *"We removed the 'Show labels when
     zoomed closer than [__]' Setting along with its 'Use current zoom'. But maybe that was hasty.
     Obviously we don't want to show labels at the entire world view."* A geographic project can now
-    open on the whole world, where every label is on top of every other.
+    open on the whole world, where every label is on top of every other. **Cutting the zoom from
+    GO TO was right and is not reopened** (his, 2026-09-11: *"That's a different use case than map
+    search."*) -- a reader who types a coordinate is asking to be moved, not rescaled.
   - **PLACE SEARCH PICKS ITS OWN ZOOM AND SHOULD NOT.** *"If Mapbox or OSM returns a zoom level
     with place name searches, we should use that zoom level ... This is embarrassing."* Nominatim
     returns a `boundingbox` on every result, which is better than a zoom: fit it. Check what
