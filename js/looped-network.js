@@ -18874,9 +18874,20 @@ var EngCalcs = EngCalcs || {};
 			alert(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
 			return null;
 		}
+		// **OPEN FIRST, THEN APPLY** -- the order openProject() has always used, and the reason is the
+		// pending view. applySaved() binds the document's saved view to `library.openId` as it reads
+		// it (Task 629's rule: a view belongs to a PROJECT), so applying before the switch bound it
+		// to the project being LEFT, restoreViewOrFit() then refused it as somebody else's, and every
+		// imported file and every gallery example opened on a zoom-to-fit instead of the view it was
+		// saved with. Tom, 2026-09-12: *"Net3 xy, Elm Street Center, examples open away from their
+		// center to a blank screen. The others are okay."* -- the others were the ones whose fit
+		// happened to look like their saved view.
+		//
+		// The index entry is still pushed after, because its name comes from the document applySaved()
+		// has just installed; nothing inside applySaved() reads the index, only `library.openId`.
+		library.openId = id;
 		applySaved(saved);
 		library.projects.push({ id: id, name: project.name, updated: Date.now() });
-		library.openId = id;
 		clearUndo();
 		saveToStorage();
 		refreshAllFromDocument();
