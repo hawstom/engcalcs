@@ -165,10 +165,22 @@ console.log('\n-- the Help menu rows --');
 	// which calculator somebody was on, and this page is the one that cannot be inferred from a
 	// referrer. Matched loosely on the path so a later parameter does not turn this red, then
 	// asserted exactly for the parameter that carries the answer.
-	const dests = body.match(/ext\('contact\.php[^']*'\)/g) || [];
-	report(dests.length === 1, 'exactly one row opens contact.php', `${dests.length}`);
+	// **AND IT GOES THROUGH suiteUrl(), WHICH IS THE HALF THAT WAS BROKEN** (Tom, 2026-09-12:
+	// *"Help, Fix and Privacy Notice, Terms of use, this is a broken link"*). A bare
+	// 'contact.php' resolves against the address the visitor typed, so under the /app/ rewrite on
+	// librewaternet.org it asked for librewaternet.org/contact.php and returned 404.
+	// dev/scripts/js_page_url_check.php holds that for every page URL in js/*.js; this asserts it
+	// for this row, because this is the harness that knows what the row is FOR.
+	const dests = body.match(/ext\(suiteUrl\('contact\.php[^']*'\)\)/g) || [];
+	report(dests.length === 1, 'exactly one row opens contact.php, through suiteUrl()',
+		`${dests.length}`);
 	report(dests.length === 1 && /\?from=Looped-Network/.test(dests[0]),
 		'and it names this page, so the e-mail can say where it came from', dests[0] || '(none)');
+	// The other three external suite pages the menu offers, same rule, same reason.
+	['privacy.php', 'terms.php', 'Install.php'].forEach(function (page) {
+		report(body.indexOf("suiteUrl('" + page + "')") >= 0,
+			page + ' is addressed through suiteUrl() too');
+	});
 	// About last, where every other Help menu in the world puts it.
 	report(body.indexOf('about_main_menu') > body.indexOf('lpn_help_fix'), 'About is last');
 	// Notes is the one row that does not leave the page, so it must NOT be an ext().

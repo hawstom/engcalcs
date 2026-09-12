@@ -314,6 +314,20 @@ if ($type === "EngCalcsApp") :
 ?>
 EngCalcs.languages = <?=json_encode($ec_app_langs, JSON_UNESCAPED_UNICODE)?>;
 EngCalcs.lwnSiteUrl = <?=json_encode(EC_LWN_SITE_URL)?>;
+<?php // **WHERE THE SUITE'S OWN PAGES LIVE, BECAUSE A RELATIVE ONE IS WRONG AT /app/** (Tom,
+      // 2026-09-12: *"Help, Fix and Privacy Notice, Terms of use, this is a broken link"*). The
+      // app's Help menu opened 'privacy.php', 'terms.php', 'contact.php' and 'Install.php'
+      // relatively. That is correct on hawsedc.com/engcalcs/ and DEAD on librewaternet.org/app/,
+      // where the address is a REWRITE onto Looped-Network.php -- so the four resolved to
+      // librewaternet.org/privacy.php and returned 404. It is nav_link_absolute_check.php's
+      // finding in another construct: that check reads the rendered nav, and a URL built inside a
+      // JS menu is invisible to it.
+      //
+      // EC_SW_BASE is the right constant and not a near-miss: its own docblock is "web path
+      // prefix the suite's own FILES are addressed by ... whatever URL the visitor arrived at",
+      // which is this question exactly. The ~210 hardcoded '/engcalcs/...' paths already bet on
+      // it, so a menu row that reads it cannot drift from them. ?>
+EngCalcs.suiteBase = <?=json_encode(EC_SW_BASE)?>;
 EngCalcs.langSwitchPath = <?=json_encode(ecLanguageSwitchPath(
 	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
 	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''))?>;

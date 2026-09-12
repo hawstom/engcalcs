@@ -167,6 +167,8 @@ run_check "canonical path selftest"      blocking php dev/scripts/canonical_path
 # mutation because a ratchet that has never been red is worth nothing.
 run_check "suite nav links absolute"     blocking php dev/scripts/nav_link_absolute_check.php
 run_check "suite nav links selftest"     blocking php dev/scripts/nav_link_absolute_selftest.php
+run_check "js page urls absolute"        blocking php dev/scripts/js_page_url_check.php
+run_check "js page urls selftest"        blocking php dev/scripts/js_page_url_selftest.php
 # Task 322 rows 11 and 12. FOUR third-party requests, all opt-in, each behind its own gate -- and
 # every cookie, localStorage key and IndexedDB store a shipped file writes is written down. The
 # second found two that were not, in the file whose only claim is that it is complete. Neither
