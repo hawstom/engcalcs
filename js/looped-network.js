@@ -8933,7 +8933,10 @@ var EngCalcs = EngCalcs || {};
 	// **THE ONE DOOR TO A PLACE ON THE EARTH** (Task 437). js/lpn-search.js resolves a place NAME
 	// and then travels through here, so the size question, the zoom floor and the placement case
 	// are asked once rather than reimplemented beside them.
-	function goToPoint(ll) {
+	//
+	// `extent` is optional and is the geocoder's `{south, north, west, east}`. Absent means "I know
+	// where, not how big" -- see the zoom note below.
+	function goToPoint(ll, extent) {
 		// **WHILE PLACING, IT ASKS THE SECOND HALF OF THE QUESTION TOO.** Tom, 2026-08-18: *"In the
 		// Go to... box, ask for lat/lon and approximate size of project area in project length
 		// units. Provide a default of either 1000m or 3000 ft."* That is the half we do NOT have --
@@ -8944,19 +8947,90 @@ var EngCalcs = EngCalcs || {};
 			var span = georefAskSize();
 			if (span > 0) { georefGoTo(ll, span); return; }
 		}
-		// **THE ZOOM IS THE USER'S AND GOING SOMEWHERE DOES NOT SPEND IT** (Tom, 2026-09-08:
-		// *"Goto should preserve the zoom factor. Otherwise good."*). This used to zoom IN to a
-		// site-sized span (a kilometre across) whenever the view was wider than that, on the
-		// argument that arriving zoomed to the whole county leaves you no better off. Half of that
-		// was already conceded -- a view CLOSER than a site was kept, because somebody lined up on
-		// a street corner wants to travel rather than be zoomed out -- and Tom has now settled the
-		// other half the same way. A scale is a decision the user made before they pressed this,
-		// and travelling is not a reason to overrule it.
+		// **THE ZOOM IS THE USER'S AND TYPING A COORDINATE DOES NOT SPEND IT** (Tom, 2026-09-08:
+		// *"Goto should preserve the zoom factor. Otherwise good."*, and again 2026-09-12: *"Goto,
+		// however, should not zoom."*). This used to zoom IN to a site-sized span (a kilometre
+		// across) whenever the view was wider than that, on the argument that arriving zoomed to
+		// the whole county leaves you no better off. Half of that was already conceded -- a view
+		// CLOSER than a site was kept, because somebody lined up on a street corner wants to travel
+		// rather than be zoomed out -- and Tom settled the other half the same way. A scale is a
+		// decision the user made before they pressed this, and travelling is not a reason to
+		// overrule it.
 		//
-		// It is the ONE DOOR, so this governs the place-name search in js/lpn-search.js too, which
-		// is the same promise: type a name, keep your scale, arrive.
-		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: state.s });
+		// **AN EXTENT IS THE ONE THING THAT OVERRULES IT, AND ONLY THE GEOCODER HAS ONE** (Tom,
+		// 2026-09-12: *"I requested that place name search zoom if OSM provides a zoom level with
+		// its results."*). The two callers are not the same request wearing different clothes: a
+		// typed lat/lon says WHERE and says nothing about how big the place is, while a searched
+		// name comes back with the extent of the thing found. So the rule is not "search zooms and
+		// Go to does not" -- it is that a caller holding a size may spend the zoom and a caller
+		// holding none may not, which is why this is still ONE door and not two travellers with
+		// rival opinions. js/lpn-search.js passes the box; goToLatLon() passes nothing.
+		var box = extent ? inwardBox(extent) : null;
+		var fit = box ? fitScaleForBox(box) : 0;
+		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(ll.lon),
+			cy: fit > 0 ? (box.y1 + box.y2) / 2 : inwardY(ll.lat), s: fit > 0 ? fit : state.s });
 		georefDetachTick();
+	}
+	/**
+	 * **THE ONE PLACE AN EXTENT CROSSES INTO THE DRAWING FRAME.** The fit needs the box's width and
+	 * its height, and the arrival needs its centre, and doing each of those from the geographic
+	 * numbers would cross the boundary eight times for one box -- which
+	 * dev/lpn-spike/local-origin-harness.js counts, deliberately, because a coordinate converter
+	 * with readers scattered through the file is how a frame mismatch gets in. Converted once,
+	 * here, and everything after this is drawing units.
+	 *
+	 * **AN INVERTED OR WRAPPED BOX IS REFUSED HERE**, before any of it is drawn, and that is not
+	 * belt-and-braces on top of the parser -- this is the ONE DOOR, and a door that trusts its
+	 * callers to have validated is a door with its rule written outside it. An east less than its
+	 * west is what a box crossing the antimeridian looks like (Fiji, the Chukotka coast); read as a
+	 * plain subtraction it is nearly the whole world backwards, which zooms out to the planet and
+	 * centres in the wrong ocean. The test has to be a SIGNED comparison of the geographic values,
+	 * because the drawn spans are absolute and by then the evidence is gone.
+	 */
+	function inwardBox(ext) {
+		if (!ext || !isFinite(ext.east) || !isFinite(ext.west) ||
+			!isFinite(ext.north) || !isFinite(ext.south) ||
+			ext.east < ext.west || ext.north < ext.south) { return null; }
+		return { x1: inwardX(ext.west), x2: inwardX(ext.east),
+			y1: inwardY(ext.north), y2: inwardY(ext.south) };
+	}
+	// A tenth of the view left around the place, because a box drawn edge to edge reads as an
+	// accident rather than as a frame.
+	var SEARCH_FIT_PAD = 0.9;
+	// **AND IT WILL NOT ZOOM CLOSER THAN A SITE, WHICH IS THE HALF A RAW FIT GETS WRONG.**
+	// Nominatim pads a single node's box to a few tens of metres, and applyView()'s own ceiling is
+	// 500 px per METRE -- so fitting a post box literally would arrive with a doorway filling the
+	// window and no street on screen. The floor is 1 km across: the same site-sized span the
+	// retired Go-to span constant used, which is the size Tom liked for arriving somewhere and
+	// objected to only as a thing imposed on a Go to he had already scaled. It bounds the CLOSE
+	// end alone --
+	// a country still arrives showing a country.
+	var SEARCH_FIT_FLOOR_M = 1000;
+	/**
+	 * Pixels per drawing unit that frames an already-inward `box`, or 0 for "no opinion, keep the
+	 * user's scale". Drawing units in, a scale out: it never sees a longitude.
+	 *
+	 * Both axes, and the SMALLER of the two scales, because fitting means the whole box is on
+	 * screen rather than one axis of it. A degenerate axis (a box with no height, which a
+	 * zero-area result can produce) is skipped rather than dividing by zero; a box degenerate in
+	 * BOTH axes has no size and returns 0, which is the honest answer and lands on the Go to rule.
+	 *
+	 * The floor is converted through DEG_PER_M, a degree of LATITUDE, and applied to a span in
+	 * drawing units -- where x is degrees of longitude, which are shorter than that away from the
+	 * equator. So at high latitude the floor is slightly conservative, allowing a little more zoom
+	 * than 1 km. That is maxScale()'s own approximation, stated in its own comment, and using the
+	 * same one here keeps the two bounds commensurable instead of correct-but-disagreeing.
+	 */
+	function fitScaleForBox(box) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0, dx, dy, s;
+		if (!w || !h || !box) { return 0; }
+		dx = Math.abs(box.x2 - box.x1);
+		dy = Math.abs(box.y2 - box.y1);
+		if (!isFinite(dx) || !isFinite(dy)) { return 0; }
+		s = Math.min(dx > 0 ? w / dx : Infinity, dy > 0 ? h / dy : Infinity) * SEARCH_FIT_PAD;
+		if (!isFinite(s) || s <= 0) { return 0; }
+		return Math.min(s, w / (SEARCH_FIT_FLOOR_M * DEG_PER_M));
 	}
 
 	// ---- Task 497: elevations read from the land surface ------------------------------------------
@@ -16818,8 +16892,11 @@ var EngCalcs = EngCalcs || {};
 		// in exactly this position. Built here rather than in PHP because the whole pane is; the
 		// strings are the SUITE's existing keys, so this costs no translation.
 		var legal = elh('p', { 'class': 'lpn-examples-legal' });
-		[[pc.privacy_link || 'Privacy notice', 'privacy.php'],
-			[pc.terms_link || 'Terms of use', 'terms.php']].forEach(function (pair) {
+		// The pair carries the finished URL rather than a page name: a row that stores 'privacy.php'
+		// and addresses it somewhere else is the relative link this just fixed, waiting for the next
+		// reader to use the array the obvious way.
+		[[pc.privacy_link || 'Privacy notice', suiteUrl('privacy.php')],
+			[pc.terms_link || 'Terms of use', suiteUrl('terms.php')]].forEach(function (pair) {
 			var a = elh('a', { href: pair[1], target: '_blank', rel: 'noopener' }, pair[0]);
 			legal.appendChild(a);
 		});
@@ -22249,6 +22326,19 @@ var EngCalcs = EngCalcs || {};
 	// it depicts. Phase 2, a filmstrip showing a GESTURE rather than a state, is a separate thing
 	// and this does not retire it.
 	var LPN_SCREENSHOTS_URL = 'https://librewaternet.org/screenshots.html';
+	// **A SUITE PAGE IS ADDRESSED FROM THE ORIGIN, NEVER RELATIVELY** (Tom, 2026-09-12: *"Help,
+	// Fix and Privacy Notice, Terms of use, this is a broken link"*). All three were, and so were
+	// Install and the gallery's own legal row. A relative 'privacy.php' is correct on
+	// hawsedc.com/engcalcs/ and resolves to librewaternet.org/privacy.php -- a 404 -- under the
+	// /app/ rewrite, because a rewrite is not a directory. The HTML is byte-identical on both
+	// hosts and only the base differs, which is why nothing here could see it and Tom found it by
+	// clicking: the same failure, in the same words, that nav_link_absolute_check.php was written
+	// for after the navbar did it.
+	//
+	// ONE DOOR, so the base is stated once. `EngCalcs.suiteBase` is EC_SW_BASE emitted by
+	// echoHTMLHead(); the fallback is the canonical mount, which is what every other absolute path
+	// in this file already says.
+	function suiteUrl(page) { return (EngCalcs.suiteBase || '/engcalcs/') + page; }
 	// About and Contact are DELIBERATE REPEATS of the suite's own More menu: the navbar is for
 	// somebody choosing a calculator, this is for somebody already inside one. Both reuse the
 	// existing keys, so they cost no new translation and cannot drift from the navbar's wording.
@@ -22306,7 +22396,7 @@ var EngCalcs = EngCalcs || {};
 			// two links to one destination halve each other's weight rather than doubling the
 			// invitation (echoFeedback() in lib/Calculators.lib.php).
 
-			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php?from=Looped-Network') },
+			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext(suiteUrl('contact.php?from=Looped-Network')) },
 			{ separator: true },
 			// **HELP HOLDS THE COMMANDS AGAIN** (Task 625, Ida's reversal 2026-09-11). These rows
 			// spent an hour in a menu hanging off the product mark, on the theory that "what is
@@ -22321,14 +22411,14 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'install', label: pc.install_main_menu || 'Install',
 				fn: function () {
 					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
-					window.open('Install.php', '_blank', 'noopener');
+					window.open(suiteUrl('Install.php'), '_blank', 'noopener');
 				} },
 			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			{ separator: true },
 			// Task 286 wants the notice FINDABLE and withdrawal as easy as consent; this page has
 			// no footer, so Help is its home and always was.
-			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
-			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
+			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext(suiteUrl('privacy.php')) },
+			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext(suiteUrl('terms.php')) },
 			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
 				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather

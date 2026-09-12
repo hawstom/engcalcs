@@ -137,18 +137,51 @@
 	 * response must produce "nothing found", never a NaN centre that flies the map to the middle of
 	 * the Atlantic. lat/lon arrive as STRINGS in jsonv2 and are parsed here, once.
 	 */
+	/**
+	 * **THE EXTENT NOMINATIM SENDS WITH EVERY RESULT** (Tom, 2026-09-12: *"I requested that place
+	 * name search zoom if OSM provides a zoom level with its results."*).
+	 *
+	 * **IT SENDS NO ZOOM LEVEL, AND THAT IS WORTH KNOWING RATHER THAN WORKING AROUND.** There is no
+	 * `zoom` field in the jsonv2 search response and never has been -- a zoom is a property of a
+	 * MAP (tile pyramid, viewport size, device pixels), and Nominatim does not know any of ours.
+	 * What it sends is `boundingbox`, the extent of the thing it found, which is strictly better:
+	 * a zoom would have to be re-derived for this canvas anyway, and the box is the answer to the
+	 * question the zoom was standing in for. So the feature is honoured exactly as asked -- a
+	 * country arrives showing a country and a street arrives showing a street -- and the arithmetic
+	 * that turns an extent into a scale belongs to whoever owns the viewport, not here.
+	 *
+	 * Four strings, in Nominatim's own order: south, north, west, east. Every one of them is
+	 * validated, because a partly-numeric box is worse than none -- it would fly the map to a
+	 * scale derived from a NaN. A box that CROSSES THE ANTIMERIDIAN (east < west, which is what
+	 * Fiji and the Chukotka coast produce) is REFUSED rather than wrapped: the fit arithmetic is a
+	 * subtraction in one frame and would read such a box as nearly the whole world backwards. A
+	 * refusal costs the zoom and keeps the travel, which is the behaviour that shipped before this.
+	 */
+	function parseBox(bb) {
+		if (!bb || bb.length !== 4) { return null; }
+		var s = parseFloat(bb[0]), n = parseFloat(bb[1]), w = parseFloat(bb[2]), e = parseFloat(bb[3]);
+		if (!isFinite(s) || !isFinite(n) || !isFinite(w) || !isFinite(e)) { return null; }
+		if (Math.abs(s) > 90 || Math.abs(n) > 90 || Math.abs(w) > 180 || Math.abs(e) > 180) { return null; }
+		if (n < s || e < w) { return null; }
+		return { south: s, north: n, west: w, east: e };
+	}
 	EC.lpnSearchParse = function (data) {
-		var out = [], i, r, lat, lon;
+		var out = [], i, r, lat, lon, hit;
 		if (!data || !data.length) { return out; }
 		for (i = 0; i < data.length; i++) {
 			r = data[i] || {};
 			lat = parseFloat(r.lat);
 			lon = parseFloat(r.lon);
 			if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) { continue; }
-			out.push({
+			hit = {
 				lat: lat, lon: lon,
 				label: String(r.display_name || r.name || (lat + ', ' + lon))
-			});
+			};
+			// Absent rather than null when there is no usable box, so the host's test is the plain
+			// `if (extent)` and a result with no extent is indistinguishable from a typed Go to.
+			var box = parseBox(r.boundingbox);
+			if (box) { hit.extent = box; }
+			out.push(hit);
 		}
 		return out;
 	};
@@ -327,8 +360,13 @@
 		return results[n - 1];
 	}
 
+	// **THE EXTENT IS WHAT MAKES SEARCH DIFFERENT FROM GO TO, AND IT IS THE ONLY DIFFERENCE.**
+	// Tom, 2026-09-12: *"Goto, however, should not zoom."* Both still travel through the host's one
+	// door; this one hands it the box OSM sent and a typed coordinate hands it nothing, so the
+	// zoom-preserving rule Tom set on 2026-09-08 is still exactly what a Go to does. A result
+	// whose box we refused above also hands nothing, and therefore behaves like a Go to.
 	function arrive(hit) {
-		if (seam && seam.goTo) { seam.goTo({ lat: hit.lat, lon: hit.lon }); }
+		if (seam && seam.goTo) { seam.goTo({ lat: hit.lat, lon: hit.lon }, hit.extent); }
 		// The credit rides with the result it belongs to, which is what "as suitable for your
 		// medium" means when the medium is a notice box over a map.
 		notice(hit.label + ' — ' + CREDIT);

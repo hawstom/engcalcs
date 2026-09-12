@@ -92,6 +92,42 @@ ok('display_name is the label, and name is the fallback',
 ok('an empty answer is no results, not an error', EC.lpnSearchParse([]).length === 0);
 ok('null and undefined are no results either',
 	EC.lpnSearchParse(null).length === 0 && EC.lpnSearchParse(undefined).length === 0);
+// ---- 3b. the boundingbox, which is the only zoom Nominatim offers ------------------------------
+// Tom, 2026-09-12: *"I requested that place name search zoom if OSM provides a zoom level with its
+// results."* It provides no zoom LEVEL -- there is no such field and never has been, a zoom being a
+// property of a map rather than of a place -- and it provides `boundingbox`, the extent of the
+// thing found, which is the better answer to the same question. Four STRINGS in Nominatim's own
+// order: south, north, west, east.
+//
+// What the host does with an extent is dev/lpn-spike/goto-keeps-zoom-harness.js section 4; this is
+// only whether a box comes off the wire intact. **A PARTLY-NUMERIC BOX MUST PRODUCE NO BOX**, not a
+// box with a NaN edge -- the host would derive a scale from it and fly the map to nowhere.
+section('3b. the boundingbox');
+{
+	const withBox = EC.lpnSearchParse([{ lat: '51.5', lon: '-0.12', display_name: 'London',
+		boundingbox: ['51.28', '51.69', '-0.51', '0.33'] }]);
+	ok('a well-formed box arrives named, in system order, as numbers',
+		withBox.length === 1 && withBox[0].extent &&
+		withBox[0].extent.south === 51.28 && withBox[0].extent.north === 51.69 &&
+		withBox[0].extent.west === -0.51 && withBox[0].extent.east === 0.33,
+		JSON.stringify(withBox[0].extent));
+	// ABSENT, not null: the host's test is a plain `if (extent)`, so a result with no usable box is
+	// indistinguishable from a typed Go to and inherits its zoom-preserving rule for free.
+	[['no boundingbox key at all', undefined],
+		['three values instead of four', ['51.2', '51.6', '-0.5']],
+		['a non-numeric edge', ['51.28', 'NaN', '-0.51', '0.33']],
+		['a latitude past the pole', ['-91', '51.69', '-0.51', '0.33']],
+		['north below south', ['51.69', '51.28', '-0.51', '0.33']],
+		['east below west -- a box crossing the antimeridian', ['-18', '-12', '177', '-178']]
+	].forEach(function (pair) {
+		const r = EC.lpnSearchParse([{ lat: '51.5', lon: '-0.12', boundingbox: pair[1] }]);
+		ok(pair[0] + ' yields a result carrying no extent',
+			r.length === 1 && !('extent' in r[0]), JSON.stringify(r[0].extent));
+	});
+	ok('...and such a result still carries its lat/lon, so it still travels',
+		EC.lpnSearchParse([{ lat: '51.5', lon: '-0.12' }])[0].lat === 51.5);
+}
+
 // EVERY ONE OF THESE WOULD OTHERWISE BE A PLAUSIBLE-LOOKING WRONG PLACE.
 const junk = EC.lpnSearchParse([
 	{ lat: 'north', lon: '-122', display_name: 'not a number' },

@@ -308,8 +308,15 @@ console.log('\n--- one home for the concept ---');
 	// came in -- captured OUTWARD, written INWARD -- so the numbers are the file's own bytes and a
 	// document with a local origin still lands where it belongs.
 	// ...and Task 436's backdrop is the other half of the same boundary, written INWARD.
-	ok('inwardX has one definition and sixteen call sites', count(/inwardX\(/g) === 17, count(/inwardX\(/g));
-	ok('inwardY has one definition and seventeen call sites', count(/inwardY\(/g) === 18, count(/inwardY\(/g));
+	// **THE PLACE-NAME SEARCH'S EXTENT ADDED TWO SITES TO EACH AXIS AND NOT EIGHT** (2026-09-12).
+	// A geocoder result now arrives with the bounding box OSM sent, and framing it needs the box's
+	// width, its height and its centre -- which, computed from the geographic numbers where each is
+	// needed, crosses this boundary eight times for one box. `inwardBox()` converts the two edges of
+	// each axis ONCE and everything after it is drawing units, so the cost is the honest minimum:
+	// two x edges and two y edges. That refactor was made because THIS COUNT went red, which is the
+	// assertion doing the job it was written for rather than an inconvenience to be re-baselined.
+	ok('inwardX has one definition and eighteen call sites', count(/inwardX\(/g) === 19, count(/inwardX\(/g));
+	ok('inwardY has one definition and nineteen call sites', count(/inwardY\(/g) === 20, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
