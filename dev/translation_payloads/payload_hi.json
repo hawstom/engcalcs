@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1782,
-        "delta_key_count": 14,
+        "expected_key_count": 1785,
+        "delta_key_count": 17,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -521,12 +521,15 @@
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+        "lpn_tool_key_hint_two": "Shortcut: press {key} or {key2}.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_time_play_tip": "Play animation.",
+        "lpn_time_pause_tip": "Pause animation.",
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
@@ -537,12 +540,15 @@
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+        "lpn_tool_key_hint_two": "Shortcut: press {key} or {key2}.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_time_play_tip": "Play animation.",
+        "lpn_time_pause_tip": "Pause animation.",
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
@@ -625,6 +631,22 @@
                     "key": "lpn_ex_basic_si_title",
                     "value": "मूल नेटवर्क, ली\/से (SI)",
                     "english": "Basic network, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_tool_key_hint_two": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_key_hint",
+                    "value": "शॉर्टकट: {key} दबाएँ।",
+                    "english": "Shortcut: press {key}."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_junction_tip",
+                    "value": "जंक्शन जोड़ने के लिए मानचित्र पर क्लिक करें: वह बिंदु जहाँ पाइप मिलते हैं या जहाँ जल का उपयोग होता है।",
+                    "english": "Click the map to add a junction: a point where pipes meet or where water is used."
                 }
             }
         },
@@ -721,6 +743,38 @@
                     "key": "lpn_notes_1_term",
                     "value": "इसे कैसे हल किया जाता है",
                     "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_time_play_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_play",
+                    "value": "चलाएँ",
+                    "english": "Play"
+                },
+                "next_translated": {
+                    "key": "lpn_time_pause",
+                    "value": "रोकें",
+                    "english": "Pause"
+                }
+            }
+        },
+        "lpn_time_pause_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_play",
+                    "value": "चलाएँ",
+                    "english": "Play"
+                },
+                "next_translated": {
+                    "key": "lpn_time_pause",
+                    "value": "रोकें",
+                    "english": "Pause"
                 }
             }
         },

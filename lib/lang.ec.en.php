@@ -1132,6 +1132,7 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // LPN_TOOL_KEYS, so the mapping has a single home and no translator has to keep a number in step
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Shortcut: press {key}.';
+$ec_lang['lpn_tool_key_hint_two']='Shortcut: press {key} or {key2}.';
 $ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
 $ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
 $ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage whose water level rises and falls as it fills and empties.';
@@ -2126,7 +2127,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a Text. Cl
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project, and [Esc] brings you back here from any other mode. Another [Esc] unselects any selected objects.';
+$ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project. Pressing Esc a second time unselects whatever is selected.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. The label highlights briefly to alert you that it was moved. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
@@ -2599,6 +2600,8 @@ $ec_lang['lpn_time_no_period']='This project has no extended period simulation s
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';
+$ec_lang['lpn_time_play_tip']='Play animation.';
+$ec_lang['lpn_time_pause_tip']='Pause animation.';
 $ec_lang['lpn_time_pause']='Pause';
 $ec_lang['lpn_time_next']='Step forward';
 $ec_lang['lpn_time_last']='Go to the end';

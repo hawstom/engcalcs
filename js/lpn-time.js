@@ -402,6 +402,8 @@
 			first: pageConfig.lpn_time_first || 'Go to the start',
 			prev: pageConfig.lpn_time_prev || 'Step back',
 			play: pageConfig.lpn_time_play || 'Play',
+			playTip: pageConfig.lpn_time_play_tip || 'Play animation.',
+			pauseTip: pageConfig.lpn_time_pause_tip || 'Pause animation.',
 			pause: pageConfig.lpn_time_pause || 'Pause',
 			next: pageConfig.lpn_time_next || 'Step forward',
 			last: pageConfig.lpn_time_last || 'Go to the end',
@@ -1564,7 +1566,7 @@
 		// display, not removal, so renderPanel() can put it back without rebuilding the strip.
 		syncRunButton();
 		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
-		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, null, true);
+		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, S.playTip, true);
 		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
 		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
 		// the pane is gone rather than mirrored here: two controls for one current step are two
@@ -1611,6 +1613,11 @@
 		ui.step.value = String(i < 0 ? 0 : i);
 		ui.play.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
 		swapIcon(ui.play, state.playing ? 'pause' : 'play');
+		// **THE TIP FOLLOWS THE ICON**: while a run is playing this control is Pause, and a tip
+		// still saying Play describes a button that is not there. Written to `tipWhenLive` rather
+		// than to `title`, because the loop below is the one writer of the visible tip and it
+		// restores from exactly this field when the control is re-enabled.
+		ui.play.dataset.tipWhenLive = state.playing ? strings().pauseTip : strings().playTip;
 		// **ONE STOP MEANS THE TRANSPORT IS INERT BY DESIGN, AND IT HAS TO SAY SO.** Tom, 2026-08-19,
 		// on Net3-World -- a file that carries no [TIMES] block at all: "No time steps are
 		// available. It is not running or something is wrong with the play controls and the time

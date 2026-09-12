@@ -113,6 +113,27 @@ EngCalcs.initTips = function (root) {
 		if (control && !el.dataset.ecTipClickWired) {
 			el.dataset.ecTipClickWired = '1';
 			el.addEventListener('click', function () { tip.hide(); });
+			// **A TIP THAT WILL NOT LEAVE WHEN THE POINTER DOES** (Tom, 2026-09-12: *"they don't
+			// close immediately when you leave hovering their item. Test case: Water menu"*).
+			//
+			// The trigger is `hover focus`, and Bootstrap hides only when EVERY active trigger has
+			// released. Clicking a menu button gives it FOCUS and leaves it there while the menu
+			// stands open, so from then on hovering the button and leaving again releases `hover`
+			// while `focus` is still held, and the tip stays on screen over the open menu. The
+			// 100 ms hide delay never runs, because the hide is never asked for. It looks like a
+			// stuck tooltip and it is a held trigger.
+			//
+			// **JUDGED BY :focus-visible, WHICH IS THE BROWSER'S OWN ANSWER** to "did this focus
+			// come from a keyboard or from a click". A keyboard user who has tabbed here must keep
+			// the tip -- focus IS their hover, and taking it away on a stray mouse movement would
+			// remove the only explanation they can reach. A pointer user's leftover focus is an
+			// artefact of the click and carries no such meaning. `matches` throws on an unknown
+			// pseudo-class in an older engine, so an engine that cannot answer keeps the tip.
+			el.addEventListener('mouseleave', function () {
+				var keyboard = true;
+				try { keyboard = !!(el.matches && el.matches(':focus-visible')); } catch (e) {}
+				if (!keyboard) { tip.hide(); }
+			});
 		}
 		// **A TAP ON THE "?" ASKS A QUESTION; IT DOES NOT START TYPING** (Tom, 2026-08-29, from a
 		// phone: *"The only problem is that it puts me in the input field, bringing up my input

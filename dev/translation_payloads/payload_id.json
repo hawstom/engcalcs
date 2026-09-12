@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1782,
-        "delta_key_count": 15,
+        "expected_key_count": 1785,
+        "delta_key_count": 18,
         "exempt_key_count": 40,
         "exempt_keys": [
             "u_imgd",
@@ -529,6 +529,7 @@
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+        "lpn_tool_key_hint_two": "Shortcut: press {key} or {key2}.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
@@ -536,6 +537,8 @@
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_tag": "Tag",
+        "lpn_time_play_tip": "Play animation.",
+        "lpn_time_pause_tip": "Pause animation.",
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
@@ -546,6 +549,7 @@
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+        "lpn_tool_key_hint_two": "Shortcut: press {key} or {key2}.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
@@ -553,6 +557,8 @@
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_tag": "Tag",
+        "lpn_time_play_tip": "Play animation.",
+        "lpn_time_pause_tip": "Pause animation.",
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project."
@@ -635,6 +641,22 @@
                     "key": "lpn_ex_basic_si_title",
                     "value": "Jaringan dasar, L\/s (SI)",
                     "english": "Basic network, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_tool_key_hint_two": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_key_hint",
+                    "value": "Pintasan: tekan {key}.",
+                    "english": "Shortcut: press {key}."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_junction_tip",
+                    "value": "Klik peta untuk menambahkan simpul: titik tempat pipa-pipa bertemu atau tempat air digunakan.",
+                    "english": "Click the map to add a junction: a point where pipes meet or where water is used."
                 }
             }
         },
@@ -747,6 +769,38 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Tag dapat memiliki arti apa pun sesuai kebutuhan Anda, misalnya zona tekanan atau surat perintah kerja. Tidak ada perhitungan di sini maupun di EPANET yang membacanya. Tag hanya satu kata: EPANET berhenti membaca pada spasi pertama, sehingga spasi ditolak saat Anda mengetiknya. Tag ini dibawa masuk dan keluar dari berkas EPANET.",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_time_play_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_play",
+                    "value": "Putar",
+                    "english": "Play"
+                },
+                "next_translated": {
+                    "key": "lpn_time_pause",
+                    "value": "Jeda",
+                    "english": "Pause"
+                }
+            }
+        },
+        "lpn_time_pause_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_play",
+                    "value": "Putar",
+                    "english": "Play"
+                },
+                "next_translated": {
+                    "key": "lpn_time_pause",
+                    "value": "Jeda",
+                    "english": "Pause"
                 }
             }
         },

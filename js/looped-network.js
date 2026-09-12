@@ -21920,7 +21920,7 @@ var EngCalcs = EngCalcs || {};
 			// **NO LONGER A SUBMENU.** The fly-out's four rows were the cross of two questions and
 			// could not hold the other two; the box asks all four at once (Task 477).
 			{ icon: 'new', label: pc.lpn_file_new || 'New project…', fn: openNewProjectBox },
-			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
+			{ icon: 'open', label: pc.lpn_file_open || 'Open…', tip: pc.lpn_file_open_tip, fn: openFromFile },
 			// **UNDER OPEN, NOT UNDER NEW** (Tasks 305 and 314). New creates something that did not
 			// exist; Open retrieves something that does, and an example exists. Opening one drops a
 			// COPY into a new tab, which is what keeps the word honest -- see openExample().
@@ -22046,7 +22046,7 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
 			{ icon: 'select-polygon', label: pc.lpn_tool_area_polygon || 'Select a polygon',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
-			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
+			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
@@ -22315,7 +22315,7 @@ var EngCalcs = EngCalcs || {};
 	function mapMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', fn: zoomExtent },
+			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
 			// **THE BACKGROUND IMAGE CAME HERE FROM INSERT** (Tom, 2026-08-27). A picture behind the
 			// drawing is not a water asset; it is the same kind of thing as the street map two rows
 			// down, and EPANET files its own Backdrop under this menu for the same reason. A
@@ -23286,10 +23286,29 @@ var EngCalcs = EngCalcs || {};
 			for (kk in LPN_TOOL_KEYS) {
 				if (Object.prototype.hasOwnProperty.call(LPN_TOOL_KEYS, kk) && LPN_TOOL_KEYS[kk] === t.mode) { keyForMode = kk; }
 			}
+			// **A NAMED KEY BESIDE THE DIGIT** (Tom, 2026-09-12: *"Delete tip: '.... Shortcut:
+			// press Delete.'"* and *"Select tip: Should we use our standard 'Shortcut: ' wording
+			// for the Esc explanations?"*). Two tools answer to a key that is not one of the eight
+			// digits, and both facts were being told in prose instead: the Delete tip said nothing
+			// about the key at all, and the Select tip spelled Esc out twice in square brackets,
+			// in its own idiom, in 26 languages. Declared here rather than written into the two
+			// strings for the same reason LPN_TOOL_KEYS is: the mapping has one home.
+			//
+			// **NEITHER KEY SWITCHES THE TOOL ON, and that is not the claim.** Delete removes what
+			// is selected and Esc returns to Select; the tip says what to press to do the thing
+			// the button is named for, which is what a reader is asking. The sentence Esc's SECOND
+			// press earns is in lpn_tip_select, because a shortcut line cannot hold it.
+			var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
+			var altForMode = LPN_TOOL_ALT_KEYS[t.mode] || null;
 			var tipText = t.tip;
-			if (keyForMode) {
+			if (keyForMode && altForMode) {
 				tipText = (tipText ? tipText + ' ' : '')
-					+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.').replace('{key}', keyForMode);
+					+ (pc.lpn_tool_key_hint_two || 'Shortcut: press {key} or {key2}.')
+						.replace('{key}', keyForMode).replace('{key2}', altForMode);
+			} else if (keyForMode || altForMode) {
+				tipText = (tipText ? tipText + ' ' : '')
+					+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.')
+						.replace('{key}', keyForMode || altForMode);
 			}
 			setIconLabel(btn, t.icon, pc[t.key] || t.mode, tipText);
 			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
