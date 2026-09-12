@@ -52,64 +52,51 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ---
 
-## The network model
+## Solver
 
-- 146| A looped water network solved in the page by the global gradient method, with nothing to install.
-- 451, 419| Or solved by EPANET 2.3.5 itself, the EPA's own engine compiled into the page, and where the two engines disagree the page tells you by how much.
-- 467| Answers follow your edits as you make them, and on a network large enough for that to drag, you can turn it off.
+- 146| Native solver available for steady state (single moment) simulation.
+- 451, 419| EPANET 2.3.5 solver for extended period simulations. Solver comparison display.
+- 467| Auto-recalculate option.
 
-## Starting from what you already have
+## Projects and Saving
 
-- 196, 483| Opens EPANET `.inp` files, takes the part it supports, and files a note on the element concerned for every difference rather than dropping it quietly.
-- 314, 257, 454| Net1, Net2, Net3, Elm Street Center and a Net3 placed on the world, each one click away.
-- 145| Draw in latitude and longitude over a street map or satellite imagery, with the same tools you use anywhere else.
-- 476| An x/y network you already have can be placed on the world, then moved, scaled and rotated onto its real ground.
-- 276| Your own site plan or aerial photograph under the drawing, scaled by picking two points on it or by typing the size of a pixel.
-- 437| Type a place name and the map goes there, if you turn that on.
-- 497| Ground elevations read from terrain data and typed into the document, never replacing a number you already have without your having asked for exactly that.
+- 146.08, 447, 352, 360| Multiple open project tabs saved in browser or save to "lwn" file format with locking for office network collaboration.
+- 2, 4, 37, 246| Install for offline use.
+- 486| Best on PC, tested on a phone.
 
-## Drawing the network
+## Import, Export, and Map or Backdrop
 
-- 146.02| Junction, reservoir, tank, pipe, pump, valve and text, placed by clicking the map.
-- 345| ID prefixes you choose, with Apply to all for when you change your mind.
-- 353, 420, 389| Find elements by any property, jump straight to one by ID, and set a property across everything the search found.
-- 540| Or write the search out yourself, with AND, OR and brackets, in the words of your own language.
+- 196, 483, 281| EPANET `.inp` files import and export with data fidelity and detailed accept/ignore report.
+- 314, 257, 454| Examples from EPANET and others, XY and Lat/Lon, loaded and solved in one click.
+- 145, 276| World map canvas or your own backdrop with friendly positioning options.
+- 476| XY to Lat/Lon conversion import wizard.
+- 437, 497| Place name search and elevations from map DEM w/ preview.
 
-## Over time
+## Adding, editing, and displaying assets and results
 
-- 248.01, 423, 410| Extended-period simulation: tanks fill and drain, demands follow their patterns, and a transport bar plays the run or steps to any moment in it.
-- 248.02| Patterns on a reservoir head and on a pump's speed, beside the demand patterns.
-- 248.03, 460| Rule-based controls in EPANET's own words, read, written and edited beside the patterns and curves a run needs, with every level, pressure and flow in a rule put into the units your project is showing.
-- 450| A run reports its progress as it goes and hands you the engine's own report of it at the end.
-- 448| Color limits hold still across a run, so a color means the same thing at every step.
+- 146.02| Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text.
+- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links.
+- 353, 420, 389, 540| Find, replace, goto elements including complex queries in your language.
+- 434, 455| Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves.
+- 384, 327| Network coloring: three to seven ranges, eight ways of choosing where the breaks fall, and 41 color ramps.
+- 337, 342, 376| Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets.
+- 331, 362| Independent size settings for text, symbol, and pipes.
+- 409, 433, 506, 510| HGL profiles with modern path selection and editing.
 
-## What else it will tell you
+## Extended period simulations
 
-- 530| Fire flow for the whole system in one press: every junction tested against the flow your code requires, what it can actually deliver at the residual you set, and what drawing that flow does to everything around it.
-- 566| Water quality over a run: how old the water reaching a point is, how much of it came from a source you name, and how a chemical residual decays as it travels, with the reaction coefficients yours to state rather than ours to guess.
-- 566.01| What the pumps cost: how long each one ran, the power it drew, the energy it used and the money that came to, including the demand charge on the highest power drawn at any one moment.
-- 409, 433, 506, 510| Profiles: click along the map to choose the path, see ground, hydraulic grade and the pressure between them, and save the path with the project under a name you give it.
+- 248.01, 423, 410, 248.02| Extended-period simulation following patterns for demands, reservoir head, and pump speed.
+- 248.03, 460| EPANET-style rule-based controls.
+- 450| EPANET run report.
+- 448| Color limits constant through a simulation, so a color means the same thing at every step.
+- 566| Water quality: age, share from a source, chemical decay.
+- 566.01| Pump energy cost: Run length, power use, and cost including peak demand charge.
 
-## Reading the answers
+## Premium features
 
-- 434, 455| A table for each kind of part: junctions, reservoirs, tanks, pipes, pumps and valves.
-- 384, 327| Color the map by any value, from one control: three to seven classes, eight ways of choosing where the breaks fall, and 41 color ramps.
-- 397, 398, 399, 469, 146.01, 383| Labels place themselves, keep a leader back to what they name if you drag them elsewhere, and where there is no room shed values in the order you chose instead of disappearing whole.
-- 329, 333, 336| Pipe labels lie along their pipe the way a map draws a street name, with prefixes, suffixes and a separator you choose.
-- 337, 342, 376| A Text object takes several lines, bold, and a rotation that can match a pipe, and all lettering is haloed so it stays readable over the drawing underneath.
-- 331, 362| Text, symbols and pipes are three independent screen sizes, so a drawing reads the same at every zoom.
+- 530| Fire flow failure and collateral (design) failure analysis.
+- 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
 
-## Scenarios
-
-- 201, 407, 412, 512| Change a few properties without disturbing the network they belong to, switch between those scenarios, and see at a glance which elements carry an override.
-
-## Where your work lives
-
-- 246| A project is a `.lwn` file: JSON inside, on your own disk, readable without us.
-- 146.08, 447, 352, 360| As many projects as you like, each open in its own tab and saved in your own browser as you work, with the File menu remembering the recent ones and each reopening where you were looking.
-- 281| Writes EPANET `.inp` files back out, and every value you did not edit comes back exactly as it went in, character for character.
-- 2, 4, 37| Open it once with a connection and it keeps working with none, and it installs on a desktop or a phone as an app of its own, icon and all.
-- 486| And although you of course prefer working on your PC, it works also on a phone in tall mode.
 
 ## The calculators
 
@@ -119,9 +106,10 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 11, 31| Sketches drawn to scale from your own numbers, and a tip on every input saying what the number is.
 - 39, 80, 228| Name a calculation and copy a link to it; the link carries your inputs, and nothing is shared unless you share it.
 - 422, 425| Changing an input unit asks first, and says plainly that it reinterprets the numbers you typed rather than converting them.
+- 7, 34| Water networks and the two Manning calculators get all languages. The rest of the suite gets Spanish, Portuguese, French, and Turkish, and every calculator is findable by name in every language while it waits its turn.
 
 ## Language, license, and privacy
 
-- 7, 15, 22, 34| Twenty-seven languages, and every word is evaluated for translation: the network model and the two Manning calculators go into all of them, the rest of the suite into Spanish, Portuguese, French, and Turkish, and every calculator is findable by name in every language while it waits its turn.
+- 15, 22| Twenty-seven languages, and every word is evaluated for translation.
 - 244| Free software under the GNU GPL, source in the open.
 - 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
