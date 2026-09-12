@@ -1346,6 +1346,16 @@ sewer-slope cluster converts at 1%, and at 1.7% on the second export. That non-c
   name), so this is open rather than closed.** Anything that reopens it has to answer the file
   name question first. He suggested the interface designer could noodle it.
 
+- 30|634| **Re-shoot the everything-at-once frame; it is the front page's lead.**
+  `dev/screenshots/0082.PNG` is published as the LibreWaterNet lead image and as Plate 1 of
+  screenshots.html, on Tom's instruction 2026-09-12: *"This quintessence of what we've built is
+  still not implemented after multiple reminders from me. Do it. Feature it prominently."* It is
+  the right picture and it is older than the software in two visible ways, both fixed by one
+  capture: it carries the **EngCalcs navbar the divorce deleted** (Task 625), which is the one
+  thing this site is not supposed to advertise, and its **Libraries box has no Fittings section**,
+  which Tom spotted himself. Drop the new frame in as `0082` and nothing else changes: the file
+  name, the dimensions, the alt text and both captions already fit.
+
 ## Completed
 
 **Closed IDs live in `dev/roadmap-closed-ids.md`**, one line each so a cited `Task N` still resolves;
