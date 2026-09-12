@@ -840,7 +840,6 @@
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.",
         "lpn_menu_settings": "Settings",
         "lpn_menu_help": "Help",
-        "lpn_help_not_epanet": "Not EPANET",
         "lpn_help_screenshots": "Screenshot gallery",
         "lpn_help_walkthroughs": "Walkthroughs",
         "lpn_edit_delete_network": "Delete network",
@@ -1780,7 +1779,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1778,
+    "count": 1777,
     "active_prefixes": [
         "about",
         "bpn",

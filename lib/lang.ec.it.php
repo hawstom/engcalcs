@@ -1702,7 +1702,6 @@ $ec_lang['lpn_pane_paste_note']='Questa tabella serve per inserire valori incoll
 $ec_lang['lpn_pane_filter_note']='Filtrato per {q}. Mostrati {n} di {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostra tutto';
 $ec_lang['lpn_pane_filter_none']='Nulla in questa tabella corrisponde al filtro.';
-$ec_lang['lpn_help_not_epanet']='Non è EPANET';
 $ec_lang['lpn_help_screenshots']='Galleria di schermate';
 $ec_lang['lpn_find_filter_btn']='Filtra nella tabella attuale';
 $ec_lang['lpn_find_filter_table']='Tabella da filtrare';

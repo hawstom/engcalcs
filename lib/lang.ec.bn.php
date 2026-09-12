@@ -1715,7 +1715,6 @@ $ec_lang['lpn_pane_paste_note']='এই সারণিটি একটি স�
 $ec_lang['lpn_pane_filter_note']='{q} দ্বারা ফিল্টার করা হয়েছে। {all}টির মধ্যে {n}টি দেখানো হচ্ছে।';
 $ec_lang['lpn_pane_filter_clear']='সব দেখান';
 $ec_lang['lpn_pane_filter_none']='এই সারণিতে ফিল্টারের সাথে কিছুই মেলে না।';
-$ec_lang['lpn_help_not_epanet']='EPANET নয়';
 $ec_lang['lpn_help_screenshots']='স্ক্রিনশট গ্যালারি';
 $ec_lang['lpn_find_filter_btn']='বর্তমান সারণিতে ফিল্টার করুন';
 $ec_lang['lpn_find_filter_table']='ফিল্টার করার সারণি';

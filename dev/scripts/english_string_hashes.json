@@ -2447,7 +2447,6 @@
         "lpn_gpv_curve_source_tip": "3113a8246fd09a06be211d72776113702f81e6c0",
         "lpn_help_fix": "21556ba8411184cec8574bf3206020e7694b968d",
         "lpn_help_icons": "ff00fa0ede1828c97e66677befffc6ed5f49200e",
-        "lpn_help_not_epanet": "014823b0a47ccefdc0dad08d73f758b2ed7514ff",
         "lpn_help_notes": "8d4516cf570eac7e3e1854038b19f606d8cd5d99",
         "lpn_help_screenshots": "840633384797f338d9d827b9ec29692d74e882e4",
         "lpn_help_walkthroughs": "0b78ac5827cd7cc6424e5b9b334af5c2d003d310",
@@ -6406,10 +6405,6 @@
         },
         "lpn_help_icons": {
             "words": 5,
-            "ends_sentence": false
-        },
-        "lpn_help_not_epanet": {
-            "words": 2,
             "ends_sentence": false
         },
         "lpn_help_notes": {

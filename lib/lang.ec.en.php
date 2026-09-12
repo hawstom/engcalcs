@@ -1344,7 +1344,6 @@ $ec_lang_syn['lpn_menu_help']='Help, Guidance, Assistance, Support, or Informati
 // chances with automatic browser translators and not flag it as English." Browser translation is
 // good enough on a blog page, and a permanent "(in English)" cost more, constantly, than the
 // occasional reader who meets it untranslated.
-$ec_lang['lpn_help_not_epanet']='Not EPANET';
 $ec_lang['lpn_help_screenshots']='Screenshot gallery';
 $ec_lang['lpn_help_walkthroughs']='Walkthroughs';
 $ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials';

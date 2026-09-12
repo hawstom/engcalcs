@@ -360,6 +360,45 @@ the block.
   - The three exact identities that named it, the live capture and Tom's own file:
     `dev/lpn-blank-map-incidents.md`. **Also Task 624's original report** -- one bug, two faces.
 
+- 70|630| **[H] The map's own honesty: a scale bar, and what projection we offer.**
+  Tom, 2026-09-11, at high latitude: *"longitude lines are still parallel and latitude lines are
+  straight as reported by the coordinates tracker, which cannot work ... a more local projection
+  like any UTM zone is needed."* Backed by `dev/map-coordinate-review.md` and
+  `dev/map-coordinate-mathematics.md`.
+  - **THE SCALE BAR IS THE WHOLE OF THE FIRST RANK, AND THE NUMBER SAYS WHY.** Every geodetic term
+    in the system is under **350 ppm**; reading a distance off the picture with no bar is
+    **198,000 ppm** (`sec φ - 1`: 19.8% at Phoenix, 100% at 60N). 500x the worst geodesy. Tom:
+    *"It's a lie at larger latitudes."* -- which is the argument FOR one computed at the view's own
+    latitude, not against. Formula and the Leaflet/OpenLayers/Google conventions: mathematics §5.3.
+  - **A PROJECTION CHOICE IS A SEPARATE AND BIGGER QUESTION** (his: *"We may have to require or
+    offer Standard projection (including UTM) as an option along with lat/lon and arbitrary xy"*).
+    Weigh it against "ONLY THE USER TOUCHES A FILE'S NUMBERS": a stored CRS change rewrites
+    coordinates, an ENTRY/DISPLAY CRS does not. Mathematics §6 costs all three.
+  - **HIS TEST CASE IS THE ACCEPTANCE TEST**: a north east-west pipe is correctly SHORTER than a
+    south one, which he accepts. What is not defensible is the readout at 89.99, and that nothing
+    on screen names the projection in force.
+  - Corrections the mathematics found, each with its own line in that report: the Sterbenz comment
+    (wrong twice over), `maxScale()` unclamped by extent (28 px of float32 drift at scope),
+    `geo-precision-harness`'s exactness claim (true in Novato, false in Nairobi), and `lenAuto`
+    being a PLAN length that does not say so (1.12% at 15% grade).
+
+- 50|631| **Four things Tom hit while testing, none of them urgent.**
+  2026-09-11, in one message. Recorded together because each is small and none blocks the others.
+  - **THE LABEL-ZOOM SETTING MAY HAVE BEEN CUT TOO FAST.** *"We removed the 'Show labels when
+    zoomed closer than [__]' Setting along with its 'Use current zoom'. But maybe that was hasty.
+    Obviously we don't want to show labels at the entire world view."* A geographic project can now
+    open on the whole world, where every label is on top of every other.
+  - **PLACE SEARCH PICKS ITS OWN ZOOM AND SHOULD NOT.** *"If Mapbox or OSM returns a zoom level
+    with place name searches, we should use that zoom level ... This is embarrassing."* Nominatim
+    returns a `boundingbox` on every result, which is better than a zoom: fit it. Check what
+    `js/lpn-search.js` currently does with it before writing anything.
+  - **[Use DEM] BELONGS IN THE GROUP PROPERTIES BOX** (his: *"It would be really cool"*). Task 542
+    put elevation behind two deliberate doors and warned against a third; a group-properties button
+    is the same gesture as the Find-and-replace one, on a set the user has already chosen, so it
+    is arguably the second door rather than a third. Judge it against 542 before building.
+  - **COORDINATE READOUT AT EXTREME LATITUDE** is Task 630's, and is noted here only so a reader
+    of this block is not left thinking it was forgotten.
+
 - 95|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
   Reproduced 13/13 by `dev/lpn-spike/blank-map-harness.js`. **A gap BETWEEN two branches:**
   `initLibrary()` returns null when the open project's stored document does not parse, but its

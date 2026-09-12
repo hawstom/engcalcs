@@ -1710,7 +1710,6 @@ $ec_lang['lpn_pane_paste_note']='यह तालिका स्प्रेड
 $ec_lang['lpn_pane_filter_note']='{q} से फ़िल्टर किया गया। {all} में से {n} दिखाए जा रहे हैं।';
 $ec_lang['lpn_pane_filter_clear']='सभी दिखाएँ';
 $ec_lang['lpn_pane_filter_none']='इस तालिका में कुछ भी इस फ़िल्टर से मेल नहीं खाता।';
-$ec_lang['lpn_help_not_epanet']='EPANET नहीं';
 $ec_lang['lpn_help_screenshots']='स्क्रीनशॉट गैलरी';
 $ec_lang['lpn_find_filter_btn']='वर्तमान तालिका में फ़िल्टर करें';
 $ec_lang['lpn_find_filter_table']='फ़िल्टर करने के लिए तालिका';

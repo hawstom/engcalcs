@@ -1709,7 +1709,6 @@ $ec_lang['lpn_pane_paste_note']='Acest tabel este destinat introducerii valorilo
 $ec_lang['lpn_pane_filter_note']='Filtrat după {q}. Se afișează {n} din {all}.';
 $ec_lang['lpn_pane_filter_clear']='Afișează tot';
 $ec_lang['lpn_pane_filter_none']='Nimic din acest tabel nu corespunde filtrului.';
-$ec_lang['lpn_help_not_epanet']='Nu este EPANET';
 $ec_lang['lpn_help_screenshots']='Galerie de capturi de ecran';
 $ec_lang['lpn_find_filter_btn']='Filtrează în tabelul curent';
 $ec_lang['lpn_find_filter_table']='Tabel de filtrat';

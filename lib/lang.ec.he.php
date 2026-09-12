@@ -1705,7 +1705,6 @@ $ec_lang['lpn_pane_paste_note']='טבלה זו מיועדת להזנת ערכי�
 $ec_lang['lpn_pane_filter_note']='מסונן לפי {q}. מוצגים {n} מתוך {all}.';
 $ec_lang['lpn_pane_filter_clear']='הצג הכול';
 $ec_lang['lpn_pane_filter_none']='שום דבר בטבלה זו אינו תואם למסנן.';
-$ec_lang['lpn_help_not_epanet']='לא EPANET';
 $ec_lang['lpn_help_screenshots']='גלריית צילומי מסך';
 $ec_lang['lpn_find_filter_btn']='סינון בטבלה הנוכחית';
 $ec_lang['lpn_find_filter_table']='טבלה לסינון';

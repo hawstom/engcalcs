@@ -1711,7 +1711,6 @@ $ec_lang['lpn_pane_paste_note']='این جدول برای واردکردن مق�
 $ec_lang['lpn_pane_filter_note']='پالایش‌شده با {q}. نمایش {n} از {all}.';
 $ec_lang['lpn_pane_filter_clear']='نمایش همه';
 $ec_lang['lpn_pane_filter_none']='هیچ‌چیز در این جدول با پالایه هم‌خوانی ندارد.';
-$ec_lang['lpn_help_not_epanet']='نه EPANET';
 $ec_lang['lpn_help_screenshots']='گالری تصاویر صفحه';
 $ec_lang['lpn_find_filter_btn']='پالایش در جدول کنونی';
 $ec_lang['lpn_find_filter_table']='جدول برای پالایش';

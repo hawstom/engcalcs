@@ -1729,7 +1729,6 @@ $ec_lang['lpn_pane_filter_note']='បានត្រងដោយ {q}។ កំ�
 $ec_lang['lpn_pane_filter_clear']='បង្ហាញទាំងអស់';
 $ec_lang['lpn_pane_filter_none']='គ្មានអ្វីនៅក្នុងតារាងនេះត្រូវនឹងតម្រងទេ។';
 
-$ec_lang['lpn_help_not_epanet']='មិនមែន EPANET';
 $ec_lang['lpn_help_screenshots']='វិចិត្រសាលរូបភាពអេក្រង់';
 $ec_lang['lpn_find_filter_btn']='ត្រងក្នុងតារាងបច្ចុប្បន្ន';
 $ec_lang['lpn_find_filter_table']='តារាងត្រូវត្រង';

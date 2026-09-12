@@ -1711,7 +1711,6 @@ $ec_lang['lpn_pane_paste_note']='此表用于将电子表格中的数值粘贴�
 $ec_lang['lpn_pane_filter_note']='已按 {q} 过滤，显示 {all} 项中的 {n} 项。';
 $ec_lang['lpn_pane_filter_clear']='显示全部';
 $ec_lang['lpn_pane_filter_none']='此表中没有与过滤条件匹配的内容。';
-$ec_lang['lpn_help_not_epanet']='与 EPANET 的区别';
 $ec_lang['lpn_help_screenshots']='截图库';
 $ec_lang['lpn_find_filter_btn']='在当前表格中过滤';
 $ec_lang['lpn_find_filter_table']='要过滤的表格';

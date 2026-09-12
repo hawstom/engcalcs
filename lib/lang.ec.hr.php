@@ -1708,7 +1708,6 @@ $ec_lang['lpn_pane_paste_note']='Ova tablica je namijenjena za unos vrijednosti 
 $ec_lang['lpn_pane_filter_note']='Filtrirano po {q}. Prikazano {n} od {all}.';
 $ec_lang['lpn_pane_filter_clear']='Prikaži sve';
 $ec_lang['lpn_pane_filter_none']='Ništa u ovoj tablici ne odgovara filtru.';
-$ec_lang['lpn_help_not_epanet']='Nije EPANET';
 $ec_lang['lpn_help_screenshots']='Galerija snimaka zaslona';
 $ec_lang['lpn_find_filter_btn']='Filtriraj u trenutnoj tablici';
 $ec_lang['lpn_find_filter_table']='Tablica za filtriranje';

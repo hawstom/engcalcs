@@ -1721,7 +1721,6 @@ $ec_lang['lpn_pane_paste_note']='Bu tablo, bir e-tablodan zaten var olan satırl
 $ec_lang['lpn_pane_filter_note']='{q} ile filtrelendi. {all} öğeden {n} tanesi gösteriliyor.';
 $ec_lang['lpn_pane_filter_clear']='Hepsini göster';
 $ec_lang['lpn_pane_filter_none']='Bu tabloda filtreyle eşleşen hiçbir şey yok.';
-$ec_lang['lpn_help_not_epanet']='EPANET Değil';
 $ec_lang['lpn_help_screenshots']='Ekran görüntüsü galerisi';
 $ec_lang['lpn_find_filter_btn']='Geçerli tabloda filtrele';
 $ec_lang['lpn_find_filter_table']='Filtrelenecek tablo';

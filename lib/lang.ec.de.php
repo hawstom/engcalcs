@@ -1703,7 +1703,6 @@ $ec_lang['lpn_pane_paste_note']='Diese Tabelle ist dafür gedacht, Werte durch E
 $ec_lang['lpn_pane_filter_note']='Gefiltert nach {q}. Zeigt {n} von {all}.';
 $ec_lang['lpn_pane_filter_clear']='Alle anzeigen';
 $ec_lang['lpn_pane_filter_none']='Nichts in dieser Tabelle entspricht dem Filter.';
-$ec_lang['lpn_help_not_epanet']='Nicht EPANET';
 $ec_lang['lpn_help_screenshots']='Screenshot-Galerie';
 $ec_lang['lpn_find_filter_btn']='In aktueller Tabelle filtern';
 $ec_lang['lpn_find_filter_table']='Zu filternde Tabelle';

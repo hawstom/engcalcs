@@ -1706,7 +1706,6 @@ $ec_lang['lpn_pane_paste_note']='Esta tabla está pensada para ingresar valores 
 $ec_lang['lpn_pane_filter_note']='Filtrado por {q}. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostrar todo';
 $ec_lang['lpn_pane_filter_none']='Nada en esta tabla coincide con el filtro.';
-$ec_lang['lpn_help_not_epanet']='No es EPANET';
 $ec_lang['lpn_help_screenshots']='Galería de capturas de pantalla';
 $ec_lang['lpn_find_filter_btn']='Filtrar en la tabla actual';
 $ec_lang['lpn_find_filter_table']='Tabla para filtrar';

@@ -1716,7 +1716,6 @@ $ec_lang['lpn_pane_paste_note']='یہ جدول سپریڈ شیٹ سے پیسٹ �
 $ec_lang['lpn_pane_filter_note']='{q} کے مطابق فلٹر کیا گیا۔ {all} میں سے {n} دکھائے جا رہے ہیں۔';
 $ec_lang['lpn_pane_filter_clear']='سب دکھائیں';
 $ec_lang['lpn_pane_filter_none']='اس جدول میں کچھ بھی فلٹر سے مطابقت نہیں رکھتا۔';
-$ec_lang['lpn_help_not_epanet']='EPANET نہیں';
 $ec_lang['lpn_help_screenshots']='اسکرین شاٹ گیلری';
 $ec_lang['lpn_find_filter_btn']='موجودہ جدول میں فلٹر کریں';
 $ec_lang['lpn_find_filter_table']='فلٹر کرنے کے لیے جدول';

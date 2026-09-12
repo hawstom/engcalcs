@@ -1706,7 +1706,6 @@ $ec_lang['lpn_pane_paste_note']='Ce tableau est destiné à la saisie de valeurs
 $ec_lang['lpn_pane_filter_note']='Filtré par {q}. Affichage de {n} sur {all}.';
 $ec_lang['lpn_pane_filter_clear']='Tout afficher';
 $ec_lang['lpn_pane_filter_none']='Rien dans ce tableau ne correspond au filtre.';
-$ec_lang['lpn_help_not_epanet']='Ce n\'est pas EPANET';
 $ec_lang['lpn_help_screenshots']='Galerie de captures d\'écran';
 $ec_lang['lpn_find_filter_btn']='Filtrer dans le tableau actuel';
 $ec_lang['lpn_find_filter_table']='Tableau à filtrer';

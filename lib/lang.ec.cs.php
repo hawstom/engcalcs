@@ -1704,7 +1704,6 @@ $ec_lang['lpn_pane_paste_note']='Tato tabulka slouží k zadávání hodnot vlo�
 $ec_lang['lpn_pane_filter_note']='Filtrováno podle {q}. Zobrazeno {n} z {all}.';
 $ec_lang['lpn_pane_filter_clear']='Zobrazit vše';
 $ec_lang['lpn_pane_filter_none']='Ničemu v této tabulce filtr neodpovídá.';
-$ec_lang['lpn_help_not_epanet']='Není EPANET';
 $ec_lang['lpn_help_screenshots']='Galerie snímků obrazovky';
 $ec_lang['lpn_find_filter_btn']='Filtrovat v aktuální tabulce';
 $ec_lang['lpn_find_filter_table']='Tabulka k filtrování';

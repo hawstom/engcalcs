@@ -1710,7 +1710,6 @@ $ec_lang['lpn_pane_paste_note']='ဤဇယားသည် spreadsheet မှ က
 $ec_lang['lpn_pane_filter_note']='{q} ဖြင့် စစ်ထုတ်ထားသည်။ {all} အနက် {n} ခု ပြသနေသည်။';
 $ec_lang['lpn_pane_filter_clear']='အားလုံး ပြရန်';
 $ec_lang['lpn_pane_filter_none']='ဤဇယားတွင် စစ်ထုတ်မှုနှင့် ကိုက်ညီသော အရာ တစ်ခုမျှ မရှိပါ။';
-$ec_lang['lpn_help_not_epanet']='EPANET မဟုတ်ပါ';
 $ec_lang['lpn_help_screenshots']='မျက်နှာပြင်ဓာတ်ပုံများ';
 $ec_lang['lpn_find_filter_btn']='လက်ရှိဇယားတွင် စစ်ထုတ်ရန်';
 $ec_lang['lpn_find_filter_table']='စစ်ထုတ်မည့် ဇယား';

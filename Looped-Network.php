@@ -1178,8 +1178,28 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div id="lpn_about_boxtitle" class="lpn-setbox-title"><?=$ec_lang['about_main_menu']?></div>
 	<div class="lpn-popover-body">
 <?php   // The mark itself opens the box, so the box shows the mark: the reader's eye lands on the
-        // thing they pressed. ecIcon() is the one door to the geometry (icon_name_check.php). ?>
-		<h2 class="lpn-about-name"><?=ecIcon('water')?>LibreWaterNet.org</h2>
+        // thing they pressed.
+        //
+        // **THE COLOUR FAVICON, NOT THE MONO GLYPH** (Tom, 2026-09-11: *"The colored one is
+        // lovely. Use it."*). I argued for mono and rendered both at real size
+        // (dev/icon-preview/render/about-icon/about-icon.png); he looked and chose colour, and
+        // the About box is the one place in the app where the mark is the SUBJECT rather than a
+        // control, which is what makes a full-colour tile right here and wrong in the menu bar.
+        //
+        // An <img> of the shipped favicon rather than ecIcon(): the colour version is a composed
+        // drawing with gradients and a sky, not a currentColor stroke glyph, so it is not in
+        // $ec_icons and icon_name_check.php has nothing to check.
+        //
+        // **NO `?v=<filemtime>`, AND THAT IS THE SERVICE WORKER'S CALL RATHER THAN A PREFERENCE.**
+        // It shipped with one for about ten minutes and sw_manifest_check.php refused it:
+        // `ecSwAssetUrl()` deliberately does not version an image, so the worker precaches
+        // `icons/favicon.svg` bare, and a page asking for `?v=...` asks for a URL the precache
+        // does not hold -- a guaranteed cache miss on the one page whose offline promise matters.
+        // The cost is Task 620's, already known and already true of every icon here: a CHANGED
+        // favicon does not reach a visitor who has loaded the app before. Fix that at
+        // ecSwAssetUrl(), for all icons at once, not by versioning one <img> and breaking the
+        // precache to do it. ?>
+		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" />LibreWaterNet.org</h2>
 		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
 <?php   $ec_build = ecDeployIdentity();

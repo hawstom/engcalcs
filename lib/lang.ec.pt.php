@@ -1709,7 +1709,6 @@ $ec_lang['lpn_pane_paste_note']='Esta tabela é destinada a inserir valores cola
 $ec_lang['lpn_pane_filter_note']='Filtrado por {q}. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostrar tudo';
 $ec_lang['lpn_pane_filter_none']='Nada nesta tabela corresponde ao filtro.';
-$ec_lang['lpn_help_not_epanet']='Não é o EPANET';
 $ec_lang['lpn_help_screenshots']='Galeria de capturas de tela';
 $ec_lang['lpn_find_filter_btn']='Filtrar na tabela atual';
 $ec_lang['lpn_find_filter_table']='Tabela a filtrar';

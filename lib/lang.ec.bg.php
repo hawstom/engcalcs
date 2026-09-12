@@ -1702,7 +1702,6 @@ $ec_lang['lpn_pane_paste_note']='Тази таблица е предназнач
 $ec_lang['lpn_pane_filter_note']='Филтрирано по {q}. Показани {n} от {all}.';
 $ec_lang['lpn_pane_filter_clear']='Показване на всички';
 $ec_lang['lpn_pane_filter_none']='Нищо в тази таблица не отговаря на филтъра.';
-$ec_lang['lpn_help_not_epanet']='Не е EPANET';
 $ec_lang['lpn_help_screenshots']='Галерия със снимки на екрана';
 $ec_lang['lpn_find_filter_btn']='Филтриране в текущата таблица';
 $ec_lang['lpn_find_filter_table']='Таблица за филтриране';

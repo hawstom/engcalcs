@@ -1712,7 +1712,6 @@ $ec_lang['lpn_pane_paste_note']='هذا الجدول مخصص لإدخال ال�
 $ec_lang['lpn_pane_filter_note']='تمت التصفية حسب {q}. عرض {n} من {all}.';
 $ec_lang['lpn_pane_filter_clear']='إظهار الكل';
 $ec_lang['lpn_pane_filter_none']='لا شيء في هذا الجدول يطابق عامل التصفية.';
-$ec_lang['lpn_help_not_epanet']='ليس EPANET';
 $ec_lang['lpn_help_screenshots']='معرض لقطات الشاشة';
 $ec_lang['lpn_find_filter_btn']='تصفية في الجدول الحالي';
 $ec_lang['lpn_find_filter_table']='الجدول المراد تصفيته';

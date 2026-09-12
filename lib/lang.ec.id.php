@@ -1705,7 +1705,6 @@ $ec_lang['lpn_pane_paste_note']='Tabel ini dimaksudkan untuk memasukkan nilai de
 $ec_lang['lpn_pane_filter_note']='Difilter berdasarkan {q}. Menampilkan {n} dari {all}.';
 $ec_lang['lpn_pane_filter_clear']='Tampilkan semua';
 $ec_lang['lpn_pane_filter_none']='Tidak ada yang cocok dengan filter di tabel ini.';
-$ec_lang['lpn_help_not_epanet']='Bukan EPANET';
 $ec_lang['lpn_help_screenshots']='Galeri tangkapan layar';
 $ec_lang['lpn_find_filter_btn']='Filter di tabel saat ini';
 $ec_lang['lpn_find_filter_table']='Tabel yang akan difilter';

@@ -82,7 +82,29 @@ EngCalcs.initTips = function (root) {
 		// touch platform already uses for "what is this", and the tap keeps doing the button's job.
 		var longPress = control && !canHover;
 		var tip = bootstrap.Tooltip.getOrCreateInstance(el, {
-			trigger: longPress ? 'manual' : ((control || canHover) ? 'hover focus' : 'click')
+			trigger: longPress ? 'manual' : ((control || canHover) ? 'hover focus' : 'click'),
+			// **A TIP THAT FIRES THE INSTANT THE POINTER ARRIVES IS A TIP THAT FIRES WHEN THE
+			// POINTER IS ONLY PASSING THROUGH** (Tom, 2026-09-11: *"Our tips are embarrassingly
+			// obtrusive ... My initial thought is to increase the global delay before showing a
+			// tip. That delay length has to balance discoverability and annoyance."*). Bootstrap's
+			// own default is 0, which is what shipped, and this page is the worst case for it: 22
+			// icon-only toolbar buttons at ~6px apart, so crossing the strip to reach the canvas
+			// detonates a row of tooltips nobody asked for.
+			//
+			// **SHOW 500 ms, WHICH IS WINDOWS' OWN INITIAL TOOLTIP DELAY** -- the number the
+			// largest population of these users already has in their hands, and long enough that
+			// transit does not trigger while a deliberate hover still feels immediate. It is a
+			// balance and not a maximum: the toolbar is icon-only by ruling, so a tip is the
+			// PRIMARY way to learn it, and a long delay would trade one embarrassment for a worse
+			// one. Do not raise this without watching somebody learn the strip.
+			//
+			// **HIDE 100 ms, FOR A DIFFERENT REASON**: adjacent buttons are 6px apart, and a zero
+			// hide delay makes a slow drag along the strip strobe. It is short enough that a tip
+			// never follows the pointer onto the map.
+			//
+			// Applies to the long-press path too and does no harm there: `manual` ignores the show
+			// delay, since nothing auto-triggers it.
+			delay: { show: 500, hide: 100 }
 		});
 		// A control also hides its tip on click: hide() clears every active trigger at once, so
 		// the tip cannot hang over the panel the button just opened. Kept for the long-press case

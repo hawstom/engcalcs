@@ -1714,7 +1714,6 @@ $ec_lang['lpn_pane_paste_note']='Jedwali hili limekusudiwa kwa kuingiza thamani 
 $ec_lang['lpn_pane_filter_note']='Imechujwa kwa {q}. Inaonyesha {n} kati ya {all}.';
 $ec_lang['lpn_pane_filter_clear']='Onyesha vyote';
 $ec_lang['lpn_pane_filter_none']='Hakuna kitu kwenye jedwali hili kinacholingana na kichujio.';
-$ec_lang['lpn_help_not_epanet']='Si EPANET';
 $ec_lang['lpn_help_screenshots']='Mkusanyiko wa picha za skrini';
 $ec_lang['lpn_find_filter_btn']='Chuja kwenye jedwali la sasa';
 $ec_lang['lpn_find_filter_table']='Jedwali la kuchuja';

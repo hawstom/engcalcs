@@ -22596,7 +22596,21 @@ var EngCalcs = EngCalcs || {};
 				// deliberately still `lpn_menu_project`, and a fallback repeating the old label is
 				// the one place the rename did not reach. It shows only where pageConfig failed to
 				// supply the key, which is precisely when nobody is watching.
-				id: 'lpn_menu_project', icon: 'water', label: pc.lpn_menu_project || 'Water',
+				// **'plan', NOT 'water', AND THE COLLISION IS WHY** (Tom, 2026-09-11: *"Our Mac-style
+				// app icon is now the same as our Map menu."*). The home mark took the tower when
+				// it became the leftmost item, and two identical towers in a seven-item bar is one
+				// glyph doing two jobs. Ida ruled the MENU changes, not the mark: the tower is the
+				// product identity and the bar's only uniqueness signal once `.lpn-menubar-word`
+				// is hidden below 640px, where every item is a glyph and shape is all that is left.
+				// Weight alone -- solid mark against stroke menus, the Apple trick -- was rendered
+				// and rejected: at 17px two towers of different weight are still the tower twice.
+				//
+				// `plan` was THIS MENU'S OWN ICON before the Task 523 rename and has been drawn
+				// and unused since; Tom on it then: *"We really came out victorious with our Plan
+				// icon. But it looks like now we need to change it."* `settings` and `library` are
+				// disqualified for appearing as ROWS inside this same menu, which would repeat the
+				// defect one level down. No new geometry, no new strings.
+				id: 'lpn_menu_project', icon: 'plan', label: pc.lpn_menu_project || 'Water',
 				tip: pc.lpn_menu_project_tip, open: openProjectBarMenu
 			},
 			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also

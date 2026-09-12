@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**67 open tasks.** Next (100): 9 · Soon (75): 9 · Someday (50): 17 · Maybe (25): 10 · Parked (5): 17 · priority 60 (60): 3 · priority 95 (95): 2
+**69 open tasks.** Next (100): 9 · Soon (75): 9 · Someday (50): 18 · Maybe (25): 10 · Parked (5): 17 · priority 60 (60): 3 · priority 70 (70): 1 · priority 95 (95): 2
 
 ## 100 — Next (9)
 
@@ -38,13 +38,17 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 623 — [H] · File loss judged only by people whose files are throwaway.
 - Task 624 — [H] · The scale fallbacks turn any missed publish into a flooded canvas.
 
+## 70 — Priority 70 (1)
+
+- Task 630 — [H] · The map's own honesty: a scale bar, and what projection we offer.
+
 ## 60 — Priority 60 (3)
 
 - Task 625 — [H] · BUILT: the app page divorced from EngCalcs chrome. Remainder below.
 - Task 626 — A refused beacon is retried like an offline one, 20 times.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 
-## 50 — Someday (17)
+## 50 — Someday (18)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -63,6 +67,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
+- Task 631 — Four things Tom hit while testing, none of them urgent.
 
 ## 25 — Maybe (10)
 
@@ -101,5 +106,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-60 of 67 titles are within 4–12 words. `!` marks the rest;
+62 of 69 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

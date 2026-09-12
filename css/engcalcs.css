@@ -1360,6 +1360,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    than to .ec-icon's 1.05em base, so the glyph and the name read as one lockup. */
 .lpn-about-name { display: flex; align-items: center; gap: .45em; }
 .lpn-about-name .ec-icon { width: 1.5em; height: 1.5em; flex: none; }
+/* The colour mark is an <img>, not an inline glyph (Tom chose colour here, 2026-09-11). Sized to
+   the heading like its mono predecessor; `flex: none` so a long site name cannot squash it. */
+.lpn-about-name .lpn-about-mark { width: 1.5em; height: 1.5em; flex: none; }
 .lpn-menubar-item:hover { background: #def; border-color: #9bd; }
 /* ---- Project tab strip (ROADMAP Task 211) ----
    Sits directly ON TOP OF THE MAP, below the toolbar (revised 2026-08-04 after seeing the first

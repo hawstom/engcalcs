@@ -1710,7 +1710,6 @@ $ec_lang['lpn_pane_paste_note']='ይህ ሠንጠረዥ አስቀድመው ካ�
 $ec_lang['lpn_pane_filter_note']='በ{q} ተጣርቷል። {n} ከ{all} ውስጥ እያሳየ ነው።';
 $ec_lang['lpn_pane_filter_clear']='ሁሉንም አሳይ';
 $ec_lang['lpn_pane_filter_none']='በዚህ ሠንጠረዥ ውስጥ ከማጣሪያው ጋር የሚስማማ ምንም ነገር የለም።';
-$ec_lang['lpn_help_not_epanet']='EPANET አይደለም';
 $ec_lang['lpn_help_screenshots']='የስክሪንሾት ማዕከለ-ስዕላት';
 $ec_lang['lpn_find_filter_btn']='በአሁኑ ሠንጠረዥ ውስጥ አጣራ';
 $ec_lang['lpn_find_filter_table']='የሚጣራ ሠንጠረዥ';

@@ -1710,7 +1710,6 @@ $ec_lang['lpn_pane_paste_note']='Ова табела је намењена за 
 $ec_lang['lpn_pane_filter_note']='Филтрирано по {q}. Приказано {n} од {all}.';
 $ec_lang['lpn_pane_filter_clear']='Прикажи све';
 $ec_lang['lpn_pane_filter_none']='Ништа у овој табели не одговара филтеру.';
-$ec_lang['lpn_help_not_epanet']='Није EPANET';
 $ec_lang['lpn_help_screenshots']='Галерија снимака екрана';
 $ec_lang['lpn_find_filter_btn']='Филтер у тренутној табели';
 $ec_lang['lpn_find_filter_table']='Табела за филтрирање';

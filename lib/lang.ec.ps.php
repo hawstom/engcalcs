@@ -1705,7 +1705,6 @@ $ec_lang['lpn_pane_paste_note']='دا جدول د دې لپاره دی چې ار
 $ec_lang['lpn_pane_filter_note']='د {q} له مخې فلټر شوی. {n} د {all} نه ښودل کیږي.';
 $ec_lang['lpn_pane_filter_clear']='ټول وښایاست';
 $ec_lang['lpn_pane_filter_none']='په دې جدول کې هیڅ شی له فلټر سره سمون نه خوري.';
-$ec_lang['lpn_help_not_epanet']='EPANET نه دی';
 $ec_lang['lpn_help_screenshots']='د سکرین‌شاټونو ګالري';
 $ec_lang['lpn_find_filter_btn']='په اوسني جدول کې فلټر';
 $ec_lang['lpn_find_filter_table']='د فلټر کولو جدول';

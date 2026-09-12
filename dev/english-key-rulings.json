@@ -980,11 +980,6 @@
             "on": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
             "ruled": "2026-09-06"
         },
-        "lpn_help_not_epanet": {
-            "on": "Not EPANET",
-            "ruled": "2026-09-07",
-            "answer": "OK."
-        },
         "lpn_help_screenshots": {
             "on": "Screenshot gallery",
             "ruled": "2026-09-07",
