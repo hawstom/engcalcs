@@ -447,6 +447,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a
 			      // proportional font makes the whole readout jitter as they do. ?>
 			<div id="lpn_coords" style="font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px">X: --  Y: --</div>
+			<?php // **THE SCALE BAR** (Tom, 2026-09-11: *"let's add it"*). A cell of this strip like
+			      // everything else in it, so it wraps on a narrow window and is reserved against by
+			      // zoomExtent() with the rest. Its WIDTH is the measurement -- refreshScaleBar() in
+			      // js/looped-network.js sets it -- and the bar itself is the bottom border, so the
+			      // number and the length it labels cannot drift apart. Hidden until there is a view
+			      // to measure; a view too wide for one number to be honest hides it again. ?>
+			<div id="lpn_scalebar" class="lpn-scalebar" style="display:none"></div>
 			<?php // THE STANDING ONE-TAP GRIEVANCE LINK (ROADMAP Task 207, Rung 0 of the cost ladder in
 			      // dev/dilettante-path.md). Today the only invitation on this page is Help > Fix
 			      // something, which opens contact.php in a new tab: the page whose users have the most

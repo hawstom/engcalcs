@@ -207,6 +207,24 @@ input.ec-spin[type=number] {
 	white-space: nowrap;
 }
 
+/* THE SCALE BAR. The element's WIDTH is the measurement, set by refreshScaleBar(), and the bar is
+   this rule's bottom border with two end ticks -- so there is one length on the screen and it is
+   the one the number labels. Drawing a separate <svg> bar beside a sized box would be two lengths
+   that have to agree. Ticks are box-shadow rather than pseudo-elements so the element stays a
+   plain text node for anything measuring the strip's height. */
+.lpn-scalebar {
+	background: rgba(255, 255, 255, .8);
+	padding: 2px 6px 1px;
+	text-align: center;
+	line-height: 1.3;
+	border-bottom: 2px solid #333;
+	border-left: 1px solid #333;
+	border-right: 1px solid #333;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
 /* The engine-difference notes inside #lpn_status, which expire two minutes after they are said
    (Tom, 2026-09-05: "Give it a timer, maybe 2 minutes and maybe fading if that's easy."). The
    transition is the whole of the fade; the span keeps its place in the flow while it runs, or the

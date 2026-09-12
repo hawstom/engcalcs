@@ -4034,6 +4034,9 @@ var EngCalcs = EngCalcs || {};
 		// setTransform(), so the basemap has exactly one place to learn that the visible window
 		// changed -- rather than six call sites that each have to remember. Debounced inside.
 		scheduleBasemapRefresh();
+		// The bar is a fact about the current zoom, so it belongs on the same seam as the basemap:
+		// every pan and every zoom in this file arrives here and nowhere else.
+		refreshScaleBar();
 		// ...and the one place a model being placed onto the map learns the same thing (Task 145).
 		// While it is DETACHED it must not move on the screen at all, which takes an equal and
 		// opposite transform on its own group, and a re-derivation once the gesture settles.
@@ -4186,6 +4189,101 @@ var EngCalcs = EngCalcs || {};
 		});
 		return o;
 	}
+	/**
+	 * ---- THE SCALE BAR (Tom, 2026-09-11: *"let's add it"*, and 2026-09-12: *"Bar scale is fine."*)
+	 *
+	 * **IT IS MEASURED THE WAY A PIPE IS MEASURED, and that is the whole design.** The bar asks
+	 * `geodesicMeters()` for the ground distance between the two ends of its own span on the
+	 * screen -- the same function that fills every `lenAuto` length on the map. So the bar cannot
+	 * disagree with the lengths it sits beside: if one is wrong they are wrong together, by the
+	 * same amount, for the same reason. Deriving it instead from a Mercator scale factor would
+	 * have been a second opinion about ground distance, and a second opinion is a defect waiting
+	 * for a latitude to show up at.
+	 *
+	 * **IT IS A MITIGATION, NOT A FIX, and Tom said so before I did** (Task 630): a conformal
+	 * projection's scale varies down the view, so one bar is honest at ONE latitude. This one is
+	 * honest at the latitude of the bar itself, which is the bottom-left of the window, because
+	 * that is where a reader's eye is when they use it. At the 300 km mission scope the variation
+	 * across a window is small; at a continental zoom it is not, and nothing here pretends
+	 * otherwise. The bar does not appear at all when the view is too wide for a single number to
+	 * mean anything.
+	 *
+	 * **A ROUND NUMBER FIRST, THEN THE PIXELS.** A bar of a fixed width labelled 431 ft is a
+	 * number nobody can multiply; every paper map picks 1, 2 or 5 times a power of ten and lets
+	 * the bar be whatever width that comes to. So do we, in the project's own length unit.
+	 */
+	var SCALEBAR_MAX_PX = 170;      // the widest the bar may draw, before rounding pulls it in
+	var SCALEBAR_MIN_PX = 45;       // under this the label crowds the bar and it is not worth drawing
+	// A view this wide has no single scale worth printing: at 90 degrees of longitude on screen
+	// the bar's own latitude tells you nothing about the top of the window.
+	var SCALEBAR_MAX_DEGREES = 90;
+
+	/**
+	 * Ground distance, in the project's DISPLAY length unit, for one pixel at the bar's own place
+	 * on the screen. Null when it cannot be measured, which is a reason not to draw rather than a
+	 * number to guess.
+	 */
+	function scaleBarUnitsPerPx() {
+		var probe = 100, a, b, metres;
+		if (!svg || !state.s || !isFinite(state.s) || state.s <= 0) { return null; }
+		if (!isGeoProject()) {
+			// A grid project's world unit IS the display length unit, so there is nothing to ask.
+			return 1 / state.s;
+		}
+		if (!Geom || !Geom.geodesicMeters) { return null; }
+		// The bar sits at the bottom left, so it is measured there: same latitude, two points the
+		// probe width apart. y is whatever the bottom of the canvas is; x starts at the left.
+		var r = svg.getBoundingClientRect();
+		if (!r || !r.width) { return null; }
+		var w0 = screenToWorld(r.left, r.bottom), w1 = screenToWorld(r.left + probe, r.bottom);
+		a = { lon: outwardX(w0.x), lat: outwardY(w0.y) };
+		b = { lon: outwardX(w1.x), lat: outwardY(w1.y) };
+		if (!isFinite(a.lon) || !isFinite(a.lat) || !isFinite(b.lon)) { return null; }
+		// **THE TEST IS THE WHOLE WINDOW, NOT THE PROBE.** A 100 px probe is a fraction of a
+		// degree at any working zoom and would never trip, while the view around it can be the
+		// whole planet -- where one number at the bar's own latitude says nothing about the top
+		// of the screen, and Mercator has pinned the poles besides. Measured in degrees of
+		// longitude because that is what the frame's x axis IS.
+		if (r.width / state.s > SCALEBAR_MAX_DEGREES) { return null; }
+		metres = Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat);
+		if (!isFinite(metres) || metres <= 0) { return null; }
+		return toDisplay(metres / probe, 'lpn_u_length');
+	}
+
+	/** 1, 2 or 5 times a power of ten: the largest such number that still fits the pixel budget. */
+	function scaleBarRound(raw) {
+		if (!(raw > 0)) { return 0; }
+		// **Math.log(1000)/Math.LN10 IS 2.9999999999999996**, so a plain floor puts 1000 in the
+		// hundreds decade and the bar prints 500 where it should print 1000. Correcting the
+		// decade afterwards is exact for every double; nudging the logarithm is not.
+		var pow = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), n, i, steps = [5, 2, 1];
+		if (raw / pow >= 10) { pow *= 10; }
+		else if (raw / pow < 1) { pow /= 10; }
+		n = raw / pow;
+		for (i = 0; i < steps.length; i++) {
+			if (n >= steps[i]) { return steps[i] * pow; }
+		}
+		return pow;
+	}
+
+	function refreshScaleBar() {
+		var el = document.getElementById('lpn_scalebar');
+		if (!el) { return; }
+		var perPx = scaleBarUnitsPerPx(), nice, px, unit;
+		if (!perPx || !isFinite(perPx) || perPx <= 0) { el.style.display = 'none'; return; }
+		nice = scaleBarRound(perPx * SCALEBAR_MAX_PX);
+		px = nice / perPx;
+		if (!isFinite(px) || px < SCALEBAR_MIN_PX) { el.style.display = 'none'; return; }
+		unit = unitLabel('lpn_u_length');
+		el.style.display = '';
+		el.style.width = Math.round(px) + 'px';
+		// **A BARE NUMBER, no thousands separator**, which is what every other number drawn on
+		// this map is: the labels are bare by design, and a bar reading "1,000 ft" beside a pipe
+		// label reading "1000" would be two conventions in one glance. `nice` is always 1, 2 or 5
+		// times a power of ten, so String() is exact and there is nothing to round.
+		el.textContent = String(nice) + (unit ? ' ' + unit : '');
+	}
+
 	function screenToWorld(sx, sy) {
 		var r = svg.getBoundingClientRect();
 		return { x: (sx - r.left - state.tx) / state.s, y: (sy - r.top - state.ty) / state.s };

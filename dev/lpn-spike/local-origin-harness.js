@@ -283,8 +283,14 @@ console.log('\n--- one home for the concept ---');
 	// it reaches for LONGITUDE because Mercator x IS longitude, so outwardX() is exact where
 	// outwardY() saturates at the cut-off. It was first written calling cartesianY() directly and
 	// THIS FILE CAUGHT IT -- which is the whole argument for counting these.
-	ok('outwardX has one definition and nineteen call sites', count(/outwardX\(/g) === 20, count(/outwardX\(/g));
-	ok('outwardY has one definition and nineteen call sites', count(/outwardY\(/g) === 20, count(/outwardY\(/g));
+	// **THE SCALE BAR ADDED TWO SITES TO EACH PAIR, and they are a MEASUREMENT rather than a
+	// conversion of anything the document holds.** scaleBarUnitsPerPx() turns the two ends of the
+	// bar's own span on the screen into places on the Earth, so it can ask geodesicMeters() how
+	// far apart they are -- the same function that fills every lenAuto length, which is the whole
+	// point: the bar and the pipe labels beside it cannot come to different answers about ground
+	// distance. It touches no stored coordinate and writes nothing back.
+	ok('outwardX has one definition and twenty-one call sites', count(/outwardX\(/g) === 22, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-one call sites', count(/outwardY\(/g) === 22, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

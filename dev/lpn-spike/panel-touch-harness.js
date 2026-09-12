@@ -198,6 +198,12 @@ console.log('\n--- one place hides a panel, tips and all ---');
 			'the one-time menu cue (Task 625): a line of text and a dismiss button, with no drag, '
 			+ 'no resize, no stored geometry and nothing focusable to trap -- hidePanel() exists '
 			+ 'for boxes that have those, and it would also write a layout record this has none of'],
+		[/el\.style\.display = 'none'; return; }\n\t\tnice = scaleBarRound/,
+			'the scale bar, when there is no honest number to print: a readout in the map footer '
+			+ 'strip, with no drag, no resize, no stored geometry and nothing focusable -- the '
+			+ 'same reasoning as the menu cue two rows up'],
+		[/el\.style\.display = 'none'; return; }\n\t\tunit = unitLabel/,
+			'the scale bar again, when the rounded bar would be too short to label'],
 		[/el\.style\.display = 'none';\n\t}/, 'hidePanel() itself']
 	];
 	const lines = code.split('\n');

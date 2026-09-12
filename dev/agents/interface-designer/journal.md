@@ -861,3 +861,40 @@ gets undone. Full four-question answer and the ranked table: `dev/help-menu-mast
 No shipped file touched. This is advice pending Tom's word, same as every prior entry in this
 file — but stated as plainly as the ask required: three of my own rulings from earlier the same
 day are wrong and the fourth (the Water menu icon) stands on its own.
+
+## 2026-09-12 — New-tab ruling: the tree had already converged, just never wrote it down
+
+Asked to rule when a link opens in a new tab vs. the same one, across `/app/` and
+`librewaternet.org`. Read every outbound link in both properties (~50 sites) looking for a
+violation and found none — this repo had independently reached, by individual comment at each
+site, the same rule twice over: `lib/config.inc.php:117-119` on `EC_LWN_APP_URL` and
+`lib/Calculators.lib.php:105-107` on `ecLinkTipLabel()` both state it without naming it as a
+general policy.
+
+**Ruling: new tab is for an ERRAND that would cost the reader something if the tab navigated away
+(unsaved work, typed form values) and that they mean to return from immediately; same tab is for
+a DESTINATION, where Back is the only way back anybody needs.** `/app/` satisfies the errand test
+everywhere, because the whole page is effectively a form behind a `beforeunload` guard — so its
+uniform "every outbound row is a new tab" is not overreach, it is the one rule applied to a page
+where the risk is total. `librewaternet.org` satisfies it nowhere, so its uniform "every link is
+the same tab" — including external citations to epa.gov and Wikipedia — is the same rule,
+correctly answering the other way.
+
+**CITED**: NN/g (nngroup.com/articles/new-browser-windows-and-tabs/) — same tab by default,
+new tab only when the reader needs outside information mid-task. GOV.UK Design System
+(design-system.service.gov.uk/styles/links/) — identical default and identical exception, worded
+around not losing form input. Both are silent on "external vs. internal" as the deciding
+property, which is the axis this repo does NOT split on and I am not introducing.
+
+**One gap named, not fixed**: WCAG 3.2.5 (AAA) and GOV.UK both pair a forced new tab with visible
+text — "(opens in new tab)" — so the change of context is reader-initiated rather than sprung on
+them. Nothing in this suite carries that text anywhere, on any of the ~25 new-tab links. AAA is
+above this suite's target level, and the fix costs a translated string per visible instance, so
+this is a wishlist item, not a ruling.
+
+**One open call, not decided**: `citations.html`'s ~30-row source table is the closest thing to
+NN/g's "reference lookup mid-task" exception on the reading side, but nothing is actually LOST by
+following a citation same-tab (Back restores scroll position), so I did not overrule its current
+same-tab state — flagged for behavioural evidence (do readers come back?) rather than a guess.
+
+Full report: `dev/agents/interface-designer/link-target-ruling.md`. No shipped file touched.
