@@ -2287,6 +2287,61 @@ $ec_lang['lpn_push_assets']='Nodes and pipes:';
 $ec_lang['lpn_push_none_displayed']='None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
 $ec_lang['lpn_push_nothing']='No existing asset has any of the properties being applied.';
 $ec_lang['lpn_push_no_change']='Every asset already has these values, so nothing would change.';
+// ---- Custom properties (ROADMAP Task 636) ----
+// A field the user invents, designed one row at a time in Settings > Assets, and then carried by
+// every asset kind the row applies to. The key a document stores is ALWAYS namespaced, so a custom
+// property can never collide with a built-in field; the visible key is what the reader types and
+// the prefix is added for them.
+$ec_lang['lpn_settings_custom_props']='Custom properties';
+$ec_lang['lpn_settings_custom_props_note']='A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.';
+$ec_lang['lpn_cp_design']='Design';
+$ec_lang['lpn_cp_design_tip']='One row per custom property, reading across: key, label, applies to, validate as, restrict characters, restrict length, low limit, high limit.';
+$ec_lang['lpn_cp_add']='Add custom property';
+$ec_lang['lpn_cp_add_tip']='Adds one more row to the design table. Give it a key and a label, then choose the asset kinds that carry it.';
+$ec_lang['lpn_cp_remove']='Remove';
+$ec_lang['lpn_cp_remove_tip']='Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.';
+$ec_lang['lpn_cp_none']='No custom property is designed yet.';
+$ec_lang['lpn_cp_key']='Key';
+$ec_lang['lpn_cp_key_tip']='The name this property is stored under. No spaces. A prefix is added for you so that your key can never collide with a built-in field.';
+$ec_lang['lpn_cp_label']='Label';
+$ec_lang['lpn_cp_label_tip']='What a reader sees on the properties box, in Find and at the head of a table column.';
+$ec_lang['lpn_cp_applies']='Applies to';
+$ec_lang['lpn_cp_applies_tip']='Which asset kinds carry this property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.';
+$ec_lang['lpn_cp_validate']='Validate as';
+$ec_lang['lpn_cp_validate_tip']='What a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.';
+$ec_lang['lpn_cp_restrict']='Restrict characters';
+$ec_lang['lpn_cp_restrict_tip']='A set of characters to allow or to refuse, where the at sign stands for any letter and the number sign for any digit.';
+$ec_lang['lpn_cp_restrict_mode']='Allow or refuse';
+$ec_lang['lpn_cp_restrict_allow']='Allow only these';
+$ec_lang['lpn_cp_restrict_deny']='Refuse these';
+$ec_lang['lpn_cp_length']='Restrict length';
+$ec_lang['lpn_cp_length_tip']='The greatest number of characters a value may have. Leave it empty for no limit.';
+$ec_lang['lpn_cp_low']='Low limit';
+$ec_lang['lpn_cp_low_tip']='The smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.';
+$ec_lang['lpn_cp_high']='High limit';
+$ec_lang['lpn_cp_high_tip']='The largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.';
+$ec_lang['lpn_cp_val_none']='Do not validate';
+$ec_lang['lpn_cp_val_number']='Number';
+$ec_lang['lpn_cp_val_integer']='Integer';
+$ec_lang['lpn_cp_val_text']='Text';
+$ec_lang['lpn_cp_val_upper']='ALL CAPS';
+$ec_lang['lpn_cp_val_camel']='camelCase';
+$ec_lang['lpn_cp_val_pascal']='PascalCase';
+$ec_lang['lpn_cp_val_snake']='snake_case';
+$ec_lang['lpn_cp_val_hyphen']='hyphen-case';
+// **A VALUE THAT BREAKS ITS OWN DESIGN IS FLAGGED AND KEPT** (Tom, 2026-09-13). Tightening a limit
+// is a way of asking a question about the data, so nothing is ever cleared or refused: the value
+// stays exactly as it was typed and says what is wrong with it.
+$ec_lang['lpn_cp_flag']='{label}: {reason} The value is kept exactly as you typed it.';
+$ec_lang['lpn_cp_bad_number']='This property is designed to hold a number.';
+$ec_lang['lpn_cp_bad_integer']='This property is designed to hold a whole number.';
+$ec_lang['lpn_cp_bad_case']='This value does not match the capitalization this property is designed for.';
+$ec_lang['lpn_cp_bad_chars']='This value uses a character this property does not allow.';
+$ec_lang['lpn_cp_bad_length']='This value is longer than this property allows.';
+$ec_lang['lpn_cp_bad_low']='This value is below the low limit of this property.';
+$ec_lang['lpn_cp_bad_high']='This value is above the high limit of this property.';
+$ec_lang['lpn_cp_key_needed']='Give this custom property a key with no spaces.';
+$ec_lang['lpn_cp_key_taken']='Another custom property already uses that key.';
 // ---- Scenarios (ROADMAP Task 184) ----
 // A project holds one drawing and a list of scenarios. Base is the drawing itself; every other
 // scenario is nothing but a set of values of its own, laid over Base.

@@ -3138,7 +3138,199 @@ var EngCalcs = EngCalcs || {};
 	// One line on purpose: dev/scripts/scenario_seam_check.php exempts this function BY NAME from the
 	// rule that nothing else spells a key prefix, and it reads the source a line at a time.
 	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : group === 'label' ? 't:' : 'n:') + id; }
-	function isOverridable(el, prop) { return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop]; }
+	// ---- CUSTOM PROPERTIES (ROADMAP Task 636; dev/custom-property-scope.md) --------------------
+	//
+	// A field the user invents: designed one row at a time in Settings > Assets, then carried by
+	// every asset kind the row applies to, and offered everywhere an ordinary property is -- the
+	// properties box, multi-properties, Find and replace, and the Tables pane.
+	//
+	// **THE KEY IS NAMESPACED, SO A COLLISION WITH A BUILT-IN FIELD IS IMPOSSIBLE** (Tom,
+	// 2026-09-13) rather than refused by a list of reserved names that would go stale the day a
+	// property was added. customPropKey() is the one place the prefix is applied, and it is applied
+	// to whatever the reader types: a key of `demand` is stored as `custom_demand` and reaches
+	// `el._custom_demand`, which no built-in reader ever asks for.
+	//
+	// **EVERYTHING IS OVERRIDABLE BY A SCENARIO, with no per-property distinction** (Tom, same day:
+	// *"Are we trying to be control freaks? No! Let the people do the things!"*). That is why
+	// isOverridable() consults this list as well as LPN_OVERRIDABLE, and why every write below goes
+	// through setProp() -- inside a scenario a direct `el._custom_x = v` would edit Base under
+	// every other scenario at once (dev/scenario-seam-repair.md). LPN_OVERRIDABLE itself is left
+	// alone: it is a LITERAL that dev/scripts/scenario_seam_check.php parses, and a user-defined
+	// key has no literal to be in.
+	//
+	// **A VALUE STORED IS THE STRING THE USER TYPED.** Nothing here computes with a custom
+	// property -- Tom, 2026-09-13, on why they are unitless: *"we aren't trying to interpret it.
+	// EPANET gave us the perfect example with Chemical; it doesn't matter."* Keeping the text is
+	// what lets a value that breaks its own design be flagged in place with its bytes intact.
+	var LPN_CP_PREFIX = 'custom_';
+	// The ID-prefix letters the design table's "Applies to" column is written in, per the scope
+	// document. They are the STRUCTURAL letters (LPN_ID_KEY), never settings.idPrefixes, which the
+	// user can change at will -- a design that moved when a preference moved would strand every
+	// value already typed.
+	var LPN_CP_TYPE_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V' };
+	// The case rules, and they read the ENGLISH alphabet only. That is a stated limit in the scope
+	// document rather than an oversight: a case rule is an assertion about an alphabet, and most of
+	// the 27 languages this suite ships in have no such distinction to assert.
+	var LPN_CP_CASE_RE = {
+		upper: /^[^a-z]*$/,
+		camel: /^[a-z][A-Za-z0-9]*$/,
+		pascal: /^[A-Z][A-Za-z0-9]*$/,
+		snake: /^[a-z0-9]+(_[a-z0-9]+)*$/,
+		hyphen: /^[a-z0-9]+(-[a-z0-9]+)*$/
+	};
+	function customPropKey(raw) {
+		var k = String(raw === undefined || raw === null ? '' : raw).replace(/\s+/g, '');
+		// Applied to the BARE key, so a reader who types the prefix back in does not get it twice.
+		while (k.indexOf(LPN_CP_PREFIX) === 0) { k = k.slice(LPN_CP_PREFIX.length); }
+		return k ? LPN_CP_PREFIX + k : '';
+	}
+	function customPropBareKey(key) {
+		var k = String(key || '');
+		return k.indexOf(LPN_CP_PREFIX) === 0 ? k.slice(LPN_CP_PREFIX.length) : k;
+	}
+	function customPropDefs() {
+		var list = settings && settings.customProps;
+		return (list && list.length) ? list : [];
+	}
+	function customPropLabel(def) {
+		return (def && def.label) || customPropBareKey(def && def.key);
+	}
+	// The letter this element answers to. A Text object carries no `type` of its own -- every label
+	// is a Text -- so it is recognised by its group, the same way elGroup() recognises it.
+	function customPropTypeKey(el) {
+		if (!el) { return ''; }
+		if (elGroup(el) === 'label') { return 'X'; }
+		return LPN_CP_TYPE_KEY[el.type] || '';
+	}
+	function customPropAppliesLetters(def) {
+		return String((def && def.applies) || '').toUpperCase().split(/[^A-Z]+/).filter(function (s) { return s; });
+	}
+	function customPropApplies(def, el) {
+		var tk = customPropTypeKey(el);
+		return !!tk && customPropAppliesLetters(def).indexOf(tk) >= 0;
+	}
+	function customPropDefByKey(key) {
+		var list = customPropDefs(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].key && list[i].key === key) { return list[i]; } }
+		return null;
+	}
+	// Every custom property THIS element carries, in design-table order.
+	function customPropsFor(el) {
+		return customPropDefs().filter(function (d) { return d.key && customPropApplies(d, el); });
+	}
+	// Does any element of this group-and-type carry the property? The question Find, the Tables
+	// pane and pushSpecList() ask, where there is a kind rather than an element in hand.
+	function customPropAppliesToType(def, group, type) {
+		var tk = group === 'label' ? 'X' : LPN_CP_TYPE_KEY[type] || '';
+		return !!tk && customPropAppliesLetters(def).indexOf(tk) >= 0;
+	}
+	function customPropIsNumeric(def) {
+		var v = def && def.validate;
+		return v === 'number' || v === 'integer';
+	}
+	// One character against a restriction set, where `@` stands for any letter and `#` for any
+	// digit -- the scope document's own shorthand, so `@#.-_` is "letters, digits, dot, hyphen and
+	// underscore".
+	function customPropCharInSet(set, ch) {
+		if (set.indexOf('@') >= 0 && /[A-Za-z]/.test(ch)) { return true; }
+		if (set.indexOf('#') >= 0 && /[0-9]/.test(ch)) { return true; }
+		return set.replace(/[@#]/g, '').indexOf(ch) >= 0;
+	}
+	/**
+	 * **WHAT IS WRONG WITH THIS VALUE, OR NULL.** Never a refusal and never a repair: Tom,
+	 * 2026-09-13, turned the question into a feature -- *"this could be a beautiful exploration
+	 * tool. You change the constraints just to do a bit of data entry error checking."* So
+	 * tightening a limit is a QUERY, the value stays exactly as it was typed, and every caller
+	 * flags in place.
+	 *
+	 * A BLANK IS NOT A FAILURE. An absent value says the asset states nothing, which is the same
+	 * standing a fire flow nobody typed has; validating it would paint every asset in the drawing
+	 * red the moment a property was designed.
+	 */
+	function customPropProblem(def, value) {
+		var pc = EngCalcs.pageConfig || {}, s, n, re, i, ok, lim, cmp;
+		if (!def) { return null; }
+		s = (value === undefined || value === null) ? '' : String(value);
+		if (s === '') { return null; }
+		if (customPropIsNumeric(def)) {
+			n = Number(s);
+			if (s.trim() === '' || !isFinite(n)) { return pc.lpn_cp_bad_number || 'This property is designed to hold a number.'; }
+			if (def.validate === 'integer' && Math.floor(n) !== n) { return pc.lpn_cp_bad_integer || 'This property is designed to hold a whole number.'; }
+		} else if (LPN_CP_CASE_RE[def.validate]) {
+			re = LPN_CP_CASE_RE[def.validate];
+			if (!re.test(s)) { return pc.lpn_cp_bad_case || 'This value does not match the capitalization this property is designed for.'; }
+		}
+		if (def.restrict) {
+			for (i = 0; i < s.length; i++) {
+				ok = customPropCharInSet(String(def.restrict), s.charAt(i));
+				if (def.restrictMode === 'deny' ? ok : !ok) {
+					return pc.lpn_cp_bad_chars || 'This value uses a character this property does not allow.';
+				}
+			}
+		}
+		lim = Number(def.maxLength);
+		if (def.maxLength !== '' && def.maxLength !== null && def.maxLength !== undefined && isFinite(lim) && lim > 0 && s.length > lim) {
+			return pc.lpn_cp_bad_length || 'This value is longer than this property allows.';
+		}
+		// **THE LIMITS ARE COMPARED THE WAY THE PROPERTY IS DESIGNED TO BE READ.** A number is
+		// compared as a number; anything else in the reader's own dictionary order, which is
+		// findCollator()'s answer and not UTF-16 code-unit order -- the same argument Task 598
+		// makes about Above and Below in Find.
+		cmp = function (a, b) {
+			if (customPropIsNumeric(def)) { return Number(a) - Number(b); }
+			return findCollator().compare(String(a), String(b));
+		};
+		if (def.low !== '' && def.low !== null && def.low !== undefined && cmp(s, def.low) < 0) {
+			return pc.lpn_cp_bad_low || 'This value is below the low limit of this property.';
+		}
+		if (def.high !== '' && def.high !== null && def.high !== undefined && cmp(s, def.high) > 0) {
+			return pc.lpn_cp_bad_high || 'This value is above the high limit of this property.';
+		}
+		return null;
+	}
+	// The sentence a flagged control carries in its tip: which property, what is wrong, and the
+	// promise that nothing was touched.
+	function customPropFlagText(def, problem) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_cp_flag || '{label}: {reason} The value is kept exactly as you typed it.')
+			.split('{label}').join(customPropLabel(def))
+			.split('{reason}').join(problem);
+	}
+	// Paint (or clear) the flag on one control. `lpn-cp-bad` is the whole of the styling and
+	// `ec-help` is what js/Calculators.lib.js wires the tap tooltip on, so the reason is readable
+	// on a phone as well as under a pointer.
+	function customPropPaintFlag(target, def, value) {
+		var problem = customPropProblem(def, value), cls = target.className || '';
+		cls = cls.replace(/\s*lpn-cp-bad\b/g, '').replace(/\s*ec-help\b/g, '');
+		if (problem) {
+			target.className = (cls + ' lpn-cp-bad ec-help').replace(/^\s+/, '');
+			target.title = customPropFlagText(def, problem);
+		} else {
+			target.className = cls;
+			target.removeAttribute('title');
+		}
+		return problem;
+	}
+	// **THE ONE READ AND THE ONE WRITE.** The read goes through effective(), so a scenario's
+	// override wins exactly as it does for a diameter; the write goes through setProp(), so in Base
+	// it writes the element and in a scenario it records an override. An empty box stores
+	// `undefined`, which is "this asset states nothing" -- the standing of a blank everywhere else
+	// on this page, and what setOverride() turns into its own null sentinel inside a scenario.
+	function customPropValue(el, def) { return effective(el, def.key); }
+	function setCustomProp(el, def, raw) {
+		var s = (raw === undefined || raw === null) ? '' : String(raw);
+		setProp(el, def.key, s === '' ? undefined : s);
+	}
+	// **A CUSTOM PROPERTY IS OVERRIDABLE, ALWAYS** (Task 636, Tom 2026-09-13: *"Let the people do
+	// the things!"*), with no per-property distinction and no row in LPN_OVERRIDABLE -- that
+	// whitelist is a literal dev/scripts/scenario_seam_check.php parses, and a key the user invents
+	// has no literal to be in. Asked FIRST and cheaply: the list is empty in every document that
+	// designs none, which is every document today.
+	function isOverridable(el, prop) {
+		var d = customPropDefs().length ? customPropDefByKey(prop) : null;
+		if (d) { return customPropApplies(d, el); }
+		return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop];
+	}
 	function inBaseScenario() { return !!activeScenario().isBase; }
 	function hasOverride(el, prop) {
 		var ov = activeScenario().overrides[ovKey(el)];
@@ -3514,13 +3706,49 @@ var EngCalcs = EngCalcs || {};
 				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'bulkCoeff'); }, get: function (l) { return effective(l, 'bulkCoeff'); }, set: function (l, v) { l._bulkCoeff = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'wallCoeff', group: 'link', field: 'wallCoeff', prop: 'wallCoeff', label: pc.lpn_reaction_wall || 'Wall reaction coefficient',
 				applies: function (l) { return l.type === 'pipe' && reactionFieldsShown() && !pipeTypeOwns(l, 'wallCoeff'); }, get: function (l) { return effective(l, 'wallCoeff'); }, set: function (l, v) { l._wallCoeff = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
-		];
+		].concat(customPushSpecs());
+	}
+	/**
+	 * **THE CUSTOM PROPERTIES, IN THE SAME LIST AND IN THE SAME SHAPE** (Task 636, and Tom's own
+	 * ruling that *"Find and replace WRITES a custom property, through pushSpecList()"*). A fourth
+	 * opinion about which properties are writable would drift the day somebody designed one, which
+	 * is the argument this list already makes for the tag.
+	 *
+	 * `group: 'any'` for the reason the tag answers it: one design can apply to junctions AND
+	 * pipes, and two specs of one name would put the word twice in one pull-down while
+	 * replaceSpec() wrote only whichever came first. replaceSpecGroupOk() is the one reader of it.
+	 *
+	 * **`str`, NOT `text`.** `text` is the tag's marker and carries the one-word rule through
+	 * lpnTagText(); a custom property is whatever the design says and its bytes are the user's, so
+	 * it has a marker of its own and replaceValueOf() hands the typed string straight back.
+	 *
+	 * **AND `set` GOES THROUGH setProp() RATHER THAN WRITING BASE.** Every other spec here writes
+	 * the element with a marked base-write, because both pushes are Base-level by construction;
+	 * a custom property has no map label, so pushFieldShown() is false for it and NEITHER push ever
+	 * reaches this setter. What does reach it is replaceWrite(), through `prop` -- and routing the
+	 * setter the same way means there is no path at all by which a custom property is written
+	 * outside the scenario seam.
+	 */
+	function customPushSpecs() {
+		return customPropDefs().filter(function (def) { return !!def.key; }).map(function (def) {
+			return { key: def.key, group: 'any', field: def.key, prop: def.key, str: true,
+				label: customPropLabel(def),
+				applies: function (el) { return customPropApplies(def, el); },
+				get: function (el) { return effective(el, def.key); },
+				set: function (el, v) { setProp(el, def.key, v); } };
+		});
 	}
 	// Is this push spec's property visible on the map right now? The one place that question is
 	// asked, so the Settings push and the scenario push cannot come to different answers about the
 	// same checkbox -- and the one place `altField` is honoured.
 	function pushFieldShown(s) {
-		return !!(labelSettings[s.group][s.field] || (s.altField && labelSettings[s.group][s.altField]));
+		// A spec whose group is 'any' has no side of labelSettings to be shown on -- the custom
+		// properties (Task 636) and nothing else. They carry no map label, so BOTH pushes skip
+		// them, which is the same standing a required fire flow and the two reaction coefficients
+		// already have in this list: they are here so Find and replace can write them.
+		var m = labelSettings[s.group];
+		if (!m) { return false; }
+		return !!(m[s.field] || (s.altField && m[s.altField]));
 	}
 	// **THE DANGEROUS ACTION** (Task 184). Base-side, it forces the displayed properties onto every
 	// scenario, ignoring their markers. In the delta model "forcing Base's value onto a scenario" IS
@@ -3724,6 +3952,12 @@ var EngCalcs = EngCalcs || {};
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
 			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X' },
+			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
+			// project-versus-browser rule, not window furniture: a document whose assets carry a
+			// value under a key means nothing without the design of that key, so the list rides in
+			// serializeProject() along with the rest of `settings` and never becomes a localStorage
+			// sibling key. Empty in every document that designs none.
+			customProps: [],
 			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this:
 			// nothing can create an emitter yet, so the control was a no-op (Task 191).
 			emitterExponent: 0.5,
@@ -10441,6 +10675,16 @@ var EngCalcs = EngCalcs || {};
 	// differently. "All elements" offers ID alone, because it is the only property a junction, a
 	// pipe and a text label all have -- an honest answer rather than a menu of properties that
 	// silently match nothing.
+	// The custom-property rows for one scope. "Everything" offers none, for the reason the ID row
+	// gives there: a design applies to some asset kinds and not others, so under a scope that holds
+	// all of them the honest answer is to pick the kind first.
+	function findOfferCustom(out, d) {
+		if (d.key === 'all') { return; }
+		customPropDefs().forEach(function (def) {
+			if (!def.key || !customPropAppliesToType(def, d.group, d.type)) { return; }
+			out.push([def.key, customPropLabel(def), customPropLabel(def)]);
+		});
+	}
 	function findPropDefs() {
 		var pc = EngCalcs.pageConfig || {}, d = findScopeDef(findState.scope),
 			// The third element of every row is the English spelling the parser also accepts. A
@@ -10474,6 +10718,7 @@ var EngCalcs = EngCalcs || {};
 			// on using the same Conditions as other range values"). "Which of my notes is set
 			// biggest" has no other answer on this page.
 			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier', 'Size multiplier']);
+			findOfferCustom(out, d);
 			return out;
 		}
 		// **TAG IS BAND 1, BESIDE THE ID, AND IT IS OFFERED UNDER "Everything" TOO** (Tom,
@@ -10575,6 +10820,12 @@ var EngCalcs = EngCalcs || {};
 		// returns. It is also inherently a question about the network rather than about a class of
 		// element, so restricting it to the node scopes would mean running the same report three
 		// times. Band 4, and alone in it.
+		// **BAND 2, AND LAST IN IT: THE PROPERTIES THE USER INVENTED** (Task 636). Offered only where
+		// the design says this scope carries one, which is the standing honesty rule of this
+		// function: a property that silently matches nothing does not go in the menu. Its English
+		// spelling for the parser is its own label, because a custom property has no English name
+		// but the one the reader gave it.
+		findOfferCustom(out, d);
 		if (d.key === 'all' || d.group === 'node') {
 			out.push(['connection', pc.lpn_find_prop_connection || 'Connectivity', 'Connection']);
 		}
@@ -10738,6 +10989,11 @@ var EngCalcs = EngCalcs || {};
 	// already a language with words in it, and a second one inside the value box would be a
 	// punctuation dialect nobody can be taught from a pull-down.
 	function findPropIsText(prop) {
+		// A custom property is text unless its design says it holds a number (Task 636) -- the one
+		// place this page asks what a user-defined field IS, and it asks the design rather than the
+		// values, so an empty column still gets the conditions its author intended.
+		var d = customPropDefs().length ? customPropDefByKey(prop) : null;
+		if (d) { return !customPropIsNumeric(d); }
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' || prop === 'tag';
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
@@ -10927,6 +11183,26 @@ var EngCalcs = EngCalcs || {};
 		// every element in the drawing, which is how "what have we tagged so far" gets asked.
 		if (prop === 'tag') {
 			return cand.group === 'label' ? undefined : (cand.el.tag || undefined);
+		}
+		// **A CUSTOM PROPERTY IS READ THROUGH effective(), LIKE EVERY OTHER INPUT HERE** (Task 636),
+		// so a scenario's override is what a search inside that scenario finds. Above the label
+		// bail-out below, because a Text object carries custom properties too (Tom, 2026-09-13:
+		// *"Text objects are included. Why not?"*).
+		//
+		// A NUMERIC DESIGN HANDS BACK A NUMBER so that greater-than and less-than mean arithmetic;
+		// everything else hands back the stored text, which findPropIsText() puts on the text
+		// conditions. An absent value reads as undefined, like a fire flow nobody stated, so
+		// `contains` with an empty box lists exactly the assets that CARRY one.
+		var cpDef = customPropDefs().length ? customPropDefByKey(prop) : null;
+		if (cpDef) {
+			if (!customPropApplies(cpDef, cand.el)) { return undefined; }
+			var cpV = effective(cand.el, prop);
+			if (cpV === undefined || cpV === null || cpV === '') { return undefined; }
+			if (customPropIsNumeric(cpDef)) {
+				var cpN = Number(cpV);
+				return isFinite(cpN) ? cpN : undefined;
+			}
+			return String(cpV);
 		}
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
@@ -12226,6 +12502,12 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function replaceValueOf(spec) {
 		var raw = String(replaceState.value).trim(), v;
+		// **A CUSTOM PROPERTY'S VALUE IS THE BYTES THE USER TYPED** (Task 636). No one-word rule and
+		// no parseFloat: the design decides what a good value looks like, and a value that breaks
+		// it is flagged where it is READ rather than refused here -- Tom's own ruling, and the
+		// reason an empty box still refuses, since erasing a property on 400 assets is a real
+		// action that must not be spelled the same way as leaving a box alone.
+		if (spec && spec.str) { return raw === '' ? undefined : raw; }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
 			return v === '' ? undefined : v;
@@ -14312,7 +14594,32 @@ var EngCalcs = EngCalcs || {};
 	// the moment the set changes, and a sort left pointing at a column that has gone falls back to
 	// the id ordering paneTableSorted() already uses for a value nothing carries.
 	function paneCols(spec) {
-		return spec.cols.filter(function (c) { return !c.when || c.when(); });
+		return spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec));
+	}
+	/**
+	 * **THE CUSTOM PROPERTY COLUMNS** (Task 636), appended rather than baked into buildPaneTables():
+	 * that list is built once and cached, and a design the user adds while the pane is open must
+	 * appear without a page reload. paneTableSignature() reads paneCols(), so adding or removing a
+	 * design rebuilds the table by itself.
+	 *
+	 * **AND THE MULTI-PROPERTIES BOX GETS THEM FREE**, because it takes its property list from
+	 * paneCols() rather than restating one -- so a custom property is editable across a selection
+	 * on exactly the terms a diameter is.
+	 *
+	 * `str: true` so the cell reads and writes the bytes the user typed; the setter is
+	 * setCustomProp(), which is setProp(), so a table edit inside a scenario records an override
+	 * exactly as the popup's own row does. `flag` is the per-row hook that paints an out-of-design
+	 * value without clearing it.
+	 */
+	function paneCustomCols(spec) {
+		return customPropDefs().filter(function (def) {
+			return def.key && customPropAppliesToType(def, spec.group, spec.type);
+		}).map(function (def) {
+			return { key: def.key, label: function () { return customPropLabel(def); }, str: true, em: 6,
+				prop: def.key, cp: def,
+				get: function (el) { return effective(el, def.key); },
+				set: function (el, v) { setCustomProp(el, def, v); } };
+		});
 	}
 	function paneColByKey(spec, key) {
 		var cols = paneCols(spec), i;
@@ -14665,6 +14972,11 @@ var EngCalcs = EngCalcs || {};
 				// without being told. It keeps the value and puts the caret in it; typing over a
 				// cell wipes it, which is the difference between (b) and (a) in Tom's own numbering.
 				input.addEventListener('dblclick', function () { paneEnterEdit(input, false); });
+				// **AN OUT-OF-DESIGN VALUE IS FLAGGED IN THE CELL AND NEVER CLEARED** (Task 636).
+				// Four hundred rows is where a person actually goes looking for the outliers, which
+				// is the whole of Tom's "beautiful exploration tool": tighten a limit and the cells
+				// that break it light up, loosen it and they go out again.
+				if (c.cp) { customPropPaintFlag(input, c.cp, input.value); }
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
@@ -14695,6 +15007,7 @@ var EngCalcs = EngCalcs || {};
 					// person can sit on a cell for a minute without typing, and a solve that
 					// refused to refresh it would leave one stale number in a live table.
 					target.value = paneCellText(c, el);
+					if (c.cp) { customPropPaintFlag(target, c.cp, target.value); }
 				}
 			});
 		});
@@ -26701,16 +27014,17 @@ var EngCalcs = EngCalcs || {};
 		if (unitsBlock && unitsHolder && unitsBlock.parentNode !== unitsHolder) { unitsHolder.appendChild(unitsBlock); }
 		var byId = function (id) { return document.getElementById(id); };
 		var idBody = byId('lpn_set_id_fields'), defBody = byId('lpn_set_default_fields'),
+			customBody = byId('lpn_set_custom_fields'),
 			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
 			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
 			energyBody = byId('lpn_set_energy_fields'),
 			pageBody = byId('lpn_set_page_fields');
-		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody) { return; }
+		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody) { return; }
 		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
 		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
 		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
 		// the day it was added -- seven Track rows after four switches.
-		[idBody, defBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody].forEach(clearFields);
+		[idBody, defBody, customBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -26818,6 +27132,158 @@ var EngCalcs = EngCalcs || {};
 			wrap.appendChild(input); wrap.appendChild(apply);
 			row(idBody, f[1], wrap);
 		});
+		// ---- Custom properties (ROADMAP Task 636; dev/custom-property-scope.md) ----
+		//
+		// **ONE HEADING OVER THE WHOLE BLOCK, NOT EIGHT OVER EIGHT ABBREVIATED CELLS.** That is
+		// Tom's own alternative in the scope document and it is the one built: a single "Design"
+		// with the column names in its tip. Eight headings over eight three-letter cells is more
+		// chrome than content, and the point of the table is to read twenty rows at once.
+		//
+		// **ADDED AND REMOVED LIKE DEMAND CATEGORIES, EDITED IN PLACE LIKE A SPREADSHEET.** Every
+		// cell is a live control on `settings.customProps[i]`; nothing is staged and there is no
+		// OK button, which is the same contract every other row in this box has.
+		//
+		// **THE KEY IS NAMESPACED ON THE WAY IN.** customPropKey() adds the prefix, so what the
+		// reader types can never collide with a built-in field however they spell it -- refused by
+		// construction rather than by a reserved list that would go stale (Tom, 2026-09-13).
+		//
+		// **A KEY CHANGE DOES NOT CARRY THE VALUES ACROSS**, deliberately and on the same terms as
+		// Remove: the key IS the identity, the values stay in the file under the old one, and
+		// typing that key again brings them back. Moving them would have to move every scenario's
+		// overrides too, and a rename that silently rewrites four hundred assets is a bigger act
+		// than a cell edit looks like.
+		function customPropBox(target) {
+			note(target, pc.lpn_settings_custom_props_note || 'A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.');
+			var head = document.createElement('div');
+			head.className = 'lpn-set-note lpn-cp-head';
+			setFieldLabel(head, pc.lpn_cp_design || 'Design', pc.lpn_cp_design_tip);
+			target.appendChild(head);
+			var defs = customPropDefs();
+			if (!defs.length) { note(target, pc.lpn_cp_none || 'No custom property is designed yet.'); }
+			var table = document.createElement('table');
+			table.className = 'lpn-cp-table';
+			var tbody = document.createElement('tbody');
+			table.appendChild(tbody);
+			// One cell of the design table. `size` is the abbreviation the scope document asks for:
+			// a truncated cell unfocused, its full length when the caret is in it, which is what a
+			// text input does by itself once it is narrow.
+			function cell(tr, ctl, labelText, tip, size) {
+				var td = document.createElement('td');
+				if (size) { ctl.size = size; }
+				ctl.setAttribute('aria-label', labelText);
+				if (tip) { ctl.title = tip; }
+				td.appendChild(ctl);
+				tr.appendChild(td);
+				return ctl;
+			}
+			// **EVERY EDIT IS COMMITTED ON `change`, NOT ON `input`.** A design table drives the
+			// property popup, the Tables pane and Find; rebuilding all three per keystroke would
+			// take the cell out from under the hand typing in it.
+			function commit(redrawBox) {
+				saveToStorage();
+				if (redrawBox) { rebuildSettingsFields(); }
+				refreshPaneIfOpen();
+				refreshPopupIfOpen();
+			}
+			function textCell(tr, def, field, labelText, tip, size, onCommit) {
+				var input = document.createElement('input');
+				input.type = 'text';
+				input.value = (def[field] === undefined || def[field] === null) ? '' : String(def[field]);
+				input.addEventListener('change', function () {
+					if (onCommit) { onCommit(input); return; }
+					def[field] = input.value.trim();
+					commit(false);
+				});
+				return cell(tr, input, labelText, tip, size);
+			}
+			defs.forEach(function (def, i) {
+				var tr = document.createElement('tr');
+				// KEY -- namespaced on the way in, refused empty, refused if another row has it.
+				textCell(tr, def, 'key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, 8, function (input) {
+					var k = customPropKey(input.value), j;
+					if (!k) {
+						alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
+						input.value = customPropBareKey(def.key); return;
+					}
+					for (j = 0; j < defs.length; j++) {
+						if (j !== i && defs[j].key === k) {
+							alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
+							input.value = customPropBareKey(def.key); return;
+						}
+					}
+					def.key = k;
+					commit(true);
+				}).value = customPropBareKey(def.key);
+				textCell(tr, def, 'label', pc.lpn_cp_label || 'Label', pc.lpn_cp_label_tip, 8);
+				// APPLIES TO -- the ID prefix letters, per the scope document, so twenty rows read
+				// at a glance. Upper-cased on commit, because J and j are the same asset kind.
+				textCell(tr, def, 'applies', pc.lpn_cp_applies || 'Applies to', pc.lpn_cp_applies_tip, 5, function (input) {
+					def.applies = customPropAppliesLetters({ applies: input.value }).join(',');
+					input.value = def.applies;
+					commit(false);
+				});
+				var vsel = document.createElement('select');
+				[['none', pc.lpn_cp_val_none || 'Do not validate'],
+					['number', pc.lpn_cp_val_number || 'Number'],
+					['integer', pc.lpn_cp_val_integer || 'Integer'],
+					['text', pc.lpn_cp_val_text || 'Text'],
+					['upper', pc.lpn_cp_val_upper || 'ALL CAPS'],
+					['camel', pc.lpn_cp_val_camel || 'camelCase'],
+					['pascal', pc.lpn_cp_val_pascal || 'PascalCase'],
+					['snake', pc.lpn_cp_val_snake || 'snake_case'],
+					['hyphen', pc.lpn_cp_val_hyphen || 'hyphen-case']].forEach(function (o) {
+					var opt = document.createElement('option');
+					opt.value = o[0]; opt.textContent = o[1];
+					if (o[0] === (def.validate || 'none')) { opt.selected = true; }
+					vsel.appendChild(opt);
+				});
+				vsel.addEventListener('change', function () { def.validate = vsel.value; commit(false); });
+				cell(tr, vsel, pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip);
+				var msel = document.createElement('select');
+				[['allow', pc.lpn_cp_restrict_allow || 'Allow only these'],
+					['deny', pc.lpn_cp_restrict_deny || 'Refuse these']].forEach(function (o) {
+					var opt = document.createElement('option');
+					opt.value = o[0]; opt.textContent = o[1];
+					if (o[0] === (def.restrictMode || 'allow')) { opt.selected = true; }
+					msel.appendChild(opt);
+				});
+				msel.addEventListener('change', function () { def.restrictMode = msel.value; commit(false); });
+				cell(tr, msel, pc.lpn_cp_restrict_mode || 'Allow or refuse', pc.lpn_cp_restrict_tip);
+				textCell(tr, def, 'restrict', pc.lpn_cp_restrict || 'Restrict characters', pc.lpn_cp_restrict_tip, 5);
+				textCell(tr, def, 'maxLength', pc.lpn_cp_length || 'Restrict length', pc.lpn_cp_length_tip, 3);
+				textCell(tr, def, 'low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip, 5);
+				textCell(tr, def, 'high', pc.lpn_cp_high || 'High limit', pc.lpn_cp_high_tip, 5);
+				var rm = document.createElement('button');
+				rm.type = 'button';
+				rm.className = 'lpn-cp-remove';
+				rm.textContent = pc.lpn_cp_remove || 'Remove';
+				helpTip(rm, pc.lpn_cp_remove_tip);
+				rm.addEventListener('click', function () {
+					saveUndoSnapshot();
+					settings.customProps.splice(i, 1);
+					commit(true);
+				});
+				cell(tr, rm, pc.lpn_cp_remove || 'Remove');
+				tbody.appendChild(tr);
+			});
+			target.appendChild(table);
+			var add = document.createElement('button');
+			add.type = 'button';
+			add.textContent = pc.lpn_cp_add || 'Add custom property';
+			helpTip(add, pc.lpn_cp_add_tip);
+			add.addEventListener('click', function () {
+				saveUndoSnapshot();
+				if (!settings.customProps) { settings.customProps = []; }
+				// BLANK, not a copy of the row above. A new row is a question to the user, exactly
+				// as a new demand category is, and seeding it with somebody else's design would put
+				// a rule nobody wrote onto every asset the moment a key was typed.
+				settings.customProps.push({ key: '', label: '', applies: '', validate: 'none',
+					restrictMode: 'allow', restrict: '', maxLength: '', low: '', high: '' });
+				commit(true);
+			});
+			target.appendChild(add);
+		}
+		customPropBox(customBody);
 		// ---- 2. Default inputs ----
 		// A mode the user re-enters mid-drawing ("OK, now all the 8 inch pipes"), which is why it
 		// used to be the one section that opened expanded. Nothing opens or closes now.
@@ -31418,6 +31884,39 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// **THE CUSTOM PROPERTY ROWS** (Task 636), one per design that applies to this element, in the
+	// design table's own order. A line of TEXT whatever the design says, because the document
+	// stores the bytes the user typed and nothing here computes with them -- see setCustomProp().
+	//
+	// **THE WRITE IS setProp(), THROUGH setCustomProp()**, so inside a scenario this records an
+	// override rather than editing Base under every other scenario at once; and every row carries
+	// the ordinary override marker, because a custom property is overridable like everything else
+	// (Tom, 2026-09-13).
+	//
+	// **A VALUE THAT BREAKS ITS OWN DESIGN IS FLAGGED AND KEPT.** The box turns and carries the
+	// reason in its tip; nothing is cleared and nothing is refused, so tightening a limit is a way
+	// of ASKING a question about the data rather than a gate that eats it.
+	function customPropFields(fields, el) {
+		customPropsFor(el).forEach(function (def) {
+			var label = document.createElement('label'), input = document.createElement('input'),
+				v = customPropValue(el, def);
+			input.type = 'text';
+			input.value = (v === undefined || v === null) ? '' : String(v);
+			customPropPaintFlag(input, def, input.value);
+			input.addEventListener('change', function () {
+				saveUndoSnapshot();
+				setCustomProp(el, def, input.value);
+				customPropPaintFlag(input, def, input.value);
+				completeEdit({ el: el, prop: def.key });
+				refreshPopupIfOpen();
+			});
+			setFieldLabel(label, customPropLabel(def));
+			label.appendChild(input);
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+			overrideMarker(fields, el, def.key);
+		});
+	}
 	// A pattern chooser, in the popup's own row shape. The OPTIONS come from libFillPatternOptions(),
 	// which the Libraries box's own default-pattern row also uses, so the two can never disagree
 	// about what patterns exist or about what the blank entry is called.
@@ -32716,6 +33215,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		qualityResultRow(fields, n);
 		tagField(fields, n);
+		customPropFields(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
 		coordFields(fields, outwardX(n.x), outwardY(n.y));
@@ -33445,6 +33945,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		closedField(fields, l, linkId);
 		tagField(fields, l);
+		customPropFields(fields, l);
 		activeField(fields, l);
 		pushHereButton(fields, l);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
@@ -33983,6 +34484,7 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_field_text_attached_tip ||
 					'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.');
 		}
+		customPropFields(fields, lb);
 		importNotesField(fields, lb);
 		tipsIn(fields);
 	}

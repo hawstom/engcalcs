@@ -848,6 +848,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						<div class="lpn-set-subbody"><div id="lpn_set_id_fields" class="lpn-set-part"></div></div>
 						<div class="lpn-set-sub" id="lpn_set_sub_defaults"><?=$ec_lang['lpn_settings_defaults']?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_default_fields" class="lpn-set-part"></div></div>
+						<?php // ---- Custom properties (ROADMAP Task 636) ----
+						      // A field the user invents. The body is one abbreviated DESIGN TABLE, a row per
+						      // property, built by js/looped-network.js; the heading lives here with every other
+						      // sub-heading so that where a control sits is readable in one place. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_customProps"><?=$ec_lang['lpn_settings_custom_props']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_custom_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 				<?php // ---- Section: CALCULATION ----
@@ -2284,6 +2290,55 @@ EngCalcs.pageConfig = {
 	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
 	lpn_settings_defaults: <?=json_encode($ec_lang['lpn_settings_defaults'])?>,
 	lpn_settings_defaults_note: <?=json_encode($ec_lang['lpn_settings_defaults_note'])?>,
+	<?php // Custom properties (ROADMAP Task 636): the design table under Settings > Assets, the
+	      // rows it draws on every asset it applies to, and the sentence a value that breaks its
+	      // own design carries in its tip. ?>
+	lpn_cp_add: <?=json_encode($ec_lang['lpn_cp_add'])?>,
+	lpn_cp_add_tip: <?=json_encode($ec_lang['lpn_cp_add_tip'])?>,
+	lpn_cp_applies: <?=json_encode($ec_lang['lpn_cp_applies'])?>,
+	lpn_cp_applies_tip: <?=json_encode($ec_lang['lpn_cp_applies_tip'])?>,
+	lpn_cp_bad_case: <?=json_encode($ec_lang['lpn_cp_bad_case'])?>,
+	lpn_cp_bad_chars: <?=json_encode($ec_lang['lpn_cp_bad_chars'])?>,
+	lpn_cp_bad_high: <?=json_encode($ec_lang['lpn_cp_bad_high'])?>,
+	lpn_cp_bad_integer: <?=json_encode($ec_lang['lpn_cp_bad_integer'])?>,
+	lpn_cp_bad_length: <?=json_encode($ec_lang['lpn_cp_bad_length'])?>,
+	lpn_cp_bad_low: <?=json_encode($ec_lang['lpn_cp_bad_low'])?>,
+	lpn_cp_bad_number: <?=json_encode($ec_lang['lpn_cp_bad_number'])?>,
+	lpn_cp_design: <?=json_encode($ec_lang['lpn_cp_design'])?>,
+	lpn_cp_design_tip: <?=json_encode($ec_lang['lpn_cp_design_tip'])?>,
+	lpn_cp_flag: <?=json_encode($ec_lang['lpn_cp_flag'])?>,
+	lpn_cp_high: <?=json_encode($ec_lang['lpn_cp_high'])?>,
+	lpn_cp_high_tip: <?=json_encode($ec_lang['lpn_cp_high_tip'])?>,
+	lpn_cp_key: <?=json_encode($ec_lang['lpn_cp_key'])?>,
+	lpn_cp_key_needed: <?=json_encode($ec_lang['lpn_cp_key_needed'])?>,
+	lpn_cp_key_taken: <?=json_encode($ec_lang['lpn_cp_key_taken'])?>,
+	lpn_cp_key_tip: <?=json_encode($ec_lang['lpn_cp_key_tip'])?>,
+	lpn_cp_label: <?=json_encode($ec_lang['lpn_cp_label'])?>,
+	lpn_cp_label_tip: <?=json_encode($ec_lang['lpn_cp_label_tip'])?>,
+	lpn_cp_length: <?=json_encode($ec_lang['lpn_cp_length'])?>,
+	lpn_cp_length_tip: <?=json_encode($ec_lang['lpn_cp_length_tip'])?>,
+	lpn_cp_low: <?=json_encode($ec_lang['lpn_cp_low'])?>,
+	lpn_cp_low_tip: <?=json_encode($ec_lang['lpn_cp_low_tip'])?>,
+	lpn_cp_none: <?=json_encode($ec_lang['lpn_cp_none'])?>,
+	lpn_cp_remove: <?=json_encode($ec_lang['lpn_cp_remove'])?>,
+	lpn_cp_remove_tip: <?=json_encode($ec_lang['lpn_cp_remove_tip'])?>,
+	lpn_cp_restrict: <?=json_encode($ec_lang['lpn_cp_restrict'])?>,
+	lpn_cp_restrict_allow: <?=json_encode($ec_lang['lpn_cp_restrict_allow'])?>,
+	lpn_cp_restrict_deny: <?=json_encode($ec_lang['lpn_cp_restrict_deny'])?>,
+	lpn_cp_restrict_mode: <?=json_encode($ec_lang['lpn_cp_restrict_mode'])?>,
+	lpn_cp_restrict_tip: <?=json_encode($ec_lang['lpn_cp_restrict_tip'])?>,
+	lpn_cp_val_camel: <?=json_encode($ec_lang['lpn_cp_val_camel'])?>,
+	lpn_cp_val_hyphen: <?=json_encode($ec_lang['lpn_cp_val_hyphen'])?>,
+	lpn_cp_val_integer: <?=json_encode($ec_lang['lpn_cp_val_integer'])?>,
+	lpn_cp_val_none: <?=json_encode($ec_lang['lpn_cp_val_none'])?>,
+	lpn_cp_val_number: <?=json_encode($ec_lang['lpn_cp_val_number'])?>,
+	lpn_cp_val_pascal: <?=json_encode($ec_lang['lpn_cp_val_pascal'])?>,
+	lpn_cp_val_snake: <?=json_encode($ec_lang['lpn_cp_val_snake'])?>,
+	lpn_cp_val_text: <?=json_encode($ec_lang['lpn_cp_val_text'])?>,
+	lpn_cp_val_upper: <?=json_encode($ec_lang['lpn_cp_val_upper'])?>,
+	lpn_cp_validate: <?=json_encode($ec_lang['lpn_cp_validate'])?>,
+	lpn_cp_validate_tip: <?=json_encode($ec_lang['lpn_cp_validate_tip'])?>,
+	lpn_settings_custom_props_note: <?=json_encode($ec_lang['lpn_settings_custom_props_note'])?>,
 	lpn_settings_push_note: <?=json_encode($ec_lang['lpn_settings_push_note'])?>,
 	lpn_settings_push_btn: <?=json_encode($ec_lang['lpn_settings_push_btn'])?>,
 	lpn_push_confirm: <?=json_encode($ec_lang['lpn_push_confirm'])?>,
