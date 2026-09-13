@@ -289,8 +289,14 @@ console.log('\n--- one home for the concept ---');
 	// far apart they are -- the same function that fills every lenAuto length, which is the whole
 	// point: the bar and the pipe labels beside it cannot come to different answers about ground
 	// distance. It touches no stored coordinate and writes nothing back.
-	ok('outwardX has one definition and twenty-one call sites', count(/outwardX\(/g) === 22, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-one call sites', count(/outwardY\(/g) === 22, count(/outwardY\(/g));
+	// **TASK 628 ADDED ONE SITE TO EACH PAIR, AND IT IS THE SECOND GUARD OF THAT SHAPE.**
+	// viewShowsModel() asks whether a camera a document states is on the Earth at all before
+	// applySaved() accepts it, and it needs BOTH axes where Task 629's guard needed only
+	// longitude: mercLat() is strictly monotonic, so a saturating latitude still answers the
+	// yes-or-no question even though it cannot answer how far. Through the pair, like everything
+	// else, rather than reaching for cartesianY() -- which is what this count is for.
+	ok('outwardX has one definition and twenty-two call sites', count(/outwardX\(/g) === 23, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-two call sites', count(/outwardY\(/g) === 23, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
