@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**80 open tasks.** Next (100): 10 · Soon (75): 17 · Someday (50): 26 · Maybe (25): 10 · Parked (5): 17
+**83 open tasks.** Next (100): 10 · Soon (75): 18 · Someday (50): 27 · Maybe (25): 10 · Parked (5): 18
 
 ## 100 — Next (10)
 
@@ -18,11 +18,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
-- Task 616 — [H] · Visual feedback: a prompt history in the banner area.
 - Task 618 — WYSIWYG hit areas: what you can click is what you can see.
 - Task 638 — Node and link symbology do not offer the chemical properties.
+- Task 646 — Attach the world map to an XY project without changing the project.
 
-## 75 — Soon (17)
+## 75 — Soon (18)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -41,8 +41,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 637 — A Graph button on the Properties box.
 - Task 642 — Retire the Windows WSL2 IP script and its scheduled task.
 - Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
+- Task 647 — A project that is whole but entirely off screen should say so.
 
-## 50 — Someday (26)
+## 50 — Someday (27)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -70,6 +71,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 640 — A Graphs submenu under Water, holding five plots.
 - Task 641 — Choose a real EPSG projection in the new project box.
 - Task 645 — The app icon's legs are leggier than the favicon's.
+- Task 648 — The About icon's outlines are too heavy for its scale.
 
 ## 25 — Maybe (10)
 
@@ -84,7 +86,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 619 — [H] · The map cursor reverts to an arrow on Chrome at fractional display scaling.
 - Task 621 — [H] · A command search: KDH went looking for one.
 
-## 5 — Parked (17)
+## 5 — Parked (18)
 
 *Ruled against, or set aside, and kept here for documentation. A row is alive only so that it is not re-proposed from scratch.*
 
@@ -105,8 +107,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 482 — EPANET's vocabulary collides with ours, and we are keeping ours.
 - Task 492 — [H] · Rewriting the 986 existing commit messages is NOT recommended.
 - ! Task 537 — [H] · PARKED. Both seats say a phone reaching a PC's model is a want that mostly is not there.
+- Task 616 — Visual feedback: a prompt history in the banner area.
 
 ---
 
-73 of 80 titles are within 4–12 words. `!` marks the rest;
+76 of 83 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
