@@ -182,3 +182,24 @@ is answered for the three that remain after the divorce; see item 5 series above
     distinct from the `pipe` asset icon two levels down) if the "plan reads as generic project,
     not water" mismatch still nags after 16 September — not urgent, and not worth a fourth icon
     change before the demo.
+
+19. **Task 616 — reclassify DEM/engine/locking disconnect notices from `setNotice()` (expiring)
+    to the existing persist-until-cleared pattern** (`noteMapUnmeasurable()`,
+    `js/looped-network.js:34869`; `#lpn_lock_banner`, `Looped-Network.php:170`). No new UI, no new
+    strings — reuses a pattern this page already ships and has already been read by a live tester
+    (Tom saw it, KDH did not, because it was on a countdown a standing fact should never have
+    been on). This is the one real fix inside Task 616's evidence; rank it above the history idea
+    entirely. See journal, 2026-09-13.
+
+20. **Task 616 — a small closed notification log (bell/count, opens a short static list), NOT a
+    banner-area band.** Answers the recoverability half of MJH's suggestion without adding a
+    fifth permanent attention-competitor to a page whose diagnosed defect is that readers do not
+    see the four it already has. A real build — its own branch, not folded into demo prep. Ranked
+    below item 19 and below the standing chrome-diagnosis work (items 5-8, 13-18), which is the
+    same cognitive failure (inattentional blindness) applied to permanent chrome and is nearer
+    done. See journal, 2026-09-13.
+
+21. **Task 616 — do NOT build the banner-area prompt history as proposed.** New permanent chrome
+    is the wrong instrument for a sampling problem (inattentional blindness, not legibility) that
+    a longer timer already failed to fix once (120 s, still missed). If asked again, redirect to
+    items 19-20. See journal, 2026-09-13.

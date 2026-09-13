@@ -966,3 +966,144 @@ formula), OBSERVED against `style.css`:
 No shipped file touched in `librewaternet.org` or `engcalcs`. Full ranked answer given directly
 to Tom in conversation; not duplicated into a `dev/*.md` file here since the subject file lives in
 the sibling repository and this journal is the record of judgment, not of the target prose.
+
+## 2026-09-13 — Task 616: the proposed fix repeats the diagnosis that hired me
+
+Asked to rule on "a prompt history in the banner area." **The instrument is wrong before the
+placement question is even asked**, and the task's own evidence says so if you read it as a
+pattern rather than as two separate misses.
+
+**What actually happened, OBSERVED, is not a duration failure.** `STATUS_NOTICE_MS = 8000`
+(`js/looped-network.js:34857`) governs the ordinary case; the Hide-titles highlight was already
+raised to 120 s and MJH still missed it (ROADMAP Task 616 block); KDH missed a DEM-disconnect
+notice Tom himself saw on the same screen. Two different readers, two different messages, two
+different durations, one result. **CITED**: this is inattentional blindness, not banner blindness
+— Mack & Rock's "invisible gorilla" finding (Simons & Chabris, 1999; summarized
+en.wikipedia.org/wiki/Inattentional_blindness) is that attention narrowed onto a task makes an
+unexpected, unrelated-looking stimulus invisible **regardless of how long it is on screen**,
+because the viewer never samples that region of the display at all. Banner blindness (NN/g,
+nngroup.com/videos/banner-blindness) is the narrower, ad-shaped version of the same thing and is
+also live here — `#lpn_map_notice` (`Looped-Network.php:334`) is a small bordered box in a
+fixed screen corner, which is exactly the visual signature banner blindness trains people to
+skip. **Raising the timer a second time treats a sampling problem as a legibility problem**, and
+the evidence already falsified that once.
+
+**1. Is a banner-area history the right shape?** No, on two independent grounds.
+   - It adds a FIFTH thing to a page whose diagnosed defect is that readers do not see the four
+     it already has (this seat's whole brief). A history band is new, permanent, page-level
+     chrome — worse than the transient notice it is meant to fix, because it is always there to
+     be filtered out, not just there for eight seconds.
+   - **The two lost messages were never "on the map" in the reader's sense** — OBSERVED,
+     `#lpn_map_notice` sits at `top:4px; left:4px`, and the reader was not looking at the top-left
+     corner, they were looking at whatever they were drawing or reading. A history in a
+     page-level banner moves the message even further from where the eyes already were not.
+   - What the evidence actually asks for is **recoverability, not a second display surface**: a
+     reader who missed something wants to find out what they missed after the fact, on demand,
+     not to have it re-shown to them in a place they will filter the same way. That is a LOG
+     behind a control, not a second live band — closer to a browser's own notification tray
+     (bell icon, badge count, click to open a static list) than to a banner. Zero standing
+     screen real estate; the reader's own noticing that "something happened and I don't know
+     what" (a common report, per Tom's transcripts) is answered by a place to go look, not by a
+     wider stage for the same performance.
+
+**2. Where should a notice appear so someone looking at the MAP sees it?** Two honest answers,
+   because the underlying problem (inattentional blindness) has no single fix in the corner-box
+   family this page already tried:
+   - **Anchor it to the thing it is about, not to a fixed screen corner.** `#lpn_map_notice`
+     already does half of this right — it is drawn on the canvas, not in a page-top banner,
+     which is correct given the full-window-drawing-surface rule. But top-left is a fixed
+     address, not a following one; a message about a save or an import has no location on the
+     map at all, so "anchor to content" only helps the subset of notices that ARE about a
+     specific node/pipe/tank. For those (a scenario deactivation, a prefix-rename count, a
+     multi-edit result), a marker or brief highlight AT the affected geometry — this seat's own
+     wishlist item 1 (hover highlight) is the adjacent, already-approved precedent for
+     "draw attention at the object, not at a corner readout" — would put the message where a
+     reader's eyes are more likely to already be, because they just interacted there.
+   - **For notices about the SYSTEM rather than the model** (DEM server disconnected, engine
+     unreachable, locking unavailable), OBSERVED: this codebase already has the right pattern and
+     simply does not apply it consistently. `noteMapUnmeasurable()` (`js/looped-network.js:34869`)
+     and `#lpn_lock_banner` (`Looped-Network.php:170`, `role="status"`) both STAND until the
+     condition clears rather than expiring on a clock — the correct shape for "the DEM server is
+     unreachable," which is a state, not an event. KDH's miss is this seam's own bug: a
+     connectivity failure is being said through `setNotice()` (the 8 s/120 s transient), when the
+     precedent for "this is true until it stops being true" already exists two functions away.
+     **Fixing that misclassification is a smaller, cheaper, more targeted move than building a
+     history band, and it is not a new instrument — it is using the one the page already owns
+     correctly.**
+
+**3. Should duration vary by severity, and by what classes?** Yes, and the research answer is
+   sharper than "vary it" — CITED, Material Design's own snackbar spec
+   (m2.material.io/design/components/snackbars.html): 4–10 s is the entire sanctioned range for
+   ANY auto-dismissing toast, and a persistent one is only ever paired with an explicit close
+   control, never a longer timer — Material never ships a 120 s auto-dismiss, which is what this
+   page's engine-difference note already is (`LPN_ENGINE_NOTE_MS = 120000`,
+   `js/looped-network.js:34971`). CITED, accessibility.build's notification guide (fetched
+   2026-09-13): "a notification that carries an action or essential information must not
+   auto-dismiss" at all — not "gets a longer timer," never expires until the reader (or the
+   condition) dismisses it. That reframes the question: **the axis is not "how long" but
+   "does this expire on a clock, or on the condition changing / the reader acting."**
+   - **Class A — routine confirmation** ("Saved X.", "Renamed {n} assets.", "Imported X."): true
+     for a moment, carries no action, safe to lose. Keep `setNotice()`'s short expiry —
+     Material's 4-10 s band; this suite's 8 s is already inside it and needs no change.
+   - **Class B — a fact the reader should be able to act on but is not urgent** (Hide-titles
+     confirmation, "titles hidden, use Settings to restore," the engine-difference notes): carries
+     an instruction, so **do not auto-dismiss on a timer at all** — dismiss on the NEXT relevant
+     action (the reader touches Settings, or does the thing again), or give it its own small close
+     control. This is where Task 616's 120 s sat and where it will keep failing, because
+     inattentional blindness does not respect any timer.
+   - **Class C — a standing system state** (DEM/EPANET/locking unreachable): use the pattern this
+     page already has for exactly this (`noteMapUnmeasurable`, `#lpn_lock_banner`) — persists
+     until the condition clears, re-shown if it recurs, never a countdown. `role="alert"` (CITED,
+     WCAG 4.1.3 guidance, properaccess.nl/dockaccess.org: assertive is for messages that "cannot
+     wait") is defensible here where it is not for A or B, since a broken connection changes what
+     the reader should trust about every subsequent answer on screen.
+   - A reader does something different in each: A, nothing (it is a receipt); B, decide whether to
+     act now or later, so it must still be legible later, which argues for the log/history from
+     Q1 as the RECOVERY mechanism rather than the display mechanism; C, stop trusting elevation
+     data or DEM fills until it clears.
+
+**4. Can a notice carry an action?** Yes for Class B and C, and it is the right fix for "Use
+   Settings..." specifically — but the two failure modes are independent and fixing one does not
+   fix the other. A sentence that says "Use Settings..." and a link that says "Open Settings" cost
+   the same attention to a reader who never looked at the box; the action turns a missed
+   opportunity into a smaller missed opportunity, not a seen one. Making it a link is worth doing
+   on its own terms (fewer steps for the reader who DOES see it, one fewer full-sentence
+   round-trip through 27 languages if the link text reuses an existing menu-item string) but
+   ranks behind fixing what shows the box in the first place, and should not be sold as solving
+   discoverability.
+
+**5. Ranking.** Against the chrome brief I was hired for, and against doing nothing:
+   - **Do not build the banner-area history before 16 September, or arguably at all in this
+     shape.** It is new permanent chrome, on a page whose demonstrated problem is chrome nobody
+     sees, proposed as the fix for a problem chrome placement did not cause.
+   - **If one thing ships from this task, it is the Class C reclassification** (route
+     DEM/engine/locking disconnect notices through the existing `noteMapUnmeasurable`/
+     `#lpn_lock_banner` persist-until-cleared pattern instead of `setNotice()`'s expiring one).
+     It is the cheapest true fix on the list — no new UI, no new strings, reuses a pattern the
+     page already ships and reader-tested — and it is the one case in the evidence (KDH/DEM)
+     where the missed message was actually consequential rather than a nice-to-have receipt.
+   - **Below that: a small, closed recovery log** (a bell/count on the toolbar or status area,
+     opening a short static list of the session's last several Class A/B notices) answers the
+     recoverability half of MJH's suggestion without adding a live band. This is a real build,
+     not a one-line fix, so it ranks below the reclassification and belongs on a branch of its
+     own, not folded into whatever ships before the demonstration.
+   - **The action-link conversion (Q4) is a one-string polish**, worth doing whenever Class B
+     strings are next touched, not urgent on its own.
+   - **All of this ranks below the four-bar chrome diagnosis itself** (wishlist items 5-8, 13-18):
+     that work is about the SAME cognitive failure (inattentional blindness / banner blindness)
+     applied to permanent chrome instead of transient notices, is already scoped, already has
+     rulings from Tom, and is nearer done. Spending demonstration-prep time on a new banner
+     instrument would be adding a fifth attention competitor to a page still working out how to
+     get readers to see the first four.
+
+**What I answered myself vs. what needs Tom's judgement:** the instrument critique (Q1), the
+placement diagnosis (Q2) and the severity/duration classification (Q3) are read off evidence
+already in this repository plus external research — no new information from Tom is needed to
+settle them. **Two things are his call, not mine**: whether a recovery log is worth building at
+all before the demonstration (a scope/priority decision, not a hierarchy one), and whether
+`role="alert"` for Class C is too aggressive for readers using assistive technology on this page
+today, which is a judgement about HOW MUCH interruption a "the ground is shifting under you" fact
+deserves — that is a values call, not a design-hierarchy one.
+
+No shipped file touched. `dev/agents/interface-designer/wishlist.md` carries the ranked build
+items from this entry.
