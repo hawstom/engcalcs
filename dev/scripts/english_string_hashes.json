@@ -2634,13 +2634,8 @@
         "lpn_net_bad_file": "e8efd822c75e111af12d170f300b643b1c75daf7",
         "lpn_net_emergency": "a469bd39646afbb29e721d7974f24f83d7722838",
         "lpn_new_coords": "8ebebca0195929f0e6604560db2d6f829dc20c86",
-        "lpn_new_coords_geo": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
-        "lpn_new_coords_tip": "b76db7291edb31e260fc4aac8055f6ec96c39c0e",
-        "lpn_new_coords_xy": "23fa90497422bb69a7c4cc3fda5436f437718550",
         "lpn_new_create": "6e157c5da4410b7e9de85f5c93026b9176e69064",
-        "lpn_new_place": "17acdca1bd57b72f292486f19ac4c32588bac8d0",
         "lpn_new_place_hint": "41856c8b6bada67d66440e6e0d8c6077f490e058",
-        "lpn_new_place_tip": "21552d337cc52eae763c25b8cdef1c796df20437",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_new_title": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
         "lpn_new_units_tip": "53e24da1717c3530d59cbbb7664625c51bdb8db8",
@@ -7155,33 +7150,13 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_new_coords_geo": {
-            "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_new_coords_tip": {
-            "words": 55,
-            "ends_sentence": true
-        },
-        "lpn_new_coords_xy": {
-            "words": 2,
-            "ends_sentence": false
-        },
         "lpn_new_create": {
             "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_new_place": {
-            "words": 4,
             "ends_sentence": false
         },
         "lpn_new_place_hint": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_new_place_tip": {
-            "words": 42,
-            "ends_sentence": true
         },
         "lpn_new_text": {
             "words": 1,
