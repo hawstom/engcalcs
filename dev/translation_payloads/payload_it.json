@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1785,
-        "delta_key_count": 19,
+        "expected_key_count": 1833,
+        "delta_key_count": 67,
         "exempt_key_count": 36,
         "exempt_keys": [
             "calc_units_us",
@@ -530,10 +530,58 @@
         "lpn_pane_text_attached": "Attached",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_settings_custom_props": "Custom properties",
+        "lpn_settings_custom_props_note": "A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.",
+        "lpn_cp_design": "Design",
+        "lpn_cp_design_tip": "One row per custom property, reading across: key, label, applies to, validate as, restrict characters, restrict length, low limit, high limit.",
+        "lpn_cp_add": "Add custom property",
+        "lpn_cp_add_tip": "Adds one more row to the design table. Give it a key and a label, then choose the asset kinds that carry it.",
+        "lpn_cp_remove": "Remove",
+        "lpn_cp_remove_tip": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
+        "lpn_cp_none": "No custom property is designed yet.",
+        "lpn_cp_key": "Key",
+        "lpn_cp_key_tip": "The name this property is stored under. No spaces. A prefix is added for you so that your key can never collide with a built-in field.",
+        "lpn_cp_label": "Label",
+        "lpn_cp_label_tip": "What a reader sees on the properties box, in Find and at the head of a table column.",
+        "lpn_cp_applies": "Applies to",
+        "lpn_cp_applies_tip": "Which asset kinds carry this property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.",
+        "lpn_cp_validate": "Validate as",
+        "lpn_cp_validate_tip": "What a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
+        "lpn_cp_restrict": "Restrict characters",
+        "lpn_cp_restrict_tip": "A set of characters to allow or to refuse, where the at sign stands for any letter and the number sign for any digit.",
+        "lpn_cp_restrict_mode": "Allow or refuse",
+        "lpn_cp_restrict_allow": "Allow only these",
+        "lpn_cp_restrict_deny": "Refuse these",
+        "lpn_cp_length": "Restrict length",
+        "lpn_cp_length_tip": "The greatest number of characters a value may have. Leave it empty for no limit.",
+        "lpn_cp_low": "Low limit",
+        "lpn_cp_low_tip": "The smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_high": "High limit",
+        "lpn_cp_high_tip": "The largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_val_none": "Do not validate",
+        "lpn_cp_val_number": "Number",
+        "lpn_cp_val_integer": "Integer",
+        "lpn_cp_val_text": "Text",
+        "lpn_cp_val_upper": "ALL CAPS",
+        "lpn_cp_val_camel": "camelCase",
+        "lpn_cp_val_pascal": "PascalCase",
+        "lpn_cp_val_snake": "snake_case",
+        "lpn_cp_val_hyphen": "hyphen-case",
+        "lpn_cp_flag": "{label}: {reason} The value is kept exactly as you typed it.",
+        "lpn_cp_bad_number": "This property is designed to hold a number.",
+        "lpn_cp_bad_integer": "This property is designed to hold a whole number.",
+        "lpn_cp_bad_case": "This value does not match the capitalization this property is designed for.",
+        "lpn_cp_bad_chars": "This value uses a character this property does not allow.",
+        "lpn_cp_bad_length": "This value is longer than this property allows.",
+        "lpn_cp_bad_low": "This value is below the low limit of this property.",
+        "lpn_cp_bad_high": "This value is above the high limit of this property.",
+        "lpn_cp_key_needed": "Give this custom property a key with no spaces.",
+        "lpn_cp_key_taken": "Another custom property already uses that key.",
         "lpn_time_play_tip": "Play animation",
         "lpn_time_pause_tip": "Pause animation",
         "lpn_time_runbox_hide": "Do not show this box again",
@@ -551,10 +599,58 @@
         "lpn_pane_text_attached": "Attached",
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
+        "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_settings_custom_props": "Custom properties",
+        "lpn_settings_custom_props_note": "A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.",
+        "lpn_cp_design": "Design",
+        "lpn_cp_design_tip": "One row per custom property, reading across: key, label, applies to, validate as, restrict characters, restrict length, low limit, high limit.",
+        "lpn_cp_add": "Add custom property",
+        "lpn_cp_add_tip": "Adds one more row to the design table. Give it a key and a label, then choose the asset kinds that carry it.",
+        "lpn_cp_remove": "Remove",
+        "lpn_cp_remove_tip": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
+        "lpn_cp_none": "No custom property is designed yet.",
+        "lpn_cp_key": "Key",
+        "lpn_cp_key_tip": "The name this property is stored under. No spaces. A prefix is added for you so that your key can never collide with a built-in field.",
+        "lpn_cp_label": "Label",
+        "lpn_cp_label_tip": "What a reader sees on the properties box, in Find and at the head of a table column.",
+        "lpn_cp_applies": "Applies to",
+        "lpn_cp_applies_tip": "Which asset kinds carry this property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.",
+        "lpn_cp_validate": "Validate as",
+        "lpn_cp_validate_tip": "What a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
+        "lpn_cp_restrict": "Restrict characters",
+        "lpn_cp_restrict_tip": "A set of characters to allow or to refuse, where the at sign stands for any letter and the number sign for any digit.",
+        "lpn_cp_restrict_mode": "Allow or refuse",
+        "lpn_cp_restrict_allow": "Allow only these",
+        "lpn_cp_restrict_deny": "Refuse these",
+        "lpn_cp_length": "Restrict length",
+        "lpn_cp_length_tip": "The greatest number of characters a value may have. Leave it empty for no limit.",
+        "lpn_cp_low": "Low limit",
+        "lpn_cp_low_tip": "The smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_high": "High limit",
+        "lpn_cp_high_tip": "The largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_val_none": "Do not validate",
+        "lpn_cp_val_number": "Number",
+        "lpn_cp_val_integer": "Integer",
+        "lpn_cp_val_text": "Text",
+        "lpn_cp_val_upper": "ALL CAPS",
+        "lpn_cp_val_camel": "camelCase",
+        "lpn_cp_val_pascal": "PascalCase",
+        "lpn_cp_val_snake": "snake_case",
+        "lpn_cp_val_hyphen": "hyphen-case",
+        "lpn_cp_flag": "{label}: {reason} The value is kept exactly as you typed it.",
+        "lpn_cp_bad_number": "This property is designed to hold a number.",
+        "lpn_cp_bad_integer": "This property is designed to hold a whole number.",
+        "lpn_cp_bad_case": "This value does not match the capitalization this property is designed for.",
+        "lpn_cp_bad_chars": "This value uses a character this property does not allow.",
+        "lpn_cp_bad_length": "This value is longer than this property allows.",
+        "lpn_cp_bad_low": "This value is below the low limit of this property.",
+        "lpn_cp_bad_high": "This value is above the high limit of this property.",
+        "lpn_cp_key_needed": "Give this custom property a key with no spaces.",
+        "lpn_cp_key_taken": "Another custom property already uses that key.",
         "lpn_time_play_tip": "Play animation",
         "lpn_time_pause_tip": "Pause animation",
         "lpn_time_runbox_hide": "Do not show this box again",
@@ -722,6 +818,22 @@
                 }
             }
         },
+        "lpn_storage_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_storage_full",
+                    "value": "Non salvato. Lo spazio di archiviazione del browser è pieno o non disponibile, quindi le modifiche recenti andranno perse alla chiusura di questa scheda.",
+                    "english": "Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab."
+                },
+                "next_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Come viene risolto",
+                    "english": "How it is solved"
+                }
+            }
+        },
         "lpn_menu_cue": {
             "reason": "missing",
             "current_value": null,
@@ -783,6 +895,758 @@
                     "key": "lpn_notes_1_term",
                     "value": "Come viene risolto",
                     "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_settings_custom_props": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_settings_custom_props_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_design": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_design_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_add_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_remove_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_key": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_key_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_label_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_applies": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_applies_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_validate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_validate_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_restrict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_restrict_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_restrict_mode": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_restrict_allow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_restrict_deny": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_length_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_low": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_low_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_high": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_high_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_number": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_integer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_upper": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_camel": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_pascal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_snake": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_val_hyphen": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_flag": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_number": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_integer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_case": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_chars": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_low": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_bad_high": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_key_needed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
+                }
+            }
+        },
+        "lpn_cp_key_taken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Ogni elemento ha già questi valori, quindi nulla cambierebbe.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_overrides",
+                    "value": "N. di valori personalizzati",
+                    "english": "No. of custom values"
                 }
             }
         },
