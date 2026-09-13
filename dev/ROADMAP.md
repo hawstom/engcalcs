@@ -92,6 +92,34 @@ the block.
   - Weigh against Task 616's finding before choosing the instrument: a transient notice on a row
     nobody is looking at is measured, twice, not to work.
 
+- 50|649| **Retire the nested repository: serve the suite by Alias at both mounts.**
+  Tom asked on 2026-09-13 how the repositories and the web deployment should be organized, guessing
+  that *"we want web under repository, or in other words, the repositories fully transcendent of web
+  sites."* **He is right and it is already built** -- three repositories that ARE their own document
+  root. The one anomaly left is that `engcalcs` sits INSIDE the `hawsedc.com` repository, kept out of
+  it by a single `.gitignore` line. Full analysis, the three options and the costs:
+  `dev/git-organization-recommendation.md`.
+  - **THE ARGUMENT IS NOT TIDINESS. THE CURRENT ASYMMETRY HAS ALREADY SHIPPED TWO DEFECTS.**
+    librewaternet reaches the suite by Alias plus a rewrite; hawsedc reaches it by filesystem
+    nesting. The HTML is byte-identical at both, so nothing here can see the difference -- which is
+    exactly the root cause recorded for `nav_link_absolute_check.php` (1,275 relative nav links,
+    dead at `/app/`, a third of the navbar broken at the front door until Tom clicked it) and
+    `js_page_url_check.php` (the same defect in a second construct, found three days later). Alias
+    at BOTH mounts makes "this suite is served at more than one address" the visible shape of the
+    tree instead of a surprise. **A check finds a defect; a structure prevents the class.**
+  - **A SUBMODULE IS THE TEXTBOOK ANSWER AND IS REJECTED**, so nobody re-proposes it: the two do not
+    version together (the suite serves two domains on its own schedule), and it would turn Tom's
+    deploy from `git pull` into `git pull && git submodule update --init --recursive`. A deploy step
+    somebody can forget is a deploy step somebody will forget.
+  - **NOT BEFORE THE 16 SEPTEMBER DEMONSTRATION.** The risk is a live 500: `Options -Indexes` needs
+    `AllowOverride Options`, and where that grant is missing Apache fails closed for every request
+    under `/engcalcs/`. The benefit compounds over months; do it on a quiet day.
+  - `hawsedc.com/engcalcs/` is the indexed address and does not move. An Alias is transparent to the
+    URL, so the risk is a configuration error, not a design flaw.
+  - Meanwhile `nested_repo_boundary_check.php` (advisory) holds the line, and the worktree layout
+    simplifies as a side effect: `worktrees/<branch>` Aliased, with no stand-in parent directory
+    whose only job is to make `/engcalcs/...` resolve.
+
 - 50|648| **The About icon's outlines are too heavy for its scale.**
   Tom, 2026-09-13, closing out the icon work: *"the About icon has outlines unduly heavy for its
   scale, and it can be adjusted to look right (appropriate stroke width) for that scale, which could

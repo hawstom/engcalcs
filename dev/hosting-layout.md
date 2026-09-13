@@ -122,35 +122,34 @@ address and carries the whole search history; no version of this plan is worth b
 
 ## 5. The local working directory
 
-Tom's idea (B1) is to make the CC project a parent folder holding `hawsedc/`,
-`hawsedc/engcalcs/` (this repo), `librewaternet.org/` and `libreepanet.org/` as
-siblings.
+**REWRITTEN 2026-09-13, because the symlink layout this section used to describe is gone.** It said
+the repository was reachable as `~/webdev/engcalcs/hawsedc.com/engcalcs` and physically at
+`/var/www/cnm/public_html/hawsedc/engcalcs`, by symlink, and that a physical move would take
+`hawsedc.local` down because `/home/haws` is `drwxr-x---` and Apache cannot traverse it.
 
-**DONE 2026-08-24, and it moved NOTHING** — which is why it cost nothing. The tree is:
+**The move happened anyway, and the traversal problem was solved rather than avoided.** The tree is:
 
     ~/webdev/
-      engcalcs/
-        hawsedc.com -> /var/www/cnm/public_html/hawsedc     (symlink)
-      librewaternet.org/                                    (its own git repo, empty)
+      hawsedc.com/            git@hawstom/hawsedc.com     DocumentRoot hawsedc.local
+        engcalcs/             git@hawstom/engcalcs        nested; the parent ignores it
+      librewaternet.org/      git@hawstom/librewaternet   DocumentRoot librewaternet.local
+      not-epanet.org/         git@hawstom/not-epanet      DocumentRoot not-epanet.local
+      worktrees/
+        <branch>/engcalcs/    a worktree                  DocumentRoot worktrees/<branch>
 
-So the repository is reachable as `~/webdev/engcalcs/hawsedc.com/engcalcs` and is still
-physically at `/var/www/cnm/public_html/hawsedc/engcalcs`, with `.git` beside its own
-working tree exactly as before (Tom, 2026-08-24). No path assumption moved, `CLAUDE.md`
-did not re-root, and `dev/scripts/*.php` still resolves `__DIR__ . '/../../lib'`.
+Nothing is a symlink any more and `/var/www/cnm/public_html` is empty. Apache serves
+`/home/haws/webdev/...` directly, so the permission question was answered in the vhosts, not dodged.
 
-**A PHYSICAL MOVE INTO `~/webdev` WOULD TAKE `hawsedc.local` DOWN, and that is the reason
-the links point the way they do.** `/home/haws` is `drwxr-x---`, so Apache's `www-data`
-cannot traverse it at all; serving the suite from there needs `chmod o+x` on the home
-directory *and* a new `<Directory>` block. `hawsedc.local`'s vhost inherits
-`Options Indexes FollowSymLinks` from `<Directory /var/www/>`, so a symlink is followed
-happily — in this direction. Verified after the change: `/engcalcs/` returns 200 on
-both :80 and :443.
+**`hawsedc.com/engcalcs/` still does not move.** It is the indexed address carrying the whole search
+history, and that constraint outlived the layout it was written about.
 
-**Launch Claude Code from the repository directory, not from `~/webdev/engcalcs`.**
-`CLAUDE.md` lives in the repo, and a session rooted at the parent would not find it.
-The `~/webdev` tree is for a person navigating projects, not for the agent's root.
+**Launch Claude Code from the repository directory**, `~/webdev/hawsedc.com/engcalcs`. `CLAUDE.md`
+lives in the repo and a session rooted at a parent will not find it -- and the memory directory is
+keyed to the working directory's path, so launching from somewhere else silently starts with no
+project memory at all.
 
-Renaming production's `~/public_html/hawsedc` to `~/hawsedc.com` to match the other
-domains is cosmetic and is the one change that can break the live site for a `git pull`
-deploy. It is not worth doing on its own; fold it into step 3 if the host makes it easy,
-and leave it alone otherwise.
+**The remaining open question is the NESTING**, not the location: `engcalcs` sits inside the
+`hawsedc.com` repository and is kept out of it by one `.gitignore` line. The three options, the
+recommendation, and the reason the current asymmetry has already shipped two defects are in
+`dev/git-organization-recommendation.md`. `nested_repo_boundary_check.php` holds the line meanwhile.
+
