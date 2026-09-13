@@ -21,8 +21,16 @@ uncommitted; silence means commit and push.
 
 - **Work directly on `master`.** No feature branches — the project is small enough for one branch,
   and per-task branches accumulated as stale refs.
-- **FOUR NAMED EXCEPTIONS: `customers` and `projections` (2026-09-11), `graphs` and
-  `custom-properties` (2026-09-12).** Tom asked twice about a "don't work on master" paradigm and
+- **FOUR NAMED EXCEPTIONS, ALL SINGULAR: `customer` and `projection` (2026-09-11), `graph` and
+  `custom-property` (2026-09-12).** **A branch names the capability being built, in the singular, in
+  the database tradition** (Tom, 2026-09-12). He renamed all four the day they were made, and the
+  reason is worth more than the convention: the first three were plural because plural is what gut
+  feel produces, and when the fourth was singular on his instruction the other three were left alone
+  on the argument that a projection list "is not a database entity". That was gut feel wearing a
+  reason's clothes -- *"It's not a reasoned exception. If we are plural here, we should be plural
+  everywhere. Gut feel is not a good reason."* A UI label that genuinely names a collection is a
+  different question and is decided on its own (the Water menu's **Graphs** submenu holds five
+  different graphs and stays plural). Tom asked twice about a "don't work on master" paradigm and
   the answer to the general question is still no -- what bit this tree was CONCURRENT SESSIONS IN
   ONE DIRECTORY, and a branch does not help, because both sessions still share the checkout. A
   worktree does, and is already allowed below. But these four are the shape a branch is actually
