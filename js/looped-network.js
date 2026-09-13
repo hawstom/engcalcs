@@ -15468,7 +15468,20 @@ var EngCalcs = EngCalcs || {};
 	// which is what makes the chart, the map mark and the summary follow a drag live without any of
 	// them knowing a drag exists.
 	function profileStops() {
-		if (profileState.draw) { return profileState.draw.stops.slice(); }
+		// **ARMING THE CHOOSER MUST NOT LOOK LIKE LOSING THE PROFILE** (Tom, 2026-09-12, on the
+		// second press of the tab: *"At the first click, I think I lost my profile or found a bug.
+		// I don't think this toggle is an intentional feature."* It is one -- Task 506, his own
+		// 2026-08-24 instruction -- but an empty stop list read straight through blanked the chart
+		// AND the map mark the instant the chooser armed, so the gesture announced itself by
+		// deleting what the reader was looking at, and the third press putting it back is what read
+		// as a toggle.) An armed chooser with NOTHING CHOSEN YET shows the path that is already
+		// there; the first map click is the moment the reader has committed, and from there the new
+		// list is the one on show. The commentary line carries the mode either way.
+		if (profileState.draw) {
+			return profileState.draw.stops.length
+				? profileState.draw.stops.slice()
+				: profileBaseStops();
+		}
 		if (profileState.editDrag && profileState.editDrag.trial) { return profileState.editDrag.trial.slice(); }
 		return profileBaseStops();
 	}
@@ -19570,7 +19583,7 @@ var EngCalcs = EngCalcs || {};
 			// one sentence covering all four would claim a chemical is modelled for a file whose
 			// only water-quality section is [MIXING]. One name doing two jobs gets split.
 			case 'quality':
-			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'reactions': return pc.lpn_inp_drop_quality || 'This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Quality, then run the model, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 			case 'sources':
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';

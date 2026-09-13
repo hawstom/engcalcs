@@ -448,6 +448,43 @@ function startDraw() { pressProfile(); }
 	same(L.profileStops(), JSON.parse(before), 'Escape before the first click costs nothing either');
 }
 
+// ---- 4b. arming the chooser must not look like losing the profile -----------------------------
+// Tom, 2026-09-12: *"When I click Profile in the bottom pane, it toggles the sole displayed profile
+// off and on. At the first click, I think I lost my profile or found a bug."* The gesture IS
+// intentional (Task 506, his own instruction), but it used to announce itself by blanking the chart
+// and the map mark the instant it armed, with nothing chosen yet -- and the cancel putting them back
+// is what read as a toggle. An armed chooser with an EMPTY stop list now shows the path that is
+// already there; the first map click is the commitment, and from there the new list is on show.
+{
+	console.log('\n--- the second press shows, it does not blank ---');
+	const n = build();
+	startDraw();
+	click(X('A'), Y('A'), hit({ node: n.id.A }));
+	click(X('C'), Y('C'), hit({ node: n.id.C }));
+	dblclick(X('D'), Y('D'), hit({ node: n.id.D }));
+	const before = JSON.stringify(L.profileStops());
+	const beforePath = JSON.stringify(L.profilePath().links);
+	L.hoverSet(true);
+
+	startDraw();
+	ok('the second press arms the gesture', !!L.profileState().draw);
+	same(L.profileStops(), JSON.parse(before), '...and the displayed path is UNCHANGED');
+	same(L.profilePath().links, JSON.parse(beforePath), '...over the same links');
+	ok('...and it is still painted on the map', L.mapSolid().length === 2,
+		L.mapSolid().length + ' solid polylines');
+	ok('...with the line saying a new path is being chosen',
+		/starts/.test(L.sayText() || ''), JSON.stringify(L.sayText()));
+
+	// The first click is where the old path gives way -- the reader has committed by then.
+	click(X('D'), Y('D'), hit({ node: n.id.D }));
+	same(L.profileStops(), [n.id.D], 'the first click is the moment the new path takes over');
+	ok('...and the old route is off the map', L.mapSolid().length === 0);
+
+	// And the underlying document was never touched, so a cancel is still exact.
+	pressEscape();
+	same(L.profileStops(), JSON.parse(before), 'cancelling after all that still restores it exactly');
+}
+
 // ---- 5. the chooser gets out of the map's way when it is not running --------------------------
 {
 	console.log('\n--- an unarmed chooser is invisible to the map ---');
