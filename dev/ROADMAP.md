@@ -232,38 +232,6 @@ the block.
   No export function: a project file already is the export. A name conflict is reported and skipped,
   never renamed silently.
 
-- 100|615| **[H] The water icon: keep experimenting, and record the votes.**
-  Tom, 2026-09-09: *"Let's keep experimenting including your proof sheet suggestion and working the
-  users."* **THE MARK SHIPPED 2026-09-10 and this task now carries only the votes and the one open
-  proportion question.** Drawings, measurements and every rejected round: `dev/icon-preview/README.md`
-  and `ship-notes.md`. Sheets: `concepts-2026-09-08b.html` (geometry), `concepts-2026-09-09-color.html`
-  (color), `render/ship/` and `render/app-icons/` (the shipped proofs).
-  - **What ships:** `icons/favicon.svg` (WT-TALL-3, silver on an overcast sky) on librewaternet.org,
-    not-epanet.org and the app page; the engraved mono tower as the `lpn_` Water menu icon; and
-    `icon-192/512.png` plus `icon.svg` as the installable app icons. Tom: *"Favicon as it stands is
-    my one true love."*
-  - **THE SHADING FOLLOWS THE SOLID, WHICH IS THE ONE IDEA WORTH KEEPING.** One light above, three
-    surfaces: the CYLINDER wall takes a left-right band, the CONE roof a radial highlight from the
-    apex, the HEMISPHERE belly a downward darkening from the springline. Round 3c had shaded all
-    three as if they were the wall. Tom supplied the correction in three sentences after losing his
-    sketch, and they are quoted verbatim in `ship-notes.md` because nothing else corroborates them.
-  - **THE L FOR LIBRE IS GONE** (Tom, 2026-09-10: *"The L is gone."*). It cannot sit on this
-    geometry: WT-TALL-3's crown is a 1.5-unit cone against WT-WIDE's 3.65-unit dome, and the letter
-    fuses into the outline with zero legible pixels at 17 px AND at 32. `render/ship/L-test.png`.
-  - **OPEN, AND THE ONLY THING OPEN: the app icon's legs are 21.5% longer relative to the tank than
-    the favicon draws them.** A maskable icon must keep its body inside a circle of 80% diameter
-    while Tom's own ruling says descenders reach the bottom, and those are mutually exclusive --
-    any point on the frame edge is >=12 units from center against a 9.6 safe radius. The body is
-    scaled 0.85 and the descenders run to the true edge, so both hold, at that proportion cost.
-    It reads as the same mark and is visibly leggier. Shipped on the coordinator's judgement and
-    flagged for Tom; the fallbacks are a smaller safe margin or a second shorter-legged tower.
-  - **THE VOTES, and they still do not agree, which is the finding.** MAH, lay person, 29: likes
-    old-timey. PCW, senior civil engineer, 60+, no EPANET experience: likes `wt-tall-3` -- the
-    aspect that shipped. MJH, civil engineering designer and power user, 27: **read `wt-wide-L` as a
-    lavatory SINK**, thought that was fine, and preferred it to any old-timey tower. Three people,
-    three answers, and one of them did not see a water tower at all. Keep collecting; a fourth
-    reader who does not see a tower is the signal that would reopen the drawing.
-
 - 100|616| **[H] Visual feedback: a prompt history in the banner area.**
   MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable
   history of prompts in the banner area**, with this one as a banner prompt reading
@@ -673,6 +641,19 @@ the block.
   - **WHO DECIDES IS NAMED AND IT IS NOT US:** *"Only Sue knows. Or only our human connections
     know."* Ask the `utility-planning-engineer` seat and a real surveyor before choosing between a
     factor and an increment; the difference matters to whoever has to defend a length in a report.
+
+- 50|645| **The app icon's legs are leggier than the favicon's.**
+  Left open when Task 615 closed 2026-09-13, and flagged for Tom rather than decided. The app
+  icon's legs are **21.5% longer relative to the tank** than `icons/favicon.svg` draws them.
+  - **THE TWO RULES ARE MUTUALLY EXCLUSIVE AND THAT IS WHY IT IS OPEN.** A maskable icon must keep
+    its body inside a circle of 80% diameter; Tom's own ruling says descenders reach the bottom.
+    Any point on the frame edge is >=12 units from center against a 9.6 safe radius. The body is
+    scaled 0.85 and the descenders run to the true edge, so both rules hold, at that proportion cost.
+  - Shipped on the coordinator's judgement. It reads as the same mark and is visibly leggier.
+    The fallbacks are a smaller safe margin or a second shorter-legged tower drawn for the maskable
+    pair alone. `dev/icon-preview/ship-notes.md` has every measured distance.
+  - **NOT urgent and possibly not worth doing:** Tom on the favicon, *"Favicon as it stands is my
+    one true love."* Only the app icon is in question, and only when installed.
 
 - 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:

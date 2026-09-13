@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**82 open tasks.** Next (100): 13 · Soon (75): 17 · Someday (50): 25 · Maybe (25): 10 · Parked (5): 17
+**82 open tasks.** Next (100): 12 · Soon (75): 17 · Someday (50): 26 · Maybe (25): 10 · Parked (5): 17
 
-## 100 — Next (13)
+## 100 — Next (12)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
@@ -18,7 +18,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
-- Task 615 — [H] · The water icon: keep experimenting, and record the votes.
 - Task 616 — [H] · Visual feedback: a prompt history in the banner area.
 - Task 618 — WYSIWYG hit areas: what you can click is what you can see.
 - Task 627 — [H] · An unreadable document leaves a named tab, then autosave destroys it.
@@ -45,7 +44,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 642 — Retire the Windows WSL2 IP script and its scheduled task.
 - Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 
-## 50 — Someday (25)
+## 50 — Someday (26)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -72,6 +71,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 639 — Layers: the first heading under Map and page.
 - Task 640 — A Graphs submenu under Water, holding five plots.
 - Task 641 — Choose a real EPSG projection in the new project box.
+- Task 645 — The app icon's legs are leggier than the favicon's.
 
 ## 25 — Maybe (10)
 
