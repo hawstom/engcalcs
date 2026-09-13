@@ -957,7 +957,28 @@ Full inventory: `dev/cookie-storage-inventory.md`.
 
 ---
 
-## Deploying: four facts that are in no file you will be editing
+## Deploying: five facts that are in no file you will be editing
+
+- **PRODUCTION IS NOT MASTER. Production is the SHA somebody last pulled** (Tom, 2026-09-12: *"Production
+  is not master. Say it again and again. Master is not production."*). Deployment is a `git pull` Tom
+  runs; master can advance for days and ship nothing. **Never say "it is live" because you pushed** --
+  say what you pushed, and let him say what he pulled. The About box's build line is the instrument
+  that answers it, and `ecDeployIdentity()` is why that line is trustworthy now: the SHA and the date
+  come from the same ref, so a stale date cannot sit beside a fresh sha. To check from here, read
+  `git rev-parse HEAD` in the deployed checkout -- the answer on 2026-09-12 happened to equal
+  `origin/master`, which is a fact about that day and not a rule.
+  - **THE ONE REAL COST, and it is the argument on the other side: you cannot pull half of master.**
+    A hotfix during a frozen window carries everything else on master with it. That is what makes a
+    shippable master worth protecting, and it is why feature work in such a window belongs on a
+    branch rather than on master with a promise not to pull.
+  - **The "nobody works on master" paradigm was declined TWICE on a concurrency argument, and that
+    argument does not answer the release one.** What was rejected -- see the Git Workflow section --
+    is branches as ISOLATION between concurrent sessions, which they do not provide in one shared
+    checkout. Tom, 2026-09-12, naming the real version: *"we could run a development paradigm where
+    master is the production line and nobody is allowed to work on master, and that would be the
+    big-house paradigm."* **That is a different proposal and the record does not contain a reasoned
+    rejection of it.** If it is raised again, argue it on release safety, and do not cite the
+    concurrency rejection as though it settled the question.
 
 - **`Options -Indexes` in `.htaccess` needs `AllowOverride Options`, and where that grant is missing
   Apache returns 500 FOR EVERY REQUEST under `/engcalcs/`** — it does not ignore the line. Confirmed
