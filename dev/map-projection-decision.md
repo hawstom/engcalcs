@@ -139,3 +139,67 @@ volume, and Tom has already said there is no urgency.
    screen names the projection in force.
 
 **What is defensible is the arithmetic. What is not is the picture and the readout.**
+
+
+## Tom's rulings, 2026-09-13
+
+All nine questions of the projection brief, answered. **These are decisions, not notes.**
+
+- **P1 STORE WHAT THE USER SUPPLIED, and state which.** Not easting/northing, not lon/lat --
+  whichever they typed. His reasoning is that the real world offers three shapes and we cannot
+  privilege one: `N E`, `E N` (XY), and lat/lon (*"WGS84 / Pseudo-Mercator is the only one in the
+  real world today"*). We translate to WGS84 lat/lon only to talk to OSM. This is the option that
+  honours "only the user touches a file's numbers" exactly, and it costs two code paths forever.
+- **P2 NO DOOR changes a project's CRS.** Save to a file and reopen through **Open and convert
+  coordinates**, on a COPY. Two refinements of his own: **refuse to save under the same file name**,
+  and the wording may need to be **"Convert coordinates to new file"** to make the break cleaner.
+- **P3 proj4js.** Settled; State Plane and the national grids are why.
+- **P4 GROUND DISTANCE (grid / k), AND DO NOT ADVERTISE IT YET.** His condition, and it is the
+  interesting half: grid-to-ground is *"straining at a gnat while we are swallowing the camel of
+  slope distance, pipe dips, pipe depth."* So compute ground length because it is nearly free -- the
+  scale factor is stored per node and averaged per pipe, and it varies far less than it matters --
+  but **claim nothing about length accuracy in public until slope distance and a length adjustment
+  exist too.** That is Task 643.
+- **P5 DRAW IN THE PROJECTION; FIT THE TILES TO IT.** *"What you type is what you see. What you
+  paste from a spreadsheet is what you get."* Project the view's centre coordinate to WGS84 and use
+  that point's scale factor and **convergence angle** to place the OSM request -- a rotation and a
+  uniform scale, never a stretch. **CHECKED AGAINST THE LITERATURE AND HE IS RIGHT, with one
+  refinement below.**
+- **P6 THE FULL EPSG REGISTER, SEARCHABLE, BUT LOCATION FIRST.** The wizard asks WHERE before it
+  asks WHICH -- zoom, Go to, or a place-name search -- because knowing the region collapses
+  thousands of candidates to a handful. *"The other option is to require them to know. But that's
+  less kind."* Copy to carry: UTM is the dominant world standard, a region may have its own
+  unyielding customs, ask a Land Surveyor if unsure.
+- **P7 SCALE AT THE VIEW CENTRE**, and account for the CRS scale factor there.
+- **P8 `;CRS` comment** in the `.inp`, matching the custom-property answer so there is one
+  convention.
+- **P9 ASK EVERY TIME.** The new-project wizard already asks and that is right. Open question he
+  raised: can it be **non-modal**, allowing zoom and search to narrow the projection list, while
+  refusing data entry until the project is initialized?
+
+### The one refinement to P5: pin per TILE, not per VIEW
+
+Both projections are conformal -- Web Mercator, Transverse Mercator and Lambert Conformal Conic all
+are -- so the mapping between them IS locally a rotation plus a uniform scale, which is exactly what
+he describes. The error is second-order and grows with the span the single pin has to cover. Web
+Mercator's point scale runs as `sec(phi)` while a projected CRS's is near constant, so the spread
+across a view is about `tan(phi) x dphi`. Computed at latitude 33.5 degrees:
+
+| view extent | scale spread | edge misalignment |
+|---|---|---|
+| 1 km | 0.0104% | 0.03 m |
+| 3 km | 0.0312% | 0.23 m |
+| 10 km | 0.1039% | 2.60 m |
+| 100 km | 1.0389% | 260 m |
+| 300 km | 3.1167% | 2,338 m |
+
+So a single centre pin is exact enough for drawing and visibly wrong at overview zoom -- and 300 km
+is this suite's own stated mission scope, where it is off by more than two kilometres.
+
+**The fix is his own method applied per tile rather than per view.** A tile covers a small span at
+every zoom level, so a per-tile rotation-and-scale keeps the residual bounded by TILE size instead
+of VIEW size, and it never needs a threshold or a subdivision pass. This is what OpenLayers' raster
+reprojection does in its general form (it triangulates and subdivides until the residual is under
+about half a pixel); per-tile is the same idea with the subdivision already chosen for us by the
+tile grid. Grid convergence at 100 km from a central meridian at this latitude is 0.496 degrees,
+which is the rotation he is calling for and is large enough to see.

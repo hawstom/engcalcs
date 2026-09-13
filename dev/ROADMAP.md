@@ -660,6 +660,20 @@ the block.
     names. `dev/local-preview.md` does not exist yet and the arrangement is recorded only in this
     session and in `~/webdev/worktrees/_panel/`; write it down before deleting the thing it replaces.
 
+- 75|643| **The camel behind grid-to-ground: slope distance and a length adjustment.**
+  Tom, 2026-09-13, answering the projection brief's question about grid versus ground length:
+  *"this is straining at a gnat while we are swallowing the camel of slope distance, pipe dips, pipe
+  depth, some of which are trivial, but all of which are usually much more of a factor than grid to
+  ground."* **This task is the camel**, and Task 641 is gated on it in one respect: ground length is
+  computed there but **nothing about length accuracy is claimed in public until this exists.**
+  - Two candidate controls, neither decided: a **project-wide setting to use slope distance for
+    automatic lengths** (we have elevations, so the arithmetic is free), and a **length adjustment
+    for unmapped bends** -- *"length factor"* or *"length increment"* -- at asset level, project
+    level, or both.
+  - **WHO DECIDES IS NAMED AND IT IS NOT US:** *"Only Sue knows. Or only our human connections
+    know."* Ask the `utility-planning-engineer` seat and a real surveyor before choosing between a
+    factor and an increment; the difference matters to whoever has to defend a length in a report.
+
 - 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -1066,6 +1080,14 @@ the block.
     Settings box, the Properties popup, Find and the Tables pane. **Task 247 is the one to keep
     away from** -- lumping a meter to its nearest node is arithmetic in the plane this task is
     changing underneath it.
+  - **ALL NINE DESIGN QUESTIONS ARE ANSWERED (Tom, 2026-09-13)**; the rulings and the working are in
+    `dev/map-projection-decision.md`. The four that change the build: **store what the user
+    supplied** and state which (not E/N, not lon/lat -- whichever they typed); **proj4js**; **ground
+    distance, grid / k**, computed but NOT advertised until Task 643 exists; and **draw in the
+    projection, fitting the tiles to it** by the centre's scale factor and convergence angle.
+    Measured against the literature and corrected in one place: pin the transform **per TILE, not
+    per view** -- a single centre pin is off 0.03 m across 1 km and 2,338 m across the 300 km
+    mission scope.
   - **Task 630 is the defect this feature answers** -- the map draws lat/lon as xy, which is 19.8%
     at Phoenix and 100% at 60N. Read `dev/map-projection-decision.md` first: it holds Tom's own
     architecture (store easting/northing in a stated CRS, let the drawing frame BE that plane) and
