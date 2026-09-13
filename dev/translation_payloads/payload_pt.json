@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1833,
-        "delta_key_count": 65,
+        "expected_key_count": 1847,
+        "delta_key_count": 79,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_imgd",
@@ -532,14 +532,28 @@
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+        "lpn_result_avg_water_age": "Average water age",
+        "lpn_result_avg_source_share": "Average source share",
+        "lpn_result_avg_concentration": "Average concentration",
+        "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_status": "Status",
+        "lpn_result_status_open": "Open",
+        "lpn_result_status_closed": "Closed",
         "lpn_tool_key_hint_two": "Shortcut: press {key} or {key2}.",
+        "lpn_georef_projected": "This project already states a map projection, so its coordinates cannot be placed on the map a second time.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_new_coords_proj": "projected coordinates",
+        "lpn_new_crs": "Map projection",
+        "lpn_new_crs_tip": "The projection your coordinates are already measured in. Eastings and northings are stored exactly as you type them, and nothing is converted. A project cannot change its projection afterward, so to work in a different one, start a new project. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
+        "lpn_crs_none": "Not georeferenced",
         "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_field_northing": "Northing",
+        "lpn_field_easting": "Easting",
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.",
         "lpn_cp_design": "Design",
@@ -599,14 +613,28 @@
         "lpn_field_emitter_tip": "An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.",
         "lpn_popup_boxtitle": "Properties",
         "lpn_map_unmeasurable": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
+        "lpn_result_avg_water_age": "Average water age",
+        "lpn_result_avg_source_share": "Average source share",
+        "lpn_result_avg_concentration": "Average concentration",
+        "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_status": "Status",
+        "lpn_result_status_open": "Open",
+        "lpn_result_status_closed": "Closed",
         "lpn_tool_key_hint_two": "Shortcut: press {key} or {key2}.",
+        "lpn_georef_projected": "This project already states a map projection, so its coordinates cannot be placed on the map a second time.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_new_coords_proj": "projected coordinates",
+        "lpn_new_crs": "Map projection",
+        "lpn_new_crs_tip": "The projection your coordinates are already measured in. Eastings and northings are stored exactly as you type them, and nothing is converted. A project cannot change its projection afterward, so to work in a different one, start a new project. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
+        "lpn_crs_none": "Not georeferenced",
         "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
         "lpn_about_credits": "Credits",
         "lpn_help_welcome": "Welcome page",
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
+        "lpn_field_northing": "Northing",
+        "lpn_field_easting": "Easting",
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.",
         "lpn_cp_design": "Design",
@@ -741,6 +769,118 @@
                 }
             }
         },
+        "lpn_result_avg_water_age": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_avg_source_share": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_avg_concentration": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_friction_factor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_status_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_status_closed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
         "lpn_tool_key_hint_two": {
             "reason": "missing",
             "current_value": null,
@@ -754,6 +894,22 @@
                     "key": "lpn_tool_add_junction_tip",
                     "value": "Clique no mapa para adicionar uma junção: um ponto onde os tubos se encontram ou onde a água é usada.",
                     "english": "Click the map to add a junction: a point where pipes meet or where water is used."
+                }
+            }
+        },
+        "lpn_georef_projected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_georef_on_map",
+                    "value": "Este projeto já está em lat\/lon.",
+                    "english": "This project is already on lat\/lon."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_empty",
+                    "value": "Esse arquivo não tem uma rede, então não há nada para posicionar.",
+                    "english": "That file has no network in it, so there is nothing to place."
                 }
             }
         },
@@ -786,6 +942,70 @@
                     "key": "lpn_pane_paste_note",
                     "value": "Esta tabela é destinada a inserir valores colando de uma planilha em linhas que já existem. Se ela não atender às suas necessidades, use Ajuda, Corrigir algo para nos contar.",
                     "english": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us."
+                }
+            }
+        },
+        "lpn_new_coords_proj": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "Um projeto xy usa coordenadas que não são latitude e longitude. Um projeto lat\/lon tem coordenadas geográficas, então um mapa de ruas ou uma imagem de satélite pode ser desenhado atrás dele, e as elevações dos nós podem ser lidas do terreno. Um projeto xy pode ser convertido para lat\/lon com Arquivo, Abrir um arquivo xy no mapa.",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_new_place",
+                    "value": "Começar perto deste local",
+                    "english": "Start near this place"
+                }
+            }
+        },
+        "lpn_new_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "Um projeto xy usa coordenadas que não são latitude e longitude. Um projeto lat\/lon tem coordenadas geográficas, então um mapa de ruas ou uma imagem de satélite pode ser desenhado atrás dele, e as elevações dos nós podem ser lidas do terreno. Um projeto xy pode ser convertido para lat\/lon com Arquivo, Abrir um arquivo xy no mapa.",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_new_place",
+                    "value": "Começar perto deste local",
+                    "english": "Start near this place"
+                }
+            }
+        },
+        "lpn_new_crs_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "Um projeto xy usa coordenadas que não são latitude e longitude. Um projeto lat\/lon tem coordenadas geográficas, então um mapa de ruas ou uma imagem de satélite pode ser desenhado atrás dele, e as elevações dos nós podem ser lidas do terreno. Um projeto xy pode ser convertido para lat\/lon com Arquivo, Abrir um arquivo xy no mapa.",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_new_place",
+                    "value": "Começar perto deste local",
+                    "english": "Start near this place"
+                }
+            }
+        },
+        "lpn_crs_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords_tip",
+                    "value": "Um projeto xy usa coordenadas que não são latitude e longitude. Um projeto lat\/lon tem coordenadas geográficas, então um mapa de ruas ou uma imagem de satélite pode ser desenhado atrás dele, e as elevações dos nós podem ser lidas do terreno. Um projeto xy pode ser convertido para lat\/lon com Arquivo, Abrir um arquivo xy no mapa.",
+                    "english": "An xy project uses coordinates that are not latitude and longitude. A lat\/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat\/lon with File, Open an xy file on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_new_place",
+                    "value": "Começar perto deste local",
+                    "english": "Start near this place"
                 }
             }
         },
@@ -866,6 +1086,38 @@
                     "key": "lpn_notes_1_term",
                     "value": "Como é calculado",
                     "english": "How it is solved"
+                }
+            }
+        },
+        "lpn_field_northing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "Feche este tubo para que nenhuma água possa passar por ele. O tubo permanece no mapa e mantém todos os seus números, e você pode abri-lo novamente a qualquer momento.",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Fator de tamanho",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_easting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "Feche este tubo para que nenhuma água possa passar por ele. O tubo permanece no mapa e mantém todos os seus números, e você pode abri-lo novamente a qualquer momento.",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Fator de tamanho",
+                    "english": "Size multiplier"
                 }
             }
         },
