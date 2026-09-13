@@ -7,7 +7,6 @@ standing prose that is not a task.
 | Priority | Means |
 |---|---|
 | **100** | **Next.** Being worked, or the thing to pick up on finishing something. |
-| **95** | **Move to 100 on September 18.** TEMPORARY sixth tier, Tom's own, holding what was deferred past EWB. It is not a rank between Next and Soon; it is a dated parking space, and it empties. |
 | **75** | **Soon.** Real, wanted, queued behind Next. |
 | **50** | **Someday.** Agreed worth doing; nothing is waiting on it. |
 | **25** | **Maybe.** Worth keeping; not obviously worth doing. |
@@ -15,7 +14,12 @@ standing prose that is not a task.
 | **0** | **Closed** — the block moves to `dev/roadmap-closed-ids.md` in the same edit. |
 
 **NO TASK MAY SIT AT ANY OTHER NUMBER** (Tom, 2026-09-12: *"the system has been completely lost.
-Restore it... No tasks are allowed at any other priority tiers."*). `roadmap_id_check.php` FAILS on
+Restore it... No tasks are allowed at any other priority tiers."*). **Five values again: the
+temporary 95 tier is RETIRED.** It existed to park work deferred past EWB, and branch work needs no
+parking -- with master the production line, a task in flight on its own branch ships when it is
+merged and not before, so a dated holding pen answers a question nobody has any more (Tom,
+2026-09-12: *"empty the tier into branch or branches"*). Its two tasks, 627 and 628, went to 100 and
+to branches of their own. `roadmap_id_check.php` FAILS on
 one now, because this rule was prose for three weeks and drifted anyway -- seven tasks had settled at
 30, 40, 60 and 70 by the day he read the file, and the header itself had been spliced in half by an
 edit that inserted five tasks into the middle of its opening sentence, taking the table above with it.
@@ -340,7 +344,7 @@ the block.
     with `qualityUnitId()`, which is the one place that knows a source share has no unit; a
     reaction rate is a third unit again. Add a field and that override is what has to learn it.
 
-- 95|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
+- 100|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
   Reproduced 13/13 by `dev/lpn-spike/blank-map-harness.js`. **A gap BETWEEN two branches:**
   `initLibrary()` returns null when the open project's stored document does not parse, but its
   last act before reading is `if (!indexEntry(library.openId)) { library.openId =
@@ -360,7 +364,7 @@ the block.
     parses, holds 97 nodes and 119 links, and 677 symbols were in the DOM. **Do not cite this as
     the cause of any incident.**
 
-- 95|628| **[H] A restored view is never checked against the model it must show.**
+- 100|628| **[H] A restored view is never checked against the model it must show.**
   Tom, 2026-09-10, after a machine restart: *"Zoom to fit restores it all. It's a zoom mistake!"*
   Full measurement in `dev/lpn-blank-map-incidents.md`. His stored view was
   `{cx: 835.390625, cy: -4957.78125, s: 5.322222222222222}` on a geographic Net3.
