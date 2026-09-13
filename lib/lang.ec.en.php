@@ -1849,6 +1849,7 @@ $ec_lang['lpn_prompt_project_name']='Name for this project';
 $ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
 $ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
+$ec_lang['lpn_storage_unreadable']='Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
 // The About box's one translatable sentence (Task 625). The LICENCE NAME itself is deliberately
 // inside it in English: the FSF asks that "GNU General Public License" not be translated, and a
 // translated licence name is a different licence as far as a reader checking it is concerned.

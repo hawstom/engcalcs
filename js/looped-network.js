@@ -17360,11 +17360,41 @@ var EngCalcs = EngCalcs || {};
 	// full quota would go on drawing into a document that is not being saved. setStorageError()
 	// surfaces it in the status bar.
 	var storageError = false;
-	function setStorageError(on) {
+	// WHICH refusal is standing, so a second kind can replace the first rather than be swallowed by
+	// the `on === storageError` guard. '' is the quota/unavailable one this started as.
+	var storageErrorKind = '';
+	// **THE OPEN PROJECT WHOSE STORED DOCUMENT COULD NOT BE READ** (Task 627). A third state, and it
+	// is neither of the two this page used to have: the key is PRESENT, its bytes are the only copy
+	// of somebody's work, and nothing here understood them. So it is not a first visit -- starting a
+	// fresh project on top of it destroys the copy -- and it is not a quota failure, where writing
+	// is what is refused rather than reading. saveToStorage() declines to write over this id for as
+	// long as it is the open one, and setStorageError() says so. NEVER REPAIR SILENTLY.
+	var unreadableOpenId = null;
+	// The modal is worth exactly one showing per unreadable document. A successful write to any
+	// SIBLING project clears storageError through writeJSON(), so without this the next refused
+	// autosave would raise the alert again, and again, on every debounce.
+	var unreadableTold = false;
+	function setStorageError(on, kind) {
 		var pc = EngCalcs.pageConfig || {};
-		if (on === storageError) { return; }
+		kind = on ? (kind || '') : '';
+		if (on === storageError && kind === storageErrorKind) { return; }
 		storageError = on;
-		if (on) { setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.'); }
+		storageErrorKind = kind;
+		if (!on) { return; }
+		if (kind === 'unreadable') {
+			var said = pc.lpn_storage_unreadable || 'Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.';
+			setStatus(said);
+			// **AND A MODAL, because the status line is not durable enough for THIS one.** The first
+			// solve on the empty document runs `if (!doc.nodes.length) { setStatus(''); return; }`
+			// and the sentence is gone -- which is the exact silence this defect is made of, a named
+			// tab over a blank map with nothing on screen saying why. lpn_storage_too_new already
+			// answers a document that cannot be opened the same way, and this is that plus a refusal
+			// to write. The quota message keeps the status line alone: there the work is still on
+			// screen and still editable, so a modal per failed autosave would be unusable.
+			if (!unreadableTold) { unreadableTold = true; alert(said); }
+			return;
+		}
+		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
 	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
@@ -17599,6 +17629,16 @@ var EngCalcs = EngCalcs || {};
 	// to disk, rather than advertising a project whose content never landed.
 	function saveToStorage() {
 		if (!library.openId) { return; }
+		// **NEVER WRITE OVER A DOCUMENT WE COULD NOT READ** (Task 627). This is the write that used
+		// to turn a blank map into a lost project: the tab still named the work, `doc` was empty
+		// because nothing was ever applied, and the solve debounce serialized that emptiness over
+		// the only copy. Refusing costs a session's edits on a tab that has nothing in it anyway;
+		// writing costs the document. The message is re-asserted rather than assumed, because a
+		// successful write to a SIBLING project clears the flag through writeJSON().
+		if (unreadableOpenId && unreadableOpenId === library.openId) {
+			setStorageError(true, 'unreadable');
+			return;
+		}
 		// **A PLACEMENT IN PROGRESS IS NOT A DOCUMENT** (Task 145's georeferencing tool). While the
 		// model is being carried onto lat/lon the project already says `coords: geo` and its
 		// coordinates are still grid numbers -- a state that is correct on screen for the length of
@@ -18386,7 +18426,14 @@ var EngCalcs = EngCalcs || {};
 		if (repaired) { saveIndex(); }
 		if (!indexEntry(library.openId)) { library.openId = library.projects[0].id; }
 		var doc2 = readDocument(projectKey(library.openId));
-		if (!doc2) { return null; }
+		// **NULL HERE IS NOT "START EMPTY" AND NEVER WAS** (Task 627). adoptOrphans() has already
+		// dropped every entry whose key is ABSENT, so reaching this line with a null means the key
+		// is present and unreadable -- truncated by an unclean shutdown, or written by a version
+		// this one refuses. The id is recorded so init() can take its own branch and so
+		// saveToStorage() can refuse; returning null alone put the page in the gap BETWEEN init()'s
+		// two branches, since `indexEntry(library.openId)` is true by construction two lines above.
+		if (!doc2) { unreadableOpenId = library.openId; unreadableTold = false; return null; }
+		unreadableOpenId = null;
 		return doc2;
 	}
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
@@ -23325,7 +23372,16 @@ var EngCalcs = EngCalcs || {};
 		profileResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
-		if (opening) {
+		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and
+		// could not be read, and no document at all. The middle one used to fall between the two
+		// branches below and do nothing whatever -- no apply, no create, no throw -- leaving the tab
+		// strip naming a project over an empty `doc`. It is deliberately NOT folded into either
+		// neighbour: applying is impossible, and creating a fresh project registers a new document
+		// over bytes we could not read. So the page keeps the tab, draws nothing, refuses to save,
+		// and says all of that out loud. See setStorageError().
+		if (!opening && unreadableOpenId) {
+			setStorageError(true, 'unreadable');
+		} else if (opening) {
 			applySaved(opening);
 			buildDom();
 			// The boot path does not go through refreshAllFromDocument(), so it marks the arrival

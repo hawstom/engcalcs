@@ -1,13 +1,13 @@
-// **A DOCUMENT THAT WILL NOT PARSE LEAVES A NAMED TAB OVER A BLANK MAP -- AND THE NEXT AUTOSAVE
-// DESTROYS IT.** (ROADMAP Task 627; incident in dev/lpn-blank-map-incidents.md, 2026-09-10)
+// **A DOCUMENT THAT WILL NOT PARSE LEAVES A NAMED TAB OVER A BLANK MAP. THE PAGE MUST NOT THEN
+// SAVE OVER IT.** (ROADMAP Task 627; incident in dev/lpn-blank-map-incidents.md, 2026-09-10)
 //
 //   node dev/lpn-spike/blank-map-harness.js
 //
 // Tom restarted his computer, opened the local lpn, and after a reload: "Net3 disappeared. The
 // project tab name is the only thing left ... The project is still in storage. But the map is
-// blank." No error of any kind in the console -- the whole failure is silent.
+// blank." No error of any kind in the console -- the whole failure was silent.
 //
-// THE MECHANISM, which is a gap BETWEEN two branches rather than a fault inside either:
+// THE MECHANISM, which was a gap BETWEEN two branches rather than a fault inside either:
 //
 //   var opening = initLibrary(), bornClean = false;
 //   if (opening) { applySaved(opening); ... }
@@ -16,17 +16,24 @@
 // initLibrary() returns null when the open project's stored document does not parse. But it has
 // already guaranteed `library.openId` names a real index entry -- its last act before reading the
 // document is `if (!indexEntry(library.openId)) { library.openId = library.projects[0].id; }`. So
-// `opening` is null AND `indexEntry()` is truthy, and NEITHER branch runs. Nothing is applied,
-// nothing is created, nothing throws. The tab strip renders the name out of the index and the map
-// draws an empty `doc`.
+// `opening` was null AND `indexEntry()` truthy, and NEITHER branch ran. Nothing applied, nothing
+// created, nothing thrown. The tab strip rendered the name out of the index and the map drew an
+// empty `doc`.
 //
-// **THE LOSS IS THE AUTOSAVE, NOT THE CORRUPTION.** The bytes are still on disk at that moment and
-// are the only copy of the work. saveToStorage() then writes serializeProject() -- the empty doc --
-// over that key on the solve debounce, and the recoverable state is gone. Section 3 is that write.
+// **THE LOSS WAS THE AUTOSAVE, NOT THE CORRUPTION.** The bytes are still on disk at that moment and
+// are the only copy of the work. saveToStorage() then wrote serializeProject() -- the empty doc --
+// over that key on the solve debounce, and the recoverable state was gone.
+//
+// **THE FIX IS A THIRD STATE, WHICH IS WHAT SECTIONS 2 AND 3 NOW ASSERT.** Unreadable is not "first
+// visit": creating a fresh project there overwrites the bytes just as surely. So initLibrary()
+// records the id, init() takes its own branch, saveToStorage() REFUSES to write over that key, and
+// setStorageError(true, 'unreadable') tells the reader in the status line and in a modal. Nothing
+// is repaired and nothing is guessed at; the bytes are left for a person to deal with.
 //
 // Why the index entry survives to trigger it: adoptOrphans() drops an entry whose key is ABSENT
 // (`getItem(...) !== null`), so a key that is PRESENT and unparseable passes the filter and then
-// fails at JSON.parse. An unclean shutdown is one way to get a truncated value.
+// fails at JSON.parse. An unclean shutdown is one way to get a truncated value. That is deliberate
+// and stays: dropping the entry would delete the tab that is the only sign the work exists.
 
 const { loadLoopedNetwork, byId, setUnitSet, clearResizeObservers } = require('./lpn-dom-stub.js');
 
@@ -41,6 +48,11 @@ setUnitSet('us');
 global.fetch = () => Promise.reject(new Error('no network in this harness'));
 global.EngCalcs.setIconLabel = () => {};
 global.window.history = { replaceState: () => {} };
+// The stub's alert is a no-op, so the refusal's modal has nowhere to be seen. Capture it: "the user
+// is told" is half of what this task closed, and an assertion that cannot see the telling is an
+// assertion about the other half only.
+let alerts = [];
+global.alert = global.window.alert = (msg) => { alerts.push(String(msg)); };
 global.window.setTimeout = (f, t) => setTimeout(f, t);
 global.window.clearTimeout = (t) => clearTimeout(t);
 // The deferred map sizing must not run behind the test's back; this harness never needs a sized
@@ -60,6 +72,7 @@ function boot() {
 	return L;
 }
 const PKEY = (id) => 'lpn_project_' + id;
+const PC = global.EngCalcs.pageConfig;
 
 // ---- 1. A REAL PROJECT, SAVED -------------------------------------------------------------
 console.log('--- a project with a network in it, autosaved to storage ---');
@@ -106,13 +119,25 @@ const after = boot();
 
 	const d = after.getDoc();
 	check(d.nodes.length === 0 && d.links.length === 0,
-		'THE MAP IS BLANK: nothing was applied and nothing was created',
+		'the map is blank: there was nothing readable to apply',
 		'nodes=' + d.nodes.length + ' links=' + d.links.length);
+
+	// **AND THE READER IS TOLD, WHICH IS THE HALF THE ORIGINAL DEFECT HAD NONE OF.** Asserted
+	// against pageConfig, never against the English: harness_wording_check.php is a ratchet, and a
+	// pinned literal would tax the next rewording with a red build.
+	const said = PC.lpn_storage_unreadable;
+	check(!!said, 'the page supplies lpn_storage_unreadable');
+	check(alerts.length === 1 && alerts[0] === said,
+		'THE USER IS TOLD: one modal, carrying lpn_storage_unreadable',
+		alerts.length + ' alert(s)');
+	check(byId.lpn_status_text.textContent === said,
+		'and the status line says the same thing');
 }
 
-// ---- 3. THE AUTOSAVE THAT TURNS A BLANK MAP INTO A LOST PROJECT ---------------------------
+// ---- 3. THE AUTOSAVE THAT USED TO TURN A BLANK MAP INTO A LOST PROJECT -------------------
 //
-// Up to here the user's bytes are still on disk. This is the write that ends that.
+// The user's bytes are still on disk here, and they are the only copy. This is the write that
+// used to end that, and it must now do nothing at all.
 console.log('--- the solve debounce fires one autosave ---');
 {
 	const before = localStorage.getItem(PKEY(openId));
@@ -122,14 +147,41 @@ console.log('--- the solve debounce fires one autosave ---');
 	after.saveToStorage();
 
 	const now = localStorage.getItem(PKEY(openId));
-	let nowDoc = null;
-	try { nowDoc = JSON.parse(now); } catch (e) {}
-	check(now !== corrupt, 'THE AUTOSAVE OVERWROTE THE STORED DOCUMENT', 'now ' + now.length + ' chars');
-	check(!!nowDoc && (nowDoc.nodes || []).length === 0 && (nowDoc.links || []).length === 0,
-		'AND WHAT IT WROTE IS EMPTY -- the work is now unrecoverable',
-		nowDoc ? 'nodes=' + (nowDoc.nodes || []).length + ' links=' + (nowDoc.links || []).length : 'unparseable');
-	check(now.indexOf('"nodes":[]') >= 0 || (nowDoc && nowDoc.nodes.length === 0),
-		'a valid, empty, freshly-serialized project stands where the network was');
+	check(now === corrupt, 'THE BYTES SURVIVE: the autosave refused to write over them',
+		now === null ? 'the key is gone' : now.length + ' chars');
+	check(alerts.length === 1, 'and the reader is not told a second time per debounce',
+		alerts.length + ' alert(s)');
+
+	// Ten more, because the refusal has to hold for the whole session and not just the first frame.
+	for (let n = 0; n < 10; n++) { after.saveToStorage(); }
+	check(localStorage.getItem(PKEY(openId)) === corrupt,
+		'and it still holds after ten more autosaves');
+
+	// The index must not have been quietly emptied either -- the tab is the only sign the work
+	// exists, and a project nobody can see is the same loss wearing a tidier face.
+	const entry = after.indexEntry(openId);
+	check(!!entry && entry.name === savedName, 'the tab is still there to be dealt with by a person',
+		entry && entry.name);
+}
+
+// ---- 4. A SIBLING PROJECT IS UNAFFECTED ---------------------------------------------------
+//
+// The refusal is keyed on the id that could not be read, not on "something went wrong once".
+console.log('--- a second project in the same library still saves ---');
+{
+	const good = 'pgood' + Date.now().toString(36);
+	localStorage.setItem(PKEY(good), JSON.stringify({ v: 1, nodes: [], links: [] }));
+	const lib = after.getLibrary();
+	lib.projects.push({ id: good, name: 'Sibling', updated: 0 });
+	lib.openId = good;
+	after.addNode('junction', 50, 50);
+	after.saveToStorage();
+	let wrote = null;
+	try { wrote = JSON.parse(localStorage.getItem(PKEY(good))); } catch (e) {}
+	check(!!wrote && (wrote.nodes || []).length === 1,
+		'the sibling project was written normally', wrote ? 'nodes=' + (wrote.nodes || []).length : 'unparseable');
+	check(localStorage.getItem(PKEY(openId)) === corrupt,
+		'and the unreadable document is STILL untouched');
 }
 
 console.log('\n' + (failures ? 'FAIL ' : 'ok   ') + (checks - failures) + '/' + checks + ' checks');

@@ -2254,6 +2254,7 @@ EngCalcs.pageConfig = {
 	lpn_status_closed_opened: <?=json_encode($ec_lang['lpn_status_closed_opened'])?>,
 	lpn_status_closed_empty: <?=json_encode($ec_lang['lpn_status_closed_empty'])?>,
 	lpn_storage_full: <?=json_encode($ec_lang['lpn_storage_full'])?>,
+	lpn_storage_unreadable: <?=json_encode($ec_lang['lpn_storage_unreadable'])?>,
 	lpn_backdrop_menu: <?=json_encode($ec_lang['lpn_backdrop_menu'])?>,
 	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,
 	lpn_backdrop_scale: <?=json_encode($ec_lang['lpn_backdrop_scale'])?>,
