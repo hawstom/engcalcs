@@ -162,6 +162,32 @@ define('EC_LWN_SITE_URL', CANONICAL_ORIGIN_DEFAULT . '/');
 function ecDeployIdentity($root = null) {
     if ($root === null) { $root = dirname(__DIR__); }
     $git = $root . '/.git';
+    // **IN A WORKTREE `.git` IS A FILE, NOT A DIRECTORY**, holding one line: `gitdir: <path>`.
+    // Every read below is then a read of a path that does not exist, so the sha comes back EMPTY
+    // and the About box says nothing about which code is running -- which is the whole point of
+    // the readout. It matters because CLAUDE.md now makes a worktree how two sessions coexist at
+    // all, so this failed for every concurrent agent and passed for whoever ran it on the main
+    // checkout. Followed rather than resolved to a canonical path: the pointer is what git itself
+    // reads, and the directory it names holds this worktree's own HEAD, refs and reflog.
+    if (is_file($git)) {
+        $ptr = @file_get_contents($git);
+        if ($ptr !== false && preg_match('/^gitdir:\s*(.+)$/m', $ptr, $m)) {
+            $dir = rtrim(trim($m[1]), '/');
+            // A relative pointer is relative to the worktree root, which is where the file sits.
+            if ($dir !== '' && $dir[0] !== '/') { $dir = $root . '/' . $dir; }
+            $git = $dir;
+        }
+    }
+    // **AND A WORKTREE'S GIT DIRECTORY HOLDS ITS OWN HEAD BUT NOT ITS OWN REFS.** `refs/heads/` and
+    // `packed-refs` are SHARED and live in the common directory, which `commondir` names -- so a
+    // worktree HEAD saying `ref: refs/heads/<branch>` resolves through there. Both are looked in,
+    // worktree first, because `refs/bisect` and friends really are per worktree.
+    $common = $git;
+    $cd = @file_get_contents($git . '/commondir');
+    if ($cd !== false && trim($cd) !== '') {
+        $cd = rtrim(trim($cd), '/');
+        $common = ($cd !== '' && $cd[0] === '/') ? $cd : $git . '/' . $cd;
+    }
     $out = array('sha' => '', 'date' => '');
     // Every file whose mtime marks "this checkout's HEAD last moved". Collected rather than picked,
     // because which one records it depends on whether the refs have been packed.
@@ -172,19 +198,22 @@ function ecDeployIdentity($root = null) {
         $sha = false;
         if (strpos($head, 'ref: ') === 0) {
             $ref = substr($head, 5);
-            $refPath = $git . '/' . $ref;
-            $sha = @file_get_contents($refPath);
-            if ($sha !== false) {
-                $stamps[] = @filemtime($refPath);   // rewritten by every fast-forward
-            } else {
+            foreach (array($git . '/' . $ref, $common . '/' . $ref) as $refPath) {
+                $sha = @file_get_contents($refPath);
+                if ($sha !== false) {
+                    $stamps[] = @filemtime($refPath);   // rewritten by every fast-forward
+                    break;
+                }
+            }
+            if ($sha === false) {
                 // Packed by `git gc`, so the loose ref file is gone and the sha is in one table.
                 // Its mtime is when gc ran, which is also the last time this ref can have moved --
                 // a later move would have written the loose file back.
-                $packed = @file_get_contents($git . '/packed-refs');
+                $packed = @file_get_contents($common . '/packed-refs');
                 if ($packed !== false
                     && preg_match('/^([0-9a-f]{40})\s+' . preg_quote($ref, '/') . '$/m', $packed, $m)) {
                     $sha = $m[1];
-                    $stamps[] = @filemtime($git . '/packed-refs');
+                    $stamps[] = @filemtime($common . '/packed-refs');
                 }
             }
         } else {
