@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**80 open tasks.** Next (100): 13 · Soon (75): 15 · Someday (50): 25 · Maybe (25): 10 · Parked (5): 17
+**81 open tasks.** Next (100): 13 · Soon (75): 16 · Someday (50): 25 · Maybe (25): 10 · Parked (5): 17
 
 ## 100 — Next (13)
 
@@ -25,7 +25,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 628 — [H] · A restored view is never checked against the model it must show.
 - Task 638 — Node and link symbology do not offer the chemical properties.
 
-## 75 — Soon (15)
+## 75 — Soon (16)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -42,6 +42,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 634 — Re-shoot the everything-at-once frame; it is the front page's lead.
 - Task 635 — A Zoom to button on the Properties box.
 - Task 637 — A Graph button on the Properties box.
+- Task 642 — Retire the Windows WSL2 IP script and its scheduled task.
 
 ## 50 — Someday (25)
 
@@ -108,5 +109,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-73 of 80 titles are within 4–12 words. `!` marks the rest;
+74 of 81 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

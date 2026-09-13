@@ -332,18 +332,6 @@ the block.
     good reason. Things on the map are small."* The cursor change is WORKING and was welcomed; the
     difficulty is ACQUISITION, which is the "node fat" item above reached independently.
 
-- 100|638| **Node and link symbology do not offer the chemical properties.**
-  Tom, 2026-09-12: *"Add all chemical modeling properties to Settings.Visualization."* Measured the
-  same day: `COLOR_NODE_FIELDS` offers ONE quality entry covering all three analyses, and
-  `COLOR_LINK_FIELDS` offers none at all -- no quality, no reaction rate -- so a link can never be
-  coloured or labelled by anything the quality run produced. `linkFieldDefs()` has the same gap.
-  - EPANET colours a link by its average quality, its reaction rate, its friction factor and its
-    status; it colours a node by quality and by initial quality. Default to that list
-    (CLAUDE.md's EPANET-vocabulary rule) rather than inventing one.
-  - **The unit is the trap, not the list.** `colorFieldUnit()` already overrides the declared unit
-    with `qualityUnitId()`, which is the one place that knows a source share has no unit; a
-    reaction rate is a third unit again. Add a field and that override is what has to learn it.
-
 - 100|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
   Reproduced 13/13 by `dev/lpn-spike/blank-map-harness.js`. **A gap BETWEEN two branches:**
   `initLibrary()` returns null when the open project's stored document does not parse, but its
@@ -383,6 +371,18 @@ the block.
     autosaved the good view over it. It matches neither shipped Net3's saved view, so not a
     straight copy of a sibling tab's; two Net3 examples that differ in frame and are identical in
     node count (97/119) is still the first place to look.
+
+- 100|638| **Node and link symbology do not offer the chemical properties.**
+  Tom, 2026-09-12: *"Add all chemical modeling properties to Settings.Visualization."* Measured the
+  same day: `COLOR_NODE_FIELDS` offers ONE quality entry covering all three analyses, and
+  `COLOR_LINK_FIELDS` offers none at all -- no quality, no reaction rate -- so a link can never be
+  coloured or labelled by anything the quality run produced. `linkFieldDefs()` has the same gap.
+  - EPANET colours a link by its average quality, its reaction rate, its friction factor and its
+    status; it colours a node by quality and by initial quality. Default to that list
+    (CLAUDE.md's EPANET-vocabulary rule) rather than inventing one.
+  - **The unit is the trap, not the list.** `colorFieldUnit()` already overrides the declared unit
+    with `qualityUnitId()`, which is the one place that knows a source share has no unit; a
+    reaction rate is a third unit again. Add a field and that override is what has to learn it.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -644,6 +644,21 @@ the block.
   values CSV, spreadsheet ODS. It may carry a time-range selector. Shape and the two unknowns
   (PDF and ODS are formats this suite has never written): `dev/graphs-scope.md`. Task 640 is the
   menu this belongs to and Task 599 is the plot itself.
+
+- 75|642| **Retire the Windows WSL2 IP script and its scheduled task.**
+  Tom, 2026-09-13, after the branch previews came up: *"If this works for a while, I delete the
+  Windows Task Scheduler and script."* `C:\TGHFiles\Update-WSL2-IP.ps1` runs elevated at logon to
+  rewrite a hosts line and point a netsh port proxy at whatever address WSL currently has. **Browsing
+  from inside WSL needs none of it** -- Apache is on the same host as the browser, so there is no
+  proxy to keep pointed and no address that moves.
+  - **GATED ON LIVING WITH IT, not on a date.** It is his machine's only route to `hawsedc.local` and
+    `librewaternet.local` from a WINDOWS browser, and those are still how he checks appearance --
+    WSLg renders with Linux font stacks and his users are on Windows. Deleting it early costs him the
+    truer view of his own site.
+  - What goes when it goes: the Task Scheduler entry, the script, and the `$hostnames` list it
+    maintains. What must be checked FIRST: whether anything else on that machine reaches WSL by those
+    names. `dev/local-preview.md` does not exist yet and the arrangement is recorded only in this
+    session and in `~/webdev/worktrees/_panel/`; write it down before deleting the thing it replaces.
 
 - 50|146.09| **A key map: the whole project as a thumbnail, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
