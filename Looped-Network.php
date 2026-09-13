@@ -447,6 +447,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a
 			      // proportional font makes the whole readout jitter as they do. ?>
 			<div id="lpn_coords" style="font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px">X: --  Y: --</div>
+			<?php // **THE PROJECTION, BESIDE THE COORDINATES IT EXPLAINS** (Task 641). A pair of numbers
+			      // with no coordinate system named is the defect Tom found at 89.99 degrees: the
+			      // readout was lying and nothing on screen said in what. Filled by
+			      // refreshCrsReadout() in js/looped-network.js; NOT monospace, because it is a name
+			      // rather than digits that change under the pointer. ?>
+			<div id="lpn_crs" style="background:rgba(255,255,255,.8);padding:2px 6px"><?=$ec_lang['lpn_crs_none']?></div>
 			<?php // **THE SCALE BAR** (Tom, 2026-09-11: *"let's add it"*). A cell of this strip like
 			      // everything else in it, so it wraps on a narrow window and is reserved against by
 			      // zoomExtent() with the rest. Its WIDTH is the measurement -- refreshScaleBar() in
@@ -1115,7 +1121,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<legend><?=ecTipLabel($ec_lang['lpn_new_coords'], $ec_lang['lpn_new_coords_tip'])?></legend>
 			<label><input type="radio" name="lpn_new_coords" value="xy" checked> <?=$ec_lang['lpn_new_coords_xy']?></label>
 			<label><input type="radio" name="lpn_new_coords" value="geo"> <?=$ec_lang['lpn_new_coords_geo']?></label>
+			<label><input type="radio" name="lpn_new_coords" value="proj"> <?=$ec_lang['lpn_new_coords_proj']?></label>
 		</fieldset>
+		<?php // ENABLED ONLY FOR A PROJECTED PROJECT, on exactly the argument the place field below
+		      // makes: a control that vanishes as you touch the radio above it reads as a glitch,
+		      // where a greyed one says which choice the question belongs to.
+		      //
+		      // **THE OPTIONS ARE BUILT BY JS**, like the unit selects further down and for the same
+		      // reason -- the list is generated from the EPSG numbering rather than typed, so there
+		      // is no table here for a hand edit to disagree with. Task 641. ?>
+		<div class="lpn-new-block" id="lpn_new_crs_block">
+			<label for="lpn_new_crs"><?=ecTipLabel($ec_lang['lpn_new_crs'], $ec_lang['lpn_new_crs_tip'])?></label>
+			<select id="lpn_new_crs" disabled></select>
+		</div>
 		<?php // ENABLED ONLY FOR LAT/LON, which is Tom's own wording of the rule. An xy grid has no
 		      // place on the Earth to travel to, so the field is disabled rather than hidden: a
 		      // control that appears and vanishes as you touch the radio above it reads as a glitch,
@@ -1303,6 +1321,9 @@ EngCalcs.pageConfig = {
 	lpn_field_text_valign_middle: <?=json_encode($ec_lang['lpn_field_text_valign_middle'])?>,
 	lpn_field_lon: <?=json_encode($ec_lang['lpn_field_lon'])?>,
 	lpn_field_lat: <?=json_encode($ec_lang['lpn_field_lat'])?>,
+	lpn_field_northing: <?=json_encode($ec_lang['lpn_field_northing'])?>,
+	lpn_field_easting: <?=json_encode($ec_lang['lpn_field_easting'])?>,
+	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
 	lpn_valve_type_gpv: <?=json_encode($ec_lang['lpn_valve_type_gpv'])?>,
 	lpn_field_valve_setting_drop: <?=json_encode($ec_lang['lpn_field_valve_setting_drop'])?>,
@@ -1996,6 +2017,7 @@ EngCalcs.pageConfig = {
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
 	lpn_georef_backdrop_unrotated: <?=json_encode($ec_lang['lpn_georef_backdrop_unrotated'])?>,
 	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,
+	lpn_georef_projected: <?=json_encode($ec_lang['lpn_georef_projected'])?>,
 	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
 	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,
 	lpn_georef_tab_locked: <?=json_encode($ec_lang['lpn_georef_tab_locked'])?>,

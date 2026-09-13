@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read**, of 17 untranslated keys, of 1785 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read**, of 24 untranslated keys, of 1792 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (17, 10 to read @@ NEEDS RULING)
+## lpn_  (24, 17 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -33,15 +33,27 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_about_license`**
   > Licensed under the GNU General Public License v3.0 or later.
   @@ NEEDS RULING
+- **`lpn_crs_none`**
+  > Not georeferenced
+  @@ NEEDS RULING
+- **`lpn_field_easting`**
+  > Easting
+  @@ NEEDS RULING
 - **`lpn_field_emitter`**
   > Emitter coefficient
   _Ruled OK 2026-09-09._
 - **`lpn_field_emitter_tip`**
   > An extra outflow that depends on pressure, for a sprinkler, an open outlet, or a modeled leak. The flow it releases is this coefficient times the pressure raised to the emitter exponent, which is set once for the whole network under Settings, Calculation, Hydraulics. Leave it blank on an ordinary junction.
   _Ruled OK 2026-09-09._
+- **`lpn_field_northing`**
+  > Northing
+  @@ NEEDS RULING
 - **`lpn_field_text_attached_tip`**
   > This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
   _Ruled OK 2026-09-09._
+- **`lpn_georef_projected`**
+  > This project already states a map projection, so its coordinates cannot be placed on the map a second time.
+  @@ NEEDS RULING
 - **`lpn_georef_save_locked`**
   > Finish the placement with the "Keep this placement" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.
   _Ruled OK 2026-09-09._
@@ -53,6 +65,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-10._
 - **`lpn_menu_cue`**
   > Start with the menus above. Use the toolbar for quick access.
+  @@ NEEDS RULING
+- **`lpn_new_coords_proj`**
+  > projected coordinates
+  @@ NEEDS RULING
+- **`lpn_new_crs`**
+  > Map projection
+  @@ NEEDS RULING
+- **`lpn_new_crs_tip`**
+  > The projection your coordinates are already measured in. Eastings and northings are stored exactly as you type them, and nothing is converted. A project cannot change its projection afterward, so to work in a different one, start a new project. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.
   @@ NEEDS RULING
 - **`lpn_pane_text_attached`**
   > Attached
