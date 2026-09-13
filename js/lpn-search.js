@@ -365,21 +365,30 @@
 	// door; this one hands it the box OSM sent and a typed coordinate hands it nothing, so the
 	// zoom-preserving rule Tom set on 2026-09-08 is still exactly what a Go to does. A result
 	// whose box we refused above also hands nothing, and therefore behaves like a Go to.
-	function arrive(hit) {
-		if (seam && seam.goTo) { seam.goTo({ lat: hit.lat, lon: hit.lon }, hit.extent); }
+	//
+	// **TWO DESTINATIONS, ONE ENGINE** (Task 641 phase 2). `to` is where the answer goes: absent, it
+	// is the map, which is what a search has always meant. The Geographic projection box passes one,
+	// because it wants the POINT rather than a moved map -- it is choosing which projections cover
+	// where you are looking, on a project that does not exist yet. Everything that touches the
+	// network -- the consent gate, the one-a-second rule, the repeated-query memory, the timeout and
+	// the chooser -- is on this side of the seam either way, which is the rule lpnSearchRun() states
+	// for its own second door: a second DOOR, never a second engine.
+	function arrive(hit, to) {
+		if (to) { to({ lat: hit.lat, lon: hit.lon, extent: hit.extent, label: hit.label }); }
+		else if (seam && seam.goTo) { seam.goTo({ lat: hit.lat, lon: hit.lon }, hit.extent); }
 		// The credit rides with the result it belongs to, which is what "as suitable for your
 		// medium" means when the medium is a notice box over a map.
 		notice(hit.label + ' — ' + CREDIT);
 	}
 
-	function finish(results, query) {
+	function finish(results, query, to) {
 		if (!results.length) {
 			notice(t('lpn_search_none', 'Nothing found for that name.') +
 				' “' + query + '”');
 			return;
 		}
 		var hit = chooseFrom(results);
-		if (hit) { arrive(hit); }
+		if (hit) { arrive(hit, to); }
 	}
 
 	/**
@@ -387,7 +396,7 @@
 	 * offline, rate-limited, timed out, unreadable and nothing-found call for four different next
 	 * actions, and a single "search failed" would hide which one this is.
 	 */
-	function send(query) {
+	function send(query, to) {
 		var controller = (typeof AbortController === 'function') ? new AbortController() : null;
 		var timer = root.setTimeout(function () { if (controller) { controller.abort(); } }, TIMEOUT_MS);
 		inFlight = true;
@@ -409,7 +418,7 @@
 		}).then(function (data) {
 			var results = EC.lpnSearchParse(data);
 			last = { query: query, results: results };
-			finish(results, query);
+			finish(results, query, to);
 		}).catch(function (err) {
 			if (err && err.kind === 'rate') {
 				notice(t('lpn_search_rate',
@@ -468,8 +477,12 @@
 	 * it passes nothing and is asked here -- still BEFORE anything is sent, which is the order
 	 * lpnSearchOpen() is careful about for the same reason.
 	 */
-	EC.lpnSearchRun = function (text, gated) {
-		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+	EC.lpnSearchRun = function (text, gated, to) {
+		// The map is the destination unless one is supplied, and only the MAP needs a geographic
+		// project to travel in: a caller that takes the point itself is asking a question about the
+		// Earth, not about this document, so the guard belongs to the default destination alone.
+		if (!seam) { return; }
+		if (!to && seam.isGeo && !seam.isGeo()) { return; }
 		if (inFlight) {
 			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
 			return;
@@ -484,7 +497,7 @@
 		// sending repeatedly the same query may be classified as faulty" clause, honoured in
 		// memory rather than on the device. It is also the common case in real use: you search,
 		// you pick the wrong one of five, you search the same thing again.
-		if (last && last.query === query) { finish(last.results, query); return; }
+		if (last && last.query === query) { finish(last.results, query, to); return; }
 		if (EC.lpnSearchWait(lastAt, Date.now()) > 0) {
 			notice(t('lpn_search_toofast',
 				'One search a second — that is what the place-name service allows. Try ' +
@@ -495,7 +508,20 @@
 			notice(t('lpn_search_nofetch', 'This browser cannot reach the place-name service.'));
 			return;
 		}
-		send(query);
+		send(query, to);
+	};
+
+	/**
+	 * **THE SECOND DESTINATION, NAMED** (Task 641 phase 2): the words in hand, and the answer handed
+	 * back as a point instead of moving the map. The Geographic projection box's place-name row is
+	 * the one caller -- it filters a projection catalogue by where you are looking, on a project
+	 * that may not exist yet and may not be geographic when it does.
+	 *
+	 * It is lpnSearchRun() with a destination, not a path of its own: the consent question is still
+	 * asked here, before anything is sent, and a refusal still costs the caller nothing else.
+	 */
+	EC.lpnSearchPoint = function (text, onHit) {
+		EC.lpnSearchRun(text, false, onHit || function () {});
 	};
 
 	// --------------------------------------------------------------------------------------------

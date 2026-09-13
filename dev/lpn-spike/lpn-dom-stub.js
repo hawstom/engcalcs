@@ -354,8 +354,13 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_lock_banner',
   // The New-project box and its controls (ROADMAP Task 477). #lpn_new_units_fields is the one JS
   // fills, by cloning the strip's own `.lpn-units-item` wrappers into it.
-  'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_place', 'lpn_new_create',
-  'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si',
+  'lpn_new_panel', 'lpn_new_units_fields', 'lpn_new_method', 'lpn_new_create',
+  'lpn_new_cancel', 'lpn_new_close', 'lpn_new_us', 'lpn_new_si', 'lpn_new_crs_pick',
+  // The Geographic projection box (Task 641 phase 2): the two filters, the selector they narrow,
+  // and the note that says which filter is doing the narrowing.
+  'lpn_crsbox', 'lpn_crsbox_title', 'lpn_crsbox_close', 'lpn_crsbox_view', 'lpn_crsbox_place',
+  'lpn_crsbox_search', 'lpn_crsbox_name', 'lpn_crsbox_list', 'lpn_crsbox_note', 'lpn_crsbox_ok',
+  'lpn_crsbox_cancel',
   // The satellite teaser, a cell of that strip (ROADMAP Task 452).
   'lpn_basemap_teaser',
   // The one-tap grievance link (ROADMAP Task 207) and the span setStatus() writes into. The span
@@ -611,6 +616,32 @@ const LPN_UNIT_PRESETS = {
   si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_epanet: 'lps', velocity: 'mps', gradient: 'gradePercent', roughness: 'mm', elapsed_time: 'hr' }
 };
 
+// **THE NEW-PROJECT BOX'S COORDINATE-SYSTEM RADIOS** (Task 641 phase 2). The page reads them with
+// a `:checked` selector rather than by id, which is the ordinary way to read a radio group and the
+// one shape of query this stub answers beyond the unit selects. `checked` is an accessor pair so
+// that setting one CLEARS the other, which is the single physical relationship a radio group has
+// and the one a plain boolean property would hold constant -- the stub-shaped failure
+// dev/testing-notes.md warns about.
+const newCoordsRadios = { geo: mkEl('input'), local: mkEl('input') };
+Object.keys(newCoordsRadios).forEach(function (k) {
+  const r = newCoordsRadios[k];
+  r.type = 'radio';
+  r.name = 'lpn_new_coords';
+  r.value = k;
+  let on = (k === 'local');
+  Object.defineProperty(r, 'checked', {
+    get() { return on; },
+    set(v) {
+      on = !!v;
+      if (on) {
+        Object.keys(newCoordsRadios).forEach(function (o) {
+          if (o !== k) { newCoordsRadios[o].checked = false; }
+        });
+      }
+    }
+  });
+});
+
 global.document = {
   createElement: mkEl,
   createElementNS: (ns, tag) => mkEl(tag, true),
@@ -618,7 +649,14 @@ global.document = {
   getElementById: id => byId[id] || null,
   querySelector: sel => {
     const m = /^select\[name="([^"]+)"\]$/.exec(sel);
-    return m ? (unitSelects[m[1]] || null) : null;
+    if (m) { return unitSelects[m[1]] || null; }
+    if (sel === '#lpn_new_panel input[name="lpn_new_coords"]:checked') {
+      return newCoordsRadios.geo.checked ? newCoordsRadios.geo
+        : (newCoordsRadios.local.checked ? newCoordsRadios.local : null);
+    }
+    const r = /^#lpn_new_panel input\[name="lpn_new_coords"\]\[value="([a-z]+)"\]$/.exec(sel);
+    if (r) { return newCoordsRadios[r[1]] || null; }
+    return null;
   },
   querySelectorAll: () => [],
   // **DOCUMENT LISTENERS ARE RECORDED AND CAN BE DISPATCHED.** This was `() => {}` until
@@ -1048,6 +1086,6 @@ function loadLoopedNetwork(injectSource, preludeSource, mutate) {
 	return global.__LPN;
 }
 
-module.exports = { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
+module.exports = { ROOT, mkEl, byId, ensure, unitSelects, newCoordsRadios, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
 	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet, flushResizeObservers, clearResizeObservers,
 	visibleTip };

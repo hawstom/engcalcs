@@ -24,7 +24,7 @@
 // Every user-facing string is asserted against EngCalcs.pageConfig, never against an English
 // literal -- harness_wording_check.php is a ratchet and a reworded key must not redden this file.
 
-const { byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { byId, ensure, setUnitSet, loadLoopedNetwork, newCoordsRadios } = require('./lpn-dom-stub.js');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
@@ -35,6 +35,15 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, applySaved: applySaved,\n" +
 	"\t\tdeleteNetwork: deleteNetwork, georefStart: georefStart,\n" +
 	"\t\tcrsCatalogue: crsCatalogue, crsLabel: crsLabel, crsName: crsDisplayName,\n" +
+	// Phase 2: the spatial filter, the box that drives it, and the New-project box's own answer.
+	"\t\tcrsExtent: crsExtent, crsCovers: crsCoversPoint, crsFiltered: crsFiltered,\n" +
+	"\t\tWEBMERC: LPN_CRS_WEBMERC,\n" +
+	"\t\topenCrsBox: openCrsBox, renderCrsBoxList: renderCrsBoxList,\n" +
+	"\t\tcrsBoxSearch: crsBoxSearch, crsBoxOk: crsBoxOk, closeCrsBox: closeCrsBox,\n" +
+	"\t\tcrsBoxState: function () { return crsBox; },\n" +
+	"\t\tnewBoxAnswers: newBoxAnswers, newBoxCoords: newBoxCoords,\n" +
+	"\t\tnewBoxGeo: function () { return newBoxGeo; },\n" +
+	"\t\tsyncNewBoxCrsPick: syncNewBoxCrsPick,\n" +
 	"\t\tassignCrs: assignProjectCrs, crsCode: projectCrsCode,\n" +
 	"\t\taxisNames: axisNames, coordKind: coordKind,\n" +
 	"\t\treadoutAt: coordReadoutAt, readoutBlank: coordReadoutBlank,\n" +
@@ -78,10 +87,13 @@ setUnitSet('si');
 {
 	console.log('\n--- the catalogue ---');
 	const list = L.crsCatalogue();
-	ok('sixty UTM zones in each hemisphere', list.length === 120, String(list.length));
+	// 121: sixty UTM zones in each hemisphere, and EPSG:3857 -- which phase 2 added, because
+	// lat/lon is not a third kind of project beside "projected", it is a projection with a name.
+	ok('sixty UTM zones in each hemisphere, plus the geographic answer',
+		list.length === 121, String(list.length));
 	const codes = {};
 	list.forEach(c => { codes[c.code] = (codes[c.code] || 0) + 1; });
-	ok('no code appears twice', Object.keys(codes).length === 120);
+	ok('no code appears twice', Object.keys(codes).length === 121);
 	ok('zone 12 north is EPSG:32612', !!codes[ZONE12N]);
 	ok('zone 12 south is EPSG:32712', !!codes['EPSG:32712']);
 	ok('the name carries the zone and the hemisphere',
@@ -247,6 +259,207 @@ setUnitSet('si');
 	L.refreshMapStatus();
 	ok('...and an unprojected grid says it is not georeferenced',
 		crsEl.textContent === PC.lpn_crs_none, crsEl.textContent);
+}
+
+// ---- 7. phase 2: ONE question with TWO answers, and EPSG:3857 is the geographic one -------------
+//
+// Tom's interface specification of 2026-09-13 collapses phase 1's three radios into two. What has
+// to stay true through that collapse is everything section 2 above asserts: the declaration is
+// final, and lat/lon is still a different KIND of document from a projected plane rather than a
+// row in the same list that happens to be selected.
+{
+	console.log('\n--- phase 2: the catalogue carries the geographic answer ---');
+	const list = L.crsCatalogue();
+	ok('EPSG:3857 is in the catalogue', list.some(e => e.code === L.WEBMERC));
+	ok('...one hundred and twenty one rows in all', list.length === 121, String(list.length));
+	ok('...and it is first, being the commonest answer', list[0].code === L.WEBMERC, list[0].code);
+	ok('...named as the register names it, not described',
+		/Pseudo-Mercator/.test(L.crsLabel(L.WEBMERC)), L.crsLabel(L.WEBMERC));
+	// A lon/lat document must never store it as a projected plane: its numbers are degrees, and a
+	// project.crs of EPSG:3857 would be claiming they are metres.
+	L.reset();
+	ok('and it is refused as a projected declaration', L.assignCrs(L.WEBMERC) === false);
+	ok('...leaving the project with no projection at all', L.crsCode() === '');
+	// The status strip's geographic name and the catalogue's are ONE string now.
+	L.reset(L.GEO);
+	ok('the status strip reads the geographic name out of the catalogue',
+		L.crsName() === L.crsLabel(L.WEBMERC), L.crsName());
+}
+
+// ---- 8. WHERE ON THE EARTH A PROJECTION APPLIES -------------------------------------------------
+//
+// **THE FILTER IS DATA, NOT A TRANSFORM, AND THAT IS THE WHOLE REASON IT COULD SHIP.** An EPSG area
+// of use is a longitude and latitude box and a place-name result is a longitude and a latitude, so
+// the question "does this projection cover where I am looking" is a comparison between two things
+// already in the same units. Nothing below converts a coordinate; the transform that would turn a
+// longitude into an easting is still not in this repository.
+{
+	console.log('\n--- the extents, generated from the numbering ---');
+	// Petaluma, California -- the page's own worked example, and UTM zone 10N by arithmetic:
+	// -122.64 falls in [-126, -120), which is zone 10 of the sixty.
+	const PETALUMA = { lon: -122.6367, lat: 38.2324 };
+	const z10 = L.crsExtent('EPSG:32610');
+	ok('zone 10 north spans six degrees of longitude',
+		z10.w === -126 && z10.e === -120, z10.w + '..' + z10.e);
+	ok('...and the register\'s northern limits', z10.s === 0 && z10.n === 84, z10.s + '..' + z10.n);
+	const z10s = L.crsExtent('EPSG:32710');
+	ok('the southern zone of the same number is the same strip, below the equator',
+		z10s.w === z10.w && z10s.e === z10.e && z10s.s === -80 && z10s.n === 0);
+	ok('zone 1 starts at the antimeridian', L.crsExtent('EPSG:32601').w === -180);
+	ok('...and zone 60 ends there', L.crsExtent('EPSG:32660').e === 180);
+	ok('the geographic answer covers the whole drawable world',
+		L.crsExtent(L.WEBMERC).w === -180 && L.crsExtent(L.WEBMERC).e === 180);
+	// **A CODE WE DO NOT KNOW HAS NO EXTENT, AND THAT MUST NOT EXCLUDE IT.** The honest statement
+	// about an area of use we cannot state is that we cannot state it -- so a State Plane zone in a
+	// hand-edited file is still offered rather than quietly filtered away.
+	ok('a code we do not know states no extent', L.crsExtent('EPSG:2223') === null);
+	ok('...and is therefore not excluded by the filter', L.crsCovers('EPSG:2223', PETALUMA) === true);
+
+	console.log('\n--- the spatial filter narrows a hundred and twenty one to a handful ---');
+	ok('Petaluma is inside zone 10 north', L.crsCovers('EPSG:32610', PETALUMA) === true);
+	ok('...and outside zone 12 north', L.crsCovers(ZONE12N, PETALUMA) === false);
+	ok('...and outside its own southern twin, being north of the equator',
+		L.crsCovers('EPSG:32710', PETALUMA) === false);
+	const near = L.crsFiltered(PETALUMA, '');
+	ok('a place leaves only the projections that cover it', near.length === 2, String(near.length));
+	ok('...the geographic answer and the one zone', near.some(e => e.code === L.WEBMERC) &&
+		near.some(e => e.code === 'EPSG:32610'), near.map(e => e.code).join(','));
+	ok('no place at all offers the whole catalogue',
+		L.crsFiltered(null, '').length === 121, String(L.crsFiltered(null, '').length));
+
+	console.log('\n--- the name filter, which is the other half of Tom\'s box ---');
+	ok('a zone number narrows by name', L.crsFiltered(null, 'zone 12N').length === 1,
+		String(L.crsFiltered(null, 'zone 12N').length));
+	ok('...case does not matter', L.crsFiltered(null, 'zone 12n').length === 1);
+	ok('an EPSG code finds its own row',
+		L.crsFiltered(null, '32612').length === 1 &&
+		L.crsFiltered(null, '32612')[0].code === ZONE12N);
+	ok('the two filters compose', L.crsFiltered(PETALUMA, 'UTM').length === 1 &&
+		L.crsFiltered(PETALUMA, 'UTM')[0].code === 'EPSG:32610');
+	ok('a name that matches nothing leaves nothing, rather than everything',
+		L.crsFiltered(null, 'State Plane').length === 0);
+}
+
+// ---- 9. THE BOX ITSELF: two filters, one catalogue, and the answer it hands back -----------------
+{
+	console.log('\n--- the Geographic projection box ---');
+	const PETALUMA = { lat: 38.2324, lon: -122.6367, extent: null };
+	const listEl = byId.lpn_crsbox_list, viewEl = byId.lpn_crsbox_view,
+		nameEl = byId.lpn_crsbox_name, noteEl = byId.lpn_crsbox_note,
+		placeEl = byId.lpn_crsbox_place;
+	L.reset();
+	let picked = null;
+	L.openCrsBox(L.WEBMERC, null, function (code, ll) { picked = { code: code, ll: ll }; });
+	ok('it opens', byId.lpn_crsbox.style.display === 'block', byId.lpn_crsbox.style.display);
+	ok('...on the whole catalogue, because no place has been found yet',
+		listEl.children.length === 121, String(listEl.children.length));
+	ok('...and says so rather than looking broken', noteEl.textContent === PC.lpn_crs_noview,
+		noteEl.textContent);
+	ok('...opening on the projection it was handed', L.crsBoxState().code === L.WEBMERC);
+
+	// THE PLACE ARRIVES, and the list collapses. This is the whole feature.
+	L.crsBoxState().place = PETALUMA;
+	L.renderCrsBoxList();
+	ok('a place narrows the list to what covers it', listEl.children.length === 2,
+		String(listEl.children.length));
+	ok('...and the note counts rather than apologising',
+		noteEl.textContent === PC.lpn_crs_count.replace('{n}', '2').replace('{total}', '121'),
+		noteEl.textContent);
+	ok('...and the choice survived the narrowing, being still on the list',
+		L.crsBoxState().code === L.WEBMERC);
+
+	// Turning the filter OFF is the other half of Tom's checkbox.
+	viewEl.checked = false;
+	L.renderCrsBoxList();
+	ok('unchecking the map filter offers the whole list again', listEl.children.length === 121);
+	viewEl.checked = true;
+
+	// A filter that excludes the current choice must move it to something real rather than leave
+	// the box reporting a projection that is not on its own list.
+	nameEl.value = 'zone 10N';
+	L.renderCrsBoxList();
+	ok('the name filter composes with the place', listEl.children.length === 1);
+	ok('...and the choice moved to the only row left', L.crsBoxState().code === 'EPSG:32610',
+		L.crsBoxState().code);
+	ok('...which is what the selector is showing', listEl.value === 'EPSG:32610', listEl.value);
+
+	// **THE ANSWER GOES TO THE CALLER; THIS BOX DECLARES NOTHING.** assignProjectCrs() stays the
+	// one writer, which is what keeps the declaration final.
+	L.crsBoxOk();
+	ok('Select hands the code back to whoever opened the box',
+		picked && picked.code === 'EPSG:32610', picked && picked.code);
+	ok('...and the place with it, so one search answers two questions',
+		picked && picked.ll && picked.ll.lat === PETALUMA.lat);
+	ok('...and the box is shut', byId.lpn_crsbox.style.display !== 'block');
+	ok('...and no project declared anything', L.crsCode() === '');
+
+	// **THE PLACE-NAME SEARCH IS THE SUITE'S ONE GEOCODER, THROUGH ITS OWN GATE.** What is asserted
+	// here is that the box asks js/lpn-search.js for a POINT and does not move the map: a box
+	// choosing a projection for a project that does not exist yet has no map to move.
+	console.log('\n--- the place-name search, through js/lpn-search.js ---');
+	const realPoint = global.EngCalcs.lpnSearchPoint;
+	let asked = [];
+	global.EngCalcs.lpnSearchPoint = function (text, onHit) {
+		asked.push(text);
+		onHit({ lat: PETALUMA.lat, lon: PETALUMA.lon, extent: null, label: 'Petaluma' });
+	};
+	L.openCrsBox(L.WEBMERC, null, function () {});
+	ok('it opens on the whole catalogue again', listEl.children.length === 121);
+	placeEl.value = '  Petaluma, California  ';
+	L.crsBoxSearch();
+	ok('the words typed reach the one geocoder, trimmed',
+		asked.length === 1 && asked[0] === 'Petaluma, California', JSON.stringify(asked));
+	ok('...and the point it answers with becomes the filter',
+		listEl.children.length === 2, String(listEl.children.length));
+	asked = [];
+	placeEl.value = '   ';
+	L.crsBoxSearch();
+	ok('an empty field sends nothing at all', asked.length === 0);
+	global.EngCalcs.lpnSearchPoint = realPoint;
+	L.closeCrsBox();
+}
+
+// ---- 10. THE NEW-PROJECT BOX: two radios, and where EPSG:3857 parts from the rest ----------------
+//
+// The collapse from three answers to two costs exactly one comparison, and it is in newBoxAnswers().
+// Getting it wrong makes a document that stores degrees and calls them a projected plane, or one
+// that stores eastings with no projection named -- both of which render perfectly.
+{
+	console.log('\n--- the New-project box, with two radios ---');
+	L.reset();
+	newCoordsRadios.local.checked = true;
+	ok('the box opens on the answer that commits to nothing', L.newBoxCoords() === 'local');
+	ok('...which asks for no projection at all',
+		L.newBoxAnswers().geo === false && L.newBoxAnswers().crs === '');
+
+	newCoordsRadios.geo.checked = true;
+	ok('choosing the geographic radio is read back', L.newBoxCoords() === 'geo');
+	L.newBoxGeo().crs = L.WEBMERC;
+	L.newBoxGeo().place = null;
+	ok('...and EPSG:3857 makes a lat/lon project, not a projected one',
+		L.newBoxAnswers().geo === true && L.newBoxAnswers().crs === '');
+
+	L.newBoxGeo().crs = ZONE12N;
+	ok('...while any other projection makes a projected one',
+		L.newBoxAnswers().geo === false && L.newBoxAnswers().crs === ZONE12N);
+
+	// A projection chosen in the box and then abandoned by unchecking the radio is a declaration
+	// nobody made, and this is the one declaration that can never be withdrawn.
+	newCoordsRadios.local.checked = true;
+	ok('a projection left over from a chooser nobody committed to is not declared',
+		L.newBoxAnswers().geo === false && L.newBoxAnswers().crs === '');
+
+	// The chooser button STATES the answer, which is what makes it one control rather than two.
+	newCoordsRadios.geo.checked = true;
+	L.newBoxGeo().crs = ZONE12N;
+	L.syncNewBoxCrsPick();
+	ok('the chooser button reads the projection now in force',
+		byId.lpn_new_crs_pick.textContent.indexOf(L.crsLabel(ZONE12N)) === 0,
+		byId.lpn_new_crs_pick.textContent);
+	newCoordsRadios.local.checked = true;
+	L.syncNewBoxCrsPick();
+	ok('...and is greyed when the question belongs to the other radio',
+		byId.lpn_new_crs_pick.disabled === true);
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));

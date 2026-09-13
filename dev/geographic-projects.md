@@ -257,3 +257,59 @@ consent gate down, taking the nodes as an argument, so all doors are one behavio
 - `dev/lpn-spike/terrain-harness.js` drives the real page. Its tile stub returns BYTES encoded by
   Mapbox's own formula from an independent inverse Mercator, so the tile arithmetic, the pixel
   index and the decode are all still under test.
+
+## 8. The coordinate-system question has TWO answers, not three (Task 641 phase 2)
+
+Tom specified the interface on 2026-09-13, and it supersedes phase 1's three radios:
+
+```
+Coordinate system ?
+_ Geographic projection [...]
+_ Local, schematic, custom, or georeference later
+```
+
+**lat/lon is not a third kind of project beside "projected"; it is a projection, and the register
+names it** — EPSG:3857, WGS 84 / Pseudo-Mercator, which §6 above establishes is the frame this page
+has drawn in all along. So one radio covers the whole catalogue and the chooser decides which
+document you get: EPSG:3857 makes the lon/lat project this page has always made, basemap, place-name
+search and terrain elevations included; any other code makes the projected project of phase 1, which
+holds the user's own eastings and northings and converts nothing. `newBoxAnswers()` is the one place
+those two part, and it is one comparison.
+
+**EPSG:3857 is never stored as `project.crs`.** `assignProjectCrs()` refuses it by name: a document
+stating it as a projected plane would be claiming its longitudes are metres. `isGeoProject()` remains
+the one thing that answers "is this document lon/lat".
+
+### The Geographic projection box, and why a spatial filter needed no library
+
+Tom: it *"uses the map view as a UX element to filter the universe of projections to the ones
+applicable to the project (view). Lets the user filter by name and select a projection at any time."*
+Two filters over one catalogue — a map-view filter and a free-text name filter — feeding a selector.
+
+**AN AREA OF USE IS A LONGITUDE AND LATITUDE BOX, WHICH IS THE WHOLE REASON THIS SHIPPED.** The EPSG
+register states every projection's extent in lon/lat, and a place-name result is a lon/lat, so "does
+this cover where I am looking" is a comparison between two things already in the same units.
+`crsExtent()` generates all 121 extents from the numbering — a UTM zone is six degrees wide by
+definition, with the register's own 84 / −80 limits — so the filter is DATA and not a transform, and
+nothing in it needs proj4js. Searching Petaluma leaves 2 of 121 rows standing.
+
+An extent we cannot state returns null, and null DOES NOT EXCLUDE: a hand-edited State Plane code is
+still offered, because the honest statement about an area of use we do not know is that we do not
+know it.
+
+**The place-name row is the suite's one geocoder through its own gate.** `EngCalcs.lpnSearchPoint()`
+is a second DESTINATION for `js/lpn-search.js`, not a second engine — same `ec_geosearch` consent
+question, same one-a-second rule, same chooser and same repeated-query memory; it hands back the
+point instead of moving the map, because a box choosing a projection for a project that does not
+exist yet has no map to move. The point it finds is also where the new geographic project opens, so
+one search answers two questions and costs one request.
+
+### What is still blocked on a transform
+
+Converting a network BETWEEN coordinate systems, a basemap or terrain elevations behind a projected
+project, and the point scale factor of ruling P7. All of them need a real forward and inverse
+projection, which is proj4js, which is not vendored and whose vendoring is Tom's decision.
+`File > Open to new coordinates` (renamed from "Open an xy file on the map", Tom's name, 2026-09-13)
+still does what it always did — the georeferencing wizard over a lon/lat frame — and now names the
+arriving project `Project{n}`, because the file's own name belongs to the file, which still exists
+and still holds the coordinates it always held.

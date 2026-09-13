@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**81 still to read**, of 88 untranslated keys, of 1856 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**98 still to read**, of 105 untranslated keys, of 1873 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (88, 81 to read @@ NEEDS RULING)
+## lpn_  (105, 98 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -195,8 +195,44 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_cp_validate_tip`**
   > Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.
   @@ NEEDS RULING
+- **`lpn_crs_choose`**
+  > Select
+  @@ NEEDS RULING
+- **`lpn_crs_count`**
+  > {n} of {total} projections listed.
+  @@ NEEDS RULING
+- **`lpn_crs_list`**
+  > Projection
+  @@ NEEDS RULING
+- **`lpn_crs_list_tip`**
+  > The projections left by the two filters above. Choose one and press Select.
+  @@ NEEDS RULING
+- **`lpn_crs_name`**
+  > Projection name filter
+  @@ NEEDS RULING
+- **`lpn_crs_name_tip`**
+  > Shows only the projections whose name or EPSG code contains what you type. Try a zone number, or UTM, or Mercator.
+  @@ NEEDS RULING
 - **`lpn_crs_none`**
   > Not georeferenced
+  @@ NEEDS RULING
+- **`lpn_crs_noview`**
+  > No place has been searched for yet, so the whole list is offered. Search for a place above to narrow it.
+  @@ NEEDS RULING
+- **`lpn_crs_place`**
+  > Place name search
+  @@ NEEDS RULING
+- **`lpn_crs_place_tip`**
+  > Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.
+  @@ NEEDS RULING
+- **`lpn_crs_search`**
+  > Search
+  @@ NEEDS RULING
+- **`lpn_crs_view`**
+  > Filter by map view
+  @@ NEEDS RULING
+- **`lpn_crs_view_tip`**
+  > Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.
   @@ NEEDS RULING
 - **`lpn_field_easting`**
   > Easting
@@ -228,8 +264,23 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_menu_cue`**
   > Start with the menus above. Use the toolbar for quick access.
   @@ NEEDS RULING
-- **`lpn_new_coords_proj`**
-  > projected coordinates
+- **`lpn_new_coordsys`**
+  > Coordinate system
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_geo`**
+  > Geographic projection
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_geo_tip`**
+  > Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_local`**
+  > Local, schematic, custom, or georeference later
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_local_tip`**
+  > Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_tip`**
+  > Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.
   @@ NEEDS RULING
 - **`lpn_new_crs`**
   > Map projection

@@ -2961,7 +2961,21 @@ var EngCalcs = EngCalcs || {};
 	// not, so they are absent by construction rather than by a new gate. They wait on proj4js
 	// (ruling P3), and so does the point scale factor of ruling P7. **Nothing here claims anything
 	// about the accuracy of a length**; that claim waits on Task 643.
+	//
+	// **PHASE 2 COLLAPSED THE QUESTION FROM THREE ANSWERS TO TWO** (Tom's interface specification,
+	// 2026-09-13). lat/lon is not a third kind beside "projected"; it IS a projection, and the
+	// register names it -- EPSG:3857, WGS 84 / Pseudo-Mercator, which is the frame this page has
+	// drawn in since the projection seam landed. So the catalogue carries it, the New-project box
+	// offers one "geographic projection" radio over the whole list, and EPSG:3857 is the answer
+	// that produces exactly the lat/lon project this page has always made -- basemap, place-name
+	// search, terrain elevations and all. Everything else in the catalogue is a plane we hold the
+	// user's own eastings and northings in without converting them.
 	var LPN_CRS_UTM_N = 32600, LPN_CRS_UTM_S = 32700, LPN_CRS_UTM_ZONES = 60;
+	// **EPSG:3857 IS THE GEOGRAPHIC ANSWER AND IS NEVER STORED AS `project.crs`.** It names the
+	// drawing frame of a lon/lat document, and a document that stated it as a projected plane would
+	// be claiming its numbers are metres. isGeoProject() is the one thing that answers "is this
+	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
+	var LPN_CRS_WEBMERC = 'EPSG:3857';
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -2971,6 +2985,8 @@ var EngCalcs = EngCalcs || {};
 	// growth, not its limit.
 	function crsCatalogue() {
 		var out = [], z;
+		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
+		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
 		for (z = 1; z <= LPN_CRS_UTM_ZONES; z++) {
 			out.push({ code: 'EPSG:' + (LPN_CRS_UTM_N + z), name: 'WGS 84 / UTM zone ' + z + 'N' });
 		}
@@ -2991,6 +3007,53 @@ var EngCalcs = EngCalcs || {};
 		var e = crsEntry(code);
 		return e ? e.name : String(code || '');
 	}
+	// ---- WHERE ON THE EARTH A PROJECTION APPLIES, AND WHY THAT IS NOT A TRANSFORM ---------------
+	//
+	// **AN AREA OF USE IS A LONGITUDE AND LATITUDE BOX, WHICH IS THE WHOLE REASON THIS IS CHEAP.**
+	// The EPSG register states every projection's extent in lon/lat, and a place-name result is a
+	// lon/lat too, so "does this projection cover where I am looking" is a comparison between two
+	// numbers already in the same units. Nothing here converts a coordinate and nothing here needs
+	// a projection library: the transform -- turning a longitude into an easting -- is a separate
+	// thing this page still does not have and must not pretend to (ruling P3, and Task 643 for any
+	// claim about a length).
+	//
+	// **GENERATED FROM THE NUMBERING, like the catalogue it filters**, so 121 extents cost one
+	// formula and no two of them can disagree. A UTM zone is six degrees of longitude wide by
+	// definition, and the register's own north/south latitude limits are 84 and -80.
+	//
+	// A code we do not know returns null, and null is DOES-NOT-EXCLUDE rather than does-not-match:
+	// a file hand-edited to a State Plane zone must still be offered, because the honest statement
+	// about an extent we cannot state is that we cannot state it.
+	function crsExtent(code) {
+		var c = String(code || ''), n, north, south, z;
+		if (c === LPN_CRS_WEBMERC) {
+			return { w: -180, e: 180, s: -LPN_MERC_MAX_LAT, n: LPN_MERC_MAX_LAT };
+		}
+		if (!/^EPSG:[0-9]+$/.test(c)) { return null; }
+		n = parseInt(c.slice(5), 10);
+		north = n > LPN_CRS_UTM_N && n <= LPN_CRS_UTM_N + LPN_CRS_UTM_ZONES;
+		south = n > LPN_CRS_UTM_S && n <= LPN_CRS_UTM_S + LPN_CRS_UTM_ZONES;
+		if (!north && !south) { return null; }
+		z = n - (north ? LPN_CRS_UTM_N : LPN_CRS_UTM_S);
+		return { w: -180 + 6 * (z - 1), e: -180 + 6 * z,
+			s: north ? 0 : -80, n: north ? 84 : 0 };
+	}
+	// `ll` is { lon, lat } -- SYSTEM order, x then y, which is what every caller here holds.
+	function crsCoversPoint(code, ll) {
+		var ex = crsExtent(code);
+		if (!ex || !ll) { return true; }
+		return ll.lon >= ex.w && ll.lon <= ex.e && ll.lat >= ex.s && ll.lat <= ex.n;
+	}
+	// The two filters of the box, as ONE function of a plain value, so a harness can ask what the
+	// list would be without driving a select. `text` matches the NAME or the CODE, because somebody
+	// who knows they want EPSG:32612 should be able to type it.
+	function crsFiltered(ll, text) {
+		var t = String(text == null ? '' : text).trim().toLowerCase();
+		return crsCatalogue().filter(function (e) {
+			if (t && (e.name + ' ' + e.code).toLowerCase().indexOf(t) < 0) { return false; }
+			return crsCoversPoint(e.code, ll);
+		});
+	}
 	function projectCrsCode() { return (project && project.crs) ? String(project.crs) : ''; }
 	function isProjectedProject() { return !isGeoProject() && !!projectCrsCode(); }
 	// THE ONLY WRITER. Refuses a project that already declares one, refuses a lat/lon project (which
@@ -2999,6 +3062,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isGeoProject()) { return false; }
+		// **EPSG:3857 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
+		// lon/lat project, and newProject() takes that branch; if it ever reached here it would
+		// write a document claiming its longitudes were metres.
+		if (String(code) === LPN_CRS_WEBMERC) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
 			(doc.labels && doc.labels.length))) { return false; }
@@ -3010,7 +3077,7 @@ var EngCalcs = EngCalcs || {};
 	// on the Earth -- which is a fact worth printing rather than leaving blank.
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
-		if (isGeoProject()) { return 'WGS 84 / Pseudo-Mercator'; }
+		if (isGeoProject()) { return crsLabel(LPN_CRS_WEBMERC); }
 		code = projectCrsCode();
 		return code ? crsLabel(code) : (pc.lpn_crs_none || 'Not georeferenced');
 	}
@@ -19774,7 +19841,22 @@ var EngCalcs = EngCalcs || {};
 		// after the project rather than the file, and why Save cannot go back where this came from.
 		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
-		if (asGeo && upId) { georefStart(); }
+		if (asGeo && upId) { renameToNumbered(upId); georefStart(); }
+	}
+	// **A CONVERTED PROJECT IS A NEW PROJECT AND IS NAMED LIKE ONE** (Tom, 2026-09-13, specifying
+	// what File > Open to new coordinates does: *"Behavior = existing plus Project name =
+	// 'Project{n}'"*). The file's own name belongs to the FILE, which still exists and still holds
+	// the coordinates it always held; what is on screen is a second document about to be placed
+	// somewhere else. Carrying the name over would give two different documents one name, and the
+	// one this page can save is the one that is not the original.
+	function renameToNumbered(id) {
+		var entry = indexEntry(id);
+		if (!entry || !project) { return; }
+		project.name = nextProjectName();
+		entry.name = project.name;
+		saveIndex();
+		saveToStorage();
+		renderTabs();
 	}
 
 	// ---- EPANET .inp import (ROADMAP Task 196) ----
@@ -20629,7 +20711,7 @@ var EngCalcs = EngCalcs || {};
 		// A file that already states DEGREES arrived on the map by itself -- docFromInp() read that
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that
 		// rather than starting a wizard over coordinates that are already lon/lat.
-		if (asGeo) { georefStart(); }
+		if (asGeo) { renameToNumbered(id); georefStart(); }
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
@@ -22776,28 +22858,27 @@ var EngCalcs = EngCalcs || {};
 	var newBoxUnits = [];     // [{ name, sel }] -- the clone beside the real select's name
 	var newBoxWired = false;
 	function newBoxEl() { return document.getElementById('lpn_new_panel'); }
-	// 'xy', 'geo' or 'proj' -- the three answers to the one question that cannot be changed
-	// afterwards. Defaults to 'xy', which is what openNewProjectBox() checks on open.
+	// 'geo' or 'local' -- **TWO answers, not three** (Task 641 phase 2, Tom's interface
+	// specification of 2026-09-13). A geographic project states a PROJECTION and lat/lon is one of
+	// them; what is left over is the project that sits on no part of the Earth. Defaults to
+	// 'local', which is what openNewProjectBox() checks on open: the box has always opened on the
+	// answer that commits to nothing, and this is that answer.
 	function newBoxCoords() {
 		var r = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"]:checked');
-		return (r && r.value) ? String(r.value) : 'xy';
+		return (r && r.value) ? String(r.value) : 'local';
 	}
-	function newBoxIsGeo() { return newBoxCoords() === 'geo'; }
-	// **THE PROJECTION LIST IS BUILT, NOT TYPED**, the same way the unit selects below it are cloned
-	// rather than retyped: crsCatalogue() generates it from the EPSG numbering, so this box holds no
-	// second opinion about what a zone is called (Task 641).
-	function buildNewBoxCrs() {
-		var sel = document.getElementById('lpn_new_crs'), list, i, opt;
-		if (!sel) { return; }
-		sel.innerHTML = '';
-		list = crsCatalogue();
-		for (i = 0; i < list.length; i++) {
-			opt = document.createElement('option');
-			opt.value = list[i].code;
-			opt.textContent = list[i].name;
-			sel.appendChild(opt);
-		}
-		if (list.length) { sel.value = list[0].code; }
+	// **THE BOX'S OWN ANSWER TO THE PROJECTION QUESTION, AND THE PLACE THAT CAME WITH IT.**
+	// EPSG:3857 to begin with, which is Tom's own recommendation in the radio's tip and which makes
+	// exactly the lat/lon project this page has always made. `place` is whatever the projection
+	// box's place-name search last found: it filters the catalogue there, and it is where the new
+	// project opens here, so one search answers two questions.
+	var newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
+	// The chooser states the answer and changes it, so its LABEL is the projection now in force.
+	function syncNewBoxCrsPick() {
+		var b = document.getElementById('lpn_new_crs_pick');
+		if (!b) { return; }
+		b.textContent = crsLabel(newBoxGeo.crs) + '\u2026';
+		b.disabled = newBoxCoords() !== 'geo';
 	}
 	// **CLONED, AND THE `name` ATTRIBUTE IS THE THING THAT MUST NOT SURVIVE THE CLONE.**
 	// wireUnitSelects() listens on the DOCUMENT for a change whose target's `name` is one of
@@ -22861,22 +22942,6 @@ var EngCalcs = EngCalcs || {};
 			if (want !== undefined) { u.sel.value = want; }
 		});
 	}
-	// The place field belongs to the lat/lon choice, so it is DISABLED rather than hidden: a control
-	// that vanishes as you touch the radio above it reads as a glitch, where a greyed one says which
-	// choice the question belongs to.
-	function syncNewBoxPlace() {
-		var box = document.getElementById('lpn_new_place'), geo = newBoxIsGeo();
-		if (!box) { return; }
-		box.disabled = !geo;
-		if (!geo) { box.value = ''; }
-	}
-	// The projection select belongs to the projected choice exactly as the place field above belongs
-	// to lat/lon, and is greyed rather than hidden for the same reason.
-	function syncNewBoxCrs() {
-		var sel = document.getElementById('lpn_new_crs');
-		if (!sel) { return; }
-		sel.disabled = newBoxCoords() !== 'proj';
-	}
 	function closeNewBox() {
 		var box = newBoxEl();
 		hidePanel(box);
@@ -22887,17 +22952,24 @@ var EngCalcs = EngCalcs || {};
 	// last), and splitting it out is what lets a harness drive it without a browser.
 	// { geo, place, method, units }.
 	function newBoxAnswers() {
-		var placeEl = document.getElementById('lpn_new_place'),
-			methodEl = document.getElementById('lpn_new_method'),
-			crsEl = document.getElementById('lpn_new_crs'),
-			kind = newBoxCoords(), geo = kind === 'geo', units = {};
+		var methodEl = document.getElementById('lpn_new_method'),
+			kind = newBoxCoords(), onEarth = kind === 'geo',
+			code = onEarth ? String(newBoxGeo.crs || '') : '', units = {};
 		newBoxUnits.forEach(function (u) { units[u.name] = u.sel.value; });
 		return {
-			geo: geo,
-			// Only when the projected radio is the one checked: a code read off a greyed select is a
-			// declaration nobody made, and this is the one declaration that can never be withdrawn.
-			crs: (kind === 'proj' && crsEl) ? String(crsEl.value || '') : '',
-			place: (geo && placeEl) ? String(placeEl.value || '').trim() : '',
+			// **EPSG:3857 IS THE lat/lon PROJECT AND EVERY OTHER CODE IS A PROJECTED ONE.** That is
+			// the whole of what collapsing three radios into two costs: one comparison, here, at the
+			// one place the box's answer becomes a project. The two kinds are genuinely different
+			// documents -- one stores degrees and draws Web Mercator behind them, the other stores
+			// the plane's own eastings and northings -- and this is where they part.
+			geo: onEarth && code === LPN_CRS_WEBMERC,
+			// Only when the geographic radio is the one checked: a code left over from a chooser
+			// nobody opened is a declaration nobody made, and this is the one declaration that can
+			// never be withdrawn.
+			crs: (onEarth && code !== LPN_CRS_WEBMERC) ? code : '',
+			// The point the place-name search found, not the words that found it: the search has
+			// already run, in the projection box, so this costs no second request.
+			place: onEarth ? newBoxGeo.place : null,
 			method: methodEl ? methodEl.value : frictionMethod(),
 			units: units
 		};
@@ -22910,7 +22982,7 @@ var EngCalcs = EngCalcs || {};
 	function createProjectFrom(a) {
 		var coords = a.geo ? LPN_COORDS_GEO : null,
 			crs = a.geo ? '' : (a.crs || ''),
-			place = a.place || '',
+			place = a.place || null,
 			method = a.method || frictionMethod(),
 			units = a.units || {}, id;
 		id = newProject(coords, crs);
@@ -22930,11 +23002,14 @@ var EngCalcs = EngCalcs || {};
 		// the very defect the baseline exists to remove (Task 264).
 		stampProjectSaved(id);
 		renderTabs();
-		// LAST, and only for a lat/lon project with something typed. It is the page's one search path:
-		// the consent question, the one-a-second rule and the chooser are all in js/lpn-search.js and
-		// none of them is reimplemented here. It runs after the project exists because moving the map
-		// is what a result DOES.
-		if (coords && place && EngCalcs.lpnSearchRun) { EngCalcs.lpnSearchRun(place); }
+		// LAST, and only for a lat/lon project that found a place. **IT IS A POINT NOW, NOT WORDS**
+		// (Task 641 phase 2): the search already ran, in the projection box, where it was answering
+		// the filter question -- so arriving there costs no second request to somebody else's free
+		// service, which is the one-a-second rule honoured by not asking twice. It runs after the
+		// project exists because moving the map is what a result DOES.
+		if (coords && place && isFinite(place.lat) && isFinite(place.lon)) {
+			goToPoint({ lat: place.lat, lon: place.lon }, place.extent);
+		}
 		return id;
 	}
 	function wireNewBox() {
@@ -22954,8 +23029,18 @@ var EngCalcs = EngCalcs || {};
 		if (si) { si.addEventListener('click', function () { applyNewBoxPreset('si'); }); }
 		if (us) { us.addEventListener('click', function () { applyNewBoxPreset('us'); }); }
 		if (method) { method.addEventListener('change', syncNewBoxRoughness); }
+		var pick = document.getElementById('lpn_new_crs_pick');
+		if (pick) {
+			pick.addEventListener('click', function () {
+				openCrsBox(newBoxGeo.crs, newBoxGeo.place, function (code, ll) {
+					newBoxGeo.crs = code;
+					newBoxGeo.place = ll || newBoxGeo.place;
+					syncNewBoxCrsPick();
+				});
+			});
+		}
 		box.addEventListener('change', function (e) {
-			if (e.target && e.target.name === 'lpn_new_coords') { syncNewBoxPlace(); syncNewBoxCrs(); }
+			if (e.target && e.target.name === 'lpn_new_coords') { syncNewBoxCrsPick(); }
 		});
 		// Enter is Create and Escape is Cancel, which is what makes this box one keystroke for
 		// somebody who only ever wanted a blank sheet. Enter is taken on the BOX, not on the text
@@ -22975,15 +23060,17 @@ var EngCalcs = EngCalcs || {};
 		// this page is set to, an xy grid, and an empty place field. A box that remembered the last
 		// answers would be a fifth kind of stored preference, and this page's own rule is that a
 		// preference is saved as an empty template project rather than as a setting.
-		var xy = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"][value="xy"]');
-		if (xy) { xy.checked = true; }
+		var local = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"][value="local"]');
+		if (local) { local.checked = true; }
+		// The projection answer resets with the box, for the reason the note above gives: a box that
+		// remembered the last answers would be a fifth kind of stored preference, and a remembered
+		// PLACE is a record of where somebody's network is, which this page stores nowhere.
+		newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
 		buildNewBoxUnits();
-		buildNewBoxCrs();
 		method = document.getElementById('lpn_new_method');
 		if (method) { method.value = frictionMethod(); }
 		syncNewBoxRoughness();
-		syncNewBoxPlace();
-		syncNewBoxCrs();
+		syncNewBoxCrsPick();
 		box.style.display = 'block';
 		raisePanel(box);   // centred, not dragged, so it is raised where it becomes visible
 		h = fitPanelToViewport(box);
@@ -22993,6 +23080,160 @@ var EngCalcs = EngCalcs || {};
 		initTipsIn(box);
 		var create = document.getElementById('lpn_new_create');
 		if (create && create.focus) { create.focus(); }
+	}
+	// ---- THE GEOGRAPHIC PROJECTION BOX (ROADMAP Task 641 phase 2) -------------------------------
+	//
+	// Tom, 2026-09-13: it *"uses the map view as a UX element to filter the universe of projections
+	// to the ones applicable to the project (view). Lets the user filter by name and select a
+	// projection at any time."*
+	//
+	// **TWO FILTERS OVER ONE CATALOGUE, AND NEITHER IS A TRANSFORM.** The spatial one asks whether
+	// a projection's area of use covers the point the map is looking at -- a comparison between two
+	// lon/lat pairs, which is why 121 rows can be narrowed to the two or three that apply without
+	// this page owning any way to turn a longitude into an easting. crsExtent() states where the
+	// data comes from and what null means there.
+	//
+	// **THE VIEW IS A POINT, NOT A DOCUMENT.** It comes from the open project when that project is
+	// on the Earth, and from the place-name search otherwise -- which is what makes the box usable
+	// before there is a project at all, which is the case it exists for. It is never stored.
+	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
+	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
+	function crsBoxViewOn() {
+		var c = document.getElementById('lpn_crsbox_view');
+		return !!(c && c.checked);
+	}
+	// What the spatial filter is filtering BY: the checkbox's answer and the point together, so a
+	// filter that is on with nothing to filter by is one value rather than two conditions at every
+	// call site. null means "offer everything", which is what crsFiltered() does with it.
+	function crsBoxPoint() { return crsBoxViewOn() ? crsBox.place : null; }
+	// **THE LIST IS REBUILT, AND THE CHOICE SURVIVES IT WHEREVER IT CAN.** Typing in either filter
+	// must not silently move the answer to something else; only a filter that excludes the current
+	// choice may, and then it falls to the first row rather than to nothing.
+	function renderCrsBoxList() {
+		var pc = EngCalcs.pageConfig || {},
+			sel = document.getElementById('lpn_crsbox_list'),
+			note = document.getElementById('lpn_crsbox_note'),
+			nameEl = document.getElementById('lpn_crsbox_name'),
+			total = crsCatalogue().length,
+			list = crsFiltered(crsBoxPoint(), nameEl ? nameEl.value : ''),
+			kept = crsBox.code, has = false, i, opt;
+		if (!sel) { return; }
+		sel.innerHTML = '';
+		for (i = 0; i < list.length; i++) {
+			if (list[i].code === kept) { has = true; }
+			opt = document.createElement('option');
+			opt.value = list[i].code;
+			opt.textContent = list[i].name;
+			sel.appendChild(opt);
+		}
+		// Membership is decided from the LIST rather than by writing to the select and reading it
+		// back: a real <select> refuses a value it has no option for and the headless DOM the
+		// harnesses run against accepts any string, so reading the element back would test the
+		// stub rather than the rule.
+		crsBox.code = has ? kept : (list.length ? list[0].code : kept);
+		sel.value = crsBox.code;
+		if (note) {
+			// A filter that is on and filtering nothing looks broken, so it says which it is.
+			note.textContent = (crsBoxViewOn() && !crsBox.place)
+				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above to narrow it.')
+				: (pc.lpn_crs_count || '{n} of {total} projections listed.')
+					.replace('{n}', String(list.length)).replace('{total}', String(total));
+		}
+	}
+	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
+	// second DESTINATION rather than by a second engine. What comes back is a point, so the map is
+	// not moved by a box that is choosing a projection; the point becomes the filter, and a new
+	// geographic project later opens there.
+	function crsBoxSearch() {
+		var field = document.getElementById('lpn_crsbox_place'),
+			text = field ? String(field.value || '').trim() : '';
+		if (!text || !EngCalcs.lpnSearchPoint) { return; }
+		EngCalcs.lpnSearchPoint(text, function (hit) {
+			crsBox.place = { lat: hit.lat, lon: hit.lon, extent: hit.extent };
+			renderCrsBoxList();
+		});
+	}
+	function closeCrsBox() { hidePanel(crsBoxEl()); }
+	function crsBoxOk() {
+		var sel = document.getElementById('lpn_crsbox_list'),
+			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
+			pick = crsBox.onPick;
+		closeCrsBox();
+		if (pick) { pick(code, crsBox.place); }
+	}
+	var crsBoxWired = false;
+	function wireCrsBox() {
+		if (crsBoxWired) { return; }
+		crsBoxWired = true;
+		var box = crsBoxEl();
+		if (!box) { return; }
+		var ok = document.getElementById('lpn_crsbox_ok'),
+			cancel = document.getElementById('lpn_crsbox_cancel'),
+			close = document.getElementById('lpn_crsbox_close'),
+			search = document.getElementById('lpn_crsbox_search'),
+			view = document.getElementById('lpn_crsbox_view'),
+			nameEl = document.getElementById('lpn_crsbox_name'),
+			listEl = document.getElementById('lpn_crsbox_list');
+		if (ok) { ok.addEventListener('click', crsBoxOk); }
+		if (cancel) { cancel.addEventListener('click', closeCrsBox); }
+		if (close) { close.addEventListener('click', closeCrsBox); }
+		if (search) { search.addEventListener('click', crsBoxSearch); }
+		if (view) { view.addEventListener('change', renderCrsBoxList); }
+		if (nameEl) { nameEl.addEventListener('input', renderCrsBoxList); }
+		// The selector is the answer, so reading it back on every change keeps crsBox.code true
+		// while the two filters above are being typed into.
+		if (listEl) {
+			listEl.addEventListener('change', function () {
+				if (listEl.value) { crsBox.code = String(listEl.value); }
+			});
+		}
+		// **ENTER IN THE PLACE FIELD SEARCHES; ENTER ANYWHERE ELSE SELECTS.** A text field whose
+		// Enter dismissed the box would send somebody away with the projection they started with,
+		// one keystroke after typing the name of the town that would have chosen it for them.
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				if (e.target === document.getElementById('lpn_crsbox_place')) { crsBoxSearch(); }
+				else { crsBoxOk(); }
+			} else if (e.key === 'Escape') { e.preventDefault(); closeCrsBox(); }
+		});
+	}
+	// `code` is what to open on, `place` the point already found if there is one, `onPick` where the
+	// answer goes. The caller owns the answer: this box states no project's projection itself, which
+	// is what keeps assignProjectCrs() the only writer.
+	function openCrsBox(code, place, onPick) {
+		var box = crsBoxEl(), h, r, v;
+		if (!box) { return; }
+		wireCrsBox();
+		crsBox.code = code || LPN_CRS_WEBMERC;
+		crsBox.onPick = onPick || null;
+		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** Only a geographic project has a view that is
+		// a place on the Earth; a projected or local one has eastings or canvas units, and turning
+		// those into a longitude is the transform this page does not have. So the point comes from
+		// the open project when it can, from the caller when it was found earlier in this box, and
+		// from the place-name search otherwise.
+		crsBox.place = place || null;
+		if (!crsBox.place && isGeoProject()) {
+			v = currentView();
+			if (v) { crsBox.place = { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+		}
+		var field = document.getElementById('lpn_crsbox_place'),
+			nameEl = document.getElementById('lpn_crsbox_name'),
+			viewEl = document.getElementById('lpn_crsbox_view');
+		if (field) { field.value = ''; }
+		if (nameEl) { nameEl.value = ''; }
+		if (viewEl) { viewEl.checked = true; }
+		renderCrsBoxList();
+		box.style.display = 'block';
+		raisePanel(box);
+		h = fitPanelToViewport(box);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+		box.style.top = Math.max(chromeFloor(), (window.innerHeight - h) / 2) + 'px';
+		initTipsIn(box);
+		// The place field, because the box's own Escape and Enter live on a keydown handler that
+		// only fires while focus is inside it -- and because a place is the first thing to type.
+		if (field && field.focus) { field.focus(); }
 	}
 	function openFileMenu(anchor) {
 		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
@@ -23068,7 +23309,7 @@ var EngCalcs = EngCalcs || {};
 			// nothing about the project on screen makes this impossible, because the result is a new
 			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
 			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open an xy file on the map…',
+			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open to new coordinates…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a

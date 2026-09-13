@@ -55,6 +55,10 @@ const L = loadLoopedNetwork(
   // Task 477's New-project box: the opener, the value it makes a project out of, and the closer.
   "\t\topenNewProjectBox: openNewProjectBox, createProjectFrom: createProjectFrom,\n" +
   "\t\tnewBoxAnswers: newBoxAnswers, closeNewBox: closeNewBox,\n" +
+  // Task 641 phase 2: the place a new geographic project opens at is a POINT now, so the harness
+  // reads the view back through the same two boundary functions the page draws with.
+  "\t\tcurrentView: currentView, outwardX: outwardX, outwardY: outwardY,\n" +
+  "\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
   "\t\trefreshMapStatus: refreshMapStatus,\n" +
   "\t\tunitSetLabel: unitSetLabel,\n" +
   // Task 277. The gesture is driven through the REAL pointer handlers below; applyDrag() is
@@ -827,23 +831,43 @@ console.log('\n--- Settings panel stays in sync ---');
     L.settings().defaults.roughness < 1, String(L.settings().defaults.roughness));
   ok('...on a project that is still clean', L.tabAsterisk(L.indexEntry(mid)).show === false);
 
-  // A lat/lon project, and the place search. The search is js/lpn-search.js's one runner: what is
-  // asserted here is that the box CALLS it, with the words typed, and only for a lat/lon project.
-  let asked = [];
-  const realRun = EngCalcs.lpnSearchRun;
-  EngCalcs.lpnSearchRun = function (q) { asked.push(q); };
-  L.createProjectFrom({ geo: true, units: usUnits, method: 'hw', place: 'Petaluma, California' });
+  // A lat/lon project, and the place it opens at. **IT IS A POINT NOW, NOT WORDS** (Task 641
+  // phase 2): the place-name search runs in the Geographic projection box, where it is answering
+  // the "which projections cover this" question, so creating the project travels to a point that
+  // has already been found rather than sending a second request to somebody else's free service.
+  // Where that point comes from is projection-harness.js's business; what is asserted here is that
+  // the project opens on it, and only when the project is on the Earth.
+  const PETALUMA = { lat: 38.2324, lon: -122.6367, extent: null };
+  L.setCanvas(800, 600);
+  L.createProjectFrom({ geo: true, units: usUnits, method: 'hw', place: PETALUMA });
   ok('a lat/lon project is geographic', L.getProject().coords === 'geo', String(L.getProject().coords));
-  ok('...and the place typed in the box is handed to the search, unchanged',
-    asked.length === 1 && asked[0] === 'Petaluma, California', JSON.stringify(asked));
-  asked = [];
-  L.createProjectFrom({ geo: true, units: usUnits, method: 'hw', place: '' });
-  ok('an empty place field searches for nothing at all', asked.length === 0, JSON.stringify(asked));
-  asked = [];
-  L.createProjectFrom({ geo: false, units: usUnits, method: 'hw', place: 'Petaluma, California' });
-  ok('and an xy project never searches, whatever is in the field',
-    asked.length === 0, JSON.stringify(asked));
-  EngCalcs.lpnSearchRun = realRun;
+  {
+    const v = L.currentView();
+    ok('...and it opens at the place the projection box found',
+      !!v && Math.abs(L.outwardY(v.cy) - PETALUMA.lat) < 1e-6 &&
+      Math.abs(L.outwardX(v.cx) - PETALUMA.lon) < 1e-6,
+      v ? L.outwardY(v.cy) + ', ' + L.outwardX(v.cx) : 'no view');
+  }
+  L.createProjectFrom({ geo: true, units: usUnits, method: 'hw', place: null });
+  {
+    // No place found means the whole-world view a new geographic project has always opened on --
+    // which is nowhere near Petaluma, so this is observable rather than vacuous.
+    const v = L.currentView();
+    ok('a geographic project with no place opens on the world instead',
+      !!v && Math.abs(L.outwardY(v.cy)) < 1e-6 && Math.abs(L.outwardX(v.cx)) < 1e-6,
+      v ? L.outwardY(v.cy) + ', ' + L.outwardX(v.cx) : 'no view');
+  }
+  {
+    // A local project has no place on the Earth to travel to, whatever the answers carry -- its
+    // x and y are canvas units, and a longitude typed into them would be a coordinate meaning
+    // something it does not mean.
+    L.createProjectFrom({ geo: false, units: usUnits, method: 'hw', place: PETALUMA });
+    const v = L.currentView();
+    ok('and a local project never travels, whatever the answers carry',
+      !L.getProject().coords && !!v &&
+      Math.abs(v.cy - PETALUMA.lat) > 1 && Math.abs(v.cx - PETALUMA.lon) > 1,
+      v ? v.cx + ', ' + v.cy : 'no view');
+  }
 }
 
 // ---- Task 264 follow-up: a brand-new project EARNS its asterisk --------------------------------
