@@ -1004,6 +1004,14 @@ the block.
   does**: Properties, multi-properties, Find, Tables, Graphs. His whole specification, and the
   three things to decide before building (`.inp` has nowhere to put one):
   `dev/custom-property-scope.md`.
+  - **ALL NINE DESIGN QUESTIONS ARE ANSWERED (Tom, 2026-09-13)** and the answers are in the scope
+    document. The three that change the build: **everything is overridable by a scenario**, with no
+    per-property distinction (*"Let the people do the things!"*); the key is **NAMESPACED**
+    (`user_`/`custom_`) so a collision with a built-in field is impossible rather than refused; and
+    a value that breaks its own design is **FLAGGED IN PLACE, never cleared** -- which he turned
+    into a feature, *"a beautiful exploration tool. You change the constraints just to do a bit of
+    data entry error checking."* `Validate as` also gains a **Don't validate** entry, which the
+    original spec did not have.
   - **SINGULAR, in the database tradition** (Tom, 2026-09-12). The branch is `custom-property`, the
     document is `dev/custom-property-scope.md`, and a table is named for the row it holds.
   - **EMBRACE 247 but do NOT gate it.** An account number could be a custom property and the saving
