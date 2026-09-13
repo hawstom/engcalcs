@@ -1221,6 +1221,10 @@ $ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still 
 $ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any asset to move it closer to where it really is.';
 $ec_lang['lpn_georef_backdrop_unrotated']='The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
+// The same refusal for the other coordinate system that is already on the Earth (Task 641). Said
+// separately because the reason is different: a lat/lon project IS the map, while a projected one
+// states which plane it is on, and placing it again would rewrite every number in it.
+$ec_lang['lpn_georef_projected']='This project already states a map projection, so its coordinates cannot be placed on the map a second time.';
 $ec_lang['lpn_georef_empty']='That file has no network in it, so there is nothing to place.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
 // Switching projects while a model is being placed corrupted BOTH of them (Tom, 2026-09-08),
@@ -1595,6 +1599,23 @@ $ec_lang['lpn_new_coords_geo']='lat/lon';
 $ec_lang['lpn_new_coords_tip']='An xy project uses coordinates that are not latitude and longitude. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File, Open an xy file on the map.';
 // The place-name field, enabled only for a latitude-and-longitude project. Optional, always: a
 // blank one makes the project and moves nothing.
+// **THE THIRD COORDINATE CHOICE: A REAL MAP PROJECTION** (Task 641, Tom 2026-09-12). Lower case
+// beside its two siblings, on the 2026-08-18 ruling above that these three names imply no proper
+// nouns. The PROJECTION's own name is a different thing and is deliberately not a language key at
+// all: "WGS 84 / UTM zone 12N" is a registered name rather than a description of a control, exactly
+// as the OpenStreetMap credit is, and a GIS reader in any language needs to recognize it. The
+// catalogue note in js/looped-network.js states that in one place.
+$ec_lang['lpn_new_coords_proj']='projected coordinates';
+$ec_lang['lpn_new_crs']='Map projection';
+// **WHAT IT PROMISES AND WHAT IT REFUSES.** The promise is that nothing is converted, which is this
+// suite's own rule about the user's numbers. The refusal is that the choice is final, and it is
+// stated here because this control is the only place it can be read before it binds.
+//
+// Nothing here claims anything about how accurate a length is: that claim waits on Task 643.
+$ec_lang['lpn_new_crs_tip']='The projection your coordinates are already measured in. Eastings and northings are stored exactly as you type them, and nothing is converted. A project cannot change its projection afterward, so to work in a different one, start a new project. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.';
+// What the status strip says when a project has no projection at all. The xy grid is a plane the
+// user declared the meaning of, and it sits nowhere on the Earth.
+$ec_lang['lpn_crs_none']='Not georeferenced';
 $ec_lang['lpn_new_place']='Start near this place';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_new_place_tip']='Optional. Type a town, an address, or a landmark. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. If blank, the map starts zoomed to whole world.';
@@ -2165,6 +2186,10 @@ $ec_lang['lpn_field_y']='Y';
 // from the "lat, long" a person says out loud.
 $ec_lang['lpn_field_lon']='Longitude';
 $ec_lang['lpn_field_lat']='Latitude';
+// The two axes of a projected coordinate system, named as a surveyor names them. Read in PUBLIC
+// order, northing first, which is the same order the latitude above is read in.
+$ec_lang['lpn_field_northing']='Northing';
+$ec_lang['lpn_field_easting']='Easting';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';

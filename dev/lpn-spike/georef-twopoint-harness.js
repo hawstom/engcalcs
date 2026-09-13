@@ -460,7 +460,10 @@ console.log('\n--- the project tabs refuse to switch while a model is being plac
 	ok('the refusal is one function, called from every door that ends or writes the project',
 		guards === 6,
 		guards + ' call sites (switchToTab, closeTab, newProject, openFileMenu, openFromFile, saveCurrent)');
-	['function switchToTab(', 'function closeTab(', 'function newProject(coords)',
+	// **THE DOOR, NOT ITS ARITY.** This read `function newProject(coords)` and went red the day the
+	// signature grew a second argument (Task 641) -- a pin on a parameter list, which says nothing
+	// about whether the door asks the guard.
+	['function switchToTab(', 'function closeTab(', 'function newProject(',
 		'function openFileMenu(', 'async function openFromFile(', 'async function saveCurrent('].forEach(function (f) {
 		const at = src.indexOf(f);
 		ok(f.replace('function ', '').replace('async ', '').replace('coords', '') + ' asks it',

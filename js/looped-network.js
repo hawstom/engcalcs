@@ -2933,6 +2933,115 @@ var EngCalcs = EngCalcs || {};
 	// document ever saved is a grid project, so nothing migrates and no version is owed.
 	var LPN_COORDS_GEO = 'geo';
 	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
+
+	// ---- A PROJECT'S DECLARED COORDINATE REFERENCE SYSTEM (ROADMAP Task 641) ---------------------
+	//
+	// **THE PROJECT DECLARES A CRS; IT IS NEVER CONVERTED INTO ONE.** Tom's architecture, ruling P1
+	// of 2026-09-13: store what the user supplied and state which. A projected project holds the
+	// eastings and northings that were typed or pasted, byte for byte, and the drawing frame IS that
+	// plane -- so there is no transform anywhere on this path and nothing of ours can rewrite a
+	// number. Lengths are Euclidean in that plane because that is what a projected plane is for.
+	//
+	// **THIS IS NOT THE STORAGE CLAUDE.md FORBIDS, and the distinction is the whole design.** What is
+	// forbidden is storing the PROJECTED COORDINATES of a lon/lat document: mercLat(mercY(lat)) is a
+	// different double for 69.8% of latitudes, so every open-and-save would rewrite the file. An EPSG
+	// CODE is a name for a plane, not a coordinate in one; storing it moves no number at all, and the
+	// numbers it names were the user's from the moment they arrived.
+	//
+	// **AND IT CANNOT BE CHANGED** (Tom, ruling P2: *"We don't want this to be a dabbler action."*).
+	// The same argument LPN_COORDS_GEO makes one screen up, only sharper: a bare easting of 500,000
+	// names a different place in every zone there is, so a project that changed its mind would have
+	// to reinterpret every node, vertex, label and backdrop registration at once. The one door is a
+	// file conversion onto a COPY, which is not built; until it is, the honest answer is that there
+	// is no door, and assignProjectCrs() below is the only writer and refuses every second call.
+	//
+	// **WHAT IS DELIBERATELY NOT BUILT HERE**, so nothing is read into it that it does not do: there
+	// is no transform, so a projected project offers no basemap, no place-name search and no terrain
+	// elevations. Every one of those is already gated on isGeoProject(), which a projected project is
+	// not, so they are absent by construction rather than by a new gate. They wait on proj4js
+	// (ruling P3), and so does the point scale factor of ruling P7. **Nothing here claims anything
+	// about the accuracy of a length**; that claim waits on Task 643.
+	var LPN_CRS_UTM_N = 32600, LPN_CRS_UTM_S = 32700, LPN_CRS_UTM_ZONES = 60;
+	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
+	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
+	// rather than describes, and a GIS reader in any language looks for exactly those characters.
+	// GENERATED from the numbering rather than typed, so 120 entries cost one formula and no two of
+	// them can disagree. The register's other families -- State Plane, the national grids -- join
+	// this list when there is a transform to make them mean something; the list is the shape of that
+	// growth, not its limit.
+	function crsCatalogue() {
+		var out = [], z;
+		for (z = 1; z <= LPN_CRS_UTM_ZONES; z++) {
+			out.push({ code: 'EPSG:' + (LPN_CRS_UTM_N + z), name: 'WGS 84 / UTM zone ' + z + 'N' });
+		}
+		for (z = 1; z <= LPN_CRS_UTM_ZONES; z++) {
+			out.push({ code: 'EPSG:' + (LPN_CRS_UTM_S + z), name: 'WGS 84 / UTM zone ' + z + 'S' });
+		}
+		return out;
+	}
+	function crsEntry(code) {
+		var list = crsCatalogue(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].code === code) { return list[i]; } }
+		return null;
+	}
+	// A code this build does not know is the USER'S DATA and is shown exactly as it stands -- a file
+	// written by a later build, or one hand-edited to a State Plane zone, says what it says and is
+	// not silently corrected to something we do recognize.
+	function crsLabel(code) {
+		var e = crsEntry(code);
+		return e ? e.name : String(code || '');
+	}
+	function projectCrsCode() { return (project && project.crs) ? String(project.crs) : ''; }
+	function isProjectedProject() { return !isGeoProject() && !!projectCrsCode(); }
+	// THE ONLY WRITER. Refuses a project that already declares one, refuses a lat/lon project (which
+	// IS its own coordinate system), and refuses one with anything drawn in it -- because at that
+	// point there are numbers on the page whose meaning the answer would change.
+	function assignProjectCrs(code) {
+		if (!project || !code) { return false; }
+		if (isGeoProject()) { return false; }
+		if (project.crs) { return false; }
+		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
+			(doc.labels && doc.labels.length))) { return false; }
+		project.crs = String(code);
+		return true;
+	}
+	// What the status strip says this project is drawn in. EPSG:3857 names itself for a geographic
+	// project, and an unprojected grid is a plane the user declared the meaning of that sits nowhere
+	// on the Earth -- which is a fact worth printing rather than leaving blank.
+	function crsDisplayName() {
+		var pc = EngCalcs.pageConfig || {}, code;
+		if (isGeoProject()) { return 'WGS 84 / Pseudo-Mercator'; }
+		code = projectCrsCode();
+		return code ? crsLabel(code) : (pc.lpn_crs_none || 'Not georeferenced');
+	}
+	// **THE AXES ARE NAMED FOR THE COORDINATE SYSTEM AND READ IN PUBLIC ORDER** (Task 641, and
+	// CLAUDE.md's coordinate-order rule). Latitude before longitude, northing before easting: both
+	// pairs are read north first, which is how a person says them. X before Y is the exception and
+	// is not one -- on the unprojected grid x really is first, and there is nothing to reverse.
+	function axisNames() {
+		var pc = EngCalcs.pageConfig || {};
+		if (isGeoProject()) {
+			return { first: pc.lpn_field_lat || 'Latitude', second: pc.lpn_field_lon || 'Longitude' };
+		}
+		if (isProjectedProject()) {
+			return { first: pc.lpn_field_northing || 'Northing', second: pc.lpn_field_easting || 'Easting' };
+		}
+		return { first: 'X', second: 'Y' };
+	}
+	function readsNorthFirst() { return isGeoProject() || isProjectedProject(); }
+	function coordReadout(a, b) {
+		var n = axisNames();
+		return n.first + ': ' + a + '  ' + n.second + ': ' + b;
+	}
+	function coordReadoutAt(wx, wy) {
+		return readsNorthFirst()
+			? coordReadout(coordText(outwardY(wy)), coordText(outwardX(wx)))
+			: coordReadout(coordText(outwardX(wx)), coordText(outwardY(wy)));
+	}
+	function coordReadoutBlank() { return coordReadout('--', '--'); }
+	// The readout is rewritten when the KIND changes, and two UTM zones are two kinds: a northing
+	// read under the wrong zone is the silent error this whole feature exists to stop.
+	function coordKind() { return isGeoProject() ? 'geo' : (projectCrsCode() || 'xy'); }
 	// x is a LONGITUDE and y is a LATITUDE, in that order -- this page's own x/y order, and the
 	// opposite of the "lat, long" a person says out loud.
 	//
@@ -9838,6 +9947,14 @@ var EngCalcs = EngCalcs || {};
 		if (georef) { return; }
 		if (isGeoProject()) {
 			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+			return;
+		}
+		// **A DECLARED PROJECTION IS ALREADY ON THE EARTH** (Task 641). This wizard rewrites every
+		// coordinate in the document, which is exactly what ruling P2 says no door may do to a
+		// project that states its own coordinate system. The xy grid it was built for states none.
+		if (isProjectedProject()) {
+			setNotice(pc.lpn_georef_projected ||
+				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
 			return;
 		}
 		if (!doc.nodes.length) {
@@ -19185,7 +19302,7 @@ var EngCalcs = EngCalcs || {};
 	// A new project inherits the CURRENT project's settings and label choices rather than factory
 	// defaults: "New" clears the network, not your preferences, now that preferences live per
 	// project. The workflow it protects is set 8-inch/150/K=2 defaults, then draw.
-	function newProject(coords) {
+	function newProject(coords, crs) {
 		// Making a project opens it, which is a project switch with an extra step -- and the
 		// wizard's state belongs to the document it started on. Same refusal, same reason.
 		if (georefBlocksProjectSwitch()) { return; }
@@ -19226,6 +19343,10 @@ var EngCalcs = EngCalcs || {};
 			pendingView = geoHomeView();
 			pendingViewFor = pendingView ? id : null;   // the project being born, not the one leaving
 		}
+		// **THE PROJECTION IS DECLARED HERE AND NOWHERE ELSE** (Task 641). Only when there is one:
+		// an absent key is what an unprojected grid and a lat/lon project have always had, so no
+		// file ever written gains a word and nothing migrates.
+		if (coords !== LPN_COORDS_GEO && crs) { assignProjectCrs(crs); }
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
 		backdrop = null;
@@ -22554,9 +22675,28 @@ var EngCalcs = EngCalcs || {};
 	var newBoxUnits = [];     // [{ name, sel }] -- the clone beside the real select's name
 	var newBoxWired = false;
 	function newBoxEl() { return document.getElementById('lpn_new_panel'); }
-	function newBoxIsGeo() {
+	// 'xy', 'geo' or 'proj' -- the three answers to the one question that cannot be changed
+	// afterwards. Defaults to 'xy', which is what openNewProjectBox() checks on open.
+	function newBoxCoords() {
 		var r = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"]:checked');
-		return !!r && r.value === 'geo';
+		return (r && r.value) ? String(r.value) : 'xy';
+	}
+	function newBoxIsGeo() { return newBoxCoords() === 'geo'; }
+	// **THE PROJECTION LIST IS BUILT, NOT TYPED**, the same way the unit selects below it are cloned
+	// rather than retyped: crsCatalogue() generates it from the EPSG numbering, so this box holds no
+	// second opinion about what a zone is called (Task 641).
+	function buildNewBoxCrs() {
+		var sel = document.getElementById('lpn_new_crs'), list, i, opt;
+		if (!sel) { return; }
+		sel.innerHTML = '';
+		list = crsCatalogue();
+		for (i = 0; i < list.length; i++) {
+			opt = document.createElement('option');
+			opt.value = list[i].code;
+			opt.textContent = list[i].name;
+			sel.appendChild(opt);
+		}
+		if (list.length) { sel.value = list[0].code; }
 	}
 	// **CLONED, AND THE `name` ATTRIBUTE IS THE THING THAT MUST NOT SURVIVE THE CLONE.**
 	// wireUnitSelects() listens on the DOCUMENT for a change whose target's `name` is one of
@@ -22629,6 +22769,13 @@ var EngCalcs = EngCalcs || {};
 		box.disabled = !geo;
 		if (!geo) { box.value = ''; }
 	}
+	// The projection select belongs to the projected choice exactly as the place field above belongs
+	// to lat/lon, and is greyed rather than hidden for the same reason.
+	function syncNewBoxCrs() {
+		var sel = document.getElementById('lpn_new_crs');
+		if (!sel) { return; }
+		sel.disabled = newBoxCoords() !== 'proj';
+	}
 	function closeNewBox() {
 		var box = newBoxEl();
 		hidePanel(box);
@@ -22641,10 +22788,14 @@ var EngCalcs = EngCalcs || {};
 	function newBoxAnswers() {
 		var placeEl = document.getElementById('lpn_new_place'),
 			methodEl = document.getElementById('lpn_new_method'),
-			geo = newBoxIsGeo(), units = {};
+			crsEl = document.getElementById('lpn_new_crs'),
+			kind = newBoxCoords(), geo = kind === 'geo', units = {};
 		newBoxUnits.forEach(function (u) { units[u.name] = u.sel.value; });
 		return {
 			geo: geo,
+			// Only when the projected radio is the one checked: a code read off a greyed select is a
+			// declaration nobody made, and this is the one declaration that can never be withdrawn.
+			crs: (kind === 'proj' && crsEl) ? String(crsEl.value || '') : '',
 			place: (geo && placeEl) ? String(placeEl.value || '').trim() : '',
 			method: methodEl ? methodEl.value : frictionMethod(),
 			units: units
@@ -22657,10 +22808,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	function createProjectFrom(a) {
 		var coords = a.geo ? LPN_COORDS_GEO : null,
+			crs = a.geo ? '' : (a.crs || ''),
 			place = a.place || '',
 			method = a.method || frictionMethod(),
 			units = a.units || {}, id;
-		id = newProject(coords);
+		id = newProject(coords, crs);
 		// **THE UNITS GO IN THROUGH applyUnitSelections(), the same door a document's own units come
 		// in through.** Not through a change event on each select: that is the user-gesture path, and
 		// it would ask an empty project whether to reinterpret or convert numbers it does not have.
@@ -22702,7 +22854,7 @@ var EngCalcs = EngCalcs || {};
 		if (us) { us.addEventListener('click', function () { applyNewBoxPreset('us'); }); }
 		if (method) { method.addEventListener('change', syncNewBoxRoughness); }
 		box.addEventListener('change', function (e) {
-			if (e.target && e.target.name === 'lpn_new_coords') { syncNewBoxPlace(); }
+			if (e.target && e.target.name === 'lpn_new_coords') { syncNewBoxPlace(); syncNewBoxCrs(); }
 		});
 		// Enter is Create and Escape is Cancel, which is what makes this box one keystroke for
 		// somebody who only ever wanted a blank sheet. Enter is taken on the BOX, not on the text
@@ -22725,10 +22877,12 @@ var EngCalcs = EngCalcs || {};
 		var xy = document.querySelector('#lpn_new_panel input[name="lpn_new_coords"][value="xy"]');
 		if (xy) { xy.checked = true; }
 		buildNewBoxUnits();
+		buildNewBoxCrs();
 		method = document.getElementById('lpn_new_method');
 		if (method) { method.value = frictionMethod(); }
 		syncNewBoxRoughness();
 		syncNewBoxPlace();
+		syncNewBoxCrs();
 		box.style.display = 'block';
 		raisePanel(box);   // centred, not dragged, so it is raised where it becomes visible
 		h = fitPanelToViewport(box);
@@ -23825,7 +23979,11 @@ var EngCalcs = EngCalcs || {};
 		scenarios = defaultScenarios();
 		// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
 		// what kind of document this is -- and it is the one property that cannot be re-chosen later.
-		project = { name: project.name, docId: project.docId, coords: project.coords, activeScenario: 'base' };
+		project = { name: project.name, docId: project.docId, coords: project.coords,
+			// **AND SO DOES `crs`, on exactly the same argument** (Task 641): emptying the drawing
+			// does not change what plane it was drawn in, and it is the other property that can
+			// never be re-chosen.
+			crs: project.crs, activeScenario: 'base' };
 		// The backdrop is deliberately NOT removed -- see the note above the function.
 		// saveToStorage(), NOT removeItem(): labelSettings/settings are preferences, not network
 		// content, and must survive "New / Clear". removeItem() wipes them out of localStorage too,
@@ -24526,17 +24684,13 @@ var EngCalcs = EngCalcs || {};
 				// **THE READOUT IS WHERE A GEOGRAPHIC PROJECT ANNOUNCES ITSELF** (Task 145). It is
 				// already on screen, already about coordinates, and it costs the user nothing --
 				// which is the whole reason there is no banner and no badge saying the same thing.
-				var pcc = EngCalcs.pageConfig || {};
 				// **LATITUDE FIRST** (Tom, 2026-08-24: "It should be lat/lon everywhere... history says
 				// Lat/Lon."). The readout led with Longitude because the drawing's x is the
 				// longitude and the pair was emitted in x,y order -- which is a fact about storage
 				// showing through into a line a person reads. X and Y keep their own order, because
 				// there x IS first.
-				coordsEl.textContent = isGeoProject()
-					? (pcc.lpn_field_lat || 'Latitude') + ': ' + coordText(outwardY(w.y)) +
-						'  ' + (pcc.lpn_field_lon || 'Longitude') + ': ' + coordText(outwardX(w.x))
-					: 'X: ' + coordText(outwardX(w.x)) + '  Y: ' + coordText(outwardY(w.y));
-				coordsKind = isGeoProject() ? 'geo' : 'xy';
+				coordsEl.textContent = coordReadoutAt(w.x, w.y);
+				coordsKind = coordKind();
 			});
 		}
 		// Rubber-band line while drawing a pipe/pump (Tom, 2026-07-30) -- tracks the live pointer
@@ -25967,13 +26121,22 @@ var EngCalcs = EngCalcs || {};
 	// in one project is the case it must keep out of.
 	var coordsKind = '';
 	function refreshCoordsReadout() {
-		var el = document.getElementById('lpn_coords'), pc = EngCalcs.pageConfig || {},
-			kind = isGeoProject() ? 'geo' : 'xy';
+		var el = document.getElementById('lpn_coords'), kind = coordKind();
+		// FIRST, and outside the kind test: the name is what the numbers beside it mean, and it has
+		// to be right even on the refreshes that leave live digits alone.
+		refreshCrsReadout();
 		if (!el || kind === coordsKind) { return; }
 		coordsKind = kind;
-		el.textContent = kind === 'geo'
-			? (pc.lpn_field_lat || 'Latitude') + ': --  ' + (pc.lpn_field_lon || 'Longitude') + ': --'
-			: 'X: --  Y: --';
+		el.textContent = coordReadoutBlank();
+	}
+	// **THE PROJECTION, BESIDE THE COORDINATES IT EXPLAINS** (Task 641). Tom's own acceptance test
+	// is a readout at 89.99 degrees that reports parallel meridians: *"the readout is lying, and
+	// nothing on screen names the projection in force."* This is the line that names it, and for an
+	// unprojected grid it says so in words rather than saying nothing.
+	function refreshCrsReadout() {
+		var el = document.getElementById('lpn_crs');
+		if (!el) { return; }
+		el.textContent = crsDisplayName();
 	}
 	// "US Units" / "SI Units", for the example network's title block. `system` is the preset the
 	// caller just committed the project to, never a reading of the live strip: an example FORCES the
