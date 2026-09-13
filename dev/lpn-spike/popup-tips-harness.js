@@ -80,8 +80,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The Settings box's hosts (Task 441, restructured): rebuildSettingsFields() writes a row into
   // the host that stands under its own sub-heading, and returns early if ANY of them is absent --
   // so a host added to the page and not to this list turns every assertion below into a silent
-  // pass on an empty box. Energy joined them under Task 566.
-  'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
+  // pass on an empty box. Energy joined them under Task 566, custom properties under Task 636 --
+  // and that one did not fail silently, which is this list's own comment working: the box came back
+  // empty and every assertion under it went red at once.
+  'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_custom_fields',
+  'lpn_set_map_fields', 'lpn_set_units_fields',
   'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_energy_fields',
   'lpn_set_page_fields'
 ].forEach(ensure);
