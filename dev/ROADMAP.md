@@ -59,6 +59,49 @@ the block.
 
 # Tasks
 
+- 100|646| **Attach the world map to an XY project without changing the project.**
+  Tom, 2026-09-13, thinking past Task 641: *"even an arbitrary XY project can have a world map
+  background with a good wizard. Our Map menu can have a new Background map (georeference) 'Attach
+  the world map to this project without changing it any other way.'"* That sentence is the feature
+  and very nearly the tip.
+  - **THE POINT IS THAT THE PROJECT DOES NOT MOVE.** Task 641 makes a coordinate system PERMANENT
+    because converting one is a dabbler action; this is the opposite door and is safe for exactly
+    that reason -- it attaches a backdrop to a drawing whose own numbers are untouched. It is
+    therefore NOT a conversion and must never become one.
+  - The machinery exists: `georefStart()` is the two-point place-on-the-map wizard, and the second
+    radio of Tom's new-project box already promises this in its tip (*"attach your own background
+    image or the world map or adjust the attachment at any time from the Map menu"*), so the promise
+    ships before the menu row does. Close that gap.
+  - Read with Task 497 (basemap tiles, `js/lpn-terrain.js`) and CLAUDE.md's third-party section: a
+    tile request is consented and gated, and attaching a backdrop must not walk past that gate.
+
+- 75|647| **A project that is whole but entirely off screen should say so.**
+  Tom, 2026-09-13, on Task 628 as it shipped: *"Could we check whether any of the network is present
+  on the map and alert that project is intact, but entirely outside the current view?"*
+  - **THE ARITHMETIC ALREADY EXISTS AND IS NOT WIRED TO A MESSAGE.** `viewShowsModel()`'s third leg
+    asks exactly this question -- can the window at this scale intersect the model extent -- and on
+    a NO it silently refits. That is right at load. This task is the same question asked AFTER load,
+    when the user has panned away by hand and nothing refits.
+  - **628 CHOSE SILENCE DELIBERATELY AND THIS IS NOT A REVERSAL OF THAT.** At load the recovery is
+    indistinguishable from opening a document with no view, so there is nothing to say. Panning your
+    own work off screen is a different situation: the user did it, nothing is going to undo it, and
+    "your network is intact and off to the north west" is information they cannot get any other way.
+  - **THE DISTINCTION THAT MAKES IT WORTH BUILDING IS TOM'S OWN:** *"a blank map is equally fatal as
+    a lost project. User doesn't know the difference."* This is the message that tells them the
+    difference. Pair it with Zoom to fit as the action.
+  - Weigh against Task 616's finding before choosing the instrument: a transient notice on a row
+    nobody is looking at is measured, twice, not to work.
+
+- 50|648| **The About icon's outlines are too heavy for its scale.**
+  Tom, 2026-09-13, closing out the icon work: *"the About icon has outlines unduly heavy for its
+  scale, and it can be adjusted to look right (appropriate stroke width) for that scale, which could
+  open up additional detail on the roof and belly shading and the legs and catwalk."*
+  - The reward is the second half of that sentence: a correct stroke weight BUYS detail rather than
+    only fixing a blemish, because what is currently crowding the drawing out is the outline itself.
+  - `dev/icon-preview/gen-about-icon.js` is the generator; the shading rule the whole mark follows
+    is in `ship-notes.md` (one light above, three surfaces, and the shading follows the SOLID).
+    Do not re-open the geometry: Tom on the favicon, *"my one true love."*
+
 - 100|185| **Match/Copy properties tool (originated during Task 146).**
   **RAISED TO 100 BY TOM, 2026-09-07.** The earlier gate -- 100 with Task 186, and only once all of
   the EPANET file is implemented -- is superseded by his own promotion, exactly as Task 186's was.
@@ -231,34 +274,6 @@ the block.
   file, then import anything that is not a name conflict, that probably would be all that's needed."*
   No export function: a project file already is the export. A name conflict is reported and skipped,
   never renamed silently.
-
-- 100|616| **[H] Visual feedback: a prompt history in the banner area.**
-  MJH, 2026-09-09, having missed the Hide-titles highlight entirely: he suggests **an expandable
-  history of prompts in the banner area**, with this one as a banner prompt reading
-  *"Titles hidden. Use Settings..."*. Tom: *"Maybe we keep these perspectives in an evolving
-  roadmap task for Icon and for Visual feedback."*
-  - **THE HIGHLIGHT ITSELF IS NOT THE PROBLEM AND WAS ALREADY LENGTHENED.** It ran for 4 seconds;
-    Tom, watching PCW: *"2 minutes can go by very fast when you are shopping or learning."* It is
-    120 s now, cleared early by the first press inside the box. MJH still did not see it, which is
-    the evidence that a transient mark on a row somebody is not looking at is the wrong instrument.
-  - **What the page has today is one `setNotice()` line that is replaced by the next one.** So a
-    message that arrives while the reader is looking elsewhere is gone with no trace, and there is
-    nowhere to look it up. A history makes every notice recoverable and costs no new storage if it
-    lives in memory for the session.
-  - Open questions, none decided: whether the history is per session or per project; whether it
-    survives a reload (it should not, on the furniture-versus-project rule); and whether a prompt
-    can carry an action, which is what would make *"Use Settings..."* a link rather than a
-    sentence. Answer those before building.
-  - **IT HAPPENED AGAIN WITH A SECOND READER, AND THIS TIME THE NOTICE MATTERED.** Tom testing with
-    KDH, 2026-09-10: *"He didn't notice the banner about the DEM server being disconnected. I did.
-    But it wasn't up long enough. I suggest a minute or two."* Two readers, two sessions, two
-    different notices missed -- MJH's suggestion arriving twice from different directions is the
-    finding, not the individual misses.
-  - **THE NUMBER IS `STATUS_NOTICE_MS = 8000`** (`js/looped-network.js:34386`), one global timeout.
-    **Do not simply raise it**: the same seam carries routine confirmations, and a two-minute
-    confirmation is noise where a two-minute FAILURE is a rescue. Duration by severity means
-    `setNotice()` takes one and the `seam.notice()` bridge `js/lpn-terrain.js` calls must carry it
-    -- a shared write seam, so a designed change and not a constant edit.
 
 - 100|618| **WYSIWYG hit areas: what you can click is what you can see.**
   Tom, 2026-09-09, on the corrected map: *"On the PC with a default cursor, precision is high.
@@ -1196,6 +1211,27 @@ the block.
     first-time reader who needed the search, so a discoverable affordance and an undiscoverable one
     are both half an answer.
   - Filed as a maybe-someday on his own framing. Decide the location question before any code.
+
+- 5|616| **Visual feedback: a prompt history in the banner area.**
+  **PARKED 2026-09-13 at Tom's word** (*"Whew. Put it at priority 5."*), and the parking is not
+  indifference -- it is what two independent readings concluded. **The interface designer seat
+  says the task has the WRONG SHAPE**: the highlight ran 4 s, then 120 s, and MJH missed it both
+  times, which is inattentional blindness rather than a duration failure, and a history in the
+  banner area is a FIFTH chrome band on a page whose diagnosed defect is that readers do not see
+  the four it has. Her citations (Simons and Chabris; NN/g on banner blindness; Material's snackbar
+  spec; WCAG 4.1.3) are in `dev/agents/interface-designer/journal.md`.
+  - **THE ONE REAL DEFECT UNDERNEATH WAS A MISCLASSIFICATION, NOT AN ABSENCE.** The DEM-disconnect
+    notice KDH missed was reporting a CONDITION and expired on an 8 s clock while the condition was
+    still true. The page already owns the persist-until-cleared pattern (`noteMapUnmeasurable()`,
+    `#lpn_lock_banner`); that notice was not using it. Fixing that needs no new interface and no new
+    strings, and it is the one case where a miss actually mattered.
+  - **TOM'S ANSWERS ARE ON RECORD** should this ever come back, from the 2026-09-13 interview:
+    history survives a reload and is kept per project; three duration classes, with the lower limit
+    raised to about 10 s (*"10, 30, 90?"*); a notice carries no button or link (*"A banner message
+    is a banner message. Whatever it says, it says."*); everything goes in the history. He also said
+    *"I am not completely sold on this project."*
+  - **IT WOULD COST A NEW `localStorage` KEY** on his own answers (survives reload), so it needs the
+    exemption test before anybody builds it. That is the first question, not the last.
 
 - 5|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
