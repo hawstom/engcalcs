@@ -37,6 +37,26 @@ approximation), every distance printed before rendering, and the favicon-side-by
 check: `render/app-icons/`, principally `proof.png`. Full writeup and the exact per-point distances:
 `ship-notes.md`, "Addendum, 2026-09-10" section.
 
+## The reader votes, 2026-09-09 to 2026-09-10 -- THE RECORD, and they do not agree
+
+Moved here verbatim from ROADMAP Task 615 when that task closed on 2026-09-13. **The disagreement
+is the finding, not a tie to be broken.** Three readers, three answers, and one of them did not see
+a water tower at all.
+
+| Reader | Who | Verdict |
+|---|---|---|
+| MAH | Lay person, 29 | Likes old-timey. |
+| PCW | Senior civil engineer, 60+, no EPANET experience | Likes `wt-tall-3` -- the aspect that shipped. |
+| MJH | Civil engineering designer and power user, 27 | **Read `wt-wide-L` as a lavatory SINK**, thought that was fine, and preferred it to any old-timey tower. |
+
+**Keep collecting. A FOURTH READER WHO DOES NOT SEE A TOWER IS THE SIGNAL THAT WOULD REOPEN THE
+DRAWING** -- one reader seeing a sink is an anecdote; two is a defect in the mark. Nothing else
+reopens it: Tom on the shipped favicon, 2026-09-10, *"Favicon as it stands is my one true love."*
+
+Ranked below the drawing rounds deliberately -- this section is evidence about readers, and the
+sections above are evidence about geometry. The open proportion question that shipped with the app
+icons is ROADMAP Task 645, not a vote.
+
 ## Water tower IN COLOR, round 3 (2026-09-09, revised 2026-09-10) -- CURRENT
 
 `node gen-concepts-color.js` writes 16 color candidates and 5 mono menu candidates (`ic-*.svg`),
