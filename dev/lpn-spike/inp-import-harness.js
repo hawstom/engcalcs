@@ -435,9 +435,14 @@ console.log('\n--- a tank, in an LPS file ---');
 	// still matters, and is what this ever really guarded, is that a tank is NOT a junction-sized
 	// mark: nodeRadius() is the circumscribing half every clear-run inset, leader and hit test
 	// reads.
+	// **THE BOX IS READ OFF THE <g> TRANSFORM, NOT OFF THE NESTED <svg>** (Task 651). The symbol's
+	// own width and height are the icon's 24 x 24 frame now and would answer "square" for ever;
+	// the drawn box is `scale(w/24, h/24)` on the wrapper. dev/lpn-spike/nested-viewport-harness.js
+	// is where that seam is held.
+	const tkBox = /scale\(([-\d.eE+]+),([-\d.eE+]+)\)/.exec(String(tkEl.symbolG.getAttribute('transform') || ''));
 	ok('the tank is drawn in its own square box, undistorted',
-		parseFloat(tkEl.symbol.getAttribute('height')) === parseFloat(tkEl.symbol.getAttribute('width')),
-		tkEl.symbol.getAttribute('width') + ' x ' + tkEl.symbol.getAttribute('height'));
+		!!tkBox && parseFloat(tkBox[1]) === parseFloat(tkBox[2]),
+		tkEl.symbolG.getAttribute('transform'));
 	ok('...and its hit radius is bigger than a junction\'s', L.nodeRadius('TK1') > L.nodeRadius('J1'),
 		L.nodeRadius('TK1') + ' vs ' + L.nodeRadius('J1'));
 }

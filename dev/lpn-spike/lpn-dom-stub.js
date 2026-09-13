@@ -522,6 +522,14 @@ const unitSelects = {};
 // 265's unitSetName() reads it to ask whether the strip matches a preset. A stub without it makes
 // that function skip every select and vacuously report "us", which is a test agreeing with itself.
 function mkUnitSelect(name, family, opts, chosen) {
+  // **A REPLACED SELECT IS DETACHED, BECAUSE THAT IS WHAT REPLACING ONE DOES** (Task 651).
+  // setUnitSet() calls this again for every name, and the old object used to keep its parentNode
+  // and simply stop being the one `document.querySelector` answers with -- a state no browser can
+  // be in, and the stub-removes-the-coupling trap in dev/testing-notes.md. It went unnoticed while
+  // unitEl() re-queried on every read; the moment that answer was remembered, the stub was the only
+  // place in the world where the memory could go stale, and five colour-ramp assertions went red
+  // against page code that is correct.
+  if (unitSelects[name]) { unitSelects[name].parentNode = null; }
   const s = mkEl('select');
   s.name = name;
   s.dataset.family = family;
@@ -764,8 +772,14 @@ global.confirm = global.window.confirm;
 global.prompt = global.window.prompt;
 global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
-// iconEl comes from js/Icons.lib.js in the browser; the map symbols only need to not throw here.
-// iconEl/setLabel come from js/Icons.lib.js in the browser; here they only need to not throw.
+// iconEl/setLabel come from js/Calculators.lib.js in the browser.
+// **IT RETURNS AN <svg>, AND THE TAG IS THE COUPLING** (Task 651). It returned a <g> for as long as
+// it existed, on the reasonable-sounding ground that a map symbol only needs to not throw here --
+// and that held the one quantity under test constant. A map symbol is a NESTED <svg>, which is a
+// VIEWPORT, and Gecko lays a viewport out in app units: a sixtieth of a user unit, which on a
+// geographic drawing is a sixtieth of a DEGREE. A stub handing back a <g> makes every assertion
+// about that invariant vacuous while reading green, which is dev/testing-notes.md's own trap.
+// dev/lpn-spike/nested-viewport-harness.js is what needs it.
 // The example's annotations are composed from strings that already exist elsewhere in the suite
 // (see example-draw-fixture.js); the page emits them into pageConfig, so the harness must too, read
 // from the real lang file rather than restated here.
@@ -811,7 +825,7 @@ global.EngCalcs = {
     return (typeof name === 'string' && Object.prototype.hasOwnProperty.call(unitFactors, name))
       ? unitFactors[name] : 1;
   },
-  iconEl: () => mkEl('g'),
+  iconEl: () => { const e = mkEl('svg', true); e.setAttribute('viewBox', '0 0 24 24'); return e; },
   // The REAL EngCalcs.setUnits (js/Calculators.lib.js) moves every unit select to a preset and then
   // calls submitForm(), which re-enters EngCalcs.pageCalculator. Both halves matter and this stub
   // does both: without it `if (EngCalcs.setUnits)` was simply false here, so every code path that

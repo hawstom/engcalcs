@@ -202,6 +202,28 @@ so `(x − ox) + ox === x` and a shifted coordinate returns to the file as the b
 The open decision is where a geographic document's origin is STORED, given that `view.cx/cy` and
 `backdrop.tx/ty` are in the drawing frame — the two candidates are in Task 439.
 
+## 6b. A DEGREE IS A HUGE USER UNIT, AND ONE LAYOUT ENGINE ROUNDS IT (Task 651)
+
+**Nothing that carries a world coordinate may be laid out by the browser's layout engine.** Gecko
+lays a nested `<svg>` viewport out in app units, which are a sixtieth of a USER unit -- so on an XY
+project a sixtieth of a foot, and here a sixtieth of a DEGREE. Every map symbol was a nested `<svg>`
+placed by its `x`/`y`, and in Firefox each one was therefore floored onto a one-arcminute grid:
+**1.85 km, always west and always north**, because a floor goes toward minus infinity and internal y
+is y-down. Reproduced on the shipped Net3 lat/lon example; invisible in Chromium and invisible on an
+XY project, which is why it shipped.
+
+**The displacement is in WORLD units, so it looks like bad data rather than bad paint** -- it does
+not move under zoom, it survives a reload, and it survives a save and reopen. That is the first
+thing to know when the next one of these is reported.
+
+The rule now: **the nested `<svg>` keeps its own integer 24 x 24 viewport and a `<g>` transform
+carries the place and the size** (`symbolBoxTransform()` in `js/looped-network.js`). An SVG
+transform is a float matrix and is not laid out at all, which is why the grab shapes -- which have
+ridden a transform since they were written -- were never displaced, and why a pump you could not see
+was still a pump you could click. Guard: `dev/lpn-spike/nested-viewport-harness.js`. `<rect>`,
+`<circle>`, `<path>`, `<polyline>` and `<image>` are pure SVG geometry and are not affected;
+`<foreignObject>` is a viewport and would be.
+
 ## 7. Elevations from the land surface (Tasks 497 and 542)
 
 A geographic project knows where every node is, so the one number a designer otherwise types by

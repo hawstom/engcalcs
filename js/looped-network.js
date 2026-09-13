@@ -5666,15 +5666,53 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
 	// have one (`ne.symbol` is null for a junction). Sizes to nodeSymbolSize(), an independent
-	// width/height per type, not nodeRadius()'s single circumscribing scalar; buildNodeEls() sets the
-	// `preserveAspectRatio="none"` that stretches the icon to that box instead of letterboxing it.
+	// width/height per type, not nodeRadius()'s single circumscribing scalar; the non-uniform
+	// `scale(w/24, h/24)` in symbolBoxTransform() stretches the square icon to that box.
 
 	function positionNodeSymbol(id) {
 		var n = nodeById(id), ne = nodeEls[id];
-		if (!ne || !ne.symbol) { return; }
+		if (!ne || !ne.symbolG) { return; }
 		var s = nodeSymbolSize(n);
-		ne.symbol.setAttribute('x', n.x - s.w / 2); ne.symbol.setAttribute('y', n.y - s.h / 2);
-		ne.symbol.setAttribute('width', s.w); ne.symbol.setAttribute('height', s.h);
+		ne.symbolG.setAttribute('transform', symbolBoxTransform(n.x - s.w / 2, n.y - s.h / 2, s.w, s.h));
+	}
+	// ---- THE 1/60 RULE: A WORLD COORDINATE NEVER GOES ON A NESTED <svg> ------------------------
+	//
+	// **GECKO LAYS A NESTED <svg> VIEWPORT OUT IN APP UNITS, WHICH ARE 1/60 OF A USER UNIT**, so
+	// its `x` and `y` are FLOORED to a sixtieth of whatever a world unit happens to be. On an XY
+	// project a world unit is a foot or a metre and a sixtieth of one is invisible. On a GEOGRAPHIC
+	// project a world unit is a DEGREE, so the same floor moves a symbol by up to one ARCMINUTE --
+	// 1.85 km on the ground -- always west and always north, because a floor goes toward minus
+	// infinity on both axes and internal y is y-down. Measured in Firefox 2026-09-13 on the shipped
+	// Net3 lat/lon example: the two reservoirs, the three tanks and both pumps drawn 30-110 px away
+	// from their own nodes, over open space kilometres from the network, while the grab shapes, the
+	// labels, the pipes and the basemap tiles beside them were all exactly right.
+	//
+	// **IT IS A DISPLACEMENT IN WORLD UNITS, WHICH IS WHY IT LOOKS LIKE DATA AND NOT LIKE PAINT**:
+	// it does not move under zoom, it survives a reload, and it survives a save and reopen, so the
+	// first honest reading of it is that the coordinates are wrong. They are not; every number in
+	// the document and every number this page computes is right, and only the one attribute Gecko
+	// rounds is not.
+	//
+	// **THE FIX IS THAT THE NESTED <svg> KEEPS AN INTEGER 24 x 24 VIEWPORT -- its own viewBox,
+	// nothing to round -- AND A <g> TRANSFORM CARRIES THE PLACE AND THE SIZE.** An SVG transform is
+	// a float matrix in both engines and is not laid out at all, which is why the grab shapes, which
+	// have always ridden a transform (syncNodeHit(), resizePumpSymbol()), were never displaced.
+	// `scale(w/24, h/24)` also does what preserveAspectRatio="none" was doing, so a tank is still
+	// stretched to its own box rather than letterboxed into a square.
+	//
+	// Every symbol on this map goes through here. dev/lpn-spike/nested-viewport-harness.js counts
+	// the call sites and fails a nested <svg> that carries a world coordinate.
+	function symbolBoxTransform(x, y, w, h) {
+		return 'translate(' + x + ',' + y + ') scale(' + (w / SYMBOL_VIEWBOX) + ',' + (h / SYMBOL_VIEWBOX) + ')';
+	}
+	// The icon frame every shape in lib/Icons.lib.php is drawn in, and the viewport a map symbol
+	// therefore keeps. One number rather than a 24 in four places.
+	var SYMBOL_VIEWBOX = 24;
+	// The nested <svg> holds its own viewBox and nothing else: integers, so nothing rounds.
+	function sizeSymbolViewport(svgEl) {
+		if (!svgEl) { return; }
+		svgEl.setAttribute('x', 0); svgEl.setAttribute('y', 0);
+		svgEl.setAttribute('width', SYMBOL_VIEWBOX); svgEl.setAttribute('height', SYMBOL_VIEWBOX);
 	}
 	var VERTEX_HANDLE_R = 0.45;
 	// Stroke widths (pipe, node outline, arrow, vertex handle, leader, rubber band) live in
@@ -6728,17 +6766,19 @@ var EngCalcs = EngCalcs || {};
 		var symbol = (n.type === 'reservoir' || n.type === 'tank')
 			? buildMapIconSvg(n.type, 'lpn-node-symbol lpn-node-symbol-' + n.type)
 			: null;
+		var symbolG = null;
 		if (symbol) {
-			// The nested <svg>'s viewBox is square (0 0 24 24) but the box it is placed into is not.
-			// Default preserveAspectRatio ("xMidYMid meet") letterboxes the square icon inside that
-			// box; "none" stretches it to fill, which is the point of the independent width/height.
-			symbol.setAttribute('preserveAspectRatio', 'none');
+			// **THE BOX IS A <g> TRANSFORM AND THE VIEWPORT IS 24 x 24** -- see symbolBoxTransform().
+			// A world coordinate on the nested <svg> is rounded to a sixtieth of a user unit by
+			// Gecko, which on a geographic project is an arcminute.
+			sizeSymbolViewport(symbol);
+			symbolG = el('g', { 'class': 'lpn-node-symbol-box' }, nodesLayer);
 			// The opaque backdrop matches the symbol's own silhouette from lib/Icons.lib.php, and
 			// takes it from the SAME TABLE the grab shape does. A TRIANGLE for the reservoir,
 			// because a rectangle behind one leaves its corners outside the outline and the pipe
 			// appears to stop short of the reservoir instead of running behind it.
 			prependSymbolBackdrop(symbol, 'path', { d: SYMBOL_SILHOUETTE[n.type] }, 'lpn-node-symbol-backdrop');
-			nodesLayer.appendChild(symbol);
+			symbolG.appendChild(symbol);
 		}
 		// Leader+text go in labelsLayer, the topmost layer, so this label is never covered by a
 		// LATER node/link's own symbol. The leader starts hidden until layoutNodeLabel() below
@@ -6758,7 +6798,7 @@ var EngCalcs = EngCalcs || {};
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
-		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, symbolG: symbolG, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		// The words are not the target; this is (see syncLabelHit).
 		nodeEls[n.id].lblHit = attachLabelHit(text, nodeEls[n.id], labelsLayer, true);
 		noteMeasuredWidth(nodeEls[n.id], tw);
@@ -6854,7 +6894,7 @@ var EngCalcs = EngCalcs || {};
 		// shape is now the symbol's OWN OUTLINE (SYMBOL_SILHOUETTE) rather than a square round it,
 		// so it claims only the ground the pump covers. A FINGER still gives the node precedence
 		// wherever it is near one -- that is touchNodeOver(), unchanged, and it reads data-link.
-		var symbolG = null, symbolSvg = null, symbolHit = null;
+		var symbolG = null, symbolSvg = null, symbolHit = null, symbolBox = null;
 		if (l.type === 'pump' || l.type === 'valve') {
 			// `|| nodesLayer` is for the spike harnesses that build their own layer stack by hand and
 			// know nothing of this one; on the real page linkSymbolLayer always exists. A harness
@@ -6869,7 +6909,10 @@ var EngCalcs = EngCalcs || {};
 			// this map is now the toolbar icon's own geometry, and only the SIZE differs by type.
 			symbolSvg = buildMapIconSvg(l.type, '');
 			if (symbolSvg) {
-				symbolG.appendChild(symbolSvg);
+				// **THE SIZE RIDES A <g>, THE VIEWPORT STAYS 24 x 24** -- see symbolBoxTransform().
+				sizeSymbolViewport(symbolSvg);
+				symbolBox = el('g', { 'class': 'lpn-link-symbol-box' }, symbolG);
+				symbolBox.appendChild(symbolSvg);
 				// The backdrop traces the SYMBOL, never its bounding box: a rectangle would blank out
 				// the pipe on both sides of a pump's casing or a valve's waist, where the pipe should
 				// still be visible running through. The pump's thin discharge tail gets no backdrop --
@@ -6899,7 +6942,7 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id] = {
 			line: line, halo: halo, hit: hit, handles: handles, arrows: arrows, text: text, tw: 8,
 			leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1,
-			symbolG: symbolG, symbolSvg: symbolSvg, symbolHit: symbolHit
+			symbolG: symbolG, symbolSvg: symbolSvg, symbolHit: symbolHit, symbolBox: symbolBox
 		};
 		// The words are not the target; this is (see syncLabelHit).
 		linkEls[l.id].lblHit = attachLabelHit(text, linkEls[l.id], labelsLayer, true);
@@ -6920,8 +6963,10 @@ var EngCalcs = EngCalcs || {};
 		var le = linkEls[id], l = linkById(id);
 		if (!le || !le.symbolSvg || !l) { return; }
 		var size = pumpSymbolSize(l.type), half = size / 2;
-		le.symbolSvg.setAttribute('x', -half); le.symbolSvg.setAttribute('y', -half);
-		le.symbolSvg.setAttribute('width', size); le.symbolSvg.setAttribute('height', size);
+		// **THE BOX IS A <g> TRANSFORM, NOT THE NESTED <svg>'s x/y/width/height** -- see
+		// symbolBoxTransform(). symbolG already carries the place and the rotation, so the size
+		// gets its own inner <g> and the split this comment describes is untouched.
+		if (le.symbolBox) { le.symbolBox.setAttribute('transform', symbolBoxTransform(-half, -half, size, size)); }
 		// The grab shape is the symbol's own outline in the same box, so it grows and shrinks with
 		// the drawing and there is no second opinion anywhere about how big a pump is.
 		// **SPLIT EXACTLY AS symbolG/symbolSvg IS SPLIT: SIZE HERE, PLACE THERE.** A zoom or a
@@ -6936,7 +6981,7 @@ var EngCalcs = EngCalcs || {};
 		// inside the scale below -- and DECLARED, never left to the initial 1 user unit, which on a
 		// geographic drawing is thousands of screen pixels (specs/nodehit.js).
 		if (le.symbolHit) {
-			var k = size / 24, sc = (state.s || 1) * k;
+			var k = size / SYMBOL_VIEWBOX, sc = (state.s || 1) * k;
 			le.symbolHit.setAttribute('transform', 'translate(' + (-half) + ',' + (-half) + ') scale(' + k + ')');
 			le.symbolHit.style.setProperty('--lpn-symhit', LPN_SYMBOL_HIT_PX / sc);
 			le.symbolHit.style.setProperty('--lpn-symhit-coarse', LPN_SYMBOL_HIT_COARSE_PX / sc);
@@ -17642,7 +17687,7 @@ var EngCalcs = EngCalcs || {};
 		if (nodeEls[id].hit) { nodeEls[id].hit.remove(); }
 		if (nodeEls[id].lblHit) { nodeEls[id].lblHit.remove(); }
 		nodeEls[id].leader.remove();
-		if (nodeEls[id].symbol) { nodeEls[id].symbol.remove(); }
+		if (nodeEls[id].symbolG) { nodeEls[id].symbolG.remove(); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
 		// A real deletion drops every scenario's overrides on the element (Task 184). Left behind,
@@ -25808,7 +25853,28 @@ var EngCalcs = EngCalcs || {};
 	// x/y positions are deliberately NOT run through this: they are schematic map coordinates with
 	// no established real-world scale until Task 145's backdrop registration.
 	// By [name=], not getElementById: echoUnitSelect() emits name= only, never id=.
-	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
+	//
+	// **AND THE ANSWER IS REMEMBERED, BECAUSE THIS WAS A DOCUMENT QUERY IN AN ARITHMETIC PATH**
+	// (Task 651). Every unit read on this page arrives here -- unitFactor(), unitLabel(),
+	// unitKey(), unitSymbol() -- and a label pass reads a unit for every quantity on every label.
+	// MEASURED with the CPU profiler on the shipped Net3 lat/lon example, one change on the Settings
+	// box's Quality selector: 2.85 s of an 18.9 s run inside `document.querySelector`, 15% of the
+	// whole pass, spent finding nine elements over and over. There are nine of these selects, they
+	// are server-rendered ONCE by echoUnitSelect(), and rebuildSettingsFields() MOVES the block
+	// rather than rebuilding it -- so the answer is stable for the life of the page.
+	//
+	// **THE CACHE IS BELIEVED ONLY WHILE IT IS STILL WHAT THE QUERY WOULD RETURN**: attached to the
+	// document, and still carrying the name asked for. Anything else re-queries, so a future
+	// rebuild cannot be served a detached node and no call site has to remember to invalidate --
+	// the same shape of invariant unprojectStoredGeo() uses on `_ysrc`.
+	var unitElCache = {};
+	function unitEl(name) {
+		var c = unitElCache[name];
+		if (c && c.isConnected !== false && c.parentNode && (c.name || c.getAttribute('name')) === name) { return c; }
+		c = document.querySelector('select[name="' + name + '"]');
+		unitElCache[name] = c;
+		return c;
+	}
 	// ---- ONE SET OF UNITS, NOT AN INPUT SET AND A RESULT SET (ROADMAP Task 522) -----------------
 	//
 	// Tom, 2026-08-24, reversing Task 422's split: *"I think it's our design mistake, and we

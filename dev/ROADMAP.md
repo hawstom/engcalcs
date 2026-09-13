@@ -398,6 +398,18 @@ the block.
     answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
     `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 
+- 75|653| **A Settings select costs 2.5 seconds, and it is the label pass.** Tom,
+  2026-09-13: *"the Settings Quality selector is very sluggish and doesn't work (change) once it
+  responds. All selectors are the same that way."* MEASURED on the shipped Net3 lat/lon example in
+  BOTH engines -- 2.5 s for Quality, 3.4-4.7 s for a unit select, 25 s to touch all 25 selects --
+  so it is not a Firefox defect and not Task 636's. The CPU profile puts 89% of it in
+  `refreshLabelText()`: `getBBox` per label plus `lpn-collide`'s overlap pass, on all 97 nodes,
+  every time. Rebuilding the whole box is 4.6% and is the design the code argues for. Task 651 took
+  the one free 15% (`unitEl()` was a `document.querySelector` per unit read); what is left is the
+  label engine, which is why this is its own task and not a patch. The user-visible half is that
+  the box is rebuilt under an open dropdown, so the control reads as broken rather than as slow --
+  `refreshLabelText()` has 40 call sites and coalescing it into a frame is the shape of the fix.
+
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
