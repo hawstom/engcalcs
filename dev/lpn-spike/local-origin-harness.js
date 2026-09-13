@@ -295,8 +295,14 @@ console.log('\n--- one home for the concept ---');
 	// longitude: mercLat() is strictly monotonic, so a saturating latitude still answers the
 	// yes-or-no question even though it cannot answer how far. Through the pair, like everything
 	// else, rather than reaching for cartesianY() -- which is what this count is for.
-	ok('outwardX has one definition and twenty-two call sites', count(/outwardX\(/g) === 23, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-two call sites', count(/outwardY\(/g) === 23, count(/outwardY\(/g));
+	// **TASK 641 PHASE 2 ADDED ONE SITE TO EACH PAIR, AND IT IS A READING RATHER THAN A
+	// CONVERSION.** openCrsBox() asks where the map is looking so the Geographic projection box can
+	// filter the catalogue to the projections that cover it, and "where on the Earth" is exactly
+	// what the outward pair answers. It reads the CAMERA, never a stored coordinate, and writes
+	// nothing anywhere -- and it takes the branch only for a geographic project, because a
+	// projected or local view is not a place the outward pair could name.
+	ok('outwardX has one definition and twenty-three call sites', count(/outwardX\(/g) === 24, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-three call sites', count(/outwardY\(/g) === 24, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

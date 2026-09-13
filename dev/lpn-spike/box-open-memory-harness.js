@@ -249,6 +249,7 @@ console.log('\n--- the boot path reopens exactly the three boxes, and nothing el
 	// their own: dev/lpn-spike/report-box-memory-harness.js.
 	[['lpn_popup', 'the property popup -- an answer to a selection that is not restored'],
 	 ['lpn_new_panel', 'the New-project box -- a modal'],
+	 ['lpn_crsbox', 'the Geographic projection box -- a chooser off that modal'],
 	 ['lpn_ff_run_box', 'the fire-flow run dialog -- a modal'],
 	 ['lpn_notes_popup', 'the notes popover -- transient'],
 	 ['lpn_dialog', 'the confirm dialog -- a modal'],

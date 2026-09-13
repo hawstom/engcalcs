@@ -1117,7 +1117,7 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Open an xy file on the map…';
+$ec_lang['lpn_file_import_geo']='Open to new coordinates…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new project tab on this page, on the world map. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more precisely.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
@@ -1599,13 +1599,30 @@ $ec_lang['lpn_new_coords_geo']='lat/lon';
 $ec_lang['lpn_new_coords_tip']='An xy project uses coordinates that are not latitude and longitude. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File, Open an xy file on the map.';
 // The place-name field, enabled only for a latitude-and-longitude project. Optional, always: a
 // blank one makes the project and moves nothing.
-// **THE THIRD COORDINATE CHOICE: A REAL MAP PROJECTION** (Task 641, Tom 2026-09-12). Lower case
-// beside its two siblings, on the 2026-08-18 ruling above that these three names imply no proper
-// nouns. The PROJECTION's own name is a different thing and is deliberately not a language key at
-// all: "WGS 84 / UTM zone 12N" is a registered name rather than a description of a control, exactly
-// as the OpenStreetMap credit is, and a GIS reader in any language needs to recognize it. The
-// catalogue note in js/looped-network.js states that in one place.
-$ec_lang['lpn_new_coords_proj']='projected coordinates';
+// ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
+// **TWO ANSWERS, NOT THREE.** Phase 1 asked xy / lat/lon / projected, which split one question in
+// two: lat/lon IS a projection on this page -- the drawing frame is Web Mercator and the register
+// has a name for it, EPSG:3857 -- so "geographic projection" covers it and every zoned system
+// alike, and what is left over is the project that sits on no part of the Earth at all. Tom's own
+// wording throughout, including the capital L of "Lat/Lon".
+//
+// **THE SIX KEYS THE THREE-RADIO BOX USED ARE LEFT DEFINED AND ARE NOW RENDERED BY NOTHING** --
+// lpn_new_coords, _tip, _xy, _geo, lpn_new_place and lpn_new_place_tip. New keys rather than
+// reworded ones on purpose: those six are translated into 26 languages, and a repointed key would
+// show 26 confident translations of the OLD question, where an absent key shows English, which is
+// the correct untranslated state. Whether they are debt is a judgement call and Tom's.
+$ec_lang['lpn_new_coordsys']='Coordinate system';
+$ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.';
+$ec_lang['lpn_new_coordsys_geo']='Geographic projection';
+$ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
+$ec_lang['lpn_new_coordsys_local']='Local, schematic, custom, or georeference later';
+$ec_lang['lpn_new_coordsys_local_tip']='Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.';
+// ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
+// Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
+// ones applicable to the project (view). Lets the user filter by name and select a projection at
+// any time." Two filters over one catalogue, and the catalogue itself is not keyed: a projection's
+// NAME is the EPSG register's own, exactly as the OpenStreetMap credit is, and a GIS reader in any
+// language looks for those characters.
 $ec_lang['lpn_new_crs']='Map projection';
 // **WHAT IT PROMISES AND WHAT IT REFUSES.** The promise is that nothing is converted, which is this
 // suite's own rule about the user's numbers. The refusal is that the choice is final, and it is
@@ -1613,7 +1630,23 @@ $ec_lang['lpn_new_crs']='Map projection';
 //
 // Nothing here claims anything about how accurate a length is: that claim waits on Task 643.
 $ec_lang['lpn_new_crs_tip']='The projection your coordinates are already measured in. Eastings and northings are stored exactly as you type them, and nothing is converted. A project cannot change its projection afterward, so to work in a different one, start a new project. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.';
-// What the status strip says when a project has no projection at all. The xy grid is a plane the
+// The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
+// answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
+// out of a hundred and twenty.
+$ec_lang['lpn_crs_view']='Filter by map view';
+$ec_lang['lpn_crs_view_tip']='Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.';
+$ec_lang['lpn_crs_place']='Place name search';
+$ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.';
+$ec_lang['lpn_crs_search']='Search';
+$ec_lang['lpn_crs_name']='Projection name filter';
+$ec_lang['lpn_crs_name_tip']='Shows only the projections whose name or EPSG code contains what you type. Try a zone number, or UTM, or Mercator.';
+$ec_lang['lpn_crs_list']='Projection';
+$ec_lang['lpn_crs_list_tip']='The projections left by the two filters above. Choose one and press Select.';
+$ec_lang['lpn_crs_choose']='Select';
+// Said rather than left blank: a filter that is on and filtering nothing looks broken.
+$ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above to narrow it.';
+$ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
+// What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 $ec_lang['lpn_crs_none']='Not georeferenced';
 $ec_lang['lpn_new_place']='Start near this place';

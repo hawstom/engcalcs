@@ -1119,38 +1119,33 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_title']?></div>
 	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
-		<?php // THE TOP CHOICE, and it is top because it is the one that cannot be changed afterwards:
-		      // a project is an xy grid or it is on the Earth, and LPN_COORDS_GEO explains at length
-		      // why that is not a toggle. Radios rather than a dropdown -- two options, both worth
-		      // reading, and the second one enables a control below it. ?>
+		<?php // THE TOP CHOICE, and it is top because it is the one that cannot be changed afterwards
+		      // (Task 641 phase 2, Tom's own specification of 2026-09-13). **TWO ANSWERS, NOT THREE.**
+		      // A geographic project states a PROJECTION, and lat/lon is one of them -- EPSG:3857, the
+		      // Web Mercator the drawing frame has always been. What is left over is the project that
+		      // sits on no part of the Earth: local, schematic, custom, or not georeferenced yet.
+		      //
+		      // The permanence is stated in the group tip, in Tom's words, because this control is the
+		      // only place it can be read before it binds. LPN_COORDS_GEO and assignProjectCrs() are
+		      // where the two doors are actually shut.
+		      //
+		      // Each radio carries its own "?" INSIDE its label, which is the shipped pattern one line
+		      // down in the legend rather than a new one: the glyph selects the radio it explains,
+		      // which is the radio you were reading about. ?>
 		<fieldset class="lpn-new-block">
-			<legend><?=ecTipLabel($ec_lang['lpn_new_coords'], $ec_lang['lpn_new_coords_tip'])?></legend>
-			<label><input type="radio" name="lpn_new_coords" value="xy" checked> <?=$ec_lang['lpn_new_coords_xy']?></label>
-			<label><input type="radio" name="lpn_new_coords" value="geo"> <?=$ec_lang['lpn_new_coords_geo']?></label>
-			<label><input type="radio" name="lpn_new_coords" value="proj"> <?=$ec_lang['lpn_new_coords_proj']?></label>
+			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></legend>
+			<div>
+				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_coordsys_geo_tip'])?></label>
+				<?php // THE CHOOSER, and its LABEL IS THE ANSWER -- the projection now in force, with the
+				      // "..." this page spends on "opens a box". One control that both states the choice
+				      // and changes it, rather than a select beside a button: the catalogue is 121 rows
+				      // long and a bare dropdown of it is the thing the box exists to filter. ?>
+				<button type="button" id="lpn_new_crs_pick" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_crs']))?>"></button>
+			</div>
+			<div>
+				<label><input type="radio" name="lpn_new_coords" value="local" checked> <?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label>
+			</div>
 		</fieldset>
-		<?php // ENABLED ONLY FOR A PROJECTED PROJECT, on exactly the argument the place field below
-		      // makes: a control that vanishes as you touch the radio above it reads as a glitch,
-		      // where a greyed one says which choice the question belongs to.
-		      //
-		      // **THE OPTIONS ARE BUILT BY JS**, like the unit selects further down and for the same
-		      // reason -- the list is generated from the EPSG numbering rather than typed, so there
-		      // is no table here for a hand edit to disagree with. Task 641. ?>
-		<div class="lpn-new-block" id="lpn_new_crs_block">
-			<label for="lpn_new_crs"><?=ecTipLabel($ec_lang['lpn_new_crs'], $ec_lang['lpn_new_crs_tip'])?></label>
-			<select id="lpn_new_crs" disabled></select>
-		</div>
-		<?php // ENABLED ONLY FOR LAT/LON, which is Tom's own wording of the rule. An xy grid has no
-		      // place on the Earth to travel to, so the field is disabled rather than hidden: a
-		      // control that appears and vanishes as you touch the radio above it reads as a glitch,
-		      // where a greyed one says "that question belongs to the other choice".
-		      //
-		      // The text goes to js/lpn-search.js's own runner on Create, consent gate and all --
-		      // never to a second search path built into the box. ?>
-		<div class="lpn-new-block" id="lpn_new_place_block">
-			<label for="lpn_new_place"><?=ecTipLabel($ec_lang['lpn_new_place'], $ec_lang['lpn_new_place_tip'])?></label>
-			<input type="text" id="lpn_new_place" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_new_place_hint'])?>" disabled>
-		</div>
 		<?php // The units, as Tom answered it on 2026-08-24: *"all units are shown ... with the US and
 		      // SI presets to set them."* The selects are built by JS from the page's own strip; the
 		      // two preset buttons are here because they are markup with strings in them. ?>
@@ -1182,6 +1177,59 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		</div>
 	</div>
 </div>
+
+<?php // ---- THE GEOGRAPHIC PROJECTION BOX (ROADMAP Task 641 phase 2) ----------------------------
+      //
+      // Tom's summary, 2026-09-13: it *"uses the map view as a UX element to filter the universe of
+      // projections to the ones applicable to the project (view). Lets the user filter by name and
+      // select a projection at any time."*
+      //
+      // **A SPATIAL FILTER IS DATA, NOT A TRANSFORM.** Every projection in the catalogue covers a
+      // strip of the Earth stated in longitude and latitude -- that is what an EPSG area of use is
+      // -- and a place-name result is a longitude and a latitude too, so the filter is a
+      // containment test between two things that are already in the same units. Nothing here
+      // converts a coordinate, and nothing here needs a projection library to exist.
+      //
+      // **THE PLACE SEARCH IS js/lpn-search.js, THROUGH ITS OWN GATE.** It is the suite's one
+      // geocoder: EngCalcs.lpnSearchPoint() is a second DESTINATION for that engine and not a
+      // second engine -- same consent question, same one-a-second rule, same chooser, same
+      // repeated-query memory. See the third-party section of CLAUDE.md.
+      //
+      // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
+      // strings are language keys and PHP is where those live. ?>
+<div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
+	<?php // The title carries the tip that says what choosing one COMMITS you to -- that nothing of
+	      // yours is converted, and that the choice is final. It is the phase-1 wording, moved from
+	      // the control that is gone to the box that replaced it. ?>
+	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_crs_tip'])?></div>
+	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
+		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
+		      // MOVES the thing it filters by on the right. ?>
+		<div class="lpn-new-block">
+			<label><input type="checkbox" id="lpn_crsbox_view" checked> <?=ecTipLabel($ec_lang['lpn_crs_view'], $ec_lang['lpn_crs_view_tip'])?></label>
+		</div>
+		<div class="lpn-new-block">
+			<label for="lpn_crsbox_place"><?=ecTipLabel($ec_lang['lpn_crs_place'], $ec_lang['lpn_crs_place_tip'])?></label>
+			<input type="text" id="lpn_crsbox_place" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_new_place_hint'])?>">
+			<button type="button" id="lpn_crsbox_search"><?=$ec_lang['lpn_crs_search']?></button>
+		</div>
+		<div class="lpn-new-block">
+			<label for="lpn_crsbox_name"><?=ecTipLabel($ec_lang['lpn_crs_name'], $ec_lang['lpn_crs_name_tip'])?></label>
+			<input type="text" id="lpn_crsbox_name" autocomplete="off">
+		</div>
+		<div class="lpn-new-block">
+			<label for="lpn_crsbox_list"><?=ecTipLabel($ec_lang['lpn_crs_list'], $ec_lang['lpn_crs_list_tip'])?></label>
+			<select id="lpn_crsbox_list" size="10"></select>
+			<div id="lpn_crsbox_note"></div>
+		</div>
+		<div class="lpn-new-actions">
+			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_crs_choose']?></button>
+			<button type="button" id="lpn_crsbox_cancel"><?=$ec_lang['lpn_cancel']?></button>
+		</div>
+	</div>
+</div>
+
 
 <?php // **THE ABOUT BOX** (ROADMAP Task 625; Tom, 2026-09-11: *"a simple popup like Notes that acts
       // like most programs"*). It REPLACES Help > About's old link to About.php, which was the
@@ -1330,6 +1378,8 @@ EngCalcs.pageConfig = {
 	lpn_field_northing: <?=json_encode($ec_lang['lpn_field_northing'])?>,
 	lpn_field_easting: <?=json_encode($ec_lang['lpn_field_easting'])?>,
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
+	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
+	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
 	lpn_valve_type_gpv: <?=json_encode($ec_lang['lpn_valve_type_gpv'])?>,
 	lpn_field_valve_setting_drop: <?=json_encode($ec_lang['lpn_field_valve_setting_drop'])?>,
