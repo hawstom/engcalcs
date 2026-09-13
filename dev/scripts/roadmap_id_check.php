@@ -74,9 +74,12 @@ $offTier = array();
 // still reads, and every 60 is somebody's private opinion about a gap between Soon and Next that
 // nobody else can re-derive.
 //
-// **95 IS TEMPORARY AND DATED**, holding what was deferred past EWB until 2026-09-18. When it
-// empties, delete it from this list and from the header table together.
-$TIERS = array(0, 5, 25, 50, 75, 95, 100);
+// **95 WAS A TEMPORARY SIXTH TIER AND IS RETIRED** (2026-09-12, the day it was created -- it held
+// work deferred past EWB). Branch work needs no parking: with master as the production line a task
+// ships when its branch is merged and not before, so a dated holding pen answers a question nobody
+// has. Removed from here and from ROADMAP.md's header table in the same edit, which is what its own
+// note said to do.
+$TIERS = array(0, 5, 25, 50, 75, 100);
 
 foreach ($files as $which => $p) {
     $lines = file($p, FILE_IGNORE_NEW_LINES);
@@ -195,8 +198,9 @@ if ($offTier) {
         printf("    %-7s line %-6d Task %-8s prio %-4s %s\n",
                $h['file'], $h['line'], $h['id'], $h['priority'], $h['title']);
     }
-    echo "\nPriority is one of " . implode(', ', $TIERS) . " and nothing else: 100 Next, 95 move to\n";
-    echo "100 on September 18 (temporary), 75 Soon, 50 Someday, 25 Maybe, 5 Parked, 0 Closed.\n";
+    echo "\nPriority is one of " . implode(', ', $TIERS) . " and nothing else: 100 Next, 75 Soon,\n";
+    echo "50 Someday, 25 Maybe, 5 Parked, 0 Closed. (A temporary 95 tier parked work past EWB for\n";
+    echo "one day and was retired on 2026-09-12: branch work needs no parking.)\n";
     echo "Pick the tier that is TRUE, never the nearest one: a task at 60 is a 75 you are hedging\n";
     echo "about or a 50 you are flattering. 45-vs-50 is a distinction nobody can re-derive a month\n";
     echo "later, which is why the fine scale was retired on 2026-08-21.\n";
