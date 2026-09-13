@@ -300,65 +300,24 @@ the block.
     good reason. Things on the map are small."* The cursor change is WORKING and was welcomed; the
     difficulty is ACQUISITION, which is the "node fat" item above reached independently.
 
-- 100|627| **[H] An unreadable document leaves a named tab, then autosave destroys it.**
-  Reproduced 13/13 by `dev/lpn-spike/blank-map-harness.js`. **A gap BETWEEN two branches:**
-  `initLibrary()` returns null when the open project's stored document does not parse, but its
-  last act before reading is `if (!indexEntry(library.openId)) { library.openId =
-  library.projects[0].id; }` -- so at `init()`'s `else if (!indexEntry(library.openId))` the entry
-  EXISTS, and neither branch runs. Nothing applied, nothing created, **nothing thrown**. The tab
-  strip renders the name from the index over an empty `doc`.
-  - **THE LOSS IS THE AUTOSAVE, NOT THE CORRUPTION.** At the blank-map moment the user's bytes are
-    still on disk and are the only copy; `saveToStorage()` then writes the empty
-    `serializeProject()` over that key on the solve debounce. Tom saw exactly this state and it
-    held: *"The project is still in storage. But the map is blank."*
-  - `adoptOrphans()` drops an entry whose key is ABSENT (`getItem(...) !== null`), so a PRESENT
-    unparseable key walks past the filter and fails later at `JSON.parse`.
-  - **The fix is a third state, not a wider `else`.** Unreadable is not "first visit" -- creating a
-    fresh project there overwrites the bytes too. It must refuse to autosave over a document it
-    could not read and say so; `setStorageError()` is the existing seam. Never repair silently.
-  - **NO KNOWN OCCURRENCE, and it was filed believing it had one.** Tom's 2026-09-10 document
-    parses, holds 97 nodes and 119 links, and 677 symbols were in the DOM. **Do not cite this as
-    the cause of any incident.**
-
-- 100|628| **[H] A restored view is never checked against the model it must show.**
-  Tom, 2026-09-10, after a machine restart: *"Zoom to fit restores it all. It's a zoom mistake!"*
-  Full measurement in `dev/lpn-blank-map-incidents.md`. His stored view was
-  `{cx: 835.390625, cy: -4957.78125, s: 5.322222222222222}` on a geographic Net3.
-  - **THE SCALE ALONE MADE IT INVISIBLE.** `s` is px per degree; at 5.322 that document's
-    0.0965 x 0.082 degree extent draws **0.51 x 0.44 px**. Invisible even perfectly centred.
-  - **AND THE CENTRE WAS OUTSIDE THE WORLD IN BOTH AXES.** `mercY()` is 0 at the equator and +-180
-    at the cut-off, so cy -4957.78 is 27x outside it; `mercLat()` saturates at exactly -90, which
-    is the latitude his status bar showed. cx 835.39 is likewise past longitude's +-180.
-  - **NOTHING VALIDATES A VIEW ON THE WAY IN.** `applySaved()` installs whatever the document
-    states. A view that cannot intersect the model's own extent, or a scale that draws the whole
-    network under a pixel, is arithmetically detectable at load -- and the fix is Zoom to fit,
-    which is exactly what recovered it by hand.
-  - **THE USER CANNOT TELL THIS FROM LOST WORK.** Tom: *"a blank map is equally fatal as a lost
-    project. User doesn't know the difference."* Severity is loss-grade whatever the cause.
-  - **HOW THE VIEW GOT THERE IS NOT ESTABLISHED** and the specimen is spent -- Zoom to fit
-    autosaved the good view over it. It matches neither shipped Net3's saved view, so not a
-    straight copy of a sibling tab's; two Net3 examples that differ in frame and are identical in
-    node count (97/119) is still the first place to look.
-
 - 100|638| **Node and link symbology do not offer the chemical properties.**
-  Tom, 2026-09-12: *"Add all chemical modeling properties to Settings.Visualization."* Measured the
-  same day: `COLOR_NODE_FIELDS` offers ONE quality entry covering all three analyses, and
-  `COLOR_LINK_FIELDS` offers none at all -- no quality, no reaction rate -- so a link can never be
-  coloured or labelled by anything the quality run produced. `linkFieldDefs()` has the same gap.
-  - EPANET colours a link by its average quality, its reaction rate, its friction factor and its
-    status; it colours a node by quality and by initial quality. Default to that list
-    (CLAUDE.md's EPANET-vocabulary rule) rather than inventing one.
-  - **The unit is the trap, not the list.** `colorFieldUnit()` already overrides the declared unit
-    with `qualityUnitId()`, which is the one place that knows a source share has no unit; a
-    reaction rate is a third unit again. Add a field and that override is what has to learn it.
-  - **THREE OF THE FOUR LINK FIELDS SHIPPED, AND THE REACTION RATE IS BLOCKED ON THE ENGINE.**
-    Average quality, friction factor and status are in, with the node's quality and initial
-    quality (`dev/lpn-spike/chemical-symbology-harness.js`). **The vendored toolkit exposes no
-    reaction-rate getter** -- its `LinkProperty` enum ends at `LinkQual` (14), and EPANET carries
-    the rate only in its binary `.out` file and in a full `.rpt` table. So the remaining work is
-    either a binary-output reader or mass-transfer arithmetic of our own, and the second is the
-    class this project refuses. The friction factor needed neither: `f = 2 g D h_f / (L V^2)` is
-    the definition of f, back-computed the way EPANET's own report back-computes it.
+  **MOSTLY SHIPPED 2026-09-13; THE REACTION RATE IS WHAT IS LEFT.** Node symbology now offers
+  quality and initial quality; link symbology offers average quality, friction factor and status,
+  coloured AND labelled, in both `COLOR_*_FIELDS` and `nodeFieldDefs()`/`linkFieldDefs()`.
+  `dev/lpn-spike/chemical-symbology-harness.js`, 40 assertions off a real EPS run.
+  - **THE REACTION RATE IS NOT SHIPPABLE FROM THE TOOLKIT AND THAT IS THE FINDING.** The vendored
+    engine's `LinkProperty` enum ends at `LinkQual` (14) -- EPANET exposes NO getter for it, carrying
+    it only in the binary `.out` file and a full `.rpt` table. Shipping it means writing a binary
+    output parser, or inventing mass-transfer arithmetic of our own, which is the class this project
+    refuses. **The friction factor needed neither and that is why it shipped**: `f = 2gD h_f/(L V^2)`
+    is the definition, back-computed as EPANET's own report back-computes it, for any method.
+  - A link's average quality **was never read from the engine at all** before this; `EN_LINKQUAL`
+    is now harvested in `js/lpn-epanet.js` and carried through `js/lpn-time.js` as its own map,
+    because link ids and node ids are two namespaces.
+  - **`status` is categorical and the ramp is numeric**, so it enters as 1 open / 0 closed. The map
+    reads correctly; the LEGEND prints numeric bands rather than the two words. Fixing that means
+    changing the field-definition shape, which was deliberately not done while Task 636 was in
+    flight beside it. Decide whether the legend is worth that.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -1081,6 +1040,21 @@ the block.
     at Phoenix and 100% at 60N. Read `dev/map-projection-decision.md` first: it holds Tom's own
     architecture (store easting/northing in a stated CRS, let the drawing frame BE that plane) and
     the one question that sizes the work, proj4js or UTM alone.
+  - **PHASE 1 SHIPPED 2026-09-13.** `project.crs` holds an EPSG code, declared at creation and
+    never afterward: `assignProjectCrs()` is the only writer and refuses a project that already
+    states one, a lat/lon project, or one with anything drawn in it; `georefStart()` refuses a
+    projected project by name, which shuts the second door. The list is GENERATED from the EPSG
+    numbering (120 WGS 84 UTM zones, 32601-32660 / 32701-32760), never typed. The status bar names
+    the projection and the readout names its axes per coordinate system, north first.
+    `dev/lpn-spike/projection-harness.js`, 40 assertions.
+  - **NO TRANSFORM EXISTS ON THE PROJECTED PATH, BY CONSTRUCTION.** proj4js was not vendored, so
+    basemap, place-name search and terrain elevations are absent rather than newly gated -- all
+    three already gate on `isGeoProject()`, which a projected project is not. The eastings and
+    northings in the file are the ones the user typed and the round trip is byte-identical.
+    Everything needing the inverse transform is therefore still open: State Plane and the full
+    register, point scale factor, ground length, per-tile reprojection, `;CRS` in the `.inp`, and
+    the **Open and convert coordinates...** rename, which was deliberately NOT made because it
+    would advertise a door that does not exist yet.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
