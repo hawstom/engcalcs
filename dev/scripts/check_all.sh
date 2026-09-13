@@ -422,6 +422,7 @@ run_check "screenshot publication"       advisory php dev/scripts/screenshot_pub
 # keeps it short. Advisory by construction -- citing a closed task as a RECORD is legitimate, so
 # only a human can tell a stale claim from a correct citation.
 run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_check.php
+run_check "branch hygiene"             advisory php dev/scripts/branch_hygiene_check.php
 # Task 322. This line used to pipe the report through `grep -q "^CHANGED"`, so the NOTE it printed
 # had NO TEXT UNDER IT -- nine role changes were sitting in a report nobody could see from here,
 # and an advisory whose findings never reach the reader is not an advisory. --brief prints the
