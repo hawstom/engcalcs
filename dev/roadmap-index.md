@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**72 open tasks.** Next (100): 9 · Soon (75): 9 · Someday (50): 18 · Maybe (25): 10 · Parked (5): 17 · priority 60 (60): 4 · priority 70 (70): 1 · priority 95 (95): 2 · priority 40 (40): 1 · priority 30 (30): 1
+**80 open tasks.** Next (100): 11 · Soon (75): 15 · Someday (50): 25 · Maybe (25): 10 · Parked (5): 17 · priority 95 (95): 2
 
-## 100 — Next (9)
+## 100 — Next (11)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
@@ -18,15 +18,17 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
+- Task 615 — [H] · The water icon: keep experimenting, and record the votes.
 - Task 616 — [H] · Visual feedback: a prompt history in the banner area.
 - Task 618 — WYSIWYG hit areas: what you can click is what you can see.
+- Task 638 — Node and link symbology do not offer the chemical properties.
 
 ## 95 — Priority 95 (2)
 
 - Task 627 — [H] · An unreadable document leaves a named tab, then autosave destroys it.
 - Task 628 — [H] · A restored view is never checked against the model it must show.
 
-## 75 — Soon (9)
+## 75 — Soon (15)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -37,19 +39,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 617 — A basemap the reader can tone down, and a menu of tile styles.
 - Task 623 — [H] · File loss judged only by people whose files are throwaway.
 - Task 624 — [H] · The scale fallbacks turn any missed publish into a flooded canvas.
-
-## 70 — Priority 70 (1)
-
-- Task 630 — [H] · The map shows lat/lon as xy, and that is the problem.
-
-## 60 — Priority 60 (4)
-
 - Task 625 — [H] · BUILT: the app page divorced from EngCalcs chrome. Remainder below.
 - Task 626 — A refused beacon is retried like an offline one, 20 times.
-- Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
-- Task 633 — The project tab strip, and whether it could collapse into the toolbar.
+- Task 630 — [H] · The map shows lat/lon as xy, and that is the problem.
+- Task 634 — Re-shoot the everything-at-once frame; it is the front page's lead.
+- Task 635 — A Zoom to button on the Properties box.
+- Task 637 — A Graph button on the Properties box.
 
-## 50 — Someday (18)
+## 50 — Someday (25)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -68,15 +65,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
+- Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
-
-## 40 — Priority 40 (1)
-
 - Task 632 — Animation speed control for the transport.
-
-## 30 — Priority 30 (1)
-
-- Task 634 — Re-shoot the everything-at-once frame; it is the front page's lead.
+- Task 633 — The project tab strip, and whether it could collapse into the toolbar.
+- Task 636 — A custom properties UI, designed in a table.
+- Task 639 — Layers: the first heading under Map and page.
+- Task 640 — A Graphs submenu under Water, holding five plots.
+- Task 641 — Choose a real EPSG projection in the new project box.
 
 ## 25 — Maybe (10)
 
@@ -115,5 +111,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-65 of 72 titles are within 4–12 words. `!` marks the rest;
+73 of 80 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

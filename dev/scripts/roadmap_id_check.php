@@ -60,6 +60,23 @@ foreach ($files as $which => $p) {
 $seen  = array();   // id => list of hits, across both files
 $wrongFile = array();
 $long  = array();
+$offTier = array();
+
+// **THE ONLY PRIORITIES THERE ARE.** Tom, 2026-09-12, having read a file in which seven tasks had
+// settled at 30, 40, 60 and 70: *"The five-tier roadmap system your team suggested turned out to
+// work very well, and since I suggested temporarily moving all pending priority 100 tasks to 95 ...
+// the system has been completely lost. Restore it. ... No tasks are allowed at any other priority
+// tiers."*
+//
+// The rule had been prose in ROADMAP.md's own header since 2026-08-21 and drifted anyway, which is
+// CLAUDE.md's argument for checks in one file: the header said "five values and nothing between
+// them" on the same screen as a task at 40. An off-tier number is invisible -- the file still sorts,
+// still reads, and every 60 is somebody's private opinion about a gap between Soon and Next that
+// nobody else can re-derive.
+//
+// **95 IS TEMPORARY AND DATED**, holding what was deferred past EWB until 2026-09-18. When it
+// empties, delete it from this list and from the header table together.
+$TIERS = array(0, 5, 25, 50, 75, 95, 100);
 
 foreach ($files as $which => $p) {
     $lines = file($p, FILE_IGNORE_NEW_LINES);
@@ -97,6 +114,9 @@ foreach ($files as $which => $p) {
         $seen[$id][] = $hit;
         $cur = $hit + array('n' => 1);
 
+        if (!in_array((int)$m[1], $TIERS, true)) {
+            $offTier[] = $hit;
+        }
         $closed = ($m[1] === '0');
         if ($closed !== ($which === 'closed')) {
             $wrongFile[] = $hit;
@@ -165,6 +185,21 @@ if ($straddle) {
     echo "\nA task lives in exactly one file: ROADMAP.md while it is open, the archive once closed.\n";
     echo "Two copies means the close COPIED instead of moving, or an open task nested inside a\n";
     echo "parent's block travelled with the parent into the archive. Keep one, delete the other.\n";
+    $failed = true;
+}
+
+if ($offTier) {
+    if ($failed) { echo "\n"; }
+    echo "PRIORITY OFF THE TIERS (" . count($offTier) . "):\n\n";
+    foreach ($offTier as $h) {
+        printf("    %-7s line %-6d Task %-8s prio %-4s %s\n",
+               $h['file'], $h['line'], $h['id'], $h['priority'], $h['title']);
+    }
+    echo "\nPriority is one of " . implode(', ', $TIERS) . " and nothing else: 100 Next, 95 move to\n";
+    echo "100 on September 18 (temporary), 75 Soon, 50 Someday, 25 Maybe, 5 Parked, 0 Closed.\n";
+    echo "Pick the tier that is TRUE, never the nearest one: a task at 60 is a 75 you are hedging\n";
+    echo "about or a 50 you are flattering. 45-vs-50 is a distinction nobody can re-derive a month\n";
+    echo "later, which is why the fine scale was retired on 2026-08-21.\n";
     $failed = true;
 }
 

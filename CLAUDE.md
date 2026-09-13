@@ -21,15 +21,23 @@ uncommitted; silence means commit and push.
 
 - **Work directly on `master`.** No feature branches — the project is small enough for one branch,
   and per-task branches accumulated as stale refs.
-- **TWO NAMED EXCEPTIONS, APPROVED 2026-09-11: `customers` and `projections`.** Tom asked twice
-  about a "don't work on master" paradigm and the answer to the general question is still no --
-  what bit this tree was CONCURRENT SESSIONS IN ONE DIRECTORY, and a branch does not help, because
-  both sessions still share the checkout. A worktree does, and is already allowed below. But these
-  two are the shape a branch is actually for: **large, speculative, and abandonable**. Task 247
-  (Customers) and Task 630 (Projections) may each be dropped after a week's work, and Projections
-  can touch the coordinate seam that every geographic document depends on. **The condition is that
-  each is MERGED OR KILLED, never left to rot** -- a stale ref is the failure the no-branches rule
-  exists to prevent, and it is prevented by deleting the branch, not by never making one.
+- **FOUR NAMED EXCEPTIONS: `customers` and `projections` (2026-09-11), `graphs` and
+  `custom-properties` (2026-09-12).** Tom asked twice about a "don't work on master" paradigm and
+  the answer to the general question is still no -- what bit this tree was CONCURRENT SESSIONS IN
+  ONE DIRECTORY, and a branch does not help, because both sessions still share the checkout. A
+  worktree does, and is already allowed below. But these four are the shape a branch is actually
+  for: **large, speculative, and abandonable**. Task 247 (Customers), Task 641 (Projections),
+  Task 640 (Graphs) and Task 636 (Custom properties) may each be dropped after a week's work;
+  Projections can touch the coordinate seam that every geographic document depends on, and Custom
+  properties reaches the Properties box, Find, the Tables pane and Graphs at once. **The condition
+  is that each is MERGED OR KILLED, never left to rot** -- a stale ref is the failure the
+  no-branches rule exists to prevent, and it is prevented by deleting the branch, not by never
+  making one.
+  - **THEY SHARE SEAMS, so read the worktree rule below before running two of them at once.**
+    Graphs and Custom properties both write into the bottom pane's tab strip; Custom properties and
+    Customers both add fields to the Properties box and to Find; Projections and Customers both
+    place things by coordinate. Two of these in flight together is the five-defect shape that
+    `scenario_seam_check.php` exists because of -- name the seam in both briefs, or sequence them.
 - **Stage explicit paths. Never `git add -A`** — Tom runs concurrent sessions in the same working
   directory, and a broad add commits their in-progress work under your message.
 - **Report the push state unabridged and unprompted:** the commit SHA, and that
@@ -682,7 +690,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `harvest_english_rulings.php --check` + `harvest_rulings_selftest.php` | **A mark Tom writes on `dev/new-english-keys.md` reaches a file that survives regeneration.** He hand-edits that list — the header says never to, and he does, because it is the list in front of him — and three times running the marks stayed only in the working tree and he was asked the same questions again: *"I already ruled on many of these. You are losing my rulings."* The `--write` refusal beside it stops a regeneration DESTROYING a mark; this stops one merely being ignored, which loses it just as completely. Two destinations, because the file asks two kinds of question: an answer in the translators' section is a finding's `human_answer` in `dev/english-friction/*.json`; anything else is a ruling in `dev/english-key-rulings.json`, keyed on the exact English as an approval already is. **His words are stored verbatim, not reduced to a boolean** — "OK." and "It's fine as is. Add a _syn per 1." are both readings and only one is finished — and printed back on the key, which is the receipt. Idempotent by asking the DESTINATION, never "has the file changed". The selftest is a live mutation, because a check that passes by finding nothing is the shape that has already died of success here once |
 | `generate_examples.php --check` | The served `examples/` matches its source |
 | `generate_features.php --check` | `dev/features.md` matches its hand-written source, and every ID a feature cites is genuinely closed |
-| `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else |
+| `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else; and **priority is one of 100, 95, 75, 50, 25, 5, 0 and no other number**. That last leg was prose in the roadmap's own header for three weeks and drifted anyway -- seven tasks had settled at 30, 40, 60 and 70 by the day Tom read the file (*"the system has been completely lost. Restore it."*, 2026-09-12), on the same screen as a header sentence saying five values and nothing between them. An off-tier number is invisible: the file still sorts and still reads, and every 60 is a private opinion about a gap nobody else can re-derive. **95 is temporary and dated** -- it holds what was deferred past EWB until 2026-09-18, and when it empties it leaves the check and the header table together |
 | `check_table_parity_check.php` + selftest | This table and `check_all.sh` name the same checks. Matched on script filename, not on labels — the two files may word a check differently. Eight checks ran unlisted when it was written |
 | `doc_path_check.php` + selftest | Every path `CLAUDE.md` cites exists. Scoped to that file: `dev/*.md` has 31 dead citations and nearly all are legitimate history, which would make it a judgement call. Deliberately timid about what looks like a path, and prints how much it turned away. `~/webdev/...` and `../sitemap.xml` are outside this tree, so their absence proves nothing |
 | `run_harnesses.sh` | The lpn solver and editor harnesses (count derived from the glob, never typed) |
@@ -988,6 +996,9 @@ Production SSH is blocked on port 22; origin is GitHub, pulled over `ssh.github.
   day*, or say nothing.
 - **Don't attribute repo prose to Tom.** `CLAUDE.md`, code comments and `dev/*.md` are AI-written.
   Quote only the transcript or a dated first-person quote.
+- **ROADMAP priority is one of six numbers: 100 Next, 95 (temporary, move to 100 on 2026-09-18),
+  75 Soon, 50 Someday, 25 Maybe, 5 Parked — plus 0 for closed.** Never a number between them, and
+  never a new tier. `roadmap_id_check.php` blocks on one.
 - **ROADMAP length discipline: the default is 1–3 lines, hard cap ~15.** The one test for adding a
   line: *would a competent person, reading the short version, DO SOMETHING DIFFERENT if this line
   were there?* Expansion is earned only by (a) a decision with a real rejected alternative, (b) a
