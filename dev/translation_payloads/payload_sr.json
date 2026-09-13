@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 1847,
-        "delta_key_count": 79,
+        "expected_key_count": 1856,
+        "delta_key_count": 88,
         "exempt_key_count": 27,
         "exempt_keys": [
             "calc_units_us",
@@ -539,37 +539,43 @@
         "lpn_field_northing": "Northing",
         "lpn_field_easting": "Easting",
         "lpn_settings_custom_props": "Custom properties",
-        "lpn_settings_custom_props_note": "A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.",
+        "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
-        "lpn_cp_design_tip": "One row per custom property, reading across: key, label, applies to, validate as, restrict characters, restrict length, low limit, high limit.",
+        "lpn_cp_design_tip": "One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
         "lpn_cp_add": "Add custom property",
-        "lpn_cp_add_tip": "Adds one more row to the design table. Give it a key and a label, then choose the asset kinds that carry it.",
+        "lpn_cp_add_tip": "Adds one more row to the design table and opens it for editing. Give it a key and a label, then choose the asset kinds that carry it.",
         "lpn_cp_remove": "Remove",
         "lpn_cp_remove_tip": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
+        "lpn_cp_edit_tip": "Opens the design of this custom property, where every part of it is shown at full length.",
+        "lpn_cp_edit_title": "Custom property design",
         "lpn_cp_none": "No custom property is designed yet.",
         "lpn_cp_key": "Key",
-        "lpn_cp_key_tip": "The name this property is stored under. No spaces. A prefix is added for you so that your key can never collide with a built-in field.",
+        "lpn_cp_key_tip": "Key: A property is stored under this name. It takes no spaces, and a prefix is added for you so that your key can never collide with a built-in field.",
         "lpn_cp_label": "Label",
-        "lpn_cp_label_tip": "What a reader sees on the properties box, in Find and at the head of a table column.",
+        "lpn_cp_label_tip": "Label: A reader sees this on the properties box, in Find and at the head of a table column.",
         "lpn_cp_applies": "Applies to",
-        "lpn_cp_applies_tip": "Which asset kinds carry this property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.",
+        "lpn_cp_applies_tip": "Applies to: These asset kinds carry the property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.",
         "lpn_cp_validate": "Validate as",
-        "lpn_cp_validate_tip": "What a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
+        "lpn_cp_validate_tip": "Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
         "lpn_cp_restrict": "Restrict characters",
-        "lpn_cp_restrict_tip": "A set of characters to allow or to refuse, where the at sign stands for any letter and the number sign for any digit.",
+        "lpn_cp_restrict_tip": "Restrict characters: A value may use only the characters listed here, or none of them, where \"@\" means any letter; \"#\" means any number, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
         "lpn_cp_restrict_mode": "Allow or refuse",
+        "lpn_cp_restrict_mode_tip": "Allow or refuse: The characters beside this are either the only ones a value may use or the ones it may not use.",
         "lpn_cp_restrict_allow": "Allow only these",
         "lpn_cp_restrict_deny": "Refuse these",
-        "lpn_cp_length": "Restrict length",
-        "lpn_cp_length_tip": "The greatest number of characters a value may have. Leave it empty for no limit.",
+        "lpn_cp_minlength": "Fewest characters",
+        "lpn_cp_minlength_tip": "Fewest characters: A shorter value is flagged, which is how you find the empty and the half-typed entries. Leave it empty for no limit.",
+        "lpn_cp_length": "Most characters",
+        "lpn_cp_length_tip": "Most characters: A longer value is flagged. Leave it empty for no limit.",
         "lpn_cp_low": "Low limit",
-        "lpn_cp_low_tip": "The smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_low_tip": "Low limit: This is the smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
         "lpn_cp_high": "High limit",
-        "lpn_cp_high_tip": "The largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_high_tip": "High limit: This is the largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
         "lpn_cp_val_none": "Do not validate",
-        "lpn_cp_val_number": "Number",
+        "lpn_cp_val_number": "Number .",
+        "lpn_cp_val_number_comma": "Number ,",
         "lpn_cp_val_integer": "Integer",
-        "lpn_cp_val_text": "Text",
+        "lpn_cp_val_datetime": "Date and time",
         "lpn_cp_val_upper": "ALL CAPS",
         "lpn_cp_val_camel": "camelCase",
         "lpn_cp_val_pascal": "PascalCase",
@@ -578,8 +584,11 @@
         "lpn_cp_flag": "{label}: {reason} The value is kept exactly as you typed it.",
         "lpn_cp_bad_number": "This property is designed to hold a number.",
         "lpn_cp_bad_integer": "This property is designed to hold a whole number.",
+        "lpn_cp_bad_datetime": "This value does not look like a date or a time.",
         "lpn_cp_bad_case": "This value does not match the capitalization this property is designed for.",
         "lpn_cp_bad_chars": "This value uses a character this property does not allow.",
+        "lpn_cp_bad_space": "White space is allowed only between other characters.",
+        "lpn_cp_bad_minlength": "This value is shorter than this property allows.",
         "lpn_cp_bad_length": "This value is longer than this property allows.",
         "lpn_cp_bad_low": "This value is below the low limit of this property.",
         "lpn_cp_bad_high": "This value is above the high limit of this property.",
@@ -620,37 +629,43 @@
         "lpn_field_northing": "Northing",
         "lpn_field_easting": "Easting",
         "lpn_settings_custom_props": "Custom properties",
-        "lpn_settings_custom_props_note": "A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.",
+        "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
-        "lpn_cp_design_tip": "One row per custom property, reading across: key, label, applies to, validate as, restrict characters, restrict length, low limit, high limit.",
+        "lpn_cp_design_tip": "One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
         "lpn_cp_add": "Add custom property",
-        "lpn_cp_add_tip": "Adds one more row to the design table. Give it a key and a label, then choose the asset kinds that carry it.",
+        "lpn_cp_add_tip": "Adds one more row to the design table and opens it for editing. Give it a key and a label, then choose the asset kinds that carry it.",
         "lpn_cp_remove": "Remove",
         "lpn_cp_remove_tip": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
+        "lpn_cp_edit_tip": "Opens the design of this custom property, where every part of it is shown at full length.",
+        "lpn_cp_edit_title": "Custom property design",
         "lpn_cp_none": "No custom property is designed yet.",
         "lpn_cp_key": "Key",
-        "lpn_cp_key_tip": "The name this property is stored under. No spaces. A prefix is added for you so that your key can never collide with a built-in field.",
+        "lpn_cp_key_tip": "Key: A property is stored under this name. It takes no spaces, and a prefix is added for you so that your key can never collide with a built-in field.",
         "lpn_cp_label": "Label",
-        "lpn_cp_label_tip": "What a reader sees on the properties box, in Find and at the head of a table column.",
+        "lpn_cp_label_tip": "Label: A reader sees this on the properties box, in Find and at the head of a table column.",
         "lpn_cp_applies": "Applies to",
-        "lpn_cp_applies_tip": "Which asset kinds carry this property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.",
+        "lpn_cp_applies_tip": "Applies to: These asset kinds carry the property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.",
         "lpn_cp_validate": "Validate as",
-        "lpn_cp_validate_tip": "What a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
+        "lpn_cp_validate_tip": "Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
         "lpn_cp_restrict": "Restrict characters",
-        "lpn_cp_restrict_tip": "A set of characters to allow or to refuse, where the at sign stands for any letter and the number sign for any digit.",
+        "lpn_cp_restrict_tip": "Restrict characters: A value may use only the characters listed here, or none of them, where \"@\" means any letter; \"#\" means any number, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
         "lpn_cp_restrict_mode": "Allow or refuse",
+        "lpn_cp_restrict_mode_tip": "Allow or refuse: The characters beside this are either the only ones a value may use or the ones it may not use.",
         "lpn_cp_restrict_allow": "Allow only these",
         "lpn_cp_restrict_deny": "Refuse these",
-        "lpn_cp_length": "Restrict length",
-        "lpn_cp_length_tip": "The greatest number of characters a value may have. Leave it empty for no limit.",
+        "lpn_cp_minlength": "Fewest characters",
+        "lpn_cp_minlength_tip": "Fewest characters: A shorter value is flagged, which is how you find the empty and the half-typed entries. Leave it empty for no limit.",
+        "lpn_cp_length": "Most characters",
+        "lpn_cp_length_tip": "Most characters: A longer value is flagged. Leave it empty for no limit.",
         "lpn_cp_low": "Low limit",
-        "lpn_cp_low_tip": "The smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_low_tip": "Low limit: This is the smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
         "lpn_cp_high": "High limit",
-        "lpn_cp_high_tip": "The largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
+        "lpn_cp_high_tip": "High limit: This is the largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.",
         "lpn_cp_val_none": "Do not validate",
-        "lpn_cp_val_number": "Number",
+        "lpn_cp_val_number": "Number .",
+        "lpn_cp_val_number_comma": "Number ,",
         "lpn_cp_val_integer": "Integer",
-        "lpn_cp_val_text": "Text",
+        "lpn_cp_val_datetime": "Date and time",
         "lpn_cp_val_upper": "ALL CAPS",
         "lpn_cp_val_camel": "camelCase",
         "lpn_cp_val_pascal": "PascalCase",
@@ -659,8 +674,11 @@
         "lpn_cp_flag": "{label}: {reason} The value is kept exactly as you typed it.",
         "lpn_cp_bad_number": "This property is designed to hold a number.",
         "lpn_cp_bad_integer": "This property is designed to hold a whole number.",
+        "lpn_cp_bad_datetime": "This value does not look like a date or a time.",
         "lpn_cp_bad_case": "This value does not match the capitalization this property is designed for.",
         "lpn_cp_bad_chars": "This value uses a character this property does not allow.",
+        "lpn_cp_bad_space": "White space is allowed only between other characters.",
+        "lpn_cp_bad_minlength": "This value is shorter than this property allows.",
         "lpn_cp_bad_length": "This value is longer than this property allows.",
         "lpn_cp_bad_low": "This value is below the low limit of this property.",
         "lpn_cp_bad_high": "This value is above the high limit of this property.",
@@ -1233,6 +1251,38 @@
                 }
             }
         },
+        "lpn_cp_edit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
+        "lpn_cp_edit_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
         "lpn_cp_none": {
             "reason": "missing",
             "current_value": null,
@@ -1425,6 +1475,22 @@
                 }
             }
         },
+        "lpn_cp_restrict_mode_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
         "lpn_cp_restrict_allow": {
             "reason": "missing",
             "current_value": null,
@@ -1442,6 +1508,38 @@
             }
         },
         "lpn_cp_restrict_deny": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
+        "lpn_cp_minlength": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
+        "lpn_cp_minlength_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1585,6 +1683,22 @@
                 }
             }
         },
+        "lpn_cp_val_number_comma": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
         "lpn_cp_val_integer": {
             "reason": "missing",
             "current_value": null,
@@ -1601,7 +1715,7 @@
                 }
             }
         },
-        "lpn_cp_val_text": {
+        "lpn_cp_val_datetime": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1745,6 +1859,22 @@
                 }
             }
         },
+        "lpn_cp_bad_datetime": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
         "lpn_cp_bad_case": {
             "reason": "missing",
             "current_value": null,
@@ -1762,6 +1892,38 @@
             }
         },
         "lpn_cp_bad_chars": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
+        "lpn_cp_bad_space": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Сваки елемент већ има ове вредности, па се ништа не би променило.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Сценарио",
+                    "english": "Scenario"
+                }
+            }
+        },
+        "lpn_cp_bad_minlength": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
