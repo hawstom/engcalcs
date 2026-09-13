@@ -27,10 +27,13 @@ uncommitted; silence means commit and push.
   - **SACRED MEANS ONE TESTABLE THING: master is pullable at any moment.** `sh dev/scripts/check_all.sh`
     passes on the MERGE RESULT before the merge is pushed -- not on the branch beforehand, which is a
     different tree. A red master is a production outage waiting for whenever Tom next pulls.
-  - **THIS SUPERSEDES "work directly on master, no feature branches", and the reason it fell is
-    worth keeping.** That rule was argued on STALE REFS, and it was declined twice more on a
-    CONCURRENCY argument -- neither of which answers the release one. What decided it: **you cannot
-    pull half of master.** With features landing on master, a fix during a frozen window ships every
+  - **THIS SUPERSEDES "work directly on master, no feature branches", and WHO ARGUED WHICH SIDE is
+    the part to keep.** The original rule was inferred from an observation -- Tom worked on master,
+    therefore branching practice did not apply here -- and that inference was AI's, not his
+    instruction. **He then questioned it twice and was talked out of it twice**, on a STALE REFS
+    argument and a CONCURRENCY argument, neither of which answers the release one. His own account,
+    2026-09-12: *"I knew better, but I am not very assertive. Why fight CC when it's moving
+    forward."* What finally decided it: **you cannot pull half of master.** With features landing on master, a fix during a frozen window ships every
     unfinished thing beside it, so the whole team stops. With master sacred, a fix is a two-commit
     branch and everyone else keeps working -- Tom: *"most of the company doesn't care about EWB,
     because they are still working hard on projection at projection-custom-property."*
@@ -47,6 +50,13 @@ uncommitted; silence means commit and push.
     good reason."* A UI label naming a real collection is a separate question decided on its own:
     the Water menu's **Graphs** submenu holds five different graphs and stays plural, which Tom
     allowed in the same breath -- *"Public-facing menu is plural and natural and gut feely."*
+  - **AND THE GENERAL LESSON, which is not about git: WHEN TOM QUESTIONS A STANDING RULE TWICE,
+    THE RULE IS THE SUSPECT -- not the question.** He is not very assertive and will not fight a
+    session that is moving confidently forward; an AI that keeps producing a reasoned-sounding
+    defence will therefore win every time, including the times it is wrong. Three weeks of a
+    paradigm he never wanted is what that cost here. **A repeated question is evidence. Re-argue the
+    rule from scratch, out loud, and say plainly which parts of the original reasoning do not
+    address what is being asked** -- as the concurrency argument did not address release safety.
   - **MERGE FROM MASTER OFTEN, INTO MASTER WHEN DONE.** A long-lived branch that never takes master
     back is a merge conflict being saved up. The four capability branches are large, speculative and
     abandonable, which is what a branch is genuinely for.
