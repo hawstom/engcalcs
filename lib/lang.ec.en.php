@@ -1670,7 +1670,7 @@ $ec_lang['lpn_inp_drop_pump_speed']='These pumps run at a speed other than the o
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
 $ec_lang['lpn_inp_drop_rules']='This file has rule-based controls. This page reads them and uses them. Run the model and the rules are applied, with every level, pressure and flow in them put into the units this project is showing. Open Rules under Libraries to read one or change one. They are kept exactly as the file states them, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_eps']='This file describes an extended period simulation. The part of this page that runs an extended period simulation did not load, so only the starting conditions came in.';
-$ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Water quality, then run the model, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_quality']='This file describes how the water quality changes as it travels: what is in the water to begin with, and how fast that substance reacts in the pipes and in the tanks. This page reads those numbers and uses them. Choose a chemical under Settings, Calculation, Quality, then run the model, and the concentration is worked out along the network as the run goes on. The lines are kept, and they are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sources_mixing']='This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
 $ec_lang['lpn_inp_drop_energy']='This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
 // Edited by TGH 2026-09-07
@@ -2506,7 +2506,7 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
-$ec_lang['lpn_settings_map_display']='Map appearance';
+$ec_lang['lpn_settings_map_display']='Appearance';
 $ec_lang_syn['lpn_settings_map_display']='How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
@@ -2667,14 +2667,14 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_visualization']='Visualization';
 $ec_lang['lpn_settings_sec_map']='Map and page';
-$ec_lang['lpn_settings_sec_assets']='Defaults for new assets';
+$ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
 $ec_lang['lpn_settings_node_symbology']='Node symbology';
 $ec_lang['lpn_settings_link_symbology']='Link symbology';
 $ec_lang['lpn_settings_page']='Page';
 $ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
-$ec_lang['lpn_settings_quality']='Water quality';
+$ec_lang['lpn_settings_quality']='Quality';
 $ec_lang['lpn_settings_quality_track']='Quality parameter';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_quality_track_tip']='Choose what the run should trace through the network: how long the water has been in the system, where it came from, or a chemical that reacts as it travels. Only a chemical needs coefficients.';
@@ -2697,7 +2697,7 @@ $ec_lang['lpn_quality_initial']='Initial quality';
 $ec_lang['lpn_quality_initial_tip']='How much of the chemical this node holds when the run starts. A reservoir holds its own value for the whole run, which is how the residual leaving a treatment plant is usually stated. Blank means 0.';
 $ec_lang['lpn_result_concentration']='Concentration';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at this point after it has travelled and reacted. The units are yours as labelled with the chemical name under Settings, Water quality.';
+$ec_lang['lpn_result_concentration_tip']='How much of the chemical is left at this point after it has travelled and reacted. The units are yours as labelled with the chemical name under Settings, Calculation, Quality.';
 // **THE BOOSTER DOSE AND THE TANK MIXING MODEL** (ROADMAP Task 579), EPANET's `[SOURCES]` and
 // `[MIXING]`. EPANET's own words throughout, and its own four source types and four mixing models,
 // because an engineer choosing between them is choosing between real pieces of equipment and real
@@ -2712,7 +2712,7 @@ $ec_lang['lpn_source_type_setpoint']='Setpoint booster';
 $ec_lang['lpn_source_type_flowpaced']='Flow-paced booster';
 $ec_lang['lpn_source_quality']='Source quality';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_source_quality_tip']='How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Water quality; for a mass booster it is a mass flow per minute. Blank means no chemical source, functionally equivalent to 0.';
+$ec_lang['lpn_source_quality_tip']='How strong the dose is. For every type but the mass booster this is a concentration, in the units named beside the chemical under Settings, Calculation, Quality; for a mass booster it is a mass flow per minute. Blank means no chemical source, functionally equivalent to 0.';
 $ec_lang['lpn_source_pattern']='Source pattern';
 $ec_lang['lpn_source_pattern_tip']='A time pattern that scales the dose through the run, for a feed that is not constant. No pattern means that the dose is the same at every step.';
 $ec_lang['lpn_mixing_model']='Mixing model';
@@ -2731,12 +2731,12 @@ $ec_lang['lpn_reaction_wall']='Wall reaction coefficient';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_reaction_wall_tip']='Reaction at the pipe wall (see EPANET Help) used for every pipe with no entry. A negative number decays the chemical. Blank means no wall reaction.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_pipe_tip']='Reaction in the body of the water (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficent set for the whole network under Settings, Water quality.';
+$ec_lang['lpn_reaction_pipe_tip']='Reaction in the body of the water (see EPANET Help). A negative number decays the chemical and a positive one increases it. Blank means to use the coefficent set for the whole network under Settings, Calculation, Quality.';
 // The tank's own coefficient. EPANET's Tank properties call it exactly this, and the popup it
 // stands in is a tank's, so the word "tank" would only be said twice.
 $ec_lang['lpn_reaction_tank']='Reaction coefficient';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reaction_tank_tip']='Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Water quality.';
+$ec_lang['lpn_reaction_tank_tip']='Reaction in the water held in this tank, as a rate in 1/day. A negative number decays the chemical and a positive one grows it. Water stands in a tank far longer than it stands in any pipe, so this is often where a residual is lost. Blank means to use the bulk reaction coefficient set for the whole network under Settings, Calculation, Quality.';
 // Three column headings, in tables whose tab already says what the parts are. Column width is king,
 // so each drops the word "coefficient" that the popup label carries in full.
 $ec_lang['lpn_reaction_bulk_short']='Bulk reaction';
