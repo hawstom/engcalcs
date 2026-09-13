@@ -3836,13 +3836,17 @@ var EngCalcs = EngCalcs || {};
 			// them for a reason they did not ask for.
 			node: { id: true, elev: true, demand: true, demandActual: false, head: false, pressure: true,
 				// OFF, like every other field a network does not have until it is asked for.
-				quality: false },
+				quality: false, initQuality: false },
 			// Every INPUT property a link carries is offered, not just the ones a result depends on:
 			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
 			// you want spread across a drawing when checking someone's model. Off by default --
 			// turning every one on would bury the results.
 
-			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false },
+			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false,
+				// Task 638's three, all OFF: a friction factor, a status and an average quality are
+				// each asked for by name, and turning them on by default would bury the two rows
+				// (flow and velocity) a link label ships showing.
+				friction: false, status: false, quality: false },
 			// Per-field decimal places (Task 189). A PARALLEL map, not a boolean-turned-object: the
 			// boolean maps are merged key-by-key out of localStorage, and a shape change there
 			// silently reinterprets every already-saved network's toggles. Non-numeric fields (ID)
@@ -3864,8 +3868,16 @@ var EngCalcs = EngCalcs || {};
 				// ("14.3 hr"); two would be a minute and a half of false precision on a quantity
 				// whose own transport step is five minutes. A source share in percent is the same
 				// shape of number.
-				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1 },
-				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4 }
+				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
+				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
+				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1, initQuality: 2 },
+				// friction 4 -- a Darcy f runs 0.015 to 0.04, so 2 places is two significant figures
+				//   at best and reads as "0.02" for most of a network.
+				// **STATUS HAS NO ENTRY AND THAT IS THE POINT**: this map is the one place naming
+				// which fields are numeric, so a status prints its word with no decimals spinner
+				// beside it, exactly as ID does.
+				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4,
+					friction: 4, quality: 1 }
 			},
 			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
 			// of them and the number.
@@ -3918,9 +3930,15 @@ var EngCalcs = EngCalcs || {};
 				// by name is the last one to give up its space. It carries a rank and NO entry in
 				// LPN_NODE_DROP_RULE, which is the pair of statements "order this row inside the column"
 				// and "do not make this a criterion for which whole label wins a contested spot".
-				node: { quality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
-				link: { flow: 9, velocity: 8, headloss: 7, gradient: 6,
-					diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
+				// initQuality ranks just under quality for the same argument: it is only ever on
+				// because somebody switched the analysis on, so it outranks the six hydraulic rows.
+				node: { quality: 7, initQuality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
+				// **RENUMBERED, NOT REORDERED** (Task 638): every row that existed keeps the
+				// neighbours it had, and the three new ones are slotted where they belong -- the
+				// friction factor beside the gradient it is derived from, the status and the
+				// average quality on top because neither is ever on unless it was asked for.
+				link: { quality: 12, status: 11, flow: 10, velocity: 9, headloss: 8, gradient: 7,
+					friction: 6, diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field. Here rather than in `settings` because a label mark is a property
@@ -5820,13 +5838,125 @@ var EngCalcs = EngCalcs || {};
 		// concentration is in the document's own stated unit, so neither crosses anything.
 		return mode === 'age' ? toDisplay(v, resultUnit('age')) : v;
 	}
+	/**
+	 * **THE HEADING FOR A LINK'S QUALITY, WHICH IS A DIFFERENT QUANTITY FROM A NODE'S** (Task 638).
+	 * EPANET reports a node's own value and a link's AVERAGE over the water standing in it, so the
+	 * two get two words rather than one word used twice -- the same split lpn_quality_trace and
+	 * lpn_result_source_share already live on.
+	 *
+	 * **THREE WHOLE NAMES, NOT A WORD PLUS A HEADING.** Composing "Average" + qualityLabel() at
+	 * render time is the fragment composition CLAUDE.md forbids: it breaks in a gendered language,
+	 * in a word-order language and in the five right-to-left ones.
+	 */
+	function linkQualityLabel() {
+		var pc = EngCalcs.pageConfig || {}, mode = qualityMode();
+		if (mode === 'trace') { return pc.lpn_result_avg_source_share || 'Average source share'; }
+		if (mode === 'chemical') { return pc.lpn_result_avg_concentration || 'Average concentration'; }
+		return pc.lpn_result_avg_water_age || 'Average water age';
+	}
+	/**
+	 * The average quality along a link, in the displayed unit, or undefined where there is none.
+	 * nodeQualityValue()'s twin, and it asks the identical two questions first: the analysis has to
+	 * be one of the three, and the RESULT'S OWN MODE must still be the document's -- a setting can
+	 * be changed without re-running, and a percentage printed under a heading reading Average water
+	 * age is the defect that guard exists for.
+	 */
+	function linkQualityValue(l) {
+		var mode = qualityMode(), v;
+		if (mode !== 'age' && mode !== 'trace' && mode !== 'chemical') { return undefined; }
+		if (!lastSolveResult || !lastSolveResult.linkQualities) { return undefined; }
+		if (lastSolveResult.qualityMode !== mode) { return undefined; }
+		v = lastSolveResult.linkQualities[l.id];
+		if (typeof v !== 'number' || !isFinite(v)) { return undefined; }
+		// SECONDS out of the engine, exactly as a node's age is; a share is a percentage and a
+		// concentration is in the document's own stated unit, so neither crosses anything.
+		return mode === 'age' ? toDisplay(v, resultUnit('age')) : v;
+	}
+	/**
+	 * **THIS LINK'S STATUS, AS 'open' OR 'closed'** (Task 638). EPANET colours a link by status and
+	 * so does this page now.
+	 *
+	 * **THE RUN'S ANSWER WHERE THERE IS ONE, THE DOCUMENT'S OTHERWISE, AND THEY ARE ONE QUANTITY.**
+	 * A check valve that shut, a pump a control stopped and a valve that went closed are all states
+	 * the engine reports and the document never held; a link nobody has run is open or shut exactly
+	 * as the user drew it. Head already reaches one column by two roads for the same reason -- see
+	 * the note in refreshLabelTextPass() -- and both roads end in the same quantity, which is the
+	 * test that rule actually applies.
+	 */
+	function linkStatusOf(l) {
+		var st = lastSolveResult && lastSolveResult.statuses && lastSolveResult.statuses[l.id];
+		if (st === 'open' || st === 'closed') { return st; }
+		return effective(l, 'status') === 'closed' ? 'closed' : 'open';
+	}
+	function linkStatusText(l) {
+		var pc = EngCalcs.pageConfig || {};
+		return linkStatusOf(l) === 'closed'
+			? (pc.lpn_result_status_closed || 'Closed')
+			: (pc.lpn_result_status_open || 'Open');
+	}
+	/**
+	 * **STATUS AS A NUMBER, BECAUSE A COLOUR RAMP IS A NUMBER LINE** -- 1 open, 0 closed.
+	 *
+	 * The colour system this page has is a break-based ramp over a numeric field, and a field
+	 * definition is a unit id (see COLOR_LINK_FIELDS), so a categorical field has no other way in
+	 * without changing that shape -- which Task 636 is feeding at the same time and which therefore
+	 * must not move. Two values across any class count put every closed link in the bottom band and
+	 * every open one in the top, which is the map EPANET's own Status view draws. **The legend is
+	 * the honest cost:** it prints the numeric bands rather than the two words, and the words are
+	 * available one tick away as a LABEL.
+	 */
+	function linkStatusNumber(l) { return linkStatusOf(l) === 'closed' ? 0 : 1; }
+	/**
+	 * **THE DARCY-WEISBACH FRICTION FACTOR THIS LINK'S HEAD LOSS WORKS OUT TO** (Task 638), which
+	 * is EPANET's own link report column and is computed the way EPANET computes it:
+	 *
+	 *     h_f = f (L/D) V^2 / 2g   =>   f = 2 g D h_f / (L V^2)
+	 *
+	 * **EPANET REPORTS IT WHATEVER THE FRICTION METHOD**, back-computed from the loss the method
+	 * produced -- so a Hazen-Williams network has one too, and that is not a contradiction: it is
+	 * the equivalent f, which is exactly what the column means. Dimensionless, so every quantity in
+	 * it must be in ONE system: linkLengthSI() and the diameter divided by its own factor, against
+	 * a head loss and a velocity that come out of the solver in SI already. Dividing by the
+	 * DECLARED length is the Task 255 shape of defect and is wrong by 3.281x in US units.
+	 *
+	 * **DERIVED HERE RATHER THAN READ BACK, because the toolkit has no getter for it.** EPANET's
+	 * LinkProperty enum stops at LinkQual; the friction factor lives in the binary output file and
+	 * in a full report table. The arithmetic above is the definition of f and not a model of ours,
+	 * which is what makes deriving it honest where a reaction rate would not be.
+	 *
+	 * Undefined for a pump (no length, and a rise rather than a loss), for a zero-length link and
+	 * wherever the water is not moving -- f is not defined at zero velocity, and a zero there would
+	 * read as a perfectly smooth pipe.
+	 */
+	function linkFrictionFactor(l) {
+		var len, dia, hf, v;
+		if (l.type === 'pump') { return undefined; }
+		if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+		len = linkLengthSI(l);
+		dia = effective(l, 'diameter') / unitFactor('lpn_u_diameter');
+		hf = shownHeadloss(l, lastSolveResult.headlosses[l.id]);
+		v = lastSolveResult.velocities[l.id];
+		if (!(len > 0) || !(dia > 0) || typeof v !== 'number' || !isFinite(v) || !v) { return undefined; }
+		if (typeof hf !== 'number' || !isFinite(hf)) { return undefined; }
+		return 2 * EngCalcs.G * dia * hf / (len * v * v);
+	}
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', demandActual: 'lpn_u_flow',
 		head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure',
 		// Declared with the age unit so the field is offered; colorFieldUnit() overrides it with
 		// qualityUnitId(), which is the one place that knows a source share has no unit.
-		quality: 'lpn_u_age' };
+		quality: 'lpn_u_age',
+		// **THE STARTING CONCENTRATION IS A TYPED NUMBER AND CARRIES NO UNIT OF OURS** (Task 638).
+		// Its unit is the label the document states beside the chemical's name, which is text the
+		// user owns -- so the id is '' and colorFieldUnitText() answers the document's characters.
+		initQuality: '' };
 	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow',
-		velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
+		velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient',
+		// **THE CHEMICAL FIELDS A LINK HAS** (Task 638). Declared with the age unit for the same
+		// reason the node's quality is -- so the field is offered at all -- and colorFieldUnit()
+		// overrides it with qualityUnitId(), which is the one place that knows a source share has
+		// no unit. A friction factor is dimensionless and a status is not a quantity, so both
+		// declare '' and mean it.
+		quality: 'lpn_u_age', friction: '', status: '' };
 	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
 	// refreshLabelText() prints, so the colour and the printed number can never describe different
 	// quantities. undefined means "this element has no such value" (no solve yet, or the field does
@@ -5858,11 +5988,20 @@ var EngCalcs = EngCalcs || {};
 		// A reservoir and a tank have a water age and a source share like anything else -- they are
 		// where the water comes FROM, so their own value is the most telling one on the map.
 		if (field === 'quality') { return nodeQualityValue(n); }
+		// **A TYPED NUMBER, SO IT IS READ THROUGH effective() AND CROSSES NOTHING** (Task 638) --
+		// EPANET converts an initial quality nowhere either, so there is no factor on this side.
+		if (field === 'initQuality') { return nodeInitQuality(n); }
 		return undefined;
 	}
 	function colorLinkValue(l, field) {
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
 		if (field === 'roughness') { return l.type === 'pipe' ? effective(l, 'roughness') : undefined; }
+		// **ABOVE THE FLOW GUARD, AND DELIBERATELY** (Task 638). A status is a fact about the link
+		// whether or not anything has been solved, and linkQualityValue() asks its own two
+		// questions -- the analysis and the result's own mode -- which a missing flow does not
+		// answer. Everything below here is a hydraulic result and needs one.
+		if (field === 'status') { return linkStatusNumber(l); }
+		if (field === 'quality') { return linkQualityValue(l); }
 		if (!lastSolveResult || lastSolveResult.flows[l.id] === undefined) { return undefined; }
 		if (field === 'flow') { return toDisplay(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow')); }
 		if (field === 'velocity') { return l.type === 'pump' ? undefined : toDisplay(lastSolveResult.velocities[l.id], 'lpn_u_velocity'); }
@@ -5872,6 +6011,9 @@ var EngCalcs = EngCalcs || {};
 			if (l.type === 'pump' || !len) { return undefined; }
 			return toDisplay(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, 'lpn_u_gradient');
 		}
+		// Dimensionless, worked out from SI quantities and returned as it stands -- see
+		// linkFrictionFactor(), which is where the one system rule is argued.
+		if (field === 'friction') { return linkFrictionFactor(l); }
 		return undefined;
 	}
 	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
@@ -5885,8 +6027,11 @@ var EngCalcs = EngCalcs || {};
 	var COLOR_FIELD_ORDER = {
 		// Demand before Base demand: the resolved one is the question a reader is actually asking
 		// ("what is being drawn here"), and the base is the input behind it.
-		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality'],
-		link: ['velocity', 'flow', 'headloss', 'gradient', 'diameter', 'roughness']
+		// The two chemical fields trail the hydraulic ones on both groups: neither exists until
+		// somebody switches the analysis on and runs, which is the standing of `quality` already.
+		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality', 'initQuality'],
+		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'diameter', 'roughness',
+			'status', 'quality']
 	};
 	function colorFieldOptions(group) {
 		var defs = group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS, out = [], seen = {};
@@ -5984,7 +6129,12 @@ var EngCalcs = EngCalcs || {};
 	// The unit a field's numbers are read in -- the same table the legend heading uses.
 	function colorFieldUnit(group, field) {
 		// One field's unit follows another setting, so it is asked rather than looked up.
-		if (group === 'node' && field === 'quality') { return qualityUnitId(); }
+		// **BOTH QUALITY FIELDS, NODE AND LINK** (Task 638): a link's average quality is the same
+		// quantity in the same unit as a node's own, so it comes through the same one place that
+		// knows a source share has no unit and a water age has a time. `initQuality` is NOT here --
+		// it is a typed concentration whose unit is the document's own label, which is text and not
+		// an id, so it declares '' above and colorFieldUnitText() answers for it.
+		if (field === 'quality') { return qualityUnitId(); }
 		return (group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS)[field] || '';
 	}
 	// **THE UNIT AS A LEGEND PRINTS IT, WHICH IS NOT ALWAYS A UNIT ID.** A head loss gradient in
@@ -5993,9 +6143,16 @@ var EngCalcs = EngCalcs || {};
 	// its id's own label, so there is still one table behind both.
 	function colorFieldUnitText(group, field) {
 		var id;
-		if (group === 'node' && field === 'quality') { return qualityUnitText(); }
+		if (field === 'quality') { return qualityUnitText(); }
+		// A starting concentration is written in the units named beside the chemical, so this
+		// answers the document's own characters and never a unit of ours (Task 638). Under water
+		// age or a source trace the document states no chemical and this is '', which is honest:
+		// nobody has said what the number is in.
+		if (group === 'node' && field === 'initQuality') { return concentrationUnitText(); }
 		id = colorFieldUnit(group, field);
 		if (id) { return unitLabel(id); }
+		// A friction factor is dimensionless and a status is not a quantity at all; both print
+		// their heading bare, which is what `roughness` and `km` already do.
 		return field === 'gradient' ? gradientSuffix() : '';
 	}
 	// The breaks a MODE produces for the values presently on the map.
@@ -26017,7 +26174,12 @@ var EngCalcs = EngCalcs || {};
 			['elev', pc.lpn_field_elev || 'Elevation'],
 			// LAST, and off by default. It is the one field here that no network has until a run
 			// has been made with the analysis switched on, and its heading follows that switch.
-			['quality', qualityLabel()]
+			['quality', qualityLabel()],
+			// **THE NUMBER THE NODE STARTS WITH, under EPANET's own name for it** (Task 638). An
+			// INPUT rather than a result, so it sits after the result it feeds rather than with
+			// Elevation: the two quality rows belong beside each other, and this is the only input
+			// on this list that a hydraulic run cannot produce.
+			['initQuality', (pc.lpn_quality_initial || 'Initial quality')]
 		];
 	}
 	function linkFieldDefs(pc) {
@@ -26032,7 +26194,14 @@ var EngCalcs = EngCalcs || {};
 			['roughness', roughnessLabel()], ['km', pc.lpn_field_km_short || 'Minor loss, k'],
 			['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
-			['gradient', pc.lpn_result_gradient || 'Head loss gradient']
+			['gradient', pc.lpn_result_gradient || 'Head loss gradient'],
+			// **EPANET'S OWN FOUR LINK REPORT COLUMNS, COMPLETED** (Task 638). The friction factor
+			// goes with the loss it is back-computed from; the status and the average quality trail
+			// it, both off by default for the reason the node's quality row is -- neither exists
+			// until somebody asks for it.
+			['friction', pc.lpn_result_friction_factor || 'Friction factor'],
+			['status', pc.lpn_result_status || 'Status'],
+			['quality', linkQualityLabel()]
 		];
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
@@ -35770,8 +35939,15 @@ var EngCalcs = EngCalcs || {};
 		// a map in 27 languages to save a legend lookup; a diameter and a length are already
 		// unprefixed on the same argument. The field is off by default, the Labels list names it,
 		// and a user who wants a prefix can type their own.
-		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '' },
-		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=' }
+		// **AND THE STARTING CONCENTRATION GETS NONE ON THE SAME ARGUMENT** (Task 638): it is the
+		// quality row's own input, and neither half of that pair has a symbol a reader would know.
+		node: { id: '', demand: 'Qb=', demandActual: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=', quality: '', initQuality: '' },
+		// **'f=' IS THE ONE NEW SYMBOL, AND IT EARNS ITS PLACE** (Task 638): f is the friction
+		// factor in every hydraulics text in every one of these 27 languages, exactly as Q, V and S
+		// are. A status prints a WORD and would read as an equation with one; an average quality
+		// has no symbol for the same reason a node's quality has none.
+		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=',
+			friction: 'f=', status: '', quality: '' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
 	// follows the method selector rather than being frozen at the moment defaults were built.
@@ -35983,7 +36159,10 @@ var EngCalcs = EngCalcs || {};
 			// plainRound(), not displayRound(): nodeQualityValue() has already crossed into the
 			// displayed unit, exactly as resolvedDemand() has. Crossing twice is the Task 255 shape
 			// of defect and it looks like a plausible number.
-			quality: nodeValueMap(function (n) { return plainRound(nodeQualityValue(n), nd.quality); })
+			quality: nodeValueMap(function (n) { return plainRound(nodeQualityValue(n), nd.quality); }),
+			// plainRound(): a typed starting concentration is already in the unit the document
+			// states beside the chemical's name and crosses nothing (Task 638).
+			initQuality: nodeValueMap(function (n) { return plainRound(nodeInitQuality(n), nd.initQuality); })
 		};
 		// **BUILT HERE AND NOWHERE ELSE**, because this is already the one function that runs on every
 		// model change, every solve and every unit switch -- the exact set of events that invalidates
@@ -36007,6 +36186,7 @@ var EngCalcs = EngCalcs || {};
 			head: fieldExtrema(nodeVal.head.list),
 			pressure: fieldExtrema(nodeVal.pressure.list),
 			quality: fieldExtrema(nodeVal.quality.list),
+			initQuality: fieldExtrema(nodeVal.initQuality.list),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
 			// PIPE-ONLY, not merely not-a-pump (Task 248 phase 2). A valve has no length by
 			// definition and no roughness to speak of, so including it would drag the low end of
@@ -36039,7 +36219,16 @@ var EngCalcs = EngCalcs || {};
 				var len = linkLengthSI(l);
 				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, resultUnit('gradient'), ld.gradient);
-			}))
+			})),
+			// **BOTH DIMENSIONLESS, SO plainRound() AND NOT displayRound()** (Task 638), the same
+			// treatment roughness and km already have. `linkQuality` is spelled out rather than
+			// sharing the `quality` bucket above: this is one flat table keyed on field name, and a
+			// node's water age and a link's average of it are two ranges -- pooling them would put
+			// the network-wide high tick on whichever group happened to hold the bigger number.
+			// **NO STATUS ENTRY**: an extrema tick means "this is the highest in the network", which
+			// is not a thing an open pipe is.
+			friction: fieldExtrema(doc.links.map(function (l) { return plainRound(linkFrictionFactor(l), ld.friction); })),
+			linkQuality: fieldExtrema(doc.links.map(function (l) { return plainRound(linkQualityValue(l), ld.quality); }))
 		};
 		var nodeLines = {}, linkLines = {};
 		doc.nodes.forEach(function (n) {
@@ -36080,6 +36269,12 @@ var EngCalcs = EngCalcs || {};
 			// same rule an unsolved pressure and an unstated elevation already follow.
 			var qualVal = nodeQualityValue(n);
 			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, extrema.quality, nd.quality))); }
+			// **AND ONLY WHERE ONE IS TYPED.** Blank means EPANET's own zero and prints nothing:
+			// "nobody stated a starting concentration" and "the starting concentration is zero" are
+			// different facts, and printing 0.00 for the first is the same defect an unsolved
+			// pressure printed as a zero would be.
+			var initQualVal = nodeInitQuality(n);
+			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, extrema.initQuality, nd.initQuality))); }
 			// EMPTY IS CAPTURED BEFORE THE PLACEHOLDER BELOW: a label with no fields toggled on still gets
 			// an empty line pushed so getBBox() never throws, and everything downstream (the leader, the
 			// collision box) must know it is really empty rather than really one blank line.
@@ -36141,7 +36336,19 @@ var EngCalcs = EngCalcs || {};
 				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
 				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
 				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), extrema.gradient, ld.gradient, gradientSuffix()))); }
+				// rawLine(), not numLine(): linkFrictionFactor() is already a dimensionless number
+				// and running it through a unit factor would scale it by whatever the unit strip
+				// happened to be showing (Task 638).
+				var fricVal = linkFrictionFactor(l);
+				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, extrema.friction, ld.friction))); }
 			}
+			// **OUTSIDE THE FLOW GUARD, for the reason colorLinkValue() gives**: a status is a fact
+			// about the link whether or not anything has been solved, and an average quality asks
+			// its own two questions rather than the flow's. A status is TEXT, like an ID -- which is
+			// why it has no entry in the decimals map and gets no spinner.
+			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
+			var lqVal = linkQualityValue(l);
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, extrema.linkQuality, ld.quality))); }
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One

@@ -128,6 +128,12 @@
 			// having nothing, where zeros would read as an answer. `qualityMode` travels with it
 			// because the NUMBER does not say which quantity it is.
 			qualities: f.qualities, qualityMode: (run.quality && run.quality.mode) || null,
+			// **THE LINK HALF OF THE SAME ANSWER** (Task 638) -- EPANET's average quality along
+			// each link, in the same unit and under the same `qualityMode` as the node map above.
+			// Carried beside it rather than folded into it: a link id and a node id are two
+			// namespaces, and one map keyed on both is a collision waiting for a network that
+			// names a pipe after a junction.
+			linkQualities: f.linkQualities,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
 			demands: f.demands, levels: f.levels, statuses: f.statuses, t: f.t

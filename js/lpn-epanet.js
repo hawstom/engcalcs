@@ -81,6 +81,14 @@
 		// kW and percent whatever the flow units are, which is the reason `[ENERGY]` needs no
 		// conversion clone: see the note over EngCalcs.lpnEnergyParse.
 		EN_ENERGY = 13,
+		// **THE LINK'S AVERAGE WATER-QUALITY VALUE** (ROADMAP Task 638). The twin of EN_QUALITY
+		// above and read in exactly the same way: EPANET averages the value over the segments
+		// standing in the link at the moment the quality clock is on, and what the number MEANS is
+		// whatever [OPTIONS] Quality asked for -- HOURS for water age, PERCENT for a source share,
+		// the chemical's own stated unit for a concentration. It is the only quality quantity the
+		// toolkit exposes for a link; a reaction rate and a friction factor appear in EPANET's
+		// binary output and in a full report table and have no getter at all.
+		EN_LINKQUAL = 14,
 		EN_PUMP_EFFIC = 17;
 
 	// **THE STATISTICS AND OPTIONS THAT SAY WHETHER THE RUN CONVERGED** (ROADMAP Task 565).
@@ -1761,7 +1769,7 @@
 					 * beside a plausible large one.
 					 */
 					function qslice() {
-						var slice0 = nowMs(), finished = false, f, tq, qstep, qi, qn;
+						var slice0 = nowMs(), finished = false, f, tq, qstep, qi, qn, ql;
 						try {
 							for (;;) {
 								tq = p.runQ();
@@ -1772,6 +1780,16 @@
 									for (qi = 0; qi < model.nodes.length; qi++) {
 										qn = model.nodes[qi];
 										f.qualities[qn.id] = p.getNodeValue(nodeIdx[qn.id], EN_QUALITY) *
+											(qualityIsAge ? 3600 : 1);
+									}
+									// **THE SAME WALK, THE SAME FRAME, THE SAME CONVERSION** (Task
+									// 638). A link's average quality has to cross to SECONDS under
+									// water age exactly as a node's does, or the map would print a
+									// pipe in hours beside a junction in seconds under one heading.
+									f.linkQualities = {};
+									for (qi = 0; qi < model.links.length; qi++) {
+										ql = model.links[qi];
+										f.linkQualities[ql.id] = p.getLinkValue(linkIdx[ql.id], EN_LINKQUAL) *
 											(qualityIsAge ? 3600 : 1);
 									}
 								}

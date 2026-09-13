@@ -547,7 +547,14 @@ console.log('\n--- and on the 480-pipe grid specs/perf.js uses ---');
 	console.log(`       ${drawn} node labels drawn, ${shed} of them after shedding`);
 	report(drawn >= 45, '...and the pair rule earns its keep at this size',
 		drawn + ' node labels drawn (loser-only measured 39)');
-	report(best.placements <= 5, 'the cap holds on a big drawing too', best.placements + ' placements');
+	// **DERIVED, NOT TYPED -- and this is the very literal the note above warned about.** That note
+	// says "a second literal 4 in a harness is how the first one survived two new fields being
+	// added to that column", and then this line typed a 5. Task 638 added a ranked field to the
+	// node column on 2026-09-13 and two rows to every link label, the cascade needed one more rung,
+	// and a bound that is a fact about the column went red for describing an older column. Same
+	// expression as the general cap above, so there is now one statement of it and not two.
+	report(best.placements <= 1 + L.maxRungs(), 'the cap holds on a big drawing too',
+		best.placements + ' placements against a cap of ' + (1 + L.maxRungs()));
 	report(best.layouts < 40, 'and a rung is still one forced layout', best.layouts + ' forced layouts');
 }
 

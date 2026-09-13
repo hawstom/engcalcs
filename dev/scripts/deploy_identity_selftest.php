@@ -160,6 +160,54 @@ echo "\n--- the three shapes that are not an ordinary branch ---\n";
 }
 
 // ================================================================================================
+// 4b. A WORKTREE, WHERE `.git` IS A FILE AND THE REFS ARE SOMEBODY ELSE'S
+// ================================================================================================
+// **THIS RETURNED AN EMPTY SHA IN EVERY WORKTREE AND NOBODY COULD SEE IT** (found 2026-09-13 while
+// running check_all.sh from one). In a worktree `.git` is a FILE holding `gitdir: <path>`, so every
+// read was a read of a path that does not exist; and the directory it names holds this worktree's
+// own HEAD and reflog but NOT `refs/heads/` or `packed-refs`, which are shared and live in the
+// directory `commondir` points at. Two hops, and missing either one produces the same silent
+// nothing. It failed only for a concurrent agent -- the paradigm CLAUDE.md now requires -- and
+// passed for whoever ran it on the main checkout, which is why the live call in section 6 could
+// not catch it either.
+echo "\n--- a worktree: .git is a file, and the refs belong to the common directory ---\n";
+{
+    $moved = mktime(14, 20, 0, 8, 9, 2026);
+    // The shape `git worktree add` really makes: a common `.git` beside a `worktrees/<name>` whose
+    // HEAD names a branch whose ref file is up in the common directory.
+    $r = fixture([
+        'main/.git/worktrees/wt/HEAD' => "ref: refs/heads/feature\n",
+        'main/.git/worktrees/wt/commondir' => "../..\n",
+        'main/.git/worktrees/wt/logs/HEAD' => "x\n",
+        'main/.git/refs/heads/feature' => $SHA . "\n",
+        'wt/.git' => "gitdir: __ROOT__/main/.git/worktrees/wt\n",
+    ], ['main/.git/refs/heads/feature' => $moved, 'main/.git/worktrees/wt/logs/HEAD' => $moved]);
+    // The pointer is absolute in a real worktree, so the fixture's own root is written in now that
+    // it exists.
+    file_put_contents($r . '/wt/.git', "gitdir: $r/main/.git/worktrees/wt\n");
+    $d = ecDeployIdentity($r . '/wt');
+    ok('a worktree yields the sha of the branch it is on', $d['sha'] === substr($SHA, 0, 8), $d['sha']);
+    ok('...and dates from the ref, which lives in the COMMON directory',
+        $d['date'] === utc($moved), $d['date']);
+    rmtree($r);
+}
+{
+    // A RELATIVE pointer, which is what `git worktree add --relative-paths` writes. Resolved
+    // against the worktree root, because that is where the `.git` file sits.
+    $moved = mktime(7, 5, 0, 9, 10, 2026);
+    $r = fixture([
+        'main/.git/worktrees/wt/HEAD' => "ref: refs/heads/feature\n",
+        'main/.git/worktrees/wt/commondir' => "../..\n",
+        'main/.git/refs/heads/feature' => $SHA . "\n",
+        'wt/.git' => "gitdir: ../main/.git/worktrees/wt\n",
+    ], ['main/.git/refs/heads/feature' => $moved]);
+    $d = ecDeployIdentity($r . '/wt');
+    ok('a relative gitdir pointer resolves against the worktree root',
+        $d['sha'] === substr($SHA, 0, 8) && $d['date'] === utc($moved), $d['sha'] . ' ' . $d['date']);
+    rmtree($r);
+}
+
+// ================================================================================================
 // 5. FETCH_HEAD IS NOT A DEPLOY
 // ================================================================================================
 // A bare `git fetch` rewrites FETCH_HEAD and deploys nothing. Consulting it would have reported a

@@ -90,8 +90,13 @@ Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
 L.settings().alignPipeLabels = false;
 L.refreshLabelText();
 
+// **TASK 638 MADE THIS ELEVEN VALUES, NOT NINE.** The line above turns on every field the link map
+// declares, so adding one to that map lands here by construction -- which is the point of reading
+// the toggles rather than listing them. `friction` and `status` are both answerable from a plain
+// hydraulic solve; the average `quality` is NOT on this list because this harness runs no quality
+// analysis, and a field with no value prints nothing rather than a zero.
 const READING_ORDER = ['id', 'diameter', 'length', 'roughness', 'km',
-	'flow', 'velocity', 'headloss', 'gradient'];
+	'flow', 'velocity', 'headloss', 'gradient', 'friction', 'status'];
 
 function fieldsOn(id) {
 	return (L.linkEls()[id].lines || []).map(function (x) { return x.field; });
