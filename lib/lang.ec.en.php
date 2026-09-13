@@ -1029,6 +1029,21 @@ $ec_lang['lpn_result_water_age']='Water age';
 $ec_lang['lpn_result_water_age_tip']='How long the water reaching this point has been in the system. Where flows meet, the number is the average of the arriving ages, weighted by flow. In a tank it is the average age of the water held, so a tank that turns over slowly usually holds the oldest water in a network. There is no regulatory limit to compare it against, so judge the number against your own system.';
 $ec_lang['lpn_result_source_share']='Source share';
 $ec_lang['lpn_result_source_share_tip']='How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports.';
+// **THE LINK HALF OF THE THREE QUALITY ANSWERS** (ROADMAP Task 638). EPANET reports a node's own
+// value and a LINK's AVERAGE over the water standing in it, so the two are different quantities and
+// take different words. Three whole names rather than one name built from a word and a heading: a
+// label composed at render time breaks in a gendered, a word-order and a right-to-left language,
+// which is the rule in CLAUDE.md under Concept-level label reuse.
+$ec_lang['lpn_result_avg_water_age']='Average water age';
+$ec_lang['lpn_result_avg_source_share']='Average source share';
+$ec_lang['lpn_result_avg_concentration']='Average concentration';
+// EPANET's own two link report columns, in EPANET's own words. A friction factor is the
+// dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
+// method produced the loss, so it has no unit and never crosses one.
+$ec_lang['lpn_result_friction_factor']='Friction factor';
+$ec_lang['lpn_result_status']='Status';
+$ec_lang['lpn_result_status_open']='Open';
+$ec_lang['lpn_result_status_closed']='Closed';
 $ec_lang['lpn_result_head']='Head';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement.';

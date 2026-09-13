@@ -210,8 +210,64 @@ console.log('\n2. A SHED SUBSET PRICES WITHIN THE MEASURED BEARING TOLERANCE');
 	// headless stub's metrics differ, so the number here is not the browser's. What a fence this
 	// size catches is the arithmetic going structurally wrong -- a dropped separator, a mis-scaled
 	// k, an owner list out of step -- which would be tens of percent, not one.
-	report(worst < 0.05, 'a shed subset prices within 5% of its real width', (100 * worst).toFixed(3) + '%');
+	//
+	// **THE FENCE IS A PROPERTY OF THE CONTENT, NOT ONLY OF THE ARITHMETIC, AND TASK 638 MEASURED
+	// THAT.** Every row this pass had ever priced was DIGITS; the link status row added on
+	// 2026-09-13 prints a WORD, and the stub's per-character metrics model letters and digits
+	// differently from the way priceKeep() sums them. Measured on this fixture, one row at a time:
+	// digits only, 1.111% mean and 1.111% worst; with the word row, 5.201% and 8.333%. The
+	// arithmetic did not change and neither did anything it does -- the same k, the same owner
+	// list, the same separator -- so widening the fence to admit the word is the honest reading
+	// rather than a regression being waved through.
+	//
+	// **THE ORIGINAL GUARANTEE IS STILL TESTED AT ITS ORIGINAL STRENGTH** in section 2b below,
+	// which runs the identical comparison over numeric rows alone. Widening this fence without
+	// that would have thrown away the tight bound for every row that still deserves it.
+	report(worst < 0.10, 'a shed subset prices within 10% of its real width', (100 * worst).toFixed(3) + '%');
+	report(mean < 0.06, '...and the mean is well inside that', (100 * mean).toFixed(3) + '%');
+}
+
+console.log('\n2b. AND OVER NUMERIC ROWS ALONE IT STILL PRICES TO THE ORIGINAL TOLERANCE');
+{
+	// **THE SAME COMPARISON, WITH THE ONE WORD ROW OFF.** Section 2's fence had to widen to admit a
+	// row of letters (Task 638); this keeps the bound the pricing arithmetic was actually built to,
+	// so a real regression in it still fails here even though the wider fence above would pass.
+	// Written as a second pass rather than as a filter inside the first, because what is being
+	// compared is a whole LABEL's priced width against its drawn width -- there is no per-row
+	// number to exclude.
+	const les = L.linkEls();
+	const doc = L.getDoc();
+	L.labelSettings().link.status = false;
+	L.refreshLabelText();
+	L.relayoutLabels();
+	let n = 0, worst = 0, sum = 0;
+	doc.links.forEach(function (l) {
+		const le = les[l.id];
+		if (!le || le.empty || !le.allLines || le.allLines.length < 2) { return; }
+		const all = le.allLines, order = L.shedOrder(all);
+		const drawn = all.length - le.lines.length;
+		if (drawn >= all.length - 1) { return; }
+		const before = le.lines;
+		const keep = L.keepSet(all, order, drawn + 1);
+		const w = L.priceKeep(le, keep, all);
+		if (w === null) { return; }
+		const kept = all.filter((line, i) => keep[i]);
+		L.render(le, l, kept, L.fs() + 'px');
+		const real = le.twPx;
+		if (!(real > 0)) { return; }
+		const rel = Math.abs(w - real) / real;
+		n++; sum += rel; if (rel > worst) { worst = rel; }
+		L.render(le, l, before, L.fs() + 'px');
+	});
+	const mean = sum / Math.max(1, n);
+	console.log(`       digits only: mean ${(100 * mean).toFixed(3)}%   worst ${(100 * worst).toFixed(3)}%`);
+	report(n > 5, 'enough numeric labels shed a value to measure the gap', n + ' compared');
+	report(worst < 0.05, 'over digits alone it still prices within the original 5%', (100 * worst).toFixed(3) + '%');
 	report(mean < 0.02, '...and the mean is far inside that', (100 * mean).toFixed(3) + '%');
+	// Put the row back, so anything after this sees the drawing the rest of the file describes.
+	L.labelSettings().link.status = true;
+	L.refreshLabelText();
+	L.relayoutLabels();
 }
 
 console.log('\n3. THE PASS COSTS FAR FEWER FORCED LAYOUTS THAN IT HAS SHEDDING LABELS');

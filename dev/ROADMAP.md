@@ -383,6 +383,14 @@ the block.
   - **The unit is the trap, not the list.** `colorFieldUnit()` already overrides the declared unit
     with `qualityUnitId()`, which is the one place that knows a source share has no unit; a
     reaction rate is a third unit again. Add a field and that override is what has to learn it.
+  - **THREE OF THE FOUR LINK FIELDS SHIPPED, AND THE REACTION RATE IS BLOCKED ON THE ENGINE.**
+    Average quality, friction factor and status are in, with the node's quality and initial
+    quality (`dev/lpn-spike/chemical-symbology-harness.js`). **The vendored toolkit exposes no
+    reaction-rate getter** -- its `LinkProperty` enum ends at `LinkQual` (14), and EPANET carries
+    the rate only in its binary `.out` file and in a full `.rpt` table. So the remaining work is
+    either a binary-output reader or mass-transfer arithmetic of our own, and the second is the
+    class this project refuses. The friction factor needed neither: `f = 2 g D h_f / (L V^2)` is
+    the definition of f, back-computed the way EPANET's own report back-computes it.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;

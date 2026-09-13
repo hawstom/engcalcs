@@ -118,17 +118,30 @@ const def = L.defaultLabelSettings();
 // **THE PREFERENCE IS UNCHANGED BY TASK 445; ONLY THE NUMBERS ARE.** Tom's list still runs from the
 // value kept longest to the value shed first, so as a DROP order it reads backwards -- which is why
 // this literal is his list reversed rather than a new decision about which value matters.
+// **TASK 638 ADDED THREE ROWS AND REORDERED NONE OF HIS.** The friction factor goes with the
+// results it is back-computed from, between the diameter and the gradient; the status and the
+// average quality go ABOVE the whole of his list, on the argument the node's quality row already
+// won -- neither is ever on unless somebody switched the analysis on and asked for it by name, so
+// neither should give up its space to a value that is on by default.
 eq(dropOrderOf(def.priority.link),
-	['id', 'km', 'roughness', 'length', 'diameter', 'gradient', 'headloss', 'velocity', 'flow'],
-	'link drop order is Tom\'s list reversed: id shed first, flow kept longest');
+	['id', 'km', 'roughness', 'length', 'diameter', 'friction', 'gradient', 'headloss', 'velocity',
+		'flow', 'status', 'quality'],
+	'link drop order is Tom\'s list reversed, with Task 638\'s three slotted in');
 // Stated as meaning rather than as position, so it fails under the OLD sense instead of merely
 // sorting differently.
 ok(def.priority.link.id === Math.min.apply(null, Object.keys(def.priority.link).map(function (k) {
 	return def.priority.link[k];
 })), 'a link ID holds the LOWEST number, which is now what "shed first" means');
-ok(def.priority.link.flow === Math.max.apply(null, Object.keys(def.priority.link).map(function (k) {
+// **HIS OWN LIST IS ASKED ABOUT ON ITS OWN**, so the claim he made -- the flow is the last of these
+// values standing -- is still tested rather than quietly widened by every field added after it.
+const TOM_LINK_FIELDS = ['id', 'km', 'roughness', 'length', 'diameter', 'gradient', 'headloss',
+	'velocity', 'flow'];
+ok(def.priority.link.flow === Math.max.apply(null, TOM_LINK_FIELDS.map(function (k) {
 	return def.priority.link[k];
-})), 'and the flow holds the highest, so it is the last value standing');
+})), 'and of the values he named, the flow holds the highest: the last one standing');
+ok(['status', 'quality'].every(function (k) {
+	return TOM_LINK_FIELDS.every(function (t) { return def.priority.link[k] > def.priority.link[t]; });
+}), 'a status and an average quality outrank all of them, being on only because they were asked for');
 
 // Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on". Reversed here
 // for the same reason as the link list.
@@ -138,8 +151,11 @@ ok(def.priority.link.flow === Math.max.apply(null, Object.keys(def.priority.link
 // Water quality joined the TOP of it on 2026-09-01. It is the one node field that is never on
 // unless somebody switched the analysis on and re-ran, so a field asked for by name is the last
 // to give up its space.
-eq(dropOrderOf(def.priority.node), ['head', 'elev', 'pressure', 'demand', 'demandActual', 'quality'],
-	'node drop order is head, elevation, pressure, base demand, demand, water quality -- quality decides last and so wins');
+// The starting concentration joined it under the quality row on 2026-09-13 (Task 638), on the same
+// argument: it is only ever on because the chemical analysis is.
+eq(dropOrderOf(def.priority.node),
+	['head', 'elev', 'pressure', 'demand', 'demandActual', 'initQuality', 'quality'],
+	'node drop order is head, elevation, pressure, base demand, demand, initial quality, water quality -- quality decides last and so wins');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read**, of 17 untranslated keys, of 1785 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read**, of 24 untranslated keys, of 1792 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (17, 10 to read @@ NEEDS RULING)
+## lpn_  (24, 17 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -60,6 +60,27 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_popup_boxtitle`**
   > Properties
   _Ruled OK 2026-09-09._
+- **`lpn_result_avg_concentration`**
+  > Average concentration
+  @@ NEEDS RULING
+- **`lpn_result_avg_source_share`**
+  > Average source share
+  @@ NEEDS RULING
+- **`lpn_result_avg_water_age`**
+  > Average water age
+  @@ NEEDS RULING
+- **`lpn_result_friction_factor`**
+  > Friction factor
+  @@ NEEDS RULING
+- **`lpn_result_status`**
+  > Status
+  @@ NEEDS RULING
+- **`lpn_result_status_closed`**
+  > Closed
+  @@ NEEDS RULING
+- **`lpn_result_status_open`**
+  > Open
+  @@ NEEDS RULING
 - **`lpn_settings_runbox`**
   > Show the run progress box
   @@ NEEDS RULING
