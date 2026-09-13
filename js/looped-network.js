@@ -3955,7 +3955,8 @@ var EngCalcs = EngCalcs || {};
 				// Task 638's three, all OFF: a friction factor, a status and an average quality are
 				// each asked for by name, and turning them on by default would bury the two rows
 				// (flow and velocity) a link label ships showing.
-				friction: false, status: false, quality: false },
+				// And Task 652's reaction rate on the same argument.
+				friction: false, status: false, quality: false, rate: false },
 			// Per-field decimal places (Task 189). A PARALLEL map, not a boolean-turned-object: the
 			// boolean maps are merged key-by-key out of localStorage, and a shape change there
 			// silently reinterprets every already-saved network's toggles. Non-numeric fields (ID)
@@ -3986,7 +3987,9 @@ var EngCalcs = EngCalcs || {};
 				// which fields are numeric, so a status prints its word with no decimals spinner
 				// beside it, exactly as ID does.
 				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4,
-					friction: 4, quality: 1 }
+				// rate 2 -- a reaction rate runs from a hundredth to a few units of the chemical's
+				//   own concentration per day, and the report EPANET prints it in shows two places.
+					friction: 4, quality: 1, rate: 2 }
 			},
 			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
 			// of them and the number.
@@ -4046,7 +4049,10 @@ var EngCalcs = EngCalcs || {};
 				// neighbours it had, and the three new ones are slotted where they belong -- the
 				// friction factor beside the gradient it is derived from, the status and the
 				// average quality on top because neither is ever on unless it was asked for.
-				link: { quality: 12, status: 11, flow: 10, velocity: 9, headloss: 8, gradient: 7,
+				// **RENUMBERED AGAIN, NOT REORDERED** (Task 652), on the rule the line above states:
+				// the reaction rate goes on top beside the average quality, because like it the row
+				// is never on unless the chemical analysis was switched on and run.
+				link: { rate: 13, quality: 12, status: 11, flow: 10, velocity: 9, headloss: 8, gradient: 7,
 					friction: 6, diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
@@ -5982,6 +5988,56 @@ var EngCalcs = EngCalcs || {};
 		return mode === 'age' ? toDisplay(v, resultUnit('age')) : v;
 	}
 	/**
+	 * **THE REACTION RATE ALONG A PIPE -- EPANET'S OWN NUMBER, NOT ONE OF OURS** (Task 652).
+	 *
+	 * The toolkit has no getter for it, which is why this page shipped a friction factor and no
+	 * reaction rate: an f is the definition of head loss rearranged and anybody can check it on
+	 * paper, where a reaction rate is a MODEL -- a bulk term, a wall term and a mass-transfer
+	 * coefficient off a Sherwood correlation -- and writing our own would have been inventing
+	 * arithmetic nothing checks. **The number here is read out of EPANET's own binary output file
+	 * instead**, the very array its own report column prints from; js/lpn-epanet.js's
+	 * fillReactionRates() is where that is argued and dev/lpn-spike/reaction-rate-harness.js is
+	 * where it is anchored against EPANET's own `.rpt`.
+	 *
+	 * **IT EXISTS FOR A CHEMICAL AND FOR NOTHING ELSE.** EPANET leaves the array at zero unless the
+	 * analysis is a chemical, so a water age and a source trace have no rate at all rather than a
+	 * rate of zero -- and the RESULT'S OWN MODE must still be the document's, which is the identical
+	 * guard linkQualityValue() above states its reason for.
+	 *
+	 * **AND IT IS A MAGNITUDE.** EPANET's reactpipes() accumulates `fabs(c_new - c_old)`, so a
+	 * chlorine decaying at 2.5 and one growing at 2.5 report the same number. That is EPANET's own
+	 * decision, it is what its report column means, and it is not ours to sign.
+	 */
+	function linkReactionRate(l) {
+		var v;
+		if (qualityMode() !== 'chemical') { return undefined; }
+		if (!lastSolveResult || !lastSolveResult.linkRates) { return undefined; }
+		if (lastSolveResult.qualityMode !== 'chemical') { return undefined; }
+		v = lastSolveResult.linkRates[l.id];
+		if (typeof v !== 'number' || !isFinite(v)) { return undefined; }
+		// Crosses nothing. A concentration is carried as a label and converted by nobody, EPANET
+		// included, and the `day` underneath it is the engine's own fixed basis -- so there is no
+		// factor on either side of this and there never will be one.
+		return v;
+	}
+	/**
+	 * **THE UNIT A REACTION RATE IS READ IN: the document's own concentration label, per day.**
+	 *
+	 * A THIRD unit beside the age's time and the source share's bare '%', and it is TEXT for the
+	 * reason both of those are -- no family, no factor, nothing to convert. EPANET prints
+	 * `mg/L/day` and this prints exactly that where the document states `Chlorine mg/L`.
+	 *
+	 * **THE `day` IS TRANSLATED AND IS NOT A NEW KEY.** The `elapsed_time` family already offers
+	 * it, so the word is read off that select's own option rather than written a second time into
+	 * 27 language files; unitLabelFor() answers for an option whether or not it is the selected
+	 * one, which is what lets a page showing water age in hours still say `/day` here. A document
+	 * that states no concentration unit still states a time basis, so this says `/day` on its own
+	 * rather than inventing the `mg/L` EPANET would have defaulted to.
+	 */
+	function reactionRateUnitText() {
+		return concentrationUnitText() + '/' + unitLabelFor(unitEl('lpn_u_age'), 'day');
+	}
+	/**
 	 * **THIS LINK'S STATUS, AS 'open' OR 'closed'** (Task 638). EPANET colours a link by status and
 	 * so does this page now.
 	 *
@@ -6030,8 +6086,13 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * **DERIVED HERE RATHER THAN READ BACK, because the toolkit has no getter for it.** EPANET's
 	 * LinkProperty enum stops at LinkQual; the friction factor lives in the binary output file and
-	 * in a full report table. The arithmetic above is the definition of f and not a model of ours,
-	 * which is what makes deriving it honest where a reaction rate would not be.
+	 * in a full report table. The arithmetic above is the DEFINITION of f and not a model of ours,
+	 * which is what made deriving it honest where deriving a reaction rate would not have been.
+	 *
+	 * **THE REACTION RATE IS NOT DERIVED AT ALL** (Task 652): linkReactionRate() below reads
+	 * EPANET's own value straight out of that same binary file, which is the door this note did
+	 * not see. It is open to an f as well, and taking it would cost every run the output file --
+	 * the definition above is free and exact, so it stays.
 	 *
 	 * Undefined for a pump (no length, and a rise rather than a loss), for a zero-length link and
 	 * wherever the water is not moving -- f is not defined at zero velocity, and a zero there would
@@ -6065,7 +6126,11 @@ var EngCalcs = EngCalcs || {};
 		// overrides it with qualityUnitId(), which is the one place that knows a source share has
 		// no unit. A friction factor is dimensionless and a status is not a quantity, so both
 		// declare '' and mean it.
-		quality: 'lpn_u_age', friction: '', status: '' };
+		// **AND A REACTION RATE MAKES A THIRD UNIT ON THIS PAGE** (Task 652) -- a concentration per
+		// day, which is neither the age's time nor the source share's bare '%'. It declares '' here
+		// for the reason `roughness` does, because there is no unit FAMILY for it; the mark a legend
+		// prints comes out of colorFieldUnitText() below, which asks reactionRateUnitText().
+		quality: 'lpn_u_age', friction: '', status: '', rate: '' };
 	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
 	// refreshLabelText() prints, so the colour and the printed number can never describe different
 	// quantities. undefined means "this element has no such value" (no solve yet, or the field does
@@ -6123,6 +6188,11 @@ var EngCalcs = EngCalcs || {};
 		// Dimensionless, worked out from SI quantities and returned as it stands -- see
 		// linkFrictionFactor(), which is where the one system rule is argued.
 		if (field === 'friction') { return linkFrictionFactor(l); }
+		// **ABOVE NOTHING AND BELOW THE FLOW GUARD IS WRONG FOR IT, SO IT SITS WITH `quality`.**
+		// Moved? No: linkReactionRate() asks its own two questions exactly as linkQualityValue()
+		// does, and a missing flow answers neither -- but it is reached only on a solved link
+		// anyway, because the engine writes the array on the same run that produced the flows.
+		if (field === 'rate') { return linkReactionRate(l); }
 		return undefined;
 	}
 	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
@@ -6140,7 +6210,7 @@ var EngCalcs = EngCalcs || {};
 		// somebody switches the analysis on and runs, which is the standing of `quality` already.
 		node: ['pressure', 'head', 'elev', 'demandActual', 'demand', 'quality', 'initQuality'],
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'diameter', 'roughness',
-			'status', 'quality']
+			'status', 'quality', 'rate']
 	};
 	function colorFieldOptions(group) {
 		var defs = group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS, out = [], seen = {};
@@ -6253,6 +6323,9 @@ var EngCalcs = EngCalcs || {};
 	function colorFieldUnitText(group, field) {
 		var id;
 		if (field === 'quality') { return qualityUnitText(); }
+		// The third quality unit (Task 652). Its own function for the same reason qualityUnitText()
+		// is one: the mark follows the document's chemical label, so it cannot be a table entry.
+		if (group === 'link' && field === 'rate') { return reactionRateUnitText(); }
 		// A starting concentration is written in the units named beside the chemical, so this
 		// answers the document's own characters and never a unit of ours (Task 638). Under water
 		// age or a source trace the document states no chemical and this is '', which is honest:
@@ -26364,7 +26437,11 @@ var EngCalcs = EngCalcs || {};
 			// until somebody asks for it.
 			['friction', pc.lpn_result_friction_factor || 'Friction factor'],
 			['status', pc.lpn_result_status || 'Status'],
-			['quality', linkQualityLabel()]
+			['quality', linkQualityLabel()],
+			// **THE FIFTH AND LAST OF EPANET'S LINK REPORT COLUMNS** (Task 652), read off the
+			// engine's own binary output. Off by default with the other three: it is a chemical
+			// answer and does not exist until somebody switches the analysis on.
+			['rate', pc.lpn_result_reaction_rate || 'Reaction rate']
 		];
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
@@ -36110,7 +36187,9 @@ var EngCalcs = EngCalcs || {};
 		// are. A status prints a WORD and would read as an equation with one; an average quality
 		// has no symbol for the same reason a node's quality has none.
 		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=',
-			friction: 'f=', status: '', quality: '' }
+		// **AND A REACTION RATE GETS NONE** (Task 652), on the average quality's own argument: it
+		// is the reacting half of that same pair and has no symbol a reader would recognise.
+			friction: 'f=', status: '', quality: '', rate: '' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
 	// follows the method selector rather than being frozen at the moment defaults were built.
@@ -36391,7 +36470,10 @@ var EngCalcs = EngCalcs || {};
 			// **NO STATUS ENTRY**: an extrema tick means "this is the highest in the network", which
 			// is not a thing an open pipe is.
 			friction: fieldExtrema(doc.links.map(function (l) { return plainRound(linkFrictionFactor(l), ld.friction); })),
-			linkQuality: fieldExtrema(doc.links.map(function (l) { return plainRound(linkQualityValue(l), ld.quality); }))
+			linkQuality: fieldExtrema(doc.links.map(function (l) { return plainRound(linkQualityValue(l), ld.quality); })),
+			// plainRound() again (Task 652): the rate is in the document's own concentration per
+			// day, which is a label and not a factor, so there is no unit to round it through.
+			rate: fieldExtrema(doc.links.map(function (l) { return plainRound(linkReactionRate(l), ld.rate); }))
 		};
 		var nodeLines = {}, linkLines = {};
 		doc.nodes.forEach(function (n) {
@@ -36512,6 +36594,10 @@ var EngCalcs = EngCalcs || {};
 			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
 			var lqVal = linkQualityValue(l);
 			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, extrema.linkQuality, ld.quality))); }
+			// rawLine() for the third time on this block, and for the third reason: the number is
+			// already in the unit its heading names and there is no factor to run it through.
+			var lrVal = linkReactionRate(l);
+			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, extrema.rate, ld.rate))); }
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One

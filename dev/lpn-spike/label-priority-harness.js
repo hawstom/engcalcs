@@ -118,14 +118,15 @@ const def = L.defaultLabelSettings();
 // **THE PREFERENCE IS UNCHANGED BY TASK 445; ONLY THE NUMBERS ARE.** Tom's list still runs from the
 // value kept longest to the value shed first, so as a DROP order it reads backwards -- which is why
 // this literal is his list reversed rather than a new decision about which value matters.
-// **TASK 638 ADDED THREE ROWS AND REORDERED NONE OF HIS.** The friction factor goes with the
-// results it is back-computed from, between the diameter and the gradient; the status and the
-// average quality go ABOVE the whole of his list, on the argument the node's quality row already
-// won -- neither is ever on unless somebody switched the analysis on and asked for it by name, so
-// neither should give up its space to a value that is on by default.
+// **TASK 638 ADDED THREE ROWS AND REORDERED NONE OF HIS; TASK 652 ADDED A FOURTH THE SAME WAY.**
+// The friction factor goes with the results it is back-computed from, between the diameter and the
+// gradient; the status, the average quality and the REACTION RATE go ABOVE the whole of his list,
+// on the argument the node's quality row already won -- none of them is ever on unless somebody
+// switched the analysis on and asked for it by name, so none should give up its space to a value
+// that is on by default.
 eq(dropOrderOf(def.priority.link),
 	['id', 'km', 'roughness', 'length', 'diameter', 'friction', 'gradient', 'headloss', 'velocity',
-		'flow', 'status', 'quality'],
+		'flow', 'status', 'quality', 'rate'],
 	'link drop order is Tom\'s list reversed, with Task 638\'s three slotted in');
 // Stated as meaning rather than as position, so it fails under the OLD sense instead of merely
 // sorting differently.
@@ -139,9 +140,9 @@ const TOM_LINK_FIELDS = ['id', 'km', 'roughness', 'length', 'diameter', 'gradien
 ok(def.priority.link.flow === Math.max.apply(null, TOM_LINK_FIELDS.map(function (k) {
 	return def.priority.link[k];
 })), 'and of the values he named, the flow holds the highest: the last one standing');
-ok(['status', 'quality'].every(function (k) {
+ok(['status', 'quality', 'rate'].every(function (k) {
 	return TOM_LINK_FIELDS.every(function (t) { return def.priority.link[k] > def.priority.link[t]; });
-}), 'a status and an average quality outrank all of them, being on only because they were asked for');
+}), 'a status, an average quality and a reaction rate outrank all of them, being on only because they were asked for');
 
 // Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on". Reversed here
 // for the same reason as the link list.
