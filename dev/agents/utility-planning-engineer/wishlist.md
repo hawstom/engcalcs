@@ -777,3 +777,36 @@ now Row 3 above (reconsidered), the second is Parked above (per Tom's instructio
   freestanding feature; not enough on its own to earn a row, and I did not find a citation
   suggesting utilities at our target scale automate this step rather than doing it by hand once
   or twice per calibration cycle.
+
+## 2026-09-13 — Task 643 answered (not a row I found — Tom named this seat as the decider)
+
+Full research and citations: journal, 2026-09-13 entry. My working answer to the two questions
+Task 643 poses to this seat:
+
+- **Slope distance: build it, but as a labeled alternate quantity, never as a silent replacement
+  of plan length, and do not default it on.** Quantified (my own trig, SPECULATION but checkable
+  in two lines): under ~15% grade the divergence from plan distance is under ~1.1%, dwarfed by
+  ordinary Hazen-Williams C uncertainty (routinely an 80%+ swing on headloss across a mixed-age
+  system). It earns its keep only in hilly/mountain systems. CITED (Phoenix, Mesa Water, Delaware
+  DOT plan-reading materials): a reviewing agency accepts length off a STATIONED plan-and-profile
+  sheet, and station is horizontal distance by definition — never slope distance. Reporting slope
+  distance as "the" length risks disagreeing with the approved plan sheet, which is a worse defect
+  than the fraction of a percent it fixes.
+- **Length adjustment for unmapped bends: a FACTOR (percent of length), project-level default with
+  an asset-level override, and I could not find a citable named industry practice for this exact
+  thing** — treat as my own reasoned inference and verify with a real surveyor before building, per
+  Tom's own instruction that only that seat or Sue can answer it. Reasoning: an increment needs
+  something countable, and unmapped bends are by definition not counted; AWWA C600's joint-
+  deflection practice (up to 5° per push-on joint, used to lay long-radius curves without bending
+  pipe) makes real incidental wiggle a per-unit-length phenomenon, which is a factor's shape, not
+  an increment's.
+- **Rank: I would leave Task 643 at 75, not raise or lower it.** It is cheap (elevations already
+  exist; one project setting; one optional per-asset override) and it answers a real question for
+  the minority of systems in genuinely hilly terrain, but it is smaller than "the camel" framing
+  suggests for the median system in this suite's own footprint — the C-factor and demand-
+  allocation uncertainty already in any hydraulic model is the dominant source of length-adjacent
+  error, by roughly two orders of magnitude, not this. Tom's own gnat-vs-camel comparison (bigger
+  than grid-to-ground) is quantitatively correct even so: grid-to-ground at this suite's stated
+  300 km scope is 206 ppm (CLAUDE.md, `scope-of-service-harness.js`), a further order of magnitude
+  below even a 5% grade's slope-distance error. Both are small; the camel is still bigger than the
+  gnat.

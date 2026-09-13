@@ -2015,3 +2015,90 @@ indirection) — a designer reading "this pipe's type was flattened" when what a
 next open. Recommend two distinct alert sentences sharing one mechanism (both are already the
 "say what's flattening and how many elements it affects" discipline ROADMAP.md:321-326 already
 commits to for 465), not one generic "some pipes were flattened" line.
+
+## 2026-09-13 — Sue: Task 643, the camel — slope distance is real but below the noise floor for most systems; length adjustment should be a project-level FACTOR, not an increment, and I could not find a citable industry term for it
+
+Tom asked by name (Task 643: *"Only Sue knows. Or only our human connections know."*) to choose
+between two length-correction controls: (1) a project-wide slope-distance toggle, (2) a length
+adjustment for unmapped bends, factor or increment, asset or project level.
+
+**Q1 — slope distance: quantified, and it is smaller than "the camel" framing suggests for most
+systems, though Tom's OWN comparison (bigger than grid-to-ground) holds up numerically.**
+SPECULATION (my own trig, not sourced — nobody publishes this number because it is a two-line
+derivation): slope distance / plan distance = sec(θ) where θ=atan(grade). At 5% grade the
+divergence is 0.13%; at 10%, 0.50%; at 15%, 1.11%; at 20%, 1.98%. Headloss is linear in length, so
+these numbers ARE the headloss error directly. Compare to Hazen-Williams C uncertainty — a C
+assumed at 130 for new pipe against an aged 90-100 (a routine spread in a master-plan model
+covering decades of installation) changes headloss by roughly (130/95)^1.852 ≈ 1.8, an 80%
+swing — two orders of magnitude bigger than a 15% grade's 1.1% slope-distance error. **A length
+error under roughly 1% (grade under ~15%) does not change a headloss answer anybody would act on;
+it is dwarfed by ordinary C-factor and demand-allocation uncertainty already in the model.** Most
+distribution mains, laid to a fairly constant cover following the ground, sit well under that grade
+except in genuinely mountainous service areas. So: it is real, it is free (elevations already
+exist, per Task 643's own note), and it is smaller than the framing implies for the majority of
+systems — it only earns its keep in hilly/mountain utilities. **This DOES confirm Tom's own
+framing, though**, not contradicts it: CLAUDE.md already records the grid-to-ground distortion at
+this suite's 300 km scope as 206 ppm (0.0206%) — an order of magnitude smaller again than even a
+5% grade's slope-distance error. Gnat vs. camel is the right relative size, even though the camel
+itself is still small compared to everything else in the model.
+
+**A finding that argues against defaulting it on, or maybe against exposing it as "the" length at
+all: CITED, multiple municipal design-standard and submittal-checklist pages (Phoenix water-main
+plan checklist, Mesa Water submittal requirements, a Delaware DOT plan-reading primer, and a
+general surveying definition of "station") — a plan-and-profile sheet reports pipe length as
+STATIONING, and station is defined, universally, as HORIZONTAL distance along the alignment, never
+slope distance. Fittings are "called out by type and stationing." That is the acceptance
+criterion for Q3 below, and it means the convention a reviewing agency actually checks against is
+plan/horizontal length, not slope distance. A project that quietly computes "truer" slope-distance
+lengths and reports them as pipe length risks disagreeing with its own approved plan-and-profile
+sheet, which is a worse defect than the 0.5-1% it was trying to fix. If built, it should be a
+clearly-labeled alternate quantity ("ground/slope length," shown beside plan length), never a
+silent replacement of the length a stationing convention already owns.
+
+**Q2 — factor, not increment, and at project level with an asset-level override — but I could NOT
+find a named industry practice for this exact thing, so treat this as my own reasoned inference,
+SPECULATION, and verify with an actual surveyor before locking it in, exactly as Tom asked.**
+What I found instead is adjacent, not on point: CITED, several plumbing/HVAC piping references
+(katmarsoftware.com, up.codes "Total Equivalent Length of Piping") give a "broad-brush allowance"
+of roughly 15-75% added length for fittings and valves at PRELIMINARY design stage before routing
+is fixed — but that is EQUIVALENT length for minor-loss K-values in short, fitting-dense building
+runs, a different physical quantity from actual excess pipe footage in a long buried main, and it
+is a PERCENTAGE (factor), not a per-item increment. CITED, AWWA C600 (via wsscwater.com and
+national pipe distributor deflection tables): ductile-iron push-on joints allow up to 5 degrees of
+deflection per joint, and standard practice lays LONG-RADIUS CURVES using this joint deflection
+rather than bending pipe — meaning a real water main's incidental wiggle (a curve run to follow a
+road, not a mapped fitting) is a continuous, small, PER-UNIT-LENGTH phenomenon (more joints over a
+longer run means more accumulated deflection), which argues for a factor (percent of length)
+scaling with the run, not a discrete increment, because there is nothing countable to attach an
+increment to when the bends are, by Task 643's own wording, UNMAPPED. An increment only makes
+sense for a KNOWN, DRAWN fitting (a bend vertex with a manufacturer lay length), which is a
+different and already-served case (draw the vertex). **Project level as the practical default**
+(terrain and utility-crossing density are a property of a system or sub-area, not of one pipe) with
+an **asset-level override** for a pipe the designer knows better (surveyed = 0%, known-congested
+utility corridor = higher) mirrors the pattern this suite already uses for other overridable
+properties (project default + `setProp()` override) — OBSERVED pattern, not verified against the
+specific property list, so re-derive before citing which properties currently work this way.
+
+**Q3 — the acceptance criterion, answered directly:** a reviewing agency accepts a pipe length off
+a scaled PLAN AND PROFILE sheet: horizontal stationing at (commonly) 50 ft ticks and 100 ft labels,
+slope, pipe length, invert and grade elevations, and every fitting called out BY TYPE AND STATION
+— CITED, Phoenix water-main plan checklist (phoenix.gov), Mesa Water plan submittal requirements
+(mesawater.org), Delaware Center for Transportation's plan-reading primer (sites.udel.edu). It does
+not check a hydraulic model's internal length field at all; it checks a drawn, stationed sheet. A
+hydraulic model's length is defensible to the extent it reconciles with that sheet, not the other
+way around — which is the practical reason Q1's "truer" quantity must never silently replace the
+plan length.
+
+**Q4 — honest rank: smaller than priority 75 for most systems, real and cheap enough to keep at
+that priority for the minority it serves, and the increment-vs-factor half is genuinely
+unresolved without a surveyor.** I would not raise Task 643 above the fire-flow and library-type
+work already ranked higher in this file. I would not lower it either — it is cheap (data already
+in the model, one project setting, one optional asset override), it closes a real "what does our
+computed length even mean" question for the hilly-terrain minority of utilities this suite could
+serve, and Tom's own "gnat vs. camel" framing is quantitatively correct even though the camel
+itself is a small animal next to C-factor and demand uncertainty. **My one concrete addition to
+the roadmap block Tom should read before deciding: label whichever length this produces distinctly
+from the plan/stationed length, and do not make slope distance the reported "length" by default**
+— that is the one way this feature could make a report LESS defensible instead of more.
+
+— Sue
