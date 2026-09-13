@@ -7324,6 +7324,85 @@ var EngCalcs = EngCalcs || {};
 		if (!isGeoProject() || !isFinite(sc) || sc <= 0) { return true; }
 		return Math.abs(outwardX(v.cx)) - 180 <= (w / 2) / sc;
 	}
+	// **A STORED VIEW IS CHECKED AGAINST THE MODEL IT HAS TO SHOW, ON THE WAY IN** (ROADMAP Task
+	// 628). Tom, 2026-09-10, after a machine restart on a geographic Net3: *"Zoom to fit restores
+	// it all. It's a zoom mistake!"* The document was whole and 677 symbols were in the DOM; the
+	// camera was {cx: 835.390625, cy: -4957.78125, s: 5.322222222222222}, from which that 0.0965
+	// by 0.082 degree network draws 0.51 px by 0.44 px, centred 27 worlds off the map. Full
+	// measurement: dev/lpn-blank-map-incidents.md. Guarded by
+	// dev/lpn-spike/view-shows-model-harness.js.
+	//
+	// **THE USER CANNOT TELL THIS FROM LOST WORK.** Tom: *"a blank map is equally fatal as a lost
+	// project. User doesn't know the difference."* So the severity is loss-grade whatever the
+	// cause, and the recovery is the one that worked by hand: refuse the view, and let
+	// restoreViewOrFit() fit the network exactly as it does for a document that states no view at
+	// all. A view is OURS and not the user's data (unprojectStoredGeo's note), so declining one
+	// rewrites nothing they typed, and the next save records the good camera, so the file heals.
+	//
+	// **THREE INDEPENDENT TESTS, ALL ARITHMETIC, AND ONLY ONE CARRIES A CHOSEN NUMBER.**
+	//
+	//   1. IS THE CENTRE ON EARTH AT ALL, IN BOTH AXES. viewIsReachable() above asks the same
+	//      question of longitude alone and says why: outwardY() runs through mercLat(), which
+	//      saturates at the cut-off and throws away the magnitude. A magnitude is not needed here,
+	//      because mercLat() is strictly monotonic -- |latitude| past MERC_MAX_LAT is exactly
+	//      |Mercator y| past 180, which is off the square world. Tom's cy saturated his status bar
+	//      at -90, which is how he found it, and no y-axis test existed to see that.
+	//   2. DOES THE WHOLE MODEL DRAW UNDER A FEW PIXELS. Judged at the scale applyView() will
+	//      really use, clamp included, so a view this refuses is genuinely a view that would have
+	//      drawn that small. **THE COST IS HONEST AND IS ACCEPTED**: a geographic project
+	//      deliberately saved zoomed out to the whole world is refused too, because a 0.1 degree
+	//      network is half a pixel there and half a pixel is what being unable to find your work
+	//      looks like. Opening a project is a request to see it.
+	//   3. CAN THE WINDOW REACH THE MODEL. The canvas at that scale is a rectangle in world units;
+	//      if it cannot intersect the extent of the nodes and vertices, the drawing is off screen.
+	//      Skipped while the canvas has no size, because the answer then depends on a number we do
+	//      not have -- legs 1 and 2 need none and still fire.
+	//
+	// **THE EXTENT IS THE RAW MODEL, NOT bbox().** bbox() reads rendered label boxes off nodeEls,
+	// which at this point still belong to the PREVIOUS document -- the very frame confusion Task
+	// 629 traced. Node and vertex coordinates are the document itself and need nothing drawn.
+	//
+	// **AND IT SAYS NOTHING TO THE USER, DELIBERATELY.** The recovery is indistinguishable from
+	// what the page has always done with a document that carries no view, there is nothing for
+	// anybody to act on, and Task 616 measures that notices on this page are missed. A message
+	// would buy a string in 27 languages to report a repair that is already on screen.
+	var LPN_VIEW_MIN_MODEL_PX = 4;
+	function modelExtent() {
+		var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity, i, j, vs;
+		function inc(x, y) {
+			if (!isFinite(x) || !isFinite(y)) { return; }
+			if (x < minx) { minx = x; } if (x > maxx) { maxx = x; }
+			if (y < miny) { miny = y; } if (y > maxy) { maxy = y; }
+		}
+		for (i = 0; i < doc.nodes.length; i++) { inc(doc.nodes[i].x, doc.nodes[i].y); }
+		for (i = 0; i < doc.links.length; i++) {
+			vs = doc.links[i].verts || [];
+			for (j = 0; j < vs.length; j++) { inc(vs[j].x, vs[j].y); }
+		}
+		if (!isFinite(minx) || !isFinite(miny)) { return null; }
+		return { minx: minx, maxx: maxx, miny: miny, maxy: maxy, w: maxx - minx, h: maxy - miny };
+	}
+	function viewShowsModel(v) {
+		var ext, sc, w, h, halfW, halfH;
+		if (!validView(v)) { return false; }
+		if (isGeoProject() && (Math.abs(outwardX(v.cx)) > 180 ||
+			Math.abs(outwardY(v.cy)) > LPN_MERC_MAX_LAT)) { return false; }
+		ext = modelExtent();
+		// Nothing to show, so nothing this can be wrong about. An empty document's view is its
+		// own business and defaultViewForCoords() owns that case.
+		if (!ext) { return true; }
+		// The w/h form of a view states no scale at all -- it is a region, and applyView() derives
+		// the scale from the canvas, so there is no number here to judge.
+		if (!isFinite(v.s) || v.s <= 0) { return true; }
+		sc = Math.max(minScale(), Math.min(maxScale(), v.s));
+		if (Math.max(ext.w, ext.h) * sc < LPN_VIEW_MIN_MODEL_PX) { return false; }
+		w = svg && svg.clientWidth ? svg.clientWidth : 0;
+		h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		if (!w || !h) { return true; }
+		halfW = (w / 2) / sc; halfH = (h / 2) / sc;
+		return v.cx + halfW >= ext.minx && v.cx - halfW <= ext.maxx &&
+			v.cy + halfH >= ext.miny && v.cy - halfH <= ext.maxy;
+	}
 	function applyView(v) {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
@@ -18096,7 +18175,13 @@ var EngCalcs = EngCalcs || {};
 			? { x: saved.origin.x, y: saved.origin.y } : { x: 0, y: 0 };
 		// Consumed once, by the restoreViewOrFit() at the end of refreshAllFromDocument(). A file
 		// written before this existed has none, and gets a fit exactly as it always did.
-		pendingView = validView(saved.view) ? saved.view : null;
+		// **AND A VIEW THAT CANNOT SHOW THIS MODEL IS DECLINED HERE** (Task 628, see
+		// viewShowsModel()), which hands the document the same fit. This is the whole document's
+		// one door, and by this line everything the test needs is installed and in the drawing
+		// frame: doc.nodes, doc.links, doc.origin, and `project`, so isGeoProject() answers for the
+		// document ARRIVING rather than the one leaving. `saved.view` is in that frame too -- the
+		// projection, the rebase and the flip above all carry it.
+		pendingView = viewShowsModel(saved.view) ? saved.view : null;
 		pendingViewFor = pendingView ? library.openId : null;
 		// **A RESERVOIR WITH NO ELEVATION KEEPS HAVING NO ELEVATION** (Task 390). Back-filling one
 		// equal to the head writes a number nobody typed into a field labelled as the user's, and
