@@ -115,6 +115,19 @@ the block.
     `.inp` answer while that is still cheap to change, and spends none of the drawing-surface budget.
   - **The account number is a label on a demand, never a key into anything**, and it is the first
     personal-adjacent data in the suite: it must never reach a log row or a usage statistic.
+  - **AND IT IS NOT A CUSTOM PROPERTY, so 636 DOES NOT BLOCK THIS** (Tom, 2026-09-12: *"epanetjs.com
+    doesn't really have 'account number'. They just have the asset id, like any node, so it's not
+    absolutely necessary to have a custom property to get Customer working."*). This corrects a
+    recommendation made the same day that Task 636 land first so an account number could BE a custom
+    property. It can, later, and the gain would be real; what is wrong is treating it as the way in.
+    An asset id already identifies a meter, exactly as it identifies every other element.
+  - **CONCURRENCY: everything here except the shared field seams can run beside 636.** The three
+    places they collide are `pushSpecList()` (one source of truth for writable properties, 8
+    callers), the Properties popup's `BAND_NODE`/`RESULT_NODE`, and the Tables pane's columns. The
+    geometry -- the meter symbol, the perpendicular leader, the `linkAnchor {link, t}` handle, the
+    nearest-node lumping -- touches none of them. **Sequence only the field work; let the drawing
+    surface proceed.** Also shares the coordinate frame with Task 641, so the lumping arithmetic
+    waits on whatever 641 decides about the drawing plane.
   - **Tom ruled the open questions 2026-08-24 — `dev/customer-demands.md` §7 has all of them.** The
     two that change the build: a meter carries a **Count** (so *forty-two residential services* is
     one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
@@ -986,7 +999,15 @@ the block.
   low and high limits. **Every applicable custom property then appears everywhere an ordinary one
   does**: Properties, multi-properties, Find, Tables, Graphs. His whole specification, and the
   three things to decide before building (`.inp` has nowhere to put one):
-  `dev/custom-properties-scope.md`.
+  `dev/custom-property-scope.md`.
+  - **SINGULAR, in the database tradition** (Tom, 2026-09-12). The branch is `custom-property`, the
+    document is `dev/custom-property-scope.md`, and a table is named for the row it holds.
+  - **EMBRACE 247 but do NOT gate it.** An account number could be a custom property and the saving
+    would be real, but Tom ruled it is not the way in: an asset id already identifies a meter. Land
+    the field seams here first -- `pushSpecList()`, the popup bands, the Tables columns -- and 247's
+    geometry runs beside them.
+  - **AVOID running beside 640.** Graphs must offer a custom property in its selector, so it wants
+    this list to exist before it is written rather than to invent a second one.
 
 - 50|639| **Layers: the first heading under Map and page.**
   Tom, 2026-09-12. A Layers sub-heading under `Settings > Map and page`, ABOVE Appearance, with a
@@ -1012,6 +1033,12 @@ the block.
   - **A PROJECT CANNOT CHANGE ITS PROJECTION**, deliberately, unless an import conversion wizard is
     built: *"We don't want this to be a dabbler action."* The one door is `Open an xy file on the
     map`, which becomes **Open and convert coordinates...**.
+  - **CONCURRENCY: this and Task 636 are the safe pair, and they are running now** (Tom, 2026-09-12:
+    *"Have projection and custom property proceed at full speed."*). No shared seam was found: this
+    branch lives in the coordinate frame, the new-project box and the status bar; 636 lives in the
+    Settings box, the Properties popup, Find and the Tables pane. **Task 247 is the one to keep
+    away from** -- lumping a meter to its nearest node is arithmetic in the plane this task is
+    changing underneath it.
   - **Task 630 is the defect this feature answers** -- the map draws lat/lon as xy, which is 19.8%
     at Phoenix and 100% at 60N. Read `dev/map-projection-decision.md` first: it holds Tom's own
     architecture (store easting/northing in a stated CRS, let the drawing frame BE that plane) and

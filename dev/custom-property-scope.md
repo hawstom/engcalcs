@@ -1,4 +1,4 @@
-# Custom properties on `lpn_` elements
+# The custom property on an `lpn_` element
 
 Tom's own specification, 2026-09-12, recorded verbatim in substance because it is a DESIGN and not a
 wish. ROADMAP Task 636 is the one-line pointer at this file. Nothing here is built.
