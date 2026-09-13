@@ -1591,12 +1591,9 @@ $ec_lang['lpn_new_coords']='Coordinates';
 // as not to imply any proper names", and the same two words the File menu and the georeferencing
 // gesture already use. Do not spell either of them out here; a third wording for the same choice is
 // how a reader stops being sure they are the same choice.
-$ec_lang['lpn_new_coords_xy']='xy coordinates';
-$ec_lang['lpn_new_coords_geo']='lat/lon';
 // What each choice really means, and the fact that picking xy is not final. Said on the group
 // rather than on each radio: one tip, one "?", and the two options are only meaningful against
 // each other.
-$ec_lang['lpn_new_coords_tip']='An xy project uses coordinates that are not latitude and longitude. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File, Open an xy file on the map.';
 // The place-name field, enabled only for a latitude-and-longitude project. Optional, always: a
 // blank one makes the project and moves nothing.
 // ---- THE COORDINATE SYSTEM QUESTION, AS TOM SPECIFIED IT (Task 641 phase 2, 2026-09-13) ------
@@ -1649,9 +1646,7 @@ $ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 $ec_lang['lpn_crs_none']='Not georeferenced';
-$ec_lang['lpn_new_place']='Start near this place';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_new_place_tip']='Optional. Type a town, an address, or a landmark. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. If blank, the map starts zoomed to whole world.';
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded
 // defaults; a preference is a template FILE rather than an invisible saved setting.
 // Edited by TGH 2026-09-07
