@@ -858,7 +858,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // A field the user invents. The body is one abbreviated DESIGN TABLE, a row per
 						      // property, built by js/looped-network.js; the heading lives here with every other
 						      // sub-heading so that where a control sits is readable in one place. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_customProps"><?=$ec_lang['lpn_settings_custom_props']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_customProps"><?=ecTipLabel($ec_lang['lpn_settings_custom_props'], $ec_lang['lpn_settings_custom_props_note'])?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_custom_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
@@ -2328,13 +2328,18 @@ EngCalcs.pageConfig = {
 	lpn_cp_applies_tip: <?=json_encode($ec_lang['lpn_cp_applies_tip'])?>,
 	lpn_cp_bad_case: <?=json_encode($ec_lang['lpn_cp_bad_case'])?>,
 	lpn_cp_bad_chars: <?=json_encode($ec_lang['lpn_cp_bad_chars'])?>,
+	lpn_cp_bad_datetime: <?=json_encode($ec_lang['lpn_cp_bad_datetime'])?>,
 	lpn_cp_bad_high: <?=json_encode($ec_lang['lpn_cp_bad_high'])?>,
 	lpn_cp_bad_integer: <?=json_encode($ec_lang['lpn_cp_bad_integer'])?>,
 	lpn_cp_bad_length: <?=json_encode($ec_lang['lpn_cp_bad_length'])?>,
 	lpn_cp_bad_low: <?=json_encode($ec_lang['lpn_cp_bad_low'])?>,
+	lpn_cp_bad_minlength: <?=json_encode($ec_lang['lpn_cp_bad_minlength'])?>,
 	lpn_cp_bad_number: <?=json_encode($ec_lang['lpn_cp_bad_number'])?>,
+	lpn_cp_bad_space: <?=json_encode($ec_lang['lpn_cp_bad_space'])?>,
 	lpn_cp_design: <?=json_encode($ec_lang['lpn_cp_design'])?>,
 	lpn_cp_design_tip: <?=json_encode($ec_lang['lpn_cp_design_tip'])?>,
+	lpn_cp_edit_tip: <?=json_encode($ec_lang['lpn_cp_edit_tip'])?>,
+	lpn_cp_edit_title: <?=json_encode($ec_lang['lpn_cp_edit_title'])?>,
 	lpn_cp_flag: <?=json_encode($ec_lang['lpn_cp_flag'])?>,
 	lpn_cp_high: <?=json_encode($ec_lang['lpn_cp_high'])?>,
 	lpn_cp_high_tip: <?=json_encode($ec_lang['lpn_cp_high_tip'])?>,
@@ -2348,6 +2353,8 @@ EngCalcs.pageConfig = {
 	lpn_cp_length_tip: <?=json_encode($ec_lang['lpn_cp_length_tip'])?>,
 	lpn_cp_low: <?=json_encode($ec_lang['lpn_cp_low'])?>,
 	lpn_cp_low_tip: <?=json_encode($ec_lang['lpn_cp_low_tip'])?>,
+	lpn_cp_minlength: <?=json_encode($ec_lang['lpn_cp_minlength'])?>,
+	lpn_cp_minlength_tip: <?=json_encode($ec_lang['lpn_cp_minlength_tip'])?>,
 	lpn_cp_none: <?=json_encode($ec_lang['lpn_cp_none'])?>,
 	lpn_cp_remove: <?=json_encode($ec_lang['lpn_cp_remove'])?>,
 	lpn_cp_remove_tip: <?=json_encode($ec_lang['lpn_cp_remove_tip'])?>,
@@ -2355,15 +2362,17 @@ EngCalcs.pageConfig = {
 	lpn_cp_restrict_allow: <?=json_encode($ec_lang['lpn_cp_restrict_allow'])?>,
 	lpn_cp_restrict_deny: <?=json_encode($ec_lang['lpn_cp_restrict_deny'])?>,
 	lpn_cp_restrict_mode: <?=json_encode($ec_lang['lpn_cp_restrict_mode'])?>,
+	lpn_cp_restrict_mode_tip: <?=json_encode($ec_lang['lpn_cp_restrict_mode_tip'])?>,
 	lpn_cp_restrict_tip: <?=json_encode($ec_lang['lpn_cp_restrict_tip'])?>,
 	lpn_cp_val_camel: <?=json_encode($ec_lang['lpn_cp_val_camel'])?>,
+	lpn_cp_val_datetime: <?=json_encode($ec_lang['lpn_cp_val_datetime'])?>,
 	lpn_cp_val_hyphen: <?=json_encode($ec_lang['lpn_cp_val_hyphen'])?>,
 	lpn_cp_val_integer: <?=json_encode($ec_lang['lpn_cp_val_integer'])?>,
 	lpn_cp_val_none: <?=json_encode($ec_lang['lpn_cp_val_none'])?>,
 	lpn_cp_val_number: <?=json_encode($ec_lang['lpn_cp_val_number'])?>,
+	lpn_cp_val_number_comma: <?=json_encode($ec_lang['lpn_cp_val_number_comma'])?>,
 	lpn_cp_val_pascal: <?=json_encode($ec_lang['lpn_cp_val_pascal'])?>,
 	lpn_cp_val_snake: <?=json_encode($ec_lang['lpn_cp_val_snake'])?>,
-	lpn_cp_val_text: <?=json_encode($ec_lang['lpn_cp_val_text'])?>,
 	lpn_cp_val_upper: <?=json_encode($ec_lang['lpn_cp_val_upper'])?>,
 	lpn_cp_validate: <?=json_encode($ec_lang['lpn_cp_validate'])?>,
 	lpn_cp_validate_tip: <?=json_encode($ec_lang['lpn_cp_validate_tip'])?>,

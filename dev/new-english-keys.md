@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**72 still to read**, of 79 untranslated keys, of 1847 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**81 still to read**, of 88 untranslated keys, of 1856 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (79, 72 to read @@ NEEDS RULING)
+## lpn_  (88, 81 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -37,19 +37,22 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Add custom property
   @@ NEEDS RULING
 - **`lpn_cp_add_tip`**
-  > Adds one more row to the design table. Give it a key and a label, then choose the asset kinds that carry it.
+  > Adds one more row to the design table and opens it for editing. Give it a key and a label, then choose the asset kinds that carry it.
   @@ NEEDS RULING
 - **`lpn_cp_applies`**
   > Applies to
   @@ NEEDS RULING
 - **`lpn_cp_applies_tip`**
-  > Which asset kinds carry this property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.
+  > Applies to: These asset kinds carry the property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.
   @@ NEEDS RULING
 - **`lpn_cp_bad_case`**
   > This value does not match the capitalization this property is designed for.
   @@ NEEDS RULING
 - **`lpn_cp_bad_chars`**
   > This value uses a character this property does not allow.
+  @@ NEEDS RULING
+- **`lpn_cp_bad_datetime`**
+  > This value does not look like a date or a time.
   @@ NEEDS RULING
 - **`lpn_cp_bad_high`**
   > This value is above the high limit of this property.
@@ -63,14 +66,26 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_cp_bad_low`**
   > This value is below the low limit of this property.
   @@ NEEDS RULING
+- **`lpn_cp_bad_minlength`**
+  > This value is shorter than this property allows.
+  @@ NEEDS RULING
 - **`lpn_cp_bad_number`**
   > This property is designed to hold a number.
+  @@ NEEDS RULING
+- **`lpn_cp_bad_space`**
+  > White space is allowed only between other characters.
   @@ NEEDS RULING
 - **`lpn_cp_design`**
   > Design
   @@ NEEDS RULING
 - **`lpn_cp_design_tip`**
-  > One row per custom property, reading across: key, label, applies to, validate as, restrict characters, restrict length, low limit, high limit.
+  > One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.
+  @@ NEEDS RULING
+- **`lpn_cp_edit_tip`**
+  > Opens the design of this custom property, where every part of it is shown at full length.
+  @@ NEEDS RULING
+- **`lpn_cp_edit_title`**
+  > Custom property design
   @@ NEEDS RULING
 - **`lpn_cp_flag`**
   > {label}: {reason} The value is kept exactly as you typed it.
@@ -79,7 +94,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > High limit
   @@ NEEDS RULING
 - **`lpn_cp_high_tip`**
-  > The largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.
+  > High limit: This is the largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.
   @@ NEEDS RULING
 - **`lpn_cp_key`**
   > Key
@@ -91,25 +106,31 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Another custom property already uses that key.
   @@ NEEDS RULING
 - **`lpn_cp_key_tip`**
-  > The name this property is stored under. No spaces. A prefix is added for you so that your key can never collide with a built-in field.
+  > Key: A property is stored under this name. It takes no spaces, and a prefix is added for you so that your key can never collide with a built-in field.
   @@ NEEDS RULING
 - **`lpn_cp_label`**
   > Label
   @@ NEEDS RULING
 - **`lpn_cp_label_tip`**
-  > What a reader sees on the properties box, in Find and at the head of a table column.
+  > Label: A reader sees this on the properties box, in Find and at the head of a table column.
   @@ NEEDS RULING
 - **`lpn_cp_length`**
-  > Restrict length
+  > Most characters
   @@ NEEDS RULING
 - **`lpn_cp_length_tip`**
-  > The greatest number of characters a value may have. Leave it empty for no limit.
+  > Most characters: A longer value is flagged. Leave it empty for no limit.
   @@ NEEDS RULING
 - **`lpn_cp_low`**
   > Low limit
   @@ NEEDS RULING
 - **`lpn_cp_low_tip`**
-  > The smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.
+  > Low limit: This is the smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.
+  @@ NEEDS RULING
+- **`lpn_cp_minlength`**
+  > Fewest characters
+  @@ NEEDS RULING
+- **`lpn_cp_minlength_tip`**
+  > Fewest characters: A shorter value is flagged, which is how you find the empty and the half-typed entries. Leave it empty for no limit.
   @@ NEEDS RULING
 - **`lpn_cp_none`**
   > No custom property is designed yet.
@@ -132,11 +153,17 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_cp_restrict_mode`**
   > Allow or refuse
   @@ NEEDS RULING
+- **`lpn_cp_restrict_mode_tip`**
+  > Allow or refuse: The characters beside this are either the only ones a value may use or the ones it may not use.
+  @@ NEEDS RULING
 - **`lpn_cp_restrict_tip`**
-  > A set of characters to allow or to refuse, where the at sign stands for any letter and the number sign for any digit.
+  > Restrict characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any number, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
   @@ NEEDS RULING
 - **`lpn_cp_val_camel`**
   > camelCase
+  @@ NEEDS RULING
+- **`lpn_cp_val_datetime`**
+  > Date and time
   @@ NEEDS RULING
 - **`lpn_cp_val_hyphen`**
   > hyphen-case
@@ -148,16 +175,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Do not validate
   @@ NEEDS RULING
 - **`lpn_cp_val_number`**
-  > Number
+  > Number .
+  @@ NEEDS RULING
+- **`lpn_cp_val_number_comma`**
+  > Number ,
   @@ NEEDS RULING
 - **`lpn_cp_val_pascal`**
   > PascalCase
   @@ NEEDS RULING
 - **`lpn_cp_val_snake`**
   > snake_case
-  @@ NEEDS RULING
-- **`lpn_cp_val_text`**
-  > Text
   @@ NEEDS RULING
 - **`lpn_cp_val_upper`**
   > ALL CAPS
@@ -166,7 +193,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Validate as
   @@ NEEDS RULING
 - **`lpn_cp_validate_tip`**
-  > What a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.
+  > Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.
   @@ NEEDS RULING
 - **`lpn_crs_none`**
   > Not georeferenced
@@ -241,7 +268,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Custom properties
   @@ NEEDS RULING
 - **`lpn_settings_custom_props_note`**
-  > A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.
+  > Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.
   @@ NEEDS RULING
 - **`lpn_settings_runbox`**
   > Show the run progress box

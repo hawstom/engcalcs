@@ -975,9 +975,10 @@ the block.
 
 - 50|636| **A custom properties UI, designed in a table.**
   Tom, 2026-09-12, in full: a Custom properties heading under `Settings > Assets`, every property
-  one row of an abbreviated design table, added and removed like demand categories and edited in
-  place like a spreadsheet -- key, label, applies-to, validation, character restriction, length,
-  low and high limits. **Every applicable custom property then appears everywhere an ordinary one
+  one row of an abbreviated design table, added and removed like demand categories -- key, label,
+  applies-to, validation, character restriction, length, low and high limits. **The pane SHOWS a
+  truncated design and a POPUP edits it** (his revision 5 of eleven, 2026-09-13, confirming his own
+  original specification and reversing what phase 1 built). **Every applicable custom property then appears everywhere an ordinary one
   does**: Properties, multi-properties, Find, Tables, Graphs. His whole specification, and the
   three things to decide before building (`.inp` has nowhere to put one):
   `dev/custom-property-scope.md`.
@@ -989,6 +990,9 @@ the block.
     into a feature, *"a beautiful exploration tool. You change the constraints just to do a bit of
     data entry error checking."* `Validate as` also gains a **Don't validate** entry, which the
     original spec did not have.
+  - **PHASE 1 AND HIS ELEVEN NUMBERED REVISIONS OF IT BOTH SHIPPED 2026-09-13.** What is left is
+    Graphs, the `.inp` `;@key=value` comment convention, and the validation-regexp door revision 6
+    deliberately left shut. The revisions are folded into `dev/custom-property-scope.md`.
   - **SINGULAR, in the database tradition** (Tom, 2026-09-12). The branch is `custom-property`, the
     document is `dev/custom-property-scope.md`, and a table is named for the row it holds.
   - **EMBRACE 247 but do NOT gate it.** An account number could be a custom property and the saving
