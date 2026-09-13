@@ -1,7 +1,7 @@
 # Translation sprint 251 — `lpn_` promotion + consent/privacy/terms
 
 You are translating the EngCalcs hydraulic-engineering calculator suite into ONE language.
-Repo root: `/var/www/cnm/public_html/hawsedc/engcalcs`
+Repo root: `~/webdev/hawsedc.com/engcalcs`
 
 ## Your two files
 
