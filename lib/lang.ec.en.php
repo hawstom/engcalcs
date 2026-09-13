@@ -1041,6 +1041,13 @@ $ec_lang['lpn_result_avg_concentration']='Average concentration';
 // dimensionless Darcy-Weisbach f the head loss along this link works out to, whichever friction
 // method produced the loss, so it has no unit and never crosses one.
 $ec_lang['lpn_result_friction_factor']='Friction factor';
+// **EPANET'S OWN COLUMN NAME, AND THE FIFTH OF ITS LINK REPORT COLUMNS** (ROADMAP Task 652). Not a
+// plainer synonym: reaction rate is the term of art an engineer reads on a report, and the number
+// shown IS EPANET's own, read off the binary output file it prints that report from. One key and
+// no tip beside it, because a link result has no popup row to hang one on -- the two facts a
+// reader needs (that it is a MAGNITUDE, and that its unit is the stated concentration per day) are
+// carried by the unit mark the legend prints and by dev/water-quality.md until there is a row.
+$ec_lang['lpn_result_reaction_rate']='Reaction rate';
 $ec_lang['lpn_result_status']='Status';
 $ec_lang['lpn_result_status_open']='Open';
 $ec_lang['lpn_result_status_closed']='Closed';

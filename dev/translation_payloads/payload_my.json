@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1868,
-        "delta_key_count": 108,
+        "expected_key_count": 1869,
+        "delta_key_count": 109,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -525,6 +525,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -635,6 +636,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -865,6 +867,22 @@
             }
         },
         "lpn_result_friction_factor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "ဤနေရာသို့ ရောက်ရှိသော ရေထဲမှ မည်မျှသည် ခြေရာခံနေရာမှ လာသနည်း ဆိုသည်ကို ပြသသည်။ ၎င်းသည် ရင်းမြစ် ခြေရာခံမှု ခွဲခြမ်းစိတ်ဖြာမှုက အစီရင်ခံသည့်အရာ ဖြစ်သည်။",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "ဖိမြင့်ဆင့်",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_reaction_rate": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

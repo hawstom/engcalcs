@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**98 still to read**, of 105 untranslated keys, of 1868 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**99 still to read**, of 106 untranslated keys, of 1869 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (105, 98 to read @@ NEEDS RULING)
+## lpn_  (106, 99 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -305,6 +305,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_result_friction_factor`**
   > Friction factor
+  @@ NEEDS RULING
+- **`lpn_result_reaction_rate`**
+  > Reaction rate
   @@ NEEDS RULING
 - **`lpn_result_status`**
   > Status

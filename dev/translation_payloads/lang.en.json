@@ -708,6 +708,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -1870,7 +1871,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1868,
+    "count": 1869,
     "active_prefixes": [
         "about",
         "bpn",

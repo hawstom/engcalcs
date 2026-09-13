@@ -149,7 +149,8 @@ Built 2026-09-03 (Task 566). Against the six-item list this section used to carr
    with the transport broken. Re-run at a 10 s quality step so the answer is the physics rather than
    one lucky discretisation.
 
-**Still not built, deliberately:** a link-level quality result -- see the section below.
+**And the link half shipped after it:** an average quality, a friction factor and a status under
+Task 638, and the REACTION RATE under Task 652 -- see the two sections at the end of this file.
 
 ---
 
@@ -186,7 +187,73 @@ popup's result row, the Tables heading (`c.unitText`) and the colour legend
 RTL reader. The gradient's `gradientSuffix()` was already living on this split; this generalises it
 rather than inventing it.
 
-## Link quality: DECLINED, with the reasons (2026-09-04)
+## The reaction rate: EPANET'S OWN NUMBER, off its binary output file (Task 652, 2026-09-13)
+
+EPANET reports five link columns and this page shipped four of them under Task 638. The fifth was
+left out, correctly at the time and for a reason worth keeping: **the toolkit's `LinkProperty` enum
+stops at `LinkQual`, so there is no getter**, and where a friction factor is the definition of head
+loss rearranged, a reaction rate is a MODEL -- a bulk term, a wall term, and a mass-transfer
+coefficient off a Sherwood correlation. Writing our own would have been inventing arithmetic nothing
+checks, which is the one thing this repository will not do with a number.
+
+**The door that was missed is the BINARY OUTPUT FILE.** EPANET fills `qual->PipeRateCoeff[k]` in
+`reactpipes()` (`src/qualreact.c`) and writes it as the seventh of eight per-link series in
+`linkoutput()` (`src/output.c`, `case REACTRATE`) -- the very array its own `.rpt` link table prints
+from. The vendored `epanet-js` 0.9.0 already exports `readBinary()` and names that series
+`reactionRate`. **So no arithmetic of ours is on the path, and no upstream contribution was needed**
+-- `dev/reaction-rate-upstream.md` records what a pull request would have been, and why it is moot.
+
+- **The cost is one file, and it is asked for only when it can be answered.** `initQ(EN_SAVE)` is
+  what writes `eps.out` at all, and `PipeRateCoeff` stays at zero unless `Qualflag == CHEM` -- so an
+  age run and a source trace would pay for the whole file and get a column of zeros. Chemical only.
+  **Measured on Net3 over 24 hours at a 5 minute reporting step** (289 periods, 119 links): a
+  1.56 MB output file, 11 ms to read it back and **234 ms in `readBinary()`**, which materialises
+  all eight series for every link and all four for every node. It scales with links times periods,
+  so a utility-scale network at a fine reporting step would pay seconds of it on the main thread
+  after the progress bar has already finished. **That is this approach's known weakness**, written
+  down rather than left to be rediscovered. The cheap fix if it bites is to read the seventh series
+  out of the file rather than every series; the expensive one is a worker. Neither was done on
+  speculation, and using the library's own reader is what keeps the file format somebody else's
+  opinion rather than a second one of ours.
+- **It is a MAGNITUDE, in the stated concentration per DAY.** `reactpipes()` accumulates
+  `fabs(c_new - c_old)`, so a residual decaying at 2.5 and one growing at 2.5 report the same
+  number, and `SECperDAY` fixes the time basis whatever the flow units are. Both are EPANET's own
+  decisions and neither is ours to change. **That gives this page a THIRD quality unit** beside the
+  age's time and the source share's bare `%`: `reactionRateUnitText()` is the document's own
+  concentration label plus the `elapsed_time` family's already-translated `day`, so no new unit key
+  was written and no factor exists to get wrong.
+- **Pipes only, and the gate is EPANET'S TYPE rather than our document's word.** `reactpipes()` is
+  written `if (Link[k].Type != PIPE) continue;`, so a pump, a valve and even a CVPipe get a run of
+  zeros. Left UNDEFINED here rather than carried as 0: EPANET did not compute a rate for those, and
+  a 0 reads as one that it did. **The two really can disagree** -- a pump with no curve is written by
+  our own exporter as a short fat PIPE, which EPANET then reacts, correctly; reading the type out of
+  the binary file is what makes the engine's answer the one that stands.
+- **Anchored three ways** (`dev/lpn-spike/reaction-rate-harness.js`):
+  1. **Against EPANET's own printed `.rpt`**, every pipe at every reporting period, by handing the
+     page's own exported `.inp` to a separate Workspace with nothing added but a `[REPORT]` section.
+     **26 comparisons, worst 0.0035** against the report's own two-decimal precision of 0.005 -- the
+     bound is the report's and not one anybody chose.
+  2. **Against the published model, recomputed in the harness from the manual** -- first-order bulk
+     plus a wall term limited by mass transfer, with the Sherwood correlation and the Schmidt
+     number. **Worst 0.0043%.** Leg 1 alone would pass if our reader and EPANET's writer agreed
+     about a number that meant something else entirely; this says the quantity is the one the water
+     quality chapter defines. That arithmetic lives in the harness and is never shipped.
+     *(It is available only because a first-order rate is LINEAR in concentration, so the mean of
+     the rate is the rate at the mean and the engine's own average quality is enough to check it.
+     It would not hold at second order or under a limiting potential.)*
+  3. **Against frame alignment**, with a run still changing at every step and a non-zero report
+     start -- the one arrangement in which EPANET's period index and this page's frame list could
+     drift apart. Both legs above pass with every rate hung on the wrong frame, because a settled
+     run reports the same number for ever.
+
+  Mutation-tested: a 0.1% scaling, a dropped type gate and a one-period shift each turn the file red.
+- **On screen it is a symbology and label field only**, like the other three: `COLOR_LINK_FIELDS`,
+  `COLOR_FIELD_ORDER` and `linkFieldDefs()`. There is no link result popup to hang a tip on, so the
+  two facts a reader needs -- that it is a magnitude, and that its basis is per day -- are carried by
+  the unit mark and by this file. **Where the magnitude disclosure belongs is the open question**,
+  and it is Tom's.
+
+## Link quality: DECLINED, with the reasons (2026-09-04) -- SUPERSEDED by Task 638
 
 EPANET reports a quality for a LINK as well as for a node, and the bridge captures nodes only. It
 stays that way, and this is the record so it is not re-proposed as an oversight:

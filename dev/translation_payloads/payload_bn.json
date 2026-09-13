@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1868,
-        "delta_key_count": 106,
+        "expected_key_count": 1869,
+        "delta_key_count": 107,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -524,6 +524,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -632,6 +633,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -860,6 +862,22 @@
             }
         },
         "lpn_result_friction_factor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "এই বিন্দুতে পৌঁছানো পানির কতটা ট্রেস নোড থেকে এসেছে। এটিই উৎস ট্রেস বিশ্লেষণ যা জানায়।",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "জলশীর্ষ",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_reaction_rate": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

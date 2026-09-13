@@ -86,8 +86,9 @@
 		// standing in the link at the moment the quality clock is on, and what the number MEANS is
 		// whatever [OPTIONS] Quality asked for -- HOURS for water age, PERCENT for a source share,
 		// the chemical's own stated unit for a concentration. It is the only quality quantity the
-		// toolkit exposes for a link; a reaction rate and a friction factor appear in EPANET's
-		// binary output and in a full report table and have no getter at all.
+		// toolkit exposes for a link. A friction factor and a REACTION RATE have no getter at all --
+		// both live in the binary output file and in a full report table, and that is where the
+		// reaction rate is now read from (Task 652; see the rateOn note inside lpnEpanetRun).
 		EN_LINKQUAL = 14,
 		EN_PUMP_EFFIC = 17;
 
@@ -1620,6 +1621,52 @@
 					// not either.
 					qualOn = EngCalcs.lpnQualityRuns(model.quality),
 					qualityIsAge = qualOn && (model.quality || {}).mode === 'age',
+					/**
+					 * **THE REACTION RATE IS EPANET'S OWN NUMBER, READ OUT OF EPANET'S OWN BINARY
+					 * OUTPUT FILE** (ROADMAP Task 652). Nothing on this page computes it, and
+					 * nothing here may learn to.
+					 *
+					 * The toolkit's `LinkProperty` enum stops at `LinkQual`, so there is no getter,
+					 * which is why this page shipped a friction factor and no reaction rate: an f is
+					 * the DEFINITION of head loss rearranged, where a reaction rate is a MODEL, and
+					 * deriving the second would have been inventing arithmetic nothing checks.
+					 * **The binary `.out` file is the door that was missed.** EPANET fills
+					 * `qual->PipeRateCoeff[k]` in `reactpipes()` (`src/qualreact.c`) as the
+					 * volume-weighted mean of `fabs(c_new - c_old)` over the parcels standing in the
+					 * pipe, divided by the quality step and scaled by `SECperDAY`; it writes that
+					 * array as the seventh of eight per-link series in `linkoutput()`
+					 * (`src/output.c`, `case REACTRATE`), which is the very array its own `.rpt`
+					 * link table prints from. The vendored wrapper already exports a reader for that
+					 * file -- `readBinary()` -- and names the series `reactionRate`. So the number
+					 * this page shows and the number in EPANET's report are one value out of one
+					 * array, not two implementations that happen to agree.
+					 *
+					 * **IT IS A MAGNITUDE AND IT IS IN mass/L/day**, both EPANET's own decisions:
+					 * the `fabs` is in the line above and the `SECperDAY` beside it, so a decaying
+					 * chlorine and a growing one report the same sign. Say so wherever it is shown.
+					 *
+					 * **ASKED FOR ONLY WHEN IT CAN BE ANSWERED, AND THE COST IS MEASURED.** Saving the
+					 * output makes EPANET write every node and link series for every reporting period,
+					 * and `PipeRateCoeff` stays at zero unless `Qualflag == CHEM` -- so a water age or a
+					 * source trace would pay for the whole file and get a column of zeros.
+					 *
+					 * **MEASURED 2026-09-13, on Net3 over 24 hours at a 5 minute reporting step** (289
+					 * periods, 119 links, 97 nodes): a 1.56 MB output file, 11 ms to read it out of the
+					 * engine's filesystem and **234 ms in readBinary()**, which materialises all eight
+					 * series for every link and all four for every node. It scales with links times
+					 * periods, so a utility-scale network at a fine reporting step would pay seconds of
+					 * it, on the main thread, at the end of a run -- and the run's own progress bar has
+					 * already finished by then. **That is the known weakness of this approach** and the
+					 * reason the measurement is written down rather than left to be rediscovered. The
+					 * cheap fix if it ever bites is to read the seventh series out of the file directly
+					 * instead of every series out of it; the expensive one is a worker. Neither was done
+					 * on speculation, and using the library's own reader is what keeps the file format
+					 * somebody else's opinion rather than a second one of ours.
+					 */
+					rateOn = qualOn && (model.quality || {}).mode === 'chemical',
+					// The bytes of `eps.out`, read in shutdown() beside the report and for the same
+					// reason: closing is what flushes the last period to the engine's filesystem.
+					outBytes = null,
 					// The two passes share one progress bar, so each owns half of it. Both are the
 					// same walk over the same duration, which is the only reason a flat half-and-half
 					// split is honest rather than a guess.
@@ -1637,6 +1684,12 @@
 					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
 					try { p.close(); } catch (e) { /* already torn down */ }
 					try { txt = ws.readFile('eps.rpt') || ''; } catch (e) { txt = ''; }
+					// The same flush, the same moment, the other file. Wrapped on its own rather
+					// than sharing the report's catch: a build whose filesystem cannot hand back
+					// the binary must still hand back the report.
+					if (rateOn) {
+						try { outBytes = ws.readFile('eps.out', 'binary') || null; } catch (e) { outBytes = null; }
+					}
 					return txt;
 				}
 				function tell(frac) {
@@ -1719,8 +1772,65 @@
 							if (firstBadT === null) { firstBadT = tNow; }
 						}
 					}
+					/**
+					 * **THE REACTION RATE OFF EPANET'S BINARY OUTPUT, ONTO THE FRAMES THAT ALREADY
+					 * EXIST** (Task 652). Called once, after shutdown() has flushed `eps.out`.
+					 *
+					 * **PERIOD i IS FRAME i, AND THAT IS ASSERTED RATHER THAN ASSUMED.** EPANET
+					 * writes one period per reporting instant from `Rstart` on, and isReportTime()
+					 * walks the identical grid, so the two lists are the same instants in the same
+					 * order -- but they are produced by two different loops, so a length that
+					 * disagrees means one of them is not the grid we think it is. **A disagreement
+					 * fills NOTHING**, because a rate hung on the wrong frame is a wrong answer
+					 * rather than a missing one, and this page's own rule is that a value it cannot
+					 * stand behind is simply absent.
+					 *
+					 * A pump and a valve are not pipes, and `reactpipes()` skips them -- their
+					 * series is a run of zeros. Left undefined here rather than carried as 0: a
+					 * zero-length link holds no water, so it has no rate, and 0 reads as one.
+					 */
+					function fillReactionRates() {
+						var parsed, links, k, per, l, frame, series,
+							// **THE PIPE TYPE IS ASKED FOR, NOT ASSUMED TO BE 1.** It is EPANET's own enum
+							// value and the wrapper publishes it, so a build that does not is one whose
+							// numbering we cannot vouch for -- and reading the series with a guessed
+							// type would put a rate on a pump. No rate at all is honest there.
+							pipeType = mod.LinkType && mod.LinkType.Pipe;
+						if (!rateOn || !outBytes || typeof mod.readBinary !== 'function') { return; }
+						if (typeof pipeType !== 'number') { return; }
+						try { parsed = mod.readBinary(outBytes); } catch (e) { return; }
+						links = parsed && parsed.results && parsed.results.links;
+						if (!links || !parsed.prolog) { return; }
+						if (parsed.prolog.reportingPeriods !== frames.length) { return; }
+						for (k = 0; k < links.length; k++) {
+							l = links[k];
+							series = l && l.reactionRate;
+							if (!series) { continue; }
+							// **EPANET'S OWN GATE, NOT A SECOND OPINION BUILT OUT OF OUR DOCUMENT.**
+							// `reactpipes()` is written `if (Link[k].Type != PIPE) continue;`, so
+							// the engine reacts EXACTLY the links whose type is Pipe and writes a
+							// run of zeros for every other one. A pump and a valve hold no water,
+							// and so does a check-valve pipe as far as this array is concerned --
+							// CVPipe is a type of its own in that enum and the engine skips it.
+							// Left undefined rather than carried as 0: EPANET did not compute a
+							// rate for these, and a 0 reads as one that it did.
+							if (l.type !== pipeType) { continue; }
+							for (per = 0; per < frames.length && per < series.length; per++) {
+								frame = frames[per];
+								if (!frame) { continue; }
+								if (!frame.linkRates) { frame.linkRates = {}; }
+								// **NOT CONVERTED, AND THAT IS NOT AN OMISSION.** It is a
+								// concentration per day, and a concentration is the one quantity on
+								// this bridge that has no factor on either side (see the [QUALITY]
+								// note above). The `day` is EPANET's, fixed, and is named in the
+								// heading rather than scaled away.
+								frame.linkRates[l.id] = series[per];
+							}
+						}
+					}
 					function done() {
 						var report = shutdown();
+						fillReactionRates();
 						seen = 1;
 						tell(1);
 						resolve({
@@ -1807,7 +1917,10 @@
 							// the precondition, not tidying up.
 							p.closeH();
 							p.openQ();
-							p.initQ(EN_NOSAVE);
+							// EN_SAVE here is what writes `eps.out` at all -- see the rateOn note
+							// above. It is the entire cost of the reaction rate, and it buys
+							// EPANET'S OWN number in place of one of ours.
+							p.initQ(rateOn ? EN_SAVE : EN_NOSAVE);
 						} catch (e) { failed(e); return; }
 						phase0 = 0.5; phaseSpan = 0.5; t = 0; guard = 0;
 						qslice();

@@ -1886,6 +1886,7 @@ EngCalcs.pageConfig = {
 	lpn_result_avg_source_share: <?=json_encode($ec_lang['lpn_result_avg_source_share'])?>,
 	lpn_result_avg_concentration: <?=json_encode($ec_lang['lpn_result_avg_concentration'])?>,
 	lpn_result_friction_factor: <?=json_encode($ec_lang['lpn_result_friction_factor'])?>,
+	lpn_result_reaction_rate: <?=json_encode($ec_lang['lpn_result_reaction_rate'])?>,
 	lpn_result_status: <?=json_encode($ec_lang['lpn_result_status'])?>,
 	lpn_result_status_open: <?=json_encode($ec_lang['lpn_result_status_open'])?>,
 	lpn_result_status_closed: <?=json_encode($ec_lang['lpn_result_status_closed'])?>,

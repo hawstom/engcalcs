@@ -8,9 +8,12 @@
 // anything the quality run produced. `linkFieldDefs()` had the same gap. EPANET colours a link by
 // its average quality, its reaction rate, its friction factor and its status, and a node by its
 // quality and its initial quality; three of those four link fields and the missing node one are
-// what this file asserts. (The reaction rate is NOT here and is not shipped: the vendored toolkit's
-// LinkProperty enum stops at LinkQual, so EPANET exposes no getter for it, and deriving one would
-// mean writing mass-transfer arithmetic of our own. See the report on Task 638.)
+// what this file asserts. (The REACTION RATE shipped separately under Task 652 and is asserted in
+// dev/lpn-spike/reaction-rate-harness.js. What stood here -- that it could not ship because the
+// toolkit exposes no getter and deriving one would mean writing mass-transfer arithmetic of our
+// own -- was right about the getter and wrong about the conclusion: EPANET writes the number into
+// its BINARY OUTPUT FILE, the wrapper already exports a reader for it, and nothing had to be
+// derived.)
 //
 // **THE UNIT IS THE TRAP, NOT THE LIST, AND IT IS WHY THIS FILE IS MOSTLY ABOUT UNITS.** One
 // quality field means three different quantities depending on `settings.quality.mode`:

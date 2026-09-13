@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1868,
-        "delta_key_count": 105,
+        "expected_key_count": 1869,
+        "delta_key_count": 106,
         "exempt_key_count": 42,
         "exempt_keys": [
             "u_imgd",
@@ -535,6 +535,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -642,6 +643,7 @@
         "lpn_result_avg_source_share": "Average source share",
         "lpn_result_avg_concentration": "Average concentration",
         "lpn_result_friction_factor": "Friction factor",
+        "lpn_result_reaction_rate": "Reaction rate",
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
@@ -869,6 +871,22 @@
             }
         },
         "lpn_result_friction_factor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_source_share_tip",
+                    "value": "Quanto da água que chega a este ponto veio do nó de rastreamento. É isso que a análise Rastreamento de origem informa.",
+                    "english": "How much of the water reaching this point came from the trace node. This is what the Source trace analysis reports."
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "Carga",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_result_reaction_rate": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

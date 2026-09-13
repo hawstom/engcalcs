@@ -134,6 +134,13 @@
 			// namespaces, and one map keyed on both is a collision waiting for a network that
 			// names a pipe after a junction.
 			linkQualities: f.linkQualities,
+			// **EPANET'S OWN REACTION RATE PER PIPE** (Task 652), read off its binary output file
+			// rather than computed here or anywhere else -- js/lpn-epanet.js's fillReactionRates()
+			// carries the whole argument. Present only under a CHEMICAL analysis, and only on links
+			// the engine's own reactpipes() reacted, so a pump, a valve and a check-valve pipe carry
+			// no entry at all rather than a zero. It rides beside linkQualities for the same
+			// namespace reason and under the same `qualityMode`.
+			linkRates: f.linkRates,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
 			demands: f.demands, levels: f.levels, statuses: f.statuses, t: f.t

@@ -344,16 +344,18 @@ the block.
     difficulty is ACQUISITION, which is the "node fat" item above reached independently.
 
 - 100|638| **Node and link symbology do not offer the chemical properties.**
-  **MOSTLY SHIPPED 2026-09-13; THE REACTION RATE IS WHAT IS LEFT.** Node symbology now offers
+  **THE FIELDS ALL SHIPPED 2026-09-13; ONE LEGEND QUESTION IS WHAT IS LEFT.** Node symbology offers
   quality and initial quality; link symbology offers average quality, friction factor and status,
   coloured AND labelled, in both `COLOR_*_FIELDS` and `nodeFieldDefs()`/`linkFieldDefs()`.
   `dev/lpn-spike/chemical-symbology-harness.js`, 40 assertions off a real EPS run.
-  - **THE REACTION RATE IS NOT SHIPPABLE FROM THE TOOLKIT AND THAT IS THE FINDING.** The vendored
-    engine's `LinkProperty` enum ends at `LinkQual` (14) -- EPANET exposes NO getter for it, carrying
-    it only in the binary `.out` file and a full `.rpt` table. Shipping it means writing a binary
-    output parser, or inventing mass-transfer arithmetic of our own, which is the class this project
-    refuses. **The friction factor needed neither and that is why it shipped**: `f = 2gD h_f/(L V^2)`
-    is the definition, back-computed as EPANET's own report back-computes it, for any method.
+  - **THE REACTION RATE SHIPPED TOO, UNDER TASK 652, AND WHAT STOOD HERE WAS WRONG.** This block
+    said it was not shippable from the toolkit, on the ground that `LinkProperty` ends at `LinkQual`
+    and the only alternatives were a binary parser or mass-transfer arithmetic of our own. The enum
+    finding is correct; the conclusion was not. **EPANET writes the number into its binary output
+    file and the vendored wrapper already exports a reader for it** (`readBinary()`, series
+    `reactionRate`), so nothing was derived and nothing upstream was needed. The general lesson is
+    worth more than the feature: the question that answers this is not *what does the API expose?*
+    but *what does the engine WRITE?* -- an engine with a report has a report to read.
   - A link's average quality **was never read from the engine at all** before this; `EN_LINKQUAL`
     is now harvested in `js/lpn-epanet.js` and carried through `js/lpn-time.js` as its own map,
     because link ids and node ids are two namespaces.
