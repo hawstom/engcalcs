@@ -2470,15 +2470,22 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    copying a string; these were three sizes in three places, two of them inline in JS. */
 .lpn-set-note, .lpn-rp-credit { font-size: .85em; opacity: .8; }
 .lpn-set-note { margin: 2px 0 4px; }
-/* Custom properties (ROADMAP Task 636): the abbreviated DESIGN TABLE under Settings > Assets.
-   One heading over the whole block rather than eight over eight three-letter cells, so the point
-   of the table -- reading twenty designs at once -- survives. Cells are narrow on purpose; a text
-   input shows its full value when the caret is in it. */
+/* Custom properties (ROADMAP Task 636): the DESIGN SUMMARY under Settings > Assets, which reads
+   and never edits -- the form itself is a popup (Tom, 2026-09-13). Every heading and every cell is
+   truncated HERE, in one ellipsis rule, rather than sliced to three letters in code: a slice is
+   made in English, and "Val" is not the first three letters of anything a Turkish or Hindi reader
+   would recognise. The key is the one column with no limit on it, because the key is the identity
+   the whole row is filed under. */
 .lpn-cp-head { font-weight: 600; opacity: 1; }
 .lpn-cp-table { border-collapse: collapse; font-size: .85em; }
-.lpn-cp-table td { padding: 1px 2px; }
-.lpn-cp-table input, .lpn-cp-table select { font-size: 1em; max-width: 9em; }
-.lpn-cp-remove { font-size: 1em; padding: 0 .4em; }
+.lpn-cp-table td, .lpn-cp-table th { padding: 1px 2px; text-align: left; vertical-align: bottom; }
+.lpn-cp-table th { font-weight: 600; white-space: nowrap; }
+.lpn-cp-th-text, .lpn-cp-cell {
+	display: inline-block; max-width: 4.5em;
+	overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom;
+}
+.lpn-cp-cell-key { max-width: none; }
+.lpn-cp-remove, .lpn-cp-edit { font-size: 1em; padding: 0 .4em; }
 /* **A VALUE THAT BREAKS ITS OWN DESIGN IS FLAGGED IN PLACE AND NEVER CLEARED** (Tom, 2026-09-13:
    tightening a limit is a way of ASKING a question about the data). The outline says which cells
    answer the question; the value underneath it is untouched. */

@@ -3335,7 +3335,53 @@ var EngCalcs = EngCalcs || {};
 	}
 	function customPropIsNumeric(def) {
 		var v = def && def.validate;
-		return v === 'number' || v === 'integer';
+		return v === 'number' || v === 'number_comma' || v === 'integer';
+	}
+	/**
+	 * **THE NUMBER THIS DESIGN SAYS THE VALUE IS, OR NaN.** Two numeric types, told apart by the
+	 * decimal mark (Tom, 2026-09-13: *"make Number into 'Number .', and add also a 'Number ,'"*).
+	 *
+	 * **THE OTHER MARK IS REFUSED RATHER THAN IGNORED**, and that is the whole point of the split:
+	 * a property designed as `Number ,` that quietly accepted `1.5` would read it as one and a
+	 * half in a region where it means one thousand five hundred, and nobody would ever see the
+	 * disagreement. Refusing it FLAGS the value and keeps the bytes, which is what every other
+	 * rule here does.
+	 */
+	function customPropNumberOf(def, raw) {
+		var t = String(raw === undefined || raw === null ? '' : raw).trim(),
+			comma = def && def.validate === 'number_comma',
+			other = comma ? '.' : ',';
+		if (t === '' || t.indexOf(other) >= 0) { return NaN; }
+		if (comma) { t = t.replace(',', '.'); }
+		if (!/^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(t)) { return NaN; }
+		return Number(t);
+	}
+	/**
+	 * **COULD THIS BE A DATE OR A TIME AT ALL?** One type called "Date and time" and deliberately
+	 * permissive (Tom, 2026-09-13: *"we simply say 'Date and time' and then we internally do our
+	 * magic to flag any values that do not look to us like any possible date and time
+	 * expression"*). It is not a parser and must not become one: a date is written a dozen ways
+	 * across the 27 languages this suite ships in, and a rule tight enough to pick one of them
+	 * would flag four hundred correct entries in somebody else's region.
+	 *
+	 * So the question asked is the negative one -- what could not be a date or a time under any
+	 * convention -- and that is a value with no digit in it, a value carrying a character no date
+	 * or time expression uses, or digits with nothing date-shaped or time-shaped about them.
+	 *
+	 * **THE DOOR LEFT OPEN, AND IT IS NOT BUILT:** Tom's own next step if this proves too loose is
+	 * to expose the rules as validation regular expressions in Settings, below Design. Nothing
+	 * here should harden until he asks for that, because a stricter default and a regexp box are
+	 * answers to the same complaint and only one of them is his.
+	 */
+	function customPropDatetimeOk(raw) {
+		var t = String(raw === undefined || raw === null ? '' : raw).trim();
+		if (!/\d/.test(t)) { return false; }
+		if (!/^[0-9A-Za-z:\/\-.,+ ]+$/.test(t)) { return false; }
+		if (/\d\s*[-\/.]\s*\d/.test(t)) { return true; }    // 2026-09-13, 9/13/2026, 13.09.2026
+		if (/\d\s*:\s*\d/.test(t)) { return true; }          // 14:30, 2:05 pm
+		if (/[A-Za-z]{3}/.test(t)) { return true; }          // 13 September 2026, Sep 13, 2026 T, Z
+		if (/^\d{4,8}$/.test(t)) { return true; }            // 2026, 20260913
+		return isFinite(Date.parse(t));
 	}
 	// One character against a restriction set, where `@` stands for any letter and `#` for any
 	// digit -- the scope document's own shorthand, so `@#.-_` is "letters, digits, dot, hyphen and
@@ -3362,20 +3408,39 @@ var EngCalcs = EngCalcs || {};
 		s = (value === undefined || value === null) ? '' : String(value);
 		if (s === '') { return null; }
 		if (customPropIsNumeric(def)) {
-			n = Number(s);
-			if (s.trim() === '' || !isFinite(n)) { return pc.lpn_cp_bad_number || 'This property is designed to hold a number.'; }
+			n = customPropNumberOf(def, s);
+			if (!isFinite(n)) { return pc.lpn_cp_bad_number || 'This property is designed to hold a number.'; }
 			if (def.validate === 'integer' && Math.floor(n) !== n) { return pc.lpn_cp_bad_integer || 'This property is designed to hold a whole number.'; }
+		} else if (def.validate === 'datetime') {
+			if (!customPropDatetimeOk(s)) { return pc.lpn_cp_bad_datetime || 'This value does not look like a date or a time.'; }
 		} else if (LPN_CP_CASE_RE[def.validate]) {
 			re = LPN_CP_CASE_RE[def.validate];
 			if (!re.test(s)) { return pc.lpn_cp_bad_case || 'This value does not match the capitalization this property is designed for.'; }
 		}
 		if (def.restrict) {
+			// **WHITE SPACE ONLY BETWEEN OTHER CHARACTERS** (Tom, 2026-09-13, revision 10, and his
+			// reason is the user's satisfaction rather than ours): a leading or trailing space is
+			// invisible on the screen and turns up later as two values that look identical and
+			// sort apart. Held HERE, inside the character restriction, because that is where the
+			// tip states it and because a property nobody restricted is a property whose owner has
+			// asked us not to have opinions about its text.
+			if (/^\s|\s$/.test(s)) {
+				return pc.lpn_cp_bad_space || 'White space is allowed only between other characters.';
+			}
 			for (i = 0; i < s.length; i++) {
 				ok = customPropCharInSet(String(def.restrict), s.charAt(i));
 				if (def.restrictMode === 'deny' ? ok : !ok) {
 					return pc.lpn_cp_bad_chars || 'This value uses a character this property does not allow.';
 				}
 			}
+		}
+		// **A FEWEST AND A MOST** (Tom, 2026-09-13, revision 9: *"Good for dates and datetimes and
+		// finding empty or partial entries."*). The minimum FLAGS a short value and never pads it,
+		// which is the same promise the whole of this function makes: a blank is still not a
+		// failure, because a blank says the asset states nothing.
+		lim = Number(def.minLength);
+		if (def.minLength !== '' && def.minLength !== null && def.minLength !== undefined && isFinite(lim) && lim > 0 && s.length < lim) {
+			return pc.lpn_cp_bad_minlength || 'This value is shorter than this property allows.';
 		}
 		lim = Number(def.maxLength);
 		if (def.maxLength !== '' && def.maxLength !== null && def.maxLength !== undefined && isFinite(lim) && lim > 0 && s.length > lim) {
@@ -3386,7 +3451,7 @@ var EngCalcs = EngCalcs || {};
 		// findCollator()'s answer and not UTF-16 code-unit order -- the same argument Task 598
 		// makes about Above and Below in Find.
 		cmp = function (a, b) {
-			if (customPropIsNumeric(def)) { return Number(a) - Number(b); }
+			if (customPropIsNumeric(def)) { return customPropNumberOf(def, a) - customPropNumberOf(def, b); }
 			return findCollator().compare(String(a), String(b));
 		};
 		if (def.low !== '' && def.low !== null && def.low !== undefined && cmp(s, def.low) < 0) {
@@ -3419,6 +3484,42 @@ var EngCalcs = EngCalcs || {};
 			target.removeAttribute('title');
 		}
 		return problem;
+	}
+	// **THE OPTION LISTS LIVE ONCE**, because two readers now ask what a design says: the popup
+	// that EDITS it and the truncated summary row in Settings that SHOWS it. Two copies of these
+	// lists would be two chances for the table to name a rule the form cannot set.
+	//
+	// **THERE IS NO `Text` TYPE ANY MORE** (Tom, 2026-09-13, revision 7: *"I suppose that the Text
+	// validation type was really 'Do not validate'. We can remove it. It has no other useful
+	// meaning since everything is text."*). A document that still states it validates as nothing,
+	// which is what it always did -- LPN_CP_CASE_RE never had a `text` row -- so no migration is
+	// owed and none is written.
+	function customPropValidateOptions() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			['none', pc.lpn_cp_val_none || 'Do not validate'],
+			['number', pc.lpn_cp_val_number || 'Number .'],
+			['number_comma', pc.lpn_cp_val_number_comma || 'Number ,'],
+			['integer', pc.lpn_cp_val_integer || 'Integer'],
+			['datetime', pc.lpn_cp_val_datetime || 'Date and time'],
+			['upper', pc.lpn_cp_val_upper || 'ALL CAPS'],
+			['camel', pc.lpn_cp_val_camel || 'camelCase'],
+			['pascal', pc.lpn_cp_val_pascal || 'PascalCase'],
+			['snake', pc.lpn_cp_val_snake || 'snake_case'],
+			['hyphen', pc.lpn_cp_val_hyphen || 'hyphen-case']
+		];
+	}
+	function customPropRestrictOptions() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			['allow', pc.lpn_cp_restrict_allow || 'Allow only these'],
+			['deny', pc.lpn_cp_restrict_deny || 'Refuse these']
+		];
+	}
+	function customPropOptionLabel(opts, value, fallback) {
+		var i, v = value || fallback;
+		for (i = 0; i < opts.length; i++) { if (opts[i][0] === v) { return opts[i][1]; } }
+		return '';
 	}
 	// **THE ONE READ AND THE ONE WRITE.** The read goes through effective(), so a scenario's
 	// override wins exactly as it does for a diameter; the write goes through setProp(), so in Base
@@ -27332,6 +27433,114 @@ var EngCalcs = EngCalcs || {};
 		updateAreaHint();
 	}
 
+	/**
+	 * **THE CUSTOM PROPERTY DESIGN FORM, AND IT IS A POPUP** (Tom, 2026-09-13, confirming his own
+	 * original specification: *"the Custom Property design form must be a popup and ... the
+	 * Settings pane can show only truncated forms of the design except for the key"*).
+	 *
+	 * Every part of one design at full length, one control per line, in the same order the summary
+	 * table reads across -- so the row you pressed Edit on and the form you are looking at are the
+	 * same sentence, once abbreviated and once written out.
+	 *
+	 * **NOTHING IS STAGED AND THERE IS NO OK BUTTON.** Each control commits on `change`, exactly
+	 * as every other row of the Settings box does, and Close only closes. Staging would have to
+	 * answer what a cancelled key rename means for values already typed under it, and the answer
+	 * this page already gives is the one in the summary's comment: the key is the identity and
+	 * nothing is ever rewritten behind the user.
+	 *
+	 * **A COMMIT REDRAWS THE SUMMARY UNDERNEATH**, which is the point of the two views: the
+	 * abbreviation you will read tomorrow is written while you are still looking at the long form
+	 * that produced it.
+	 */
+	function openCustomPropDesign(index) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!customPropDefs()[index]) { return; }
+		openDialog(function (body) {
+			var def = customPropDefs()[index], title = document.createElement('div');
+			title.className = 'lpn-cp-head';
+			title.textContent = pc.lpn_cp_edit_title || 'Custom property design';
+			body.appendChild(title);
+			function commit() {
+				saveToStorage();
+				rebuildSettingsFields();
+				refreshPaneIfOpen();
+				refreshPopupIfOpen();
+			}
+			function row(labelText, ctl, tip) {
+				var line = document.createElement('label'), text = document.createElement('span');
+				line.className = 'lpn-set-row';
+				setFieldLabel(text, labelText, tip);
+				ctl.setAttribute('aria-label', labelText);
+				line.appendChild(text);
+				line.appendChild(ctl);
+				body.appendChild(line);
+				return ctl;
+			}
+			function textRow(field, labelText, tip, onCommit) {
+				var input = document.createElement('input');
+				input.type = 'text';
+				input.value = (def[field] === undefined || def[field] === null) ? '' : String(def[field]);
+				input.addEventListener('change', function () {
+					if (onCommit) { onCommit(input); return; }
+					def[field] = input.value.trim();
+					commit();
+				});
+				return row(labelText, input, tip);
+			}
+			function selectRow(field, labelText, tip, opts, fallback) {
+				var sel = document.createElement('select');
+				opts.forEach(function (o) {
+					var opt = document.createElement('option');
+					opt.value = o[0]; opt.textContent = o[1];
+					if (o[0] === (def[field] || fallback)) { opt.selected = true; }
+					sel.appendChild(opt);
+				});
+				sel.addEventListener('change', function () { def[field] = sel.value; commit(); });
+				return row(labelText, sel, tip);
+			}
+			// KEY -- namespaced on the way in, refused empty, refused if another row has it. The
+			// box shows and takes the BARE key; the prefix is ours and is never typed.
+			textRow('key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, function (input) {
+				var k = customPropKey(input.value), defs = customPropDefs(), j;
+				if (!k) {
+					alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
+					input.value = customPropBareKey(def.key); return;
+				}
+				for (j = 0; j < defs.length; j++) {
+					if (j !== index && defs[j].key === k) {
+						alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
+						input.value = customPropBareKey(def.key); return;
+					}
+				}
+				def.key = k;
+				input.value = customPropBareKey(def.key);
+				commit();
+			}).value = customPropBareKey(def.key);
+			textRow('label', pc.lpn_cp_label || 'Label', pc.lpn_cp_label_tip);
+			// APPLIES TO -- the ID prefix letters, per the scope document, so twenty rows read at a
+			// glance. Upper-cased on commit, because J and j are the same asset kind.
+			textRow('applies', pc.lpn_cp_applies || 'Applies to', pc.lpn_cp_applies_tip, function (input) {
+				def.applies = customPropAppliesLetters({ applies: input.value }).join(',');
+				input.value = def.applies;
+				commit();
+			});
+			selectRow('validate', pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip,
+				customPropValidateOptions(), 'none');
+			selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or refuse', pc.lpn_cp_restrict_mode_tip,
+				customPropRestrictOptions(), 'allow');
+			textRow('restrict', pc.lpn_cp_restrict || 'Restrict characters', pc.lpn_cp_restrict_tip);
+			textRow('minLength', pc.lpn_cp_minlength || 'Fewest characters', pc.lpn_cp_minlength_tip);
+			textRow('maxLength', pc.lpn_cp_length || 'Most characters', pc.lpn_cp_length_tip);
+			textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);
+			textRow('high', pc.lpn_cp_high || 'High limit', pc.lpn_cp_high_tip);
+		}, [{ label: pc.lpn_close || 'Close', fn: function () { } }]);
+		// The tips in here are built after openDialog() has put the box on the screen, so the
+		// tooltip wiring has to be asked for; every other box on this page is server-rendered and
+		// gets it at init.
+		var dlg = document.getElementById('lpn_dialog');
+		if (dlg && typeof initTipsIn === 'function') { initTipsIn(dlg); }
+	}
+
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
 	// rows below did not move between categories by being re-parented at run time -- each one is
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
@@ -27466,14 +27675,17 @@ var EngCalcs = EngCalcs || {};
 		});
 		// ---- Custom properties (ROADMAP Task 636; dev/custom-property-scope.md) ----
 		//
-		// **ONE HEADING OVER THE WHOLE BLOCK, NOT EIGHT OVER EIGHT ABBREVIATED CELLS.** That is
-		// Tom's own alternative in the scope document and it is the one built: a single "Design"
-		// with the column names in its tip. Eight headings over eight three-letter cells is more
-		// chrome than content, and the point of the table is to read twenty rows at once.
+		// **THE PANE SHOWS THE DESIGN AND A POPUP EDITS IT** (Tom, 2026-09-13: *"I think I
+		// specified that the Custom Property design form must be a popup and that the Settings
+		// pane can show only truncated forms of the design except for the key. I now confirm that
+		// specification."*). Phase 1 made every cell a live control in the pane and he read it
+		// back as the wrong shape: ten editable cells per row is a form pretending to be a table,
+		// and it can be neither wide enough to type in nor narrow enough to read twenty rows of.
+		// So the table is a SUMMARY -- text, truncated by the stylesheet, with the key at full
+		// length because the key is the identity -- and openCustomPropDesign() is the form.
 		//
-		// **ADDED AND REMOVED LIKE DEMAND CATEGORIES, EDITED IN PLACE LIKE A SPREADSHEET.** Every
-		// cell is a live control on `settings.customProps[i]`; nothing is staged and there is no
-		// OK button, which is the same contract every other row in this box has.
+		// **COLUMN HEADINGS ARE BACK** (his revision 3), truncated, each carrying the tip that
+		// writes its name out in full.
 		//
 		// **THE KEY IS NAMESPACED ON THE WAY IN.** customPropKey() adds the prefix, so what the
 		// reader types can never collide with a built-in field however they spell it -- refused by
@@ -27485,7 +27697,6 @@ var EngCalcs = EngCalcs || {};
 		// overrides too, and a rename that silently rewrites four hundred assets is a bigger act
 		// than a cell edit looks like.
 		function customPropBox(target) {
-			note(target, pc.lpn_settings_custom_props_note || 'A property you invent yourself. It is stored with the project, it appears on every asset kind you choose, and a scenario can override it like any other property.');
 			var head = document.createElement('div');
 			head.className = 'lpn-set-note lpn-cp-head';
 			setFieldLabel(head, pc.lpn_cp_design || 'Design', pc.lpn_cp_design_tip);
@@ -27494,98 +27705,91 @@ var EngCalcs = EngCalcs || {};
 			if (!defs.length) { note(target, pc.lpn_cp_none || 'No custom property is designed yet.'); }
 			var table = document.createElement('table');
 			table.className = 'lpn-cp-table';
+			var thead = document.createElement('thead'), htr = document.createElement('tr');
+			// **THE HEADINGS ARE BACK, TRUNCATED, EACH CARRYING ITS OWN TIP** (Tom, 2026-09-13,
+			// revision 3, reversing the no-headings alternative phase 1 took from the scope
+			// document). Ten unlabelled cells were readable only to whoever designed them.
+			//
+			// **THE TRUNCATION IS THE STYLESHEET'S, NOT A slice()**, and that is the part worth
+			// keeping: a heading cut to three letters in code is cut in ENGLISH, and "Val" is not
+			// the first three letters of anything a Turkish or Hindi reader would recognise.
+			// .lpn-cp-th-text is one ellipsis rule, so every language truncates in its own words
+			// and the full name is one hover away in the tip.
+			//
+			// The glyph is OUTSIDE the truncating span on purpose: inside it, the ellipsis eats
+			// the "?" first and the tip becomes unreachable on touch, which is the whole of what
+			// the tip is for.
+			function headCell(labelText, tip) {
+				var th = document.createElement('th'), help, txt, glyph;
+				if (!tip) { th.textContent = labelText || ''; htr.appendChild(th); return th; }
+				help = document.createElement('span');
+				help.className = 'ec-help'; help.title = tip;
+				txt = document.createElement('span');
+				txt.className = 'lpn-cp-th-text'; txt.textContent = labelText;
+				glyph = document.createElement('span');
+				glyph.className = 'ec-tip'; glyph.textContent = '?';
+				help.appendChild(txt);
+				help.appendChild(document.createTextNode(' '));
+				help.appendChild(glyph);
+				th.appendChild(help);
+				htr.appendChild(th);
+				return th;
+			}
+			var vOpts = customPropValidateOptions(), mOpts = customPropRestrictOptions();
+			// One list, read twice: the heading row and then every summary row, so a column can
+			// never head one thing and show another.
+			var COLS = [
+				{ head: pc.lpn_cp_key || 'Key', tip: pc.lpn_cp_key_tip, cls: 'lpn-cp-cell-key',
+				  text: function (def) { return customPropBareKey(def.key); } },
+				{ head: pc.lpn_cp_label || 'Label', tip: pc.lpn_cp_label_tip,
+				  text: function (def) { return def.label || ''; } },
+				{ head: pc.lpn_cp_applies || 'Applies to', tip: pc.lpn_cp_applies_tip,
+				  text: function (def) { return def.applies || ''; } },
+				{ head: pc.lpn_cp_validate || 'Validate as', tip: pc.lpn_cp_validate_tip,
+				  text: function (def) { return customPropOptionLabel(vOpts, def.validate, 'none'); } },
+				{ head: pc.lpn_cp_restrict_mode || 'Allow or refuse', tip: pc.lpn_cp_restrict_mode_tip,
+				  text: function (def) { return customPropOptionLabel(mOpts, def.restrictMode, 'allow'); } },
+				{ head: pc.lpn_cp_restrict || 'Restrict characters', tip: pc.lpn_cp_restrict_tip,
+				  text: function (def) { return def.restrict || ''; } },
+				{ head: pc.lpn_cp_minlength || 'Fewest characters', tip: pc.lpn_cp_minlength_tip,
+				  text: function (def) { return def.minLength === undefined || def.minLength === null ? '' : String(def.minLength); } },
+				{ head: pc.lpn_cp_length || 'Most characters', tip: pc.lpn_cp_length_tip,
+				  text: function (def) { return def.maxLength === undefined || def.maxLength === null ? '' : String(def.maxLength); } },
+				{ head: pc.lpn_cp_low || 'Low limit', tip: pc.lpn_cp_low_tip,
+				  text: function (def) { return def.low === undefined || def.low === null ? '' : String(def.low); } },
+				{ head: pc.lpn_cp_high || 'High limit', tip: pc.lpn_cp_high_tip,
+				  text: function (def) { return def.high === undefined || def.high === null ? '' : String(def.high); } }
+			];
+			COLS.forEach(function (c) { headCell(c.head, c.tip); });
+			headCell('');
+			headCell('');
+			thead.appendChild(htr);
+			table.appendChild(thead);
 			var tbody = document.createElement('tbody');
 			table.appendChild(tbody);
-			// One cell of the design table. `size` is the abbreviation the scope document asks for:
-			// a truncated cell unfocused, its full length when the caret is in it, which is what a
-			// text input does by itself once it is narrow.
-			function cell(tr, ctl, labelText, tip, size) {
-				var td = document.createElement('td');
-				if (size) { ctl.size = size; }
-				ctl.setAttribute('aria-label', labelText);
-				if (tip) { ctl.title = tip; }
-				td.appendChild(ctl);
-				tr.appendChild(td);
-				return ctl;
-			}
-			// **EVERY EDIT IS COMMITTED ON `change`, NOT ON `input`.** A design table drives the
-			// property popup, the Tables pane and Find; rebuilding all three per keystroke would
-			// take the cell out from under the hand typing in it.
-			function commit(redrawBox) {
-				saveToStorage();
-				if (redrawBox) { rebuildSettingsFields(); }
-				refreshPaneIfOpen();
-				refreshPopupIfOpen();
-			}
-			function textCell(tr, def, field, labelText, tip, size, onCommit) {
-				var input = document.createElement('input');
-				input.type = 'text';
-				input.value = (def[field] === undefined || def[field] === null) ? '' : String(def[field]);
-				input.addEventListener('change', function () {
-					if (onCommit) { onCommit(input); return; }
-					def[field] = input.value.trim();
-					commit(false);
-				});
-				return cell(tr, input, labelText, tip, size);
-			}
 			defs.forEach(function (def, i) {
 				var tr = document.createElement('tr');
-				// KEY -- namespaced on the way in, refused empty, refused if another row has it.
-				textCell(tr, def, 'key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, 8, function (input) {
-					var k = customPropKey(input.value), j;
-					if (!k) {
-						alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
-						input.value = customPropBareKey(def.key); return;
-					}
-					for (j = 0; j < defs.length; j++) {
-						if (j !== i && defs[j].key === k) {
-							alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
-							input.value = customPropBareKey(def.key); return;
-						}
-					}
-					def.key = k;
-					commit(true);
-				}).value = customPropBareKey(def.key);
-				textCell(tr, def, 'label', pc.lpn_cp_label || 'Label', pc.lpn_cp_label_tip, 8);
-				// APPLIES TO -- the ID prefix letters, per the scope document, so twenty rows read
-				// at a glance. Upper-cased on commit, because J and j are the same asset kind.
-				textCell(tr, def, 'applies', pc.lpn_cp_applies || 'Applies to', pc.lpn_cp_applies_tip, 5, function (input) {
-					def.applies = customPropAppliesLetters({ applies: input.value }).join(',');
-					input.value = def.applies;
-					commit(false);
+				// **THE PANE SHOWS THE DESIGN; IT NO LONGER EDITS IT** (Tom, 2026-09-13, revision
+				// 5: *"the Custom Property design form must be a popup and ... the Settings pane
+				// can show only truncated forms of the design except for the key. I now confirm
+				// that specification."*). So a cell is TEXT, the key is the one column with no
+				// truncation on it, and Edit is the only door to the form.
+				COLS.forEach(function (c) {
+					var td = document.createElement('td'), sp = document.createElement('span');
+					sp.className = 'lpn-cp-cell' + (c.cls ? ' ' + c.cls : '');
+					sp.textContent = c.text(def);
+					td.appendChild(sp);
+					tr.appendChild(td);
 				});
-				var vsel = document.createElement('select');
-				[['none', pc.lpn_cp_val_none || 'Do not validate'],
-					['number', pc.lpn_cp_val_number || 'Number'],
-					['integer', pc.lpn_cp_val_integer || 'Integer'],
-					['text', pc.lpn_cp_val_text || 'Text'],
-					['upper', pc.lpn_cp_val_upper || 'ALL CAPS'],
-					['camel', pc.lpn_cp_val_camel || 'camelCase'],
-					['pascal', pc.lpn_cp_val_pascal || 'PascalCase'],
-					['snake', pc.lpn_cp_val_snake || 'snake_case'],
-					['hyphen', pc.lpn_cp_val_hyphen || 'hyphen-case']].forEach(function (o) {
-					var opt = document.createElement('option');
-					opt.value = o[0]; opt.textContent = o[1];
-					if (o[0] === (def.validate || 'none')) { opt.selected = true; }
-					vsel.appendChild(opt);
-				});
-				vsel.addEventListener('change', function () { def.validate = vsel.value; commit(false); });
-				cell(tr, vsel, pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip);
-				var msel = document.createElement('select');
-				[['allow', pc.lpn_cp_restrict_allow || 'Allow only these'],
-					['deny', pc.lpn_cp_restrict_deny || 'Refuse these']].forEach(function (o) {
-					var opt = document.createElement('option');
-					opt.value = o[0]; opt.textContent = o[1];
-					if (o[0] === (def.restrictMode || 'allow')) { opt.selected = true; }
-					msel.appendChild(opt);
-				});
-				msel.addEventListener('change', function () { def.restrictMode = msel.value; commit(false); });
-				cell(tr, msel, pc.lpn_cp_restrict_mode || 'Allow or refuse', pc.lpn_cp_restrict_tip);
-				textCell(tr, def, 'restrict', pc.lpn_cp_restrict || 'Restrict characters', pc.lpn_cp_restrict_tip, 5);
-				textCell(tr, def, 'maxLength', pc.lpn_cp_length || 'Restrict length', pc.lpn_cp_length_tip, 3);
-				textCell(tr, def, 'low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip, 5);
-				textCell(tr, def, 'high', pc.lpn_cp_high || 'High limit', pc.lpn_cp_high_tip, 5);
-				var rm = document.createElement('button');
+				var editTd = document.createElement('td'), edit = document.createElement('button');
+				edit.type = 'button';
+				edit.className = 'lpn-cp-edit';
+				edit.textContent = pc.lpn_profile_edit || 'Edit';
+				helpTip(edit, pc.lpn_cp_edit_tip);
+				edit.addEventListener('click', function () { openCustomPropDesign(i); });
+				editTd.appendChild(edit);
+				tr.appendChild(editTd);
+				var rmTd = document.createElement('td'), rm = document.createElement('button');
 				rm.type = 'button';
 				rm.className = 'lpn-cp-remove';
 				rm.textContent = pc.lpn_cp_remove || 'Remove';
@@ -27593,9 +27797,13 @@ var EngCalcs = EngCalcs || {};
 				rm.addEventListener('click', function () {
 					saveUndoSnapshot();
 					settings.customProps.splice(i, 1);
-					commit(true);
+					saveToStorage();
+					rebuildSettingsFields();
+					refreshPaneIfOpen();
+					refreshPopupIfOpen();
 				});
-				cell(tr, rm, pc.lpn_cp_remove || 'Remove');
+				rmTd.appendChild(rm);
+				tr.appendChild(rmTd);
 				tbody.appendChild(tr);
 			});
 			target.appendChild(table);
@@ -27610,8 +27818,12 @@ var EngCalcs = EngCalcs || {};
 				// as a new demand category is, and seeding it with somebody else's design would put
 				// a rule nobody wrote onto every asset the moment a key was typed.
 				settings.customProps.push({ key: '', label: '', applies: '', validate: 'none',
-					restrictMode: 'allow', restrict: '', maxLength: '', low: '', high: '' });
-				commit(true);
+					restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' });
+				saveToStorage();
+				rebuildSettingsFields();
+				// Straight into the form, because a blank row in a summary table says nothing at
+				// all about what the user has just been given.
+				openCustomPropDesign(settings.customProps.length - 1);
 			});
 			target.appendChild(add);
 		}

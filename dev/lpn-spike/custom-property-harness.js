@@ -51,6 +51,10 @@ const L = loadLoopedNetwork(
 	"\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tcustomBody: function () { return document.getElementById('lpn_set_custom_fields'); },\n" +
+	"\t\tdialogBody: function () { return document.getElementById('lpn_dialog_body'); },\n" +
+	"\t\topenCustomPropDesign: openCustomPropDesign, closeDialog: closeDialog,\n" +
+	"\t\tcustomPropValidateOptions: customPropValidateOptions,\n" +
+	"\t\tcustomPropBareKey: customPropBareKey,\n" +
 	"\t\tpushSpecList: pushSpecList, pushFieldShown: pushFieldShown,\n" +
 	"\t\tpaneTables: paneTables, paneCols: paneCols, paneWriteCellText: paneWriteCellText,\n" +
 	"\t\tfindState: function () { return findState; }, findPropDefs: findPropDefs,\n" +
@@ -289,9 +293,13 @@ ok('6.4 the design comes back', !!L.customPropDefByKey(route.key));
 ok('6.5 and the Base value comes back verbatim', L.effective(back, route.key) === 'BASE-ROUTE',
 	String(L.effective(back, route.key)));
 
-// ---- 7. THE DESIGN TABLE UNDER SETTINGS > ASSETS ----------------------------------------------
+// ---- 7. THE SUMMARY IN SETTINGS, AND THE FORM IN A POPUP --------------------------------------
 //
-// Added and removed like demand categories, edited in place like a spreadsheet.
+// **THE PANE SHOWS THE DESIGN; THE POPUP EDITS IT** (Tom, 2026-09-13: *"the Custom Property design
+// form must be a popup and ... the Settings pane can show only truncated forms of the design except
+// for the key. I now confirm that specification."*). Phase 1 built ten live controls per row in the
+// pane, which is the shape this section exists to keep from coming back: the assertion that matters
+// is 7.10, that the summary holds NO editable control at all.
 clearDesigns();
 L.rebuildSettingsFields();
 const body = L.customBody();
@@ -304,40 +312,192 @@ function buttons(host, text) {
 	return out;
 }
 function fire(el, kind) { (el._listeners[kind] || []).forEach(function (f) { f({ target: el }); }); }
+// Every control in a host, whatever it is: the question the summary must answer NO to.
+function controlsIn(host) {
+	const out = [];
+	(function walk(el) {
+		if (el._tag === 'input' || el._tag === 'select' || el._tag === 'textarea') { out.push(el); }
+		(el.children || []).forEach(walk);
+	})(host);
+	return out;
+}
+function byAria(host, label) {
+	return controlsIn(host).filter(function (c) { return c.getAttribute('aria-label') === label; })[0] || null;
+}
+// The truncating spans the summary writes, in column order.
+function summaryCells(host) {
+	const out = [];
+	(function walk(el) {
+		if ((el['class'] || '').indexOf('lpn-cp-cell') >= 0) { out.push(el); }
+		(el.children || []).forEach(walk);
+	})(host);
+	return out;
+}
+function headTips(host) {
+	const out = [];
+	(function walk(el) {
+		if ((el['class'] || '').indexOf('ec-help') >= 0 && el.title) { out.push(el.title); }
+		(el.children || []).forEach(walk);
+	})(host);
+	return out;
+}
 const addBtn = buttons(body, PC.lpn_cp_add)[0];
 ok('7.1 the box offers an Add control', !!addBtn);
 fire(addBtn, 'click');
 ok('7.2 adding appends one design row', settings().customProps.length === 1);
-// Edit the key in place. The row is rebuilt after a key change, so the control is fetched again.
-function cells() {
-	const out = [];
-	(function walk(el) {
-		if (el.type === 'text' || el._tag === 'select') { out.push(el); }
-		(el.children || []).forEach(walk);
-	})(L.customBody());
-	return out;
-}
-let c0 = cells()[0];
-c0.value = 'acct no';
-fire(c0, 'change');
-ok('7.3 a key typed in place is namespaced and unspaced',
+// **AND OPENS THE FORM ON IT**, because a blank row in a summary table says nothing about what the
+// user has just been given.
+let dlg = L.dialogBody();
+ok('7.3 adding opens the design popup', !!byAria(dlg, PC.lpn_cp_key));
+// The key is typed in the POPUP now, not in the pane.
+let keyBox = byAria(dlg, PC.lpn_cp_key);
+keyBox.value = 'acct no';
+fire(keyBox, 'change');
+ok('7.4 a key typed in the popup is namespaced and unspaced',
 	settings().customProps[0].key === L.customPropKey('acctno'), settings().customProps[0].key);
+// **THE KEY IS THE ONE COLUMN SHOWN IN FULL** -- his own exception, and the column the row is
+// filed under.
+ok('7.5 the summary shows the bare key in the first cell',
+	summaryCells(L.customBody())[0]._text === L.customPropBareKey(settings().customProps[0].key),
+	summaryCells(L.customBody())[0]._text);
+ok('7.6 and the key cell is the one with no truncation on it',
+	(summaryCells(L.customBody())[0]['class'] || '').indexOf('lpn-cp-cell-key') >= 0);
 // A second row may not take the first one's key.
+L.closeDialog();
 fire(buttons(L.customBody(), PC.lpn_cp_add)[0], 'click');
-const rowCells = cells();
-const secondKeyBox = rowCells.filter(function (x) { return x.getAttribute('aria-label') === PC.lpn_cp_key; })[1];
+ok('7.7 a second row opens its own form', settings().customProps.length === 2);
+const secondKeyBox = byAria(L.dialogBody(), PC.lpn_cp_key);
 secondKeyBox.value = 'acctno';
 lastAlert = null;
 fire(secondKeyBox, 'change');
-ok('7.4 a duplicate key is refused, in the page’s own words', lastAlert === PC.lpn_cp_key_taken,
+ok('7.8 a duplicate key is refused, in the page’s own words', lastAlert === PC.lpn_cp_key_taken,
 	String(lastAlert));
-ok('7.5 and the second design keeps no key', settings().customProps[1].key === '');
-// Remove takes the row away.
+ok('7.9 and the second design keeps no key', settings().customProps[1].key === '');
+L.closeDialog();
+// **THE PANE EDITS NOTHING.** Ten live controls per row is what revision 5 removed.
+ok('7.10 the summary holds no editable control', controlsIn(L.customBody()).length === 0,
+	String(controlsIn(L.customBody()).length));
+// Every row offers both doors.
+const editBtns = buttons(L.customBody(), PC.lpn_profile_edit);
+ok('7.11 every row offers Edit', editBtns.length === settings().customProps.length);
 const rm = buttons(L.customBody(), PC.lpn_cp_remove);
-ok('7.6 every row offers Remove', rm.length === settings().customProps.length);
+ok('7.12 every row offers Remove', rm.length === settings().customProps.length);
+// Edit opens the form on the row it belongs to, not on the first one.
+fire(editBtns[0], 'click');
+ok('7.13 Edit opens the form on its own row',
+	byAria(L.dialogBody(), PC.lpn_cp_key).value === L.customPropBareKey(settings().customProps[0].key));
+// The form carries every part of the design at full length, one row each.
+[PC.lpn_cp_key, PC.lpn_cp_label, PC.lpn_cp_applies, PC.lpn_cp_validate, PC.lpn_cp_restrict_mode,
+	PC.lpn_cp_restrict, PC.lpn_cp_minlength, PC.lpn_cp_length, PC.lpn_cp_low, PC.lpn_cp_high
+].forEach(function (lbl, i) {
+	ok('7.14.' + (i + 1) + ' the form has a control for one more column', !!byAria(L.dialogBody(), lbl), lbl);
+});
+L.closeDialog();
 fire(rm[1], 'click');
-ok('7.7 removing takes one row away', settings().customProps.length === 1);
-ok('7.8 and leaves the other one alone', settings().customProps[0].key === L.customPropKey('acctno'));
+ok('7.15 removing takes one row away', settings().customProps.length === 1);
+ok('7.16 and leaves the other one alone', settings().customProps[0].key === L.customPropKey('acctno'));
+
+// ---- 8. THE HEADINGS AND THEIR TIPS -----------------------------------------------------------
+//
+// **HEADINGS ARE BACK, TRUNCATED, EACH CARRYING ITS OWN TIP** (revision 3), and **EVERY COLUMN TIP
+// LEADS WITH THE NAME OF ITS COLUMN** (revision 4). The second is asserted as a RELATIONSHIP
+// between two pageConfig values rather than as English, so rewording either one keeps the test.
+[['key', PC.lpn_cp_key, PC.lpn_cp_key_tip], ['label', PC.lpn_cp_label, PC.lpn_cp_label_tip],
+	['applies', PC.lpn_cp_applies, PC.lpn_cp_applies_tip],
+	['validate', PC.lpn_cp_validate, PC.lpn_cp_validate_tip],
+	['mode', PC.lpn_cp_restrict_mode, PC.lpn_cp_restrict_mode_tip],
+	['restrict', PC.lpn_cp_restrict, PC.lpn_cp_restrict_tip],
+	['minLength', PC.lpn_cp_minlength, PC.lpn_cp_minlength_tip],
+	['maxLength', PC.lpn_cp_length, PC.lpn_cp_length_tip],
+	['low', PC.lpn_cp_low, PC.lpn_cp_low_tip], ['high', PC.lpn_cp_high, PC.lpn_cp_high_tip]
+].forEach(function (c, i) {
+	ok('8.1.' + (i + 1) + ' the ' + c[0] + ' tip leads with its own column name',
+		typeof c[2] === 'string' && c[2].indexOf(c[1] + ':') === 0, String(c[2]).slice(0, 24));
+});
+const tips = headTips(L.customBody());
+ok('8.2 the design heading carries its own tip', tips.indexOf(PC.lpn_cp_design_tip) >= 0);
+[PC.lpn_cp_key_tip, PC.lpn_cp_label_tip, PC.lpn_cp_applies_tip, PC.lpn_cp_validate_tip,
+	PC.lpn_cp_restrict_mode_tip, PC.lpn_cp_restrict_tip, PC.lpn_cp_minlength_tip,
+	PC.lpn_cp_length_tip, PC.lpn_cp_low_tip, PC.lpn_cp_high_tip].forEach(function (t, i) {
+	ok('8.3.' + (i + 1) + ' one more column heading carries its tip', tips.indexOf(t) >= 0);
+});
+// **THE SECTION HEADING'S OWN TIP IS TOM'S SENTENCE** (revision 1). It is server-rendered, so this
+// is asserted on the SOURCE and on the two KEYS, never on the English.
+const pageSrc = require('fs').readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+ok('8.4 the Custom properties heading carries the note as its tip',
+	pageSrc.indexOf("ecTipLabel($ec_lang['lpn_settings_custom_props'], $ec_lang['lpn_settings_custom_props_note'])") >= 0);
+
+// ---- 9. THE VALIDATION TYPES TOM ASKED FOR ----------------------------------------------------
+//
+// Revision 7 removed Text, revision 6 added one permissive Date and time, revision 11 split Number
+// by its decimal mark, and revision 9 added a Fewest characters. Revision 10 is the white space
+// rule, which lives inside the character restriction because that is where its tip states it.
+const vOpts = L.customPropValidateOptions().map(function (o) { return o[0]; });
+ok('9.1 there is no Text type any more', vOpts.indexOf('text') < 0, vOpts.join(','));
+ok('9.2 Do not validate is still there', vOpts.indexOf('none') >= 0);
+ok('9.3 both numeric types are offered',
+	vOpts.indexOf('number') >= 0 && vOpts.indexOf('number_comma') >= 0);
+ok('9.4 Date and time is offered', vOpts.indexOf('datetime') >= 0);
+// A document that still states the removed type validates as nothing, which is what it always did.
+const legacy = { key: L.customPropKey('t'), label: 't', applies: 'J', validate: 'text',
+	restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
+ok('9.5 a design that still states Text accepts anything', problem(legacy, 'anything at all') === null);
+
+const dot = { key: L.customPropKey('n'), label: 'n', applies: 'J', validate: 'number',
+	restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
+ok('9.6 Number . accepts a dot decimal', problem(dot, '3.5') === null);
+ok('9.7 Number . flags a comma decimal', problem(dot, '3,5') === PC.lpn_cp_bad_number);
+dot.validate = 'number_comma';
+ok('9.8 Number , accepts a comma decimal', problem(dot, '3,5') === null);
+ok('9.9 Number , flags a dot decimal', problem(dot, '3.5') === PC.lpn_cp_bad_number);
+ok('9.10 either accepts a plain integer', problem(dot, '42') === null);
+// And the limits are read with the SAME mark, or a comma design would compare nonsense.
+dot.low = '10,5';
+ok('9.11 a comma design compares its limits with a comma', problem(dot, '9,5') === PC.lpn_cp_bad_low);
+ok('9.12 and passes a value above it', problem(dot, '11,5') === null);
+dot.low = '';
+
+const when = { key: L.customPropKey('w'), label: 'w', applies: 'J', validate: 'datetime',
+	restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
+['2026-09-13', '9/13/2026', '13.09.2026', '14:30', '2:05 pm', '13 September 2026',
+	'Sep 13, 2026 14:30', '2026-09-13T14:30:00Z', '20260913'].forEach(function (v, i) {
+	ok('9.13.' + (i + 1) + ' Date and time accepts one more plausible expression', problem(when, v) === null, v);
+});
+ok('9.14 it flags a value with no digit in it', problem(when, 'sometime soon') === PC.lpn_cp_bad_datetime);
+ok('9.15 it flags a value no date could carry', problem(when, '13/09/2026 *** ') === PC.lpn_cp_bad_datetime);
+ok('9.16 a blank is still not a failure', problem(when, '') === null);
+
+// **THE FEWEST, AND IT FLAGS WITHOUT PADDING** -- the whole of Tom's exploration-tool ruling
+// applied to the new limit.
+clearDesigns();
+const part = design({ key: L.customPropKey('part'), label: 'Part', applies: 'J', validate: 'none',
+	restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' });
+const nP = L.addNode('junction', 500, 0);
+L.setCustomProp(nP, part, 'AB');
+part.minLength = 4;
+ok('9.17 a short value is flagged', L.customPropProblem(part, L.effective(nP, part.key)) === PC.lpn_cp_bad_minlength);
+ok('9.18 and is NOT padded or cleared', L.effective(nP, part.key) === 'AB', String(L.effective(nP, part.key)));
+part.minLength = 2;
+ok('9.19 loosening it puts the flag out', L.customPropProblem(part, L.effective(nP, part.key)) === null);
+part.minLength = 4;
+ok('9.20 a blank is still not a failure under a minimum', L.customPropProblem(part, '') === null);
+part.minLength = ''; part.maxLength = 3;
+ok('9.21 the maximum still flags a long value', L.customPropProblem(part, 'ABCD') === PC.lpn_cp_bad_length);
+part.maxLength = '';
+
+// **WHITE SPACE ONLY BETWEEN OTHER CHARACTERS** (revision 10), inside the character restriction.
+const sp = { key: L.customPropKey('s'), label: 's', applies: 'J', validate: 'none',
+	restrictMode: 'allow', restrict: '@# ', minLength: '', maxLength: '', low: '', high: '' };
+ok('9.22 a space between characters is fine', problem(sp, 'MAIN ST') === null);
+ok('9.23 a leading space is flagged', problem(sp, ' MAIN') === PC.lpn_cp_bad_space);
+ok('9.24 a trailing space is flagged', problem(sp, 'MAIN ') === PC.lpn_cp_bad_space);
+// And the restriction itself is still the rudimentary validator Tom keeps for saying "no slashes".
+sp.restrict = '@#';
+ok('9.25 an unlisted slash is still refused by the character set',
+	problem(sp, 'MAIN/ST') === PC.lpn_cp_bad_chars);
+// A property nobody restricted is one whose owner asked us to have no opinion about its text.
+sp.restrict = '';
+ok('9.26 with no restriction declared, white space is nobody’s business', problem(sp, ' MAIN ') === null);
 
 console.log(fails ? ('\nFAILED: ' + fails) : '\nAll custom-property checks passed.');
 process.exit(fails ? 1 : 0);

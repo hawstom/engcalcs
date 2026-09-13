@@ -1,49 +1,77 @@
 # The custom property on an `lpn_` element
 
 Tom's own specification, 2026-09-12, recorded verbatim in substance because it is a DESIGN and not a
-wish. ROADMAP Task 636 is the one-line pointer at this file. Nothing here is built.
+wish. ROADMAP Task 636 is the one-line pointer at this file. Phase 1 shipped 2026-09-13 and his eleven
+numbered revisions of it the same day; both are folded into the statements below rather than
+appended to them.
 
 ## Where it lives
 
 A **Custom properties** heading under `Settings > Assets`, beside ID prefixes and Defaults.
 
-## The design table
+## The design table, and the form that is not it
 
-Every custom property is one row. The columns are the property's DESIGN, abbreviated hard, because
-the point of the table is to read twenty of them at once:
+**THE SETTINGS PANE SHOWS THE DESIGN; A POPUP EDITS IT** (Tom, 2026-09-13, confirming his own
+original specification: *"the Custom Property design form must be a popup and ... the Settings pane
+can show only truncated forms of the design except for the key. I now confirm that
+specification."*). Phase 1 put ten live controls in every pane row and he read it back as the wrong
+shape: a row that editable is a form pretending to be a table, and it can be neither wide enough to
+type in nor narrow enough to read twenty of.
 
-| Column | Truncation |
-|---|---|
-| Key | none; no spaces allowed |
-| Label | truncated |
-| Applies to | prefixes only, e.g. `J,L,R` |
-| Validate as | three letters |
-| Restrict list | three letters |
-| Restrict length | three letters |
-| Low value limit | none |
-| High value limit | none |
+So the pane is a SUMMARY, one row per property, reading across: Key, Label, Applies to, Validate as,
+Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit,
+then Edit and Remove.
 
-**Maybe no column headings at all** -- Tom's own alternative, and it is the better one to try first:
-a single heading over the whole block reading *Design*, carrying the column names in its tip. Eight
-headings over eight abbreviated cells is more chrome than content.
+- **Truncation is the stylesheet's, never a `slice()` in code.** A heading cut to three letters is
+  cut in ENGLISH, and "Val" is the first three letters of nothing a Turkish or Hindi reader would
+  recognise. One ellipsis rule truncates every language in its own words.
+- **The key is the one column with no limit on it**, because the key is the identity the row is
+  filed under, and it is his stated exception.
+- **Headings are back** (his revision 3, reversing phase 1's no-headings alternative), each carrying
+  a tip, and **every column tip leads with the name of its own column** (revision 4) because the
+  heading above it is the abbreviation.
+- **The popup stages nothing and has no OK.** Each control commits on `change`, as every other row
+  of the Settings box does; Close only closes.
+- **Add and remove like demand categories**, and Add opens the form on the new row: a blank row in a
+  summary table says nothing about what the user has just been given.
 
-## Editing
+## Validation
 
-**Add and remove like demand categories; edit in place like a spreadsheet**, for every design
-property. Click a cell and it expands to its full length and shows its tip; unfocused it is
-truncated and silent.
-
-- **Property key** -- no spaces.
-- **Property label** -- what a reader sees.
-- **Applies to** -- a multi-selector over the element types (Junction, Reservoir, Tank, Pipe, Pump,
-  Valve, Text).
-- **Validate entry as** -- Number, Integer, Text, ALL CAPS, CamelCase, pascalCase, snake_case,
-  hyphen-case. **English only initially**, which is a stated limit and not an oversight: a case rule
-  is an assertion about an alphabet.
-- **Restrict text** -- an allowed/disallowed selector over a character set, where `@` stands for
-  alpha and `#` for numeric (`@#.-_`, or `'"\`).
-- **Restrict text length**.
-- **Low value/text limit** and **High value/text limit**.
+- **Do not validate** -- and `Text` is GONE (revision 7: *"I suppose that the Text validation type
+  was really 'Do not validate'. We can remove it. It has no other useful meaning since everything is
+  text."*). A document that still states `text` validates as nothing, which is what it always did.
+- **Number . and Number ,** (revision 11). Two numeric types told apart by the decimal mark, which
+  is this page's answer to regionalization: the separator is SHOWN rather than named, so the option
+  reads the same in all 27 languages. The other mark is refused rather than ignored, because a
+  `Number ,` design that quietly took `1.5` would read one and a half where the region means one
+  thousand five hundred. Low and high limits are read with the same mark. **No Positive type**: his
+  own observation is that *"the validator with a refusal of '-' can do 'Positive' also"*.
+- **Integer.**
+- **Date and time** (revision 6), ONE type and deliberately permissive: *"we simply say 'Date and
+  time' and then we internally do our magic to flag any values that do not look to us like any
+  possible date and time expression."* It is not a parser and must not become one -- a date is
+  written a dozen ways across 27 languages, and a rule tight enough to pick one of them flags four
+  hundred correct entries in somebody else's region. So the question asked is the negative one: no
+  digit at all, a character no date or time expression uses, or digits with nothing date-shaped or
+  time-shaped about them. **THE DOOR LEFT OPEN AND NOT BUILT:** his own next step if this proves too
+  loose is to expose the rules as validation regular expressions in Settings, below Design. Nothing
+  should harden until he asks for that, because a stricter default and a regexp box answer the same
+  complaint and only one of them is his.
+- **The case rules**: ALL CAPS, camelCase, PascalCase, snake_case, hyphen-case. **English only
+  initially**, which is a stated limit and not an oversight: a case rule is an assertion about an
+  alphabet.
+- **Restrict characters** -- an allow/refuse set where `@` is any letter and `#` any digit, and
+  everything else is listed literally. Kept because it is already a decent rudimentary validator for
+  saying "we do not do slashes" (revision 6b).
+- **White space must be MID-STRING** (revision 10), and his reason is the user's satisfaction rather
+  than ours: a leading or trailing space is invisible on screen and turns up later as two values
+  that look identical and sort apart. Held INSIDE the character restriction, because that is where
+  the tip states it and because a property nobody restricted is one whose owner has asked us to have
+  no opinion about its text.
+- **Fewest characters and Most characters** (revision 9: *"Good for dates and datetimes and finding
+  empty or partial entries."*). The minimum FLAGS a short value and never pads it. A blank is still
+  not a failure, because a blank says the asset states nothing.
+- **Low value limit and High value limit.**
 
 ## Reach
 
