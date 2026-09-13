@@ -1,0 +1,39 @@
+#!/bin/sh
+# Refuse a commit on master. Installed by dev/hooks/install.sh; see CLAUDE.md, Git Workflow.
+#
+# **MASTER IS THE PRODUCTION LINE AND NOBODY WORKS ON IT** (2026-09-12). That rule was written and
+# then broken by its own author three times in the hour after writing it, which is this project's
+# standing argument in one sentence: a rule a machine enforces is worth roughly ten a human must
+# remember.
+#
+# **A MERGE IS THE EXCEPTION AND IS DETECTED, NOT DECLARED.** During `git merge`, git writes
+# .git/MERGE_HEAD before running this hook, so a merge commit is told from a hand-written one
+# without anybody passing a flag. That matters because a flag people pass routinely is a flag people
+# pass reflexively.
+#
+# The escape hatch is `git commit --no-verify`, which git provides and this hook cannot take away.
+# That is correct: the hook is here to stop drift, not to stop you.
+
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+[ "$branch" = "master" ] || exit 0
+[ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ] && exit 0
+
+cat >&2 <<'MSG'
+
+  REFUSED: this is a commit on master, and master is the production line.
+
+  Every change starts on a branch and reaches master by a merge. Move this work:
+
+      git stash
+      git checkout -b <name>
+      git stash pop
+
+  Naming: a short descriptive slug (profile-blank-on-arm), or <task-id>-<slug> when a
+  roadmap task exists (627-blank-map-autosave). No date prefix -- git already knows the
+  age, and dev/scripts/branch_hygiene_check.php prints it.
+
+  A merge commit is allowed here and needs nothing from you.
+  Genuinely need to bypass?  git commit --no-verify
+
+MSG
+exit 1

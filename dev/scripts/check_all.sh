@@ -443,6 +443,16 @@ if [ -n "$ADVISORY" ]; then
 	echo "Not blocking. Worth a look when convenient; see CLAUDE.md for what each one means."
 fi
 echo "All blocking checks pass."
+
+# **THE STAMP THE pre-push HOOK READS.** It records the exact commit this run passed on, so
+# `dev/hooks/pre-push` can refuse a push of master that nobody verified. It is written ONLY on a
+# clean tree: a pass measured against uncommitted edits says nothing about the commit that will
+# actually be pushed, and a stamp that lies is worse than none. In .git/, so it is never committed
+# and never travels to another clone -- a stamp is a fact about THIS machine's last run.
+if [ -d .git ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
+	git rev-parse HEAD > .git/check-all-passed 2>/dev/null && \
+		echo "Stamped $(git rev-parse --short HEAD) as verified (dev/hooks/pre-push reads this)."
+fi
 echo ""
 echo "Not covered here, and worth knowing: rc's Robinson coefficients are still unverified (the"
 echo "paper is paywalled), and nothing above reads code for design or logic errors."

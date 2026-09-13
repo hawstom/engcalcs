@@ -1,0 +1,53 @@
+#!/bin/sh
+# Refuse to push master unless check_all.sh passed on exactly this commit.
+#
+# **THIS IS THE HOOK TODAY'S EVIDENCE ASKED FOR.** The pre-commit hook beside it would not have
+# caught what actually happened on 2026-09-12: two merges were pushed to master having run two
+# individual checks instead of the suite. Both happened to be green, which is the least useful
+# outcome -- luck confirming a shortcut teaches the wrong lesson. The rule is "check_all passes on
+# the MERGE RESULT before the merge is pushed", and this is that rule with teeth.
+#
+# **IT COMPARES THE COMMIT, NOT A TIMESTAMP.** check_all.sh stamps .git/check-all-passed with the
+# HEAD it verified, and only on a clean tree. A time window would pass a commit made after the run;
+# a commit id cannot. That is also why the workflow is merge-then-verify-then-push rather than
+# verify-then-merge: the merge result is a different tree from the branch, and it is the one that
+# ships.
+#
+# Only master is guarded. A feature branch is pushed freely -- it ships to nobody.
+# Escape hatch: git push --no-verify.
+
+remote_ref_guarded=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+	case "$remote_ref" in
+		refs/heads/master) remote_ref_guarded=1; pushed_sha="$local_sha" ;;
+	esac
+done
+[ "$remote_ref_guarded" = "1" ] || exit 0
+
+# A deletion (all-zero local sha) is not a content change and has nothing to verify.
+case "$pushed_sha" in *[!0]*) ;; *) exit 0 ;; esac
+
+stamp_file="$(git rev-parse --git-dir)/check-all-passed"
+stamp=""
+[ -f "$stamp_file" ] && stamp=$(cat "$stamp_file" 2>/dev/null)
+
+[ "$stamp" = "$pushed_sha" ] && exit 0
+
+cat >&2 <<MSG
+
+  REFUSED: pushing master, but check_all.sh has not passed on this commit.
+
+      pushing:  $(git rev-parse --short "$pushed_sha" 2>/dev/null)
+      verified: ${stamp:-(nothing stamped)}
+
+  Master is the production line: whatever is here is what Tom gets when he next pulls,
+  and he pulls without reading it. Run the suite on THIS commit -- the merge result, not
+  the branch it came from, which is a different tree:
+
+      sh dev/scripts/check_all.sh
+
+  It stamps this commit on success and the push will then go through.
+  Genuinely need to bypass?  git push --no-verify
+
+MSG
+exit 1
