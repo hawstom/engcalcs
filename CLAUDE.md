@@ -19,33 +19,48 @@ checks" below.
 general assistant default. The only exception is Tom explicitly saying to leave something
 uncommitted; silence means commit and push.
 
-- **Work directly on `master`.** No feature branches — the project is small enough for one branch,
-  and per-task branches accumulated as stale refs.
-- **FOUR NAMED EXCEPTIONS, ALL SINGULAR: `customer` and `projection` (2026-09-11), `graph` and
-  `custom-property` (2026-09-12).** **A branch names the capability being built, in the singular, in
-  the database tradition** (Tom, 2026-09-12). He renamed all four the day they were made, and the
-  reason is worth more than the convention: the first three were plural because plural is what gut
-  feel produces, and when the fourth was singular on his instruction the other three were left alone
-  on the argument that a projection list "is not a database entity". That was gut feel wearing a
-  reason's clothes -- *"It's not a reasoned exception. If we are plural here, we should be plural
-  everywhere. Gut feel is not a good reason."* A UI label that genuinely names a collection is a
-  different question and is decided on its own (the Water menu's **Graphs** submenu holds five
-  different graphs and stays plural). Tom asked twice about a "don't work on master" paradigm and
-  the answer to the general question is still no -- what bit this tree was CONCURRENT SESSIONS IN
-  ONE DIRECTORY, and a branch does not help, because both sessions still share the checkout. A
-  worktree does, and is already allowed below. But these four are the shape a branch is actually
-  for: **large, speculative, and abandonable**. Task 247 (Customers), Task 641 (Projections),
-  Task 640 (Graphs) and Task 636 (Custom properties) may each be dropped after a week's work;
-  Projections can touch the coordinate seam that every geographic document depends on, and Custom
-  properties reaches the Properties box, Find, the Tables pane and Graphs at once. **The condition
-  is that each is MERGED OR KILLED, never left to rot** -- a stale ref is the failure the
-  no-branches rule exists to prevent, and it is prevented by deleting the branch, not by never
-  making one.
+- **`master` IS THE PRODUCTION LINE AND NOBODY WORKS ON IT** (Tom, 2026-09-12, retooling the
+  paradigm: *"Master as sacred production line lets us work more happily merging all the while into
+  and from master at will... I am eager for the freedom of branches."*). **Every change starts on a
+  branch, however small, and reaches master only by a merge somebody decided to make.** Branches are
+  cheap; that is what they are for.
+  - **SACRED MEANS ONE TESTABLE THING: master is pullable at any moment.** `sh dev/scripts/check_all.sh`
+    passes on the MERGE RESULT before the merge is pushed -- not on the branch beforehand, which is a
+    different tree. A red master is a production outage waiting for whenever Tom next pulls.
+  - **THIS SUPERSEDES "work directly on master, no feature branches", and the reason it fell is
+    worth keeping.** That rule was argued on STALE REFS, and it was declined twice more on a
+    CONCURRENCY argument -- neither of which answers the release one. What decided it: **you cannot
+    pull half of master.** With features landing on master, a fix during a frozen window ships every
+    unfinished thing beside it, so the whole team stops. With master sacred, a fix is a two-commit
+    branch and everyone else keeps working -- Tom: *"most of the company doesn't care about EWB,
+    because they are still working hard on projection at projection-custom-property."*
+  - **THE STALE-REF FAILURE IS REAL AND IS NOW A CHECK, not a promise.** `branch_hygiene_check.php`
+    lists every branch with its age, its distance from master and whether it is merged. It is
+    ADVISORY -- when a branch should die is judgement -- but it means an abandoned branch is
+    reported rather than discovered a year later. **Merged or killed, never left to rot.**
+  - **A BRANCH NAMES ITS CAPABILITY, IN THE SINGULAR, in the database tradition** (Tom, 2026-09-12):
+    `customer`, `projection`, `graph`, `custom-property`. He renamed all four the day they were
+    made, and the reason outlives the convention: three were plural because plural is what gut feel
+    produces, and when the fourth came out singular the others were left alone on the argument that
+    a projection list "is not a database entity" -- gut feel wearing a reason's clothes. *"It's not
+    a reasoned exception. If we are plural here, we should be plural everywhere. Gut feel is not a
+    good reason."* A UI label naming a real collection is a separate question decided on its own:
+    the Water menu's **Graphs** submenu holds five different graphs and stays plural, which Tom
+    allowed in the same breath -- *"Public-facing menu is plural and natural and gut feely."*
+  - **MERGE FROM MASTER OFTEN, INTO MASTER WHEN DONE.** A long-lived branch that never takes master
+    back is a merge conflict being saved up. The four capability branches are large, speculative and
+    abandonable, which is what a branch is genuinely for.
   - **THEY SHARE SEAMS, so read the worktree rule below before running two of them at once.**
-    Graphs and Custom properties both write into the bottom pane's tab strip; Custom properties and
-    Customers both add fields to the Properties box and to Find; Projections and Customers both
-    place things by coordinate. Two of these in flight together is the five-defect shape that
+    `graph` and `custom-property` both write the bottom pane's tab strip; `custom-property` and
+    `customer` both add fields to the Properties box and to Find; `projection` and `customer` both
+    place things by coordinate. Two in flight together is the five-defect shape
     `scenario_seam_check.php` exists because of -- name the seam in both briefs, or sequence them.
+  - **CONCURRENT SESSIONS NOW REQUIRE A WORKTREE, and this is the change that bites.** Under the old
+    paradigm two sessions shared one checkout and both sat on master, needing only explicit staging.
+    **One checkout can only be on one branch**, so a second session that checks out a different
+    branch rewrites the files under the first one. A branch does not isolate concurrent sessions --
+    it never did, which is what the old rejection got right -- so the worktree rule below stops being
+    a subagent convenience and becomes how two sessions coexist at all.
 - **Stage explicit paths. Never `git add -A`** — Tom runs concurrent sessions in the same working
   directory, and a broad add commits their in-progress work under your message.
 - **Report the push state unabridged and unprompted:** the commit SHA, and that
@@ -77,10 +92,10 @@ block, where people actually look for them. End with:
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 ```
 
-### The one exception to no-branches: parallel subagents get worktrees
+### Worktrees: how two workers coexist in one checkout
 
-- **A worktree is justified by CONCURRENCY, never by caution.** One agent working alone works on
-  `master`.
+- **A worktree is justified by CONCURRENCY, never by caution.** One worker alone needs only a
+  branch; a second worker at the same time needs a worktree, because one checkout holds one branch.
 - **The orchestrator merges promptly and deletes the branch** as each track lands. A worktree branch
   outliving its agent is the stale-ref problem by another door.
 - **Give concurrent agents disjoint file territory, and say so in the brief.** Two tracks that both
@@ -706,7 +721,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `harness_wording_check.php` + selftest | A harness must not pin English WORDING as a literal. On 2026-09-08 Tom reworded three strings and three harnesses went red — not because anything broke, but because each asserted the old English (`/none of them changed/`, `/Limiting potential/i`, four copies of `lpn_goto_bad`). **There were 199 more, and 147 of them were repaired the same day — the baseline is 52.** A pin taxes exactly the work this project most wants to be free: `dev/english-key-rulings.json` is built on a ruling LAPSING when the wording moves, and a pinned harness makes that cost a red build in a file about hydraulics whose message names a fitting rather than a string. The fix is one line and already works — assert against `EngCalcs.pageConfig.<key>`, which the DOM stub fills from the real language file; where a harness loads no stub it reads `lang.ec.en.php` itself, and a message carrying `{placeholders}` becomes a PATTERN with the numbers left open. **A RATCHET, not a repair**, because the judgement is per site: three of the 147 were asserting against the WRONG key and passed anyway (`lpn_replace_none` for `lpn_scenario_push_none`, `lpn_engine_unavailable` for `lpn_time_no_engine`), which is what a fragment shared between two strings buys you. **18 sites are DECLARED correct as they stand** in the check's own exception table, keyed on file and exact literal with a reason each, and a declaration matching nothing FAILS: an assertion read off `PC.<key>` about a consent gate's own content is meant to go red, a project name the harness types in is not the page's text at all, and a `pc.x || 'English'` fallback in fixture code is `js_fallback_string_check.php`'s business. The remaining 52 are all in `dev/browser-pass/`. A literal is a pin when, normalised, it is a substring of a normalised English value; three words and twelve characters is the floor, and a shorter one is turned away and COUNTED, being an element id or a unit keyword far more often than wording. A harness that builds its expected text at runtime has no literal to compare and is invisible, which is what makes a false positive impossible |
 | `stale_claim_check.php` | *Advisory.* A `Task N` cited in `CLAUDE.md` or a `dev/*.md` whose task is CLOSED, ranked by whether a negation sits beside it — the shape of the three false "not built yet" claims that shipped in one day. A worklist, never a verdict |
 | `stale_claim_selftest.php` | The DEMOTIONS in the check above, against fixtures. Blocking, because the check it guards is not: a demotion trades coverage for a shorter list and the tool looks identical either way. The three real false claims must keep ranking HIGH |
-| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php`, `screenshot_publish_check.php` | Judgement calls that must not block a commit — and one that cannot run everywhere: the screenshot one reads the SIBLING repository, which is outside this tree, and prints that it checked nothing rather than passing in silence |
+| *advisory:* `key_hygiene_check.php`, `size_budget_check.php`, `detect_english_drift.php`, `example_folder_check.php`, `mode_name_check.php`, `screenshot_publish_check.php`, `branch_hygiene_check.php` | Judgement calls that must not block a commit — and one that cannot run everywhere: the screenshot one reads the SIBLING repository, which is outside this tree, and prints that it checked nothing rather than passing in silence |
 
 **When you are about to write a new rule in this file, first ask whether it can be a check.** Every
 rule here that became a script stopped being violated. Every rule that stayed prose kept being
