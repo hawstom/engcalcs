@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read**, of 105 untranslated keys, of 1868 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**6 still to read**, of 105 untranslated keys, of 1868 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (105, 8 to read @@ NEEDS RULING)
+## lpn_  (105, 6 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -271,11 +271,11 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.
   _Ruled OK 2026-09-14._
 - **`lpn_new_coordsys_local`**
-  > Local, schematic, or custom
-  @@ NEEDS RULING
+  > Local, schematic, custom, or georeference later
+  _Ruled OK 2026-09-14._
 - **`lpn_new_coordsys_local_tip`**
-  > Choose this to attach your own background image.
-  @@ NEEDS RULING
+  > Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.
+  _Ruled OK 2026-09-14._
 - **`lpn_new_coordsys_tip`**
   > Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.
   _Ruled OK 2026-09-14._

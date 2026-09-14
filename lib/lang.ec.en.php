@@ -1621,8 +1621,8 @@ $ec_lang['lpn_new_coordsys']='Coordinate system';
 $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.';
 $ec_lang['lpn_new_coordsys_geo']='Geographic projection';
 $ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
-$ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
-$ec_lang['lpn_new_coordsys_local_tip']='Choose this to attach your own background image.';
+$ec_lang['lpn_new_coordsys_local']='Local, schematic, custom, or georeference later';
+$ec_lang['lpn_new_coordsys_local_tip']='Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.';
 // ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
