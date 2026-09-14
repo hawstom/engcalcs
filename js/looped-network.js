@@ -29143,6 +29143,41 @@ var EngCalcs = EngCalcs || {};
 		// while the Find box is closed, which is nearly always.
 		refreshFindForm();
 	}
+	/**
+	 * A heading's own words, WITHOUT the "?" glyph of a tip it may carry.
+	 *
+	 * `ecTipLabel()` with no link wraps the label text AND the glyph in one `.ec-help`, which is
+	 * CLAUDE.md's rule and is right on the heading: with no link, a one-character tap target is
+	 * not usable. But the index reads the heading's `textContent` to build its own row, so it
+	 * took the glyph with it and the left pane grew a stray "?" (Tom, 2026-09-13: *"the glyph
+	 * needs to be separate so it doesn't go to the index pane."*). The separation belongs HERE,
+	 * at the reader, rather than in hand-assembled markup the helpers exist to prevent: the glyph
+	 * is already its own `.ec-tip` element, so it is removable from a clone without any opinion
+	 * about how the heading was built. Written against every heading, not the one that has a tip
+	 * today -- `lpn_set_sub_customProps` is the only one now, and the next is a silent repeat.
+	 */
+	function setboxHeadingText(el) {
+		var found = false, clone;
+		function strip(node) {
+			var kids = node.children ? [].slice.call(node.children) : [], i, k;
+			for (i = 0; i < kids.length; i++) {
+				k = kids[i];
+				if (k.classList && k.classList.contains('ec-tip')) {
+					found = true;
+					if (k.parentNode) { k.parentNode.removeChild(k); }
+				} else { strip(k); }
+			}
+		}
+		if (!el) { return ''; }
+		if (!el.cloneNode) { return el.textContent; }
+		clone = el.cloneNode(true);
+		strip(clone);
+		// Nothing was a tip, so the heading's own words are all there ever were. Returned
+		// untouched rather than trimmed, because the trim below exists only to eat the single
+		// space ecTipLabel() puts between the label and the glyph it has just removed.
+		if (!found) { return el.textContent; }
+		return clone.textContent.replace(/\s+$/, '');
+	}
 	// The left pane, read off the right one. A section row and a row per sub-heading inside it;
 	// clicking either scrolls the content pane so that heading is at its top.
 	function buildSettingsIndex() {
@@ -29175,11 +29210,11 @@ var EngCalcs = EngCalcs || {};
 		[].forEach.call(content.querySelectorAll('.lpn-set-sec'), function (sec) {
 			var head = sec.querySelector('.lpn-set-head');
 			if (!head) { return; }
-			link(head, head.textContent, 'lpn-setbox-link-sec').setAttribute('data-sec', sec.id);
+			link(head, setboxHeadingText(head), 'lpn-setbox-link-sec').setAttribute('data-sec', sec.id);
 			[].forEach.call(sec.querySelectorAll('.lpn-set-sub'), function (sub) {
 				n++;
 				if (!sub.id) { sub.id = 'lpn_set_sub_auto' + n; }
-				link(sub, sub.textContent, 'lpn-setbox-link-sub').setAttribute('data-sub', sub.id);
+				link(sub, setboxHeadingText(sub), 'lpn-setbox-link-sub').setAttribute('data-sub', sub.id);
 			});
 		});
 	}
