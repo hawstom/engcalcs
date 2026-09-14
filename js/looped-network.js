@@ -3618,33 +3618,26 @@ var EngCalcs = EngCalcs || {};
 		if (!/^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(t)) { return NaN; }
 		return Number(t);
 	}
-	/**
-	 * **COULD THIS BE A DATE OR A TIME AT ALL?** One type called "Date and time" and deliberately
-	 * permissive (Tom, 2026-09-13: *"we simply say 'Date and time' and then we internally do our
-	 * magic to flag any values that do not look to us like any possible date and time
-	 * expression"*). It is not a parser and must not become one: a date is written a dozen ways
-	 * across the 27 languages this suite ships in, and a rule tight enough to pick one of them
-	 * would flag four hundred correct entries in somebody else's region.
-	 *
-	 * So the question asked is the negative one -- what could not be a date or a time under any
-	 * convention -- and that is a value with no digit in it, a value carrying a character no date
-	 * or time expression uses, or digits with nothing date-shaped or time-shaped about them.
-	 *
-	 * **THE DOOR LEFT OPEN, AND IT IS NOT BUILT:** Tom's own next step if this proves too loose is
-	 * to expose the rules as validation regular expressions in Settings, below Design. Nothing
-	 * here should harden until he asks for that, because a stricter default and a regexp box are
-	 * answers to the same complaint and only one of them is his.
-	 */
-	function customPropDatetimeOk(raw) {
-		var t = String(raw === undefined || raw === null ? '' : raw).trim();
-		if (!/\d/.test(t)) { return false; }
-		if (!/^[0-9A-Za-z:\/\-.,+ ]+$/.test(t)) { return false; }
-		if (/\d\s*[-\/.]\s*\d/.test(t)) { return true; }    // 2026-09-13, 9/13/2026, 13.09.2026
-		if (/\d\s*:\s*\d/.test(t)) { return true; }          // 14:30, 2:05 pm
-		if (/[A-Za-z]{3}/.test(t)) { return true; }          // 13 September 2026, Sep 13, 2026 T, Z
-		if (/^\d{4,8}$/.test(t)) { return true; }            // 2026, 20260913
-		return isFinite(Date.parse(t));
-	}
+	// **THERE IS NO "DATE AND TIME" VALIDATION TYPE, AND IT IS NOT COMING BACK WITHOUT AN ASK.**
+	// Removed 2026-09-14 on Tom's instruction -- make it work or remove it -- and removing was the
+	// honest half, because HE NEVER ASKED FOR IT. What shipped called itself validation and
+	// validated nothing a data-entry clerk would care about: `2026-13-45` passed, being digits
+	// separated by dashes, and so did `99:99`. A rule that admits a 13th month is not a loose rule,
+	// it is a rule about punctuation wearing a calendar's name, and a property designed as
+	// "Date and time" that accepts a 13th month is worse than one with no type at all -- the user
+	// believes something is being checked.
+	//
+	// **AND IT COULD NOT BE FIXED IN PLACE, WHICH IS WHY THIS IS A DELETION AND NOT A TIGHTENING.**
+	// A date is written a dozen ways across the 27 languages this suite ships in, so a rule tight
+	// enough to reject the 13th month in one convention rejects correct entries in another:
+	// 13/09/2026 is a real date in most of the world and a real nothing in the United States, and
+	// the validator cannot know which the user meant. Length limits and the character restriction
+	// still serve dates well and are Tom's own suggestion for them (revision 9: *"Good for dates
+	// and datetimes and finding empty or partial entries."*).
+	//
+	// The door he left open is still the right one and is still not built: expose the rules as
+	// validation regular expressions in Settings, below Design. That is a real answer to a real
+	// need, and it is his to ask for.
 	// One character against a restriction set, where `@` stands for any letter and `#` for any
 	// digit -- the scope document's own shorthand, so `@#.-_` is "letters, digits, dot, hyphen and
 	// underscore".
@@ -3673,8 +3666,6 @@ var EngCalcs = EngCalcs || {};
 			n = customPropNumberOf(def, s);
 			if (!isFinite(n)) { return pc.lpn_cp_bad_number || 'This value is not a number as required for this property.'; }
 			if (def.validate === 'integer' && Math.floor(n) !== n) { return pc.lpn_cp_bad_integer || 'This value is not a whole number as required for this property.'; }
-		} else if (def.validate === 'datetime') {
-			if (!customPropDatetimeOk(s)) { return pc.lpn_cp_bad_datetime || 'This value does not look like a date or a time.'; }
 		} else if (LPN_CP_CASE_RE[def.validate]) {
 			re = LPN_CP_CASE_RE[def.validate];
 			if (!re.test(s)) { return pc.lpn_cp_bad_case || 'This value is not ALL CAPS as required for this property.'; }
@@ -3763,7 +3754,6 @@ var EngCalcs = EngCalcs || {};
 			['number', pc.lpn_cp_val_number || 'Number .'],
 			['number_comma', pc.lpn_cp_val_number_comma || 'Number ,'],
 			['integer', pc.lpn_cp_val_integer || 'Integer'],
-			['datetime', pc.lpn_cp_val_datetime || 'Date and time'],
 			['upper', pc.lpn_cp_val_upper || 'ALL CAPS'],
 			['camel', pc.lpn_cp_val_camel || 'camelCase'],
 			['pascal', pc.lpn_cp_val_pascal || 'PascalCase'],
@@ -14957,6 +14947,40 @@ var EngCalcs = EngCalcs || {};
 		c.unitText = qualityUnitText;
 		return c;
 	}
+	/**
+	 * **THE STARTING CONCENTRATION AS A COLUMN** (Tom, 2026-09-14: *"Initial quality is in no Table
+	 * and no multi-properties. Embarrassing, and we are committed to finishing it."*).
+	 *
+	 * **ONE COLUMN FIXES BOTH HALVES OF THAT SENTENCE, WHICH IS WHY THERE IS NO SECOND EDIT FOR
+	 * THE MULTI-PROPERTIES BOX.** `multiGroups()` derives its sections from `paneTables()`, so the
+	 * table spec is the single source and a property absent from it is absent from both places by
+	 * construction. That is also the reason the omission happened at all: the popup grew the field
+	 * (Task 566) and nothing else had to, so nothing else did.
+	 *
+	 * It is the popup row's twin and is built from the same three parts on purpose -- the same
+	 * gate, the same `effective()` read, the same `setProp()` write -- because two editors of one
+	 * property must not have two ideas of what editing it means. `scenario_seam_check.php` holds
+	 * the write half of that.
+	 *
+	 * **BLANK IS A STATE AND NOT A ZERO**, as in the popup: an empty cell is a node that states
+	 * nothing and takes EPANET's own zero, and a typed 0 is a node deliberately holding none. A
+	 * pane cell hands back `+'' === 0`, so the column declares `blank` and the cell handler passes
+	 * `undefined` through -- the same arrangement `paneColReaction()` documents.
+	 *
+	 * **NOT CONVERTED, AND THE UNIT IS TEXT.** A concentration's unit is the label the document
+	 * states beside the chemical's name; there is no unit family for it and nothing to convert to,
+	 * so this declares `unitText` and leaves the unit id empty, exactly as the quality column does.
+	 */
+	function paneColNodeInitQuality() {
+		return { key: 'initQuality', label: 'lpn_quality_initial', unitText: concentrationUnitText,
+			em: 3.5, blank: true,
+			// The popup's own gate, asked rather than stored: the field exists only while a
+			// chemical is being tracked, and the heading follows the same switch.
+			when: function () { return qualityMode() === 'chemical'; },
+			prop: 'initQuality',
+			get: function (n) { return effective(n, 'initQuality'); },
+			set: function (n, v) { setProp(n, 'initQuality', v); } };
+	}
 	function paneUnitElevHead() { return 'lpn_u_elevhead'; }
 	// **A REACTION COEFFICIENT AS A COLUMN** (Task 566), for the pipe pair and for the tank's own.
 	// It is the popup row's twin and is deliberately built from the same three parts: the same
@@ -15123,6 +15147,7 @@ var EngCalcs = EngCalcs || {};
 						set: function (n, v) { setProp(n, 'fireFlow', fireFlowStore(v)); } },
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
+					paneColNodeInitQuality(),
 					paneColNodeQuality()
 				]
 			},
@@ -15141,6 +15166,7 @@ var EngCalcs = EngCalcs || {};
 					// ground is unknown -- an imported reservoir states a head and no elevation, and
 					// a 0 there would assert what the file never said (Task 390).
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
+					paneColNodeInitQuality(),
 					paneColNodeQuality()
 				]
 			},
@@ -15172,6 +15198,7 @@ var EngCalcs = EngCalcs || {};
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
+					paneColNodeInitQuality(),
 					paneColNodeQuality()
 				]
 			},
@@ -28363,10 +28390,13 @@ var EngCalcs = EngCalcs || {};
 						def[field] = input.value.trim();
 						commit();
 					});
-					row(body, labelText, input, tip);
+					// The row is kept ON the input so a caller can reach the label span, which is
+					// what lets the character box be RE-TITLED by the mode below. Returning the
+					// input stays the common case and no existing caller changes.
+					input.lpnRow = row(body, labelText, input, tip);
 					return input;
 				}
-				function selectRow(field, labelText, tip, opts, fallback) {
+				function selectRow(field, labelText, tip, opts, fallback, after) {
 					var sel = document.createElement('select');
 					opts.forEach(function (o) {
 						var opt = document.createElement('option');
@@ -28375,7 +28405,11 @@ var EngCalcs = EngCalcs || {};
 						sel.appendChild(opt);
 					});
 					sel.setAttribute('aria-label', labelText);
-					sel.addEventListener('change', function () { def[field] = sel.value; commit(); });
+					sel.addEventListener('change', function () {
+						def[field] = sel.value;
+						if (after) { after(sel.value); }
+						commit();
+					});
 					row(body, labelText, sel, tip);
 					return sel;
 				}
@@ -28411,9 +28445,38 @@ var EngCalcs = EngCalcs || {};
 				});
 				selectRow('validate', pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip,
 					vOpts, 'none');
+				// **THE CHARACTER BOX IS TITLED BY THE MODE, AND THAT IS THE 09-14 DEFECT.** Tom:
+				// *"Custom property `Restrict these characters` never switches to Allow. It stays
+				// on Restrict."* The select persisted perfectly -- `deny` was stored, read back
+				// and enforced -- but the TEXT BOX BESIDE IT was captioned 'Restrict these
+				// characters' whichever mode was chosen, so choosing Allow changed nothing a user
+				// could see and the feature read as broken. A control that stores the right value
+				// and shows the wrong word is indistinguishable from one that does not work.
+				//
+				// The two captions are the SELECT'S OWN OPTION STRINGS, reused rather than
+				// re-keyed: they are the exact words the user just picked, they already exist in
+				// all 27 languages, and two strings that must agree cannot drift if there is only
+				// one of each.
+				function restrictCaption(mode) {
+					var j;
+					for (j = 0; j < mOpts.length; j++) { if (mOpts[j][0] === mode) { return mOpts[j][1]; } }
+					return pc.lpn_cp_restrict || 'Restrict these characters';
+				}
+				var restrictInput;
 				selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or restrict', pc.lpn_cp_restrict_mode_tip,
-					mOpts, 'allow');
-				textRow('restrict', pc.lpn_cp_restrict || 'Restrict these characters', pc.lpn_cp_restrict_tip);
+					mOpts, 'allow', function (mode) {
+						var cap = restrictCaption(mode),
+							lab = restrictInput && restrictInput.lpnRow && restrictInput.lpnRow.firstChild;
+						if (lab) { lab.textContent = cap; }
+						// **BOTH CAPTIONS, OR THE FIX IS HALF DONE.** The visible span and the
+						// input's own aria-label are two statements of the same thing, and a
+						// screen reader hears only the second -- so updating one of them would
+						// leave exactly this defect in place for the reader least able to work
+						// around it.
+						if (restrictInput) { restrictInput.setAttribute('aria-label', cap); }
+					});
+				restrictInput = textRow('restrict', restrictCaption(def.restrictMode || 'allow'),
+					pc.lpn_cp_restrict_tip);
 				textRow('minLength', pc.lpn_cp_minlength || 'Length lower limit', pc.lpn_cp_minlength_tip);
 				textRow('maxLength', pc.lpn_cp_length || 'Length upper limit', pc.lpn_cp_length_tip);
 				textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);

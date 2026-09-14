@@ -289,6 +289,50 @@ ok('the map is emptied rather than copied, so no later edit can leave two disagr
 ok('and the document reports the moved value as the tank\'s own',
 	L.docReactions().tank.T1 === -0.65);
 
+// =================================================================================================
+head('9. Initial quality reaches the Tables, and therefore the multi-properties box');
+// =================================================================================================
+// Tom, 2026-09-14: *"Initial quality is in no Table and no multi-properties. Embarrassing, and we
+// are committed to finishing it."* The field shipped into the popup with Task 566 and nowhere
+// else. **ONE COLUMN FIXES BOTH HALVES**, because multiGroups() derives its sections from
+// paneTables() -- so what is asserted here is the table spec, and the multi box follows it by
+// construction. It is also why the omission was invisible: nothing but the popup had to change,
+// so nothing but the popup did.
+L.setQuality(Object.assign({}, CHEM));
+['junctions', 'reservoirs', 'tanks'].forEach(function (tab) {
+	ok('the ' + tab + ' table offers Initial quality', L.paneCols(tab).indexOf('initQuality') >= 0,
+		L.paneCols(tab).join(','));
+});
+{
+	const col = L.paneCol('junctions', 'initQuality');
+	ok('it is an INPUT, not a result -- it can be written',
+		!!col && typeof col.set === 'function' && !col.result);
+	// The same three parts as the popup row: same gate, same effective() read, same setProp()
+	// write. Two editors of one property must not have two ideas of what editing it means.
+	ok('...through setProp, so a scenario edit cannot reach BASE', col.prop === 'initQuality');
+	col.set(jun, 0.8);
+	ok('...and writing the cell moves the number the popup reads',
+		L.effective(jun, 'initQuality') === 0.8, String(L.effective(jun, 'initQuality')));
+	// **BLANK IS A STATE, NOT A ZERO** -- an empty cell is a node that states nothing and takes
+	// EPANET's own zero; a typed 0 is a node deliberately holding none. A pane cell hands back
+	// `+'' === 0`, so the column has to declare `blank` or the two become one.
+	ok('...and the column declares blank, so an empty cell is not a typed zero', col.blank === true);
+	// A concentration's unit is the label the document states beside the chemical's name. There is
+	// no unit family for it, so this is unitText and never a converted quantity.
+	ok('...and its unit is the document\'s own text, not a converted family',
+		typeof col.unitText === 'function' && !col.unit, String(col.unitText && col.unitText()));
+	ok('...which is the chemical\'s own stated unit', col.unitText() === 'mg/L', col.unitText());
+}
+// And it obeys the same gate as everything else here: no chemical, no column.
+L.setQuality({ mode: 'age' });
+['junctions', 'reservoirs', 'tanks'].forEach(function (tab) {
+	ok('a water-age run drops Initial quality from ' + tab,
+		L.paneCols(tab).indexOf('initQuality') < 0);
+});
+ok('and the number itself survives being hidden',
+	L.effective(jun, 'initQuality') === 0.8, String(L.effective(jun, 'initQuality')));
+L.setQuality(Object.assign({}, CHEM));
+
 console.log(fails === 0 ? '\nreaction controls harness: all checks passed'
 	: `\nreaction controls harness: ${fails} FAILED`);
 process.exit(fails === 0 ? 0 : 1);
