@@ -15,7 +15,11 @@ that stay on Tom's list; they are never counted as passes.
 It walks outward from a junction one pixel at a time on eight bearings and reads the cursor the
 browser actually computes, which is how Task 569 was diagnosed: the "flicker at 12 px" was never a
 ring, it was the strip of bare canvas between a node (`pointer`) and its own label (`move`), showing
-`default`. The canvas now says `grab` and the section asserts it.
+`default`. The canvas carries a deliberate cursor of its own now, and the section asserts that
+rather than a glyph: it reads the canvas's own computed value and holds every other check against
+it. It named `grab` until 2026-09-13, and all three checks went red the day Tom retired the open
+hand (*"it's very cute and all ... but it's not right for professional work"*) -- a spec reporting a
+regression that was a decision, which is the pinned-wording trap in another costume.
 
 **It REPORTED rather than asserted for two commits, and the reason is worth keeping.** The property
 was decidable, so asserting it was tempting — but it did not hold, the fix was a pending human
