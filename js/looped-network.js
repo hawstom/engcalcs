@@ -23301,10 +23301,21 @@ var EngCalcs = EngCalcs || {};
 	var newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
 	// The chooser states the answer and changes it, so its LABEL is the projection now in force.
 	function syncNewBoxCrsPick() {
-		var b = document.getElementById('lpn_new_crs_pick');
+		var b = document.getElementById('lpn_new_crs_pick'),
+			n = document.getElementById('lpn_new_crs_name'),
+			off = newBoxCoords() !== 'geo';
 		if (!b) { return; }
-		b.textContent = crsLabel(newBoxGeo.crs) + '\u2026';
-		b.disabled = newBoxCoords() !== 'geo';
+		// The button's own word never changes now -- see the note in Looped-Network.php. A control
+		// that is 3 characters wide on one project and 50 on the next is one that moves under the
+		// pointer, and the register's names got a great deal longer on 2026-09-14.
+		b.disabled = off;
+		if (n) {
+			n.textContent = crsLabel(newBoxGeo.crs);
+			// Greyed with the button rather than hidden: the projection is still what this radio
+			// WOULD use, and blanking it would read as "none chosen" to somebody who is about to
+			// switch back.
+			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
+		}
 	}
 	// **CLONED, AND THE `name` ATTRIBUTE IS THE THING THAT MUST NOT SURVIVE THE CLONE.**
 	// wireUnitSelects() listens on the DOCUMENT for a change whose target's `name` is one of

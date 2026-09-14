@@ -498,17 +498,29 @@ setUnitSet('si');
 	ok('a projection left over from a chooser nobody committed to is not declared',
 		L.newBoxAnswers().geo === false && L.newBoxAnswers().crs === '');
 
-	// The chooser button STATES the answer, which is what makes it one control rather than two.
+	// **THE BUTTON IS AN ELLIPSIS AND THE NAME SITS BESIDE IT** (Tom, 2026-09-14: *"The button is
+	// not a good place for the full projection name. How about an ellipsis button followed by the
+	// name?"*). It used to be one control doing both jobs; with 5,346 register names in play, some
+	// of them past 50 characters, that made a button whose width changed every time it was used.
+	const crsNameEl = ensure('lpn_new_crs_name');
 	newCoordsRadios.geo.checked = true;
 	L.newBoxGeo().crs = ZONE12N;
 	L.syncNewBoxCrsPick();
-	ok('the chooser button reads the projection now in force',
-		byId.lpn_new_crs_pick.textContent.indexOf(L.crsLabel(ZONE12N)) === 0,
+	ok('the name beside the button states the projection now in force',
+		crsNameEl.textContent === L.crsLabel(ZONE12N), crsNameEl.textContent);
+	ok('...and the button itself does NOT carry it, so its width cannot move',
+		byId.lpn_new_crs_pick.textContent.indexOf(L.crsLabel(ZONE12N)) < 0,
 		byId.lpn_new_crs_pick.textContent);
 	newCoordsRadios.local.checked = true;
 	L.syncNewBoxCrsPick();
 	ok('...and is greyed when the question belongs to the other radio',
 		byId.lpn_new_crs_pick.disabled === true);
+	// The name greys WITH it rather than blanking: the projection is still what that radio would
+	// use, and an empty slot reads as "none chosen" to somebody about to switch back.
+	ok('...and the name greys with it rather than vanishing',
+		crsNameEl.textContent === L.crsLabel(ZONE12N)
+			&& String(crsNameEl.className).indexOf('lpn-dim') >= 0,
+		crsNameEl.textContent + ' / ' + crsNameEl.className);
 }
 
 // ---- 11. THE CAMERA THE NEW PROJECT OPENS ON ----------------------------------------------------

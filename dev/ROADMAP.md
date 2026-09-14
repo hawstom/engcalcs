@@ -1247,8 +1247,26 @@ the block.
     one of which agreed. Generated from PROJ's build of EPSG v12.029 out of a **PyPI wheel pinned
     by sha256** — IOGP's REST API was measured and rejected, being ~9,000 requests for a snapshot
     nothing publishes a hash of. `dev/projection-catalogue.md` §5 has the vendoring argument and
-    the weaker-digest admission. **The deploy blocker `utm-only` stays OPEN**: Tom asked to TEST
-    with the full universe and has not yet, and closing one is his word.
+    the weaker-digest admission. The deploy blocker `utm-only` was CLOSED on his word 2026-09-14.
+  - **PHASE 5, THE TRANSFORM, IS NOW THE WHOLE OF WHAT IS LEFT, AND TOM HAS ASKED FOR IT TWICE IN
+    ONE DAY IN TWO COSTUMES.** (a) *"The projected project needs to open at the place you searched
+    for. We know the lat/lon and zoom level they searched for."* (b) *"The world map is not in the
+    background. It appears that the math to put the world map tiles on the projected map is not
+    implemented or is wrong."* **It is not wrong; it is absent** -- `basemapOn()` is
+    `isGeoProject() && ...`, so a projected project has never drawn a tile.
+    - **THEY ARE ONE MISSING PIECE, WHICH IS THE THING TO SEE.** Both need a forward and inverse
+      transform between lon/lat and the plane: (a) is one point, (b) is four corners per TILE.
+      Everything else phase 4 shipped is data and needed none. Nothing cheaper works for (a)
+      either -- an empty projected project has no coordinates to fit to, so "where is the site in
+      this plane" has no answer but the transform.
+    - **THAT MEANS proj4js, AND THE NUMBERS ARE MEASURED** (`dev/projection-catalogue.md` §6):
+      `proj4` 2.22.0, MIT, 126.7 KB minified / 41.1 KB gzipped, bundling almost no definitions --
+      so per-CRS proj4 strings are a second data problem, and `proj.db` states them as PARAMETERS
+      rather than as strings, which our generator would have to assemble per projection method.
+    - **AND PIN PER TILE, NOT PER VIEW.** Already measured: a single centre pin is 0.03 m out
+      across 1 km and 2,338 m across the 300 km mission scope.
+    - **THE STANDING REFUSAL SURVIVES IT.** A transform makes "convert my network" askable and the
+      answer is still no -- converting rewrites every number the user typed.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
