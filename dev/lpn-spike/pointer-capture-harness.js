@@ -15,8 +15,11 @@
 // cannot be dragged is exactly what he described.
 //
 // **THE TREE HAD DECIDED THIS TWICE IN OPPOSITE DIRECTIONS**, which is this project's standing
-// signature for a rule nobody wrote down: the two pane-grip setPointerCapture() calls were already
-// wrapped in try/catch, and this one was not.
+// signature for a rule nobody wrote down. The sentence that stood here said the two pane-grip calls
+// were already wrapped in try/catch; **they were not, and Task 660 found it**. They were feature
+// TESTED -- `if (grip.setPointerCapture)` -- which guards a method that is missing, not one that
+// throws, and `makePanelDraggable()` guarded its call by nothing at all. All four are wrapped now;
+// `panel-capture-harness.js` holds the other three.
 //
 // **CAPTURE IS AN OPTIMISATION HERE, NOT A REQUIREMENT.** It keeps pointermove arriving when the
 // pointer leaves the svg. Losing it degrades a drag at the edges; losing the gesture loses the map.

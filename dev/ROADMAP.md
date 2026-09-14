@@ -446,6 +446,48 @@ the block.
   - Shipped meanwhile: `specs/pan.js`, and a guard on the `tick()` heartbeat so one throwing frame
     can no longer end every drag for the life of the page, which is that report's exact signature.
 
+- 100|660| **Double-click does not open a file, and the list is the browser's.**
+  It fails in his Chrome and the file list is not ours. Tom, 2026-09-13, on the same Ubuntu Chrome under WSLg that could not pan: *"Double-click on file
+  fails to open in Chrome. Must use 'Open' button."*
+  - **THERE IS NO IN-PAGE FILE LIST.** `openFromFile()` calls `window.showOpenFilePicker()`, and
+    where the File System Access API is absent a hidden `<input type="file">`; both put up the
+    BROWSER'S OWN chooser, and this page is not running while it is on screen. The recent-files
+    rows in the File menu open on a SINGLE click. The only `dblclick` listeners in
+    `js/looped-network.js` are the map canvas, the element popup and a table cell.
+  - **AND THE THIRD READING IS RULED OUT TOO:** double-clicking a `.lwn` in a file manager was
+    never going to reach us -- `manifest.php` declares no `file_handlers`, so the installed app is
+    not registered for the extension. Declaring one is a task nobody has opened.
+  - **NOT REPRODUCED, and a CDP mouse cannot reach it** any more than it reached Task 650's pan.
+  - **THE ONE-MINUTE TEST is in the header of `dev/lpn-spike/panel-capture-harness.js`**: a console
+    snippet that says whether `dblclick` reaches the PAGE at all on that machine. It does not, and
+    the chooser is failing the same way and neither is ours; it does, and the fault is inside the
+    chooser alone. Either answer settles where to look, and the single-click route (select, then
+    press Open) is the one to demonstrate from on 2026-09-16 regardless.
+  - Shipped meanwhile, from the same scan: the other three `setPointerCapture()` sites are guarded
+    (see the closed Task 658 note in `pointer-capture-harness.js`, whose claim that they already
+    were was wrong).
+
+- 100|638| **Node and link symbology do not offer the chemical properties.**
+  **THE FIELDS ALL SHIPPED 2026-09-13; ONE LEGEND QUESTION IS WHAT IS LEFT.** Node symbology offers
+  quality and initial quality; link symbology offers average quality, friction factor and status,
+  coloured AND labelled, in both `COLOR_*_FIELDS` and `nodeFieldDefs()`/`linkFieldDefs()`.
+  `dev/lpn-spike/chemical-symbology-harness.js`, 40 assertions off a real EPS run.
+  - **THE REACTION RATE SHIPPED TOO, UNDER TASK 652, AND WHAT STOOD HERE WAS WRONG.** This block
+    said it was not shippable from the toolkit, on the ground that `LinkProperty` ends at `LinkQual`
+    and the only alternatives were a binary parser or mass-transfer arithmetic of our own. The enum
+    finding is correct; the conclusion was not. **EPANET writes the number into its binary output
+    file and the vendored wrapper already exports a reader for it** (`readBinary()`, series
+    `reactionRate`), so nothing was derived and nothing upstream was needed. The general lesson is
+    worth more than the feature: the question that answers this is not *what does the API expose?*
+    but *what does the engine WRITE?* -- an engine with a report has a report to read.
+  - A link's average quality **was never read from the engine at all** before this; `EN_LINKQUAL`
+    is now harvested in `js/lpn-epanet.js` and carried through `js/lpn-time.js` as its own map,
+    because link ids and node ids are two namespaces.
+  - **`status` is categorical and the ramp is numeric**, so it enters as 1 open / 0 closed. The map
+    reads correctly; the LEGEND prints numeric bands rather than the two words. Fixing that means
+    changing the field-definition shape, which was deliberately not done while Task 636 was in
+    flight beside it. Decide whether the legend is worth that.
+
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
   more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with
