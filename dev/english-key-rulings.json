@@ -11,6 +11,16 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_about_credits": {
+            "on": "Credits",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_about_license": {
+            "on": "Licensed under the GNU General Public License v3.0 or later.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_area_hint_lasso_go": {
             "on": "Move to draw the outline. Click to finish.",
             "ruled": "2026-09-09",
@@ -69,6 +79,341 @@
         "lpn_area_selected": {
             "on": "{n} selected.",
             "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_cp_add": {
+            "on": "Add custom property",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_add_tip": {
+            "on": "Adds a row to the design table and opens it for editing.",
+            "ruled": "2026-09-14",
+            "answer": "Edited"
+        },
+        "lpn_cp_applies": {
+            "on": "Applies to",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_applies_tip": {
+            "on": "Applies to: Comma separated list of ID prefixes for assets that use this property, such as J,L,R.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_bad_case": {
+            "on": "This value is not ALL CAPS as required for this property.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_bad_chars": {
+            "on": "This value uses a character this property does not allow.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_bad_datetime": {
+            "on": "This value does not look like a date or a time.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_bad_high": {
+            "on": "This value is above the high limit of this property.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_bad_integer": {
+            "on": "This value is not a whole number as required for this property.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_bad_length": {
+            "on": "This value is longer than this property allows.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_bad_low": {
+            "on": "This value is below the low limit of this property.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_bad_minlength": {
+            "on": "This value is shorter than this property allows.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_bad_number": {
+            "on": "This value is not a number as required for this property.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_bad_space": {
+            "on": "White space is allowed only between other characters.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_design": {
+            "on": "Design",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_design_tip": {
+            "on": "One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_edit_tip": {
+            "on": "Opens the design of this custom property, where every part of it is shown at full length.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_edit_title": {
+            "on": "Custom property design",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_flag": {
+            "on": "{label}: {reason} The value is kept exactly as you typed it.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_high": {
+            "on": "High limit",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_high_tip": {
+            "on": "High limit: This is the largest value you expect. Numbers are compared as numbers and text in dictionary order.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_key": {
+            "on": "Key",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_key_needed": {
+            "on": "Give this custom property a key with no spaces.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_key_taken": {
+            "on": "Another custom property already uses that key.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_key_tip": {
+            "on": "Key: A property is stored under this name. Spaces are not allowed, and a prefix is added for you so that your key can never collide with a built-in field.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_label": {
+            "on": "Label",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_label_tip": {
+            "on": "Label: A reader sees this on the properties box, in Find and at the head of a table column.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_length": {
+            "on": "Length upper limit",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_length_tip": {
+            "on": "Length upper limit: Any longer entry is flagged.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_low": {
+            "on": "Low limit",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_low_tip": {
+            "on": "Low limit: This is the smallest value you expect. Numbers are compared as numbers and text in dictionary order.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_minlength": {
+            "on": "Length lower limit",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_minlength_tip": {
+            "on": "Length lower limits: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_none": {
+            "on": "No custom property is designed yet.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_remove": {
+            "on": "Remove",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_remove_tip": {
+            "on": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_restrict": {
+            "on": "Restrict these characters",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_restrict_allow": {
+            "on": "Allow only these characters",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_restrict_deny": {
+            "on": "Restrict these characters",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_restrict_mode": {
+            "on": "Allow or restrict",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_restrict_mode_tip": {
+            "on": "Allow or restrict: The given characters are either the only ones a value may use or the ones it may not use.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_restrict_tip": {
+            "on": "Restrict characters: A value may use only the characters listed here, or none of them, where \"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
+        },
+        "lpn_cp_val_camel": {
+            "on": "camelCase",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_datetime": {
+            "on": "Date and time",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_hyphen": {
+            "on": "hyphen-case",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_integer": {
+            "on": "Integer",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_none": {
+            "on": "Do not validate",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_number": {
+            "on": "Number .",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_number_comma": {
+            "on": "Number ,",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_pascal": {
+            "on": "PascalCase",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_snake": {
+            "on": "snake_case",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_val_upper": {
+            "on": "ALL CAPS",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_validate": {
+            "on": "Validate as",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_cp_validate_tip": {
+            "on": "Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_choose": {
+            "on": "Select",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_count": {
+            "on": "{n} of {total} projections listed.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_list": {
+            "on": "Projection",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_list_tip": {
+            "on": "The projections left by the two filters above. Choose one and press Select.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_name": {
+            "on": "Projection name filter",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_name_tip": {
+            "on": "Shows only the projections whose name or EPSG code contains what you type. Try a zone number, or UTM, or Mercator.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_none": {
+            "on": "Not georeferenced",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_noview": {
+            "on": "No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.",
+            "ruled": "2026-09-14",
+            "answer": "Edited, and confirm that this describes the specified and targeted behavior, that the visible map area is used to filter the list."
+        },
+        "lpn_crs_place": {
+            "on": "Place name search",
+            "ruled": "2026-09-14",
+            "answer": "OK. And this seems like a duplicate string maybe."
+        },
+        "lpn_crs_place_tip": {
+            "on": "Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.",
+            "ruled": "2026-09-14",
+            "answer": "OK. And this seems like a duplicate string maybe."
+        },
+        "lpn_crs_search": {
+            "on": "Search",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_view": {
+            "on": "Filter by map view",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_crs_view_tip": {
+            "on": "Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.",
+            "ruled": "2026-09-14",
             "answer": "OK"
         },
         "lpn_curve_kind_effic": {
@@ -640,6 +985,11 @@
             "on": "Name or description of the category.",
             "ruled": "2026-08-29"
         },
+        "lpn_field_easting": {
+            "on": "Easting",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_field_emitter": {
             "on": "Emitter coefficient",
             "ruled": "2026-09-09",
@@ -658,6 +1008,11 @@
         "lpn_field_fittings_tip": {
             "on": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
             "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_field_northing": {
+            "on": "Northing",
+            "ruled": "2026-09-14",
             "answer": "OK"
         },
         "lpn_field_pipetype": {
@@ -937,6 +1292,11 @@
             "on": "The background image was moved and resized with the model, but it could not be rotated. Use Background image > Move to line it up.",
             "ruled": "2026-08-29"
         },
+        "lpn_georef_projected": {
+            "on": "This project already states a map projection, so its coordinates cannot be placed on the map a second time.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_georef_save_locked": {
             "on": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
             "ruled": "2026-09-09",
@@ -984,6 +1344,11 @@
             "on": "Screenshot gallery",
             "ruled": "2026-09-07",
             "answer": "Edited."
+        },
+        "lpn_help_welcome": {
+            "on": "Welcome page",
+            "ruled": "2026-09-14",
+            "answer": "OK"
         },
         "lpn_hide_titles": {
             "on": "Hide these titles",
@@ -1236,6 +1601,11 @@
             "ruled": "2026-09-10",
             "answer": "OK"
         },
+        "lpn_menu_cue": {
+            "on": "Start with the menus above. Use the toolbar for quick access.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_menu_map": {
             "on": "Map",
             "ruled": "2026-08-29"
@@ -1303,9 +1673,49 @@
             "on": "Coordinates",
             "ruled": "2026-08-29"
         },
+        "lpn_new_coordsys": {
+            "on": "Coordinate system",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_new_coordsys_geo": {
+            "on": "Geographic projection",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_new_coordsys_geo_tip": {
+            "on": "Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_new_coordsys_local": {
+            "on": "Local, schematic, custom, or georeference later",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_new_coordsys_local_tip": {
+            "on": "Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_new_coordsys_tip": {
+            "on": "Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_new_create": {
             "on": "Create",
             "ruled": "2026-08-29"
+        },
+        "lpn_new_crs": {
+            "on": "Map projection",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_new_crs_tip": {
+            "on": "The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
+            "ruled": "2026-09-14",
+            "answer": "Edited."
         },
         "lpn_new_place_hint": {
             "on": "Petaluma, California",
@@ -1576,6 +1986,21 @@
             "on": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
             "ruled": "2026-09-04"
         },
+        "lpn_result_avg_concentration": {
+            "on": "Average concentration",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_result_avg_source_share": {
+            "on": "Average source share",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_result_avg_water_age": {
+            "on": "Average water age",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_result_concentration": {
             "on": "Concentration",
             "ruled": "2026-09-04"
@@ -1588,6 +2013,16 @@
             "on": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
             "ruled": "2026-08-29"
         },
+        "lpn_result_friction_factor": {
+            "on": "Friction factor",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_result_reaction_rate": {
+            "on": "Reaction rate",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_result_source_share": {
             "on": "Source share",
             "ruled": "2026-09-01"
@@ -1595,6 +2030,21 @@
         "lpn_result_source_share_tip": {
             "on": "The source trace share reports how much of the water reaching this point came from the trace node.",
             "ruled": "2026-09-02"
+        },
+        "lpn_result_status": {
+            "on": "Status",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_result_status_closed": {
+            "on": "Closed",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_result_status_open": {
+            "on": "Open",
+            "ruled": "2026-09-14",
+            "answer": "OK"
         },
         "lpn_result_water_age": {
             "on": "Water age",
@@ -1686,6 +2136,16 @@
         "lpn_settings_area_hint_tip": {
             "on": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
             "ruled": "2026-09-09",
+            "answer": "OK"
+        },
+        "lpn_settings_custom_props": {
+            "on": "Custom properties",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_settings_custom_props_note": {
+            "on": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
+            "ruled": "2026-09-14",
             "answer": "OK"
         },
         "lpn_settings_damp_limit": {
@@ -1783,6 +2243,16 @@
         "lpn_settings_quality_track_tip": {
             "on": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
             "ruled": "2026-09-01"
+        },
+        "lpn_settings_runbox": {
+            "on": "Show the run progress box",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_settings_runbox_tip": {
+            "on": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
         },
         "lpn_settings_show_arrows": {
             "on": "Flow direction arrows",
@@ -1882,6 +2352,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_storage_unreadable": {
+            "on": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_terrain_blank_ids": {
             "on": "These nodes are still blank: {ids}",
             "ruled": "2026-08-29"
@@ -1902,6 +2377,16 @@
             "on": "These are the nodes that will be filled in: {ids}",
             "ruled": "2026-08-29"
         },
+        "lpn_time_pause_tip": {
+            "on": "Pause animation",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_time_play_tip": {
+            "on": "Play animation",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_time_run_report_copied": {
             "on": "Copied",
             "ruled": "2026-09-04"
@@ -1909,6 +2394,11 @@
         "lpn_time_run_report_copy": {
             "on": "Copy",
             "ruled": "2026-09-04"
+        },
+        "lpn_time_runbox_hide": {
+            "on": "Do not show this box again",
+            "ruled": "2026-09-14",
+            "answer": "OK"
         },
         "lpn_tool_area_lasso": {
             "on": "Select a lasso",
@@ -1934,6 +2424,11 @@
             "on": "Shortcut: press {key}.",
             "ruled": "2026-09-07",
             "answer": "OK."
+        },
+        "lpn_tool_key_hint_two": {
+            "on": "Shortcut: press {key} or {key2}.",
+            "ruled": "2026-09-14",
+            "answer": "OK"
         },
         "lpn_wrong_btn": {
             "on": "Something wrong here?",

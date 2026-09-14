@@ -1633,7 +1633,7 @@ $ec_lang['lpn_new_crs']='Map projection';
 // stated here because this control is the only place it can be read before it binds.
 //
 // Nothing here claims anything about how accurate a length is: that claim waits on Task 643.
-$ec_lang['lpn_new_crs_tip']='The projection your coordinates are already measured in. Eastings and northings are stored exactly as you type them, and nothing is converted. A project cannot change its projection afterward, so to work in a different one, start a new project. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.';
+$ec_lang['lpn_new_crs_tip']='The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1648,7 +1648,7 @@ $ec_lang['lpn_crs_list']='Projection';
 $ec_lang['lpn_crs_list_tip']='The projections left by the two filters above. Choose one and press Select.';
 $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
-$ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above to narrow it.';
+$ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
@@ -2375,7 +2375,7 @@ $ec_lang['lpn_settings_custom_props_note']='Properties you define yourself for y
 $ec_lang['lpn_cp_design']='Design';
 $ec_lang['lpn_cp_design_tip']='One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.';
 $ec_lang['lpn_cp_add']='Add custom property';
-$ec_lang['lpn_cp_add_tip']='Adds one more row to the design table and opens it for editing. Give it a key and a label, then choose the asset kinds that carry it.';
+$ec_lang['lpn_cp_add_tip']='Adds a row to the design table and opens it for editing.';
 $ec_lang['lpn_cp_remove']='Remove';
 $ec_lang['lpn_cp_remove_tip']='Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.';
 $ec_lang['lpn_cp_edit_tip']='Opens the design of this custom property, where every part of it is shown at full length.';
@@ -2385,27 +2385,27 @@ $ec_lang['lpn_cp_none']='No custom property is designed yet.';
 // above it is truncated to keep twenty rows readable at once, so the tip is the only place the
 // full name of the column is ever written out.
 $ec_lang['lpn_cp_key']='Key';
-$ec_lang['lpn_cp_key_tip']='Key: A property is stored under this name. It takes no spaces, and a prefix is added for you so that your key can never collide with a built-in field.';
+$ec_lang['lpn_cp_key_tip']='Key: A property is stored under this name. Spaces are not allowed, and a prefix is added for you so that your key can never collide with a built-in field.';
 $ec_lang['lpn_cp_label']='Label';
 $ec_lang['lpn_cp_label_tip']='Label: A reader sees this on the properties box, in Find and at the head of a table column.';
 $ec_lang['lpn_cp_applies']='Applies to';
-$ec_lang['lpn_cp_applies_tip']='Applies to: These asset kinds carry the property, written as the ID prefix letters, such as J,L,R. Leave it empty and nothing carries it.';
+$ec_lang['lpn_cp_applies_tip']='Applies to: Comma separated list of ID prefixes for assets that use this property, such as J,L,R.';
 $ec_lang['lpn_cp_validate']='Validate as';
 $ec_lang['lpn_cp_validate_tip']='Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.';
-$ec_lang['lpn_cp_restrict']='Restrict characters';
-$ec_lang['lpn_cp_restrict_tip']='Restrict characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any number, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.';
-$ec_lang['lpn_cp_restrict_mode']='Allow or refuse';
-$ec_lang['lpn_cp_restrict_mode_tip']='Allow or refuse: The characters beside this are either the only ones a value may use or the ones it may not use.';
-$ec_lang['lpn_cp_restrict_allow']='Allow only these';
-$ec_lang['lpn_cp_restrict_deny']='Refuse these';
-$ec_lang['lpn_cp_minlength']='Fewest characters';
-$ec_lang['lpn_cp_minlength_tip']='Fewest characters: A shorter value is flagged, which is how you find the empty and the half-typed entries. Leave it empty for no limit.';
-$ec_lang['lpn_cp_length']='Most characters';
-$ec_lang['lpn_cp_length_tip']='Most characters: A longer value is flagged. Leave it empty for no limit.';
+$ec_lang['lpn_cp_restrict']='Restrict these characters';
+$ec_lang['lpn_cp_restrict_tip']='Restrict characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.';
+$ec_lang['lpn_cp_restrict_mode']='Allow or restrict';
+$ec_lang['lpn_cp_restrict_mode_tip']='Allow or restrict: The given characters are either the only ones a value may use or the ones it may not use.';
+$ec_lang['lpn_cp_restrict_allow']='Allow only these characters';
+$ec_lang['lpn_cp_restrict_deny']='Restrict these characters';
+$ec_lang['lpn_cp_minlength']='Length lower limit';
+$ec_lang['lpn_cp_minlength_tip']='Length lower limits: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.';
+$ec_lang['lpn_cp_length']='Length upper limit';
+$ec_lang['lpn_cp_length_tip']='Length upper limit: Any longer entry is flagged.';
 $ec_lang['lpn_cp_low']='Low limit';
-$ec_lang['lpn_cp_low_tip']='Low limit: This is the smallest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.';
+$ec_lang['lpn_cp_low_tip']='Low limit: This is the smallest value you expect. Numbers are compared as numbers and text in dictionary order.';
 $ec_lang['lpn_cp_high']='High limit';
-$ec_lang['lpn_cp_high_tip']='High limit: This is the largest value you expect. Numbers are compared as numbers and text in dictionary order. Leave it empty for no limit.';
+$ec_lang['lpn_cp_high_tip']='High limit: This is the largest value you expect. Numbers are compared as numbers and text in dictionary order.';
 $ec_lang['lpn_cp_val_none']='Do not validate';
 // **TWO NUMERIC TYPES, TOLD APART BY THE DECIMAL MARK** (Tom, 2026-09-13, revision 11: *"make
 // Number into 'Number .', and add also a 'Number ,'"*). The separator is shown rather than named,
@@ -2423,10 +2423,10 @@ $ec_lang['lpn_cp_val_hyphen']='hyphen-case';
 // is a way of asking a question about the data, so nothing is ever cleared or refused: the value
 // stays exactly as it was typed and says what is wrong with it.
 $ec_lang['lpn_cp_flag']='{label}: {reason} The value is kept exactly as you typed it.';
-$ec_lang['lpn_cp_bad_number']='This property is designed to hold a number.';
-$ec_lang['lpn_cp_bad_integer']='This property is designed to hold a whole number.';
+$ec_lang['lpn_cp_bad_number']='This value is not a number as required for this property.';
+$ec_lang['lpn_cp_bad_integer']='This value is not a whole number as required for this property.';
 $ec_lang['lpn_cp_bad_datetime']='This value does not look like a date or a time.';
-$ec_lang['lpn_cp_bad_case']='This value does not match the capitalization this property is designed for.';
+$ec_lang['lpn_cp_bad_case']='This value is not ALL CAPS as required for this property.';
 $ec_lang['lpn_cp_bad_chars']='This value uses a character this property does not allow.';
 $ec_lang['lpn_cp_bad_space']='White space is allowed only between other characters.';
 $ec_lang['lpn_cp_bad_minlength']='This value is shorter than this property allows.';

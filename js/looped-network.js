@@ -3476,13 +3476,13 @@ var EngCalcs = EngCalcs || {};
 		if (s === '') { return null; }
 		if (customPropIsNumeric(def)) {
 			n = customPropNumberOf(def, s);
-			if (!isFinite(n)) { return pc.lpn_cp_bad_number || 'This property is designed to hold a number.'; }
-			if (def.validate === 'integer' && Math.floor(n) !== n) { return pc.lpn_cp_bad_integer || 'This property is designed to hold a whole number.'; }
+			if (!isFinite(n)) { return pc.lpn_cp_bad_number || 'This value is not a number as required for this property.'; }
+			if (def.validate === 'integer' && Math.floor(n) !== n) { return pc.lpn_cp_bad_integer || 'This value is not a whole number as required for this property.'; }
 		} else if (def.validate === 'datetime') {
 			if (!customPropDatetimeOk(s)) { return pc.lpn_cp_bad_datetime || 'This value does not look like a date or a time.'; }
 		} else if (LPN_CP_CASE_RE[def.validate]) {
 			re = LPN_CP_CASE_RE[def.validate];
-			if (!re.test(s)) { return pc.lpn_cp_bad_case || 'This value does not match the capitalization this property is designed for.'; }
+			if (!re.test(s)) { return pc.lpn_cp_bad_case || 'This value is not ALL CAPS as required for this property.'; }
 		}
 		if (def.restrict) {
 			// **WHITE SPACE ONLY BETWEEN OTHER CHARACTERS** (Tom, 2026-09-13, revision 10, and his
@@ -3579,8 +3579,8 @@ var EngCalcs = EngCalcs || {};
 	function customPropRestrictOptions() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			['allow', pc.lpn_cp_restrict_allow || 'Allow only these'],
-			['deny', pc.lpn_cp_restrict_deny || 'Refuse these']
+			['allow', pc.lpn_cp_restrict_allow || 'Allow only these characters'],
+			['deny', pc.lpn_cp_restrict_deny || 'Restrict these characters']
 		];
 	}
 	function customPropOptionLabel(opts, value, fallback) {
@@ -23259,7 +23259,7 @@ var EngCalcs = EngCalcs || {};
 		if (note) {
 			// A filter that is on and filtering nothing looks broken, so it says which it is.
 			note.textContent = (crsBoxViewOn() && !crsBox.place)
-				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above to narrow it.')
+				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.')
 				: (pc.lpn_crs_count || '{n} of {total} projections listed.')
 					.replace('{n}', String(list.length)).replace('{total}', String(total));
 		}
@@ -27938,11 +27938,11 @@ var EngCalcs = EngCalcs || {};
 			});
 			selectRow('validate', pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip,
 				customPropValidateOptions(), 'none');
-			selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or refuse', pc.lpn_cp_restrict_mode_tip,
+			selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or restrict', pc.lpn_cp_restrict_mode_tip,
 				customPropRestrictOptions(), 'allow');
-			textRow('restrict', pc.lpn_cp_restrict || 'Restrict characters', pc.lpn_cp_restrict_tip);
-			textRow('minLength', pc.lpn_cp_minlength || 'Fewest characters', pc.lpn_cp_minlength_tip);
-			textRow('maxLength', pc.lpn_cp_length || 'Most characters', pc.lpn_cp_length_tip);
+			textRow('restrict', pc.lpn_cp_restrict || 'Restrict these characters', pc.lpn_cp_restrict_tip);
+			textRow('minLength', pc.lpn_cp_minlength || 'Length lower limit', pc.lpn_cp_minlength_tip);
+			textRow('maxLength', pc.lpn_cp_length || 'Length upper limit', pc.lpn_cp_length_tip);
 			textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);
 			textRow('high', pc.lpn_cp_high || 'High limit', pc.lpn_cp_high_tip);
 		}, [{ label: pc.lpn_close || 'Close', fn: function () { } }]);
@@ -28159,13 +28159,13 @@ var EngCalcs = EngCalcs || {};
 				  text: function (def) { return def.applies || ''; } },
 				{ head: pc.lpn_cp_validate || 'Validate as', tip: pc.lpn_cp_validate_tip,
 				  text: function (def) { return customPropOptionLabel(vOpts, def.validate, 'none'); } },
-				{ head: pc.lpn_cp_restrict_mode || 'Allow or refuse', tip: pc.lpn_cp_restrict_mode_tip,
+				{ head: pc.lpn_cp_restrict_mode || 'Allow or restrict', tip: pc.lpn_cp_restrict_mode_tip,
 				  text: function (def) { return customPropOptionLabel(mOpts, def.restrictMode, 'allow'); } },
-				{ head: pc.lpn_cp_restrict || 'Restrict characters', tip: pc.lpn_cp_restrict_tip,
+				{ head: pc.lpn_cp_restrict || 'Restrict these characters', tip: pc.lpn_cp_restrict_tip,
 				  text: function (def) { return def.restrict || ''; } },
-				{ head: pc.lpn_cp_minlength || 'Fewest characters', tip: pc.lpn_cp_minlength_tip,
+				{ head: pc.lpn_cp_minlength || 'Length lower limit', tip: pc.lpn_cp_minlength_tip,
 				  text: function (def) { return def.minLength === undefined || def.minLength === null ? '' : String(def.minLength); } },
-				{ head: pc.lpn_cp_length || 'Most characters', tip: pc.lpn_cp_length_tip,
+				{ head: pc.lpn_cp_length || 'Length upper limit', tip: pc.lpn_cp_length_tip,
 				  text: function (def) { return def.maxLength === undefined || def.maxLength === null ? '' : String(def.maxLength); } },
 				{ head: pc.lpn_cp_low || 'Low limit', tip: pc.lpn_cp_low_tip,
 				  text: function (def) { return def.low === undefined || def.low === null ? '' : String(def.low); } },
