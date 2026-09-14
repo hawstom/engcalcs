@@ -59,6 +59,37 @@ the block.
 
 # Tasks
 
+- 100|663| **Three questions about the reaction rate that only Tom can answer.**
+  Raised when Task 652 shipped the number on 2026-09-13, and written down HERE because they were
+  first put to him in a chat message, which is the one place a question he has to answer later
+  cannot survive. He asked *"Where are the five questions?"* -- this is the answer, and two of the
+  five he has already closed.
+  - **ANSWERED, and recorded so they are not re-asked.** *Is only the RATE an absolute value, or are
+    concentrations at risk too?* Only the rate: the `fabs` is inside EPANET's own `reactpipes()` and
+    applies to `PipeRateCoeff` alone, so concentrations travel a different path and are untouched.
+    On that basis Tom ruled *"I agree. Leave it alone"* -- so we report **EPANET's number exactly**
+    and do NOT show a signed rate of our own, even though the coefficients would let us. A number
+    that disagrees with the reference implementation is the one an engineer cannot defend in a
+    report, which is the same argument Sue made about stationing under Task 643.
+  - **OPEN 1, and the smallest: WHERE DOES THE MAGNITUDE DISCLOSURE LIVE?** A decaying chlorine and
+    a growing one print the same number. A link result has no popup row to hang a tip on, so today
+    only the code comment and `dev/water-quality.md` say so. A tip on the Labels row, a new link
+    result row, or leave it as EPANET leaves it?
+  - **OPEN 2: IS 234 ms ACCEPTABLE?** Measured on Net3 over 24 hours at a 5 minute reporting step
+    (289 periods, 119 links): an 1.56 MB output file, 11 ms to read it out of the engine and 234 ms
+    in `readBinary()`. It scales with links times periods, **on the main thread, after the run's own
+    progress bar has already finished** -- so a utility-scale network at a fine step pays seconds of
+    silence. Accept it, or show no rate on a large chemical run?
+  - **OPEN 3: EPANET'S VALUE IS THE LAST QUALITY STEP BEFORE EACH REPORTING INSTANT**, not an
+    average over the period. Report it as EPANET does and say nothing, or say so on screen?
+  - **AND ONE HE HAS ALREADY ASKED FOR, WHICH IS NOT A QUESTION:** *"Nice, though I would like an
+    opportunity to contribute someday."* No pull request was needed for this feature, but the door is
+    open and he wants it. `dev/reaction-rate-upstream.md` holds what a PR would contain, that the C
+    toolkit and the wrapper we vendor are both MIT, and that the FSL-1.1-MIT terms are on the
+    epanet-js WEB APP and not on the toolkit. **Cloning an external repository was blocked on the git
+    organization question, and that is now answered**: an upstream clone goes to `~/src/<project>`,
+    never into `~/webdev`, which is for things we serve. See `dev/git-organization-recommendation.md`.
+
 - 100|659| **The map and an element must differ by color, now that no glyph separates them.**
   Tom, 2026-09-13, having looked at `pointer` on the map: *"Unfortunately pointer doesn't look very
   good on the map. We are left doing exactly what epanetjs did, default on the map and pointer on
@@ -107,6 +138,22 @@ the block.
     difference. Pair it with Zoom to fit as the action.
   - Weigh against Task 616's finding before choosing the instrument: a transient notice on a row
     nobody is looking at is measured, twice, not to work.
+
+- 50|664| **A link's status colours correctly and its legend prints numbers.**
+  Left open when Task 638 closed 2026-09-13. `status` is CATEGORICAL and this page's colour system
+  is a break-based numeric ramp, so status enters as 1 open / 0 closed. **The map reads correctly**
+  -- closed links land in the bottom band, as EPANET's own Status view draws them -- and the words
+  are one tick away as a label. **The LEGEND is what is wrong**: it prints numeric bands where it
+  should print the two words.
+  - **THE FIX MEANS CHANGING THE FIELD-DEFINITION SHAPE**, which is why it was not done: Task 636
+    was in flight beside it feeding the same structures, and changing the shape under a concurrent
+    track is the seam collision this project has already paid five defects for. That constraint is
+    gone now; both have landed.
+  - The shape question is real and worth answering once: a field definition is `[key, label]` and a
+    colour map is `{key: unitId}`, neither of which can say "this quantity is a small set of named
+    states". Whatever carries that will also serve any future categorical field.
+  - Weigh against doing nothing: a legend reading 0 and 1 beside a map that is visibly right is a
+    blemish, not a wrong answer, and this page has wrong answers to fix first.
 
 - 50|649| **Retire the nested repository: serve the suite by Alias at both mounts.**
   Tom asked on 2026-09-13 how the repositories and the web deployment should be organized, guessing
@@ -374,27 +421,6 @@ the block.
     whether it pans in a guest profile with extensions off.
   - Shipped meanwhile: `specs/pan.js`, and a guard on the `tick()` heartbeat so one throwing frame
     can no longer end every drag for the life of the page, which is that report's exact signature.
-
-- 100|638| **Node and link symbology do not offer the chemical properties.**
-  **THE FIELDS ALL SHIPPED 2026-09-13; ONE LEGEND QUESTION IS WHAT IS LEFT.** Node symbology offers
-  quality and initial quality; link symbology offers average quality, friction factor and status,
-  coloured AND labelled, in both `COLOR_*_FIELDS` and `nodeFieldDefs()`/`linkFieldDefs()`.
-  `dev/lpn-spike/chemical-symbology-harness.js`, 40 assertions off a real EPS run.
-  - **THE REACTION RATE SHIPPED TOO, UNDER TASK 652, AND WHAT STOOD HERE WAS WRONG.** This block
-    said it was not shippable from the toolkit, on the ground that `LinkProperty` ends at `LinkQual`
-    and the only alternatives were a binary parser or mass-transfer arithmetic of our own. The enum
-    finding is correct; the conclusion was not. **EPANET writes the number into its binary output
-    file and the vendored wrapper already exports a reader for it** (`readBinary()`, series
-    `reactionRate`), so nothing was derived and nothing upstream was needed. The general lesson is
-    worth more than the feature: the question that answers this is not *what does the API expose?*
-    but *what does the engine WRITE?* -- an engine with a report has a report to read.
-  - A link's average quality **was never read from the engine at all** before this; `EN_LINKQUAL`
-    is now harvested in `js/lpn-epanet.js` and carried through `js/lpn-time.js` as its own map,
-    because link ids and node ids are two namespaces.
-  - **`status` is categorical and the ramp is numeric**, so it enters as 1 open / 0 closed. The map
-    reads correctly; the LEGEND prints numeric bands rather than the two words. Fixing that means
-    changing the field-definition shape, which was deliberately not done while Task 636 was in
-    flight beside it. Decide whether the legend is worth that.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;

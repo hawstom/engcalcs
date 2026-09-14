@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**87 open tasks.** Next (100): 12 · Soon (75): 19 · Someday (50): 28 · Maybe (25): 10 · Parked (5): 18
+**88 open tasks.** Next (100): 12 · Soon (75): 19 · Someday (50): 29 · Maybe (25): 10 · Parked (5): 18
 
 ## 100 — Next (12)
 
@@ -19,10 +19,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
 - Task 618 — WYSIWYG hit areas: what you can click is what you can see.
-- Task 638 — Node and link symbology do not offer the chemical properties.
 - Task 646 — Attach the world map to an XY project without changing the project.
 - Task 650 — Panning was reported broken in Chrome, and could not be reproduced.
 - ! Task 659 — The map and an element must differ by color, now that no glyph separates them.
+- Task 663 — Three questions about the reaction rate that only Tom can answer.
 
 ## 75 — Soon (19)
 
@@ -46,7 +46,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
 
-## 50 — Someday (28)
+## 50 — Someday (29)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -76,6 +76,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 645 — The app icon's legs are leggier than the favicon's.
 - Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
+- Task 664 — A link's status colours correctly and its legend prints numbers.
 
 ## 25 — Maybe (10)
 
@@ -115,5 +116,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-79 of 87 titles are within 4–12 words. `!` marks the rest;
+80 of 88 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
