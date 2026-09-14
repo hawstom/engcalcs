@@ -27,7 +27,7 @@ chrome, HawsEDC, menus, toolbar, and tabs. And a good designer would know exactl
 don't know what to do."* **It carries what nobody here has ever carried: a judgement about
 LAYOUT** -- this suite's working guide is 900 lines about correctness and almost nothing about
 attention. Its standing brief is to DIAGNOSE and rank, never to redesign, because a redesign before
-the 16 September demonstration is the distraction Tom named himself. **Ask him for a name.**
+the 17 September demonstration is the distraction Tom named himself. **Ask him for a name.**
 
 **Each agent keeps a journal and a wish list.** The journal is what it learned; the wish list is
 what it would build next, in its own order. Tom, 2026-08-24: *"We all have our pet priorities, and

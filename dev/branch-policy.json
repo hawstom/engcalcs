@@ -1,0 +1,40 @@
+{
+    "_comment": [
+        "WHICH BRANCHES MAY NOT REACH master ON AI JUDGEMENT ALONE.",
+        "",
+        "Written 2026-09-13 after six capability-branch merges landed on master in one session",
+        "without Tom's word. His ruling: 'Really you should never merge a major branch to master",
+        "without my all-clear on completion.' The harm is not a broken build -- every one of those",
+        "merges was green -- it is that GREEN IS NOT DONE. A passing suite says the code works; it",
+        "says nothing about whether the FEATURE is finished, and only Tom can answer that.",
+        "",
+        "A branch listed here needs a matching entry in dev/branch-all-clears.json, pinned to the",
+        "exact commit cleared, before dev/hooks/pre-merge-commit will let it into master.",
+        "",
+        "A branch NOT listed here is an ordinary track -- a defect fix, a doc change, a tooling",
+        "change -- and merges on the existing rules: green check_all on the merge result, and the",
+        "pre-push stamp. That distinction is the whole design. Do not list everything; a gate that",
+        "stops all work is a gate somebody switches off."
+    ],
+    "protected": [
+        "customer",
+        "graph",
+        "projection",
+        "custom-property"
+    ],
+    "freeze": {
+        "active": true,
+        "_comment": [
+            "A FREEZE stops EVERY merge into master, including ordinary tracks, except one marked",
+            "'hotfix:' in its merge subject. Set active true and state until and why. Tom, 2026-09-13:",
+            "'We do want to continue development right through the EWB meeting, but we can't do that",
+            "if we are merging our work to master.' A freeze is how development continues while the",
+            "production line holds still.",
+            "",
+            "It is OFF today because he did not ask for one -- he asked for the all-clear gate. Turning",
+            "It is ON as of 2026-09-13. It was OFF for the first draft of this file, on the reasoning that he had asked for the all-clear gate rather than a freeze -- and that was wrong: the freeze was already in dev/session-handoff.md, set on 2026-09-10, and had simply never been read."
+        ],
+        "until": "after EWB, which is 17 September (Tom, 2026-09-13, correcting this repository). Lift on his word, not on a date.",
+        "why": "Tom, 2026-09-13: \"We do want to continue development right through the EWB meeting, but we cant do that if we are merging our work to master.\" His plan of 2026-09-10 already said it: \"4 days of bugs, then 2 days of translation, not earlier\" -- dev/session-handoff.md section 5, \"Bugs only until the freeze\". Six capability merges went in on 09-13 against that plan because nobody had read it."
+    }
+}

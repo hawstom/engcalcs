@@ -218,7 +218,7 @@ thing's design cost; it spends it twice.
   This is cheap (a label, not a control) and is the only thing that would let a clerk NOTICE they
   are about to paste State Plane numbers into a UTM-mode field before doing it, rather than after.
 
-## Q6 — Is this the right priority before 16 September
+## Q6 — Is this the right priority before 17 September
 
 **Tom says no urgency, and I agree with him from my own seat, more strongly than I expected to
 before writing this.** Two independent reasons:

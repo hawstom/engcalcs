@@ -1,0 +1,37 @@
+#!/bin/sh
+# Refuse a merge into master that Tom has not cleared. Installed by dev/hooks/install.sh.
+#
+# **GREEN IS NOT DONE, AND THAT IS THE WHOLE OF WHY THIS EXISTS.** On 2026-09-13 six capability
+# branch merges landed on master in one session, every one of them with check_all.sh passing on the
+# merge result and the pre-push stamp in place. Both existing hooks worked perfectly and neither had
+# anything to say, because neither asks the question that mattered: is the FEATURE finished? Tom:
+# *"Really you should never merge a major branch to master without my all-clear on completion."*
+# `projection` went in with the full projection universe still missing, which he had asked for twice;
+# `custom-property` went in with Allow/Restrict not switching and a date validator that does not
+# validate and that he never asked for. A suite cannot see any of that.
+#
+# **IT GATES MERGES, WHICH IS THE DOOR NOTHING WATCHED.** pre-commit refuses a commit on master and
+# pre-push refuses an unverified push; a merge is exempt from the first by construction and passes
+# the second as soon as the suite is re-run. So the one gate on a capability branch was AI judgement,
+# exercised repeatedly, under time pressure, by the same party that wrote the code.
+#
+# The escape hatch is `git merge --no-verify`, which git provides and this hook cannot take away.
+# That is correct: the hook is here to stop drift, not to stop Tom.
+
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+[ "$branch" = "master" ] || exit 0
+
+policy="$root/dev/branch-policy.json"
+[ -f "$policy" ] || exit 0
+merge_head_file="$(git rev-parse --git-dir)/MERGE_HEAD"
+[ -f "$merge_head_file" ] || exit 0
+merge_sha=$(head -n1 "$merge_head_file")
+
+# WHAT IS BEING MERGED. MERGE_MSG carries the subject git is about to use, which is where the
+# branch name lives; the sha is the authority for the all-clear pin.
+msg_file="$(git rev-parse --git-dir)/MERGE_MSG"
+subject=$(head -n1 "$msg_file" 2>/dev/null)
+
+php "$root/dev/scripts/branch_gate.php" "$merge_sha" "$subject" || exit 1
+exit 0

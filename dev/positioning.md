@@ -309,7 +309,7 @@ words, and they overturn nothing above except which EPANET-bearing name he would
   than promised.
 - **AND THE EPANET WORD EARNS ITS PLACE ON REACH, NOT ON BORROWED CREDIT** -- it is how the
   engineers who never bought WaterCAD know what this is.
-- **NOTHING CHANGES BEFORE HIS EWB MEETING (16 September).** His instruction: *"We will worry about
+- **NOTHING CHANGES BEFORE HIS EWB MEETING (17 September).** His instruction: *"We will worry about
   this after my EWB meeting."* LibreWaterNet.org remains the front door and the app's own name; do
   not put EPANET++ on a page, in a string, or in a commit message until he reopens it.
 

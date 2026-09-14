@@ -161,7 +161,7 @@ as data rather than as a maintained flyout. Partially, **Notes on this page**, f
 **Walkthroughs stays separate** — it links to worked, guided material, not a fact lookup, and search
 does not replace a tutorial.
 
-**Recommendation: not for 16 September, and not scoped here.** It is a real feature (an index to
+**Recommendation: not for 17 September, and not scoped here.** It is a real feature (an index to
 build, a results UI to place, a decision about whether it searches labels, tips, both) — exactly
 the class of work the brief asks me not to start. Record it as the long-run answer to "Help keeps
 growing a row per feature," rank it below every item in this document, and pick it up as its own
@@ -263,7 +263,7 @@ English only, in scope for the freeze the same way Install's reused key was.
 | 2 | Retire `lpn_notes_1/2_term/def` from the Notes popup; fold into the About rewrite | content move, no new mechanism | wrong-genre content in a task-context popup |
 | 3 | Add one outbound sentence from About to LibreWaterNet.org; do not repoint or merge the two pages | one string, one link | answers "could LWN be About" without a register mismatch |
 | 4 | Add the way-back mark: mono icon-only link, far left of the menu bar, before File | ~40-50px width, one string | the actual new thing asked for; only candidate without Help's discoverability ceiling |
-| 5 | Search help: defer past 16 September, note what it would eventually displace (Toolbar key, partly Notes) | none now | keeps Help from becoming a menu that grows a row per feature, without building it under demo pressure |
+| 5 | Search help: defer past 17 September, note what it would eventually displace (Toolbar key, partly Notes) | none now | keeps Help from becoming a menu that grows a row per feature, without building it under demo pressure |
 
 **If only one could be done: #4, the way-back mark.** It is the one genuinely NEW thing asked for,
 it is the only item that both answers a real gap (there is currently no route back at all) and
@@ -417,7 +417,7 @@ here is spiraling.
 | 1 | Merge legal band into the About band (Q1) | zero — reorders existing rows, no new string | one fewer separator; genre-consistent band now that About is in-page |
 | 2 | Add `LibreWaterNet.org` row, `ext()`, in the Install/Screenshot/Not EPANET band (Q2) | one string, one row | the no-risk look at the mission page the same-tab mark cannot offer |
 
-Both are cheap; neither is urgent against 16 September, but neither risks anything either — the
+Both are cheap; neither is urgent against 17 September, but neither risks anything either — the
 merge is a pure reorder and the new row is one key in the pattern already used twenty times over
 in this same menu.
 
@@ -629,7 +629,7 @@ standing for a concrete-sounding label ("Water") — but every other menu-bar ic
 already abstract relative to its label (a page corner for "File," a pencil for "Edit," a
 push-pin for "Map," a question mark for "Help") and none of those are read as broken; a menu
 icon's job is to be a stable, quickly-recognized SHAPE next to its neighbors, not a literal
-illustration of the word. Recommend leaving `plan` in place through 16 September, and filing a
+illustration of the word. Recommend leaving `plan` in place through 17 September, and filing a
 water-specific icon (a small pipe-and-junction glyph, distinct from `pipe` which already names an
 asset type two levels down) as post-demo wishlist work, not urgent.
 
