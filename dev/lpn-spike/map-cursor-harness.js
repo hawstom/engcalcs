@@ -125,9 +125,17 @@ ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.l
 // with a zero fallback, which is what makes the keyword safe. Either half alone is the bug, so
 // neither may be dropped.
 // The FOURTH slot is the cursor each shape must carry -- see the note below the hit-area assertion.
+// **THE INK ROWS TRACK THE OBJECT CURSOR RATHER THAN NAMING IT** (2026-09-13). They read 'default'
+// until Tom moved objects to `pointer`, and then failed over a decision rather than a defect -- and
+// worse, they failed AFTER `.lpn-node`'s own rule had already been changed, so for one run the
+// harness was the only thing saying the band and the disc disagreed. That is the finding worth
+// keeping: OBJ below is resolved from `.lpn-node` itself, so ink and disc cannot drift apart again
+// whatever glyph is chosen. `inherit` stays spelled out, because slop inheriting the MAP's cursor is
+// a different claim and is not affected by what an object wears.
+const OBJ = (/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*([a-z-]+)/.exec(cssCode) || [])[1] || 'default';
 [['.lpn-link-hit', 'visibleStroke', null, 'inherit'],
-	['.lpn-link-symbol-hit', 'visible', /stroke-width:\s*var\(--lpn-symhit,\s*0\)/, 'default'],
-	['.lpn-node-hit', 'visible', /stroke-width:\s*0\s*;/, 'default']].forEach(function (row) {
+	['.lpn-link-symbol-hit', 'visible', /stroke-width:\s*var\(--lpn-symhit,\s*0\)/, OBJ],
+	['.lpn-node-hit', 'visible', /stroke-width:\s*0\s*;/, OBJ]].forEach(function (row) {
 	// Anchored at a line start: `.lpn-vertexmode .lpn-link-hit` is a DIFFERENT rule that correctly
 	// says crosshair, and an unanchored match finds it first and reads it as this one.
 	const re = new RegExp('(^|\\n)\\' + row[0] + '\\s*\\{([^}]*)\\}');
@@ -149,22 +157,40 @@ ok('no #lpn_canvas rule says move', canvasMove.length === 0, String(canvasMove.l
 		!!m && new RegExp('cursor:\\s*' + row[3] + '\\s*;').test(m[2]),
 		m ? (/cursor:\s*([a-z-]+)/.exec(m[2]) || [])[1] : '(no rule)');
 });
-// **AND THE DRAWN THINGS SAY `default`, WHICH IS TOM'S OWN PREFERENCE MEASURED AGAINST THE SAME
-// COMPLAINT** (2026-09-09, having used the corrected map: *"I prefer default over pointer at the
-// labels and assets. It's more precise."*). A finger's hot spot sits at the tip of a hand about
-// 20 px wide; an arrow tapers to nothing at its own hot spot, so it hides less of a 7 px junction
-// disc. The band must still not be the thing carrying it, which is what the rows above hold.
-ok('the drawn pipe says default', /\.lpn-link \{[^}]*cursor:\s*default/.test(cssCode));
-ok('the drawn node says default', /\.lpn-node \{[^}]*cursor:\s*default/.test(cssCode));
+// **AND THE DRAWN THINGS SAY `pointer` WHILE THE BARE MAP SAYS `default`** (Tom, 2026-09-13, having
+// tried the alternative: *"All default is a downgrade. Let's try map default and select pointer."*).
+// This read `default` on both, pinning his 2026-09-09 preference, and that preference was measured
+// when the BARE map said `grab` -- so the contrast came from the background and an arrow on the
+// object was enough. Take the hand away and the object's glyph is the only thing left carrying
+// "this is selectable", which is why the same reasoning lands the other way round.
+//
+// **ASSERTED AS A RELATIONSHIP, NOT A GLYPH, DELIBERATELY.** Pinning `pointer` here would make the
+// next change of mind a red build in a file about hydraulics, which is the trap harness_wording_check
+// exists for in the string case. What the design actually requires is that an OBJECT and the BARE MAP
+// do not say the same thing, so that is what these hold. ROADMAP Task 659 is the colour change that
+// would let both go back to `default`; if it lands, this relationship is the thing to revisit.
+const objCursor = function (sel) {
+	const m = new RegExp('\\' + sel + ' \\{[^}]*cursor:\\s*([a-z-]+)').exec(cssCode);
+	return m ? m[1] : null;
+};
+ok('the drawn pipe states a cursor', !!objCursor('.lpn-link'), objCursor('.lpn-link'));
+ok('...and it is NOT what the bare map says, so an object reads as an object',
+	objCursor('.lpn-link') !== mapCursor, objCursor('.lpn-link') + ' vs map ' + mapCursor);
+ok('the drawn node states a cursor', !!objCursor('.lpn-node'), objCursor('.lpn-node'));
+ok('...and it differs from the bare map too',
+	objCursor('.lpn-node') !== mapCursor, objCursor('.lpn-node') + ' vs map ' + mapCursor);
 
 // The two grabbable things he named by hand, positively asserted -- a label and a vertex grip both
-// used to wear the four-headed arrow, and both are the smallest targets on the map. They say
-// `default` since 2026-09-09, for the reason on the drawn pipe above; what matters here is that
-// neither has gone back to `move`, which the list further up holds absolutely.
-ok('a draggable label says default',
-	/\.lpn-draglbl\s*\{[^}]*cursor:\s*default\b/.test(cssCode));
-ok('a vertex grip says default',
-	/\.lpn-vhandle\s*\{[^}]*cursor:\s*default\b/.test(cssCode));
+// used to wear the four-headed arrow, and both are the smallest targets on the map. They follow the
+// drawn pipe and node: an OBJECT does not say what the bare map says. **What matters most here is
+// that neither has gone back to `move`**, which the list further up holds absolutely -- that is the
+// complaint Tom raised in the first place, and it is independent of which glyph an object wears.
+ok('a draggable label states a cursor', !!objCursor('.lpn-draglbl'), objCursor('.lpn-draglbl'));
+ok('...and it does not say what the bare map says',
+	objCursor('.lpn-draglbl') !== mapCursor, objCursor('.lpn-draglbl') + ' vs map ' + mapCursor);
+ok('a vertex grip states a cursor', !!objCursor('.lpn-vhandle'), objCursor('.lpn-vhandle'));
+ok('...and it does not say what the bare map says either',
+	objCursor('.lpn-vhandle') !== mapCursor, objCursor('.lpn-vhandle') + ' vs map ' + mapCursor);
 
 console.log('\n-- 2. which modes wear the placement cursor, driven through setMode() --');
 

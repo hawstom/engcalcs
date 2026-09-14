@@ -322,10 +322,17 @@ console.log('\n--- the stylesheet half ---');
 	// map was pannable while they pointed at an asset (Tom, at 100 px symbols: *"Reservoir and Pump
 	// cursor is a grab except for a single pixel at its anchor point"*). Ink carries the object
 	// cursor; slop inherits. `.lpn-link-hit` is still slop and still inherits.
-	ok('...and it carries the object cursor, because the band IS the ink now',
-		/cursor:\s*default/.test(rule));
-	ok('...while the DRAWN disc still carries the object cursor, or the feedback moved onto nothing',
-		/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*default/.test(css));
+	// **ASSERTED AS "THE SAME AS THE DISC", NOT AS A GLYPH.** These read `cursor: default` until
+	// 2026-09-13, when Tom moved objects to `pointer` (*"All default is a downgrade. Let's try map
+	// default and select pointer."*) and both lines went red over a decision rather than a defect.
+	// The property the paragraph above actually states is that the BAND and the DRAWN DISC agree --
+	// ink carries the object cursor and slop inherits it -- so whichever glyph the object wears, the
+	// grab band must not be the place it changes. That survives the next change of mind for free.
+	const discCursor = (/(?:^|\n)\.lpn-node \{[^}]*cursor:\s*([a-z-]+)/.exec(css) || [])[1];
+	const bandCursor = (/cursor:\s*([a-z-]+)/.exec(rule) || [])[1];
+	ok('the DRAWN disc states an object cursor', !!discCursor, discCursor);
+	ok('...and the band carries THE SAME one, because the band IS the ink now',
+		!!bandCursor && bandCursor === discCursor, bandCursor + ' vs disc ' + discCursor);
 	// **`visible` WITH A DECLARED STROKE-WIDTH, WHICH IS NOT THE 2026-09-09 DEFECT COMING BACK.**
 	// That defect was `pointer-events: visible` with NO `stroke-width` at all: the perimeter then
 	// takes the initial value, ONE USER UNIT, which on this page is one WORLD unit -- 11.5 px of
