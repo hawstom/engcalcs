@@ -300,6 +300,22 @@ the block.
     good reason. Things on the map are small."* The cursor change is WORKING and was welcomed; the
     difficulty is ACQUISITION, which is the "node fat" item above reached independently.
 
+- 100|650| **Panning was reported broken in Chrome, and could not be reproduced.**
+  Tom, 2026-09-13, three days before the EWB demonstration: *"I couldn't pan (I can edit and zoom)
+  on reload, even repeated reload... Panning is broken, and it wasn't before that repair procedure
+  ran. Even Page, Start fresh doesn't restore pan."* Ubuntu Chrome only; his Ubuntu Firefox pans.
+  - **NOT STORED STATE, on his own evidence.** Start fresh deletes every project, every setting and
+    the IndexedDB and reloads as a brand-new visitor, and the fault survived it.
+  - **NOT REPRODUCIBLE HERE**, in Chrome for Testing 151 and Google Chrome 153, headless, on an
+    empty map, an XY example, a geographic Net3, after one and two reloads, and with a stored view
+    poisoned to his own bad camera so the Task 628 repair runs on the way in. `specs/pan.js` is
+    that search, kept. The pan gesture's own code is untouched by every commit in the repair.
+  - **A SYNTHETIC CDP MOUSE CANNOT REACH what is left**: an extension's overlay, a Chrome setting,
+    a native drag the page never sees. What is wanted from Tom is the console while he drags, and
+    whether it pans in a guest profile with extensions off.
+  - Shipped meanwhile: `specs/pan.js`, and a guard on the `tick()` heartbeat so one throwing frame
+    can no longer end every drag for the life of the page, which is that report's exact signature.
+
 - 100|638| **Node and link symbology do not offer the chemical properties.**
   **MOSTLY SHIPPED 2026-09-13; THE REACTION RATE IS WHAT IS LEFT.** Node symbology now offers
   quality and initial quality; link symbology offers average quality, friction factor and status,

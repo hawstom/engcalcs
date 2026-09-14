@@ -57,9 +57,17 @@ const cssCode = CSS.replace(/\/\*[\s\S]*?\*\//g, ' ');
 
 console.log('\n-- 1. the three cursors, read out of the stylesheet --');
 
-ok('bare canvas says grab', /#lpn_canvas\s*\{[^}]*cursor:\s*grab\b/.test(cssCode));
-ok('canvas says grabbing while the button is down',
-	/#lpn_canvas\.lpn-panning\s*\{[^}]*cursor:\s*grabbing\b/.test(cssCode));
+// **THE MAP'S OWN CURSOR IS `pointer`, AND THE GRAB HAND IS GONE** (Tom, 2026-09-13: *"I really
+// think that it's very cute and all to have a 'grab' cursor. But it's not right for professional
+// work. We need solid efficiency."*). These two lines read `grab` and `#lpn_canvas.lpn-panning
+// { cursor: grabbing }` until that day; the second rule no longer exists at all, which is why the
+// moving-state assertion is gone rather than rewritten. What is still asserted is the property
+// Task 569 actually bought: bare map says SOMETHING deliberate, so it cannot read as dead space --
+// css/engcalcs.css carries the ruling and the option not taken.
+const mapCursor = (/#lpn_canvas\s*\{[^}]*cursor:\s*([a-z-]+)/.exec(cssCode) || [])[1];
+ok('the bare canvas states a cursor of its own', !!mapCursor, mapCursor || 'none');
+ok('...and it is not the default arrow, which is what "dead space" looked like',
+	mapCursor !== 'default' && mapCursor !== 'auto', mapCursor || 'none');
 ok('placement/area mode says crosshair over the whole drawing',
 	/#lpn_canvas\.lpn-placemode[^{]*\*[^{]*\{[^}]*cursor:\s*crosshair\b/.test(cssCode));
 

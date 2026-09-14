@@ -8841,11 +8841,17 @@ var EngCalcs = EngCalcs || {};
 	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
 	var drag = null;
-	// **THE ONE PLACE THE PANNING CLASS IS WRITTEN** (Task 569). It exists so the cursor rule has a
-	// single switch rather than five, and so a future pan path cannot forget to open the hand again:
-	// every end-of-drag route already funnels through the pointerup/cancel handler that clears it.
-	// Guarded on `svg` because the georeferencing bar and the harnesses reach this file before the
-	// layers are built.
+	// **THE ONE PLACE THE PANNING CLASS IS WRITTEN** (Task 569). It exists so a moving-state cursor
+	// rule has a single switch rather than five, and so a future pan path cannot forget to turn it
+	// off again: every end-of-drag route already funnels through the pointerup/cancel handler that
+	// clears it. Guarded on `svg` because the georeferencing bar and the harnesses reach this file
+	// before the layers are built.
+	//
+	// **NOTHING STYLES IT TODAY, AND THAT IS THE POINT OF LEAVING IT** (Tom, 2026-09-13: the grab
+	// hand is *"very cute and all ... but it's not right for professional work"*). The class drove
+	// `cursor: grabbing` and went with the open hand it closed; the switch stays because restoring a
+	// moving-state cursor is then one CSS rule and no change here. css/engcalcs.css carries the
+	// ruling and the option not taken.
 	function setPanning(on) {
 		if (svg && svg.classList) { svg.classList.toggle('lpn-panning', !!on); }
 	}
@@ -25389,12 +25395,12 @@ var EngCalcs = EngCalcs || {};
 				: (labelEls[drag.id] && labelEls[drag.id].text));
 		}
 		if (drag.type === 'pan') {
-			// **THE OPEN HAND CLOSES WHILE THE MAP IS ACTUALLY MOVING** (Task 569). `#lpn_canvas`
-			// wears `cursor: grab` at rest; this class swaps it for `grabbing`. Set HERE rather than
-			// at pointerdown, in the one place a pan actually translates the map, because five call
+			// **THE MAP IS MOVING, SAID IN ONE PLACE** (Task 569). Set HERE rather than at
+			// pointerdown, in the one place a pan actually translates the map, because five call
 			// sites create a `type: 'pan'` drag and only some of them become a pan -- a press that
-			// turns out to be a click would otherwise close the hand and open it again with nothing
-			// having moved.
+			// turns out to be a click would otherwise raise and lower the flag with nothing having
+			// moved. The class styles nothing since 2026-09-13, when the grab hand went; see
+			// setPanning(), which is where that is recorded.
 			setPanning(true);
 			state.tx = drag.tx0 + (p.x - drag.startX); state.ty = drag.ty0 + (p.y - drag.startY);
 			setTransform();
@@ -25453,8 +25459,30 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 
+	// **THE HEARTBEAT MUST NOT BE KILLABLE BY ONE BAD FRAME.** `tick()` reschedules itself, so a
+	// throw anywhere inside `applyDrag()` used to end the chain: the map then answered the wheel and
+	// every click exactly as before, and NO drag on the page ever worked again until a reload --
+	// no console message a user would see, no banner, nothing on screen to act on. Panning is the
+	// only gesture that depends on this loop and on nothing else, which makes "I can edit and zoom
+	// but I cannot pan" the signature it produces (ROADMAP Task 650).
+	//
+	// **THE CATCH IS NOT A FIX FOR A KNOWN DEFECT AND MUST NOT BE READ AS ONE.** Nothing in this
+	// tree is known to throw here; the report that prompted it was never reproduced. What it buys is
+	// that the next thing that does throw costs one frame instead of the session, and says so where
+	// a developer can read it -- ONCE, because a throwing drag throws sixty times a second and a
+	// flooded console is a console nobody reads. `dragDirty` is cleared on the way out so a frame
+	// that failed cannot be retried forever against the same bad state.
+	var tickFailed = false;
 	function tick() {
-		if (drag && dragDirty) { applyDrag(); dragDirty = false; }
+		try {
+			if (drag && dragDirty) { applyDrag(); dragDirty = false; }
+		} catch (err) {
+			dragDirty = false;
+			if (!tickFailed && window.console && window.console.error) {
+				tickFailed = true;
+				window.console.error('lpn: a drag frame failed; the map keeps running', err);
+			}
+		}
 		requestAnimationFrame(tick);
 	}
 

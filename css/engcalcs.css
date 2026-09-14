@@ -356,44 +356,39 @@ html[lang="zh"] .ec-welcome {
    .lpn-link-symbol-backdrop below, ROADMAP Task 146.10 follow-up, 2026-08-09), so it must equal
    whatever the canvas itself is painted -- keep it in step with the inline `background` on
    #lpn_canvas in Looped-Network.php. */
-/* **THE BARE MAP SAYS `grab`, NOT `default`** (ROADMAP Task 569, Tom 2026-09-06: *"Try a Pan
-   cursor."*). It was `default` and that was the whole of a bug he had reported and nobody had
-   diagnosed: *"it occasionally flickers from pan/drag cross to default pointer... almost (!)
-   reliably at 12px from the point of a node."*
+/* **THE BARE MAP SAYS `pointer`, AND THE OPEN HAND IS GONE** (Tom, 2026-09-13: *"I really think
+   that it's very cute and all to have a 'grab' cursor. But it's not right for professional work. We
+   need solid efficiency. And I can't think of anything better than to have 'default' everywhere on
+   the map with a color change between map (pan) and element (select). Equal alternative would be
+   'pointer' on the map for pan and 'default' at element select."*)
 
-   **THERE WAS NEVER A RING AT 12 px. IT IS A GAP.** dev/browser-pass/specs/cursorflicker.js walks
-   outward from a junction one pixel at a time and reads the cursor the browser actually computes:
-   the node's own circle ends at ~3.5 px, its LABEL (`.lpn-draglbl`, then `cursor: move` -- the
-   four-headed arrow he called the pan/drag cross) begins at 9-13 px depending on bearing, and in
-   between was bare canvas showing `default`. So a pointer crossing that strip read
-   **pointer, default, move**, and his 12 px is simply where the placement pass had put that
-   label -- which is why it was there on some bearings and absent on others.
+   **HIS SECOND OPTION IS BUILT, BECAUSE THE FIRST IS NOT COMPLETE ON ITS OWN.** Every object on
+   this map already says `default`, on his own ruling of 2026-09-08 (*"I prefer default over pointer
+   at the labels and assets. It's more precise."*), so `default` on the map as well leaves the
+   cursor carrying no map/element distinction at all until a hover colour is designed to replace it.
+   The second option carries the same distinction with a glyph that is already on the screen, and it
+   is the tweak he asked for. **The first option is one word away**: write `default` below and
+   design the colour change; nothing else here has to move.
 
-   `grab` rather than `move`: `move` is what a thing you have HOLD of says, and the map is not held
-   until the button is down. `grab` is the open hand every map on the web uses for "you may drag
-   this", so the strip between a node and its label now reads as more map rather than as nothing.
-   The fix is not that the gap closed -- it is that bare map stopped being indistinguishable from
-   dead space. */
-#lpn_canvas { touch-action: none; cursor: grab; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
-/* **AND `grabbing` WHILE THE BUTTON IS DOWN**, which is the other half of the convention and the
-   thing that makes the open hand honest: an open hand that never closes is a promise the interface
-   does not keep. The class is written by the pan handler that already exists, so nothing new
-   decides when a pan is happening. */
-/* **THE `*` HALF IS GONE, AND IT IS WHY THE POINTER CURSOR DISAPPEARED FROM THE WHOLE MAP** (Tom,
-   2026-09-08: *"My cursor is never turning into a pointer even though select (pointer) mode is on.
-   The phantom flicker is gone. But so is the pointer change at objects; it's always a pan/drag
-   mouse."*). `#lpn_canvas.lpn-panning *` is specificity (1,1,0) and every object cursor on this map
-   is (0,1,0) -- .lpn-node, .lpn-link, .lpn-link-hit, .lpn-link-symbol-hit, .lpn-vhandle,
-   .lpn-draglbl -- so while that class was on, NOTHING on the drawing could say what it was. And the
-   class is written by one handler and cleared by another that is guarded on the drag it is ending,
-   so a gesture whose drag was dropped somewhere else left the fist on for good, with no way back
-   short of a reload.
+   **WHAT SURVIVES FROM TASK 569 IS THE PROPERTY, NOT THE GLYPH.** That task fixed bare canvas
+   reading `default` because nothing there carried a cursor rule at all, so the strip between a
+   node's disc and its own label read pointer, default, move, and Tom reported it as a flicker at
+   12 px. There was never a ring at 12 px; it is a gap, measured one pixel at a time by
+   dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
+   own cursor everywhere it shows through. What is superseded is `grab` itself: it is the open hand
+   every web map uses, and this is not a web map. */
+#lpn_canvas { touch-action: none; cursor: pointer; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
+/* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
+   rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
+   the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
+   so restoring a moving-state cursor is one rule here and no JavaScript at all.
 
-   `cursor` is an inherited property, so the bare map still closes its hand: the canvas's own value
-   reaches every child that does not state one, which is every child except the six that mean
-   something. That is the rule the convention actually wants -- an object under the pointer says
-   what it is whether or not the map is moving. */
-#lpn_canvas.lpn-panning { cursor: grabbing; }
+   **DO NOT BRING BACK THE `*` HALF** (Tom, 2026-09-08: *"My cursor is never turning into a pointer
+   even though select (pointer) mode is on... it's always a pan/drag mouse."*).
+   `#lpn_canvas.lpn-panning *` is specificity (1,1,0) and every object cursor on this map is (0,1,0)
+   -- .lpn-node, .lpn-link, .lpn-link-hit, .lpn-link-symbol-hit, .lpn-vhandle, .lpn-draglbl -- so
+   while that class was on, NOTHING on the drawing could say what it was. `cursor` inherits, so a
+   rule on the canvas alone already reaches every child that does not state one. */
 /* Fading the BACKDROP is the counterpart of fading the symbols below: a busy, dark aerial or plan
    swallows a 0.5-wide pipe and a black flow arrow, and the standard answer everywhere else (AutoCAD
    image fade, QGIS layer transparency) is to knock the reference material back rather than thicken

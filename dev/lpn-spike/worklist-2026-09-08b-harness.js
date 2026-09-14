@@ -61,8 +61,13 @@ console.log('--- an object under the pointer says what it is, panning or not ---
 	// and never will: getComputedStyle() answers '' for every property, by design.
 	ok('no universal selector under the panning class outranks the object cursors',
 		!/#lpn_canvas\.lpn-panning\s*\*/.test(CSS));
-	ok('...while the canvas itself still closes its hand, which cursor inheritance carries',
-		/#lpn_canvas\.lpn-panning\s*\{[^}]*cursor:\s*grabbing/.test(CSS));
+	// **AND THERE IS NO MOVING-STATE RULE AT ALL SINCE 2026-09-13**, which is a stronger version of
+	// the same guarantee rather than a weakening. This asserted `#lpn_canvas.lpn-panning { cursor:
+	// grabbing }`, the closing half of the open hand, and the hand went when Tom struck it (*"very
+	// cute and all ... not right for professional work"*). With no rule on that class, an object
+	// under the pointer cannot be overruled by a pan however the class is written or cleared.
+	ok('...and the panning class now styles nothing, so it can outrank nothing',
+		!/#lpn_canvas\.lpn-panning\s*\{/.test(CSS));
 	// The six that mean something. Each is a bare class selector, so each keeps its own cursor.
 	// **THE BANDS TAKE THE CANVAS'S CURSOR SINCE 2026-09-09, and that is not a weakening of this
 	// section.** Tom: *"we want the cursor to clearly become a pointer when pointing is appropriate,

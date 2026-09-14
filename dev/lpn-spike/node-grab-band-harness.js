@@ -367,7 +367,12 @@ console.log('\n--- the stylesheet half ---');
 	// The 2026-09-08 fix that must not come back: the `*` half of the panning rule.
 	ok('the panning rule still does NOT reach every child of the canvas',
 		css.indexOf('#lpn_canvas.lpn-panning *') < 0);
-	ok('the bare map still offers the open hand', /#lpn_canvas \{[^}]*cursor:\s*grab/.test(css));
+	// **THE BARE MAP STILL SPEAKS, AND NO LONGER WITH A HAND** (Tom, 2026-09-13: the grab cursor is
+	// *"not right for professional work"*). This read `cursor: grab`; the property under it is that
+	// the canvas states a cursor at all, which is what stops the strip between a node and its label
+	// reading as dead space. The glyph is css/engcalcs.css's to choose.
+	ok('the bare map still states a cursor of its own, so it is not dead space',
+		/#lpn_canvas \{[^}]*cursor:\s*(?!default\b|auto\b)[a-z-]+/.test(css));
 }
 
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nall checks passed');

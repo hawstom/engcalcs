@@ -125,6 +125,13 @@ exports.run = async function ({ browser, report }) {
 		const dirs = [[1, 0, 'E'], [0, 1, 'S'], [-1, 0, 'W'], [0, -1, 'N'],
 			[0.7071, 0.7071, 'SE'], [-0.7071, 0.7071, 'SW'],
 			[0.7071, -0.7071, 'NE'], [-0.7071, -0.7071, 'NW']];
+		// **THE MAP'S OWN CURSOR IS READ, NEVER TYPED.** Three checks below ask "is this the bare
+		// map talking", and each of them used to answer by naming `grab` -- so all three went red
+		// on the day Tom retired the open hand, reporting a regression that was a decision.
+		const mapCursor = await a.page.evaluate(() => {
+			const c = document.getElementById('lpn_canvas');
+			return c ? getComputedStyle(c).cursor : '(no canvas)';
+		});
 		const sandwiches = [];
 		for (const [dx, dy, name] of dirs) {
 			const r = runs(await walk(a, n, dx, dy, 40));
@@ -143,7 +150,7 @@ exports.run = async function ({ browser, report }) {
 			// the old shape could not have told a wrongly-inheriting object from a deliberate one.
 			for (let i = 0; i < r.length; i++) {
 				const isCanvas = r[i].id === 'lpn_canvas';
-				if (isCanvas && r[i].cursor !== 'grab' && r[i].cursor !== 'grabbing') {
+				if (isCanvas && r[i].cursor !== mapCursor) {
 					sandwiches.push(`${name} bare map says ${r[i].cursor} at ${show(r[i])}`);
 				}
 			}
@@ -152,19 +159,24 @@ exports.run = async function ({ browser, report }) {
 		// line reported rather than asserted while `#lpn_canvas` was `cursor: default` and the fix
 		// was a pending decision -- a spec that can never go green makes `node run.js` exit 1 for
 		// ever, and this suite's README promises that exit 0 means every check passed. The canvas
-		// now says `grab`, so a band of `default` between two meaningful cursors would be a
-		// REGRESSION rather than a known state, and that is exactly what an assertion is for.
+		// carries a deliberate cursor now, so a band of `default` between two meaningful cursors
+		// would be a REGRESSION rather than a known state, and that is what an assertion is for.
 		report.ok(sandwiches.length === 0,
-			'the bare map says the open hand everywhere it shows through',
-			sandwiches.length ? sandwiches.join(' ;; ') : 'none on eight bearings');
-		// **AND THE HAND IS OPEN ON THE BARE MAP.** Asserted separately from the sandwich test
-		// because they can fail for different reasons: the test above would still pass if the
-		// canvas were given some other non-default cursor, and `grab` is the specific promise.
-		const bare = await a.page.evaluate(() => {
-			const c = document.getElementById('lpn_canvas');
-			return c ? getComputedStyle(c).cursor : '(no canvas)';
-		});
-		report.eq(bare, 'grab', 'the bare map offers the open hand, so it reads as pannable');
+			'the bare map says the map cursor everywhere it shows through',
+			sandwiches.length ? sandwiches.join(' ;; ') : `none on eight bearings (map says ${mapCursor})`);
+		// **AND THE BARE MAP MUST NOT SAY WHAT AN OBJECT SAYS.** Asserted separately from the
+		// sandwich test because the two fail for different reasons: that one compares the canvas
+		// with ITSELF and would pass whatever value the canvas held, including `default`.
+		//
+		// **IT NAMES NO GLYPH, AND THAT IS THE CORRECTION** (Tom, 2026-09-13, striking the open
+		// hand: *"it's very cute and all ... but it's not right for professional work."*). This line
+		// read `report.eq(bare, 'grab', ...)` and so had to be edited the moment he changed his
+		// mind, which is the pin dev/testing-notes.md warns about in another costume: the PROPERTY
+		// is that the map and the objects on it do not say the same thing, and every object on this
+		// map says `default` on his own 2026-09-08 ruling.
+		const bare = mapCursor;
+		report.ok(bare !== 'default' && bare !== 'auto',
+			'the bare map carries a cursor of its own, so it does not read as dead space', bare);
 
 		// **AND A NODE SAYS `pointer` FOR MORE THAN ITS OWN SEVEN PIXELS** (Tom, 2026-09-08: *"I get
 		// no help from the mouse pointer. It's just a pan cross the entire time."*). Nothing was
@@ -176,7 +188,7 @@ exports.run = async function ({ browser, report }) {
 		// **THIS IS THE ONE PLACE THE RESOLVED CURSOR IS REACHABLE.** dev/lpn-spike has no CSS
 		// engine, so its node-grab-band-harness.js can pin the mechanism and not the value; this
 		// walks outward from the dot and reads what the browser actually computes.
-		const reach = await a.page.evaluate(() => {
+		const reach = await a.page.evaluate((mapCur) => {
 			const c = document.querySelector('.lpn-node');
 			if (!c) { return null; }
 			const b = c.getBoundingClientRect();
@@ -190,16 +202,18 @@ exports.run = async function ({ browser, report }) {
 				for (let d = 0; d <= 40; d++) {
 					const el = document.elementFromPoint(cx + dx * d, cy + dy * d);
 					if (!el) { break; }
-					// Anything that is not the bare map's own `grab` counts as an object cursor,
-					// so a change of preference between `pointer` and `default` does not break this.
+					// Anything that is not the bare map's OWN cursor counts as an object cursor,
+					// and the map's own value is read from the canvas rather than typed, so a
+					// change of preference between `grab`, `pointer` and `default` cannot make
+					// this walk measure the wrong thing.
 					const cur = getComputedStyle(el).cursor;
-					if (cur === 'grab' || cur === 'grabbing' || cur === 'auto') { break; }
+					if (cur === mapCur || cur === 'auto') { break; }
 					last = d;
 				}
 				if (last > best) { best = last; }
 			}
 			return { disc: b.width / 2, reach: best };
-		});
+		}, mapCursor);
 		// **THE BAND NO LONGER CARRIES THE CURSOR, AND THAT REVERSED THIS PAIR OF ASSERTIONS**
 		// (2026-09-09). They were written when `.lpn-node-hit` said `pointer`, so the invisible
 		// 12 px band showed the finger and the reach ran past the drawn disc. Tom then found the
