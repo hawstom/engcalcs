@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read**, of 104 untranslated keys, of 1867 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read**, of 105 untranslated keys, of 1868 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (104, 5 to read @@ NEEDS RULING)
+## lpn_  (105, 8 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -243,6 +243,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_field_text_attached_tip`**
   > This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
   _Ruled OK 2026-09-09._
+- **`lpn_find_op_empty`**
+  > empty
+  @@ NEEDS RULING
 - **`lpn_georef_projected`**
   > This project already states a map projection, so its coordinates cannot be placed on the map a second time.
   _Ruled OK 2026-09-14._
@@ -268,11 +271,11 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.
   _Ruled OK 2026-09-14._
 - **`lpn_new_coordsys_local`**
-  > Local, schematic, custom, or georeference later
-  _Ruled OK 2026-09-14._
+  > Local, schematic, or custom
+  @@ NEEDS RULING
 - **`lpn_new_coordsys_local_tip`**
-  > Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.
-  _Ruled OK 2026-09-14._
+  > Choose this to attach your own background image.
+  @@ NEEDS RULING
 - **`lpn_new_coordsys_tip`**
   > Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.
   _Ruled OK 2026-09-14._

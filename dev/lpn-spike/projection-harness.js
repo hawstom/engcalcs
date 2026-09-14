@@ -560,6 +560,24 @@ setUnitSet('si');
 		ok('...and did not read the searched latitude as a northing',
 			!!v && Math.abs(v.cy - PETALUMA.lat) > 1 && Math.abs(v.cx - PETALUMA.lon) > 1,
 			v ? v.cx + ', ' + v.cy : 'no view');
+		// **THE CAMERA HAS TWO PARTS AND ONLY ONE OF THEM NEEDS A TRANSFORM** (Tom, 2026-09-14,
+		// on his third report of this: *"Zoom new project to same zoom as new project wizard
+		// instead of 0,0 at upper left."*). WHERE it points is impossible and is answered by the
+		// notice above. HOW FAR OUT it is zoomed is a ratio of a ground distance to a screen
+		// distance, needs no transform, and was the half that kept being thrown away with the
+		// other one.
+		ok('...and the plane\'s origin is CENTRED, not parked in the upper-left corner',
+			!!v && v.cx === 0 && v.cy === 0, v ? v.cx + ', ' + v.cy : 'no view');
+		// The old behaviour was defaultViewForCoords()'s xy answer: {cx: W/2, cy: H/2, s: 1},
+		// which is one pixel per plane unit with the origin in the corner. Both halves are gone.
+		ok('...and the scale is no longer the bare 1 px per unit that produced the report',
+			!!v && v.s !== 1, v ? String(v.s) : 'no view');
+		// A place with no extent falls to the same site-sized floor the geographic path uses:
+		// 1000 m across 800 px, with the 0.9 pad, in metres because this fixture's length unit is
+		// SI. 800 / 1000 * 0.9 = 0.72, and the height leg (600/1000*0.9 = 0.54) is the smaller,
+		// so that is the one that wins.
+		ok('...and it is the wizard\'s own ground zoom, fitted to the canvas',
+			!!v && Math.abs(v.s - 0.54) < 1e-9, v ? String(v.s) : 'no view');
 	}
 
 	// No place, no sentence: a notice that fires when nobody searched for anything is noise.

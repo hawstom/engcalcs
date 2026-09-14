@@ -184,8 +184,10 @@ ok('the row is labelled with the popup\'s own word', L.propLabels('pipe')[1] ===
 // since Task 598 above and below as well, which on a word means DICTIONARY ORDER in the reader's
 // own language (Tom, 2026-09-06: *"ID, Tag, and Text should also allow Below and Above"*). "every
 // asset our register calls MAIN-19xx or later" is a real question about somebody else's numbering.
+// `empty` joined them on 2026-09-14 and is last: "which pipes have I not tagged yet" is the
+// data-entry question, and a tag is exactly the field somebody fills in over several sittings.
 ok('its conditions are the text ones',
-	same(L.opKeys('pipe', 'tag'), ['contains', 'equals', 'gt', 'lt', 'top', 'bottom']),
+	same(L.opKeys('pipe', 'tag'), ['contains', 'equals', 'gt', 'lt', 'top', 'bottom', 'empty']),
 	JSON.stringify(L.opKeys('pipe', 'tag')));
 
 // =====================================================================================

@@ -50,6 +50,11 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn findMatches().map(function (c) { return c.group + ':' + c.el.id; });\n" +
 	"\t\t},\n" +
 	"\t\tfindState: function () { return findState; },\n" +
+	// The line the controls WRITE, as a pure function of the state, so a serializer assertion
+	// does not depend on which control was last touched.
+	"\t\tqueryFor: function (scope, prop, op, value) {\n" +
+	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op; findState.value = value;\n" +
+	"\t\t\treturn findQueryString(); },\n" +
 	// The words, not the ids -- what a Text result actually shows.
 	"\t\tfindText: function (scope, prop, op, value) {\n" +
 	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op; findState.value = value;\n" +
@@ -270,12 +275,15 @@ function build(unitSet) {
 		JSON.stringify(L.propKeys('text')));
 	// **AND SINCE TASK 598 A TEXT PROPERTY GETS above AND below TOO** (Tom, 2026-09-06: *"ID, Tag,
 	// and Text should also allow Below and Above for a localized alphanumeric order (dictionary
-	// order) comparison."*). `contains` stays first, because it is what an ID lookup means.
+	// order) comparison."*). `contains` stays first, because it is what an ID lookup means, and
+	// `empty` is LAST on both lists (Tom, 2026-09-14) -- a condition that takes no value at all
+	// belongs after the ones that do, and the common conditions keep their places in a pull-down
+	// that is now seven rows long.
 	ok('a text property gets contains, equal to, and the dictionary comparisons',
-		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals', 'gt', 'lt', 'top', 'bottom']),
+		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals', 'gt', 'lt', 'top', 'bottom', 'empty']),
 		JSON.stringify(L.opKeys('all', 'id')));
 	ok('a numeric property gets the number comparisons and no "contains"',
-		JSON.stringify(L.opKeys('pipe', 'diameter')) === JSON.stringify(['equals', 'gt', 'lt', 'top', 'bottom']),
+		JSON.stringify(L.opKeys('pipe', 'diameter')) === JSON.stringify(['equals', 'gt', 'lt', 'top', 'bottom', 'empty']),
 		JSON.stringify(L.opKeys('pipe', 'diameter')));
 	// **THE EXTREMES ARE A STANDARD CONDITION ON EVERYTHING WITH AN ORDER** (Tom, 2026-08-26:
 	// *"it should be a standard condition, but it's not"*). They were numbers-only, which is what
@@ -1195,6 +1203,65 @@ console.log('\n--- the Find box comes back where it was left ---');
 	try { L.loadLayout(); } catch (e) { threw = true; }
 	ok('...and unreadable storage is survived, not thrown on', !threw && L.getLayout().pos === null);
 	global.localStorage.removeItem('lpn_findbox');
+}
+
+// ---- "empty" -- THE DATA-ENTRY QUESTION (Tom, 2026-09-14) ---------------------------------------
+//
+// *"Find needs a way to find empty values."* He offered two shapes and this is the second, a
+// Condition on every property, because the first -- ranking blanks into "n lowest" -- would make
+// a junction nobody typed an elevation on the lowest junction in the network, and on a
+// half-entered network every one of the ten lowest would be a blank.
+{
+	console.log('\n--- empty ---');
+	ok('empty is offered on a numeric property', L.opKeys('junction', 'elev').indexOf('empty') >= 0,
+		L.opKeys('junction', 'elev').join(','));
+	ok('...and on a text one', L.opKeys('all', 'id').indexOf('empty') >= 0,
+		L.opKeys('all', 'id').join(','));
+	// **IT IS LAST, AFTER THE EXTREMES.** The conditions people reach for most stay at the top of
+	// a pull-down that is now seven rows long.
+	ok('...last in the list, so the common conditions keep their places',
+		L.opKeys('junction', 'elev').slice(-1)[0] === 'empty');
+
+	// A junction with no elevation typed, beside ones that have one.
+	L.setPopupOpen(true);
+	L.buildPanel();
+	const blank = L.addNode('junction', 900, 900);
+	blank.elev = undefined;
+	const filled = L.addNode('junction', 950, 950);
+	filled.elev = 42;
+	const empties = L.find('junction', 'elev', 'empty', '');
+	ok('it finds the junction that states no elevation', empties.indexOf('node:' + blank.id) >= 0,
+		empties.join(','));
+	// **AND IT FINDS ONLY THOSE.** The failure that would make this useless is matching
+	// everything, which is what conflating "states nothing" with "does not apply" does. The two
+	// sets are disjoint and neither is empty, which is the whole claim.
+	ok('...and NOT the junction that has one, which is the failure that would make it useless',
+		empties.indexOf('node:' + filled.id) < 0, empties.join(','));
+
+	// **THE QUERY LINE ENDS AT THE CONDITION.** A trailing '' would say "empty equal to nothing"
+	// and would not round-trip. The panel is rebuilt so the line is written from the state just
+	// set, rather than left over from the search before it.
+	const line = L.queryFor('junction', 'elev', 'empty', '');
+	ok('the query line takes no value', /empty\s*$/.test(String(line)), String(line));
+	L.buildPanel();
+	L.type(String(line));
+	ok('...and parses back to the same condition',
+		L.findState().op === 'empty' && L.findState().prop === 'elev',
+		L.findState().prop + '/' + L.findState().op);
+
+	// **A BLANK BOX IS NOT A MISTAKE HERE**, which is the point: the condition asks its whole
+	// question, so pressing Find with nothing typed must run rather than scold.
+	L.pressFind();
+	ok('pressing Find with an empty box runs the search rather than asking for a value',
+		panelLines(L.resultsBox()).join(' ').indexOf(PC.lpn_find_no_value) < 0,
+		panelLines(L.resultsBox()).join(' '));
+
+	// A value written after it is somebody meaning something else, and is refused rather than
+	// silently dropped.
+	L.type('Junction.Elevation empty 5');
+	L.pressFind();
+	ok('a value after empty is refused, not silently dropped', L.results().length === 0,
+		String(L.results().length));
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

@@ -16,18 +16,15 @@
         "unfinished capability cannot burden master even if somebody forgets. Closing one is Tom's",
         "word, recorded in 'closed_by', never an AI's judgement that the work looks sufficient."
     ],
-    "blockers": [
-        {
-            "id": "utm-only",
-            "branch": "projection",
-            "blocks": "deployment",
-            "open": true,
-            "raised": "before the projection branch was created",
-            "words": "We won't deploy with UTM only.",
-            "restated": "Tom, 2026-09-13: 'When are we going to add the full universe of projections? We can't release without it, and I would like to test with it.'",
-            "state": "ADDRESSED 2026-09-14, AWAITING TOM'S WORD. All 5,346 live projected CRS now ship in js/data/epsg-projected.json (343 KB raw, 79 KB gzipped), generated from PROJ's own build of EPSG v12.029 out of a PyPI wheel pinned by sha256, and fetched when the projection chooser first opens. State Plane, every national grid and every regional UTM are in it. The 183 hand-typed rows remain as the offline fallback, and projection_catalogue_check.php holds all 182 of them against the register's own names -- every one agreed on the day it landed. What is still NOT possible is anything needing a transform: a basemap, terrain, the initial view of a projected project, the point scale factor. dev/projection-catalogue.md section 2 draws that line and section 7 is the warning against reading a row count as progress.",
-            "state_note": "THIS ENTRY STAYS OPEN UNTIL TOM SAYS OTHERWISE. He asked to TEST with the full universe, and he has not yet. 'Closing one is Tom's word, recorded in closed_by, never an AI's judgement that the work looks sufficient' -- this file's own rule, and the whole reason it exists.",
-            "closed_by": null
-        }
+    "blockers": [],
+    "_closed_note": [
+        "CLOSED AND DELETED 2026-09-14: 'utm-only'. Tom: \"Close/delete it. Obsolete.\" All 5,346 live",
+        "projected CRS shipped that day in js/data/epsg-projected.json, which is what the blocker asked",
+        "for. Kept as one line rather than a kept entry, because this file is a register of what is OPEN",
+        "-- a closed blocker that stays in it is a thing a later reader has to rule out.",
+        "",
+        "The register still works and is still the rule: when Tom says a thing blocks release, it is",
+        "written here in the same turn, before any work starts on it. A constraint that exists only in a",
+        "transcript does not exist."
     ]
 }

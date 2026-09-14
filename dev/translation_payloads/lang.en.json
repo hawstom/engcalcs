@@ -869,6 +869,7 @@
         "lpn_find_op_equals": "equal to",
         "lpn_find_op_gt": "above",
         "lpn_find_op_lt": "below",
+        "lpn_find_op_empty": "empty",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
         "lpn_find_op_top": "{n} highest",
@@ -962,8 +963,8 @@
         "lpn_new_coordsys_tip": "Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.",
         "lpn_new_coordsys_geo": "Geographic projection",
         "lpn_new_coordsys_geo_tip": "Select a geographic projection. Use WGS 84 \/ Pseudo-Mercator EPSG:3857 for Lat\/Lon.",
-        "lpn_new_coordsys_local": "Local, schematic, custom, or georeference later",
-        "lpn_new_coordsys_local_tip": "Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.",
+        "lpn_new_coordsys_local": "Local, schematic, or custom",
+        "lpn_new_coordsys_local_tip": "Choose this to attach your own background image.",
         "lpn_new_crs": "Map projection",
         "lpn_new_crs_tip": "The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
         "lpn_crs_view": "Filter by map view",
@@ -1869,7 +1870,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1867,
+    "count": 1868,
     "active_prefixes": [
         "about",
         "bpn",

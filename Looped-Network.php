@@ -1417,6 +1417,7 @@ EngCalcs.pageConfig = {
 	lpn_find_op_equals: <?=json_encode($ec_lang['lpn_find_op_equals'])?>,
 	lpn_find_op_gt: <?=json_encode($ec_lang['lpn_find_op_gt'])?>,
 	lpn_find_op_lt: <?=json_encode($ec_lang['lpn_find_op_lt'])?>,
+	lpn_find_op_empty: <?=json_encode($ec_lang['lpn_find_op_empty'])?>,
 	lpn_find_count: <?=json_encode($ec_lang['lpn_find_count'])?>,
 	lpn_find_op_top: <?=json_encode($ec_lang['lpn_find_op_top'])?>,
 	lpn_find_op_bottom: <?=json_encode($ec_lang['lpn_find_op_bottom'])?>,
