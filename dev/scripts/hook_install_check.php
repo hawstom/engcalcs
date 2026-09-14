@@ -40,7 +40,7 @@ if ($path !== '') {
     exit(1);
 }
 
-$hooks = array('pre-commit', 'pre-push');
+$hooks = array('pre-commit', 'pre-push', 'pre-merge-commit');
 $bad = array();
 foreach ($hooks as $h) {
     $src = 'dev/hooks/' . $h;

@@ -479,7 +479,7 @@ Tom has NOT yet authorized.
 
 ## 5. THE NEXT THINGS, in the order I would take them
 
-**Rewritten 2026-09-10. EWB IS 16 SEPTEMBER AND TOM'S OWN PLAN GOVERNS:** *"4 days of bugs, then 2
+**Rewritten 2026-09-10. EWB IS 17 SEPTEMBER AND TOM'S OWN PLAN GOVERNS:** *"4 days of bugs, then 2
 days of translation, not earlier."* Translation freeze **14 Sep**; he keeps the right to tweak
 English until then. He explicitly declined an earlier sprint. **Nothing below is a reason to break
 that.**

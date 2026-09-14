@@ -1,0 +1,32 @@
+{
+    "_comment": [
+        "WHAT MUST NOT REACH master, AND WHY. Each entry is a thing somebody said blocks release.",
+        "",
+        "Written 2026-09-13, after `projection` was merged carrying 183 of 5,346 projections while",
+        "'We won't deploy with UTM only' was a standing instruction from before that branch existed.",
+        "THAT SENTENCE APPEARED NOWHERE IN THIS REPOSITORY -- it lived in a conversation, and a",
+        "conversation is not a place a later session can look. The orchestrator even restated it in a",
+        "brief ('a release blocker stated plainly') and merged the branch two hours later anyway.",
+        "",
+        "**A CONSTRAINT THAT EXISTS ONLY IN A TRANSCRIPT DOES NOT EXIST.** When Tom says a thing",
+        "blocks release, it is written HERE in the same turn, before any work starts on it. That is",
+        "the whole rule, and it is the one the projection failure is made of.",
+        "",
+        "dev/scripts/branch_gate.php refuses a merge of any branch named by an OPEN blocker, so an",
+        "unfinished capability cannot burden master even if somebody forgets. Closing one is Tom's",
+        "word, recorded in 'closed_by', never an AI's judgement that the work looks sufficient."
+    ],
+    "blockers": [
+        {
+            "id": "utm-only",
+            "branch": "projection",
+            "blocks": "deployment",
+            "open": true,
+            "raised": "before the projection branch was created",
+            "words": "We won't deploy with UTM only.",
+            "restated": "Tom, 2026-09-13: 'When are we going to add the full universe of projections? We can't release without it, and I would like to test with it.'",
+            "state": "183 of 5,346 live projected CRS are offered (UTM, a few national grids). dev/projection-catalogue.md has the numbers: the full register is 336 KB raw / 79 KB gzipped as data alone, needs no transform and no proj4js, and is redistributable under the IOGP terms with one attribution line.",
+            "closed_by": null
+        }
+    ]
+}

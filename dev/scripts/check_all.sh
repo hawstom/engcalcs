@@ -423,6 +423,7 @@ run_check "screenshot publication"       advisory php dev/scripts/screenshot_pub
 # only a human can tell a stale claim from a correct citation.
 run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_check.php
 run_check "git hooks installed"          blocking php dev/scripts/hook_install_check.php
+run_check "branch policy selftest"       blocking php dev/scripts/branch_policy_selftest.php
 run_check "branch hygiene"             advisory php dev/scripts/branch_hygiene_check.php
 run_check "nested repo boundary"      advisory php dev/scripts/nested_repo_boundary_check.php
 # Task 322. This line used to pipe the report through `grep -q "^CHANGED"`, so the NOTE it printed

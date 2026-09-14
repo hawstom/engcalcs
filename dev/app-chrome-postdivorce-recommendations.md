@@ -251,12 +251,12 @@ Why this over the others, ranked against every other candidate in this document:
 - It is the direct answer to what actually produced the finding this whole brief opens with — **the
   eye stops at the toolbar row and does not continue upward** — without asking a stateful control
   (§C) to relocate somewhere it cannot function, and without betting the wide-screen-only layout
-  win (§A) before 16 September.
+  win (§A) before 17 September.
 - It composes cleanly with B and D: neither depends on it, and both get slightly cheaper to notice
   once the two rows read as one strip rather than two.
 - Reversible in minutes if it looks wrong in a real pass — it is a background-color and border rule,
   not a structural change, which matters given the stated risk (a redesign distraction before the
-  16 September demonstration).
+  17 September demonstration).
 
 **Rank order overall:** E (unify paint) → D (Help menu, cheap and self-contained) → B (Language on
 menu bar, cheap, reuses existing widget) → A-2 (responsive merge, real engineering, do after the
@@ -367,7 +367,7 @@ Real design work, not a redraw — offered as diagnosis-and-direction per the br
 3. **Given that parity is not achievable or desirable, the lever that is left is genre, not
    size: make the menu bar read as "part of the application's tool surface" rather than
    "a navigation list," independent of how much ink it occupies.** This is the one worth Tom's
-   attention before 16 September, and it is a smaller ask than either the literal merge or a
+   attention before 17 September, and it is a smaller ask than either the literal merge or a
    hairline: the menu bar's icons are already the same icon family, same stroke weight, same
    `currentColor` treatment as the toolbar's — the genre cue that is missing is that the toolbar
    is ALWAYS icon-only (no word ever competes with the glyph for attention) while the menu bar is

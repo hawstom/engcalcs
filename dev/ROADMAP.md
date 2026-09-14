@@ -213,7 +213,7 @@ the block.
     version together (the suite serves two domains on its own schedule), and it would turn Tom's
     deploy from `git pull` into `git pull && git submodule update --init --recursive`. A deploy step
     somebody can forget is a deploy step somebody will forget.
-  - **NOT BEFORE THE 16 SEPTEMBER DEMONSTRATION.** The risk is a live 500: `Options -Indexes` needs
+  - **NOT BEFORE THE 17 SEPTEMBER DEMONSTRATION.** The risk is a live 500: `Options -Indexes` needs
     `AllowOverride Options`, and where that grant is missing Apache fails closed for every request
     under `/engcalcs/`. The benefit compounds over months; do it on a quiet day.
   - `hawsedc.com/engcalcs/` is the indexed address and does not move. An Alias is transparent to the

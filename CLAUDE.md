@@ -57,9 +57,29 @@ uncommitted; silence means commit and push.
     paradigm he never wanted is what that cost here. **A repeated question is evidence. Re-argue the
     rule from scratch, out loud, and say plainly which parts of the original reasoning do not
     address what is being asked** -- as the concurrency argument did not address release safety.
-  - **MERGE FROM MASTER OFTEN, INTO MASTER WHEN DONE.** A long-lived branch that never takes master
-    back is a merge conflict being saved up. The four capability branches are large, speculative and
-    abandonable, which is what a branch is genuinely for.
+  - **MERGE FROM MASTER OFTEN. INTO MASTER ONLY WHEN TOM SAYS A CAPABILITY BRANCH IS DONE.** A
+    long-lived branch that never takes master back is a merge conflict being saved up, so the first
+    half is unchanged. **The second half used to read "into master when done" and that sentence cost
+    six unasked merges in one session on 2026-09-13** -- it never said WHO decides done, and the AI
+    read its own green build as the answer. Tom: *"Really you should never merge a major branch to
+    master without my all-clear on completion."*
+    - **GREEN IS NOT DONE, and this is the distinction the old wording lost.** `check_all.sh` says
+      the code works. It cannot say whether the FEATURE is finished. Every one of those six merges
+      was green; `projection` went in without the projection universe he had asked for TWICE, and
+      `custom-property` with a validator that does not validate and that he never asked for. No
+      suite can see either.
+    - **A DEFECT TRACK STILL MERGES ON THE OLD RULE** -- green on the merge result, and push. The
+      gate is only for a branch listed in `dev/branch-policy.json`, because a gate that stops all
+      work is a gate somebody switches off.
+    - **IT IS A CHECK NOW, NOT THIS PARAGRAPH.** `dev/hooks/pre-merge-commit` refuses the merge;
+      `dev/branch-all-clears.json` records his exact words pinned to the commit he cleared, so the
+      approval LAPSES BY ITSELF when the branch moves, exactly as a ruling in
+      `dev/english-key-rulings.json` lapses when the English changes. A FREEZE in
+      `dev/branch-policy.json` stops every merge but a `hotfix:`, which is how development continues
+      while the production line holds still.
+    - The four capability branches are large, speculative and abandonable, which is what a branch is
+      genuinely for -- and is exactly why finishing one is a judgement about the product rather than
+      about the build.
   - **THEY SHARE SEAMS, so read the worktree rule below before running two of them at once.**
     `graph` and `custom-property` both write the bottom pane's tab strip; `custom-property` and
     `customer` both add fields to the Properties box and to Find; `projection` and `customer` both
@@ -724,6 +744,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `generate_examples.php --check` | The served `examples/` matches its source |
 | `generate_features.php --check` | `dev/features.md` matches its hand-written source, and every ID a feature cites is genuinely closed |
 | `hook_install_check.php` | The two git hooks that keep master the production line are installed and byte-identical to `dev/hooks/`. **A copy, not `core.hooksPath`, and that reversal was MEASURED**: core.hooksPath resolves INTO THE WORKING TREE, so checking out a commit without `dev/hooks/` silently deletes every guard -- a commit straight onto master went through unrefused for exactly that reason on the day they were written. It failed OPEN and SILENTLY. A copy in `.git/` survives every checkout and buys one problem, staleness, which is what this check is. Not-installed is a failure too: a checkout nobody ran `dev/hooks/install.sh` in has no guard at all, which is the state this exists to make visible |
+| `branch_policy_selftest.php` | **GREEN IS NOT DONE.** `dev/hooks/pre-merge-commit` refuses a merge of a branch listed in `dev/branch-policy.json` unless `dev/branch-all-clears.json` records Tom's words PINNED TO THE COMMIT he cleared -- so the approval lapses by itself the moment the branch moves, the way an English ruling lapses when the wording changes. Written after six capability merges landed on master in one session, every one of them green and two of them unfinished in ways only he could see. **The existing hooks had nothing to say because neither watches a MERGE**: pre-commit exempts merge commits by construction, and pre-push passes as soon as the suite is re-run. Blocking, and the selftest is why: this hook only speaks when it refuses, so one that has silently stopped working is indistinguishable from one nobody has tripped -- the failing-open shape that already cost this project a guard on 2026-09-12. Nine cases against a throwaway git repository the test builds, including a freeze that stops an ORDINARY branch and still lets a `hotfix:` through |
 | `roadmap_id_check.php` | ID uniqueness across ROADMAP + closed ledger; priority 0 means closed and nothing else; and **priority is one of 100, 95, 75, 50, 25, 5, 0 and no other number**. That last leg was prose in the roadmap's own header for three weeks and drifted anyway -- seven tasks had settled at 30, 40, 60 and 70 by the day Tom read the file (*"the system has been completely lost. Restore it."*, 2026-09-12), on the same screen as a header sentence saying five values and nothing between them. An off-tier number is invisible: the file still sorts and still reads, and every 60 is a private opinion about a gap nobody else can re-derive. **A temporary 95 tier was retired on 2026-09-12, the day after it was made** -- it parked work past EWB, and branch work needs no parking: with master as the production line a task ships when its branch merges and not before |
 | `check_table_parity_check.php` + selftest | This table and `check_all.sh` name the same checks. Matched on script filename, not on labels — the two files may word a check differently. Eight checks ran unlisted when it was written |
 | `doc_path_check.php` + selftest | Every path `CLAUDE.md` cites exists. Scoped to that file: `dev/*.md` has 31 dead citations and nearly all are legitimate history, which would make it a judgement call. Deliberately timid about what looks like a path, and prints how much it turned away. `~/webdev/...` and `../sitemap.xml` are outside this tree, so their absence proves nothing |

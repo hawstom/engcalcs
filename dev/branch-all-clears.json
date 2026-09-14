@@ -1,0 +1,19 @@
+{
+    "_comment": [
+        "TOM'S ALL-CLEARS, one per protected branch, pinned to the commit he cleared.",
+        "",
+        "Keyed and pinned the way dev/english-key-rulings.json is keyed on the exact English text,",
+        "and for the same reason: AN APPROVAL MUST LAPSE BY ITSELF WHEN WHAT WAS APPROVED CHANGES.",
+        "Clear a branch at one commit, push three more, and 'head' no longer matches -- the gate",
+        "closes again without anybody remembering to close it.",
+        "",
+        "WRITE HIS WORDS VERBATIM. 'Yes' and 'Yes, but drop the date validator' are both all-clears",
+        "and only one of them is finished. A boolean would lose the difference, which is exactly the",
+        "mistake the rulings file already avoids.",
+        "",
+        "AI PROPOSES, TOM APPROVES, THEN AI WRITES -- never AI writing its own permission. If this",
+        "file is edited in the same session that merges the branch, and Tom's words are not in the",
+        "transcript, the gate has been walked around rather than passed."
+    ],
+    "cleared": {}
+}
