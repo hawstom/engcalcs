@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1869,
-        "delta_key_count": 107,
+        "expected_key_count": 1867,
+        "delta_key_count": 105,
         "exempt_key_count": 39,
         "exempt_keys": [
             "u_imgd",
@@ -606,7 +606,6 @@
         "lpn_cp_val_number": "Number .",
         "lpn_cp_val_number_comma": "Number ,",
         "lpn_cp_val_integer": "Integer",
-        "lpn_cp_val_datetime": "Date and time",
         "lpn_cp_val_upper": "ALL CAPS",
         "lpn_cp_val_camel": "camelCase",
         "lpn_cp_val_pascal": "PascalCase",
@@ -615,7 +614,6 @@
         "lpn_cp_flag": "{label}: {reason} The value is kept exactly as you typed it.",
         "lpn_cp_bad_number": "This value is not a number as required for this property.",
         "lpn_cp_bad_integer": "This value is not a whole number as required for this property.",
-        "lpn_cp_bad_datetime": "This value does not look like a date or a time.",
         "lpn_cp_bad_case": "This value is not ALL CAPS as required for this property.",
         "lpn_cp_bad_chars": "This value uses a character this property does not allow.",
         "lpn_cp_bad_space": "White space is allowed only between other characters.",
@@ -715,7 +713,6 @@
         "lpn_cp_val_number": "Number .",
         "lpn_cp_val_number_comma": "Number ,",
         "lpn_cp_val_integer": "Integer",
-        "lpn_cp_val_datetime": "Date and time",
         "lpn_cp_val_upper": "ALL CAPS",
         "lpn_cp_val_camel": "camelCase",
         "lpn_cp_val_pascal": "PascalCase",
@@ -724,7 +721,6 @@
         "lpn_cp_flag": "{label}: {reason} The value is kept exactly as you typed it.",
         "lpn_cp_bad_number": "This value is not a number as required for this property.",
         "lpn_cp_bad_integer": "This value is not a whole number as required for this property.",
-        "lpn_cp_bad_datetime": "This value does not look like a date or a time.",
         "lpn_cp_bad_case": "This value is not ALL CAPS as required for this property.",
         "lpn_cp_bad_chars": "This value uses a character this property does not allow.",
         "lpn_cp_bad_space": "White space is allowed only between other characters.",
@@ -2069,22 +2065,6 @@
                 }
             }
         },
-        "lpn_cp_val_datetime": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_push_no_change",
-                    "value": "Setiap elemen sudah memiliki nilai ini, sehingga tidak ada yang akan berubah.",
-                    "english": "Every asset already has these values, so nothing would change."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_label",
-                    "value": "Skenario",
-                    "english": "Scenario"
-                }
-            }
-        },
         "lpn_cp_val_upper": {
             "reason": "missing",
             "current_value": null,
@@ -2198,22 +2178,6 @@
             }
         },
         "lpn_cp_bad_integer": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_push_no_change",
-                    "value": "Setiap elemen sudah memiliki nilai ini, sehingga tidak ada yang akan berubah.",
-                    "english": "Every asset already has these values, so nothing would change."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_label",
-                    "value": "Skenario",
-                    "english": "Scenario"
-                }
-            }
-        },
-        "lpn_cp_bad_datetime": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

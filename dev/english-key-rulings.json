@@ -111,11 +111,6 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_cp_bad_datetime": {
-            "on": "This value does not look like a date or a time.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
         "lpn_cp_bad_high": {
             "on": "This value is above the high limit of this property.",
             "ruled": "2026-09-14",
@@ -293,11 +288,6 @@
         },
         "lpn_cp_val_camel": {
             "on": "camelCase",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
-        "lpn_cp_val_datetime": {
-            "on": "Date and time",
             "ruled": "2026-09-14",
             "answer": "OK"
         },

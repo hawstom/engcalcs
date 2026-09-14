@@ -407,12 +407,39 @@ const designRows = byClass(firstBody, 'lpn-set-row');
 ok('7.12 the design fields are the box’s own row primitive', designRows.length === 10,
 	String(designRows.length));
 // Each part of the design has its own line, named the way the page names it.
+// **THE CHARACTER BOX IS CAPTIONED BY THE MODE, NOT BY A FIXED STRING** (fixed 2026-09-14): a
+// design in the default `allow` mode titles it with the Allow option's own words. That is the
+// defect Tom reported as *"Restrict these characters never switches to Allow"* -- the select
+// always stored the right value and the caption beside it never moved.
 [PC.lpn_cp_key, PC.lpn_cp_label, PC.lpn_cp_applies, PC.lpn_cp_validate, PC.lpn_cp_restrict_mode,
-	PC.lpn_cp_restrict, PC.lpn_cp_minlength, PC.lpn_cp_length, PC.lpn_cp_low, PC.lpn_cp_high
+	PC.lpn_cp_restrict_allow, PC.lpn_cp_minlength, PC.lpn_cp_length, PC.lpn_cp_low, PC.lpn_cp_high
 ].forEach(function (lbl, i) {
 	ok('7.13.' + (i + 1) + ' one more design field has its own control',
 		!!byAria(firstBody, lbl), lbl);
 });
+// **AND IT FOLLOWS THE MODE WHEN THE MODE MOVES.** The defect Tom reported on 2026-09-14 was
+// exactly this: the select stored `deny` correctly, and the box beside it went on saying the same
+// words, so the control looked dead. Both captions are asserted, because a screen reader hears
+// only the second and updating one of them would leave the defect in place for the reader least
+// able to work around it.
+{
+	const modeSel = byAria(firstBody, PC.lpn_cp_restrict_mode);
+	ok('7.13.11 the mode select is there to drive', !!modeSel);
+	modeSel.value = 'deny';
+	fire(modeSel, 'change');
+	ok('7.13.12 choosing Restrict re-captions the character box',
+		!!byAria(firstBody, PC.lpn_cp_restrict_deny), PC.lpn_cp_restrict_deny);
+	ok('7.13.13 ...and the old caption is gone, so the control is not saying both',
+		!byAria(firstBody, PC.lpn_cp_restrict_allow));
+	ok('7.13.14 ...and the design stored the mode it was given',
+		settings().customProps[0].restrictMode === 'deny',
+		settings().customProps[0].restrictMode);
+	modeSel.value = 'allow';
+	fire(modeSel, 'change');
+	ok('7.13.15 switching back to Allow re-captions again, which is the reported defect',
+		!!byAria(firstBody, PC.lpn_cp_restrict_allow));
+	ok('7.13.16 ...and stores allow', settings().customProps[0].restrictMode === 'allow');
+}
 // Remove is on line one, because it is not a design field and should not cost opening the row.
 const rm = buttons(L.customBody(), PC.lpn_cp_remove);
 ok('7.14 every row offers Remove', rm.length === settings().customProps.length);
@@ -474,7 +501,7 @@ ok('9.1 there is no Text type any more', vOpts.indexOf('text') < 0, vOpts.join('
 ok('9.2 Do not validate is still there', vOpts.indexOf('none') >= 0);
 ok('9.3 both numeric types are offered',
 	vOpts.indexOf('number') >= 0 && vOpts.indexOf('number_comma') >= 0);
-ok('9.4 Date and time is offered', vOpts.indexOf('datetime') >= 0);
+ok('9.4 Date and time is NOT offered, having been removed 2026-09-14', vOpts.indexOf('datetime') < 0);
 // A document that still states the removed type validates as nothing, which is what it always did.
 const legacy = { key: L.customPropKey('t'), label: 't', applies: 'J', validate: 'text',
 	restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
@@ -494,15 +521,30 @@ ok('9.11 a comma design compares its limits with a comma', problem(dot, '9,5') =
 ok('9.12 and passes a value above it', problem(dot, '11,5') === null);
 dot.low = '';
 
-const when = { key: L.customPropKey('w'), label: 'w', applies: 'J', validate: 'datetime',
-	restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
-['2026-09-13', '9/13/2026', '13.09.2026', '14:30', '2:05 pm', '13 September 2026',
-	'Sep 13, 2026 14:30', '2026-09-13T14:30:00Z', '20260913'].forEach(function (v, i) {
-	ok('9.13.' + (i + 1) + ' Date and time accepts one more plausible expression', problem(when, v) === null, v);
-});
-ok('9.14 it flags a value with no digit in it', problem(when, 'sometime soon') === PC.lpn_cp_bad_datetime);
-ok('9.15 it flags a value no date could carry', problem(when, '13/09/2026 *** ') === PC.lpn_cp_bad_datetime);
-ok('9.16 a blank is still not a failure', problem(when, '') === null);
+// **THERE IS NO DATE AND TIME TYPE, AND THESE ASSERT THAT IT STAYS GONE.** Removed 2026-09-14 on
+// Tom's instruction after he found that a 13th month passed it. The type was never asked for and
+// what it checked was punctuation, not calendars; the record is in js/looped-network.js beside
+// customPropCharInSet(). A DELETION NEEDS A TEST AS MUCH AS A FEATURE DOES: the way this comes
+// back is somebody re-adding a plausible-looking option to customPropValidateOptions().
+ok('9.13 no Date and time option is offered',
+	!L.customPropValidateOptions().some(o => o[0] === 'datetime'),
+	JSON.stringify(L.customPropValidateOptions().map(o => o[0])));
+{
+	// A document saved while the type existed still states it. That value must degrade to no
+	// validation rather than to a thrown error or to a rule nobody can see -- the file is the
+	// user's and we do not rewrite it.
+	const when = { key: L.customPropKey('w'), label: 'w', applies: 'J', validate: 'datetime',
+		restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
+	ok('9.14 a stored datetime design validates nothing rather than throwing',
+		problem(when, 'sometime soon') === null);
+	ok('9.15 ...including the 13th month that ended the feature', problem(when, '2026-13-45') === null);
+	ok('9.16 a blank is still not a failure', problem(when, '') === null);
+	// The limits Tom actually named for dates still work on that same design, which is the point:
+	// removing the type removed nothing a date needed.
+	when.minLength = '8';
+	ok('9.17 ...and a length limit still flags a partial date',
+		problem(when, '2026') === PC.lpn_cp_bad_minlength, problem(when, '2026'));
+}
 
 // **THE FEWEST, AND IT FLAGS WITHOUT PADDING** -- the whole of Tom's exploration-tool ruling
 // applied to the new limit.
