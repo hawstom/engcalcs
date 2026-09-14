@@ -80,9 +80,24 @@ console.log('--- an object under the pointer says what it is, panning or not ---
 	// this section was written for was that an object said NOTHING different from the bare map; it
 	// still says something different (`grab` is the map, `default` is a thing), and the arrow hides
 	// less of a 7 px disc than the hand did.
-	[['.lpn-node', 'default'], ['.lpn-link', 'default'], ['.lpn-link-hit', 'inherit'],
-		['.lpn-link-symbol-hit', 'default'], ['.lpn-vhandle', 'default'], ['.lpn-draglbl', 'default']
+	// **UPDATED 2026-09-13, AND THE PROPERTY IS THE ONE THE PARAGRAPH ABOVE ALREADY NAMES.** These
+	// rows read 'default' as a literal, so they went red the day Tom moved objects to `pointer`
+	// (*"All default is a downgrade. Let's try map default and select pointer."*) -- a decision, not
+	// a defect. The complaint this section exists for is that an object said NOTHING DIFFERENT from
+	// the bare map, and that is a RELATIONSHIP between two rules, not a glyph. So the rows now say
+	// which side each shape is on: OBJ means "whatever an object wears", and the check is that it is
+	// not what the canvas wears. `inherit` stays literal -- slop deliberately taking the MAP's
+	// cursor is a different claim, and asserting it against OBJ would quietly invert it.
+	const MAPC = (/#lpn_canvas \{[^}]*cursor:\s*([a-z-]+)/.exec(CSS) || [])[1];
+	[['.lpn-node', 'OBJ'], ['.lpn-link', 'OBJ'], ['.lpn-link-hit', 'inherit'],
+		['.lpn-link-symbol-hit', 'OBJ'], ['.lpn-vhandle', 'OBJ'], ['.lpn-draglbl', 'OBJ']
 	].forEach(function (row) {
+		if (row[1] === 'OBJ') {
+			const got = (new RegExp('\\' + row[0] + '[^{}]*\\{[^}]*cursor:\\s*([a-z-]+)').exec(CSS) || [])[1];
+			ok(row[0] + ' says something the bare map does not', !!got && got !== MAPC,
+				got + ' vs map ' + MAPC);
+			return;
+		}
 		const re = new RegExp('\\' + row[0].replace('.', '.') + '[^{}]*\\{[^}]*cursor:\\s*' + row[1]);
 		ok(row[0] + ' still states cursor: ' + row[1], re.test(CSS));
 	});
