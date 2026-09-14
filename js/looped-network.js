@@ -2970,7 +2970,7 @@ var EngCalcs = EngCalcs || {};
 	// that produces exactly the lat/lon project this page has always made -- basemap, place-name
 	// search, terrain elevations and all. Everything else in the catalogue is a plane we hold the
 	// user's own eastings and northings in without converting them.
-	var LPN_CRS_UTM_N = 32600, LPN_CRS_UTM_S = 32700, LPN_CRS_UTM_ZONES = 60;
+
 	// **EPSG:3857 IS THE GEOGRAPHIC ANSWER AND IS NEVER STORED AS `project.crs`.** It names the
 	// drawing frame of a lon/lat document, and a document that stated it as a projected plane would
 	// be claiming its numbers are metres. isGeoProject() is the one thing that answers "is this
@@ -2979,19 +2979,95 @@ var EngCalcs = EngCalcs || {};
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
-	// GENERATED from the numbering rather than typed, so 120 entries cost one formula and no two of
-	// them can disagree. The register's other families -- State Plane, the national grids -- join
-	// this list when there is a transform to make them mean something; the list is the shape of that
-	// growth, not its limit.
+	//
+	// **A FAMILY IS ONE ROW, AND THE NAME AND THE AREA OF USE COME OUT OF THE SAME ROW.** Everything
+	// in the register that this page can state is a numbered ZONE of a projection applied to a datum:
+	// the code is a base plus the zone number, the name is the register's own pattern with the zone
+	// in it, and the area of use is that zone's strip of longitude intersected with the datum's own
+	// area. So a family is data, and adding one is a row rather than two functions that can disagree
+	// about the same projection -- which is the failure this shape exists to make impossible, the
+	// catalogue and the extent having been two separate generators until Task 641 phase 3.
+	//
+	//   base   the EPSG code of zone 0, so code = base + zone
+	//   first/last  the zones the register actually defines for this family
+	//   name   the register's OWN name, with {z} standing for the zone number
+	//   s/n    the family's latitude limits, in degrees
+	//   w/e    optional longitude clip, for a family whose datum covers less than the zone strip
+	//   zw/z0  the zone strip: zone z runs from z0 + zw*(z-1) to z0 + zw*z. UTM's 6 degrees from
+	//          -180 is the default, and the zone NUMBER drives it -- not the family's own first
+	//          zone, because a family that starts at zone 28 still means UTM's zone 28.
+	//
+	// **THE NAMES ARE THE REGISTER'S AND ARE NOT LANGUAGE KEYS** (see the note above): "ETRS89 / UTM
+	// zone 32N" names a registered thing, and a GIS reader in any language looks for those exact
+	// characters.
+	//
+	// **THE LATITUDE BAND IS THE UNION OF THE FAMILY'S ZONES, ROUNDED OUTWARD**, and that direction
+	// is the whole of the judgement in these rows. A band that is too NARROW wrongly excludes a
+	// projection from somebody standing inside its real area of use; one that is too WIDE offers an
+	// extra row that the name filter and the user's own eyes throw away in a second. The register
+	// states a box per ZONE and this table states one per FAMILY, so outward is the only safe way to
+	// round. Every code, name and bound below was verified against the EPSG registry and epsg.io on
+	// 2026-09-13; the working, the traps and what is deliberately left out are in
+	// dev/projection-catalogue.md.
+	var LPN_CRS_FAMILIES = [
+		// WGS 84, the worldwide default and the only family this page shipped with.
+		{ base: 32600, first: 1, last: 60, name: 'WGS 84 / UTM zone {z}N', s: 0, n: 84 },
+		{ base: 32700, first: 1, last: 60, name: 'WGS 84 / UTM zone {z}S', s: -80, n: 0 },
+		// **NAD83, AND IT STOPS AT ZONE 23** -- 26900 + zone is not a formula that runs to 60. The
+		// register assigned 26901..26923 and then stopped; zones 59N and 60N exist under entirely
+		// different codes (3372 and 3373), and an arithmetic family would mint 26959, which is not a
+		// coordinate system at all. The trap is that it would look exactly like one in a saved file.
+		{ base: 26900, first: 1, last: 23, name: 'NAD83 / UTM zone {z}N', s: 14.9, n: 84 },
+		// **ETRS89, AND IT STOPS AT 37 FOR A DIFFERENT REASON.** 25838 (zone 38N) exists and is
+		// DEPRECATED, so offering it would hand somebody a superseded code that every GIS still
+		// reads -- which is worse than an unknown one, because nothing complains.
+		{ base: 25800, first: 28, last: 37, name: 'ETRS89 / UTM zone {z}N', s: 32, n: 85 },
+		// Australia, current and previous datum. The MGA zone number IS the UTM zone number, so the
+		// default strip formula places them with nothing special said.
+		{ base: 7800, first: 46, last: 59, name: 'GDA2020 / MGA zone {z}', s: -60, n: -8 },
+		{ base: 28300, first: 48, last: 58, name: 'GDA94 / MGA zone {z}', s: -60, n: -8 }
+	];
+	// **A GRID THAT IS NOT A ZONE OF ANYTHING IS A ROW OF ITS OWN**, with the register's own area of
+	// use typed out, because there is no strip formula to derive it from. These four are the national
+	// grids an engineer outside the United States is most likely to be handed a drawing in.
+	var LPN_CRS_SINGLES = [
+		{ code: 'EPSG:27700', name: 'OSGB36 / British National Grid',
+			w: -9.01, e: 2.01, s: 49.75, n: 61.01 },
+		{ code: 'EPSG:2157', name: 'IRENET95 / Irish Transverse Mercator',
+			w: -10.56, e: -5.34, s: 51.39, n: 55.43 },
+		{ code: 'EPSG:28992', name: 'Amersfoort / RD New',
+			w: 3.2, e: 7.22, s: 50.75, n: 53.7 },
+		{ code: 'EPSG:2193', name: 'NZGD2000 / New Zealand Transverse Mercator 2000',
+			w: 166.37, e: 178.63, s: -47.33, n: -34.1 }
+	];
+	function crsSingle(code) {
+		var i;
+		for (i = 0; i < LPN_CRS_SINGLES.length; i++) {
+			if (LPN_CRS_SINGLES[i].code === code) { return LPN_CRS_SINGLES[i]; }
+		}
+		return null;
+	}
+	function crsFamilyFor(n) {
+		var i, f;
+		for (i = 0; i < LPN_CRS_FAMILIES.length; i++) {
+			f = LPN_CRS_FAMILIES[i];
+			if (n > f.base + f.first - 1 && n <= f.base + f.last) { return f; }
+		}
+		return null;
+	}
+	function crsFamilyName(f, z) { return f.name.replace('{z}', String(z)); }
 	function crsCatalogue() {
-		var out = [], z;
+		var out = [], i, f, z;
 		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
 		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
-		for (z = 1; z <= LPN_CRS_UTM_ZONES; z++) {
-			out.push({ code: 'EPSG:' + (LPN_CRS_UTM_N + z), name: 'WGS 84 / UTM zone ' + z + 'N' });
+		for (i = 0; i < LPN_CRS_FAMILIES.length; i++) {
+			f = LPN_CRS_FAMILIES[i];
+			for (z = f.first; z <= f.last; z++) {
+				out.push({ code: 'EPSG:' + (f.base + z), name: crsFamilyName(f, z) });
+			}
 		}
-		for (z = 1; z <= LPN_CRS_UTM_ZONES; z++) {
-			out.push({ code: 'EPSG:' + (LPN_CRS_UTM_S + z), name: 'WGS 84 / UTM zone ' + z + 'S' });
+		for (i = 0; i < LPN_CRS_SINGLES.length; i++) {
+			out.push({ code: LPN_CRS_SINGLES[i].code, name: LPN_CRS_SINGLES[i].name });
 		}
 		return out;
 	}
@@ -3017,26 +3093,36 @@ var EngCalcs = EngCalcs || {};
 	// thing this page still does not have and must not pretend to (ruling P3, and Task 643 for any
 	// claim about a length).
 	//
-	// **GENERATED FROM THE NUMBERING, like the catalogue it filters**, so 121 extents cost one
-	// formula and no two of them can disagree. A UTM zone is six degrees of longitude wide by
-	// definition, and the register's own north/south latitude limits are 84 and -80.
+	// **READ OUT OF THE SAME FAMILY ROW THE CATALOGUE IS BUILT FROM**, so a projection's name and
+	// the place it applies cannot disagree about which projection they are describing. A UTM zone is
+	// six degrees of longitude wide by definition, and the register's own north and south limits for
+	// WGS 84 UTM are 84 and -80.
 	//
 	// A code we do not know returns null, and null is DOES-NOT-EXCLUDE rather than does-not-match:
 	// a file hand-edited to a State Plane zone must still be offered, because the honest statement
 	// about an extent we cannot state is that we cannot state it.
 	function crsExtent(code) {
-		var c = String(code || ''), n, north, south, z;
+		var c = String(code || ''), n, f, z, zw, z0, w, e;
 		if (c === LPN_CRS_WEBMERC) {
 			return { w: -180, e: 180, s: -LPN_MERC_MAX_LAT, n: LPN_MERC_MAX_LAT };
 		}
 		if (!/^EPSG:[0-9]+$/.test(c)) { return null; }
+		f = crsSingle(c);
+		if (f) { return { w: f.w, e: f.e, s: f.s, n: f.n }; }
 		n = parseInt(c.slice(5), 10);
-		north = n > LPN_CRS_UTM_N && n <= LPN_CRS_UTM_N + LPN_CRS_UTM_ZONES;
-		south = n > LPN_CRS_UTM_S && n <= LPN_CRS_UTM_S + LPN_CRS_UTM_ZONES;
-		if (!north && !south) { return null; }
-		z = n - (north ? LPN_CRS_UTM_N : LPN_CRS_UTM_S);
-		return { w: -180 + 6 * (z - 1), e: -180 + 6 * z,
-			s: north ? 0 : -80, n: north ? 84 : 0 };
+		f = crsFamilyFor(n);
+		if (!f) { return null; }
+		z = n - f.base;
+		zw = f.zw || 6;
+		z0 = (f.z0 === undefined) ? -180 : f.z0;
+		w = z0 + zw * (z - 1);
+		e = w + zw;
+		// The datum's own area of use, where it is narrower than the zone. A family that covers the
+		// whole strip states neither and the strip stands.
+		if (f.w !== undefined && f.w > w) { w = f.w; }
+		if (f.e !== undefined && f.e < e) { e = f.e; }
+		if (e <= w) { return null; }
+		return { w: w, e: e, s: f.s, n: f.n };
 	}
 	// `ll` is { lon, lat } -- SYSTEM order, x then y, which is what every caller here holds.
 	function crsCoversPoint(code, ll) {
@@ -23133,6 +23219,26 @@ var EngCalcs = EngCalcs || {};
 		// project exists because moving the map is what a result DOES.
 		if (coords && place && isFinite(place.lat) && isFinite(place.lon)) {
 			goToPoint({ lat: place.lat, lon: place.lon }, place.extent);
+		} else if (crs && place && isFinite(place.lat) && isFinite(place.lon)) {
+			// **A PROJECTED PROJECT CANNOT TRAVEL TO THE PLACE THAT CHOSE ITS PROJECTION, AND THAT
+			// IS THE ONE THING THE WIZARD HAS TO SAY OUT LOUD** (Tom, 2026-09-13: *"The initial
+			// view for the project needs to match the view used in the projection wizard, but it
+			// put 0,0 at the upper left of the map instead."* -- measured at {cx: w/2, cy: h/2,
+			// s: 1}, which is defaultViewForCoords()'s xy answer, the world origin in the corner
+			// at one pixel per unit).
+			//
+			// **THE GEOGRAPHIC PATH ALREADY DID THE RIGHT THING**, and the two paths are not one
+			// feature with a bug in it: a lat/lon project's camera is in degrees, which is what
+			// the search hands back, so arriving is a comparison of like with like. A projected
+			// project's camera is in the plane's own eastings and northings, and turning a
+			// longitude into an easting is the transform this page does not have (ruling P3 --
+			// see dev/projection-catalogue.md for what having one would cost and unlock).
+			//
+			// So the honest answer is a sentence rather than a guess. A camera placed by an
+			// approximation would be OURS and not the user's data, which is why it is tempting;
+			// what stops it is that the next question after "how did it know where to look" is
+			// "then convert my network", and the answer to that one is no.
+			setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
 		}
 		return id;
 	}

@@ -1148,6 +1148,32 @@ the block.
     register, point scale factor, ground length, per-tile reprojection, `;CRS` in the `.inp`, and
     the **Open and convert coordinates...** rename, which was deliberately NOT made because it
     would advertise a door that does not exist yet.
+  - **PHASE 3, 2026-09-13: the catalogue is a table of FAMILIES and holds 183 rows.** Tom called the
+    full universe a release blocker; the answer, with the numbers, the licensing and the proj4js
+    memo, is `dev/projection-catalogue.md`. The headline: the whole register is shippable as DATA
+    with no transform at all, because a projected project holds the user's own numbers and a name.
+    Also fixed there: a projected project born from the wizard opened at the plane's origin in the
+    corner, and now says why it cannot travel to the searched place.
+
+- 50|660| **Make every standing box draggable and resizable, as a house standard.**
+  Tom, 2026-09-13: *"All boxes are better if they are draggable and resizeable. Can we just say that
+  is standard?"* Proposal, not a defect report, and the survey says it is cheap: **10 of the page's
+  14 standing boxes already drag and 7 already resize**, and the mechanism is one call --
+  `wireBoxMemory(box, key, layout, save, isOpen)` does the drag, the resize grip, the touch half and
+  the remembered layout together.
+  - **Four boxes are left**: New project, Geographic projection, About, and Notes. Each costs a
+    `.lpn-setbox`-shaped shell in CSS (the `resize: both` needs a non-visible overflow and a
+    `.lpn-popover-body` to scroll), one `wireBoxMemory()` call, one furniture key and one row in
+    `dev/cookie-storage-inventory.md`. `lpn_furniture_check.php` DERIVES the furniture list from the
+    page's own writes, so a new key fails until somebody says which home it is in -- which is the
+    question that check exists to force.
+  - **THE MENUS ARE THE DECLARED EXCEPTION and the reason is already written** in `css/engcalcs.css`
+    beside `.lpn-dragpanel`: a menu hangs off a button and is dismissed by clicking away, so
+    dragging one is a gesture with nothing to return it. A standing box is one that stays until it
+    is closed, and that is the line the standard should be stated on.
+  - **Notes is the one with real value in it** -- it holds the user's own text and can be long. About
+    is short and the two wizards are answered and gone, so for those three this is consistency
+    rather than need.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,

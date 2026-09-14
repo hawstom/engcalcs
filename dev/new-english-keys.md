@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read**, of 106 untranslated keys, of 1869 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read**, of 107 untranslated keys, of 1870 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (106, 2 to read @@ NEEDS RULING)
+## lpn_  (107, 3 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -222,6 +222,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_crs_place`**
   > Place name search
   _Ruled 2026-09-14: OK. And this seems like a duplicate string maybe._
+- **`lpn_crs_place_projected`**
+  > A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.
+  @@ NEEDS RULING
 - **`lpn_crs_place_tip`**
   > Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.
   _Ruled 2026-09-14: OK. And this seems like a duplicate string maybe._
