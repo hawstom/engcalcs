@@ -203,3 +203,33 @@ is answered for the three that remain after the divorce; see item 5 series above
     is the wrong instrument for a sampling problem (inattentional blindness, not legibility) that
     a longer timer already failed to fix once (120 s, still missed). If asked again, redirect to
     items 19-20. See journal, 2026-09-13.
+
+22. **Task 636 — replace the custom-property design popup with an inline expander (key on line 1,
+    each other field on its own stacked line below), not the shipped `openDialog()` modal.**
+    Measured at 375px: the shipped `.lpn-cp-table` needs ≈551px for its nine truncated columns
+    against ≈254px of available content-pane width, so a phone reader sees roughly four of eleven
+    columns at a time and loses the key — the one column meant to stay legible — off screen while
+    scrolling to read Low/High limit. The popup already renders its ten fields through
+    `.lpn-set-row` internally, which is the SAME primitive the box's other multi-field rows
+    collapse through on a phone (`css/engcalcs.css:2620-2625`), so an inline expander costs no new
+    responsive layout work and removes a third overlay layer (map → Settings box → modal) that
+    exists only because the table it replaces cannot be read at that width. Also the one control
+    in the whole Settings box that leaves the box to be edited — every other section commits
+    in-place. A real, if modest, rebuild; its own branch, not demo prep. See journal, 2026-09-13.
+
+23. **A house rule for future standing boxes: draggable + resizable together, by default, using
+    the existing `makePanelDraggable()`/`addPanelResizeGrip()`/furniture-key template** — but
+    ONLY for a STANDING panel (one left open beside the map for more than a few seconds), never
+    for a `openDialog()` MODAL DECISION (Save/Discard/Cancel, alerts, single-purpose reports),
+    whose whole job is to be answered and dismissed and whose long content already scrolls inside
+    a fixed frame. Decide drag and resize together, off that one classification, not separately.
+    Not a new mechanism — the infrastructure already exists and is already shared by Settings,
+    Libraries and the four report boxes; a new standing box is a ~4-line addition, not a build.
+    See journal, 2026-09-13.
+
+24. **One classification Tom should make, not me: is the custom-property design surface a modal
+    decision or a standing mini-editor?** It is ten fields, each committing individually with no
+    OK/Cancel — editor-shaped, not decision-shaped — but it currently sits inside `openDialog()`.
+    If item 22 is built, this question disappears (there is no longer a separate box). If the
+    popup is kept, decide whether it belongs in the modal family as-is or should be pulled into
+    the standing-panel family per item 23's rule. See journal, 2026-09-13.
