@@ -375,6 +375,27 @@ the block.
   - Shipped meanwhile: `specs/pan.js`, and a guard on the `tick()` heartbeat so one throwing frame
     can no longer end every drag for the life of the page, which is that report's exact signature.
 
+- 100|660| **Double-click does not open a file, and the list is the browser's.**
+  It fails in his Chrome and the file list is not ours. Tom, 2026-09-13, on the same Ubuntu Chrome under WSLg that could not pan: *"Double-click on file
+  fails to open in Chrome. Must use 'Open' button."*
+  - **THERE IS NO IN-PAGE FILE LIST.** `openFromFile()` calls `window.showOpenFilePicker()`, and
+    where the File System Access API is absent a hidden `<input type="file">`; both put up the
+    BROWSER'S OWN chooser, and this page is not running while it is on screen. The recent-files
+    rows in the File menu open on a SINGLE click. The only `dblclick` listeners in
+    `js/looped-network.js` are the map canvas, the element popup and a table cell.
+  - **AND THE THIRD READING IS RULED OUT TOO:** double-clicking a `.lwn` in a file manager was
+    never going to reach us -- `manifest.php` declares no `file_handlers`, so the installed app is
+    not registered for the extension. Declaring one is a task nobody has opened.
+  - **NOT REPRODUCED, and a CDP mouse cannot reach it** any more than it reached Task 650's pan.
+  - **THE ONE-MINUTE TEST is in the header of `dev/lpn-spike/panel-capture-harness.js`**: a console
+    snippet that says whether `dblclick` reaches the PAGE at all on that machine. It does not, and
+    the chooser is failing the same way and neither is ours; it does, and the fault is inside the
+    chooser alone. Either answer settles where to look, and the single-click route (select, then
+    press Open) is the one to demonstrate from on 2026-09-16 regardless.
+  - Shipped meanwhile, from the same scan: the other three `setPointerCapture()` sites are guarded
+    (see the closed Task 658 note in `pointer-capture-harness.js`, whose claim that they already
+    were was wrong).
+
 - 100|638| **Node and link symbology do not offer the chemical properties.**
   **THE FIELDS ALL SHIPPED 2026-09-13; ONE LEGEND QUESTION IS WHAT IS LEFT.** Node symbology offers
   quality and initial quality; link symbology offers average quality, friction factor and status,

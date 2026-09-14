@@ -13873,7 +13873,10 @@ var EngCalcs = EngCalcs || {};
 			grip.addEventListener('pointerdown', function (e) {
 				var body = document.getElementById('lpn_pane_body');
 				dragFrom = { y: e.clientY, h: body ? body.getBoundingClientRect().height : paneState.h };
-				if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); }
+				// try/catch, not a feature test (Task 660): the call EXISTS and still throws
+				// NotFoundError when the pointer is no longer active, so `if (grip.setPointerCapture)`
+				// never guarded the thing that actually goes wrong.
+				try { if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 				e.preventDefault();
 			});
 			grip.addEventListener('pointermove', function (e) {
@@ -14024,7 +14027,8 @@ var EngCalcs = EngCalcs || {};
 		if (grip) {
 			grip.addEventListener('pointerdown', function (e) {
 				dragFrom = { x: e.clientX, w: rpaneState.w };
-				if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); }
+				// try/catch, not a feature test -- see the bottom pane's grip (Task 660).
+				try { if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 				e.preventDefault();
 			});
 			grip.addEventListener('pointermove', function (e) {
@@ -25197,9 +25201,11 @@ var EngCalcs = EngCalcs || {};
 			// this line sits BEFORE pointers.set() and before any drag record is made -- so one throw
 			// means no pan, ever, while clicks and wheel zoom keep working, because they are other
 			// handlers. That is an invisible failure: the map draws, every element still selects, and
-			// only dragging is dead. The two other setPointerCapture() calls in this file (the pane
-			// grips) were already wrapped exactly this way; this one was not, so the tree had decided
-			// the same question in two opposite directions. Capture is an OPTIMISATION here -- it keeps
+			// only dragging is dead. **The claim that once stood here -- that the other
+			// setPointerCapture() calls in this file were already wrapped this way -- was WRONG, and
+			// Task 660 found it.** The two pane grips were feature-TESTED (`if (grip.setPointerCapture)`),
+			// which guards a missing method and not a throwing one, and the panel drag was guarded by
+			// nothing at all. All four are wrapped now. Capture is an OPTIMISATION here -- it keeps
 			// pointermove arriving when the pointer leaves the svg -- so losing it degrades the drag at
 			// the edges rather than removing it, which is strictly better than losing the gesture.
 			try { svg.setPointerCapture(e.pointerId); } catch (err) { /* drag without capture */ }
@@ -32607,7 +32613,14 @@ var EngCalcs = EngCalcs || {};
 					e.clientX > r.right - LPN_RESIZE_CORNER && e.clientY > r.bottom - LPN_RESIZE_CORNER) { return; }
 			}
 			drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, w: r.width, h: r.height };
-			popup.setPointerCapture(e.pointerId);
+			// **GUARDED, FOR THE REASON THE CANVAS PRESS IS** (Task 660). setPointerCapture() throws
+			// NotFoundError when the browser no longer treats the pointer as active, and Chromium's
+			// Wayland backend under WSLg is a place that happens. Unguarded, the throw skipped
+			// e.preventDefault() below and escaped the handler, so a press on a box's chrome left the
+			// browser free to start its own text selection over the panel. Capture is an optimisation
+			// here -- it keeps pointermove arriving when the pointer leaves the box -- so losing it
+			// degrades the drag at the edges rather than removing it.
+			try { popup.setPointerCapture(e.pointerId); } catch (err) { /* drag without capture */ }
 			e.preventDefault();
 		});
 		popup.addEventListener('pointermove', function (e) {
@@ -32626,7 +32639,11 @@ var EngCalcs = EngCalcs || {};
 		function endDrag(e) {
 			if (!drag) { return; }
 			drag = null;
-			if (popup.hasPointerCapture && popup.hasPointerCapture(e.pointerId)) { popup.releasePointerCapture(e.pointerId); }
+			// hasPointerCapture() is not a promise that release will succeed: the capture can be lost
+			// between the two calls, and then release throws the same NotFoundError the press does.
+			try {
+				if (popup.hasPointerCapture && popup.hasPointerCapture(e.pointerId)) { popup.releasePointerCapture(e.pointerId); }
+			} catch (err) { /* the browser had already taken it back */ }
 			relaxPanelCap(popup);
 		}
 		popup.addEventListener('pointerup', endDrag);
