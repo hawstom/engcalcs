@@ -11517,7 +11517,13 @@ var EngCalcs = EngCalcs || {};
 			['elev', 'lpn_field_elev', 'Elevation'],
 			['demand', 'lpn_field_base_demand', 'Base demand'],
 			['demandCategory', 'lpn_find_prop_demand_desc', 'Description of this demand category'],
-			['fireFlow', 'lpn_ff_required', 'Required fire flow']
+			['fireFlow', 'lpn_ff_required', 'Required fire flow'],
+			// **LAST IN BAND 2, BESIDE THE OTHER THINGS YOU TYPE** (Tom, 2026-09-14). It is an
+			// INPUT -- the concentration a node starts a run holding -- so it belongs here and
+			// not with the results, even though its only reader is a chemical run. The result it
+			// feeds is `quality`, in RESULT_NODE, which is the same split the popup and the
+			// Tables pane both make.
+			['initQuality', 'lpn_quality_initial', 'Initial quality']
 		];
 		var RESULT_NODE = [
 			['demandActual', 'bpn_demand', 'Demand'],
@@ -11546,6 +11552,15 @@ var EngCalcs = EngCalcs || {};
 				var key = f[0];
 				if (key === 'demandCategory' || key === 'fireFlow') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
+				} else if (key === 'initQuality') {
+					// **THE SAME GATE THE POPUP AND THE TABLES COLUMN USE**, and it is the reason
+					// this row needs a clause of its own: `initQuality` is in COLOR_NODE_FIELDS,
+					// so the generic test below would offer it whether or not a chemical is being
+					// tracked -- and a property somebody can search and replace but never see is
+					// exactly the failure the reaction coefficients were given this treatment for.
+					// Every node kind carries one: a junction and a tank start with it, and a
+					// reservoir keeps supplying it for the whole run.
+					if (d.group !== 'node' || qualityMode() !== 'chemical') { return; }
 				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
 				} else {
@@ -11836,13 +11851,43 @@ var EngCalcs = EngCalcs || {};
 				['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
 				['gt', pc.lpn_find_op_gt || 'above', ['above', 'greater than']],
 				['lt', pc.lpn_find_op_lt || 'below', ['below', 'less than']],
-				findExtremeDef('top'), findExtremeDef('bottom')];
+				findExtremeDef('top'), findExtremeDef('bottom'), findEmptyDef()];
 		}
 		return [['equals', pc.lpn_find_op_equals || 'equal to', 'equal to'],
 			['gt', pc.lpn_find_op_gt || 'above', ['above', 'greater than']],
 			['lt', pc.lpn_find_op_lt || 'below', ['below', 'less than']],
-			findExtremeDef('top'), findExtremeDef('bottom')];
+			findExtremeDef('top'), findExtremeDef('bottom'), findEmptyDef()];
 	}
+	/**
+	 * **"empty" IS A CONDITION ON EVERY PROPERTY, AND IT TAKES NO VALUE** (Tom, 2026-09-14: *"Find
+	 * needs a way to find empty values. Either include empty/blank values when returning n lowest
+	 * or add a Condition=empty/blank selector option in all cases."*).
+	 *
+	 * **THE SECOND OF HIS TWO OPTIONS, AND THE REASON IS THAT THE FIRST WOULD BREAK A RULE HE
+	 * ALREADY SET.** Sorting blanks into "n lowest" would make a junction nobody typed an
+	 * elevation on the LOWEST junction in the network -- and the extremes branch turns those away
+	 * on purpose, because a blank is the absence of a number and not a small one. Ranking it would
+	 * also bury the real answer: on a half-entered network every one of the ten lowest would be a
+	 * blank, which is the opposite of what the extremes are for. So "empty" is its own question,
+	 * asked and answered on its own, and the extremes keep meaning what they mean.
+	 *
+	 * **THIS IS THE DATA-ENTRY QUESTION, and it is the one a clerk asks most.** "Which assets have
+	 * I not finished?" had no expression in this panel at all: `contains ''` matches everything
+	 * that HAS a value, `equal to` with a blank box is refused, and the extremes skip blanks. The
+	 * whole exploration-tool argument Tom made for the custom-property limits -- *"You change the
+	 * constraints just to do a bit of data entry error checking"* -- wants this one condition.
+	 *
+	 * Offered on every property with a value, INCLUDING the custom ones, which is where it earns
+	 * its keep: a design that applies to 400 valves and is filled in on 380 of them.
+	 */
+	function findEmptyDef() {
+		var pc = EngCalcs.pageConfig || {};
+		return ['empty', pc.lpn_find_op_empty || 'empty', 'empty'];
+	}
+	// Valueless conditions, as one question rather than a literal repeated at five call sites --
+	// the serializer, the parser, the validator, the matcher and the Replace gate all have to
+	// agree, and they disagreed about the extremes once already.
+	function findOpIsValueless(op) { return op === 'empty'; }
 	// **ONE STRING SERVES THE PULL-DOWN, THE QUERY LINE AND THE PARSER** (Tom, 2026-08-27: *"the
 	// parser needs to read the lang keys instead of doing IO on its internal strings... What needs
 	// to match are the selector and the string, both per the lang file."*).
@@ -12028,6 +12073,28 @@ var EngCalcs = EngCalcs || {};
 				}
 			});
 			return findSortMatches(out).slice(0, findExtremeCount());
+		}
+		// **EMPTY: THE ASSET STATES NOTHING FOR THIS PROPERTY.** Before the blank-value guard
+		// below, because this is the one condition whose whole point is an empty box.
+		//
+		// **THE SCOPE IS WHAT MAKES THIS HONEST.** `findValueOf()` answers undefined both for "this
+		// element states nothing" and for "this property does not apply here", and the two must
+		// not be conflated -- otherwise `Everything.Elevation empty` would report every pipe in
+		// the drawing as an unfinished junction. They are already separated upstream:
+		// findPropDefs() offers a property only under a scope whose elements can carry it, so
+		// within the chosen scope every candidate is one the question can be asked of. That is the
+		// same rule the `contains ''` branch leans on, in the other direction.
+		if (findOpIsValueless(findState.op)) {
+			findCandidates().forEach(function (c) {
+				var val = findValueOf(c, findState.prop);
+				// A NUMBER that is not finite counts as empty: NaN is what an unsolved result and
+				// an unparseable entry both come back as, and neither is a value the user typed.
+				if (val === undefined || val === null || val === ''
+						|| (typeof val === 'number' && !isFinite(val))) {
+					out.push(c);
+				}
+			});
+			return findSortMatches(out);
 		}
 		if (v === '') { return out; }
 		// **ANY ROW MATCHES.** The one property a single element holds several of; see the note in
@@ -12238,7 +12305,11 @@ var EngCalcs = EngCalcs || {};
 				findLabelOf(findPropDefs(), findState.prop),
 			op = findLabelOf(findOpDefs(), findState.op),
 			v = String(findState.value).trim();
-		if (findPropIsConnection(findState.prop)) { return head + ' ' + op; }
+		// Both ask their whole question in the condition, so the line ends there. A trailing `''`
+		// would read as "empty equal to nothing" and would not parse back to this query.
+		if (findPropIsConnection(findState.prop) || findOpIsValueless(findState.op)) {
+			return head + ' ' + op;
+		}
 		if (findOpIsExtreme(findState.op)) {
 			return head + ' ' + findExtremeText(findState.op, findExtremeCount());
 		}
@@ -12466,6 +12537,10 @@ var EngCalcs = EngCalcs || {};
 			op = m.key; i += m.len;
 			// A connection condition asks the whole question by itself and takes no value.
 			if (findPropIsConnection(prop)) { return { t: 'cond', scope: scope, prop: prop, op: op, value: '' }; }
+			// `empty` likewise. Returned HERE rather than tolerated below, so that a value written
+			// after it is a parse error rather than silently dropped: `Node.Elevation empty 5` is
+			// somebody who means something else.
+			if (findOpIsValueless(op)) { return { t: 'cond', scope: scope, prop: prop, op: op, value: '' }; }
 			at = i;
 			v = value(op, findLabelOf(opDefs, op));
 			if (err) { return null; }
@@ -12924,7 +12999,8 @@ var EngCalcs = EngCalcs || {};
 		// condition asks the whole question by itself -- none of them needs a value, so none of
 		// them is scolded for having none.
 		if (String(findState.value).trim() === '' && !findPropIsConnection(findState.prop) &&
-				!findOpIsExtreme(findState.op) && findState.op !== 'contains') {
+				!findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op) &&
+				findState.op !== 'contains') {
 			findResults = [];
 			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
 			return;
@@ -23329,6 +23405,58 @@ var EngCalcs = EngCalcs || {};
 		closeNewBox();
 		createProjectFrom(a);
 	}
+	/**
+	 * **THE WIZARD'S ZOOM, EXPRESSED IN THE PLANE'S OWN UNITS.** Pixels per plane unit, such that
+	 * the same patch of ground the wizard was showing fills the same canvas.
+	 *
+	 * **THIS IS NOT A TRANSFORM AND DOES NOT BECOME ONE.** It converts a DISTANCE, never a
+	 * position: how many metres wide the searched place is, and how many pixels there are to put
+	 * it in. No coordinate crosses between the two frames, so nothing here can place a network on
+	 * the Earth or reproject one -- the line ruling P3 draws is untouched.
+	 *
+	 * **THE PLANE'S UNIT IS TAKEN TO BE THE PROJECT'S LENGTH UNIT, AND THAT IS AN ASSUMPTION WORTH
+	 * SEEING.** The EPSG register states each CRS's own unit and js/data/epsg-projected.json does
+	 * not carry it (it holds a name and an area of use, which is all the chooser needs). The user
+	 * picked a length unit in the same wizard two controls above this one, so it is the best
+	 * statement available of what their numbers are in -- and a State Plane ftUS project is chosen
+	 * by somebody working in feet. If it is wrong the zoom is out by 3.28, which is one scroll
+	 * wheel notch and is visible immediately; being wrong about a POSITION would be silent, which
+	 * is the difference that makes this safe and that one not.
+	 *
+	 * A place with no extent gets the same site-sized floor the geographic path uses, for the
+	 * same reason: Nominatim pads a single node to a few tens of metres and fitting that literally
+	 * arrives with a doorway filling the screen.
+	 */
+	function projectedFitScale(place) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+			ext = place && place.extent,
+			lat = place && isFinite(place.lat) ? place.lat : 0,
+			// Metres per degree, at this latitude for longitude and everywhere for latitude. The
+			// same approximation DEG_PER_M already makes, and for the same purpose -- a zoom.
+			mPerDegLat = 1 / DEG_PER_M,
+			mPerDegLon = mPerDegLat * Math.cos(lat * Math.PI / 180),
+			wideM = 0, highM = 0, perUnit, sw, sh, s;
+		if (!w || !h) { return 1; }
+		if (ext && isFinite(ext.east) && isFinite(ext.west) &&
+				isFinite(ext.north) && isFinite(ext.south) &&
+				ext.east >= ext.west && ext.north >= ext.south) {
+			wideM = (ext.east - ext.west) * mPerDegLon;
+			highM = (ext.north - ext.south) * mPerDegLat;
+		}
+		// The floor, and it is a floor on the SPAN rather than on the scale, so one rule covers
+		// the no-extent case and the too-small-extent case at once.
+		if (!(wideM > SEARCH_FIT_FLOOR_M)) { wideM = SEARCH_FIT_FLOOR_M; }
+		if (!(highM > SEARCH_FIT_FLOOR_M)) { highM = SEARCH_FIT_FLOOR_M; }
+		// Metres -> the plane's unit. A factor is "how many of that unit per SI unit", so this
+		// multiplies, exactly as a display conversion does.
+		perUnit = unitFactor('lpn_u_length');
+		if (!isFinite(perUnit) || perUnit <= 0) { perUnit = 1; }
+		sw = w / (wideM * perUnit);
+		sh = h / (highM * perUnit);
+		s = Math.min(sw, sh) * SEARCH_FIT_PAD;
+		return (isFinite(s) && s > 0) ? s : 1;
+	}
 	function createProjectFrom(a) {
 		var coords = a.geo ? LPN_COORDS_GEO : null,
 			crs = a.geo ? '' : (a.crs || ''),
@@ -23374,10 +23502,24 @@ var EngCalcs = EngCalcs || {};
 			// longitude into an easting is the transform this page does not have (ruling P3 --
 			// see dev/projection-catalogue.md for what having one would cost and unlock).
 			//
-			// So the honest answer is a sentence rather than a guess. A camera placed by an
-			// approximation would be OURS and not the user's data, which is why it is tempting;
-			// what stops it is that the next question after "how did it know where to look" is
-			// "then convert my network", and the answer to that one is no.
+			// **BUT THE ZOOM IS NOT THE POSITION, AND CONFLATING THEM IS WHAT KEPT THIS BROKEN FOR
+			// THREE REPORTS** (Tom, 2026-09-14, the third: *"Zoom new project to same zoom as new
+			// project wizard instead of 0,0 at upper left. This is my third request, and this is a
+			// major bug and embarrassment."*).
+			//
+			// Read his original sentence again: *"The initial view for the project needs to match
+			// the view used in the projection wizard, but it put 0,0 at the upper left."* He is
+			// describing a CAMERA, and a camera has two parts. WHERE it points needs a transform
+			// and we do not have one. HOW FAR OUT it is zoomed needs no transform at all -- it is
+			// a ratio between a ground distance and a screen distance, and both the wizard and
+			// this project know their own ground distances. The previous two passes answered the
+			// whole request with the half that is impossible, and shipped a sentence.
+			//
+			// So: the origin goes to the CENTRE of the canvas rather than the corner, and the
+			// scale is the one the wizard was looking at. The user lands on an empty plane at a
+			// workable zoom instead of at a pin-prick corner, and nothing here claims to know
+			// where on the Earth that plane is.
+			applyView({ cx: 0, cy: 0, s: projectedFitScale(place) });
 			setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
 		}
 		return id;
@@ -23466,6 +23608,29 @@ var EngCalcs = EngCalcs || {};
 	// **THE VIEW IS A POINT, NOT A DOCUMENT.** It comes from the open project when that project is
 	// on the Earth, and from the place-name search otherwise -- which is what makes the box usable
 	// before there is a project at all, which is the case it exists for. It is never stored.
+	/**
+	 * **THE ROW A PERSON READS IN THE CHOOSER: THE REGISTER'S NAME AND THE REGISTER'S NUMBER**
+	 * (Tom, 2026-09-14: *"Include EPSG number in projection selector as I hinted by using it in my
+	 * specification."*). He wrote `EPSG:32612` throughout the specification, which is how an
+	 * engineer actually identifies one of these: the NAME is what you read and the CODE is what
+	 * you check, and a drawing, a GIS layer and a surveyor's note all carry the number.
+	 *
+	 * It matters most now that there are 5,346 of them. Seven live codes are called
+	 * "NAD83 / Kentucky North" across four realizations and two unit variants, and the name alone
+	 * cannot tell them apart -- picking the wrong one is a silent error that every GIS will read
+	 * without complaint.
+	 *
+	 * **NOT A LANGUAGE KEY, either half of it.** The name is the register's own and the code is a
+	 * number; this is the OpenStreetMap-credit rule, and the filter already searches both halves
+	 * so somebody who types 26929 lands on it.
+	 */
+	function crsOptionText(entry) {
+		if (!entry) { return ''; }
+		var name = String(entry.name || ''), code = String(entry.code || '');
+		if (!code) { return name; }
+		if (!name) { return code; }
+		return name + ' (' + code + ')';
+	}
 	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
 	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
 	function crsBoxViewOn() {
@@ -23493,7 +23658,7 @@ var EngCalcs = EngCalcs || {};
 			if (list[i].code === kept) { has = true; }
 			opt = document.createElement('option');
 			opt.value = list[i].code;
-			opt.textContent = list[i].name;
+			opt.textContent = crsOptionText(list[i]);
 			sel.appendChild(opt);
 		}
 		// Membership is decided from the LIST rather than by writing to the select and reading it

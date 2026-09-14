@@ -113,7 +113,15 @@ const CURATED_SETTING = {
 	colorModes: 'how those limits were chosen', colorLegendPosition: 'where the legend sits',
 	linkWidth: 'line weight',
 	textSize: 'label size', symbolSize: 'symbol size', mapHeight: 'pane height',
-	backdropOpacity: 'how strongly the site plan shows through'
+	backdropOpacity: 'how strongly the site plan shows through',
+	// **THE SECOND MODEL FIELD A SHIPPED EXAMPLE MAY STATE MORE OF THAN ITS SOURCE**, and it is
+	// exempted here for the same reason `rules` is: so that section 6 below can be STRICTER than
+	// the blanket compare rather than weaker. EPA's Net3.inp has no notion of a custom property,
+	// so "match your source" could only ever prove that we ship none -- and Tom saved one onto
+	// Net3-Novato on 2026-09-14 precisely so the feature can be met from the gallery without
+	// designing one first. Every line of it is asserted by name below, and every other example
+	// must still ship none.
+	customProps: 'a curated demonstration; asserted by name in section 6'
 };
 // Same idea for an element: geometry and label placement are the drawing, not the network.
 //
@@ -230,6 +238,12 @@ PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 			if (!s) { missing.push(e.id); return; }
 			new Set(Object.keys(e).concat(Object.keys(s))).forEach((k) => {
 				if (CURATED_ELEMENT[k]) { return; }
+				// A custom property's VALUE, same standing as the design in CURATED_SETTING: no
+				// `.inp` states one, so the only thing a blanket compare could prove is that we
+				// ship none. The three that exist are asserted by name in section 6. A prefix
+				// rather than a name, because the key is the user's own and is minted at design
+				// time -- `custom_date_installed` here.
+				if (k.indexOf('_custom_') === 0) { return; }
 				if (dump(e[k]) === dump(s[k])) { return; }
 				missing.push(e.id + '.' + k + ': source ' + dump(e[k]) + ' vs shipped ' + dump(s[k]));
 			});
@@ -377,6 +391,57 @@ PUBLISHED.forEach((file) => {
 	ok('...and every asset they name is in the project', dangling.length === 0, dangling.join(', '));
 });
 done('the curated rules are the ones declared');
+
+// ---- 6. THE CURATED CUSTOM PROPERTY ------------------------------------------------------------
+//
+// Tom saved a custom property onto Net3-Novato on 2026-09-14 so the feature can be MET from the
+// gallery -- opened, read, filtered and searched -- without designing one first. It is the second
+// thing a shipped example may state that its `.inp` source cannot (see `rules`), so it is exempt
+// from the blanket compare above and asserted line by line here instead. Two ways this could rot:
+// the design could be dropped by the generator, and a later edit could quietly spread it to the
+// other six examples.
+{
+	const NOVATO = 'Net3-Novato-CA-World.lwn';
+	const open = openShipped(NOVATO);
+	const defs = ((open.settings || {}).customProps) || [];
+	ok('Net3-Novato ships exactly one custom property design', defs.length === 1, dump(defs));
+	const d = defs[0] || {};
+	// **THE WHOLE DESIGN, FIELD BY FIELD, because each field is a different promise.** The key is
+	// what the value rides on, `applies` is which assets offer it, and the four limits are the
+	// data-entry checks -- which is what makes this example worth shipping: it demonstrates the
+	// character restriction and the length limits doing real work on a date, which is exactly the
+	// use Tom named for them and the reason the invented "Date and time" validator was removable.
+	ok('...keyed as the user typed it', d.key === 'custom_date_installed', dump(d.key));
+	ok('...labelled for a reader', d.label === 'Date installed', dump(d.label));
+	ok('...applying to the four asset kinds he chose', d.applies === 'L,T,P,V', dump(d.applies));
+	ok('...with no invented validator behind it', d.validate === 'none', dump(d.validate));
+	ok('...allowing only date characters', d.restrictMode === 'allow' && d.restrict === '# :-@',
+		dump(d.restrictMode) + ' ' + dump(d.restrict));
+	ok('...and the length limits that catch a half-typed date',
+		d.minLength === '10' && d.maxLength === '19', dump(d.minLength) + '-' + dump(d.maxLength));
+	ok('...between two dates a water system could plausibly carry',
+		d.low === '1900-01-01 00:00:00' && d.high === '2027-01-01 00:00:00',
+		dump(d.low) + ' .. ' + dump(d.high));
+
+	// The VALUES. A design nothing carries demonstrates nothing, which is the whole point of
+	// saving the example rather than writing the design into the code.
+	const vals = {};
+	(open.nodes || []).forEach((n) => {
+		if (n._custom_date_installed !== undefined) { vals[n.id] = n._custom_date_installed; }
+	});
+	ok('...and three tanks carry a value for it', Object.keys(vals).length === 3, dump(vals));
+	ok('...each of them a date the design would accept',
+		Object.keys(vals).every((id) => /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(vals[id])),
+		dump(vals));
+
+	// And it has not spread. Six other examples, none of them designed one.
+	const spread = PUBLISHED.filter((f) => f !== NOVATO).filter((f) => {
+		const o = openShipped(f);
+		return (((o.settings || {}).customProps) || []).length > 0;
+	});
+	ok('no other example ships a custom property', spread.length === 0, spread.join(', '));
+}
+done('the curated custom property is the one declared');
 
 console.log(fails ? '\n' + fails + ' FAILED of ' + checks : '\nall ' + checks + ' example-audit checks passed');
 process.exit(fails ? 1 : 0);

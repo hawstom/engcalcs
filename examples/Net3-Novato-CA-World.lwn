@@ -1,13 +1,14 @@
 {
 	"format": "hawsedc-lpn",
-	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
-	"v": 10,
+	"app": "https://librewaternet.org/app/",
+	"v": 11,
 	"project": {
 		"name": "Net3-Novato-CA-World",
 		"activeScenario": "base",
 		"coords": "geo",
 		"basemap": "osm",
-		"docId": "dmt7h1h7nr0nxm2yk"
+		"docId": "dmt7h1h7nr0nxm2yk",
+		"gallery": "Net3-Novato-CA-World.lwn"
 	},
 	"scenarios": [
 		{
@@ -880,7 +881,8 @@
 			"tankDiameter": 85,
 			"tok": {
 				"minLevel": ".1"
-			}
+			},
+			"_custom_date_installed": "1971-01-01 00:00:00"
 		},
 		{
 			"id": "2",
@@ -891,7 +893,8 @@
 			"_level": 23.5,
 			"minLevel": 6.5,
 			"maxLevel": 40.3,
-			"tankDiameter": 50
+			"tankDiameter": 50,
+			"_custom_date_installed": "1983-01-01 00:00:00"
 		},
 		{
 			"id": "3",
@@ -907,7 +910,8 @@
 				"elev": "129.0",
 				"_level": "29.0",
 				"minLevel": "4.0"
-			}
+			},
+			"_custom_date_installed": "1952-01-01 00:00:00"
 		}
 	],
 	"links": [
@@ -2448,22 +2452,7 @@
 			"lenAuto": false,
 			"_status": "closed",
 			"_k": 0,
-			"curvePoints": [
-				[
-					0,
-					104
-				],
-				[
-					2000,
-					92
-				],
-				[
-					4000,
-					63
-				]
-			],
-			"curveRef": null,
-			"curveId": "1"
+			"_curveId": "1"
 		},
 		{
 			"id": "335",
@@ -2474,22 +2463,7 @@
 			"_diameter": 30,
 			"lenAuto": false,
 			"_k": 0,
-			"curvePoints": [
-				[
-					0,
-					200
-				],
-				[
-					8000,
-					138
-				],
-				[
-					14000,
-					86
-				]
-			],
-			"curveRef": null,
-			"curveId": "2"
+			"_curveId": "2"
 		}
 	],
 	"labels": [
@@ -2539,8 +2513,11 @@
 			"id": true,
 			"elev": true,
 			"demand": true,
+			"demandActual": false,
 			"head": true,
-			"pressure": true
+			"pressure": true,
+			"quality": false,
+			"initQuality": false
 		},
 		"link": {
 			"id": true,
@@ -2551,14 +2528,21 @@
 			"flow": true,
 			"velocity": true,
 			"headloss": false,
-			"gradient": false
+			"gradient": false,
+			"friction": false,
+			"status": false,
+			"quality": false,
+			"rate": false
 		},
 		"decimals": {
 			"node": {
 				"demand": 2,
+				"demandActual": 2,
 				"head": 2,
 				"pressure": 2,
-				"elev": 2
+				"elev": 2,
+				"quality": 1,
+				"initQuality": 2
 			},
 			"link": {
 				"diameter": 0,
@@ -2568,7 +2552,10 @@
 				"flow": 2,
 				"velocity": 2,
 				"headloss": 2,
-				"gradient": 4
+				"gradient": 4,
+				"friction": 4,
+				"quality": 1,
+				"rate": 2
 			}
 		},
 		"prefix": {
@@ -2582,16 +2569,23 @@
 		"separator": ", ",
 		"priority": {
 			"node": {
+				"quality": 7,
+				"initQuality": 6,
+				"demandActual": 5,
 				"demand": 4,
 				"pressure": 3,
 				"elev": 2,
 				"head": 1
 			},
 			"link": {
+				"rate": 13,
+				"quality": 12,
+				"status": 11,
 				"flow": 9,
 				"velocity": 8,
 				"headloss": 7,
 				"gradient": 6,
+				"friction": 6,
 				"diameter": 5,
 				"length": 4,
 				"roughness": 3,
@@ -2612,6 +2606,20 @@
 			"V": "V",
 			"X": "X"
 		},
+		"customProps": [
+			{
+				"key": "custom_date_installed",
+				"label": "Date installed",
+				"applies": "L,T,P,V",
+				"validate": "none",
+				"restrictMode": "allow",
+				"restrict": "# :-@",
+				"minLength": "10",
+				"maxLength": "19",
+				"low": "1900-01-01 00:00:00",
+				"high": "2027-01-01 00:00:00"
+			}
+		],
 		"emitterExponent": 0.5,
 		"hydraulics": {
 			"specificGravity": 1,
@@ -2626,9 +2634,20 @@
 			"demandMultiplier": 1,
 			"emitterExponent": 0.5
 		},
-		"tolerance": 1e-9,
+		"qualityOptions": {
+			"quality": "Trace Lake",
+			"diffusivity": "1.0",
+			"tolerance": "0.01"
+		},
+		"quality": {
+			"mode": "trace",
+			"traceNode": "Lake",
+			"src": "Trace Lake"
+		},
+		"fileOptions": {},
 		"engine": "epanet",
 		"autoRun": true,
+		"nodeElevSource": "value",
 		"defaults": {
 			"nodeElev": 0,
 			"demand": 0,
@@ -2656,6 +2675,8 @@
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,
+		"showArrows": true,
+		"leaderSnapDeg": 0,
 		"legendPosition": "top-right",
 		"colorNodeField": "pressure",
 		"colorLinkField": "velocity",
@@ -2689,16 +2710,7 @@
 			"node.pressure": "pressure",
 			"link.velocity": "pretty"
 		},
-		"qualityOptions": {
-			"quality": "Trace Lake",
-			"diffusivity": "1.0",
-			"tolerance": "0.01"
-		},
-		"quality": {
-			"mode": "trace",
-			"traceNode": "Lake",
-			"src": "Trace Lake"
-		},
+		"tolerance": 1e-9,
 		"reactions": {
 			"orderBulk": 1,
 			"orderTank": 1,
@@ -2714,6 +2726,15 @@
 			"globalPrice": 0,
 			"demandCharge": 0,
 			"effic": {}
+		},
+		"sources": {
+			"read": true
+		},
+		"mixing": {
+			"read": true
+		},
+		"tags": {
+			"read": true
 		}
 	},
 	"patterns": [
@@ -2944,6 +2965,8 @@
 			}
 		}
 	],
+	"pipeTypes": [],
+	"fittingSets": [],
 	"profiles": [],
 	"times": {
 		"duration": 86400,
@@ -3063,21 +3086,7 @@
 			}
 		}
 	],
-	"view": {
-		"cx": -122.6045196044775,
-		"cy": 41.267445287606655,
-		"s": 6478.7497871167825
-	},
-	"units": {
-		"lpn_u_length": "ft",
-		"lpn_u_diameter": "in",
-		"lpn_u_elevhead": "fth2o",
-		"lpn_u_pressure": "psi",
-		"lpn_u_flow": "gpm",
-		"lpn_u_velocity": "ftps",
-		"lpn_u_gradient": "gradePercent",
-		"lpn_u_roughness": "ft"
-	},
+	"rules": [],
 	"inpSections": {
 		"ENERGY": [
 			" Global Efficiency  \t75",
@@ -3098,5 +3107,21 @@
 			" Summary            \tNo",
 			" Page               \t0"
 		]
+	},
+	"view": {
+		"cx": -122.55542216894564,
+		"cy": 41.2591119379213,
+		"s": 5354.338667038663
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_diameter": "in",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent",
+		"lpn_u_roughness": "ft",
+		"lpn_u_age": "hr"
 	}
 }

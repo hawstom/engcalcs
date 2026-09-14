@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1867,
-        "delta_key_count": 104,
+        "expected_key_count": 1868,
+        "delta_key_count": 105,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -530,12 +530,13 @@
         "lpn_georef_projected": "This project already states a map projection, so its coordinates cannot be placed on the map a second time.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_find_op_empty": "empty",
         "lpn_new_coordsys": "Coordinate system",
         "lpn_new_coordsys_tip": "Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.",
         "lpn_new_coordsys_geo": "Geographic projection",
         "lpn_new_coordsys_geo_tip": "Select a geographic projection. Use WGS 84 \/ Pseudo-Mercator EPSG:3857 for Lat\/Lon.",
-        "lpn_new_coordsys_local": "Local, schematic, custom, or georeference later",
-        "lpn_new_coordsys_local_tip": "Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.",
+        "lpn_new_coordsys_local": "Local, schematic, or custom",
+        "lpn_new_coordsys_local_tip": "Choose this to attach your own background image.",
         "lpn_new_crs": "Map projection",
         "lpn_new_crs_tip": "The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
         "lpn_crs_view": "Filter by map view",
@@ -636,12 +637,13 @@
         "lpn_georef_projected": "This project already states a map projection, so its coordinates cannot be placed on the map a second time.",
         "lpn_georef_save_locked": "Finish the placement with the \"Keep this placement\" button, or press Cancel, before you save. The project is still being placed, so what is on the screen is not yet what would be written to the file.",
         "lpn_pane_text_attached": "Attached",
+        "lpn_find_op_empty": "empty",
         "lpn_new_coordsys": "Coordinate system",
         "lpn_new_coordsys_tip": "Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.",
         "lpn_new_coordsys_geo": "Geographic projection",
         "lpn_new_coordsys_geo_tip": "Select a geographic projection. Use WGS 84 \/ Pseudo-Mercator EPSG:3857 for Lat\/Lon.",
-        "lpn_new_coordsys_local": "Local, schematic, custom, or georeference later",
-        "lpn_new_coordsys_local_tip": "Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.",
+        "lpn_new_coordsys_local": "Local, schematic, or custom",
+        "lpn_new_coordsys_local_tip": "Choose this to attach your own background image.",
         "lpn_new_crs": "Map projection",
         "lpn_new_crs_tip": "The projection your coordinates are already measured in. Coordinates are stored exactly as you type them, and nothing is converted. This selection is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate. UTM is the dominant worldwide standard, a region may have customs of its own, and a Land Surveyor is the person to ask if you are not sure.",
         "lpn_crs_view": "Filter by map view",
@@ -994,6 +996,22 @@
                     "key": "lpn_pane_paste_note",
                     "value": "តារាងនេះមានបំណងសម្រាប់បញ្ចូលតម្លៃដោយបិទភ្ជាប់ពីសៀវភៅបញ្ជីអេឡិចត្រូនិកទៅជួរដេកដែលមានស្រាប់រួចហើយ។ ប្រសិនបើវាមិនសមនឹងតម្រូវការរបស់អ្នកទេ សូមប្រើ ជំនួយ, ជួសជុលអ្វីមួយ ដើម្បីប្រាប់យើង។",
                     "english": "This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us."
+                }
+            }
+        },
+        "lpn_find_op_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_op_lt",
+                    "value": "តូចជាង",
+                    "english": "below"
+                },
+                "next_translated": {
+                    "key": "lpn_find_count",
+                    "value": "{n} ត្រូវបានរកឃើញ។ ចុចមួយដើម្បីទៅកាន់វា។",
+                    "english": "{n} found. Click one to go to it."
                 }
             }
         },
