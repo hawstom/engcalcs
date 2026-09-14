@@ -122,6 +122,30 @@ the block.
   - Read with Task 497 (basemap tiles, `js/lpn-terrain.js`) and CLAUDE.md's third-party section: a
     tile request is consented and gated, and attaching a backdrop must not walk past that gate.
 
+- 75|665| **Make draggable and resizable the standard for a standing box.**
+  Tom, 2026-09-13: *"All boxes are better if they are draggable and resizeable. Can we just say that
+  is standard?"* **The interface-designer seat says yes, conditionally, and supplied the condition as
+  a rule that needs no further judgement call** (`dev/agents/interface-designer/journal.md`):
+  - **DECIDE DRAG AND RESIZE TOGETHER, OFF WHETHER THE BOX IS MEANT TO STAY OPEN BESIDE THE MAP FOR
+    MORE THAN A MOMENT.** A standing panel gets both. An `openDialog()` MODAL gets neither: it exists
+    to be answered and dismissed, and its long content already scrolls rather than resizes. That line
+    is one this codebase already draws elsewhere, so the rule describes the tree rather than
+    reforming it.
+  - **The infrastructure is already general**: `makePanelDraggable()` and `addPanelResizeGrip()` are
+    shared by Settings, Libraries and four report boxes, so a new standing box costs about four
+    lines, not a redesign.
+  - **BUT EVERY NEW DRAGGABLE BOX IS A NEW FURNITURE KEY**, and that is the per-box cost that is not
+    zero: `localStorage` only, never `serializeProject()` (`lpn_furniture_check.php` is blocking,
+    Task 584), and `storage_inventory_check.php` requires it be documented. **It is NOT new consent
+    surface** -- furniture is what the visitor asked for by moving the box -- but it is a line in
+    `dev/cookie-storage-inventory.md` every time.
+  - **A draggable box on a PHONE is a liability**, not a feature: there is nowhere to drag it to, and
+    one dragged half off a small screen is unrecoverable without a reset. The existing phone guards
+    stay, and any new grip inherits them.
+  - **ONE EDGE CASE IS TOM'S:** the custom property design surface is editor-shaped but currently
+    lives in the modal family. If the key-plus-expander lands (Task 636's refinement), the question
+    disappears; if the popup stays, he decides which family it belongs to.
+
 - 75|647| **A project that is whole but entirely off screen should say so.**
   Tom, 2026-09-13, on Task 628 as it shipped: *"Could we check whether any of the network is present
   on the map and alert that project is intact, but entirely outside the current view?"*
