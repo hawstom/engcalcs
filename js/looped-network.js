@@ -3263,11 +3263,24 @@ var EngCalcs = EngCalcs || {};
 	// What the status strip says this project is drawn in. EPSG:3857 names itself for a geographic
 	// project, and an unprojected grid is a plane the user declared the meaning of that sits nowhere
 	// on the Earth -- which is a fact worth printing rather than leaving blank.
+	/**
+	 * **THE NAME AND THE NUMBER** (Tom, 2026-09-14: *"The projection name in the status area needs
+	 * to include the EPSG number."*), through the same helper the chooser uses so the strip and
+	 * the pull-down cannot come to spell one projection two ways.
+	 *
+	 * The number is how an engineer actually identifies one of these — a drawing, a GIS layer and
+	 * a surveyor's note all carry it — and with 5,346 in the register the name alone is no longer
+	 * enough: seven live codes are called "NAD83 / Kentucky North". A project that states no
+	 * coordinate system has no number to print and keeps its plain sentence.
+	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
-		if (isGeoProject()) { return crsLabel(LPN_CRS_WEBMERC); }
+		if (isGeoProject()) {
+			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
+		}
 		code = projectCrsCode();
-		return code ? crsLabel(code) : (pc.lpn_crs_none || 'Not georeferenced');
+		return code ? crsOptionText({ code: code, name: crsLabel(code) })
+			: (pc.lpn_crs_none || 'Not georeferenced');
 	}
 	// **THE AXES ARE NAMED FOR THE COORDINATE SYSTEM AND READ IN PUBLIC ORDER** (Task 641, and
 	// CLAUDE.md's coordinate-order rule). Latitude before longitude, northing before easting: both
@@ -3279,14 +3292,24 @@ var EngCalcs = EngCalcs || {};
 			return { first: pc.lpn_field_lat || 'Latitude', second: pc.lpn_field_lon || 'Longitude' };
 		}
 		if (isProjectedProject()) {
-			return { first: pc.lpn_field_northing || 'Northing', second: pc.lpn_field_easting || 'Easting' };
+			return {
+				first: pc.lpn_field_northing || 'Northing', second: pc.lpn_field_easting || 'Easting',
+				// **THE STATUS STRIP GETS THE SHORT PAIR** (Tom, 2026-09-14: *"Northing and
+				// Easting in the status bar can be abbreviated to N and E."*). The strip is
+				// three "label: value" pairs at 11px on one line, and two nine-letter words
+				// spend most of it on saying what a surveyor reads off a single letter. The
+				// POPUP keeps the full words, where a field is read once and named properly --
+				// which is why these are a second pair here rather than a rename.
+				firstShort: pc.lpn_field_northing_abbr || 'N',
+				secondShort: pc.lpn_field_easting_abbr || 'E'
+			};
 		}
 		return { first: 'X', second: 'Y' };
 	}
 	function readsNorthFirst() { return isGeoProject() || isProjectedProject(); }
 	function coordReadout(a, b) {
 		var n = axisNames();
-		return n.first + ': ' + a + '  ' + n.second + ': ' + b;
+		return (n.firstShort || n.first) + ': ' + a + '  ' + (n.secondShort || n.second) + ': ' + b;
 	}
 	function coordReadoutAt(wx, wy) {
 		return readsNorthFirst()
@@ -9397,10 +9420,44 @@ var EngCalcs = EngCalcs || {};
 	// to Kenya by dragging a 20 km window. The floor is now the scale at which 360 degrees of
 	// longitude fit the canvas, which is the whole world and no further; past that the map only
 	// repeats itself.
+	/**
+	 * **HOW FAR OUT THE MAP MAY ZOOM, AND THE PROJECTED CASE WAS AN ACCIDENT** (Tom, 2026-09-14:
+	 * *"A projected project limits my zoom out ... I don't think it's necessary or intentional."*
+	 * It was not).
+	 *
+	 * `MIN_SCALE_GRID` is 0.05, and it was chosen for an UNPROJECTED grid, where a world unit is
+	 * whatever the user says it is. In a projected project a world unit is a METRE, so the same
+	 * number capped an 800 px window at 16 km across -- **well inside this suite's own 300 km
+	 * mission scope**, and so a city-wide system could not be seen whole. Nothing intended that;
+	 * the constant simply predates there being a plane measured in real ground units.
+	 *
+	 * So a locatable projected project is allowed to pull back to `LPN_PLANE_SPAN_M`, measured in
+	 * the PLANE'S OWN UNIT rather than assumed: two points a kilometre apart are projected and
+	 * the distance between them is how many plane units a metre is, which answers it for a State
+	 * Plane zone in survey feet without parsing anything. `Math.min` because this may only ever
+	 * loosen the existing floor, never tighten it.
+	 */
+	var LPN_PLANE_SPAN_M = 1000000;   // a thousand kilometres: three times the mission scope
+	function planeUnitsPerMetre() {
+		if (!projectLocatable() || !isProjectedProject()) { return 0; }
+		var code = projectCrsCode(), c = crsExtent(code), lat, lon, a, b;
+		if (!c) { return 0; }
+		lat = (c.s + c.n) / 2; lon = (c.w + c.e) / 2;
+		a = EngCalcs.lpnCrsForward(code, { lon: lon, lat: lat });
+		// One kilometre north, which needs no cos(latitude) and works at any longitude.
+		b = EngCalcs.lpnCrsForward(code, { lon: lon, lat: lat + 1 / 111.132 });
+		if (!a || !b) { return 0; }
+		var d = Math.hypot(b.x - a.x, b.y - a.y);
+		return (isFinite(d) && d > 0) ? d / 1000 : 0;
+	}
 	function minScale() {
-		if (!isGeoProject()) { return MIN_SCALE_GRID; }
 		var w = (svg && svg.clientWidth) || 1000;
-		return Math.max(MIN_SCALE_GRID, w / 360);
+		if (isGeoProject()) { return Math.max(MIN_SCALE_GRID, w / 360); }
+		if (isProjectedProject()) {
+			var per = planeUnitsPerMetre();
+			if (per > 0) { return Math.min(MIN_SCALE_GRID, w / (LPN_PLANE_SPAN_M * per)); }
+		}
+		return MIN_SCALE_GRID;
 	}
 	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
@@ -10114,6 +10171,25 @@ var EngCalcs = EngCalcs || {};
 		// Go to does not" -- it is that a caller holding a size may spend the zoom and a caller
 		// holding none may not, which is why this is still ONE door and not two travellers with
 		// rival opinions. js/lpn-search.js passes the box; goToLatLon() passes nothing.
+		// **A PROJECTED PROJECT TRAVELS THROUGH THE TRANSFORM** (Task 641 phase 5). Everything
+		// below this assumes the drawing frame IS lon/lat, which is true of a geographic project
+		// and of nothing else; in a plane, a latitude has to be projected before it is a place
+		// the camera can point at. Same rule about the zoom either way -- an extent may spend it
+		// and a bare coordinate may not.
+		if (isProjectedProject()) {
+			var p = projectLocatable()
+				? EngCalcs.lpnCrsForward(projectCrsCode(), { lon: ll.lon, lat: ll.lat }) : null;
+			if (!p) {
+				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				return;
+			}
+			applyView({
+				cx: inwardX(p.x), cy: inwardY(p.y),
+				s: extent ? projectedFitScale({ lat: ll.lat, lon: ll.lon, extent: extent }) : state.s
+			});
+			georefDetachTick();
+			return;
+		}
 		var box = extent ? inwardBox(extent) : null;
 		var fit = box ? fitScaleForBox(box) : 0;
 		applyView({ cx: fit > 0 ? (box.x1 + box.x2) / 2 : inwardX(ll.lon),
@@ -24404,19 +24480,24 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Hide map readouts'),
 				tip: pc.lpn_clean_map_tip,
 				fn: function () { setCleanMap(!cleanMapOn()); } },
-			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas
-			// units with no place on the Earth, so there is no street map that could go behind one.
-			// The label states what the row will DO, because this menu has no checkmark column.
+			// **HIDDEN WHERE THE PROJECT CANNOT SAY WHERE IT IS, not disabled.** A grid project's
+			// x/y are canvas units with no place on the Earth, so travelling to a latitude means
+			// nothing there. **A PROJECTED PROJECT IS NOT IN THAT CASE ANY MORE** (Tom,
+			// 2026-09-14: *"A projected project ... removes Map, Go to, and removes Map, Search
+			// place name. Is this intentional?"* -- it was not; it was `isGeoProject()` written
+			// before there was a transform, and the answer to a typed latitude is now one forward
+			// projection away). The label states what the row will DO, because this menu has no
+			// checkmark column.
 			{
-				hidden: !isGeoProject(), separator: true
+				hidden: !projectLocatable(), separator: true
 			},
 			{
-				hidden: !isGeoProject(), icon: 'globe',
+				hidden: !projectLocatable(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
 				tip: pc.lpn_goto_tip, fn: goToLatLon
 			},
 			{
-				hidden: !isGeoProject() || !EngCalcs.lpnSearchOpen, icon: 'find',
+				hidden: !projectLocatable() || !EngCalcs.lpnSearchOpen, icon: 'find',
 				label: EngCalcs.lpnSearchMenuLabel && EngCalcs.lpnSearchMenuLabel(),
 				tip: EngCalcs.lpnSearchMenuTip && EngCalcs.lpnSearchMenuTip(),
 				fn: function () { EngCalcs.lpnSearchOpen(); }
