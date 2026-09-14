@@ -58,6 +58,8 @@ const L = loadLoopedNetwork(
 	// The DEM controls' own gate, and the two functions that turn nodes into places for it.
 	"\t\tlocatable: projectLocatable, nodeLonLat: nodeLonLat,\n" +
 	"\t\tterrainPoints: terrainPointsForIds, terrainNeeding: terrainNodesNeedingElevation,\n" +
+	"\t\tterrainAtDefault: terrainNodesAtDefaultElevation,\n" +
+	"\t\tsetDefaultElev: function (v) { settings.defaults.nodeElev = v; },\n" +
 	"\t\tdemOffered: function () { return projectLocatable() && !!mapboxToken()\n" +
 	"\t\t\t&& !!EngCalcs.lpnTerrainFillFor; },\n" +
 	"\t\tcreateProjectFrom: createProjectFrom,\n" +
@@ -277,6 +279,113 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		ok('...at its real place too',
 			need.length > 0 && Math.abs(need[0].lon - PHOENIX.lon) < 1e-6,
 			need.length ? need[0].lon.toFixed(6) : '');
+	}
+
+	head('10b. And the filler actually RUNS -- the gate was not the only one');
+	// **"They appear now, but they don't work. They don't do anything."** (Tom, 2026-09-14, after
+	// the menu gate was widened.) js/lpn-terrain.js keeps its OWN copy of the question, as the
+	// first line of all three entry points, and it asked `seam.isGeo()`. So the row was shown by
+	// one gate and refused by another, silently, with no notice and nothing sent. **A CHECK ON
+	// WHETHER THE CONTROL IS OFFERED CANNOT SEE THIS** -- which is exactly what section 10 is, so
+	// this section drives the thing itself.
+	{
+		const terrain = require(path.join(ROOT, 'js', 'lpn-terrain.js')) || global.EngCalcs;
+		const EC = global.EngCalcs;
+		const said = [];
+		let asked = 0;
+		EC.lpnTerrainInit({
+			locatable: () => true, token: () => 'pk.test',
+			needing: () => [], having: () => [], starting: () => [],
+			write: (rows) => rows.map((r) => r.id),
+			record: () => {},
+			notice: (m) => said.push(String(m))
+		});
+		global.window.confirm = () => { asked++; return false; };
+		global.confirm = global.window.confirm;
+		// One real point, in a real place. Refusing at the consent question is a fine outcome --
+		// what is being asserted is that it GOT there, which means it passed the locatable gate.
+		EC.lpnTerrainFillFor([{ id: 'J1', lon: PHOENIX.lon, lat: PHOENIX.lat }], { confirm: false });
+		ok('the fill reaches its own consent question rather than returning silently',
+			asked > 0 || said.length > 0, 'asked=' + asked + ' said=' + JSON.stringify(said));
+
+		// And the seam really is asked the new question, not the old one: a project that cannot
+		// be located still stops it dead.
+		said.length = 0; asked = 0;
+		EC.lpnTerrainInit({
+			locatable: () => false, token: () => 'pk.test',
+			needing: () => [], having: () => [], starting: () => [],
+			write: (rows) => rows.map((r) => r.id), record: () => {},
+			notice: (m) => said.push(String(m))
+		});
+		EC.lpnTerrainFillFor([{ id: 'J1', lon: PHOENIX.lon, lat: PHOENIX.lat }], { confirm: false });
+		ok('...and a project that cannot be located still stops it on the first line',
+			asked === 0 && said.length === 0, 'asked=' + asked + ' said=' + JSON.stringify(said));
+	}
+
+	head('10c. Novato: the nodes a person has just drawn are the ones to offer');
+	// **"We report falsely that the DEM has no elevation for Novato California."** (Tom,
+	// 2026-09-14.) There are THREE lists behind the fill -- nodes with no elevation, nodes that
+	// have one, and nodes still sitting on the elevation a new node starts with -- and only the
+	// first two were taught about projected projects. On a projected project the third answered
+	// "none", and it is the one that matters there, because every node somebody has just drawn is
+	// on the starting elevation. With nothing to offer, the fill reported nothing done, which
+	// reads as the DEM having no data for the place.
+	{
+		const NOVATO = { lon: -122.5697, lat: 38.1074 };
+		const UTM10N = 'EPSG:32610';            // the zone Novato is actually in
+		L.newProject(null, UTM10N);
+		L.setCanvas(W, H);
+		L.setMapSized();
+		L.setDefaultElev(0);
+		const q = global.EngCalcs.lpnCrsForward(UTM10N, NOVATO);
+		ok('Novato projects into zone 10N', !!q && q.x > 500000 && q.x < 600000,
+			q ? q.x.toFixed(0) + ', ' + q.y.toFixed(0) : 'null');
+		const a = L.addNode('junction', L.inwardX(q.x), L.inwardY(q.y));
+		const b = L.addNode('junction', L.inwardX(q.x + 300), L.inwardY(q.y + 300));
+		a.elev = 0; b.elev = 0;                  // both still on the starting elevation
+		const at = L.terrainAtDefault();
+		ok('the still-on-the-default list is not empty on a projected project',
+			at.points.length === 2, JSON.stringify(at.points.map((p) => p.id)));
+		ok('...and it names Novato, not an easting',
+			Math.abs(at.points[0].lon - NOVATO.lon) < 1e-6
+				&& Math.abs(at.points[0].lat - NOVATO.lat) < 1e-6,
+			at.points[0].lon.toFixed(6) + ', ' + at.points[0].lat.toFixed(6));
+
+		// **AND THE WHOLE FILL RUNS AND REPORTS A FILL, not a blank.** Only the network step is
+		// stubbed -- the plan, the tile grouping, the decode, the write and the report text are
+		// all the real ones, because the false report came out of those.
+		const EC2 = global.EngCalcs;
+		const wrote = [];
+		const said = [];
+		EC2.lpnTerrainFetchPixels = function (tile) {
+			// 100 m, in Mapbox's own Terrain-RGB encoding, for every point on the tile.
+			const v = Math.round((100 + 10000) * 10);
+			return Promise.resolve(tile.points.map((pt) => ({
+				id: pt.id, r: (v >> 16) & 255, g: (v >> 8) & 255, b: v & 255
+			})));
+		};
+        EC2.lpnTerrainInit({
+			locatable: () => true, token: () => 'pk.test',
+			nodesNeedingElevation: () => [], nodesWithElevation: () => [],
+			nodesAtDefaultElevation: () => at,
+			fill: (rows) => { rows.forEach((r) => wrote.push(r)); return rows.map((r) => r.id); },
+			record: () => {},
+			notice: (m) => said.push(String(m))
+		});
+		global.window.confirm = () => true;
+		global.confirm = global.window.confirm;
+		// lpn-terrain's root is `window`, and it refuses to start if that has no fetch. The
+		// network step itself is stubbed above; this only gets past the capability check.
+		global.window.fetch = global.fetch;
+		await new Promise((res) => { EC2.lpnTerrainFillFor(at.points, { quiet: false }); setTimeout(res, 50); });
+		ok('both nodes were written an elevation', wrote.length === 2,
+			JSON.stringify(wrote.map((w) => w.id + '=' + Math.round(w.meters))));
+		ok('...of the 100 m the DEM said', wrote.every((w) => Math.abs(w.meters - 100) < 0.5),
+			JSON.stringify(wrote.map((w) => w.meters)));
+		// The report must not say they are still blank -- that is the false sentence.
+		ok('...and nothing reported them as having no elevation',
+			!said.some((m) => /still have no elevation|not on the terrain map/.test(m)),
+			JSON.stringify(said));
 	}
 
 	head('11. ...and a project that cannot be located is still refused');

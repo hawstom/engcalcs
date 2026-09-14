@@ -9436,8 +9436,18 @@ var EngCalcs = EngCalcs || {};
 	 * the distance between them is how many plane units a metre is, which answers it for a State
 	 * Plane zone in survey feet without parsing anything. `Math.min` because this may only ever
 	 * loosen the existing floor, never tighten it.
+	 *
+	 * **AND THE SPAN IS THE WHOLE EARTH, WHICH IS TO SAY THERE IS NO PRACTICAL LIMIT.** It was a
+	 * thousand kilometres for one round and Tom came straight back: *"Zoom out for projected
+	 * project is still limited, but much further out."* Three times the mission scope sounded
+	 * generous and is still a number somebody can hit, and there is nothing on the other side of
+	 * it worth protecting — the plane's coordinates stop meaning much outside their own area of
+	 * use, but so does looking at a UTM grid from orbit, and a person doing it is navigating
+	 * rather than measuring. The tiles bow out gracefully on their own: `lpnCrsBounds()` returns
+	 * null once the view spans more than half the world, so the basemap clears instead of asking
+	 * for the Earth one tile at a time.
 	 */
-	var LPN_PLANE_SPAN_M = 1000000;   // a thousand kilometres: three times the mission scope
+	var LPN_PLANE_SPAN_M = 40075000;   // the equator, so no network can reach the floor
 	function planeUnitsPerMetre() {
 		if (!projectLocatable() || !isProjectedProject()) { return 0; }
 		var code = projectCrsCode(), c = crsExtent(code), lat, lon, a, b;
@@ -10345,10 +10355,17 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function terrainNodesAtDefaultElevation() {
 		var d = settings.defaults.nodeElev, out = [];
-		if (!isGeoProject() || typeof d !== 'number' || !isFinite(d)) { return { value: d, points: out }; }
+		if (!projectLocatable() || typeof d !== 'number' || !isFinite(d)) { return { value: d, points: out }; }
 		doc.nodes.forEach(function (n) {
 			if (n.elev !== d) { return; }
-			out.push({ id: n.id, lon: outwardX(n.x), lat: outwardY(n.y) });
+			// **THE THIRD LIST, AND THE ONE THAT WAS MISSED ON 2026-09-14.** Its two siblings were
+			// taught about projected projects and this was not, so on a projected project it
+			// answered "no nodes are on the starting elevation" -- which is the list that MATTERS
+			// most there, because every node a person has just drawn is on it. The fill then had
+			// nothing to offer and said so, and the report read as the DEM having no data.
+			var ll = nodeLonLat(n);
+			if (!ll) { return; }
+			out.push({ id: n.id, lon: ll.lon, lat: ll.lat });
 		});
 		return { value: d, points: out };
 	}
@@ -40001,7 +40018,7 @@ var EngCalcs = EngCalcs || {};
 	// what a geographic project is, how to travel to a point, and where to speak. The geocoder, its
 	// usage-policy budget, its own consent gate and every string in them live in that file.
 	if (EngCalcs.lpnSearchInit) {
-		EngCalcs.lpnSearchInit({ isGeo: isGeoProject, goTo: goToPoint, notice: setNotice });
+		EngCalcs.lpnSearchInit({ locatable: projectLocatable, goTo: goToPoint, notice: setNotice });
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). Six functions: what a geographic project
 	// is, the token that decides whether the feature exists at all, which nodes have no elevation,
@@ -40012,7 +40029,7 @@ var EngCalcs = EngCalcs || {};
 	// string live in that file.
 	if (EngCalcs.lpnTerrainInit) {
 		EngCalcs.lpnTerrainInit({
-			isGeo: isGeoProject, token: mapboxToken, notice: setNotice,
+			locatable: projectLocatable, token: mapboxToken, notice: setNotice,
 			nodesNeedingElevation: terrainNodesNeedingElevation,
 			nodesWithElevation: terrainNodesWithElevation,
 			nodesAtDefaultElevation: terrainNodesAtDefaultElevation,

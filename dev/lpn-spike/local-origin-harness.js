@@ -312,8 +312,13 @@ console.log('\n--- one home for the concept ---');
 	// coordinates themselves; both now go through nodeLonLat(), which is the ONE place a node
 	// becomes a place on the Earth whichever kind of project holds it. Two readers of the same
 	// question became one, so the census fell from 26 to 25.
-	ok('outwardX has one definition and twenty-four call sites', count(/outwardX\(/g) === 25, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-four call sites', count(/outwardY\(/g) === 25, count(/outwardY\(/g));
+	// **AND ONE MORE OFF EACH when the THIRD terrain list joined the other two behind
+	// nodeLonLat().** terrainNodesAtDefaultElevation() still converted for itself, and on a
+	// projected project it therefore answered "no nodes are on the starting elevation" -- the
+	// list that matters most there, because every node just drawn is on it. Tom saw the result
+	// as the DEM having no data for Novato. Three readers of one question are now one: 25 -> 24.
+	ok('outwardX has one definition and twenty-three call sites', count(/outwardX\(/g) === 24, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-three call sites', count(/outwardY\(/g) === 24, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

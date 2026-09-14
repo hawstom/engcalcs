@@ -523,7 +523,7 @@
 	 * to confirm a fill whose size they have not been told.
 	 */
 	EC.lpnTerrainFill = function () {
-		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		var token = seam.token && seam.token();
 		if (!token) { return; }   // the row is hidden without one; this is the belt to that brace
 		if (running) {
@@ -598,7 +598,7 @@
 	 * `done` is called after the readings are recorded, so a caller can redraw.
 	 */
 	EC.lpnTerrainSample = function (want, done) {
-		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		var token = seam.token && seam.token();
 		if (!token) { return; }
 		if (running) {
@@ -641,7 +641,7 @@
 
 	EC.lpnTerrainFillFor = function (want, opts) {
 		opts = opts || {};
-		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		var token = seam.token && seam.token();
 		if (!token) { return; }
 		if (running) {
@@ -725,7 +725,11 @@
 	 * The whole seam from js/looped-network.js. SEVEN functions now -- `record` joined them with
 	 * Task 542's sample-before-you-write control, and it is the one that writes NOTHING to the
 	 * document: it hands back a reading so the page can show it and let a person decide. Six
-	 * functions: what a geographic project is, the
+	 * functions: **whether the project can say where on the Earth a point of it is** (it asked
+	 * "is this geographic" until 2026-09-14, and that single word was why the elevation controls
+	 * appeared on a projected project and then did nothing at all when pressed -- the row was
+	 * shown by a widened gate in js/looped-network.js and refused by this one, silently, on the
+	 * first line of all three entry points), the
 	 * token, which nodes need an elevation, WHICH already have one, which are still on the starting
 	 * elevation, how to write a batch (returning the ids it wrote), and where to speak. The two
 	 * "which" answers are lists of ids and not counts, because this file names the nodes in both
