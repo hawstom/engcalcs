@@ -59,6 +59,22 @@ the block.
 
 # Tasks
 
+- 100|659| **The map and an element must differ by color, now that no glyph separates them.**
+  Tom, 2026-09-13, having looked at `pointer` on the map: *"Unfortunately pointer doesn't look very
+  good on the map. We are left doing exactly what epanetjs did, default on the map and pointer on
+  select or default everywhere, possibly with color change on select."* **`default` everywhere
+  SHIPPED the same day**, which is the second of his two, so the cursor now carries NO map/element
+  distinction at all and the color change is the whole of what replaces it.
+  - **HIS FIRST OPTION WAS NOT TAKEN BECAUSE IT REVERSES A RULING HE MADE FIVE DAYS EARLIER**
+    (2026-09-08: *"I prefer default over pointer at the labels and assets. It's more precise."*).
+    Putting `pointer` back on the labels and assets is his to decide deliberately. **Ask him which
+    he wants before building either half** -- a color change is wasted if the glyph comes back.
+  - The distinction to carry is *this is an object you can select* against *this is bare map you can
+    pan*. Hover, not selection state, is the moment that needs it.
+  - `dev/browser-pass/specs/cursorflicker.js` measures the gap between a node's disc and its label
+    one pixel at a time and must keep passing: whatever carries the distinction cannot reintroduce
+    a strip that changes three times in 12 px.
+
 - 100|646| **Attach the world map to an XY project without changing the project.**
   Tom, 2026-09-13, thinking past Task 641: *"even an arbitrary XY project can have a world map
   background with a good wizard. Our Map menu can have a new Background map (georeference) 'Attach

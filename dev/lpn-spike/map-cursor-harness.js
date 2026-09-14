@@ -66,8 +66,16 @@ console.log('\n-- 1. the three cursors, read out of the stylesheet --');
 // css/engcalcs.css carries the ruling and the option not taken.
 const mapCursor = (/#lpn_canvas\s*\{[^}]*cursor:\s*([a-z-]+)/.exec(cssCode) || [])[1];
 ok('the bare canvas states a cursor of its own', !!mapCursor, mapCursor || 'none');
-ok('...and it is not the default arrow, which is what "dead space" looked like',
-	mapCursor !== 'default' && mapCursor !== 'auto', mapCursor || 'none');
+// **THE "NOT default" HALF IS RETIRED, ON TOM'S RULING OF 2026-09-13** (*"Unfortunately pointer
+// doesn't look very good on the map... default on the map and pointer on select or default
+// everywhere"*). It conflated two different things: that the canvas DECLARES a cursor, which is the
+// property Task 569 bought and which the line above still holds, and that the declared glyph is not
+// the arrow, which was only ever a consequence of `grab` being the glyph at the time. The map now
+// says `default` deliberately, which is a declaration and not an omission -- `auto` would be the
+// omission, and that is what the line below still refuses. What replaces the glyph as the
+// map/element distinction is a color change: ROADMAP Task 659.
+ok('...and it is a DECLARED value, not the browser deciding for us',
+	mapCursor !== 'auto', mapCursor || 'none');
 ok('placement/area mode says crosshair over the whole drawing',
 	/#lpn_canvas\.lpn-placemode[^{]*\*[^{]*\{[^}]*cursor:\s*crosshair\b/.test(cssCode));
 

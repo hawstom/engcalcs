@@ -356,28 +356,30 @@ html[lang="zh"] .ec-welcome {
    .lpn-link-symbol-backdrop below, ROADMAP Task 146.10 follow-up, 2026-08-09), so it must equal
    whatever the canvas itself is painted -- keep it in step with the inline `background` on
    #lpn_canvas in Looped-Network.php. */
-/* **THE BARE MAP SAYS `pointer`, AND THE OPEN HAND IS GONE** (Tom, 2026-09-13: *"I really think
-   that it's very cute and all to have a 'grab' cursor. But it's not right for professional work. We
-   need solid efficiency. And I can't think of anything better than to have 'default' everywhere on
-   the map with a color change between map (pan) and element (select). Equal alternative would be
-   'pointer' on the map for pan and 'default' at element select."*)
+/* **THE BARE MAP SAYS `default`, AND BOTH THE OPEN HAND AND THE POINTER ARE GONE** (Tom,
+   2026-09-13, twice in one day). First: *"I really think that it's very cute and all to have a
+   'grab' cursor. But it's not right for professional work. We need solid efficiency."* Then, having
+   seen `pointer` tried: *"Unfortunately pointer doesn't look very good on the map. We are left doing
+   exactly what epanetjs did, default on the map and pointer on select or default everywhere,
+   possibly with color change on select."*
 
-   **HIS SECOND OPTION IS BUILT, BECAUSE THE FIRST IS NOT COMPLETE ON ITS OWN.** Every object on
-   this map already says `default`, on his own ruling of 2026-09-08 (*"I prefer default over pointer
-   at the labels and assets. It's more precise."*), so `default` on the map as well leaves the
-   cursor carrying no map/element distinction at all until a hover colour is designed to replace it.
-   The second option carries the same distinction with a glyph that is already on the screen, and it
-   is the tweak he asked for. **The first option is one word away**: write `default` below and
-   design the colour change; nothing else here has to move.
+   **`default` EVERYWHERE IS BUILT, WHICH IS THE SECOND OF THE TWO HE NAMED, AND THE REASON IS THAT
+   THE FIRST WOULD REVERSE A RULING HE MADE FIVE DAYS EARLIER.** Every object on this map says
+   `default` on his own instruction of 2026-09-08 (*"I prefer default over pointer at the labels and
+   assets. It's more precise."*), so "pointer on select" means putting the pointer back on the
+   labels and assets he had just taken it off. That is a reversal and not a tweak, so it is his to
+   make deliberately rather than mine to infer. **The missing half is the colour change on select**,
+   which he named both times and which is the thing that would carry the map/element distinction
+   once no glyph does: ROADMAP Task 659.
 
    **WHAT SURVIVES FROM TASK 569 IS THE PROPERTY, NOT THE GLYPH.** That task fixed bare canvas
    reading `default` because nothing there carried a cursor rule at all, so the strip between a
    node's disc and its own label read pointer, default, move, and Tom reported it as a flicker at
    12 px. There was never a ring at 12 px; it is a gap, measured one pixel at a time by
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
-   own cursor everywhere it shows through. What is superseded is `grab` itself: it is the open hand
-   every web map uses, and this is not a web map. */
-#lpn_canvas { touch-action: none; cursor: pointer; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
+   own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
+   because this is not a web map, and then `pointer`, because he looked at it. */
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-map-bg: #fff; }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
