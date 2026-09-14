@@ -38,6 +38,9 @@ const L = loadLoopedNetwork(
 	// Phase 2: the spatial filter, the box that drives it, and the New-project box's own answer.
 	"\t\tcrsExtent: crsExtent, crsCovers: crsCoversPoint, crsFiltered: crsFiltered,\n" +
 	"\t\tWEBMERC: LPN_CRS_WEBMERC,\n" +
+	// Phase 4: the fetched register behind the two readers above.
+	"\t\tcrsRegisterLoad: crsRegisterLoad, crsRegisterReady: crsRegisterReady,\n" +
+	"\t\tcrsRegisterCredit: crsRegisterCredit,\n" +
 	"\t\topenCrsBox: openCrsBox, renderCrsBoxList: renderCrsBoxList,\n" +
 	"\t\tcrsBoxSearch: crsBoxSearch, crsBoxOk: crsBoxOk, closeCrsBox: closeCrsBox,\n" +
 	"\t\tcrsBoxState: function () { return crsBox; },\n" +
@@ -568,5 +571,118 @@ setUnitSet('si');
 		noticeEl.textContent === '', noticeEl.textContent);
 }
 
-console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));
-process.exit(fails ? 1 : 0);
+// ---- 9. THE FETCHED REGISTER (phase 4) ----------------------------------------------------------
+//
+// **THE REAL FILE, NOT A FIXTURE.** `js/data/epsg-projected.json` is committed and is 5,346 rows of
+// the thing being tested, so a hand-made stand-in would only prove the loader can read a file
+// somebody wrote to suit it. The only thing stubbed is `fetch`, because there is no server here.
+//
+// What this covers that projection_catalogue_check.php cannot: the check reads the FILE, and this
+// reads what the page DOES with it -- that the catalogue grows, that a State Plane zone becomes
+// choosable, that the register's own box wins over the family approximation, and that a failed
+// fetch leaves a working chooser rather than an empty one.
+{
+	console.log('\n--- the fetched register ---');
+	const fs = require('fs');
+	const path = require('path');
+	const dataPath = path.resolve(__dirname, '..', '..', 'js', 'data', 'epsg-projected.json');
+	const doc = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+	const before = L.crsCatalogue().length;
+	ok('the built-in catalogue stands before any load', before === 183, String(before));
+	ok('...and Alabama East is not in it yet',
+		!L.crsCatalogue().some(e => e.code === 'EPSG:26929'));
+
+	// The failure path FIRST, because it is the one that ships to anybody offline and because the
+	// loader remembers its answer -- so a later success in the same process would hide it.
+	let served = null;
+	global.fetch = () => Promise.resolve({ ok: false, status: 404 });
+	const failed = new Promise(res => L.crsRegisterLoad(res));
+
+	failed.then(() => {
+		ok('a failed fetch leaves the built-in catalogue, not an empty one',
+			L.crsCatalogue().length === 183, String(L.crsCatalogue().length));
+		ok('...and claims no attribution it is not displaying', L.crsRegisterCredit() === '');
+		ok('...and still answers for a built-in zone',
+			!!L.crsExtent('EPSG:32612'), JSON.stringify(L.crsExtent('EPSG:32612')));
+	}).then(() => {
+		// A second module instance, because the first has latched 'failed' -- which is itself the
+		// behaviour we just asserted, so it is reloaded rather than reset.
+		delete require.cache[require.resolve('./lpn-dom-stub.js')];
+		global.fetch = (url) => {
+			served = url;
+			return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(doc) });
+		};
+		const M = loadLoopedNetwork(
+			"\t\tcrsCatalogue: crsCatalogue, crsExtent: crsExtent, crsFiltered: crsFiltered,\n" +
+			"\t\tcrsRegisterLoad: crsRegisterLoad, crsRegisterReady: crsRegisterReady,\n" +
+			"\t\tcrsRegisterCredit: crsRegisterCredit, crsLabel: crsLabel,\n"
+		);
+		return new Promise(res => M.crsRegisterLoad(() => res(M)));
+	}).then((M) => {
+		ok('the register loads', M.crsRegisterReady());
+		// 5,346 rows, minus Pseudo-Mercator which the catalogue already put first itself.
+		ok('the catalogue is the whole universe', M.crsCatalogue().length === 5346,
+			String(M.crsCatalogue().length));
+		ok('...addressed from the origin, not relatively',
+			typeof served === 'string' && served.charAt(0) === '/', String(served));
+
+		// **STATE PLANE, which is where this project's own users work** and the whole reason 183
+		// rows was not an answer. Alabama East is Transverse Mercator; Kentucky North is the
+		// deprecation trap -- 26979 is superseded by 2205 and must not be offered.
+		ok('State Plane arrives', M.crsLabel('EPSG:26929') === 'NAD83 / Alabama East',
+			M.crsLabel('EPSG:26929'));
+		ok('...including the survey-foot zones',
+			M.crsCatalogue().some(e => / \(ftUS\)$/.test(e.name)));
+		ok('...and the deprecated Kentucky North is NOT offered',
+			!M.crsCatalogue().some(e => e.code === 'EPSG:26979'));
+		ok('...while its live replacement is',
+			M.crsLabel('EPSG:2205') === 'NAD83 / Kentucky North', M.crsLabel('EPSG:2205'));
+		ok('no ESRI-style name reached the list',
+			!M.crsCatalogue().some(e => e.name.indexOf('(Meters)') >= 0));
+
+		// **THE REGISTER'S OWN BOX BEATS THE FAMILY APPROXIMATION**, which is the point of routing
+		// crsExtent() through it: the family table rounds a band outward over sixty zones because
+		// one row has to cover all of them, and the register states a box per CRS.
+		const z12 = M.crsExtent('EPSG:32612');
+		ok('a UTM zone keeps its six degrees of longitude', z12.w === -114 && z12.e === -108,
+			JSON.stringify(z12));
+		// WGS 84 UTM is the case where the two AGREE -- the register really does say 0 to 84 for a
+		// northern zone, which is where the family band's numbers came from. The band only costs
+		// something on a DATUM-LIMITED family, where one row has to cover every zone: NAD83 UTM
+		// 12N is stated at 14.9 by the family (the datum's southern limit, in Mexico) and at 31.33
+		// by the register (this zone's own). 16 degrees of latitude that were offering Arizona's
+		// coordinate system to somebody looking at Guatemala.
+		const nad12 = M.crsExtent('EPSG:26912');
+		ok('...and a datum-limited family takes the register\'s own latitude, not the band',
+			nad12.s > 31 && nad12.s < 32, JSON.stringify(nad12));
+		ok('...which is narrower than the built-in table could be', nad12.s > 14.9 + 10);
+		const mga55 = M.crsExtent('EPSG:7855');
+		ok('...at both ends', mga55.s > -60 && mga55.n < -8, JSON.stringify(mga55));
+		const al = M.crsExtent('EPSG:26929');
+		ok('Alabama East states a real area of use',
+			al.w < -84 && al.e > -87 && al.s > 30 && al.n < 36, JSON.stringify(al));
+
+		// The spatial filter over 5,346 rows is the feature Tom described, so it is asserted at
+		// full size rather than on the built-in list.
+		const inAlabama = M.crsFiltered({ lon: -86, lat: 32.5 }, '');
+		ok('the view filter narrows the universe to a readable list',
+			inAlabama.length > 0 && inAlabama.length < 400, String(inAlabama.length));
+		ok('...and Alabama East survives it',
+			inAlabama.some(e => e.code === 'EPSG:26929'));
+		ok('...while a New Zealand grid does not',
+			!inAlabama.some(e => e.code === 'EPSG:2193'));
+		ok('the name filter still reaches a code somebody types',
+			M.crsFiltered(null, '26929').some(e => e.code === 'EPSG:26929'));
+
+		// The IOGP terms require the acknowledgement wherever the dataset is transmitted.
+		ok('the IOGP acknowledgement is available to display',
+			/IOGP/.test(M.crsRegisterCredit()), M.crsRegisterCredit());
+
+		console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));
+		process.exit(fails ? 1 : 0);
+	}).catch((e) => {
+		console.log('FAIL  the register section threw   ' + (e && e.stack ? e.stack : e));
+		process.exit(1);
+	});
+}

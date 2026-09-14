@@ -233,6 +233,7 @@ run_check "social card image"            blocking php dev/scripts/social_card_ch
 # package.json agrees with what is committed. js/vendor/README.md documented all this in prose and
 # nothing checked it, so the record and the bytes were free to drift apart in silence (Task 413).
 run_check "vendored code integrity"      blocking php dev/scripts/vendor_integrity_check.php
+run_check "projection catalogue"         blocking php dev/scripts/projection_catalogue_check.php
 # Task 184 x Task 248. setProp() is the ONE write seam for an overridable property; a call site that
 # writes el._diameter directly edits BASE from inside a scenario, silently, under every other
 # scenario at once. That is not hypothetical -- the valve popup did it on five fields, and the two

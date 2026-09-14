@@ -1240,6 +1240,15 @@ the block.
     with no transform at all, because a projected project holds the user's own numbers and a name.
     Also fixed there: a projected project born from the wizard opened at the plane's origin in the
     corner, and now says why it cannot travel to the searched place.
+  - **PHASE 4, 2026-09-14: THE FULL UNIVERSE SHIPPED — all 5,346 live projected CRS.**
+    `js/data/epsg-projected.json`, 343 KB raw / 79 KB gzipped, fetched when the chooser first opens
+    and never precached; the 183 built-in rows stay as the offline fallback and
+    `projection_catalogue_check.php` holds all 182 of them against the register's own names, every
+    one of which agreed. Generated from PROJ's build of EPSG v12.029 out of a **PyPI wheel pinned
+    by sha256** — IOGP's REST API was measured and rejected, being ~9,000 requests for a snapshot
+    nothing publishes a hash of. `dev/projection-catalogue.md` §5 has the vendoring argument and
+    the weaker-digest admission. **The deploy blocker `utm-only` stays OPEN**: Tom asked to TEST
+    with the full universe and has not yet, and closing one is his word.
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
