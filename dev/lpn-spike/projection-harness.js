@@ -42,6 +42,8 @@ const L = loadLoopedNetwork(
 	"\t\tcrsBoxSearch: crsBoxSearch, crsBoxOk: crsBoxOk, closeCrsBox: closeCrsBox,\n" +
 	"\t\tcrsBoxState: function () { return crsBox; },\n" +
 	"\t\tnewBoxAnswers: newBoxAnswers, newBoxCoords: newBoxCoords,\n" +
+	// The wizard's answer becoming a project, and the camera that project opens on.
+	"\t\tcreateProjectFrom: createProjectFrom, currentView: currentView,\n" +
 	"\t\tnewBoxGeo: function () { return newBoxGeo; },\n" +
 	"\t\tsyncNewBoxCrsPick: syncNewBoxCrsPick,\n" +
 	"\t\tassignCrs: assignProjectCrs, crsCode: projectCrsCode,\n" +
@@ -82,18 +84,21 @@ const crsEl = ensure('lpn_crs'), coordsEl = ensure('lpn_coords');
 setUnitSet('si');
 
 // ---- 1. the catalogue ---------------------------------------------------------------------------
-// Generated from the EPSG numbering rather than typed, so what is asserted here is the numbering
-// itself: 32601..32660 north and 32701..32760 south, which is the register's own arithmetic.
+// Generated from a table of FAMILIES rather than typed row by row, so what is asserted here is the
+// numbering itself -- and, since phase 3, the three places the numbering does NOT run, which is
+// where a family table gets a project into trouble. dev/projection-catalogue.md holds the working.
 {
 	console.log('\n--- the catalogue ---');
 	const list = L.crsCatalogue();
-	// 121: sixty UTM zones in each hemisphere, and EPSG:3857 -- which phase 2 added, because
-	// lat/lon is not a third kind of project beside "projected", it is a projection with a name.
-	ok('sixty UTM zones in each hemisphere, plus the geographic answer',
-		list.length === 121, String(list.length));
+	// 121 shipped in phase 2: sixty WGS 84 UTM zones in each hemisphere and EPSG:3857. Phase 3 added
+	// 58 regional UTM zones on four datums and four national grids, all verified against the
+	// register on 2026-09-13.
+	ok('one hundred and twenty one WGS 84 rows and sixty two more', list.length === 183,
+		String(list.length));
 	const codes = {};
 	list.forEach(c => { codes[c.code] = (codes[c.code] || 0) + 1; });
-	ok('no code appears twice', Object.keys(codes).length === 121);
+	ok('no code appears twice', Object.keys(codes).length === list.length,
+		Object.keys(codes).length + ' distinct of ' + list.length);
 	ok('zone 12 north is EPSG:32612', !!codes[ZONE12N]);
 	ok('zone 12 south is EPSG:32712', !!codes['EPSG:32712']);
 	ok('the name carries the zone and the hemisphere',
@@ -271,7 +276,9 @@ setUnitSet('si');
 	console.log('\n--- phase 2: the catalogue carries the geographic answer ---');
 	const list = L.crsCatalogue();
 	ok('EPSG:3857 is in the catalogue', list.some(e => e.code === L.WEBMERC));
-	ok('...one hundred and twenty one rows in all', list.length === 121, String(list.length));
+	// **A COUNT IS A MEASUREMENT AND IS PINNED DELIBERATELY.** 121 until 2026-09-13, when the six
+	// regional UTM families and the four national grids landed; see dev/projection-catalogue.md.
+	ok('...one hundred and eighty three rows in all', list.length === 183, String(list.length));
 	ok('...and it is first, being the commonest answer', list[0].code === L.WEBMERC, list[0].code);
 	ok('...named as the register names it, not described',
 		/Pseudo-Mercator/.test(L.crsLabel(L.WEBMERC)), L.crsLabel(L.WEBMERC));
@@ -321,21 +328,60 @@ setUnitSet('si');
 	ok('...and outside its own southern twin, being north of the equator',
 		L.crsCovers('EPSG:32710', PETALUMA) === false);
 	const near = L.crsFiltered(PETALUMA, '');
-	ok('a place leaves only the projections that cover it', near.length === 2, String(near.length));
-	ok('...the geographic answer and the one zone', near.some(e => e.code === L.WEBMERC) &&
-		near.some(e => e.code === 'EPSG:32610'), near.map(e => e.code).join(','));
+	ok('a place leaves only the projections that cover it', near.length === 3, String(near.length));
+	ok('...the geographic answer and the two zone 10 norths, on their two datums',
+		near.some(e => e.code === L.WEBMERC) && near.some(e => e.code === 'EPSG:32610') &&
+		near.some(e => e.code === 'EPSG:26910'), near.map(e => e.code).join(','));
 	ok('no place at all offers the whole catalogue',
-		L.crsFiltered(null, '').length === 121, String(L.crsFiltered(null, '').length));
+		L.crsFiltered(null, '').length === 183, String(L.crsFiltered(null, '').length));
+
+	console.log('\n--- phase 3: the families the numbering does NOT run through ---');
+	// **EVERY ONE OF THESE IS A ROW A FORMULA WOULD HAVE MINTED, AND NONE OF THEM IS A COORDINATE
+	// SYSTEM.** A minted code is the worst kind of defect this feature can have: it is stored in the
+	// user's file, it is permanent, and it looks exactly like a real declaration.
+	const has = c => L.crsCatalogue().some(e => e.code === c);
+	ok('NAD83 UTM stops at zone 23, where the register stopped', has('EPSG:26923') && !has('EPSG:26924'));
+	ok('...so no arithmetic zone 59 north, which really lives at 3372', !has('EPSG:26959'));
+	ok('ETRS89 UTM stops at zone 37, because 38N is deprecated',
+		has('EPSG:25837') && !has('EPSG:25838'));
+	ok('...and does not start below 28', !has('EPSG:25827'));
+	ok('GDA2020 MGA runs 46 to 59 and takes neither neighbour',
+		has('EPSG:7846') && has('EPSG:7859') && !has('EPSG:7845') && !has('EPSG:7860'));
+	ok('GDA94 MGA runs 48 to 58 and takes neither neighbour',
+		has('EPSG:28348') && has('EPSG:28358') && !has('EPSG:28347') && !has('EPSG:28359'));
+	// The zone strip is driven by the ZONE NUMBER, not by the family's own first zone -- a family
+	// starting at 28 still means UTM's zone 28, which is the one place this table could be wrong
+	// everywhere at once and still look right.
+	ok('a family that starts at zone 28 still places zone 28 where UTM puts it',
+		L.crsExtent('EPSG:25832').w === L.crsExtent('EPSG:32632').w &&
+		L.crsExtent('EPSG:25832').e === L.crsExtent('EPSG:32632').e,
+		JSON.stringify(L.crsExtent('EPSG:25832')));
+	ok('...and an Australian zone 55 sits where WGS 84 zone 55 does',
+		L.crsExtent('EPSG:7855').w === 144 && L.crsExtent('EPSG:7855').e === 150,
+		JSON.stringify(L.crsExtent('EPSG:7855')));
+
+	console.log('\n--- phase 3: a grid that is a zone of nothing ---');
+	ok('the British National Grid is in the catalogue, named as the register names it',
+		L.crsLabel('EPSG:27700') === 'OSGB36 / British National Grid', L.crsLabel('EPSG:27700'));
+	ok('...with its own typed area of use, there being no strip to derive one from',
+		L.crsCovers('EPSG:27700', { lon: -0.12, lat: 51.5 }) === true &&
+		L.crsCovers('EPSG:27700', { lon: 2.35, lat: 48.86 }) === false);
+	ok('the Dutch and New Zealand grids are there too',
+		has('EPSG:28992') && has('EPSG:2193') && has('EPSG:2157'));
+	ok('...and searching Wellington offers the New Zealand one',
+		L.crsFiltered({ lon: 174.78, lat: -41.29 }, '').some(e => e.code === 'EPSG:2193'));
 
 	console.log('\n--- the name filter, which is the other half of Tom\'s box ---');
-	ok('a zone number narrows by name', L.crsFiltered(null, 'zone 12N').length === 1,
-		String(L.crsFiltered(null, 'zone 12N').length));
-	ok('...case does not matter', L.crsFiltered(null, 'zone 12n').length === 1);
+	ok('a zone number narrows by name to the two datums that state it',
+		L.crsFiltered(null, 'zone 12N').length === 2,
+		L.crsFiltered(null, 'zone 12N').map(e => e.code).join(','));
+	ok('...case does not matter', L.crsFiltered(null, 'zone 12n').length === 2);
 	ok('an EPSG code finds its own row',
 		L.crsFiltered(null, '32612').length === 1 &&
 		L.crsFiltered(null, '32612')[0].code === ZONE12N);
-	ok('the two filters compose', L.crsFiltered(PETALUMA, 'UTM').length === 1 &&
-		L.crsFiltered(PETALUMA, 'UTM')[0].code === 'EPSG:32610');
+	ok('the two filters compose', L.crsFiltered(PETALUMA, 'UTM').length === 2 &&
+		L.crsFiltered(PETALUMA, 'UTM').every(e => /zone 10N$/.test(e.name)),
+		L.crsFiltered(PETALUMA, 'UTM').map(e => e.code).join(','));
 	ok('a name that matches nothing leaves nothing, rather than everything',
 		L.crsFiltered(null, 'State Plane').length === 0);
 }
@@ -352,7 +398,7 @@ setUnitSet('si');
 	L.openCrsBox(L.WEBMERC, null, function (code, ll) { picked = { code: code, ll: ll }; });
 	ok('it opens', byId.lpn_crsbox.style.display === 'block', byId.lpn_crsbox.style.display);
 	ok('...on the whole catalogue, because no place has been found yet',
-		listEl.children.length === 121, String(listEl.children.length));
+		listEl.children.length === 183, String(listEl.children.length));
 	ok('...and says so rather than looking broken', noteEl.textContent === PC.lpn_crs_noview,
 		noteEl.textContent);
 	ok('...opening on the projection it was handed', L.crsBoxState().code === L.WEBMERC);
@@ -360,10 +406,10 @@ setUnitSet('si');
 	// THE PLACE ARRIVES, and the list collapses. This is the whole feature.
 	L.crsBoxState().place = PETALUMA;
 	L.renderCrsBoxList();
-	ok('a place narrows the list to what covers it', listEl.children.length === 2,
+	ok('a place narrows the list to what covers it', listEl.children.length === 3,
 		String(listEl.children.length));
 	ok('...and the note counts rather than apologising',
-		noteEl.textContent === PC.lpn_crs_count.replace('{n}', '2').replace('{total}', '121'),
+		noteEl.textContent === PC.lpn_crs_count.replace('{n}', '3').replace('{total}', '183'),
 		noteEl.textContent);
 	ok('...and the choice survived the narrowing, being still on the list',
 		L.crsBoxState().code === L.WEBMERC);
@@ -371,12 +417,12 @@ setUnitSet('si');
 	// Turning the filter OFF is the other half of Tom's checkbox.
 	viewEl.checked = false;
 	L.renderCrsBoxList();
-	ok('unchecking the map filter offers the whole list again', listEl.children.length === 121);
+	ok('unchecking the map filter offers the whole list again', listEl.children.length === 183);
 	viewEl.checked = true;
 
 	// A filter that excludes the current choice must move it to something real rather than leave
 	// the box reporting a projection that is not on its own list.
-	nameEl.value = 'zone 10N';
+	nameEl.value = 'WGS 84 / UTM zone 10N';
 	L.renderCrsBoxList();
 	ok('the name filter composes with the place', listEl.children.length === 1);
 	ok('...and the choice moved to the only row left', L.crsBoxState().code === 'EPSG:32610',
@@ -404,13 +450,13 @@ setUnitSet('si');
 		onHit({ lat: PETALUMA.lat, lon: PETALUMA.lon, extent: null, label: 'Petaluma' });
 	};
 	L.openCrsBox(L.WEBMERC, null, function () {});
-	ok('it opens on the whole catalogue again', listEl.children.length === 121);
+	ok('it opens on the whole catalogue again', listEl.children.length === 183);
 	placeEl.value = '  Petaluma, California  ';
 	L.crsBoxSearch();
 	ok('the words typed reach the one geocoder, trimmed',
 		asked.length === 1 && asked[0] === 'Petaluma, California', JSON.stringify(asked));
 	ok('...and the point it answers with becomes the filter',
-		listEl.children.length === 2, String(listEl.children.length));
+		listEl.children.length === 3, String(listEl.children.length));
 	asked = [];
 	placeEl.value = '   ';
 	L.crsBoxSearch();
@@ -460,6 +506,66 @@ setUnitSet('si');
 	L.syncNewBoxCrsPick();
 	ok('...and is greyed when the question belongs to the other radio',
 		byId.lpn_new_crs_pick.disabled === true);
+}
+
+// ---- 11. THE CAMERA THE NEW PROJECT OPENS ON ----------------------------------------------------
+//
+// Tom, 2026-09-13: *"The initial view for the project needs to match the view used in the projection
+// wizard, but it put 0,0 at the upper left of the map instead."*
+//
+// **THE TWO PATHS ARE DIFFERENT AND ONLY ONE OF THEM COULD EVER TRAVEL.** A lat/lon project's camera
+// is in degrees, which is the unit the place-name search answers in, so the wizard's point IS the
+// view. A projected project's camera is in the plane's own eastings and northings, and turning a
+// longitude into one of those is the transform this page does not have -- so it opens on its own
+// plane and says so, rather than opening somewhere that looks like an answer.
+//
+// The measurement that named the defect: a projected project born from the wizard opened at
+// {cx: w/2, cy: h/2, s: 1}, which puts the plane's origin exactly in the top-left corner at one
+// pixel per unit. That is defaultViewForCoords()'s xy answer, and it is what Tom was looking at.
+{
+	console.log('\n--- the camera a new project opens on ---');
+	const PETALUMA = { lat: 38.2324, lon: -122.6367, extent: null };
+	const W = 800, H = 600;
+	const noticeEl = ensure('lpn_map_notice');
+
+	L.reset();
+	L.setCanvas(W, H);
+	L.createProjectFrom({ geo: true, units: {}, method: 'hw', place: PETALUMA });
+	{
+		const v = L.currentView();
+		ok('a lat/lon project opens on the point the wizard found',
+			!!v && Math.abs(L.outwardY(v.cy) - PETALUMA.lat) < 1e-6 &&
+			Math.abs(L.outwardX(v.cx) - PETALUMA.lon) < 1e-6,
+			v ? L.outwardY(v.cy) + ', ' + L.outwardX(v.cx) : 'no view');
+		// The defect, stated as the thing that must NOT come back: the origin in the corner.
+		ok('...and not on the origin in the corner, which is what was reported',
+			!!v && !(Math.abs(v.cx - W / 2) < 1e-9 && Math.abs(v.cy - H / 2) < 1e-9 && v.s === 1),
+			v ? v.cx + ', ' + v.cy + ' @ ' + v.s : 'no view');
+	}
+
+	// **AND THE HONEST HALF.** A projected project cannot be placed, so what is asserted is that it
+	// says so -- in the language file's own words, never in an English literal.
+	noticeEl.textContent = '';
+	L.reset();
+	L.setCanvas(W, H);
+	L.createProjectFrom({ geo: false, crs: ZONE12N, units: {}, method: 'hw', place: PETALUMA });
+	ok('a projected project made from the wizard states that it cannot travel there',
+		noticeEl.textContent === PC.lpn_crs_place_projected, noticeEl.textContent);
+	ok('...and holds the projection it was given', L.crsCode() === ZONE12N, L.crsCode());
+	{
+		const v = L.currentView();
+		ok('...and did not read the searched latitude as a northing',
+			!!v && Math.abs(v.cy - PETALUMA.lat) > 1 && Math.abs(v.cx - PETALUMA.lon) > 1,
+			v ? v.cx + ', ' + v.cy : 'no view');
+	}
+
+	// No place, no sentence: a notice that fires when nobody searched for anything is noise.
+	noticeEl.textContent = '';
+	L.reset();
+	L.setCanvas(W, H);
+	L.createProjectFrom({ geo: false, crs: ZONE12N, units: {}, method: 'hw', place: null });
+	ok('a projected project nobody searched a place for says nothing',
+		noticeEl.textContent === '', noticeEl.textContent);
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));

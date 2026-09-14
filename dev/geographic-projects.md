@@ -326,10 +326,34 @@ point instead of moving the map, because a box choosing a projection for a proje
 exist yet has no map to move. The point it finds is also where the new geographic project opens, so
 one search answers two questions and costs one request.
 
+### The initial view, and which of the two paths could ever have it
+
+Tom, 2026-09-13, having used it: *"The initial view for the project needs to match the view used in
+the projection wizard, but it put 0,0 at the upper left of the map instead."*
+
+**IT IS THE PROJECTED PATH, AND THE GEOGRAPHIC ONE WAS ALREADY RIGHT** -- measured, not inferred: a
+projected project born from the wizard opened at `{cx: w/2, cy: h/2, s: 1}`, which is
+`defaultViewForCoords()`'s xy answer and puts the plane's origin exactly in the top-left corner at
+one pixel per unit. A lat/lon project opens on the searched point, and always did.
+
+The two are not one feature with a bug in it. **A lat/lon project's camera is in DEGREES, which is
+the unit the place-name search answers in**, so arriving is a comparison of like with like and
+`goToPoint()` does it. A projected project's camera is in the plane's own eastings and northings,
+and turning a longitude into an easting is the transform this page does not have. So the fix is a
+sentence rather than a guess: `lpn_crs_place_projected` says the plane cannot be put on the Earth
+yet, once, at the moment the search would otherwise have been silently discarded. Guarded in
+`dev/lpn-spike/projection-harness.js`, in both directions -- the geographic camera IS the point, and
+is NOT the origin in the corner.
+
+**An approximate camera is tempting and is still wrong.** A view is OURS and not the user's data, so
+placing one approximately would break no rule about their numbers. What stops it is the next
+question: somebody who sees the page find their town in a UTM plane will ask it to convert their
+network, and the answer to that is no until there is a real transform.
+
 ### What is still blocked on a transform
 
 Converting a network BETWEEN coordinate systems, a basemap or terrain elevations behind a projected
-project, and the point scale factor of ruling P7. All of them need a real forward and inverse
+project, the INITIAL VIEW of a projected project (above), and the point scale factor of ruling P7. All of them need a real forward and inverse
 projection, which is proj4js, which is not vendored and whose vendoring is Tom's decision.
 `File > Open to new coordinates` (renamed from "Open an xy file on the map", Tom's name, 2026-09-13)
 still does what it always did — the georeferencing wizard over a lon/lat frame — and now names the

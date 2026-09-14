@@ -1650,6 +1650,7 @@ $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
+$ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 $ec_lang['lpn_crs_none']='Not georeferenced';

@@ -556,6 +556,7 @@
         "lpn_crs_choose": "Select",
         "lpn_crs_noview": "No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.",
         "lpn_crs_count": "{n} of {total} projections listed.",
+        "lpn_crs_place_projected": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.",
         "lpn_crs_none": "Not georeferenced",
         "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
@@ -567,14 +568,13 @@
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
-        "lpn_cp_design_tip": "One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
+        "lpn_cp_design_tip": "One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
         "lpn_cp_add": "Add custom property",
         "lpn_cp_add_tip": "Adds a row to the design table and opens it for editing.",
         "lpn_cp_remove": "Remove",
         "lpn_cp_remove_tip": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
-        "lpn_cp_edit_tip": "Opens the design of this custom property, where every part of it is shown at full length.",
-        "lpn_cp_edit_title": "Custom property design",
         "lpn_cp_none": "No custom property is designed yet.",
+        "lpn_cp_unnamed": "Not named yet",
         "lpn_cp_key": "Key",
         "lpn_cp_key_tip": "Key: A property is stored under this name. Spaces are not allowed, and a prefix is added for you so that your key can never collide with a built-in field.",
         "lpn_cp_label": "Label",
@@ -664,6 +664,7 @@
         "lpn_crs_choose": "Select",
         "lpn_crs_noview": "No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.",
         "lpn_crs_count": "{n} of {total} projections listed.",
+        "lpn_crs_place_projected": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.",
         "lpn_crs_none": "Not georeferenced",
         "lpn_storage_unreadable": "Not saved. This project could not be read from browser storage. Its stored copy is left exactly as it is and will not be written over, so nothing on this tab is being saved. Open a file or create a new project to keep working.",
         "lpn_menu_cue": "Start with the menus above. Use the toolbar for quick access.",
@@ -675,14 +676,13 @@
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
-        "lpn_cp_design_tip": "One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
+        "lpn_cp_design_tip": "One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
         "lpn_cp_add": "Add custom property",
         "lpn_cp_add_tip": "Adds a row to the design table and opens it for editing.",
         "lpn_cp_remove": "Remove",
         "lpn_cp_remove_tip": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
-        "lpn_cp_edit_tip": "Opens the design of this custom property, where every part of it is shown at full length.",
-        "lpn_cp_edit_title": "Custom property design",
         "lpn_cp_none": "No custom property is designed yet.",
+        "lpn_cp_unnamed": "Not named yet",
         "lpn_cp_key": "Key",
         "lpn_cp_key_tip": "Key: A property is stored under this name. Spaces are not allowed, and a prefix is added for you so that your key can never collide with a built-in field.",
         "lpn_cp_label": "Label",
@@ -1327,6 +1327,22 @@
                 }
             }
         },
+        "lpn_crs_place_projected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_coords",
+                    "value": "Coordonate",
+                    "english": "Coordinates"
+                },
+                "next_translated": {
+                    "key": "lpn_new_units_tip",
+                    "value": "Un proiect își păstrează propriile unități, deci această alegere aparține doar acestui proiect și nimic de aici nu este salvat ca setare a browserului. Pentru a începe proiecte noi într-un anumit fel, salvați un proiect gol ca șablon și faceți o copie a lui de fiecare dată.",
+                    "english": "Each project keeps its own units and other settings, so this choice belongs to this project alone and nothing here is saved as a browser setting. To save your preferences permanently, save an empty project as your template and start from it every time."
+                }
+            }
+        },
         "lpn_crs_none": {
             "reason": "missing",
             "current_value": null,
@@ -1583,39 +1599,23 @@
                 }
             }
         },
-        "lpn_cp_edit_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_push_no_change",
-                    "value": "Fiecare element are deja aceste valori, deci nimic nu s-ar schimba.",
-                    "english": "Every asset already has these values, so nothing would change."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_label",
-                    "value": "Scenariu",
-                    "english": "Scenario"
-                }
-            }
-        },
-        "lpn_cp_edit_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_push_no_change",
-                    "value": "Fiecare element are deja aceste valori, deci nimic nu s-ar schimba.",
-                    "english": "Every asset already has these values, so nothing would change."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_label",
-                    "value": "Scenariu",
-                    "english": "Scenario"
-                }
-            }
-        },
         "lpn_cp_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Fiecare element are deja aceste valori, deci nimic nu s-ar schimba.",
+                    "english": "Every asset already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_label",
+                    "value": "Scenariu",
+                    "english": "Scenario"
+                }
+            }
+        },
+        "lpn_cp_unnamed": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

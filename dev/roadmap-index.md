@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 13 · Soon (75): 20 · Someday (50): 29 · Maybe (25): 10 · Parked (5): 18
+**91 open tasks.** Next (100): 13 · Soon (75): 20 · Someday (50): 30 · Maybe (25): 10 · Parked (5): 18
 
 ## 100 — Next (13)
 
@@ -48,7 +48,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
 - Task 665 — Make draggable and resizable the standard for a standing box.
 
-## 50 — Someday (29)
+## 50 — Someday (30)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -78,6 +78,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 645 — The app icon's legs are leggier than the favicon's.
 - Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
+- Task 660 — Make every standing box draggable and resizable, as a house standard.
 - Task 664 — A link's status colours correctly and its legend prints numbers.
 
 ## 25 — Maybe (10)
@@ -118,5 +119,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-82 of 90 titles are within 4–12 words. `!` marks the rest;
+83 of 91 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

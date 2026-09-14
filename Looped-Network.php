@@ -1380,6 +1380,7 @@ EngCalcs.pageConfig = {
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
+	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
 	lpn_valve_type_gpv: <?=json_encode($ec_lang['lpn_valve_type_gpv'])?>,
 	lpn_field_valve_setting_drop: <?=json_encode($ec_lang['lpn_field_valve_setting_drop'])?>,
