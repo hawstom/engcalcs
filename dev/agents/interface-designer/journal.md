@@ -1107,3 +1107,174 @@ deserves — that is a values call, not a design-hierarchy one.
 
 No shipped file touched. `dev/agents/interface-designer/wishlist.md` carries the ranked build
 items from this entry.
+
+## 2026-09-13 — Task 636 (custom-property design table) and the "all boxes draggable" proposal
+
+Two independent layout questions, both today.
+
+### Q1 — does the custom-property design table belong in the Settings box?
+
+**Settings is defined by one membership rule, and the property clearly passes it.** OBSERVED
+(`js/looped-network.js:28994-29000`), Tom, 2026-08-18: *"If it's for the entire project, it's in
+Settings."* A custom property's DESIGN (its schema — key, label, applies-to, validate-as, the
+length/value limits) is applied across every asset of a kind, project-wide; only its per-element
+VALUE lives on a node or link, and that already lives outside Settings, in the property popup. So
+the home is right. **What is not settled by that rule is which WIDGET inside Settings hosts it,
+and the shipped widget is the one place in the box that abandoned the box's own convention rather
+than reusing it.**
+
+OBSERVED: every other multi-field row in Settings is `.lpn-set-row`
+(`css/engcalcs.css:2575-2609`), and it already has a phone answer built in — a container query
+collapses its two-column grid to one column and stacks under 24rem
+(`css/engcalcs.css:2620-2625`). The custom-property summary instead ships a raw `<table>`
+(`.lpn-cp-table`, `css/engcalcs.css:2470-2489`) with nine of eleven columns truncated to
+`max-width: 4.5em` and left to the content pane's own `overflow: auto`
+(`css/engcalcs.css:2352`) for anything wider than the pane. That is a second, novel answer to
+"too many fields, not enough width" introduced in the one box that had already solved that
+problem a different way.
+
+**Measured, not estimated, at 375px (a common phone width):** `.lpn-setbox` is
+`width: min(34rem, 94vw)` (`css/engcalcs.css:2239`) → 352px; minus 16px padding, a 72px index
+pane (`4.5rem`, phone value, `css/engcalcs.css:2344-2347`) and a 10px gap leaves **≈254px** of
+content-pane width. The nine truncated columns alone demand `9 × 4.5em` at the table's own
+`font-size: .85em` (≈13.6px) — **≈551px**. The key column carries no cap at all, so it pushes
+everything after it further right still. Net: **a reader can see roughly four of eleven columns
+at once, and scrolling right to read Low limit or High limit scrolls the key — the one column the
+design deliberately left unabbreviated because "the key is the identity" — off the screen.** The
+one column built to always be legible is the one a phone reader loses first. This is not a
+hypothetical: it follows arithmetically from the box's own declared widths.
+
+One thing the shipped table gets right and is worth keeping regardless of what else changes:
+OBSERVED, the truncation is CSS `text-overflow: ellipsis` on the visible span, not a `slice()` in
+JS (`css/engcalcs.css:2471-2475`, comment states the reasoning) — a screen reader reads the full,
+untruncated `textContent`. The failure above is a SIGHTED-phone-reader failure, not an
+accessibility-tree failure.
+
+**His third alternative — key on line 1, an expander revealing every other field on its own line
+below — is not merely "also workable," it is the better fit for this codebase specifically, and
+I did not expect that going in.** Two findings drove the reversal:
+
+1. **The shipped popup already reuses `.lpn-set-row` internally** — `openCustomPropDesign()`'s
+   `row()` helper sets `line.className = 'lpn-set-row'`
+   (`js/looped-network.js:27889-27896`). So the popup and a hypothetical expander would render
+   IDENTICAL stacked single-column fields on a phone; the only difference is whether that stack
+   sits inside a THIRD overlay layer (map → Settings box → modal) or inline, one level down,
+   inside the summary the reader is already looking at. On a page whose diagnosed defect is
+   attention lost to competing chrome, the extra overlay is a cost with no matching benefit — the
+   layout work it buys already happens for free inside the box.
+2. **The popup is the only control in the entire Settings box that leaves the box to be edited.**
+   Every other section — colors, labels, id prefixes, defaults, units, hydraulics — commits
+   in-place through a `.lpn-set-row`. An inline expander is consistent with that; the modal is the
+   one exception, introduced the same day as the table it is meant to fix.
+
+Compared honestly rather than by default:
+- **On a pointer:** no clear winner in isolation, but the expander has the edge for the actual use
+  case Tom described when he specified the summary table at all — scanning several property
+  designs to compare them. A modal replaces the list with one property at a time; an inline
+  expander lets two or three stay open beside each other.
+- **On a phone:** the expander wins outright. It needs no new width arithmetic (reuses
+  `.lpn-set-row`'s existing collapse), adds no overlay depth, and never separates the key from the
+  fields it identifies — the key is the row it belongs to, not a column that can scroll away from
+  it.
+- **CITED**, on the general shape of the choice: NN/g, "Modal & Nonmodal Dialogs: When (& When
+  Not) to Use Them" (nngroup.com/articles/modal-nonmodal-dialog) — modal is for a task that
+  genuinely needs the user's full attention pulled off everything else; a nonmodal / inline
+  affordance is preferred when the task is not that urgent and the surrounding context (here, the
+  other property designs) still matters to the work. Ten fields committed one at a time with no
+  OK/Cancel is an editor, not a decision — it does not need the interruption a modal buys.
+- **CITED**, on the mechanism: the WAI-ARIA APG Disclosure (Show/Hide) pattern
+  (w3.org/WAI/ARIA/apg/patterns/disclosure/) is exactly this shape — a button plus a
+  collapsed/expanded region, `aria-expanded` doing the state, no focus trap, no backdrop, keyboard
+  support for free — and native `<details>/<summary>` implements it with no JS state at all
+  (MDN). Either gets full assistive-tech support cheaper than the modal, which had to
+  hand-implement `aria-modal`, a backdrop and first-button focus itself
+  (`js/looped-network.js:24265-24292`, correctly, but that correctness is a cost the disclosure
+  pattern does not incur).
+- **CITED**, on the general family the table half of this replaces: the "collapse a wide table to
+  stacked field/value pairs under a narrow viewport" pattern is standard, older responsive-design
+  advice (documented repeatedly on Smashing Magazine and CSS-Tricks, and catalogued among Brad
+  Frost's responsive patterns) — it is not a novel proposal, it is this page declining to use a
+  technique it otherwise already knows.
+
+**A fourth shape, named for completeness and not recommended:** a master-detail layout — one
+`<select>` choosing which custom property to edit, one vertical form below it for the chosen one,
+no table and no per-row expander at all. SPECULATION: this avoids width arithmetic entirely, but
+it hides every OTHER property while one is open, which is worse than either shipped shape for the
+review/compare use Tom's own summary table was built to serve, and it makes "how many custom
+properties exist and what are they" require opening the dropdown rather than reading a list. Not
+recommended; named so the option space is not artificially narrowed to the two Tom already named.
+
+**Recommendation, ranked:** the shipped popup is not "fine as is" — the phone failure above is
+real and specific, not a stylistic quibble — but it is also not urgent before 2026-09-16: this is
+a Settings sub-feature reached only after opening Settings > Assets, not one of the four bars a
+first-time viewer's eye ever crosses, and a live demonstration is far more likely to run on a
+laptop than a phone. Replace the popup with the inline expander when there is time to do it
+properly (reusing `.lpn-set-row` per revealed field, `<details>/<summary>` or an
+`aria-expanded` button for the disclosure itself, and folding `openCustomPropDesign()`'s field
+list into the expanded body rather than a second dialog). This is a real, if modest, rebuild —
+not a one-line fix — and belongs on its own branch, not folded into demo prep.
+
+### Q2 — should every box be draggable and resizable, as a house standard?
+
+**Yes, conditionally, and the condition is already the one distinction this codebase draws
+everywhere else in this file: STANDING PANEL versus MODAL DECISION.**
+
+OBSERVED: the infrastructure for the "yes" half is already built, shared and cheap.
+`makePanelDraggable()` and `addPanelResizeGrip()` (`js/looped-network.js:32480-32630`) are one
+call each; the panel z-stack (`raisePanel()`/`renormalisePanelStack()`) is generic; the furniture
+rule (CLAUDE.md, Task 584) already routes remembered position/size through `localStorage`,
+never `serializeProject()`, and already refuses to write a remembered CORNER from a phone while
+still giving a phone a touch-draggable resize grip (`css/engcalcs.css:3236-3260`,
+`js/looped-network.js:32465-32478`). Settings, Libraries and, since 2026-09-08, all four report
+boxes already do this (`js/looped-network.js:29849-29855`). Making a new STANDING box do the same
+is now four things — a `LPN_<X>BOX_KEY` constant, a load/save pair copied from the Library box's
+template, one `makePanelDraggable()` call and one `addPanelResizeGrip()` call — not a redesign.
+`lpn_furniture_check.php` already derives the furniture-key list from the write sites, so a new
+key cannot go undocumented by omission.
+
+OBSERVED, the "no" half: `openDialog()`'s modal (`js/looped-network.js:24265-24292`) is
+deliberately different — `aria-modal="true"` backed by a real backdrop (Tom, 2026-08-05: *"I
+still can change tabs/projects, and this can confuse my feeble human mind"*), fixed and centered,
+its body scrolling rather than the box resizing (`#lpn_dialog_body { max-height: 60vh;
+overflow-y: auto }`, `css/engcalcs.css:1323-1338`, fixed after Tom's 2026-09-02 "runs off the
+screen" report). It is used for Save/Discard/Cancel prompts, alerts and single-purpose import
+reports — things that must be answered before anything else can happen. Dragging or resizing a
+box whose entire job is to be read once and dismissed buys nothing; it would only add a furniture
+key for a box nobody leaves open.
+
+**Stated as a rule someone could apply without asking me:** a box gets drag + resize together,
+using `makePanelDraggable()` + `addPanelResizeGrip()` + a furniture key, if and only if it is a
+STANDING panel — one a reader may reasonably want open beside the map while doing something else,
+for more than a few seconds, and may want positioned or sized to fit what they are doing. A box
+gets neither if it is a MODAL DECISION — its content is answered and dismissed, the page is
+inert while it is open, and its own scroll (not its own resize) is how long content is handled.
+Decide both properties by the SAME test, not separately — draggable-but-fixed-size or
+resizable-but-immovable are not real cases here, because a box worth moving is a box worth sizing
+and vice versa; the codebase's own comment agrees (`js/looped-network.js:32603`, "resizable gives
+up nothing, and one made resizable later needs no second edit here").
+
+**Why this does not reopen the chrome-attention argument I was hired on:** the four-bar
+diagnosis is about ALWAYS-VISIBLE, first-glance chrome that a reader's eye has to find before
+they have done anything. A box's own drag grip and resize corner are discovered by someone who
+has ALREADY opened that box and is already engaged with it — the inattentional-blindness finding
+(Task 616 entry, above) does not transfer, because the failure mode there was never sampling the
+region at all, and here the reader is looking directly at the thing. Extending drag/resize to
+more standing boxes adds no new first-glance competitor.
+
+**One genuine edge case, and it is Tom's to call, not mine:** the custom-property design surface
+sits exactly on the seam between the two categories as currently built — ten fields, each
+committing individually, no OK/Cancel — which is editor-shaped, not decision-shaped, even though
+it is currently built on `openDialog()`. If Q1's recommendation (fold it into an inline expander
+inside the already-draggable/resizable Settings box) is taken, this edge case disappears — there
+is no longer a separate box to classify. If the popup is kept instead, Tom should decide whether
+it is a modal decision (stays as is) or a standing mini-editor that should be pulled out of
+`openDialog()` into the standing-panel family — that is a judgment about what KIND of task
+editing a custom property is, not a hierarchy question I can settle from the code alone.
+
+**What is mine versus his:** the Settings-vs-widget diagnosis (Q1), the phone measurement, and
+the draggable/resizable rule (Q2) are read off evidence already in this repository plus cited
+external convention — no new information from Tom is needed to settle those. His alone: whether
+to spend a post-demo cycle rebuilding the custom-property editor as an expander at all (a
+priority call), and the one edge-case classification above.
+
+No shipped file touched. Ranked build items added to `dev/agents/interface-designer/wishlist.md`.
