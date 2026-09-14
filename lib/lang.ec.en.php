@@ -2228,6 +2228,10 @@ $ec_lang['lpn_field_lat']='Latitude';
 // order, northing first, which is the same order the latitude above is read in.
 $ec_lang['lpn_field_northing']='Northing';
 $ec_lang['lpn_field_easting']='Easting';
+// layout: status strip. The one-line readout at the bottom of the map, where the full words
+// spend most of the line. A surveyor reads these off a single letter; use your language's own.
+$ec_lang['lpn_field_northing_abbr']='N';
+$ec_lang['lpn_field_easting_abbr']='E';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';

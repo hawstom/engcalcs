@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1868,
-        "delta_key_count": 105,
+        "expected_key_count": 1870,
+        "delta_key_count": 107,
         "exempt_key_count": 42,
         "exempt_keys": [
             "u_imgd",
@@ -573,6 +573,8 @@
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_northing": "Northing",
         "lpn_field_easting": "Easting",
+        "lpn_field_northing_abbr": "N",
+        "lpn_field_easting_abbr": "E",
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
@@ -680,6 +682,8 @@
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_northing": "Northing",
         "lpn_field_easting": "Easting",
+        "lpn_field_northing_abbr": "N",
+        "lpn_field_easting_abbr": "E",
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
@@ -1477,6 +1481,38 @@
             }
         },
         "lpn_field_easting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "Feche este tubo para que nenhuma água possa passar por ele. O tubo permanece no mapa e mantém todos os seus números, e você pode abri-lo novamente a qualquer momento.",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Fator de tamanho",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_northing_abbr": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "Feche este tubo para que nenhuma água possa passar por ele. O tubo permanece no mapa e mantém todos os seus números, e você pode abri-lo novamente a qualquer momento.",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Fator de tamanho",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_easting_abbr": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

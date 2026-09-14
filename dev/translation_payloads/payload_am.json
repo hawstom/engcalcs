@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1868,
-        "delta_key_count": 105,
+        "expected_key_count": 1870,
+        "delta_key_count": 107,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -559,6 +559,8 @@
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_northing": "Northing",
         "lpn_field_easting": "Easting",
+        "lpn_field_northing_abbr": "N",
+        "lpn_field_easting_abbr": "E",
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
@@ -666,6 +668,8 @@
         "lpn_about_license": "Licensed under the GNU General Public License v3.0 or later.",
         "lpn_field_northing": "Northing",
         "lpn_field_easting": "Easting",
+        "lpn_field_northing_abbr": "N",
+        "lpn_field_easting_abbr": "E",
         "lpn_settings_custom_props": "Custom properties",
         "lpn_settings_custom_props_note": "Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.",
         "lpn_cp_design": "Design",
@@ -1463,6 +1467,38 @@
             }
         },
         "lpn_field_easting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_lat",
+                    "value": "ኬክሮስ",
+                    "english": "Latitude"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "የመጠን ብዜት",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_northing_abbr": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_lat",
+                    "value": "ኬክሮስ",
+                    "english": "Latitude"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "የመጠን ብዜት",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_easting_abbr": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

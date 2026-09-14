@@ -214,10 +214,16 @@ setUnitSet('si');
 	const wx = 40, wy = -25;
 	const east = L.coordText(L.outwardX(wx)), north = L.coordText(L.outwardY(wy));
 	ok('the two coordinates are distinguishable', east !== north, east + ' / ' + north);
-	ok('a projected readout leads with the northing',
+	// **THE STRIP USES THE SHORT PAIR** (Tom, 2026-09-14). Three "label: value" pairs at 11px on
+	// one line, and Northing/Easting spent most of it; the popup keeps the full words. Read from
+	// the keys, never as literals, so a translator's own abbreviation passes too.
+	ok('a projected readout leads with the northing, abbreviated',
 		L.readoutAt(wx, wy) ===
-			PC.lpn_field_northing + ': ' + north + '  ' + PC.lpn_field_easting + ': ' + east,
+			PC.lpn_field_northing_abbr + ': ' + north + '  ' + PC.lpn_field_easting_abbr + ': ' + east,
 		L.readoutAt(wx, wy));
+	ok('...and the short pair really is shorter than the long one',
+		PC.lpn_field_northing_abbr.length < PC.lpn_field_northing.length,
+		PC.lpn_field_northing_abbr + ' vs ' + PC.lpn_field_northing);
 
 	L.reset(L.GEO);
 	L.setCanvas(800, 600);
@@ -242,7 +248,13 @@ setUnitSet('si');
 	L.reset();
 	ok('an unprojected grid says so in words', L.crsName() === PC.lpn_crs_none, L.crsName());
 	L.reset(null, ZONE12N);
-	ok('a projected project is named by its zone', L.crsName() === L.crsLabel(ZONE12N), L.crsName());
+	// **THE NAME AND THE NUMBER** (Tom, 2026-09-14: *"The projection name in the status area
+	// needs to include the EPSG number."*). With 5,346 in the register the name alone stopped
+	// being an identifier -- seven live codes are called "NAD83 / Kentucky North" -- and the
+	// number is what a drawing, a GIS layer and a surveyor's note all carry.
+	ok('a projected project is named by its zone', L.crsName().indexOf(L.crsLabel(ZONE12N)) === 0,
+		L.crsName());
+	ok('...and states its EPSG number', L.crsName().indexOf(ZONE12N) > 0, L.crsName());
 	L.reset(L.GEO);
 	ok('a geographic project names Pseudo-Mercator', /Pseudo-Mercator/.test(L.crsName()), L.crsName());
 
@@ -260,7 +272,9 @@ setUnitSet('si');
 	L.reset(null, ZONE12N);
 	L.refreshMapStatus();
 	ok('#lpn_crs carries the name before the pointer has moved',
-		crsEl.textContent === L.crsLabel(ZONE12N), crsEl.textContent);
+		crsEl.textContent.indexOf(L.crsLabel(ZONE12N)) === 0, crsEl.textContent);
+	ok('...with its number, the same as everywhere else it is named',
+		crsEl.textContent.indexOf(ZONE12N) > 0, crsEl.textContent);
 	ok('#lpn_coords is blank but correctly headed',
 		coordsEl.textContent === L.readoutBlank(), coordsEl.textContent);
 	L.reset();
@@ -290,10 +304,12 @@ setUnitSet('si');
 	L.reset();
 	ok('and it is refused as a projected declaration', L.assignCrs(L.WEBMERC) === false);
 	ok('...leaving the project with no projection at all', L.crsCode() === '');
-	// The status strip's geographic name and the catalogue's are ONE string now.
+	// The status strip's geographic name and the catalogue's are ONE string now -- the strip adds
+	// the EPSG number, and a geographic project has one like any other: it IS EPSG:3857.
 	L.reset(L.GEO);
 	ok('the status strip reads the geographic name out of the catalogue',
-		L.crsName() === L.crsLabel(L.WEBMERC), L.crsName());
+		L.crsName().indexOf(L.crsLabel(L.WEBMERC)) === 0, L.crsName());
+	ok('...and numbers it too', L.crsName().indexOf(L.WEBMERC) > 0, L.crsName());
 }
 
 // ---- 8. WHERE ON THE EARTH A PROJECTION APPLIES -------------------------------------------------

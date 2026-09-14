@@ -346,8 +346,14 @@ console.log('\n--- one home for the concept ---');
 	// opens ON the place the wizard searched for, and that point arrives as an easting and a
 	// northing like any other. **THE y SIDE IS THE ONE THAT BITES** -- inwardY negates, so a
 	// northing that skipped it would draw the world upside down and still look like a map.
-	ok('inwardX has one definition and twenty-two call sites', count(/inwardX\(/g) === 23, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-three call sites', count(/inwardY\(/g) === 24, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR TRAVELLING INTO A PLANE.** goToPoint() is the single door for "take
+	// me to this latitude and longitude", and a projected project answers it by projecting the
+	// point and then bringing it into the local frame like any other outside number. Widening
+	// that door is what put Map > Go to and Map > Search place name back on a projected project
+	// (Tom, 2026-09-14: *"I don't think it's necessary or intentional"* -- it was not; the rows
+	// were written `isGeoProject()` before there was a transform).
+	ok('inwardX has one definition and twenty-three call sites', count(/inwardX\(/g) === 24, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-four call sites', count(/inwardY\(/g) === 25, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
