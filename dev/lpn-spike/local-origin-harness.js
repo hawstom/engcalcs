@@ -301,8 +301,14 @@ console.log('\n--- one home for the concept ---');
 	// what the outward pair answers. It reads the CAMERA, never a stored coordinate, and writes
 	// nothing anywhere -- and it takes the branch only for a geographic project, because a
 	// projected or local view is not a place the outward pair could name.
-	ok('outwardX has one definition and twenty-three call sites', count(/outwardX\(/g) === 24, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-three call sites', count(/outwardY\(/g) === 24, count(/outwardY\(/g));
+	// **TASK 641 PHASE 5 ADDED TWO SITES TO EACH PAIR, AND THEY ARE THE PROJECTED BASEMAP.**
+	// paintBasemapTiles() asks which patch of the Earth the view covers so it knows which tiles to
+	// fetch, and in a PROJECTED project that question can only be answered by handing the plane's
+	// own eastings and northings to the transform -- so the two screen corners go out through this
+	// pair exactly as the geographic branch beside them already did. Reading the camera, writing
+	// nothing.
+	ok('outwardX has one definition and twenty-five call sites', count(/outwardX\(/g) === 26, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-five call sites', count(/outwardY\(/g) === 26, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -327,8 +333,16 @@ console.log('\n--- one home for the concept ---');
 	// each axis ONCE and everything after it is drawing units, so the cost is the honest minimum:
 	// two x edges and two y edges. That refactor was made because THIS COUNT went red, which is the
 	// assertion doing the job it was written for rather than an inconvenience to be re-baselined.
-	ok('inwardX has one definition and eighteen call sites', count(/inwardX\(/g) === 19, count(/inwardX\(/g));
-	ok('inwardY has one definition and nineteen call sites', count(/inwardY\(/g) === 20, count(/inwardY\(/g));
+	// **AND TASK 641 PHASE 5 ADDS FOUR INWARD SITES: THREE TILE CORNERS AND THE ARRIVAL.**
+	// A projected tile is placed from three corners transformed into the plane, and every one of
+	// them is an outside number that has to come through this door -- skipping it would draw the
+	// street map half a million units from the network, which is the defect this whole census
+	// exists to make impossible. The fourth is createProjectFrom(): a new projected project now
+	// opens ON the place the wizard searched for, and that point arrives as an easting and a
+	// northing like any other. **THE y SIDE IS THE ONE THAT BITES** -- inwardY negates, so a
+	// northing that skipped it would draw the world upside down and still look like a map.
+	ok('inwardX has one definition and twenty-two call sites', count(/inwardX\(/g) === 23, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-three call sites', count(/inwardY\(/g) === 24, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
