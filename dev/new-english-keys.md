@@ -77,7 +77,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_cp_design_tip`**
   > One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.
-  @@ NEEDS RULING
+  Rejected. Revise to match design field labels (I notice the characters fields).
 - **`lpn_cp_flag`**
   > {label}: {reason} The value is kept exactly as you typed it.
   _Ruled OK 2026-09-14._
@@ -122,7 +122,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_cp_minlength_tip`**
   > Length lower limit: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.
-  @@ NEEDS RULING
+  OK
 - **`lpn_cp_none`**
   > No custom property is designed yet.
   _Ruled OK 2026-09-14._
@@ -149,10 +149,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_cp_restrict_tip`**
   > Restrict these characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
-  @@ NEEDS RULING
+  OK
 - **`lpn_cp_unnamed`**
   > Not named yet
-  @@ NEEDS RULING
+  OK
 - **`lpn_cp_val_camel`**
   > camelCase
   _Ruled OK 2026-09-14._
@@ -215,7 +215,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled 2026-09-14: OK. And this seems like a duplicate string maybe._
 - **`lpn_crs_place_projected`**
   > A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.
-  @@ NEEDS RULING
+  This is a problem. The projected project needs to open at the place you searched for. We know the lat/lon and zoom level they searched for. That needs to be the initial view of their project.
 - **`lpn_crs_place_tip`**
   > Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.
   _Ruled 2026-09-14: OK. And this seems like a duplicate string maybe._
@@ -245,7 +245,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-09._
 - **`lpn_find_op_empty`**
   > empty
-  @@ NEEDS RULING
+  OK
 - **`lpn_georef_projected`**
   > This project already states a map projection, so its coordinates cannot be placed on the map a second time.
   _Ruled OK 2026-09-14._
@@ -272,10 +272,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_new_coordsys_local`**
   > Local, schematic, or custom
-  @@ NEEDS RULING
+  OK
 - **`lpn_new_coordsys_local_tip`**
-  > Choose this to attach your own background image.
-  @@ NEEDS RULING
+  > Not georeferenced. Attach your own background image or none.
+  Edited
 - **`lpn_new_coordsys_tip`**
   > Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.
   _Ruled OK 2026-09-14._
