@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 106 untranslated keys, of 1869 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read**, of 106 untranslated keys, of 1869 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (106, all ruled)
+## lpn_  (106, 2 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -130,8 +130,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Length lower limit
   _Ruled OK 2026-09-14._
 - **`lpn_cp_minlength_tip`**
-  > Length lower limits: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.
-  _Ruled OK 2026-09-14._
+  > Length lower limit: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.
+  @@ NEEDS RULING
 - **`lpn_cp_none`**
   > No custom property is designed yet.
   _Ruled OK 2026-09-14._
@@ -157,8 +157,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Allow or restrict: The given characters are either the only ones a value may use or the ones it may not use.
   _Ruled OK 2026-09-14._
 - **`lpn_cp_restrict_tip`**
-  > Restrict characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
-  _Ruled OK 2026-09-14._
+  > Restrict these characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
 - **`lpn_cp_val_camel`**
   > camelCase
   _Ruled OK 2026-09-14._
