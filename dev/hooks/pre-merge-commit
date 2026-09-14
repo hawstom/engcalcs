@@ -2,36 +2,34 @@
 # Refuse a merge into master that Tom has not cleared. Installed by dev/hooks/install.sh.
 #
 # **GREEN IS NOT DONE, AND THAT IS THE WHOLE OF WHY THIS EXISTS.** On 2026-09-13 six capability
-# branch merges landed on master in one session, every one of them with check_all.sh passing on the
-# merge result and the pre-push stamp in place. Both existing hooks worked perfectly and neither had
-# anything to say, because neither asks the question that mattered: is the FEATURE finished? Tom:
-# *"Really you should never merge a major branch to master without my all-clear on completion."*
-# `projection` went in with the full projection universe still missing, which he had asked for twice;
-# `custom-property` went in with Allow/Restrict not switching and a date validator that does not
-# validate and that he never asked for. A suite cannot see any of that.
+# merges landed on master in one session, every one with check_all.sh passing and the pre-push stamp
+# in place. Both existing hooks worked perfectly and neither had anything to say, because neither
+# asks the question that mattered: is the FEATURE finished? `projection` went in carrying 183 of
+# 5,346 projections while "We won't deploy with UTM only" was a standing instruction that appeared
+# nowhere in this repository.
 #
-# **IT GATES MERGES, WHICH IS THE DOOR NOTHING WATCHED.** pre-commit refuses a commit on master and
-# pre-push refuses an unverified push; a merge is exempt from the first by construction and passes
-# the second as soon as the suite is re-run. So the one gate on a capability branch was AI judgement,
-# exercised repeatedly, under time pressure, by the same party that wrote the code.
+# **THERE IS NO MERGE_HEAD HERE, AND THE FIRST DRAFT OF THIS HOOK DIED ON THAT.** It read
+# .git/MERGE_HEAD, which git has NOT written when pre-merge-commit runs on a clean merge -- so the
+# hook exited 0 on every real merge and the guard was decorative. It failed OPEN and SILENTLY, the
+# exact pair dev/hooks/install.sh already warns about, and the selftest did not catch it because it
+# drove branch_gate.php directly and never ran a merge. What git DOES give us is GIT_REFLOG_ACTION,
+# which reads "merge <what was named on the command line>".
 #
-# The escape hatch is `git merge --no-verify`, which git provides and this hook cannot take away.
-# That is correct: the hook is here to stop drift, not to stop Tom.
+# **THE CONFLICTED MERGE TAKES A DIFFERENT DOOR ENTIRELY**, which was the other half of the hole:
+# git stops, the human runs `git commit`, and that fires pre-commit -- which exempted merge commits
+# by construction. pre-commit carries this same gate for that path now. Two doors, one decision,
+# and dev/scripts/branch_policy_selftest.php section 9 drives BOTH with real merges.
+#
+# Bypass with `git merge --no-verify`. That is correct: the hook stops drift, not Tom.
 
 root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
-branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-[ "$branch" = "master" ] || exit 0
+[ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "master" ] || exit 0
+[ -f "$root/dev/branch-policy.json" ] || exit 0
 
-policy="$root/dev/branch-policy.json"
-[ -f "$policy" ] || exit 0
-merge_head_file="$(git rev-parse --git-dir)/MERGE_HEAD"
-[ -f "$merge_head_file" ] || exit 0
-merge_sha=$(head -n1 "$merge_head_file")
+# WHAT IS BEING MERGED, from the reflog action git sets for us: "merge projection".
+named=${GIT_REFLOG_ACTION#merge }
+[ "$named" = "$GIT_REFLOG_ACTION" ] && exit 0   # not a merge action: nothing to judge
+merge_sha=$(git rev-parse --verify "$named" 2>/dev/null) || exit 0
 
-# WHAT IS BEING MERGED. MERGE_MSG carries the subject git is about to use, which is where the
-# branch name lives; the sha is the authority for the all-clear pin.
-msg_file="$(git rev-parse --git-dir)/MERGE_MSG"
-subject=$(head -n1 "$msg_file" 2>/dev/null)
-
-php "$root/dev/scripts/branch_gate.php" "$merge_sha" "$subject" || exit 1
+php "$root/dev/scripts/branch_gate.php" "$merge_sha" "merge $named" || exit 1
 exit 0

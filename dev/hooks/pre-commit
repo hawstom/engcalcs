@@ -16,7 +16,21 @@
 
 branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 [ "$branch" = "master" ] || exit 0
-[ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ] && exit 0
+# **A MERGE COMMIT IS NOT WAVED THROUGH ANY MORE; IT IS HANDED TO THE MERGE GATE.** This line used
+# to be a bare `exit 0`, and that was right when the only rule was "no hand-written commit on
+# master". It became a HOLE on 2026-09-13, when merging itself acquired a rule: a CONFLICTED merge
+# never reaches pre-merge-commit at all -- git stops, the human runs `git commit`, and this hook is
+# what fires. So the door that most of a busy session's merges actually go through was the one
+# exempting them. MERGE_HEAD exists here, which is what pre-merge-commit lacks.
+merge_head_file="$(git rev-parse --git-dir)/MERGE_HEAD"
+if [ -f "$merge_head_file" ]; then
+	root=$(git rev-parse --show-toplevel 2>/dev/null)
+	[ -f "$root/dev/branch-policy.json" ] || exit 0
+	msg_file="$(git rev-parse --git-dir)/MERGE_MSG"
+	php "$root/dev/scripts/branch_gate.php" "$(head -n1 "$merge_head_file")" \
+		"$(head -n1 "$msg_file" 2>/dev/null)" || exit 1
+	exit 0
+fi
 
 cat >&2 <<'MSG'
 
