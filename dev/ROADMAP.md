@@ -122,6 +122,23 @@ the block.
   - Read with Task 497 (basemap tiles, `js/lpn-terrain.js`) and CLAUDE.md's third-party section: a
     tile request is consented and gated, and attaching a backdrop must not walk past that gate.
 
+- 75|666| **The tables interface: copy and paste, column widths, and the spreadsheet feel.**
+  Tom, 2026-09-14: *"Tables spreadsheet editing: Copy/paste doesn't work right. We need a
+  tables-interface branch that may be a long-term tweaking project to include column-widths,
+  copy/paste, etc."*
+  - **A capability branch, `tables-interface`, listed in `dev/branch-policy.json`** -- open-ended
+    tweaking against a feel only he can judge is exactly the "done" no suite can report.
+  - **COPY AND PASTE IS THE DEFECT; THE REST IS THE PROGRAMME.** Fix it first rather than let it
+    wait on the long work -- a broken paste is the `data-entry-clerk`'s whole day. Also named the
+    same day: user-resizable columns, headings that do not wrap, columns too wide.
+  - **THE TABLE IS AN EDITOR OF THE DOCUMENT, NOT A GRID**, and that shapes all of it. Cells write
+    through `setProp()` (`scenario_seam_check.php`), a blank is a STATE not a zero where a column
+    declares `blank`, and `multiGroups()` builds the multi-properties box from these same specs.
+    So a paste is a batch of validated property writes under one undo snapshot; getting that
+    wrong is silent inside a scenario.
+  - **Shares the bottom pane's tab strip with `custom-property` and `graph`**, and `custom-property`
+    adds columns too. Name the seam in any brief, or sequence them.
+
 - 75|665| **Make draggable and resizable the standard for a standing box.**
   Tom, 2026-09-13: *"All boxes are better if they are draggable and resizeable. Can we just say that
   is standard?"* **The interface-designer seat says yes, conditionally, and supplied the condition as

@@ -20,7 +20,8 @@
         "customer",
         "graph",
         "projection",
-        "custom-property"
+        "custom-property",
+        "tables-interface"
     ],
     "freeze": {
         "active": false,
