@@ -55,6 +55,11 @@ const L = loadLoopedNetwork(
 	"\t\trefreshBasemap: refreshBasemap,\n" +
 	"\t\ttiles: function () { return Array.prototype.slice.call(basemapLayer.children || []); },\n" +
 	"\t\tinwardX: inwardX, inwardY: inwardY, outwardX: outwardX, outwardY: outwardY,\n" +
+	// The DEM controls' own gate, and the two functions that turn nodes into places for it.
+	"\t\tlocatable: projectLocatable, nodeLonLat: nodeLonLat,\n" +
+	"\t\tterrainPoints: terrainPointsForIds, terrainNeeding: terrainNodesNeedingElevation,\n" +
+	"\t\tdemOffered: function () { return projectLocatable() && !!mapboxToken()\n" +
+	"\t\t\t&& !!EngCalcs.lpnTerrainFillFor; },\n" +
 	"\t\tcreateProjectFrom: createProjectFrom,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -234,6 +239,60 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			!!v && Math.hypot(v.cx, v.cy) > 1000, v ? Math.hypot(v.cx, v.cy).toFixed(0) : '');
 		ok('...and the world map is under it', L.tiles().length > 0,
 			before + ' -> ' + L.tiles().length + ' tiles');
+	}
+
+	head('10. The DEM elevation controls are offered too');
+	// Tom, 2026-09-14: *"A new project with a projection doesn't offer the DEM elevation
+	// buttons."* The basemap gate was widened and this one was not -- four copies of
+	// `isGeoProject() && mapboxToken()` that did not move together -- so a projected project drew
+	// the world map and then refused to read heights off the very same tiles. One predicate now.
+	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.test';
+	global.EngCalcs.lpnTerrainFillFor = global.EngCalcs.lpnTerrainFillFor || function () {};
+	{
+		L.newProject(null, ZONE12N);
+		L.setCanvas(W, H);
+		L.setMapSized();
+		ok('a projected project can say where on the Earth it is', L.locatable());
+		ok('...so the DEM controls are offered', L.demOffered());
+
+		// **AND THE POINTS HANDED TO THE SERVER ARE REAL PLACES, not eastings wearing a
+		// longitude's name.** This is the failure that would have shipped a working-looking
+		// button: 400179 is a fine number and a meaningless longitude.
+		const want = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+		const n = L.addNode('junction', L.inwardX(want.x), L.inwardY(want.y));
+		const pts = L.terrainPoints([n.id]);
+		ok('one node, one point', pts.length === 1, JSON.stringify(pts));
+		ok('...at the longitude and latitude it was built from',
+			Math.abs(pts[0].lon - PHOENIX.lon) < 1e-6 && Math.abs(pts[0].lat - PHOENIX.lat) < 1e-6,
+			pts[0].lon.toFixed(6) + ', ' + pts[0].lat.toFixed(6));
+		ok('...and it is a plausible place, not an easting in disguise',
+			Math.abs(pts[0].lon) <= 180 && Math.abs(pts[0].lat) <= 90);
+		// A new node is born with the default elevation, so it is NOT missing one. Clearing it is
+		// what "I have not typed this yet" looks like to terrainHasElev(), and it is the state
+		// the whole fill feature exists for.
+		delete n.elev;
+		const need = L.terrainNeeding();
+		ok('a node with no elevation is offered to the filler',
+			need.some((q) => q.id === n.id), String(need.length) + ' needing');
+		ok('...at its real place too',
+			need.length > 0 && Math.abs(need[0].lon - PHOENIX.lon) < 1e-6,
+			need.length ? need[0].lon.toFixed(6) : '');
+	}
+
+	head('11. ...and a project that cannot be located is still refused');
+	{
+		const CAT2 = JSON.parse(require('fs').readFileSync(
+			path.join(ROOT, 'js', 'data', 'epsg-projected.json'), 'utf8'));
+		const none = CAT2.crs.map((r) => r[0]).filter((c) => !DEFS.defs[c])[0];
+		L.newProject(null, 'EPSG:' + none);
+		L.setCanvas(W, H);
+		L.setMapSized();
+		ok('a CRS with no transform cannot be located', L.locatable() === false);
+		ok('...so the DEM controls stay hidden rather than failing on a press',
+			L.demOffered() === false);
+		const n2 = L.addNode('junction', 10, 10);
+		ok('...and no node is offered to the terrain server', L.terrainPoints([n2.id]).length === 0);
+		ok('...nor does nodeLonLat invent a place for it', L.nodeLonLat(n2) === null);
 	}
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall projected-basemap checks passed');
