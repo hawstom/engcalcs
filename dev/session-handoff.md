@@ -708,3 +708,41 @@ will not be translated."* **Ask him; do not infer.**
 the cursor colour change is wanted now that objects carry `pointer`), Task 665 (the draggable-box
 standard), and whether custom properties should appear in symbology -- **ask Sue about that last one
 and record the answer in her hopper, per his instruction.**
+
+---
+
+## 8. 2026-09-14 — THE EIGHT STRANDED SHELLS, AND THE GUARD THAT NOW STOPS THEM
+
+**STATE, perishable:** branch `waiter-deadlock` is pushed at `465d6724` and is **NOT merged**,
+because master is frozen. It is an ordinary tooling track, not a capability branch, so it needs no
+all-clear -- only the freeze lifting. `check_all.sh` passed on it; re-run on the MERGE RESULT, which
+is a different tree.
+
+**TRAP, permanent and measured here.** Tom found Claude Code refusing to exit, reporting eight
+shells running. They were background wait loops from a session whose work had finished 10 hours
+earlier, all sleeping at 0.0% CPU. His words: *"Claude Code doesn't want to exit. It tells me things
+are running. And there are 8 shells, whatever that means."* Two bugs, and neither is visible while
+you are typing the loop:
+
+1. **A self-matching `pgrep`** (three of the eight). `until ! pgrep -f "run_harnesses.sh"` never
+   exits: the shell running the loop has that string in its OWN command line, so pgrep finds itself.
+   Bracket the first character -- `[r]un_harnesses.sh` matches the same processes and not this one.
+2. **An unreachable sentinel** (the other five). `until grep -q "^EXIT=" out` never exits if the
+   watched job was KILLED, because nothing then writes the marker. Those five waited on files that
+   read `[exited with code 144]`.
+
+**It is a guard now, not this paragraph.** `.claude/hooks/guard-wait-loops.php` refuses both shapes
+before the command runs; `dev/scripts/wait_for.sh` is the bounded waiter it points at;
+`dev/scripts/reap_stale_waiters.sh` clears strays. **The guard is in `.claude/` and not in
+`dev/scripts/` because it HAD to be** -- the defect is a command typed at runtime and never
+committed, so nothing reading files in this repository can ever see it.
+
+**THE HOOK NEEDS A CLAUDE CODE RESTART TO TAKE EFFECT**, since `.claude/settings.json` is read at
+startup. Until the next session starts, the guard is committed but not live. Delete this sentence
+once a session has started with it in place.
+
+**AND THE LESSON THAT IS NOT ABOUT SHELLS:** mutation testing found a hole in the guard's own
+selftest. All three self-matching fixtures were ALSO unbounded, so the second detector caught them
+and neutering the first one still passed. A detector whose every fixture is also caught by a
+different detector can die in silence. The selftest now carries a self-matching loop that IS
+bounded, which only the first detector can fail.
