@@ -25,7 +25,8 @@
             "raised": "before the projection branch was created",
             "words": "We won't deploy with UTM only.",
             "restated": "Tom, 2026-09-13: 'When are we going to add the full universe of projections? We can't release without it, and I would like to test with it.'",
-            "state": "183 of 5,346 live projected CRS are offered (UTM, a few national grids). dev/projection-catalogue.md has the numbers: the full register is 336 KB raw / 79 KB gzipped as data alone, needs no transform and no proj4js, and is redistributable under the IOGP terms with one attribution line.",
+            "state": "ADDRESSED 2026-09-14, AWAITING TOM'S WORD. All 5,346 live projected CRS now ship in js/data/epsg-projected.json (343 KB raw, 79 KB gzipped), generated from PROJ's own build of EPSG v12.029 out of a PyPI wheel pinned by sha256, and fetched when the projection chooser first opens. State Plane, every national grid and every regional UTM are in it. The 183 hand-typed rows remain as the offline fallback, and projection_catalogue_check.php holds all 182 of them against the register's own names -- every one agreed on the day it landed. What is still NOT possible is anything needing a transform: a basemap, terrain, the initial view of a projected project, the point scale factor. dev/projection-catalogue.md section 2 draws that line and section 7 is the warning against reading a row count as progress.",
+            "state_note": "THIS ENTRY STAYS OPEN UNTIL TOM SAYS OTHERWISE. He asked to TEST with the full universe, and he has not yet. 'Closing one is Tom's word, recorded in closed_by, never an AI's judgement that the work looks sufficient' -- this file's own rule, and the whole reason it exists.",
             "closed_by": null
         }
     ]

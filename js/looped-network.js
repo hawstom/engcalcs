@@ -3047,6 +3047,92 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
+	// ---- THE FULL REGISTER, FETCHED (ROADMAP Task 641 phase 4) ----------------------------------
+	//
+	// **EVERYTHING ABOVE IS NOW THE FALLBACK, NOT THE CATALOGUE.** Tom, 2026-09-13 and again on
+	// 09-14, and it is a release blocker in his own words: *"When are we going to add the full
+	// universe of projections? We can't release without it, and I would like to test with it."*
+	// 183 hand-typed rows were an honest partial and they are not what he asked for.
+	//
+	// **THE WHOLE UNIVERSE IS DATA, AND THAT IS THE ONLY REASON THIS IS CHEAP.** A projected
+	// project in this suite converts nothing -- it holds the user's own eastings and northings and
+	// states what they are called -- so the register only has to give a NAME and a lon/lat AREA OF
+	// USE. Both are data; neither is a transform. 5,346 live projected CRS are 343 KB raw and
+	// 79 KB gzipped, which is a third of the Bootstrap stylesheet this suite already ships, and
+	// they cost ZERO strings in 26 languages because a projection's name is not a language key.
+	// What this does NOT unlock is everything gated on a transform -- a basemap, terrain, the
+	// initial view of a projected project, the point scale factor. dev/projection-catalogue.md
+	// section 2 draws that line, and section 7 is the warning against reading a row count as
+	// progress: a bigger catalogue makes a projected project CORRECTLY NAMED, not more useful.
+	//
+	// **FETCHED WHEN THE CHOOSER FIRST OPENS, NEVER AT PAGE LOAD**, and never precached by the
+	// service worker. It is dead weight on every visitor who never opens the box, and the box is
+	// opened about once per project. Same origin -- this is our own file, so it is not a
+	// third-party request and asks nobody's consent.
+	//
+	// **AND THE BUILT-IN TABLE STAYS, AS THE ANSWER WHEN THE FETCH FAILS.** Same shape the EPANET
+	// engine already has: a rich path and a working one, so the chooser is never empty and a fork
+	// with no network still has UTM. Two catalogues of one thing is the arrangement that drifts,
+	// so projection_catalogue_check.php holds all 182 built-in rows against the register's own
+	// names on every commit -- js_fallback_string_check.php's finding in another construct.
+	var LPN_CRS_REGISTER = null;      // code -> [code, name, w, s, e, n]
+	var LPN_CRS_REG_LIST = null;      // [{ code, name }] in register order, the chooser's list
+	var LPN_CRS_REG_CREDIT = '';      // the IOGP acknowledgement their terms require
+	var crsRegisterState = 'idle';    // idle | loading | ready | failed
+	var crsRegisterWaiting = [];      // callers who arrived while a load was already in flight
+	function crsRegisterReady() { return crsRegisterState === 'ready' && !!LPN_CRS_REG_LIST; }
+	function crsRegisterCredit() { return crsRegisterReady() ? LPN_CRS_REG_CREDIT : ''; }
+	function crsRegisterSettle(state) {
+		crsRegisterState = state;
+		var waiting = crsRegisterWaiting, i;
+		crsRegisterWaiting = [];
+		for (i = 0; i < waiting.length; i++) { waiting[i](); }
+	}
+	// **`done` IS CALLED HOWEVER THIS ENDS, INCLUDING FOR A CALLER WHO ARRIVED MID-FLIGHT**, so a
+	// caller never has to know whether it is the first one. The mid-flight case is not theoretical
+	// and is not rare: the box can be closed and reopened while the 343 KB is still arriving, and
+	// the version of this that simply returned when the state was already 'loading' DROPPED that
+	// caller's callback -- so the second opening kept the 183 rows for ever, with no error
+	// anywhere. dev/lpn-spike/projection-harness.js found it by being the second caller.
+	function crsRegisterLoad(done) {
+		var cb = (typeof done === 'function') ? done : function () {};
+		if (crsRegisterState === 'ready' || crsRegisterState === 'failed') { cb(); return; }
+		if (crsRegisterState === 'loading') { crsRegisterWaiting.push(cb); return; }
+		crsRegisterState = 'loading';
+		crsRegisterWaiting.push(cb);
+		// suiteUrl() is the ONE door for a suite address from JavaScript, and it is not optional
+		// here: '/app/' is a REWRITE, so a relative 'js/data/…' resolves against it and 404s on
+		// librewaternet.org while working perfectly on hawsedc.com. js_page_url_check.php holds it.
+		fetch(suiteUrl('js/data/epsg-projected.json'), { credentials: 'same-origin' })
+			.then(function (r) {
+				if (!r.ok) { throw new Error('HTTP ' + r.status); }
+				return r.json();
+			})
+			.then(function (doc) {
+				var rows = (doc && doc.crs) || [], map = {}, list = [], i, r;
+				if (!rows.length) { throw new Error('no rows'); }
+				for (i = 0; i < rows.length; i++) {
+					r = rows[i];
+					// A malformed row is SKIPPED rather than failing the load: a chooser missing
+					// one projection is a smaller harm than a chooser that will not open, and the
+					// committed file's shape is held by a blocking check anyway.
+					if (!r || r.length !== 6 || !r[0] || !r[1]) { continue; }
+					map['EPSG:' + r[0]] = r;
+					list.push({ code: 'EPSG:' + r[0], name: r[1] });
+				}
+				if (!list.length) { throw new Error('no usable rows'); }
+				LPN_CRS_REGISTER = map;
+				LPN_CRS_REG_LIST = list;
+				LPN_CRS_REG_CREDIT = String((doc && doc.attribution) || 'EPSG Dataset © IOGP');
+				crsRegisterSettle('ready');
+			})
+			.catch(function () {
+				// No message and no dialog. The built-in 183 are a working catalogue, not a
+				// degraded one, and a visitor who never wanted a State Plane zone should not be
+				// told that something they did not ask for did not arrive.
+				crsRegisterSettle('failed');
+			});
+	}
 	function crsFamilyFor(n) {
 		var i, f;
 		for (i = 0; i < LPN_CRS_FAMILIES.length; i++) {
@@ -3060,6 +3146,14 @@ var EngCalcs = EngCalcs || {};
 		var out = [], i, f, z;
 		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
 		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
+		// The register, once it is here. Pseudo-Mercator is already first and is a live projected
+		// CRS like any other, so it is skipped rather than offered twice.
+		if (crsRegisterReady()) {
+			for (i = 0; i < LPN_CRS_REG_LIST.length; i++) {
+				if (LPN_CRS_REG_LIST[i].code !== LPN_CRS_WEBMERC) { out.push(LPN_CRS_REG_LIST[i]); }
+			}
+			return out;
+		}
 		for (i = 0; i < LPN_CRS_FAMILIES.length; i++) {
 			f = LPN_CRS_FAMILIES[i];
 			for (z = f.first; z <= f.last; z++) {
@@ -3107,6 +3201,14 @@ var EngCalcs = EngCalcs || {};
 			return { w: -180, e: 180, s: -LPN_MERC_MAX_LAT, n: LPN_MERC_MAX_LAT };
 		}
 		if (!/^EPSG:[0-9]+$/.test(c)) { return null; }
+		// THE REGISTER'S OWN BOX WINS over anything derived here, and for a reason worth stating:
+		// the family table rounds a band OUTWARD across all of a family's zones, because one row
+		// has to cover sixty of them. The register states a box per CRS. Where we have the real
+		// one, the approximation has nothing to offer.
+		if (crsRegisterReady() && LPN_CRS_REGISTER[c]) {
+			f = LPN_CRS_REGISTER[c];
+			return { w: f[2], e: f[4], s: f[3], n: f[5] };
+		}
 		f = crsSingle(c);
 		if (f) { return { w: f.w, e: f.e, s: f.s, n: f.n }; }
 		n = parseInt(c.slice(5), 10);
@@ -23379,6 +23481,12 @@ var EngCalcs = EngCalcs || {};
 				? (pc.lpn_crs_noview || 'No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.')
 				: (pc.lpn_crs_count || '{n} of {total} projections listed.')
 					.replace('{n}', String(list.length)).replace('{total}', String(total));
+			// **THE ACKNOWLEDGEMENT THE IOGP TERMS REQUIRE, AND IT IS NOT A LANGUAGE KEY** -- the
+			// same rule as the OpenStreetMap and Nominatim credits: it names an owner rather than
+			// saying anything, and it is the condition on which we may transmit their dataset at
+			// all. It appears only while the register is the thing being listed, because the
+			// built-in 183 rows are our own hand-typed table and credit nobody.
+			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -23465,6 +23573,15 @@ var EngCalcs = EngCalcs || {};
 		if (nameEl) { nameEl.value = ''; }
 		if (viewEl) { viewEl.checked = true; }
 		renderCrsBoxList();
+		// **THE FETCH STARTS HERE AND THE BOX DOES NOT WAIT FOR IT.** The list is already drawn
+		// from the built-in table, so the box opens at once and grows to the full register when it
+		// arrives; the callback re-renders, and renderCrsBoxList() keeps the current choice across
+		// a rebuild wherever the filters still admit it. A failure is silent and leaves the 183.
+		crsRegisterLoad(function () {
+			// Only if the box is still the one on screen -- a load that lands after the user has
+			// closed it must not repaint a hidden panel.
+			if (crsBoxEl() && crsBoxEl().style.display === 'block') { renderCrsBoxList(); }
+		});
 		box.style.display = 'block';
 		raisePanel(box);
 		h = fitPanelToViewport(box);

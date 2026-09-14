@@ -233,6 +233,7 @@ run_check "social card image"            blocking php dev/scripts/social_card_ch
 # package.json agrees with what is committed. js/vendor/README.md documented all this in prose and
 # nothing checked it, so the record and the bytes were free to drift apart in silence (Task 413).
 run_check "vendored code integrity"      blocking php dev/scripts/vendor_integrity_check.php
+run_check "projection catalogue"         blocking php dev/scripts/projection_catalogue_check.php
 # Task 184 x Task 248. setProp() is the ONE write seam for an overridable property; a call site that
 # writes el._diameter directly edits BASE from inside a scenario, silently, under every other
 # scenario at once. That is not hypothetical -- the valve popup did it on five fields, and the two
@@ -424,6 +425,13 @@ run_check "screenshot publication"       advisory php dev/scripts/screenshot_pub
 run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_check.php
 run_check "git hooks installed"          blocking php dev/scripts/hook_install_check.php
 run_check "branch policy selftest"       blocking php dev/scripts/branch_policy_selftest.php
+# A BACKGROUND WAIT LOOP THAT CANNOT FINISH. Eight of them were left sleeping on 2026-09-13 and
+# were still there ten hours later; the only symptom Tom could see was that Claude Code would not
+# exit. The guard lives in .claude/hooks/ rather than here because the defect never reaches this
+# repository -- it is a command a session types at runtime -- so a PreToolUse hook is the only place
+# it is visible before it runs. Blocking, and the selftest is the point: a guard that only speaks
+# when it refuses is, once it has silently broken, indistinguishable from one nobody has tripped.
+run_check "wait guard selftest"          blocking php dev/scripts/wait_guard_selftest.php
 run_check "branch hygiene"             advisory php dev/scripts/branch_hygiene_check.php
 run_check "nested repo boundary"      advisory php dev/scripts/nested_repo_boundary_check.php
 # Task 322. This line used to pipe the report through `grep -q "^CHANGED"`, so the NOTE it printed
