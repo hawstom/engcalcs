@@ -193,6 +193,68 @@ if ($renamed) {
         . "      another construct.\n        " . implode("\n        ", array_slice($renamed, 0, 5));
 }
 
+// ---- 7. the proj4 definitions beside it ---------------------------------------------------------
+// **THE TRANSFORM HALF, AND THIS CHECK HOLDS ONLY WHAT AN OFFLINE READ CAN.** Whether the
+// definitions are RIGHT is dev/lpn-spike/projection-defs-harness.js's question, and it needs
+// js/vendor/proj4.js to answer it. What is asked here is the pair of things a harness would not
+// notice: that the file is intact since it was committed, and that it was generated from the same
+// register as the catalogue beside it. Two data files built from different EPSG releases would
+// each be internally consistent and would disagree about which codes exist.
+$defsEntry = null;
+foreach ($manifest['data'] as $d) {
+    if (isset($d['path']) && $d['path'] === 'js/data/epsg-proj4.json') { $defsEntry = $d; break; }
+}
+if ($defsEntry === null) {
+    $fail[] = "no manifest entry for js/data/epsg-proj4.json.\n"
+        . "      The definitions are third-party data and are recorded like the catalogue.";
+} else {
+    $defsPath = $root . '/js/data/epsg-proj4.json';
+    if (!is_readable($defsPath)) {
+        $fail[] = "js/data/epsg-proj4.json is missing. Regenerate it:\n"
+            . "      see the header of dev/scripts/generate_projection_defs.js";
+    } else {
+        $draw = file_get_contents($defsPath);
+        $ddig = base64_encode(hash('sha384', $draw, true));
+        if ($ddig !== $defsEntry['digest']) {
+            $fail[] = "digest mismatch for js/data/epsg-proj4.json\n"
+                . "      manifest: " . $defsEntry['digest'] . "\n"
+                . "      on disk:  " . $ddig . "\n"
+                . "      Regenerated deliberately? Update the digest and 'rows' beside it.\n"
+                . "      Otherwise somebody hand-edited a generated file -- revert it.";
+        }
+        $ddoc = json_decode($draw, true);
+        if (!is_array($ddoc) || !isset($ddoc['defs']) || !is_array($ddoc['defs'])) {
+            $fail[] = "js/data/epsg-proj4.json is not valid JSON with a 'defs' object";
+        } else {
+            $dn = count($ddoc['defs']);
+            if (isset($ddoc['count']) && $ddoc['count'] !== $dn) {
+                $fail[] = "the definitions file says count=" . $ddoc['count'] . " and holds $dn";
+            }
+            if (isset($defsEntry['rows']) && $defsEntry['rows'] !== $dn) {
+                $fail[] = "the manifest says " . $defsEntry['rows'] . " definitions and the file holds $dn";
+            }
+            if (isset($ddoc['epsg_version'], $doc['epsg_version'])
+                    && $ddoc['epsg_version'] !== $doc['epsg_version']) {
+                $fail[] = "the two projection data files came from DIFFERENT EPSG releases:\n"
+                    . "      catalogue " . $doc['epsg_version'] . ", definitions " . $ddoc['epsg_version'] . ".\n"
+                    . "      Regenerate both from one proj.db; they disagree about which codes exist.";
+            }
+            $orphan = array();
+            foreach (array_keys($ddoc['defs']) as $dc) {
+                if (!isset($byCode[(int)$dc])) { $orphan[] = $dc; }
+            }
+            if ($orphan) {
+                $fail[] = count($orphan) . " definitions name a CRS the catalogue does not list ("
+                    . implode(', ', array_slice($orphan, 0, 6)) . ").\n"
+                    . "      A transform nothing can choose, which means the two files disagree.";
+            }
+            if (empty($ddoc['attribution'])) {
+                $fail[] = "js/data/epsg-proj4.json states no attribution; the IOGP terms require it.";
+            }
+        }
+    }
+}
+
 // ---- report --------------------------------------------------------------------------------------
 if ($note) { foreach ($note as $t) { echo "  note: $t\n"; } }
 if ($fail) {
@@ -201,8 +263,9 @@ if ($fail) {
     exit(1);
 }
 printf(
-    "projection catalogue OK: %d live projected CRS, EPSG %s (%s), %d built-in fallbacks all resolve\n",
-    $n, isset($doc['epsg_version']) ? $doc['epsg_version'] : '?',
+    "projection catalogue OK: %d live projected CRS, %d with a transform, EPSG %s (%s), %d built-in fallbacks all resolve\n",
+    $n, (isset($ddoc['defs']) && is_array($ddoc['defs'])) ? count($ddoc['defs']) : 0,
+    isset($doc['epsg_version']) ? $doc['epsg_version'] : '?',
     isset($doc['epsg_date']) ? $doc['epsg_date'] : '?', count($builtIn)
 );
 exit(0);
