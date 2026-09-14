@@ -1136,11 +1136,21 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<legend><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_new_coordsys_tip'])?></legend>
 			<div>
 				<label><input type="radio" name="lpn_new_coords" value="geo"> <?=ecTipLabel($ec_lang['lpn_new_coordsys_geo'], $ec_lang['lpn_new_coordsys_geo_tip'])?></label>
-				<?php // THE CHOOSER, and its LABEL IS THE ANSWER -- the projection now in force, with the
-				      // "..." this page spends on "opens a box". One control that both states the choice
-				      // and changes it, rather than a select beside a button: the catalogue is 121 rows
-				      // long and a bare dropdown of it is the thing the box exists to filter. ?>
-				<button type="button" id="lpn_new_crs_pick" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_crs']))?>"></button>
+				<?php // THE CHOOSER IS AN ELLIPSIS BUTTON AND THE ANSWER SITS BESIDE IT (Tom, 2026-09-14:
+				      // *"The button is not a good place for the full projection name. How about an
+				      // ellipsis button followed by the name?"*). It used to be one control doing both
+				      // jobs -- the button's own label was the projection -- and a button that changes
+				      // width every time you use it is a button that moves under the pointer. Register
+				      // names run to 50 characters and there are 5,346 of them now, which is what turned
+				      // a tidy idea into a stretched control.
+				      //
+				      // Still ONE thing to press, and the "..." is this page's own spelling of "opens a
+				      // box". The name is TEXT, not a second control: nothing to click, nothing to tab
+				      // to, and it can wrap without dragging the button with it. The button names the
+				      // projection through aria-describedby, so a screen reader still hears what it
+				      // would be changing rather than a bare ellipsis. ?>
+				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_crs']))?>">&hellip;</button>
+				<span id="lpn_new_crs_name" class="lpn-new-crs-name"></span>
 			</div>
 			<div>
 				<label><input type="radio" name="lpn_new_coords" value="local" checked> <?=ecTipLabel($ec_lang['lpn_new_coordsys_local'], $ec_lang['lpn_new_coordsys_local_tip'])?></label>

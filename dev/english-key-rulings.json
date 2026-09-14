@@ -152,9 +152,9 @@
             "answer": "OK"
         },
         "lpn_cp_design_tip": {
-            "on": "One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
+            "on": "One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
             "ruled": "2026-09-14",
-            "answer": "OK"
+            "answer": "Rejected. Revise to match design field labels (I notice the characters fields)."
         },
         "lpn_cp_edit_tip": {
             "on": "Opens the design of this custom property, where every part of it is shown at full length.",
@@ -237,9 +237,9 @@
             "answer": "Edited."
         },
         "lpn_cp_minlength_tip": {
-            "on": "Length lower limits: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.",
+            "on": "Length lower limit: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.",
             "ruled": "2026-09-14",
-            "answer": "Edited."
+            "answer": "OK"
         },
         "lpn_cp_none": {
             "on": "No custom property is designed yet.",
@@ -282,9 +282,14 @@
             "answer": "Edited."
         },
         "lpn_cp_restrict_tip": {
-            "on": "Restrict characters: A value may use only the characters listed here, or none of them, where \"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+            "on": "Restrict these characters: A value may use only the characters listed here, or none of them, where \"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
             "ruled": "2026-09-14",
-            "answer": "Edited."
+            "answer": "OK"
+        },
+        "lpn_cp_unnamed": {
+            "on": "Not named yet",
+            "ruled": "2026-09-14",
+            "answer": "OK"
         },
         "lpn_cp_val_camel": {
             "on": "camelCase",
@@ -385,6 +390,11 @@
             "on": "Place name search",
             "ruled": "2026-09-14",
             "answer": "OK. And this seems like a duplicate string maybe."
+        },
+        "lpn_crs_place_projected": {
+            "on": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.",
+            "ruled": "2026-09-14",
+            "answer": "This is a problem. The projected project needs to open at the place you searched for. We know the lat/lon and zoom level they searched for. That needs to be the initial view of their project."
         },
         "lpn_crs_place_tip": {
             "on": "Type a town, an address, or a landmark, and the map view moves there. The words you type go to OpenStreetMap’s place-name service, which asks your permission the first time. A new geographic project also starts at the place you find here.",
@@ -1088,6 +1098,11 @@
             "on": "no links at node",
             "ruled": "2026-08-29"
         },
+        "lpn_find_op_empty": {
+            "on": "empty",
+            "ruled": "2026-09-14",
+            "answer": "OK"
+        },
         "lpn_find_prop_connection": {
             "on": "Connection",
             "ruled": "2026-08-29"
@@ -1679,14 +1694,14 @@
             "answer": "OK"
         },
         "lpn_new_coordsys_local": {
-            "on": "Local, schematic, custom, or georeference later",
+            "on": "Local, schematic, or custom",
             "ruled": "2026-09-14",
             "answer": "OK"
         },
         "lpn_new_coordsys_local_tip": {
-            "on": "Choose this to attach your own background image or the world map or adjust the attachment at any time from the Map menu.",
+            "on": "Not georeferenced. Attach your own background image or none.",
             "ruled": "2026-09-14",
-            "answer": "OK"
+            "answer": "Edited"
         },
         "lpn_new_coordsys_tip": {
             "on": "Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.",

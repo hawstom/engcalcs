@@ -1622,7 +1622,7 @@ $ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. 
 $ec_lang['lpn_new_coordsys_geo']='Geographic projection';
 $ec_lang['lpn_new_coordsys_geo_tip']='Select a geographic projection. Use WGS 84 / Pseudo-Mercator EPSG:3857 for Lat/Lon.';
 $ec_lang['lpn_new_coordsys_local']='Local, schematic, or custom';
-$ec_lang['lpn_new_coordsys_local_tip']='Choose this to attach your own background image.';
+$ec_lang['lpn_new_coordsys_local_tip']='Not georeferenced. Attach your own background image or none.';
 // ---- THE GEOGRAPHIC PROJECTION BOX -----------------------------------------------------------
 // Tom's summary: it "uses the map view as a UX element to filter the universe of projections to the
 // ones applicable to the project (view). Lets the user filter by name and select a projection at
@@ -2376,7 +2376,7 @@ $ec_lang['lpn_settings_custom_props']='Custom properties';
 // of what a reader needs before opening the design table.
 $ec_lang['lpn_settings_custom_props_note']='Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.';
 $ec_lang['lpn_cp_design']='Design';
-$ec_lang['lpn_cp_design_tip']='One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.';
+$ec_lang['lpn_cp_design_tip']='One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or restrict, the characters field named by that choice, Length lower limit, Length upper limit, Low limit, High limit.';
 $ec_lang['lpn_cp_add']='Add custom property';
 $ec_lang['lpn_cp_add_tip']='Adds a row to the design table and opens it for editing.';
 $ec_lang['lpn_cp_remove']='Remove';
