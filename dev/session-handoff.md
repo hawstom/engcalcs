@@ -1,16 +1,43 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-08 (fourth session)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-14 (sixth session)
 
-**Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of one
-unusually dense day and it goes stale fast: everything below is either a RULING Tom made (permanent
-until he changes it), a TRAP measured on this tree (permanent), or a STATE (perishable, and dated so
-you can tell). Delete a state line once you have checked it and it is no longer news.
+## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-14.
+
+**MASTER IS FROZEN.** `dev/branch-policy.json`, `freeze.active = true`, until after EWB on
+**17 September** (not the 16th; this repository said 16 in six places and was wrong). Tom,
+2026-09-13: *"We do want to continue development right through the EWB meeting, but we can't do that
+if we are merging our work to master."* Development continues on branches. **Merging does not.**
+
+**YOU MAY NOT MERGE A CAPABILITY BRANCH ON YOUR OWN JUDGEMENT, EVER.** Tom: *"Really you should
+never merge a major branch to master without my all-clear on completion."* `customer`, `graph`,
+`projection` and `custom-property` are declared in `dev/branch-policy.json`; an all-clear goes in
+`dev/branch-all-clears.json` in his words, pinned to the commit, and lapses by itself when the
+branch moves. **`dev/hooks/pre-merge-commit` and `pre-commit` now refuse both merge paths** -- but
+a guard is not an excuse to stop thinking, and the first version of that guard was DEAD for a day.
+
+**THERE IS AN OPEN DEPLOY BLOCKER.** `dev/deploy-blockers.json`: `projection` cannot ship with UTM
+only. 183 of 5,346 projections are offered. Tom said *"We won't deploy with UTM only"* before that
+branch existed, and **that sentence appeared nowhere in this repository** -- which is why the
+register now exists. **A constraint that lives only in a transcript does not exist. Write it down in
+the turn he says it.**
+
+**WHY ALL THREE OF THOSE ARE HERE:** on 2026-09-13 six capability merges landed on master in one
+session, every one of them green, two of them unfinished in ways only Tom could see, against his own
+plan in §5 of this file. **The session that did it had not read this file.** That is the whole root
+cause. Read it.
 
 ---
 
-## 0. IF YOU READ ONE SECTION, READ §6 — it is 2026-09-10 and newer than everything else
+**Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of dense days
+and it goes stale fast: everything below is either a RULING Tom made (permanent until he changes
+it), a TRAP measured on this tree (permanent), or a STATE (perishable, and dated so you can tell).
+Delete a state line once you have checked it and it is no longer news.
+
+---
+
+## 0. IF YOU READ ONE SECTION, READ §7 — it is 2026-09-14 and newer than everything else
 
 The file is append-only by design: §1-§3c are 2026-09-05 to 09-06, §4/§4b are 09-09, §4c and §5 are
-09-10 morning, and **§6 is the current state.** Where an older section disagrees with a newer one,
+09-10 morning, and **§7 is the current state.** Where an older section disagrees with a newer one,
 the newer wins and says so.
 **Every count in here is stale by construction. Read counts from the scripts.**
 
@@ -641,3 +668,43 @@ failure paints). The amplifier is fixed, so if it fires again the symptom is now
 see rather than a blue wall -- **that is the same bug wearing a survivable face, and it should be
 reported, not shrugged at.** What it still needs is a CPU-throttled spec so first paint can beat
 `publishScaleSizes()`.
+
+---
+
+## 7. 2026-09-14 — WHAT THE LAST SESSION DID, AND WHAT IT BROKE
+
+**STATE, all of it perishable. master is `97d72188`, green and pushed. EWB is 17 September.**
+
+**SHIPPED AND ON MASTER** (Tasks 627, 628, 636, 638, 641, 652, 658, 660 and the cursor): the
+unreadable-document third state; view validation at `applySaved()`; custom properties with a key
+line and an expander; node and link chemical symbology; project CRS with a projection chooser; the
+reaction rate read out of EPANET's own binary output; a guard on `setPointerCapture()`; and the map
+cursor at `default` with objects at `pointer`.
+
+**KNOWN BROKEN, REPORTED BY TOM AFTER THOSE MERGES, NOT YET FIXED:**
+1. **Custom property `Restrict these characters` never switches to Allow.** It stays on Restrict.
+2. **Date and time validation does not validate** -- a 13th month passes. **He never asked for it.**
+   His instruction: make it work or REMOVE it. Removing is the honest default; it was invented.
+3. **Initial quality is in no Table and no multi-properties.** His words: *"Embarrassing, and we are
+   committed to finishing it."*
+4. **Projection opens a new project at 0,0 in the corner instead of the view chosen in the wizard**,
+   on the PROJECTED path. A fix exists on the `projection` branch and is NOT on master.
+5. **Table column headings do not wrap and the columns are too wide.** He wants user-resizable
+   columns eventually.
+6. **Settings selectors block for 2 to 3 seconds** in both browsers (Task 653). Not a regression.
+
+**HIS ENVIRONMENT, AND IT IS NOT OUR CODE:** Ubuntu Chrome under WSLg pairs no presses at all --
+measured `{click: 4, dblclick: 0, detail2: 0}` -- so panning and double-click are dead while single
+clicks and wheel zoom work. Firefox on the same machine goes unresponsive. **`wsl.exe --shutdown`
+is the likely fix and it KILLS THE CLAUDE CODE SESSION**, so it is a boundary action: finish, push,
+`/clear`, then shut down. He will not demonstrate on Ubuntu Chrome.
+
+**TRANSLATION:** 90 English keys were added on 09-13 and 6 retired. A sprint is NOT authorized; he
+said *"No translation sprint yet."* §5's plan named 14 Sep, and he has since said he does not
+recognise the phrase "translation freeze" and reads it only as *"some strings may change, but they
+will not be translated."* **Ask him; do not infer.**
+
+**OPEN QUESTIONS HE HAS NOT ANSWERED:** Task 663 (three reaction-rate questions), Task 659 (whether
+the cursor colour change is wanted now that objects carry `pointer`), Task 665 (the draggable-box
+standard), and whether custom properties should appear in symbology -- **ask Sue about that last one
+and record the answer in her hopper, per his instruction.**
