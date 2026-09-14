@@ -451,7 +451,7 @@
 	 * nobody types a place name and only then learns where it was about to go.
 	 */
 	EC.lpnSearchOpen = function () {
-		if (!seam || (seam.isGeo && !seam.isGeo())) { return; }
+		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		if (inFlight) {
 			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
 			return;
@@ -482,7 +482,7 @@
 		// project to travel in: a caller that takes the point itself is asking a question about the
 		// Earth, not about this document, so the guard belongs to the default destination alone.
 		if (!seam) { return; }
-		if (!to && seam.isGeo && !seam.isGeo()) { return; }
+		if (!to && seam.locatable && !seam.locatable()) { return; }
 		if (inFlight) {
 			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
 			return;
