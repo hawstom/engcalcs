@@ -8686,9 +8686,20 @@ var EngCalcs = EngCalcs || {};
 	function projectedBasemapOk() {
 		return isProjectedProject() && !!EngCalcs.lpnCrsHas && EngCalcs.lpnCrsHas(projectCrsCode());
 	}
-	function basemapOn() {
-		return (isGeoProject() || projectedBasemapOk()) && project.basemap !== 'off';
-	}
+	/**
+	 * **CAN THIS PROJECT SAY WHERE ON THE EARTH A POINT OF IT IS?** The one question behind every
+	 * feature that reaches outside the drawing: the basemap, the place-name search, and the DEM
+	 * elevations. A geographic project always could -- its coordinates ARE the answer. A projected
+	 * one can since Task 641 phase 5, for the 98% of the register with a transform.
+	 *
+	 * **IT IS ONE PREDICATE BECAUSE IT WAS FOUR COPIES OF `isGeoProject() && mapboxToken()` AND
+	 * THEY DID NOT MOVE TOGETHER.** The basemap was widened on 2026-09-14 and the elevation
+	 * buttons were not, so a new projected project drew the world map and then refused to read
+	 * heights off it -- Tom, the same day: *"A new project with a projection doesn't offer the DEM
+	 * elevation buttons."* Both are the same question and now they ask it once.
+	 */
+	function projectLocatable() { return isGeoProject() || projectedBasemapOk(); }
+	function basemapOn() { return projectLocatable() && project.basemap !== 'off'; }
 	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
 	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
 	function setBasemapStyle(style) {
@@ -10191,25 +10202,42 @@ var EngCalcs = EngCalcs || {};
 	 * A node this document does not have is dropped rather than reported: an id can only get here
 	 * from a list this file made a moment ago, and a node deleted in between is not an error.
 	 */
+	/**
+	 * **WHERE ON THE EARTH THIS NODE IS, WHICHEVER KIND OF PROJECT IT LIVES IN.** OUTWARD first,
+	 * because document coordinates are local to `doc.origin` and Y-down (Task 354) and what a
+	 * terrain server needs is a place on the Earth.
+	 *
+	 * A geographic project's outward x/y ARE longitude and latitude. A projected project's are an
+	 * easting and a northing, and turning those into a place is the transform — **the one door,
+	 * so that a second reader cannot come to a different opinion about what a node's coordinates
+	 * mean.** Returns null where the project cannot say, which the callers below treat as "offer
+	 * nothing" rather than as an error.
+	 */
+	function nodeLonLat(n) {
+		if (!n) { return null; }
+		var x = outwardX(n.x), y = outwardY(n.y);
+		if (isGeoProject()) { return { lon: x, lat: y }; }
+		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
+		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
+	}
 	function terrainPointsForIds(ids) {
-		if (!isGeoProject()) { return []; }
+		if (!projectLocatable()) { return []; }
 		var out = [];
 		(ids || []).forEach(function (id) {
-			var n = nodeById(id);
-			if (!n) { return; }
-			out.push({ id: n.id, lon: outwardX(n.x), lat: outwardY(n.y) });
+			var n = nodeById(id), ll = nodeLonLat(n);
+			if (!n || !ll) { return; }
+			out.push({ id: n.id, lon: ll.lon, lat: ll.lat });
 		});
 		return out;
 	}
 	function terrainNodesNeedingElevation() {
-		if (!isGeoProject()) { return []; }
+		if (!projectLocatable()) { return []; }
 		var out = [];
 		doc.nodes.forEach(function (n) {
 			if (terrainHasElev(n)) { return; }
-			// OUTWARD, because doc coordinates are local to doc.origin and Y-down (Task 354), and
-			// what a terrain server needs is a place on the Earth. A geographic project's outward
-			// x/y ARE longitude and latitude.
-			out.push({ id: n.id, lon: outwardX(n.x), lat: outwardY(n.y) });
+			var ll = nodeLonLat(n);
+			if (!ll) { return; }
+			out.push({ id: n.id, lon: ll.lon, lat: ll.lat });
 		});
 		return out;
 	}
@@ -13374,7 +13402,7 @@ var EngCalcs = EngCalcs || {};
 	// can work on at all.
 	function replaceIsDem() {
 		return replaceState.source === 'dem' && replaceState.prop === 'elev' &&
-			isGeoProject() && !!mapboxToken() && !!EngCalcs.lpnTerrainFillFor;
+			projectLocatable() && !!mapboxToken() && !!EngCalcs.lpnTerrainFillFor;
 	}
 	// **THE DEM SET IS EVERY NODE THE QUERY FOUND, WHATEVER ELEVATION IT HOLDS** (Task 542). The
 	// typed-value path below skips an element that already holds the target number, because writing
@@ -13632,7 +13660,7 @@ var EngCalcs = EngCalcs || {};
 		// Elevation is selected to change, From DEM as an option for New value."*). Offered ONLY for
 		// Elevation and only on a project the feature can work on, which is why it is built here
 		// rather than being a permanent row: a source select over Diameter would be nonsense.
-		if (replaceState.prop === 'elev' && isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
+		if (replaceState.prop === 'elev' && projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			findSelect(box, pc.lpn_replace_source || 'New value source',
 				[['value', pc.lpn_settings_elev_source_typed || 'The elevation typed above'],
 					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
@@ -17945,7 +17973,7 @@ var EngCalcs = EngCalcs || {};
 	// failure, so it says nothing.
 	function elevSourceIsDem() {
 		return (settings.defaults.nodeElevSource || 'value') === 'dem' &&
-			isGeoProject() && !!mapboxToken() && !!EngCalcs.lpnTerrainFillFor;
+			projectLocatable() && !!mapboxToken() && !!EngCalcs.lpnTerrainFillFor;
 	}
 	// **ONE BATCH PER BURST OF DRAWING, NOT ONE REQUEST PER NODE** (Task 542). Drawing a run of ten
 	// junctions is ten calls to addNode() inside a few seconds; ten tile requests for ten points
@@ -27159,8 +27187,29 @@ var EngCalcs = EngCalcs || {};
 	// (EC_DEFAULT_UNIT_SET), not from anything they chose.
 	//
 	// EVERY LABEL HERE IS BORROWED, no new keys: this shipped at zero translation cost.
+	/**
+	 * **FETCH THE TRANSFORM WHEN A PROJECTED PROJECT BECOMES THE CURRENT ONE.**
+	 *
+	 * The basemap painter used to be the only thing that asked, and that was not enough: a
+	 * project whose basemap is OFF never paints, so the transform never arrived and every feature
+	 * that depends on it — the DEM elevation controls above all — stayed hidden with no way for
+	 * the user to know why. Hung on refreshMapStatus() because that is what already runs whenever
+	 * the project changes, including the boot path and a tab switch.
+	 *
+	 * Re-entrant by construction rather than by a flag: the callback calls refreshMapStatus()
+	 * again, which reaches here, sees `lpnCrsReady()` and stops.
+	 */
+	function ensureCrsForProject() {
+		if (!isProjectedProject() || !EngCalcs.lpnCrsLoad || !EngCalcs.lpnCrsReady) { return; }
+		if (EngCalcs.lpnCrsReady()) { return; }
+		EngCalcs.lpnCrsLoad(function () {
+			refreshBasemap();
+			refreshMapStatus();
+		});
+	}
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
+		ensureCrsForProject();
 		if (!el) { return; }
 		// A PIPE, not spaces. Three "Label: value" pairs run together are one undifferentiated string
 		// at 11px, and whitespace is the weakest divider there is.
@@ -28812,7 +28861,7 @@ var EngCalcs = EngCalcs || {};
 		// no `EC_MAPBOX_TOKEN` -- which is the same gate the Map menu's own row used, and the same
 		// argument: a control that is visibly inert teaches nobody anything. rebuildSettingsBox()
 		// runs on a project switch, so the row appears and disappears with the project it is about.
-		if (isGeoProject() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
+		if (projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			var elevSrc = document.createElement('select');
 			[['value', pc.lpn_settings_elev_source_typed || 'The elevation typed above'],
 				['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']].forEach(function (o) {
@@ -33537,7 +33586,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function elevationDemRow(fields, n, nodeId, setElev) {
 		var pc = EngCalcs.pageConfig || {}, wrap, sample, use, said, m, shown;
-		if (!isGeoProject() || !mapboxToken() || !EngCalcs.lpnTerrainSample) { return; }
+		if (!projectLocatable() || !mapboxToken() || !EngCalcs.lpnTerrainSample) { return; }
 		wrap = document.createElement('div');
 		wrap.className = 'lpn-elev-dem';
 
