@@ -3364,6 +3364,13 @@ var EngCalcs = EngCalcs || {};
 		var k = String(key || '');
 		return k.indexOf(LPN_CP_PREFIX) === 0 ? k.slice(LPN_CP_PREFIX.length) : k;
 	}
+	// **WHICH DESIGN IS EXPANDED, FOR THE LIFE OF THIS PAGE AND NO LONGER.** Keyed on the property
+	// key (a row with no key yet by its index), so rebuildSettingsFields() -- which runs on every
+	// commit, and a commit is every keystroke that lands -- can put the reader back where they
+	// were. FURNITURE, so CLAUDE.md's project-versus-browser rule puts it here and NOT in
+	// serializeProject() and NOT in localStorage: which box somebody has open is a fact about the
+	// screen they are sitting at, and a colleague opening the file must not inherit it.
+	var cpOpenKeys = {};
 	function customPropDefs() {
 		var list = settings && settings.customProps;
 		return (list && list.length) ? list : [];
@@ -27874,95 +27881,6 @@ var EngCalcs = EngCalcs || {};
 	 * abbreviation you will read tomorrow is written while you are still looking at the long form
 	 * that produced it.
 	 */
-	function openCustomPropDesign(index) {
-		var pc = EngCalcs.pageConfig || {};
-		if (!customPropDefs()[index]) { return; }
-		openDialog(function (body) {
-			var def = customPropDefs()[index], title = document.createElement('div');
-			title.className = 'lpn-cp-head';
-			title.textContent = pc.lpn_cp_edit_title || 'Custom property design';
-			body.appendChild(title);
-			function commit() {
-				saveToStorage();
-				rebuildSettingsFields();
-				refreshPaneIfOpen();
-				refreshPopupIfOpen();
-			}
-			function row(labelText, ctl, tip) {
-				var line = document.createElement('label'), text = document.createElement('span');
-				line.className = 'lpn-set-row';
-				setFieldLabel(text, labelText, tip);
-				ctl.setAttribute('aria-label', labelText);
-				line.appendChild(text);
-				line.appendChild(ctl);
-				body.appendChild(line);
-				return ctl;
-			}
-			function textRow(field, labelText, tip, onCommit) {
-				var input = document.createElement('input');
-				input.type = 'text';
-				input.value = (def[field] === undefined || def[field] === null) ? '' : String(def[field]);
-				input.addEventListener('change', function () {
-					if (onCommit) { onCommit(input); return; }
-					def[field] = input.value.trim();
-					commit();
-				});
-				return row(labelText, input, tip);
-			}
-			function selectRow(field, labelText, tip, opts, fallback) {
-				var sel = document.createElement('select');
-				opts.forEach(function (o) {
-					var opt = document.createElement('option');
-					opt.value = o[0]; opt.textContent = o[1];
-					if (o[0] === (def[field] || fallback)) { opt.selected = true; }
-					sel.appendChild(opt);
-				});
-				sel.addEventListener('change', function () { def[field] = sel.value; commit(); });
-				return row(labelText, sel, tip);
-			}
-			// KEY -- namespaced on the way in, refused empty, refused if another row has it. The
-			// box shows and takes the BARE key; the prefix is ours and is never typed.
-			textRow('key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, function (input) {
-				var k = customPropKey(input.value), defs = customPropDefs(), j;
-				if (!k) {
-					alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
-					input.value = customPropBareKey(def.key); return;
-				}
-				for (j = 0; j < defs.length; j++) {
-					if (j !== index && defs[j].key === k) {
-						alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
-						input.value = customPropBareKey(def.key); return;
-					}
-				}
-				def.key = k;
-				input.value = customPropBareKey(def.key);
-				commit();
-			}).value = customPropBareKey(def.key);
-			textRow('label', pc.lpn_cp_label || 'Label', pc.lpn_cp_label_tip);
-			// APPLIES TO -- the ID prefix letters, per the scope document, so twenty rows read at a
-			// glance. Upper-cased on commit, because J and j are the same asset kind.
-			textRow('applies', pc.lpn_cp_applies || 'Applies to', pc.lpn_cp_applies_tip, function (input) {
-				def.applies = customPropAppliesLetters({ applies: input.value }).join(',');
-				input.value = def.applies;
-				commit();
-			});
-			selectRow('validate', pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip,
-				customPropValidateOptions(), 'none');
-			selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or restrict', pc.lpn_cp_restrict_mode_tip,
-				customPropRestrictOptions(), 'allow');
-			textRow('restrict', pc.lpn_cp_restrict || 'Restrict these characters', pc.lpn_cp_restrict_tip);
-			textRow('minLength', pc.lpn_cp_minlength || 'Length lower limit', pc.lpn_cp_minlength_tip);
-			textRow('maxLength', pc.lpn_cp_length || 'Length upper limit', pc.lpn_cp_length_tip);
-			textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);
-			textRow('high', pc.lpn_cp_high || 'High limit', pc.lpn_cp_high_tip);
-		}, [{ label: pc.lpn_close || 'Close', fn: function () { } }]);
-		// The tips in here are built after openDialog() has put the box on the screen, so the
-		// tooltip wiring has to be asked for; every other box on this page is server-rendered and
-		// gets it at init.
-		var dlg = document.getElementById('lpn_dialog');
-		if (dlg && typeof initTipsIn === 'function') { initTipsIn(dlg); }
-	}
-
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
 	// rows below did not move between categories by being re-parented at run time -- each one is
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
@@ -28097,17 +28015,31 @@ var EngCalcs = EngCalcs || {};
 		});
 		// ---- Custom properties (ROADMAP Task 636; dev/custom-property-scope.md) ----
 		//
-		// **THE PANE SHOWS THE DESIGN AND A POPUP EDITS IT** (Tom, 2026-09-13: *"I think I
-		// specified that the Custom Property design form must be a popup and that the Settings
-		// pane can show only truncated forms of the design except for the key. I now confirm that
-		// specification."*). Phase 1 made every cell a live control in the pane and he read it
-		// back as the wrong shape: ten editable cells per row is a form pretending to be a table,
-		// and it can be neither wide enough to type in nor narrow enough to read twenty rows of.
-		// So the table is a SUMMARY -- text, truncated by the stylesheet, with the key at full
-		// length because the key is the identity -- and openCustomPropDesign() is the form.
+		// **KEY ON LINE ONE, AN EXPANDER FOR THE REST** (Tom, 2026-09-13, his own third option:
+		// *"each custom property lists only key on line 1 with an expander to show all other
+		// design fields below it on one line each"*). It replaces the summary table and the
+		// design POPUP that phase 2 built, and the reason is measured rather than preferred.
 		//
-		// **COLUMN HEADINGS ARE BACK** (his revision 3), truncated, each carrying the tip that
-		// writes its name out in full.
+		// **THE TABLE DID NOT FIT, AND NOT ONLY ON A PHONE.** Twelve columns at nine truncated
+		// cells apiece need 721 px before a single property is designed; the Settings content
+		// pane is 410 px at the shipped box width on a 1200 px screen and 202 px at 360 px. So
+		// the pane scrolled sideways by 319 px on a PC and 527 px on a phone, and
+		// dev/browser-pass/specs/labelcols.js -- which has asserted since Task 435 that this pane
+		// never scrolls sideways -- went red the moment a heading row existed. Worse on the
+		// reading side than on the arithmetic: scrolling right to reach the high limit scrolls
+		// the KEY off the screen, and the key is the one column deliberately left unabbreviated
+		// because it is the identity the row is filed under.
+		//
+		// **AND THE POPUP WAS THE WRONG SHAPE TWICE OVER.** #lpn_dialog is `width: 50vw` capped at
+		// 360 px, so on a 360 px phone the design form was 180 px wide with its label column
+		// crushed to 4 px and 2,661 px of content inside a 444 px scroller. It was also the only
+		// control in the whole Settings box that left the box to be edited; every other row in
+		// here commits in place, which is what the expander restores.
+		//
+		// **THE ROWS ARE .lpn-set-row, WHICH IS THE WHOLE POINT.** Every other multi-field row in
+		// this box already collapses to one column under the container query at 24rem, so a
+		// design field inherits the phone layout that was written once rather than needing a
+		// second one. Nothing here is truncated, so nothing is cut in ENGLISH.
 		//
 		// **THE KEY IS NAMESPACED ON THE WAY IN.** customPropKey() adds the prefix, so what the
 		// reader types can never collide with a built-in field however they spell it -- refused by
@@ -28125,98 +28057,37 @@ var EngCalcs = EngCalcs || {};
 			target.appendChild(head);
 			var defs = customPropDefs();
 			if (!defs.length) { note(target, pc.lpn_cp_none || 'No custom property is designed yet.'); }
-			var table = document.createElement('table');
-			table.className = 'lpn-cp-table';
-			var thead = document.createElement('thead'), htr = document.createElement('tr');
-			// **THE HEADINGS ARE BACK, TRUNCATED, EACH CARRYING ITS OWN TIP** (Tom, 2026-09-13,
-			// revision 3, reversing the no-headings alternative phase 1 took from the scope
-			// document). Ten unlabelled cells were readable only to whoever designed them.
-			//
-			// **THE TRUNCATION IS THE STYLESHEET'S, NOT A slice()**, and that is the part worth
-			// keeping: a heading cut to three letters in code is cut in ENGLISH, and "Val" is not
-			// the first three letters of anything a Turkish or Hindi reader would recognise.
-			// .lpn-cp-th-text is one ellipsis rule, so every language truncates in its own words
-			// and the full name is one hover away in the tip.
-			//
-			// The glyph is OUTSIDE the truncating span on purpose: inside it, the ellipsis eats
-			// the "?" first and the tip becomes unreachable on touch, which is the whole of what
-			// the tip is for.
-			function headCell(labelText, tip) {
-				var th = document.createElement('th'), help, txt, glyph;
-				if (!tip) { th.textContent = labelText || ''; htr.appendChild(th); return th; }
-				help = document.createElement('span');
-				help.className = 'ec-help'; help.title = tip;
-				txt = document.createElement('span');
-				txt.className = 'lpn-cp-th-text'; txt.textContent = labelText;
-				glyph = document.createElement('span');
-				glyph.className = 'ec-tip'; glyph.textContent = '?';
-				help.appendChild(txt);
-				help.appendChild(document.createTextNode(' '));
-				help.appendChild(glyph);
-				th.appendChild(help);
-				htr.appendChild(th);
-				return th;
-			}
 			var vOpts = customPropValidateOptions(), mOpts = customPropRestrictOptions();
-			// One list, read twice: the heading row and then every summary row, so a column can
-			// never head one thing and show another.
-			var COLS = [
-				{ head: pc.lpn_cp_key || 'Key', tip: pc.lpn_cp_key_tip, cls: 'lpn-cp-cell-key',
-				  text: function (def) { return customPropBareKey(def.key); } },
-				{ head: pc.lpn_cp_label || 'Label', tip: pc.lpn_cp_label_tip,
-				  text: function (def) { return def.label || ''; } },
-				{ head: pc.lpn_cp_applies || 'Applies to', tip: pc.lpn_cp_applies_tip,
-				  text: function (def) { return def.applies || ''; } },
-				{ head: pc.lpn_cp_validate || 'Validate as', tip: pc.lpn_cp_validate_tip,
-				  text: function (def) { return customPropOptionLabel(vOpts, def.validate, 'none'); } },
-				{ head: pc.lpn_cp_restrict_mode || 'Allow or restrict', tip: pc.lpn_cp_restrict_mode_tip,
-				  text: function (def) { return customPropOptionLabel(mOpts, def.restrictMode, 'allow'); } },
-				{ head: pc.lpn_cp_restrict || 'Restrict these characters', tip: pc.lpn_cp_restrict_tip,
-				  text: function (def) { return def.restrict || ''; } },
-				{ head: pc.lpn_cp_minlength || 'Length lower limit', tip: pc.lpn_cp_minlength_tip,
-				  text: function (def) { return def.minLength === undefined || def.minLength === null ? '' : String(def.minLength); } },
-				{ head: pc.lpn_cp_length || 'Length upper limit', tip: pc.lpn_cp_length_tip,
-				  text: function (def) { return def.maxLength === undefined || def.maxLength === null ? '' : String(def.maxLength); } },
-				{ head: pc.lpn_cp_low || 'Low limit', tip: pc.lpn_cp_low_tip,
-				  text: function (def) { return def.low === undefined || def.low === null ? '' : String(def.low); } },
-				{ head: pc.lpn_cp_high || 'High limit', tip: pc.lpn_cp_high_tip,
-				  text: function (def) { return def.high === undefined || def.high === null ? '' : String(def.high); } }
-			];
-			COLS.forEach(function (c) { headCell(c.head, c.tip); });
-			headCell('');
-			headCell('');
-			thead.appendChild(htr);
-			table.appendChild(thead);
-			var tbody = document.createElement('tbody');
-			table.appendChild(tbody);
 			defs.forEach(function (def, i) {
-				var tr = document.createElement('tr');
-				// **THE PANE SHOWS THE DESIGN; IT NO LONGER EDITS IT** (Tom, 2026-09-13, revision
-				// 5: *"the Custom Property design form must be a popup and ... the Settings pane
-				// can show only truncated forms of the design except for the key. I now confirm
-				// that specification."*). So a cell is TEXT, the key is the one column with no
-				// truncation on it, and Edit is the only door to the form.
-				COLS.forEach(function (c) {
-					var td = document.createElement('td'), sp = document.createElement('span');
-					sp.className = 'lpn-cp-cell' + (c.cls ? ' ' + c.cls : '');
-					sp.textContent = c.text(def);
-					td.appendChild(sp);
-					tr.appendChild(td);
-				});
-				var editTd = document.createElement('td'), edit = document.createElement('button');
-				edit.type = 'button';
-				edit.className = 'lpn-cp-edit';
-				edit.textContent = pc.lpn_profile_edit || 'Edit';
-				helpTip(edit, pc.lpn_cp_edit_tip);
-				edit.addEventListener('click', function () { openCustomPropDesign(i); });
-				editTd.appendChild(edit);
-				tr.appendChild(editTd);
-				var rmTd = document.createElement('td'), rm = document.createElement('button');
+				// `<details>` rather than a button and a hidden div: it is the WAI-ARIA disclosure
+				// pattern for free, it is the idiom multiSection() already uses on this page, and
+				// every row inside it is built eagerly, so a collapsed property is still
+				// searchable by setboxUnitText() and still reachable by Find in the browser.
+				var box = document.createElement('details'), sum = document.createElement('summary'),
+					body = document.createElement('div');
+				box.className = 'lpn-cp-item';
+				sum.className = 'lpn-cp-summary';
+				body.className = 'lpn-cp-body';
+				// **LINE ONE IS THE KEY AND NOTHING ELSE IS ABBREVIATED ONTO IT.** A blank row is
+				// one the user has just been given and has not named yet, so it says so rather
+				// than showing an empty line nobody can tell from a rendering fault.
+				var keyText = document.createElement('span');
+				keyText.className = 'lpn-cp-key';
+				keyText.textContent = customPropBareKey(def.key) || (pc.lpn_cp_unnamed || 'Not named yet');
+				sum.appendChild(keyText);
+				// Remove sits on line one because it is not a design field and does not belong
+				// under the expander -- and because removing a property you can see the key of
+				// should not cost opening it first. `preventDefault()` because a click inside a
+				// <summary> toggles the disclosure as well, which would leave the NEXT property
+				// open on the line the removed one vacated.
+				var rm = document.createElement('button');
 				rm.type = 'button';
 				rm.className = 'lpn-cp-remove';
 				rm.textContent = pc.lpn_cp_remove || 'Remove';
 				helpTip(rm, pc.lpn_cp_remove_tip);
-				rm.addEventListener('click', function () {
+				rm.addEventListener('click', function (e) {
+					if (e && e.preventDefault) { e.preventDefault(); }
+					if (e && e.stopPropagation) { e.stopPropagation(); }
 					saveUndoSnapshot();
 					settings.customProps.splice(i, 1);
 					saveToStorage();
@@ -28224,11 +28095,102 @@ var EngCalcs = EngCalcs || {};
 					refreshPaneIfOpen();
 					refreshPopupIfOpen();
 				});
-				rmTd.appendChild(rm);
-				tr.appendChild(rmTd);
-				tbody.appendChild(tr);
+				sum.appendChild(rm);
+				box.appendChild(sum);
+				box.appendChild(body);
+				// **THE EXPANDED STATE IS FURNITURE AND IS NOT STORED ANYWHERE** (CLAUDE.md's
+				// project-versus-browser rule, and Task 584's answer to the temptation): whether a
+				// design is open is a fact about the screen somebody is sitting at, so it lives in
+				// the element and dies with the rebuild. A row the user is editing is reopened by
+				// cpOpenKeys below, which is memory within one rebuild and not storage.
+				if (cpOpenKeys[def.key || ('#' + i)]) { box.open = true; }
+				box.addEventListener('toggle', function () {
+					cpOpenKeys[def.key || ('#' + i)] = !!box.open;
+				});
+				// Every control commits on `change`, as every other row of this box does. There is
+				// no OK and nothing is staged.
+				//
+				// **AND IT DOES NOT REBUILD THE SETTINGS BOX, WHICH MATTERS FOR THE KEYBOARD.**
+				// `change` on a text input fires on BLUR, so a rebuild here would destroy the
+				// field the user has just left AND the nine after it while the browser was
+				// moving focus into the next one -- ten design fields in a row is exactly where
+				// somebody tabs. The ID prefix rows beside this one commit with `saveToStorage()`
+				// alone for the same reason. Nothing else in this box reads a design field except
+				// line one's own key text, which is written here; the Properties box, the Tables
+				// pane and Find read the label and are repainted by the two calls below.
+				function commit() {
+					saveToStorage();
+					keyText.textContent = customPropBareKey(def.key) || (pc.lpn_cp_unnamed || 'Not named yet');
+					refreshPaneIfOpen();
+					refreshPopupIfOpen();
+				}
+				function textRow(field, labelText, tip, onCommit) {
+					var input = document.createElement('input');
+					input.type = 'text';
+					input.value = (def[field] === undefined || def[field] === null) ? '' : String(def[field]);
+					input.setAttribute('aria-label', labelText);
+					input.addEventListener('change', function () {
+						if (onCommit) { onCommit(input); return; }
+						def[field] = input.value.trim();
+						commit();
+					});
+					row(body, labelText, input, tip);
+					return input;
+				}
+				function selectRow(field, labelText, tip, opts, fallback) {
+					var sel = document.createElement('select');
+					opts.forEach(function (o) {
+						var opt = document.createElement('option');
+						opt.value = o[0]; opt.textContent = o[1];
+						if (o[0] === (def[field] || fallback)) { opt.selected = true; }
+						sel.appendChild(opt);
+					});
+					sel.setAttribute('aria-label', labelText);
+					sel.addEventListener('change', function () { def[field] = sel.value; commit(); });
+					row(body, labelText, sel, tip);
+					return sel;
+				}
+				// KEY -- refused empty, refused if another row has it. The box shows and takes the
+				// BARE key; the prefix is ours and is never typed. It is a field like the others
+				// because line one is a heading and a heading is not a text box; renaming has to
+				// live somewhere, and under the expander is where every other edit already is.
+				textRow('key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, function (input) {
+					var k = customPropKey(input.value), all = customPropDefs(), j;
+					if (!k) {
+						alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
+						input.value = customPropBareKey(def.key); return;
+					}
+					for (j = 0; j < all.length; j++) {
+						if (j !== i && all[j].key === k) {
+							alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
+							input.value = customPropBareKey(def.key); return;
+						}
+					}
+					delete cpOpenKeys[def.key || ('#' + i)];
+					def.key = k;
+					cpOpenKeys[def.key] = true;
+					input.value = customPropBareKey(def.key);
+					commit();
+				}).value = customPropBareKey(def.key);
+				textRow('label', pc.lpn_cp_label || 'Label', pc.lpn_cp_label_tip);
+				// APPLIES TO -- the ID prefix letters, per the scope document. Upper-cased on
+				// commit, because J and j are the same asset kind.
+				textRow('applies', pc.lpn_cp_applies || 'Applies to', pc.lpn_cp_applies_tip, function (input) {
+					def.applies = customPropAppliesLetters({ applies: input.value }).join(',');
+					input.value = def.applies;
+					commit();
+				});
+				selectRow('validate', pc.lpn_cp_validate || 'Validate as', pc.lpn_cp_validate_tip,
+					vOpts, 'none');
+				selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or restrict', pc.lpn_cp_restrict_mode_tip,
+					mOpts, 'allow');
+				textRow('restrict', pc.lpn_cp_restrict || 'Restrict these characters', pc.lpn_cp_restrict_tip);
+				textRow('minLength', pc.lpn_cp_minlength || 'Length lower limit', pc.lpn_cp_minlength_tip);
+				textRow('maxLength', pc.lpn_cp_length || 'Length upper limit', pc.lpn_cp_length_tip);
+				textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);
+				textRow('high', pc.lpn_cp_high || 'High limit', pc.lpn_cp_high_tip);
+				target.appendChild(box);
 			});
-			target.appendChild(table);
 			var add = document.createElement('button');
 			add.type = 'button';
 			add.textContent = pc.lpn_cp_add || 'Add custom property';
@@ -28241,11 +28203,11 @@ var EngCalcs = EngCalcs || {};
 				// a rule nobody wrote onto every asset the moment a key was typed.
 				settings.customProps.push({ key: '', label: '', applies: '', validate: 'none',
 					restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' });
+				// OPEN, because a collapsed blank line says nothing at all about what the user has
+				// just been given -- the same argument that used to open the popup on the new row.
+				cpOpenKeys['#' + (settings.customProps.length - 1)] = true;
 				saveToStorage();
 				rebuildSettingsFields();
-				// Straight into the form, because a blank row in a summary table says nothing at
-				// all about what the user has just been given.
-				openCustomPropDesign(settings.customProps.length - 1);
 			});
 			target.appendChild(add);
 		}

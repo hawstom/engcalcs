@@ -2467,22 +2467,30 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    copying a string; these were three sizes in three places, two of them inline in JS. */
 .lpn-set-note, .lpn-rp-credit { font-size: .85em; opacity: .8; }
 .lpn-set-note { margin: 2px 0 4px; }
-/* Custom properties (ROADMAP Task 636): the DESIGN SUMMARY under Settings > Assets, which reads
-   and never edits -- the form itself is a popup (Tom, 2026-09-13). Every heading and every cell is
-   truncated HERE, in one ellipsis rule, rather than sliced to three letters in code: a slice is
-   made in English, and "Val" is not the first three letters of anything a Turkish or Hindi reader
-   would recognise. The key is the one column with no limit on it, because the key is the identity
-   the whole row is filed under. */
+/* Custom properties (ROADMAP Task 636): the DESIGN under Settings > Assets, as ONE LINE PER
+   PROPERTY WITH AN EXPANDER -- Tom's own third option, 2026-09-13.
+
+   **IT REPLACED A TWELVE-COLUMN TABLE, AND THE TABLE'S PROBLEM WAS MEASURED.** Nine truncated
+   cells plus Edit and Remove need 721 px before a single property exists, against a Settings
+   content pane of 410 px at the shipped box width on a 1200 px screen and 202 px at 360 px. So
+   the pane scrolled sideways -- which dev/browser-pass/specs/labelcols.js has forbidden since
+   Task 435 -- and scrolling right to read the high limit scrolled the KEY out of view, the one
+   column deliberately left unabbreviated because it is the identity the row is filed under.
+
+   **SO THERE IS NO TRUNCATION RULE HERE AT ALL ANY MORE, AND THAT IS THE GAIN.** A field under
+   the expander is a `.lpn-set-row` like every other row in this box, so it inherits the container
+   query that collapses to one column at 24rem instead of needing a phone layout of its own -- and
+   nothing is cut to three letters in ENGLISH, which is what the old ellipsis rule existed to
+   avoid and could only ever half-avoid. */
 .lpn-cp-head { font-weight: 600; opacity: 1; }
-.lpn-cp-table { border-collapse: collapse; font-size: .85em; }
-.lpn-cp-table td, .lpn-cp-table th { padding: 1px 2px; text-align: left; vertical-align: bottom; }
-.lpn-cp-table th { font-weight: 600; white-space: nowrap; }
-.lpn-cp-th-text, .lpn-cp-cell {
-	display: inline-block; max-width: 4.5em;
-	overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom;
-}
-.lpn-cp-cell-key { max-width: none; }
-.lpn-cp-remove, .lpn-cp-edit { font-size: 1em; padding: 0 .4em; }
+.lpn-cp-item { margin: 2px 0; }
+/* The key is the line, so it carries the weight; Remove sits after it and stays small. The
+   summary's own `display` is deliberately left alone: the disclosure triangle is part of that
+   element's default line box, and a `display: flex` summary loses the marker in every engine. */
+.lpn-cp-summary { cursor: pointer; }
+.lpn-cp-key { font-weight: 600; margin-right: .5em; overflow-wrap: anywhere; }
+.lpn-cp-body { margin-left: 12px; }
+.lpn-cp-remove { font-size: 1em; padding: 0 .4em; }
 /* **A VALUE THAT BREAKS ITS OWN DESIGN IS FLAGGED IN PLACE AND NEVER CLEARED** (Tom, 2026-09-13:
    tightening a limit is a way of ASKING a question about the data). The outline says which cells
    answer the question; the value underneath it is untouched. */

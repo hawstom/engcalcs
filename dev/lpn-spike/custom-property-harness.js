@@ -51,8 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\trenderNodeFields: renderNodeFields, renderLinkFields: renderLinkFields,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tcustomBody: function () { return document.getElementById('lpn_set_custom_fields'); },\n" +
-	"\t\tdialogBody: function () { return document.getElementById('lpn_dialog_body'); },\n" +
-	"\t\topenCustomPropDesign: openCustomPropDesign, closeDialog: closeDialog,\n" +
+	"\t\tsetboxHeadingText: setboxHeadingText,\n" +
 	"\t\tcustomPropValidateOptions: customPropValidateOptions,\n" +
 	"\t\tcustomPropBareKey: customPropBareKey,\n" +
 	"\t\tpushSpecList: pushSpecList, pushFieldShown: pushFieldShown,\n" +
@@ -293,13 +292,27 @@ ok('6.4 the design comes back', !!L.customPropDefByKey(route.key));
 ok('6.5 and the Base value comes back verbatim', L.effective(back, route.key) === 'BASE-ROUTE',
 	String(L.effective(back, route.key)));
 
-// ---- 7. THE SUMMARY IN SETTINGS, AND THE FORM IN A POPUP --------------------------------------
+// ---- 7. ONE LINE PER PROPERTY, WITH AN EXPANDER -----------------------------------------------
 //
-// **THE PANE SHOWS THE DESIGN; THE POPUP EDITS IT** (Tom, 2026-09-13: *"the Custom Property design
-// form must be a popup and ... the Settings pane can show only truncated forms of the design except
-// for the key. I now confirm that specification."*). Phase 1 built ten live controls per row in the
-// pane, which is the shape this section exists to keep from coming back: the assertion that matters
-// is 7.10, that the summary holds NO editable control at all.
+// **KEY ON LINE ONE, THE REST UNDER AN EXPANDER** (Tom, 2026-09-13, his own third option: *"each
+// custom property lists only key on line 1 with an expander to show all other design fields below
+// it on one line each"*). It replaced BOTH earlier shapes and this section is what keeps either
+// from coming back:
+//
+//   * PHASE 1 put ten live controls on one pane line, which he read back as a form pretending to
+//     be a table;
+//   * PHASE 2 put a twelve-column summary table in the pane and the form in a popup, and the
+//     table did not fit anywhere. Measured in Chromium: its heading row alone needs 721 px
+//     against a Settings content pane of 410 px at the shipped box width on a 1200 px screen and
+//     202 px at 360 px, so the pane scrolled sideways by 319 px and 527 px -- which
+//     dev/browser-pass/specs/labelcols.js has forbidden since Task 435 -- and reaching the high
+//     limit scrolled the KEY out of view. The popup was no better: #lpn_dialog is 50vw capped at
+//     360 px, so on a 360 px phone the design form was 180 px wide with a 4 px label column and
+//     2,661 px of content in a 444 px scroller.
+//
+// So the assertions that matter here are 7.5 (there is no table left), 7.6 (the key is on line
+// one, in full) and 7.11 (every design field is a `.lpn-set-row`, which is what buys the phone
+// layout that was already written once for every other row in this box).
 clearDesigns();
 L.rebuildSettingsFields();
 const body = L.customBody();
@@ -312,7 +325,6 @@ function buttons(host, text) {
 	return out;
 }
 function fire(el, kind) { (el._listeners[kind] || []).forEach(function (f) { f({ target: el }); }); }
-// Every control in a host, whatever it is: the question the summary must answer NO to.
 function controlsIn(host) {
 	const out = [];
 	(function walk(el) {
@@ -324,11 +336,18 @@ function controlsIn(host) {
 function byAria(host, label) {
 	return controlsIn(host).filter(function (c) { return c.getAttribute('aria-label') === label; })[0] || null;
 }
-// The truncating spans the summary writes, in column order.
-function summaryCells(host) {
+function byTag(host, tag) {
 	const out = [];
 	(function walk(el) {
-		if ((el['class'] || '').indexOf('lpn-cp-cell') >= 0) { out.push(el); }
+		if (el._tag === tag) { out.push(el); }
+		(el.children || []).forEach(walk);
+	})(host);
+	return out;
+}
+function byClass(host, cls) {
+	const out = [];
+	(function walk(el) {
+		if ((el['class'] || '').split(/\s+/).indexOf(cls) >= 0) { out.push(el); }
 		(el.children || []).forEach(walk);
 	})(host);
 	return out;
@@ -345,63 +364,81 @@ const addBtn = buttons(body, PC.lpn_cp_add)[0];
 ok('7.1 the box offers an Add control', !!addBtn);
 fire(addBtn, 'click');
 ok('7.2 adding appends one design row', settings().customProps.length === 1);
-// **AND OPENS THE FORM ON IT**, because a blank row in a summary table says nothing about what the
-// user has just been given.
-let dlg = L.dialogBody();
-ok('7.3 adding opens the design popup', !!byAria(dlg, PC.lpn_cp_key));
-// The key is typed in the POPUP now, not in the pane.
-let keyBox = byAria(dlg, PC.lpn_cp_key);
+// **AND OPENS IT**, because a collapsed blank line says nothing about what the user has just been
+// given -- the same argument that used to open the popup on a new row.
+ok('7.3 adding opens the new design', byTag(L.customBody(), 'details')[0].open === true);
+let keyBox = byAria(L.customBody(), PC.lpn_cp_key);
+ok('7.4 the key is edited in the pane, with no popup in the way', !!keyBox);
 keyBox.value = 'acct no';
 fire(keyBox, 'change');
-ok('7.4 a key typed in the popup is namespaced and unspaced',
+ok('7.5 a typed key is namespaced and unspaced',
 	settings().customProps[0].key === L.customPropKey('acctno'), settings().customProps[0].key);
-// **THE KEY IS THE ONE COLUMN SHOWN IN FULL** -- his own exception, and the column the row is
-// filed under.
-ok('7.5 the summary shows the bare key in the first cell',
-	summaryCells(L.customBody())[0]._text === L.customPropBareKey(settings().customProps[0].key),
-	summaryCells(L.customBody())[0]._text);
-ok('7.6 and the key cell is the one with no truncation on it',
-	(summaryCells(L.customBody())[0]['class'] || '').indexOf('lpn-cp-cell-key') >= 0);
+// **THERE IS NO TABLE.** The twelve-column summary is what did not fit; a `<table>` reappearing in
+// this host is the regression, whatever it holds.
+ok('7.6 nothing in the design box is a table', byTag(L.customBody(), 'table').length === 0);
+// **LINE ONE IS THE KEY, IN FULL AND UNABBREVIATED** -- his own exception, and the identity the
+// property is filed under. Read here with NO rebuild in between, which is the second half of the
+// assertion: commit() writes this text in place precisely so that it does not have to rebuild the
+// Settings box, because `change` fires on BLUR and a rebuild would destroy the nine fields after
+// the one the user has just tabbed out of.
+const summary1 = byTag(L.customBody(), 'summary')[0];
+ok('7.7 line one shows the bare key, written in place with no rebuild',
+	byClass(summary1, 'lpn-cp-key')[0]._text === L.customPropBareKey(settings().customProps[0].key),
+	byClass(summary1, 'lpn-cp-key')[0]._text);
 // A second row may not take the first one's key.
-L.closeDialog();
 fire(buttons(L.customBody(), PC.lpn_cp_add)[0], 'click');
-ok('7.7 a second row opens its own form', settings().customProps.length === 2);
-const secondKeyBox = byAria(L.dialogBody(), PC.lpn_cp_key);
+ok('7.8 a second row is added', settings().customProps.length === 2);
+const secondKeyBox = controlsIn(byTag(L.customBody(), 'details')[1])
+	.filter(function (c) { return c.getAttribute('aria-label') === PC.lpn_cp_key; })[0];
 secondKeyBox.value = 'acctno';
 lastAlert = null;
 fire(secondKeyBox, 'change');
-ok('7.8 a duplicate key is refused, in the page’s own words', lastAlert === PC.lpn_cp_key_taken,
+ok('7.9 a duplicate key is refused, in the page’s own words', lastAlert === PC.lpn_cp_key_taken,
 	String(lastAlert));
-ok('7.9 and the second design keeps no key', settings().customProps[1].key === '');
-L.closeDialog();
-// **THE PANE EDITS NOTHING.** Ten live controls per row is what revision 5 removed.
-ok('7.10 the summary holds no editable control', controlsIn(L.customBody()).length === 0,
-	String(controlsIn(L.customBody()).length));
-// Every row offers both doors.
-const editBtns = buttons(L.customBody(), PC.lpn_profile_edit);
-ok('7.11 every row offers Edit', editBtns.length === settings().customProps.length);
-const rm = buttons(L.customBody(), PC.lpn_cp_remove);
-ok('7.12 every row offers Remove', rm.length === settings().customProps.length);
-// Edit opens the form on the row it belongs to, not on the first one.
-fire(editBtns[0], 'click');
-ok('7.13 Edit opens the form on its own row',
-	byAria(L.dialogBody(), PC.lpn_cp_key).value === L.customPropBareKey(settings().customProps[0].key));
-// The form carries every part of the design at full length, one row each.
+ok('7.10 and the second design keeps no key', settings().customProps[1].key === '');
+// A row with no key yet says so rather than showing a line nobody can tell from a rendering fault.
+ok('7.11 an unnamed design says so on line one',
+	byClass(byTag(L.customBody(), 'summary')[1], 'lpn-cp-key')[0]._text === PC.lpn_cp_unnamed);
+// **EVERY DESIGN FIELD IS A .lpn-set-row**, which is the whole reason this shape survives a phone:
+// the container query that collapses every other row in this box to one column at 24rem collapses
+// these too, so no second layout was written.
+const firstBody = byClass(byTag(L.customBody(), 'details')[0], 'lpn-cp-body')[0];
+const designRows = byClass(firstBody, 'lpn-set-row');
+ok('7.12 the design fields are the box’s own row primitive', designRows.length === 10,
+	String(designRows.length));
+// Each part of the design has its own line, named the way the page names it.
 [PC.lpn_cp_key, PC.lpn_cp_label, PC.lpn_cp_applies, PC.lpn_cp_validate, PC.lpn_cp_restrict_mode,
 	PC.lpn_cp_restrict, PC.lpn_cp_minlength, PC.lpn_cp_length, PC.lpn_cp_low, PC.lpn_cp_high
 ].forEach(function (lbl, i) {
-	ok('7.14.' + (i + 1) + ' the form has a control for one more column', !!byAria(L.dialogBody(), lbl), lbl);
+	ok('7.13.' + (i + 1) + ' one more design field has its own control',
+		!!byAria(firstBody, lbl), lbl);
 });
-L.closeDialog();
+// Remove is on line one, because it is not a design field and should not cost opening the row.
+const rm = buttons(L.customBody(), PC.lpn_cp_remove);
+ok('7.14 every row offers Remove', rm.length === settings().customProps.length);
+ok('7.15 and Remove is on line one, not under the expander',
+	byTag(byTag(L.customBody(), 'summary')[0], 'button').length === 1);
 fire(rm[1], 'click');
-ok('7.15 removing takes one row away', settings().customProps.length === 1);
-ok('7.16 and leaves the other one alone', settings().customProps[0].key === L.customPropKey('acctno'));
+ok('7.16 removing takes one row away', settings().customProps.length === 1);
+ok('7.17 and leaves the other one alone', settings().customProps[0].key === L.customPropKey('acctno'));
+// **THE EXPANDED STATE IS FURNITURE AND REACHES NO FILE** (CLAUDE.md's project-versus-browser
+// rule). rebuildSettingsFields() runs on every commit, so the row the reader is typing in has to
+// be reopened -- and that memory must not ride out in the project.
+L.rebuildSettingsFields();
+ok('7.18 the row being edited is still open after a rebuild',
+	byTag(L.customBody(), 'details')[0].open === true);
+const savedNow = L.serializeProject();
+const savedProps = JSON.stringify((savedNow.settings || {}).customProps || []);
+ok('7.19 and no expander state rides in the saved project',
+	JSON.stringify(savedNow).indexOf('cpOpen') < 0 && savedProps.indexOf('open') < 0, savedProps);
 
-// ---- 8. THE HEADINGS AND THEIR TIPS -----------------------------------------------------------
+// ---- 8. THE FIELD LABELS AND THEIR TIPS -------------------------------------------------------
 //
-// **HEADINGS ARE BACK, TRUNCATED, EACH CARRYING ITS OWN TIP** (revision 3), and **EVERY COLUMN TIP
-// LEADS WITH THE NAME OF ITS COLUMN** (revision 4). The second is asserted as a RELATIONSHIP
-// between two pageConfig values rather than as English, so rewording either one keeps the test.
+// **EVERY DESIGN TIP LEADS WITH THE NAME OF ITS OWN FIELD** (Tom, 2026-09-13, revision 4). It was
+// written when the name above the value was an abbreviated column heading; it is kept now that the
+// name is written out, because a tip that repeats its own label is how a reader confirms which
+// control the tooltip belongs to. Asserted as a RELATIONSHIP between two pageConfig values rather
+// than as English, so rewording either one keeps the test.
 [['key', PC.lpn_cp_key, PC.lpn_cp_key_tip], ['label', PC.lpn_cp_label, PC.lpn_cp_label_tip],
 	['applies', PC.lpn_cp_applies, PC.lpn_cp_applies_tip],
 	['validate', PC.lpn_cp_validate, PC.lpn_cp_validate_tip],
@@ -411,7 +448,7 @@ ok('7.16 and leaves the other one alone', settings().customProps[0].key === L.cu
 	['maxLength', PC.lpn_cp_length, PC.lpn_cp_length_tip],
 	['low', PC.lpn_cp_low, PC.lpn_cp_low_tip], ['high', PC.lpn_cp_high, PC.lpn_cp_high_tip]
 ].forEach(function (c, i) {
-	ok('8.1.' + (i + 1) + ' the ' + c[0] + ' tip leads with its own column name',
+	ok('8.1.' + (i + 1) + ' the ' + c[0] + ' tip leads with its own field name',
 		typeof c[2] === 'string' && c[2].indexOf(c[1] + ':') === 0, String(c[2]).slice(0, 24));
 });
 const tips = headTips(L.customBody());
@@ -419,7 +456,7 @@ ok('8.2 the design heading carries its own tip', tips.indexOf(PC.lpn_cp_design_t
 [PC.lpn_cp_key_tip, PC.lpn_cp_label_tip, PC.lpn_cp_applies_tip, PC.lpn_cp_validate_tip,
 	PC.lpn_cp_restrict_mode_tip, PC.lpn_cp_restrict_tip, PC.lpn_cp_minlength_tip,
 	PC.lpn_cp_length_tip, PC.lpn_cp_low_tip, PC.lpn_cp_high_tip].forEach(function (t, i) {
-	ok('8.3.' + (i + 1) + ' one more column heading carries its tip', tips.indexOf(t) >= 0);
+	ok('8.3.' + (i + 1) + ' one more design field carries its tip', tips.indexOf(t) >= 0);
 });
 // **THE SECTION HEADING'S OWN TIP IS TOM'S SENTENCE** (revision 1). It is server-rendered, so this
 // is asserted on the SOURCE and on the two KEYS, never on the English.
@@ -498,6 +535,53 @@ ok('9.25 an unlisted slash is still refused by the character set',
 // A property nobody restricted is one whose owner asked us to have no opinion about its text.
 sp.restrict = '';
 ok('9.26 with no restriction declared, white space is nobody’s business', problem(sp, ' MAIN ') === null);
+
+// ---- 10. THE GLYPH DOES NOT GO TO THE INDEX PANE ----------------------------------------------
+//
+// Tom, 2026-09-13: *"It looks like you used the sub-heading label for the index also as is
+// typical. But the glyph needs to be separate so it doesn't go to the index pane."*
+//
+// `ecTipLabel()` with no link wraps the label text AND the "?" in ONE `.ec-help`, which is
+// CLAUDE.md's rule and is right on the heading: with no link the tap target would otherwise be a
+// single character. buildSettingsIndex() then read that heading's `textContent` to name its own
+// row, so the left pane grew a stray "?" beside one section name -- a defect of the READER, not
+// of the markup, which is why the fix is setboxHeadingText() and not hand-built `.ec-help`
+// (`dev/scripts/tip_markup_check.php` blocks the build on that, and the helpers hold the
+// strip_tags()/htmlspecialchars() a title="" needs).
+//
+// The fixture is the exact three-part shape lib/Calculators.lib.php emits -- text, a space, a
+// `.ec-tip` span -- and 8.4 above is what holds the real heading to that helper, so the two
+// assertions together cover the markup end and the reading end. Asserted against
+// EngCalcs.pageConfig, never English.
+function tipHeading(text, tip) {
+	var host = document.createElement('div'), help = document.createElement('span'),
+		glyph = document.createElement('span');
+	help.className = 'ec-help';
+	help.title = tip;
+	help.appendChild(document.createTextNode(text + ' '));
+	glyph.className = 'ec-tip';
+	glyph.textContent = '?';
+	help.appendChild(glyph);
+	host.appendChild(help);
+	return host;
+}
+const cpHead = tipHeading(PC.lpn_settings_custom_props, PC.lpn_settings_custom_props_note);
+ok('10.1 the heading itself still carries the glyph, so the tap target is the whole label',
+	cpHead.textContent.indexOf('?') >= 0);
+ok('10.2 the index reads the label alone',
+	L.setboxHeadingText(cpHead) === PC.lpn_settings_custom_props,
+	JSON.stringify(L.setboxHeadingText(cpHead)));
+// A heading with no tip is every other one in the box, and it must come back byte-identical --
+// the trim exists only to eat the space ecTipLabel() puts in front of the glyph.
+const plainHead = document.createElement('div');
+plainHead.textContent = PC.lpn_settings_defaults;
+ok('10.3 a heading with no tip is untouched',
+	L.setboxHeadingText(plainHead) === PC.lpn_settings_defaults);
+// Written against every heading rather than the one that has a tip today: the next author to add
+// one would otherwise repeat the defect in silence.
+const secHead = tipHeading(PC.lpn_settings_sec_assets, PC.lpn_cp_design_tip);
+ok('10.4 a SECTION heading that grows a tip is read the same way',
+	L.setboxHeadingText(secHead) === PC.lpn_settings_sec_assets);
 
 console.log(fails ? ('\nFAILED: ' + fails) : '\nAll custom-property checks passed.');
 process.exit(fails ? 1 : 0);

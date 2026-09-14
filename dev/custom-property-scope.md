@@ -1,39 +1,62 @@
 # The custom property on an `lpn_` element
 
 Tom's own specification, 2026-09-12, recorded verbatim in substance because it is a DESIGN and not a
-wish. ROADMAP Task 636 is the one-line pointer at this file. Phase 1 shipped 2026-09-13 and his eleven
-numbered revisions of it the same day; both are folded into the statements below rather than
-appended to them.
+wish. ROADMAP Task 636 is the one-line pointer at this file. Phases 1 and 2 shipped 2026-09-13 and his
+eleven numbered revisions of them the same day; all of it is folded into the statements below
+rather than appended to them.
 
 ## Where it lives
 
 A **Custom properties** heading under `Settings > Assets`, beside ID prefixes and Defaults.
 
-## The design table, and the form that is not it
+## One line per property, with an expander
 
-**THE SETTINGS PANE SHOWS THE DESIGN; A POPUP EDITS IT** (Tom, 2026-09-13, confirming his own
-original specification: *"the Custom Property design form must be a popup and ... the Settings pane
-can show only truncated forms of the design except for the key. I now confirm that
-specification."*). Phase 1 put ten live controls in every pane row and he read it back as the wrong
-shape: a row that editable is a form pretending to be a table, and it can be neither wide enough to
-type in nor narrow enough to read twenty of.
+**KEY ON LINE ONE, EVERY OTHER DESIGN FIELD UNDER AN EXPANDER** (Tom, 2026-09-13, his own third
+option: *"each custom property lists only key on line 1 with an expander to show all other design
+fields below it on one line each"*). He offered it beside the popup and asked which fits; the
+answer was measured rather than preferred, and it is this one.
 
-So the pane is a SUMMARY, one row per property, reading across: Key, Label, Applies to, Validate as,
-Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit,
-then Edit and Remove.
+**WHAT THE TABLE AND THE POPUP ACTUALLY DID, in Chromium.** The twelve-column summary needed 721 px
+for its heading row before a single property was designed, against a Settings content pane of
+410 px at the shipped box width on a 1200 px screen and 202 px at 360 px. So the pane scrolled
+sideways by 319 px on a PC and 527 px on a phone -- and `dev/browser-pass/specs/labelcols.js` has
+asserted since Task 435 that it never does, so that spec was RED the moment a heading row existed.
+Worse on the reading side than on the arithmetic: scrolling right to reach the high limit scrolled
+the KEY out of view, and the key is the one column deliberately left unabbreviated because it is
+the identity the row is filed under. The popup was no better on a phone -- `#lpn_dialog` is 50vw
+capped at 360 px, so at 360 px the design form was 180 px wide with a 4 px label column and
+2,661 px of content inside a 444 px scroller.
 
-- **Truncation is the stylesheet's, never a `slice()` in code.** A heading cut to three letters is
-  cut in ENGLISH, and "Val" is the first three letters of nothing a Turkish or Hindi reader would
-  recognise. One ellipsis rule truncates every language in its own words.
-- **The key is the one column with no limit on it**, because the key is the identity the row is
-  filed under, and it is his stated exception.
-- **Headings are back** (his revision 3, reversing phase 1's no-headings alternative), each carrying
-  a tip, and **every column tip leads with the name of its own column** (revision 4) because the
-  heading above it is the abbreviation.
-- **The popup stages nothing and has no OK.** Each control commits on `change`, as every other row
-  of the Settings box does; Close only closes.
-- **Add and remove like demand categories**, and Add opens the form on the new row: a blank row in a
-  summary table says nothing about what the user has just been given.
+So the pane is now, per property:
+
+- **Line one: the key, in full, and Remove.** Remove is not a design field and does not belong
+  under the expander; and removing a property whose key you can already read should not cost
+  opening it first. A design with no key yet says so (`lpn_cp_unnamed`), because a blank line is
+  indistinguishable from a rendering fault.
+- **Under the expander: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters,
+  Fewest characters, Most characters, Low limit, High limit** -- one `.lpn-set-row` each. Key is a
+  field as well as the heading because renaming has to live somewhere and a heading is not a text
+  box.
+- **Nothing is truncated any more, and that is the gain.** A `.lpn-set-row` already collapses to
+  one column under the container query at 24rem, so a design field inherits the phone layout that
+  was written once for every other row in this box. The old ellipsis rule existed to keep a slice
+  from being made in ENGLISH, and not slicing at all is the better answer to the same problem.
+- **Every control commits on `change`**, as every other row of the Settings box does. There is no
+  OK and nothing is staged -- which is also what the popup broke: it was the only control in the
+  whole box that left the box to be edited. **And a commit does NOT rebuild the Settings box**:
+  `change` fires on BLUR, so rebuilding would destroy the field just left and the nine after it
+  while the browser was moving focus into the next one, and ten fields in a row is exactly where
+  somebody tabs. Line one's key text is written in place instead. The ID prefix rows beside this
+  one have always committed with `saveToStorage()` alone, for the same reason.
+- **Whether a design is open is FURNITURE and is stored nowhere** -- not in `serializeProject()`,
+  not in `localStorage`. It lives in `cpOpenKeys` for the life of the page, so that the rebuilds
+  that DO happen -- Add and Remove, which change the structure -- put the reader back where they
+  were.
+- **Add appends a blank design and opens it**, for the reason the popup used to open on a new row.
+
+*(Superseded, recorded so it is not rebuilt by habit: the design SUMMARY TABLE with `Edit` and
+`Remove` per row, and `openCustomPropDesign()`, both shipped in phase 2. `lpn_cp_edit_tip` and
+`lpn_cp_edit_title` went with them.)*
 
 ## Validation
 
