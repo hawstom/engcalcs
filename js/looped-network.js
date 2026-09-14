@@ -25192,7 +25192,17 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointerdown', function (e) {
 			gestureMoved = false;
 			if (regMode) { return; } // a Scale/Position registration click sequence is pending -- see wireBackdropMenu()
-			svg.setPointerCapture(e.pointerId);
+			// **GUARDED, BECAUSE A THROW HERE TAKES THE WHOLE GESTURE WITH IT.** setPointerCapture()
+			// rejects with NotFoundError when the browser no longer considers the pointer active, and
+			// this line sits BEFORE pointers.set() and before any drag record is made -- so one throw
+			// means no pan, ever, while clicks and wheel zoom keep working, because they are other
+			// handlers. That is an invisible failure: the map draws, every element still selects, and
+			// only dragging is dead. The two other setPointerCapture() calls in this file (the pane
+			// grips) were already wrapped exactly this way; this one was not, so the tree had decided
+			// the same question in two opposite directions. Capture is an OPTIMISATION here -- it keeps
+			// pointermove arriving when the pointer leaves the svg -- so losing it degrades the drag at
+			// the edges rather than removing it, which is strictly better than losing the gesture.
+			try { svg.setPointerCapture(e.pointerId); } catch (err) { /* drag without capture */ }
 			pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 			if (pointers.size === 2) {
 				var pts = Array.from(pointers.values());

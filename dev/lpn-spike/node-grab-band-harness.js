@@ -367,12 +367,15 @@ console.log('\n--- the stylesheet half ---');
 	// The 2026-09-08 fix that must not come back: the `*` half of the panning rule.
 	ok('the panning rule still does NOT reach every child of the canvas',
 		css.indexOf('#lpn_canvas.lpn-panning *') < 0);
-	// **THE BARE MAP STILL SPEAKS, AND NO LONGER WITH A HAND** (Tom, 2026-09-13: the grab cursor is
-	// *"not right for professional work"*). This read `cursor: grab`; the property under it is that
-	// the canvas states a cursor at all, which is what stops the strip between a node and its label
-	// reading as dead space. The glyph is css/engcalcs.css's to choose.
+	// **THE BARE MAP STILL SPEAKS, AND NOW IT SAYS `default`** (Tom, 2026-09-13, twice: the grab
+	// cursor is *"not right for professional work"*, and then *"pointer doesn't look very good on
+	// the map"*). This read `cursor: grab`, then `cursor: pointer`, and the glyph is not the
+	// property. The property is that the canvas DECLARES a cursor, which is what stops the strip
+	// between a node and its label changing three times in 12 px. `default` is a declaration;
+	// `auto`, or no rule at all, is the omission Task 569 fixed, and that is all this refuses now.
+	// The map/element distinction moves to a color change: ROADMAP Task 659.
 	ok('the bare map still states a cursor of its own, so it is not dead space',
-		/#lpn_canvas \{[^}]*cursor:\s*(?!default\b|auto\b)[a-z-]+/.test(css));
+		/#lpn_canvas \{[^}]*cursor:\s*(?!auto\b)[a-z-]+/.test(css));
 }
 
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nall checks passed');
