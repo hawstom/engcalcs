@@ -2,10 +2,18 @@
 
 ## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-14.
 
-**MASTER IS FROZEN.** `dev/branch-policy.json`, `freeze.active = true`, until after EWB on
-**17 September** (not the 16th; this repository said 16 in six places and was wrong). Tom,
-2026-09-13: *"We do want to continue development right through the EWB meeting, but we can't do that
-if we are merging our work to master."* Development continues on branches. **Merging does not.**
+**THE FREEZE IS A FEATURE FREEZE, AND READING IT AS A MERGE FREEZE BLOCKS BUG FIXES.** Corrected
+2026-09-14; `dev/branch-policy.json` now has `freeze.active = false` and states the plan.
+
+**Tom's plan, in his own words on 2026-09-14 after this repository got it wrong twice:** freeze
+FEATURES on 10 September; fix bugs through 14 September; translate on the 14th; **then keep fixing
+bugs AND DEPLOYING THEM through 16 September.** So a bug fix merges to master on the ordinary rules
+and master must stay PULLABLE, because he is pulling it. What may not merge is a FEATURE.
+
+*"But what I am hearing from you blocks bug fixes, and that is unacceptable."* The 09-13 reading
+turned his sentence *"we can't do that if we are merging our work to master"* into a total merge
+freeze; **"our work" meant the capability branches**, which is what the `protected` list is for.
+A day of bug-fixing was lost to it. Do not set `freeze.active` true again without his word.
 
 **YOU MAY NOT MERGE A CAPABILITY BRANCH ON YOUR OWN JUDGEMENT, EVER.** Tom: *"Really you should
 never merge a major branch to master without my all-clear on completion."* `customer`, `graph`,
@@ -14,8 +22,12 @@ never merge a major branch to master without my all-clear on completion."* `cust
 branch moves. **`dev/hooks/pre-merge-commit` and `pre-commit` now refuse both merge paths** -- but
 a guard is not an excuse to stop thinking, and the first version of that guard was DEAD for a day.
 
-**THERE IS AN OPEN DEPLOY BLOCKER.** `dev/deploy-blockers.json`: `projection` cannot ship with UTM
-only. 183 of 5,346 projections are offered. Tom said *"We won't deploy with UTM only"* before that
+**THERE IS AN OPEN DEPLOY BLOCKER, NOW ADDRESSED AND AWAITING HIS WORD.** `dev/deploy-blockers.json`:
+`projection` cannot ship with UTM only. **All 5,346 live projected CRS shipped 2026-09-14** —
+`js/data/epsg-projected.json`, State Plane and every national grid included, fetched when the
+chooser opens, the 183 hand-typed rows kept as the offline fallback. **The blocker STAYS OPEN**: he
+asked to TEST with the full universe and has not yet, and closing one is his word, never an AI's.
+Originally 183 of 5,346 projections were offered. Tom said *"We won't deploy with UTM only"* before that
 branch existed, and **that sentence appeared nowhere in this repository** -- which is why the
 register now exists. **A constraint that lives only in a transcript does not exist. Write it down in
 the turn he says it.**
@@ -688,7 +700,14 @@ cursor at `default` with objects at `pointer`.
 3. **Initial quality is in no Table and no multi-properties.** His words: *"Embarrassing, and we are
    committed to finishing it."*
 4. **Projection opens a new project at 0,0 in the corner instead of the view chosen in the wizard**,
-   on the PROJECTED path. A fix exists on the `projection` branch and is NOT on master.
+   on the PROJECTED path. ~~A fix exists on the `projection` branch and is NOT on master.~~
+   **THAT SENTENCE WAS FALSE and is corrected 2026-09-14**: `projection` is **0 commits ahead of
+   master** (so are `custom-property`, `customer` and `graph` — all four are bare labels on an
+   older master commit, holding nothing). Whatever fix was meant either merged with the branch or
+   never existed. **A projected project cannot travel to a searched place without a transform**,
+   which this page does not have; what it does now is SAY so, which is the phase-3 note the
+   harness asserts. If he wants the project to actually open there, that is proj4js — Task 641
+   phase 5 and `dev/projection-catalogue.md` §6.
 5. **Table column headings do not wrap and the columns are too wide.** He wants user-resizable
    columns eventually.
 6. **Settings selectors block for 2 to 3 seconds** in both browsers (Task 653). Not a regression.

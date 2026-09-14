@@ -23,18 +23,27 @@
         "custom-property"
     ],
     "freeze": {
-        "active": true,
+        "active": false,
         "_comment": [
-            "A FREEZE stops EVERY merge into master, including ordinary tracks, except one marked",
-            "'hotfix:' in its merge subject. Set active true and state until and why. Tom, 2026-09-13:",
-            "'We do want to continue development right through the EWB meeting, but we can't do that",
-            "if we are merging our work to master.' A freeze is how development continues while the",
-            "production line holds still.",
+            "THE FREEZE IS A FEATURE FREEZE. IT HAS NEVER BEEN A MERGE FREEZE, AND READING IT AS ONE",
+            "BLOCKS BUG FIXES -- which are the entire content of these days.",
             "",
-            "It is OFF today because he did not ask for one -- he asked for the all-clear gate. Turning",
-            "It is ON as of 2026-09-13. It was OFF for the first draft of this file, on the reasoning that he had asked for the all-clear gate rather than a freeze -- and that was wrong: the freeze was already in dev/session-handoff.md, set on 2026-09-10, and had simply never been read."
+            "Tom's plan, stated 2026-09-10 and repeated 2026-09-14 because this repository kept getting",
+            "it wrong: freeze FEATURES on 10 September; fix bugs through 14 September; translate on the",
+            "14th; then keep fixing bugs AND DEPLOYING THEM through 16 September.",
+            "",
+            "So a bug fix merges to master on the ordinary rules -- green check_all on the merge result",
+            "-- and master must stay PULLABLE, because he is pulling it every day. What may not merge is",
+            "a FEATURE, and the 'protected' list above is the whole mechanism for that: a capability",
+            "branch needs his all-clear.",
+            "",
+            "'active: true' stops EVERY merge but a 'hotfix:'. That is an emergency instrument and it is",
+            "OFF. It was ON from 2026-09-13 to 2026-09-14 on a misreading of 'we can't do that if we are",
+            "merging our work to master' -- 'our work' meant the capability branches, not the bug fixes",
+            "he was waiting on. Tom, 2026-09-14: 'what I am hearing from you blocks bug fixes, and that",
+            "is unacceptable.' Do not set it true again without his word."
         ],
-        "until": "after EWB, which is 17 September (Tom, 2026-09-13, correcting this repository). Lift on his word, not on a date.",
-        "why": "Tom, 2026-09-13: \"We do want to continue development right through the EWB meeting, but we cant do that if we are merging our work to master.\" His plan of 2026-09-10 already said it: \"4 days of bugs, then 2 days of translation, not earlier\" -- dev/session-handoff.md section 5, \"Bugs only until the freeze\". Six capability merges went in on 09-13 against that plan because nobody had read it."
+        "until": null,
+        "why": null
     }
 }
