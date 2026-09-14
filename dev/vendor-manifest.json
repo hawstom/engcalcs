@@ -13,6 +13,48 @@
   ],
   "data": [
     {
+      "name": "EPSG Dataset, proj4 definitions",
+      "path": "js/data/epsg-proj4.json",
+      "digest": "a+RXSDVAFkFUN5dAjQ1Abxr6RdfTnwcV4BJLyvy9Xl346nzLx2N8ErWYku5lTyma",
+      "rows": 5240,
+      "epsg_version": "v12.029",
+      "epsg_date": "2025-10-02",
+      "licence": "IOGP EPSG Terms of Use",
+      "licence_url": "https://epsg.org/terms-of-use.html",
+      "attribution": "EPSG Dataset © IOGP",
+      "upstream": "https://epsg.org/",
+      "generated_by": "dev/scripts/generate_projection_defs.js",
+      "checked_by": "dev/scripts/projection_catalogue_check.php and dev/lpn-spike/projection-defs-harness.js",
+      "input": {
+        "what": "the same proj.db the catalogue is built from, read for conversion parameters rather than for names",
+        "package": "pyproj 3.8.0",
+        "file": "pyproj-3.8.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "sha256": "6b34cec6bdd66b721980c003cc2a0fce0cab7949444ad037fc2a7ecb6f3b996c",
+        "sha256_source": "published by PyPI at https://pypi.org/pypi/pyproj/json",
+        "member": "pyproj/proj_dir/share/proj/proj.db",
+        "proj_version": "9.8.1",
+        "committed": false
+      },
+      "_comment": [
+        "THE TRANSFORM HALF OF THE PROJECTION DATA (Task 641 phase 5). The catalogue beside this",
+        "says what a coordinate system is CALLED; this says how to turn a longitude into an",
+        "easting, which is what a basemap behind a projected project and an arrival at a searched",
+        "place both need. Fetched only when a projected project needs it, never with the chooser.",
+        "",
+        "5,240 of 5,346 -- 98.0%. The remainder is projection METHODS proj4 does not implement or",
+        "we have not mapped, and it is a real state the page states: no basemap, no arrival, the",
+        "user's own coordinates untouched. Substituting a near-enough projection would draw a map",
+        "tens of metres out, which is worse than no map.",
+        "",
+        "SAME WEAKER-DIGEST CAVEAT AS THE CATALOGUE: the derivation is ours and nobody publishes a",
+        "hash of it. What makes it trustworthy is not this digest but the harness, which holds it",
+        "against proj4's OWN definitions for the 120 UTM zones (0.000 m over 1,080 points) and the",
+        "central meridians against the register's own NAMES (1,550 of them, all agreeing). That",
+        "second one is not decoration: EPSG unit 9110 is sexagesimal DDD.MMSSsss, and misreading",
+        "it as a decimal degree round-trips perfectly while sitting kilometres from the truth."
+      ]
+    },
+    {
       "name": "EPSG Dataset, live projected CRS",
       "path": "js/data/epsg-projected.json",
       "digest": "Od9zbfb0wsOeNKEDRK9wru43t5HHSBDjS/hLY7G1z2AZoSzT1hl97Ki4qTisSoPF",
@@ -89,6 +131,27 @@
           "path": "js/vendor/bootstrap.bundle.min.js",
           "from": "dist/js/bootstrap.bundle.min.js",
           "digest": "C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL",
+          "modifications": []
+        }
+      ]
+    },
+    {
+      "name": "proj4",
+      "version": "2.22.0",
+      "licence": "MIT",
+      "upstream": "https://www.npmjs.com/package/proj4",
+      "notes": "The tarball's sha1 matched the shasum npm publishes for 2.22.0 (f4fa16ed0b158923be8713d67bf62e5e1400693f), so this is the upstream release. Vendored 2026-09-14 for Task 641 phase 5: a projected project could not draw a basemap or open on the place the wizard searched, because both need a transform between lon/lat and the plane and this suite had none. It bundles almost no CRS definitions; those are generated into js/data/epsg-proj4.json from the same pinned proj.db the catalogue comes from.",
+      "files": [
+        {
+          "path": "js/vendor/proj4.js",
+          "from": "dist/proj4.js",
+          "digest": "RCBbAm8IhfOOoFV7vqUhspSb+BCSvVSd84WJpv5VMq4rNiXJ88VMHtndxQntlbnd",
+          "modifications": []
+        },
+        {
+          "path": "js/vendor/proj4.LICENSE",
+          "from": "LICENSE.md",
+          "digest": "7GojCYJcJsOKggF1JGJ+Jm2YGs3BAVbA2oY4W6ZP7bGjpz3IFH8O6aW8D0iFOYuo",
           "modifications": []
         }
       ]

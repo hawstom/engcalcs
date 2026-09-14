@@ -2680,6 +2680,13 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-collide.js?v=<?=filemtime(__DIR__.'/js/lpn-collide.js')?>"></script>
 <script src="/engcalcs/js/lpn-profile.js?v=<?=filemtime(__DIR__.'/js/lpn-profile.js')?>"></script>
 <script src="/engcalcs/js/lpn-georef.js?v=<?=filemtime(__DIR__.'/js/lpn-georef.js')?>"></script>
+<?php // **THE TRANSFORM, AND IT IS THE LOADER THAT SHIPS HERE, NOT THE LIBRARY** (Task 641 phase
+      // 5). js/lpn-crs.js is a few kilobytes and fetches js/vendor/proj4.js (130 KB) and the 5,240
+      // definitions (62 KB gzipped) only once a PROJECTED project actually needs them -- which is
+      // never, for the majority who work in latitude and longitude, where tiles go straight into
+      // the Mercator frame with no transform at all. Putting 190 KB on every page load to serve
+      // the minority is the shape of decision that put the EPANET engine on the critical path. ?>
+<script src="/engcalcs/js/lpn-crs.js?v=<?=filemtime(__DIR__.'/js/lpn-crs.js')?>"></script>
 <?php // The colour catalogue and the swatch GEOMETRY (js/lpn-ramps.js). Pure arithmetic, no DOM:
       // the strip in the Coloring controls asks it how wide each box is rather than counting on
       // flex, which is how the first swatch came to eat the whole strip. ?>

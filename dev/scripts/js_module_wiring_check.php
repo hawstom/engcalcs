@@ -83,6 +83,10 @@ const EC_HARNESS_LAZY_MODULES = [
                      . 'gate, so the shared stub is the last place it should be started; the '
                      . 'harnesses about it load it themselves.',
     'lpn-terrain.js' => 'the Mapbox elevation lookup, for exactly the same reason as lpn-search.js.',
+    'lpn-crs.js' => 'the projected-coordinate transform. It fetches js/vendor/proj4.js and 62 KB '
+                  . 'of definitions on first use, so booting it in the shared stub would make '
+                  . 'every harness pay for a library almost none of them touch; the projection '
+                  . 'harnesses load it themselves.',
 ];
 
 /**

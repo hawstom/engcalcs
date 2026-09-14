@@ -8662,7 +8662,11 @@ var EngCalcs = EngCalcs || {};
 					// zoom happened to ask for different tile numbers.
 					key: basemapStyle() + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
 					url: tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
-					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT
+					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT,
+					// The tile's own corner of the Earth, carried so a PROJECTED project can ask
+					// where this square lands in its plane. The geographic path ignores these:
+					// its frame IS Mercator, so the four numbers above are already the answer.
+					lonW: lonL, lonE: lonR, latN: latT, latS: latB
 				});
 			}
 		}
@@ -8673,7 +8677,18 @@ var EngCalcs = EngCalcs || {};
 	// whole of `project`, so it rides along with no new plumbing. ABSENT means on: a geographic
 	// project is a statement that you want a map of the Earth behind you, and opening one onto grey
 	// nothing is the failure the roadmap block describes.
-	function basemapOn() { return isGeoProject() && project.basemap !== 'off'; }
+	// **AND SINCE 2026-09-14 A PROJECTED PROJECT MAY HAVE ONE TOO** (Task 641 phase 5). Tom:
+	// *"the world map is not in the background."* It was not absent by decision -- it was absent
+	// because this page could not turn a longitude into an easting, so there was nowhere to put
+	// the tile. `EngCalcs.lpnCrsHas()` is that question asked honestly: 98% of the register can be
+	// transformed and the rest cannot, and for the rest the answer stays no rather than becoming
+	// a map drawn somewhere near enough.
+	function projectedBasemapOk() {
+		return isProjectedProject() && !!EngCalcs.lpnCrsHas && EngCalcs.lpnCrsHas(projectCrsCode());
+	}
+	function basemapOn() {
+		return (isGeoProject() || projectedBasemapOk()) && project.basemap !== 'off';
+	}
 	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
 	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
 	function setBasemapStyle(style) {
@@ -8767,6 +8782,16 @@ var EngCalcs = EngCalcs || {};
 	function paintBasemapTiles() {
 		if (!basemapLayer) { return; }
 		var k, r, tl, br, list, want;
+		// **THE TRANSFORM IS FETCHED HERE, WHICH IS THE ONE PLACE EVERY ENTRY GOES THROUGH.** A
+		// projected project can arrive by being created, by being opened from a file, by the boot
+		// path restoring a tab, or by a pan -- and all four repaint. Asking at each of them
+		// instead would be four things to keep in step, and the boot path is the one that gets
+		// forgotten (see the credit note below, which is the same lesson).
+		if (isProjectedProject() && project.basemap !== 'off' && EngCalcs.lpnCrsLoad
+				&& EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
+			EngCalcs.lpnCrsLoad(function () { refreshBasemap(); });
+			return;
+		}
 		if (!basemapOn() || !svg || !mapSized) {
 			basemapLayer.innerHTML = '';
 			basemapEls = {};
@@ -8775,26 +8800,83 @@ var EngCalcs = EngCalcs || {};
 		r = svg.getBoundingClientRect();
 		tl = screenToWorld(r.left, r.top);
 		br = screenToWorld(r.right, r.bottom);
-		list = basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
+		// **WHICH PATCH OF THE EARTH IS ON SCREEN, ASKED THE WAY THIS FRAME CAN ANSWER IT.** In a
+		// geographic project the frame is Mercator, so the corners ARE lon/lat once outwardX/Y
+		// have run. In a projected one they are eastings and northings, and the answer has to
+		// come back through the transform -- from the whole perimeter rather than four corners,
+		// because a projected rectangle's edges bow and a corner-only box leaves a strip of
+		// missing tiles along the top. lpnCrsBounds() states that.
+		var proj = projectedBasemapOk(), bnds = null;
+		if (proj) {
+			// outwardX/outwardY, exactly as the geographic branch below uses them: they are the
+			// one boundary out of the drawing frame, and in a projected project they hand back
+			// the plane's own eastings and northings with the local origin and the y negation
+			// undone.
+			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(),
+				outwardX(tl.x), outwardY(tl.y), outwardX(br.x), outwardY(br.y));
+			if (!bnds) { basemapLayer.innerHTML = ''; basemapEls = {}; return; }
+		}
+		// **THE ZOOM ARGUMENT IS A SCALE IN THE FRAME'S OWN UNITS AND THEY ARE NOT THE SAME UNITS.**
+		// `state.s` is pixels per world unit: per DEGREE in a geographic project, per metre or per
+		// foot in a projected one. Handing the projected number straight to tileZoomFor() would
+		// ask for zoom 0 over a city. So it is converted to the degrees-per-pixel the tile chooser
+		// expects, using the ground width the view actually covers.
+		var scaleForTiles = state.s;
+		if (proj) {
+			var wpx = Math.max(1, r.right - r.left);
+			var degPerPx = (bnds.east - bnds.west) / wpx;
+			scaleForTiles = degPerPx > 0 ? 1 / degPerPx : state.s;
+		}
+		list = proj
+			? basemapTileList(bnds.west, bnds.south, bnds.east, bnds.north, scaleForTiles)
+			: basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
 		want = {};
 		list.tiles.forEach(function (t) {
 			want[t.key] = true;
 			if (basemapEls[t.key]) { return; }
+			// **WHERE the tile goes is the branch; MAKING it is not.** Two `el('image')` calls
+			// would be two places to remember crossorigin, the class and the aspect rule, and
+			// dev/lpn-spike/basemap-harness.js counts the creation sites for exactly that reason.
+			// So the branch computes a box and hands it over.
+			var place;
+			if (proj) {
+				// **ONE AFFINE PER TILE, WHICH IS THE WHOLE ACCURACY DECISION.** A Mercator tile
+				// is a curved quadrilateral in a projected plane and an SVG image can only be
+				// given an affine, so the curvature is absorbed tile by tile: pinned once for the
+				// whole view the error reaches 2,338 m across this suite's 300 km scope, and
+				// pinned per tile it is far under the width of the line a pipe is drawn with.
+				var cn = EngCalcs.lpnCrsTileCorners(projectCrsCode(), t.lonW, t.latN, t.lonE, t.latS);
+				if (!cn) { return; }   // degenerate at the pole; one tile missing beats a smear
+				// Into the drawing frame at the page's own seam, which subtracts the local origin
+				// and NEGATES y -- without that a northing draws the world upside down.
+				var ax = inwardX(cn.tl.x), ay = inwardY(cn.tl.y);
+				place = {
+					x: 0, y: 0, width: 1, height: 1,
+					transform: 'matrix(' + [
+						inwardX(cn.tr.x) - ax, inwardY(cn.tr.y) - ay,
+						inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
+					].join(' ') + ')'
+				};
+			} else {
+				// **THE TILE BOX IS SQUARE** -- this frame is Web Mercator, so a Mercator tile
+				// keeps its own proportions and needs no matrix at all. This said "NOT square in
+				// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
+				// the frame as it was before Task 145.
+				place = { x: t.px, y: t.py, width: t.pw, height: t.ph };
+			}
 			// crossorigin=anonymous: no cookies and no credentials travel to the tile server, which
 			// is the cheapest privacy win available here. OSM's tile servers send
 			// Access-Control-Allow-Origin: *, so it costs nothing. The Referer is deliberately left
 			// alone -- the tile usage policy asks for a real one, and the browser sends it.
-			basemapEls[t.key] = el('image', {
-				href: t.url, x: t.px, y: t.py, width: t.pw, height: t.ph,
-				// **THE TILE BOX IS SQUARE** -- this frame is projected (see the basemap note above),
-				// so a Web Mercator tile keeps its own proportions here. This said "NOT square in
-				// this unprojected frame -- it is 1 : cos(latitude)" until 2026-09-11, describing
-				// the frame as it was before Task 145. `none` is kept deliberately all the same:
-				// it makes the raster fill the box the arithmetic computed rather than letting the
-				// renderer letterbox on a sub-pixel rounding difference at a tile seam.
-				preserveAspectRatio: 'none', crossorigin: 'anonymous',
+			//
+			// `preserveAspectRatio: none` makes the raster fill the box the arithmetic computed
+			// rather than letting the renderer letterbox on a sub-pixel rounding difference at a
+			// tile seam -- and in the projected case it is doing real work, because the matrix
+			// deliberately makes the box a parallelogram.
+			basemapEls[t.key] = el('image', Object.assign({
+				href: t.url, preserveAspectRatio: 'none', crossorigin: 'anonymous',
 				'class': 'lpn-basemap-tile'
-			}, basemapLayer);
+			}, place), basemapLayer);
 		});
 		for (k in basemapEls) {
 			if (basemapEls.hasOwnProperty(k) && !want[k]) {
@@ -23530,8 +23612,40 @@ var EngCalcs = EngCalcs || {};
 			// scale is the one the wizard was looking at. The user lands on an empty plane at a
 			// workable zoom instead of at a pin-prick corner, and nothing here claims to know
 			// where on the Earth that plane is.
+			// **AND NOW IT TRAVELS THERE** (Task 641 phase 5). Tom ruled on the sentence below
+			// rather than on the code: *"This is a problem. The projected project needs to open
+			// at the place you searched for. We know the lat/lon and zoom level they searched
+			// for. That needs to be the initial view of their project."* He was right, and the
+			// two passes before this one answered the whole request with the half that was
+			// impossible. One forward transform of one point is all it ever needed.
+			//
+			// The project id is captured because the fetch is asynchronous and a user can open
+			// another tab while 190 KB is in the air; arriving then would move somebody else's
+			// camera.
+			var bornAs = id, ll = { lon: place.lon, lat: place.lat };
 			applyView({ cx: 0, cy: 0, s: projectedFitScale(place) });
-			setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+			if (!EngCalcs.lpnCrsLoad) {
+				// **NO TRANSFORM MODULE AT ALL STILL OWES THE SENTENCE.** Caught by
+				// dev/lpn-spike/projection-harness.js, which loads the editor without
+				// js/lpn-crs.js: the first draft skipped the whole branch and the user got
+				// neither the arrival nor the explanation -- a project silently on its own plane
+				// with nothing said about it, which is the state this notice exists to prevent.
+				setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+			} else {
+				EngCalcs.lpnCrsLoad(function () {
+					if (library.openId !== bornAs) { return; }
+					var p = EngCalcs.lpnCrsHas(crs) ? EngCalcs.lpnCrsForward(crs, ll) : null;
+					if (p) {
+						applyView({ cx: inwardX(p.x), cy: inwardY(p.y), s: projectedFitScale(place) });
+						refreshBasemap();
+						return;
+					}
+					// **THE 2% STILL GET THE SENTENCE, AND IT IS STILL TRUE FOR THEM.** A CRS
+					// whose projection method proj4 does not implement cannot be placed, and
+					// saying so is better than a plane pretending to be somewhere.
+					setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+				});
+			}
 		}
 		return id;
 	}
