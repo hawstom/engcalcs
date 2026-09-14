@@ -2,6 +2,26 @@
 
 ## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-14.
 
+**WHERE THE 09-14 BUG LIST LANDED — master `06aaf790`, green and pushed.** Done and on master: the
+`empty` Find condition, Initial quality in Find (chemical-gated) and in the Tables and
+multi-properties, EPSG codes in the projection selector, the projected-project zoom, Tom's Net3
+custom-property example, and the two custom-property defects. **The `utm-only` deploy blocker is
+CLOSED on his word** (*"Close/delete it. Obsolete."*) — `dev/deploy-blockers.json` holds no open
+blocker now, and the register itself stands.
+
+**TWO STRINGS ARE DELIBERATELY DIFFERENT ON master AND ON `projection`, AND THAT IS NOT DRIFT.**
+`lpn_new_coordsys_local` and its tip promise georeferencing later, which cannot be met until
+`projection` lands. master carries the short honest pair (*"Local, schematic, or custom"* /
+*"Choose this to attach your own background image."*); `projection` carries the full pair and is
+merged up to master (`f3740ec9`). **When `projection` merges after EWB the branch's wording wins,
+and that is the intended outcome** — do not "fix" either side to match the other before then.
+
+**`tables-interface` EXISTS AND IS NOT ON master, ON HIS INSTRUCTION** (*"Roadmap not on master
+until approved"*). It carries Task 666 and lists itself in `dev/branch-policy.json`, so the merge
+gate refuses it from its own tree without touching master's policy. Copy and paste in the tables
+is BROKEN and is the defect inside that programme.
+
+
 **THE FREEZE IS A FEATURE FREEZE, AND READING IT AS A MERGE FREEZE BLOCKS BUG FIXES.** Corrected
 2026-09-14; `dev/branch-policy.json` now has `freeze.active = false` and states the plan.
 
