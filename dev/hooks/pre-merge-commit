@@ -31,13 +31,17 @@ named=${GIT_REFLOG_ACTION#merge }
 [ "$named" = "$GIT_REFLOG_ACTION" ] && exit 0   # not a merge action: nothing to judge
 merge_sha=$(git rev-parse --verify "$named" 2>/dev/null) || exit 0
 
-# **THE SUBJECT COMES FROM MERGE_MSG, WHICH IS THE MESSAGE ACTUALLY BEING WRITTEN.** Passing
-# "merge $named" instead was a real flaw and it bit on the first live use: a merge deliberately
-# subjected `hotfix:` was refused by the freeze, because the hook had thrown that word away before
-# the gate could read it. MERGE_MSG exists here even though MERGE_HEAD does not.
-msg_file="$(git rev-parse --git-dir)/MERGE_MSG"
-subject=$(head -n1 "$msg_file" 2>/dev/null)
-[ -n "$subject" ] || subject="merge $named"
+# **THIS HOOK CANNOT SEE THE MESSAGE, AND THAT IS MEASURED, NOT ASSUMED.** Neither MERGE_HEAD nor
+# MERGE_MSG exists when pre-merge-commit runs on a clean merge -- both are written later -- so a
+# `hotfix:` subject is invisible here however carefully it is typed. Probed 2026-09-14 rather than
+# reasoned: the hook logged an empty MERGE_MSG and fell back every time.
+#
+# **SO THE FREEZE ESCAPE ON THIS PATH IS `git merge --no-verify`, AND THAT IS BETTER.** A word in a
+# subject line is a flag somebody types by habit; --no-verify is a decision somebody makes, visible
+# in the command, and git already provides it. The `hotfix:` recognition in branch_gate.php is still
+# live and still tested -- it is reached through pre-commit, which DOES have MERGE_MSG because a
+# conflicted merge is committed by hand.
+subject="merge $named"
 
 php "$root/dev/scripts/branch_gate.php" "$merge_sha" "$subject" || exit 1
 exit 0
