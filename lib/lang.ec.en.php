@@ -2373,14 +2373,13 @@ $ec_lang['lpn_settings_custom_props']='Custom properties';
 // of what a reader needs before opening the design table.
 $ec_lang['lpn_settings_custom_props_note']='Properties you define yourself for your own purposes. They are stored with the project and scenarios like all other properties.';
 $ec_lang['lpn_cp_design']='Design';
-$ec_lang['lpn_cp_design_tip']='One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.';
+$ec_lang['lpn_cp_design_tip']='One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.';
 $ec_lang['lpn_cp_add']='Add custom property';
 $ec_lang['lpn_cp_add_tip']='Adds a row to the design table and opens it for editing.';
 $ec_lang['lpn_cp_remove']='Remove';
 $ec_lang['lpn_cp_remove_tip']='Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.';
-$ec_lang['lpn_cp_edit_tip']='Opens the design of this custom property, where every part of it is shown at full length.';
-$ec_lang['lpn_cp_edit_title']='Custom property design';
 $ec_lang['lpn_cp_none']='No custom property is designed yet.';
+$ec_lang['lpn_cp_unnamed']='Not named yet';
 // **EVERY COLUMN TIP LEADS WITH THE NAME OF ITS COLUMN** (Tom, 2026-09-13, revision 4). The heading
 // above it is truncated to keep twenty rows readable at once, so the tip is the only place the
 // full name of the column is ever written out.

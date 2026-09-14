@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read**, of 106 untranslated keys, of 1869 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read**, of 105 untranslated keys, of 1868 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (106, 2 to read @@ NEEDS RULING)
+## lpn_  (105, 4 to read @@ NEEDS RULING)
 
 - **`lpn_about_credits`**
   > Credits
@@ -79,14 +79,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Design
   _Ruled OK 2026-09-14._
 - **`lpn_cp_design_tip`**
-  > One row per custom property, reading across: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.
-  _Ruled OK 2026-09-14._
-- **`lpn_cp_edit_tip`**
-  > Opens the design of this custom property, where every part of it is shown at full length.
-  _Ruled OK 2026-09-14._
-- **`lpn_cp_edit_title`**
-  > Custom property design
-  _Ruled OK 2026-09-14._
+  > One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.
+  @@ NEEDS RULING
 - **`lpn_cp_flag`**
   > {label}: {reason} The value is kept exactly as you typed it.
   _Ruled OK 2026-09-14._
@@ -158,6 +152,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_cp_restrict_tip`**
   > Restrict these characters: A value may use only the characters listed here, or none of them, where "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
+- **`lpn_cp_unnamed`**
+  > Not named yet
   @@ NEEDS RULING
 - **`lpn_cp_val_camel`**
   > camelCase
