@@ -467,27 +467,6 @@ the block.
     (see the closed Task 658 note in `pointer-capture-harness.js`, whose claim that they already
     were was wrong).
 
-- 100|638| **Node and link symbology do not offer the chemical properties.**
-  **THE FIELDS ALL SHIPPED 2026-09-13; ONE LEGEND QUESTION IS WHAT IS LEFT.** Node symbology offers
-  quality and initial quality; link symbology offers average quality, friction factor and status,
-  coloured AND labelled, in both `COLOR_*_FIELDS` and `nodeFieldDefs()`/`linkFieldDefs()`.
-  `dev/lpn-spike/chemical-symbology-harness.js`, 40 assertions off a real EPS run.
-  - **THE REACTION RATE SHIPPED TOO, UNDER TASK 652, AND WHAT STOOD HERE WAS WRONG.** This block
-    said it was not shippable from the toolkit, on the ground that `LinkProperty` ends at `LinkQual`
-    and the only alternatives were a binary parser or mass-transfer arithmetic of our own. The enum
-    finding is correct; the conclusion was not. **EPANET writes the number into its binary output
-    file and the vendored wrapper already exports a reader for it** (`readBinary()`, series
-    `reactionRate`), so nothing was derived and nothing upstream was needed. The general lesson is
-    worth more than the feature: the question that answers this is not *what does the API expose?*
-    but *what does the engine WRITE?* -- an engine with a report has a report to read.
-  - A link's average quality **was never read from the engine at all** before this; `EN_LINKQUAL`
-    is now harvested in `js/lpn-epanet.js` and carried through `js/lpn-time.js` as its own map,
-    because link ids and node ids are two namespaces.
-  - **`status` is categorical and the ramp is numeric**, so it enters as 1 open / 0 closed. The map
-    reads correctly; the LEGEND prints numeric bands rather than the two words. Fixing that means
-    changing the field-definition shape, which was deliberately not done while Task 636 was in
-    flight beside it. Decide whether the legend is worth that.
-
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
   more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with
