@@ -1303,32 +1303,12 @@
             "on": "Coordinates",
             "ruled": "2026-08-29"
         },
-        "lpn_new_coords_geo": {
-            "on": "lat/lon",
-            "ruled": "2026-09-01"
-        },
-        "lpn_new_coords_tip": {
-            "on": "An xy project is a model on any coordinates other than lat/lon. A lat/lon project has geographic coordinates, so a street map or satellite picture can be drawn behind it and node elevations can be read from the terrain. An xy project can be converted to lat/lon with File > Import xy to lat/lon.",
-            "ruled": "2026-08-29"
-        },
-        "lpn_new_coords_xy": {
-            "on": "xy grid",
-            "ruled": "2026-08-29"
-        },
         "lpn_new_create": {
             "on": "Create",
             "ruled": "2026-08-29"
         },
-        "lpn_new_place": {
-            "on": "Start near this place",
-            "ruled": "2026-08-29"
-        },
         "lpn_new_place_hint": {
             "on": "Petaluma, California",
-            "ruled": "2026-08-29"
-        },
-        "lpn_new_place_tip": {
-            "on": "Optional. Type a town, a street or a landmark and the new map opens there. The words you type go to OpenStreetMap's place-name service, which asks your permission the first time. Leave it empty and the map opens on the whole world.",
             "ruled": "2026-08-29"
         },
         "lpn_new_title": {
