@@ -723,6 +723,14 @@ EngCalcs.lpnCollide = (function () {
 	// index's own array instead, so the caller's obstacles come back exactly as they went in. That
 	// matters more than it looks: a pass that scribbles on its inputs cannot be run twice on the
 	// same data to check that it agrees with itself, which is the cheapest strong assertion there is.
+	// **HOW MANY OBSTACLES WERE TOO BIG TO RASTERISE, ACROSS THE LAST placeLabels() CALL.** A
+	// diagnostic and nothing else -- no decision reads it. It exists because the bound below is the
+	// kind of guard that passes by finding nothing: a harness that merely asserted "placeLabels did
+	// not hang" would keep passing if the overflow path stopped being reached, and the reader would
+	// never know the test had gone blind. dev/lpn-spike/collide-span-bound-harness.js asserts this
+	// is NON-ZERO on the fixture that used to kill the tab, and zero on an ordinary drawing.
+	var oversizedCount = 0;
+
 	function grid(cell, obs) {
 		// A ZERO OR NON-FINITE CELL IS FATAL, NOT MERELY WRONG: span() divides by it, so Math.floor
 		// gives +/-Infinity and the fill loop never terminates. The reach became a function of the
@@ -754,6 +762,28 @@ EngCalcs.lpnCollide = (function () {
 		// 64 cells across the largest obstacle: still a fine grid for the drawing it is indexing,
 		// and it caps the index at 64^2 entries for the worst obstacle instead of unbounded.
 		if (isFinite(extent) && extent > 0 && extent / cell > 64) { cell = extent / 64; }
+		// **AND THE CELL SIZING ABOVE ONLY BOUNDS THE OBSTACLES THAT EXIST WHEN IT RUNS** (Task 668,
+		// Tom 2026-09-15: the Open-to-new-coordinates wizard froze for 13-15 s after Search by name
+		// or Go to, then Chrome killed the tab on the next pan). `placeLabels()` PUSHES obstacles as
+		// it goes -- every placed label commits its box and its leader -- so an obstacle can arrive
+		// after `cell` is fixed and be arbitrarily larger than anything the sizing saw. One leader
+		// measured 25.7 DEGREES OF LONGITUDE, about 2,500 km, against a cell of 0.0222: span() filled
+		// 1,158 x 1,182 = 1.37 MILLION cells for that single segment, and the process died on a
+		// drawing of 18 nodes. Pure arithmetic, no DOM -- it reproduces in node.
+		//
+		// **SO THE BOUND BELONGS IN span() ITSELF, WHERE NO CALLER CAN GET PAST IT**, rather than in
+		// another sizing heuristic that the next unforeseen obstacle walks around. An obstacle too
+		// big to rasterise goes on an overflow list that near() tests on EVERY query, through the
+		// SAME narrow-phase distance test the cells use -- so the set of obstacles that comes back is
+		// exactly the set it was before, and collide-harness.js's member-by-member comparison against
+		// obstaclesInReach() is what holds that claim. Dropping the obstacle instead would have been
+		// cheaper and is the one thing this module must never do: a broad phase that quietly loses an
+		// obstacle produces a layout that looks fine and is wrong in one place nobody will ever find.
+		//
+		// The budget is the worst case the cell sizing above already allows itself (64 x 64), so in
+		// every drawing where that sizing works this list stays empty and nothing changes.
+		var SPAN_CELL_BUDGET = 4096;
+		var over = { boxes: [], segments: [] };
 		var cells = new Map(), stamp = 0, bStamp = [], sStamp = [];
 		function key(i, j) { return i * 4294967296 + j; }
 		function put(list, i, j, idx) {
@@ -763,7 +793,12 @@ EngCalcs.lpnCollide = (function () {
 		}
 		function span(x0, y0, x1, y1, list, idx) {
 			var i, j, i0 = Math.floor(x0 / cell), i1 = Math.floor(x1 / cell),
-				j0 = Math.floor(y0 / cell), j1 = Math.floor(y1 / cell);
+				j0 = Math.floor(y0 / cell), j1 = Math.floor(y1 / cell),
+				nx = i1 - i0 + 1, ny = j1 - j0 + 1;
+			// `!(a <= b)` rather than `a > b`, so a NaN extent -- an obstacle carrying a NaN
+			// coordinate -- takes the overflow path instead of falling through the comparison and
+			// running the loop with NaN bounds.
+			if (!(nx * ny <= SPAN_CELL_BUDGET)) { over[list].push(idx); oversizedCount++; return; }
 			for (i = i0; i <= i1; i++) { for (j = j0; j <= j1; j++) { put(list, i, j, idx); } }
 		}
 		return {
@@ -812,8 +847,30 @@ EngCalcs.lpnCollide = (function () {
 						}
 					}
 				}
+				// The oversized few, tested exactly as the cells' contents were. Kept last so the
+				// stamps above already hold whatever the 3x3 block found, and an obstacle that is
+				// somehow in both is still returned once.
+				for (k = 0; k < over.boxes.length; k++) {
+					idx = over.boxes[k];
+					if (bStamp[idx] === stamp) { continue; }
+					bStamp[idx] = stamp;
+					o = obs.boxes[idx];
+					if (Math.hypot(o.cx - x, o.cy - y) < r + Math.hypot(o.w, o.h) / 2) {
+						out.boxes.push(o);
+					}
+				}
+				for (k = 0; k < over.segments.length; k++) {
+					idx = over.segments[k];
+					if (sStamp[idx] === stamp) { continue; }
+					sStamp[idx] = stamp;
+					o = obs.segments[idx];
+					if (pointToSegmentDistance(x, y, o) < r) { out.segments.push(o); }
+				}
 				return out;
-			}
+			},
+			// For a harness: how many obstacles were too big to rasterise. Zero on every ordinary
+			// drawing, and a non-zero count is the signal that a scale mismatch is in play.
+			oversized: function () { return over.boxes.length + over.segments.length; }
 		};
 	}
 	// The same question asked of a plain list. Kept because it is the DEFINITION the grid has to
@@ -992,6 +1049,7 @@ EngCalcs.lpnCollide = (function () {
 	}
 	function placeLabels(labels, obstacles, opts) {
 		opts = opts || {};
+		oversizedCount = 0;
 		// **ONE REACH FOR THE WHOLE PASS, NOT ONE PER LABEL.** Tom, 2026-08-16: *"A single one is
 		// better, I think. I didn't specify per label."* The caller sets it from the text size, so
 		// it already scales with the lettering; deriving it from each label's own box as well would
@@ -1950,6 +2008,7 @@ EngCalcs.lpnCollide = (function () {
 		effectiveScores: effectiveScores,
 		placeLabels: placeLabels,
 		labelCrossings: labelCrossings,
+		oversizedObstacles: function () { return oversizedCount; },
 		repairCrossingGangs: repairCrossingGangs,
 		shedCrossingSurvivors: shedCrossingSurvivors
 	};

@@ -737,7 +737,7 @@
         "lpn_basemap_satellite_tip": "Photographs of the earth from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "xy",
-        "lpn_file_import_geo": "Open to new coordinates…",
+        "lpn_file_import_geo": "Open xy file on map…",
         "lpn_file_import_geo_tip": "Opens a project file or an EPANET file in a new project tab on this page, on the world map. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more precisely.",
         "lpn_georef_asdeg_btn": "These are already lat\/lon",
         "lpn_georef_asdeg_tip": "Press this only if the x and y in this file really are a longitude and a latitude. The network then jumps to where those numbers say it is, and nothing needs placing. Every number stays exactly as it is either way.",

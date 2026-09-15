@@ -560,6 +560,6 @@
         }
     },
     "key_syn": {
-        "lpn_field_tag": "User defined field, Asset tag, Grouping field"
+        "lpn_field_tag": "Tag, Custom property, User property, Custom label"
     }
 }

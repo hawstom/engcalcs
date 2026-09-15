@@ -1124,7 +1124,7 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Open to new coordinates…';
+$ec_lang['lpn_file_import_geo']='Open xy file on map…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new project tab on this page, on the world map. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more precisely.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
@@ -2134,7 +2134,7 @@ $ec_lang['lpn_field_tag']='Tag';
 // strips commentary by POSITION and a whole sentence on the left ships to 26 agents as a
 // synonym list.
 // Edited by TGH 2026-09-07
-$ec_lang_syn['lpn_field_tag']='User defined field, Asset tag, Grouping field | EPANET’s own [TAGS] value: one unspaced token of the user’s own meaning, often a pressure zone or a work order. Not a markup tag, not a price tag, and not this page’s Label object.';
+$ec_lang_syn['lpn_field_tag']='Tag, Custom property, User property, Custom label | EPANET’s own [TAGS] value: one unspaced token of the user’s own meaning, often a pressure zone or a work order.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tag_tip']='A one-word identifier with any meaning you require, such as a pressure zone or a work order.';
 $ec_lang['lpn_pump_effic_curve']='Pump efficiency curve';
@@ -2231,7 +2231,9 @@ $ec_lang['lpn_field_easting']='Easting';
 // layout: status strip. The one-line readout at the bottom of the map, where the full words
 // spend most of the line. A surveyor reads these off a single letter; use your language's own.
 $ec_lang['lpn_field_northing_abbr']='N';
+$ec_lang_syn['lpn_field_northing_abbr']='Northing | abbreviation of Northing, as short as the language has a short form for; the full word where it has none.';
 $ec_lang['lpn_field_easting_abbr']='E';
+$ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as short as the language has a short form for; the full word where it has none.';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
