@@ -59,18 +59,19 @@ the block.
 
 # Tasks
 
-- 100|668| **A label leader 1,000 times the reach, after a georeference settle.**
-  FOUND while fixing the crash below and NOT the same defect. With `span()` bounded the page no
-  longer dies, but the placement is still wrong: after a settle one committed leader measured
-  **25.7 degrees of longitude, about 2,500 km**, against a grid cell of 0.0222 and an `outer`
-  reach that cannot have exceeded it -- a candidate roughly a thousand times further out than the
-  reach allows. `candidatesFor()` is bounded by `outer`, so the number cannot come from there;
-  the likely source is a stale `home` or anchor surviving `georefWrite()`, in a frame that has
-  just changed units. **Not diagnosed -- do not guess it closed.** Reproduce with
-  `georefSetTransform()` on the transform `georefReproject()` computes for a jump from the start
-  view to a 1 km site, which is four lines against the DOM stub.
-  - It is invisible today: the leader is drawn, and a reader sees a label in an odd place rather
-    than a line to Peru, because the label itself is clamped. That is why it wants a task.
+- 100|669| **Show labels at this zoom or closer.**
+  Tom, 2026-09-15, while reporting the Task 668 crash: *"We previously had a 'Show labels at this
+  zoom or closer' in settings. I guess it was a bad idea to remove that."*
+  - **I CANNOT FIND THAT IT EVER SHIPPED, and say so rather than quietly build it.** Searched
+    `js/looped-network.js`, `lib/lang.ec.en.php`, `dev/*.md`, and `git log -S` across ALL refs for
+    the phrase and for every spelling of a zoom threshold on labels. Nothing. The nearest things
+    that do exist are label SHEDDING, which drops label content when the drawing gets crowded
+    rather than when it gets small, and the thematic toggle, which hides labels outright.
+  - So this is a REQUEST, not a restoration, and it needs his word on which it is before anybody
+    writes code. If it did ship, it was under a name none of those searches match.
+  - Worth noting what prompted it: at the time he asked, labels really were thousands of miles
+    away (Task 668), so far-zoom clutter looked like a labelling problem when it was a units one.
+    Ask again now that the drawing frames correctly.
 
 - 100|667| **Tom's reflections on saving, locking and who can see your work.**
   Written down 2026-09-14 from a testing exchange with JHB, at Tom's instruction ("For roadmap,
