@@ -8567,14 +8567,36 @@ var EngCalcs = EngCalcs || {};
 		zoomExtent(true);
 	}
 	// Where a project with nothing to fit and nothing remembered opens: the ground under Net3 for a
-	// geographic one, and for an XY one the transform a first-ever visit has -- the world origin at
-	// the top-left corner at one pixel per unit.
+	// geographic one, and for an XY one the transform a first-ever visit has.
+	//
+	// **THE ORIGIN SITS AT THE BOTTOM LEFT, SO EVERY COORDINATE A NEW PROJECT PRODUCES IS
+	// POSITIVE** (Task 673, Tom 2026-09-15: *"It might be nice for a new non-geo project to have
+	// 0,0 at the lower, not upper left, so that initial coordinates are all positive."*).
+	//
+	// It used to be `cy: h / 2`, which put the world origin at the TOP left -- and because
+	// `outwardY()` negates (a file stores y UP while memory runs y DOWN), everything drawn below
+	// that corner, which is everything, came out with a NEGATIVE northing. A surveyor reading the
+	// table saw a column of minus signs on a site nobody had placed anywhere. Nothing was wrong
+	// with the arithmetic; the camera was simply pointed at the wrong quadrant.
+	//
+	// `cy: -h / 2` points it at the first quadrant instead: internal y runs [-h, 0] across the
+	// canvas, so outward y runs [0, h] and x already ran [0, w]. No converter moves, no stored
+	// number changes meaning, and an existing project is untouched -- this is the camera for a
+	// project that has no view of its own yet.
+	//
+	// **`s: 1` IS ONE PIXEL PER DRAWING UNIT, and it is a choice worth stating rather than
+	// inheriting.** A drawing unit is a foot under `us` and a metre under `si`, so a first-ever
+	// visit frames about 1000 x 500 of them -- a site, in either system, which is the scale this
+	// page is for. It is also the only scale at which the ruler in somebody's head matches the
+	// screen: at 1:1 a 100 ft lateral is 100 px, so a first estimate needs no arithmetic. Anything
+	// drawn immediately re-frames it anyway, because `zoomExtent()` takes over as soon as there is
+	// content.
 	function defaultViewForCoords() {
 		if (isGeoProject()) { return geoHomeView(); }
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		if (!w || !h) { return null; }
-		return { cx: w / 2, cy: h / 2, s: 1 };
+		return { cx: w / 2, cy: -h / 2, s: 1 };
 	}
 	// `auto` marks a fit NOBODY ASKED FOR: boot, a freshly drawn example, a document with no stored
 	// view, the deferred fit once the canvas has a height. Those establish a view rather than
@@ -23928,8 +23950,10 @@ var EngCalcs = EngCalcs || {};
 			// IS THE ONE THING THE WIZARD HAS TO SAY OUT LOUD** (Tom, 2026-09-13: *"The initial
 			// view for the project needs to match the view used in the projection wizard, but it
 			// put 0,0 at the upper left of the map instead."* -- measured at {cx: w/2, cy: h/2,
-			// s: 1}, which is defaultViewForCoords()'s xy answer, the world origin in the corner
-			// at one pixel per unit).
+			// s: 1}, which was defaultViewForCoords()'s xy answer at the time: the world origin in
+			// the corner at one pixel per unit. That default moved to the BOTTOM left under Task
+			// 673, for a different reason -- negative northings -- and the projected path's own
+			// complaint is unchanged by it).
 			//
 			// **THE GEOGRAPHIC PATH ALREADY DID THE RIGHT THING**, and the two paths are not one
 			// feature with a bug in it: a lat/lon project's camera is in degrees, which is what
