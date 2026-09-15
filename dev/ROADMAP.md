@@ -1359,6 +1359,13 @@ the block.
     which is the control proving it was firing. `elementFromPoint` returns the same element and the
     computed cursor stays `grab` at the pixel and the instant the arrow is painted. **Chrome is
     drawing a cursor that disagrees with its own computed style.**
+  - **A DETERMINISTIC TRIGGER, 2026-09-14, and it is better than the 1px nudge.** Tom: *"File
+    Save cursor is lost. Google Chrome on Windows."* The native save picker is a MODAL that
+    returns with the pointer where it was, so nothing moves and no hit test runs -- and Chrome
+    paints the default arrow. Same browser, same OS, same signature as the report below, and it
+    happens on demand rather than by careful mousework. **Use this to reproduce, not the 1px
+    move.** Nothing in the save path touches a cursor, a class or a mode: the only writer of
+    `style.cursor` is nudgeCursor(), and `.lpn-placemode` is written by setMode() alone.
   - **AND IT REPRODUCES ON epanetjs.com's MAP, which settles it** (Tom, 2026-09-10: *"It does the
     same thing at the epanetjs.com map. They don't have a default cursor on their map, but it
     changes to one anyway."*). A different site, a different codebase, a different rendering stack,
