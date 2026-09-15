@@ -202,6 +202,17 @@ run_check "calculator page selftest"     blocking php dev/scripts/calculator_pag
 # device on the response that starts it, before any banner has asked and with no way to take it back.
 run_check "no PHP sessions"              blocking php dev/scripts/no_session_check.php
 run_check "no-session selftest"          blocking php dev/scripts/no_session_selftest.php
+# EVERY DIRECTORY IS DECLARED WEB-SERVED OR BLOCKED, and the blocks are still there.
+# Deployment is `git pull`, so every tracked directory sits under the document root whether or not a
+# visitor has any business in it. Five said so (dev, log, lpn-locks, spock, and .git in the root
+# file); .claude, .github and .vscode did not, and /engcalcs/.claude/settings.json was served as a
+# plain HTTP 200 -- the agent definitions, the hook scripts and the permission allow-list. Found
+# 2026-09-15 by the ACCOUNT'S OWN DAILY PAGE CHECK, not by anything in here, and not by reading:
+# the root <FilesMatch "^\."> looks like it covers the case and matches FILENAMES only, which is
+# the lesson already written above the .git rule in that same file. Nothing renders wrong when it
+# is broken, which is why it stood.
+run_check "docroot exposure"             blocking php dev/scripts/docroot_exposure_check.php
+run_check "docroot exposure selftest"    blocking php dev/scripts/docroot_exposure_selftest.php
 # Task 322 row 27. FOUR SENTENCES THAT SHIPPED AND WERE STRUCK BY TOM PERSONALLY -- "your phone"
 # (it is always "a phone"), "PC application", "the only third-party request", "no extended-period
 # simulation yet". Each reads perfectly reasonably, which is why they come back. Scoped to shipped

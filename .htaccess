@@ -34,3 +34,33 @@ RedirectMatch 404 "/\.git(/|$)"
 # it fails loud, not silent. Confirmed working on this host 2026-07-28; if the site
 # is ever moved, re-test this line first and delete it if the new host 500s.
 Options -Indexes
+
+# Block every DOT-DIRECTORY, which is a different thing from a dotfile and is the
+# mistake this file has now made twice. The FilesMatch "^\." at the top matches
+# FILENAMES only -- so .git needed its own rule above, and .claude, .github and
+# .vscode needed one and did not have it. On 2026-09-15 the account's daily page
+# check found /engcalcs/.claude/hooks/guard-wait-loops.php returning 500, which is
+# how anybody learned that .claude/settings.json was served as a plain 200: the
+# agent definitions, the hook scripts and the permission list, all readable.
+#
+# BOTH a blanket rule here AND a `Require all denied` inside each of the three, and
+# that is deliberate rather than belt-and-braces superstition: they sit at DIFFERENT
+# APACHE OVERRIDE LEVELS. This rule is mod_alias (FileInfo); the per-directory files
+# are mod_authz_core (Limit), which is what dev/.htaccess has always relied on. This
+# file already records that `Options` needs a grant the rest of it does not and 500s
+# the whole suite where that grant is missing -- so a host change can silence one
+# level while leaving the other. A blanket rule alone would also be the only thing
+# standing between the permission list and the open web, and the blanket rule is the
+# half that cannot be tested from inside this repository.
+#
+# The blanket rule is what covers the NEXT dot-directory somebody adds, which would
+# otherwise get no file and be exposed the day it lands; the three files are what
+# cover the ones that exist today if this rule is ever not read.
+# .well-known is excepted by name: it is the one dot-directory that exists to be
+# fetched, and although ACME challenges are served from the domain root rather than
+# from here, a rule that would break certificate renewal if this suite ever became a
+# document root is not worth the two characters it saves.
+#
+# mod_alias, the same override level as the Redirect rules above, so this is known
+# to be permitted on this host -- unlike Options, which needs a separate grant.
+RedirectMatch 404 "/\.(?!well-known/)[^/]+/"
