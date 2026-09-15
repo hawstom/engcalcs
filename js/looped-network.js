@@ -33389,9 +33389,29 @@ var EngCalcs = EngCalcs || {};
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
 			if (e.target !== popup) { return; }
+			// The double-click reset now clears the SIZE as well as the corner. It is one gesture
+			// meaning "put this back how it opens", and a box that sprang back to its automatic
+			// place while keeping a height somebody dragged would be obeying half of that.
 			popupUserPos = null;
+			popupUserSize = null;
+			popup.style.width = '';
+			popup.style.height = '';
 			if (currentPopup) { reopenPopupAtElement(); }
 		});
+		// **WHAT A DRAG OF THE CORNER LEAVES BEHIND**, observed rather than listened for: CSS
+		// `resize` fires no event of its own. Same instrument the Find box uses, and the same two
+		// refusals -- nothing is recorded while the box is hidden, and nothing measured at phone
+		// width is recorded, because there the box is filling the window and the number is the
+		// window's rather than the user's.
+		if (window.ResizeObserver) {
+			new window.ResizeObserver(function () {
+				var r;
+				if (popup.style.display === 'none' || smallScreen()) { return; }
+				r = popup.getBoundingClientRect();
+				if (!(r.width > 0) || !(r.height > 0)) { return; }
+				popupUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
+			}).observe(popup);
+		}
 	}
 	// Re-opens whatever is currently open at its AUTOMATIC place -- used by the double-click reset
 	// above. Goes through the same renderers a fresh click does, so there is one path to being open.
@@ -34325,6 +34345,9 @@ var EngCalcs = EngCalcs || {};
 	// transient view choice, not a project setting -- in the document, a colleague opening your file
 	// would inherit where your screen's popup sat.
 	var popupUserPos = null;
+	// The size a drag gave the properties box, in the same session-only standing as the
+	// position above. Written by the observer in wirePopupDrag().
+	var popupUserSize = null;
 	// **A BOX THAT OPENS UNDER A FINGER MUST NOT ANSWER THAT FINGER'S OWN CLICK** (Tom, 2026-08-31:
 	// *"the node editor open with the pattern selector open"*).
 	//
@@ -34378,7 +34401,21 @@ var EngCalcs = EngCalcs || {};
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
-		popup.style.left = sx + 'px'; popup.style.top = sy + 'px'; popup.style.display = 'block';
+		popup.style.left = sx + 'px'; popup.style.top = sy + 'px';
+		// `flex`, not `block`: the box is a column now -- title band, then body -- so the body can
+		// take the height a drag gave the box and scroll inside it. Same reason the Find box is a
+		// flex column, and it is what makes `resize: both` mean anything here.
+		popup.style.display = 'flex';
+		// **A SIZE THE USER DRAGGED IS RE-APPLIED ON EVERY OPEN, and it is a SESSION choice like
+		// popupUserPos beside it** -- neither is written to storage. That is the existing ruling
+		// for this box and it is left alone: the properties popup opens per element, dozens of
+		// times an hour, and where it sits is a fact about the last thing you clicked rather than
+		// a preference about the page. A remembered size with no remembered corner would be half
+		// a decision.
+		if (popupUserSize) {
+			popup.style.width = popupUserSize.w + 'px';
+			popup.style.height = popupUserSize.h + 'px';
+		}
 		// **RAISED HERE, WHERE IT BECOMES VISIBLE** (Tom, 2026-09-05: *"When an asset is clicked and
 		// its properties box opens, it is hidden under Libraries... It needs to win at the moment the
 		// asset is clicked."*). The property popup is the one panel that does NOT go through
@@ -34392,7 +34429,10 @@ var EngCalcs = EngCalcs || {};
 		// The HEIGHT is capped first (Task 372) and the clamp is then given the capped height: an
 		// element with many properties can be taller than the window, and clamping such a box only
 		// ever chooses which end of it to lose.
-		h = fitPanelToViewport(popup);
+		// **THE FIT IS SKIPPED WHEN THE USER HAS CHOSEN A HEIGHT**, because fitPanelToViewport()
+		// starts by RESETTING the height -- which is right for a box sizing itself to its content
+		// and is exactly what would undo a drag on the next open.
+		h = popupUserSize ? popup.getBoundingClientRect().height : fitPanelToViewport(popup);
 		r = popup.getBoundingClientRect();
 		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';

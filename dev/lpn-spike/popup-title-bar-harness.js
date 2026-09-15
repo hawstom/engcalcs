@@ -122,5 +122,61 @@ console.log('\n--- the bar is still what drags the box ---');
 		/popup\.classList\.add\('lpn-dragpanel'\)/.test(js));
 }
 
+// ================================================================================================
+// 4. AND IT RESIZES (Tom, 2026-09-14)
+// ================================================================================================
+// *"Element properties and group properties no longer resizeable."* Both render into #lpn_popup,
+// so this is one box and one fix -- and it is Task 665's standard ("draggable and resizable is the
+// standard for a standing box") reaching the box a person opens most often.
+//
+// **CHECKED IN FOUR PLACES BECAUSE resize: both IS FOUR THINGS.** The declaration alone does
+// nothing: the browser draws no grabber without a non-visible overflow, the body must be free to
+// take the dragged height or the content spills instead of scrolling, the box must be laid out as
+// a column for that to mean anything, and the one door that opens it must stop resetting the
+// height it was given. Any one of the four missing is a box that looks resizable and is not.
+console.log('\n--- resizing ---');
+{
+	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8')
+		.replace(/\/\*[\s\S]*?\*\//g, '');
+	const js = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
+	const rule = /\.lpn-propbox \{([^}]*)\}/.exec(css);
+	ok('the properties box has a shell of its own', !!rule, rule && rule[1].trim());
+	ok('...declaring resize: both', !!rule && /resize:\s*both/.test(rule[1]));
+	ok('...with the non-visible overflow the grabber needs',
+		!!rule && /overflow:\s*hidden/.test(rule[1]));
+	ok('...laid out as a column, so the body can take the height',
+		!!rule && /flex-direction:\s*column/.test(rule[1]));
+	ok('...and a width floor, because the property rows stop fitting first',
+		!!rule && /min-width:/.test(rule[1]));
+	ok('the body gives up its own cap and scrolls inside the box instead',
+		/\.lpn-propbox \.lpn-popover-body \{[^}]*max-height:\s*none/.test(css));
+	// **NO `width`, DELIBERATELY.** .lpn-findbox needed one because an inline max-width cannot be
+	// dragged past; this box's only cap is .lpn-popover's viewport bound, so it goes on sizing
+	// itself to the element's own properties -- a valve and a tank open at different widths.
+	ok('...and no fixed width, so it still sizes itself to the element',
+		!!rule && !/[^-]width:\s*(min|\d)/.test(rule[1].replace(/min-width:[^;]*;/, '')));
+
+	ok('the markup wears the class', /id="lpn_popup" class="[^"]*lpn-propbox/.test(html));
+	ok('the one door opens it as a flex column, not a block',
+		/function openPopupAt[\s\S]{0,900}?popup\.style\.display = 'flex'/.test(js));
+	// The trap: fitPanelToViewport() RESETS the height before measuring, which is right for a box
+	// sizing itself to its content and is exactly what would undo a drag on the next open.
+	ok('...and stops re-fitting the height once the user has chosen one',
+		/popupUserSize \? popup\.getBoundingClientRect\(\)\.height : fitPanelToViewport\(popup\)/.test(js));
+	ok('...re-applying the size a drag left behind', /popupUserSize\.w \+ 'px'/.test(js));
+	// CSS resize fires no event, so the size has to be observed.
+	ok('the dragged size is observed rather than listened for',
+		/ResizeObserver[\s\S]{0,400}?popupUserSize = \{/.test(js));
+	ok('...and never recorded from a phone-width fill',
+		/ResizeObserver[\s\S]{0,300}?smallScreen\(\)/.test(js));
+	// One gesture means "put it back how it opens", so it has to clear both.
+	ok('the double-click reset clears the size as well as the corner',
+		/popupUserPos = null;\s*popupUserSize = null;/.test(js));
+	// **SESSION ONLY, like the position beside it.** No new localStorage key, so no new row in
+	// dev/cookie-storage-inventory.md and nothing for lpn_furniture_check.php to place.
+	ok('...and nothing about it reaches storage',
+		!/lpn_propbox|LPN_PROPBOX/.test(js));
+}
+
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nall checks passed');
 process.exit(fails ? 1 : 0);

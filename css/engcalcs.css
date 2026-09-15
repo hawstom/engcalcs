@@ -1518,6 +1518,22 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    overstates the room actually available. */
 .lpn-popover { box-sizing: border-box; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); }
 .lpn-popover-body { overflow: auto; max-height: calc(100vh - 56px); }
+/* **AND THE PROPERTIES BOX RESIZES** (Tom, 2026-09-14: *"Element properties and group properties
+   no longer resizeable."*). It is the same shell the Find and Settings boxes already wear, for the
+   reason their own notes give: one set of box mechanics on this page rather than a second. This is
+   Task 665's standard reaching the box a person opens most.
+
+   **NO `width` HERE, WHICH IS THE DIFFERENCE FROM .lpn-findbox.** That box had to trade an inline
+   `max-width` for a definite `width` because a cap cannot be dragged past. This one's only cap is
+   `.lpn-popover`'s viewport bound, so it keeps sizing itself to whatever properties the element
+   has -- a valve and a tank open at different widths and always did -- and a drag simply writes an
+   inline size over that.
+
+   `resize: both` needs a non-visible overflow to be drawn at all, and it costs nothing: the
+   scrolling already lives on `.lpn-popover-body`, which takes the height a drag gave the box. The
+   floor is a width, as it is on every other box here -- the property rows stop fitting first. */
+.lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(17rem, 94vw); }
+.lpn-propbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
 /* **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the Find box on a phone). Two
    halves of one phrase -- "Diameter / greater than" -- each narrower than the sentence it belongs
    to, so pairing them costs nothing and buys back a whole line where lines are scarcest.

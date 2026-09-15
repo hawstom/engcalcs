@@ -632,7 +632,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // somewhere other than where it visually appeared, so the tap fell through to the canvas
       // underneath and was read as a background pan). fixed is always viewport-relative, matching
       // clientX/clientY directly with no scroll math needed. ?>
-<div id="lpn_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_popup" class="d-print-none lpn-popover lpn-propbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<?php // **THE DRAG BAND IS NAMED AND DELINEATED** (Tom, 2026-09-08: *"There is no visual title bar
 	      // depiction. For a non-hog box like this I would expect a title bar with a title in it;
 	      // maybe the right title is 'Properties'. Or empty for now. But a nice line delineating the

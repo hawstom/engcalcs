@@ -635,7 +635,11 @@ console.log('\n--- Escape ---');
 	L.setSelection('node', ids[0]);
 	L.toggleInSelection('node', e2.id);
 	L.openMulti();
-	report(L.popupDisplay() === 'block', 'the multi box is open');
+	// **OPEN, not a particular display keyword.** It became `flex` on 2026-09-14 when the box was
+	// made resizable: a resizable box is a flex column so its body can take the dragged height.
+	// What this line is about is whether the box opened, so it asks that.
+	report(L.popupDisplay() !== 'none' && L.popupDisplay() !== '', 'the multi box is open',
+		L.popupDisplay());
 	pressEscape();
 	report(L.popupDisplay() === 'none', 'Escape closes the box');
 	report(L.selectionCount() === 2, '...and leaves the selection alone, one thing per press', String(L.selectionCount()));
