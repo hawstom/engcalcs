@@ -912,7 +912,7 @@ $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start b
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='Welcome to water supply network modelling';
-$ec_lang['lpn_examples_heading']='Open an example';
+$ec_lang['lpn_examples_heading']='Open your own copy of an example';
 $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.';
 $ec_lang['lpn_examples_open']='Open';
 $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb';

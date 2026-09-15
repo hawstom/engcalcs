@@ -67,11 +67,25 @@ examples.forEach(function (ex) {
 	report(ex.nodes > 0 && ex.links > 0, `${ex.file} has a network in it`, `${ex.nodes}/${ex.links}`);
 });
 
-console.log('\n-- the served copy is byte-identical to the authored project --');
+// **ONE MEMBER IS CUT OUT AND EVERY OTHER BYTE IS THE SOURCE'S OWN** (Task 666). The served copy
+// used to be byte-identical, and that shipped a defect: the `docId` inside a project file IS the
+// lock key, so seven examples each carried ONE, and two strangers who each opened the same example
+// and saved it contended over a single lock on our server -- read as "did I change the web site?"
+// by two testers. The published copy therefore carries no docId and the page mints a fresh one at
+// the first save.
+//
+// **THE ASSERTION IS STILL EXACTNESS, AND DELIBERATELY SO.** A weaker "the JSON is equivalent"
+// would pass a generator that re-serialised the file, which is the thing this test has always
+// existed to prevent -- round-tripping rewrites every number in a document whose numbers are
+// somebody else's (CLAUDE.md, "ONLY THE USER TOUCHES A FILE'S NUMBERS"). So the excision is
+// performed HERE, independently, and the result must match the served bytes exactly.
+const DOC_ID_MEMBER = /,\s*"docId"\s*:\s*"[^"]*"/;
+console.log('\n-- the served copy is the authored one with the lock key excised, byte for byte --');
 examples.forEach(function (ex) {
 	const a = fs.readFileSync(path.join(srcDir, ex.file), 'utf8');
 	const b = fs.readFileSync(path.join(outDir, ex.file), 'utf8');
-	report(a === b, `${ex.file} is a faithful copy, not a re-serialisation`);
+	report(!/"docId"\s*:/.test(b), `${ex.file} is served without a lock key`);
+	report(a.replace(DOC_ID_MEMBER, '') === b, `${ex.file} is otherwise a faithful copy, not a re-serialisation`);
 });
 
 // ---- THE BACKDROP IS PART OF THE EXAMPLE, and it has been silently dropped once ----------------

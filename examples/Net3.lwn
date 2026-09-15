@@ -4,8 +4,7 @@
 	"v": 7,
 	"project": {
 		"name": "Net3",
-		"activeScenario": "base",
-		"docId": "dmsvsf9ydP1h0vx5r"
+		"activeScenario": "base"
 	},
 	"scenarios": [
 		{

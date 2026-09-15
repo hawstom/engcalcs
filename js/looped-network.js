@@ -18321,7 +18321,7 @@ var EngCalcs = EngCalcs || {};
 		// clause advertised a choice nobody is being asked to make. The line stays because a
 		// gallery greeting is not an engine advertisement; only the clause went.
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || 'Welcome to water supply network modelling'));
-		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || 'Open an example'));
+		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || 'Open your own copy of an example'));
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || 'Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.'));
 		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT.** Nothing guarantees the cards fit the map's
 		// height -- the count grows and the map height is a user setting -- so anything after the
@@ -25434,7 +25434,7 @@ var EngCalcs = EngCalcs || {};
 		restoreViewOrFit();
 		// **"?lpn_examples=1" OPENS THE GALLERY, so a link somewhere else can land on it.** The
 		// LibreWaterNet page had two calls to action pointing at the same bare URL, one of them
-		// labelled "Open an example" -- and a returning visitor with a project of their own would
+		// labelled "Open your own copy of an example" -- and a returning visitor with a project of their own would
 		// have got the map, not the gallery, so the promise was false for exactly the reader most
 		// likely to notice. This is the File > Open example... route, not a second mechanism:
 		// showExamplesOverlay() is the same call the menu item makes.
