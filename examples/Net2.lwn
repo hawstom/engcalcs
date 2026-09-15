@@ -4,8 +4,7 @@
 	"v": 7,
 	"project": {
 		"name": "Net2",
-		"activeScenario": "base",
-		"docId": "dmsvw3bderwgjCUML"
+		"activeScenario": "base"
 	},
 	"scenarios": [
 		{

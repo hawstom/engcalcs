@@ -4,8 +4,7 @@
 	"v": 6,
 	"project": {
 		"name": "Elm-Street-Center",
-		"activeScenario": "base",
-		"docId": "dmstuhhwxALmo8Chb"
+		"activeScenario": "base"
 	},
 	"scenarios": [
 		{

@@ -219,6 +219,54 @@ $manifest = array();
 $written = array();
 $problems = array();
 
+/**
+ * **THE PUBLISHED COPY CARRIES NO `docId`, AND THAT IS A CORRECTNESS FIX, NOT TIDINESS**
+ * (ROADMAP Task 666, found 2026-09-14).
+ *
+ * The `docId` inside a project file IS the lock key -- `lpn-lock.php` says so in its own header,
+ * and `saveAsCurrent()` says it twice ("Identity is the `docId` INSIDE the target file, never its
+ * name"). Every example used to ship with a FIXED one, and `openExample()` mints no replacement:
+ * a gallery example has no `fileName`, so `isFileProject()` is false, so `forking` is false on its
+ * first Save as, and the id survives. That rule is right for a project somebody DREW -- there was
+ * no original to be a copy of -- and wrong for one that arrived as a file every visitor on Earth
+ * downloaded.
+ *
+ * **THE SYMPTOM WAS REACHABLE BY TWO STRANGERS WHO NEVER MET**: open Net3 from the wall, Save as,
+ * and the next person to do the same is told somebody else has your file open, by their initials
+ * if they gave any. Two testers reported fearing they had "changed the web site". No shared
+ * folder, network or office is needed -- the broker is keyed on the id, and the id came down the
+ * wire with the example.
+ *
+ * **A TEXT EXCISION, NEVER A DECODE-AND-RE-ENCODE.** Round-tripping the JSON would reformat every
+ * number in the file, which is the one thing this suite does not do to a document somebody else's
+ * numbers live in (CLAUDE.md, "ONLY THE USER TOUCHES A FILE'S NUMBERS"). So one member is cut out
+ * of the raw text and every other byte is the source's own. The page mints a fresh id by itself:
+ * `ensureDocId()` runs BEFORE the first write on exactly this path.
+ *
+ * The SOURCE keeps its id -- those are real working projects in dev/, and a `docId` is what makes
+ * one lockable while it is being authored.
+ */
+function stripDocId($raw, $name, array &$problems)
+{
+	$n = preg_match_all('/"docId"\s*:/', $raw);
+	if ($n === 0) { return $raw; }
+	if ($n > 1) {
+		// Never guess which one. A second docId means the format grew one somewhere else and this
+		// function no longer knows what it is cutting.
+		$problems[] = "$name: $n docId members, expected at most 1 -- not stripped";
+		return $raw;
+	}
+	// Take the preceding comma where there is one, the trailing comma otherwise, so the object
+	// stays well formed whether the member is last or not.
+	$out = preg_replace('/,\s*"docId"\s*:\s*"[^"]*"/', '', $raw, 1, $hit);
+	if (!$hit) { $out = preg_replace('/"docId"\s*:\s*"[^"]*"\s*,\s*/', '', $raw, 1, $hit); }
+	if (!$hit || json_decode($out, true) === null) {
+		$problems[] = "$name: could not remove docId cleanly -- not stripped";
+		return $raw;
+	}
+	return $out;
+}
+
 foreach ($files as $name) {
 	$raw = file_get_contents($srcDir . '/' . $name);
 	$doc = json_decode($raw, true);
@@ -274,7 +322,7 @@ foreach ($files as $name) {
 		'links' => count($doc['links'] ?? array()),
 		'thumb' => $svg === null ? null : $thumbName
 	);
-	$written[$name] = $raw;
+	$written[$name] = stripDocId($raw, $name, $problems);
 	if ($svg !== null) { $written[$thumbName] = $svg; }
 }
 
@@ -293,6 +341,21 @@ usort($manifest, function ($a, $b) {
 $written['manifest.json'] = json_encode(
 	array('v' => 1, 'generated' => 'dev/scripts/generate_examples.php', 'examples' => $manifest),
 	JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
+
+/* **NOTHING PUBLISHED CARRIES A LOCK KEY** (Task 666). Stated here as its own assertion rather
+ * than left to the freshness comparison, because the two fail for different reasons and only this
+ * one names the defect: freshness says the served copy disagrees with the generator, which a
+ * reader fixes by regenerating, and regenerating is exactly what would hide a stripDocId() that
+ * had quietly stopped working. Held over what is ABOUT TO BE WRITTEN, so it guards the generator
+ * and not just the directory. */
+foreach ($written as $file => $content) {
+	if (substr($file, -5) !== '.json' && substr($file, -4) !== '.lwn') { continue; }
+	if ($file === 'manifest.json') { continue; }
+	if (preg_match('/"docId"\s*:/', $content)) {
+		$problems[] = "$file: carries a docId, which IS the lock key -- two strangers who each open"
+			. " this example and save it would contend over one lock (Task 666)";
+	}
+}
 
 if ($check) {
 	$stale = array();
