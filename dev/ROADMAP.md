@@ -59,6 +59,31 @@ the block.
 
 # Tasks
 
+- 100|672| **The placement wizard degrades and then crashes after a few pans.**
+  Tom's own minimal statement, 2026-09-15: *"xy project floating on world map can't zoom and pan
+  more than a very few times (at great delay) without extreme slowdown, browser reports of
+  unresponsiveness, and crashing."* OPEN, and the earlier fixes did NOT close it -- Task 668's
+  `span()` bound removed one out-of-memory path and the offset repair removed the labels in
+  China, but he still has this.
+  - **THREE HEADLESS REPRODUCTIONS FAILED and that is itself a finding.** Driving the same
+    gestures against the DOM stub gives a flat 384 elements, a flat heap and 10-25 ms per settle,
+    on the real Elm Street Center file, through both search branches and through Finish. So the
+    cost is in something node does not do.
+  - Ruled out by reading, each with its evidence: basemap tiles do NOT accumulate
+    (`paintBasemapTiles()` removes every key not in `want`); the tooltip re-init sites are
+    `buildMenuBar()` and `init()`, neither on the settle path, so Bootstrap's strong instance map
+    is not being fed per gesture; the label collision grid is bounded since Task 668.
+  - Still open, in the order I would look: tile FETCH and DECODE cost per gesture (the count is
+    bounded, the bytes are not); SVG rasterisation under the compensation transform, which holds
+    the detached model still with `scale(f.s / state.s)` and can therefore be asked to draw the
+    drawing at a large multiple; and the 1.7 MB backdrop data URI, which `georefWriteBackdrop()`
+    re-places on every settle -- Tom reports it still happens with no background image, which
+    weakens but does not kill that one.
+  - **`?debug=perf` SHIPPED FOR THIS** and is the next step: it prints, per settle, the wall time
+    of each part of `georefSetTransform()`, the tile count, the compensation transform, the view
+    scale and Chrome's heap. One run on the machine that actually fails answers what three
+    reproductions could not.
+
 - 100|671| **Flow direction arrows follow the link color.**
   Tom, 2026-09-15. `.lpn-arrow` is `stroke: #000` in `css/engcalcs.css`, fixed, so on a coloured
   or thematic map every pipe changes colour and its arrows stay black.

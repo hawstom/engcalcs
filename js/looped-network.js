@@ -1695,6 +1695,72 @@ var EngCalcs = EngCalcs || {};
 	function debugBoxesOn() {
 		return typeof location !== 'undefined' && /(\?|&)debug=boxes(&|$)/.test(location.search || '');
 	}
+	/**
+	 * ---- `?debug=perf` : where the seconds go while the placement wizard is open ----------------
+	 *
+	 * **AN INSTRUMENT, NOT A FIX** (Task 672). Tom, 2026-09-15: *"xy project floating on world map
+	 * can't zoom and pan more than a very few times (at great delay) without extreme slowdown,
+	 * browser reports of unresponsiveness, and crashing."*
+	 *
+	 * **THREE HEADLESS REPRODUCTIONS FAILED, and that is the reason this exists.** Driving the same
+	 * gestures against the DOM stub gives a flat 384 elements, a flat heap and 10-25 ms a cycle --
+	 * so whatever is costing him the seconds is something node does not do: fetching and decoding
+	 * tiles, rasterising SVG under a large transform, or a retained object the stub never creates.
+	 * Guessing a fourth time would cost another round trip; measuring in the browser that is
+	 * actually failing costs one.
+	 *
+	 * It reports, per settle: the wall time of each part of georefSetTransform(), how many basemap
+	 * tiles are on the map, the compensation scale the detached model is being held still with, and
+	 * Chrome's own heap reading where it is offered. `performance.memory` is Chrome-only and
+	 * absent elsewhere, which is stated rather than silently blank.
+	 *
+	 * Off unless asked for, so it costs a shipped page one regex on load.
+	 */
+	var perfDebugEl = null, perfDebugRows = [], perfDebugN = 0;
+	function perfDebugOn() {
+		return typeof location !== 'undefined' && /(\?|&)debug=perf(&|$)/.test(location.search || '');
+	}
+	function perfDebugMem() {
+		var m = (typeof performance !== 'undefined') && performance.memory;
+		return m ? Math.round(m.usedJSHeapSize / 1048576) + ' MB' : 'n/a';
+	}
+	// Times `fn` and records it under `name`. Returns whatever fn returned, so a caller can wrap a
+	// call in place without restructuring anything.
+	function perfDebugTime(name, fn) {
+		if (!perfDebugOn()) { return fn(); }
+		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
+		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+		perfDebugRows.push(name + ' ' + (t1 - t0).toFixed(1) + 'ms');
+		return out;
+	}
+	function perfDebugReport() {
+		if (!perfDebugOn()) { perfDebugRows = []; return; }
+		perfDebugN++;
+		var tiles = 0, k;
+		for (k in basemapEls) { if (basemapEls.hasOwnProperty(k)) { tiles++; } }
+		var comp = 'none', ml = modelLayer && modelLayer.getAttribute && modelLayer.getAttribute('transform');
+		if (ml) { comp = ml; }
+		var line = '#' + perfDebugN + '  ' + perfDebugRows.join('  ') +
+			'  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
+			'  | s ' + (state.s ? state.s.toExponential(3) : '?') +
+			'  | hold ' + comp;
+		perfDebugRows = [];
+		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
+		if (!perfDebugEl && document.body) {
+			perfDebugEl = document.createElement('div');
+			perfDebugEl.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3000;max-width:96vw;' +
+				'font:11px/1.35 monospace;background:rgba(0,0,0,.82);color:#0f0;padding:4px 6px;' +
+				'white-space:pre;pointer-events:none;max-height:40vh;overflow:hidden';
+			document.body.appendChild(perfDebugEl);
+		}
+		if (perfDebugEl) {
+			// Newest first, and only the last eight: the interesting thing is the TREND across a
+			// handful of gestures, and a list that grows without bound is itself a leak.
+			var prev = perfDebugEl.textContent ? perfDebugEl.textContent.split('\n') : [];
+			perfDebugEl.textContent = [line].concat(prev).slice(0, 8).join('\n');
+		}
+	}
+
 	// ---- ?debug=labels : a bench for the placement pass -----------------------------------------
 	//
 	// A URL PARAMETER AND NOT A SETTINGS SECTION, for the same reason ?debug=boxes is one.
@@ -10031,15 +10097,16 @@ var EngCalcs = EngCalcs || {};
 	function georefSetTransform(t) {
 		georef.t = t;
 		georef.rotDeg = t.rotDeg;
-		georefWrite(t);
-		buildDom();
+		perfDebugTime('write', function () { georefWrite(t); });
+		perfDebugTime('buildDom', function () { buildDom(); });
 		// Anything sized in screen pixels was left at the scale of the LAST redraw while the model
 		// was being held still (onZoomChanged does no work at all while detached), so the settle
 		// that re-derives the coordinates is also where those sizes catch up.
-		refreshSymbolSizes();
-		refreshTextLabelSizes();
-		georefDrawFrame();
-		georefRefreshBar();
+		perfDebugTime('symbols', function () { refreshSymbolSizes(); });
+		perfDebugTime('textSizes', function () { refreshTextLabelSizes(); });
+		perfDebugTime('frame', function () { georefDrawFrame(); });
+		perfDebugTime('bar', function () { georefRefreshBar(); });
+		perfDebugReport();
 	}
 
 	// ---- the bar -------------------------------------------------------------------------------
