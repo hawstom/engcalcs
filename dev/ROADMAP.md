@@ -59,31 +59,6 @@ the block.
 
 # Tasks
 
-- 100|666| **Every gallery example ships one docId.**
-  Two strangers who each open the same example and save it then contend over one lock.
-  Found 2026-09-14 while answering Tom's question about emailing a file. **The lock key is the
-  `docId` INSIDE the file** -- `lpn-lock.php` says so in its own header, and the Save-as path says
-  it twice ("Identity is the `docId` INSIDE the target file, never its name"). All seven shipped
-  examples carry a FIXED one, `Net3.lwn` being `dmsvsf9ydP1h0vx5r`, and `openExample()` does not
-  mint a new one. A gallery example has no `fileName`, so `isFileProject()` is false, so
-  `forking` is false on its first Save as -- and the comment there says that is deliberate,
-  because "a browser project's FIRST save keeps its id, because there was no other file to be a
-  copy of." Correct for a project somebody DREW; wrong for one that arrived from a file every
-  visitor on Earth downloaded.
-  - **THE SYMPTOM IS THE ONE TWO TESTERS HAVE ALREADY REPORTED.** Open Net3 from the wall, Save
-    as, and a stranger who does the same is told somebody else has your file open -- by name, if
-    they gave initials. That reads as "I changed the web site", which is exactly what the testers
-    said. Nobody has to share a folder, a network or an office: the broker is keyed on the id and
-    the id came down the wire with the example.
-  - **The fix is in the EXAMPLE, not in the lock.** Ship the examples with no `docId` and let
-    `importProject()` mint one on arrival -- a file with no docId is already handled ("not one of
-    ours; the user's business"). That keeps the first-save rule intact for drawn projects and
-    costs one change in the example generator plus a re-stamp of `examples/`.
-    `generate_examples.php --check` holds the served copies against their source, so both move
-    together.
-  - Guard it: a check that no file in `examples/` carries a `docId`, which is a one-line scan and
-    stops the next hand-saved example reintroducing it.
-
 - 100|667| **Tom's reflections on saving, locking and who can see your work.**
   Written down 2026-09-14 from a testing exchange with JHB, at Tom's instruction ("For roadmap,
   not now"). **Not one task -- four, deliberately kept together because they are one
@@ -92,9 +67,10 @@ the block.
     argue that they were not sophisticated enough. Or we can make at least some small
     clarification."* His own proposal is the gallery heading: **"Open your own copy of an
     example,"** which the page already says in smaller print beneath it. Cheap, and the second
-    report is the evidence the first was not an outlier. Note that Task 666 above may be the real
-    cause for at least one of them, in which case this wording is the belt and the fix is the
-    braces.
+    report is the evidence the first was not an outlier. **DONE 2026-09-14** -- the heading is
+    now his sentence, and Task 666 (the shared example docId, closed the same day) was very
+    likely the real cause for at least one of the two reports: this wording is the belt and
+    that fix is the braces.
   - **(b) ASK FOR INITIALS LATER -- ONLY WHEN A COLLEAGUE ACTUALLY WANTS IN.** Tom's design, in
     his words: save the lock with NO initials; when a mate opens the file, tell them *"This file
     appears to be in use. To avoid data loss, choose carefully from the following options"* and
