@@ -5,6 +5,48 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0c. Document "point Save at your synced Drive/OneDrive/Dropbox folder" — likely already true, costs a sentence
+
+2026-09-15, answering Task 667(d): the suite's existing `showSaveFilePicker()`/`showOpenFilePicker()`
+(`js/looped-network.js:21783,22221,22358`) is provider-agnostic by construction — a folder synced by
+Google Drive for Desktop, OneDrive, or Dropbox is an ordinary OS folder, and Chrome's own docs
+confirm the File System Access API already treats a cloud-backed folder as local
+(`developer.chrome.com/docs/capabilities/web-apis/file-system-access`). If this actually works
+against a live synced folder — I could not test that from this environment — it answers Tom's
+"maybe there's a provider that does that" with zero new code, zero new third-party request, and
+zero new consent gate, for whichever Chromium-only visitor already has one of those apps installed.
+**Ranked as a near-zero-cost item: verify it works, then say so somewhere visitor-facing.** Full
+citations and the honest limits (Chromium-only; Firefox/Safari fall back to download, which does
+not land in a synced folder automatically): journal, 2026-09-15 entry, Question 2 part (1).
+
+## 0d. A named in-app cloud-drive connector (Drive/OneDrive/Dropbox picker) is real but is three builds, not one, and each opens a new third-party gate
+
+2026-09-15, the other half of Task 667(d): Google Drive Picker and Dropbox Chooser/Saver are both
+confirmed buildable with no server-side secret and no per-user record of ours — `drive.file` is a
+non-sensitive OAuth scope (no Google verification cap), and Dropbox's Chooser/Saver needs no
+"Production" approval (both CITED in the journal entry). OneDrive's picker is the same general
+shape but I did not verify it to the same depth. **Ranked below row 0c because it is real cost for
+a benefit 0c may already deliver for free**: each connector is a distinct integration (three
+providers, three builds) and each is a NEW third-party request needing its own consent gate and
+`privacy.php` paragraph — the cost CLAUDE.md asks to flag loudly. Worth building only if 0c turns
+out not to work in practice, or if Tom specifically wants an in-page "Connect" button over "point
+your Save dialog here." Full citations: journal, 2026-09-15 entry, Question 2 part (2).
+
+## 0e. Task 674's own premise is half backwards — EPANET's GUI already has typed coordinates; epanet-js appears not to
+
+2026-09-15: checked both claims in the roadmap block for Task 674 against primary sources. EPANET
+2.2's own Property Editor DOES let a user type X/Y (CITED, EPA's own manual source,
+`github.com/USEPA/EPANET2.2/blob/master/User_Manual/docs/6_objects.rst`) — the roadmap block's
+framing of EPANET as "`[COORDINATES]` section, plain text people hand-edit" describes only the file
+format, not the GUI, and is incomplete. epanet-js's rendered property panel
+(`apps/app/src/panels/asset-panel/asset-panel.tsx`, commit `8a68389`, checked directly) has no
+coordinate field at all, as far as I can find — the stronger and more surprising half. **Recording
+this as a correction to the roadmap's own evidence, not as a new task** — the recommendation
+(build it) is unaffected and, if anything, better supported: EPANET's reference GUI has had this
+for decades and a funded 2025-era competitor apparently still lacks it. Full citations: journal,
+2026-09-15 entry, Question 1. Zero build cost; this is a note for whoever writes the Task 674
+brief, so they cite EPANET's manual correctly instead of the file-format text.
+
 ## 0. Add a licence re-check step to the epanet-js upgrade instructions
 
 2026-09-08: checking Tom's EPANET-freedom-hierarchy statement, I found that `epanet-js`'s own
