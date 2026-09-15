@@ -23262,6 +23262,7 @@ var EngCalcs = EngCalcs || {};
 	// Every button that goes through here is also recorded, so Help > "What the toolbar icons mean"
 	// is DERIVED from the strip rather than being a second list to keep in step with it. A new
 	// toolbar button appears in that list without anybody remembering to add it.
+	var toolbarTipsWired = false;
 	var toolbarIconIndex = [];
 	function setIconLabel(el, iconName, name, tip) {
 		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
@@ -23454,7 +23455,7 @@ var EngCalcs = EngCalcs || {};
 				// plain row at every level, so entering "Blank project" closed the menu that
 				// "Blank project" was in.
 				if (canHover()) { b.addEventListener('mouseenter', cancelSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
+				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			} else {
 				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
 				// does -- otherwise it hangs beside a row it no longer belongs to. On a DELAY, because
@@ -23463,7 +23464,7 @@ var EngCalcs = EngCalcs || {};
 				// Same gate: on touch this fired from the synthesised mouse sequence and armed a
 				// 350 ms close of the fly-out the user had just opened.
 				if (canHover()) { b.addEventListener('mouseenter', scheduleSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
+				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			}
 			list.appendChild(b);
 		});
@@ -25585,6 +25586,22 @@ var EngCalcs = EngCalcs || {};
 	// (Delete, Undo, Select -- in that order), and everything else (Zoom Extent, Draw Example).
 	function wireToolbar() {
 		var toolbar = document.getElementById('lpn_toolbar'), pc = EngCalcs.pageConfig || {};
+		// **ONE DELEGATED LISTENER FOR THE WHOLE STRIP, ATTACHED ONCE** (Task 670). The buttons are
+		// rebuilt on a unit switch and on a language relabel; this element is not, so a listener
+		// here outlives every rebuild and a button added later inherits the behaviour instead of
+		// having to remember it. Wrapping each button's own handler would have been the same fix
+		// written eleven times, and the twelfth button is the one that ships without it.
+		//
+		// It runs on the BUBBLE, after the button's own handler, so the command has already run --
+		// which is what makes "no tip after a command" true rather than "no tip during one".
+		if (toolbar && !toolbarTipsWired) {
+			toolbarTipsWired = true;
+			toolbar.addEventListener('click', function (e) {
+				if (e.target && e.target.closest && e.target.closest('button')) {
+					dismissTipsAfterCommand();
+				}
+			});
+		}
 		// Rebuilt, not appended to: this runs again on a unit switch and a language-driven relabel.
 		toolbarIconIndex = [];
 		setModeUI = function () {
@@ -25789,6 +25806,9 @@ var EngCalcs = EngCalcs || {};
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
 		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
+		// **`zoomExtent` BY REFERENCE, so the click event arrives as its `auto` argument.** Left
+		// exactly as it was -- changing it is a behaviour change to the fit and belongs in its own
+		// task, not in a tooltip fix.
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
@@ -30205,6 +30225,27 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function hideOpenTips() { hideTipsIn(document); }
+	/**
+	 * **A COMMAND HAS JUST RUN, SO NO TIP SHOULD BE LEFT STANDING** (Task 670, Tom 2026-09-15:
+	 * *"On phone, Map menu and toolbar, Zoom to fit leaves a tip showing."*).
+	 *
+	 * **WHY ZOOM TO FIT AND NOT THE OTHERS, which is the part that explains the whole bug.** Almost
+	 * every other command on those two surfaces OPENS A PANEL, and opening one already calls
+	 * `hideOpenTips()` -- so the sweep was riding along on a side effect rather than being anybody's
+	 * job. Zoom to fit opens nothing. It changes the view and returns, and on a POINTER the tip then
+	 * goes away by itself because the mouse moves off the button; on TOUCH there is no such motion,
+	 * so the tip stands over the map with the command already done.
+	 *
+	 * So the rule is about the ACT, not about the control: running a command dismisses the tip that
+	 * raised it. Both surfaces go through here, and `sweepOrphanTips()` comes too because a menu row
+	 * is DESTROYED by `closeMenu()` a moment earlier -- its tooltip is rendered into document.body,
+	 * survives its trigger, and `hideTipsIn()` walks from a root down to triggers, so it cannot see
+	 * one that no longer has any.
+	 */
+	function dismissTipsAfterCommand() {
+		hideOpenTips();
+		sweepOrphanTips();
+	}
 	/**
 	 * **A TIP WHOSE TRIGGER NO LONGER EXISTS IS SWEPT FROM THE BODY.**
 	 *
