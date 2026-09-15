@@ -579,5 +579,8 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_field_northing_abbr": "Northing",
+        "lpn_field_easting_abbr": "Easting"
+    }
 }

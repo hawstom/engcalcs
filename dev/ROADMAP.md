@@ -59,6 +59,19 @@ the block.
 
 # Tasks
 
+- 100|668| **A label leader 1,000 times the reach, after a georeference settle.**
+  FOUND while fixing the crash below and NOT the same defect. With `span()` bounded the page no
+  longer dies, but the placement is still wrong: after a settle one committed leader measured
+  **25.7 degrees of longitude, about 2,500 km**, against a grid cell of 0.0222 and an `outer`
+  reach that cannot have exceeded it -- a candidate roughly a thousand times further out than the
+  reach allows. `candidatesFor()` is bounded by `outer`, so the number cannot come from there;
+  the likely source is a stale `home` or anchor surviving `georefWrite()`, in a frame that has
+  just changed units. **Not diagnosed -- do not guess it closed.** Reproduce with
+  `georefSetTransform()` on the transform `georefReproject()` computes for a jump from the start
+  view to a 1 km site, which is four lines against the DOM stub.
+  - It is invisible today: the leader is drawn, and a reader sees a label in an odd place rather
+    than a line to Peru, because the label itself is clamped. That is why it wants a task.
+
 - 100|667| **Tom's reflections on saving, locking and who can see your work.**
   Written down 2026-09-14 from a testing exchange with JHB, at Tom's instruction ("For roadmap,
   not now"). **Not one task -- four, deliberately kept together because they are one
@@ -87,6 +100,25 @@ the block.
   - **(d) CONNECT TO THE USER'S OWN CLOUD DRIVE instead**, which needs no account of ours and is
     the cheaper half of (c). Tom: *"maybe there's a provider that does that."* Worth a
     `market-researcher` question before any design.
+  - **(f) THE CONVERSION IS A "SAVE AS" AND THE MENU SHOULD SAY SO** (Tom, 2026-09-15, and this
+    supersedes the wording argument that preceded it). His diagnosis is that the naming fight was
+    a symptom: *"we've been neglecting to use a standard paradigm because our design is wrong."*
+    The row participates in the **File, Save as…** family, except that what we built is an
+    "Open as", which is why no name for it read correctly. **His redesign, in three steps:**
+    (1) the row becomes **File, Convert coordinates as…**; (2) it offers a file picker OR makes a
+    duplicate tab named `Copy of {project_name}`; (3) the redesigned conversion wizard runs.
+    - **AND "CONVERT" IS THE HONEST WORD, which reverses what this repo had written down.** Tom:
+      *"let's not fool ourselves, conversion of all coordinates is happening."* He is right and
+      the code agrees -- `georefWrite()` re-derives every stored point, and
+      `georefSetTransform()`'s own comment says "nothing but the coordinates changes", which
+      concedes that the coordinates DO. The rule we actually hold is **never convert IN PLACE**,
+      and a Save-as shape does not: the original file is untouched. The three past lessons
+      reconciled in his words: we learned not to convert in place, and this does not; we dropped
+      the word "convert", but the operation always was one; and we must be able to reproject
+      BETWEEN projections, not only from unprojected to projected.
+    - **THIS IS PROJECTION-BRANCH WORK, not master's**, on his instruction. The interim English on
+      master is his: `Open xy file on map…`, which is what the shipped translations already say.
+
   - **(e) CONCURRENT EDITING, THE GOOGLE DOCS SHAPE.** Tom already priced it himself in the
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.

@@ -24119,7 +24119,7 @@ var EngCalcs = EngCalcs || {};
 			// nothing about the project on screen makes this impossible, because the result is a new
 			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
 			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open to new coordinates…',
+			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
