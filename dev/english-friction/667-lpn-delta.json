@@ -11,8 +11,10 @@
         "open an existing xy file onto a map (what the translations say)",
         "open this project again under a different coordinate system (what the English says)"
       ],
-      "disposition": "open",
-      "resolution": "NOT FIXED in this sprint -- it is stale TRANSLATION rather than ambiguous English, so it belongs in a resync set, not here. Filed so the next sprint picks it up: detect_english_drift.php should now see it, the English having been rebaselined at the close of this sprint."
+      "disposition": "english",
+      "resolution": "Tom asked 2026-09-14: *\"Should `en` be 'Convert coordinates as...'?\"* **NO, and the code answers it twice.** (1) The row's own comment records that *\"the old 'Convert to lat/lon...' row, which converted the OPEN project and had to be greyed whenever that project was already on the map, is gone with it\"* -- so Convert names a command deliberately RETIRED, and restoring the name restores the confusion the removal bought. (2) Nothing is converted: `openAsGeoFile()` reads ANOTHER file and lands it in a NEW TAB as an upload, and a wizard places it on the world map by zoom, scale and rotate -- by eye, not by transform. 'Convert coordinates' would promise rewriting the user's numbers, which this suite refuses by rule (js/lpn-crs.js: *\"converting rewrites every number somebody typed\"*). **AND NEITHER OFFERED READING WAS RIGHT, INCLUDING TOM'S** -- it is not this project going to a new file, and not this project reopened; it is a DIFFERENT file arriving in a new tab. The finding framed the question wrongly, which is why every answer to it was wrong. **The shipped translations were closer to the behaviour than the current English**: 'Open xy file on map' names a file arriving on the map, which is what happens. So the English drifted away from the code and the translations did not. Proposed replacement put to Tom, not yet written: 'Open a file onto the world map...'.",
+      "human_answer": "The answer is 2 almost. The answer is \"Open this project to a new file under a different coordinate system\" (that is what the English says). Code has changed. Behavior has changed with the introduction of projections. Maybe _syn is needed: \"Make a copy of a project file under a different coordinate system...\" Should `en` be \"Convert coordinates as...\"?",
+      "human_answered": "2026-09-15"
     },
     {
       "key": "lpn_cp_restrict_deny",
@@ -47,8 +49,10 @@
         "the compass direction",
         "the coordinate axis of a projected grid"
       ],
-      "disposition": "open",
-      "resolution": "SHIPPED AS TRANSLATED, no English change. The abbreviation keys are separate (lpn_field_northing_abbr / _easting_abbr) so a language that cannot abbreviate can carry the full word there, which is what ar did. Recorded because the next person to add a coordinate readout will assume first-letter abbreviation works and it does not."
+      "disposition": "intent",
+      "resolution": "Tom's ruling 2026-09-14: the abbreviation keys assume nothing, and the answer is a synonym rather than an English change -- _syn on the abbreviation key can carry the full word, and the abbreviation tag or the glossary can say it is an abbreviation OF that word. That is an INTENT case by the routing rule: an English reader does not stumble on 'N'; a translator cannot recover which N it is. The _syn diff is proposed to him for approval and is NOT yet written -- $ec_lang_syn takes explicit approval of the exact text, with no standing carve-out.",
+      "human_answer": "The abbreviation keys assume nothing. _syn Can say \"Northing\" and the abbreviation tag or glossary can say \"Abbreviation of Northing\". Use your judgement.",
+      "human_answered": "2026-09-15"
     },
     {
       "key": "lpn_field_tag",
@@ -59,22 +63,23 @@
         "EPANET's [TAGS] token, a grouping word the user chooses",
         "the caption shown on a custom property"
       ],
-      "disposition": "open",
-      "resolution": "NOT FIXED -- choosing a second word in four languages is lexical judgement I cannot verify, and inventing one is the failure mode this project distrusts. The four values are DELIBERATELY ABSENT from the glossary's 'tag (EPANET)' term, so absent reads as unconfirmed rather than untranslated and the next sprint is asked the question rather than handed an answer. Cosmetic: no number is wrong."
+      "disposition": "dismissed",
+      "resolution": "CLOSED on Tom's ruling 2026-09-14, which DISMISSES the four-language collision rather than fixing it: *\"Tag is just whatever ID-like synonym was available. The exact translation is not important because Tag has no real meaning.\"* He named Label and Custom label among its own synonyms, so es/it/sw/tr rendering Tag and Label with one word is sanctioned, not a defect. **The one live consequence, recorded so it is not rediscovered as a bug:** in those four languages the Properties box shows two adjacent fields under one name, and no rename is coming. A _syn carrying his synonym list is proposed to him and NOT yet written.",
+      "human_answer": "The truth is that \"Tag\" is just whatever ID-like synonym was available. The exact translation is not important because Tag has no real meaning. Maybe _syn could help (\"Tag, Custom property, User property, Label, Custom label\")",
+      "human_answered": "2026-09-15"
     },
     {
       "key": "lpn_crs_list",
       "source": "translator",
       "lang": "fa",
-      "complaint": "THREE AGENTS TOOK THE WRONG SENSE OF \"Projection\": fa gave the psychological sense, km a sorting system, sw a drawing. The cartographic sense is the one meant -- the rule that turns a longitude and latitude into an easting and a northing -- and nothing in the payload said so, because there was no glossary term for it.",
+      "complaint": "THREE AGENTS MISSED THE SENSE OF \"Projection\": fa gave the psychological one, km a sorting system, sw a drawing. Nothing in the payload said which sense was meant, because there was no glossary term for it.",
       "readings": [
-        "map projection (cartographic)",
+        "map projection, which is the geometric sense applied to the globe",
         "psychological projection",
-        "optical projection",
         "a forecast"
       ],
       "disposition": "glossary",
-      "resolution": "FIXED at the mechanism. A new glossary term 'projection (map)' was created, harvested from the 23 renderings that took the cartographic sense, wired into prefixToTermNames()['lpn']. The three false friends are withheld from it rather than recorded, so the next sprint is told the sense and is not shown a wrong precedent. The three SHIPPED STRINGS are still wrong and are the next sprint's resync, not this one's."
+      "resolution": "FIXED at the mechanism. A new glossary term 'projection (map)' was created, harvested from the 23 renderings that took the right sense, and wired into prefixToTermNames()['lpn']. **Tom corrected the term's context the same day and the correction is the useful part:** *\"Projection is in the geometric or optical sense also.\"* The first draft had ruled the optical sense OUT, which is backwards -- a map projection IS a geometric projection, the globe cast onto a plane, cone or cylinder, so a language reaching for its geometry word is correct. Only the psychological sense and 'a forecast' are the wrong ones. The three renderings are withheld from the term as UNCONFIRMED, not branded; their shipped strings are a resync, not this sprint's work."
     },
     {
       "key": "lpn_cp_flag",
@@ -85,8 +90,10 @@
         "one sentence",
         "two sentences"
       ],
-      "disposition": "open",
-      "resolution": "NOT FIXED. It reads correctly in English and in most scripts; the report is about sentence separation in Khmer, where the full stop is not the sentence boundary marker. A rewrite of the composition is an English change and Tom has not ruled on it."
+      "disposition": "dismissed",
+      "resolution": "CLOSED on Tom's ruling 2026-09-14: the capital T makes the sentence start obvious to every translator, and no English change is needed. No further action.",
+      "human_answer": "The capital T makes a sentence start obvious to all translators. No ruling is needed.",
+      "human_answered": "2026-09-15"
     },
     {
       "key": "lpn_cp_bad_case",

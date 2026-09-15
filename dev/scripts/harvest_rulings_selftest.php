@@ -49,17 +49,41 @@ if ($rc !== 0) {
 }
 
 /* The first entry in the file, whatever it is today: `- **`key`**` and its `  > ` value block. */
+/*
+ * **AN EMPTY LIST IS SUCCESS, NOT A BROKEN SELFTEST** (2026-09-14). This refused to run the day
+ * the backlog reached zero -- every key translated and every friction finding answered -- so
+ * finishing the work turned the build red, which is the same died-of-success shape the docblock
+ * above says this file exists to avoid, arriving by the other door: there the FIXTURE could
+ * retire, here the whole FILE can. Leg 2 already plants an entry of its own invention; legs 1 and
+ * 3 now do the same when there is nothing real to borrow, so the parser is still exercised over a
+ * genuinely empty list. The tree is restored from $original either way, so the plant never
+ * survives the run.
+ */
+$base = $original;
+$synthetic = false;
 if (!preg_match('/^- \*\*`([a-z0-9_]+)`\*\*\n((?:  > [^\n]*\n)+)/m', $original, $m)) {
-    fwrite(STDERR, "SELFTEST CANNOT RUN: no entry found in dev/new-english-keys.md to use as a fixture.\n");
-    exit(2);
+    $synthetic = true;
+    $fixtureKey = 'ec_selftest_empty_list_key';
+    $fixtureHead = "- **`" . $fixtureKey . "`**\n  > selftest fixture value\n";
+    $base = rtrim($original, "\n") . "\n\n## ec_  (1, selftest fixture)\n\n" . $fixtureHead;
+    /* The plant itself must be invisible to the parser, or legs 1 and 3 are measuring the plant
+     * rather than the mark. Asserted rather than assumed. */
+    file_put_contents($md, $base);
+    list($rc, $txt) = ecRunCheck($script);
+    file_put_contents($md, $original);
+    if ($rc !== 0) {
+        fwrite(STDERR, "SELFTEST CANNOT RUN: the synthetic fixture is itself read as a mark.\n" . $txt . "\n");
+        exit(2);
+    }
+} else {
+    $fixtureHead = $m[0];
+    $fixtureKey  = $m[1];
 }
-$fixtureHead = $m[0];
-$fixtureKey  = $m[1];
 
 try {
     /* Leg 1: a plausible mark. `ec_selftest_marker` cannot occur in any real answer, so a pass here
      * is the parser reading the mark and not a coincidence. */
-    file_put_contents($md, str_replace($fixtureHead, $fixtureHead . "  ec_selftest_marker one\n", $original));
+    file_put_contents($md, str_replace($fixtureHead, $fixtureHead . "  ec_selftest_marker one\n", $base));
     list($rc, $txt) = ecRunCheck($script);
     if ($rc === 0) { $fails[] = 'leg 1: a planted mark on ' . $fixtureKey . ' was NOT reported.'; }
     elseif (strpos($txt, $fixtureKey) === false) { $fails[] = 'leg 1: reported a failure but did not name the key.'; }
@@ -94,7 +118,7 @@ try {
     file_put_contents($md, $original);
     $furniture = "  **What this asks for:** a WORDING ruling -- is the English above right.\n"
         . "  *The proposal:* PROPOSED English: something.\n";
-    file_put_contents($md, str_replace($fixtureHead, $fixtureHead . $furniture, $original));
+    file_put_contents($md, str_replace($fixtureHead, $fixtureHead . $furniture, $base));
     list($rc, $txt) = ecRunCheck($script);
     if ($rc !== 0) {
         $fails[] = "leg 3: the generator's OWN furniture was reported as an unharvested mark:\n" . $txt;
@@ -115,6 +139,6 @@ if ($fails) {
     foreach ($fails as $f) { fwrite(STDERR, '  - ' . $f . "\n"); }
     exit(1);
 }
-echo "harvest_rulings_selftest: 4 legs OK on fixture `" . $fixtureKey . "` — a planted mark is seen in both"
+echo "harvest_rulings_selftest: 4 legs OK on " . ($synthetic ? 'a SYNTHETIC fixture (the real list is empty)' : 'fixture `' . $fixtureKey . '`') . " — a planted mark is seen in both"
     . " sections, the generator's own furniture is not mistaken for one, and a clean tree is clean.\n";
 exit(0);
