@@ -9655,6 +9655,73 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Writes the mapped positions back in the SAME ORDER they were captured. Order stability is why
 	// the tool locks editing: an element added mid-placement would shift every index after it.
+	/**
+	 * **AN OFFSET IS NOT A POSITION, AND THE REPROJECTION HAS TO MOVE IT ANYWAY** (Task 668, Tom
+	 * 2026-09-15: *"I see labels thousands of miles away, not in Sedona or Arizona, but in Canada,
+	 * China, the Atlantic, and south Pacific."*).
+	 *
+	 * `eachStoredPoint()` visits POSITIONS, and it is right not to visit these: a label offset is a
+	 * vector, so the local-origin shift must not apply to it (Task 354). But a reprojection changes
+	 * the UNIT the vector is written in, and nothing was re-deriving them -- so Elm Street Center's
+	 * stored `lx = -57` went from 57 feet to **57 DEGREES, about 6,300 km**, and the label landed in
+	 * China. Measured: the anchor-to-home delta came out byte-identical before and after the
+	 * settle, (-24.88, +24.99) in feet and then in degrees.
+	 *
+	 * **THREE FAMILIES, and the third is the one a reader would miss**: a node's `lx/ly`, a link's
+	 * `lx/ly`, and an ANCHORED Text's own `x/y`, which are an offset from its anchor rather than a
+	 * position (`textLabelPoint()`) -- which is exactly why `eachStoredPoint()` skips an anchored
+	 * label and visits a free-floating one.
+	 *
+	 * **TRANSFORM THE TIP AND SUBTRACT THE TRANSFORMED BASE, rather than scaling by a factor.** The
+	 * factor would have to be kept in step with `metersPerUnit`, the rotation and the y flip, and
+	 * that is three chances to disagree with `georefWrite()` about what the transform is. Mapping
+	 * two points through the SAME function and differencing them cannot disagree with it at all,
+	 * and it carries the rotation for free.
+	 */
+	function georefCaptureOffsets() {
+		var out = [];
+		function add(el, ax, ay, ox, oy, keys) {
+			out.push({ el: el, keys: keys,
+				base: { x: outwardX(ax), y: outwardY(ay) },
+				tip: { x: outwardX(ax + ox), y: outwardY(ay + oy) } });
+		}
+		(doc.nodes || []).forEach(function (n) {
+			if (n.lx === undefined && n.ly === undefined) { return; }
+			var d = defaultLabelOffset();
+			add(n, n.x, n.y, n.lx !== undefined ? n.lx : d.x, n.ly !== undefined ? n.ly : d.y,
+				{ x: n.lx !== undefined ? 'lx' : null, y: n.ly !== undefined ? 'ly' : null });
+		});
+		(doc.links || []).forEach(function (l) {
+			if (l.lx === undefined && l.ly === undefined) { return; }
+			var d = defaultLabelOffset(), mid = linkLabelMid(l);
+			if (!mid || !isFinite(mid.x) || !isFinite(mid.y)) { return; }
+			add(l, mid.x, mid.y, l.lx !== undefined ? l.lx : d.x, l.ly !== undefined ? l.ly : d.y,
+				{ x: l.lx !== undefined ? 'lx' : null, y: l.ly !== undefined ? 'ly' : null });
+		});
+		(doc.labels || []).forEach(function (lb) {
+			if (!textIsAnchored(lb)) { return; }   // a free one is a POSITION; eachStoredPoint has it
+			var an = textAnchorPoint(lb);
+			if (!an || !isFinite(an.x) || !isFinite(an.y)) { return; }
+			add(lb, an.x, an.y, lb.x || 0, lb.y || 0, { x: 'x', y: 'y' });
+		});
+		return out;
+	}
+	// Re-derives each captured offset through `t`. Runs AFTER the positions are written, because a
+	// link's midpoint and a link-anchored Text's station are both read off the moved geometry.
+	function georefWriteOffsets(t) {
+		var list = georef && georef.offs;
+		if (!list) { return; }
+		function map(x, y) {
+			var ll = EngCalcs.lpnGeorefToLonLat(t, x, y);
+			return { x: inwardX(ll.lon), y: inwardY(ll.lat) };
+		}
+		list.forEach(function (o) {
+			var b = map(o.base.x, o.base.y), p = map(o.tip.x, o.tip.y);
+			if (!isFinite(b.x) || !isFinite(b.y) || !isFinite(p.x) || !isFinite(p.y)) { return; }
+			if (o.keys.x) { o.el[o.keys.x] = p.x - b.x; }
+			if (o.keys.y) { o.el[o.keys.y] = p.y - b.y; }
+		});
+	}
 	function georefWrite(t) {
 		var i = 0;
 		eachStoredPoint(doc, function (pt, get, set) {
@@ -9665,6 +9732,7 @@ var EngCalcs = EngCalcs || {};
 			else { pt.x = inwardX(ll.lon); pt.y = inwardY(ll.lat); }
 		});
 		georefWriteBackdrop(t);
+		georefWriteOffsets(t);
 	}
 	function georefSrcBounds() { return EngCalcs.lpnGeorefBounds(georef.src); }
 	function georefSrcCentre() {
@@ -10651,7 +10719,8 @@ var EngCalcs = EngCalcs || {};
 		// its second half, the instructions, so those are said as a notice instead: a sentence you
 		// can read while you work beats a modal you must dismiss before you can start.
 		georef = {
-			step: GEOREF_STEP_DETACHED, src: georefCapture(), bd: georefCaptureBackdrop(), t: null,
+			step: GEOREF_STEP_DETACHED, src: georefCapture(), bd: georefCaptureBackdrop(),
+			offs: georefCaptureOffsets(), t: null,
 			frozen: null, rotDeg: 0,
 			// **WHAT UNDO GETS BACK IF THE USER FINISHES** (Task 436). Taken HERE, before one number
 			// has moved, because the wizard's whole run is one act to the person pressing Ctrl+Z --
