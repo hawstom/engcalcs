@@ -114,7 +114,11 @@ function prefixToTermNames(): array
             // word that makes them terms of art.
             'open (link status)', 'source trace', 'trace node', 'query keyword (AND, OR)',
             'path (profile route)', 'static pressure (fire flow)', 'available fire flow',
-            'emitter'],
+            // Added 2026-09-14 (sprint 667, the projection delta). 'projection (map)' is the
+            // cartographic rule turning a longitude into an easting, and three agents reached
+            // for the psychological, the optical and the sorting sense instead -- the false
+            // friend a term exists to prevent, measured rather than predicted.
+            'emitter', 'projection (map)'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read**, of 108 untranslated keys, of 1871 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read**, of 108 untranslated keys, of 1871 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (108, 4 to read @@ NEEDS RULING)
+## lpn_  (108, all ruled)
 
 - **`lpn_about_credits`**
   > Credits
@@ -77,7 +77,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_cp_design_tip`**
   > One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or restrict, the characters field named by that choice, Length lower limit, Length upper limit, Low limit, High limit.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-15._
 - **`lpn_cp_flag`**
   > {label}: {reason} The value is kept exactly as you typed it.
   _Ruled OK 2026-09-14._
@@ -233,7 +233,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_field_easting_abbr`**
   > E
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-15._
 - **`lpn_field_emitter`**
   > Emitter coefficient
   _Ruled OK 2026-09-09._
@@ -245,7 +245,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_field_northing_abbr`**
   > N
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-15._
 - **`lpn_field_text_attached_tip`**
   > This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.
   _Ruled OK 2026-09-09._
@@ -338,7 +338,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-14._
 - **`lpn_terrain_denied`**
   > The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.
-  @@ NEEDS RULING
+  _Ruled OK 2026-09-15._
 - **`lpn_time_pause_tip`**
   > Pause animation
   _Ruled OK 2026-09-14._

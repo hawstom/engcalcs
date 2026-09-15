@@ -1,0 +1,104 @@
+{
+  "sprint": "667-lpn-delta",
+  "description": "The projection / custom-property / Find delta, 108 lpn_ keys x 26 languages = 2,808 strings, run 2026-09-14 as one agent per language. Entries below are what the agents reported back, plus two collisions found by harvesting the shipped values afterwards and comparing them across languages -- a check no single agent could have run, because each sees only its own file.",
+  "entries": [
+    {
+      "key": "lpn_file_import_geo",
+      "source": "translator",
+      "lang": "ur",
+      "complaint": "The shipped translations say \"Open xy file on map\" while the current English is \"Open to new coordinates...\". Independently hit by zh, de and ur in the same sprint, each reporting that the string in front of them did not describe the control. The English moved and the 26 translations did not.",
+      "readings": [
+        "open an existing xy file onto a map (what the translations say)",
+        "open this project again under a different coordinate system (what the English says)"
+      ],
+      "disposition": "open",
+      "resolution": "NOT FIXED in this sprint -- it is stale TRANSLATION rather than ambiguous English, so it belongs in a resync set, not here. Filed so the next sprint picks it up: detect_english_drift.php should now see it, the English having been rebaselined at the close of this sprint."
+    },
+    {
+      "key": "lpn_cp_restrict_deny",
+      "source": "translator",
+      "lang": "pt",
+      "complaint": "Duplicates lpn_cp_restrict word for word in English, so an agent translating both is asked to distinguish two strings that are identical. Caused the same day by the caption change that made restrictCaption() re-caption the character box from the mode's own option text.",
+      "readings": [
+        "the allow caption",
+        "the deny caption"
+      ],
+      "disposition": "english",
+      "resolution": "OPEN -- the two English values must differ or one key must go. Tom has not ruled. Raised in the handoff; it is cosmetic, not a wrong number, so it did not hold the sprint."
+    },
+    {
+      "key": "lpn_cp_val_upper",
+      "source": "translator",
+      "lang": "fr",
+      "complaint": "\"ALL CAPS\" is prose sitting in a list whose other four members are code-convention NAMES (camelCase, PascalCase, snake_case, hyphen-case) that must not be translated. Also reported by ar. Two agents resolved the tension by leaving it in English (ps, sr), which is the wrong half to keep: the other four are names of formats, this one is a description of one.",
+      "readings": [
+        "the literal token ALL CAPS, a name like the four beside it",
+        "a description: every letter upper case"
+      ],
+      "disposition": "dismissed",
+      "resolution": "FIXED. The four format names are now declared exempt globally in translation_exempt_keys.json -- identical to English is permanently correct there, because lpn_cp_bad_case quotes the format name back at the user and a translated one would name a rule the page does not apply. ALL CAPS is NOT exempt and was translated in ps and sr, the two that had left it."
+    },
+    {
+      "key": "lpn_field_northing",
+      "source": "translator",
+      "lang": "de",
+      "complaint": "Northing/Easting and their one-letter abbreviations have no stable convention across languages, and the abbreviation keys assume the first letter of the word works. Answers ranged over Latin N/E, Turkish K/D, Ukrainian Pn/Sh, German Hochwert/Rechtswert (H/R) and Hebrew tsadi/mem. ARABIC CANNOT ABBREVIATE AT ALL: shamal and sharq both begin with the same letter, so a one-character abbreviation is ambiguous in a status bar that shows both at once.",
+      "readings": [
+        "the compass direction",
+        "the coordinate axis of a projected grid"
+      ],
+      "disposition": "open",
+      "resolution": "SHIPPED AS TRANSLATED, no English change. The abbreviation keys are separate (lpn_field_northing_abbr / _easting_abbr) so a language that cannot abbreviate can carry the full word there, which is what ar did. Recorded because the next person to add a coordinate readout will assume first-letter abbreviation works and it does not."
+    },
+    {
+      "key": "lpn_field_tag",
+      "source": "translator",
+      "lang": "es",
+      "complaint": "FOUR LANGUAGES GIVE Tag AND THIS PAGE'S OWN Label THE IDENTICAL WORD: es Etiqueta, it Etichetta, sw Lebo, tr Etiket. lpn_field_tag and lpn_cp_label then stand in the same Properties box under one name. The synonym on lpn_field_tag says in as many words that it is not this page's Label object, so the guard was written and did not reach the outcome. Two of the four are anchor languages. Found by comparing the shipped values across all 26 files, which no single agent can do.",
+      "readings": [
+        "EPANET's [TAGS] token, a grouping word the user chooses",
+        "the caption shown on a custom property"
+      ],
+      "disposition": "open",
+      "resolution": "NOT FIXED -- choosing a second word in four languages is lexical judgement I cannot verify, and inventing one is the failure mode this project distrusts. The four values are DELIBERATELY ABSENT from the glossary's 'tag (EPANET)' term, so absent reads as unconfirmed rather than untranslated and the next sprint is asked the question rather than handed an answer. Cosmetic: no number is wrong."
+    },
+    {
+      "key": "lpn_crs_list",
+      "source": "translator",
+      "lang": "fa",
+      "complaint": "THREE AGENTS TOOK THE WRONG SENSE OF \"Projection\": fa gave the psychological sense, km a sorting system, sw a drawing. The cartographic sense is the one meant -- the rule that turns a longitude and latitude into an easting and a northing -- and nothing in the payload said so, because there was no glossary term for it.",
+      "readings": [
+        "map projection (cartographic)",
+        "psychological projection",
+        "optical projection",
+        "a forecast"
+      ],
+      "disposition": "glossary",
+      "resolution": "FIXED at the mechanism. A new glossary term 'projection (map)' was created, harvested from the 23 renderings that took the cartographic sense, wired into prefixToTermNames()['lpn']. The three false friends are withheld from it rather than recorded, so the next sprint is told the sense and is not shown a wrong precedent. The three SHIPPED STRINGS are still wrong and are the next sprint's resync, not this one's."
+    },
+    {
+      "key": "lpn_cp_flag",
+      "source": "translator",
+      "lang": "km",
+      "complaint": "Composes as '{label}: {reason} The value is kept exactly as you typed it.' and every {reason} already ends in a full stop, so the two sentences run together with a single space and no break in some scripts.",
+      "readings": [
+        "one sentence",
+        "two sentences"
+      ],
+      "disposition": "open",
+      "resolution": "NOT FIXED. It reads correctly in English and in most scripts; the report is about sentence separation in Khmer, where the full stop is not the sentence boundary marker. A rewrite of the composition is an English change and Tom has not ruled on it."
+    },
+    {
+      "key": "lpn_cp_bad_case",
+      "source": "translator",
+      "lang": "*",
+      "complaint": "All 26 agents independently left camelCase, PascalCase, snake_case and hyphen-case untranslated, which lang_syntax_validate.php then blocked on as 104 identical-to-english findings. Unanimity across 26 languages is the definition of exempt, not of neglect.",
+      "readings": [
+        "the name of a format the page checks against",
+        "a phrase describing letter case"
+      ],
+      "disposition": "dismissed",
+      "resolution": "FIXED by declaration. The four keys are exempt with languages '*' in translation_exempt_keys.json. The underscore IS the snake_case convention, so the name cannot be carried into another script without naming a different rule than the one the page applies."
+    }
+  ]
+}

@@ -152,9 +152,9 @@
             "answer": "OK"
         },
         "lpn_cp_design_tip": {
-            "on": "One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or refuse, Restrict characters, Fewest characters, Most characters, Low limit, High limit.",
-            "ruled": "2026-09-14",
-            "answer": "Rejected. Revise to match design field labels (I notice the characters fields)."
+            "on": "One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or restrict, the characters field named by that choice, Length lower limit, Length upper limit, Low limit, High limit.",
+            "ruled": "2026-09-15",
+            "answer": "OK"
         },
         "lpn_cp_edit_tip": {
             "on": "Opens the design of this custom property, where every part of it is shown at full length.",
@@ -990,6 +990,11 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_field_easting_abbr": {
+            "on": "E",
+            "ruled": "2026-09-15",
+            "answer": "OK"
+        },
         "lpn_field_emitter": {
             "on": "Emitter coefficient",
             "ruled": "2026-09-09",
@@ -1013,6 +1018,11 @@
         "lpn_field_northing": {
             "on": "Northing",
             "ruled": "2026-09-14",
+            "answer": "OK"
+        },
+        "lpn_field_northing_abbr": {
+            "on": "N",
+            "ruled": "2026-09-15",
             "answer": "OK"
         },
         "lpn_field_pipetype": {
@@ -2365,6 +2375,11 @@
         "lpn_terrain_blank_ids": {
             "on": "These nodes are still blank: {ids}",
             "ruled": "2026-08-29"
+        },
+        "lpn_terrain_denied": {
+            "on": "The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.",
+            "ruled": "2026-09-15",
+            "answer": "OK"
         },
         "lpn_terrain_filled_ids": {
             "on": "These nodes were filled in: {ids}",
