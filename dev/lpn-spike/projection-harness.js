@@ -458,6 +458,21 @@ setUnitSet('si');
 	ok('...and the box is shut', byId.lpn_crsbox.style.display !== 'block');
 	ok('...and no project declared anything', L.crsCode() === '');
 
+	// **AND DOUBLE-CLICKING A ROW IS THE SAME ACT** (Tom, 2026-09-14: *"When I double-click a
+	// projection, that should be equivalent to Select or done."*). Enter already did it; the
+	// pointer had no equivalent, and with 5,346 rows a person who has filtered to the one they
+	// want should not have to travel to a button to say so. Driven through the REAL listener on
+	// the REAL element, so this cannot pass while the box is wired to something else.
+	let picked2 = null;
+	L.openCrsBox(ZONE12N, PETALUMA, function (code, ll) { picked2 = { code: code, ll: ll }; });
+	const dblList = byId.lpn_crsbox_list;
+	dblList.value = 'EPSG:32610';
+	(dblList._listeners.dblclick || []).forEach(function (f) { f({}); });
+	ok('a double-click hands the code back exactly as Select does',
+		picked2 && picked2.code === 'EPSG:32610', picked2 && picked2.code);
+	ok('...and shuts the box', byId.lpn_crsbox.style.display !== 'block');
+	ok('...and still declares nothing itself', L.crsCode() === '');
+
 	// **THE PLACE-NAME SEARCH IS THE SUITE'S ONE GEOCODER, THROUGH ITS OWN GATE.** What is asserted
 	// here is that the box asks js/lpn-search.js for a POINT and does not move the map: a box
 	// choosing a projection for a project that does not exist yet has no map to move.

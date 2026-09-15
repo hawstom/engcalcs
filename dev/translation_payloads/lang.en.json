@@ -582,7 +582,7 @@
         "bpn_show_elevation": "Elevation",
         "bpn_supply1_h": "Static supply head",
         "lpn_main_menu": "Water Supply Network",
-        "lpn_main_title": "Free Online Water Distribution Network Calculator with the EPANET Solver",
+        "lpn_main_title": "Free Online Water Distribution Network Modeling with the EPANET Solver",
         "lpn_main_desc": "Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files",
         "lpn_title_units": "{units} Units",
         "lpn_tool_select": "Select",
@@ -1790,6 +1790,7 @@
         "lpn_terrain_cancelled": "Nothing was changed and nothing was sent.",
         "lpn_terrain_nofetch": "This browser cannot reach the terrain service.",
         "lpn_terrain_working": "Reading the land surface…",
+        "lpn_terrain_denied": "The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.",
         "lpn_terrain_failed": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.",
         "lpn_terrain_done": "{n} elevation(s) filled in.",
         "lpn_terrain_missed": "{m} could not be read and are still blank.",
@@ -1872,7 +1873,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1870,
+    "count": 1871,
     "active_prefixes": [
         "about",
         "bpn",

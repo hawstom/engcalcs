@@ -2641,6 +2641,7 @@ EngCalcs.pageConfig = {
 	lpn_terrain_cancelled: <?=json_encode($ec_lang['lpn_terrain_cancelled'])?>,
 	lpn_terrain_nofetch: <?=json_encode($ec_lang['lpn_terrain_nofetch'])?>,
 	lpn_terrain_working: <?=json_encode($ec_lang['lpn_terrain_working'])?>,
+	lpn_terrain_denied: <?=json_encode($ec_lang['lpn_terrain_denied'])?>,
 	lpn_terrain_failed: <?=json_encode($ec_lang['lpn_terrain_failed'])?>,
 	lpn_terrain_done: <?=json_encode($ec_lang['lpn_terrain_done'])?>,
 	lpn_terrain_missed: <?=json_encode($ec_lang['lpn_terrain_missed'])?>,

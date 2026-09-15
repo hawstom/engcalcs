@@ -597,6 +597,35 @@
 	 *
 	 * `done` is called after the readings are recorded, so a caller can redraw.
 	 */
+	/**
+	 * **"COULD NOT REACH" AND "WAS REFUSED" ARE DIFFERENT NEWS, AND WE REPORTED BOTH AS THE
+	 * FIRST.** Every tile failure landed on one sentence saying the service could not be reached
+	 * and the reader may be offline. A Mapbox token is usually restricted to the addresses it may
+	 * be used from, so the commonest real failure is not a lost network at all -- it is a 401 or
+	 * a 403 from a host the token does not list, which this suite hits every time it is served
+	 * somewhere new (dev/session-handoff.md records satellite and DEM going 403 on
+	 * librewaternet.org for exactly that reason). Telling somebody to check their connection when
+	 * the service answered immediately and said no sends them looking in the wrong place.
+	 *
+	 * `fetchPixels` already throws `{kind:'http', status}`; nothing read it until now.
+	 */
+	function refusedStatus(err) {
+		if (!err || err.kind !== 'http') { return 0; }
+		return (err.status === 401 || err.status === 403) ? err.status : 0;
+	}
+	function reportNoHeights(notice, denied) {
+		if (denied) {
+			notice(t('lpn_terrain_denied',
+				'The terrain service refused the request ({status}), so no elevation was changed. '
+				+ 'The Mapbox token this site uses may not allow the web address you are on.')
+				.replace('{status}', String(denied)));
+			return;
+		}
+		notice(t('lpn_terrain_failed',
+			'We could not reach the terrain service, so no elevation was changed. You may ' +
+			'be offline. Everything else on this page works without it.'));
+	}
+
 	EC.lpnTerrainSample = function (want, done) {
 		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		var token = seam.token && seam.token();
@@ -618,20 +647,18 @@
 			return;
 		}
 		running = true;
-		var heights = [], failed = 0;
+		var heights = [], failed = 0, denied = 0;
 		Promise.all(plan.tiles.map(function (tile) {
 			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
 				pixels.forEach(function (p) {
 					var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
 					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
 				});
-			}, function () { failed++; });
+			}, function (err) { failed++; denied = denied || refusedStatus(err); });
 		})).then(function () {
 			running = false;
 			if (!heights.length) {
-				notice(t('lpn_terrain_failed',
-					'We could not reach the terrain service, so no elevation was changed. You may ' +
-					'be offline. Everything else on this page works without it.'));
+				reportNoHeights(notice, denied);
 			} else if (seam.record) {
 				seam.record(heights);
 			}
@@ -684,7 +711,7 @@
 		// the success line, not the failures: a fill that could not reach the service, or that left
 		// nodes blank, is news whatever started it. Nothing is ever silent about what it did NOT do.
 		if (!quiet) { notice(t('lpn_terrain_working', 'Reading the land surface…')); }
-		var heights = [], failed = 0;
+		var heights = [], failed = 0, denied = 0;
 		var jobs = plan.tiles.map(function (tile) {
 			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
 				pixels.forEach(function (p) {
@@ -694,14 +721,12 @@
 					// would then have to notice was wrong.
 					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
 				});
-			}, function () { failed++; });
+			}, function (err) { failed++; denied = denied || refusedStatus(err); });
 		});
 		Promise.all(jobs).then(function () {
 			running = false;
 			if (!heights.length) {
-				notice(t('lpn_terrain_failed',
-					'We could not reach the terrain service, so no elevation was changed. You may ' +
-					'be offline. Everything else on this page works without it.'));
+				reportNoHeights(notice, denied);
 				return;
 			}
 			// **ONE CALL, ONE UNDO SNAPSHOT, ONE EVENT.** The seam takes the whole list, not a node

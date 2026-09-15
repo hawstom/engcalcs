@@ -23973,6 +23973,20 @@ var EngCalcs = EngCalcs || {};
 			listEl.addEventListener('change', function () {
 				if (listEl.value) { crsBox.code = String(listEl.value); }
 			});
+			// **DOUBLE-CLICKING A ROW IS SELECTING IT** (Tom, 2026-09-14: *"When I double-click a
+			// projection, that should be equivalent to Select or done."*). It is what a list box
+			// has meant since lists were in boxes, and with 5,346 rows a person who has filtered
+			// down to the one they want should not have to travel to a button to say so. Enter
+			// already did this; the pointer had no equivalent.
+			//
+			// Through crsBoxOk() rather than a second copy of it, so the double-click, Enter and
+			// the button cannot come to mean three slightly different things -- crsBoxOk() reads
+			// the selector, closes the box and hands the answer to whoever opened it.
+			listEl.addEventListener('dblclick', function (e) {
+				if (e.preventDefault) { e.preventDefault(); }
+				if (listEl.value) { crsBox.code = String(listEl.value); }
+				crsBoxOk();
+			});
 		}
 		// **ENTER IN THE PLACE FIELD SEARCHES; ENTER ANYWHERE ELSE SELECTS.** A text field whose
 		// Enter dismissed the box would send somebody away with the projection they started with,
