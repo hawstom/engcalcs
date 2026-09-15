@@ -193,6 +193,40 @@
             ],
             "reason": "Manual -- the colour-band mode where the reader sets the breaks. Four independent sprint-459 agents landed on the identical word; it is the ordinary term in each of these languages for this sense, not an untranslated string."
         },
+        "lpn_cp_label": {
+            "category": "cognate",
+            "languages": [
+                "id"
+            ],
+            "reason": "Label -- the Indonesian word, spelled identically (KBBI)."
+        },
+        "lpn_cp_val_camel": {
+            "category": "code-convention",
+            "languages": "*",
+            "reason": "camelCase -- the NAME of a code-identifier format, quoted back at the user by lpn_cp_bad_case when a value does not match it. All 26 agents in sprint 667 independently left it in English: the format name is what the user must type against, so a translated one would describe a rule the page does not apply."
+        },
+        "lpn_cp_val_hyphen": {
+            "category": "code-convention",
+            "languages": "*",
+            "reason": "hyphen-case -- same as lpn_cp_val_camel."
+        },
+        "lpn_cp_val_pascal": {
+            "category": "code-convention",
+            "languages": "*",
+            "reason": "PascalCase -- same as lpn_cp_val_camel; the format name is the thing being checked."
+        },
+        "lpn_cp_val_snake": {
+            "category": "code-convention",
+            "languages": "*",
+            "reason": "snake_case -- same as lpn_cp_val_camel; the underscore IS the convention, so the name cannot be carried into another script."
+        },
+        "lpn_crs_list": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Projection -- the French word, spelled identically, and the cartographic sense here."
+        },
         "lpn_curve_volume_col": {
             "category": "cognate",
             "languages": [
@@ -319,6 +353,13 @@
             "languages": "*",
             "reason": "Y -- map coordinate axis symbol."
         },
+        "lpn_fitting_k": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Coefficient -- the correct French word is the English word. Tom, 2026-09-08, on the fr agent disambiguating it to 'Coefficient k' to clear the identical-to-English gate: 'That is the tail wagging the dog. The right answer is to add a standard comment flag to the French.' A gate that makes a translator write worse French than French has is a gate mis-set, not a translation problem."
+        },
         "lpn_geomap": {
             "category": "symbol",
             "languages": "*",
@@ -400,6 +441,16 @@
                 "fr"
             ],
             "reason": "Concentration -- identical in French, and its agent substituted 'Teneur' only to clear the gate. Teneur is a real French water-quality word and is not wrong; it was not, however, a translation decision."
+        },
+        "lpn_result_status": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "hr",
+                "id",
+                "pt"
+            ],
+            "reason": "Status -- the ordinary word in each of these languages, spelled identically. French took Etat and Serbian Cyrillic Статус, so this is per-language rather than global."
         },
         "lpn_scenario_base": {
             "category": "cognate",
@@ -579,13 +630,6 @@
             "category": "abbreviation",
             "languages": "*",
             "reason": "IMGD -- imperial million gallons per day. Sibling of u_mgd ('MGD'), which needs no entry because ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters. IMGD has exactly four, so it falls off that heuristic by one character while meaning the same kind of thing. Several languages do render it (Mgal imp/dia, Mgal imp/j, Mgal imp/Tag) and exemption does not stop them -- it only says that keeping the Latin abbreviation, as many scripts do for unit symbols, is a legitimate answer rather than an untranslated string."
-        },
-        "lpn_fitting_k": {
-            "category": "cognate",
-            "languages": [
-                "fr"
-            ],
-            "reason": "Coefficient -- the correct French word is the English word. Tom, 2026-09-08, on the fr agent disambiguating it to 'Coefficient k' to clear the identical-to-English gate: 'That is the tail wagging the dog. The right answer is to add a standard comment flag to the French.' A gate that makes a translator write worse French than French has is a gate mis-set, not a translation problem."
         }
     }
 }
