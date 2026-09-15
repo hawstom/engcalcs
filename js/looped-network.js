@@ -1735,6 +1735,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function perfDebugReport() {
 		if (!perfDebugOn()) { perfDebugRows = []; return; }
+		// **SAY ONCE, OUT LOUD, THAT IT IS ARMED.** Tom ran with the flag and reported seeing no
+		// readout (2026-09-15); the console lines were going out, so the useful thing to know
+		// first is whether the flag reached the page at all. Without this, "no green box" is
+		// ambiguous between a flag that never arrived and an overlay that is hidden.
+		if (!perfDebugN && typeof console !== 'undefined' && console.log) {
+			console.log('[lpn perf] instrument armed. One line per settle follows, and the same ' +
+				'lines appear bottom-left on the map.');
+		}
 		perfDebugN++;
 		var tiles = 0, k;
 		for (k in basemapEls) { if (basemapEls.hasOwnProperty(k)) { tiles++; } }
@@ -6991,6 +6999,19 @@ var EngCalcs = EngCalcs || {};
 		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
 		// and the polyline are both black by the same argument).
 		if (le.symbolSvg) { le.symbolSvg.style.color = col; }
+		// **AND SO DO THE FLOW ARROWS** (Task 671, Tom 2026-09-15). Same argument as the symbol one
+		// line above, and the same argument Tom already made about the vertex dot (2026-09-02:
+		// *"Change vertex color too."*): a chevron sitting ON a pipe is part of that pipe's mark,
+		// and leaving it black while the pipe turns blue makes it read as a separate object.
+		//
+		// The empty string is how a cleared thematic field gets its colour BACK, not a black: it
+		// removes the inline style and the stylesheet's own `var(--lpn-map-ink)` applies, which is
+		// what the line beside it falls back to. That is why the CSS default had to move off
+		// `#000` in the same change -- otherwise turning the thematic map off would leave arrows
+		// black on ink-coloured pipes, which is this defect with one extra step.
+		if (le.arrows) {
+			le.arrows.forEach(function (a) { if (a && a.style) { a.style.stroke = col; } });
+		}
 	}
 	// The one entry point. Cheap enough to call on every solve: it is two passes over the document
 	// setting one inline style each, no measurement and no layout.

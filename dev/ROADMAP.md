@@ -84,19 +84,6 @@ the block.
     scale and Chrome's heap. One run on the machine that actually fails answers what three
     reproductions could not.
 
-- 100|671| **Flow direction arrows follow the link color.**
-  Tom, 2026-09-15. `.lpn-arrow` is `stroke: #000` in `css/engcalcs.css`, fixed, so on a coloured
-  or thematic map every pipe changes colour and its arrows stay black.
-  - **THERE IS A PRECEDENT TWO RULES BELOW, and it settles the argument rather than starting it**:
-    the vertex dot already takes the map's own ink, on Tom's *"Change vertex color too."*
-    (2026-09-02) -- it was black among blue and a bend read as a different kind of thing. An arrow
-    is the same case.
-  - The one thing to decide is the arrow on a pipe carrying a DARK thematic colour: the chevron is
-    an open stroke, not a filled triangle, deliberately, so that it does not read as absorbed into
-    the pipe. Taking the pipe's exact colour risks losing it against the pipe at some widths.
-    Worth checking whether it wants the link colour outright or the link colour with a contrast
-    floor, and that is a browser judgement, not an arithmetic one.
-
 - 100|669| **Show labels at this zoom or closer.**
   Tom, 2026-09-15, while reporting the Task 668 crash: *"We previously had a 'Show labels at this
   zoom or closer' in settings. I guess it was a bad idea to remove that."*
