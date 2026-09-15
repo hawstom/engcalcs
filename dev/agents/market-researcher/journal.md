@@ -1160,3 +1160,124 @@ Tom's own words are "I would very happily donate... I can talk to anybody in tha
 an open door, not a plan. Nothing here should be read as a recommendation to initiate a donation
 conversation now; it is a recommendation about which door is cheapest to knock on first, and that
 door (OWF) costs one email.
+
+## 2026-09-15 — Two questions from Task 674 and Task 667(d)
+
+### Question 1 — is Task 674's "if we are alone in not offering typed coordinates, that is evidence" premise true?
+
+**EPANET 2.2 itself: YES, it lets a user type X/Y into the Property Editor.** CITED, primary
+source: `https://raw.githubusercontent.com/USEPA/EPANET2.2/master/User_Manual/docs/6_objects.rst`
+(fetched 2026-09-15, EPA's own manual repository, `usepa.github.io/EPANET2.2` is the rendered
+form). Exact text: *"Alternatively, new X and Y coordinates for the object can be typed in manually
+in the Property Editor."* The Junction Properties table in the same file lists **X-Coordinate** and
+**Y-Coordinate** as editable properties, noting that a junction with them left blank does not
+appear on the map. This directly contradicts a weaker earlier search summary I first got from a
+secondary teaching page (rpitt.eng.ua.edu, unreachable to re-verify directly) and from
+`usepa.github.io/EPANET2.2/4_EPANET_workspace.html`, which describes the Property Editor's *field
+types* in general but never lists coordinates as one of them — the primary chapter (6, "Working
+with Objects") is the one that actually states it, chapter 4 just describes the editor widget
+generically. **So EPANET's own desktop GUI is NOT a peer for "nobody offers this" — it is the
+counterexample**, and has been since long before this suite existed.
+
+**epanet-js (the web app): NO, as far as I can determine from its own rendered property panel
+source, and this is the stronger of my two epanet-js checks this session.** CITED, primary source:
+`github.com/epanet-js/epanet-js`, commit `8a683891e031b9d3005b68a0cb977857e60e42b5` (cloned
+2026-09-15, `main` branch). `apps/app/src/panels/asset-panel/asset-panel.tsx` (3,555 lines, the
+actual rendered property panel for junctions/reservoirs/tanks) contains **zero** references to
+`coordinate`, `latitude`, `longitude`, `lat`, `lng`, `x`, or `y` as a rendered field — it has
+`<QuantityRow name="elevation" .../>` and similar rows for `emitterCoefficient`,
+`isActive`/`isEnabled`, and others, but no coordinate row of any kind (checked at
+`asset-panel.tsx:552-565` for the junction section specifically, and grepped the whole file). The
+only 22 hits for `coordinates` in the whole `asset-panel/` directory are in
+`asset-panel.test.tsx` and `pump-level-based-controls.tsx`, where `coordinates` is TEST FIXTURE
+DATA (`.aJunction(IDS.J2, { coordinates: [10, 0] })`) or an internal value read to draw a level
+marker on the map — never a form field a user types into. **This is a stronger form of evidence
+than a webpage description**: it is the component that renders, not documentation that could be
+stale or aspirational. Their own roadmap item on custom coordinate systems
+(`roadmap.epanetjs.com/data-exchange/p/use-and-export-with-custom-coordinate-systems-and-projections`,
+marked complete 2026-03-30) is about DISPLAY/IMPORT/EXPORT projection, not about a typed-coordinate
+form field, and says nothing about numeric entry either way.
+
+**So Tom's premise inverts by source: he is right about epanet-js and wrong about EPANET itself.**
+The roadmap block's phrasing ("epanet-js exposes coordinates in its property panel, and EPANET's
+own `[COORDINATES]` section is plain text people hand-edit today") had it backwards on both halves —
+epanet-js is the one with no coordinate field found, and EPANET's own Property Editor (not just the
+`.inp` text section) has had typed X/Y for decades. **This does not weaken the case for Task
+674 — it changes the argument.** The evidence "we are alone" is false; the evidence "EPANET's own
+GUI, the format's reference implementation, has offered this the whole time and epanet-js — funded,
+newer, GIS-aware — chose NOT to build it" is a different and arguably stronger argument for why we
+should: it is not a novelty, it is table stakes EPANET itself sets, and a from-scratch competitor
+apparently judged it not worth building (or has not gotten to it) — SPECULATION on why epanet-js
+lacks it; I found no statement from them either way.
+
+**A GIS-adjacent convention check, brief:** I could not do a systematic survey of QGIS-plugin /
+WaterGEMS / InfoWater property panels in the time available — WaterGEMS/WaterCAD in particular has
+no public screenshot-documented property-grid reference I could pin down cheaply, and a login wall
+blocks Bentley Communities. **What I can say generally and with less rigor:** typed coordinate entry
+alongside drag-to-place is the norm in desktop GIS editors I could verify by direct inspection —
+QGIS's own vertex/feature attribute forms expose X/Y as editable fields for point geometries
+(general GIS knowledge, not independently re-verified this session — SPECULATION, downgrade
+before quoting). The one thing I verified rather than recalled is EPANET's own manual, above, and
+that alone is enough to answer what Task 674 actually asked for.
+
+### Question 2 — is there a cloud-drive route that needs no account of ours (Task 667(d))?
+
+**Two different things answer "yes" at two different costs, and the free one may already be true
+today with zero new code.**
+
+**(1) The File System Access API this suite ALREADY uses is provider-agnostic and does not care
+whether a folder is local or cloud-synced.** OBSERVED: `js/looped-network.js:21783`
+(`fileApiAvailable()`), `:22221` (`showSaveFilePicker`), `:22358` (`showOpenFilePicker`) — these
+are the suite's existing Save/Open. **CITED**, Chrome for Developers' own File System Access API
+docs (`developer.chrome.com/docs/capabilities/web-apis/file-system-access`, fetched 2026-09-15):
+*"the 'local file system' in the spec does not have to strictly refer to the file system on the
+local device... on ChromeOS these file pickers will also let you pick files and directories on
+Google Drive."* On a desktop OS the equivalent is simpler still: **Google Drive for Desktop,
+OneDrive, and Dropbox all mount as an ordinary folder** once a visitor has installed and signed
+into that provider's own app — nothing on this page has to know a folder is cloud-backed, because
+the OS already presents it as local. **If a visitor's `showSaveFilePicker()` dialog is pointed at
+their synced Drive/OneDrive/Dropbox folder, "cloud save" already works, today, with the exact code
+already shipped, no new third-party request, no new consent gate, and no registration of any kind
+on our side.** The honest limit: `fileApiAvailable()` gates on Chromium (Chrome/Edge/Opera) — the
+same OBSERVED code already falls back to download/upload for Firefox/Safari
+(`:22131`, `:22209`, `:22333`), and that fallback does NOT reach a synced folder automatically (a
+downloaded file lands in the Downloads folder, not the Drive one, unless the visitor's OS-level
+sync also watches Downloads). **This answer may already be true and simply undocumented** — I found
+no place in this repo or in `dev/positioning.md` that says so; it would cost nothing to say it
+explicitly somewhere visitor-facing if Tom confirms it tests out in practice, since I could not test
+it against a live synced folder from this environment.
+
+**(2) A direct in-app connector (Google Drive Picker, OneDrive/Graph picker, Dropbox
+Chooser/Saver) is ALSO genuinely buildable with no server and no per-user record of ours, but it is
+a new cost, not a free one.** CITED, `developers.google.com/workspace/drive/picker/guides/*`
+(fetched 2026-09-15): the Google Picker/Drive API from browser JS needs an OAuth **client ID**
+registered once in Google Cloud Console by the app operator (Tom) — *"client secrets aren't used
+for Web applications"* — so there is no server-side secret to hold and no backend to run; tokens
+live in the visitor's own browser session. The scope this suite would actually want,
+`drive.file` (per-file access, not whole-drive), is CITED as **"Recommended" and "Non-sensitive"**
+in Google's own scope-classification guidance
+(`developers.google.com/workspace/drive/api/guides/api-specific-auth`) — which matters because a
+*sensitive* scope caps an unverified app at 100 users and a Google verification review; a
+non-sensitive one does not carry that cap, CITED
+`support.google.com/cloud/answer/7454865`. **Dropbox's Chooser/Saver is the same shape and cheaper
+still** — CITED `dropbox.tech/developers/quickly-integrate-file-upload-in-your-web-app-using-the-chooser`
+and `dropbox.com/developers/chooser`: *"does not require 'Production' approval,"* browser-only, a
+few lines of JS, one app key. I did not verify OneDrive's picker to the same depth this session —
+it uses Microsoft Graph and MSAL.js as a "public client" (no secret) by the same general shape, but
+I have not confirmed its scope-sensitivity or approval requirements the way I did for Google and
+Dropbox; treat that one leg as unverified rather than as a third confirmed yes.
+
+**The catch, and it is the one CLAUDE.md explicitly asks to be flagged loudly: any of these three
+connectors is a NEW third-party request** (a fourth network call beyond OSM/Mapbox/Nominatim,
+each of which today has its own consent gate per `third_party_request_check.php`). Building one
+means: a new gate (`ec_clouddrive` or similar), a new `privacy.php` paragraph, and — because it
+picks a specific provider rather than being provider-neutral — building THREE separate
+integrations to cover Drive, OneDrive and Dropbox users equally, where route (1) above covers all
+three (and any other synced-folder provider, present or future) for free by construction.
+**Recommendation implied by the arithmetic, not asserted as Tom's call: check whether (1) already
+works before building any of (2).** If it does, "cloud save" needs a sentence of documentation and
+zero new consent surface; if a visitor specifically wants an in-page "Connect Google Drive" button
+rather than "point your Save dialog at your synced folder," that is a real but separate ask, and its
+cost is a new third-party request each time, not a database or login (Tom's actual worry) — none of
+1–2 needs a server-side secret, a user table, or a PHP session, so the structural objection in
+Task 667(c) does not apply to any of them.
