@@ -434,6 +434,16 @@ run_check "branch policy selftest"       blocking php dev/scripts/branch_policy_
 run_check "wait guard selftest"          blocking php dev/scripts/wait_guard_selftest.php
 run_check "branch hygiene"             advisory php dev/scripts/branch_hygiene_check.php
 run_check "nested repo boundary"      advisory php dev/scripts/nested_repo_boundary_check.php
+# DOES dev/host/ STILL MATCH WHAT RUNS ON THE SERVER? Those scripts -- the daily page check and the
+# mailer that makes an alarm deliverable -- existed ONLY on the host until 2026-09-15, and a plan
+# written that day proposed building an uptime watch from scratch because it could not see the one
+# already running daily. Now there are two copies and something has to compare them, which is the
+# same argument js_fallback_string_check.php makes about 892 English literals. Advisory, and it
+# PRINTS THAT IT CHECKED NOTHING when it cannot reach the host: it needs the network and an ssh key,
+# which a cold checkout has not got, and a silent pass from a check that ran nothing reads as
+# coverage. Which side is right when they differ is a judgement -- somebody may have fixed the host
+# copy at 4am -- so it refuses to recommend a direction and prints the diff command.
+run_check "host script parity"         advisory php dev/scripts/host_script_parity_check.php
 # Task 322. This line used to pipe the report through `grep -q "^CHANGED"`, so the NOTE it printed
 # had NO TEXT UNDER IT -- nine role changes were sitting in a report nobody could see from here,
 # and an advisory whose findings never reach the reader is not an advisory. --brief prints the

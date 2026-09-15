@@ -85,22 +85,24 @@ the block.
     reproductions could not.
 
 - 100|676| **Watch the sites, and send a derived weekly report.**
-  Tom, 2026-09-15, after the EWB recovery: *"mistakes like the site outages and merging difficult
-  development branches to master before proper vetting can no longer be the matter of course."*
-  Starts 18 September, on his instruction. The full plan, the diagnosis behind it and the things
-  deliberately NOT to do: `dev/reputation-and-practice.md`.
-  - **The finding that orders the work: the reputation damage came from four SILENT outages nobody
-    was watching, not from the merge** -- and the merge is already guarded by
-    `dev/hooks/pre-merge-commit`, `pre-push` and their selftest. `check_all.sh` is 80-odd checks
-    about the CONTENTS of this repository and not one of them can ask whether the site is up.
-  - **Phase 1a is a blocker on everything else and is easy to skip: PROVE THE MAIL PATH.** Cron
-    mail on this account was dead for YEARS and produced 800+ bounces, so an alarm or a report
-    posted into it is worthless. An alarm nobody has proven can reach a human is not an alarm.
-    Mind the DMARC window that opens 2026-10-04.
-  - Then: an uptime watch on the six URLs (body, not just status -- a fatal PHP error arrives
-    inside a 200); the Friday report, every number DERIVED by an existing script and none of it
-    narrated by an AI; GitHub branch protection on master, which no local hook can substitute for;
-    and only then the portable kit for Tom's other projects.
+  Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
+  master before proper vetting can no longer be the matter of course."* Plan, the corrected
+  diagnosis, and the things deliberately NOT to do: `dev/reputation-and-practice.md`.
+  - **PHASES 1, 1a AND 2 ARE CLOSED, and phase 1 closed by DISCOVERY rather than by building.** The
+    uptime watch already existed on the host and the plan could not see it, because the watch was
+    not in this repository. It is now, in `dev/host/`. **That is the finding worth keeping: a
+    diagnosis written from inside one tree could not see a working machine one directory outside
+    it.**
+  - **PHASE 2 IS A HEARTBEAT, NOT A SUMMARY** -- `dev/scripts/daily_report.sh`, 20:00 daily on
+    Tom's own offer of the faster cadence. The alarm is silent on success, so a healthy site and a
+    dead cron are the same silence; the report arriving is what separates them.
+  - **`sendmail` EXITED 0 DURING ALL 22,907 BOUNCES**, so an exit code was never evidence of
+    delivery. Phase 1a is proven at the far end, with Tom confirming receipt unprompted.
+  - **STILL OPEN, in order:** GitHub branch protection on `master`, which no local hook can
+    substitute for; a minimal pre-push for the two sibling repositories; whether the nightly 622
+    pages also want six URLs every fifteen minutes (a cost question about a shared host, and nobody
+    has been asked); then the portable kit. Clearing the 22,907 bounces is housekeeping nobody has
+    done, and the account is at 96% disk.
 
 - 100|674| **Type a node's coordinates instead of only dragging it.**
   Tom, 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and

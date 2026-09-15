@@ -1,0 +1,36 @@
+# check.exclude -- URLs check.sh must not treat as broken pages.
+#
+# One POSIX extended regular expression per line, matched against the whole URL.
+# Blank lines and lines starting with # are ignored. EVERY LINE NEEDS A REASON:
+# an exclusion with no reason is indistinguishable from a bug somebody silenced.
+#
+# This file is a DECLARATION, not a filter of convenience. If a page is genuinely
+# broken it belongs on the failure list until it is fixed, not in here. Run
+# `sh ~/check.sh -v` and the tail of the output says how many URLs this file
+# excused, so a list that quietly grows is visible.
+
+# POST-only endpoints. A bare GET is CORRECTLY refused -- 400 from the loggers,
+# 405 from the lock. Refusing is the healthy answer; a 200 here would be the bug.
+^https://[^/]+/engcalcs/log-[a-z-]+\.php$
+^https://[^/]+/engcalcs/lpn-lock\.php$
+
+# Serves HTTP 503 on purpose: that is what a maintenance page is for.
+^https://[^/]+/maintenance\.php$
+
+# webtrees 2 routes every request through /webtrees/ via its own .htaccess.
+# Asking for the front controller directly is not a URL the app claims, and its
+# 404 is the router answering correctly. The site itself is checked at famtree.php.
+^https://[^/]+/webtrees/(index|setup)\.php$
+^https://[^/]+/webtrees/public/index\.php$
+
+# MediaWiki endpoints that exist to be called WITH parameters. A bare GET gets a
+# 404 (rest.php, thumb.php, thumb_handler.php) or a 403 (img_auth.php, which is
+# an access gate doing its job) and none of that says the wiki is unwell.
+^https://[^/]+/thomas/(rest|thumb|thumb_handler|img_auth)\.php$
+
+# A command-line build script that happens to live under a docroot. It is not a
+# page and has no browser behaviour; it fatals on a GET because it expects argv.
+^https://[^/]+/tools/build-features\.php$
+
+# Working copies kept beside the live page. Not linked, not public, not pages.
+\.dev\.php$

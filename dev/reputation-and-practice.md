@@ -36,9 +36,21 @@ decides the whole plan.
 needed judgement to detect. A machine asking "does this URL return 200?" once an hour would have
 caught three of them within the hour, and the fourth is a mail path nobody had ever tested.
 
-This is the class worth spending on, and it is the class the current tooling does not touch at all.
-`check_all.sh` is 80-odd checks about the CONTENTS of this repository. Not one of them asks whether
-the site is up, because from inside the repository that question is unanswerable.
+**CORRECTED 2026-09-15, THE SAME DAY THIS WAS WRITTEN: A MACHINE WAS ALREADY ASKING.** `~/check.sh`
+on the cPanel account has fetched every page on all nine domains daily since 2026-09-09 -- 622 of
+them -- and fails on a bad status *or a PHP diagnostic inside a 200*. It was written after the
+twelve-page outage in the table above, by the session that fixed it. So the diagnosis "nobody was
+watching" is right about the WEEKS THE DAMAGE HAPPENED IN and wrong about today.
+
+**The reason this plan could not see it is the finding that survives, and it is sharper than the one
+it replaces:** `check_all.sh` is 80-odd checks about the CONTENTS of this repository, and the watch
+was not in the repository. It lived in `~/` on the server, hand-edited there, versioned by nothing.
+A plan written from inside the tree therefore proposed building from scratch a thing that was
+already running, and would have shipped a second, worse watch beside it -- worse because the
+proposed URL list was to be typed, and `check.sh` derives its list from cPanel's own vhost table
+precisely because *a hardcoded list goes stale silently, which is the same class of bug this exists
+to catch*. **The blindness the plan is about, one level up.** Both scripts are now in `dev/host/`,
+and `host_script_parity_check.php` compares the two copies.
 
 ### Kind B — a thing was done against a written plan (two of the six)
 
@@ -92,7 +104,17 @@ Written after the incidents, all of it live today:
 
 **The honest reading: the merge gate did not fail. It did not exist yet.** Every incident in this
 project has become a check within a day of being understood, and that reflex is the practice worth
-keeping. The gap is not discipline inside the repository; it is that nothing looks OUTSIDE it.
+keeping.
+
+**The gap is not that nothing looks outside the repository -- something does, and it works. The gap
+is that what looks outside is not IN here, so nobody inside can see it, count on it, or tell when
+it has stopped.** That is the whole of what phases 1 and 2 turned out to be about. It also produced
+its own worked example within the hour: on the morning of 2026-09-15 the page check found
+`/engcalcs/.claude/hooks/guard-wait-loops.php` returning 500, which is how anybody learned that
+`/engcalcs/.claude/settings.json` was served as a plain 200 -- the agent definitions, the hook
+scripts and the permission allow-list, readable by anybody. **No check in `check_all.sh` could have
+found it and none of the 80 was looking**; `docroot_exposure_check.php` is there now because a cron
+job on a server told a human something this repository could not.
 
 ---
 
@@ -148,40 +170,86 @@ Yes, and it is (section 2). Three real gaps remain:
 Sequenced so the highest-value and most mechanical comes first. Each phase is independently useful;
 stopping after phase 1 still leaves things much better than today.
 
-### Phase 1 — an uptime watch (the one that would have caught the real damage)
+### Phase 1 — an uptime watch — DONE, AND IT WAS ALREADY BUILT
 
-A script that fetches a small list of URLs and reports anything that is not 200, run by cron on a
-schedule measured in minutes, not days.
+**This phase was proposed on a false premise and is closed by bringing the existing watch into the
+repository rather than by writing one.** `~/check.sh` already does everything asked for here and two
+things that were not:
 
-- The list: `hawsedc.com/`, `hawsedc.com/engcalcs/`, `librewaternet.org/`, `librewaternet.org/app/`,
-  `not-epanet.org/`, and one calculator page deep enough to exercise PHP and the language layer.
-- It must check the BODY, not only the status: `librewaternet.org` returned a 500 with a page, and
-  a fatal PHP error can arrive inside a 200.
-- **It must be able to tell Tom.** See the dependency below.
+- **It derives its URL list** from cPanel's own vhost table and from the files on disk, never a
+  typed list -- covering 622 pages across all nine domains, where the proposal above named six URLs
+  by hand. A typed list is the same silent-staleness bug the watch exists to catch.
+- **It reads the BODY as well as the status**, matching a PHP diagnostic's own shape (a keyword, a
+  colon, `on line N`) rather than the bare word "Warning", so ordinary page copy does not read as a
+  failure.
+- It runs daily at 04:20, is SILENT on success, and mails its own failures with an envelope sender
+  Gmail accepts.
 
-**This is phase 1 because three of the four silent failures were a non-200 on a URL, and the fourth
-was the mail path this phase depends on.**
+**Six consecutive days at `failed=0`, and on 2026-09-15 it found a real one** (§2). What was
+genuinely missing was not the watch. It was that the watch was invisible from in here, and that its
+silence on a good day is indistinguishable from its being dead -- which is phase 2's job, and is
+why phase 2 is a HEARTBEAT and not a summary.
 
-### Phase 1a — THE DEPENDENCY NOBODY SHOULD SKIP: prove the mail path works
+**What is still open from this phase, and it is a judgement for Tom:** the watch runs ONCE A DAY, and
+the proposal above says "minutes, not days". A 500 on the suite's front door would now be found
+within 24 hours rather than within an hour. Whether that is worth a second, lighter run -- six URLs
+every fifteen minutes beside the nightly 622 -- is a cost question about a shared host's connection
+limits, not a technical one, and nobody has been asked.
 
-**Cron mail on this account was dead for YEARS and produced 800+ bounces.** A weekly report and an
-outage alarm are both worthless if they are posted into that. So before either ships:
+### Phase 1a — PROVEN 2026-09-15, and what proving it took
 
-- Send one test message by the exact path the reports will use, and confirm it ARRIVES — not that
-  the command exited 0.
-- Note the DMARC work already in flight (`~/.claude` memory: a monitoring window opens 2026-10-04).
-  Reporting mail must not be the thing that damages the domain's sending reputation.
-- Prefer a channel whose delivery can be verified over one that merely does not error.
+**THE RULE STANDS AND IS THE MOST PORTABLE LINE ON THIS PAGE: an alarm nobody has proven can reach
+a human is not an alarm.**
 
-**Write this down as a rule: an alarm nobody has proven can reach a human is not an alarm.**
+**The count was worse than 800. `~/mail/new` holds 22,907 bounces**, every one of them
+`550-5.7.26 ... Gmail requires all senders to authenticate with either SPF or DKIM`. **The cause is
+the ENVELOPE SENDER, which `MAILTO` gives no way to set**: cron sends as
+`jconstru@minter.nocdirect.com`, a host publishing no SPF record at all. **Pointing `MAILTO` at the
+`tom@hawsedc.com` forwarder does NOT fix it** -- measured 2026-09-08 -- because forwarding preserves
+the original envelope sender and the second hop is refused for the same reason. `~/cronmail.sh`'s
+`sendmail -f tom@hawsedc.com` is the fix; `hawsedc.com` does publish SPF covering that IP.
 
-### Phase 2 — the Friday report
+**Proven end to end 2026-09-15:** a message sent through `cronmail.sh` arrived in the destination
+inbox, flagged important, not in spam and not bounced, and Tom said so unprompted in the same hour
+-- *"I got an email from cron. It is the second email that reached me this week from cron."* The
+first was the page check's own alarm at 04:21, which is the better half of the proof: the ALARM
+reached him, not just a test.
+
+- **`sendmail` exiting 0 proves nothing.** It exited 0 during all 22,907 of those bounces. Confirm
+  arrival at the far end, or do not claim the path works.
+- **Bounces since the fix: one, dated the day of the fix itself.** Nothing since.
+- **The 22,907 historical bounces are still sitting there and the account is at 96% disk.** Nobody
+  has cleared them; the daily report counts them, and a FRESH one is called out by name, because a
+  new bounce means an alarm may have stopped reaching anybody.
+- The DMARC monitoring window still opens 2026-10-04 and reporting mail must not damage the domain's
+  sending reputation. Nothing here sends to anyone but Tom.
+
+### Phase 2 — the report — BUILT 2026-09-15, DAILY AT 20:00, and it is a HEARTBEAT
 
 Tom: *"it would be reassuring for me to get a weekly email every Friday night or Saturday morning
-reporting to me key statistics and statuses."*
+reporting to me key statistics and statuses."* Then, 2026-09-15, the sentence that decides the
+design: *"A weekly report is exactly the superpower of the entire failure monitoring plan. It's Tom
+saying every Friday night at 8:00 or whatever, 'Yep. There's my report. Cron is still up and
+working.' If you want to do it every day at 8:00 for a while, that's fine too."*
 
-Everything it should carry is ALREADY computed by a script in `dev/scripts/`; the work is
-assembling and delivering, not measuring. Proposed contents, each with its existing source:
+**SO THE REPORT ARRIVING IS THE SIGNAL, AND THAT CLOSES A HOLE THE ALARM CANNOT.** `check.sh` is
+deliberately silent on success -- correct for an alarm, and it means a healthy site and a dead cron
+look identical from the inbox. One of them had in fact been dead for years. **A report that arrives
+unconditionally is the only thing that tells them apart.** It therefore mails on EVERY run, every
+day at 20:00 on his own offer of the faster cadence, and `dev/scripts/daily_report.sh` says so in
+its first three lines so the reader knows what the arrival means.
+
+**A section that cannot be measured says NOT MEASURED in capitals and does not fail the report.** A
+report that dies because one number was unavailable is a report that stops arriving, which is the
+failure this whole task is about. `dev/host/daily-report-cron.sh` mails even when the report script
+itself is missing, for the same reason.
+
+**And it states its own limits every single day rather than once in a README:** there is no `node` on
+the host, so no harness and therefore no `check_all.sh` can run there, and the report says which
+numbers it did not take.
+
+Everything it carries is computed by a script or by `git`; the work was assembling and delivering,
+not measuring. Contents and sources:
 
 | Line | Source |
 |---|---|
@@ -194,7 +262,9 @@ assembling and delivering, not measuring. Proposed contents, each with its exist
 | English keys awaiting a ruling; untranslated count | `new_english_keys.php` |
 | Unanswered translator findings | `friction_check.php` |
 | Usage for the week | `log/lang-log-stats.sh` |
-| Advisory checks that are grumbling | `check_all.sh` NOTE lines |
+| Advisory checks that are grumbling | **NOT CARRIED.** It needs `check_all.sh`, which needs `node`, which the host has not got. Stated in the report rather than faked |
+| Bounces in the mail spool, and any fresh one | the one number that says whether the report can still be delivered |
+| Disk free | the account is at 96%, and 22,907 of those bounces are why |
 
 **One discipline, and it is the important one: every number must be DERIVED by a script, never
 narrated by an AI.** A weekly report written in prose by the same system that made the mistakes is
@@ -232,8 +302,14 @@ Tom: *"Whatever we do with great success should be portable to my other projects
   This is the cheapest thing on the list and it pays immediately on any project with a backlog.
 - **`dev/session-handoff.md`** — a STOP block a cold session reads before anything else. This is
   the artifact whose absence cost the six merges, and every AI-assisted project has the same hole.
-- **The uptime watch**, for any project that serves a URL. `hawsedc.com/gnu` serves
-  Turning_Path_Tracker, so it belongs on the same list rather than getting its own system.
+- **The uptime watch**, for any project that serves a URL -- and it needs no porting at all.
+  `~/check.sh` derives its list from the SERVER's own vhost table, so every domain on the account is
+  already covered the day it lands, `hawsedc.com/gnu` and Turning_Path_Tracker included. **The thing
+  to copy is not the script; it is the habit of keeping it in a repository.** It was invisible from
+  inside this project for six days and a plan was written proposing to rebuild it.
+- **`cronmail.sh`, and the rule above it.** Two lines of shell, and without them every alarm on the
+  account was silently refused for years. Any project whose cron mails a human has this bug until
+  somebody proves otherwise by reading the far end.
 - **The incident reflex**: every incident becomes a check the same day, and the check's comment
   records the incident. This is a habit, not code, and it is the single most valuable thing this
   repository does.
@@ -309,7 +385,17 @@ by every future session:
 
 ## 9. The one-line summary
 
-**The reputation damage came from four silent outages that no machine was watching, not from the
-merge — and the merge is already guarded. So: prove the mail path, watch the URLs, send a derived
-weekly report, and copy the roadmap discipline and the handoff file to the other projects. Nothing
-else on this page is urgent.**
+**The reputation damage came from four silent outages, not from the merge -- and the merge is
+already guarded.**
+
+**Corrected 2026-09-15, the day this was written: the URLs were already being watched, and the plan
+could not see it because the watch was not in the repository.** So the work was not to build one. It
+was to bring it in here where it can be counted on (`dev/host/`), to PROVE the mail path instead of
+assuming it (done, at the far end, with Tom confirming), and to add the one thing an alarm silent on
+success cannot do -- **arrive anyway, every day, so that silence stops being ambiguous.**
+
+Still genuinely open: GitHub branch protection on `master` (§4 gap 1), a minimal pre-push for the two
+sibling repositories (§4 gap 2), whether the 622-page watch also wants a six-URL run every fifteen
+minutes (§5 phase 1), and then the portable kit. **Nothing else on this page is urgent, and the
+sharpest lesson on it is not in the plan at all: a diagnosis written from inside one tree could not
+see a working machine sitting one directory outside it.**
