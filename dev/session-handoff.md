@@ -450,6 +450,45 @@ within minutes.
   and every one of them passed alone.
 
 
+## 4b-bis. SPRINT 667-lpn-delta CLOSED 2026-09-14 — 108 lpn_ keys x 26 languages
+
+Merged to master as `971187db` and pushed. Read every count from its script; the ones worth
+knowing before the next sprint:
+
+- **`friction_check.php --sprint=667-lpn-delta` exits 1 with FOUR OPEN ENTRIES, and that is
+  correct, not a defect.** No sprint launches until Tom answers them, and they are already on
+  `dev/new-english-keys.md` under the translators' section. They are: `lpn_file_import_geo` (the
+  shipped translations describe the OLD English and three agents reported it independently),
+  `lpn_field_tag` (see below), `lpn_field_northing` (no cross-language abbreviation convention;
+  Arabic cannot abbreviate at all), and `lpn_cp_flag` (two sentences run together because every
+  `{reason}` already ends in a full stop).
+- **THE 104 `identical-to-english` FINDINGS WERE AN EXEMPTION, NOT A TRANSLATION FAILURE.** All 26
+  agents independently left `camelCase`, `PascalCase`, `snake_case` and `hyphen-case` in English.
+  Unanimity across 26 languages IS the definition of exempt, so the four are now declared with
+  `languages: "*"` in `translation_exempt_keys.json`. `lpn_cp_bad_case` quotes the format name back
+  at the user, so a translated one would name a rule the page does not apply. The 14 other findings
+  were judged one at a time: 8 were genuine misses in otherwise fully-translated files and were
+  translated; 6 are real cognates (`lpn_result_status` in de/hr/id/pt, `lpn_crs_list` in fr,
+  `lpn_cp_label` in id) and are exempt PER LANGUAGE, never globally.
+- **TWO DEFECTS WERE FOUND BY HARVESTING THE SHIPPED VALUES AND COMPARING THEM ACROSS LANGUAGES,
+  which no single agent can do** — each sees only its own file. Worth repeating at the close of
+  every sprint. (1) **es, it, sw and tr give `lpn_field_tag` and `lpn_cp_label` the IDENTICAL
+  word** (Etiqueta, Etichetta, Lebo, Etiket), so the Properties box shows two fields under one
+  name; two of the four are anchor languages, and the synonym on the key says in as many words
+  that a Tag is not this page's Label. NOT FIXED — choosing a second word in four languages is
+  lexical judgement nobody here can verify. (2) **fa, km and sw took the WRONG SENSE of
+  "Projection"** — psychological, a sorting system, and a drawing.
+- **A glossary term `projection (map)` now exists** because of that second one, harvested from the
+  23 renderings that took the cartographic sense and wired into `prefixToTermNames()['lpn']`. The
+  three false friends are WITHHELD from it rather than recorded: absent reads as unconfirmed, so
+  the next sprint is asked the question instead of shown a wrong precedent. The same applies to
+  the four withheld values on `tag (EPANET)`. **The three shipped strings are still wrong** and
+  belong to a resync, not to this sprint.
+- **`detect_english_drift.php --baseline-new` baselined all 108**, so 0 NEW. The **150 CHANGED**
+  it now reports is the PRE-EXISTING resync backlog, unchanged in character by this sprint, and
+  still awaiting an authorization Tom has not given.
+
+
 ## 4c. THE 2026-09-10 SESSION — Tom tested by hand all day; everything is pushed
 
 **All three repositories are pushed and `check_all.sh` is green.** Read every count from its script.
