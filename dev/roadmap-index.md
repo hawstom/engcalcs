@@ -25,7 +25,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 660 — Double-click does not open a file, and the list is the browser's.
 - Task 663 — Three questions about the reaction rate that only Tom can answer.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
-- Task 668 — A label leader 1,000 times the reach, after a georeference settle.
+- Task 669 — Show labels at this zoom or closer.
 
 ## 75 — Soon (20)
 

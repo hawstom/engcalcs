@@ -317,8 +317,17 @@ console.log('\n--- one home for the concept ---');
 	// projected project it therefore answered "no nodes are on the starting elevation" -- the
 	// list that matters most there, because every node just drawn is on it. Tom saw the result
 	// as the DEM having no data for Novato. Three readers of one question are now one: 25 -> 24.
-	ok('outwardX has one definition and twenty-three call sites', count(/outwardX\(/g) === 24, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-three call sites', count(/outwardY\(/g) === 24, count(/outwardY\(/g));
+	// **AND TWO MORE ON EACH OUTWARD CONVERTER FOR THE LABEL OFFSETS** (Task 668). A label offset
+	// is a VECTOR, so the origin shift must not apply to it -- which is exactly why
+	// eachStoredPoint() does not visit one and why this census would otherwise never see it. But a
+	// REPROJECTION changes the unit the vector is written in, and nothing re-derived them: Elm
+	// Street Center's stored `lx = -57` became 57 DEGREES and its label landed in China (Tom,
+	// 2026-09-15). georefCaptureOffsets() converts a BASE and a TIP -- two points, not a vector --
+	// so the shift and the flip apply exactly once to each and cancel in the difference. Two points
+	// is why it is +2 and not +1: converting the vector directly is the mistake this task exists to
+	// catch, and it would have been +1.
+	ok('outwardX has one definition and twenty-five call sites', count(/outwardX\(/g) === 26, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-five call sites', count(/outwardY\(/g) === 26, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -357,8 +366,11 @@ console.log('\n--- one home for the concept ---');
 	// that door is what put Map > Go to and Map > Search place name back on a projected project
 	// (Tom, 2026-09-14: *"I don't think it's necessary or intentional"* -- it was not; the rows
 	// were written `isGeoProject()` before there was a transform).
-	ok('inwardX has one definition and twenty-three call sites', count(/inwardX\(/g) === 24, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-four call sites', count(/inwardY\(/g) === 25, count(/inwardY\(/g));
+	// **AND ONE MORE EACH COMING BACK** (Task 668): georefWriteOffsets() maps the captured base and
+	// tip through the transform and differences them, and both halves come home through the one
+	// door, exactly as georefWrite() itself does for a position.
+	ok('inwardX has one definition and twenty-four call sites', count(/inwardX\(/g) === 25, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-five call sites', count(/inwardY\(/g) === 26, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
