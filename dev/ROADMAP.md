@@ -84,6 +84,45 @@ the block.
     scale and Chrome's heap. One run on the machine that actually fails answers what three
     reproductions could not.
 
+- 100|674| **Type a node's coordinates instead of only dragging it.**
+  Tom, 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
+  tables. I may need to be dissuaded from this, but at the moment I can scarcely believe that we
+  and epanetjs don't expose this already."*
+  - **HE SHOULD NOT BE DISSUADED, and the reason is in this repo's own rules.** A coordinate is a
+    number the user supplied, and every other such number on this page is typeable: elevation,
+    demand, diameter, length, roughness. Position is the only one that can be entered by gesture
+    alone, which makes it the only one that cannot be entered EXACTLY. A surveyed junction has a
+    northing to two decimals and the page currently asks you to drag until you are close.
+  - **THE UNIT LABELS MUST FOLLOW THE PROJECT, which is the real work.** Three modes and three
+    vocabularies -- lat/lon for a geographic project, easting/northing for a projected one, x/y
+    for a grid -- and `axisNames()` already answers exactly that question for the status bar, so
+    the fields borrow it rather than growing a fourth opinion. Public order is lat,lon and system
+    order is lon,lat (`coord_order_check.php` is blocking), so the FIELD ORDER is decided before
+    anybody writes a row.
+  - **AND IT MUST GO THROUGH `setProp()`**, or typing a coordinate inside a scenario edits Base --
+    the seam `scenario_seam_check.php` exists for. Elevation (`z`) is already a property; only the
+    two horizontal ones are new.
+  - Worth checking before designing: epanet-js exposes coordinates in its property panel, and
+    EPANET's own `[COORDINATES]` section is plain text people hand-edit today. If we are alone in
+    not offering it, that is evidence rather than an argument, but it is the kind Tom asked for.
+
+- 50|675| **A labelled grid, with the significant digits picked out.**
+  Tom, 2026-09-15: a grid in Settings with *"options for density and opacity"*, labelled *"at the
+  lower and left map edges aligned with each grid line"*, showing three significant digits large
+  with *"the leading and trailing digits smaller. The first significant digit is the first digit
+  that changes at all across the map."*
+  - **THE TYPOGRAPHY IS THE IDEA, NOT A FLOURISH.** A state-plane northing is 1304070 and seven
+    digits at every gridline is a wall of ink in which the three that differ between one line and
+    the next are invisible. Picking those three out is what makes a grid readable at survey
+    coordinates, and it is the same observation Task 354 made about float32: the interesting part
+    of these numbers is the tail.
+  - The rule is derivable rather than a setting: the first significant digit is the first that
+    CHANGES across the visible extent, so it falls out of the extent and the grid spacing. Three
+    digits large is Tom's number.
+  - `gridLayer` already exists in the layer stack and nothing has ever drawn into it.
+  - Priority 50 rather than 100 on its own merits: it is a reading aid for a coordinate system
+    Task 674 would let people type into, so 674 lands first and may change what this needs.
+
 - 100|669| **Show labels at this zoom or closer.**
   Tom, 2026-09-15, while reporting the Task 668 crash: *"We previously had a 'Show labels at this
   zoom or closer' in settings. I guess it was a bad idea to remove that."*
