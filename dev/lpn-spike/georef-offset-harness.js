@@ -135,5 +135,52 @@ const acrossPx = after.span * sFit;
 ok('...so the drawing fills a useful part of the canvas',
 	acrossPx > 100 && acrossPx < 1200, acrossPx.toFixed(0) + ' px across');
 
+// ---------------------------------------------------------------------------------------------
+// **AND THE DOCUMENTS ALREADY SPOILED, which fixing georefWrite() cannot reach.** The offsets are
+// STORED, so every project saved before 2026-09-15 still carries them and shows China on every
+// reload -- Tom, having pulled the fix to dev: *"The labels offset bug did not change testing."*
+// ---------------------------------------------------------------------------------------------
+console.log('\n--- a document already spoiled is repaired on load ---');
+const spoiled = JSON.parse(JSON.stringify(raw));
+// What the old code left behind: the offsets kept their NUMBERS while the coordinates became
+// degrees. Reproduced by shrinking the coordinates and leaving lx/ly alone, which is exactly the
+// arithmetic the defect performed.
+const SHRINK = 1 / 58000;
+spoiled.nodes.forEach(function (n) { n.x *= SHRINK; n.y *= SHRINK; });
+const spoiledSpan = spanOf(spoiled.nodes);
+const spoiledWorst = Math.max.apply(null,
+	spoiled.nodes.map(n => Math.hypot(n.lx || 0, n.ly || 0)));
+ok('the spoiled fixture really is absurd', spoiledWorst / spoiledSpan > 1000,
+	(spoiledWorst / spoiledSpan).toExponential(2) + ' drawings away');
+
+const repaired = L.prepareDocument(spoiled);
+const left = (repaired.nodes || []).filter(n => n.lx !== undefined || n.ly !== undefined);
+ok('prepareDocument dropped the impossible offsets', left.length === 0, left.length + ' left');
+
+// ...and a HEALTHY document keeps every one of them. This is the half that matters: a repair that
+// also ate real placements would be worse than the bug.
+const healthy = L.prepareDocument(JSON.parse(JSON.stringify(raw)));
+const kept = (healthy.nodes || []).filter(n => n.lx !== undefined || n.ly !== undefined);
+ok('a healthy document keeps every offset it had', kept.length === withOffsets.length,
+	kept.length + ' of ' + withOffsets.length);
+
+// Every shipped example must pass through untouched, or the threshold is wrong.
+console.log('\n--- and no published example is touched by the repair ---');
+let touched = [];
+['Basic-example-SI-units', 'Basic-example-US-units', 'Elm-Street-Center', 'Net1', 'Net2', 'Net3',
+ 'Net3-Novato-CA-World'].forEach(function (name) {
+	const f = path.join(ROOT, 'dev/water-network-examples/' + name + '.lwn');
+	if (!fs.existsSync(f)) { return; }
+	const src = JSON.parse(fs.readFileSync(f, 'utf8'));
+	const had = (src.nodes || []).filter(n => n.lx !== undefined || n.ly !== undefined).length
+		+ (src.links || []).filter(l => l.lx !== undefined || l.ly !== undefined).length;
+	const out = L.prepareDocument(JSON.parse(JSON.stringify(src)));
+	const now = (out.nodes || []).filter(n => n.lx !== undefined || n.ly !== undefined).length
+		+ (out.links || []).filter(l => l.lx !== undefined || l.ly !== undefined).length;
+	if (had !== now) { touched.push(name + ' ' + had + '->' + now); }
+});
+ok('all seven published examples pass through unchanged', touched.length === 0,
+	touched.join('; ') || 'none touched');
+
 console.log('\n' + (fails ? fails + ' FAILED' : 'all checks passed'));
 process.exit(fails ? 1 : 0);

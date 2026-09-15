@@ -19391,6 +19391,51 @@ var EngCalcs = EngCalcs || {};
 		if (list.length || saved.curves) { saved.curves = list; }
 		return saved;
 	}
+	// The drawing's own extent, from the stored NODE coordinates alone. Deliberately not
+	// eachStoredPoint(): a free-floating Text can sit far from the network legitimately, and it
+	// would inflate the very yardstick this is measuring against.
+	function storedNodeSpan(saved) {
+		var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+		(saved.nodes || []).forEach(function (n) {
+			if (!isFinite(n.x) || !isFinite(n.y)) { return; }
+			if (n.x < minX) { minX = n.x; }
+			if (n.x > maxX) { maxX = n.x; }
+			if (n.y < minY) { minY = n.y; }
+			if (n.y > maxY) { maxY = n.y; }
+		});
+		if (!isFinite(minX) || !isFinite(minY)) { return 0; }
+		return Math.max(maxX - minX, maxY - minY);
+	}
+	// Returns how many it dropped, so a caller COULD say so. Nothing says so today: what the reader
+	// sees is labels returning to where they belong, which is the outcome they wanted.
+	function repairLabelOffsets(saved) {
+		var span = storedNodeSpan(saved), limit = span * 5, dropped = 0;
+		if (!(span > 0) || !isFinite(limit)) { return 0; }
+		function absurd(x, y) {
+			var d = Math.hypot(x || 0, y || 0);
+			return !isFinite(d) || d > limit;
+		}
+		(saved.nodes || []).forEach(function (n) {
+			if (n.lx === undefined && n.ly === undefined) { return; }
+			if (!absurd(n.lx, n.ly)) { return; }
+			delete n.lx; delete n.ly; dropped++;
+		});
+		(saved.links || []).forEach(function (l) {
+			if (l.lx === undefined && l.ly === undefined) { return; }
+			if (!absurd(l.lx, l.ly)) { return; }
+			delete l.lx; delete l.ly; dropped++;
+		});
+		// An ANCHORED Text's x/y is an offset from its anchor; a FREE one's is a position, and a
+		// position is never absurd -- it is just somewhere. Telling those two apart is the whole
+		// reason eachStoredPoint() visits one and skips the other.
+		(saved.labels || []).forEach(function (lb) {
+			if (!lb || (!lb.anchorNode && !lb.anchorLink)) { return; }
+			if (!absurd(lb.x, lb.y)) { return; }
+			lb.x = 0; lb.y = 0; dropped++;
+		});
+		return dropped;
+	}
+
 	function migrateSaved(saved) {
 		// RUN ON EVERY DOCUMENT, NOT ONLY AS THE v7 -> v8 STEP, and v2 is the whole reason. A v2
 		// document deliberately lags at v2 until the user answers its units question, so it reaches
@@ -19407,6 +19452,25 @@ var EngCalcs = EngCalcs || {};
 		// another and changes none of them, and it is idempotent (a document already holding its
 		// curves in the library has nothing left on any element for the loops below to find).
 		mintCurveLibrary(saved);
+		// **AND A LABEL OFFSET THAT CANNOT POSSIBLY BE ONE IS DROPPED, ON EVERY DOCUMENT** (Task 668).
+		// Run unconditionally for the same reason as the two above, and idempotent for a stronger
+		// one: it only ever DELETES, so a second pass finds nothing left to find.
+		//
+		// **THIS REPAIRS OUR OWN CORRUPTION AND NOTHING ELSE.** Until 2026-09-15 a reprojection left
+		// stored label offsets in the OLD unit, so `lx = -57` meant 57 feet before the wizard ran and
+		// 57 DEGREES afterwards -- about 6,300 km. Tom saw labels in Canada, China, the Atlantic and
+		// the south Pacific, and because the number is STORED they came back on every reload. Fixing
+		// georefWrite() stops new documents being spoiled; it cannot un-spoil the ones already saved,
+		// and those are sitting in people's browsers right now.
+		//
+		// **IT IS A DELIBERATE EXCEPTION TO "ONLY THE USER TOUCHES A FILE'S NUMBERS", and the shape of
+		// the exception is what makes it defensible**: the threshold is FIVE TIMES THE WHOLE DRAWING,
+		// where the corruption measured a factor of about 58,000 and a real dragged label is a
+		// fraction of one span. So it fires only on a value that cannot be a placement anybody made --
+		// a label five drawings away from its own node is not a position, it is a unit error. What it
+		// restores is the DEFAULT offset, which is derived from the text size and is always sane.
+		// A drawing with no extent is left alone: there is nothing to be absurd relative to.
+		repairLabelOffsets(saved);
 		if (saved.v === 1) {
 			// The single autosaved network becomes the project's Base. Its name is left blank, not
 			// set to "Untitled": that word is UI, and the UI localizes it (see `project` above).
@@ -23198,6 +23262,7 @@ var EngCalcs = EngCalcs || {};
 	// Every button that goes through here is also recorded, so Help > "What the toolbar icons mean"
 	// is DERIVED from the strip rather than being a second list to keep in step with it. A new
 	// toolbar button appears in that list without anybody remembering to add it.
+	var toolbarTipsWired = false;
 	var toolbarIconIndex = [];
 	function setIconLabel(el, iconName, name, tip) {
 		// **A REPAINT MUST NOT LEAVE TWO TIPS ON ONE BUTTON** (Tom, 2026-09-08: *"Two tips appear
@@ -23390,7 +23455,7 @@ var EngCalcs = EngCalcs || {};
 				// plain row at every level, so entering "Blank project" closed the menu that
 				// "Blank project" was in.
 				if (canHover()) { b.addEventListener('mouseenter', cancelSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
+				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			} else {
 				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
 				// does -- otherwise it hangs beside a row it no longer belongs to. On a DELAY, because
@@ -23399,7 +23464,7 @@ var EngCalcs = EngCalcs || {};
 				// Same gate: on touch this fired from the synthesised mouse sequence and armed a
 				// 350 ms close of the fly-out the user had just opened.
 				if (canHover()) { b.addEventListener('mouseenter', scheduleSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); });
+				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			}
 			list.appendChild(b);
 		});
@@ -25521,6 +25586,22 @@ var EngCalcs = EngCalcs || {};
 	// (Delete, Undo, Select -- in that order), and everything else (Zoom Extent, Draw Example).
 	function wireToolbar() {
 		var toolbar = document.getElementById('lpn_toolbar'), pc = EngCalcs.pageConfig || {};
+		// **ONE DELEGATED LISTENER FOR THE WHOLE STRIP, ATTACHED ONCE** (Task 670). The buttons are
+		// rebuilt on a unit switch and on a language relabel; this element is not, so a listener
+		// here outlives every rebuild and a button added later inherits the behaviour instead of
+		// having to remember it. Wrapping each button's own handler would have been the same fix
+		// written eleven times, and the twelfth button is the one that ships without it.
+		//
+		// It runs on the BUBBLE, after the button's own handler, so the command has already run --
+		// which is what makes "no tip after a command" true rather than "no tip during one".
+		if (toolbar && !toolbarTipsWired) {
+			toolbarTipsWired = true;
+			toolbar.addEventListener('click', function (e) {
+				if (e.target && e.target.closest && e.target.closest('button')) {
+					dismissTipsAfterCommand();
+				}
+			});
+		}
 		// Rebuilt, not appended to: this runs again on a unit switch and a language-driven relabel.
 		toolbarIconIndex = [];
 		setModeUI = function () {
@@ -25725,6 +25806,9 @@ var EngCalcs = EngCalcs || {};
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
 		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
+		// **`zoomExtent` BY REFERENCE, so the click event arrives as its `auto` argument.** Left
+		// exactly as it was -- changing it is a behaviour change to the fit and belongs in its own
+		// task, not in a tooltip fix.
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
 		// **THERE IS NO CLEAN-MAP BUTTON** (Tom, 2026-08-20: "Relegate Hide map readouts to the View
@@ -30141,6 +30225,27 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function hideOpenTips() { hideTipsIn(document); }
+	/**
+	 * **A COMMAND HAS JUST RUN, SO NO TIP SHOULD BE LEFT STANDING** (Task 670, Tom 2026-09-15:
+	 * *"On phone, Map menu and toolbar, Zoom to fit leaves a tip showing."*).
+	 *
+	 * **WHY ZOOM TO FIT AND NOT THE OTHERS, which is the part that explains the whole bug.** Almost
+	 * every other command on those two surfaces OPENS A PANEL, and opening one already calls
+	 * `hideOpenTips()` -- so the sweep was riding along on a side effect rather than being anybody's
+	 * job. Zoom to fit opens nothing. It changes the view and returns, and on a POINTER the tip then
+	 * goes away by itself because the mouse moves off the button; on TOUCH there is no such motion,
+	 * so the tip stands over the map with the command already done.
+	 *
+	 * So the rule is about the ACT, not about the control: running a command dismisses the tip that
+	 * raised it. Both surfaces go through here, and `sweepOrphanTips()` comes too because a menu row
+	 * is DESTROYED by `closeMenu()` a moment earlier -- its tooltip is rendered into document.body,
+	 * survives its trigger, and `hideTipsIn()` walks from a root down to triggers, so it cannot see
+	 * one that no longer has any.
+	 */
+	function dismissTipsAfterCommand() {
+		hideOpenTips();
+		sweepOrphanTips();
+	}
 	/**
 	 * **A TIP WHOSE TRIGGER NO LONGER EXISTS IS SWEPT FROM THE BODY.**
 	 *
