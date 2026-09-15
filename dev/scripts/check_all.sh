@@ -153,6 +153,15 @@ run_check "web app manifest"             blocking php dev/scripts/web_manifest_c
 run_check "web app manifest selftest"    blocking php dev/scripts/web_manifest_selftest.php
 run_check "web storage guarded"          blocking php dev/scripts/storage_guard_check.php
 run_check "storage guard selftest"       blocking php dev/scripts/storage_guard_selftest.php
+# Task 322 rows 57-58, the same method run in a second session: a construct counted, then asked
+# what writing it 217 and 29 times assumes. A typeless <button> inside a form IS a submit button,
+# so pressing it reloads the page and the answers the visitor was reading are gone; a PHP function
+# that reads $ec_lang without declaring it global sees NULL, so its labels come out empty in all 27
+# languages on a page that still validates. Neither leaves a trace on this side of the wire.
+run_check "button types declared"        blocking php dev/scripts/button_type_check.php
+run_check "button type selftest"         blocking php dev/scripts/button_type_selftest.php
+run_check "bootstrap globals declared"   blocking php dev/scripts/bootstrap_global_check.php
+run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_global_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
