@@ -388,6 +388,47 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			JSON.stringify(said));
 	}
 
+	head('10d. A refusal is not "you may be offline"');
+	// Tom, 2026-09-14, on a DEM fill that failed: *"We could not reach the ... offline...."* Every
+	// tile failure landed on that one sentence. **A MAPBOX TOKEN IS USUALLY RESTRICTED TO THE WEB
+	// ADDRESSES IT MAY BE USED FROM**, so the commonest real failure is not a lost network at all:
+	// it is a 401 or 403 from a host the token does not list, which this suite meets every time it
+	// is served somewhere new -- dev/session-handoff.md records satellite and DEM going 403 on
+	// librewaternet.org for precisely that reason, and the branch previews are more new addresses
+	// again. Telling somebody to check their connection when the service answered at once and said
+	// no sends them looking in the wrong place.
+	{
+		const EC3 = global.EngCalcs;
+		const said = [];
+		EC3.lpnTerrainInit({
+			locatable: () => true, token: () => 'pk.test',
+			nodesNeedingElevation: () => [], nodesWithElevation: () => [],
+			nodesAtDefaultElevation: () => ({ value: 0, points: [] }),
+			fill: (rows) => rows.map((r) => r.id), record: () => {},
+			notice: (m) => said.push(String(m))
+		});
+		global.window.confirm = () => true;
+		global.confirm = global.window.confirm;
+		global.window.fetch = global.fetch;
+		const pt = [{ id: 'J1', lon: PHOENIX.lon, lat: PHOENIX.lat }];
+
+		// The shape fetchPixels throws for an HTTP answer, which nothing read until now.
+		EC3.lpnTerrainFetchPixels = () => Promise.reject({ kind: 'http', status: 403 });
+		await new Promise((res) => { EC3.lpnTerrainFillFor(pt, { quiet: false }); setTimeout(res, 40); });
+		const refused = said.join(' | ');
+		ok('a 403 says the request was refused and names the status',
+			/403/.test(refused) && !/offline/i.test(refused), refused);
+		ok('...and points at the token rather than at the network',
+			/token/i.test(refused), refused);
+
+		// A genuine network failure must still read as one: this is a split, not a replacement.
+		said.length = 0;
+		EC3.lpnTerrainFetchPixels = () => Promise.reject(new Error('network'));
+		await new Promise((res) => { EC3.lpnTerrainFillFor(pt, { quiet: false }); setTimeout(res, 40); });
+		ok('a real network failure still says you may be offline',
+			/offline/i.test(said.join(' | ')), said.join(' | '));
+	}
+
 	head('11. ...and a project that cannot be located is still refused');
 	{
 		const CAT2 = JSON.parse(require('fs').readFileSync(

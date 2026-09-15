@@ -767,7 +767,7 @@ $ec_lang['bpn_h_supply_tip']='Source head at the design flow, read from the supp
 $ec_lang['bpn_show_elevation']='Elevation';
 $ec_lang['bpn_supply1_h']='Static supply head';
 $ec_lang['lpn_main_menu']='Water Supply Network';
-$ec_lang['lpn_main_title']='Free Online Water Distribution Network Calculator with the EPANET Solver';
+$ec_lang['lpn_main_title']='Free Online Water Distribution Network Modeling with the EPANET Solver';
 $ec_lang['lpn_main_desc']='Water Supply Network Analysis: Draw a Looped Pipe Network or Import EPANET Files';
 $ec_lang['lpn_title_units']='{units} Units';
 $ec_lang['lpn_tool_select']='Select';
@@ -3330,6 +3330,8 @@ $ec_lang['lpn_terrain_too_wide']='These nodes are spread over too much of the Ea
 $ec_lang['lpn_terrain_cancelled']='Nothing was changed and nothing was sent.';
 $ec_lang['lpn_terrain_nofetch']='This browser cannot reach the terrain service.';
 $ec_lang['lpn_terrain_working']='Reading the land surface…';
+// {status} is a number the service sent back, such as 403.
+$ec_lang['lpn_terrain_denied']='The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.';
 $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.';
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';

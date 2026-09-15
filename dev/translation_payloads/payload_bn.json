@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1870,
-        "delta_key_count": 108,
+        "expected_key_count": 1871,
+        "delta_key_count": 109,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -622,7 +622,8 @@
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
-        "lpn_reaction_per_day": "1\/day"
+        "lpn_reaction_per_day": "1\/day",
+        "lpn_terrain_denied": "The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on."
     },
     "keys": {
         "lpn_field_text_attached_tip": "This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.",
@@ -732,7 +733,8 @@
         "lpn_time_runbox_hide": "Do not show this box again",
         "lpn_settings_runbox": "Show the run progress box",
         "lpn_settings_runbox_tip": "A box that reports how far a run has got and what it found. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.",
-        "lpn_reaction_per_day": "1\/day"
+        "lpn_reaction_per_day": "1\/day",
+        "lpn_terrain_denied": "The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on."
     },
     "key_context": {
         "lpn_field_text_attached_tip": {
@@ -2460,6 +2462,22 @@
                     "key": "lpn_reaction_day",
                     "value": "দিন",
                     "english": "day"
+                }
+            }
+        },
+        "lpn_terrain_denied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_working",
+                    "value": "ভূমির স্তর পড়া হচ্ছে…",
+                    "english": "Reading the land surface…"
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "আমরা ভূমিরূপ সেবাটিতে পৌঁছাতে পারিনি, তাই কোনো উচ্চতা পরিবর্তিত হয়নি। আপনি হয়তো অফলাইনে আছেন। এই পাতার বাকি সবকিছু এটি ছাড়াই কাজ করে।",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
                 }
             }
         }
