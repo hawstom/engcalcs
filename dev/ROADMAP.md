@@ -84,6 +84,24 @@ the block.
     scale and Chrome's heap. One run on the machine that actually fails answers what three
     reproductions could not.
 
+- 100|676| **Watch the sites, and send a derived weekly report.**
+  Tom, 2026-09-15, after the EWB recovery: *"mistakes like the site outages and merging difficult
+  development branches to master before proper vetting can no longer be the matter of course."*
+  Starts 18 September, on his instruction. The full plan, the diagnosis behind it and the things
+  deliberately NOT to do: `dev/reputation-and-practice.md`.
+  - **The finding that orders the work: the reputation damage came from four SILENT outages nobody
+    was watching, not from the merge** -- and the merge is already guarded by
+    `dev/hooks/pre-merge-commit`, `pre-push` and their selftest. `check_all.sh` is 80-odd checks
+    about the CONTENTS of this repository and not one of them can ask whether the site is up.
+  - **Phase 1a is a blocker on everything else and is easy to skip: PROVE THE MAIL PATH.** Cron
+    mail on this account was dead for YEARS and produced 800+ bounces, so an alarm or a report
+    posted into it is worthless. An alarm nobody has proven can reach a human is not an alarm.
+    Mind the DMARC window that opens 2026-10-04.
+  - Then: an uptime watch on the six URLs (body, not just status -- a fatal PHP error arrives
+    inside a 200); the Friday report, every number DERIVED by an existing script and none of it
+    narrated by an AI; GitHub branch protection on master, which no local hook can substitute for;
+    and only then the portable kit for Tom's other projects.
+
 - 100|674| **Type a node's coordinates instead of only dragging it.**
   Tom, 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
   tables. I may need to be dissuaded from this, but at the moment I can scarcely believe that we

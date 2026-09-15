@@ -218,6 +218,7 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/scenario-seam-repair.md` | The `setProp()` write-seam incident and its guard |
 | `dev/positioning.md` | How `lpn_` is positioned against epanet-js; LibreEPANET.org. **Authority for every public claim, this repo's and the landing page's alike** |
 | `dev/librewaternet-landing.md` | The landing page left this repo 2026-08-24; where it went and what stayed |
+| `dev/reputation-and-practice.md` | **The plan from 18 Sep 2026** (Task 676). Why the reputation damage came from four SILENT outages and not from the merge; what already guards a merge; the uptime watch, the derived weekly report and the mail path that must be proven first; what is portable to Tom's other Claude Code projects and what would be cargo cult; and a list of what NOT to do, because the pull after an incident is toward ceremony |
 
 ### PUSH THE SIBLING SITES TOO, ALWAYS (Tom, 2026-09-11)
 
