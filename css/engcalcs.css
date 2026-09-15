@@ -625,7 +625,15 @@ html[lang="zh"] .ec-welcome {
    Left at 0.3 when .lpn-link went to 0.7 (Tom, 2026-07-30): he called this width "beautifully
    narrow", and what makes an arrow vanish into a dark aerial is its pure BLACK against a dark
    background, not its width -- fading the backdrop fixes that without coarsening the mark. */
-.lpn-arrow { fill: none; stroke: #000; stroke-width: 0.3; pointer-events: none; }
+/* **THE ARROW TAKES THE MAP'S OWN INK, and the thematic colour over it** (Task 671, Tom
+   2026-09-15). It was `#000` while `.lpn-link` above was `var(--lpn-map-ink)`, so an arrow was
+   already the wrong colour before any thematic map was switched on -- and with one on, every pipe
+   changed and its chevrons stayed black. Same ruling as the vertex dot two rules down, which Tom
+   made for the same reason on 2026-09-02. paintLinkColor() writes the thematic colour as an
+   inline style and clears it with the empty string, so this is what a cleared field falls back to.
+   Still an OPEN stroke and still not a filled triangle: a filled one reads as absorbed into the
+   pipe, which is the whole reason it is drawn this way. */
+.lpn-arrow { fill: none; stroke: var(--lpn-map-ink); stroke-width: 0.3; pointer-events: none; }
 /* Filled the same color as .lpn-link (Tom, 2026-07-30: vertices should read as "on the pipe",
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */

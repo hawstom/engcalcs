@@ -55,3 +55,8 @@ dev/epanet-models/
 dev/screenshots/*
 !dev/screenshots/README.md
 !dev/screenshots/INDEX.md
+
+# Windows shortcut files. Explorer drops one of these into the tree on a stray drag -- `lib/lib -
+# Shortcut.lnk` appeared on 2026-09-15 and blocked the pre-push stamp, which needs a clean tree,
+# so every push had to move it aside and put it back. Nothing here is ever a deliberate artifact.
+*.lnk
