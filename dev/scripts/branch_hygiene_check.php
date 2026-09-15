@@ -45,7 +45,14 @@ function bh_git($args) {
 $root = dirname(dirname(__DIR__));
 chdir($root);
 
-if (!is_dir('.git')) {
+// A WORKTREE'S `.git` IS A FILE, NOT A DIRECTORY, so `is_dir('.git')` is false in every one of
+// them -- and this advisory had therefore been reporting "nothing to report" from all five
+// worktrees since the day they were made. It failed OPEN and SILENTLY: a blind run and a clean
+// tree print the same line, which is the shape that has already cost this project a guard. Ask git
+// what its directory is rather than guessing at a filesystem layout that has two legal spellings.
+$probe = array();
+exec('git rev-parse --git-dir 2>/dev/null', $probe, $probeRc);
+if ($probeRc !== 0 || !$probe) {
     echo "branch hygiene: not a git checkout, nothing to report\n";
     exit(0);
 }
