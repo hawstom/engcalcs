@@ -106,23 +106,25 @@ the block.
   Tom, 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
   tables. I may need to be dissuaded from this, but at the moment I can scarcely believe that we
   and epanetjs don't expose this already."*
-  - **HE SHOULD NOT BE DISSUADED, and the reason is in this repo's own rules.** A coordinate is a
-    number the user supplied, and every other such number on this page is typeable: elevation,
-    demand, diameter, length, roughness. Position is the only one that can be entered by gesture
-    alone, which makes it the only one that cannot be entered EXACTLY. A surveyed junction has a
-    northing to two decimals and the page currently asks you to drag until you are close.
-  - **THE UNIT LABELS MUST FOLLOW THE PROJECT, which is the real work.** Three modes and three
-    vocabularies -- lat/lon for a geographic project, easting/northing for a projected one, x/y
-    for a grid -- and `axisNames()` already answers exactly that question for the status bar, so
-    the fields borrow it rather than growing a fourth opinion. Public order is lat,lon and system
-    order is lon,lat (`coord_order_check.php` is blocking), so the FIELD ORDER is decided before
-    anybody writes a row.
-  - **AND IT MUST GO THROUGH `setProp()`**, or typing a coordinate inside a scenario edits Base --
-    the seam `scenario_seam_check.php` exists for. Elevation (`z`) is already a property; only the
-    two horizontal ones are new.
-  - Worth checking before designing: epanet-js exposes coordinates in its property panel, and
-    EPANET's own `[COORDINATES]` section is plain text people hand-edit today. If we are alone in
-    not offering it, that is evidence rather than an argument, but it is the kind Tom asked for.
+  - **HE SHOULD NOT BE DISSUADED, and the evidence is stronger than this block first claimed.**
+    Position was the only number on the page enterable by gesture alone, so the only one not
+    enterable exactly. **EPANET 2.2's own Property Editor has had it for decades** (EPA's manual
+    source, `USEPA/EPANET2.2`, `6_objects.rst`: *"new X and Y coordinates ... can be typed in
+    manually"*), and **epanet-js has no coordinate row at all** (`asset-panel.tsx` at `8a68389`) --
+    the reverse of what this line used to say. WaterGEMS and InfoWater are login-gated; nothing is
+    asserted about them.
+  - **BUILT 2026-09-15 on branch `674-coordinate-entry`, AWAITING TOM'S BROWSER TEST.** Two typed
+    rows in a node's popup and two columns in each node table, both through `setNodeCoordAxis()`,
+    labelled from `axisNames()` so the vocabulary follows the project. `dev/lpn-spike/node-coord-entry-harness.js`.
+  - **EPANET says `X-Coordinate`; we kept `X`, and that is the one place its terminology is
+    outweighed rather than followed.** `lpn_field_x` already ships in 27 languages and is what the
+    status strip uses, where Tom asked for the SHORTER pair; and "X-Coordinate" loses a table
+    heading against "column width is king". Geographic and projected have no EPANET precedent.
+  - **A POSITION IS BASE-OWNED AND A TYPED ONE WRITES BASE, AS A DRAG DOES.** x and y are absent
+    from `LPN_OVERRIDABLE` by declaration, so there is no override for `setProp()` to record and
+    this block's original third bullet had the premise wrong. The harness asserts no override is
+    invented; a typed latitude also takes the `_ysrc` record, or the file saved 38.49999999999999
+    for a typed 38.5.
 
 - 50|675| **A labelled grid, with the significant digits picked out.**
   Tom, 2026-09-15: a grid in Settings with *"options for density and opacity"*, labelled *"at the

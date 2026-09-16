@@ -326,6 +326,11 @@ console.log('\n--- one home for the concept ---');
 	// so the shift and the flip apply exactly once to each and cancel in the difference. Two points
 	// is why it is +2 and not +1: converting the vector directly is the mistake this task exists to
 	// catch, and it would have been +1.
+	// **TASK 674 MOVED A SITE RATHER THAN ADDING ONE, ON EACH OUTWARD AXIS, AND THE NET ZERO IS
+	// WORTH SAYING OUT LOUD.** The node property popup used to convert both axes at its own call to
+	// coordFields(); it now reads them through nodeCoordAxis(), which is the one place a read SLOT
+	// becomes a document axis, so the popup's two sites became that function's two. A future reader
+	// seeing this total unchanged across a coordinate-entry feature should know it was checked.
 	ok('outwardX has one definition and twenty-five call sites', count(/outwardX\(/g) === 26, count(/outwardX\(/g));
 	ok('outwardY has one definition and twenty-five call sites', count(/outwardY\(/g) === 26, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
@@ -369,8 +374,14 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH COMING BACK** (Task 668): georefWriteOffsets() maps the captured base and
 	// tip through the transform and differences them, and both halves come home through the one
 	// door, exactly as georefWrite() itself does for a position.
-	ok('inwardX has one definition and twenty-four call sites', count(/inwardX\(/g) === 25, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-five call sites', count(/inwardY\(/g) === 26, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR A TYPED COORDINATE** (Task 674). setNodeCoordAxis() is the one seam a
+	// number a person types into a northing or a latitude comes through -- the property popup's two
+	// boxes and the three node tables' two columns all go through it -- and it is an outside number
+	// in exactly the sense every other site here is. **THE y SIDE IS THE ONE THAT BITES**: inwardY
+	// both negates and, in a geographic project, projects, so a latitude written straight into the
+	// document would land upside down and half a world away and still look like a coordinate.
+	ok('inwardX has one definition and twenty-five call sites', count(/inwardX\(/g) === 26, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-six call sites', count(/inwardY\(/g) === 27, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

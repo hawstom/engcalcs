@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 0 untranslated keys, of 1871 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read**, of 2 untranslated keys, of 1873 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,4 +25,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None. Every English key is present in at least one other language.
+## lpn_  (2, 2 to read @@ NEEDS RULING)
+
+- **`lpn_coord_off_world`**
+  > That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.
+  @@ NEEDS RULING
+- **`lpn_field_coord_tip`**
+  > Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.
+  @@ NEEDS RULING

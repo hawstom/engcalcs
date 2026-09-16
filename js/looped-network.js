@@ -3378,9 +3378,91 @@ var EngCalcs = EngCalcs || {};
 				secondShort: pc.lpn_field_easting_abbr || 'E'
 			};
 		}
-		return { first: 'X', second: 'Y' };
+		// **THROUGH THE LANGUAGE FILE LIKE THE OTHER FOUR.** These two were the only hardcoded
+		// literals in this function, and `lpn_field_x` / `lpn_field_y` have existed and been
+		// translated the whole time -- coordFields() was already reading them. One opinion about
+		// what an axis is called (Task 674), so a typed coordinate's label and the status strip's
+		// cannot come to spell the same axis two ways.
+		return { first: pc.lpn_field_x || 'X', second: pc.lpn_field_y || 'Y' };
 	}
 	function readsNorthFirst() { return isGeoProject() || isProjectedProject(); }
+	// **WHICH DOCUMENT AXIS THE FIRST-READ FIELD IS.** The pair is read north first wherever there
+	// is a north (readsNorthFirst()), so slot 1 is the document's y there and its x on a grid --
+	// the same fork coordReadoutAt() makes, asked once so an entry site and a display site cannot
+	// disagree about which number the top box holds.
+	function coordSlotIsY(slot) { return readsNorthFirst() ? (slot === 1) : (slot === 2); }
+	// The OUTWARD value of one read slot: what a person sees, origin added back and a geographic
+	// y already unprojected. See the seam note beside inwardY().
+	function nodeCoordAxis(n, slot) {
+		if (!n) { return undefined; }
+		return coordSlotIsY(slot) ? outwardY(n.y) : outwardX(n.x);
+	}
+	// A geographic document is the only kind with a bound, and it has two: Web Mercator has no
+	// finite y at the poles, and a longitude outside 180 degrees either way is off the world. A
+	// projected or grid coordinate is whatever the survey says, so nothing here invents a range
+	// for one.
+	function coordValueOk(isY, v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return false; }
+		if (!isGeoProject()) { return true; }
+		return isY ? Math.abs(v) <= LPN_MERC_MAX_LAT : Math.abs(v) <= 180;
+	}
+	/**
+	 * **A TYPED COORDINATE, AND THIS IS THE ONE WRITE SEAM FOR ONE** (ROADMAP Task 674; Tom,
+	 * 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
+	 * tables."*). The property popup's two boxes and the node tables' two columns both come
+	 * through here, so the popup and the table cannot come to two ideas of what placing a node
+	 * means -- the rule the tables' own header states about every other property.
+	 *
+	 * **IT WRITES BASE, DELIBERATELY, AND THAT IS WHAT A DRAG DOES TOO.** A position is IDENTITY,
+	 * not a design variable: `LPN_OVERRIDABLE` leaves x and y out by declaration, because a node
+	 * cannot be in two places at once in one rendered map. So there is no override to record and
+	 * setProp() has nothing to record one in -- a scenario shares the drawing, and typing
+	 * 1304070.25 into a northing moves the node for every scenario exactly as dragging it there
+	 * would. `elev`, `minLevel`, `from` and `to` are Base-owned in the same way and are written the
+	 * same way; dev/scripts/scenario_seam_check.php derives its property list from that
+	 * declaration, so it is silent about these two by construction rather than by exemption.
+	 *
+	 * **ONLY THE AXIS THE USER TYPED IS WRITTEN**, and that is the coordinate-exactness rule rather
+	 * than tidiness: reading a geographic y outward and writing it straight back in again runs the
+	 * latitude through `mercLat(mercY(lat))`, which differs in the last bits for 69.8% of latitudes
+	 * (CLAUDE.md), so rewriting the unchanged axis would perturb a number the user never touched.
+	 *
+	 * The `_xsrc`/`_ysrc` and `.inp` token records need nothing: each is believed only while the
+	 * drawn number is still the one derived from it, so an edit invalidates it by itself.
+	 */
+	function setNodeCoordAxis(n, slot, v) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!n || !nodeEls[n.id]) { return false; }
+		if (!coordValueOk(coordSlotIsY(slot), v)) {
+			// **REFUSED OUT LOUD.** A latitude past the Mercator cut-off has no finite y at all, so
+			// accepting one would put the node at Infinity and take the whole drawing with it; and
+			// a silent refusal is indistinguishable from a control that does nothing.
+			setNotice(pc.lpn_coord_off_world ||
+				'That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.');
+			return false;
+		}
+		if (coordSlotIsY(slot)) {
+			n.y = inwardY(v);   // base-write: a position is Base-owned geometry, as a drag is -- see this function's note
+			// **A TYPED LATITUDE IS THE USER'S NUMBER AND GETS THE SAME SOURCE RECORD A FILE'S
+			// DOES** (the `_xsrc`/`_ysrc` channel beside inwardY()). Measured before this line
+			// existed: typing 38.5 saved 38.49999999999999, and 0.1 saved 0.09999999999999677 --
+			// the projection is not invertible in doubles, which is the whole reason that channel
+			// is there. It was built for a number that arrived in a file; a number typed into this
+			// box is the same kind of thing, and the invariant is unchanged, so the file's own
+			// reader hands it straight back. GEOGRAPHIC ONLY: nothing else projects, and these two
+			// keys are stripped from the snapshot by unprojectStoredGeo(), which no other kind of
+			// project runs -- so writing one here would put it in the file.
+			if (isGeoProject()) { n[LPN_GEO_YSRC] = v; }
+		} else {
+			n.x = inwardX(v);   // base-write: the same, on the other axis
+			if (isGeoProject()) { n[LPN_GEO_XSRC] = v; }
+		}
+		updateNode(n.id);
+		// Every other label on the map is an obstacle to this node's, and the node has just moved --
+		// the same call every node drag ends in.
+		relayoutLabels();
+		return true;
+	}
 	function coordReadout(a, b) {
 		var n = axisNames();
 		return (n.firstShort || n.first) + ': ' + a + '  ' + (n.secondShort || n.second) + ': ' + b;
@@ -15357,6 +15439,33 @@ var EngCalcs = EngCalcs || {};
 			get: function (n) { return n.elev; },
 			set: function (n, v) { n.elev = v; updateNode(n.id); } };
 	}
+	/**
+	 * **A NODE'S POSITION AS TWO COLUMNS** (ROADMAP Task 674), the property popup's own two rows
+	 * in the table, through the same setNodeCoordAxis() seam so the two editors of one position
+	 * cannot have two ideas of what placing a node means.
+	 *
+	 * **THE KEYS ARE SLOTS AND THE HEADINGS ARE FUNCTIONS, BECAUSE THE SPEC IS BUILT ONCE.**
+	 * paneTables() caches, and the vocabulary follows the PROJECT -- lat/lon, northing/easting or
+	 * x/y -- so a heading resolved at build time would be whichever kind of project happened to be
+	 * open first and would stay that way for the life of the tab. A function is re-asked on every
+	 * render, and paneTableSignature() already carries the headings, so changing project kind
+	 * rebuilds these two columns by itself.
+	 *
+	 * So the key cannot be `lat` or `northing` either: it is the SELECTION and SORT identity, and
+	 * it has to survive a project whose axes are called something else. `axis1` is the first-read
+	 * slot in the sense coordSlotIsY() gives it.
+	 *
+	 * 5.5em, wider than the 3.5 an elevation gets: a state-plane northing is seven digits and two
+	 * decimals, which is the case this feature exists for.
+	 */
+	function paneColCoord(slot) {
+		return {
+			key: 'axis' + slot, em: 5.5,
+			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
+			get: function (n) { return nodeCoordAxis(n, slot); },
+			set: function (n, v) { setNodeCoordAxis(n, slot, v); }
+		};
+	}
 	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
 	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
 	// the pipe is how it changes.
@@ -15584,6 +15693,7 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'junction',
 				cols: [
 					paneColId(), paneColActive(), paneColElev(),
+					paneColCoord(1), paneColCoord(2),
 					// **THE TYPED ONE IS THE EDITABLE ONE, AND IT IS THE ONLY EDITABLE ONE** -- see
 					// resolvedDemand(). The Demand column beside it is a plain cell with no control
 					// in it at all, so there is no path by which the resolved number could be typed
@@ -15614,6 +15724,7 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'reservoir',
 				cols: [
 					paneColId(), paneColActive(), paneColElev(),
+					paneColCoord(1), paneColCoord(2),
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
 					// whose water surface is its ground, not a reservoir with no head.
@@ -15633,6 +15744,7 @@ var EngCalcs = EngCalcs || {};
 				group: 'node', type: 'tank',
 				cols: [
 					paneColId(), paneColActive(), paneColElev(),
+					paneColCoord(1), paneColCoord(2),
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
@@ -33952,24 +34064,75 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
-	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
-	// the touch answer to "show coordinates of the selected element": the corner tracker
-	// below is hover-driven (PC only), but this field is visible in the popup on any device.
 	// The two coordinate rows every popup shows, in the vocabulary THIS project uses (Task 145).
-	// One function, so a node's popup and a label's popup cannot come to different conclusions about
-	// what x means -- and so a third caller gets it right by not deciding.
+	// One function, so a node's popup and a Text's popup cannot come to different conclusions about
+	// what x means -- and so a third caller gets it right by not deciding. It also doubles as the
+	// touch answer to "show coordinates of the selected element": the corner tracker is
+	// hover-driven (pointer only), but these rows are visible in the popup on any device.
+	//
 	// **AND A GEOGRAPHIC PROJECT PUTS LATITUDE FIRST HERE TOO** (Tom, 2026-08-24). The popup and
 	// the status readout are the two places a coordinate is read, and they must agree; an X/Y
-	// project keeps x first, because there the pair really is x then y.
+	// project keeps x first, because there the pair really is x then y. Both halves of that come
+	// from axisNames() and readsNorthFirst(), which are the status strip's own two answers.
+	//
+	// **NO UNIT IN THE LABEL, AND THE NAME IS WHY** (Task 674). "Latitude" states degrees;
+	// "Northing" states whatever linear unit the declared CRS is in, which is the CRS's business
+	// and is a name this build does not hold for all 5,346 of them; "X" states a grid unit, which
+	// is declared rather than measured (see lengthField()). Naming one would be asserting something
+	// we do not know, and the status strip beside it names none either.
 	function coordFields(fields, x, y) {
-		var pc = EngCalcs.pageConfig || {}, geo = isGeoProject();
-		if (geo) {
-			readonlyField(fields, pc.lpn_field_lat || 'Latitude', coordText(y));
-			readonlyField(fields, pc.lpn_field_lon || 'Longitude', coordText(x));
-			return;
-		}
-		readonlyField(fields, pc.lpn_field_x || 'X', coordText(x));
-		readonlyField(fields, pc.lpn_field_y || 'Y', coordText(y));
+		var names = axisNames();
+		readonlyField(fields, names.first, coordText(readsNorthFirst() ? y : x));
+		readonlyField(fields, names.second, coordText(readsNorthFirst() ? x : y));
+	}
+	/**
+	 * **THE SAME TWO ROWS, TYPEABLE, ON A NODE** (ROADMAP Task 674). Tom, 2026-09-15: *"I can
+	 * scarcely believe that we and epanetjs don't expose this already."*
+	 *
+	 * A surveyed junction has a northing to two decimals, and until this existed position was the
+	 * ONLY number on this page that could be entered by gesture alone -- so the only one that could
+	 * not be entered exactly. Elevation, demand, diameter, length and roughness are all typed.
+	 *
+	 * Read-only rows stay on a TEXT object's popup, which is why this is a second function rather
+	 * than a flag on the first: a Text is placed relative to what it annotates, and `lb.x/lb.y` on
+	 * an attached one is an OFFSET from its anchor rather than a position on the map (see the label
+	 * drag). Two different quantities must not share one box.
+	 *
+	 * The value is printed the way the tables print a typed number -- six decimals with the
+	 * trailing zeros stripped -- rather than coordText()'s two, because this is now the user's own
+	 * field and a field must show what is stored. A state-plane northing rounded to 2 dp for
+	 * display and then committed back on the next edit would quietly truncate it.
+	 */
+	function nodeCoordFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, names = axisNames();
+		[1, 2].forEach(function (slot) {
+			var label = document.createElement('label'), input = document.createElement('input'),
+				v = nodeCoordAxis(n, slot);
+			input.type = 'number';
+			// step="any", unlike the elevation rows beside it: a latitude is six decimal places and
+			// the default step of 1 makes every one of them fail the browser's own validity test.
+			input.step = 'any';
+			input.value = (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
+			input.addEventListener('change', function () {
+				saveUndoSnapshot();
+				// A refusal puts the document's own number back, rather than leaving the box
+				// showing a value nothing accepted.
+				if (!setNodeCoordAxis(n, slot, +input.value)) {
+					var back = nodeCoordAxis(n, slot);
+					input.value = (typeof back === 'number' && isFinite(back)) ? String(+back.toFixed(6)) : '';
+					return;
+				}
+				// No `ov` argument anywhere here: there is no override to mark, and completeEdit()
+				// is reached through the element branch so the redraw, the solve and the save are
+				// the same three every other property edit gets.
+				completeEdit({ el: n });
+				refreshPopupIfOpen();
+			});
+			setFieldLabel(label, slot === 1 ? names.first : names.second, pc.lpn_field_coord_tip);
+			label.appendChild(input);
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+		});
 	}
 	/**
 	 * **TWO BUTTONS UNDER ELEVATION: Sample DEM, and Use DEM** (ROADMAP Task 542).
@@ -35261,7 +35424,7 @@ var EngCalcs = EngCalcs || {};
 		customPropFields(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
-		coordFields(fields, outwardX(n.x), outwardY(n.y));
+		nodeCoordFields(fields, n);
 		importNotesField(fields, n);
 		tipsIn(fields);
 	}

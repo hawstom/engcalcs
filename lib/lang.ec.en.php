@@ -2234,6 +2234,14 @@ $ec_lang['lpn_field_northing_abbr']='N';
 $ec_lang_syn['lpn_field_northing_abbr']='Northing | abbreviation of Northing, as short as the language has a short form for; the full word where it has none.';
 $ec_lang['lpn_field_easting_abbr']='E';
 $ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as short as the language has a short form for; the full word where it has none.';
+// Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
+// INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
+// states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
+// when the node is dragged.
+$ec_lang['lpn_field_coord_tip']='Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.';
+// Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
+// finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
+$ec_lang['lpn_coord_off_world']='That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
