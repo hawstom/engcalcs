@@ -369,8 +369,12 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH COMING BACK** (Task 668): georefWriteOffsets() maps the captured base and
 	// tip through the transform and differences them, and both halves come home through the one
 	// door, exactly as georefWrite() itself does for a position.
-	ok('inwardX has one definition and twenty-four call sites', count(/inwardX\(/g) === 25, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-five call sites', count(/inwardY\(/g) === 26, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR A SURVEYED POINT LIST** (Task 592). Every junction made from a CSV or
+	// a GPX arrives as a longitude and a latitude out of somebody's file, which is the definition of
+	// an outside number: it comes through this door once, in createSurveyJunctions(), and the file's
+	// own value rides beside the drawn one so the save hands it back unchanged.
+	ok('inwardX has one definition and twenty-five call sites', count(/inwardX\(/g) === 26, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-six call sites', count(/inwardY\(/g) === 27, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

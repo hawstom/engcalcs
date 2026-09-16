@@ -21590,6 +21590,154 @@ var EngCalcs = EngCalcs || {};
 		if (input) { input.click(); }
 	}
 
+	// ---- Settings > New assets > Import surveyed points (ROADMAP Task 592) -----------------------
+	//
+	// **THE READING IS js/lpn-survey.js's AND THE DOCUMENT IS OURS.** That file takes text and
+	// returns a list of surveyed points plus a list of everything it could not honour; it makes
+	// nothing, draws nothing and asks nothing. Everything below is the half only this file can do:
+	// one undo snapshot, one junction per point at the position the file states, and the report.
+	//
+	// **IT SITS BEHIND THE New assets DOOR AND NOT A NEW ONE** (Task 592, and Task 542 is why). A
+	// menu row that filled the whole drawing in one press is the defect 542 exists to have removed
+	// -- Tom's own words, *"a cool new button that I found"* -- and this command makes new assets
+	// that take the new-asset values sitting directly above it, the elevation source included. So
+	// it belongs in that section rather than in a File menu that would be a third door.
+	//
+	// **A GEOGRAPHIC PROJECT ONLY, AND IT SAYS SO RATHER THAN PROJECTING SILENTLY.** A latitude has
+	// no meaning on an XY grid and this page has no forward projection for a projected plane
+	// (dev/geographic-projects.md section 8), so the refusal names both the reason and the way out.
+	// The control is still drawn, deliberately unlike the elevation-source row beside it: somebody
+	// with a survey in hand will look for this, and a row that is simply absent teaches them
+	// nothing about why.
+	var LPN_SURVEY_ELEV_UNIT = { m: 'mh2o', ft: 'fth2o' };
+	function pickSurveyFile() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!isGeoProject()) {
+			alert(pc.lpn_survey_not_geo || 'A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.');
+			return;
+		}
+		var input = document.getElementById('lpn_survey_file');
+		if (input) { input.click(); }
+	}
+	function importSurveyFromFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		// TEXT, not bytes: a CSV and a GPX are both text, and which one this is gets decided from
+		// the content rather than the name -- see EngCalcs.lpnSurveyLooksLikeGpx().
+		reader.onload = function (ev) { landSurveyText(String(ev.target.result), file.name); };
+		reader.onerror = function () {
+			alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
+	}
+	function landSurveyText(text, fileName) {
+		var pc = EngCalcs.pageConfig || {}, parsed, outcome;
+		// Asked AGAIN here, not only at the picker: reading a file is not instant, and the project
+		// that comes back from the reader is whatever tab is open by then.
+		if (!isGeoProject()) {
+			alert(pc.lpn_survey_not_geo || 'A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.');
+			return;
+		}
+		parsed = EngCalcs.lpnSurveyParse ? EngCalcs.lpnSurveyParse(text) : { ok: false };
+		if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed)); return; }
+		// The confirm NAMES THE MAPPING, which is the whole column-mapping step: the reader sees
+		// which of their own columns became the latitude before a single junction exists, so a
+		// wrong guess of ours costs a Cancel rather than an undo.
+		if (!window.confirm(EngCalcs.lpnSurveyConfirmText(parsed, unitLabel('lpn_u_elevhead')))) {
+			setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
+			return;
+		}
+		outcome = createSurveyJunctions(parsed);
+		showSurveyReport(parsed, outcome, fileName);
+	}
+	/**
+	 * One junction per surveyed point, under ONE undo snapshot.
+	 *
+	 * **THE FILE'S OWN NUMBERS GO IN AND COME BACK OUT UNCHANGED.** A coordinate is stored in the
+	 * drawing frame, which for a geographic document is Web Mercator, and `mercLat(mercY(lat))` is a
+	 * different double for 69.8% of latitudes -- so the file's own longitude and latitude ride
+	 * beside the drawn pair in `_xsrc`/`_ysrc`, which is the channel serializeProject() already
+	 * reads, and the file's own TEXT rides in the `tok` bag, which is the channel the `.inp` writer
+	 * already reads. Neither is a new mechanism and neither needs a call site to remember anything:
+	 * both are believed only while the drawn number is still the one derived from them.
+	 */
+	function createSurveyJunctions(parsed) {
+		var notes = [], created = 0, elevFromFile = 0,
+			fileUnit = parsed.elevUnit ? LPN_SURVEY_ELEV_UNIT[parsed.elevUnit] : null,
+			// **PASS-THROUGH WHEN THE UNITS ALREADY AGREE, WHICH IS THE ONLY EXACT ANSWER** (the
+			// unit rule in CLAUDE.md, and js/lpn-inp.js's inpFlow() is the same line). Where they
+			// do not agree the number has to be converted to be displayable at all, and that is
+			// REPORTED rather than done quietly -- and the converted number keeps no token, because
+			// the text no longer says the number.
+			elevSame = !fileUnit || unitKey('lpn_u_elevhead') === fileUnit;
+		saveUndoSnapshot();
+		parsed.points.forEach(function (p) {
+			var n = addNode('junction', inwardX(p.lon), inwardY(p.lat)), want = p.id, v;
+			n[LPN_GEO_XSRC] = p.lon;
+			n[LPN_GEO_YSRC] = p.lat;
+			if (p.lonTok) { (n.tok || (n.tok = {})).x = p.lonTok; }
+			if (p.latTok) { (n.tok || (n.tok = {})).y = p.latTok; }
+			if (typeof p.elev === 'number') {
+				if (elevSame) {
+					n.elev = p.elev;
+					if (p.elevTok) { (n.tok || (n.tok = {})).elev = p.elevTok; }
+				} else {
+					n.elev = p.elev / EngCalcs.unitFactor(fileUnit) * unitFactor('lpn_u_elevhead');
+				}
+				elevFromFile++;
+			}
+			// The surveyed name, where the document can take it. A name it cannot take is reported
+			// and the junction keeps the name this page minted -- never a name repaired by adding a
+			// digit, which would put a point on the map under a name nobody wrote down.
+			if (want) {
+				if (/[\s'"]/.test(want)) { notes.push({ code: 'id-invalid', ids: [want], detail: null }); }
+				else if (allIds().indexOf(want) !== -1) { notes.push({ code: 'id-taken', ids: [want], detail: null }); }
+				else { applyNodeRename(n.id, want); }
+			}
+			created++;
+		});
+		if (!elevSame) {
+			notes.push({ code: 'elev-converted', ids: [],
+				detail: parsed.elevUnit === 'm' ? (EngCalcs.pageConfig || {}).lpn_survey_unit_m : (EngCalcs.pageConfig || {}).lpn_survey_unit_ft });
+		}
+		// **THE ORIGIN IS RE-DERIVED, for the reason Task 439 gives**: a geographic document's
+		// coordinates are shifted onto a 1/128-degree grid near the network so float32 rasterising
+		// cannot lose a pipe, and a batch of points dropped into an empty project is exactly the
+		// moment the network moves from nowhere to somewhere. Exact by construction (Sterbenz), so
+		// the sources above still hand back the file's own bytes.
+		rebaseLiveGeoDoc();
+		buildDom();
+		// **AND THE VIEW IS DELIBERATELY NOT MOVED, not even on an empty project.** The obvious
+		// kindness here is a fit, so that points arriving in Arizona are on screen for somebody
+		// whose camera is over the whole Earth. Tom has ruled on exactly this, going through the
+		// candidate list one at a time (2026-08-15): *"our current paradigm forbids autozooms or
+		// refits"*, and *"refitting and re-baselining: I see it as vanishingly defensible"*. There
+		// are four automatic fits left on this page and every one of them gives a view to a
+		// document that has none; this project has one. So the reader presses Zoom to extent, which
+		// is a control they already have, and dev/lpn-spike/view-memory-harness.js keeps a fifth
+		// fit from being added here by a bumped number instead of an argument.
+		refreshMapStatus();
+		scheduleSolve();
+		saveToStorage();
+		return { created: created, elevFromFile: elevFromFile, notes: notes };
+	}
+	function showSurveyReport(parsed, outcome, fileName) {
+		var pc = EngCalcs.pageConfig || {},
+			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome);
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_survey_report_heading || 'Imported {file}').replace('{file}', fileName);
+			body.appendChild(h);
+			lines.forEach(function (text) {
+				var p = document.createElement('p');
+				p.style.margin = '0 0 6px';
+				p.textContent = text;
+				body.appendChild(p);
+			});
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+
 	// ---- File > Import XY to lat/lon… (ROADMAP Task 447) ---------------------------------------------
 	//
 	// **OPENING A FILE ALWAYS MAKES A NEW TAB, and that is what dissolves the old question.** There
@@ -25352,6 +25500,16 @@ var EngCalcs = EngCalcs || {};
 			var f = geoInput.files[0];
 			geoInput.value = '';
 			if (f) { openAsGeoFile(f); }
+		});
+		// A FOURTH picker (Task 592). Its own, for the reason the three above are their own: a
+		// surveyed point list lands in the OPEN project rather than making a new tab, so one input
+		// serving both would have to guess which act was meant from the file's extension.
+		var surveyInput = document.getElementById('lpn_survey_file');
+		if (!surveyInput) { return; }
+		surveyInput.addEventListener('change', function () {
+			var f = surveyInput.files[0];
+			surveyInput.value = '';
+			if (f) { importSurveyFromFile(f); }
 		});
 	}
 
@@ -29374,6 +29532,17 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		defBody.appendChild(pushBtn);
+		defBody.appendChild(document.createElement('br'));
+		// **READING A SURVEYED POINT LIST (Task 592), BEHIND THIS DOOR AND NOT A NEW ONE.** It makes
+		// new assets and it takes the new-asset values above it, the Elevation source included, so
+		// this section is where it belongs; see pickSurveyFile() for why it is not a menu row and
+		// why it is drawn even on a project that has to refuse it.
+		var surveyBtn = document.createElement('button');
+		surveyBtn.type = 'button';
+		surveyBtn.textContent = pc.lpn_survey_btn || 'Import surveyed points';
+		helpTip(surveyBtn, pc.lpn_survey_btn_tip);
+		surveyBtn.addEventListener('click', pickSurveyFile);
+		defBody.appendChild(surveyBtn);
 		defBody.appendChild(document.createElement('br'));
 		// ---- 3. Map display ----
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop

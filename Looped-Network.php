@@ -216,6 +216,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
 	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
+	<?php // Settings > New assets > Import surveyed points (Task 592). A FOURTH picker, and its own for
+	      // the reason the three above are their own: this one lands points in the OPEN project
+	      // instead of making a new tab, so an input shared with them would have to guess which act
+	      // was meant. CSV or GPX, decided from the file's own content and never from its name. ?>
+	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.gpx,text/csv,text/plain,application/gpx+xml" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -2650,7 +2655,56 @@ EngCalcs.pageConfig = {
 	lpn_terrain_keep_ids: <?=json_encode($ec_lang['lpn_terrain_keep_ids'])?>,
 	lpn_terrain_filled_ids: <?=json_encode($ec_lang['lpn_terrain_filled_ids'])?>,
 	lpn_terrain_blank_ids: <?=json_encode($ec_lang['lpn_terrain_blank_ids'])?>,
-	lpn_terrain_ids_more: <?=json_encode($ec_lang['lpn_terrain_ids_more'])?>
+	lpn_terrain_ids_more: <?=json_encode($ec_lang['lpn_terrain_ids_more'])?>,
+<?php   // Reading a surveyed point list (Task 592). js/lpn-survey.js reads these through a pageConfig
+        // ALIAS, so dev/scripts/pageconfig_check.php sees every one of them and
+        // dev/scripts/js_fallback_string_check.php holds each English literal in that file against
+        // lib/lang.ec.en.php -- which is why this block is not the bracket-lookup arrangement the
+        // search and terrain blocks above it are. ?>
+	lpn_survey_btn: <?=json_encode($ec_lang['lpn_survey_btn'])?>,
+	lpn_survey_btn_tip: <?=json_encode($ec_lang['lpn_survey_btn_tip'])?>,
+	lpn_survey_not_geo: <?=json_encode($ec_lang['lpn_survey_not_geo'])?>,
+	lpn_survey_read_error: <?=json_encode($ec_lang['lpn_survey_read_error'])?>,
+	lpn_survey_cancelled: <?=json_encode($ec_lang['lpn_survey_cancelled'])?>,
+	lpn_survey_row: <?=json_encode($ec_lang['lpn_survey_row'])?>,
+	lpn_survey_err_empty: <?=json_encode($ec_lang['lpn_survey_err_empty'])?>,
+	lpn_survey_err_unreadable: <?=json_encode($ec_lang['lpn_survey_err_unreadable'])?>,
+	lpn_survey_err_no_latlon: <?=json_encode($ec_lang['lpn_survey_err_no_latlon'])?>,
+	lpn_survey_err_ambiguous_lat: <?=json_encode($ec_lang['lpn_survey_err_ambiguous_lat'])?>,
+	lpn_survey_err_ambiguous_lon: <?=json_encode($ec_lang['lpn_survey_err_ambiguous_lon'])?>,
+	lpn_survey_err_plane: <?=json_encode($ec_lang['lpn_survey_err_plane'])?>,
+	lpn_survey_err_gpx_no_wpt: <?=json_encode($ec_lang['lpn_survey_err_gpx_no_wpt'])?>,
+	lpn_survey_err_no_points: <?=json_encode($ec_lang['lpn_survey_err_no_points'])?>,
+	lpn_survey_confirm: <?=json_encode($ec_lang['lpn_survey_confirm'])?>,
+	lpn_survey_map_lines: <?=json_encode($ec_lang['lpn_survey_map_lines'])?>,
+	lpn_survey_map_gpx: <?=json_encode($ec_lang['lpn_survey_map_gpx'])?>,
+	lpn_survey_map_none: <?=json_encode($ec_lang['lpn_survey_map_none'])?>,
+	lpn_survey_elev_unit: <?=json_encode($ec_lang['lpn_survey_elev_unit'])?>,
+	lpn_survey_elev_assumed: <?=json_encode($ec_lang['lpn_survey_elev_assumed'])?>,
+	lpn_survey_unit_m: <?=json_encode($ec_lang['lpn_survey_unit_m'])?>,
+	lpn_survey_unit_ft: <?=json_encode($ec_lang['lpn_survey_unit_ft'])?>,
+	lpn_survey_confirm_pipes: <?=json_encode($ec_lang['lpn_survey_confirm_pipes'])?>,
+	lpn_survey_report_heading: <?=json_encode($ec_lang['lpn_survey_report_heading'])?>,
+	lpn_survey_report_counts: <?=json_encode($ec_lang['lpn_survey_report_counts'])?>,
+	lpn_survey_report_elev: <?=json_encode($ec_lang['lpn_survey_report_elev'])?>,
+	lpn_survey_report_clean: <?=json_encode($ec_lang['lpn_survey_report_clean'])?>,
+	lpn_survey_report_lead: <?=json_encode($ec_lang['lpn_survey_report_lead'])?>,
+	lpn_survey_note_row_short: <?=json_encode($ec_lang['lpn_survey_note_row_short'])?>,
+	lpn_survey_note_lat_missing: <?=json_encode($ec_lang['lpn_survey_note_lat_missing'])?>,
+	lpn_survey_note_lon_missing: <?=json_encode($ec_lang['lpn_survey_note_lon_missing'])?>,
+	lpn_survey_note_bad_lat: <?=json_encode($ec_lang['lpn_survey_note_bad_lat'])?>,
+	lpn_survey_note_bad_lon: <?=json_encode($ec_lang['lpn_survey_note_bad_lon'])?>,
+	lpn_survey_note_lat_range: <?=json_encode($ec_lang['lpn_survey_note_lat_range'])?>,
+	lpn_survey_note_lon_range: <?=json_encode($ec_lang['lpn_survey_note_lon_range'])?>,
+	lpn_survey_note_bad_elev: <?=json_encode($ec_lang['lpn_survey_note_bad_elev'])?>,
+	lpn_survey_note_ambiguous_elev: <?=json_encode($ec_lang['lpn_survey_note_ambiguous_elev'])?>,
+	lpn_survey_note_blank_rows: <?=json_encode($ec_lang['lpn_survey_note_blank_rows'])?>,
+	lpn_survey_note_id_duplicate: <?=json_encode($ec_lang['lpn_survey_note_id_duplicate'])?>,
+	lpn_survey_note_id_taken: <?=json_encode($ec_lang['lpn_survey_note_id_taken'])?>,
+	lpn_survey_note_id_invalid: <?=json_encode($ec_lang['lpn_survey_note_id_invalid'])?>,
+	lpn_survey_note_gpx_trkpt: <?=json_encode($ec_lang['lpn_survey_note_gpx_trkpt'])?>,
+	lpn_survey_note_gpx_rtept: <?=json_encode($ec_lang['lpn_survey_note_gpx_rtept'])?>,
+	lpn_survey_note_elev_converted: <?=json_encode($ec_lang['lpn_survey_note_elev_converted'])?>
 };
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
@@ -2709,6 +2763,11 @@ EngCalcs.pageConfig = {
       // tag, and BEFORE looped-network.js, which reads EngCalcs.lpnFireFlowDefaults when the box
       // is opened. ?>
 <script src="/engcalcs/js/lpn-fireflow.js?v=<?=filemtime(__DIR__.'/js/lpn-fireflow.js')?>"></script>
+<?php // Reading a surveyed point list -- CSV and GPX (ROADMAP Task 592). Pure parsing and column
+      // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
+      // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the
+      // file could not be read, which is a lie about the file. ?>
+<script src="/engcalcs/js/lpn-survey.js?v=<?=filemtime(__DIR__.'/js/lpn-survey.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
