@@ -127,10 +127,74 @@ rows from a paste, which is Declan's item 1.
 **TWO STRINGS ARE DELIBERATELY DIFFERENT ON master AND ON `projection`, AND THAT IS NOT DRIFT.**
 `lpn_new_coordsys_local` and its tip. When `projection` merges the branch's wording wins.
 
-**STILL WAITING ON HIM:** the Apache reload; the browser passes; **GitHub branch protection on
-`master`**, which no local hook can substitute for and which needs his account; Task 663's three
-reaction-rate questions (he answered 1, asked where 2 and 3 appear); and whether the empty
-`customer` and `graph` refs should be deleted now their work is on properly named branches.
+**THE PROPERTY GROUPING IS DECIDED IN SUBSTANCE AND NOT BUILT.** Tom's final shape, after two
+rounds with five seats: **Description and state / Dry properties / Water properties / Custom /
+Results and quick graph**, with WALL reaction coefficient dry and BULK in water, on his own ruling.
+Shut and Active BOTH stay -- a `[CONTROLS]` action changes `status` during a run
+(`js/lpn-time.js:220`, and every frame carries `statuses`) while nothing schedules `active`, so Shut
+is a state the ENGINE changes and Active is a modelling decision only a PERSON makes.
+
+- **A GROUP MUST BE ABLE TO FOLD, AND THE SEATS NEARLY TALKED US OUT OF THE FEATURE.** Asked whether
+  groups should collapse BY DEFAULT they said no, on good grounds; Ida and Declan then reasoned that
+  an always-open disclosure buys a caret and a keyboard stop and no hiding, so use a plain heading.
+  Valid logic, wrong premise. **Tom, 2026-09-16: *"If the headings are non-interactive, we ditch
+  them. The entire purpose of this was the question of how to skip over X, Y, Description, and Tag
+  and get straight to the good stuff."*** He is right, and the orchestrator had recommended the
+  plain headings -- that was a synthesis error, not the seats'.
+- **THE ANSWER IS REMEMBERED FOLDING, NOT A DEFAULT.** Open the first time anybody sees it; once TOM
+  folds a group it stays folded for every element he opens afterwards. **Declan's keyboard objection
+  INVERTS once a group is shut** -- fields inside a closed section are not reachable at all, so
+  folding removes stops rather than adding one. He measured the always-open case because that is
+  what he was asked about, and he separately RETRACTED his 800-keystroke table figure after
+  verifying `js/looped-network.js:16669`: Enter already moves DOWN a column, so a clerk filling 400
+  elevations never crosses X, Y, Description or Tag. He demoted his own reorder-to-end wish to a
+  nicety and named COLUMN HIDE as the real fix, with a design in his journal.
+- **HALF THE MECHANISM EXISTS.** `cpOpenKeys` (`js/looped-network.js:3658`) already remembers which
+  custom-property sections are open, and its own comment says *"memory within one rebuild and not
+  storage."* Only the persistence is missing: one browser-furniture `localStorage` key per group
+  name, never in `serializeProject()` (`lpn_furniture_check.php` is blocking).
+- **Sue exempts "Results and quick graph" from his three-row rule BY NAME**, because that group's
+  reason to exist is the graph button (Task 637), identical on every element type; Ida confirmed the
+  2-row count is a STRUCTURAL FLOOR, since a fixed-head node solves to at most head, pressure and
+  quality. Task 637 retires the problem when it ships.
+- **Two concrete moves and one non-move:** the link popup renders Shut BEFORE Tag while his list has
+  Tag first (a two-line swap); do NOT move Diameter after Length, because the code order is anchored
+  to the pipe-type chooser under Task 465's dated ruling and an illustrative bullet list must not
+  silently overturn one. **Sue flags "Dry properties" against the trade's "dry utilities"** (gas,
+  electric, telecom, as against wet) and offered "Asset properties" without campaigning -- his ear,
+  not ours. **Franco alone wants folding ON A PHONE by default** (Dry and Results shut, Description
+  and Water open), measured against a popup running to `min(46rem, 92dvh)`; that is unresolved and
+  is a separate question with its own evidence.
+
+**GITHUB BRANCH PROTECTION IS DECLINED. DO NOT RE-PROPOSE IT.** Tom, 2026-09-16: *"I'm sorry. I
+can't bring myself to do that."* It is his call and the gap it would have closed is narrow -- a
+clone or another machine with no hooks -- which `hook_install_check.php` already reports whenever the
+suite runs. **A gate he works around would be worse than none**, which is this project's own rule.
+Strike it from `dev/reputation-and-practice.md` §4 gap 1 as an ASK; the fact stays true.
+
+**HE IS CONFUSED ABOUT WHAT master MEANS AND HAS DELEGATED IT** (*"I confess I am confused. I will
+have to run tests with you to see how it works. Just do it the best way you find."*). The practice
+given him in one paragraph, and the one to hold: **master is where finished work lives, a branch is
+where unfinished work lives, production is whatever he last pulled.** Every change starts on a
+branch; nothing reaches master until the suite passes ON THE MERGED RESULT; a FEATURE additionally
+waits for him to have used it and said so, a defect or tooling change does not. **He wants a
+testing session** -- he picks a branch, you walk it with him, and he sees what clearing one costs.
+Offer it; do not lecture.
+
+**TRANSLATE BEFORE RELAYING. HE DOES NOT READ CODE AND SAID SO.** Tom, 2026-09-16: *"I don't know
+what those are. Your in-house with the subagents is developing a language of its own, and I don't
+know if I need to understand it."* -- about `<details>`/`<summary>`, used a dozen times as though
+they were ordinary words. **A subagent writes to another machine's standard and forwarding that
+vocabulary makes him do the one job he cannot do.** Name a thing by what it DOES (*"a collapsible
+section, the little triangle you click to fold a block away"*), keep a path or a line number only
+where he could act on it, and leave provenance citations in the journals.
+
+**STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
+is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
+Task 663's questions 2 and 3, now that he knows the reaction rate is a LINK label switched on under
+Settings > Labels and needs a chemical and an extended-period run to exist at all; the grouping
+build; and the two remaining empty refs, `660-dblclick-open` and `662-reaction-questions`.
+**`custom-property`, `customer` and `graph` are DELETED on his word, local and remote.**
 
 **CLOSING A TASK MAKES THREE FILES STALE, NOT ONE** -- `dev/ROADMAP.md`, then
 `generate_roadmap_index.php` AND `generate_features.php`, because `dev/features.md` carries the

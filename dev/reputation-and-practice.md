@@ -153,8 +153,17 @@ Yes, and it is (section 2). Three real gaps remain:
 
 1. **A local hook protects a local checkout and nothing else.** Anyone cloning this repository, or
    Tom on another machine, has no hooks until `dev/hooks/install.sh` is run. `hook_install_check.php`
-   reports it, but only when the suite is run. **Fix: GitHub branch protection on `master`** — a
-   server-side rule no local checkout can bypass. Free, five minutes in the repository settings.
+   reports it, but only when the suite is run.
+   - **THE FIX WAS GOING TO BE GITHUB BRANCH PROTECTION AND TOM HAS DECLINED IT. DO NOT RE-PROPOSE
+     IT.** 2026-09-16, asked directly and given the five steps: *"I'm sorry. I can't bring myself to
+     do that."* It is his repository and his call.
+   - **The gap that stays open is narrower than this section made it sound**, which is worth saying
+     because the ask was put to him on the strength of it: it is a clone, or Tom on a second machine,
+     with no hooks installed. On the machine he actually works on, `hook_install_check.php` reports
+     an uninstalled hook every time the suite runs, which is most of the protection.
+   - **And a gate he worked around would be worse than none** -- this project's own rule, stated in
+     §8 below and in `CLAUDE.md`. Turning on a server-side rule that makes every merge a pull
+     request, for a one-person repository, is exactly the ceremony §8 warns is paid for every day.
 2. **Nothing gates the SIBLING repositories.** `librewaternet.org` and `not-epanet.org` are pushed
    as part of finishing work, with no suite and no hooks. The landing page is the most
    reputation-exposed surface of all three and the least guarded.
