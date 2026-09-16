@@ -1574,6 +1574,36 @@ $ec_lang['lpn_profile_prompt_name']='Name for this path';
 $ec_lang['lpn_profile_delete_confirm']='Delete the saved path {name}? The drawing itself is not changed.';
 $ec_lang['lpn_profile_none_saved']='No saved paths yet';
 $ec_lang['lpn_profile_missing']='The saved path {name} uses nodes that are not in this project: {ids}';
+// ---- the time-series chart (ROADMAP Task 599) -------------------------------------------------
+// One or more assets' chosen value against time across an extended period simulation. {id} is an
+// asset name the user gave, {n} a count and {steps} a count of reporting times; all substituted,
+// never concatenated, so a language that puts them somewhere else can.
+//
+// **THE Y AXIS HAS NO KEY OF ITS OWN, AND THAT IS DELIBERATE.** Its title is the quantity's own
+// whole label with the project's unit in parentheses, built by the same expression the map's color
+// key already uses -- so the chart and the key name one quantity the same way and there is no
+// second place a wording could drift. The quantity labels themselves are the Labels popover's, in
+// every language it already has them in.
+$ec_lang['lpn_ts_menu']='Time series';
+$ec_lang['lpn_ts_tip']='Graph one or more assets against time across an extended period simulation.';
+$ec_lang['lpn_ts_title']='Values against time';
+$ec_lang['lpn_ts_group_tip']='Whether the graph shows nodes or links.';
+$ec_lang['lpn_ts_group_nodes']='Nodes';
+$ec_lang['lpn_ts_group_links']='Links';
+$ec_lang['lpn_ts_quantity_tip']='Which value to graph against time.';
+$ec_lang['lpn_ts_add']='Add selected';
+$ec_lang['lpn_ts_add_tip']='Put everything now chosen on the map onto the graph.';
+// Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
+$ec_lang['lpn_ts_add_none']='Nothing of that kind is chosen on the map.';
+$ec_lang['lpn_ts_clear']='Remove all';
+$ec_lang['lpn_ts_chip_tip']='Take {id} off the graph';
+$ec_lang['lpn_ts_none']='Nothing to graph yet. Choose assets on the map and press Add selected.';
+// The run belongs to EPANET alone, so this is also what a page whose engine is unreachable lands
+// on; the status bar says why in that case, and lpn_time_no_period covers the project that has set
+// no run time at all.
+$ec_lang['lpn_ts_no_frames']='No extended period results yet. Press Calculate to run the simulation.';
+$ec_lang['lpn_ts_summary']='Assets: {n}, reporting times: {steps}';
+$ec_lang['lpn_ts_axis_time']='Elapsed time';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

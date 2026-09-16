@@ -6640,7 +6640,31 @@ var EngCalcs = EngCalcs || {};
 		if (field === 'demandActual') { return isFixedHeadNode(n) ? undefined : resolvedDemand(n); }
 		if (field === 'head') {
 			// Derived from typed numbers, so it crosses into the RESULT unit like every other head.
-			if (isFixedHeadNode(n)) { return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead')); }
+			//
+			// **EXCEPT INSIDE A RUN, WHERE A TANK'S WATER SURFACE IS A RESULT AND NOT AN INPUT**
+			// (Task 599). The stored level is the initial condition; the level at 14:00 is what the
+			// engine integrated, and it is in the frame. Read the document's number here and a
+			// tank's head is flat across the whole day -- which is not a chart nobody looks at, it
+			// is the map label and the profile saying the tank never moved while the transport
+			// plays.
+			//
+			// **GATED ON `t`, WHICH ONLY A FRAME OF A RUN CARRIES** (js/lpn-time.js's
+			// lpnTimeFrameResult sets it; a steady-state solve does not). So nothing about a
+			// single-instant page changes -- there the document IS the answer -- and this cannot
+			// become a path by which a solved number is believed over a typed one at t=0.
+			//
+			// **NOT `pressure`'s branch too.** fixedHeadPressure() is where "a node with no ground
+			// has no pressure" lives (Task 390), and EPANET states an imported reservoir's
+			// elevation as 0, so believing its pressure array would assert a head above a ground
+			// the file never gave. A tank's pressure therefore still follows its stored level; the
+			// head above is the reading that moves.
+			if (isFixedHeadNode(n)) {
+				if (lastSolveResult && typeof lastSolveResult.t === 'number' &&
+					lastSolveResult.heads && typeof lastSolveResult.heads[n.id] === 'number') {
+					return toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead'));
+				}
+				return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'));
+			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
 		if (field === 'pressure') {
@@ -14236,6 +14260,22 @@ var EngCalcs = EngCalcs || {};
 			refresh: function () { renderPaneTable(spec); }
 		});
 	});
+	// **TIME SERIES SITS WITH THE PROFILE, AFTER THE TABLES AND BEFORE IT** (Task 599). Tom's
+	// ordering rule is "making Profile the last tab" and the reason he gave for it was that a
+	// DRAWING among six tables belongs at the end -- so a second drawing goes beside the first,
+	// inside the same stretch, and Profile keeps the position he named. Task 640 will gather all
+	// five plots under a Graphs menu; that is a second door to these tabs and not a reordering of
+	// the strip.
+	paneTabs.push({
+		id: 'timeseries', panel: 'lpn_pane_timeseries', label: 'lpn_ts_menu', tip: 'lpn_ts_tip',
+		show: function () { tsTabShow(); },
+		// Every solve and every document change while this is the tab on show -- and that includes
+		// every step of the transport, which is what keeps the `now` line under the scrubber.
+		refresh: function () { tsTabRefresh(); }
+		// NO `hide`: this tab draws nothing on the map, so there is nothing to take away with it.
+		// (The profile's hide() exists because its route highlight would otherwise outlive the
+		// panel that explains it.)
+	});
 	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
 	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
 	// one out belongs, rather than the front, where it stood between the reader and the six things
@@ -18118,6 +18158,450 @@ var EngCalcs = EngCalcs || {};
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
 
+	}
+
+
+	// ---- TIME SERIES (ROADMAP Task 599) -----------------------------------------------------------
+	//
+	// One or more assets' chosen value against time across an extended-period run. Tom, 2026-09-06:
+	// *"We haven't added anything for time series reporting or graphing such as one or more nodes'
+	// pressure or head across an EPS."* Before this the only way to read one node across the day was
+	// to scrub the transport and watch a number change.
+	//
+	// **IT IS A READER AND NOTHING ELSE.** The run already holds every reporting step
+	// (js/lpn-time.js keeps the frames), so nothing here solves, re-fetches, or stores anything: the
+	// whole feature is a second view of state the page already has. That is why it ranked above the
+	// three plots we still lack.
+	//
+	// **THE SAME DRAWING AS THE PROFILE, AND THE SAME PURE MODULE.** Every axis decision --
+	// truncation, the 1/2/2.5/5 step, how many gridlines the room will carry, which of a row of
+	// labels there is space for, data space to pixel space -- is EngCalcs.lpnProfile's, called and
+	// not copied. A second plotting idiom on this page is the expensive mistake, and the cheapest
+	// guard against one is that the second chart cannot answer an axis question for itself.
+	// js/lpn-profile.js did not have to move: its axis half was already pure, already unaware of a
+	// station, and already exported.
+	//
+	// **EVERY VALUE COMES THROUGH colorValueOf(), WHICH IS THE PAGE'S ONE VALUE-AND-UNIT SEAM.**
+	// The same expression that paints the map, fills the asset tables and prints the label beside
+	// the symbol -- so a point on this chart cannot disagree with the number the reader can see on
+	// the drawing. What makes that possible for a whole run rather than for one instant is
+	// tsAsOfFrame() below, and the two things it swaps are the only two the accessors read.
+	//
+	// **A WINDOW IS NOT A PROJECT AND A GRAPH SELECTION IS NEITHER** (Task 584). What is plotted is
+	// this reader's question in this session -- the same standing as which node the profile starts
+	// from, and as which saved path is selected, which Task 510 deliberately does not store. So
+	// there is no new localStorage key and nothing new in serializeProject(): tsState lives and dies
+	// with the page, exactly as profileState does.
+	//
+	// What is NOT here, and is named so it is not read as an oversight: an Export (PNG, PDF, CSV,
+	// ODS) and a time-range selector belong to Task 637's tab shape, and the Graphs submenu that
+	// gathers all five plots is Task 640. dev/graphs-scope.md holds both.
+
+	// **A QUALITATIVE SET, WHICH IS NOT WHAT js/lpn-ramps.js HOLDS.** Those are ColorBrewer
+	// SEQUENTIAL ramps and they answer "how big is this number"; a line per asset asks "which asset
+	// is this", where the only requirement is that neighbours be told apart. ColorBrewer Dark2, in
+	// its published order, on the same authority the ramps already stand on. It CYCLES rather than
+	// running out: the chip beside each line carries the asset's own name, so a ninth line sharing
+	// the first one's color is still identified, where refusing to draw it would not be.
+	var LPN_TS_COLORS = ['#1b9e77', '#d95f02', '#7570b3', '#e7298a',
+		'#66a61e', '#e6ab02', '#a6761d', '#666666'];
+	// Beyond this many reporting steps the per-point dots and their hover text are left off. They
+	// are the chart's readout of an exact number, and at 25 steps on EPA's Net3 they are worth
+	// having; at 500 they are more SVG elements than the lines they sit on and they merge into a
+	// band. The lines, the axes and the labels are unchanged -- only the ink nobody could aim at.
+	var LPN_TS_DOT_MAX = 60;
+	var LPN_TS_MARGIN = { left: 58, top: 12, right: 12, bottom: 44 },
+		LPN_TS_W = 560, LPN_TS_H = 340,
+		// Against .lpn-profile-tick's 10px, reused: a y label needs clearance above and below, and
+		// an elapsed time reads up to `120:00`.
+		LPN_TS_Y_LABEL_PX = 22, LPN_TS_X_LABEL_PX = 52,
+		// Below this much plot the axis title gives way rather than the drawing -- the same rule
+		// profileLayout() applies to the station title, and for the same reason.
+		LPN_TS_MIN_PLOT_H = 110;
+
+	// `group` is 'node' or 'link'; `field` is one of colorFieldOptions()'s keys. Both per group, so
+	// switching to Links and back does not throw away the question that was being asked about nodes.
+	var tsState = { group: 'node', fields: { node: '', link: '' }, picks: { node: [], link: [] } };
+	function tsGroup() { return tsState.group === 'link' ? 'link' : 'node'; }
+	function tsElementsOf(group) {
+		return (group === 'link' ? doc.links : doc.nodes).filter(isActive);
+	}
+	function tsElementById(group, id) { return group === 'link' ? linkById(id) : nodeById(id); }
+	// **PRUNED ON EVERY READ, NEVER WRITTEN BACK.** An id whose element has been deleted is dropped
+	// from what is DRAWN and left in tsState, because a delete is one undo away and a list quietly
+	// rewritten could not come back with it. Same shape as profileStops().
+	function tsPicks() {
+		var group = tsGroup();
+		return tsState.picks[group].filter(function (id) { return !!tsElementById(group, id); });
+	}
+	function tsField() {
+		var group = tsGroup(), opts = colorFieldOptions(group), f = tsState.fields[group], i;
+		for (i = 0; i < opts.length; i++) { if (opts[i][0] === f) { return f; } }
+		return opts.length ? opts[0][0] : '';
+	}
+	// A panel that opens on an empty frame asks the reader to do work before it can show them
+	// anything, so it opens on a real graph where it can -- the same rule profileSeedStops()
+	// follows. The map SELECTION first, because if anything is chosen that is what the reader came
+	// to ask about; otherwise the first few assets of the group, which is a real reading of a real
+	// network and not a placeholder. Only ever fills a BLANK list.
+	var LPN_TS_SEED = 4;
+	function tsSeedPicks() {
+		var group = tsGroup(), kept = tsPicks(), fromSel;
+		tsState.picks[group] = kept;
+		if (kept.length) { return; }
+		fromSel = selectedRefs().filter(function (s) { return s.kind === group; })
+			.map(function (s) { return s.id; });
+		if (fromSel.length) { tsState.picks[group] = fromSel; return; }
+		tsState.picks[group] = tsElementsOf(group).slice(0, LPN_TS_SEED)
+			.map(function (e) { return e.id; });
+	}
+
+	// **READ THE PAGE'S OWN ACCESSORS AS OF ONE FRAME OF THE RUN.** Two things decide what
+	// colorNodeValue()/colorLinkValue() answer, and this swaps both: `lastSolveResult`, which is
+	// every solved quantity, and the pattern clock, which is every quantity resolved from a
+	// multiplier (a junction's resolved demand is the one that bites). Restored in a `finally`, so a
+	// throw inside the accessors cannot leave the page believing it is parked at another time --
+	// which would be a wrong number on the MAP, not just on the chart.
+	//
+	// Writing to `lastSolveResult` is what makes this the one seam rather than a second opinion: the
+	// alternative was reading `frame.heads[id]` here, which is a second implementation of every unit
+	// decision in colorNodeValue() and would drift from it the first time either changed.
+	function tsAsOfFrame(frame, fn) {
+		var wasResult = lastSolveResult, wasTime = readTimeOverride;
+		lastSolveResult = frame;
+		readTimeOverride = (frame && typeof frame.t === 'number') ? frame.t : null;
+		try { return fn(); }
+		finally { lastSolveResult = wasResult; readTimeOverride = wasTime; }
+	}
+	// One entry per plotted asset: its id, its color, and its points in reporting-step order.
+	//
+	// **A MISSING VALUE IS A BREAK AND NEVER AN INTERPOLATION**, which is why the points carry
+	// `y: undefined` rather than being dropped: a pump has no velocity, and a run whose engine lost
+	// a node has no head for it. The renderer breaks its polyline there. Joining across the gap
+	// would draw a straight line through a number nobody computed -- the same rule
+	// EngCalcs.lpnProfile.profileSeries() applies to a closed link.
+	function tsSeries(frames) {
+		var group = tsGroup(), field = tsField(), ids = tsPicks();
+		return ids.map(function (id, k) {
+			var e = tsElementById(group, id);
+			return {
+				id: id,
+				color: LPN_TS_COLORS[k % LPN_TS_COLORS.length],
+				points: frames.map(function (f) {
+					var v = tsAsOfFrame(f, function () { return colorValueOf(group, e, field); });
+					return { t: f.t, y: (typeof v === 'number' && isFinite(v)) ? v : undefined };
+				})
+			};
+		});
+	}
+
+	// The drawing surface for the size the host currently is -- profileLayout()'s twin, and
+	// deliberately its own function rather than a shared one with a flag: the two charts reserve
+	// different things under the axis (rotated node names there, elapsed times here) and a single
+	// layout taking a mode argument would be one function pretending to be general.
+	function tsLayout(host) {
+		var r = host && host.getBoundingClientRect ? host.getBoundingClientRect() : null,
+			w = r && r.width > 0 ? Math.round(r.width) : LPN_TS_W,
+			h = r && r.height > 0 ? Math.round(r.height) : LPN_TS_H,
+			title, bottom, height;
+		title = (h - LPN_TS_MARGIN.top - LPN_TS_MARGIN.bottom) >= LPN_TS_MIN_PLOT_H;
+		bottom = title ? LPN_TS_MARGIN.bottom : 22;
+		height = Math.max(40, h - LPN_TS_MARGIN.top - bottom);
+		return {
+			w: w, h: h, axisTitle: title, titleY: h - 6,
+			y: EngCalcs.lpnProfile.fitTicks(height, LPN_TS_Y_LABEL_PX),
+			box: {
+				left: LPN_TS_MARGIN.left, top: LPN_TS_MARGIN.top,
+				width: Math.max(40, w - LPN_TS_MARGIN.left - LPN_TS_MARGIN.right),
+				height: height
+			}
+		};
+	}
+	// **THE PANE IS DRAGGED, SO THE CHART IS REDRAWN** -- profileResizeWatch()'s argument, in its
+	// own observer because it watches its own host. Guarded on a real change of at least a pixel:
+	// renderTimeSeries() writes into the host, and an observer firing on its own output is a loop.
+	var tsLastSize = null;
+	function tsResizeWatch() {
+		var host = document.getElementById('lpn_ts_chart');
+		if (!host || !window.ResizeObserver) { return; }
+		new window.ResizeObserver(function () {
+			var r = host.getBoundingClientRect();
+			if (!(r.width > 0) || !(r.height > 0)) { return; }
+			if (tsLastSize && Math.abs(tsLastSize.w - r.width) < 1 &&
+				Math.abs(tsLastSize.h - r.height) < 1) { return; }
+			tsLastSize = { w: r.width, h: r.height };
+			renderTimeSeries();
+		}).observe(host);
+	}
+
+	function tsTabShow() { tsSeedPicks(); rebuildTsForm(); renderTimeSeries(); }
+	function tsTabRefresh() { rebuildTsForm(); renderTimeSeries(); }
+	// Everything in the control row, rebuilt from tsState on every change: the two pull-downs, the
+	// Add button, and one chip per plotted asset.
+	//
+	// **THE CHIPS ARE THE LEGEND AND THE PICKER AT ONCE**, and that is what keeps this panel one
+	// wrapping line tall. A key drawn inside the chart and a list of what is plotted beside it would
+	// be two statements of one fact, and the pane's scarcest dimension is its height (see
+	// .lpn-profile-controls in css/engcalcs.css for where that argument was made the first time).
+	// Each chip wears its own line's color, names its asset, and takes it off the graph when
+	// pressed.
+	function rebuildTsForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_ts_form'),
+			group = tsGroup(), field = tsField(), sel, btn;
+		if (!box) { return; }
+		box.innerHTML = '';
+		sel = document.createElement('select');
+		sel.id = 'lpn_ts_group';
+		sel.className = 'lpn-ts-pick ec-help';
+		sel.title = pc.lpn_ts_group_tip || 'Whether the graph shows nodes or links.';
+		[['node', pc.lpn_ts_group_nodes || 'Nodes'], ['link', pc.lpn_ts_group_links || 'Links']]
+			.forEach(function (o) {
+				var op = document.createElement('option');
+				op.value = o[0]; op.textContent = o[1];
+				sel.appendChild(op);
+			});
+		sel.value = group;
+		sel.addEventListener('change', function () {
+			tsState.group = sel.value === 'link' ? 'link' : 'node';
+			tsSeedPicks(); rebuildTsForm(); renderTimeSeries();
+		});
+		box.appendChild(sel);
+
+		sel = document.createElement('select');
+		sel.id = 'lpn_ts_quantity';
+		sel.className = 'lpn-ts-pick ec-help';
+		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
+		colorFieldOptions(group).forEach(function (o) {
+			var op = document.createElement('option');
+			op.value = o[0]; op.textContent = o[1];
+			sel.appendChild(op);
+		});
+		sel.value = field;
+		sel.addEventListener('change', function () {
+			tsState.fields[tsGroup()] = sel.value;
+			renderTimeSeries();
+		});
+		box.appendChild(sel);
+
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.id = 'lpn_ts_add';
+		btn.className = 'lpn-profile-edit ec-help';
+		btn.textContent = pc.lpn_ts_add || 'Add selected';
+		btn.title = pc.lpn_ts_add_tip || 'Put everything now chosen on the map onto the graph.';
+		btn.addEventListener('click', tsAddSelection);
+		box.appendChild(btn);
+
+		tsPicks().forEach(function (id, k) {
+			var chip = document.createElement('button'), sw = document.createElement('i');
+			chip.type = 'button';
+			chip.className = 'lpn-profile-chip lpn-ts-chip ec-help';
+			chip.title = String(pc.lpn_ts_chip_tip || 'Take {id} off the graph').replace('{id}', id);
+			sw.className = 'lpn-ts-swatch';
+			// `color`, not `background`: the swatch is a DASH drawn as a border-top in currentColor
+			// (see .lpn-ts-swatch), because the thing it names is a line and not a filled band.
+			sw.style.color = LPN_TS_COLORS[k % LPN_TS_COLORS.length];
+			chip.appendChild(sw);
+			chip.appendChild(document.createTextNode(id));
+			chip.addEventListener('click', function () { tsRemove(id); });
+			box.appendChild(chip);
+		});
+		if (tsPicks().length) {
+			btn = document.createElement('button');
+			btn.type = 'button';
+			btn.id = 'lpn_ts_clear';
+			btn.className = 'lpn-profile-edit';
+			btn.textContent = pc.lpn_ts_clear || 'Remove all';
+			btn.addEventListener('click', function () {
+				tsState.picks[tsGroup()] = [];
+				rebuildTsForm(); renderTimeSeries();
+			});
+			box.appendChild(btn);
+		}
+		initTipsIn(box);
+	}
+	// **THE SELECTION IS THE GESTURE, because the reader already has it.** This page has had
+	// multi-select since Task 266, so "which assets" needs no picker of its own: choose them on the
+	// drawing, where they are, and press one button. An asset already on the graph is not added
+	// twice -- the same rule setSelectionList() keeps about a doubled subject.
+	//
+	// Nothing of the current group chosen is SAID, not ignored: a button that does nothing is
+	// indistinguishable from a button that is broken.
+	function tsAddSelection() {
+		var group = tsGroup(), pc = EngCalcs.pageConfig || {}, note, added = 0;
+		selectedRefs().forEach(function (s) {
+			if (s.kind !== group || tsState.picks[group].indexOf(s.id) >= 0) { return; }
+			tsState.picks[group].push(s.id);
+			added++;
+		});
+		rebuildTsForm();
+		renderTimeSeries();
+		if (added) { return; }
+		note = document.getElementById('lpn_ts_note');
+		if (note) {
+			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is chosen on the map.';
+		}
+	}
+	function tsRemove(id) {
+		var group = tsGroup(), i = tsState.picks[group].indexOf(id);
+		if (i >= 0) { tsState.picks[group].splice(i, 1); }
+		rebuildTsForm();
+		renderTimeSeries();
+	}
+	function tsText(parent, x, y, s, attrs) {
+		var t = el('text', attrs || {}, parent);
+		t.setAttribute('x', x); t.setAttribute('y', y);
+		t.appendChild(document.createTextNode(s));
+		return t;
+	}
+	// **HOURS ON THE AXIS, H:MM ON THE LABEL.** The bounds and the nice step are worked out in
+	// hours, because a step chosen on seconds is a number like 9000 that rounds to nothing a person
+	// reads; the label is then the transport's own format, so the axis and the scrubber say the same
+	// thing about the same moment.
+	function tsHours(t) { return (t || 0) / 3600; }
+	function renderTimeSeries() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
+			note = document.getElementById('lpn_ts_note'),
+			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		group = tsGroup();
+		field = tsField();
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		// **NOTHING TO GRAPH IS SAID IN WORDS, NEVER AS EMPTY AXES.** A frame with a labelled axis
+		// pair and no line in it reads as a chart that failed, and the three ways of having nothing
+		// are three different things to do about it: set a duration, press Calculate, or choose an
+		// asset. An extended-period run is EPANET's alone, so a page whose engine is unreachable
+		// lands on the middle message and js/lpn-time.js's own status note says why.
+		if (!frames.length) {
+			if (note) {
+				note.textContent = (EngCalcs.lpnTimeIsExtended && !EngCalcs.lpnTimeIsExtended(doc.times))
+					? (pc.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.')
+					: (pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.');
+			}
+			return;
+		}
+		series = tsSeries(frames);
+		if (!series.length) {
+			if (note) {
+				note.textContent = pc.lpn_ts_none ||
+					'Nothing to graph yet. Choose assets on the map and press Add selected.';
+			}
+			return;
+		}
+		series.forEach(function (s) {
+			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
+		});
+		// **SAID BEFORE THE CHART IS MEASURED**, which is load-bearing and is Task 527's lesson
+		// restated: this line shares the panel with the chart and wraps on a narrow one, so writing
+		// it afterwards would take height off the host the chart had just been laid out for, and the
+		// ResizeObserver would then redraw, blank it, grow the host and start again.
+		if (note) {
+			note.textContent = String(pc.lpn_ts_summary || 'Assets: {n}, reporting times: {steps}')
+				.replace('{n}', String(series.length))
+				.replace('{steps}', String(frames.length));
+		}
+		lay = tsLayout(host);
+		tsLastSize = { w: lay.w, h: lay.h };
+		box = lay.box;
+		// The horizontal axis is TRUNCATED for the same reason the profile's vertical one is: a run
+		// may report only its later part (js/lpn-time.js's reportStart), and an axis anchored at
+		// zero would then spend its left half on hours the engine never reported.
+		xB = EngCalcs.lpnProfile.axisBounds(
+			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
+		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
+		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v),
+				class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		// The tick is drawn; its number may not be. labelStride() answers on the DRAWN positions,
+		// so the axis keeps its structure at every width and loses only ink that would have landed
+		// on its neighbour.
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), LPN_TS_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4,
+				class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
+			tsText(svg, X(v), box.top + box.height + 14,
+				EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(v * 3600) : String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height,
+			class: 'lpn-profile-frame' }, svg);
+
+		// **WHERE THE TRANSPORT IS PARKED, drawn on the chart.** It is the one mark that ties the
+		// two readings of the same run together: the map shows one instant and this shows the whole
+		// day, and without it a reader has no way to tell which column of the chart the drawing
+		// beside it is. Inside the frame only -- a run whose report starts late has moments the
+		// chart honestly does not cover.
+		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
+		if (now >= xB.min && now <= xB.max) {
+			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
+				class: 'lpn-ts-now' }, svg);
+		}
+
+		dots = frames.length <= LPN_TS_DOT_MAX;
+		series.forEach(function (s) {
+			var run = [], i, p;
+			function flush() {
+				if (run.length > 1) {
+					el('polyline', {
+						points: run.map(function (q) { return q.x + ',' + q.y; }).join(' '),
+						class: 'lpn-ts-line', stroke: s.color
+					}, svg);
+				} else if (run.length === 1) {
+					// A single reporting step with its neighbours missing is still a reading, and a
+					// polyline of one point draws nothing at all.
+					el('circle', { cx: run[0].x, cy: run[0].y, r: 2,
+						class: 'lpn-ts-dot', fill: s.color }, svg);
+				}
+				run = [];
+			}
+			for (i = 0; i < s.points.length; i++) {
+				p = s.points[i];
+				if (p.y === undefined) { flush(); continue; }
+				run.push({ x: X(tsHours(p.t)), y: Y(p.y) });
+			}
+			flush();
+			if (!dots) { return; }
+			s.points.forEach(function (q) {
+				var c, ttl;
+				if (q.y === undefined) { return; }
+				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2,
+					class: 'lpn-ts-dot', fill: s.color }, svg);
+				// A <title>, not a tooltip of our own: it is the one every browser already has, and
+				// it is where the exact number lives -- the axis is rounded to a step a person
+				// reads, which is the whole point of the step.
+				ttl = el('title', {}, c);
+				ttl.appendChild(document.createTextNode(
+					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
+					'   ' + plainRound(q.y, 2)));
+			});
+		});
+
+		// Axis titles. The y one is the quantity and its unit, built the way renderColorLegend()
+		// builds its heading -- the same whole label and the same parenthesised unit, so the chart
+		// and the map key name one quantity the same way. THE UNIT IS THE PROJECT'S: every value
+		// above came through colorValueOf(), which converts a solved number into whatever the units
+		// strip currently says, and colorFieldUnitText() is that strip read for this one field.
+		unit = colorFieldUnitText(group, field);
+		tsText(svg, 0, 0, colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : ''),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+		if (lay.axisTitle) {
+			tsText(svg, box.left + box.width / 2, lay.titleY,
+				pc.lpn_ts_axis_time || 'Elapsed time',
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -25486,6 +25970,7 @@ var EngCalcs = EngCalcs || {};
 		// After wirePane(), because the observer needs the chart's host to be in its final place in
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
+		tsResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and
@@ -36900,7 +37385,17 @@ var EngCalcs = EngCalcs || {};
 	// function rather than a literal so that Task 248's clock has ONE place to become real. EPANET
 	// itself reports t=0 as a hydraulic result like any other, so a steady-state page and an
 	// extended-period one agree here by construction rather than by coincidence.
-	function modelTimeSeconds() { return EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0; }
+	// **AND IT CAN BE ASKED AS OF A FRAME OTHER THAN THE ONE ON SHOW** (Task 599). A time-series
+	// chart reads the page's own value accessors once per reporting step, and a pattern-derived
+	// reading -- a resolved demand is the one that matters -- resolves its multiplier at THIS
+	// function. Left alone, every point of such a line would carry the multiplier for wherever the
+	// transport happens to be parked, so a demand graph would be a flat line at today's hour and
+	// nothing on screen would say so. Null means "the transport", which is every other caller.
+	var readTimeOverride = null;
+	function modelTimeSeconds() {
+		if (readTimeOverride !== null) { return readTimeOverride; }
+		return EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0;
+	}
 
 	// The multiplier a junction's demand carries at `t`, resolved the way EPANET resolves it.
 	//
