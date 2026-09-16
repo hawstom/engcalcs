@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1871,
-        "delta_key_count": 2,
+        "expected_key_count": 1887,
+        "delta_key_count": 18,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -527,14 +527,302 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values against time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E"
     },
     "keys": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values against time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E"
     },
     "key_context": {
+        "lpn_ts_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_quantity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_chip_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_no_frames": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_axis_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "သိမ်းဆည်းထားသော လမ်းကြောင်း {name} သည် ဤပရောဂျက်တွင် မရှိသော ဆက်စပ်နေရာများကို အသုံးပြုသည် - {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
         "lpn_field_northing_abbr": {
             "reason": "equal_to_english",
             "current_value": "N",
