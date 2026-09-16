@@ -15,13 +15,31 @@
  * knew; nothing in `CLAUDE.md` or `dev/*.md` states it, and nothing held it.
  *
  * WHAT THE ATTRIBUTE IS FOR. **A `<button>` with no `type` IS a submit button** -- that is the
- * HTML default, not a browser quirk. Inside a form it therefore submits, and every control on
- * these pages is inside `<form id="ec_form">`: the preset buttons, the row-table Add and the per-row
- * delete. The calculator form has no `action`, so submitting it reloads the page with a query
- * string: the results table the visitor was reading is gone, the sketch is redrawn from defaults,
- * and the answer they had just produced is simply not there any more. It looks like the page
- * "blinked and lost my numbers", there is no error anywhere, and it is not reproducible by reading
- * the source of the control that did it -- the attribute is missing, not wrong.
+ * HTML default, not a browser quirk. Inside a form it therefore submits, and what that costs
+ * depends on WHICH form, so here are the three this suite actually renders. (Corrected
+ * 2026-09-15: this docblock said the controls sit in `<form id="ec_form">` and that the calculator
+ * form "has no action, so submitting it reloads the page". **Both were wrong** -- there is no
+ * `ec_form` anywhere and no form in the suite lacks an `action`. The check is unaffected and the
+ * rule stands; what was wrong was the reason given for it, and one of the three cases below is
+ * worse than the one that was described.)
+ *
+ *   `<form id="formInput" action="javascript:EngCalcs.submitForm()">` -- every calculator control:
+ *   the preset buttons, the row-table Add, the per-row delete. A typeless button here RUNS THE
+ *   CALCULATION. So a Reset that also has its own click handler both resets and recalculates, in
+ *   an order nobody chose, and an Add Row recalculates against a row that is not filled in yet.
+ *
+ *   `<form class="ec-consent-actions" method="post" action="/engcalcs/consent.php">` -- **this is
+ *   the bad one, and it is the one the old text missed.** A typeless button here POSTS AND
+ *   NAVIGATES, recording a consent answer the visitor did not give and leaving the page. It is
+ *   also the form where `.ec-consent-btn` styles both answers identically on purpose, so the two
+ *   buttons are deliberately interchangeable to look at.
+ *
+ *   `<form ... onsubmit="return false;">` -- the language switcher in the nav. Submission is
+ *   cancelled, so a typeless button there is harmless. It is still required, because the harmless
+ *   case is decided by an attribute on the FORM, six files away from the button.
+ *
+ * In every case the attribute is MISSING rather than wrong, so the control's own source reads
+ * correctly, nothing is logged, and the page still validates.
  *
  * SCOPE, and each boundary is a measurement rather than a taste:
  *   - **Markup is judged from the RENDERED page**, because in-form-ness cannot be read from the
@@ -132,9 +150,10 @@ function ecButtonMarkupFindings(string $page, string $html): array
         if (preg_match('/\btype\s*=/i', $tag)) { continue; }
         $findings[] = "$page renders a <button> inside a <form> with no type attribute:\n"
             . '        ' . trim(preg_replace('/\s+/', ' ', $tag)) . "\n"
-            . "      A <button> with no type IS a submit button -- the HTML default. This one is in\n"
-            . "      the calculator form, which has no action, so pressing it reloads the page: the\n"
-            . "      results the visitor was reading vanish and nothing anywhere reports an error.\n"
+            . "      A <button> with no type IS a submit button -- the HTML default. Pressing it\n"
+            . "      submits the form it is in, and nothing anywhere reports that it did: inside\n"
+            . "      formInput that runs the calculation, and inside the consent form it POSTS and\n"
+            . "      navigates, recording an answer the visitor did not give.\n"
             . '      Fix: add type="button" (or type="submit" if submitting is what it is for).';
     }
 
@@ -205,10 +224,10 @@ function ecButtonJsFindings(array $files): array
             }
             $findings[] = "$rel:$line builds a <button> and never sets $var.type:\n"
                 . "      A created button defaults to type=\"submit\", so the moment it is appended\n"
-                . "      anywhere inside a form, clicking it submits that form and reloads the page --\n"
-                . "      the visitor's results disappear and no error is reported. Where the element\n"
-                . "      ends up is decided in another function, which is why this is required of\n"
-                . "      every one of them.\n"
+                . "      anywhere inside a form, clicking it submits that form and no error is\n"
+                . "      reported: inside formInput that runs the calculation, and inside the consent\n"
+                . "      form it posts and navigates. Where the element ends up is decided in another\n"
+                . "      function, which is why this is required of every one of them.\n"
                 . "      Fix: $var.type = 'button'; beside the other properties, which is what the\n"
                 . '      other 55 sites in this suite do.';
         }

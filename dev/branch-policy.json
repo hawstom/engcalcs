@@ -20,7 +20,8 @@
         "customer",
         "graph",
         "projection",
-        "custom-property"
+        "custom-property",
+        "674-coordinate-entry"
     ],
     "freeze": {
         "active": false,
