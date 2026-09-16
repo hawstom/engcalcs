@@ -2253,3 +2253,113 @@ should stay OUTSIDE any collapsible group for that same reason, so I do not thin
 disagree, but he should say so himself. Mary has no stake here.
 
 — Sue
+
+---
+
+## 2026-09-16 — Sue: Tom's final Dry/Water cut, tested against the four hard cases; options for the 2-row problem; review order re-checked
+
+Tom overruled my transposed-coordinate reasoning with a fact I did not have (it is obvious on the
+map, not invisible), rebuilt the grouping around Dry/Water, and asked this seat for options, not
+objections. Absorbed the correction; not re-arguing coordinate slot. Brief:
+`/tmp/.../grouping-brief.md`.
+
+- **The Dry/Water cut is the right engineering cut, and it survives all four hard cases, on one
+  underlying rule: Dry answers "what is this object," Water answers "what is happening to/in/at
+  the water there."** That is NOT the same axis as typed-vs-computed (Results already carries that
+  axis alone, see below) — it is asset-vs-medium, and I hold that distinction the way I hold a
+  pipe's catalogue sheet apart from its flow test report. SPECULATION, my own framing, tested
+  against the four named cases rather than asserted:
+  - **Emitter — Dry, and correctly so, on the same logic as K and Roughness already there.** An
+    emitter coefficient describes the DEVICE's built-in capacity to pass flow (Q = C·P^0.5, a
+    property of the orifice's geometry), not a fact about the water passing through it at any
+    moment. That it is "for" flow does not move it any more than K or Roughness moves — all three
+    are already accepted in Dry with the identical property (their only USE is a water calc, their
+    definition is not). This is the strongest evidence the cut is coherent rather than convenient:
+    it is not "does this affect flow" (everything in Dry affects flow), it is "does this describe
+    the object or the water."
+  - **Fire flow — Water, and I would not move it.** It is a quantity of water, same population as
+    Demand, not a different kind of thing because it is a design REQUIREMENT rather than an
+    operating condition. A design engineer reads Demand and Fire flow with the identical verb
+    ("what water quantity did I state here") whether the number came from a fixture count or a code
+    minimum. Filing it by its SOURCE (a criterion vs. a load) rather than its KIND (a water
+    quantity) would be the drafting-category mistake I flagged against "Dimensions" — same trap, a
+    different door.
+  - **Head on a reservoir — Water, and it EXPOSES something true about a reservoir rather than
+    breaking the rule.** A reservoir is close to nothing but a boundary condition on the water; it
+    barely has an "asset" in the Dry sense (the table below shows 3 Dry rows against a pipe's 6).
+    That its defining fact and its water fact are the same number is a property of what a reservoir
+    IS, not a flaw in a cut that assumes the two are usually different. I would not manufacture a
+    Dry row for a reservoir just to balance the table.
+  - **Roughness — Dry, textbook case, no tension.** A material/finish property of the pipe wall,
+    independent of what is flowing at the moment read. Same shape as Emitter above.
+  - **The WALL/BULK split he made on his own is the same rule stated for reaction coefficients
+    specifically, and it is right: WALL is a property of the PIPE surface (Dry), BULK is a property
+    of the WATER's own chemistry (Water) — this is also physically how EPANET's own two reaction
+    terms are defined (a wall-surface-area-dependent term vs. a concentration-dependent term), so
+    the cut matches the underlying physics, not just our taxonomy. I did not need to go looking for
+    this one; it is the same distinction I would draw unprompted.
+
+- **The 2-row problem — my recommendation: exempt "Results and quick graph" from the three-row
+  minimum by name, rather than merging or padding it.** The three-row rule exists to stop a header
+  from being pure overhead over a thin PROPERTY list — but Results is not a property list, it is a
+  heading over an ACTION (the graph button, Task 637) that exists identically on every element type
+  regardless of how many result rows that type happens to produce. A pipe's seven result rows and a
+  reservoir's two are the same control with a different amount of data under it; the group's reason
+  to exist is the button, not the row count. **What I would NOT do:** fold a two-row Results into
+  Water on a reservoir/tank to hit three, because that re-introduces the exact BAND_NODE/RESULT_NODE
+  conflation Tom already avoided by separating Results in the first place (see the axis note below) —
+  fixing a cosmetic rule by breaking the structural one it was never meant to override. **Second
+  option, weaker, offered because he asked for options plural:** if the three-row rule must hold
+  literally everywhere, add nothing invented — instead show the ONE most-checked derived fact
+  (pressure for a junction-like read, or the tank's current volume/level) inline in Description-and-
+  state as a live readout, the way a dashboard states one number beside a name, and leave "Results
+  and quick graph" for the full table + button. I rank my first answer above this one; the second
+  adds a new UI idea (a live readout) this brief did not ask for and Ida should weigh in before it
+  is treated as more than an option.
+
+- **Does the grouping serve a review — yes, and better than the draft I proposed on 2026-09-15,
+  because the axis I was defending is now handled a different way than I proposed.** My own
+  2026-09-15 objection was that mixing typed and computed values in one box removes a reviewer's
+  ability to compare "what was specified" against "what happened." **Tom's actual shape already
+  answers that: Results stands alone, separate from BOTH Dry and Water, so the specify/verify axis
+  I cared about is preserved — it is just drawn as Dry+Water (inputs) vs. Results (outputs) instead
+  of my proposed Location+Design (inputs) vs. Results, and that is a cleaner two-way split than my
+  own three/four-way one.** I withdraw my 2026-09-15 recommendation to also split Location out of
+  Design as its own group — that recommendation was built on the transposed-coordinate premise Tom
+  has now corrected, and once X/Y no longer needs skim-visibility protection in the popup, folding
+  Location into Dry costs nothing and matches his stated economy rule.
+  Where my review walk and his order genuinely differ, one point: my own walk (2026-08-24 onward,
+  and restated 2026-09-15) checks the model's ANSWER against a criterion fairly early, right after
+  confirming what was specified — not last, after Custom. Results sitting last in a five-group POPUP
+  is less costly than it would be in a five-TAB interface, because nothing here is hidden behind a
+  page change, only a scroll or a collapsed header — so **position matters less than DEFAULT STATE.
+  My actual ask, if this brief wants one concrete change: Results should not default-collapsed.** I
+  check it on every element, every review; Dry and Water I sometimes skip once I've confirmed an
+  asset is unremarkable. A group I open every time belongs open every time, wherever it sits in the
+  list.
+
+- **Naming — workable, with one collision worth a cheap check before shipping, not a blocker.**
+  "Water properties" reads immediately right to me; it is what I would call the section if asked
+  cold. **"Dry properties" I would understand instantly in context (it is the ANSWER to "not
+  water"), but SPECULATION, mine, worth testing rather than asserting: "dry" already carries two
+  settled meanings in this trade that are not this one** — "dry utilities" (electric/gas/telecom, as
+  opposed to "wet utilities" water/sewer, a real and common site-plan-review term) and a "dry" pipe
+  or line meaning one with no water in it at all (a dead stub, or NFPA 13's own "dry pipe sprinkler
+  system"). Neither collision breaks understanding once you read the row contents — nobody will
+  think Diameter belongs to electric service — but a header is read before its rows, in the half-
+  second a skim takes, and "dry" is the one word here that means something ELSE first in the trade
+  rather than nothing at all. **If Tom wants a safer word with the identical meaning, "Asset
+  properties" against "Water properties" is my offered alternative** — "asset" is already standard
+  utility vocabulary (asset management, asset inventory, the exact word this repo's own submittal-
+  review framing uses) and collides with nothing. I would not fight for this; "Dry" is his own word,
+  chosen audaciously and on purpose, and the collision I found is real but modest — worth a five-
+  minute gut check with him, not a redesign.
+
+| Group | Junction | Pipe | Reservoir | Tank |
+|---|---|---|---|---|
+| Description and state | 5 | 5 | 5 | 5 |
+| Dry | 4 | 6 | 3 | 8 |
+| Water | 5 | 0 (absent) | 4 | 3 |
+| Results and quick graph | ok | 7 | 2 (exempt from 3-row rule) | 2 (exempt) |
+
+— Sue

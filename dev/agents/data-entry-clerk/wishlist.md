@@ -297,6 +297,43 @@ furniture-shaped `localStorage` key, never in `serializeProject()`), but it save
 of clicks a session for someone who collapses a group they never use, not a per-row or per-element
 cost the way items 1, 2 and 7 are. I would not build it before anything else on this list.
 
+## UPDATE 2026-09-16 to item 7: the 800-keystroke number was row-major only — Enter-down (already shipped) removes most of it, column hide/reorder removes the rest
+
+**OBSERVED**, journal tenth invocation: `js/looped-network.js:16668-16670` already moves focus DOWN
+the same column on Enter, not across the row — shipped, not proposed. My eighth-invocation
+800-keystroke count assumed a clerk tabs across a full row per element (row-major); it says nothing
+about a clerk filling one property down a whole column at a time (column-major), which the page's own
+"place by pointer, fill properties second" structure already pushes a clerk toward. **Column-major
+pays zero for coordinate slot position, at any placement.** Row-major still pays a real, smaller cost
+— unchanged from the eighth-invocation number for that one workflow only.
+
+**Re-ranking, honestly, against myself:** item 7 (reorder coordinates to the trailing end) is no
+longer the strongest available fix — see item 9 below, column hide/reorder, which a row-major clerk
+can use to remove coordinate columns from their Tab path entirely rather than merely moving them
+somewhere cheap to skip. I would still ship a sane default order (late, not mid-row) since a
+first-time clerk has not found the hide control yet, but I am retracting the claim that reordering
+alone is the fix — it is the cheap partial fix; hiding is the complete one.
+
+## 9. Column hide and reorder for the Tables pane — Tom has agreed in principle; full design in journal, tenth invocation
+
+Not previously on this list under this name — Tom proposed it himself, 2026-09-16 ("if things are
+radically spreadsheet-like, Declan can hide and reorder any columns he wants to hide"), directly
+answering my own repeated "customizable panes" framing from the seat's own opening brief. Full design
+in the journal: per-table scope, one furniture key (`LPN_PANECOLS_KEY`, outside
+`serializeProject()`, matching the pattern `lpn_furniture_check.php` already enforces), ID pinned
+non-hideable, a per-table "Columns" popover plus a header-right-click "Hide this column" shortcut for
+speed, and — the question only this seat asked — **paste onto a table with hidden columns SKIPS
+them** by removing a hidden column from `paneCols(spec)` entirely, which means `panePasteAt()`'s
+existing "ran off the last column: dropped and COUNTED" behavior already covers it with no new code
+path. Rejected REFUSE (punishes the clerk the feature is for) and rejected Excel's own actual
+hidden-column paste behaviour (writes into cells you cannot see — a documented user trap, and the
+opposite of how this codebase already treats a filtered-out row).
+
+**Ranking: above item 7 (which it supersedes as the complete fix rather than the partial one), below
+items 1/610's still-open row-creation half and the market-researcher's import row** — it is real and
+Tom has already agreed to it, but it still only removes a Tab-crossing cost for the row-major
+workflow; it does not remove a round trip the way row creation by paste or a mapped import would.
+
 ## Disagreement with Tom's own framing of Task 674 (2026-09-15), stated once
 
 Tom's question treated table placement and popup placement as one decision — "Option 1... put

@@ -23,6 +23,27 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-09-16 — not a want, a ruling request: Tom's final Dry/Water cut, answered
+
+Not a row — Tom rebuilt the grouping around "Dry properties" vs "Water properties," overruling my
+transposed-coordinate argument with a correct fact (it's obvious on the map, not invisible), and
+asked for options rather than objections. Full reasoning: journal, 2026-09-16 entry. Short form:
+**the Dry/Water cut holds under all four named hard cases** (Emitter and Roughness are Dry because
+they describe the object, not the water, same as K already there; Fire flow is Water because it is
+a water quantity like Demand regardless of whether it comes from a load or a code minimum; Head on
+a reservoir being Water exposes that a reservoir barely has a Dry asset at all, rather than breaking
+the rule). **The 2-row "Results" problem: exempt it from the three-row minimum by name** — it is a
+heading over a persistent action (Task 637's graph button), not a property list, so its row count is
+the wrong test for whether it earns a header. **My 2026-09-15 recommendation to also split Location
+out as its own group is withdrawn** — it was built on the coordinate-visibility premise Tom has
+since corrected, and his actual shape (Dry+Water as inputs vs. Results alone as outputs) already
+answers the structural objection I raised then, better than my own four-group proposal did. One
+concrete ask if the brief wants one: Results should not default-collapsed, since it is the one group
+I check on every element in a review regardless of position in the list. Naming: "Water properties"
+reads right immediately; "Dry properties" collides mildly with "dry utilities" (non-water service)
+and a "dry" pipe/line (one with no water in it) — real but modest, worth a five-minute check with
+Tom, offered "Asset properties" as a collision-free alternative if he wants one, not campaigning for it.
+
 ### 2026-09-15 — not a want, a ruling request: the five-group property collapse, answered
 
 Not a row — Tom asked this seat by name whether his five-group popup collapse (ID / Dimensions /

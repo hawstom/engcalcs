@@ -223,6 +223,44 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   about. This is not a claim the task is misconceived — Tom's own test for it is fair — only that its
   sizing does not match what my seat sees as the risk.
 
+### 7. The property popup grouping (2026-09-15 brief): a phone-specific default, and a group order that differs from a designer's
+
+- **What: on a phone specifically, default "Dry" and "Results and quick graph" CLOSED; default
+  "Description and state" and "Water" OPEN; keep desktop's default of everything open, unchanged.**
+  Full reasoning in the journal (2026-09-16). This is not a request to redesign the four groups
+  Tom already settled — it accepts them as given — it is a request for a per-breakpoint DEFAULT,
+  which the brief's four groups alone do not decide.
+- **Why: the desktop no-collapse ruling was measured against a screen that shows the whole list
+  near the fold; a phone popup does not** — `.lpn-setbox` runs to `min(46rem, 92dvh)`
+  (**OBSERVED** `css/engcalcs.css:1532`) and a full inventory is a page-length scroll inside a box
+  already consuming most of the viewport. "Nobody is complaining" is true of the screen it was
+  said about; it is not evidence about the smaller one, and I do not think it was weighed against
+  it.
+- **Group order: mine is Description and state, then Water, not Dry.** I want identity and
+  Shut/Active first, then whether the asset is live (Demand, Head, Fire flow); Dry (length,
+  diameter, roughness, K) is what a design engineer checks a run against, and it is my third
+  question, not my second. A real, stated disagreement with the order Tom's list implies — see
+  the journal for the full case.
+- **Rank, honestly, against my own other rows: LOW.** Per row 3 above, the honest baseline is that
+  I mostly do not open this box at all — real isolation/condition work runs through a GIS trace and
+  a work order, and when I do read the model it is for identity and topology, which the map and
+  tap-to-select already answer before the popup's own field order matters
+  (`dev/agents/utility-field-operator/wishlist.md:64-80`, this file). I answer this question
+  because Tom asked the team directly and named a real open problem (Results falling to 2 rows on
+  a reservoir/tank), not because it is where I would have pointed the team's attention unprompted.
+  A per-breakpoint default is a small, cheap addition to a grouping already being built, which is
+  why it is worth stating even at low priority — it costs little on top of work already happening.
+- **Shut vs. Active: no build here, a confirmation.** Tom's own distinction (Shut = what a person
+  or a `[CONTROLS]` action does; Active = a planning-table decision nobody in the field makes) reads
+  correctly to me and needs no change. The only thing I flagged is a rendering caution — two
+  identical-looking toggles side by side inviting the wrong one to be hit — worth a glance when the
+  row is built, not a design question.
+- **The two new Pipes-table columns: no build, a caution against narrowing Description.** A
+  truncated Description looks like an answer to "which asset is this" and is not one; if a
+  phone-specific default is wanted at all, hide it rather than narrow it, through whatever
+  column-hide mechanism the table already has (which is Declan's territory, not mine — I am not
+  proposing new machinery here, only naming which of "narrow" or "hide" is honest from my seat).
+
 ## Parked
 
 *(none yet)*

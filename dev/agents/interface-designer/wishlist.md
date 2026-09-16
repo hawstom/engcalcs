@@ -266,3 +266,26 @@ is answered for the three that remain after the divorce; see item 5 series above
     the same shape of cost he measured against coordinate slots 2-3 (800 stray keystrokes over 400
     junctions). This seat cannot weigh entry-volume cost and should not guess at it. See journal,
     2026-09-15.
+
+29. **Build all five Properties-popup groups as plain headings, never `<details>`/`<summary>`.**
+    Nothing in this popup collapses by default (Tom's ruling, narrowed to Settings but the reasoning
+    — a box this short does not need a navigation aid — applies at least as strongly to Properties);
+    a `<details>` that never closes buys a caret and a keyboard tab stop for zero realized benefit.
+    This is also what dissolves the "Results and quick graph falls to 2 rows" problem: the cost his
+    three-row rule is pricing is a disclosure widget's, and a plain heading over 2 rows costs nothing
+    a plain heading over 20 rows doesn't. Self-resolving further once Task 637 (Graph button) ships
+    and Results reaches 3. See journal, 2026-09-16.
+
+30. **Two small, named, zero-string-cost order fixes inside the new grouping, if he wants the "no
+    reorder" claim to hold row-for-row and not just block-for-block:** swap `tagField()` before
+    `closedField()` in `renderLinkFields()` (`js/looped-network.js:36550/35752`) so Tag precedes
+    Shut, matching his own written list; and do NOT move Length ahead of Diameter to match the same
+    list's "Length, Diameter, Roughness, K" — Diameter's position is anchored to the pipe-type
+    chooser by Task 465's own settled ruling and should not be overturned by an illustrative bullet
+    order. See journal, 2026-09-16.
+
+31. **Open question for Tom, not decided here: does "Description" in "Description and state" name a
+    row that exists?** `idField()` renders in the popup title, outside the field list; the only
+    free-text identity field the code builds is Tag. His own count table gives this group 5 rows on
+    every element type, which needs a Description row nothing currently builds. See journal,
+    2026-09-16.
