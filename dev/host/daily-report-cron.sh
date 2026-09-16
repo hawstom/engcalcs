@@ -48,10 +48,33 @@ else
     note "PREFLIGHT: no mirror at $MIRROR. Run: sh dev/host/install.sh"
 fi
 
+# NO `reset --hard`, AND THE REASON IS TOM'S QUESTION: "What good could possibly come of this?"
+# None. It was here to guarantee the checkout matched origin/master, and it bought that by being
+# willing to DESTROY anything anybody had put in that directory, silently, at 22:00, every night.
+# This repository already has that exact scar written down: the copy-aside-and-restore dance
+# destroyed another session's uncommitted language keys on 2026-09-06, and the lesson recorded from
+# it is that a technique is safe only while nobody else is writing -- which is precisely the
+# condition under which you do not need it.
+#
+# SO: FAST-FORWARD ONLY, AND REFUSE TO TOUCH A DIRTY TREE. If somebody has edited or left something
+# there, the report says so and describes the older master rather than tidying a human's work away.
+# A stale number that announces itself is worth more than a fresh one bought this way.
 if [ -d "$WORK/.git" ]; then
-    timeout 120 git -C "$WORK" fetch origin master >/dev/null 2>&1 \
-        && timeout 60 git -C "$WORK" reset --hard origin/master >/dev/null 2>&1 \
-        || note "PREFLIGHT: the report checkout could not be updated. It describes an older master."
+    dirty=$(timeout 30 git -C "$WORK" status --porcelain 2>/dev/null)
+    if [ -n "$dirty" ]; then
+        note "PREFLIGHT: $WORK has uncommitted changes, so it was LEFT ALONE and the numbers below
+may describe an older master. Nothing was discarded. Someone's work is sitting in
+that directory:
+$(printf '%s\n' "$dirty" | head -10 | sed 's/^/    /')"
+    else
+        timeout 120 git -C "$WORK" fetch origin master >/dev/null 2>&1 \
+            || note "PREFLIGHT: could not fetch in $WORK. Numbers may describe an older master."
+        # --ff-only: it cannot rewrite history and cannot discard a commit. If it refuses, that
+        # means the checkout has diverged, which is a thing to look at rather than to bulldoze.
+        timeout 60 git -C "$WORK" merge --ff-only origin/master >/dev/null 2>&1 \
+            || note "PREFLIGHT: $WORK has DIVERGED from origin/master and was not fast-forwarded.
+It holds a commit master does not. Look at it:  git -C $WORK log --oneline origin/master..HEAD"
+    fi
 else
     note "PREFLIGHT: no report checkout at $WORK. Run: sh dev/host/install.sh"
 fi
@@ -76,7 +99,12 @@ REPORT=${TMPDIR:-/tmp}/daily-report.$$
     fi
 } > "$REPORT" 2>&1
 
+# THE SUBJECT LINE IS TOM'S OWN SPECIFICATION, 2026-09-15, in his order: the cPanel account name,
+# because that is how he thinks about this machine; "daily status"; the date; and then the top
+# folder the report is about, so that a second one on another folder is distinguishable at a glance
+# in a mailbox. Derived from $PROD rather than typed, or it would go stale the day the path moves.
+SCOPE=$(printf '%s' "$PROD" | sed "s|^$HOME/||")
 cp "$REPORT" "$LOG" 2>/dev/null
-"$HOME/cronmail.sh" "[EngCalcs] daily status $(date '+%Y-%m-%d')" < "$REPORT"
+"$HOME/cronmail.sh" "jconstru daily status $(date '+%Y-%m-%d') for $SCOPE" < "$REPORT"
 rm -f "$REPORT"
 exit 0

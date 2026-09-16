@@ -56,17 +56,34 @@ hr()  { echo; echo "-- $1 ------------------------------------------------------
         | cut -c1-72; }
 miss(){ echo "   NOT MEASURED: $1"; }
 
-echo "EngCalcs status -- $(date '+%Y-%m-%d %H:%M %Z')"
-echo "host $(hostname)   report from $(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo '?')"
+# SCOPE, in folders rather than in a commit id. The header used to read "report from 3f504619" and
+# Tom asked what that meant: it was the SHA of the script generating the report, which is a fact
+# about this file and not about anything he is being told. Gone. What a reader needs is which
+# directory the numbers describe, and the honest answer is that the PAGE CHECK covers the whole
+# account while everything else covers one repository -- so both are named, and each section that
+# differs says so again where it is read.
+SCOPE=$(printf '%s' "$PROD" | sed "s|^$HOME/||")
+echo "jconstru daily status $(date '+%Y-%m-%d') for $SCOPE"
+echo "$(date '+%H:%M %Z') on $(hostname)"
 echo
-echo "This message arriving is the heartbeat. If it stops, cron stopped -- the page"
-echo "check is silent on success, so silence proves nothing on its own."
+echo "This daily message is the heartbeat of cron."
+echo
+echo "It is sent whether or not anything is wrong, because the 04:20 page check is"
+echo "SILENT when every page passes -- and that silence cannot be told apart from"
+echo "cron having died, which on this account it really had, for years. So this"
+echo "message arriving means the machinery ran. Its ABSENCE is the alarm."
 
 # ---------------------------------------------------------------------------
 # 1. UPTIME. ~/check.sh writes one row per run whether it passed or failed, which is what makes
 #    "did it run?" answerable at all. failed=0 is a pass; the failures themselves are in check.last.
 # ---------------------------------------------------------------------------
 hr "PAGE CHECK, last 7 runs"
+echo "   Every page on the WHOLE ACCOUNT -- all nine domains, not just $SCOPE."
+echo "   checked=N is how many URLs were fetched. failed=N is how many answered"
+echo "   BADLY: a status of 400 or worse, no answer at all, or a PHP error found in"
+echo "   the body of a page that still returned 200. failed=0 is the healthy line;"
+echo "   any other number means the URLs listed underneath were broken that morning."
+echo
 if [ -r "$CHECKLOG" ]; then
     tail -7 "$CHECKLOG" | sed 's/^/   /'
     last=$(tail -1 "$CHECKLOG" | sed -n 's/.*failed=\([0-9]*\).*/\1/p')
@@ -76,7 +93,9 @@ if [ -r "$CHECKLOG" ]; then
         echo "   STALE: newest row is $lastday, not $today. The 04:20 job did not run."
     fi
     if [ "${last:-0}" != "0" ] && [ -r "$CHECKLAST" ]; then
-        echo; sed 's/^/   /' "$CHECKLAST"
+        echo
+        echo "   What failed in that run:"
+        sed 's/^/   /' "$CHECKLAST"
     fi
 else
     miss "$CHECKLOG is not readable"
@@ -121,9 +140,26 @@ fi
 # 3. WHAT LANDED. --first-parent --merges is how a merge-per-capability history reads back.
 # ---------------------------------------------------------------------------
 hr "MERGED TO master, last 7 days"
+# THE COUNT FIRST, AND ANY TRUNCATION NAMED. This section said "last 7 days" and showed two days'
+# worth, because it was capped at `head -20` and there were more than twenty -- so the heading was a
+# claim the body contradicted, and Tom read it, correctly, as a lie. A truncation that does not
+# announce itself is worse than no list at all: it makes a busy week look like a quiet one.
 if [ -d "$MIRROR" ]; then
-    out=$(run 15 "git -C '$MIRROR' log --first-parent --merges --since=7.days --format='%cs %s' master")
-    if [ -n "$out" ]; then echo "$out" | head -20 | sed 's/^/   /'; else echo "   none"; fi
+    out=$(run 20 "git -C '$MIRROR' log --first-parent --merges --since=7.days --format='%cs %s' master")
+    n=$(printf '%s\n' "$out" | grep -c . )
+    if [ "${n:-0}" = "0" ]; then
+        echo "   none in the last 7 days"
+    else
+        echo "   $n merge(s) in the last 7 days, by day:"
+        printf '%s\n' "$out" | awk '{print $1}' | sort | uniq -c \
+            | awk '{printf "     %s   %s merge(s)\n", $2, $1}'
+        echo
+        echo "   the 10 most recent:"
+        printf '%s\n' "$out" | head -10 | sed 's/^/     /'
+        if [ "$n" -gt 10 ]; then
+            echo "     ... and $((n - 10)) more in the window, not listed."
+        fi
+    fi
 else
     miss "no mirror clone"
 fi
@@ -153,12 +189,20 @@ fi
 # 5. GATES. Read out of the JSON, never restated. A freeze or an open blocker that the report does
 #    not carry is a constraint living in a transcript, which dev/deploy-blockers.json exists to end.
 # ---------------------------------------------------------------------------
-hr "GATES"
-# PHP rather than jq: jq is on the host and is NOT in the development checkout, so a jq-only
-# reading prints real numbers on one machine and a bare "?" on the other -- and "?" is the shape
-# that reads as measured when it is not. PHP is already required by every other section.
-"$PHP" -r '
-$root = $argv[1];
+hr "WHAT CANNOT MERGE TO master"
+# REWRITTEN 2026-09-15. It printed four raw JSON values -- "freeze active: false", "protected:",
+# "all-clears:", "open blockers:" -- and Tom, who is the only reader, did not know what three of
+# them meant and called the fourth dangerous. He was right on both counts, and a line the reader
+# cannot interpret is noise however true it is.
+#
+# THE DANGEROUS ONE WAS "freeze active: false" DURING A FEATURE FREEZE. Both statements are true
+# and they are about different things, which is exactly why printing the boolean alone misleads:
+# `freeze.active` is an EMERGENCY STOP that refuses every merge but a `hotfix:`, and it is off
+# deliberately, because turning it on once blocked a day of bug fixes that Tom was waiting for. The
+# FEATURE freeze is held branch by branch, by the list below. So the report now says what each
+# mechanism actually does, and says out loud the gap between them -- a NEW feature branch is
+# refused by nothing until somebody adds it to that list.
+"$PHP" -r '$root = $argv[1];
 $g = function ($f) use ($root) {
     $p = "$root/dev/$f";
     if (!is_readable($p)) { return null; }
@@ -168,29 +212,69 @@ $g = function ($f) use ($root) {
 $p = $g("branch-policy.json");
 $c = $g("branch-all-clears.json");
 $b = $g("deploy-blockers.json");
+
 if ($p === null) { echo "   NOT MEASURED: dev/branch-policy.json unreadable\n"; }
 else {
-    $a = isset($p["freeze"]["active"]) ? $p["freeze"]["active"] : null;
-    printf("   freeze active: %s%s\n", $a ? "TRUE" : "false",
-        $a && !empty($p["freeze"]["until"]) ? "  until " . $p["freeze"]["until"] : "");
-    printf("   protected:     %s\n", empty($p["protected"]) ? "none" : implode(", ", $p["protected"]));
+    /* THE FEATURE FREEZE LEADS, because it is the one usually on and the one Tom means when he
+       says "we are in a freeze". Printing the EMERGENCY flag first and alone is what produced
+       "freeze active: false" during a huge freeze, which he called dangerous and was right to. */
+    $ff = !empty($p["feature_freeze"]["active"]);
+    printf("   FEATURE FREEZE -- %s\n", $ff ? "ON" : "off");
+    if ($ff) {
+        echo "     No feature merges, and YOUR OWN ALL-CLEAR DOES NOT OVERRIDE IT. An approval\n";
+        echo "     you give now keeps standing and takes effect when the freeze is lifted.\n";
+        foreach (array("since" => "frozen since", "until" => "until") as $k => $lbl) {
+            if (!empty($p["feature_freeze"][$k])) {
+                printf("     %s: %s\n", $lbl, $p["feature_freeze"][$k]);
+            }
+        }
+        echo "     Defect and tooling work is UNAFFECTED and still merges on a green suite.\n";
+    } else {
+        echo "     Features may merge, with your written all-clear, one branch at a time.\n";
+    }
+
+    $a = !empty($p["freeze"]["active"]);
+    printf("\n   Emergency stop, refusing EVERY merge but a 'hotfix:' one -- %s\n",
+        $a ? "ON" : "off");
+    if ($a) {
+        printf("     NOTHING merges until this is turned off, bug fixes included.%s\n",
+            !empty($p["freeze"]["until"]) ? " Set until: " . $p["freeze"]["until"] : "");
+    } else {
+        echo "     Off on purpose, and it is a DIFFERENT thing from the feature freeze above:\n";
+        echo "     switching this one on stops the defect fixes you are waiting for too.\n";
+    }
+
+    $prot = empty($p["protected"]) ? array() : $p["protected"];
+    echo "\n   Branches treated as FEATURES, each needing your written all-clear:\n";
+    if (!$prot) { echo "     none listed\n"; }
+    else { foreach ($prot as $one) { echo "     $one\n"; } }
+    echo "     This is a POLICY, not an inventory: a name here may be a branch that no\n";
+    echo "     longer exists, and BRANCHES above is the inventory. The two need not agree.\n";
+    echo "     A branch NOT on this list counts as a defect or tooling track and merges on\n";
+    echo "     a green suite alone -- so a NEW feature branch is refused by nothing until\n";
+    echo "     somebody adds it here.\n";
 }
+
 if ($c === null) { echo "   NOT MEASURED: dev/branch-all-clears.json unreadable\n"; }
 else {
     $k = isset($c["cleared"]) && is_array($c["cleared"]) ? array_keys($c["cleared"]) : array();
-    printf("   all-clears:    %s\n", $k ? implode(", ", $k) : "none");
+    echo "\n   All-clears you have given, still valid: " . ($k ? implode(", ", $k) : "none") . "\n";
+    echo "     Your own words, pinned to the exact commit you cleared, so the permission\n";
+    echo "     EXPIRES BY ITSELF the moment that branch moves.\n";
 }
+
 if ($b === null) { echo "   NOT MEASURED: dev/deploy-blockers.json unreadable\n"; }
 else {
     $l = array();
     foreach ((isset($b["blockers"]) && is_array($b["blockers"])) ? $b["blockers"] : array() as $one) {
         $l[] = isset($one["id"]) ? $one["id"] : "(unnamed)";
     }
-    printf("   open blockers: %s\n", $l ? strtoupper(implode(", ", $l)) : "none");
-}
-' "$HERE"
+    echo "\n   Things you have said must not ship yet: " . ($l ? strtoupper(implode(", ", $l)) : "none") . "\n";
+    echo "     Written down the moment you say one, because a constraint that lives only\n";
+    echo "     in a conversation is one a later session cannot look up.\n";
+}' "$HERE"
 
-# ---------------------------------------------------------------------------
+
 # 6. THE ENGLISH QUEUE. Tom's reading is the critical path, not the building -- dev/session-handoff
 #    §1. new_english_keys.php prints the unread count FIRST, deliberately, because this repository
 #    once reported the untranslated count as the unread one and he caught it.
@@ -267,17 +351,38 @@ fi
 #    be delivered. 22,907 of them accumulated unread over years while every alarm silently failed.
 # ---------------------------------------------------------------------------
 hr "MAIL PATH"
+# WHAT THE MAILBOX IS, because Tom asked and the answer is not obvious: ~/mail/new is the cPanel
+# CATCH-ALL for constructionnotesmanager.com, whose default address is set to the system user
+# `jconstru`, plus anything addressed to that Unix user locally -- which is where cron's own
+# undeliverable mail piled up. Every other domain on the account is set to ":fail: No Such User
+# Here" and catches nothing.
+#
+# IT IS NOT THE ACCOUNT'S DISK. The old line reported the SHARED filesystem at 96%, which is a fact
+# about the hosting company's array and not about him; his own quota is unlimited. So it reports
+# what he actually uses, and the shared figure only when it is tight enough to threaten the site.
 if [ -d "$MAILDIR" ]; then
     tot=$(ls "$MAILDIR" 2>/dev/null | wc -l | tr -d ' ')
     new=$(find "$MAILDIR" -type f -mtime -1 2>/dev/null | wc -l | tr -d ' ')
-    echo "   bounces in $MAILDIR: $tot total, $new in the last day"
-    [ "${new:-0}" != "0" ] && echo "   A FRESH BOUNCE MEANS AN ALARM MAY NOT BE REACHING ANYBODY. Read one."
+    echo "   Catch-all mailbox ($MAILDIR): $tot message(s), $new in the last day."
+    if [ "${new:-0}" != "0" ]; then
+        echo "   A FRESH ONE MAY MEAN AN ALARM IS NOT REACHING ANYBODY. Read it:"
+        echo "     ls -t $MAILDIR | head -1"
+    fi
+    if [ "${tot:-0}" -gt 2000 ]; then
+        echo "   This is a catch-all, so most of it is spam and refused cron mail. Clearing it"
+        echo "   is safe; setting the default address to \":fail:\" would stop it filling."
+    fi
 else
     miss "$MAILDIR not readable"
 fi
-df -hP "$HOME" 2>/dev/null | tail -1 | awk '{print "   disk " $5 " used, " $4 " free on " $6}'
+echo "   Account space used: $(du -sh "$HOME" 2>/dev/null | cut -f1 | tr -d ' ') (quota: unlimited)."
+sharepct=$(df -hP "$HOME" 2>/dev/null | tail -1 | awk '{gsub(/%/,"",$5); print $5}')
+if [ -n "$sharepct" ] && [ "$sharepct" -ge 98 ] 2>/dev/null; then
+    echo "   THE SHARED FILESYSTEM IS AT ${sharepct}%, which is everyone on this server and not"
+    echo "   your quota -- but at this level it can break the site. Worth telling the host."
+fi
 
-# ---------------------------------------------------------------------------
+
 # 10. WHAT THIS REPORT CANNOT SEE. Stated every single day, because a report whose limits are
 #     written down once in a README is a report whose limits nobody knows.
 # ---------------------------------------------------------------------------

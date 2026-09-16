@@ -59,31 +59,20 @@ the block.
 
 # Tasks
 
-- 100|672| **The placement wizard degrades and then crashes after a few pans.**
-  Tom's own minimal statement, 2026-09-15: *"xy project floating on world map can't zoom and pan
-  more than a very few times (at great delay) without extreme slowdown, browser reports of
-  unresponsiveness, and crashing."* OPEN, and the earlier fixes did NOT close it -- Task 668's
-  `span()` bound removed one out-of-memory path and the offset repair removed the labels in
-  China, but he still has this.
-  - **THREE HEADLESS REPRODUCTIONS FAILED and that is itself a finding.** Driving the same
-    gestures against the DOM stub gives a flat 384 elements, a flat heap and 10-25 ms per settle,
-    on the real Elm Street Center file, through both search branches and through Finish. So the
-    cost is in something node does not do.
-  - Ruled out by reading, each with its evidence: basemap tiles do NOT accumulate
-    (`paintBasemapTiles()` removes every key not in `want`); the tooltip re-init sites are
-    `buildMenuBar()` and `init()`, neither on the settle path, so Bootstrap's strong instance map
-    is not being fed per gesture; the label collision grid is bounded since Task 668.
-  - Still open, in the order I would look: tile FETCH and DECODE cost per gesture (the count is
-    bounded, the bytes are not); SVG rasterisation under the compensation transform, which holds
-    the detached model still with `scale(f.s / state.s)` and can therefore be asked to draw the
-    drawing at a large multiple; and the 1.7 MB backdrop data URI, which `georefWriteBackdrop()`
-    re-places on every settle -- Tom reports it still happens with no background image, which
-    weakens but does not kill that one.
-  - **`?debug=perf` SHIPPED FOR THIS** and is the next step: it prints, per settle, the wall time
-    of each part of `georefSetTransform()`, the tile count, the compensation transform, the view
-    scale and Chrome's heap. One run on the machine that actually fails answers what three
-    reproductions could not.
-
+- 25|672| **The placement wizard degrades and then crashes after a few pans.**
+  **DROPPED TO 25 BY TOM, 2026-09-15: *"This is not manifesting. If it does, I will report."*** Kept
+  rather than closed because the instrument built for it is the valuable part and should not be
+  rediscovered.
+  - **`?debug=perf` SHIPPED FOR THIS.** It prints, per settle, the wall time of each part of
+    `georefSetTransform()`, the tile count, the compensation transform, the view scale and Chrome's
+    heap. One run on a machine that actually fails answers what three headless reproductions could
+    not, so if he reports it again that is the first ask and not a fourth reproduction attempt.
+  - **THREE HEADLESS REPRODUCTIONS FAILED and that is itself the finding**: a flat 384 elements, a
+    flat heap and 10-25 ms per settle on the real Elm Street Center file, through both search
+    branches and through Finish. The cost is in something node does not do -- tile fetch and decode,
+    SVG rasterisation under the compensation transform, or the 1.7 MB backdrop data URI.
+  - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
+    re-init sites are off the settle path; the label collision grid is bounded since Task 668.
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
@@ -144,19 +133,25 @@ the block.
     Task 674 would let people type into, so 674 lands first and may change what this needs.
 
 - 100|669| **Show labels at this zoom or closer.**
-  Tom, 2026-09-15, while reporting the Task 668 crash: *"We previously had a 'Show labels at this
-  zoom or closer' in settings. I guess it was a bad idea to remove that."*
-  - **I CANNOT FIND THAT IT EVER SHIPPED, and say so rather than quietly build it.** Searched
-    `js/looped-network.js`, `lib/lang.ec.en.php`, `dev/*.md`, and `git log -S` across ALL refs for
-    the phrase and for every spelling of a zoom threshold on labels. Nothing. The nearest things
-    that do exist are label SHEDDING, which drops label content when the drawing gets crowded
-    rather than when it gets small, and the thematic toggle, which hides labels outright.
-  - So this is a REQUEST, not a restoration, and it needs his word on which it is before anybody
-    writes code. If it did ship, it was under a name none of those searches match.
-  - Worth noting what prompted it: at the time he asked, labels really were thousands of miles
-    away (Task 668), so far-zoom clutter looked like a labelling problem when it was a units one.
-    Ask again now that the drawing frames correctly.
-
+  Tom, 2026-09-15: *"We previously had a 'Show labels at this zoom or closer' in settings. I guess
+  it was a bad idea to remove that."*
+  - **IT DID SHIP, AND THE SEARCH THAT SAID OTHERWISE WAS INCOMPLETE.** This block used to read
+    "I CANNOT FIND THAT IT EVER SHIPPED". Tom, 2026-09-15: *"This was an original feature. You can
+    see its vestige in a 'Zoom in to see labels' text in some version of some project file."* He is
+    right: `examples/Net3.lwn` carries a Text object `X3` reading exactly **"Zoom in to see
+    labels"**. The earlier pass searched `js/looped-network.js`, the language files, `dev/*.md` and
+    `git log -S` across all refs -- **and never searched `examples/`**, which is where the evidence
+    was. A negative finding is only as wide as the places it looked, and this one did not say where
+    it had not looked.
+  - **THE VESTIGE IS AN ANNOTATION, NOT A SETTING**, so it proves the BEHAVIOUR existed and says
+    nothing about the control's name, its units or its default. Somebody typed that sentence onto
+    the drawing to tell a reader what to do. Design from his sentence, not from the Text object.
+  - **What needs deciding before code:** the threshold's unit. A zoom level, a scale, or a
+    percentage of the fit zoom? A stored absolute is meaningless across two projects of different
+    extents, which argues for something relative to the drawing's own fit.
+  - `gridLayer`'s neighbour: the thematic toggle hides labels outright and label SHEDDING drops
+    label CONTENT when the drawing is crowded. This is a third thing and must not be folded into
+    either.
 - 100|667| **Tom's reflections on saving, locking and who can see your work.**
   Written down 2026-09-14 from a testing exchange with JHB, at Tom's instruction ("For roadmap,
   not now"). **Not one task -- four, deliberately kept together because they are one
@@ -182,9 +177,20 @@ the block.
     no login, no user table and no session by construction (`no_session_check.php` blocks at
     zero), and reversing that is a consent-version bump, a rewritten banner and 26 retranslations
     before a line of it is useful. Record the want; do not cost it here.
-  - **(d) CONNECT TO THE USER'S OWN CLOUD DRIVE instead**, which needs no account of ours and is
-    the cheaper half of (c). Tom: *"maybe there's a provider that does that."* Worth a
-    `market-researcher` question before any design.
+  - **(d) CONNECT TO THE USER'S OWN CLOUD DRIVE -- ANSWERED, AND IT IS MOSTLY ALREADY TRUE.**
+    Tom asked *"maybe there's a provider that does that"*; the market researcher checked and the
+    answer is that this page ALREADY does it by accident of the API it uses. `showOpenFilePicker()`
+    / `showSaveFilePicker()` see a synced Drive, OneDrive or Dropbox folder as an ordinary OS
+    folder, so saving into the cloud works today with no account of ours, no new third-party
+    request and no consent gate. **Tom, 2026-09-15: he is doing exactly this already, and so is the
+    Filipino engineer who filed this project's first real-world report.**
+  - **(d2) AN IN-APP CONNECTOR IS A SEPARATE, PAID THING AND IS PARKED.** Tom: *"some people prefer
+    to manage their cloud drives using the browser interface. For those, a connection might be
+    nice. But I say this can be Someday or Maybe until there is more demand."* The cost is why:
+    a Drive Picker or Dropbox Chooser needs no server secret (`drive.file` is a non-sensitive
+    scope), but each is **a NEW third-party request with its own consent gate and its own paragraph
+    in `privacy.php`, one build per provider** -- against a folder-sync route that is free and
+    provider-agnostic. Revisit on demand, not on interest.
   - **(f) THE CONVERSION IS A "SAVE AS" AND THE MENU SHOULD SAY SO** (Tom, 2026-09-15, and this
     supersedes the wording argument that preceded it). His diagnosis is that the naming fight was
     a symptom: *"we've been neglecting to use a standard paradigm because our design is wrong."*
@@ -238,22 +244,6 @@ the block.
     epanet-js WEB APP and not on the toolkit. **Cloning an external repository was blocked on the git
     organization question, and that is now answered**: an upstream clone goes to `~/src/<project>`,
     never into `~/webdev`, which is for things we serve. See `dev/git-organization-recommendation.md`.
-
-- 100|659| **The map and an element must differ by color, now that no glyph separates them.**
-  Tom, 2026-09-13, having looked at `pointer` on the map: *"Unfortunately pointer doesn't look very
-  good on the map. We are left doing exactly what epanetjs did, default on the map and pointer on
-  select or default everywhere, possibly with color change on select."* **`default` everywhere
-  SHIPPED the same day**, which is the second of his two, so the cursor now carries NO map/element
-  distinction at all and the color change is the whole of what replaces it.
-  - **HIS FIRST OPTION WAS NOT TAKEN BECAUSE IT REVERSES A RULING HE MADE FIVE DAYS EARLIER**
-    (2026-09-08: *"I prefer default over pointer at the labels and assets. It's more precise."*).
-    Putting `pointer` back on the labels and assets is his to decide deliberately. **Ask him which
-    he wants before building either half** -- a color change is wasted if the glyph comes back.
-  - The distinction to carry is *this is an object you can select* against *this is bare map you can
-    pan*. Hover, not selection state, is the moment that needs it.
-  - `dev/browser-pass/specs/cursorflicker.js` measures the gap between a node's disc and its label
-    one pixel at a time and must keep passing: whatever carries the distinction cannot reintroduce
-    a strip that changes three times in 12 px.
 
 - 100|646| **Attach the world map to an XY project without changing the project.**
   Tom, 2026-09-13, thinking past Task 641: *"even an arbitrary XY project can have a world map
@@ -478,39 +468,24 @@ the block.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
 - 100|539| **Gang the neighbour labels so their leaders stop crossing.**
-  Tom, 2026-08-26, with a screenshot of two node labels whose leaders cross: *"This might be
-  forgiveable if it looked difficult or impossible. But when it looks so easy (to a human) to
-  resolve, it's embarrassing."* **That is the right test and it is the one to build against** — not
-  "are the labels legible" but "would a person looking at this see an obvious fix we missed". The
-  strategy and the name are his: *"can two nearby nodes be labeled as a gang in a direction that
-  makes their leaders mutually clear each other's nodes?"*
-  - **THE TARGET IS ZERO AND THE LAST REMEDY IS HIDING, which is his ruling of 2026-09-09 and
-    supersedes the "a comparison needs no absolute target" line that stood here**: *"if there are
-    crossing leaders we need to hide one. The count has to get down to 0... not show them if we
-    can't show them beautifully."*
-  - **ALL THREE PHASES ARE BUILT AND MEASURED; `dev/label-placement-algorithms.md` §8, §10 and §11
-    hold the numbers.** Phase two moves (`Collide.repairCrossingGangs()`, both of his routes, both
-    shipping); phase three hides one of every pair that survives (`Collide.shedCrossingSurvivors()`).
-    **Every measured view of every shipped example is at 0**, at a cost of 38 hidden labels across
-    the 28 views -- 1,715 drawn before the shed and 1,677 after -- and none at all on four of the
-    seven drawings.
-  - **The only pairs left anywhere are ones where BOTH halves are the user's own** -- two on
-    Elm-Street-Center at the fit zoom, one at 2x, one on Net1, all hand-placed on both sides. An
-    automatic pass may not hide a hand-placed label, so that is the correct outcome and it is named
-    by id in the harness.
-  - **IT ALSO SHIPPED FLICKERING, AND THAT IS FIXED (§11b).** One untouched view laid out A B A B A
-    at an unchanged count, so counting could not see it, and 14 of the 28 views did not settle --
-    with the repair switched off as well, so the oscillator was the placement pipeline and not the
-    gang route. `predictNodeLabelBoxes()` replaces the shed's memory of the last layout;
-    `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT, the shed's victims and not the
-    count. **All 28 views settle on the first pass now, in every repair mode measured.**
-  - **A MEASUREMENT DEFECT WAS FOUND AND FIXED WITH IT (§11d):** the harness read the first-fit's
-    boxes beside the DOM's repaired leaders, so every number §10 carried described a drawing that
-    did not exist and understated phase two.
-  - **WHAT IS STILL OPEN IS HIS OWN FLAG, `spot_prime`** (§9b), and it is now a weaker case than it
-    was: not one of the five residual pairs is a gang with free labels and open ground, which is the
-    only kind a search could fix. His call, on §10c and §11e.
-
+  Tom, 2026-08-26, on a screenshot of two crossing leaders: *"when it looks so easy (to a human) to
+  resolve, it's embarrassing."* All three phases are built and measured; every measured view of
+  every shipped example is at **0 crossings**, at a cost of 38 hidden labels across 28 views.
+  Numbers, both of his routes, the flicker repair and the measurement defect found with it:
+  `dev/label-placement-algorithms.md` §8-§11d.
+  - **START THE BRANCH. Tom, 2026-09-15: *"I would want to get this branch started on the grounds
+    that having a better network model could improve our performance placing labels."*** That is a
+    better reason than the one `spot_prime` was parked on, and it supersedes it. The case against
+    was that none of the five residual pairs is a gang with free labels and open ground, so a search
+    could fix none of them -- true, and it measures the wrong thing. **His argument is that the
+    MODEL is the asset**, not this week's crossing count: a count already at zero cannot show
+    whether the placement is GOOD, only that it is not embarrassing.
+  - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
+    may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
+    in the harness.
+  - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
+    the count, so a model change that oscillates is caught instead of averaged away -- which is how
+    the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
 - 100|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
   **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
   and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size).
@@ -593,43 +568,6 @@ the block.
     reassured about grab to default cursor, though he said it was hard to get a pointer. There was a
     good reason. Things on the map are small."* The cursor change is WORKING and was welcomed; the
     difficulty is ACQUISITION, which is the "node fat" item above reached independently.
-
-- 100|650| **Panning was reported broken in Chrome, and could not be reproduced.**
-  Tom, 2026-09-13, three days before the EWB demonstration: *"I couldn't pan (I can edit and zoom)
-  on reload, even repeated reload... Panning is broken, and it wasn't before that repair procedure
-  ran. Even Page, Start fresh doesn't restore pan."* Ubuntu Chrome only; his Ubuntu Firefox pans.
-  - **NOT STORED STATE, on his own evidence.** Start fresh deletes every project, every setting and
-    the IndexedDB and reloads as a brand-new visitor, and the fault survived it.
-  - **NOT REPRODUCIBLE HERE**, in Chrome for Testing 151 and Google Chrome 153, headless, on an
-    empty map, an XY example, a geographic Net3, after one and two reloads, and with a stored view
-    poisoned to his own bad camera so the Task 628 repair runs on the way in. `specs/pan.js` is
-    that search, kept. The pan gesture's own code is untouched by every commit in the repair.
-  - **A SYNTHETIC CDP MOUSE CANNOT REACH what is left**: an extension's overlay, a Chrome setting,
-    a native drag the page never sees. What is wanted from Tom is the console while he drags, and
-    whether it pans in a guest profile with extensions off.
-  - Shipped meanwhile: `specs/pan.js`, and a guard on the `tick()` heartbeat so one throwing frame
-    can no longer end every drag for the life of the page, which is that report's exact signature.
-
-- 100|660| **Double-click does not open a file, and the list is the browser's.**
-  It fails in his Chrome and the file list is not ours. Tom, 2026-09-13, on the same Ubuntu Chrome under WSLg that could not pan: *"Double-click on file
-  fails to open in Chrome. Must use 'Open' button."*
-  - **THERE IS NO IN-PAGE FILE LIST.** `openFromFile()` calls `window.showOpenFilePicker()`, and
-    where the File System Access API is absent a hidden `<input type="file">`; both put up the
-    BROWSER'S OWN chooser, and this page is not running while it is on screen. The recent-files
-    rows in the File menu open on a SINGLE click. The only `dblclick` listeners in
-    `js/looped-network.js` are the map canvas, the element popup and a table cell.
-  - **AND THE THIRD READING IS RULED OUT TOO:** double-clicking a `.lwn` in a file manager was
-    never going to reach us -- `manifest.php` declares no `file_handlers`, so the installed app is
-    not registered for the extension. Declaring one is a task nobody has opened.
-  - **NOT REPRODUCED, and a CDP mouse cannot reach it** any more than it reached Task 650's pan.
-  - **THE ONE-MINUTE TEST is in the header of `dev/lpn-spike/panel-capture-harness.js`**: a console
-    snippet that says whether `dblclick` reaches the PAGE at all on that machine. It does not, and
-    the chooser is failing the same way and neither is ours; it does, and the fault is inside the
-    chooser alone. Either answer settles where to look, and the single-click route (select, then
-    press Open) is the one to demonstrate from on 2026-09-16 regardless.
-  - Shipped meanwhile, from the same scan: the other three `setPointerCapture()` sites are guarded
-    (see the closed Task 658 note in `pointer-capture-harness.js`, whose claim that they already
-    were was wrong).
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;

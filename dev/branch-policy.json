@@ -23,6 +23,30 @@
         "custom-property",
         "674-coordinate-entry"
     ],
+    "feature_freeze": {
+        "active": true,
+        "since": "2026-09-10",
+        "until": null,
+        "why": "Tom, 2026-09-15: \"Remember that we are in a feature freeze. I will test. But even if I were to approve a merge, the scripts must block it until the freeze is removed. Right?\" As built the answer was NO -- an all-clear was the only lock, so his approval and the freeze were one key. It is two locks now.",
+        "_comment": [
+            "THE FEATURE FREEZE, AND IT IS NOT THE EMERGENCY 'freeze' BELOW.",
+            "",
+            "This refuses a merge of any branch in 'protected' -- which is to say a FEATURE -- and",
+            "refuses it EVEN WHEN Tom's all-clear for that exact commit is on file. His approval says",
+            "the feature is finished; this says it is not the week to ship it. The approval keeps",
+            "standing and the merge goes through when the freeze lifts, provided the branch has not",
+            "moved since he cleared it.",
+            "",
+            "IT LEAVES DEFECT WORK ALONE, and that separation is the entire reason it is a second",
+            "flag rather than 'freeze.active'. Setting that one on stops every merge but a 'hotfix:',",
+            "which on 2026-09-13 cost a full day of bug fixes he was waiting for: 'what I am hearing",
+            "from you blocks bug fixes, and that is unacceptable.' A gate that stops all work is a",
+            "gate somebody switches off.",
+            "",
+            "ONLY TOM LIFTS IT, in a turn where he has said so. An AI clearing its own freeze is the",
+            "2026-09-13 failure wearing a different hat."
+        ]
+    },
     "freeze": {
         "active": false,
         "_comment": [

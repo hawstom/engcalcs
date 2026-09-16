@@ -32,6 +32,16 @@ years. `dev/host/README.md` has the whole thing.
 IT.** `dev/reputation-and-practice.md` proposed building an uptime watch that had been running for
 six days. It is corrected in place. That is the lesson to carry, not the scripts.
 
+**THE FEATURE FREEZE IS A SECOND LOCK NOW, AND TOM'S OWN APPROVAL DOES NOT OPEN IT** (his choice,
+2026-09-15). `feature_freeze.active` is TRUE in `dev/branch-policy.json`: a `protected` branch is
+refused **even with a correctly pinned all-clear**, and the approval keeps standing until the freeze
+lifts. **ONLY HE LIFTS IT.** He asked *"even if I were to approve a merge, the scripts must block it
+until the freeze is removed. Right?"* and the honest answer then was no; it is yes now.
+- **IT IS NOT `freeze.active`.** That is the EMERGENCY STOP refusing every merge but a `hotfix:`,
+  and it stays OFF: its one outing cost a day of bug fixes he was waiting for. `feature_freeze`
+  refuses only what `protected` names, so **a defect or tooling track merges exactly as before.**
+  `branch_policy_selftest.php` case 8c asserts that and is the case that matters most.
+
 **`674-coordinate-entry` IS A FEATURE AND MAY NOT MERGE.** Listed in `dev/branch-policy.json` on its
 own branch, so the gate refuses it without touching master's policy. It wants Tom's browser test at
 `http://127.0.0.1:8087/engcalcs/Looped-Network.php`, which needs one `sudo systemctl reload apache2`
@@ -64,12 +74,31 @@ git checkout, nothing to report" and a blind run looked exactly like a clean tre
 `git rev-parse --git-dir`. **The shape is the one that has already cost this project a guard: failing
 open, silently.**
 
-**WHAT IS WAITING ON TOM, AND NONE OF IT IS BUILDABLE WITHOUT HIM:** Tasks 669 (is it a restoration
-or a request -- I can find no evidence it ever shipped), 659 (his first option reverses his own
-ruling of five days earlier), 663 (three reaction-rate questions), 539 (`spot_prime`, and the case
-is weaker than it was); Tasks 672, 650 and 660 all need a run on HIS machine because a synthetic CDP
-mouse cannot reach what is left; GitHub branch protection on `master`, which no local hook can
-substitute for; and one `sudo systemctl reload apache2` for port 8087.
+**HE RULED ON EIGHT TASKS ON 2026-09-15 AND THE ROADMAP CARRIES ALL OF IT.** Closed on his word:
+**659** (the cursor already carries the distinction and the roadmap's claim that `default` shipped
+everywhere was simply WRONG -- one grep of `css/engcalcs.css` disproves it), **650** and **660**
+(Ubuntu Chrome under WSLg only, *"Best to close the issue"*). **672** dropped to 25, not
+manifesting. **669 DID SHIP** and the search that said otherwise never looked in `examples/` --
+`Net3.lwn` carries a Text object reading "Zoom in to see labels". **539**: start the branch, on his
+own better reason (*"a better network model could improve our performance placing labels"*).
+**667(d)**: the synced-folder route already works and he is using it; an in-app connector is
+Someday.
+
+**STILL WAITING ON HIM:** Task 663's three reaction-rate questions, which he says are unfamiliar and
+asked to be re-put; GitHub branch protection on `master`, which no local hook can substitute for;
+one `sudo systemctl reload apache2` for port 8087; and the browser pass on `674-coordinate-entry`.
+
+**THE REPORT'S SENDER ADDRESS IS UNPROVEN AND WAS NOT SHIPPED.** He asked for
+`jconstru@constructionnotesmanager.com`. Two test messages on 2026-09-15 -- one fully on that
+domain, one with that header and the proven envelope -- **ARRIVED NOWHERE AND BOUNCED NOWHERE.** The
+account cannot read `/var/log/exim_mainlog`, so why is unknowable from here. `cronmail.sh` therefore
+carries his DISPLAY NAME on the proven address. **Do not switch it without reading the far end.**
+
+**THE CATCH-ALL IS CLOSED.** `constructionnotesmanager.com` routed unrouted mail to the system user,
+which is what filled `~/mail/new` with 22,907 bounces; it is `:fail: No Such User Here` now, like
+every other domain on the account. **And UAPI `Email::set_default_address` REFUSES EVEN A NO-OP**
+with "Invalid options specified" -- `cpapi2 Email setdefaultaddress domain=… fwdopt=fail
+failmsgs=…` is what works. A fifth entry for the cPanel-traps list.
 
 **NOTHING TO DELETE IN THE LANGUAGE FILES.** Two keys are rendered by nothing and both are the
 canonical mode names `mode_name_check.php` holds every other string against. Suffix drift 0, dead
