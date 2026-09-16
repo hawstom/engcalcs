@@ -216,6 +216,14 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
 	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
+	<?php // Library import (Task 611). A FOURTH picker, and it takes the same two extensions
+	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
+	      // else entirely: it copies one library (pipe types, fittings or curves) into the project
+	      // already open, rather than opening the file as a project of its own. One input per
+	      // destination, which is the rule the three above are already on. Here in the page rather
+	      // than in the Libraries box body, because that body is rebuilt wholesale on every add,
+	      // delete and section change and would take a wired change handler with it. ?>
+	<input type="file" id="lpn_library_file" accept=".lwn,.json,application/json" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -1623,6 +1631,16 @@ EngCalcs.pageConfig = {
 	lpn_library_fittings_used_by: <?=json_encode($ec_lang['lpn_library_fittings_used_by'])?>,
 	lpn_library_fittings_unused: <?=json_encode($ec_lang['lpn_library_fittings_unused'])?>,
 	lpn_library_fittings_in_use: <?=json_encode($ec_lang['lpn_library_fittings_in_use'])?>,
+<?php // Importing one library out of another project file (Task 611). ?>
+	lpn_library_import: <?=json_encode($ec_lang['lpn_library_import'])?>,
+	lpn_library_import_tip: <?=json_encode($ec_lang['lpn_library_import_tip'])?>,
+	lpn_library_import_heading: <?=json_encode($ec_lang['lpn_library_import_heading'])?>,
+	lpn_library_import_added: <?=json_encode($ec_lang['lpn_library_import_added'])?>,
+	lpn_library_import_conflict: <?=json_encode($ec_lang['lpn_library_import_conflict'])?>,
+	lpn_library_import_none: <?=json_encode($ec_lang['lpn_library_import_none'])?>,
+	lpn_library_import_curve_shape: <?=json_encode($ec_lang['lpn_library_import_curve_shape'])?>,
+	lpn_library_import_needs_fittings: <?=json_encode($ec_lang['lpn_library_import_needs_fittings'])?>,
+	lpn_library_import_units: <?=json_encode($ec_lang['lpn_library_import_units'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,

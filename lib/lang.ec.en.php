@@ -3162,6 +3162,18 @@ $ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
 $ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.';
+// Importing one library out of another project file (ROADMAP Task 611). The button label is one
+// whole label reused by all three sections, and the tip has to be true of all three, so it names
+// none of them.
+$ec_lang['lpn_library_import']='Import from a project file';
+$ec_lang['lpn_library_import_tip']='Choose another project file and copy what its library holds into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
+$ec_lang['lpn_library_import_heading']='Imported from {file}';
+$ec_lang['lpn_library_import_added']='Copied in: {names}';
+$ec_lang['lpn_library_import_conflict']='Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.';
+$ec_lang['lpn_library_import_none']='That project file has none of these to copy.';
+$ec_lang['lpn_library_import_curve_shape']='These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}';
+$ec_lang['lpn_library_import_needs_fittings']='These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.';
+$ec_lang['lpn_library_import_units']='The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them.';
 $ec_lang['lpn_fitting_qty']='Quantity';
 $ec_lang['lpn_fitting_name']='Fitting';
 $ec_lang['lpn_fitting_k']='Coefficient';

@@ -446,7 +446,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // fourth box that remembers where it was left, how big it was made and whether it was open.
   // Absent from this list, wireLibraryBox() and openLibraryBox() both return at their first line,
   // so nothing about that memory could be asked at all.
-  'lpn_library_box', 'lpn_libbox_close', 'lpn_libbox_index', 'lpn_libbox_content'
+  'lpn_library_box', 'lpn_libbox_close', 'lpn_libbox_index', 'lpn_libbox_content',
+  // The Libraries box's own hidden file picker (Task 611). Its own input rather than a second use
+  // of #lpn_project_file, because the two feed different readers; absent from this list,
+  // libImportPick() returns at its first line and the plumbing cannot be asked anything.
+  'lpn_library_file'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

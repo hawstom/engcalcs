@@ -25326,6 +25326,23 @@ var EngCalcs = EngCalcs || {};
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
 		// file still fires a change event.
+		// **A FOURTH PICKER, FOR ONE LIBRARY OUT OF ANOTHER PROJECT FILE** (Task 611). Wired AHEAD
+		// of the three below rather than after them, because each of those bails the whole function
+		// on a missing input, and a library import has no business depending on whether the EPANET
+		// picker happens to be in the page.
+		//
+		// Its own input rather than a second use of #lpn_project_file, on that input's own argument:
+		// the two feed different readers -- one lands a whole new project, the other copies three
+		// fields into the project already open -- and an input serving both would have to remember
+		// which, which is exactly the state libImportKind keeps and nothing else should have to.
+		var libFileInput = document.getElementById('lpn_library_file');
+		if (libFileInput) {
+			libFileInput.addEventListener('change', function () {
+				var f = libFileInput.files[0];
+				libFileInput.value = '';
+				if (f) { libImportFromFile(f); }
+			});
+		}
 		var fileInput = document.getElementById('lpn_project_file');
 		if (!fileInput) { return; }
 		fileInput.addEventListener('change', function () {
@@ -31269,6 +31286,253 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 	}
 
+	// ---- IMPORTING A LIBRARY FROM ANOTHER PROJECT FILE (ROADMAP Task 611) ------------------------
+	//
+	// Tom, 2026-09-08, and this is the whole specification: *"If the Libraries have Import buttons
+	// that ask for selecting another project file, then import anything that is not a name
+	// conflict, that probably would be all that's needed."*
+	//
+	// **THERE IS NO EXPORT BUTTON AND THERE IS NOT GOING TO BE ONE.** `serializeProject()` already
+	// writes every library whole, so `File, Save as` IS the export -- his own reading. A second
+	// writer would be a second format to keep in step for no capability at all, and the first time
+	// the two disagreed about a curve's tokens the round trip would stop being byte-identical.
+	//
+	// **A NAME CONFLICT IS REPORTED AND SKIPPED, NEVER RENAMED AND NEVER MERGED.** His instruction,
+	// and the answer this tree already gives everywhere else a definition is named: the reference
+	// stored on a pipe or a pump is the id, so quietly merging two definitions that happen to share
+	// a label is precisely Bentley's Engineering Libraries defect (*"Items are synchronized based on
+	// their label"*, dev/pipe-library-design.md §4) -- every reference re-points and nothing looks
+	// wrong from the software's side. Renaming the incoming one silently would be the same failure
+	// wearing the other hat: the user would have two definitions where they expected one, under a
+	// name they never chose. So the clash is named on screen and the user decides.
+	//
+	// **NOTHING IS REPAIRED AND NOTHING IS CONVERTED.** A definition is copied across exactly as the
+	// file wrote it -- a curve's `kind`, its `note`, its `src` lines and its per-coordinate `tok`
+	// bag included -- because those numbers are the user's and came out of a file
+	// (CLAUDE.md, "ONLY THE USER TOUCHES A FILE'S NUMBERS"). The tokens are the load-bearing half:
+	// `parseFloat()` threw the text away at the one place text became number, so a `220.0` that
+	// arrives without its token can only ever leave as `220`, and an untouched curve stops
+	// round-tripping character for character.
+	//
+	// **THE UNITS ARE THEREFORE THE USER'S QUESTION AND THE REPORT ASKS IT.** Changing a unit on
+	// this page reinterprets a typed number and does not convert it, which is absolute; a definition
+	// arriving from a file that showed millimetres into a project showing inches follows the same
+	// rule, so the number lands as written and now means inches. Converting it here would be the
+	// third conversion site CLAUDE.md warns about. What we owe the user is to SAY SO, and only when
+	// a unit that these numbers actually depend on differs.
+	//
+	// **AN IMPORTED CURVE REFERENCES NOTHING, AND THAT IS FINE** (Task 586): a curve is a document
+	// object and an element holds only a reference, so a curve nothing points at is the ordinary
+	// product of the Add button beside this one.
+	//
+	// **ONE PICKER, ONE ACT, A PARAMETER FOR WHICH LIBRARY.** `from` is the field the source
+	// document states the list under; `read` never materialises and `write` does, which is the split
+	// every library on this page is under -- an import that finds nothing must not write
+	// `curves: []` into a document that stated none. `units` names the unit selections these numbers
+	// depend on; a fittings list names none, because a minor loss coefficient is dimensionless.
+	var LIB_IMPORTABLE = {
+		curves: { from: 'curves', read: libCurvesRead, write: libCurves,
+			units: ['lpn_u_flow', 'lpn_u_elevhead'] },
+		pipetypes: { from: 'pipeTypes', read: libPipeTypesRead, write: libPipeTypes,
+			units: ['lpn_u_diameter'] },
+		fittings: { from: 'fittingSets', read: libFittingSetsRead, write: libFittingSets,
+			units: [] }
+	};
+	// Which section asked. A module variable rather than an argument because the journey goes out
+	// through a hidden <input type=file> and comes back in a change event, which carries nothing of
+	// ours -- the same shape #lpn_project_file's own handler has. Cleared the moment it is read, so
+	// a cancelled pick cannot make the NEXT one land in the wrong library.
+	var libImportKind = null;
+	function libImportPick(kind) {
+		var input = document.getElementById('lpn_library_file');
+		if (!input) { return; }
+		libImportKind = kind;
+		input.click();
+	}
+	function libImportFromFile(file) {
+		var kind = libImportKind, reader = new FileReader();
+		libImportKind = null;
+		if (!kind || !LIB_IMPORTABLE[kind]) { return; }
+		reader.onload = function (ev) { libImportText(ev.target.result, file.name, kind); };
+		reader.onerror = function () {
+			var pc = EngCalcs.pageConfig || {};
+			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+		};
+		reader.readAsText(file);
+	}
+	// **THE FILE IS READ THROUGH acceptImportedText(), NOT THROUGH A SECOND READER.** It is the one
+	// place "is this one of our documents" is answered -- it reports a bad file and a too-new file
+	// itself -- and it runs migrateSaved(), which is what makes a pre-library project file importable
+	// at all: mintCurveLibrary() lifts a v10 document's pump curves into `curves` on the way past.
+	// Nothing is APPLIED: the libraries are frame-independent, so the projection and the Y flip
+	// applySaved() would do are neither needed nor wanted over the project on screen.
+	function libImportText(text, fileName, kind) {
+		var saved = acceptImportedText(text);
+		if (!saved) { return; }
+		libImportRun(saved, fileName, kind);
+	}
+	/**
+	 * **CAN A RUN USE THIS CURVE'S POINTS?** EPANET reads a curve's abscissa as strictly increasing
+	 * whatever the kind, and refuses one that is not.
+	 *
+	 * **IT DECIDES WHAT IS SAID, NEVER WHAT IS KEPT.** A curve that fails is still copied in exactly
+	 * as the file wrote it and is named in the report instead -- dropping it would be silent loss in
+	 * the one direction this whole task is about, and repairing it would be rewriting a number that
+	 * came from a file. That is js/lpn-inp.js's own behaviour: it keeps every `[CURVES]` row,
+	 * including the ones nothing references.
+	 *
+	 * **THE VOLUME-CURVE CONDITIONS ARE DELIBERATELY NOT HERE.** A level-to-volume curve must also
+	 * never fall and must rise overall, and js/lpn-time.js asks that at the one place a tank
+	 * actually uses one. A second copy of that rule would be a second opinion about the same curve.
+	 */
+	function libCurveRunnable(c) {
+		var pts = curvePointsOf(c), i;
+		if (!pts.length) { return false; }
+		for (i = 1; i < pts.length; i++) {
+			if (!(pts[i][0] > pts[i - 1][0])) { return false; }
+		}
+		return true;
+	}
+	// Do the numbers in this library mean the same thing in both documents? Read off the two
+	// declarations rather than off the selects, because the FILE's declaration is what its numbers
+	// were typed under. A selection the source file does not state is not a difference -- an older
+	// document that named no units is not making a claim we can contradict.
+	function libImportUnitsDiffer(saved, spec) {
+		var mine = readUnitSelections(), theirs = (saved && saved.units) || {};
+		return (spec.units || []).some(function (id) {
+			return theirs[id] && mine[id] && theirs[id] !== mine[id];
+		});
+	}
+	/**
+	 * **THE IMPORT ITSELF.** Everything is decided before anything is written, which is what lets
+	 * the undo snapshot sit exactly one statement before the first mutation and lets an import that
+	 * turns out to be empty touch the document not at all.
+	 *
+	 * **A DEFINITION IS CLONED, NEVER ADOPTED.** `JSON.parse(JSON.stringify())` is the whole of it:
+	 * the incoming object is a live part of a parsed document this function is about to drop, and
+	 * sharing a reference into it would leave two projects editing one array of points the day
+	 * anything else held on to the source. The clone carries every field the file stated, named or
+	 * not -- `kind`, `note`, `points`, `src`, `tok` -- because a field we do not understand is still
+	 * the user's.
+	 *
+	 * **A NAME ALREADY TAKEN HERE IS SKIPPED, AND SO IS A SECOND COPY OF ONE NAME INSIDE THE SOURCE.**
+	 * The taken set grows as the import proceeds, so a malformed file stating `T1` twice lands its
+	 * first `T1` and reports the second, rather than quietly keeping whichever came last.
+	 */
+	function libImportRun(saved, fileName, kind) {
+		var pc = EngCalcs.pageConfig || {}, spec = LIB_IMPORTABLE[kind],
+			source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [],
+			taken = {}, clones = [], added = [], clashed = [], unusable = [], orphan = [],
+			lines = [];
+		if (!source.length) {
+			showLibraryImportReport(fileName, [pc.lpn_library_import_none
+				|| 'That project file has none of these to copy.']);
+			return;
+		}
+		spec.read().forEach(function (rec) {
+			if (rec && rec.id !== undefined && rec.id !== null) { taken[String(rec.id)] = true; }
+		});
+		source.forEach(function (rec) {
+			if (!rec || typeof rec !== 'object' || rec.id === undefined || rec.id === null
+					|| String(rec.id) === '') {
+				// Not a definition at all. Nothing to name in a report and nothing lost: a record
+				// with no id is a record nothing could ever have referred to.
+				return;
+			}
+			var id = String(rec.id), clone;
+			if (taken[id]) { clashed.push(id); return; }
+			try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
+			taken[id] = true;
+			clones.push(clone);
+			added.push(id);
+		});
+		if (clones.length) {
+			saveUndoSnapshot();
+			var dest = spec.write();
+			clones.forEach(function (clone) { dest.push(clone); });
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+		}
+		// Said AFTER the push, and against the project as it now stands, so the two questions a
+		// reader has -- is a run going to be able to use this, and is this reference going to
+		// resolve -- are answered about what they can actually see in the box behind the dialog.
+		if (kind === 'curves') {
+			clones.forEach(function (c) { if (!libCurveRunnable(c)) { unusable.push(String(c.id)); } });
+		}
+		if (kind === 'pipetypes') {
+			clones.forEach(function (t) {
+				if (pipeTypeStates(t, 'fittingsId') && !fittingSetById(t.props.fittingsId)) {
+					orphan.push(String(t.id));
+				}
+			});
+		}
+		if (added.length) {
+			lines.push((pc.lpn_library_import_added || 'Copied in: {names}')
+				.replace('{names}', added.join(', ')));
+		}
+		if (clashed.length) {
+			lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
+				.replace('{names}', clashed.join(', ')));
+		}
+		if (unusable.length) {
+			lines.push((pc.lpn_library_import_curve_shape || 'These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}')
+				.replace('{names}', unusable.join(', ')));
+		}
+		if (orphan.length) {
+			lines.push((pc.lpn_library_import_needs_fittings || 'These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.')
+				.replace('{names}', orphan.join(', ')));
+		}
+		if (added.length && libImportUnitsDiffer(saved, spec)) {
+			lines.push(pc.lpn_library_import_units || 'The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them.');
+		}
+		// A file whose list holds only records with no id says nothing above, and a dialog with a
+		// heading and no body would read as a failure of this box rather than as a fact about the
+		// file. There is always at least one sentence.
+		if (!lines.length) {
+			lines.push(pc.lpn_library_import_none || 'That project file has none of these to copy.');
+		}
+		showLibraryImportReport(fileName, lines);
+	}
+	/**
+	 * **IT ALWAYS SPEAKS, WHICH IS THE OPPOSITE OF showInpExportFlattening()'S RULE AND DELIBERATE.**
+	 * That box fires on a Save nobody asked a question with, so it stays silent where there is
+	 * nothing to say. This one answers a button somebody pressed on purpose, and the receipt naming
+	 * what landed is the whole of what makes the skip rule visible: an import that reported nothing
+	 * would leave a name conflict indistinguishable from a file with nothing in it.
+	 *
+	 * #lpn_dialog_body already scrolls at 60vh, so a long list of names is not truncated -- a
+	 * definition left out of the receipt is a definition the user does not know they have.
+	 */
+	function showLibraryImportReport(fileName, lines) {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			var h = document.createElement('p'), ul = document.createElement('ul');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_library_import_heading || 'Imported from {file}')
+				.replace('{file}', String(fileName || ''));
+			body.appendChild(h);
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			(lines || []).forEach(function (text) {
+				var li = document.createElement('li');
+				li.style.marginBottom = '4px';
+				li.textContent = text;
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+	// The button, identical in all three sections because it is the same act -- see the concept-level
+	// label rule in CLAUDE.md: one whole label reused, never composed per section. The tip has to be
+	// true of all three, so it names neither pipe types nor curves.
+	function libImportButton(host, kind) {
+		var pc = EngCalcs.pageConfig || {};
+		host.appendChild(libButton(pc.lpn_library_import || 'Import from a project file',
+			function () { libImportPick(kind); }, pc.lpn_library_import_tip));
+	}
+
 	// ---- PATTERNS --------------------------------------------------------------------------------
 	//
 	// **A PATTERN IS A SERIES, AND IT IS EDITED AS ONE FIELD OF NUMBERS.** Twenty-four separate
@@ -32175,6 +32439,7 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
+		libImportButton(host, 'pipetypes');
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -32365,6 +32630,7 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
+		libImportButton(host, 'fittings');
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -32578,6 +32844,7 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
+		libImportButton(host, 'curves');
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
