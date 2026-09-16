@@ -1281,3 +1281,102 @@ rather than "point your Save dialog at your synced folder," that is a real but s
 cost is a new third-party request each time, not a database or login (Tom's actual worry) — none of
 1–2 needs a server-side secret, a user table, or a PHP session, so the structural objection in
 Task 667(c) does not apply to any of them.
+
+## 2026-09-15 — second entry, same day: coordinate slot order (Task 674 follow-up)
+
+Tom asked two direct questions, in parallel with Sue and Franco: where do the two coordinate boxes
+go in the node Properties popup (slots 2-3 after ID, vs. end), and whether EPANET's own
+Description-and-Tag-before-Elevation order is deliberate or historical.
+
+### Question 1 — where coordinates sit
+
+**EPANET 2.2's own Property Editor table is uniform across ALL object types, node and link
+alike, and coordinates sit in slots 2-3 every time.** CITED, EPA's own manual source
+(`github.com/USEPA/EPANET2.2/blob/master/User_Manual/docs/6_objects.rst`, fetched today):
+
+- Junction: ID, **X-Coordinate, Y-Coordinate**, Description, Tag, Elevation, Base Demand, ...
+- Reservoir: ID, **X-Coordinate, Y-Coordinate**, Description, Tag, Total Head, ...
+- Tank: ID, **X-Coordinate, Y-Coordinate**, Description, Tag, Elevation, Initial Level, ...
+- Pipe: ID, **Start Node, End Node**, Description, Tag, Length, Diameter, Roughness, ...
+- Pump: ID, **Start Node, End Node**, Description, Tag, Pump Curve, Power, Speed, ...
+- Valve: ID, **Start Node, End Node**, Description, Tag, Diameter, Type, Setting, ...
+
+So it is not one designer's idiosyncrasy on one dialog — it is a rule EPANET applies to every
+object type, including links, where "position" is the two endpoint references rather than an X/Y
+pair. That consistency is itself evidence it was a deliberate editor-design choice, not an
+accident on one form.
+
+**A GIS attribute table is a genuinely different third option, and it is the more common
+professional pattern for tabular data specifically (the Tables pane's own analogue).** CITED, QGIS
+3.34 user manual (`docs.qgis.org/3.34/en/docs/user_manual/working_with_vector/attribute_table.html`,
+fetched today): the attribute table shows only non-geometry fields by default; geometry is edited
+on the map canvas or through a separate editing workflow, never as a typed coordinate column
+sitting among the attributes. ArcGIS Pro is CITED, `pro.arcgis.com` (Add XY Coordinates / Calculate
+Geometry Attributes tool pages, fetched today): the `Shape` field is a geometry data type distinct
+from any attribute column, and a typed X/Y column (`POINT_X`/`POINT_Y`) only appears if someone
+deliberately runs a tool to derive one — it is never there by default, and editing it does not
+feed back into the geometry. **In other words: the two market leaders in tabular geospatial editing
+do not put geometry in the attribute table at all — the closest analogue to our node table has no
+coordinate columns as a baseline state.** That is a real third option Tom's framing did not list:
+coordinates could live ONLY in the map (which this suite already has, since a node is drawn) and
+never in the Tables pane as columns, with the Properties popup's two boxes serving as the one
+typeable escape hatch for a precise edit. I am not recommending this — Tom has already shipped the
+table columns (Task 674) and reversing that is a bigger question than slot order — but it is worth
+him knowing the field's dominant convention is "no coordinate column at all," which makes EPANET's
+own choice to show X/Y in its editor (but NOT, as far as this source shows, in a spreadsheet-style
+table view) more notable, not less.
+
+**epanet-js confirmed again, same finding as the 2026-09-15 first entry:** no coordinate row in its
+rendered property panel (`apps/app/src/panels/asset-panel/asset-panel.tsx`, commit `8a68389`,
+checked directly). So epanet-js answers neither question — it has not built the feature at all.
+
+**I could not reach WaterGEMS, InfoWater or KYPipe's property-editor layouts this session** — all
+three are login-gated or ship as desktop-only trial installers with no public screenshots detailed
+enough to read field order from. Stated as an honest gap, not a guess.
+
+**On "identity first, then geometry, then domain values" as a general inspector-ordering
+convention:** I could not find a documented style guide (Nielsen Norman, Material Design, or a
+GIS-specific UX standard) that states this as a named rule. What I can say is narrower and better
+supported: EPANET's OWN convention, applied with the same order eleven separate times across five
+object types, count as one occurrence of the pattern Tom is calling "order of fundamentalism" — a
+real, consistent precedent in the one tool most directly comparable to `lpn_`, not a folklore claim
+dressed as one.
+
+### Question 2 — is EPANET's Description/Tag-before-Elevation order deliberate or historical
+
+**I could not settle this, and I looked in the two places most likely to hold the answer.**
+CITED, EPA's own EPANET 2 update history (`epa.gov/sites/default/files/2014-06/en2updates.txt`,
+fetched today, covering builds 2.00.01 through 2.00.12): no entry documents the Tag or Description
+field being ADDED — Tag already existed by build 2.00.06 (9/11/00), where a bug fix is logged for
+"conditions placed on string properties, such as Tags," which only makes sense if Tags predate
+that build. The file gives no changelog entry for a Property Editor field-ORDER change at any
+point, and no entry for Description at all. So the update history answers "Tag is old" but not
+"why does it sit before Elevation" or "was the order ever different."
+
+I did not find a published EPA rationale document for the Property Editor's field grouping
+(no design memo, no UI spec, nothing beyond the manual's own tables, which describe the order
+without explaining it). I could not compare EPANET 2.0's Property Editor screenshots against
+2.2's from this environment — no archived build of the 2.0 GUI was reachable, only the .inp
+format's own version notes, which are silent on GUI layout entirely.
+
+**The one structural observation I can make stands, and it is a weaker claim than "deliberate":**
+the `.inp` file format itself does not group Description/Tag with ID the way the Property Editor
+does — `[JUNCTIONS]` carries ID/Elevation/Demand/Pattern, with any Description as a trailing `;`
+comment and Tag in its own separate `[TAGS]` section entirely (`[TAGS] object-type id tag-text`,
+per the same manual). **So the Property Editor's ordering is a GUI-only decision uncorrelated with
+the file format's own section order** — the file format keeps hydraulic data (Elevation) with the
+node's other required numeric properties and treats Tag as metadata bolted on separately, which is
+closer to Tom's own instinct (hydraulics before free text) than to what the dialog shows. That is
+the most concrete thing I can offer: **EPANET's file format and EPANET's Property Editor disagree
+with each other on this question**, which weakens the file's authority for Tom's slot-order
+decision rather than strengthening it — the "EPANET does it this way" argument is only as strong as
+whichever EPANET artifact you pick.
+
+**Honest bottom line for both questions:** Question 1 has a real, citable, and consistent EPANET
+precedent (coordinates in slots 2-3, across every object type) and a real, citable counter-tradition
+(GIS attribute tables keep geometry out of the table altogether). Question 2 does not resolve —
+I found no dated origin for Description/Tag, no GUI-design rationale, and the one thing I can add
+(file-format vs. dialog disagreement) argues against treating EPANET's dialog order as settled
+practice rather than for it.
+
+— Mary

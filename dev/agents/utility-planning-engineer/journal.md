@@ -2102,3 +2102,51 @@ from the plan/stationed length, and do not make slope distance the reported "len
 — that is the one way this feature could make a report LESS defensible instead of more.
 
 — Sue
+
+## 2026-09-15 — Sue: Task 674 property order — coordinates are identity, not design variables; and EPANET's Tag position is not evidence of anything
+
+Tom asked two questions by name on where typed coordinates land in the popup/tables (Task 674).
+
+**Q1 — slot 2/3 (after ID) vs. end of the list.** I lean the same direction Tom leans, Option 1,
+but for a different reason than his: a coordinate is not in the same CLASS as a design variable
+(demand, diameter, roughness). It is part of the asset's spatial IDENTITY, paired with the ID the
+way a parcel number is paired with a legal description — SPECULATION, my own framing, but grounded
+in how a coordinate is actually used at system scale: the one workflow that touches it deliberately
+is checking a developer's submittal or a survey deliverable against the utility's own coordinate
+system, ID-by-ID. That is exactly the moment ID and coordinate sitting next to each other earns its
+keep, and it is a QA moment, not an editing moment. "People don't usually edit it" is true and is
+the wrong test — a transposed X/Y or a wrong datum is invisible in a solve (the network still
+balances) and visible only in a GIS overlay or an as-built check, which makes it precisely the kind
+of rarely-touched, load-bearing number that belongs where a reviewer's eye lands, not where it
+doesn't. I hold the same view about coefficient rows in my own wish list — availability of a number
+is not a ranking criterion for whether it should be found easily; correctness risk is. SPECULATION,
+my own inference, not measured against any actual submittal review.
+Tom's own foresight — collapsible sections, and "we know we are headed toward customizable table
+columns" — is, in my seat's terms, the actual system-scale answer already: a reviewer wants ID+
+coordinates+elevation for a survey check, a designer wants ID+diameter+roughness+demand for a
+capacity check, and no fixed popup order serves both at 2,000 nodes. WaterGEMS/OpenFlows FlexTables
+and similar mid-size-utility tools solve this with user-defined, reorderable, savable column sets
+rather than one designed order — SPECULATION/general professional recollection, not a citation I
+verified for this session. Popup field order is a stopgap worth getting right for months, not years;
+don't over-invest past what Option 1 already buys.
+
+**Q2 — EPANET puts Description and Tag before Elevation. Is that evidence of intent?** I do not
+think it holds up, and I would not lean on EPANET's dialog layout as authority here. **OBSERVED**,
+this repo's own importer (`js/lpn-inp.js:1894-1911`): EPANET's plain `.inp` `[JUNCTIONS]` data
+record is `ID Elev Demand Pattern` — Description and Tag are not IN that record at all. Tag lives
+in its own separate `[TAGS]` section (`NODE|LINK id tag`), decoupled from the physical junction
+data, and our own comment there calls it correctly: *"a tag is the join key to whatever system the
+utility already keeps its assets in."* That separation reads to me as the OPPOSITE of Tom's
+reading — a field bolted onto the format and the GUI later, as a cross-reference convenience, not
+one EPANET's authors placed above elevation on purpose. A single-author, decades-incremental public
+tool's dialog order is ordinary software archaeology (when a field was added to the form) far more
+often than a considered priority ranking — SPECULATION, I have no source for EPANET's own UI design
+history and did not find one searching this session; I would not repeat this as fact without one.
+Where I agree with the instinct underneath his question: Tag genuinely deserves identity-class
+treatment, and this project has already ruled that way independently of EPANET's layout —
+`js/lpn-inp.js:1908-1911`, "A TAG IS AN IDENTITY, SO IT IS BASE-OWNED AND NOT OVERRIDABLE... Same
+limb the element's own id sits on." That is the right authority to cite for Tag's prominence, not
+EPANET's dialog order — this project defers to EPANET's terminology, not its layout, per CLAUDE.md
+itself, and I think that line applies exactly here.
+
+— Sue

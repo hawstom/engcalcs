@@ -287,3 +287,19 @@ so it produces a contribution over weeks, not a handshake in ten days.
 standing proof that the name can be used this way" and says the question is settled.** His ruling
 removes that precedent. The legal leg is untouched; the norms leg loses its only citation. I have
 not edited that file and will not — flagging it so he decides.
+
+## 0f. Coordinates-as-map-only is a real third option nobody has weighed — worth one sentence in the Task 674 decision record either way
+
+2026-09-15: researching Tom's two-option framing (slots 2-3 vs. end of the popup/table), I found
+that QGIS and ArcGIS Pro — the dominant tools for exactly the "attribute table" pattern our Tables
+pane resembles — do NOT put geometry in the attribute table at all by default; a typed X/Y column
+only appears if someone deliberately derives one (CITED, `docs.qgis.org/3.34/.../attribute_table.html`;
+`pro.arcgis.com` Add XY Coordinates tool page, both fetched today; full citations in the journal,
+2026-09-15 second entry). That is a genuine third option Tom's two-way framing did not include:
+coordinates live only on the map, with the Properties popup's two boxes as the sole typed escape
+hatch, and no coordinate columns in the node table at all. **Not recommending it** — the table
+columns already shipped and reversing them is a bigger call than slot order — but it costs one
+sentence to record that the field's dominant convention disagrees with both of Tom's options, and
+his own choice (keep the columns, put them wherever) is deliberately choosing the less common
+pattern for a stated reason (typeable precision editing) rather than by default. Zero build cost;
+this is a note for whoever writes up the 674 decision.

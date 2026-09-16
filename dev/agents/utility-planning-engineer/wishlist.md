@@ -810,3 +810,18 @@ Task 643 poses to this seat:
   300 km scope is 206 ppm (CLAUDE.md, `scope-of-service-harness.js`), a further order of magnitude
   below even a 5% grade's slope-distance error. Both are small; the camel is still bigger than the
   gnat.
+
+### 2026-09-15 — not a new row, a ranking note on Task 674's follow-on
+
+Asked for a ruling on where Task 674's typed coordinates land in the popup and tables. My answer,
+in full: journal, 2026-09-15 entry. The one thing worth a wish-list line rather than only a journal
+line: **reorderable/user-defined table columns** would resolve the popup-order tension Tom named
+himself (identity fields vs. design fields, wanting both near the top for different tasks) better
+than any fixed order can, at the scale I care about. Not a new want — Tom's own Task 674 block
+already names it as foreseen ("we know that we are headed toward customizable table columns"), so
+per this file's own rule a known-but-unbuilt item is not a miss. Ranking it low deliberately: it is
+a real want but a multi-week UI investment, and the fixed-order Option 1 already gets 90% of the
+value for the submittal-review workflow I actually care about. Do not build this before it is asked
+for on its own.
+
+— Sue
