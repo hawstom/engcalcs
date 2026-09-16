@@ -1226,6 +1226,8 @@
         "lpn_field_easting": "Easting",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
         "lpn_field_text_size": "Size multiplier",
         "lpn_tool_labels": "Labels",
         "lpn_labels_heading_node": "Node labels",
@@ -1873,7 +1875,7 @@
         "lpn_ff_err_not_junction": "Not a junction",
         "lpn_ff_err_unknown": "No answer. The code reported was {code}."
     },
-    "count": 1871,
+    "count": 1873,
     "active_prefixes": [
         "about",
         "bpn",

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1871,
-        "delta_key_count": 1,
+        "expected_key_count": 1873,
+        "delta_key_count": 3,
         "exempt_key_count": 45,
         "exempt_keys": [
             "calc_units_us",
@@ -536,10 +536,14 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_field_tag": "Tag"
+        "lpn_field_tag": "Tag",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
     },
     "keys": {
-        "lpn_field_tag": "Tag"
+        "lpn_field_tag": "Tag",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
     },
     "key_context": {
         "lpn_field_tag": {
@@ -555,6 +559,38 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_field_coord_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting_abbr",
+                    "value": "R",
+                    "english": "E"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Größenfaktor",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_coord_off_world": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting_abbr",
+                    "value": "R",
+                    "english": "E"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Größenfaktor",
+                    "english": "Size multiplier"
                 }
             }
         }

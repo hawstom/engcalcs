@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1871,
-        "delta_key_count": 2,
+        "expected_key_count": 1873,
+        "delta_key_count": 4,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -527,11 +527,15 @@
     },
     "keys_to_translate": {
         "lpn_field_northing_abbr": "N",
-        "lpn_field_easting_abbr": "E"
+        "lpn_field_easting_abbr": "E",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
     },
     "keys": {
         "lpn_field_northing_abbr": "N",
-        "lpn_field_easting_abbr": "E"
+        "lpn_field_easting_abbr": "E",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
     },
     "key_context": {
         "lpn_field_northing_abbr": {
@@ -553,6 +557,38 @@
         "lpn_field_easting_abbr": {
             "reason": "equal_to_english",
             "current_value": "E",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "ईस्टिंग",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "आकार गुणक",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_coord_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "ईस्टिंग",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "आकार गुणक",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_coord_off_world": {
+            "reason": "missing",
+            "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_field_easting",
