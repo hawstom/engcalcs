@@ -19,7 +19,8 @@ $gate = $root . '/dev/scripts/branch_gate.php';
 $fails = 0;
 function ok($name, $cond, $extra = null) {
     global $fails;
-    echo ($cond ? "  ok   " : "  FAIL ") . $name . ($extra === null ? '' : "   " . $extra) . "\n";
+    echo ($cond ? "  ok   " : "  FAIL ") . $name . "\n";
+    if (!$cond && $extra !== null) { echo "         " . str_replace("\n", "\n         ", trim($extra)) . "\n"; }
     if (!$cond) { $fails++; }
 }
 
@@ -42,9 +43,18 @@ exec("git -C $q add -A && git -C $q commit -qm other 2>/dev/null");
 $ordinarySha = trim(shell_exec("git -C $q rev-parse ordinary"));
 exec("git -C $q checkout -q master 2>/dev/null");
 
-function writePolicy($tmp, $protected, $freeze) {
-    file_put_contents($tmp . '/dev/branch-policy.json',
-        json_encode(array('protected' => $protected, 'freeze' => $freeze), JSON_PRETTY_PRINT));
+function writePolicy($tmp, $protected, $freeze, $featureFreeze = null) {
+    $doc = array('protected' => $protected, 'freeze' => $freeze);
+    // ABSENT BY DEFAULT, deliberately: every case written before the feature freeze existed keeps
+    // passing untouched, which is itself the proof that an undeclared freeze cannot refuse anything.
+    if ($featureFreeze !== null) { $doc['feature_freeze'] = $featureFreeze; }
+    file_put_contents($tmp . '/dev/branch-policy.json', json_encode($doc, JSON_PRETTY_PRINT));
+}
+function runOut($gate, $sha, $subject, $tmp) {
+    $cmd = 'php ' . escapeshellarg($gate) . ' ' . escapeshellarg($sha) . ' ' .
+           escapeshellarg($subject) . ' ' . escapeshellarg($tmp) . ' 2>&1';
+    exec($cmd, $o, $rc);
+    return array($rc, implode("\n", $o));
 }
 function writeBlockers($tmp, $rows) {
     file_put_contents($tmp . '/dev/deploy-blockers.json',
@@ -116,7 +126,72 @@ writeBlockers($tmp, array(array('id' => 'other', 'branch' => 'somewhere-else', '
 ok('a blocker on a DIFFERENT branch does not stop this one',
     run($gate, $movedSha, 'Merge feature: something', $tmp) === 0);
 
-echo "--- 8. no policy file at all means this gate says nothing ---\n";
+// ---------------------------------------------------------------------------
+// THE FEATURE FREEZE. Tom's arrangement of 2026-09-15: a feature needs BOTH his all-clear AND the
+// freeze to be off, because he asked "even if I were to approve a merge, the scripts must block it
+// until the freeze is removed. Right?" and the answer, as built, was no.
+//
+// **IT USES $movedSha AND NOT $featureSha, AND THAT IS THE TRAP THIS SECTION FELL INTO FIRST.** The
+// gate resolves the branch NAME from the commit -- it asks which branches contain it -- so a sha
+// that is no longer any branch's tip reads as an ORDINARY TRACK and is waved through. Section 4
+// advances `feature` past $featureSha, so four of these cases were silently testing the wrong thing
+// and one of them PASSED while doing it. A case that passes for the wrong reason is worse than a
+// failing one, which is the argument the whole file is built on.
+//
+// FIVE CASES, AND 8c IS THE ONE THAT MATTERS MOST: a gate that also stopped defect work is the
+// 2026-09-13 failure that cost a day of bug fixes Tom was waiting for. The case proving an ORDINARY
+// branch still merges under a feature freeze is not completeness, it is the point.
+// ---------------------------------------------------------------------------
+$ffOn  = array('active' => true,  'since' => '2026-09-10', 'until' => null, 'why' => 'EWB');
+$ffOff = array('active' => false, 'since' => null, 'until' => null, 'why' => null);
+writeBlockers($tmp, array());          // section 7 left one; this section is not about blockers
+
+echo "--- 8. the feature freeze is a SECOND lock that an all-clear does not open ---\n";
+
+// 8a. A valid, correctly pinned all-clear -- refused anyway. This is Tom's question answered.
+writePolicy($tmp, array('feature'), $noFreeze, $ffOn);
+writeClears($tmp, array('feature' => array('head' => $movedSha, 'words' => 'Looks good.', 'cleared' => '2026-09-15')));
+list($rc, $out) = runOut($gate, $movedSha, 'Merge feature: something', $tmp);
+ok('a CLEARED feature is still refused while the feature freeze is on', $rc === 1, $out);
+ok('and the reason given is the FREEZE, naming the all-clear as already on file',
+   strpos($out, 'all-clear for this exact commit IS on file') !== false, $out);
+
+// 8b. Same commit, freeze lifted. It must go through, or his approval means nothing.
+writePolicy($tmp, array('feature'), $noFreeze, $ffOff);
+ok('the same commit merges the moment the freeze is lifted',
+   run($gate, $movedSha, 'Merge feature: something', $tmp) === 0);
+
+// 8c. AN ORDINARY BRANCH UNDER A FEATURE FREEZE. If this ever fails, the feature freeze has become
+//     the emergency stop by accident and a day of bug fixes is about to be lost again.
+writePolicy($tmp, array('feature'), $noFreeze, $ffOn);
+ok('a DEFECT track still merges under a feature freeze -- the whole separation',
+   run($gate, $ordinarySha, 'Merge fix: a defect', $tmp) === 0);
+
+// 8d. No all-clear and the freeze on. Refused, and it must not claim an approval exists.
+writeClears($tmp, array());
+list($rc, $out) = runOut($gate, $movedSha, 'Merge feature: something', $tmp);
+ok('uncleared AND frozen is refused', $rc === 1, $out);
+ok('and it does not claim an all-clear is on file when none is',
+   strpos($out, 'all-clear for this exact commit IS on file') === false, $out);
+
+// 8e. A LAPSED all-clear under a freeze -- pinned to the commit before the branch moved. Both
+//     reasons are true and the message must not hide the lapse behind the freeze.
+writeClears($tmp, array('feature' => array('head' => $featureSha, 'words' => 'Yes.', 'cleared' => '2026-09-14')));
+list($rc, $out) = runOut($gate, $movedSha, 'Merge feature: something', $tmp);
+ok('a LAPSED all-clear under a freeze is refused', $rc === 1, $out);
+ok('and says the branch MOVED, not merely that it is frozen',
+   strpos($out, 'the branch moved after he cleared it') !== false, $out);
+
+// 8f. Declared but INACTIVE, with no all-clear: the original message must survive intact, or the
+//     new leg has swallowed the argument the gate was built for.
+writePolicy($tmp, array('feature'), $noFreeze, $ffOff);
+writeClears($tmp, array());
+list($rc, $out) = runOut($gate, $movedSha, 'Merge feature: something', $tmp);
+ok('with the freeze off, an uncleared feature still hears about the all-clear', $rc === 1, $out);
+ok('and still hears GREEN IS NOT DONE, the original argument',
+   strpos($out, 'GREEN IS NOT DONE') !== false, $out);
+
+echo "--- 9. no policy file at all means this gate says nothing ---\n";
 unlink($tmp . '/dev/branch-policy.json');
 ok('silent, rather than refusing everything in a tree that never opted in',
     run($gate, $featureSha, 'Merge feature: something', $tmp) === 0);
@@ -134,7 +209,7 @@ exec('rm -rf ' . escapeshellarg($tmp));
 // BOTH DOORS, because they are different code paths: a clean merge fires pre-merge-commit, and a
 // CONFLICTED merge never reaches it -- git stops, a human runs `git commit`, and pre-commit fires.
 // That second door was open for the whole of 2026-09-13.
-echo "--- 9. THE HOOKS THEMSELVES, against real merges ---\n";
+echo "--- 10. THE HOOKS THEMSELVES, against real merges ---\n";
 $e2e = sys_get_temp_dir() . '/branch-gate-e2e-' . getmypid();
 exec('rm -rf ' . escapeshellarg($e2e));
 mkdir($e2e . '/dev/scripts', 0777, true);

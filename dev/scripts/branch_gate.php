@@ -94,6 +94,48 @@ if ($entry === null) {
     $why = "its all-clear was given at " . substr($entry['head'], 0, 8) .
            " and this merge is " . substr($mergeSha, 0, 8) . " -- the branch moved after he cleared it";
 }
+// ---------------------------------------------------------------------------
+// THE SECOND LOCK, AND TOM'S APPROVAL DOES NOT OPEN IT. Chosen by him 2026-09-15, when he asked
+// "even if I were to approve a merge, the scripts must block it until the freeze is removed.
+// Right?" -- and the honest answer was NO, not as built: an all-clear was the only lock, so his
+// approval and the freeze were the same key turned twice.
+//
+// WHY IT IS A SECOND FLAG AND NOT `freeze.active`. That one is an EMERGENCY STOP: it refuses every
+// merge but a `hotfix:`, and switching it on cost a whole day of bug fixes he was waiting for on
+// 2026-09-13 -- "what I am hearing from you blocks bug fixes, and that is unacceptable." So a
+// feature freeze cannot be expressed with it. `feature_freeze` refuses only what the `protected`
+// list already names, which is to say FEATURES, and a defect or tooling track is untouched.
+//
+// THE ORDER MATTERS: the all-clear is checked FIRST and this second. So a merge with no all-clear
+// hears about the all-clear, and a merge that HAS one hears that the freeze is what is left. A
+// gate that reports the wrong reason gets worked around rather than obeyed.
+$ff = isset($policy['feature_freeze']) ? $policy['feature_freeze'] : array();
+if (!empty($ff['active'])) {
+    fwrite(STDERR, "\n  REFUSED: '$branch' is a FEATURE and the feature freeze is on.\n\n");
+    if ($why === '') {
+        fwrite(STDERR, "  Tom's all-clear for this exact commit IS on file, and it is not enough by\n");
+        fwrite(STDERR, "  itself -- that is the arrangement he asked for on 2026-09-15. His approval\n");
+        fwrite(STDERR, "  says the feature is finished; the freeze says this is not the week to ship\n");
+        fwrite(STDERR, "  it. The approval keeps standing and this merge goes through the moment the\n");
+        fwrite(STDERR, "  freeze is lifted, PROVIDED the branch has not moved since he cleared it.\n\n");
+    } else {
+        // "It also $why" reads as broken English, because $why is a clause written to follow
+        // "is a protected branch and ...". Two reasons are both true here and the reader needs both.
+        fwrite(STDERR, "  AND SEPARATELY, $why -- so it would be refused even with the freeze off.\n\n");
+    }
+    if (!empty($ff['since'])) { fwrite(STDERR, "      frozen since:  " . $ff['since'] . "\n"); }
+    if (!empty($ff['until'])) { fwrite(STDERR, "      until:         " . $ff['until'] . "\n"); }
+    if (!empty($ff['why']))   { fwrite(STDERR, "      why:           " . $ff['why'] . "\n"); }
+    fwrite(STDERR, "\n  A DEFECT FIX IS NOT AFFECTED and must not be made to feel like it is: this\n");
+    fwrite(STDERR, "  leg fires only for a branch named in 'protected'. Everything else merges on a\n");
+    fwrite(STDERR, "  green suite, which is the whole reason this is not the emergency 'freeze'.\n\n");
+    fwrite(STDERR, "  ONLY TOM LIFTS IT: set feature_freeze.active to false in dev/branch-policy.json,\n");
+    fwrite(STDERR, "  in a turn where he has said so. An AI clearing its own freeze is the 09-13\n");
+    fwrite(STDERR, "  failure wearing a different hat.\n");
+    fwrite(STDERR, "  Genuinely need to bypass?  git merge --no-verify\n\n");
+    exit(1);
+}
+
 if ($why === '') { exit(0); }
 
 fwrite(STDERR, "\n  REFUSED: '$branch' is a protected branch and $why.\n\n");
