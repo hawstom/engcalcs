@@ -139,6 +139,31 @@ the block.
     `lpn_inp_export_flat_coords`): EPANET holds one position per node, so the other scenarios'
     positions live in the project file alone. Not carried into Find and replace or push-to-base.
 
+  - **POSITION SITS IN SLOTS 2 AND 3, IN BOTH THE POPUP AND THE TABLES. TOM RULED IT 2026-09-15**
+    after putting the question to Declan, Sue and Mary. His reason for one order rather than two:
+    **one rule, no special case to remember.** Also the order of fundamentalism, EPANET's Property
+    Editor order for all five object types, and **PNEZD** -- Point, Northing, Easting, Elevation,
+    Description -- a decades-old surveying convention the trade already reads (Declan's citation).
+    - **THE SHIPPED CODE HAD A THIRD POSITION NOBODY PROPOSED**, and only Declan found it because
+      only he read the code: the popup had them LAST while the tables had them at slots 4-5,
+      between Elevation and Demand. Fixed with the ruling.
+    - **SUE'S ARGUMENT INVERTS THE OBVIOUS OBJECTION and is the reusable part.** *"People rarely
+      edit it"* is the wrong test: a transposed X/Y or a wrong datum is **invisible to the solver**
+      -- the network still balances -- and surfaces only on a GIS overlay or an as-built check.
+      Rarely touched AND load-bearing is what belongs where a reviewer's eye lands. Her real
+      workflow for a coordinate is an ID-by-ID QA pass against a survey deliverable, not editing.
+    - **DECLAN DISSENTED, MEASURED IT, AND WAS OVERRULED -- his number stands.** In a TABLE these
+      are real typeable inputs rather than the `tabIndex=-1` cells the pane uses for computed
+      columns, so a clerk who places nodes by pointer pays two unskippable stops per row: **about
+      800 stray keystrokes over 400 junctions.** A trailing column is skippable by clicking the
+      next row; a middle one is not. **That cost becomes payable when table columns become
+      customizable, and it is the first thing to revisit then.**
+    - **TOM'S `!!!` ABOUT EPANET IS ANSWERED AND IT IS NOT A SURPRISE TO ACCOMMODATE.** He noticed
+      the Property Editor puts Description and Tag ahead of Elevation. **EPANET disagrees with
+      itself**: `[JUNCTIONS]` is `ID Elev Demand Pattern`, Description is a trailing comment and
+      Tag is its own `[TAGS]` section. All three seats independently concluded the dialog order is
+      GUI archaeology, and none could find an EPA rationale. CLAUDE.md's settled rule already
+      covers it -- **we defer to EPANET's terminology, never to its layout.**
 - 50|675| **A labelled grid, with the significant digits picked out.**
   Tom, 2026-09-15: a grid in Settings with *"options for density and opacity"*, labelled *"at the
   lower and left map edges aligned with each grid line"*, showing three significant digits large

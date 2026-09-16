@@ -15908,8 +15908,12 @@ var EngCalcs = EngCalcs || {};
 				id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
 				group: 'node', type: 'junction',
 				cols: [
-					paneColId(), paneColActive(), paneColElev(),
-					paneColCoord(1), paneColCoord(2),
+					// Position in slots 2-3, matching the popup. Tom, 2026-09-15: one rule for
+					// both surfaces. See renderNodeFields() for the reasoning and for Declan's
+					// measured dissent, which stands and is revisited when columns become
+					// customizable.
+					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColActive(), paneColElev(),
 					// **THE TYPED ONE IS THE EDITABLE ONE, AND IT IS THE ONLY EDITABLE ONE** -- see
 					// resolvedDemand(). The Demand column beside it is a plain cell with no control
 					// in it at all, so there is no path by which the resolved number could be typed
@@ -15939,8 +15943,12 @@ var EngCalcs = EngCalcs || {};
 				id: 'reservoirs', panel: 'lpn_pane_reservoirs', label: 'lpn_pane_tab_reservoirs',
 				group: 'node', type: 'reservoir',
 				cols: [
-					paneColId(), paneColActive(), paneColElev(),
-					paneColCoord(1), paneColCoord(2),
+					// Position in slots 2-3, matching the popup. Tom, 2026-09-15: one rule for
+					// both surfaces. See renderNodeFields() for the reasoning and for Declan's
+					// measured dissent, which stands and is revisited when columns become
+					// customizable.
+					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColActive(), paneColElev(),
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
 					// whose water surface is its ground, not a reservoir with no head.
@@ -15959,8 +15967,12 @@ var EngCalcs = EngCalcs || {};
 				id: 'tanks', panel: 'lpn_pane_tanks', label: 'lpn_pane_tab_tanks',
 				group: 'node', type: 'tank',
 				cols: [
-					paneColId(), paneColActive(), paneColElev(),
-					paneColCoord(1), paneColCoord(2),
+					// Position in slots 2-3, matching the popup. Tom, 2026-09-15: one rule for
+					// both surfaces. See renderNodeFields() for the reasoning and for Declan's
+					// measured dissent, which stands and is revisited when columns become
+					// customizable.
+					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColActive(), paneColElev(),
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
@@ -35488,6 +35500,27 @@ var EngCalcs = EngCalcs || {};
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); });
 		clearFields(fields);
+		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
+		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
+		// across the popup AND the tables rather than two: *"one rule, no special case to
+		// remember."* It is also the order of fundamentalism, EPANET's own Property Editor order
+		// for all five object types, and PNEZD -- Point, Northing, Easting, Elevation, Description
+		// -- which is a decades-old surveying convention the trade already reads.
+		//
+		// **SUE'S ARGUMENT IS THE ONE THAT INVERTS THE OBVIOUS OBJECTION.** "People rarely edit it"
+		// is the wrong test: a transposed X/Y or a wrong datum is INVISIBLE TO THE SOLVER -- the
+		// network still balances -- and surfaces only on a GIS overlay or an as-built check. Rarely
+		// touched AND load-bearing is exactly what belongs where a reviewer's eye lands.
+		//
+		// **DECLAN DISSENTED, MEASURED, AND WAS OVERRULED WITH A REASON -- so his number stands and
+		// is not deleted.** In a TABLE these are real typeable inputs, not the `tabIndex=-1` cells
+		// the pane uses for computed columns, so a clerk who places nodes by pointer and never
+		// types a coordinate pays two unskippable tab stops on every row: about 800 stray keystrokes
+		// over 400 junctions. A TRAILING column can be skipped by clicking the next row instead of
+		// tabbing on; a middle one cannot. He recommended splitting the two surfaces. **That cost
+		// becomes payable the day table columns are customizable (Task 186's neighbourhood), and it
+		// is the first thing to revisit then.** Full reasoning: dev/agents/data-entry-clerk/.
+		nodeCoordFields(fields, n);
 		if (n.type === 'tank') {
 			// FIVE INPUTS AND ONE COMPUTED ROW, in the order a person builds a tank: where the
 			// bottom sits, how much water is in it right now, how far it can go either way, and how
@@ -35685,7 +35718,6 @@ var EngCalcs = EngCalcs || {};
 		customPropFields(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
-		nodeCoordFields(fields, n);
 		importNotesField(fields, n);
 		tipsIn(fields);
 	}
