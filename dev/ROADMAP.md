@@ -469,23 +469,32 @@ the block.
 
 - 100|539| **Gang the neighbour labels so their leaders stop crossing.**
   Tom, 2026-08-26, on a screenshot of two crossing leaders: *"when it looks so easy (to a human) to
-  resolve, it's embarrassing."* All three phases are built and measured; every measured view of
-  every shipped example is at **0 crossings**, at a cost of 38 hidden labels across 28 views.
-  Numbers, both of his routes, the flicker repair and the measurement defect found with it:
-  `dev/label-placement-algorithms.md` §8-§11d.
-  - **START THE BRANCH. Tom, 2026-09-15: *"I would want to get this branch started on the grounds
-    that having a better network model could improve our performance placing labels."*** That is a
-    better reason than the one `spot_prime` was parked on, and it supersedes it. The case against
-    was that none of the five residual pairs is a gang with free labels and open ground, so a search
-    could fix none of them -- true, and it measures the wrong thing. **His argument is that the
-    MODEL is the asset**, not this week's crossing count: a count already at zero cannot show
-    whether the placement is GOOD, only that it is not embarrassing.
+  resolve, it's embarrassing."* **All four phases are built and measured.** Every measured view of
+  every shipped example is at **0 crossings**, at a cost of **38 hidden labels across the 28 views,
+  down from 44** -- the numbers, both of his routes, the `spot_prime` search, the flicker repair and
+  the three measurement defects found with them: `dev/label-placement-algorithms.md` §8-§12e.
+  - **PHASE FOUR WAS STARTED ON A BETTER REASON THAN THE ONE IT WAS PARKED ON. Tom, 2026-09-15:
+    *"I would want to get this branch started on the grounds that having a better network model
+    could improve our performance placing labels."*** The case against was that none of the five
+    residual pairs is a gang with free labels and open ground -- true, and it measures the wrong
+    thing. **The MODEL is the asset**: a count already at zero cannot show whether the placement is
+    GOOD, only that it is not embarrassing. **So the criterion became the labels the shed HIDES, and
+    that is what moved.**
+  - **A LEADER ACROSS A PIPE IS A TERM AND NOT A GATE, and that one call was the whole difference.**
+    Gated, the search proposed 56 trials on Net3-World and 54 were refused, because in a mesh of
+    pipes almost no open ground is reachable without crossing one. Goal 8 is the second-mildest
+    weight in the ladder; the score tuple now says so. §12c, with the measurement that the term
+    changes nothing by itself.
   - **The five pairs left anywhere have BOTH halves hand-placed by the user, and an automatic pass
-    may not hide a hand-placed label.** That bounds what the branch may touch; they are named by id
-    in the harness.
+    may not hide a hand-placed label.** They are named by id in the harness and that is correct.
+  - **What is deliberately NOT built, each for a stated reason rather than a shrug** (§12b): the
+    tile-indexed precomputation of spots, because free space is a per-VIEW quantity and an index of
+    the drawing cannot answer it; and `text_size_largest_perfect_fit`, which is an automatic text
+    size and a separate feature.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
-    the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
+    the A B A B A flicker got through the first time. All 28 views settle on the first pass.
+    `dev/lpn-spike/label-spot-harness.js` holds phase four and ratchets the shed's bill.
 - 100|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
   **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
   and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size).

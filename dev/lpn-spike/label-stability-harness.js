@@ -37,6 +37,10 @@ const { measure, EXAMPLES } = require('./label-crossing-measure.js');
 // dev/label-placement-algorithms.md section 11.
 const HEADLINE = ['Net3-Novato-CA-World.lwn', 'Net2.lwn'];
 const PASSES = 5;
+// The three repair routes plus the shed -- what the page actually does. Named once, because this
+// harness and label-gang-harness.js must be asking about the same drawing; they were both spelling
+// it 'both+shed' when the spot route made that two routes out of three (Task 539 phase four).
+const SHIPPED = 'all+shed';
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -123,7 +127,7 @@ function check(file, mode) {
 async function main() {
 	const arg = process.argv[2];
 	if (arg === '--measure') {
-		const out = await measure(process.argv[3], process.argv[4] || 'both+shed',
+		const out = await measure(process.argv[3], process.argv[4] || SHIPPED,
 			{ passes: Number(process.argv[5]) || PASSES });
 		// EXIT EXPLICITLY, with the callback -- the vendored EPANET engine leaves a handle open and
 		// a child that merely returns never exits (see label-crossing-harness.js).
@@ -139,10 +143,10 @@ async function main() {
 	// records why they are worth asking for separately -- the two-cycle that started this was in the
 	// gang route and the shed merely carried it onto the screen.
 	const modes = process.argv.slice(2).filter(function (a) {
-		return /^(off|brute|gang|both|dry)(\+shed)?$/.test(a);
+		return /^(off|brute|gang|spot|both|all|dry)(\+shed)?$/.test(a);
 	});
 	console.log('--- five passes over one untouched view; the layout must not move ---');
-	files.forEach(function (f) { (modes.length ? modes : ['both+shed']).forEach(function (m) { check(f, m); }); });
+	files.forEach(function (f) { (modes.length ? modes : [SHIPPED]).forEach(function (m) { check(f, m); }); });
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);
 }

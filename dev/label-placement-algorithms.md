@@ -368,7 +368,8 @@ happen.
 ### 9b. Finding `spot_prime`, and his own flag on it
 
 *"I waved my wand over finding spot-prime; if it's hard, let me know."* **So this is the one part
-he has not specified and the one part to report back on.** His proposal for making it affordable:
+he has not specified and the one part to report back on.** It is BUILT now and section 12 is the
+report; what follows is the sketch it was built from. His proposal for making it affordable:
 
 *"the good news is that a tile-indexed spot_prime list can be pre-calculated and stored in the form
 of centroids and extreme boxes (for fully bounded prime spots) and angles (for edge prime spots).
@@ -399,7 +400,9 @@ only once for the network"*.
 
 - **Settled**: both routes get built and measured against each other; §8's per-view crossing count
   is the measurement; the dev control knobs may be re-opened for the experiment.
-- **Not settled, and his own flag**: how `spot_prime` is found. Report back before building it.
+- **Was not settled, and was his own flag**: how `spot_prime` is found. Answered by section 12; the
+  tile-indexed precomputation and `text_size_largest_perfect_fit` are the two clauses that were
+  NOT built, each with a reason there rather than a shrug.
 - **Not stated either way, and now decided**: it is a REPAIR PASS after `shedAlignedForConflicts()`
   and after every other placement, which preserves every measurement in §8. See §10.
 
@@ -531,9 +534,14 @@ strengthening it.** The pairs that remain after phase two are 5 at the fit zoom 
 on Net3 (XY); §11 drives all of them to zero by hiding one of each, at 2 to 9 labels a view. **So
 what a `spot_prime` search would now buy is not fewer crossings -- there are none -- but fewer
 HIDDEN LABELS**, which is a real gain and a much smaller one than the case this section was written
-against. Count what a search would actually recover before building it: how many of the labels §11
-hides had open ground within reach that the candidate list did not offer. That is the cheap next
-measurement, and it is the difference between a feature and a search that finds nothing to do.
+against.
+
+**THAT RECOMMENDATION WAS OVERTAKEN, AND §12 IS THE BUILD.** Tom, 2026-09-15: the MODEL is the
+asset, and a count already at zero cannot say whether the placement is good. The measurement this
+paragraph asked for -- how many hidden labels had open ground the candidate list did not offer --
+turned out to be cheaper to take by building the search than by proxying it, and the answer is 6 of
+the 44 across the 28 views. §12 has the numbers and the three ways the first build reported
+nothing.
 
 ---
 
@@ -747,6 +755,172 @@ described labels overlapping each other with leaders through them.
   pairs at that zoom, and a leader running through a label reads as stacking.** If it still looks
   stacked to him on the shipped build, the next measurement is the overlap count at his own window
   size, not another placement change.
+
+---
+
+## 12. Phase four: `spot_prime` is built, and the number it moves is the shed (Task 539, 2026-09-15)
+
+**Tom asked for this branch on a ground that cuts against the ranking argument that had parked it,
+and he was right to.** 2026-09-15: *"I would want to get this branch started on the grounds that
+having a better network model could improve our performance placing labels."* Section 10c's case
+against was that not one of the five residual crossing pairs is a gang with free labels and open
+ground, so a search can fix none of them. **That is true and it measures the wrong thing.** Every
+measured view is already at 0 crossings, and a count at zero cannot tell you whether the placement
+is GOOD -- only that it is not embarrassing. **So the success criterion here is not the crossing
+count. It is the labels phase three has to HIDE to reach zero**, which section 10c itself named as
+the thing a search would now buy.
+
+`Collide.spotPrime()` in `js/lpn-collide.js` is the search;
+`spotStackTrials()` inside `repairCrossingGangs()` is the third trial family that uses it;
+`dev/lpn-spike/label-spot-harness.js` holds both.
+
+### 12a. What `spot_prime` turned out to be
+
+It is section 9b's own object, found per GANG rather than per network, and it is the standard search
+section 10c predicted it would be -- maximal empty rectangles over an occupancy raster, which is
+the affordable form of largest-empty-rectangle and is what Luboschik's particle-based labeling does
+(section 2). Nothing in it is novel and nothing in it needed to be.
+
+- **The grid** is capped at 48 cells a side whatever the reach, so a search is a fixed number of
+  cells and the cell SIZE grows with the area being asked about. Obstacle boxes are marked through
+  the exact oriented test rather than through their bounding range, because an aligned pipe label at
+  45 degrees fills a fifth of its own bounding box and marking the rest off would hide the ground
+  this pass exists to find.
+- **The rectangles** come from `up` heights plus one largest-rectangle-in-histogram scan per row.
+- **A spot is a PLACE, not a rectangle**, which is what makes his three extreme boxes the right
+  description: tallest skinny, widest squat and biggest square are read off every maximal rectangle
+  that CONTAINS the spot's centre. Without that, a run of forty maximal rectangles over one patch of
+  empty ground reads as forty spots.
+- **Spots come back nearest first**, because a leader is an association: of two spots that both hold
+  the stack, the near one says which node it belongs to and the far one asks the reader to follow a
+  line.
+- **It runs only where the cheap routes have left a crossing standing**, which is his *"near
+  failures or needs"* read as a schedule rather than as a place. On the shipped drawings that is a
+  minority of gangs, and it is what keeps the pass inside its frame budget.
+
+**THE RASTER ONLY PROPOSES; ADMISSION IS STILL EXACT, and that is the whole safety argument.** A
+spot is a suggestion of where to try a stack. Every trial built on one still goes through
+`pieceFor()`'s `boxesClearOf()` against the real obstacle list, still has to pass `admissible()`, and
+still has to beat the incumbent on the crossing count. So a cell the grid marks free that is not
+costs a wasted trial and can never reach the drawing -- which is the reverse of the usual
+grid-versus-definition risk, and is why the segment walk may sample rather than supercover.
+
+**Steps 2, 3 and 4 of section 9a are the caller and they went in unchanged.** `need` is step 2 (the
+estimated extents of the n stacked labels); the two column EDGES are step 3 in his own words
+(*"from the middle left point leftward or middle right point rightward of box_est"*), and it is the
+one place this could have been written backwards -- `labelBoxAtEnd()` hangs the text off the endpoint
+on the side AWAY from the anchor, so a column standing in a spot to the RIGHT of the gang has its
+endpoints on the spot's LEFT edge. Step 4 is `assignByAngle()`, which route (b) already used.
+
+### 12b. Two things were his to decide and the record did not contain a decision
+
+- **The tile-indexed PRECOMPUTATION is deliberately not built** (*"can be pre-calculated ... all in
+  advance of zooms, and all only once for the network"*). Section 10c's first finding is why: free
+  space is a per-VIEW quantity, so an index of the DRAWING cannot answer the question being asked of
+  the VIEW. What makes the search affordable instead is that it is per gang, over the gang's own
+  neighborhood, and only where a crossing survived. **If it is ever wanted, it bounds where to look
+  and does not replace the look.**
+- **`text_size_largest_perfect_fit` is not built either**, on section 10c's own argument: it is an
+  automatic text size, which is a different feature, and it should be judged on its own merits
+  rather than ridden in on this task.
+
+### 12c. A LEADER ACROSS A PIPE IS A TERM AND NOT A GATE, which was the whole difference
+
+The first build gated a spot trial on the leader breaking none of the perfect-world rules section 9c
+names -- *"without breaking any of our 'perfect world' rules including leaders crossing links or
+symbols"*. **Measured, that gate refused 54 of the 56 trials the search proposed on Net3-World**: in
+a mesh of pipes almost no open ground is reachable without crossing one, so the pass reported dozens
+of spots found and nothing tried at all.
+
+`GOAL_WEIGHT` has the answer and has had it since the first-fit was written. **Goal 8, leaders avoid
+links, is the second-mildest weight in the whole ladder** -- an absolute gate on it is harsher than
+this project's own ranking of it. So the score tuple gained a fifth term, `linkX`, exactly where goal
+8 sits: `[crossings, blocked, hits, yielding, linkX, len]`. It is a tiebreak and nothing more, since
+no trial that lowers the crossing count can lose to one that does not.
+
+**And the term changes nothing by itself, which is worth knowing before anybody suspects it.**
+Measured: the `both` mode -- brute and gang, no spot route -- is byte-identical with and without
+`linkX`, on all 28 views. It never breaks a tie the old tuple had not already decided. **The whole
+of the gain below is the spot route.**
+
+**The one gate that stayed is goal 5, a leader through somebody else's node symbol**, because that
+leader says the wrong thing outright: the reader is told the label belongs to that node.
+
+### 12d. THREE FAILURES THAT REPORTED NOTHING, and all three are fixtures now
+
+Every one of them failed by finding LESS, which is the family of failure this whole task's
+measurement lessons are about (section 11d).
+
+1. **A leader starts inside its own node's symbol, always, and a symbol box carries no owner to
+   exempt it by.** `staticObstacles()` builds one from the node's radius and nothing else, so
+   "passes through no symbol" refused every leader ever drawn: **108 spots found on Net3-World and 0
+   trials scored**, with the statistics printing both numbers and nobody reading them together. The
+   test that says "this is the symbol I come out of" is the box containing the leader's ANCHOR.
+2. **A rectangle cap below the geometric maximum truncated in ROW ORDER.** The histogram scan emits
+   at most one rectangle per (row, stack pop), so a grid of side N produces at most N x N; a cap at
+   512 over a 48 x 48 grid kept only rectangles from the top sixteen rows. A raster round one
+   obstacle in an empty field returned **the band above it and none of the three beside it** -- the
+   four bands were all there and three were never emitted. The cap is now N x N, where it cannot
+   bind.
+3. **The histogram stack held HEIGHTS instead of indices**, so the left edge of a closing bar was
+   guessed and came out on the far side of the hole: it emitted a 200 x 120 rectangle straight
+   through the obstacle. Plausible output, and only a fixture that knows the field can see it.
+
+**And one that was cost rather than correctness:** the segment walk was not clipped to the grid.
+`obstaclesInReach()` admits a segment that passes anywhere near the gang, and a trunk main on Net2
+is many times the width of the raster, so walking the whole of it stepped thousands of times through
+empty coordinate space to mark a handful of cells -- **221 ms a pass at the fit zoom of Net2 against
+26 ms with the spot route off.** Clipped first, the same drawing is within the noise of the other
+routes.
+
+### 12e. The numbers, before and after, from the same pass
+
+**Taken 2026-09-15 on this branch, 1400x900, every label field on, solved through EPANET, and BOTH
+columns measured on the same tree** -- which section 11d is the reason for: the `both` column here
+is not section 11c's, because master has moved since and a comparison across two trees describes a
+drawing that does not exist. `both+shed` is the three-phase build as it shipped; `all+shed` is it
+plus the spot route. Cells are the four views in order: zoom-to-fit, then 2x, 4x and 8x in from it.
+
+| drawing | crossings, either mode | labels hidden, `both+shed` | labels hidden, **`all+shed`** | labels drawn, `both` -> **`all`** |
+|---|---|---|---|---|
+| Net3-Novato-CA-World | 0 / 0 / 0 / 0 | 6 / 8 / 5 / 1 | **5 / 7 / 4 / 0** | 56/111/147/187 -> **57/112/150/188** |
+| Net3 (XY) | 0 / 0 / 0 / 0 | 7 / 6 / 0 / 0 | **6 / 5 / 0 / 0** | 75/124/174/206 -> **76/125/174/206** |
+| Net2 | 0 / 0 / 0 / 0 | 2 / 0 / 0 / 0 | **2 / 0 / 0 / 0** | 50/60/76/81 -> **50/62/76/81** |
+| Net1 | 1 / 0 / 0 / 0 | 0 / 0 / 1 / 2 | **0 / 0 / 1 / 2** | 25/27/26/25 -> unchanged |
+| Elm-Street-Center | 3 / 1 / 0 / 0 | 1 / 1 / 3 / 1 | **1 / 1 / 3 / 1** | 39/46/45/47 -> unchanged |
+| Basic example, either unit set | 0 throughout | 0 | **0** | unchanged |
+| **28 views** | **5 pairs, all of them hand-placed on both sides** | **44** | **38** | **1,789 -> 1,799** |
+
+**Five findings:**
+
+1. **The shed is 14% less busy: 44 labels hidden across the 28 views against 38, and 10 more labels
+   drawn.** That is the number Tom's own ruling made the cost of zero, and it is the only number this
+   phase set out to move.
+2. **The crossing count did not move, because it could not: it was 0 and it is 0.** The five pairs
+   that stand are the same five, and both halves of each are the user's own hand-placed labels --
+   Elm-Street-Center `n:J11|n:JF-ELM`, `n:J12|n:J13`, `n:J12|n:J14` at the fit zoom and
+   `n:J13|n:J14` at 2x, Net1 `n:10|n:11` at the fit zoom. An automatic pass may not hide a
+   hand-placed label, so that outcome is correct and is asserted by id.
+3. **The gain is on the big drawings and nowhere else, and the shape of that is the finding.** The
+   two Net3s account for all of it; Net1 and Elm-Street do not move at all, and they are the two
+   drawings whose labels are mostly the user's own. A search for open ground pays where there are
+   enough labels to be crowded and enough map to be empty.
+4. **Every one of the 28 views still settles on the FIRST pass** -- 56 of 56 checks in
+   `label-stability-harness.js --full`, `AAAAA` on all of them, the shed picking the same victims
+   every time. That was the risk worth naming in advance: a trial family that reaches further has
+   more ways to disagree with itself between passes, and it does not, because `spotPrime()` is a
+   pure function of the obstacle field it is handed and the field is a pure function of the drawing.
+5. **The repair sub-pass roughly doubles and the content pass does not notice.** Back to back on
+   Net3-World: 49 ms against 95 ms at the fit zoom, 37 against 90 at 4x. The content pass those sit
+   inside runs 600-1,400 ms on the same drawing under Node with the DOM stub, and a five-pass median
+   of the whole pass put `all+shed` FASTER than `both+shed` on two of the four views -- which is not
+   a speed claim, it is the factor-of-four machine noise section 10b warns about. Both figures are
+   Node with the DOM stub and neither is a browser measurement.
+
+**What is not claimed.** Section 11e's other half still stands: the labels-on-top-of-each-other
+picture Tom sent could not be reproduced headlessly, the overlap count is 0 on every view before and
+after this, and if it still looks stacked to him the next measurement is the overlap count at his own
+window size.
 
 ---
 

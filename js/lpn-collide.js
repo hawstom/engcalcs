@@ -1298,6 +1298,285 @@ EngCalcs.lpnCollide = (function () {
 		return worst;
 	}
 
+
+	// ---- ROADMAP Task 539, phase four: spot_prime -- WHERE IS THE OPEN GROUND ------------------
+	//
+	// **Tom's own step 1** (2026-09-08, dev/label-placement-algorithms.md section 9a): *"identifying
+	// a prime spot_prime of open real estate (n labels could stack here!) near failures or needs"*,
+	// and beside it the only part of the sketch he did not specify -- *"I waved my wand over finding
+	// spot-prime; if it's hard, let me know."* This is the answer, and it is section 9b's own object:
+	// a centroid, and the **three extreme boxes** he asked for -- tallest skinny, widest squat, and
+	// the biggest square whose size bounds the other two.
+	//
+	// **WHY IT BUYS ANYTHING AT ALL, which is not the crossing count.** Every measured view already
+	// sits at 0 crossings, so the number this moves is the one section 10c named: the labels phase
+	// three has to HIDE. A gang's candidate endpoints are the four corners of its node's symbol plus
+	// a polar raster reaching three label offsets out (nodeFirstFitSpec()); ground further away than
+	// that is invisible to the repair however empty it is, so a pair with open country a label's
+	// width beyond the raster reads as unfixable and one of the two gets hidden. This is the pass
+	// that can see that ground.
+	//
+	// **THE RASTER ONLY PROPOSES; ADMISSION IS STILL EXACT, and that is what makes an approximate
+	// occupancy grid safe here.** A spot is a suggestion of where to try a stack. Every trial built
+	// on one still goes through pieceFor()'s boxesClearOf() against the real obstacle list and still
+	// has to pass admissible() and beat the incumbent on the crossing count -- so a cell this
+	// marks free that is not costs a wasted trial and can never reach the drawing. That is the
+	// reverse of the usual grid-versus-definition risk and is why the segment walk below may sample
+	// rather than supercover.
+	//
+	// **THE SEARCH IS THE STANDARD ONE** (section 10c, finding 2): maximal empty rectangles over an
+	// occupancy raster, which is the affordable form of largest-empty-rectangle and is what
+	// Luboschik's particle-based labeling does. `up` heights plus one histogram scan per row gives
+	// every maximal rectangle in O(cells); nothing here is novel and nothing here needs to be.
+	//
+	// **WHAT IS NOT BUILT, AND IT IS HIS OTHER TWO CLAUSES.** (a) The tile-indexed PRECOMPUTATION
+	// (*"can be pre-calculated ... all in advance of zooms, and all only once for the network"*) is
+	// deliberately absent: section 10c's first finding is that free space is a per-VIEW quantity --
+	// link labels appear, shed and vanish with the zoom, and a stationed label yields to a node
+	// label placed this pass -- so an index of the DRAWING cannot answer the question being asked of
+	// the VIEW. What makes it affordable instead is that it runs per GANG, over the gang's own
+	// neighborhood, and only where the cheap routes have left a crossing standing. (b)
+	// `text_size_largest_perfect_fit` is a different feature -- an automatic text size -- and
+	// section 10c's third finding is that it should be judged on its own merits rather than ridden
+	// in on this task.
+	//
+	// Cost is bounded by construction and not by a budget: the grid is capped at SPOT.maxCells on a
+	// side whatever the reach, so a spot search is a fixed number of cells and the cell SIZE grows
+	// with the area being asked about.
+	var SPOT = {
+		// A side of the occupancy grid, in cells. 48 x 48 is 2,304 cells, and the cell it implies at
+		// a gang's own reach is a fraction of a label row -- finer than the question deserves, since
+		// what a spot has to resolve is "does a column of n rows fit".
+		maxCells: 48,
+		minCells: 8,
+		// How much further than the existing candidate reach a spot may sit. The whole point is
+		// ground the candidate raster cannot see, so it must be more than 1; a leader is an
+		// association and a long one is a weak one, so it must not be much more. **The obstacle
+		// neighborhood and the placements-in-reach set are both widened to match** -- a raster
+		// reaching past the obstacles it was given would call occupied ground free, and score()
+		// would not see the crossing it made out there.
+		reachFactor: 2,
+		// Spots tried per gang, nearest first, and the two column edges of each: 8 trials.
+		maxSpots: 4,
+		// **A SAFETY VALVE THAT CANNOT BIND, AND IT DID BIND.** The histogram scan emits at most
+		// one maximal rectangle per (row, stack pop), so a grid of side N produces at most N x N of
+		// them -- 2,304 here. A cap BELOW that truncates in ROW ORDER, which is a silent positional
+		// bias and not a budget: with it at 512 a 40 x 40 raster round one obstacle returned the
+		// band above it and nothing else, because every kept rectangle came from the top sixteen
+		// rows. The four bands were all there; three of them were never emitted.
+		maxRects: 48 * 48
+	};
+	// **A LEADER INTO A SPOT IS A LONG LEADER, so it is held to a rule the short ones never needed.**
+	// GOAL_WEIGHT has carried `leaderSymbol` and `leaderLink` since the first-fit was written -- a
+	// leader through a node symbol or across a pipe is a real violation, and Tom's own sizing method
+	// names it (section 9c: *"without breaking any of our 'perfect world' rules including leaders
+	// crossing links or symbols"*). It has never been a gate because within three label offsets of
+	// its own node a leader can barely reach anything. A leader to a spot can cross half a
+	// neighborhood, so for THESE trials it is a gate. Deliberately not applied to the existing
+	// routes: their rankings are measured, and turning a weight into a gate under them would move
+	// labels for a reason unrelated to this task.
+	function leaderClearOfSymbols(g, obs, ownerId) {
+		var i, o;
+		if (!g) { return true; }
+		for (i = 0; i < obs.boxes.length; i++) {
+			o = obs.boxes[i];
+			if (o.kind !== 'symbol') { continue; }
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			// **A LEADER STARTS INSIDE ITS OWN NODE'S SYMBOL, ALWAYS, and a symbol box carries no
+			// owner to exempt it by.** staticObstacles() builds one from the node's radius and
+			// nothing else, so the test below is what says "this is the symbol I come out of":
+			// the box containing the leader's ANCHOR. Without it this function refuses every
+			// leader ever drawn -- measured, and it refused all 108 spots found on Net3-World
+			// while reporting nothing at all, which is the shape of failure this whole task's
+			// measurement lessons are about.
+			if (boxOverlapDepth(box(g.ax, g.ay, 0, 0, 0), o) >= 0
+					&& Math.abs(g.ax - o.cx) <= o.w / 2 && Math.abs(g.ay - o.cy) <= o.h / 2) {
+				continue;
+			}
+			if (segmentInBoxFraction(g, o) > 0) { return false; }
+		}
+		return true;
+	}
+	// HOW MANY PIPES a leader crosses. Goal 8, and the second-mildest weight in the whole ladder --
+	// which is exactly why it is a TERM and not a gate. A gate on it was built first and measured:
+	// on Net3-World it refused 54 of the 56 trials the spot search proposed, because in a mesh of
+	// pipes almost no open ground is reachable without crossing one, and the pass then reported
+	// dozens of spots found and nothing tried. The suite's own ranking says a leader across a pipe
+	// is worse than a long leader and better than everything above it; the score tuple now says the
+	// same thing.
+	function leaderLinkCrossings(g, obs, ownerId) {
+		var i, o, n = 0;
+		if (!g) { return 0; }
+		for (i = 0; i < obs.segments.length; i++) {
+			o = obs.segments[i];
+			if (o.kind !== 'link') { continue; }
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			if (segmentsCross(g, o)) { n++; }
+		}
+		return n;
+	}
+	/**
+	 * THE OPEN REAL ESTATE within `reach` of `center`, as section 9b's objects.
+	 *
+	 * `need` is the footprint the caller wants to stand in one -- `{w, h}` -- and it is a FILTER and
+	 * not a request: a spot is returned only if one of its three extreme boxes holds it, so the
+	 * caller never has to re-ask. `cell` is the occupancy resolution and defaults to a quarter of
+	 * the needed height, which is the quantity a stack of rows is measured in.
+	 *
+	 * Returns spots NEAREST FIRST -- `[{cx, cy, dist, tall, squat, square}]`, each extreme box
+	 * `{cx, cy, w, h}` in world units. Nearest first because a leader is an association: of two
+	 * spots that both hold the stack, the near one says which node it belongs to and the far one
+	 * asks the reader to follow a line.
+	 */
+	function spotPrime(center, reach, obs, opts) {
+		opts = opts || {};
+		var need = opts.need || { w: 0, h: 0 },
+			cell = opts.cell > 0 ? opts.cell : Math.max(need.h / 4, 1e-9),
+			n = Math.ceil(2 * reach / cell), x0, y0, blocked, i, j, k, o, ii, jj,
+			up, rects = [], spots = [], used = [], c, r, bb, best, corners, minx, maxx, miny, maxy;
+		if (!(reach > 0)) { return []; }
+		if (n > SPOT.maxCells) { n = SPOT.maxCells; }
+		if (n < SPOT.minCells) { n = SPOT.minCells; }
+		cell = 2 * reach / n;
+		x0 = center.x - reach;
+		y0 = center.y - reach;
+		blocked = new Uint8Array(n * n);
+		function mark(i2, j2) {
+			if (i2 >= 0 && j2 >= 0 && i2 < n && j2 < n) { blocked[j2 * n + i2] = 1; }
+		}
+		function cellBox(i2, j2) {
+			return box(x0 + (i2 + 0.5) * cell, y0 + (j2 + 0.5) * cell, cell, cell, 0);
+		}
+		// Boxes: the cells an obstacle's own bounding range covers, each confirmed by the exact
+		// oriented test rather than by the range alone -- an aligned pipe label at 45 degrees fills
+		// a fifth of its own bounding box, and marking the rest of it off would hide the open ground
+		// this pass exists to find.
+		for (k = 0; k < obs.boxes.length; k++) {
+			o = obs.boxes[k];
+			if (o.yields) { continue; }   // a stationed pipe label gives way to a node label
+			corners = boxCorners(o);
+			minx = maxx = corners[0].x; miny = maxy = corners[0].y;
+			for (i = 1; i < 4; i++) {
+				if (corners[i].x < minx) { minx = corners[i].x; }
+				if (corners[i].x > maxx) { maxx = corners[i].x; }
+				if (corners[i].y < miny) { miny = corners[i].y; }
+				if (corners[i].y > maxy) { maxy = corners[i].y; }
+			}
+			ii = Math.max(0, Math.floor((minx - x0) / cell));
+			jj = Math.max(0, Math.floor((miny - y0) / cell));
+			for (i = ii; i < n && x0 + i * cell <= maxx; i++) {
+				for (j = jj; j < n && y0 + j * cell <= maxy; j++) {
+					if (!blocked[j * n + i] && boxOverlapDepth(cellBox(i, j), o) > 0) { mark(i, j); }
+				}
+			}
+		}
+		// Segments: walked at a third of a cell. A sample walk can miss a cell a segment merely
+		// clips at a corner, which is the one place this grid is optimistic -- see the header: an
+		// optimistic cell costs a rejected trial and cannot reach the drawing.
+		//
+		// **CLIPPED TO THE GRID FIRST, AND IT IS THE COST OF THE WHOLE PASS.** obstaclesInReach()
+		// admits a segment that passes anywhere near the gang, and a trunk main on Net2 is many
+		// times the width of the raster -- so walking the whole of it stepped thousands of times
+		// through empty coordinate space to mark a handful of cells. Unclipped, the spot route cost
+		// 221 ms a pass at the fit zoom of Net2 against 26 ms without it; clipped, the same drawing
+		// is within noise of the unclipped routes. The walk is also stepped in WHOLE cells of the
+		// clipped span rather than in a fraction of the segment's own length, so the step count is
+		// a property of the grid and not of the pipe.
+		for (k = 0; k < obs.segments.length; k++) {
+			o = obs.segments[k];
+			var dx = o.bx - o.ax, dy = o.by - o.ay, t0 = 0, t1 = 1, steps, t, ok = true;
+			[[dx, o.ax, x0, x0 + 2 * reach], [dy, o.ay, y0, y0 + 2 * reach]].forEach(function (ax) {
+				var d = ax[0], p0 = ax[1], lo = ax[2], hi = ax[3], a, b;
+				if (!ok) { return; }
+				if (Math.abs(d) < 1e-12) {
+					if (p0 < lo || p0 > hi) { ok = false; }
+					return;
+				}
+				a = (lo - p0) / d; b = (hi - p0) / d;
+				if (a > b) { var sw = a; a = b; b = sw; }
+				if (a > t0) { t0 = a; }
+				if (b < t1) { t1 = b; }
+				if (t0 > t1) { ok = false; }
+			});
+			if (!ok) { continue; }
+			steps = Math.ceil(Math.hypot(dx, dy) * (t1 - t0) / (cell / 3)) + 1;
+			for (i = 0; i <= steps; i++) {
+				t = t0 + (t1 - t0) * (steps ? i / steps : 0);
+				mark(Math.floor((o.ax + dx * t - x0) / cell), Math.floor((o.ay + dy * t - y0) / cell));
+			}
+		}
+		// Maximal empty rectangles: `up` is the free run above each cell, then one stack scan per
+		// row. Each rectangle it emits is maximal in both directions by construction.
+		up = new Int32Array(n * n);
+		for (j = 0; j < n; j++) {
+			for (i = 0; i < n; i++) {
+				up[j * n + i] = blocked[j * n + i] ? 0 : (j ? up[(j - 1) * n + i] + 1 : 1);
+			}
+		}
+		for (j = 0; j < n; j++) {
+			// The textbook largest-rectangle-in-histogram stack, over `up` as this row's histogram.
+			// INDICES on the stack and not heights: the left edge of the bar being closed is the
+			// index above the one still below it on the stack, and a stack of heights cannot answer
+			// that. A first draft stored heights and pushed `i - 1`, which emitted rectangles
+			// spanning right through a blocked column.
+			var stack = [], h, top, left;
+			for (i = 0; i <= n; i++) {
+				h = i < n ? up[j * n + i] : 0;
+				while (stack.length && up[j * n + stack[stack.length - 1]] >= h) {
+					top = stack.pop();
+					left = stack.length ? stack[stack.length - 1] + 1 : 0;
+					if (up[j * n + top] > 0 && rects.length < SPOT.maxRects) {
+						rects.push({ i0: left, i1: i - 1, j0: j - up[j * n + top] + 1, j1: j,
+							w: (i - left) * cell, h: up[j * n + top] * cell,
+							area: (i - left) * up[j * n + top] });
+					}
+				}
+				if (i < n) { stack.push(i); }
+			}
+		}
+		if (!rects.length) { return []; }
+		rects.sort(function (a, b) { return b.area - a.area; });
+		function worldBox(rc) {
+			return { cx: x0 + (rc.i0 + (rc.i1 - rc.i0 + 1) / 2) * cell,
+				cy: y0 + (rc.j0 + (rc.j1 - rc.j0 + 1) / 2) * cell, w: rc.w, h: rc.h };
+		}
+		function holds(b) { return b.w >= need.w && b.h >= need.h; }
+		// **THE SPOT IS A PLACE, NOT A RECTANGLE, which is why the three extreme boxes are read off
+		// the rectangles that CONTAIN its centre.** That is his own framing -- one spot, three ways
+		// of describing it, the square bounding the other two -- and it is what keeps a run of forty
+		// maximal rectangles over one patch of empty ground from reading as forty spots.
+		// **ENUMERATED BY AREA AND RETURNED BY DISTANCE, and the two orders do different jobs.**
+		// Area order is what makes the biggest patch of empty ground the first thing described, so
+		// the run of rectangles over it is absorbed into one spot rather than read as forty. The
+		// caller wants the NEAREST spot that holds its stack, so the shortlist -- four times as long
+		// as what is returned -- is re-sorted by distance at the end. A small near spot could in
+		// principle be crowded off that shortlist by sixteen larger ones; nothing measured on the
+		// shipped drawings comes close to the bound, so it is a cap and not a policy.
+		for (k = 0; k < rects.length && spots.length < (opts.maxSpots || SPOT.maxSpots) * 4; k++) {
+			c = worldBox(rects[k]);
+			for (i = 0, r = false; i < used.length; i++) {
+				if (Math.abs(used[i].cx - c.cx) < used[i].w / 2
+						&& Math.abs(used[i].cy - c.cy) < used[i].h / 2) { r = true; break; }
+			}
+			if (r) { continue; }
+			var tall = null, squat = null, square = null;
+			for (i = 0; i < rects.length; i++) {
+				bb = worldBox(rects[i]);
+				if (Math.abs(bb.cx - c.cx) > bb.w / 2 || Math.abs(bb.cy - c.cy) > bb.h / 2) { continue; }
+				if (!tall || bb.h > tall.h) { tall = bb; }
+				if (!squat || bb.w > squat.w) { squat = bb; }
+				if (!square || Math.min(bb.w, bb.h) > Math.min(square.w, square.h)) { square = bb; }
+			}
+			used.push(c);
+			best = [tall, square, squat].filter(holds);
+			if (!best.length) { continue; }
+			spots.push({ cx: c.cx, cy: c.cy, dist: Math.hypot(c.cx - center.x, c.cy - center.y),
+				tall: tall, squat: squat, square: square, fits: best });
+		}
+		spots.sort(function (a, b) { return a.dist - b.dist; });
+		return spots.slice(0, opts.maxSpots || SPOT.maxSpots);
+	}
+
 	// ---- ROADMAP Task 539, phase one: COUNT the crossings ---------------------------------------
 	//
 	// **THIS MEASURES; IT DOES NOT MOVE ANYTHING.** Tom, 2026-08-26, on a screenshot of two node
@@ -1519,16 +1798,22 @@ EngCalcs.lpnCollide = (function () {
 		opts = opts || {};
 		var pad = opts.pad > 0 ? opts.pad : 0,
 			leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
-			strategies = opts.strategies || ['brute', 'gang'],
+			strategies = opts.strategies || ['brute', 'gang', 'spot'],
 			useBrute = strategies.indexOf('brute') >= 0,
 			useGang = strategies.indexOf('gang') >= 0,
+			useSpot = strategies.indexOf('spot') >= 0,
 			maxCands = opts.maxCandidates > 0 ? opts.maxCandidates : 6,
 			maxTrials = opts.maxTrials > 0 ? opts.maxTrials : 512,
 			obs = obstacles || { boxes: [], segments: [] },
 			out = (placed || []).slice(), specs = {}, live = [], slotOf = {},
 			// `after` is deliberately absent until it is computed: a zero sitting there would read
 			// as "no crossings left" on every pass that never took the closing count.
-			stats = { gangs: 0, considered: 0, moved: 0, trials: 0, brute: 0, gang: 0, before: 0 };
+			stats = { gangs: 0, considered: 0, moved: 0, trials: 0, brute: 0, gang: 0, spot: 0,
+				before: 0,
+				// What the spot search was asked and what it answered, because a route that finds
+				// nothing to do and a route that finds nothing look identical in the count alone --
+				// which is the distinction section 10c said to measure before building this.
+				spotSearches: 0, spotsFound: 0, spotTrials: 0 };
 		(labels || []).forEach(function (l) { specs[l.id] = l; });
 		function leaderAt(spec, c) {
 			return Math.hypot(c.x - spec.anchor.x, c.y - spec.anchor.y) > leaderMin
@@ -1594,6 +1879,7 @@ EngCalcs.lpnCollide = (function () {
 					// boxesClearOf() per trial asked the same question of the same neighborhood a
 					// thousand times over -- and it was most of the pass.
 					clear: boxesClearOf(bs, local, pad, m.id),
+					linkX: leaderLinkCrossings(g, local, m.id),
 					len: g ? Math.hypot(g.bx - g.ax, g.by - g.ay) : 0 };
 			}
 			return m.pieces[k];
@@ -1609,7 +1895,7 @@ EngCalcs.lpnCollide = (function () {
 		// difference between a pass that can run on a drag frame and one that cannot.
 		function score(members, arr, ctx) {
 			var isMem = ctx.isMem, near = ctx.near,
-				i, j, o, c = 0, blocked = 0, yielding = 0, hits = 0, len = 0, v, mine;
+				i, j, o, c = 0, blocked = 0, yielding = 0, hits = 0, linkX = 0, len = 0, v, mine;
 			members.forEach(function (m, k) {
 				var L = live[slotOf[m.id]];
 				L.boxes = arr[k].boxes;
@@ -1653,9 +1939,15 @@ EngCalcs.lpnCollide = (function () {
 				}
 				v = arr[i].clear;
 				if (v === 'blocked') { blocked++; } else if (v === 'yielding') { yielding++; }
+				linkX += arr[i].linkX;
 				len += arr[i].len;
 			}
-			return [c, blocked, hits, yielding, len];
+			// **THE TUPLE IS THE PROJECT'S OWN GOAL ORDER, and `linkX` sits where goal 8 sits.**
+			// Crossings first (what Task 539 is), then the two GATED terms, then a label on a pipe
+			// label (goal 6), then a leader across a pipe (goal 8), then distance (goal 10). It is
+			// a tiebreak and nothing more: no trial that lowers the crossing count can lose to one
+			// that does not, whatever it does to the last two.
+			return [c, blocked, hits, yielding, linkX, len];
 		}
 		// **A TRIAL MAY NOT SPEND A HARD OVERLAP TO BUY A CROSSING, and that is a gate rather than a
 		// weight.** A crossed leader is ugly; a number printed on a node symbol or on top of another
@@ -1691,25 +1983,28 @@ EngCalcs.lpnCollide = (function () {
 		// Leaders from one place to a set of targets cannot cross when their order round the stack
 		// is the order of their targets' bearings, and a stack is one place to within its own
 		// height.
-		function stackTrials(members) {
-			var trials = [], rowH = 0;
+		function assignByAngle(members, slots) {
+			var mid = { x: 0, y: 0 }, order, ends = [], s = slots.slice();
+			s.forEach(function (p) { mid.x += p.x; mid.y += p.y; });
+			mid.x /= s.length; mid.y /= s.length;
+			s.sort(function (a, b) { return a.y - b.y; });
+			order = members.slice().sort(function (a, b) {
+				return Math.atan2(-(b.spec.anchor.y - mid.y), b.spec.anchor.x - mid.x)
+					- Math.atan2(-(a.spec.anchor.y - mid.y), a.spec.anchor.x - mid.x);
+			});
+			order.forEach(function (m, k) { ends[members.indexOf(m)] = s[k]; });
+			return ends;
+		}
+		function gangRowHeight(members) {
+			var rowH = 0;
 			members.forEach(function (m) { rowH = Math.max(rowH, m.spec.h); });
-			rowH += pad;
-			function assign(slots) {
-				var mid = { x: 0, y: 0 }, order, ends = [], s = slots.slice();
-				s.forEach(function (p) { mid.x += p.x; mid.y += p.y; });
-				mid.x /= s.length; mid.y /= s.length;
-				s.sort(function (a, b) { return a.y - b.y; });
-				order = members.slice().sort(function (a, b) {
-					return Math.atan2(-(b.spec.anchor.y - mid.y), b.spec.anchor.x - mid.x)
-						- Math.atan2(-(a.spec.anchor.y - mid.y), a.spec.anchor.x - mid.x);
-				});
-				order.forEach(function (m, k) { ends[members.indexOf(m)] = s[k]; });
-				return ends;
-			}
+			return rowH + pad;
+		}
+		function stackTrials(members) {
+			var trials = [], rowH = gangRowHeight(members);
 			// (a) the slots the gang ALREADY occupies, merely re-dealt by angle. The cheapest gang
 			// move there is: every position is one the first-fit already found room for.
-			trials.push(assign(members.map(function (m) { return m.at; })));
+			trials.push(assignByAngle(members, members.map(function (m) { return m.at; })));
 			// (b) a fresh column hung at each member's own endpoint, downward and upward.
 			members.forEach(function (m) {
 				[1, -1].forEach(function (dir) {
@@ -1717,13 +2012,50 @@ EngCalcs.lpnCollide = (function () {
 					for (k = 0; k < members.length; k++) {
 						slots.push({ x: m.at.x, y: m.at.y + dir * k * rowH });
 					}
-					trials.push(assign(slots));
+					trials.push(assignByAngle(members, slots));
+				});
+			});
+			return trials;
+		}
+		// **(c) A COLUMN HUNG IN A spot_prime -- Tom's steps 1 to 4 in one function.** The spot
+		// search answers step 1 (open real estate that n labels could stack in); `need` is step 2
+		// (the estimated extents of the n stacked labels); the two column EDGES are step 3 in his
+		// own words -- *"from the middle left point leftward or middle right point rightward of
+		// box_est"* -- and assignByAngle() is step 4, the same angle rule route (b) already uses.
+		//
+		// **THE ENDPOINT IS NOT THE BOX, and that is the one place this could be written backwards.**
+		// labelBoxAtEnd() hangs the text off the endpoint on the side AWAY from the anchor, so a
+		// column standing in a spot to the RIGHT of the gang has its endpoints on the spot's LEFT
+		// edge. Both edges are generated, because a gang straddling a spot has members on either
+		// side of it and neither edge is right for all of them; the wrong one simply loses.
+		//
+		// `yOff` is read off the first member. Every node label on a drawing shares it -- it is
+		// -0.85 of the font size -- and where they ever differ the rows shift by that difference and
+		// the exact boxesClearOf() verdict in pieceFor() decides, which is the division of labour
+		// the whole pass is built on: the raster proposes, the definition admits.
+		function spotStackTrials(members, center, local, searchReach) {
+			var rowH = gangRowHeight(members), trials = [], wNeed = 0,
+				hNeed = rowH * members.length, yOff = members[0].spec.yOff || 0, spots;
+			members.forEach(function (m) { wNeed = Math.max(wNeed, m.spec.w); });
+			stats.spotSearches++;
+			spots = spotPrime(center, searchReach, local,
+				{ need: { w: wNeed, h: hNeed }, cell: rowH / 2, maxSpots: SPOT.maxSpots });
+			stats.spotsFound += spots.length;
+			spots.forEach(function (sp) {
+				var b = sp.fits[0];
+				[b.cx - b.w / 2, b.cx + b.w / 2].forEach(function (edge) {
+					var slots = [], k;
+					for (k = 0; k < members.length; k++) {
+						slots.push({ x: edge, y: b.cy - hNeed / 2 + k * rowH - yOff });
+					}
+					trials.push(assignByAngle(members, slots));
 				});
 			});
 			return trials;
 		}
 		found.gangs.forEach(function (gang) {
-			var members = [], center = { x: 0, y: 0 }, reach = 0, local, ctx, base, best, bestArr,
+			var members = [], center = { x: 0, y: 0 }, reach = 0, searchReach = 0, local, ctx,
+				base, best, bestArr,
 				bestBy = null, cands, total = 1, rowSpan, i, k, b, idx, ends, was, arr, sc;
 			gang.forEach(function (id) {
 				var s = slotOf[id];
@@ -1750,10 +2082,20 @@ EngCalcs.lpnCollide = (function () {
 						+ Math.hypot(m.spec.w, m.spec.h) + pad);
 				});
 			});
+			// **THE SPOT ROUTE WIDENS THE WHOLE NEIGHBORHOOD, and it has to widen BOTH halves of
+			// it.** A spot may sit further out than any candidate endpoint -- that is the entire
+			// point of it -- so a raster reaching past the obstacles it was given would report
+			// occupied ground as free, and a `near` set that stopped at the old radius would not
+			// contain the labels out there, so score() would clear a crossing here and make one
+			// beyond its own horizon without ever seeing it. Widening cannot change what the other
+			// two routes do: every trial they generate lies within `reach` plus a label's diagonal
+			// by construction, so nothing that overlaps one of their boxes was ever outside the
+			// narrow list.
+			searchReach = useSpot ? reach * SPOT.reachFactor : reach;
 			// The obstacle neighborhood, taken ONCE per gang through the definition rather than
 			// the grid: near() is only sound out to its own cell size, and this radius is the
 			// gang's, not the one placeLabelsFirstFit() built its index for.
-			local = obstaclesInReach({ anchor: center, w: 0, h: 0 }, obs, reach);
+			local = obstaclesInReach({ anchor: center, w: 0, h: 0 }, obs, searchReach);
 			// The PLACEMENTS in reach, by the same definition: a box whose centre is within the
 			// radius plus its own half-diagonal, or a leader that passes inside it. Members are
 			// always in, whatever their own geometry says.
@@ -1762,14 +2104,14 @@ EngCalcs.lpnCollide = (function () {
 			for (i = 0; i < live.length; i++) {
 				if (ctx.isMem[i]) { ctx.near.push(i); continue; }
 				if (live[i].leader
-						&& pointToSegmentDistance(center.x, center.y, live[i].leader) < reach) {
+						&& pointToSegmentDistance(center.x, center.y, live[i].leader) < searchReach) {
 					ctx.near.push(i);
 					continue;
 				}
 				for (k = 0; k < live[i].boxes.length; k++) {
 					b = live[i].boxes[k];
 					if (Math.hypot(b.cx - center.x, b.cy - center.y)
-							< reach + Math.hypot(b.w, b.h) / 2) {
+							< searchReach + Math.hypot(b.w, b.h) / 2) {
 						ctx.near.push(i);
 						break;
 					}
@@ -1794,6 +2136,31 @@ EngCalcs.lpnCollide = (function () {
 					sc = score(members, arr, ctx);
 					if (admissible(sc, base) && better(sc, best)) {
 						best = sc; bestArr = arr; bestBy = 'gang';
+					}
+				});
+			}
+			// **THE SPOT ROUTE RUNS ONLY WHERE THE CHEAP ONES HAVE LEFT A CROSSING STANDING, which
+			// is Tom's own *"near failures or needs"* read as a schedule rather than as a place.**
+			// It is the most expensive trial family here -- one occupancy raster per gang -- and a
+			// gang the re-deal already cleared has nothing for it to find. On the shipped drawings
+			// that is most of them, which is what keeps the pass inside its frame budget.
+			if (useSpot && best[0] > 0) {
+				spotStackTrials(members, center, local, searchReach).forEach(function (e) {
+					arr = arrange(members, e, local);
+					// **THE ONE GATE ON A LONG LEADER: it may not pass through somebody else's
+					// node symbol.** That is goal 5, and a leader entering a foreign node says the
+					// wrong thing outright -- the reader is told this label belongs to that node.
+					// A leader ACROSS A PIPE is not gated and is a term instead; see
+					// leaderLinkCrossings(). Asked BEFORE score(), which writes the live entries as
+					// it goes -- a refused trial must not have touched the layout.
+					for (i = 0; i < arr.length; i++) {
+						if (!leaderClearOfSymbols(arr[i].leader, local, members[i].id)) { return; }
+					}
+					stats.trials++;
+					stats.spotTrials++;
+					sc = score(members, arr, ctx);
+					if (admissible(sc, base) && better(sc, best)) {
+						best = sc; bestArr = arr; bestBy = 'spot';
 					}
 				});
 			}
@@ -2008,6 +2375,10 @@ EngCalcs.lpnCollide = (function () {
 		effectiveScores: effectiveScores,
 		placeLabels: placeLabels,
 		labelCrossings: labelCrossings,
+		SPOT: SPOT,
+		spotPrime: spotPrime,
+		leaderClearOfSymbols: leaderClearOfSymbols,
+		leaderLinkCrossings: leaderLinkCrossings,
 		oversizedObstacles: function () { return oversizedCount; },
 		repairCrossingGangs: repairCrossingGangs,
 		shedCrossingSurvivors: shedCrossingSurvivors

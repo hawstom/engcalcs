@@ -41,7 +41,8 @@ const path = require('path');
 const EXAMPLES = path.join(__dirname, '../water-network-examples');
 
 // **THE MODE IS TWO SWITCHES, NOT ONE, since Task 539 phase three.** The repair route is the part
-// before a '+' ('off', 'brute', 'gang', 'both', 'dry'); a '+shed' suffix lets the FINAL SHED run,
+// before a '+' ('off', 'brute', 'gang', 'spot', 'both', 'all', 'dry'); a '+shed' suffix lets the
+// FINAL SHED run,
 // and without it Collide.shedCrossingSurvivors() is neutered so that it hides nothing. It has to be
 // switchable for the same reason the repair does: the shed drives every measured view to zero by
 // construction, so a table with it always on would report the same column four times and could not
@@ -85,7 +86,17 @@ async function measure(file, mode, opts) {
 				brute: 0, gang: 0, before: 0, after: 0 } };
 		} else {
 			const o = Object.assign({}, opts);
-			if (repairMode === 'brute' || repairMode === 'gang') { o.strategies = [repairMode]; }
+			// **THE MODE NAMES THE ROUTES EXPLICITLY, and 'both' has to keep meaning the two it
+			// always meant.** Task 539 phase four added a third route, so leaving opts alone -- the
+			// old way of spelling 'both' -- would have silently turned every recorded 'both' figure
+			// into a three-route one and made the table say the opposite of what it says.
+			if (repairMode === 'brute' || repairMode === 'gang' || repairMode === 'spot') {
+				o.strategies = [repairMode];
+			} else if (repairMode === 'both') {
+				o.strategies = ['brute', 'gang'];
+			} else if (repairMode === 'all') {
+				o.strategies = ['brute', 'gang', 'spot'];
+			}
 			// The closing count is opt-in in the pass itself, being a second sweep of the whole
 			// drawing for a number no decision reads. A harness comparing model with drawing wants it.
 			o.report = true;

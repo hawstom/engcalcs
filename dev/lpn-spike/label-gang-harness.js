@@ -46,8 +46,12 @@ const { spawnSync } = require('child_process');
 const { measure, EXAMPLES } = require('./label-crossing-measure.js');
 
 const HERE = __dirname;
-const MODES = ['off', 'brute', 'gang', 'both', 'both+shed'];
-const SHIPPED = 'both+shed';
+// **FOUR ROUTES TO COMPARE SINCE PHASE FOUR, and 'both' is kept as its own column rather than
+// folded into 'all'.** 'both' is the pair the phase-two table was measured on, so keeping it is
+// what lets the spot route's contribution be read off the difference between two columns rather
+// than argued about -- and it is how the linkX score term was shown to change nothing by itself.
+const MODES = ['off', 'brute', 'gang', 'spot', 'both', 'all', 'all+shed'];
+const SHIPPED = 'all+shed';
 const HEADLINE = 'Net3-Novato-CA-World.lwn';
 
 let checks = 0, failures = 0;
@@ -275,15 +279,17 @@ function compare(file) {
 		return null;
 	}
 	console.log('  ' + file + '   pairs (leader-leader + label-on-leader, unordered)');
-	console.log('    zoom      off    brute     gang     both    +shed   labels hid   moved   ms/pass');
+	console.log('    zoom      off    brute     gang     spot     both      all    +shed'
+		+ '   labels hid   moved   ms/pass');
 	got.off.rows.forEach(function (row, i) {
 		const cell = function (m) {
 			const r = got[m].rows[i];
 			return String(r.counts.pairs).padStart(8);
 		};
-		const both = got.both.rows[i], ship = got[SHIPPED].rows[i];
+		const both = got.all.rows[i], ship = got[SHIPPED].rows[i];
 		console.log('    x' + String(row.zoom).padEnd(4)
-			+ cell('off') + cell('brute') + cell('gang') + cell('both') + cell(SHIPPED)
+			+ cell('off') + cell('brute') + cell('gang') + cell('spot') + cell('both')
+			+ cell('all') + cell(SHIPPED)
 			+ String(ship.shed.length).padStart(13)
 			+ String((both.repair && both.repair.moved) || 0).padStart(8)
 			+ (both.repairCalls
