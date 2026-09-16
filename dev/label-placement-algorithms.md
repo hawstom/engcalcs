@@ -924,6 +924,78 @@ window size.
 
 ---
 
+## 12f. What it COSTS, measured against master, and the developer view (2026-09-16)
+
+Tom, 2026-09-16: *"This is a branch that's not really easy for a user to test... It's one where I
+want to see more under the hood. Can you give me a developer's view that has the spot-prime boxes?
+Also, can I see a report of the performance change this branch causes?"* Both, below.
+
+### The measurement, and the confound that had to be removed first
+
+**THREE TREES, ONE MACHINE, AND THE FIRST RUN WAS CONTAMINATED BY THE SESSION TAKING IT.** A first
+pass ran master, then the branch, then the branch again, while this session was editing files on the
+same four cores, and it reported the whole label pass **31% slower on the branch with the spot route
+OFF** -- which cannot be true, since that configuration differs from master by one added term. The
+run was re-taken **interleaved** (master, branch-off, branch-on, per example, twice round) with
+nothing else running. The numbers below are that second run: **7 examples x 4 views, the whole pass
+a median of 6 passes, the repair sub-pass the better of 2**, 1400x900, every label field on, solved
+through EPANET, Node with the DOM stub. **Not a browser measurement**, and the section 10b warning
+about factor-of-four machine noise still applies to any single row.
+
+| summed over 28 views | master | branch, spot route OFF | branch as it ships |
+|---|---|---|---|
+| whole content+layout pass | 6,012 ms | 6,041 ms (0%) | 6,143 ms (**+2%**) |
+| the gang repair sub-pass inside it | 157.6 ms | 207.5 ms (**+32%**) | 362.5 ms (**+130%**) |
+| labels hidden | 44 | 44 | **38** |
+
+**Three findings, and the middle one is the one nobody was looking for.**
+
+1. **THE WHOLE PASS DOES NOT MOVE MEASURABLY: +2%, inside the noise.** Per-view swings of -53% and
+   +41% appear in both directions on drawings where the repair costs a fraction of a millisecond, so
+   the honest reading of the column is "no change I can measure here". The repair is 5-9% of the
+   content pass on the big drawings and roughly 10% after this, which is why doubling it disappears.
+2. **THE BRANCH COSTS +32% OF THE REPAIR PASS WITH THE SPOT ROUTE SWITCHED OFF**, and that is
+   `linkX`. `pieceFor()` computes `leaderLinkCrossings()` for **every** piece of **every** trial of
+   **every** route, and it walks the gang's whole local segment list. Section 12c measured that the
+   term never changes the outcome in `both` mode -- byte-identical on all 28 views -- so today the
+   suite pays a third of the repair pass for a tiebreak that breaks no ties outside the spot route.
+   **Computing it lazily, only where a spot trial is being scored, should be free of behaviour
+   change and worth about 50 ms across these 28 views.** Not done here: it moves the scoring path,
+   and that wants its own stability run.
+3. **The spot route itself is the other +98%, and it is paid where the drawings are big.** Net2 and
+   the two Net3s carry all of it -- the worst single view is Net3-World at 2x, **33.5 ms to 86.4 ms**
+   inside a content pass of about 950 ms -- while Net1, Elm-Street and both Basic examples are
+   unchanged to a tenth of a millisecond, because no gang there reaches the search at all.
+
+**What is bought for it is finding 1 of section 12e, re-measured here and unchanged: 44 hidden
+labels become 38.**
+
+### The developer view: `?debug=spots`
+
+`drawSpotDebug()` in `js/looped-network.js`. A URL parameter, for the reason `?debug=boxes` is one:
+a settings checkbox would be a translated string in 27 files for a tool that reviews one algorithm.
+The trace is `null` unless the parameter is typed, so a shipped page pays one regex.
+
+| URL | what it adds |
+|---|---|
+| `?debug=spots` | the gangs the repair worked on, their two reach rings, every spot found, the three extreme boxes on each, the stack that had to fit, and a readout |
+| `?debug=spots,all` | ALSO searches the gangs the cheap routes already cleared -- marked "look only", nothing tried, and a harness fixture asserts the layout is identical either way |
+| `?debug=spots,cells` | ALSO shades the occupancy raster the rectangles are read off |
+| `?debug=labels,spots` | the placement bench beside it, which is where the hidden-label counts are printed -- **and it now carries a `spot route` checkbox, so the two configurations can be read back to back on the same view** |
+
+**THE OVERLAY IS EMPTY ON A DRAWING THE CHEAP ROUTES CLEARED, AND THAT IS THE HONEST ANSWER.** The
+shipped search runs only where a crossing survived them, which on Net1 and Elm-Street is never; the
+`,all` switch is there so that "nothing to see" can be told from "nothing found". Measured on
+Net3-World with `,all`: 9 to 15 gangs a view, 7 to 11 of them searched on the shipped schedule, 36 to
+60 spots found.
+
+The data comes out of `repairCrossingGangs()` as `stats.trace` -- an out-parameter that nothing reads
+back, so the picture cannot steer the placement. `spotPrime()` records its occupancy raster **by
+reference**, so what is drawn is the array the scan ran over rather than a second one built to look
+like it.
+
+---
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.

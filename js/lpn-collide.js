@@ -1430,7 +1430,12 @@ EngCalcs.lpnCollide = (function () {
 	 */
 	function spotPrime(center, reach, obs, opts) {
 		opts = opts || {};
-		var need = opts.need || { w: 0, h: 0 },
+		// **THE TRACE IS AN OUT-PARAMETER AND NOTHING READS IT BACK** (?debug=spots). A caller that
+		// wants to DRAW what this search saw hands in an object; the occupancy raster is recorded
+		// by reference the moment it is allocated, so the picture is the very array the scan ran
+		// over rather than a second one built to look like it. Absent, this is one comparison.
+		var rec = opts.trace || null,
+			need = opts.need || { w: 0, h: 0 },
 			cell = opts.cell > 0 ? opts.cell : Math.max(need.h / 4, 1e-9),
 			n = Math.ceil(2 * reach / cell), x0, y0, blocked, i, j, k, o, ii, jj,
 			up, rects = [], spots = [], used = [], c, r, bb, best, corners, minx, maxx, miny, maxy;
@@ -1441,6 +1446,7 @@ EngCalcs.lpnCollide = (function () {
 		x0 = center.x - reach;
 		y0 = center.y - reach;
 		blocked = new Uint8Array(n * n);
+		if (rec) { rec.field = { x0: x0, y0: y0, cell: cell, n: n, blocked: blocked }; }
 		function mark(i2, j2) {
 			if (i2 >= 0 && j2 >= 0 && i2 < n && j2 < n) { blocked[j2 * n + i2] = 1; }
 		}
@@ -1574,7 +1580,9 @@ EngCalcs.lpnCollide = (function () {
 				tall: tall, squat: squat, square: square, fits: best });
 		}
 		spots.sort(function (a, b) { return a.dist - b.dist; });
-		return spots.slice(0, opts.maxSpots || SPOT.maxSpots);
+		var outSpots = spots.slice(0, opts.maxSpots || SPOT.maxSpots);
+		if (rec) { rec.rects = rects.length; rec.shortlist = spots.length; rec.spots = outSpots; }
+		return outSpots;
 	}
 
 	// ---- ROADMAP Task 539, phase one: COUNT the crossings ---------------------------------------
@@ -1813,7 +1821,11 @@ EngCalcs.lpnCollide = (function () {
 				// What the spot search was asked and what it answered, because a route that finds
 				// nothing to do and a route that finds nothing look identical in the count alone --
 				// which is the distinction section 10c said to measure before building this.
-				spotSearches: 0, spotsFound: 0, spotTrials: 0 };
+				spotSearches: 0, spotsFound: 0, spotTrials: 0 },
+			// Null unless ?debug=spots asked for it. Carried on the stats because that is where
+			// the page already reads what the last repair did, and because nothing in the pass
+			// reads it back -- a trace that steered anything would be a second code path.
+			trace = opts.trace ? [] : null;
 		(labels || []).forEach(function (l) { specs[l.id] = l; });
 		function leaderAt(spec, c) {
 			return Math.hypot(c.x - spec.anchor.x, c.y - spec.anchor.y) > leaderMin
@@ -2033,14 +2045,16 @@ EngCalcs.lpnCollide = (function () {
 		// -0.85 of the font size -- and where they ever differ the rows shift by that difference and
 		// the exact boxesClearOf() verdict in pieceFor() decides, which is the division of labour
 		// the whole pass is built on: the raster proposes, the definition admits.
-		function spotStackTrials(members, center, local, searchReach) {
+		function spotStackTrials(members, center, local, searchReach, rec) {
 			var rowH = gangRowHeight(members), trials = [], wNeed = 0,
 				hNeed = rowH * members.length, yOff = members[0].spec.yOff || 0, spots;
 			members.forEach(function (m) { wNeed = Math.max(wNeed, m.spec.w); });
 			stats.spotSearches++;
 			spots = spotPrime(center, searchReach, local,
-				{ need: { w: wNeed, h: hNeed }, cell: rowH / 2, maxSpots: SPOT.maxSpots });
+				{ need: { w: wNeed, h: hNeed }, cell: rowH / 2, maxSpots: SPOT.maxSpots,
+					trace: rec });
 			stats.spotsFound += spots.length;
+			if (rec) { rec.need = { w: wNeed, h: hNeed }; rec.rowH = rowH; }
 			spots.forEach(function (sp) {
 				var b = sp.fits[0];
 				[b.cx - b.w / 2, b.cx + b.w / 2].forEach(function (edge) {
@@ -2055,7 +2069,7 @@ EngCalcs.lpnCollide = (function () {
 		}
 		found.gangs.forEach(function (gang) {
 			var members = [], center = { x: 0, y: 0 }, reach = 0, searchReach = 0, local, ctx,
-				base, best, bestArr,
+				base, best, bestArr, rec = null,
 				bestBy = null, cands, total = 1, rowSpan, i, k, b, idx, ends, was, arr, sc;
 			gang.forEach(function (id) {
 				var s = slotOf[id];
@@ -2144,8 +2158,20 @@ EngCalcs.lpnCollide = (function () {
 			// It is the most expensive trial family here -- one occupancy raster per gang -- and a
 			// gang the re-deal already cleared has nothing for it to find. On the shipped drawings
 			// that is most of them, which is what keeps the pass inside its frame budget.
+			// **THE TRACE EXISTS SO THAT A PERSON CAN SEE WHAT THE SEARCH SAW** (?debug=spots), and
+			// it is opened for EVERY gang rather than only the ones the search ran on -- a gang the
+			// re-deal already cleared is exactly the case somebody watching an empty screen needs
+			// explained. `ran` distinguishes the three outcomes that look identical in a count: the
+			// route was off, the route had nothing to fix, or the route looked and found nothing.
+			if (trace) {
+				rec = { cx: center.x, cy: center.y, reach: reach, searchReach: searchReach,
+					members: members.map(function (m) { return m.id; }), before: best[0],
+					ran: false, searchOnly: false, trials: 0, won: false, spots: [] };
+				trace.push(rec);
+			}
 			if (useSpot && best[0] > 0) {
-				spotStackTrials(members, center, local, searchReach).forEach(function (e) {
+				if (rec) { rec.ran = true; }
+				spotStackTrials(members, center, local, searchReach, rec).forEach(function (e) {
 					arr = arrange(members, e, local);
 					// **THE ONE GATE ON A LONG LEADER: it may not pass through somebody else's
 					// node symbol.** That is goal 5, and a leader entering a foreign node says the
@@ -2158,11 +2184,21 @@ EngCalcs.lpnCollide = (function () {
 					}
 					stats.trials++;
 					stats.spotTrials++;
+					if (rec) { rec.trials++; }
 					sc = score(members, arr, ctx);
 					if (admissible(sc, base) && better(sc, best)) {
 						best = sc; bestArr = arr; bestBy = 'spot';
 					}
 				});
+			} else if (useSpot && trace && opts.spotAlways) {
+				// **THE SEARCH RUN FOR THE PICTURE ALONE, AND NOTHING IT FINDS IS TRIED.**
+				// ?debug=spots,all answers the question the shipped schedule makes unanswerable --
+				// where IS the open ground on a drawing that needed no repair -- and it must not be
+				// able to change one label while answering it, so no trial is scored and `bestBy`
+				// cannot be reached from here. It is a developer switch and costs a shipped page
+				// nothing: `trace` is null unless somebody typed the parameter.
+				rec.searchOnly = true;
+				spotStackTrials(members, center, local, reach * SPOT.reachFactor, rec);
 			}
 			if (useBrute) {
 				cands = members.map(candidatesOf);
@@ -2213,6 +2249,7 @@ EngCalcs.lpnCollide = (function () {
 			}
 			// Whatever won, the live list must end holding it -- score() writes as it goes.
 			score(members, bestArr, ctx);
+			if (rec) { rec.won = bestBy === 'spot'; rec.by = bestBy || 'none'; rec.after = best[0]; }
 			if (!bestBy) { return; }
 			stats.moved += members.length;
 			stats[bestBy]++;
@@ -2230,6 +2267,7 @@ EngCalcs.lpnCollide = (function () {
 		// pass reads -- measured at a third of a gang-route pass on Net3-World -- and the harness
 		// that wants it measures the DRAWING anyway, which is the stronger statement.
 		if (opts.report) { stats.after = labelCrossings(drawnNow()).counts.pairs; }
+		stats.trace = trace;
 		return { results: out, stats: stats };
 	}
 

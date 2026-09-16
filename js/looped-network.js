@@ -16,7 +16,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
+	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer, spotDebugLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
@@ -1891,6 +1891,7 @@ var EngCalcs = EngCalcs || {};
 				var le = linkEls[l.id]; return le && le.hiddenCrowded && !le.hiddenShort;
 			}).length;
 		drawCollisionBoxes(lineBoxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
+		drawSpotDebug();
 		if (!debugOn('labels')) { return; }
 		// THE COUNTS, because "that looks better" is not a verdict.
 		// **DROPPED IS REPORTED FIRST, AND THE ORDER IS THE ARGUMENT** (Task 398): every other number
@@ -1936,6 +1937,12 @@ var EngCalcs = EngCalcs || {};
 				+ (panFlips === null ? '' : panFlips + ' flips under pan \u2022 ')
 				+ (gang ? gang.moved + ' gang-moved (' + gang.before + '\u2192' + gang.after
 					+ ' pairs) \u2022 ' : '')
+				// Phase four's own three numbers: what the search was asked, what it found, and how
+				// often a gang ended up standing in what it found. A route that finds nothing to do
+				// and a route that finds nothing look identical without the first of them.
+				+ (gang && gang.spotSearches !== undefined
+					? gang.spotSearches + ' spot searches \u2022 ' + gang.spotsFound + ' spots \u2022 '
+						+ gang.spot + ' placed in one \u2022 ' : '')
 				// The final shed's own two numbers: what it hid, and what it could not reach because
 				// both halves of the pair are the user's own (Task 539 phase three).
 				+ (shed ? shed.hidden.length + ' hid (crossing) \u2022 '
@@ -1969,6 +1976,20 @@ var EngCalcs = EngCalcs || {};
 				var v = parseFloat(i.value);
 				if (isFinite(v)) { set(v); refreshLabelText(); }
 			});
+			l.appendChild(i);
+			box.appendChild(l);
+		}
+		// **A/B IN THE PAGE, BECAUSE THE GAIN IS A NUMBER AND NOT A PICTURE** (Task 539 phase four).
+		// What the spot route buys is FEWER HIDDEN LABELS, and nobody can see a label that is not
+		// there. Flipping this re-lays the drawing out with the route off, so the two readouts below
+		// -- "hid (crossing)" above all -- can be read back to back on the same view.
+		function checkRow(label, get, set, hint) {
+			var l = document.createElement('label'), i = document.createElement('input');
+			l.setAttribute('style', 'display:flex;justify-content:space-between;gap:8px;align-items:center');
+			l.appendChild(document.createTextNode(label));
+			i.type = 'checkbox'; i.checked = !!get();
+			if (hint) { i.title = hint; }
+			i.addEventListener('change', function () { set(i.checked); refreshLabelText(); });
 			l.appendChild(i);
 			box.appendChild(l);
 		}
@@ -2007,6 +2028,12 @@ var EngCalcs = EngCalcs || {};
 			+ 'as the spot itself.');
 		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
 			function (v) { t.fitRoom = v; }, 1, 'Extra room left on Zoom to fit\u2019s FIRST pass, before labels are placed. Bigger = the first pass sits further out, so labels land more comfortably at the final zoom. Press Zoom to fit to see it.');
+		checkRow('spot route (phase four)', function () { return labelSpotRoute; },
+			function (v) { labelSpotRoute = v; },
+			'The search for open ground the candidate rings cannot reach. Off = the drawing as it '
+			+ 'was before Task 539 phase four. Watch the "hid (crossing)" count below: the route '
+			+ 'earns its keep by hiding fewer labels, not by lowering the crossing count, which is '
+			+ 'already zero. Add ?debug=spots to the URL to see where it looked.');
 		var g = document.createElement('div');
 		g.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
 		g.textContent = 'rank weights';
@@ -2097,6 +2124,147 @@ var EngCalcs = EngCalcs || {};
 			}, debugBoxLayer);
 		});
 		draw(placed, '#00d');
+	}
+	/**
+	 * ---- `?debug=spots` : WHAT THE spot_prime SEARCH SAW, ON THE DRAWING ITSELF -----------------
+	 *
+	 * Task 539 phase four placed labels in open ground the candidate raster cannot reach, and the
+	 * only thing a reader can see of it is that one fewer label is hidden. **That is not testable by
+	 * looking** (Tom, 2026-09-16: *"It's one where I want to see more under the hood."*), so this
+	 * draws the search: where it looked, what it found, what it tried, and what won.
+	 *
+	 * A URL PARAMETER AND NOT A SETTING, for the reason `?debug=boxes` is one -- a settings checkbox
+	 * is a translated string in 27 files for a tool that exists to review one algorithm. The trace
+	 * is `null` unless the parameter is typed, so a shipped page pays one regex.
+	 *
+	 *   ?debug=spots         the gangs the repair worked on, and the spots the search found
+	 *   ?debug=spots,all     ALSO search every other gang, for the picture alone -- see below
+	 *   ?debug=spots,cells   ALSO shade the occupancy raster the rectangles were read off
+	 *   ?debug=spots,boxes   the obstacle picture underneath it, from ?debug=boxes
+	 *
+	 * **THE SHIPPED SEARCH RUNS ONLY WHERE A CROSSING SURVIVED THE CHEAP ROUTES**, which on most
+	 * drawings is a minority of gangs and on a clean one is none at all -- so an empty overlay is
+	 * the honest answer and not a broken switch. `,all` searches every gang and marks what it finds
+	 * "look only": nothing found that way was tried, and it cannot move a label.
+	 *
+	 * THE COLOURS ANSWER THE QUESTIONS IN ORDER. Grey ring: how far the search was allowed to look
+	 * (the gang's own reach doubled). Red wash: ground an obstacle already holds. Magenta cross and
+	 * number: a spot, numbered NEAREST FIRST, which is the order the trials were built in. The three
+	 * boxes on it are Tom's own three extreme boxes -- teal the biggest square, purple the tallest
+	 * skinny, orange the widest squat -- and the blue dashed box is `need`, the stack that had to
+	 * fit, drawn where the winning extreme box would put it. A green gang ring means a spot trial
+	 * won and the labels you see are standing in it.
+	 */
+	var spotDebugTrace = null, spotDebugMs = 0, spotDebugEl = null;
+	// ON, which is what ships. The bench checkbox is the only thing that ever sets it false, and the
+	// bench exists only under ?debug=labels.
+	var labelSpotRoute = true;
+	function spotDebugOn() { return debugOn('spots'); }
+	function drawSpotDebug() {
+		if (!spotDebugLayer) { return; }
+		while (spotDebugLayer.firstChild) { spotDebugLayer.removeChild(spotDebugLayer.firstChild); }
+		if (!spotDebugOn()) { return; }
+		var s = state.s || 1, w = 1 / s, trace = spotDebugTrace || [],
+			searched = 0, found = 0, tried = 0, won = 0, lines = [];
+		function line(x1, y1, x2, y2, colour, width, dash) {
+			el('line', { x1: x1, y1: y1, x2: x2, y2: y2, stroke: colour,
+				'stroke-width': (width || 1) * w, 'stroke-dasharray': dash || 'none',
+				'pointer-events': 'none' }, spotDebugLayer);
+		}
+		function rect(b, colour, width, dash) {
+			el('rect', { x: b.cx - b.w / 2, y: b.cy - b.h / 2, width: b.w, height: b.h,
+				fill: 'none', stroke: colour, 'stroke-width': (width || 1) * w,
+				'stroke-dasharray': dash || 'none', 'pointer-events': 'none' }, spotDebugLayer);
+		}
+		function text(x, y, str, colour) {
+			var t = el('text', { x: x, y: y, fill: colour, 'font-size': 11 * w,
+				'font-family': 'monospace', 'pointer-events': 'none' }, spotDebugLayer);
+			t.textContent = str;
+			return t;
+		}
+		trace.forEach(function (g, gi) {
+			// The horizon: a search cannot propose ground outside this, however empty it is.
+			el('circle', { cx: g.cx, cy: g.cy, r: g.searchReach, fill: 'none',
+				stroke: g.won ? '#0a0' : '#888', 'stroke-width': (g.won ? 2 : 1) * w,
+				'stroke-dasharray': (6 * w) + ' ' + (4 * w), 'pointer-events': 'none' },
+				spotDebugLayer);
+			// The gang's own candidate reach, for the comparison the whole phase is about: the
+			// inner ring is everything the first-fit and the two cheap routes could ever see.
+			el('circle', { cx: g.cx, cy: g.cy, r: g.reach, fill: 'none', stroke: '#888',
+				'stroke-width': w, 'stroke-dasharray': (2 * w) + ' ' + (4 * w),
+				'pointer-events': 'none' }, spotDebugLayer);
+			text(g.cx + g.searchReach * 0.05, g.cy - g.searchReach,
+				'gang ' + (gi + 1) + ': ' + g.members.join(' + ')
+					+ (g.ran ? '' : g.searchOnly ? '  (look only)' : '  (no search: nothing to fix)'),
+				g.won ? '#0a0' : '#666');
+			if (g.ran) { searched++; }
+			tried += g.trials;
+			if (g.won) { won++; }
+			// The occupancy raster, cell by cell. Off by default: a 48 x 48 grid is 2,304 rectangles
+			// per gang, and the answer it explains is usually readable from the spots alone.
+			if (debugOn('cells') && g.field) {
+				var f = g.field, i, j;
+				for (j = 0; j < f.n; j++) {
+					for (i = 0; i < f.n; i++) {
+						if (!f.blocked[j * f.n + i]) { continue; }
+						el('rect', { x: f.x0 + i * f.cell, y: f.y0 + j * f.cell,
+							width: f.cell, height: f.cell, fill: '#d00', 'fill-opacity': 0.12,
+							stroke: 'none', 'pointer-events': 'none' }, spotDebugLayer);
+					}
+				}
+			}
+			(g.spots || []).forEach(function (sp, si) {
+				found++;
+				var b = sp.fits && sp.fits[0];
+				if (sp.square) { rect(sp.square, '#0aa', 1); }
+				if (sp.tall) { rect(sp.tall, '#a0a', 1, (4 * w) + ' ' + (3 * w)); }
+				if (sp.squat) { rect(sp.squat, '#e80', 1, (1 * w) + ' ' + (3 * w)); }
+				// The spot is a PLACE and the boxes are three ways of describing it, so the cross
+				// is the thing and the rectangles are its commentary.
+				line(sp.cx - 6 * w, sp.cy, sp.cx + 6 * w, sp.cy, '#c0c', 2);
+				line(sp.cx, sp.cy - 6 * w, sp.cx, sp.cy + 6 * w, '#c0c', 2);
+				text(sp.cx + 8 * w, sp.cy - 4 * w, String(si + 1), '#c0c');
+				// What had to fit, where the first admissible extreme box would have put it, and
+				// the two column edges the trials were actually hung from (step 3).
+				if (b && g.need) {
+					rect({ cx: b.cx, cy: b.cy, w: g.need.w, h: g.need.h }, '#06c', 1,
+						(5 * w) + ' ' + (3 * w));
+					line(b.cx - b.w / 2, b.cy - g.need.h / 2, b.cx - b.w / 2, b.cy + g.need.h / 2,
+						'#06c', 2);
+					line(b.cx + b.w / 2, b.cy - g.need.h / 2, b.cx + b.w / 2, b.cy + g.need.h / 2,
+						'#06c', 2);
+				}
+				// The leader this spot would ask the reader to follow, from the gang to the spot.
+				line(g.cx, g.cy, sp.cx, sp.cy, '#c0c', 1, (3 * w) + ' ' + (5 * w));
+			});
+			lines.push('gang ' + (gi + 1) + ' [' + g.members.join('+') + ']  pairs '
+				+ g.before + '→' + (g.after === undefined ? '?' : g.after)
+				+ '  by ' + (g.by || 'none')
+				+ (g.ran || g.searchOnly
+					? '  spots ' + (g.spots ? g.spots.length : 0) + '/' + (g.shortlist || 0)
+						+ ' of ' + (g.rects || 0) + ' rects  trials ' + g.trials
+						+ (g.searchOnly ? '  (look only)' : '')
+					: '  no search'));
+		});
+		// **THE READOUT SAYS WHAT WAS ASKED AS WELL AS WHAT WAS FOUND**, because a route that finds
+		// nothing to do and a route that finds nothing look identical in the drawing alone -- the
+		// distinction dev/label-placement-algorithms.md section 10c said to measure before this was
+		// ever built.
+		var head = trace.length + ' gangs • ' + searched + ' searched • ' + found
+			+ ' spots • ' + tried + ' trials • ' + won + ' won by spot • repair '
+			+ spotDebugMs.toFixed(1) + ' ms'
+			+ (debugOn('all') ? ' • ,all: every gang searched, look only' : '')
+			+ (debugOn('cells') ? '' : ' • add ,cells for the raster');
+		if (!spotDebugEl && document.body) {
+			spotDebugEl = document.createElement('div');
+			spotDebugEl.style.cssText = 'position:fixed;right:4px;bottom:4px;z-index:3000;'
+				+ 'max-width:60vw;font:11px/1.4 monospace;background:rgba(0,0,0,.82);color:#ff0;'
+				+ 'padding:4px 6px;white-space:pre;pointer-events:none;max-height:44vh;overflow:hidden';
+			document.body.appendChild(spotDebugEl);
+		}
+		if (spotDebugEl) {
+			spotDebugEl.textContent = [head].concat(lines.slice(0, 12)).join('\n');
+		}
 	}
 	// **WHICH NODE LABEL SURVIVES A CROWD, AS ONE NUMBER** (Task 398; §2.2). Lower places LATER and
 	// is therefore dropped sooner -- the drop order the whole column now reads in (Task 445); the
@@ -2579,8 +2747,16 @@ var EngCalcs = EngCalcs || {};
 		// flicker every pass here is written to avoid. Measured, so the price is on the record: on
 		// Net3-World with every label field on the whole repair is 19-58 ms a pass, against 25-90 ms
 		// for ONE of the four to six placeLabelsFirstFit() calls the same pass already makes.
+		var repairT0 = spotDebugOn() && typeof performance !== 'undefined' ? performance.now() : 0;
 		var repaired = Collide.repairCrossingGangs(nodeLabels, nodePlaced, obs, {
 			pad: pad, leaderMin: leaderThreshold(),
+			// Off unless somebody typed ?debug=spots. `spotAlways` additionally searches the gangs
+			// the repair had no reason to search, for the picture alone -- it scores no trial and
+			// cannot move a label.
+			trace: spotDebugOn(), spotAlways: debugOn('all'),
+			// The bench's A/B switch. Absent, the pass uses its own default, which is all three
+			// routes -- so the shipped page never reads this line.
+			strategies: labelSpotRoute ? undefined : ['brute', 'gang'],
 			// The closing count is a second sweep of the whole drawing for a number no decision
 			// reads, so it is taken only when the bench is open to print it.
 			report: debugOn('labels'),
@@ -2588,6 +2764,8 @@ var EngCalcs = EngCalcs || {};
 		});
 		nodePlaced = repaired.results;
 		lastGangRepair = repaired.stats;
+		if (repairT0) { spotDebugMs = performance.now() - repairT0; }
+		spotDebugTrace = repaired.stats.trace;
 		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The
 		// repair moves what it can show an improvement for; this closes the remainder, which is the
 		// only rung left once moving has run out. It must run HERE, after both placements and before
@@ -25468,6 +25646,9 @@ var EngCalcs = EngCalcs || {};
 		pendingPathEl = el('polyline', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
 		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
 		debugBoxLayer = el('g', {}, world);
+		// The same again for ?debug=spots, in its own layer so the two pictures can be read
+		// separately or together -- see drawSpotDebug().
+		spotDebugLayer = el('g', {}, world);
 		setTransform();
 		wireToolbar();
 		georefWireBar();

@@ -209,6 +209,71 @@ function runFixtures() {
 			JSON.stringify({ after: got.stats.after, spot: got.stats.spot,
 				found: got.stats.spotsFound }));
 	}
+
+	console.log('\n--- fixtures: the developer view (?debug=spots) sees it and cannot steer it ---');
+	{
+		// **THE TRACE IS AN OUT-PARAMETER AND A SHIPPED PAGE MUST NOT PAY FOR IT.** Absent the
+		// flag there is no list at all, which is the assertion that keeps the picture from becoming
+		// a second code path the drawing depends on.
+		const here = { x: 20, y: 0 };
+		const a = oneLabel([here]);
+		const open = { boxes: [], segments: [] };
+		const quiet = Collide.repairCrossingGangs([a], [at(a, here)], open,
+			{ strategies: ['brute', 'gang', 'spot'], foreign: CROSSED });
+		report(!quiet.stats.trace, 'no trace unless it is asked for');
+
+		const seen = Collide.repairCrossingGangs([a], [at(a, here)], open,
+			{ strategies: ['brute', 'gang', 'spot'], foreign: CROSSED, trace: true });
+		const t = (seen.stats.trace || [])[0];
+		report(!!t && t.ran && t.won && t.spots.length > 0 && t.trials > 0,
+			'a gang the search fixed is traced with its spots, its trials and its verdict',
+			t ? JSON.stringify({ ran: t.ran, by: t.by, spots: t.spots.length, trials: t.trials })
+				: 'no record');
+		// The raster is recorded BY REFERENCE, so the picture is the very array the scan ran over
+		// and not a second one built to look like it -- the drift `js_fallback_string_check.php`
+		// exists because of, in geometry.
+		report(!!t && !!t.field && t.field.blocked.length === t.field.n * t.field.n
+				&& t.need && t.need.h > 0,
+			'...and the occupancy raster and the footprint it was asked for come with it',
+			t && t.field ? t.field.n + 'x' + t.field.n + ' cells of ' + t.field.cell.toFixed(1)
+				: 'no field');
+	}
+	{
+		// **`,all` LOOKS WHERE THE SHIPPED SCHEDULE DOES NOT, AND MAY NOT MOVE ANYTHING.** The
+		// shipped search runs only where the cheap routes left a crossing standing, so on the gangs
+		// they DID clear -- most of them, on a real drawing -- the overlay would be empty, which is
+		// exactly the case somebody watching the screen needs explained. The switch searches those
+		// gangs for the picture alone, and the only thing that makes it safe to offer is that the
+		// layout it produces is identical.
+		//
+		// The fixture is the gang route's own: two crossed leaders that the re-deal clears, so by
+		// the time the spot branch is reached there is nothing left to fix.
+		const upper = { x: 30, y: 0 }, lower = { x: 30, y: 20 };
+		function gspec(id, ax, ay) {
+			return { id: id, anchor: { x: ax, y: ay }, home: { x: ax + 2, y: ay - 2 },
+				w: 20, h: 6, yOff: -3, dragged: false, sides: [], priority: 1 };
+		}
+		const a = gspec('n:A', 0, 0), b = gspec('n:B', 0, 20);
+		const open = { boxes: [], segments: [] };
+		function run(extra) {
+			return Collide.repairCrossingGangs([a, b], [at(a, lower), at(b, upper)], open,
+				Object.assign({ strategies: ['brute', 'gang', 'spot'], report: true, trace: true },
+					extra));
+		}
+		const plain = run({});
+		const look = run({ spotAlways: true });
+		const pt = (plain.stats.trace || [])[0], lt = (look.stats.trace || [])[0];
+		report(!!pt && !pt.ran && !pt.searchOnly,
+			'a gang the cheap routes cleared is not searched on a shipped page',
+			pt ? JSON.stringify({ ran: pt.ran, by: pt.by }) : 'no record');
+		report(!!lt && lt.searchOnly && !lt.ran && lt.trials === 0 && lt.spots.length > 0,
+			'...and IS searched for the picture alone under the switch, with nothing tried',
+			lt ? JSON.stringify({ searchOnly: lt.searchOnly, trials: lt.trials,
+				spots: lt.spots.length }) : 'no record');
+		report(JSON.stringify(plain.results) === JSON.stringify(look.results)
+				&& look.stats.moved === plain.stats.moved && look.stats.spot === plain.stats.spot,
+			'...and the drawing it produces is identical to the one without the switch');
+	}
 }
 
 // ================================================================================================
