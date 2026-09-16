@@ -1,0 +1,45 @@
+# check.mustblock -- URLs that MUST NOT be reachable, and check.sh fails while they are.
+#
+# One URL per line. Blank lines and lines starting with # are ignored. EVERY LINE NEEDS A REASON.
+#
+# WHY THIS EXISTS, and it is the inverse of everything else check.sh does. On 2026-09-15 that scan
+# found `/engcalcs/.claude/hooks/guard-wait-loops.php` returning 500, which is how anybody learned
+# `/engcalcs/.claude/settings.json` was served as a plain 200 -- the agent definitions, the hook
+# scripts and the permission allow-list, readable by anyone who guessed the path.
+#
+# **THE FIX MADE THE ALARM WORSE, AND THAT IS THE POINT OF THIS FILE.** Once blocked, those paths
+# answer 403, which check.sh also counts as a failure -- so a working fix would have mailed a
+# failure every morning for ever. The walk now skips dot-directories as a class, which silences the
+# nag AND silences the finding: the watch could no longer see that class of exposure at all, whether
+# or not anybody had deployed the fix. A guard that goes quiet when the thing it guards is still
+# broken is worse than no guard.
+#
+# So this file asks the opposite question. A PASS here is 401, 403 or 404. A 200 is a FAILURE and
+# names the URL. It is deliberately a SHORT, TYPED list rather than a derived one: the derived-list
+# argument that governs the rest of check.sh does not apply, because there is no rule a machine can
+# read that says which URLs ought to be unreachable -- that is a judgement, and a judgement belongs
+# in a declaration with its reason beside it.
+#
+# It also closes the deploy gap by construction. An .htaccess does nothing until the file is on the
+# server, so this fails from the moment the fix is written until the moment somebody pulls -- which
+# is the one thing nothing else here could tell you.
+
+# The Claude Code working directory: agent definitions, hook scripts, and settings.json carrying
+# the permission allow-list. Blocked by .claude/.htaccess and by a blanket dot-directory rule in
+# the suite's root .htaccess, at two Apache override levels deliberately.
+https://hawsedc.com/engcalcs/.claude/settings.json
+
+# The development tree: roadmap, scripts, harnesses, agent journals, translation payloads.
+# Blocked by dev/.htaccess since long before this file existed.
+https://hawsedc.com/engcalcs/dev/ROADMAP.md
+
+# Usage logs. No row names anybody, but they are personal-adjacent by aggregation.
+https://hawsedc.com/engcalcs/log/engcalcs-lang.log
+
+# Editor and CI configuration. Not secret, not a page, and nobody has ever intended to serve them.
+https://hawsedc.com/engcalcs/.vscode/settings.json
+https://hawsedc.com/engcalcs/.github/copilot-instructions.md
+
+# The git directory. Blocked by a RedirectMatch in the suite's root .htaccess since 2026-07-28,
+# when it was found serving a browsable index and handing out intact packfiles.
+https://hawsedc.com/engcalcs/.git/config
