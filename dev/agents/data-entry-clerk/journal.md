@@ -869,3 +869,121 @@ times). Fine as a development branch, per Tom's own framing of the ask; not a ne
 seat's own case.
 
 — Declan
+
+## Eighth invocation, 2026-09-15 — Tom asked me by name, alongside Sue and Mary: Task 674 column/row placement (X1) and the EPANET Description/Tag-before-Elevation order (X2)
+
+### What 674 actually built, read on branch `674-coordinate-entry`, not assumed from the prompt
+
+**OBSERVED** (`js/looped-network.js` on `674-coordinate-entry`, not yet merged) — the two surfaces do
+NOT currently sit in the same place, and the brief's framing ("currently placed at the END of both")
+undersells the table's real position. `buildPaneTables()`'s Junctions/Reservoirs/Tanks specs read
+`paneColId(), paneColActive(), paneColElev(), paneColCoord(1), paneColCoord(2), ...` — coordinates sit
+in slots 4-5, **immediately after Elevation, ahead of every other typed field** (Demand, Fire flow,
+Level, etc.), not at the end. Only the **popup** (`nodeCoordFields(fields, n)`, called from the node
+branch of the property-popup builder) is genuinely last — after Tag, custom properties, Active and the
+push-here button, just before the import-notes field. I read this directly rather than trusting the
+brief's summary; it changes the table math below.
+
+### The table's actual DOM tab order, read cell by cell, not assumed
+
+**OBSERVED** `paneTableRow()` (`js/looped-network.js` on the branch): the ID cell is a real `<button>`
+with no `tabIndex` override, so it IS in the browser's default tab order — the older journal claim
+("Elevation → Demand → Fire flow → (next row) Elevation" with nothing else in between) predates
+today's code and is not currently accurate; both ID and the Active checkbox are real tab stops. A
+"plain" cell (a result column, or an identity/computed-total cell) is explicitly given `tabIndex = -1`
+so Tab skips it while End/Ctrl+End can still land on it (`:16495-16498`, commented for exactly that
+reason). **Coordinate cells are real `<input>` elements with no such exclusion** — they are typeable,
+by design, and therefore ARE stopped at by Tab regardless of where they sit in the row.
+
+### The arithmetic Tom's question actually turns on: MIDDLE placement forces a cost that TRAILING placement lets a clerk opt out of
+
+**OBSERVED, derived from the two facts above.** The clerk who never types a coordinate — the ordinary
+case today, since `addNode()` still has only a pointer caller (first invocation) — has a real, wanted
+tab sequence per junction row: Elevation → Demand → Fire flow → (skip plain results) → Initial
+quality. As built, X and Y sit BETWEEN Elevation and Demand, so every one of those 400 rows forces two
+unwanted stops (a real `<input>`, not a skippable plain cell) in the MIDDLE of a run the clerk actually
+wants — 800 extra Tab presses across 400 junctions, and worse than a wasted keystroke: landing focus in
+a live coordinate box mid-sequence is a place a stray keystroke actually moves the node.
+
+**If the same two columns sat at the END of the row instead** (after every other typed and result
+column), the identical clerk's wanted sequence — Elevation → Demand → Fire flow → Quality — is now
+CONTIGUOUS and uninterrupted, and reaching the next row does not require finishing the row: a
+spreadsheet-literate clerk who is done with a row simply clicks the next row's Elevation cell rather
+than tabbing through trailing columns they don't want, the way nobody tabs past column Z to reach row
+2 of a real spreadsheet. **A trailing unwanted column costs nothing because it can be skipped by
+stopping; a middle unwanted column costs something on every row because it cannot be skipped without
+leaving the keyboard.** This is the concrete reason the CURRENT build (coordinates right after
+Elevation) is arithmetically the worst of the three shapes discussed — worse than either of Tom's
+own two named options — for the clerk who is not touching position.
+
+### The other side, cited rather than assumed: PNEZD is a real, decades-old survey convention, and it does not agree with what's built either
+
+**CITED** — PNEZD ("Point, Northing, Easting, Z/elevation, Description") is Autodesk Civil 3D's and
+the surveying trade's standard flat-file point format: "PNEZD represents the order of the data columns
+in the text file: Point number, Northing, Easting, Z coordinate (elevation), and Description"
+(Cadline Community, "Civil 3D Survey - What is a PENZD point file",
+https://www.cadlinecommunity.co.uk/hc/en-us/articles/201758902-Civil-3D-Survey-What-is-a-PENZD-point-file;
+corroborated by Eyasco's own "Survey (PNEZD) File Format" page,
+https://www.eyascopublic.com/mehelp/survey__pnezd__file_format.htm). **This is the exact shape "a
+surveyed junction has a northing to two decimals" (Task 674's own text) produces as raw material** —
+a clerk transcribing a survey deliverable reads point, then northing, then easting, then elevation, in
+that order. Note it puts coordinates BEFORE elevation, same as EPANET's GUI and Tom's option 1 — but
+the table as built puts Elevation BEFORE coordinates, matching neither EPANET's editor nor PNEZD.
+
+### Q1 — my answer, and why table and popup should NOT be forced to agree
+
+**Split the decision, because the two surfaces cost differently for my seat's metric.** In the
+**table**, the loss from a middling position is measured above at 800 keystrokes for 400 junctions and
+is avoidable by choosing an END; in the **popup**, no comparable cost exists — a popup opened once per
+element does not have a continuous same-column-many-rows keyboard run to interrupt, and the whole
+premise of Tom's own "order of fundamentalism" argument (ID, X, Y is how EPANET orders things, and
+matches PNEZD) is much better suited to a form filled top-to-bottom once per object than to a
+spreadsheet-shaped table where MOST rows, MOST of the time, never touch two of the columns.
+
+**For the table specifically: put coordinates LAST among the typed columns** (after every editable
+field, ahead of nothing but the read-only result columns, which are already tabIndex=-1 and therefore
+free regardless of where they sit) — not "at the end" vaguely, but specifically after Fire flow/Level/
+Demand and before Head/Pressure/Quality results. This is the one placement that lets the majority
+clerk (positions already set by the only door that creates a node — a pointer click) tab straight down
+the fields they actually type with zero interruption, while a clerk who DOES want to paste or type
+surveyed coordinates in bulk can still reach the columns directly by clicking into them — paste-onto-
+existing-rows (`panePasteAt()`, already shipped) does not care about column position at all, since the
+clerk clicks the drop cell first regardless of where it sits.
+
+**For the popup: I have no objection to option 1**, and it is where the PNEZD/EPANET "order of
+fundamentalism" argument actually fits — a form read top-to-bottom once per node, not a table typed
+down many times. If it must be one decision rather than two, I would rather pay the popup's smaller,
+one-time-per-element onboarding cost than the table's row-multiplied one — but I would rather Tom keep
+them separate, on the record that this is exactly the kind of case my seat exists to flag: a decision
+that reads as one question is actually two, with different right answers, because the two surfaces are
+used at different volumes.
+
+### Q2 — EPANET's Description/Tag-before-Elevation: my seat's read
+
+**Not defensible as a model to imitate, and there is real evidence it is a GUI-only artifact rather
+than a considered ordering.** CITED: the EPANET `.inp` text format's own `[JUNCTIONS]` section is
+ID, Elevation, Demand, Pattern — Description and Tag are not columns of that section at all (Description
+travels as a trailing `;`-comment; Tag lives in a wholly separate `[TAGS]` section) — confirmed against
+the EPANET 2.2 User Manual's own file-format appendix
+(https://19january2021snapshot.epa.gov/sites/static/files/2020-05/documents/epanet_userss_manual_2.2.0.pdf).
+So the ENGINE's own canonical record of a junction puts Elevation second, right after ID, with no
+Description or Tag anywhere near it — it is only the desktop GUI's property-EDITOR dialog that
+interleaves two rarely-touched free-text fields ahead of the one hydraulic number nearly every junction
+states. That the file format and the editor disagree is evidence the editor's order was not derived
+from the file's own logical structure; SPECULATION beyond that (I cannot cite EPANET's dialog-layout
+history or say it was accidental rather than deliberate — I found no source for GUI design intent,
+only the disagreement itself).
+
+**From my seat specifically:** yes, it is actively bad if copied literally, and it is bad for exactly
+the reason my seat exists to name. Description and Tag are optional, free-text, and — per my own
+gesture counts across every invocation of this journal — among the fields a volume clerk touches
+least (nothing I have measured this session or any prior one shows a clerk typing a Tag for 400
+junctions; ID, Elevation, Demand, Fire flow and now position are the ones that recur). Any popup or
+table order that makes a clerk pass over two fields they are not filling in before reaching the one
+they fill in on nearly every row pays a small tax on every element, for no offsetting benefit —
+unlike position, which at least has the PNEZD citation behind an early placement, Description/Tag
+have no comparable case for sitting ahead of Elevation. **Do not adopt this specific piece of EPANET's
+order.** Elevation belongs early (right after ID, ahead of anything optional or rarely filled),
+whether or not coordinates also go there.
+
+— Declan

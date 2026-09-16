@@ -246,3 +246,42 @@ kind today (item 1/610's still-open half), so a projected-CRS mode would be buil
 feature that does not exist yet. No urgency, per Tom's own framing (a development branch, not a
 near-term ship) — I agree with that framing from my own seat, more strongly than I expected to
 before writing the review.
+
+## 7. Task 674 (already largely built): move the table's coordinate columns to the END of the typed fields, not right after Elevation
+
+**Already built, branch `674-coordinate-entry`** — not a new feature request, a placement correction
+before merge. Full arithmetic: journal, eighth invocation, 2026-09-15.
+
+As built, the Junctions/Reservoirs/Tanks tables put X and Y in slots 4-5, directly between Elevation
+and every other typed field (Demand, Fire flow, Level...). Because coordinate cells are real, typeable
+`<input>`s (unlike a plain/result cell, which the table already excludes from Tab via `tabIndex = -1`),
+this interrupts the one continuous keyboard run the table gives a clerk today, on every one of 400
+rows, for the ordinary clerk who positions nodes by pointer and never types a coordinate — measured at
+roughly 800 unwanted Tab stops for 400 junctions, landing in a box that actually moves the node if
+mistyped. **Moving the same two columns to the end of the typed fields (after Fire flow, before the
+read-only results) removes the interruption entirely for that clerk**, because a trailing unwanted
+column can be skipped by simply not tabbing that far and clicking the next row instead, where a middle
+one cannot be skipped without leaving the keyboard. This costs nothing to a clerk who DOES want to
+paste surveyed coordinates in bulk, since paste-onto-existing-rows already works by clicking the drop
+cell directly, independent of column position.
+
+**I would NOT ask the popup to match** — see the disagreement recorded below. The table and the popup
+are used at different volumes and, on my own metric, do not have to agree.
+
+**Size:** trivial — reordering `cols:` array entries in three specs (`buildPaneTables()`), no new
+mechanism, no `js_module_wiring_check.php`/`focus_order_check.php` implications I can see (worth a
+second look by whoever ships it, since `focus_order_check.php` is exactly the check that watches
+per-row keyboard-stop cost).
+
+## Disagreement with Tom's own framing of Task 674 (2026-09-15), stated once
+
+Tom's question treated table placement and popup placement as one decision — "Option 1... put
+coordinates immediately after ID... Option 2... at the end" — and leaned toward Option 1 for both. My
+own reading of the built code says these are two different questions with two different right answers
+for my seat: the table pays a real, row-multiplied cost for a middle placement that the popup does not
+pay at all, because the popup is opened once per element rather than typed down many times. I would
+keep coordinates early in the popup (Option 1 there is genuinely harmless, and it is where the
+EPANET/PNEZD "order of fundamentalism" argument actually applies) and move them to the end of the
+typed columns in the table (functionally Option 2, but past every OTHER input, not merely past
+Elevation) — not because Tom's instinct toward Option 1 is wrong, but because it is being asked to
+answer two questions that do not have the same answer.
