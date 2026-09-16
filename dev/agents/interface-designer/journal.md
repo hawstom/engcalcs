@@ -1452,3 +1452,72 @@ convention, not a market comparison question, though the AutoCAD/Figma citations
 her kind of evidence if she wants to independently verify them.
 
 No shipped file touched.
+
+---
+
+## 2026-09-16 — Tom's audacious rebuild: options, not objections
+
+He rejected the input/result-mixing argument (correctly — everything is already one ungrouped
+list, OBSERVED `js/looped-network.js:35150-35270` node popup, `:35908-35998` link popup, both
+interleave typed and computed rows today) and built five groups himself: Description and state /
+Dry properties / Water properties / Custom / Results and quick graph. He asked for counter-
+proposals on the one open problem (Results falls to 2 rows on a reservoir/tank) and two standing
+questions (disclosure vs. plain heading; order within group). Answered in full to the orchestrator;
+recorded here for continuity.
+
+**The row-count problem dissolves once the INSTRUMENT changes, and that is my headline finding.**
+His "fewer than three rows under a heading is bad" rule is a real cost judgement, but the cost it is
+pricing is a `<details>`/`<summary>` disclosure's: a caret that promises interactivity, and — OBSERVED,
+`js/looped-network.js:16669`-family and my own 2026-09-15 wishlist item 28 — a genuine keyboard tab
+stop, one per group per popup visit. **A plain, non-interactive heading (`<h4>` or a rule+label) is
+not a tab stop and promises nothing**, so the "underfilled disclosure looks broken" complaint a
+2-row group raises under `<details>` does not exist under a plain heading — there is nothing for the
+reader to feel cheated by. Given his own standing ruling that nothing in this popup collapses by
+default (`js/looped-network.js:36248`, and now confirmed narrowed to Settings specifically, not
+Properties, by his own words: *"Settings is infinitely long and deep... Properties is not"*), a
+`<details>` element that is ALWAYS open and NEVER meant to close buys exactly nothing today except
+the caret glyph and the tab stop. **Recommend: all five groups render as plain headings, not
+`<details>`, in the single-element Properties popup** (the already-shipped `multiSection()` at
+`:36241`, used for the DIFFERENT multi-select edit box, is untouched by this — that box's per-type
+sections over a variable-length selection are a different judgement and out of scope here). This is
+also my answer to his Q2, and it is the thing that makes Q1 stop being a live problem rather than a
+tradeoff.
+
+**Order-within-group: found one real mismatch between Tom's own written list and the shipped code,
+worth a named counter-proposal rather than a shrug.** OBSERVED `js/looped-network.js:36550/35752/
+36660` (link popup): `closedField()` (Shut) renders BEFORE `tagField()` (Tag), which is Shut-then-
+Tag; his own list order is `ID, Description, Tag, Shut, Enabled/active`, Tag-before-Shut. Proposed:
+swap the two calls in `renderLinkFields()` so the shipped order matches his own sketch exactly — a
+two-line, zero-string-cost change, the actual meaning of "grouped as it stands" at the row level and
+not just the block level. Separately (OBSERVED `:35931-35998` vs. his list's `Length, Diameter,
+Roughness, K`): code renders Diameter first via the pipe-type chooser's own adjacency
+(`pipeTypeChooser` immediately after ID is Task 465's own ruling, already settled), Length last. Did
+**not** propose moving Length ahead of Diameter — that would silently overturn a named, dated ruling
+on the strength of an illustrative bullet list that was never claimed to be pixel-precise. Flagged
+the tension and recommended keeping Diameter anchored to the type chooser.
+
+**Named but did not resolve: ID and Description don't obviously exist as two separate rows today.**
+`idField()` renders in the popup TITLE, outside `fields[]` entirely; the only free-text identity
+field in the code is `tagField()` (Tag). His count table gives "Description and state" 5 rows on
+every type, which only works if "Description" names a row nothing in the codebase currently builds.
+Did not guess at this — it is a content question (does a Description field get built, or does
+"Description" mean something already named differently) and named it rather than silently deciding
+it. SPECULATION, worth someone confirming before a five-row group is built expecting a row that
+does not exist.
+
+**Phone: grouping helps at least as much as desktop, and the disclosure-vs-heading choice matters
+MORE there, not less.** OBSERVED `Looped-Network.php:635`, `css/engcalcs.css:1543`
+(`.lpn-propbox { min-width: min(17rem, 94vw) }`): the property popup is a narrow, draggable,
+resizable floating box capped to viewport width on any screen, and its fields have always been a
+single vertical column, one property per line (`js/looped-network.js` comment at the `multiRow`
+site, quoting Tom 2026-09-08: *"One property per line, as every other popup on this page"*). A
+plain heading costs one line of vertical space regardless of viewport — phone has more of that
+dimension to spend than width, via scroll — so grouping is not fighting the phone the way a wide
+table would; there is no second dimension being asked for. If anything the case for plain-over-
+`<details>` strengthens on touch: a `<summary>` genuinely toggles on tap, and a thumb landing on one
+while scrolling a small draggable box is a more plausible accident than a mouse click landing on a
+menu row by mistake — an accidental collapse mid-scroll is a cost a plain heading cannot incur at
+all. SPECULATION on the accidental-tap risk specifically (no measured incident), but the geometry
+argument (OBSERVED numbers above) does not depend on it.
+
+No shipped file touched.

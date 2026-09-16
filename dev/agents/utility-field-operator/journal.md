@@ -568,3 +568,122 @@ spend it on (a) the crossed-leader fan-out, which is unambiguously good on every
 the gang-stacking route, whose main measured payoff is a desktop screenshot and whose phone cost is
 untested. This is a genuine disagreement with the roadmap's sizing, not a claim the task is wrong to
 exist.
+
+## 2026-09-16 — Tom's final property grouping (2026-09-15): asked for a phone answer, options not complaints
+
+Read the brief in full before answering (`grouping-brief.md`, scratchpad, superseding an earlier
+draft). Tom asks for counter-proposals, not objections, and has already overruled several arguments —
+I checked I am not re-making one of them before writing this.
+
+**Honest framing first, per my own standing conclusion:** my 2026-08-25 research (above) found that
+in the field, this exact box is rarely the document I reach for at all — real isolation and condition
+work runs through a GIS trace and a work order, not a hydraulic model (CITED, journal 2026-08-25).
+That holds here too. **But Tom is not asking whether I'd open the box; he is asking, given that
+someone with this seat's habits sometimes will, how it should read when they do** — the rare
+new-development-turnover or post-mortem case my own wishlist row #3 already named as real. I am
+answering that narrower, real question, not manufacturing a broader want.
+
+### Q1 — grouped vs. long scroll, on a phone specifically, and does my answer differ from desktop's
+
+**Yes, my answer differs from the desktop answer, and I think that is worth Tom hearing plainly
+rather than folded into "no collapse anywhere."** The desktop seats concluded nothing should collapse
+by default, and Tom's own reasoning for that (*"Everything is all together now and nobody is
+complaining"*) is a fair description of a screen where all 16-20 rows are visible without scrolling
+past the fold, or nearly so. **OBSERVED**, a phone popup is not that screen: `.lpn-setbox` — the
+chrome the fire-flow box borrows, and the shape the property popup is built from — runs to
+`min(46rem, 92dvh)` at the 640px breakpoint (`css/engcalcs.css:1532`, my own 2026-08-30 entry above),
+and a junction/tank inventory of 4-8 Dry rows plus 3-5 Water rows plus a Results block is a page-length
+scroll inside a box already consuming most of the viewport. **The claim "nobody is complaining" is
+true of a desktop screen that shows the whole list at once; it says nothing about a screen that
+cannot.** A long uncollapsed scroll on a 6-inch phone is not the same object as a long uncollapsed
+scroll on a 27-inch monitor, and I do not think the no-collapse ruling was weighed against the
+smaller one.
+
+**My actual answer: default OPEN on desktop (agreeing with the standing ruling — nothing there is
+broken), and default two of the four groups CLOSED on a phone specifically — "Dry" and "Results and
+quick graph."** Not because grouping fixes a defect (it does not, per Tom's own correct point that
+headings organize what is already there rather than solving crowding), but because on the one screen
+where scroll length is a real cost, closing the two groups I am least likely to need on first look
+buys back most of that screen for the one I am. This is a genuinely different default per breakpoint,
+which is more than the brief's four groups alone settle, and I am naming it because nobody else's
+seat has the phone-scroll-cost argument to make it from.
+
+**Why those two, and not "Description and state" or "Water": see Q2.** I would not collapse
+"Description and state" ever, anywhere — five rows, always short, and it is the group that answers my
+own top-listed question ("which asset is this"). I would not collapse "Water" on a phone by default
+either, for the same reason Q2 gives.
+
+### Q2 — which group is mine first, and does it differ from a designer's
+
+**Mine: "Description and state," then "Water," not "Dry."** Standing at a valve or a hydrant, I want
+identity and Shut/Active first (am I looking at the right asset, and is it currently closed) and then
+the water-side facts that tell me whether the asset is live and what it is doing (Demand, Head,
+Fire flow) — those are the numbers that would make me second-guess what I am seeing on the ground.
+**"Dry" — length, diameter, roughness, K — is a designer's first group, not mine.** Those are sizing
+inputs a design engineer reads to check a run; I read them, if ever, only after identity and state
+have already told me I am looking at the right thing and it is doing something worth investigating
+further. This is a real order disagreement and not a small one: Tom's own list puts Dry second, ahead
+of Water, and from this seat I would swap them.
+
+**SPECULATION, mine, to be re-derived:** this is also consistent with `utility-planning-engineer`'s
+own 2026-08-25 guess about me (quoted and flagged, above, as not mine to cite as settled) —
+"read-heavy and location-anchored." A designer reads Dry first because Dry is what they are checking
+FOR CORRECTNESS against a plan sheet; I read Water first because Water is what tells me whether what
+I am standing at matches what I expect the network to be doing right now. Same box, two different
+first questions, because we are not asking the same question of it.
+
+**But this is a genuinely narrow finding, and I want to rank it as such rather than oversell it.** Per
+my own wishlist row #3, the honest baseline is that I mostly do not open this box, and when I do it is
+for identity and topology, both of which the map and the tap-to-select already answer before the
+popup's field order ever matters (`dev/agents/utility-field-operator/wishlist.md:64-80`). Group order
+inside the popup is a real but second-order question for my seat; I answer it because Tom asked, not
+because it is where I would have spent the team's attention.
+
+### Q3 — Shut vs. Active, legible from the street, and do I care about either
+
+**Legible: yes, and I think Tom's own distinction is exactly right, stated in language closer to mine
+than to a modeler's.** Shut is what I DO — I turn a wrench, the asset's operating state changes, and
+if the model tracks that at all it should track it as a fact about what happened, changeable by an
+action during a run. Active is a decision about whether the asset is even PART of the network being
+modeled at all, which is a planning-table question, not a street one — nobody in the field "makes a
+pipe inactive," they close a valve or a main breaks and gets isolated, both of which are Shut. **I
+would go further than "legible": from this seat, Active is close to invisible, and that is correct,
+not a gap.** I have never in twenty years thought in the category "is this pipe part of the system
+right now" separately from "is it flowing" — that is a modeler's abstraction for representing a
+future phase or a decommissioned segment, and it belongs where Tom put it, beside Shut in the same
+group but doing none of the work Shut does for me.
+
+**One caution, small, worth naming:** if the two ever render as visually equal-weight controls (two
+identical-looking toggles side by side), a reader unfamiliar with the distinction could plausibly
+toggle the wrong one — SPECULATION, mine, not observed in any current markup, since I have not found
+the popup's Active control rendered yet in this worktree to check its current weight against Shut's.
+Naming it so whoever builds the row watches for it, not asking for a redesign.
+
+### Q4 — the two new Pipes-table columns (Description, Tag) at 640px
+
+**Recommendation: do not hide them, and do not build bespoke 640px narrowing logic for this table —
+let Declan's column-hide-and-reorder mechanism (named in the brief as the answer for tables generally)
+cover it, and if a phone-specific default is wanted, default Description and Tag OFF rather than
+narrowed.** Reasoning from this seat specifically:
+
+- **Narrowing Description defeats its own purpose for me.** Free text truncated to a few characters
+  under 640px answers no identity question at all — a Description clipped to "Main line to..." is
+  worse than no Description column, because it looks like an answer and is not one. My own top
+  question is "which asset is this," and a column that exists to answer it in prose should not be the
+  one column squeezed to illegibility on the narrowest screen.
+- **A HIDDEN Description, chosen deliberately, is honest; a NARROWED one is not.** If Declan's
+  column mechanism already lets a table default to fewer visible columns on a phone (I have not
+  checked whether it is width-aware or purely a user choice — that is his seat's question, not mine,
+  per my brief's own instruction not to answer for the data-entry clerk), a phone default that hides
+  Description and Tag and leaves ID plus the short numeric columns is the shape I would want: it does
+  not lie about what it is showing.
+- **Sideways scroll is the fallback I would accept, not the one I would design for.** A table that
+  scrolls sideways with ID pinned is workable one-handed if ID stays visible while scrolling — I have
+  not checked whether this table's ID column is sticky under horizontal scroll, and that is the one
+  thing I would ask to be true before accepting sideways scroll as the phone answer at all.
+- **I would not spend new engineering on a bespoke 640px rule here.** The brief itself says tables
+  get no grouping and no collapsing, with Declan's per-column hide as the stated escape hatch — I
+  read that as already deciding this question one level up, and my only addition is that Description
+  is the one column where truncation reads as a wrong answer rather than an honest omission.
+
+— Franco

@@ -1129,3 +1129,137 @@ true at once and are not actually in tension, which is worth saying since the br
 question as if one seat must win.
 
 — Declan
+
+## Tenth invocation, 2026-09-16 — Tom's final grouping brief: re-cost with Enter-down, design column hide/reorder
+
+Tom read my eighth/ninth-invocation numbers and asked one question that dissolves most of them:
+*"What if tab moves downward, not rightward?"* He is right to ask it as a question rather than an
+objection to my count, because the count was never wrong about what it measured — it was wrong about
+which WORKFLOW it assumed. This entry corrects that.
+
+### First, verify the premise myself rather than take the brief's word for it
+
+**OBSERVED** `js/looped-network.js:16668-16670`, `paneHandleKey()`: `Enter` maps to
+`at = { r: r + (ext ? -1 : 1), c: c }` — same column, next row (Shift+Enter goes back up). The
+comment beside it: *"Enter commits and drops a row; Shift+Enter goes back up. The spreadsheet's own
+ending, and the reason a column of forty numbers can be typed without touching the mouse."* This is
+real and already shipped, not a proposal — confirmed by reading the function myself, not by trusting
+the brief's paraphrase of it.
+
+### Re-costing the two workflows honestly
+
+**COLUMN-major (fill one property for every row, e.g. 400 elevations off a survey printout):**
+click the first Elevation cell, type, Enter, type, Enter... The clerk never leaves the Elevation
+column. **Slot order is now completely irrelevant to this workflow — the 800-keystroke number I
+derived at the eighth invocation does not apply to it at all**, because that number counted Tab
+presses crossing a middle column, and this workflow uses no Tab and crosses nothing. This is the
+workflow the page's own UX already pushes a clerk toward without saying so: nodes are placed by
+pointer first (first invocation — `addNode()` has only a canvas-click caller), so properties are
+filled in as a SECOND pass over already-existing rows, which is naturally "one property, all rows,"
+not "all properties, one row." I did not previously credit that this second-pass structure is
+column-shaped by default; it is.
+
+**ROW-major (walk one element's full line — the PNEZD shape, one line of a marked-up plan set typed
+left to right before moving to the next point):** here slot order still matters, because this
+workflow genuinely uses Tab across a row, and Tab still walks DOM/array order — a coordinate cell
+sitting mid-row (as the current `674-coordinate-entry` branch has it, right after Elevation) still
+costs two unwanted stops per row for a clerk who is not touching position, exactly as I measured at
+the eighth invocation. **Enter-down does not help this workflow; it is orthogonal to it.**
+
+**The honest retraction:** my item 7 (move X/Y to the trailing end of the typed columns) was solving
+the row-major case only, and I did not previously separate the two cases — I wrote the 800-keystroke
+number as if it applied to "the table," when it only ever applied to one of two real workflows the
+table supports. Column-major pays nothing regardless of where coordinates sit. Row-major pays a real,
+smaller-than-I-first-scoped cost, and only for a clerk who both (a) fills several properties per
+element in one pass and (b) does not use whatever column-hiding exists. **Once hide/reorder ships
+(below), item 7's specific fix — reorder to the end — becomes the WEAKER of two available remedies**:
+a row-major clerk who never touches coordinates can just hide the two columns, which removes them
+from the Tab path entirely rather than merely moving them to a position that is cheap to skip. I
+would still take a sane default order (coordinates late, not mid-row) as the out-of-the-box state,
+since a first-time clerk has not yet found the hide control — but I am no longer arguing item 7 is
+load-bearing on its own. **The retracted number is honest: "nearly nothing," not "nearly nothing
+except when it still is a lot," because the case where it is still a lot is now avoidable by the
+clerk's own hand, not a fixed cost of the page.**
+
+### Column hide and reorder — the design Tom has agreed to in principle
+
+**Where the control lives:** one small button per table (not on the main toolbar — "the most
+expensive space on the page" per this file's own earlier reading of Tom's toolbar comments), sitting
+beside each table's existing sort/filter row. Opens a short popover: one row per column, a checkbox
+(visible/hidden) and up/down reorder (arrows or drag — arrows are cheaper to build and are keyboard-
+operable, which matters for this seat specifically; a drag-only reorder control would be the one
+piece of this whole feature a keyboard-first clerk could not use). **Also give the fast, spreadsheet-
+native shortcut**: right-click (or long-press) a column header for a one-item "Hide this column"
+menu entry, mirroring the gesture Sheets/Excel users already have and costing nothing to build beyond
+what the popover's own hide toggle already does — the header context menu and the popover checkbox
+write the same state.
+
+**One column is not hideable: ID.** It is the row's own identity, the only door `findGoTo()` gives a
+click-to-pan action through, and hiding it would strand a row with no way to identify which element
+it is. Every other column — Active included — is fair game.
+
+**Scope: per table, not global.** The six tables have different column sets and different clerk
+habits per asset type (a clerk might always hide Tag on Pipes and never touch it on Junctions where a
+survey deliverable states one) — a single global hidden-set forces one clerk's Pipe preference onto
+their Junction table for no reason. State keyed on the table id.
+
+**State: browser furniture, one constant, one write site** — the pattern `lpn_furniture_check.php`
+already expects (`LPN_PANE_KEY`, `LPN_SETBOX_KEY`, etc., each one `localStorage.setItem` outside
+`serializeProject()`). Propose `LPN_PANECOLS_KEY = 'lpn_panecols'` holding one object keyed on table
+id: `{ junctions: { order: [...col keys...], hidden: [...col keys...] }, pipes: {...}, ... }`. This
+must be OUTSIDE `serializeProject()`, checked by the same script that already caught `lpn_libbox` and
+`lpn_show_titles` being written but undeclared — a colleague opening the same file on their own
+screen must not inherit somebody else's hidden Diameter column any more than a 32-inch pane width.
+
+**What happens on paste with hidden columns — the question only this seat asks, answered: SKIP, and
+it is nearly free to build because the mechanism already exists.** `panePasteAt()` already tiles a
+pasted block positionally into `cols = paneCols(spec)` and already drops-and-counts anything past
+`cols.length` (`js/looped-network.js:16565-16568`, "IT CANNOT GROW THE TABLE... dropped and
+COUNTED"). If a hidden column is simply removed from the array `paneCols(spec)` returns for every
+interactive purpose — tabbing, arrow-jump, Home/End, AND paste — then a clerk who pastes a 6-column
+spreadsheet block starting at a visible cell fills only the VISIBLE columns from that point forward,
+and the rest silently falls into the same "dropped and COUNTED" bucket that already exists for
+running off the table's right edge. **No new code path — the paste mechanism already treats
+"nothing more to write to" as a normal, reported outcome; hiding a column just makes that boundary
+arrive sooner.** This mirrors the codebase's own existing choice for filtered rows exactly
+(`paneTableRowsInOrder(spec)` already excludes filtered-out rows from the DOM entirely, which is why
+copy of a filtered table is already "the SAFE side of a well-documented Excel trap," per my own
+fourth-invocation Q2) — hidden columns should be absent from the array, not merely CSS-hidden, so the
+same safety falls out by construction rather than needing a second rule.
+
+I considered REFUSE (block the whole paste until the clerk unhides) and reject it: it punishes the
+exact clerk the feature exists to help, forcing them to temporarily undo the customization to use it.
+I considered "paste into the hidden column anyway" (Excel's own actual behaviour for hidden columns,
+which is a documented user trap, unlike its safer behaviour for filtered rows) and reject it for the
+same reason CLAUDE.md's filtered-row precedent already rejects the Excel-default on rows: our table
+can make hidden mean ABSENT rather than merely invisible, and absent is the position that cannot
+silently write into a column that isn't there. **SKIP, not REFUSE, not Excel's own trap.**
+
+### Popup grouping, Q3 and Q4 answered directly
+
+**A five-group popup, nothing collapsed, is better than today's flat 16-20 rows — but only if the
+group heading is NOT a `<summary>`.** I flagged in my ninth invocation that `<details>` open by
+default "costs nothing," and that was true for CLICK cost but I had not yet checked TAB cost.
+**OBSERVED, checked now:** a `<summary>` element is natively focusable — it is the browser's own
+toggle control — so an open `<details>` still inserts a real Tab stop at every group boundary, even
+though nothing about it is collapsed. A clerk tabbing from Elevation (Dry) to Demand (Water) on a
+junction crosses exactly one such boundary per element; at 400 junctions that is 400 extra Tab
+presses landing on a heading with nothing to type into — the identical shape as my coordinate-slot
+finding, smaller in size (one stop, not two) but the same mechanism, and I did not name it until
+asked directly. **With nothing collapsible by default, there is no reason to pay for the toggle
+control's own Tab stop.** Two ways to avoid it, in order of preference: (1) plain, non-interactive
+headings (a styled `<div>`/`<h4>`, no `<details>`) if no reader-controlled collapse is wanted at all;
+(2) if `<details>` is kept for some future collapse affordance, give its `<summary>` `tabindex="-1"`
+— the exact idiom this file already uses for plain/result table cells (`:16495-16498`) to keep a
+control reachable by click and by End/Ctrl+End-style jumps while removing it from the ordinary Tab
+path. **Plain headings are strictly better for my seat if disclosure is never going to be used; a
+tabindex-suppressed `<summary>` is the fallback if Tom wants the toggle kept for later.**
+
+**Q4, the three-row rule breaking on Results-and-quick-graph (2 rows, reservoir and tank): I do not
+care, and I am saying so plainly rather than manufacturing an objection.** A two-row group costs my
+seat nothing extra either way, given the tabindex fix above — a heading with no Tab stop costs the
+same whether it sits over two rows or twelve. The three-row minimum is a visual-economy rule (Ida's
+territory, not mine); I have no gesture-cost stake in it and would not spend Tom's attention asking
+him to reconsider it for my sake.
+
+— Declan
