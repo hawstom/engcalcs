@@ -2150,3 +2150,106 @@ EPANET's dialog order — this project defers to EPANET's terminology, not its l
 itself, and I think that line applies exactly here.
 
 — Sue
+
+---
+
+## 2026-09-15 — Sue: the five-group property collapse — "Flow and pressure" mixes what the code itself forbids mixing; "Dimensions" quietly does the same thing
+
+Tom asked this seat by name, following the coordinate-slot ruling above. Full brief:
+`/tmp/.../collapse-brief.md` (his draft, verbatim, plus three observations of mine to test).
+
+- **OBSERVED, `js/looped-network.js:11879-11893`** (the Find-panel's own property-band comment,
+  written for a different UI surface but stating the rule this question is really about): *"THE
+  RULE, IN FOUR BANDS, ORDERED BY WHAT A NUMBER IS RATHER THAN WHERE IT CAME FROM... a number the
+  user supplied and a number we computed are different kinds of thing and must never sit in one
+  field."* That sentence is CLAUDE.md's own unit-paradigm rule (`## Unit Sets`, "A calculator
+  stores what the user typed... conversion happens at the solver... and nowhere else") applied to
+  LAYOUT rather than to arithmetic, and it is already enforced in code: `BAND_NODE` (typed:
+  demand, fire flow, initial quality) and `RESULT_NODE` (computed: demand-actual, head, pressure,
+  quality) are two separate arrays, offered in two separate passes (`js/looped-network.js:11962-
+  11964`). **Tom's "Flow and pressure" group puts `Demand`/`Emitter`/`Roughness`/`K` (typed) and
+  `Head`/`Pressure` (computed) in one box.** That is not a style choice I am weighing against
+  another style choice — it is the exact conflation this project already named and already split
+  in the sibling surface, now proposed for the popup.
+- **My answer to Q1/Q2, direct: yes, this is a real problem, and it is structural, not cosmetic.**
+  An engineer reading a model to review a submittal asks two different questions of these two
+  populations — "what did the designer state" and "what did the network do about it" — and a
+  reviewer's whole method is comparing the first against the second. A box that already contains
+  both answers removes the ability to ask "does the stated demand match the resulting head" as a
+  comparison, because both numbers read as one undifferentiated fact. **My honest read of "how an
+  engineer holds this in their head": not one idea.** I check a pipe's SIZE against a catalogue and
+  a code minimum; I check its RESULT against a criterion (velocity, pressure). Those are different
+  verbs — specify vs. verify — done at different points in a review, usually with the drawing
+  closed for the first and the model run for the second. **OBSERVED,** the popup's own comment
+  names the same split for the demand pair specifically (`js/looped-network.js:11886-11893`, "the
+  answer to shouldn't all the Demand options be together") and Tom ruled it the split way when he
+  asked the identical question about Demand alone on 2026-09-04 — this is that ruling, generalized,
+  now being asked to reverse itself for the group as a whole.
+- **"Dimensions" has a quieter version of the same defect, and it is why I would not wave the group
+  through even though nothing in it LOOKS like a result.** Elevation, Length, Diameter are all
+  typed — genuinely one population, band 2 in the code's own words. But **Horiz (X/Y) is not a
+  DESIGN variable in the sense the other three are; it is IDENTITY**, per my own answer to Task 674
+  this morning (journal, above, same date): "a coordinate is part of the asset's spatial identity,
+  paired with the ID the way a parcel number is paired with a legal description," and the workflow
+  that touches it is a QA check against a survey or a developer's submittal, not a sizing decision.
+  Length and Diameter are read to size a pipe against a criterion; X/Y and Elevation are read to
+  confirm the asset is where the plan says it is. **"Dimensions" as a single word papers over that
+  difference** — it reads as a drafting-sheet category (everything with a number and a unit on a
+  plan view) rather than an engineering one, and a drafting category is exactly the kind of grouping
+  this project has repeatedly found does not survive contact with a real review (the same lesson as
+  the BAND_NODE/RESULT_NODE split, one door over).
+- **Q3 — Shut/Included: OBSERVED, they already sit apart from both candidate homes today, and
+  neither is obviously right.** `closedField()` (`js/looped-network.js:35989`, "Shut") sits between
+  the typed design fields and Tag; `activeField()` (`:36660`, "Part of this network" — Tom's
+  "Included") sits after Tag and custom properties, on both nodes and links. Today's actual
+  position is neither "beside ID" nor "with flow." **My own vote: beside ID, not with flow, and not
+  their own group.** Whether an element participates AT ALL is the most upstream fact about it —
+  more fundamental than what it is sized or what it carries — and answering it wrong (a link
+  quietly `active: false` while every other field looks normal) is the review failure closest in
+  shape to the transposed-coordinate risk I argued for slot 2/3: invisible to a skim, visible only
+  when someone asks "why doesn't this pipe show up in the solve." Putting it in "Flow and pressure"
+  compounds Tom's own observation 1 rather than answering it — it adds a THIRD population (state) to
+  a box that already mixes two.
+- **Q4 — does a collapsed group threaten a review, and does my slot-2/3 argument survive
+  collapsing: it does not survive, and this is the finding I'd stand behind most.** My argument for
+  coordinates in slot 2 was explicitly about visibility on the SKIM — a reviewer scanning a popup or
+  a table row sees ID, X, Y before they see anything else, so a transposed pair or a wrong datum is
+  in the first three things read rather than the last. **A default-collapsed "Dimensions" group
+  puts X/Y back behind a click**, which is precisely the state slot 2/3 was chosen to end. This is
+  not a hypothetical tension — it is the same axis (does the reviewer have to ask for it, or does it
+  arrive) that decided the coordinate-slot question a few hours ago, now reopened by a different
+  door. **If Dimensions collapses, X/Y should not be inside it** — either it stays outside every
+  collapsible group (paired with ID, always open, exactly where today's ruling already put it), or
+  "Dimensions" is split into a small always-open "Location" (X, Y, Elevation) and a collapsible
+  "Size" (Length, Diameter) — the same identity/design line Q1-Q2 already draws, applied to this
+  group's own name.
+- **Q5 — what a submitted report or handoff needs: grouping helps a walk IF it matches the order a
+  reviewer actually works in, and today's draft does not, quite.** Every master-plan/submittal
+  review I have reasoned about from this seat (journal, 2026-08-24 onward) runs roughly: confirm
+  the asset is what and where it claims to be (ID + location) → check it is sized to a standard
+  (design inputs) → check the model's answer against a criterion (results) → check compliance
+  (quality) — which is the code's own four-band order, restated. **Tom's draft gets three of five
+  groups right (ID, Quality, Custom) and blurs the middle two** by putting location inside "Size"
+  and results inside "Inputs." My recommended shape, same five-group budget, same spirit as his
+  draft: **ID (id, description, tag, state — Shut/Included belongs here) → Location (X, Y,
+  elevation, always open) → Design (length, diameter, roughness, K, demand, emitter, fire flow) →
+  Results (head, pressure — read-only, own visual treatment so nobody mistakes one for the other) →
+  Quality → Custom (trailing).** That is six groups against his five, and I say so honestly rather
+  than force a fit — Location is small enough (2-3 rows) that folding it back into ID rather than
+  giving it its own header is a reasonable compression if five is a hard budget, and I would not
+  fight for the sixth group if he wants five.
+- **Custom, twice — my own opinion, held loosely.** Trailing only, not also under ID. A custom
+  property is open-ended by design (Task 636, no registry, no validation) and ID is the one group
+  on this list that IS validated (an id must be unique, a tag has rules). Mixing an unbounded list
+  into the one bounded group is a smaller version of the Dimensions problem — a box whose contents
+  are no longer predictable by its name. **Low-confidence, small want, first instinct only.**
+
+**Where I expect disagreement:** Ida on whether six groups (my count) or five (his) is the right
+visual budget, and on whether "Location" earns a header of its own at three rows — that is her
+call, not mine, and I would defer to her on the pixel question even though I hold the underlying
+identity/design split firmly. Declan may push back on Location-as-its-own-group if it adds a
+collapse/expand click to a table row he is trying to fill fast — my Q4 answer already says X/Y
+should stay OUTSIDE any collapsible group for that same reason, so I do not think we actually
+disagree, but he should say so himself. Mary has no stake here.
+
+— Sue

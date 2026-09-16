@@ -987,3 +987,145 @@ order.** Elevation belongs early (right after ID, ahead of anything optional or 
 whether or not coordinates also go there.
 
 — Declan
+
+## Ninth invocation, 2026-09-15 (same day, later) — Tom's collapsing-groups brainstorm
+
+Asked by name again on the question that follows the slot decision I lost (eighth invocation): does
+collapsible grouping in the property popup help or hurt at volume, and does it pay back the 800
+keystrokes I measured against the TABLE's coordinate slots.
+
+### The load-bearing find: the page already ruled on default-collapsed once, twice, and both times said no
+
+**OBSERVED** `js/looped-network.js:4632`, on the old Settings-box accordion: *"the Settings box does
+not collapse anything (Tom: 'No need ever to collapse')"* — and the fuller quote at `:28739`, Tom,
+2026-08-18: *"No need ever to collapse; just scroll/jump to your section."* The accordion was
+removed and replaced by a two-pane box whose left pane is the navigation, specifically because
+collapse-by-default was the wrong answer for exactly this shape of problem (many named sections, one
+box).
+
+**OBSERVED** Two places on this page already use the `<details>`/`<summary>` disclosure element —
+the exact HTML idiom Tom's brainstorm would need — and both default it **open**, on record, for a
+reason that is my seat's reason too even though neither comment was written by me:
+
+- `customPropBox()`, `js/looped-network.js:29034-29037`: *"`<details>` rather than a button and a
+  hidden div: it is the WAI-ARIA disclosure pattern for free, it is the idiom `multiSection()`
+  already uses on this page, and **every row inside it is built eagerly, so a collapsed property is
+  still searchable... and still reachable by Find**."* And on adding a new one, `:29214`: *"OPEN,
+  because a collapsed blank line says nothing at all about what the user has just been given."*
+- `multiSection()`, `js/looped-network.js:36246-36248`, on a mixed-element-type popup: *"**OPEN, ALL
+  OF THEM.** Tom's own words are that a mixed selection shows both and NEITHER IS HIDDEN, so
+  collapsing is something the reader does, never the default."*
+
+**This settles Q4 for me, from evidence the page already carries rather than from my own
+inference.** "Muffleable" here has an existing, working referent: `<details>` open by default, DOM
+content built eagerly so nothing is functionally hidden (searchable, reachable, present for a
+screen reader), and the reader — never the page — decides to collapse it. That is muffling exactly
+as my seat's own definition wants it: the capability to shrink a group is there for whoever wants
+it, and costs the volume clerk who never touches it literally nothing, because open is the state
+they never had to ask for.
+
+### Q1 — arithmetic: collapsed-by-default would cost roughly what the table's coordinate slots cost; open-by-default costs nothing
+
+A group collapsed by default that a clerk needs open costs one click to expand, **per element, per
+session, unless the open/closed state is remembered** — that is the entire question, and it collapses
+(no pun intended) to the same shape as my eighth-invocation table finding: a middle interruption
+that cannot be skipped, multiplied by 400. If a clerk routinely fills Dimensions and Flow and
+pressure but never Quality, and all three ship collapsed by default with no memory, that is up to
+two unwanted expand-clicks **per element, every single time the popup opens** — worse than the table
+case, because a click costs more attention than a Tab press and there is no way to skip it the way a
+trailing table column can be skipped by not tabbing that far (the popup is one small box; the field
+you want may sit below the collapsed one). At 400 elements that is a very real 400-800 extra clicks,
+arithmetically closer to my table finding than a fresh problem.
+
+**Open by default removes the cost entirely for the volume clerk and adds nothing measurable**: a
+`<summary>` heading with a `▸`/rotated-caret visual is one more line of scannable text, not a
+gesture. The only volume-relevant question left is whether GROUPING BOUNDARIES THEMSELVES slow Tab
+— they do not, if `<details open>` renders its body inline in normal flow (which is the element's
+own default rendering; `multiSection()` and `customPropBox()` both already rely on this), because
+Tab still walks the DOM in order and a `<summary>` is itself one extra, harmless stop (arguably a
+small win — it reads as a landmark the way a spreadsheet's frozen header row does, not a delay).
+
+**Verdict on Q1: helps, if and only if it ships open by default and stays that way unless the reader
+acts** — which is not a new position for this page to take, it is the position it already took twice.
+
+### Q2 — does it pay back the table's 800 keystrokes? No. Different surface, different mechanism.
+
+**OBSERVED** Grouping and `<details>` are constructs inside the property **popup**'s field-building
+code (`customPropBox`, `multiSection`, and by extension whatever renders Tom's five named groups).
+The Tables pane's six specs (`buildPaneTables()`) are flat column arrays with no heading hierarchy
+and no disclosure element anywhere in `paneTableRow()`/`renderPaneTable()` — grouping a popup's
+vertical field list into named `<details>` sections has no code path that touches a table's column
+order at all. **The two features do not share a write seam or a render seam; they are unrelated
+mechanisms on separate surfaces**, confirmed by reading rather than assumed from the brief.
+
+Tom accepted the 800-keystroke cost specifically "until columns become customizable" — that is a
+statement about **column order/visibility in a table**, and the thing that pays it back is
+column reordering or a trailing default placement (my own item 7, already filed and partly built on
+`674-coordinate-entry`), not anything a popup's field grouping can reach. **If this brainstorm is
+read as "the answer to the table debt," that is the wrong remedy for the right complaint** — worth
+saying plainly because Tom's own framing ties the two together in one sentence in the brief
+("Tom accepted that cost until columns become customizable. Is collapsible grouping the thing that
+pays it back") and my answer is no, name the different mechanism.
+
+### Q3 — popup and tables stay separate designs; grouping implies nothing about the table
+
+Consistent with my eighth-invocation disagreement (recorded in the wishlist): the table is typed
+down many times per session and pays a cost a form filled out once per element does not. A grouped
+**popup** heading is a vertical-flow convenience for a single object's form. **There is no version of
+"grouped columns" for the table that is not strictly worse for a volume clerk than today's flat row**
+— a spreadsheet-literate clerk tabbing across a row wants every editable cell reachable in one
+uninterrupted run (my own repeated finding), and a column-group boundary that could be
+collapsed would either (a) do nothing if always open, in which case it is decoration with no
+volume cost either way, or (b) hide columns the clerk needs to type into, which is strictly worse
+than today, never better. **My recommendation: do not extend this brainstorm to the table at all**,
+not even as a "grouped header row" — there is no version of it that helps volume entry, and version
+(b) actively regresses it.
+
+### Q4 — see the load-bearing find above. Collapsible, open-by-default, reader-controlled, satisfies "muffleable."
+
+Restated once: not removable (the field is still there, still in the DOM, still reachable by Find,
+per the page's own existing comment about exactly this), not a per-user DEFAULT the suite chooses
+for anyone, but a control the reader can act on that costs nothing to the reader who never acts on
+it. That is the definition, and this page already has two working instances of it to copy rather
+than invent.
+
+### Q5 — state persistence: browser furniture, keyed on the group's name, never inside `serializeProject()`
+
+**OBSERVED** the existing furniture-key convention: `LPN_PANE_KEY = 'lpn_pane'`
+(`js/looped-network.js:14213`), `LPN_RPANE_KEY` (`:14577`), `LPN_SETBOX_KEY` (`:30020`),
+`LPN_FINDBOX_KEY` (`:14008`), `LPN_FFBOX_KEY` (`:39519`), `LPN_ENERGYBOX_KEY` (`:39965`),
+`LPN_CMPBOX_KEY` (`:39927`), `LPN_RPTBOX_KEY` (`:40055`) — one `localStorage` key per remembered
+window-furniture fact, guarded by `lpn_furniture_check.php` because CLAUDE.md's own rule is that a
+setting belongs to the PROJECT or the BROWSER and never both, and a collapse state is screen-shaped
+furniture in exactly the sense that a pane width is: whether Quality is worth seeing every time is a
+fact about the CLERK'S OWN habitual workflow on THEIR OWN SCREEN, not a fact about the network, and a
+colleague opening the same file must not inherit somebody else's collapsed Quality group any more
+than they should inherit a 32-inch pane width.
+
+**My recommendation, concretely:** one `localStorage` key (e.g. `lpn_popgroups`) holding an object
+keyed on the GROUP NAME (`'ID'`, `'Dimensions'`, `'Flow and pressure'`, `'Quality'`, `'Custom'`) to a
+boolean, shared across every element type that offers that group name, remembered across elements
+AND across sessions (a clerk who collapses Quality once should never have to do it again, in this
+project or the next one they open) — the `<details>` `toggle` event already fires when the reader
+acts, so writing to storage is a one-line hook onto an event this element gives for free. **It must
+NOT be per-element** (would defeat the whole saving — see Q1 arithmetic) **and must NOT be
+per-project** (would violate the furniture rule the same way a stored unit-set almost did — CLAUDE.md
+is explicit that this is the one page with no per-browser unit cookie for exactly the reason a
+setting must not silently follow the wrong thing). Default state on first visit: open, per the
+precedent above.
+
+### Where I expect disagreement
+
+**Sue** owns whether "Flow and pressure" mixing typed Demand/Roughness/K with solved Head/Pressure is
+a defect — I flagged it only because a collapsed RESULT group (if this page ever did ship
+collapsed-by-default) would hide a post-solve answer, which is exactly her transposed-X/Y argument
+in a different shape; with open-by-default that concern mostly dissolves, but the INPUT/RESULT mixing
+itself is hers to rule on, not mine. **Ida** owns the visual-hierarchy question the brainstorm is
+really asking (does five named groups read better than one flat list) — my seat has nothing to say
+about whether grouping helps a reader SCAN, only about what it costs a typist who is not scanning,
+and those can point different directions on the SAME feature. I would not be surprised if Ida
+recommends grouping for legibility while I recommend it stay open-by-default for volume — both can be
+true at once and are not actually in tension, which is worth saying since the brief poses the
+question as if one seat must win.
+
+— Declan

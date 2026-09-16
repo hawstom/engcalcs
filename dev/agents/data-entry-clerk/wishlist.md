@@ -273,6 +273,30 @@ mechanism, no `js_module_wiring_check.php`/`focus_order_check.php` implications 
 second look by whoever ships it, since `focus_order_check.php` is exactly the check that watches
 per-row keyboard-stop cost).
 
+## 8. Popup group collapsing: build it, but open by default and remembered per browser — ranked as a small, cheap correctness item, not a volume-entry fix
+
+Full arithmetic and citations: journal, ninth invocation, 2026-09-15. Short version: collapsible
+`<details>`-style groups in the property popup (ID / Dimensions / Flow and pressure / Quality /
+Custom) cost a volume clerk **nothing** if they ship open by default and stay open unless the
+reader collapses one — which is the page's own existing rule for the two places it already uses this
+exact element (`customPropBox()`, `multiSection()`, both `js/looped-network.js`, both commented
+"OPEN... collapsing is something the reader does, never the default"), and matches Tom's own
+2026-08-18 ruling against the old Settings-box accordion (*"No need ever to collapse; just
+scroll/jump to your section"*). Shipped collapsed-by-default with no memory, the same feature costs
+up to 800 extra clicks across 400 elements — arithmetically the same shape as my table finding
+below, on a different surface.
+
+**It does NOT pay back the 800-keystroke table debt** (item 7 / Task 674) — that is a Tables-pane
+column-order question and this is a popup field-grouping question, and I found no code path where
+one touches the other. Tom's own sentence ties them together ("accepted that cost until columns
+become customizable... is collapsible grouping the thing that pays it back") and my answer is no:
+name the two as separate remedies rather than let one stand in for the other.
+
+**Ranked low** — it is real, and I would ship it (open-by-default, remembered per browser in a
+furniture-shaped `localStorage` key, never in `serializeProject()`), but it saves at most a handful
+of clicks a session for someone who collapses a group they never use, not a per-row or per-element
+cost the way items 1, 2 and 7 are. I would not build it before anything else on this list.
+
 ## Disagreement with Tom's own framing of Task 674 (2026-09-15), stated once
 
 Tom's question treated table placement and popup placement as one decision — "Option 1... put

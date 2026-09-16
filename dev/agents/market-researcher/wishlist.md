@@ -303,3 +303,54 @@ sentence to record that the field's dominant convention disagrees with both of T
 his own choice (keep the columns, put them wherever) is deliberately choosing the less common
 pattern for a stated reason (typeable precision editing) rather than by default. Zero build cost;
 this is a note for whoever writes up the 674 decision.
+
+## 0g. Property grouping: split "Flow and pressure" — every comparable tool keeps inputs and results apart
+
+2026-09-15, on the property-collapsing brief: epanet-js's own source (`asset-panel.tsx`,
+`state/layout.ts`, both fetched and quoted in the journal entry this date) never puts an editable
+field and a simulation result in the same section, across every asset type it has — Junction,
+Pipe, Pump, Valve, Tank all get a dedicated, separately-headed, always-last `simulationResults`
+section. Tom's draft "Flow and pressure" group mixes Demand/Emitter/Roughness/K (typed) with
+Head/Pressure (computed). **Recommendation: split it**, matching what the page's own popup
+already does elsewhere (`BAND_NODE` vs `RESULT_NODE`, per the brief) and what the one tool I could
+verify in source does everywhere. Zero-cost finding — the popup's own architecture already
+supports the split; this is a naming/placement decision, not new code. Ranked here because it
+directly resolves a question already on the table rather than opening one.
+
+## 0h. Do not default Dimensions (or anything holding elevation/coordinates) to collapsed
+
+2026-09-15: NN/g's progressive-disclosure literature (CITED, journal this date) distinguishes
+primary from secondary options; it does not bless collapsing everything, and the one comparable
+tool that ships per-section default-collapse state (epanet-js) applies it to exactly two niche
+pump-financial sections and leaves every section holding physically load-bearing data — including
+its `modelAttributes` section, which holds elevation — open by default. Sue's argument in the
+brief (a collapsed Dimensions group could hide a transposed X/Y that is invisible to the solver)
+is independently supported by this: no tool checked treats geometry as secondary. **Recommendation:
+Dimensions (and anything holding coordinates/elevation) should default open; if any group defaults
+closed, it should be the smallest, most genuinely optional one (Custom is the closer analogue to
+epanet-js's energy/energyResults — author-added, not always present)**, not a re-derivation of the
+solver-invisibility argument, just a second, independent source landing on the same side. Zero
+cost; a note for whoever sets each group's default state.
+
+## 0i. No conventional term of art for the category headings — write the plainest English, not EPANET's
+
+2026-09-15: checked epanet-js (code keys, not confirmed visitor English), QGIS (author-named
+groups, no fixed vocabulary), and Bentley's docs (no grouping found at all, weakly sourced). None
+supplies a naming convention "Dimensions" or "Flow and pressure" would be departing from. This
+means CLAUDE.md's EPANET-deference rule for `lpn_` strings does not bind this particular naming
+choice — there is no established term to defer to, so this is squarely a "write it plainly" case,
+not a "match the reference implementation" case. Zero cost; a note to head off relitigating
+EPANET-terminology deference on headings that have no EPANET equivalent to defer to (EPANET's own
+editor, per this seat's earlier finding, has no groups or headings at all).
+
+## 0j. WaterGEMS grouping is unconfirmed and should not be cited as evidence either way without a screenshot
+
+2026-09-15: the only Bentley artifact reachable without a login (a docs.bentley.com attribute
+reference page) shows a flat, ungrouped, input/result-interleaved list — but this is a
+documentation listing, not necessarily the live property grid, and Bentley's UI is commonly built
+on a categorized/alphabetic toggle control I could not confirm one way or the other for this
+product. **Flagging as an open gap rather than a finding**: if this question matters enough to
+settle, it needs either a screenshot from someone with a WaterGEMS licence or a more specific
+search than this session had time for. Zero cost either way; recorded so a future invocation does
+not re-search the same dead ends (bentley.com, virtuosity.com product pages carry no UI
+screenshots reachable without a trial signup).
