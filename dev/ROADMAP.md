@@ -73,6 +73,25 @@ the block.
     SVG rasterisation under the compensation transform, or the 1.7 MB backdrop data URI.
   - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
     re-init sites are off the settle path; the label collision grid is bounded since Task 668.
+- 75|679| **Narrower strokes on the About mark, and more pixels used.**
+  Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
+  photo-realistic since there are many more pixels. First item of business, narrower strokes on
+  the outlines."*
+  - **A NEW TASK, NOT A REOPENING.** Task 615 is CLOSED on his own *"mark 615 complete"* and a
+    closed block is never re-scanned, so the unbuilt phase is extracted here as the length rule
+    requires. What shipped is the favicon and the mark; what he wants now is a rendering of it at
+    the size Help, About actually has room for.
+  - **HIS FIRST ITEM OF BUSINESS IS THE STROKE WIDTH**, and only that. A favicon needs heavy
+    outlines to survive 16 px; the About box is showing the same geometry at many times that, where
+    the same strokes read as a cartoon. So this is a SIZE-DEPENDENT rendering, not a redesign.
+  - **DO NOT RE-OPEN THE GEOMETRY.** Tom on the favicon: *"my one true love."* The shading rule the
+    whole mark follows -- one light above, three surfaces, and the shading follows the SOLID -- is
+    in `ship-notes.md`, and `dev/icon-preview/gen-about-icon.js` is the generator.
+  - Worth asking before building: whether "photo-realistic" means gradients and a cast shadow, or
+    simply finer line work and more surfaces. Those are different amounts of work and only he knows
+    which he meant.
+
+
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
@@ -115,6 +134,25 @@ the block.
     EPANET's own `[COORDINATES]` section is plain text people hand-edit today. If we are alone in
     not offering it, that is evidence rather than an argument, but it is the kind Tom asked for.
 
+  - **WHERE THE TWO ROWS SIT IS OPEN AND IS TOM'S DECISION, narrowed by him to two options on
+    2026-09-15.** They ship at the END of the popup and of each node table today, which is neither
+    option. **Option 1: slots 2 and 3, immediately after ID** -- *"in order of fundamentalism, and
+    position-elevation is standard"*, and it matches EPANET, whose Junction order is ID,
+    X-Coordinate, Y-Coordinate, Description, Tag, Elevation. Against it: *"it uses prime real estate
+    for something that people don't usually change/edit"*, it pushes toward collapsible property
+    sections, and customizable table columns are coming anyway. **Option 2: at the end** -- out of
+    sight, but *"distinctly unorderly"*. **He leans to Option 1** *"with the foresight of some
+    collapsing and adjustments in our future"*.
+    - **A POPUP ROW AND A TABLE COLUMN MAY NOT BE ONE DECISION.** He framed them together; the
+      table is where volume entry happens and a column nobody edits in slot 2 is a tab stop paid
+      four hundred times, which is the `data-entry-clerk`'s arithmetic and not a matter of taste.
+    - **AND EPANET PUTS DESCRIPTION AND TAG BEFORE ELEVATION**, which Tom spotted in the same
+      breath (*"yet another surprise from EPANET ... !!!"*): two optional free-text fields ahead of
+      the most important hydraulic number a junction has. **Whether that is deliberate or an
+      accident of EPANET's own interface history decides how much authority its order carries
+      here** -- this project defers to EPANET's TERMINOLOGY, which is a settled rule, and has never
+      agreed to defer to its LAYOUT.
+    - Put to Declan, Sue and Mary on 2026-09-15; their answers land in their own journals.
 - 50|675| **A labelled grid, with the significant digits picked out.**
   Tom, 2026-09-15: a grid in Settings with *"options for density and opacity"*, labelled *"at the
   lower and left map edges aligned with each grid line"*, showing three significant digits large
@@ -528,46 +566,6 @@ the block.
   file, then import anything that is not a name conflict, that probably would be all that's needed."*
   No export function: a project file already is the export. A name conflict is reported and skipped,
   never renamed silently.
-
-- 100|618| **WYSIWYG hit areas: what you can click is what you can see.**
-  Tom, 2026-09-09, on the corrected map: *"On the PC with a default cursor, precision is high.
-  Ideally, everything would have a hit area that exactly matches what you see aka WYSIWYG ... Of
-  course things like text and flow arrows should have a forgiving blob-ish mask rather than being
-  stingy or pedantic about 'You didn't click me'."* Then, after using it: *"Spoiler alert, I think
-  we may be golden now except for node fat."* **HIS THREE PRIORITIES, IN HIS ORDER:**
-  1. **`visiblePainted` for node and link SYMBOLS on a PC** -- *"that's probably non-negotiable."*
-     This is the "node fat" item: a junction's hit area is a 12 screen-pixel disc
-     (`LPN_NODE_HIT_PX`) around a 7 px drawn dot, and on a pointer device he wants the drawn shape
-     itself. `@media (pointer: fine)` is the mechanism; a coarse pointer KEEPS the band, because a
-     finger is not a mouse and `dev/toolbar-icons.md`'s 44 px argument still holds there.
-     `.lpn-node-symbol, .lpn-link-symbol { pointer-events: none }` has to change for a symbol to be
-     hittable at all.
-  2. **A link's hit area matches its own drawn width**, with a small floor. *"a lower limit that is
-     not very large because WYSIWYG is important; but contextual cursor changes the argument; I
-     really like what I see right now, which is no lower limit, though a lower limit of 3px (one
-     extra on each side of a 1-px link) might be appreciated."* So: track `--lpn-lw`, floor at 3 px,
-     against today's flat 12 (`LPN_LINK_HIT_PX`).
-  3. **A text halo of half the line spacing** -- *"just so that a multi-line label or text mouse as
-     a single block; for a text size of 10, 3px (2.5) appears to be about right, and for 12px,
-     3 px."* The point is to close the gaps BETWEEN rows so a stacked label is one target, not to
-     pad the outside. **THIS ONE IS PROBABLY ALREADY DONE.** He first reported *"default pointer
-     50 px away from any visible network artifact"* and RETRACTED it the same day -- *"50px label
-     halo was an obsolete report. You fixed it, I think."* -- so that reading predates the grab-shape
-     work of 2026-09-09 and is evidence of nothing outstanding. His verdict on the shipped behaviour
-     is *"in the wild, I think it's already perfect. I get no gap between text lines."* **So start by
-     measuring and expect to find nothing to do**; the half-line-spacing figure above is what to
-     build only if a gap turns up between rows at some text size.
-  - **The two worked examples to read first**, both found and fixed 2026-09-09: `pointer-events:
-    visible` hit-testing a stroke perimeter whose undeclared `stroke-width` defaulted to one WORLD
-    unit (846 px of false reach on a geographic drawing), and SVG `<text>` hit geometry quantised to
-    Blink's 1/64 user unit, which at 8,431 px per unit is a 131.7 px quantum (271 px of false
-    reach). `dev/browser-pass/specs/nodehit.js` and `specs/lblhit.js` are the measuring instruments;
-    do not build a third.
-  - Not decided: whether the link floor should be absolute or a multiple of the drawn width.
-  - **CONFIRMED BY A FIRST-TIME READER.** Tom testing with KDH, 2026-09-10: *"He noticed and was
-    reassured about grab to default cursor, though he said it was hard to get a pointer. There was a
-    good reason. Things on the map are small."* The cursor change is WORKING and was welcomed; the
-    difficulty is ACQUISITION, which is the "node fat" item above reached independently.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -1274,13 +1272,27 @@ the block.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
 
-- 50|640| **A Graphs submenu under Water, holding five plots.**
-  Tom, 2026-09-12: Time series, Profile, Contour, Frequency, System flow balance -- all in the
-  bottom pane except Contour, which is a map layer switched under Layers (Task 639). Profile is
-  BUILT and moves under this menu rather than being written again. This row is the menu, the tab
-  shape and the export set; the plots themselves are Tasks 599 and 600, which keep their own
-  priorities. Full specification: `dev/graphs-scope.md`.
-
+- 50|640| **Graphs: the umbrella, a submenu under Water holding five plots.**
+  **THE UMBRELLA, ON TOM'S WORD, 2026-09-15** (*"640 would make a nice umbrella"*). He asked whether
+  there was an overall graphing project and there was not -- there were four unrelated rows. This is
+  now the one place the programme is described, and the menu is where every plot surfaces, which is
+  what makes it the right parent rather than 599 or 600.
+  - **THE FIVE PLOTS:** Time series, Profile, Contour, Frequency, System flow balance. All in the
+    bottom pane except **Contour, which is a map layer** switched under Layers (Task 639) -- it
+    draws over the network rather than beside it, so it is not a tab.
+  - **PROFILE IS BUILT** and MOVES under this menu rather than being written again. It already owns
+    an axis pair, a unit label per axis, a legend and a hand-rolled plot with nothing vendored, so
+    it is also the drawing idiom every other plot must reuse. **A second plotting idiom on this page
+    would be the expensive mistake.**
+  - **THE CHILDREN, which keep their own priorities and are not absorbed:**
+    - **Task 599, time series against an extended-period run** -- priority 100, and being built on
+      `feat/time-series-graph`. Ranks above the rest because the data is already there: a run holds
+      every reporting step and nothing has to be re-solved.
+    - **Task 600, the three EPANET plots we do not have** -- contour, frequency, flow balance.
+    - **Task 637, a Graph button on the Properties box** -- the other door into the same plots,
+      reached from the element rather than from the menu.
+  - This row itself is the MENU, the tab shape and the export set. Full specification:
+    `dev/graphs-scope.md`.
 - 50|641| **Choose a real EPSG projection in the new project box.**
   Tom, 2026-09-12. Beside Unprojected XY and WGS 84 / Pseudo-Mercator lat/lon, the full GIS list.
   The status bar then shows the projection name (or *not georeferenced*) beside Northing and
