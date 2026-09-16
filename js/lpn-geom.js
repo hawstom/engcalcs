@@ -172,6 +172,24 @@ EngCalcs.lpnGeom = (function () {
 		return { f: total > 0 ? bestRun / total : 0, x: bestPt.x, y: bestPt.y, dist: best };
 	}
 
+	// **WHICH END OF A POLYLINE A STATION IS NEARER, MEASURED ALONG THE LINE** (ROADMAP Task 247).
+	//
+	// `f` is a fraction of the WHOLE arc length -- nearestFractionOnPolyline()'s own answer -- so
+	// the distance along the line to the start is `f * total` and to the end is `(1 - f) * total`,
+	// and the comparison needs no length at all. That is the whole function, and it is a function
+	// rather than an expression at a call site because the RULE is the interesting part: a meter
+	// lumps its demand at the end of the pipe the water reaches it through, and on a bent pipe the
+	// nearest end ALONG the pipe and the nearest end in a straight line are different ends. Arc
+	// length is the one that means something.
+	//
+	// **A TIE GOES TO THE START, DETERMINISTICALLY.** Never at random, and never by splitting the
+	// demand between both ends: a meter exactly at the middle of a main must lump at the same
+	// junction on every reload, or the network's answers move when nothing about it has.
+	function arcEndNearer(f) {
+		var v = (typeof f === 'number' && isFinite(f)) ? Math.max(0, Math.min(1, f)) : 0;
+		return v <= 0.5 ? 'from' : 'to';
+	}
+
 	// Place something at `along` (a fraction) on the polyline, then step it clear of any
 	// obstacle it would land on top of -- `obstacleDists` are along-distances in the same
 	// space `pointAlongPolyline().dist` reports (the editor passes flow-arrow positions).
@@ -750,6 +768,7 @@ EngCalcs.lpnGeom = (function () {
 		polylinePointsAttr: polylinePointsAttr,
 		pointAlongPolyline: pointAlongPolyline,
 		nearestFractionOnPolyline: nearestFractionOnPolyline,
+		arcEndNearer: arcEndNearer,
 		segmentAtFraction: segmentAtFraction,
 		dodgeAlongPolyline: dodgeAlongPolyline,
 		leaderAttachX: leaderAttachX,

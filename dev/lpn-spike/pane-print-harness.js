@@ -72,6 +72,7 @@ global.window.print = function () {
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
+	"\t\taddCustomer: addCustomer,\n" +
 	"\t\tsetProp: setProp, wirePane: wirePane, openPane: openPane, setPaneTab: setPaneTab,\n" +
 	"\t\tpaneTables: paneTables,\n" +
 	// A solve RESULT, planted rather than computed: the sheet's job is to print what the page
@@ -116,6 +117,13 @@ L.setProp(p1, 'diameter', 8); L.setProp(p2, 'diameter', 12);
 const pu1 = L.addLink('pump', r1.id, j1.id);
 const v1 = L.addLink('valve', t1.id, j2.id);
 L.addText(50, 50);   // the Text table (2026-09-08) prints too, so it needs one row to print
+// The Customers table (Task 247) prints on exactly the same terms, so it needs a row too.
+// **ON THE FIRST JUNCTION, AND THAT IS DELIBERATE.** A meter is one of its junction's demand ROWS,
+// so the junction it lumps at prints a TOTAL rather than the one number somebody typed. Landing it
+// on j1 leaves j2, whose printed demand and elevation are the two values section 4 states, saying
+// exactly what was typed into it, and leaves the demand ORDER section 6 asserts unchanged.
+const m1 = L.addCustomer(10, 20, { link: p1.id, t: 0.1 });
+m1.account = '4417-A'; m1.demand = 3; m1.count = 4;
 // A result, planted rather than solved: the sheet's job is to print what the page holds, and a
 // solve here would only make the number harder to state.
 L.plantResult({
@@ -148,7 +156,9 @@ function sheetOf(id) {
 // ---- 1. every table prints, from the one printer ----------------------------------------------
 console.log('\n--- one printer, seven tables ---');
 {
-	report(TABLES.length === 7, 'there are seven asset tables to print', TABLES.join(','));
+	// Eight since 2026-09-15: Customers (Task 247), which prints through the one printer exactly
+	// as the seven before it do, and is the assertion that says so.
+	report(TABLES.length === 8, 'there are eight asset tables to print', TABLES.join(','));
 	// No per-type print code. The cheap guard is that the per-type names never appear -- the same
 	// guard pane-harness.js keeps over the renderer, for the same reason.
 	report(!/function print(Junctions|Reservoirs|Tanks|Pipes|Pumps|Valves)\b/.test(src),

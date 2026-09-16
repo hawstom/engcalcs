@@ -1030,6 +1030,32 @@ html[lang="zh"] .ec-welcome {
    looking at them (2026-08-15). A leader that cannot be seen is worse than none: the label it
    belongs to then reads as floating free of the network. */
 .lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0); pointer-events: none; }
+/* ---- CUSTOMERS: the meter and its service connector (ROADMAP Task 247) ----------------------
+   THE STROKE WIDTH IS SET PER ELEMENT, NOT HERE, and that is the one thing about these two that
+   is unlike every other symbol on this map. A meter is drawn to its real size (about 2 m across)
+   while that is bigger than a legible dot and held at the dot beyond -- meterHalfWorld() in
+   js/looped-network.js carries the rule and Tom's own figures -- so both its box and its
+   connector carry a computed `stroke-width` attribute. A width declared here in --lpn-sym terms
+   would be a second opinion about a size the script is already deciding.
+
+   THE CONNECTOR IS NOT PICKABLE, exactly like a label's leader above it: a press on a service
+   line means the meter, which is what a reader intends by pressing one. */
+.lpn-service { stroke: #000; pointer-events: none; fill: none; }
+.lpn-service-off { display: none; }
+.lpn-meter { fill: #fff; stroke: #000; }
+/* A METER ATTACHED TO NOTHING LOOKS LIKE IT. Its demand is in no junction's total and therefore
+   in no answer on the screen, so it is drawn dashed rather than merely drawn without a connector:
+   an absent line is a thing you have to notice, and a dashed box is a thing you can see. */
+.lpn-meter-loose { stroke-dasharray: 1.5 1.2; }
+/* The preview box of a half-placed meter, which is view state and not an element yet. The same
+   red the rubber band it hangs off is, so the two read as one gesture in progress. */
+.lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
+/* The slide handle: on the pipe, only while its meter is selected, and grabbable. */
+.lpn-custhandle { fill: #fff; stroke: #d32f2f; cursor: grab; }
+/* The account number beside the meter is GENERATED ANNOTATION (annotationEl), so it hides with the
+   rest of it and the box and its connector -- which are authored content -- never do. It carries
+   `data-cust`, so a press on the words picks the meter, exactly as a press on a node's own data
+   label picks that node; it therefore needs no rule of its own here. */
 /* A LABEL THE USER HAS JUST PLACED SAYS SO, AND THEN STOPS SAYING IT (Tom, 2026-08-15, after
    discovering he had dragged a label without meaning to: "put a timed box or highlight on dragged
    labels for about a minute, maybe fading, maybe dashed, maybe animated so it's obviously

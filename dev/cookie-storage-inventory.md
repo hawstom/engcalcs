@@ -83,7 +83,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | Key | Where | What it holds |
 |---|---|---|
 | `lpn_index` | `js/looped-network.js` | The project list: id, name, last-updated, file link state |
-| `lpn_project_<id>` | same | One whole project — the network the user drew, its settings, and any backdrop image as a data URI |
+| `lpn_project_<id>` | same | One whole project — the network the user drew, its settings, and any backdrop image as a data URI. **Since Task 247 it also holds CUSTOMER ACCOUNT NUMBERS**, which is the first personal-adjacent data this suite stores anywhere: an account number beside a map position says where a named service is. **Exempt on the same terms as every other input on this page — it is what the visitor typed, kept so it can be given back — and it is subject to one extra rule that is not about storage at all: it must never reach a log row, a usage statistic or an error report.** Nothing writes it outside this key; `log_bucket_check.php`'s six appending writers name no element and no field, and the placement gesture's one logging call records the literal `element`. A shared project file carries it, which is a fact about sharing a file rather than about this browser |
 | `lpn_document` | same | Legacy single-document key, migrated on read |
 | `lpn_identity` | same | The initials and the opaque token this browser sends to the file-lock broker |
 | `lpn_pane` | same | Whether the bottom pane is open, how tall it is, and which tab (Task 434) |

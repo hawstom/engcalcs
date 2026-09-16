@@ -788,6 +788,37 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 $ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_vertices']='Vertices';
+// ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
+// A Customer and a meter are OURS: EPANET has no such object, so there is no industry term to
+// defer to. Everything hydraulic in these strings is EPANET's own word all the same -- demand,
+// junction, pipe -- because inventing language an engineer does not recognise has been struck
+// here three times. "Station along the pipe" is the survey word for a distance measured along a
+// route, which is what it is.
+$ec_lang['lpn_tool_add_meter']='Meter';
+$ec_lang['lpn_tool_add_meter_tip']='Click the pipe that serves a customer to put a meter on it, or click open ground and then click the pipe. The demand you give the meter is added to the junction at the near end of that pipe.';
+$ec_lang['lpn_mode_add_meter']='Meter: click the pipe that serves this customer, or click open ground and then click its pipe. Escape leaves the tool.';
+$ec_lang['lpn_pane_tab_customers']='Customers';
+$ec_lang['lpn_customer_heading']='Customer {id}';
+$ec_lang['lpn_field_account']='Account number';
+$ec_lang['lpn_field_account_tip']='Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.';
+$ec_lang['lpn_field_meter_demand']='Demand per service';
+$ec_lang['lpn_field_meter_demand_tip']='What one service at this meter draws. With the count below at 1, this is the whole of it. An empty box is a meter you have not given a demand to yet, which is not the same as a meter that draws nothing.';
+$ec_lang['lpn_field_meter_count']='Services at this meter';
+$ec_lang['lpn_field_meter_count_tip']='How many identical services this one meter stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.';
+$ec_lang['lpn_field_meter_total']='Total demand';
+$ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
+$ec_lang['lpn_field_meter_pipe']='Pipe that serves it';
+$ec_lang['lpn_field_meter_pipe_tip']='The pipe this service connects to. Drag the meter onto another pipe to change it, and drag the circle on the pipe to move where along it the service connects.';
+$ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
+$ec_lang['lpn_field_meter_station_tip']='How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.';
+$ec_lang['lpn_field_meter_lumped']='Added to junction';
+$ec_lang['lpn_field_meter_lumped_tip']='The end of that pipe the water reaches this meter through, measured along the pipe. This demand is added to that junction, on top of whatever the junction states itself. Move the meter past the middle of the pipe and it changes to the other end.';
+$ec_lang['lpn_customer_detached']='⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.';
+$ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
+$ec_lang['lpn_customer_detached_count']='{n} meters are no longer connected to a pipe. Their demand is not in the answers.';
+$ec_lang['lpn_meter_pick_pipe']='Now click the pipe that serves this meter. Press Escape to cancel.';
+$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.';
+
 $ec_lang['lpn_area_hint_window_start']='Click one corner of the window.';
 $ec_lang['lpn_area_hint_window_go']='Click the opposite corner to finish.';
 $ec_lang['lpn_area_hint_lasso_start']='Click to start the outline.';

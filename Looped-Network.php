@@ -623,6 +623,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<?php // The Text table (Tom, 2026-09-08): the multi-properties box takes its rows from the
 		      // tables' column specs, so a Text object needed a table before it could have rows. ?>
 		<div id="lpn_pane_text" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_text"></div>
+		<?php // The Customer table (ROADMAP Task 247; Tom, 2026-08-24: "And we can add a Customer
+		      // table! Yes!"). The pane generates one tab per row of paneTables(), so a Customer
+		      // table is a row in that list plus this host div, and nothing else. ?>
+		<div id="lpn_pane_customers" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_customers"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -1334,6 +1338,31 @@ EngCalcs.pageConfig = {
 	lpn_tool_add_pump: <?=json_encode($ec_lang['lpn_tool_add_pump'])?>,
 	lpn_tool_add_valve: <?=json_encode($ec_lang['lpn_tool_add_valve'])?>,
 	lpn_tool_add_text: <?=json_encode($ec_lang['lpn_tool_add_text'])?>,
+	<?php // Customers: metered demands lumped at the nearest node (ROADMAP Task 247). ?>
+	lpn_tool_add_meter: <?=json_encode($ec_lang['lpn_tool_add_meter'])?>,
+	lpn_tool_add_meter_tip: <?=json_encode($ec_lang['lpn_tool_add_meter_tip'])?>,
+	lpn_mode_add_meter: <?=json_encode($ec_lang['lpn_mode_add_meter'])?>,
+	lpn_pane_tab_customers: <?=json_encode($ec_lang['lpn_pane_tab_customers'])?>,
+	lpn_customer_heading: <?=json_encode($ec_lang['lpn_customer_heading'])?>,
+	lpn_field_account: <?=json_encode($ec_lang['lpn_field_account'])?>,
+	lpn_field_account_tip: <?=json_encode($ec_lang['lpn_field_account_tip'])?>,
+	lpn_field_meter_demand: <?=json_encode($ec_lang['lpn_field_meter_demand'])?>,
+	lpn_field_meter_demand_tip: <?=json_encode($ec_lang['lpn_field_meter_demand_tip'])?>,
+	lpn_field_meter_count: <?=json_encode($ec_lang['lpn_field_meter_count'])?>,
+	lpn_field_meter_count_tip: <?=json_encode($ec_lang['lpn_field_meter_count_tip'])?>,
+	lpn_field_meter_total: <?=json_encode($ec_lang['lpn_field_meter_total'])?>,
+	lpn_field_meter_total_tip: <?=json_encode($ec_lang['lpn_field_meter_total_tip'])?>,
+	lpn_field_meter_pipe: <?=json_encode($ec_lang['lpn_field_meter_pipe'])?>,
+	lpn_field_meter_pipe_tip: <?=json_encode($ec_lang['lpn_field_meter_pipe_tip'])?>,
+	lpn_field_meter_station: <?=json_encode($ec_lang['lpn_field_meter_station'])?>,
+	lpn_field_meter_station_tip: <?=json_encode($ec_lang['lpn_field_meter_station_tip'])?>,
+	lpn_field_meter_lumped: <?=json_encode($ec_lang['lpn_field_meter_lumped'])?>,
+	lpn_field_meter_lumped_tip: <?=json_encode($ec_lang['lpn_field_meter_lumped_tip'])?>,
+	lpn_customer_detached: <?=json_encode($ec_lang['lpn_customer_detached'])?>,
+	lpn_customer_fixed_head: <?=json_encode($ec_lang['lpn_customer_fixed_head'])?>,
+	lpn_customer_detached_count: <?=json_encode($ec_lang['lpn_customer_detached_count'])?>,
+	lpn_meter_pick_pipe: <?=json_encode($ec_lang['lpn_meter_pick_pipe'])?>,
+	lpn_inp_export_flat_customers: <?=json_encode($ec_lang['lpn_inp_export_flat_customers'])?>,
 	lpn_tool_vertices: <?=json_encode($ec_lang['lpn_tool_vertices'])?>,
 	lpn_area_hint_window_start: <?=json_encode($ec_lang['lpn_area_hint_window_start'])?>,
 	lpn_area_hint_window_go: <?=json_encode($ec_lang['lpn_area_hint_window_go'])?>,

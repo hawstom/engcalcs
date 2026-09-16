@@ -417,38 +417,29 @@ the block.
 
 - 100|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
-  EPANET does not. **Full design, with the costs priced: `dev/customer-demands.md`.**
-  - **Tom's expansion, in his words:** *"expand/envision as a Customer management model where we are
-    adding Customer account numbers, and these are meters on the system. Not sure where this is
-    headed, but let's at least think that way. And of course I assume that we lump the Customer
-    demands additively at their nearest (by length) node. Graphically, I think you pick a point, it
-    draws a meter rectangle, and then you pick a pipe and it connects perpendicularly from the meter
-    to the pipe."*
-  - **Task 468 is a PREREQUISITE, not a sibling** — a Customer is one of its demand rows extended,
-    and 247 must not invent a second breakdown structure. Shares the attach-to-a-link-at-a-fraction
-    seam with Task 502.
-  - **Recommended first slice: an account number on a 468 demand row, no geometry** — it settles the
-    `.inp` answer while that is still cheap to change, and spends none of the drawing-surface budget.
-  - **The account number is a label on a demand, never a key into anything**, and it is the first
-    personal-adjacent data in the suite: it must never reach a log row or a usage statistic.
-  - **AND IT IS NOT A CUSTOM PROPERTY, so 636 DOES NOT BLOCK THIS** (Tom, 2026-09-12: *"epanetjs.com
-    doesn't really have 'account number'. They just have the asset id, like any node, so it's not
-    absolutely necessary to have a custom property to get Customer working."*). This corrects a
-    recommendation made the same day that Task 636 land first so an account number could BE a custom
-    property. It can, later, and the gain would be real; what is wrong is treating it as the way in.
-    An asset id already identifies a meter, exactly as it identifies every other element.
-  - **CONCURRENCY: everything here except the shared field seams can run beside 636.** The three
-    places they collide are `pushSpecList()` (one source of truth for writable properties, 8
-    callers), the Properties popup's `BAND_NODE`/`RESULT_NODE`, and the Tables pane's columns. The
-    geometry -- the meter symbol, the perpendicular leader, the `linkAnchor {link, t}` handle, the
-    nearest-node lumping -- touches none of them. **Sequence only the field work; let the drawing
-    surface proceed.** Also shares the coordinate frame with Task 641, so the lumping arithmetic
-    waits on whatever 641 decides about the drawing plane.
-  - **Tom ruled the open questions 2026-08-24 — `dev/customer-demands.md` §7 has all of them.** The
-    two that change the build: a meter carries a **Count** (so *forty-two residential services* is
-    one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
-    `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
-    **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
+  EPANET does not. **Design, his rulings, and what is built against what is not:
+  `dev/customer-demands.md`. Priority left at 100 for Tom to move: Slices 1-3 are in and what is
+  left is his call.**
+  - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
+    connector, the two-click gesture and its one-click door, the account number, the **Count** (so
+    forty-two residential services are one symbol), the draggable attachment, the derived junction,
+    the detached state, a Customers tab, and the `.inp` answer.
+    `dev/lpn-spike/customer-harness.js`, 66 assertions.
+  - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
+    labels, the ramp, the Tables column, the popup's resolved Demand and both solvers pick a meter up
+    without knowing what one is. **The junction is DERIVED** -- the nearest end measured ALONG the
+    pipe, a different end from the nearest in a straight line on a bent one. **Additive: nothing a
+    meter does rewrites a number the user typed on a junction.**
+  - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
+    row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
+  - **THE ACCOUNT NUMBER IS A LABEL, NEVER A KEY**, and it reaches no log row and no usage statistic.
+  - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
+    account number in the CATEGORY comment (the one field of that row that holds a name), and a
+    `customer-geometry` difference. A junction that never had one writes the same row either way.
+  - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
+    label density rule, a customer in Find, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
+    so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
+    here is a pointer gesture no harness can hold.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such

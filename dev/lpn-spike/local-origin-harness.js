@@ -326,8 +326,15 @@ console.log('\n--- one home for the concept ---');
 	// so the shift and the flip apply exactly once to each and cancel in the difference. Two points
 	// is why it is +2 and not +1: converting the vector directly is the mistake this task exists to
 	// catch, and it would have been +1.
-	ok('outwardX has one definition and twenty-five call sites', count(/outwardX\(/g) === 26, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-five call sites', count(/outwardY\(/g) === 26, count(/outwardY\(/g));
+	// **AND ONE MORE ON EACH FOR THE METER'S REAL-WORLD SIZE** (Task 247). A meter is drawn about
+	// 2 m across while the site is small enough for that to be legible, and how many metres one
+	// drawing unit is depends on WHERE you are once the drawing unit is a degree -- so
+	// metresPerWorldUnit() measures it with geodesicMeters(), which needs the point as a longitude
+	// and a latitude. Reading the drawing, writing nothing. One crossing per axis and not two: the
+	// function holds `lon` and `lat` in locals rather than converting the same point twice, which
+	// is this census asking for the honest minimum exactly as inwardBox() was made to.
+	ok('outwardX has one definition and twenty-six call sites', count(/outwardX\(/g) === 27, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-six call sites', count(/outwardY\(/g) === 27, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

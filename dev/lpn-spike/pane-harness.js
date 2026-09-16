@@ -47,6 +47,7 @@ paneBody.getBoundingClientRect = function () {
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
+	"\t\taddCustomer: addCustomer,\n" +
 	"\t\twirePane: wirePane, openPane: openPane, closePane: closePane, togglePane: togglePane,\n" +
 	"\t\tsetPaneTab: setPaneTab, paneIsOpen: paneIsOpen, paneState: function () { return paneState; },\n" +
 	"\t\tclampPaneHeight: clampPaneHeight, paneMaxHeight: paneMaxHeight,\n" +
@@ -324,8 +325,14 @@ console.log('\n--- six tabs, one renderer ---');
 	const ids = L.paneTables().map((t) => t.id);
 	// Seven since 2026-09-08: the Text table joined, because the multi-properties box takes its
 	// rows from these specs and a Text object had none (Tom: *"9 undefined assets selected"*).
-	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text',
-		'seven asset tables, in the toolbar’s Add order, nodes before links, Text last', ids.join(','));
+	// **EIGHT SINCE 2026-09-15: Customers** (Task 247, and Tom's own *"we can add a Customer table!
+	// Yes!"*). It is LAST rather than after Valve, where the Meter tool sits in the toolbar, and
+	// that is a deliberate departure from "the toolbar's Add order": a customer is not a water
+	// asset, so it belongs with the other tab that is not one rather than between the valves and
+	// the notes. Order within the six water assets is unchanged and is still asserted.
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
+		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links',
+		ids.join(','));
 	// **PROFILE IS LAST, NOT FIRST** (Tom, 2026-08-21: "making Profile the last tab"). It is still
 	// the odd one out -- a drawing where the other six are tables -- and the end of the strip is
 	// where an odd one out belongs; at the front it stood between the reader and the six things
@@ -337,7 +344,7 @@ console.log('\n--- six tabs, one renderer ---');
 	report(L.paneTabIds()[0] === 'junctions',
 		'...so the strip OPENS on a table, which is what the Print button beside it acts on',
 		L.paneTabIds()[0]);
-	report(L.paneTabIds().length === 8, 'eight tabs in all', String(L.paneTabIds().length));
+	report(L.paneTabIds().length === 9, 'nine tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before Profile');
 	// Every table has a panel div of its own in the page, which is also what gives each its own
@@ -406,6 +413,18 @@ console.log('\n--- each table lists exactly its own type ---');
 	const pu1 = L.addLink('pump', r1.id, j1.id);
 	const v1 = L.addLink('valve', t1.id, j2.id);
 	L.addText(50, 50);   // one Text, so the Text table (2026-09-08) has a row to render
+	// One customer, so the Customers table (Task 247) has a row to render -- and every assertion
+	// below that walks all the tables therefore walks a real one rather than an empty panel.
+	//
+	// **PUT ON THE FIRST PIPE, AT ITS FAR END, AND THAT PLACEMENT IS DELIBERATE TWICE OVER.** A
+	// customer is one of the junction's demand ROWS, so the junction it lumps at has more than one
+	// demand and its Base demand cell becomes plain text -- which is Task 468's own settled rule
+	// for a junction with categories, arriving here through a meter. So it lands on the junction
+	// with the BIGGEST demand and on neither of the two the write-seam section types into: the
+	// demand ORDER is unchanged (the biggest is still the biggest), and the two cells that must
+	// still be inputs still are.
+	const m1 = L.addCustomer(90, 20, { link: p1.id, t: 0.9 });
+	m1.account = '4417-A'; m1.demand = 3; m1.count = 4;
 
 	// EXACT COUNTS, and no id in two tables. Section 6 already left one reservoir on the map, which
 	// is why the reservoir count is 2 and why this is stated as counts rather than as "the one I
