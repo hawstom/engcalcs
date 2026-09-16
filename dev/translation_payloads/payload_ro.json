@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1873,
-        "delta_key_count": 4,
+        "expected_key_count": 1874,
+        "delta_key_count": 5,
         "exempt_key_count": 39,
         "exempt_keys": [
             "u_imgd",
@@ -532,14 +532,16 @@
     "keys_to_translate": {
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
-        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
-        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone."
     },
     "keys": {
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
-        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
-        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone."
     },
     "key_context": {
         "lpn_field_northing_abbr": {
@@ -603,6 +605,22 @@
                     "key": "lpn_field_text_size",
                     "value": "Factor de mărime",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_inp_export_flat_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_flat_types",
+                    "value": "{n} conducte de aici se referă la {t} tipuri de conductă. În fișier, fiecare dintre acele conducte poartă propria copie a numerelor, deci răspunsurile sunt aceleași. Ce nu poate reține fișierul este tipul de conductă în sine, deci editarea unei definiții cu urmarea ei de către fiecare conductă este ceva ce doar propriul dvs. fișier de proiect înregistrează.",
+                    "english": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_flat_fittings",
+                    "value": "Un fișier EPANET nu poate reține lista de coturi, vane și teuri din fișierul dvs. de proiect. Coeficientul de pierdere locală al {n} conducte de aici este însumat dintr-o listă de fitinguri. Totalul intră în fișier exact așa cum este, deci nimic din răspunsuri nu se schimbă.",
+                    "english": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes."
                 }
             }
         }

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1873,
-        "delta_key_count": 2,
+        "expected_key_count": 1874,
+        "delta_key_count": 3,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -519,12 +519,14 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
-        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone."
     },
     "keys": {
-        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.",
-        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180."
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone."
     },
     "key_context": {
         "lpn_field_coord_tip": {
@@ -556,6 +558,22 @@
                     "key": "lpn_field_text_size",
                     "value": "מכפיל גודל",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_inp_export_flat_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_flat_types",
+                    "value": "{n} צינורות כאן מפנים אל {t} סוגי צינורות. בקובץ, כל אחד מהצינורות הללו נושא עותק משלו של המספרים, כך שהתוצאות זהות. מה שהקובץ אינו יכול להכיל הוא סוג הצינור עצמו, כך שעריכת הגדרה אחת וגרימה לכל הצינורות לעקוב אחריה היא דבר שרק קובץ הפרויקט שלכם רושם.",
+                    "english": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_flat_fittings",
+                    "value": "קובץ EPANET אינו יכול להכיל את רשימת העיקולים, השסתומים ומצמדי ה-T שבקובץ הפרויקט שלכם. מקדם ההפסד המקומי של {n} צינורות כאן מסוכם מתוך רשימת אביזרים. הסכום נכנס לקובץ בדיוק כפי שהוא, כך שדבר אינו משתנה בתוצאות.",
+                    "english": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes."
                 }
             }
         }
