@@ -32,7 +32,8 @@ whose file count against master is zero.
 | 8091 | `feat/survey-import` | 592 |
 | 8092 | `feat/library-import` | 611 |
 
-**THE PORTS NEED ONE `sudo systemctl reload apache2` HE HAS NOT RUN**, so none of them answers yet:
+**THE APACHE RELOAD IS DONE (Tom, 2026-09-16), so the six preview ports answer.** The command it
+needed, kept because a new port needs it again:
 `sudo cp ~/webdev/worktrees/_panel/branch-preview.conf /etc/apache2/sites-available/ && sudo a2ensite branch-preview && sudo apache2ctl configtest && sudo systemctl reload apache2`
 
 **NEW BRANCHES TAKE CONVENTIONAL BRANCH PREFIXES** (`feat/`, `fix/`, `hotfix/`, `chore/`,
@@ -188,6 +189,18 @@ they were ordinary words. **A subagent writes to another machine's standard and 
 vocabulary makes him do the one job he cannot do.** Name a thing by what it DOES (*"a collapsible
 section, the little triangle you click to fold a block away"*), keep a path or a line number only
 where he could act on it, and leave provenance citations in the journals.
+
+**THE ZOOM FLOOR WAS COSTING BOTH ZOOM-OUT AND ZOOM-TO-FIT ON A BIG LOCAL DRAWING, and it is fixed
+on master (2026-09-16).** `MIN_SCALE_GRID` is 0.05 whatever a drawing unit means, so a site surveyed
+in feet -- Tom's EWB demo file is ~13,000 units across -- stopped zooming out at a window 20,000
+units wide, **and Zoom to fit stopped with it**: `fitScaleFor()` answers the floor when nothing fits
+even there, so the fit pinned at 0.05 and the network hung off both edges of a laptop-height window.
+Two symptoms, one cause, and he reported them separately. The floor is the drawing's own size now
+(`LPN_VIEW_MIN_MODEL_PX / span`, the same number that decides whether a stored view is worth
+restoring) and a step-2 fit that bottoms out falls back to the MODEL fit. `zoom-fit-harness.js`
+carries the case and it fails on the old tree. **The projected branch had the identical accident on
+2026-09-14 and this is the local-grid half of it** -- if a third zoom complaint arrives, suspect the
+constant before the arithmetic.
 
 **STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
 is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);

@@ -8642,8 +8642,25 @@ var EngCalcs = EngCalcs || {};
 
 		items = fitItems(state.s, true);
 		s = solve(labelTuning().fitRoom * settings.textSize);
+		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
+		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
+		// drawing, where step 2's answer is a statement about the drawing plus its lettering.
+		var modelFit = s;
 		items = fitItems(s);
 		s = solve();
+		// **A LABEL WIDER THAN THE WINDOW MUST NOT DECIDE THE ZOOM** (Tom, 2026-09-16, on his EWB
+		// demo file: *"Zoom to fit ... does not show the entire network. It's close, but it's not
+		// what we aim for."*). `fitScaleFor()` answers `minScale()` when nothing fits even at the
+		// floor -- "take the floor and let it overhang" -- which was a reasonable last resort while
+		// the floor was a fixed 0.05 and is a useless one now that the floor is the drawing's own
+		// size: it would pull back until the whole network was a four-pixel mark to make room for
+		// one label. Measured on his file at a 1500x650 canvas: the fit was pinned at the floor and
+		// the network hung 4 px off the top and 3 px off the bottom.
+		//
+		// So a step-2 answer that bottomed out is not an answer. Fall back to the model fit and let
+		// the lettering overhang, which is the trade the original branch intended: **the NETWORK is
+		// what Zoom to fit is for.**
+		if (!(s > minScale())) { s = modelFit; }
 		apply(s);
 		if (auto) { rebaseSignatureIfClean(); }
 	}
@@ -9557,6 +9574,60 @@ var EngCalcs = EngCalcs || {};
 	 * for the Earth one tile at a time.
 	 */
 	var LPN_PLANE_SPAN_M = 40075000;   // the equator, so no network can reach the floor
+	/**
+	 * **AND THE LOCAL GRID HAD THE SAME ACCIDENT, ONE DOOR OVER** (Tom, 2026-09-16, on his EWB demo
+	 * file: *"my zoom out is limited on master"*). `MIN_SCALE_GRID` is 0.05 whatever the drawing is
+	 * measured in, so it caps the window at 20,000 drawing units across -- which is generous for a
+	 * sketch drawn in inches and **nothing at all for a drawing surveyed in feet or metres**, where
+	 * 20,000 units is a few city blocks. The constant was never a decision about big local drawings;
+	 * it predates there being any.
+	 *
+	 * **HIS FILE PROVES IT WITH A WORSE SYMPTOM THAN THE ONE HE REPORTED: zoom-to-fit could not fit
+	 * it.** `NMG-Waterline-EWB.lwn` spans about 13,600 units with its background image, and
+	 * `fitScaleFor()` returned exactly 0.05 -- its own "not even the smallest allowed zoom fits it,
+	 * take the floor and let it overhang" branch. So the drawing hung off the edge of the window at
+	 * every zoom the page would allow, and Zoom to fit could not cure it.
+	 *
+	 * **THE FLOOR IS NOW THE DRAWING'S OWN SIZE, and it is the SAME NUMBER that decides whether a
+	 * stored view is worth restoring** -- `LPN_VIEW_MIN_MODEL_PX`. You may pull back until the
+	 * drawing is a four-pixel mark and no further, which is the point past which there is nothing to
+	 * look at, and every view you can reach is therefore a view that can be restored. `Math.min`,
+	 * for the same reason the projected branch above uses it: this may only ever LOOSEN the existing
+	 * floor, never tighten it: no drawing loses range it has today. A drawing smaller than about 80
+	 * units across gets a slightly lower floor than the old constant, which is the same rule applied
+	 * honestly rather than an exception -- it is still the scale at which the drawing is a four
+	 * pixel mark, and there was never anything to see past it.
+	 *
+	 * **THE BACKGROUND IMAGE COUNTS AS PART OF THE DRAWING HERE**, which is what his file needs: a
+	 * short pipe run over a large aerial is a real shape of project, and a floor measured from the
+	 * network alone would refuse to show the picture the network was drawn on.
+	 *
+	 * **NOTHING WAS BEING PROTECTED BY THE OLD FLOOR.** Measured 2026-09-16, laying Net3 out at 1,
+	 * 1/2, 1/5 ... 1/200 of its fit scale: 376, 849, 294, 274, 217, 212, 247, 299 ms. The cost FALLS
+	 * as the drawing shrinks and then flattens -- there is no cliff on the other side of this floor,
+	 * which was the one thing worth checking before moving it.
+	 */
+	function localContentSpan() {
+		var e = modelExtent(), lo = {}, hi = {}, span = 0;
+		if (e) {
+			lo.x = e.minx; hi.x = e.maxx; lo.y = e.miny; hi.y = e.maxy;
+		}
+		if (backdrop && isFinite(backdrop.width) && isFinite(backdrop.height)) {
+			// The placed rectangle, in world units: the image's own box moved by its placement.
+			var bx = backdrop.tx + backdrop.x * backdrop.s,
+				by = backdrop.ty + backdrop.y * backdrop.s,
+				bw = backdrop.width * backdrop.s, bh = backdrop.height * backdrop.s;
+			[[bx, by], [bx + bw, by - bh], [bx, by - bh], [bx + bw, by]].forEach(function (c) {
+				if (lo.x === undefined || c[0] < lo.x) { lo.x = c[0]; }
+				if (hi.x === undefined || c[0] > hi.x) { hi.x = c[0]; }
+				if (lo.y === undefined || c[1] < lo.y) { lo.y = c[1]; }
+				if (hi.y === undefined || c[1] > hi.y) { hi.y = c[1]; }
+			});
+		}
+		if (lo.x === undefined) { return 0; }
+		span = Math.max(hi.x - lo.x, hi.y - lo.y);
+		return isFinite(span) && span > 0 ? span : 0;
+	}
 	function planeUnitsPerMetre() {
 		if (!projectLocatable() || !isProjectedProject()) { return 0; }
 		var code = projectCrsCode(), c = crsExtent(code), lat, lon, a, b;
@@ -9576,6 +9647,8 @@ var EngCalcs = EngCalcs || {};
 			var per = planeUnitsPerMetre();
 			if (per > 0) { return Math.min(MIN_SCALE_GRID, w / (LPN_PLANE_SPAN_M * per)); }
 		}
+		var span = localContentSpan();
+		if (span > 0) { return Math.min(MIN_SCALE_GRID, LPN_VIEW_MIN_MODEL_PX / span); }
 		return MIN_SCALE_GRID;
 	}
 	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
