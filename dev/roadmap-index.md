@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**93 open tasks.** Next (100): 14 · Soon (75): 20 · Someday (50): 30 · Maybe (25): 11 · Parked (5): 18
+**93 open tasks.** Next (100): 13 · Soon (75): 21 · Someday (50): 30 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (14)
+## 100 — Next (13)
 
 - Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
@@ -18,7 +18,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
-- Task 618 — WYSIWYG hit areas: what you can click is what you can see.
 - Task 646 — Attach the world map to an XY project without changing the project.
 - Task 663 — Three questions about the reaction rate that only Tom can answer.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
@@ -26,7 +25,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 674 — Type a node's coordinates instead of only dragging it.
 - Task 676 — Watch the sites, and send a derived weekly report.
 
-## 75 — Soon (20)
+## 75 — Soon (21)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -48,6 +47,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
 - Task 665 — Make draggable and resizable the standard for a standing box.
+- Task 679 — Narrower strokes on the About mark, and more pixels used.
 
 ## 50 — Someday (30)
 
@@ -74,7 +74,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 633 — The project tab strip, and whether it could collapse into the toolbar.
 - Task 636 — A custom properties UI, designed in a table.
 - Task 639 — Layers: the first heading under Map and page.
-- Task 640 — A Graphs submenu under Water, holding five plots.
+- Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
 - Task 641 — Choose a real EPSG projection in the new project box.
 - Task 645 — The app icon's legs are leggier than the favicon's.
 - Task 648 — The About icon's outlines are too heavy for its scale.
