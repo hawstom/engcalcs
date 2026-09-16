@@ -23,12 +23,14 @@
 //      out, and a typed latitude that skipped inwardY() would be upside down as well. That census
 //      lives in local-origin-harness.js; what is asserted HERE is the round trip a person sees:
 //      type 1304070.25, read 1304070.25 back.
-//   4. **A scenario does not get its own position, and the page does not pretend it does.** x and y
-//      are absent from `LPN_OVERRIDABLE` by declaration -- a node cannot be in two places at once
-//      in one rendered map -- so the honest behaviour is a Base write, exactly as a drag inside a
-//      scenario already does. The failure to guard against is the OPPOSITE of the usual one: not a
-//      write that skips setProp(), but a coordinate that quietly became an override and then
-//      disagreed with the drawing every other scenario shares.
+//   4. **A SCENARIO GETS ITS OWN POSITION, and everything derived from position follows it.** Tom
+//      REVERSED this on 2026-09-15: *"Give the people their overrides! Whether coordinate or any
+//      other property, what's gained by denying them an override?"* -- so x and y are in
+//      `LPN_OVERRIDABLE` and the assertions that used to demand no override was invented now demand
+//      the opposite (section 6). The failures to guard against are the ones an override brings with
+//      it: a Base position quietly edited from inside a scenario, a dot that moves while its pipe's
+//      length does not, an exact typed number going in and a floating-point one coming back out,
+//      and an `.inp` that states one scenario's positions without saying so.
 //
 // **AND THE POPUP AND THE TABLE ARE ASSERTED THROUGH THEIR OWN SEAMS, NOT THROUGH A SHARED
 // HELPER.** Two editors of one property are two chances to disagree about what editing it means
@@ -56,7 +58,11 @@ const L = loadLoopedNetwork(
 	"\t\tpaneCellIsPlain: paneCellIsPlain, paneHeadingText: paneHeadingText,\n" +
 	"\t\tpaneWriteCellText: paneWriteCellText,\n" +
 	"\t\tOVERRIDABLE: LPN_OVERRIDABLE, ovKey: ovKey,\n" +
-	"\t\tsetProp: setProp, effective: effective,\n" +
+	"\t\tsetProp: setProp, effective: effective, baseValue: baseValue,\n" +
+	"\t\thasOverride: hasOverride, clearOverride: clearOverride,\n" +
+	"\t\tnodeDrawX: nodeDrawX, nodeDrawY: nodeDrawY, nodeAt: nodeAt,\n" +
+	"\t\tnodeHasCoordOverride: nodeHasCoordOverride, writeNodeCoord: writeNodeCoord,\n" +
+	"\t\tinpExportOptions: inpExportOptions,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tactiveScenario: activeScenario, inBase: inBaseScenario,\n" +
 	"\t\tserialize: serializeProject, applySaved: applySaved,\n" +
@@ -337,51 +343,83 @@ function project(kind, crs, origin) {
 		near(L.nodeCoordAxis(g, 1), 640));
 }
 
-// ---- 6. a scenario does not get its own position -----------------------------------------------
-// Section 4 of the four at the top, and the guard is the OPPOSITE way round from the usual seam
-// check. x and y are absent from LPN_OVERRIDABLE by declaration -- a node cannot be in two places
-// at once in one rendered map -- so there is nothing for setProp() to record and the honest
-// behaviour is the Base write a drag inside a scenario already makes. What must never happen is a
-// coordinate turning into an override that then disagrees with the drawing every scenario shares.
+// ---- 6. a scenario gets its own position ------------------------------------------------------
+// Section 4 of the four at the top. **THIS SECTION USED TO ASSERT THE OPPOSITE** -- that no
+// override was invented -- and Tom reversed the rule on 2026-09-15: *"We've completely
+// miscommunicated, and I apologize. What I meant to say is, 'Give the people their overrides!'
+// Whether coordinate or any other property, what's gained by denying them an override?"* The old
+// argument was that a node cannot be in two places at once in one rendered map; a scenario IS one
+// rendered map, and switching scenarios rebuilds the drawing, so there was never such a moment.
 {
 	console.log('\n--- inside a scenario ---');
-	ok('x is not an overridable node property', !L.OVERRIDABLE.node.x && !L.OVERRIDABLE.node.y);
-	// The declaration is the source of truth for scenario_seam_check.php too, so a future widening
-	// of it would have to come back here and decide what a per-scenario position would even mean.
-	ok('...while a demand is, so the whitelist is really being read', !!L.OVERRIDABLE.node.demand);
+	ok('x and y are overridable node properties', !!L.OVERRIDABLE.node.x && !!L.OVERRIDABLE.node.y);
+	// The declaration is the source of truth for scenario_seam_check.php as well, which is why it is
+	// asserted here rather than the behaviour alone being trusted.
+	ok('...and so is a demand, so the whitelist is really being read', !!L.OVERRIDABLE.node.demand);
 
 	const n = project();
 	L.setNodeCoordAxis(n, 1, 100);
 	L.setNodeCoordAxis(n, 2, 200);
-	L.createScenario('Max day');
+	const baseX = L.nodeDrawX(n), baseY = L.nodeDrawY(n);
+	const scn = L.createScenario('Max day');
 	ok('we are in a scenario', !L.inBase());
 
-	const scn = L.activeScenario();
 	ok('typing a coordinate in a scenario is accepted', L.setNodeCoordAxis(n, 1, 555) === true);
-	// **NO OVERRIDE IS INVENTED.** An override on a property the model does not treat as
-	// overridable is a value effective() would never read -- a number the user typed, stored, and
-	// silently ignored, which is worse than either answer.
 	const ov = scn.overrides[L.ovKey(n)];
-	ok('...and no override is recorded for it',
-		!ov || (ov.x === undefined && ov.y === undefined && ov.axis1 === undefined),
-		JSON.stringify(ov || null));
-	ok('...the override count stays at zero',
-		Object.keys(scn.overrides).length === 0, JSON.stringify(scn.overrides));
+	// **THE OVERRIDE HOLDS THE PUBLIC NUMBER THE USER TYPED**, not the drawing-frame one -- see
+	// writeNodeCoord(). On a grid project slot 1 is x.
+	ok('...and it IS an override, keyed on the axis that was typed',
+		!!ov && ov.x === 555 && ov.y === undefined, JSON.stringify(ov || null));
+	ok('...which the marker machinery can see', L.hasOverride(n, 'x') === true);
+	ok('...and the scenario counts it', Object.keys(scn.overrides).length === 1);
+	ok('...the popup and the tables read the scenario back', near(L.nodeCoordAxis(n, 1), 555));
+	ok('...the DRAWING follows it', near(L.nodeDrawX(n), 555) && L.nodeAt(n).x === L.nodeDrawX(n),
+		String(L.nodeDrawX(n)));
+	ok('...and Base is still visible beside it', near(L.baseValue(n, 'x'), 100),
+		String(L.baseValue(n, 'x')));
 
-	// The drawing is shared, and that is the point: back in Base the node is where it was typed.
+	// **BASE IS NOT EDITED FROM INSIDE THE SCENARIO.** This is the defect the write seam exists for
+	// (dev/scenario-seam-repair.md), asked of a position.
 	L.switchScenario('base');
-	ok('the position is the same in Base, because the drawing is one drawing',
-		near(L.nodeCoordAxis(n, 1), 555), String(L.nodeCoordAxis(n, 1)));
+	ok('Base keeps its own position', near(L.nodeCoordAxis(n, 1), 100) && near(L.nodeDrawX(n), baseX),
+		String(L.nodeCoordAxis(n, 1)));
+	ok('...on the untouched axis too', near(L.nodeDrawY(n), baseY));
 
-	// And an ordinary overridable property still behaves the other way, so this is a statement
-	// about coordinates and not a scenario model that has stopped working.
+	// A DRAG AND A TYPED COORDINATE ARE THE SAME ACT (writeNodeCoord is the one door): the drag hands
+	// over the drawing-frame number and nothing else, which is what the pointer has.
 	L.switchScenario(scn.id);
-	L.setProp(n, 'demand', 7);
-	ok('a demand typed in the scenario IS an override',
-		L.effective(n, 'demand') === 7 && Object.keys(scn.overrides).length === 1);
+	L.writeNodeCoord(n, false, 777);
+	ok('a drag inside a scenario records the same override a typed box does',
+		near(scn.overrides[L.ovKey(n)].x, L.outwardX(777)) && near(L.nodeDrawX(n), 777),
+		JSON.stringify(scn.overrides[L.ovKey(n)]));
+
+	// Clearing it returns the node to Base's position, which is the marker's untick.
+	L.clearOverride(n, 'x');
+	ok('clearing the override puts the node back where Base has it', near(L.nodeDrawX(n), baseX));
+	ok('...and the scenario is empty again', Object.keys(scn.overrides).length === 0);
+}
+
+// ---- 6b. everything DERIVED from a position follows the override -------------------------------
+// **AN OVERRIDE THAT MOVES THE DOT AND NOT THE PIPE IS WORSE THAN NO OVERRIDE.** Every one of these
+// is derived from where a node is, and every one of them reads it through a different function --
+// linkPointList() for the geometry and the Auto length, nodeLonLat() for the ground, the bbox for
+// zoom-to-fit -- so one of them left on Base's position is a network that disagrees with itself.
+{
+	console.log('\n--- what follows a moved node ---');
+	L.reset();
+	const a = L.addNode('junction', 0, 0), b = L.addNode('junction', 100, 0);
+	const l = L.addLink('pipe', a.id, b.id);
+	L.buildDom();
+	const len0 = L.geomLength(l.id);
+	ok('the pipe starts 100 units long', near(len0, 100), String(len0));
+
+	const scn = L.createScenario('Relocated');
+	L.setNodeCoordAxis(b, 1, L.outwardX(300));
+	ok('the moved node is where the scenario puts it', near(L.nodeDrawX(b), 300), String(L.nodeDrawX(b)));
+	ok('...and the PIPE LENGTH follows it', near(L.geomLength(l.id), 300), String(L.geomLength(l.id)));
+
 	L.switchScenario('base');
-	ok('...and Base does not see it', L.effective(n, 'demand') !== 7,
-		String(L.effective(n, 'demand')));
+	ok('...while Base still has the pipe it had', near(L.geomLength(l.id), 100), String(L.geomLength(l.id)));
 }
 
 // ---- 7. a typed coordinate survives the file ---------------------------------------------------
@@ -433,6 +471,76 @@ function project(kind, crs, origin) {
 	const moved = JSON.parse(JSON.stringify(L.serialize()));
 	ok('a drag after a typed coordinate drops the stale source record',
 		moved.nodes[0].y !== 38.5, String(moved.nodes[0].y));
+}
+
+// ---- 8. AN OVERRIDDEN COORDINATE IS EXACT, AND IT IS EXACT FOR A DIFFERENT REASON --------------
+//
+// A BASE latitude is exact because `_ysrc` records the characters typed and the file's own reader
+// hands them back (section 7). An OVERRIDE needs no such record: the override IS the number typed,
+// stored in the public frame, so it never meets the projection at all. That is why typing 38.5 in a
+// scenario reads back as 38.5 bit-identically while Base's own round trip lands on
+// 38.49999999999999 -- the asymmetry is real and is asserted here rather than explained.
+{
+	console.log('\n--- an overridden coordinate through the file ---');
+	const g = project(L.GEO);
+	L.setNodeCoordAxis(g, 1, 38.5);
+	L.setNodeCoordAxis(g, 2, -122.5);
+	const scn = L.createScenario('Relocated');
+	L.setNodeCoordAxis(g, 1, 38.6);
+	L.setNodeCoordAxis(g, 2, -122.4);
+	const snap = JSON.parse(JSON.stringify(L.serialize()));
+	const savedOv = (snap.scenarios.filter(x => x.id === scn.id)[0] || {}).overrides[L.ovKey(g)];
+	ok('the file states the overridden latitude and longitude exactly',
+		savedOv && savedOv.y === 38.6 && savedOv.x === -122.4, JSON.stringify(savedOv || null));
+	// **AND BASE'S OWN SOURCE RECORD IS UNTOUCHED BY IT.** Typing inside a scenario must not file a
+	// source record for a number the element does not hold, and Base's is still true because Base's
+	// coordinate has not moved.
+	ok('...while Base still states the latitude IT was given, exactly',
+		snap.nodes[0].y === 38.5 && snap.nodes[0].x === -122.5,
+		snap.nodes[0].y + ', ' + snap.nodes[0].x);
+
+	L.applySaved(snap);
+	L.buildDom();
+	const back = L.nodeById(g.id);
+	ok('an overridden latitude reads back bit-identically, with no round trip to make',
+		L.nodeCoordAxis(back, 1) === 38.6 && L.nodeCoordAxis(back, 2) === -122.4,
+		L.nodeCoordAxis(back, 1) + ', ' + L.nodeCoordAxis(back, 2));
+	L.switchScenario('base');
+	ok('...and Base opens where Base was', near(L.nodeCoordAxis(back, 1), 38.5, 1e-9));
+}
+
+// ---- 9. WHAT THE .inp EXPORTER SAYS ABOUT IT ---------------------------------------------------
+//
+// EPANET has no per-scenario coordinates. The rule this page already follows is that an export
+// writes the scenario the user is looking at, so the file states THOSE positions -- and the
+// difference is REPORTED, never dropped in silence and never faked. Driven through
+// inpExportOptions(), which is the page's own wiring to the writer: a harness passing its own
+// options would be asserting about itself.
+{
+	console.log('\n--- the .inp export ---');
+	L.reset();
+	const a = L.addNode('junction', 10, -20), b = L.addNode('junction', 100, -20);
+	L.addLink('pipe', a.id, b.id);
+	L.buildDom();
+	const base = EngCalcs.lpnExportInp(L.serialize(), L.inpExportOptions());
+	ok('a Base export reports no scenario coordinates',
+		base.ok && !base.differences.some(d => d.code === 'node-coords-scenario'));
+
+	const scn = L.createScenario('Relocated');
+	L.setNodeCoordAxis(b, 1, L.outwardX(400));
+	const out = EngCalcs.lpnExportInp(L.serialize(), L.inpExportOptions());
+	const d = (out.differences || []).filter(x => x.code === 'node-coords-scenario')[0];
+	ok('...and an export from a scenario that moved a node reports it, naming the node',
+		out.ok && !!d && d.ids.length === 1 && d.ids[0] === b.id, JSON.stringify(d || null));
+	// The row itself: the file states where THIS scenario puts the node, so nothing is faked and
+	// nothing is dropped.
+	// **OUT OF THE [COORDINATES] SECTION, not out of the whole file.** `J2\t0\t0` is the junction's
+	// own elevation-and-demand row and matches an id-first filter just as well, which is how the
+	// first version of this assertion read a coordinate off the wrong section.
+	const coordSec = out.inp.split('[COORDINATES]')[1].split('[')[0];
+	const rowB = (coordSec.split('\n').filter(t => t.trim().indexOf(b.id + '\t') === 0)[0] || '');
+	ok('...and the [COORDINATES] row states the scenario position',
+		rowB.indexOf('400') >= 0, rowB.trim());
 }
 
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nALL PASS');

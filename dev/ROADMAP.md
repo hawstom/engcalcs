@@ -120,11 +120,24 @@ the block.
     outweighed rather than followed.** `lpn_field_x` already ships in 27 languages and is what the
     status strip uses, where Tom asked for the SHORTER pair; and "X-Coordinate" loses a table
     heading against "column width is king". Geographic and projected have no EPANET precedent.
-  - **A POSITION IS BASE-OWNED AND A TYPED ONE WRITES BASE, AS A DRAG DOES.** x and y are absent
-    from `LPN_OVERRIDABLE` by declaration, so there is no override for `setProp()` to record and
-    this block's original third bullet had the premise wrong. The harness asserts no override is
-    invented; a typed latitude also takes the `_ysrc` record, or the file saved 38.49999999999999
-    for a typed 38.5.
+  - **A POSITION IS SCENARIO-OVERRIDABLE, AND THIS REVERSES A RULE THIS SESSION INVENTED** (Tom,
+    2026-09-15: *"Give the people their overrides! Whether coordinate or any other property, what's
+    gained by denying them an override?"*). The old argument -- a node cannot be in two places at
+    once in one rendered map -- **is false, because a scenario IS one rendered map**: switching
+    rebuilds the drawing, so there is no instant at which one node is drawn twice. `writeNodeCoord()`
+    is the one writer and the DRAG goes through it too, so a typed position and a dragged one behave
+    identically. Everything derived follows: pipe geometry and `lenAuto` length through
+    `linkPointList()`, the ground under a node through `nodeLonLat()`, the bbox and zoom-fit.
+  - **THE OVERRIDE HOLDS THE PUBLIC PAIR, and that is what makes it exact and frame-proof.** A
+    typed 38.5 is STORED as 38.5, so an overridden coordinate needs no `_xsrc`/`_ysrc` of its own
+    (Base's is untouched and still true); and an absolute pair survives a derived geographic origin,
+    a rebase and the Cartesian flip, none of which a drawing-frame number would. **x and y are the
+    one overridable pair stored WITHOUT the underscore** -- the file and EPANET both state `x` and
+    `y` -- so `scenario_seam_check.php` cannot see a position write, and what stands in its place is
+    the single writer plus the call-site census in `local-origin-harness.js`.
+  - **`.inp` export writes the scenario on screen and REPORTS it** (`node-coords-scenario`,
+    `lpn_inp_export_flat_coords`): EPANET holds one position per node, so the other scenarios'
+    positions live in the project file alone. Not carried into Find and replace or push-to-base.
 
 - 50|675| **A labelled grid, with the significant digits picked out.**
   Tom, 2026-09-15: a grid in Settings with *"options for density and opacity"*, labelled *"at the

@@ -2238,7 +2238,7 @@ $ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as sh
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
 // when the node is dragged.
-$ec_lang['lpn_field_coord_tip']='Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.';
+$ec_lang['lpn_field_coord_tip']='Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.';
 // Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
 $ec_lang['lpn_coord_off_world']='That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.';
@@ -3210,6 +3210,7 @@ $ec_lang['lpn_fitting_other']='Other fitting';
 $ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
 $ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
 $ec_lang['lpn_inp_export_flat_types']='{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.';
+$ec_lang['lpn_inp_export_flat_coords']='An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.';
 $ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';

@@ -331,8 +331,19 @@ console.log('\n--- one home for the concept ---');
 	// coordFields(); it now reads them through nodeCoordAxis(), which is the one place a read SLOT
 	// becomes a document axis, so the popup's two sites became that function's two. A future reader
 	// seeing this total unchanged across a coordinate-entry feature should know it was checked.
-	ok('outwardX has one definition and twenty-five call sites', count(/outwardX\(/g) === 26, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-five call sites', count(/outwardY\(/g) === 26, count(/outwardY\(/g));
+	// **AND THEN THE SCENARIO OVERRIDE ADDED TWO TO EACH, NET, WHICH IS FOUR NEW SITES AND TWO
+	// RETIRED ONES** (Task 674's second half, Tom: *"Give the people their overrides!"*). A
+	// coordinate override stores the PUBLIC pair, so the frame boundary is exactly where it is
+	// crossed. The four: writeNodeCoord() -- the one writer -- converts whichever half its caller
+	// did not hand it; effective() and baseValue() answer the popup, the tables and the marker's
+	// "Base scenario:" line in outward terms for the two bare-stored properties; and
+	// georefCaptureCoordOverrides() completes an override's missing axis from the node's own
+	// position, because the wizard's transform needs a point and an override may hold one axis. The
+	// two retired: nodeCoordAxis() and nodeLonLat() now ask effective(), which is the SAME
+	// consolidation the DEM lists made twice above -- one reader of "where is this node" rather than
+	// three.
+	ok('outwardX has one definition and twenty-seven call sites', count(/outwardX\(/g) === 28, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-seven call sites', count(/outwardY\(/g) === 28, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -380,8 +391,14 @@ console.log('\n--- one home for the concept ---');
 	// in exactly the sense every other site here is. **THE y SIDE IS THE ONE THAT BITES**: inwardY
 	// both negates and, in a geographic project, projects, so a latitude written straight into the
 	// document would land upside down and half a world away and still look like a coordinate.
-	ok('inwardX has one definition and twenty-five call sites', count(/inwardX\(/g) === 26, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-six call sites', count(/inwardY\(/g) === 27, count(/inwardY\(/g));
+	// **THE INWARD PAIR GAINED TWO EACH FOR THE SCENARIO OVERRIDE, AND THEY ARE THE HOT ONE AND THE
+	// COLD ONE** (Task 674). nodeDrawX/nodeDrawY convert an override into the drawing's frame, which
+	// is the site the whole renderer, the label pass and the bounding box come through -- and where
+	// there is no override they return the field untouched, so a Base drawing still pays nothing at
+	// all. writeNodeCoord() is the other: a typed box hands it the public number and it converts
+	// once, which is what keeps a typed 38.5 stored as 38.5.
+	ok('inwardX has one definition and twenty-seven call sites', count(/inwardX\(/g) === 28, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-eight call sites', count(/inwardY\(/g) === 29, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

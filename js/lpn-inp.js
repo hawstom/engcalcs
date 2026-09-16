@@ -2215,6 +2215,7 @@
 	 *
 	 *   doc   the saved document shape (docFromInp / serializeProject)
 	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
+	 *         .coordOverride(id)    {x, y} the ACTIVE SCENARIO moved this node to, or null
 	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
 	 *         .labelSize(label)     {w, h} of the rendered label IN MAP UNITS, for the corner shift
 	 *         .title                [TITLE] text; default doc.project.name
@@ -2230,6 +2231,18 @@
 		var eff = typeof opts.effective === 'function'
 			? opts.effective
 			: function (el, prop) { return el['_' + prop]; };
+		/**
+		 * **A NODE THE ACTIVE SCENARIO HAS MOVED** (ROADMAP Task 674). Deliberately NOT through
+		 * `eff()`, and the reason is the frame: this writer is handed the SERIALIZED document, whose
+		 * coordinates are already absolute in the file's own frame, while `effective()` reads the
+		 * LIVE document and adds the live origin to whatever it finds. Asking it here would add an
+		 * origin twice.
+		 *
+		 * The override is itself an absolute outward pair, which is the frame these rows are written
+		 * in, so it goes straight into the row.
+		 */
+		var covOf = typeof opts.coordOverride === 'function' ? opts.coordOverride : function () { return null; };
+		var movedByScenario = [];
 		function isActive(el) {
 			var a = eff(el, 'active');
 			return a === undefined || a === null || a === true;
@@ -2434,10 +2447,24 @@
 						FLOW_UNITS[flowKey].toSI)]));
 				}
 			}
-			coords.push(row([nd.id,
-				n(PLAIN, nd, 'x', (nd.x || 0) + origin.x),
-				n(PLAIN, nd, 'y', (nd.y || 0) + origin.y)]));
+			// **AN EPANET FILE HOLDS ONE POSITION PER NODE, so it states the one on screen and says
+			// so.** That is the rule every other property here already follows -- the export writes
+			// the scenario the user is looking at -- and a position is no different in kind from a
+			// demand. What the format cannot hold is the OTHER scenarios' positions, which is a
+			// difference, and a difference is reported rather than dropped in silence.
+			//
+			// Still through `n(PLAIN, nd, ...)`: lpnNumText() hands a kept token back only while it
+			// still states the value it was read for, so an overridden coordinate loses the file's
+			// own characters by itself and a Base one keeps them.
+			var cov = covOf(nd.id), cx = (nd.x || 0) + origin.x, cy = (nd.y || 0) + origin.y;
+			if (cov && (typeof cov.x === 'number' || typeof cov.y === 'number')) {
+				if (typeof cov.x === 'number') { cx = cov.x; }
+				if (typeof cov.y === 'number') { cy = cov.y; }
+				movedByScenario.push(nd.id);
+			}
+			coords.push(row([nd.id, n(PLAIN, nd, 'x', cx), n(PLAIN, nd, 'y', cy)]));
 		}
+		if (movedByScenario.length) { diff('node-coords-scenario', movedByScenario); }
 
 		// ---- links ----
 		for (i = 0; i < (doc.links || []).length; i++) {

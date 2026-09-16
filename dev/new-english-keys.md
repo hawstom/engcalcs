@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read**, of 2 untranslated keys, of 1873 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read**, of 3 untranslated keys, of 1874 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,11 +25,14 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (2, 2 to read @@ NEEDS RULING)
+## lpn_  (3, 3 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.
   @@ NEEDS RULING
 - **`lpn_field_coord_tip`**
-  > Type a coordinate to place this node exactly. A node has one position in every scenario, so this moves it everywhere, just as dragging it does.
+  > Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_coords`**
+  > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   @@ NEEDS RULING

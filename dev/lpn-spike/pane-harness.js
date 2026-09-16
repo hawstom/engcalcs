@@ -565,7 +565,10 @@ console.log('\n--- the write seam ---');
 	// ways -- a blur, an Enter, an arrow out, and a paste -- and four copies of it is four chances
 	// to forget the override mark. paneTableRow() calls that one function; this asserts the ending
 	// where it now lives.
-	report(/completeEdit\(c\.prop \? \{ el: el, prop: c\.prop \} : null\);/.test(fnBody('paneCommitCell')),
+	// **THE PROPERTY IS ASKED THROUGH paneColProp() SINCE TASK 674**, because the two coordinate
+	// columns cannot carry a literal one: which document axis the first-read column writes follows
+	// the KIND of project, while the column spec is built once and cached.
+	report(/completeEdit\(paneColProp\(c\) \? \{ el: el, prop: paneColProp\(c\) \} : null\);/.test(fnBody('paneCommitCell')),
 		'every table edit ends in completeEdit(), the popup’s own ending');
 	report(/paneCommitCell\(input\)/.test(fnBody('paneTableRow')),
 		'...and a cell reaches it through the one commit, never by repeating it');
