@@ -1,62 +1,79 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-14 (sixth session)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-15 (seventh session)
 
-## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-14.
+## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-15.
 
-**WHERE THE 09-14 BUG LIST LANDED — master `06aaf790`, green and pushed.** Done and on master: the
-`empty` Find condition, Initial quality in Find (chemical-gated) and in the Tables and
-multi-properties, EPSG codes in the projection selector, the projected-project zoom, Tom's Net3
-custom-property example, and the two custom-property defects. **The `utm-only` deploy blocker is
-CLOSED on his word** (*"Close/delete it. Obsolete."*) — `dev/deploy-blockers.json` holds no open
-blocker now, and the register itself stands.
+**MASTER IS GREEN AND FOUR ORDINARY TRACKS LANDED 2026-09-15.** Task 676 phases 1, 1a and 2; Task
+677; Task 322 half B's second pass; and the market researcher's two answers. **PRODUCTION HAS NOT
+PULLED THEM.** Production is the SHA somebody last pulled, and on the evening of 09-15 that was
+`e1c0794f`, several commits behind. Never say "it is live" because you pushed.
+
+**THE `.claude` EXPOSURE IS FIXED IN THE REPOSITORY AND STILL LIVE UNTIL TOM DEPLOYS.**
+`https://hawsedc.com/engcalcs/.claude/settings.json` answered HTTP 200 -- the agent definitions, the
+hook scripts and the permission allow-list. An `.htaccess` only takes effect once the file is on the
+server. If you are reading this before he has pulled, that URL is still readable.
+
+**THE UPTIME WATCH IS REAL, IT IS ON THE HOST, AND IT IS NOW IN `dev/host/`.** `~/check.sh` fetches
+every page on all nine domains daily at 04:20 server time -- 620 URLs, body as well as status -- and
+mails only on failure. **The report at 22:00 server time (20:00 in Phoenix) mails EVERY night
+whether or not anything is wrong**, and that is the design, not an oversight: the alarm is silent on
+success, so a healthy site and a dead cron are the same silence, and cron mail here was dead for
+years. `dev/host/README.md` has the whole thing.
+
+- **`sendmail` EXITED 0 DURING ALL 22,907 BOUNCES.** An exit code has never been evidence of
+  delivery on this account. Confirm arrival at the far end.
+- **The report runs out of `~/tgh/engcalcs-report`, a SEPARATE checkout, and reads production with
+  `git rev-parse HEAD` and nothing else. NOTHING MAY `git fetch` IN THE PRODUCTION CHECKOUT** --
+  `ecDeployIdentity()` dates the About box from `filemtime()` on `packed-refs` among others, and a
+  fetch can rewrite it, advancing the displayed build date with nothing deployed.
+- **No `node` on the host**, so no harness and no `check_all.sh` can run there. The report says so
+  every night rather than implying coverage it has not got.
+
+**A DIAGNOSIS WRITTEN FROM INSIDE THIS TREE COULD NOT SEE A WORKING MACHINE ONE DIRECTORY OUTSIDE
+IT.** `dev/reputation-and-practice.md` proposed building an uptime watch that had been running for
+six days. It is corrected in place. That is the lesson to carry, not the scripts.
+
+**`674-coordinate-entry` IS A FEATURE AND MAY NOT MERGE.** Listed in `dev/branch-policy.json` on its
+own branch, so the gate refuses it without touching master's policy. It wants Tom's browser test at
+`http://127.0.0.1:8087/engcalcs/Looped-Network.php`, which needs one `sudo systemctl reload apache2`
+he has not yet run. It adds language keys, so its own `check_all.sh` reports `payload freshness` and
+that failure is EXPECTED on the branch; the orchestrator regenerates once, when the keys reach
+master.
+
+**`tables-interface` still EXISTS AND IS NOT ON master, ON HIS INSTRUCTION.** Copy and paste in the
+tables is BROKEN and is the defect inside that programme.
 
 **TWO STRINGS ARE DELIBERATELY DIFFERENT ON master AND ON `projection`, AND THAT IS NOT DRIFT.**
-`lpn_new_coordsys_local` and its tip promise georeferencing later, which cannot be met until
-`projection` lands. master carries the short honest pair (*"Local, schematic, or custom"* /
-*"Choose this to attach your own background image."*); `projection` carries the full pair and is
-merged up to master (`f3740ec9`). **When `projection` merges after EWB the branch's wording wins,
-and that is the intended outcome** — do not "fix" either side to match the other before then.
+`lpn_new_coordsys_local` and its tip. master carries the short honest pair; `projection` carries the
+full pair. When `projection` merges the branch's wording wins. Do not "fix" either side.
 
-**`tables-interface` EXISTS AND IS NOT ON master, ON HIS INSTRUCTION** (*"Roadmap not on master
-until approved"*). It carries Task 666 and lists itself in `dev/branch-policy.json`, so the merge
-gate refuses it from its own tree without touching master's policy. Copy and paste in the tables
-is BROKEN and is the defect inside that programme.
+**THE FREEZE IS A FEATURE FREEZE. `freeze.active` IS false AND MUST STAY SO WITHOUT HIS WORD.**
+Reading it as a merge freeze cost a day of bug-fixing on 09-13.
 
+**YOU MAY NOT MERGE A CAPABILITY BRANCH ON YOUR OWN JUDGEMENT, EVER.** `customer`, `graph`,
+`projection`, `custom-property` are declared in `dev/branch-policy.json`; an all-clear goes in
+`dev/branch-all-clears.json` in his words, pinned to the commit, and lapses when the branch moves.
 
-**THE FREEZE IS A FEATURE FREEZE, AND READING IT AS A MERGE FREEZE BLOCKS BUG FIXES.** Corrected
-2026-09-14; `dev/branch-policy.json` now has `freeze.active = false` and states the plan.
+**FOUR OF THOSE BRANCH REFS NOW HOLD NOTHING master LACKS** -- `custom-property`, `customer`,
+`graph`, `660-dblclick-open`, `662-reaction-questions` all read 0 ahead. That is the residue of the
+six unsanctioned merges of 09-13. Whether each is landed work whose ref should die, or work that
+never started, is a judgement `branch_hygiene_check.php` will not make for you. **Ask him.**
 
-**Tom's plan, in his own words on 2026-09-14 after this repository got it wrong twice:** freeze
-FEATURES on 10 September; fix bugs through 14 September; translate on the 14th; **then keep fixing
-bugs AND DEPLOYING THEM through 16 September.** So a bug fix merges to master on the ordinary rules
-and master must stay PULLABLE, because he is pulling it. What may not merge is a FEATURE.
+**AND THAT ADVISORY WAS BLIND IN EVERY WORKTREE UNTIL 2026-09-15.** It tested `is_dir('.git')`,
+which is false when `.git` is a FILE -- which it is in all five worktrees -- so it printed "not a
+git checkout, nothing to report" and a blind run looked exactly like a clean tree. Fixed to ask
+`git rev-parse --git-dir`. **The shape is the one that has already cost this project a guard: failing
+open, silently.**
 
-*"But what I am hearing from you blocks bug fixes, and that is unacceptable."* The 09-13 reading
-turned his sentence *"we can't do that if we are merging our work to master"* into a total merge
-freeze; **"our work" meant the capability branches**, which is what the `protected` list is for.
-A day of bug-fixing was lost to it. Do not set `freeze.active` true again without his word.
+**WHAT IS WAITING ON TOM, AND NONE OF IT IS BUILDABLE WITHOUT HIM:** Tasks 669 (is it a restoration
+or a request -- I can find no evidence it ever shipped), 659 (his first option reverses his own
+ruling of five days earlier), 663 (three reaction-rate questions), 539 (`spot_prime`, and the case
+is weaker than it was); Tasks 672, 650 and 660 all need a run on HIS machine because a synthetic CDP
+mouse cannot reach what is left; GitHub branch protection on `master`, which no local hook can
+substitute for; and one `sudo systemctl reload apache2` for port 8087.
 
-**YOU MAY NOT MERGE A CAPABILITY BRANCH ON YOUR OWN JUDGEMENT, EVER.** Tom: *"Really you should
-never merge a major branch to master without my all-clear on completion."* `customer`, `graph`,
-`projection` and `custom-property` are declared in `dev/branch-policy.json`; an all-clear goes in
-`dev/branch-all-clears.json` in his words, pinned to the commit, and lapses by itself when the
-branch moves. **`dev/hooks/pre-merge-commit` and `pre-commit` now refuse both merge paths** -- but
-a guard is not an excuse to stop thinking, and the first version of that guard was DEAD for a day.
-
-**THERE IS AN OPEN DEPLOY BLOCKER, NOW ADDRESSED AND AWAITING HIS WORD.** `dev/deploy-blockers.json`:
-`projection` cannot ship with UTM only. **All 5,346 live projected CRS shipped 2026-09-14** —
-`js/data/epsg-projected.json`, State Plane and every national grid included, fetched when the
-chooser opens, the 183 hand-typed rows kept as the offline fallback. **The blocker STAYS OPEN**: he
-asked to TEST with the full universe and has not yet, and closing one is his word, never an AI's.
-Originally 183 of 5,346 projections were offered. Tom said *"We won't deploy with UTM only"* before that
-branch existed, and **that sentence appeared nowhere in this repository** -- which is why the
-register now exists. **A constraint that lives only in a transcript does not exist. Write it down in
-the turn he says it.**
-
-**WHY ALL THREE OF THOSE ARE HERE:** on 2026-09-13 six capability merges landed on master in one
-session, every one of them green, two of them unfinished in ways only Tom could see, against his own
-plan in §5 of this file. **The session that did it had not read this file.** That is the whole root
-cause. Read it.
-
+**NOTHING TO DELETE IN THE LANGUAGE FILES.** Two keys are rendered by nothing and both are the
+canonical mode names `mode_name_check.php` holds every other string against. Suffix drift 0, dead
+readers 0.
 ---
 
 **Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of dense days

@@ -135,8 +135,16 @@ fi
 # ---------------------------------------------------------------------------
 hr "BRANCHES"
 if [ -x "$PHP" ] || command -v "$PHP" >/dev/null 2>&1; then
-    out=$(cd "$HERE" && run 30 "'$PHP' dev/scripts/branch_hygiene_check.php")
-    if [ -n "$out" ]; then echo "$out" | head -40 | sed 's/^/   /'; else miss "branch_hygiene_check.php printed nothing"; fi
+    # POINTED AT THE MIRROR, because the checkout this runs from is single-branch by design and the
+    # script read its own tree: the first real run reported "only 'master' exists; nothing to
+    # report" about a repository with six branches, which is worse than printing nothing. The
+    # mirror is bare and that is fine -- every line of that check is a git command over refs.
+    target=$HERE
+    [ -d "$MIRROR" ] && target=$MIRROR
+    out=$(cd "$HERE" && run 30 "'$PHP' dev/scripts/branch_hygiene_check.php --root='$target'")
+    if [ -n "$out" ]; then echo "$out" | head -40 | sed 's/^/   /'
+    else miss "branch_hygiene_check.php printed nothing"; fi
+    [ "$target" = "$HERE" ] && echo "   (read from this checkout, not the mirror: it may see only one branch)"
 else
     miss "no PHP 7+ binary at $PHP"
 fi
@@ -218,8 +226,38 @@ echo "$out" | grep -oE '[0-9]+ of [0-9]+ open tasks have a conforming[^.]*' | he
 # ---------------------------------------------------------------------------
 hr "USAGE, from the production logs"
 if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ]; then
-    out=$(cd "$PROD" && run 60 "sh log/lang-log-stats.sh")
-    if [ -n "$out" ]; then echo "$out" | head -24 | sed 's/^/   /'; else miss "lang-log-stats.sh printed nothing"; fi
+    out=$(cd "$PROD" && run 120 "sh log/lang-log-stats.sh")
+    if [ -n "$out" ]; then
+        # A `head -24` HERE PRINTED TWENTY-FOUR LINES OF DEFINITIONS AND NOT ONE NUMBER, which is
+        # the failure a report is most likely to keep making: it looked full. So the sections are
+        # named. The WINDOW and FINGERPRINT lines come first and are not decoration -- that script
+        # says to quote them with any number taken from it, because two snapshots with different
+        # fingerprints describe different populations, and dev/usage-data-log.md records a 40x
+        # scale break that happened when a window went unstated.
+        picked=$(
+            # `awk '!seen'` because lang-log-stats.sh prints WINDOW and FINGERPRINT twice, once in
+            # its header and once beside the consent share. Two identical lines in a report that is
+            # meant to be identical in shape every day is a thing a reader stops to check.
+            printf '%s\n' "$out" | grep -E '^ +(WINDOW|DURATION|FINGERPRINT) ' | awk '!seen[$0]++'
+            printf '%s\n' "$out" | awk '
+                /RANK BY SHOPPING/         {r=1; print ""; print " rank by shopping:"; next}
+                r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
+                r && k>0 && /^ *$/         {r=0}
+                /reach rows:/              {print}
+            '
+        )
+        # AN EXTRACTION THAT MATCHES NOTHING MUST SAY SO. The first version of this section printed
+        # a heading and then nothing at all, on a checkout with no logs -- which is the one shape
+        # this report may never have, because an empty section reads as "no news" and it means "I
+        # did not look". If the shape of lang-log-stats.sh changes, this is what will tell you.
+        if [ -n "$(printf '%s' "$picked" | tr -d '[:space:]')" ]; then
+            printf '%s\n' "$picked" | sed 's/^/   /'
+        else
+            miss "lang-log-stats.sh ran and printed $(printf '%s\n' "$out" | wc -l | tr -d ' ') lines, but none matched the WINDOW, rank or reach-row shapes this section reads. Read it by hand: cd $PROD && sh log/lang-log-stats.sh"
+        fi
+    else
+        miss "lang-log-stats.sh printed nothing"
+    fi
 else
     miss "$PROD/log/lang-log-stats.sh not found"
 fi

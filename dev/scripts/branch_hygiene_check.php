@@ -42,7 +42,21 @@ function bh_git($args) {
     return $out;
 }
 
+// `--root=DIR` SO THIS CAN BE POINTED AT A REPOSITORY THAT IS NOT THE ONE IT LIVES IN, and the
+// reason is the nightly report rather than tidiness. That report runs out of a single-branch clone
+// on the server -- deliberately, because it must not fetch in the production checkout -- so this
+// script, reading its own tree, printed "only 'master' exists; nothing to report" every night about
+// a repository with six branches. A section that says "nothing to report" about a thing it cannot
+// see is worse than an absent one. It takes a BARE repository quite happily: everything here is a
+// git command over refs, and no working tree is read.
 $root = dirname(dirname(__DIR__));
+foreach ($argv as $bhArg) {
+    if (strpos($bhArg, '--root=') === 0) { $root = substr($bhArg, 7); }
+}
+if (!is_dir($root)) {
+    fwrite(STDERR, "branch hygiene: --root=$root is not a directory.\n");
+    exit(1);
+}
 chdir($root);
 
 // A WORKTREE'S `.git` IS A FILE, NOT A DIRECTORY, so `is_dir('.git')` is false in every one of
