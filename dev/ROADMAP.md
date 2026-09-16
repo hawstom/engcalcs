@@ -158,6 +158,60 @@ the block.
       800 stray keystrokes over 400 junctions.** A trailing column is skippable by clicking the
       next row; a middle one is not. **That cost becomes payable when table columns become
       customizable, and it is the first thing to revisit then.**
+  - **THE IDENTITY BAND IS THE WHOLE OF IT: `ID | X | Y | Description | Tag | Elevation`, ON BOTH
+    SURFACES. TOM RULED IT 2026-09-15**, calling the state he found *"a bit embarrassing"*:
+    *"Description: Isn't this new to us? I don't see it in our current UI. And Tag is at the bottom
+    like we really don't care about it, which is true. Also Tag is not in Tables."* Built: a
+    Description row and a Tag row in slots 4-5 of every node popup and all three node tables, and in
+    slots 2-3 of every link popup and all three link tables. **Tag had never been a column
+    anywhere.** `dev/lpn-spike/identity-band-harness.js`.
+    - **THE LARGER HALF WAS A SILENT DATA LOSS AND IT IS FIXED.** EPANET carries a description as
+      the TRAILING COMMENT on each element's row; `js/lpn-inp.js` split that comment into a local
+      at its main read loop and no node or link reader touched it, so **every description in every
+      imported file was discarded and `dropped` was EMPTY** -- the one contract that module has,
+      broken in the module whose own note calls this failure *"silent loss in the one module whose
+      contract is that there is none"*. Measured through the page's own parser on all six element
+      sections before the fix. The machinery was one section over the whole time: `[DEMANDS]` has
+      read its trailing comment as the demand CATEGORY since Task 468.
+    - **SIX SECTIONS READ IT AND THREE DELIBERATELY DO NOT.** `[JUNCTIONS]`, `[RESERVOIRS]`,
+      `[TANKS]`, `[PIPES]`, `[PUMPS]`, `[VALVES]` mean a description by their comment. `[DEMANDS]`
+      means a demand category, `[CURVES]` types a curve with a `;PUMP:`-style line, and `[TAGS]` is
+      carried as text -- so the read is called at those six sites rather than from the main loop,
+      where it would have given a control, a pattern and an option a description nothing means by
+      them. The harness asserts the negative as well as the positive.
+    - **EPA'S OWN Net1/2/3 CARRY NO DESCRIPTIONS -- they carry a BARE trailing `;` on every data
+      row**, which is EPANET's writer emitting the empty slot. So an empty comment must read as no
+      description, or every element of every sample file would arrive carrying one; the trim in
+      `lpnDescText()` is what gives that, and `inp-export-harness.js` is unaffected (it strips
+      comments before comparing tokens) and still passes all 4,494 checks.
+      `dev/lpn-spike/reference/descriptions.inp` is the fixture that exists because the reference
+      files have nothing to show.
+    - **BASE-OWNED, LIKE THE TAG, AND THE ARGUMENT ON THE OTHER SIDE IS TOM'S OWN.** He said the
+      same day *"Give the people their overrides! Whether coordinate or any other property, what's
+      gained by denying them an override?"*, which is what put x and y in `LPN_OVERRIDABLE`. What
+      it is weighed against: Description and Tag are ONE BAND on his other ruling, an EPANET file
+      holds one description per element, and one of the pair overridable while the other is not is
+      exactly the inconsistency he called embarrassing. **The harness asserts they AGREE rather
+      than asserting today's answer**, so ruling both the other way is a one-line change at each of
+      two write sites and the guard still holds.
+    - **ONLY THE LINE BREAK IS REFUSED.** A trailing comment runs to the end of its line, so a `;`
+      inside a description round-trips exactly (everything after the FIRST `;` is the description)
+      and so does a tab. A newline cannot be written as one at all, so `lpnDescText()` collapses it
+      to a space -- applied on `input`, the way the tag's space rule is, so a pasted paragraph shows
+      its own rule at the moment it is pasted rather than after the field is left.
+    - **ONE NAMING QUESTION IS TOM'S AND IS LEFT OPEN RATHER THAN DECIDED HERE: a junction popup
+      now says "Description" twice.** The element's own row is in the identity band at the top;
+      `lpn_field_demand_category` is the Demand categories table's third COLUMN HEADING and is also
+      the word "Description". Different contexts, so it may be fine -- but CLAUDE.md's own rule is
+      that a name doing two jobs gets split rather than chosen, and Find already carries the longer
+      spelling (`lpn_find_prop_demand_desc`, *"Description of this demand category"*) for exactly
+      this reason. It is not renamed here because the heading ships in 27 languages and column width
+      is king; `demand-category-harness.js` now asks the question STRUCTURALLY (the only Description
+      label may sit above Elevation) rather than by the word, which is what let the collision be
+      seen at all.
+    - Also in Find and replace, on the tag's terms (`group: 'any'`, a plain write, no `prop`) with
+      one difference: `str` rather than `text`, because `text` puts the value through
+      `lpnTagText()` and would keep one word of a sentence.
     - **TOM'S `!!!` ABOUT EPANET IS ANSWERED AND IT IS NOT A SURPRISE TO ACCOMMODATE.** He noticed
       the Property Editor puts Description and Tag ahead of Elevation. **EPANET disagrees with
       itself**: `[JUNCTIONS]` is `ID Elev Demand Pattern`, Description is a trailing comment and

@@ -340,8 +340,21 @@ function findAll(kids, tag) {
 	// pattern or Category label once a breakdown exists -- that duplicated heading is the defect.
 	ok('a junction with categories has NO standalone Base demand field',
 		!labels.some(t => /^Base demand/.test(t)), labels.join(' | '));
-	ok('...nor a standalone Demand pattern or Description field',
-		!labels.some(t => /^Demand pattern/.test(t)) && !labels.some(t => /^Description/.test(t)));
+	ok('...nor a standalone Demand pattern field',
+		!labels.some(t => /^Demand pattern/.test(t)), labels.join(' | '));
+	// **THE CATEGORY FIELD IS GONE TOO, AND SINCE TASK 674 IT CANNOT BE FOUND BY ITS WORDS.** The
+	// element's own Description row is in the identity band at the top of the popup now, and
+	// `lpn_field_demand_category` is the same English word -- so this is asked STRUCTURALLY instead:
+	// the only Description label may sit ABOVE the Elevation row, where the identity band is. A
+	// standalone demand-category field is one that appears below it, beside the demand rows, which
+	// is where the two that vanished used to be.
+	{
+		const iDesc = labels.map((t, i) => [t, i]).filter((p) => p[0].indexOf(PC.lpn_field_desc) === 0).map((p) => p[1]);
+		const iElev = labels.map((t, i) => [t, i]).filter((p) => p[0].indexOf(PC.lpn_field_elev) === 0).map((p) => p[1])[0];
+		ok('...nor a standalone demand-category field below the identity band',
+			iDesc.length === 1 && iElev !== undefined && iDesc[0] < iElev,
+			labels.join(' | '));
+	}
 	const table = kids.filter(c => c.tagName === 'TABLE')[0];
 	ok('...but a table holding EVERY demand', !!table);
 	ok('...one row per demand, row 0 included',

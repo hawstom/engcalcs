@@ -2122,6 +2122,17 @@ $ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says 
 //
 // {name} and {percent} are placeholders and not concatenation (Task 193): a language that puts the
 // curve name first, or wraps a percentage in its own punctuation, cannot express a prefix sandwich.
+// **THE ELEMENT'S DESCRIPTION** (Task 674). EPANET's own word, and EPANET's own Property Editor row:
+// the terminology rule decides it, and there is no vocabulary collision here of the kind Label and
+// Text have. EPANET carries it as the trailing comment on the element's own row in the file, which is
+// where this page now reads and writes it; until Task 674 it was read nowhere and every imported
+// description was discarded in silence.
+$ec_lang['lpn_field_desc']='Description';
+// THE THREE THINGS SOMEBODY HAS TO KNOW, and the third is the one nothing else on the page says: a
+// description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
+// be written as a trailing comment and is turned into a space. The tip says what the field is for
+// first, because that is what a reader of a blank box wants.
+$ec_lang['lpn_field_desc_tip']='A line of your own words about this part, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part\'s own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own

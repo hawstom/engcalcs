@@ -12160,6 +12160,15 @@ var EngCalcs = EngCalcs || {};
 		// the connection exception being widened, it is the same honesty the ID row has.
 		//
 		// The label is `lpn_field_tag`, the popup's own whole label, reused rather than re-keyed.
+		// **DESCRIPTION IS BAND 1 TOO, AHEAD OF THE TAG** (Task 674), and it needs no gate here for
+		// the same reason the tag does not: every scope still running is a node scope, a link scope
+		// or "Everything", and both groups carry one. It misses only a Text object, which is the
+		// standing of `id` here already.
+		//
+		// **AND IT IS THE PROPERTY THIS PANEL MOST WANTED.** A description is a sentence about where
+		// the asset is -- "Corner of Elm and Main" -- so `contains` on it is how somebody finds the
+		// four junctions on Elm, which no other property on this page can answer at all.
+		out.push(['desc', pc.lpn_field_desc || 'Description', 'Description']);
 		out.push(['tag', pc.lpn_field_tag || 'Tag', 'Tag']);
 		// **THE ORDER IS A RULE, AND THIS IS THE SECOND ATTEMPT AT IT** (Tom, 2026-09-04: *"I see
 		// results mixed with asset properties. So you didn't try the rules I gave you. And, for
@@ -12434,7 +12443,8 @@ var EngCalcs = EngCalcs || {};
 		// values, so an empty column still gets the conditions its author intended.
 		var d = customPropDefs().length ? customPropDefByKey(prop) : null;
 		if (d) { return !customPropIsNumeric(d); }
-		return prop === 'id' || prop === 'text' || prop === 'demandCategory' || prop === 'tag';
+		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
+			prop === 'tag' || prop === 'desc';
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -12653,6 +12663,14 @@ var EngCalcs = EngCalcs || {};
 		// every element in the drawing, which is how "what have we tagged so far" gets asked.
 		if (prop === 'tag') {
 			return cand.group === 'label' ? undefined : (cand.el.tag || undefined);
+		}
+		// **THE SAME READING FOR THE DESCRIPTION** (Task 674), straight off the element rather than
+		// through effective(): it is base-owned on purpose (descField()), so there is no override to
+		// resolve and asking for one would invent a `_desc` nothing writes. An empty or absent
+		// description reads as undefined, so `contains` with an empty box lists exactly the assets
+		// that HAVE one -- which is how "what have we written up so far" gets asked.
+		if (prop === 'desc') {
+			return cand.group === 'label' ? undefined : (cand.el.desc || undefined);
 		}
 		// **A CUSTOM PROPERTY IS READ THROUGH effective(), LIKE EVERY OTHER INPUT HERE** (Task 636),
 		// so a scenario's override is what a search inside that scenario finds. Above the label
@@ -13867,12 +13885,13 @@ var EngCalcs = EngCalcs || {};
 	 * **WRITABLE HERE, AND NOWHERE ELSE** -- the Replace side's counterpart to
 	 * FIND_EXTRA_LINK_FIELDS, which is the same shape of answer on the search side.
 	 *
-	 * `pushSpecList()` stays the source of truth for everything that is a starting VALUE, and the
-	 * tag is not one: nothing seeds a tag from a default and nothing pushes one onto every scenario,
-	 * because a tag is what somebody else's records call this asset. It also cannot be written in
-	 * that list's shape, and the reason is the interesting one: every spec there belongs to ONE
-	 * group, and a tag is carried by nodes AND links. Two specs both named Tag would put the word
-	 * twice in one pull-down and `replaceSpec()` would write only whichever came first.
+	 * `pushSpecList()` stays the source of truth for everything that is a starting VALUE, and
+	 * neither the description nor the tag is one: nothing seeds either from a default and nothing
+	 * pushes one onto every scenario, because both say what this asset IS rather than how it is
+	 * designed. They also cannot be written in that list's shape, and the reason is the interesting
+	 * one: every spec there belongs to ONE group, and both of these are carried by nodes AND links.
+	 * Two specs both named Tag would put the word twice in one pull-down and `replaceSpec()` would
+	 * write only whichever came first.
 	 *
 	 * So `group: 'any'` -- read by replaceSpecGroupOk() alone -- and a spec in the identical shape,
 	 * concatenated rather than kept as a rival list. `text: true` says the value box holds words
@@ -13887,6 +13906,25 @@ var EngCalcs = EngCalcs || {};
 	function replaceExtraSpecs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
+			// **THE DESCRIPTION IS WRITABLE HERE ON EXACTLY THE TAG'S TERMS** (Task 674): carried by
+			// nodes AND links, so `group: 'any'`; base-owned, so a plain `set` with no `prop`; and
+			// seeded by nothing and pushed onto no scenario, so it is not a `pushSpecList()` entry.
+			//
+			// **`str` RATHER THAN `text`, AND THAT IS THE ONE DIFFERENCE.** `text` puts the value
+			// through lpnTagText() and keeps one word, which is right for a tag EPANET truncates at
+			// the first space and wrong for a sentence. `str` hands the bytes over, so
+			// "Corner of Elm and Main" survives a bulk write -- and replaceValueOf() still refuses
+			// an empty box under either flag, because erasing a description on 400 assets must not
+			// be spelled the same way as leaving the box alone. The newline a paste could carry is
+			// refused by lpnDescText() at the write below, the one place that rule lives.
+			{ key: 'desc', group: 'any', field: 'desc', str: true,
+				label: pc.lpn_field_desc || 'Description',
+				applies: function () { return true; },
+				get: function (el) { return el.desc || ''; },
+				set: function (el, v) {
+					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
+					if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is an identity, not an overridable property -- see descField()
+				} },
 			{ key: 'tag', group: 'any', field: 'tag', text: true, label: pc.lpn_field_tag || 'Tag',
 				applies: function () { return true; },
 				get: function (el) { return el.tag || ''; },
@@ -13895,9 +13933,10 @@ var EngCalcs = EngCalcs || {};
 				} }
 		];
 	}
-	// A spec's group against a candidate's. Only the tag answers 'any', and only to the two groups
-	// that can hold one: a Text label is not an asset and carries no tag, so "everything" here
-	// means every NODE and every LINK, exactly as it does in findPropDefs().
+	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
+	// answers 'any', and only to the two groups that can hold one: a Text label is not an asset and
+	// carries neither, so "everything" here means every NODE and every LINK, exactly as it does in
+	// findPropDefs().
 	function replaceSpecGroupOk(spec, group) {
 		if (spec.group === 'any') { return group === 'node' || group === 'link'; }
 		return spec.group === group;
@@ -15682,6 +15721,46 @@ var EngCalcs = EngCalcs || {};
 			propFn: function () { return coordSlotIsY(slot) ? 'y' : 'x'; }
 		};
 	}
+	/**
+	 * **THE IDENTITY BAND'S OTHER TWO COLUMNS** (ROADMAP Task 674). Tom, 2026-09-15: *"Tag is at the
+	 * bottom like we really don't care about it, which is true. Also Tag is not in Tables. All that
+	 * is a bit embarrassing. We need a consistent approach."* **There was no Tag column ANYWHERE
+	 * before this** -- a property with a popup row, a Find scope and a round trip through `[TAGS]`,
+	 * and no way to read four hundred of them at once, which is what a table is for.
+	 *
+	 * `str: true`, so paneCellText() prints the words verbatim and paneParseCellText() takes
+	 * anything a pasted spreadsheet cell can hold -- which is the whole point of putting these two
+	 * in the table: a tag register and a street-corner description arrive from somewhere else, by
+	 * the column, and they are the two properties most likely to be pasted rather than typed.
+	 *
+	 * **BOTH SETTERS GO THROUGH THE SAME ONE-PLACE RULE THE POPUP USES**, so the two editors of one
+	 * property cannot disagree: `lpnDescText()` refuses the line break a trailing comment cannot
+	 * hold, `lpnTagText()` keeps the one word EPANET's reader stops at. A paste is where that
+	 * matters -- a spreadsheet cell really can carry a newline, and a popup field cannot.
+	 *
+	 * **NO `prop`**: neither is in LPN_OVERRIDABLE (see descField() and tagField()), so a plain
+	 * write is correct here in Base and in a scenario alike.
+	 *
+	 * 8em for a description and 5em for a tag. A description is a sentence -- "Corner of Elm and
+	 * Main" -- and column width is king everywhere in this pane, so it gets the widest box in it
+	 * and no more; a tag is one token of somebody's asset register.
+	 */
+	function paneColDesc() {
+		return { key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+			get: function (el) { return el.desc || ''; },
+			set: function (el, v) {
+				var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
+				if (t) { el.desc = t; } else { delete el.desc; }   // base-write: identity, as in the popup -- see descField()
+			} };
+	}
+	function paneColTag() {
+		return { key: 'tag', label: 'lpn_field_tag', str: true, em: 5,
+			get: function (el) { return el.tag || ''; },
+			set: function (el, v) {
+				var t = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(v) : String(v || '').trim().split(/\s+/)[0];
+				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: identity, as in the popup -- see tagField()
+			} };
+	}
 	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
 	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
 	// the pipe is how it changes.
@@ -15908,11 +15987,15 @@ var EngCalcs = EngCalcs || {};
 				id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
 				group: 'node', type: 'junction',
 				cols: [
-					// Position in slots 2-3, matching the popup. Tom, 2026-09-15: one rule for
-					// both surfaces. See renderNodeFields() for the reasoning and for Declan's
-					// measured dissent, which stands and is revisited when columns become
-					// customizable.
+					// **THE WHOLE IDENTITY BAND, MATCHING THE POPUP**: `ID | X | Y |
+					// Description | Tag | Elevation`. Tom, 2026-09-15: one rule for both
+					// surfaces, and Tag had never been a column anywhere. See
+					// renderNodeFields() for the reasoning, for why it is EPANET's dialog
+					// order rather than its file order, and for Declan's measured dissent
+					// about the coordinates, which stands and is revisited when columns
+					// become customizable.
 					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColDesc(), paneColTag(),
 					paneColActive(), paneColElev(),
 					// **THE TYPED ONE IS THE EDITABLE ONE, AND IT IS THE ONLY EDITABLE ONE** -- see
 					// resolvedDemand(). The Demand column beside it is a plain cell with no control
@@ -15943,11 +16026,15 @@ var EngCalcs = EngCalcs || {};
 				id: 'reservoirs', panel: 'lpn_pane_reservoirs', label: 'lpn_pane_tab_reservoirs',
 				group: 'node', type: 'reservoir',
 				cols: [
-					// Position in slots 2-3, matching the popup. Tom, 2026-09-15: one rule for
-					// both surfaces. See renderNodeFields() for the reasoning and for Declan's
-					// measured dissent, which stands and is revisited when columns become
-					// customizable.
+					// **THE WHOLE IDENTITY BAND, MATCHING THE POPUP**: `ID | X | Y |
+					// Description | Tag | Elevation`. Tom, 2026-09-15: one rule for both
+					// surfaces, and Tag had never been a column anywhere. See
+					// renderNodeFields() for the reasoning, for why it is EPANET's dialog
+					// order rather than its file order, and for Declan's measured dissent
+					// about the coordinates, which stands and is revisited when columns
+					// become customizable.
 					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColDesc(), paneColTag(),
 					paneColActive(), paneColElev(),
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
@@ -15967,11 +16054,15 @@ var EngCalcs = EngCalcs || {};
 				id: 'tanks', panel: 'lpn_pane_tanks', label: 'lpn_pane_tab_tanks',
 				group: 'node', type: 'tank',
 				cols: [
-					// Position in slots 2-3, matching the popup. Tom, 2026-09-15: one rule for
-					// both surfaces. See renderNodeFields() for the reasoning and for Declan's
-					// measured dissent, which stands and is revisited when columns become
-					// customizable.
+					// **THE WHOLE IDENTITY BAND, MATCHING THE POPUP**: `ID | X | Y |
+					// Description | Tag | Elevation`. Tom, 2026-09-15: one rule for both
+					// surfaces, and Tag had never been a column anywhere. See
+					// renderNodeFields() for the reasoning, for why it is EPANET's dialog
+					// order rather than its file order, and for Declan's measured dissent
+					// about the coordinates, which stands and is revisited when columns
+					// become customizable.
 					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColDesc(), paneColTag(),
 					paneColActive(), paneColElev(),
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
@@ -16003,7 +16094,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
@@ -16051,7 +16142,7 @@ var EngCalcs = EngCalcs || {};
 				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
 				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
 				// cell and the label beside the symbol cannot disagree.
-				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
 				])
@@ -16059,7 +16150,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
 				group: 'link', type: 'valve',
-				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
 					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
 					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
 					// valve's setting is a different physical quantity per type -- a pressure, a
@@ -21238,6 +21329,13 @@ var EngCalcs = EngCalcs || {};
 				// for it (Task 390). See the note in js/lpn-inp.js for why the old elevation=head
 				// write was a claim the file never made.
 				var rz = { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head };
+				// **THE FILE'S OWN DESCRIPTION** (Task 674), the trailing comment on the element's
+				// row. Base-owned and written with no underscore, on the same limb as the tag read
+				// out of [TAGS]: a description is what this asset IS CALLED in words, not a design
+				// variable a scenario asks a question about. Absent where the file stated none, so
+				// no element gains an empty key.
+				if (n.desc) { rz.desc = n.desc; }   // base-write: import builds Base, and a description is identity
+
 				// **THE FILE'S OWN COLUMN, AND ONLY THAT** (Task 248.02), exactly as a junction's
 				// demand pattern below. EPANET has no [OPTIONS]-level default for a head pattern, so
 				// a blank column here means no pattern at all and nothing is resolved later.
@@ -21249,7 +21347,7 @@ var EngCalcs = EngCalcs || {};
 				// vertical distances on the same staff, the diameter included, which is the one that
 				// surprises people. Nothing here is blank-means-follow the way a reservoir's head is:
 				// EPANET states every one, so every one is written.
-				return withInpNotes(carryInpTokens(n, {
+				var tk = carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
@@ -21264,7 +21362,9 @@ var EngCalcs = EngCalcs || {};
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
 					tankDiameter: n.diameter
-				}, LPN_INP_TOK_TANK), inpNodeNotes[n.id]);
+				}, LPN_INP_TOK_TANK);
+				if (n.desc) { tk.desc = n.desc; }   // base-write: see the reservoir above
+				return withInpNotes(tk, inpNodeNotes[n.id]);
 			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
@@ -21280,6 +21380,7 @@ var EngCalcs = EngCalcs || {};
 			// `n.demandPattern || doc.defaultPattern` happens at the solve. Writing the default onto
 			// the junction here would put a name the file never wrote at this row into a field
 			// labelled as the file's.
+			if (n.desc) { j.desc = n.desc; }   // base-write: see the reservoir above
 			if (n.demandPattern) { j.demandPattern = n.demandPattern; }
 			// **THE DEMAND CATEGORIES, ONE ROW EACH** (Task 468). Row 0 is the three fields above;
 			// these are the rest, in the file's order, each with its own token bag so a category's
@@ -21313,6 +21414,7 @@ var EngCalcs = EngCalcs || {};
 				_status: l.status,
 				_k: l.k || 0
 			};
+			if (l.desc) { out.desc = l.desc; }   // base-write: see the reservoir above
 			if (l.type === 'valve') {
 				// A PRV/PSV setting is a pressure and an FCV's a flow (js/lpn-inp.js's
 				// valveSettingUnit names which); a throttle's is dimensionless. The pressure is psi
@@ -35521,6 +35623,21 @@ var EngCalcs = EngCalcs || {};
 		// becomes payable the day table columns are customizable (Task 186's neighbourhood), and it
 		// is the first thing to revisit then.** Full reasoning: dev/agents/data-entry-clerk/.
 		nodeCoordFields(fields, n);
+		// **DESCRIPTION AND TAG COMPLETE THE IDENTITY BAND, IN EPANET'S OWN ORDER** (Task 674; Tom,
+		// 2026-09-15: the Description row was missing from the interface entirely and Tag sat at the
+		// bottom *"like we really don't care about it"*). `ID | X | Y | Description | Tag |
+		// Elevation`, the same five slots on this popup and in all three node tables -- one rule,
+		// which is the reason he gave for the coordinates above.
+		//
+		// **IT IS EPANET'S PROPERTY EDITOR ORDER AND NOT ITS FILE ORDER, and that is deliberate.**
+		// The file disagrees with the dialog: `[JUNCTIONS]` is `ID Elev Demand Pattern`, a
+		// description is a trailing comment and a tag is its own `[TAGS]` section. Tom noticed the
+		// dialog order himself; all three consulting seats read it as GUI archaeology with no EPA
+		// rationale behind it, and CLAUDE.md's settled rule already decides the case -- we defer to
+		// EPANET's TERMINOLOGY, never to its layout. What carries the order here is his ruling and
+		// PNEZD, the surveying convention the trade already reads.
+		descField(fields, n);
+		tagField(fields, n);
 		if (n.type === 'tank') {
 			// FIVE INPUTS AND ONE COMPUTED ROW, in the order a person builds a tank: where the
 			// bottom sits, how much water is in it right now, how far it can go either way, and how
@@ -35714,7 +35831,6 @@ var EngCalcs = EngCalcs || {};
 			sourceFields(fields, n, cu);
 		}
 		qualityResultRow(fields, n);
-		tagField(fields, n);
 		customPropFields(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
@@ -36191,6 +36307,60 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	/**
+	 * **THE ELEMENT'S DESCRIPTION** (ROADMAP Task 674). Tom, 2026-09-15: *"Description: Isn't this
+	 * new to us? I don't see it in our current UI. And Tag is at the bottom like we really don't
+	 * care about it, which is true. Also Tag is not in Tables. All that is a bit embarrassing. We
+	 * need a consistent approach."* His ruling is the full identity band on BOTH surfaces, in
+	 * EPANET's own order: ID, X, Y, Description, Tag, Elevation.
+	 *
+	 * **THERE WAS A DATA-LOSS DEFECT UNDERNEATH IT AND THAT WAS THE LARGER HALF.** EPANET carries a
+	 * description as the trailing comment on the element's row and js/lpn-inp.js split it into a
+	 * local and no reader touched it, so every description in every imported file was discarded and
+	 * `dropped` was empty -- the one contract that module has, broken in the one module whose
+	 * contract is that there is none. Both ends are wired now.
+	 *
+	 * **BASE-OWNED, NOT OVERRIDABLE, AND THAT IS A RULING RATHER THAN AN OVERSIGHT.** Same argument
+	 * the tag below makes, and the band is the point: a scenario asks what if this pipe were bigger,
+	 * not what if it were a different asset written up differently. So it is not in
+	 * `LPN_OVERRIDABLE`, `setProp()` would write a `_desc` nothing reads, and it needs no override
+	 * marker. **The argument on the other side is Tom's own, the same day** (*"Give the people their
+	 * overrides! Whether coordinate or any other property, what's gained by denying them an
+	 * override?"*), which is what put x and y into LPN_OVERRIDABLE. It is recorded here rather than
+	 * argued away: what it is weighed against is that Description and Tag are ONE BAND on his other
+	 * ruling, an EPANET file holds one description per element, and Tag overridable-while-Description-is-not
+	 * or the reverse is exactly the inconsistency he called embarrassing. Making both overridable is
+	 * a one-line change at each of two write sites if he rules that way.
+	 *
+	 * **FREE TEXT, AND ONLY THE LINE BREAK IS REFUSED** -- unlike the tag beside it, which EPANET
+	 * truncates at the first space. A trailing comment runs to the end of its line, so a `;` inside
+	 * a description round-trips exactly and so does a tab; a newline cannot be written as one at all.
+	 * `lpnDescText()` states that in the one place the exporter reads it from, exactly as
+	 * `lpnTagText()` does for the space, and it is applied on `input` so the rule is visible at the
+	 * moment somebody pastes a paragraph in rather than after they have looked away.
+	 */
+	function descField(fields, el) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'text';
+		input.value = el.desc || '';
+		function commit() {
+			var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(input.value) : String(input.value || '').trim();
+			if (input.value !== t) { input.value = t; }
+			if (t === (el.desc || '')) { return; }
+			saveUndoSnapshot();
+			if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is identity, not an overridable property -- see this function's own note
+		}
+		input.addEventListener('input', commit);
+		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
+		// `input` -- a value restored by the browser, or an autofill.
+		input.addEventListener('change', function () { commit(); refreshPopupIfOpen(); });
+		setFieldLabel(label, pc.lpn_field_desc || 'Description', pc.lpn_field_desc_tip);
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
+	/**
 	 * **THE ELEMENT'S TAG** (Task 579, `[TAGS]`). One free-text word on any node or link, the join
 	 * key to whatever system the utility already keeps its assets in.
 	 *
@@ -36369,6 +36539,13 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); });
 		clearFields(fields);
+		// **THE IDENTITY BAND, AND A LINK HAS NO COORDINATES TO PUT BETWEEN** (Task 674) -- so it is
+		// ID, Description, Tag, then everything the link is. The same two rows a node gets, at the
+		// same place in the same order, which is the whole of Tom's ruling: one rule, no special
+		// case to remember. See renderNodeFields() for why EPANET's dialog order and not its file
+		// order.
+		descField(fields, l);
+		tagField(fields, l);
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
 		} else if (l.type === 'pump') {
@@ -36443,7 +36620,6 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		closedField(fields, l, linkId);
-		tagField(fields, l);
 		customPropFields(fields, l);
 		activeField(fields, l);
 		pushHereButton(fields, l);
