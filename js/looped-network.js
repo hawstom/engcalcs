@@ -563,10 +563,83 @@ var EngCalcs = EngCalcs || {};
 		le.lines = lines;
 		return rows;
 	}
+	/**
+	 * ---- THE TAPE MEASURE'S MEMORY (Tom, 2026-09-16: *"a 5-second delay switching to Net-3"*) -----
+	 *
+	 * **A TEXT MEASUREMENT IS A FUNCTION OF THE STRING AND THE FONT SIZE, and this page asks the
+	 * same question thousands of times for one project switch.** Measured on Net3 with every label
+	 * field on: **8,140 measurements in a single switch, 1,029 of them distinct -- 87% repeats** --
+	 * and of a SECOND switch's 7,822 measurements, **100% asked a question the first switch had
+	 * already answered**. Each one is a LAYOUT READ taken between two DOM writes, so a browser
+	 * services it with a synchronous layout of an 8,400-element drawing; node does not, which is why
+	 * the headless switch is 350 ms and his is five seconds.
+	 *
+	 * Task 331 and Task 440 already banked each label's PIXEL width so that a ZOOM costs no
+	 * measurement. A project switch throws that away by construction: `buildDom()` builds new
+	 * elements, and a new element has no bank. **This is the same banking one level up** -- keyed on
+	 * what the answer actually depends on rather than on the element that happens to be asking.
+	 *
+	 * **IT DOES NOT RESCALE, AND CHROME IS WHY.** The obvious form of this banks width PER UNIT of
+	 * font size, which is the assumption `labelBoxWidth()` already ships for pixels. Measured in real
+	 * Chrome before building it -- eight label-shaped strings at thirteen sizes, against the ratio at
+	 * 2000px -- **a measurement taken below about one world unit of font size is QUANTISED**: 0.150%
+	 * error at 4 units, 1.19% at 0.5, 5.6% at 0.1 and **19.7% at 0.02**. A label's font size in world
+	 * units is `textSize / scale`, so the small end is simply "zoomed in", which is an ordinary place
+	 * to be -- and a ratio banked there and reused at any other zoom would be wrong by that much.
+	 *
+	 * So the SIZE IS PART OF THE KEY and nothing is ever rescaled: a hit returns a number this
+	 * browser measured for this string at this exact size, and a zoom is a miss that measures again,
+	 * exactly as today. That costs nothing that matters, because the repeats this exists to kill are
+	 * all at ONE size -- every data label on the map shares `effectiveFontSize()` -- which is why the
+	 * 87% and 100% above were counted with the size in the key.
+	 *
+	 * **THE KEY CARRIES THE CLASS as cheap insurance.** One font serves every map label today -- no
+	 * `.lpn-lbl` rule sets a family, weight or letter-spacing -- but a future rule that did would
+	 * otherwise make two different strings share an answer, which is the quietest kind of wrong.
+	 *
+	 * Bounded, and cleared whole rather than evicted one by one: a drawing whose labels are all
+	 * distinct gets one lookup per measurement and nothing worse.
+	 */
+	var textMeasureCache = Object.create(null), textMeasureKeys = 0;
+	var TEXT_MEASURE_MAX = 20000;
+	// `fontWorld` is the size the string is drawn at. Zero or missing means the answer cannot be
+	// attributed to a size, so the real measurement is taken and nothing is banked.
+	function measuredTextWidth(el, str, fontWorld, measure) {
+		if (!(fontWorld > 0) || !str) { return measure(); }
+		// **THE SIZE IS ROUNDED INTO THE KEY, and it has to be.** `effectiveFontSize()` is
+		// `textSize / scale`, and a fit that lands a hair from where it landed last time produces a
+		// size differing in the last bits -- which is a different key, and a measured 87% of the
+		// hits lost for a size difference of one part in ten million. Six significant figures is
+		// four orders of magnitude finer than the quantisation the measurement itself carries.
+		var k = ((el && el.getAttribute && el.getAttribute('class')) || '')
+			+ '\u0000' + fontWorld.toPrecision(6) + '\u0000' + str,
+			hit = textMeasureCache[k], w;
+		if (hit !== undefined) { return hit; }
+		w = measure();
+		if (isFinite(w) && w >= 0) {
+			if (textMeasureKeys >= TEXT_MEASURE_MAX) {
+				textMeasureCache = Object.create(null); textMeasureKeys = 0;
+			}
+			textMeasureCache[k] = w;
+			textMeasureKeys++;
+		}
+		return w;
+	}
+	// The font size a text element is drawn at, in world units -- written inline by every label
+	// writer (see writeNodeLabelGlyphs) precisely so the measurement and the size belong to the
+	// same moment.
+	function textElFontSize(el) {
+		var v = el && el.style && el.style.fontSize;
+		return v ? parseFloat(v) : 0;
+	}
 	// The read half, and the ONLY place a data label's banked widths come from. Node labels use it
 	// too: the two halves of a label's measurement have always been these same two calls.
 	function measureLabelWidths(holder) {
-		try { noteMeasuredWidth(holder, holder.text.getBBox().width); }
+		try {
+			var t = holder.text;
+			noteMeasuredWidth(holder, measuredTextWidth(t, t.textContent, textElFontSize(t),
+				function () { return t.getBBox().width; }));
+		}
 		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
 		noteRowWidths(holder);
 	}
@@ -1717,6 +1790,14 @@ var EngCalcs = EngCalcs || {};
 	 * Off unless asked for, so it costs a shipped page one regex on load.
 	 */
 	var perfDebugEl = null, perfDebugRows = [], perfDebugN = 0;
+	// **WHAT THE BROWSER PAYS FOR AND NODE DOES NOT.** A label measurement is a LAYOUT READ taken
+	// between two DOM writes, so each one forces a synchronous layout of the whole drawing -- the
+	// Task 440 finding, in a place that rebuilds every label rather than re-reading them. Counted
+	// only while the instrument is armed, so a shipped page pays one comparison per label.
+	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0 };
+	function perfDebugCount(what, n) {
+		if (perfDebugOn()) { perfDebugCounts[what] += (n === undefined ? 1 : n); }
+	}
 	function perfDebugOn() {
 		return typeof location !== 'undefined' && /(\?|&)debug=perf(&|$)/.test(location.search || '');
 	}
@@ -1749,10 +1830,13 @@ var EngCalcs = EngCalcs || {};
 		var comp = 'none', ml = modelLayer && modelLayer.getAttribute && modelLayer.getAttribute('transform');
 		if (ml) { comp = ml; }
 		var line = '#' + perfDebugN + '  ' + perfDebugRows.join('  ') +
-			'  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
+			'  | label passes ' + perfDebugCounts.labelPasses
+			+ '  | label measurements ' + perfDebugCounts.measures
+			+ '  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
 			'  | s ' + (state.s ? state.s.toExponential(3) : '?') +
 			'  | hold ' + comp;
 		perfDebugRows = [];
+		perfDebugCounts.measures = 0; perfDebugCounts.labelPasses = 0; perfDebugCounts.elements = 0;
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
@@ -2749,13 +2833,19 @@ var EngCalcs = EngCalcs || {};
 	// in pixels does not change with the zoom, so re-measuring on every wheel notch is a forced
 	// synchronous layout per label per notch, and Net3 has ~220 of them.
 	function noteRowWidths(holder) {
-		var t = holder && holder.text, out = [], seg = [], i, c, w, hasX;
+		var t = holder && holder.text, out = [], seg = [], i, c, w, hasX, fs;
+		perfDebugCount('measures');
 		if (!t || !t.childNodes) { holder.rowW = null; holder.rowWPx = null; holder.segW = null; return; }
+		// The size is read ONCE for the whole label: every tspan inherits it from the <text>.
+		fs = textElFontSize(t);
 		for (i = 0; i < t.childNodes.length; i++) {
 			c = t.childNodes[i];
 			if (c.nodeType !== 1 || !c.getAttribute) { continue; }
 			w = 0;
-			try { w = c.getComputedTextLength(); } catch (err) { w = 0; }
+			try {
+				w = measuredTextWidth(t, c.textContent, fs,
+					function () { return c.getComputedTextLength(); });
+			} catch (err) { w = 0; }
 			// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
 			// every tspan; keeping the individual figures as well as the row sums costs one array
 			// and no extra layout, and it is what lets the shed cascade below stop redrawing.
@@ -4019,7 +4109,7 @@ var EngCalcs = EngCalcs || {};
 		// multiplier row reads a different home in Base and in a scenario, a switch made while it is
 		// open would leave that field showing the number belonging to the scenario you just left --
 		// and the next keystroke would write it into the wrong place.
-		rebuildSettingsBox();
+		perfDebugTime('settings', function () { rebuildSettingsBox(); });
 		scheduleSolve();
 		saveToStorage();
 	}
@@ -20224,6 +20314,14 @@ var EngCalcs = EngCalcs || {};
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
 	// openProject() and newProject() so the two can never drift into repainting different subsets.
 	function refreshAllFromDocument() {
+		// **?debug=perf NOW COVERS THE PROJECT SWITCH** (Tom, 2026-09-16: *"There is a 5-second delay
+		// switching to Net-3 project tab"*). Task 672 built this instrument for the georeferencing
+		// wizard on exactly the reasoning that applies again here: three headless reproductions of
+		// that slowdown failed, because what costs the seconds -- forced synchronous layout, SVG
+		// rasterising, tile decoding -- is work node does not do. Measured headless, one switch into
+		// Net3 is 457 ms and builds 8,405 elements with 1,091 label measurements in among them; the
+		// browser is the only place that can say which of those is the five seconds.
+		var perfT0 = perfDebugOn() && typeof performance !== 'undefined' ? performance.now() : 0;
 		backdropImg = null;
 		backdropLayer.innerHTML = '';
 		if (backdrop) { buildBackdropImg(); }
@@ -20234,7 +20332,7 @@ var EngCalcs = EngCalcs || {};
 		refreshBasemap();
 		lastSolveResult = null;
 		closePopup();
-		buildDom();
+		perfDebugTime('buildDom', function () { buildDom(); });
 		seedDefaultInputs();
 		// EVERY section, not two of them: a different project brings its own units, its own colour
 		// field and its own friction method, and all four sections carry one or more of those.
@@ -20249,7 +20347,7 @@ var EngCalcs = EngCalcs || {};
 		//
 		// Safe when the box has never been opened: rebuildLibraryBox() returns at once if its
 		// content element is not in the page.
-		rebuildLibraryBox();
+		perfDebugTime('libraries', function () { rebuildLibraryBox(); });
 		applyLegendPosition();
 		// **NO applyMapHeight() HERE. THE BOTTOM OF THE MAP DOES NOT DEPEND ON THE MODEL.** The canvas
 		// height is a fact about the WINDOW and the page's chrome, so re-deriving it on every open
@@ -20259,7 +20357,7 @@ var EngCalcs = EngCalcs || {};
 		// The one document-driven thing that CAN change it is the tab strip's own height, when enough
 		// projects are open to wrap it onto another line. That is chrome, and renderTabs() re-measures.
 
-		refreshFontSizes();
+		perfDebugTime('fontSizes', function () { refreshFontSizes(); });
 		refreshSymbolSizes();
 		refreshValueColors();
 		renderLabelsLegend();
@@ -20276,20 +20374,24 @@ var EngCalcs = EngCalcs || {};
 		// A project or an .inp may ARRIVE holding a PRV/PSV/FCV, with the user never having picked a
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
-		restoreViewOrFit();
+		perfDebugTime('viewOrFit', function () { restoreViewOrFit(); });
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
 		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
 		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
 		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
-		scheduleSolve();
-		renderTabs();
+		perfDebugTime('scheduleSolve', function () { scheduleSolve(); });
+		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
 		// re-opening after a page load, or neither.
 		syncReadOnlyToOpenProject();
 		// LAST, and only after the network is drawn: the question it asks is about the numbers the
 		// user can now see.
 		offerUnitRestore();
+		if (perfT0) {
+			perfDebugRows.push('SWITCH ' + (performance.now() - perfT0).toFixed(1) + 'ms');
+			perfDebugReport();
+		}
 	}
 	// ---- one-time restore of a pre-Task-263 project ----
 	//
@@ -38056,6 +38158,7 @@ var EngCalcs = EngCalcs || {};
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
 	function refreshLabelText() {
+		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
 		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }

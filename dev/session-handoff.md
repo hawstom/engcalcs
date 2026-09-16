@@ -202,6 +202,30 @@ carries the case and it fails on the old tree. **The projected branch had the id
 2026-09-14 and this is the local-grid half of it** -- if a third zoom complaint arrives, suspect the
 constant before the arithmetic.
 
+**THE FIVE-SECOND PROJECT-TAB SWITCH IS A MEASUREMENT STORM, and half of it is now gone
+(2026-09-16).** Tom: *"There is a 5-second delay switching to Net-3 project tab"*, and he was right
+that it is not the solve -- turning off auto-run and thematic colouring changed nothing. **Measured:
+one switch into Net3 with every label field on asked the browser for 8,140 text measurements, 1,029
+of them distinct -- 87% repeats inside one switch, and 100% of a SECOND switch's measurements had
+been answered by the first.** Each is a layout read between two DOM writes, so a browser pays a
+synchronous layout of an 8,400-element drawing for every one; node pays arithmetic, which is why the
+headless switch is 350 ms and his is five seconds. `measuredTextWidth()` banks them on (class, size,
+string) -- **8,140 becomes 1,078, and a re-layout at an unchanged size becomes 0**.
+- **IT DOES NOT RESCALE BY FONT SIZE, and real Chrome is why.** The obvious version banks width per
+  unit of size, the assumption `labelBoxWidth()` already ships for pixels. Measured before building
+  it, eight label strings at thirteen sizes: **a measurement below about one world unit of font size
+  is quantised -- 1.19% error at 0.5 units, 5.6% at 0.1, 19.7% at 0.02** -- and a label's world font
+  size is `textSize / scale`, so the small end is simply "zoomed in". The size is part of the key.
+- **TWO THINGS ARE STILL ON THE TABLE and both are measured.** (1) **A switch lays the labels out
+  THREE TIMES**, the first at the OUTGOING project's scale, which the fit then throws away: 978 of
+  the remaining 1,078 measurements. (2) **Hiding the labels does not stop any of it** -- with
+  thematic colouring on, `dataLabelsHidden` toggles a CSS class and every label is still composed,
+  measured and placed (7,825 measurements against 7,822 with them shown). Tom asked for exactly this
+  to be confirmed; it is confirmed.
+- **`?debug=perf` NOW COVERS THE SWITCH** -- per-phase times plus `label passes` and `label
+  measurements` counts -- so the next round is measured in the browser that is actually slow rather
+  than guessed at. `dev/lpn-spike/label-measure-cache-harness.js` holds the counts.
+
 **STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
 is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
 Task 663's questions 2 and 3, now that he knows the reaction rate is a LINK label switched on under
