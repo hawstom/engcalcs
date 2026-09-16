@@ -1278,3 +1278,177 @@ to spend a post-demo cycle rebuilding the custom-property editor as an expander 
 priority call), and the one edge-case classification above.
 
 No shipped file touched. Ranked build items added to `dev/agents/interface-designer/wishlist.md`.
+
+---
+
+## 2026-09-15 — Consult: Tom's five-group popup-collapse brainstorm, and Sue's coordinate-slot conflict
+
+Asked by the orchestrator, alongside Declan, Sue and Mary, whether Tom's draft grouping (ID /
+Dimensions / Flow and pressure / Quality / Custom) is the right set of cuts for the element
+property popup, whether anything should be collapsed by default, how many bands the popup can
+carry, what precedent this most resembles, and whether a default-collapsed Dimensions group
+re-hides the coordinate-transposition risk Sue argued into slot 2/3.
+
+### What the popup actually is today, checked rather than assumed
+
+OBSERVED (`js/looped-network.js:35063-35267` `renderNodeFields()`, `:35912-36010`
+`renderLinkFields()`): **there is no grouping of any kind in the popup today.** It is one flat,
+ungrouped, always-fully-visible column of rows, built by sequential function calls with no section
+`<div>`, no heading, no `<details>`. The only structural comment describing an ORDER (not a
+grouping) is at `:11879-11884`, inside `findPropertyOffer()` — a different feature (the Find and
+colour-by property picker) — with four informal bands: identity, what-you-typed, what-the-model-
+worked-out, questions-about-the-drawing. That is close in spirit to Tom's five groups but is not
+wired to the popup at all; nobody has yet connected the two.
+
+OBSERVED, counting `renderNodeFields()`'s calls for an ordinary junction with a chemical run
+active: id, elevation, elevation-demand row, demand-category table (1+ rows), resolved demand,
+fire flow, emitter coefficient, head, pressure, initial quality, source fields, quality result,
+tag, custom properties (0+), active/shut, push-here, coordinates (2 fields), import notes — **16
+to 20+ rows for one element**, more for a tank (5 dedicated fields plus reaction, mixing, head) or
+a pipe with fittings and reaction coefficients shown. This is a genuinely long, ungrouped list, so
+Tom's brainstorm is answering a real problem and not inventing one.
+
+OBSERVED, popup CSS (`grep` for `max-height`/`overflow-y` scoped to `#lpn_popup`): **none found.**
+The box has no scroll clamp — it grows to fit its content and is dragged/repositioned by the
+reader, unlike the Settings box, which has a fixed frame, a search box and a side index
+(`lpn_setbox_index`, `js/looped-network.js:30160-30196`). The popup has neither. So today's
+failure mode for a 20-row popup is not "the wrong thing is hidden" — nothing is hidden — it is
+"the box is now taller than the window and the reader scrolls past what they want," which is a
+different defect from the one collapsing is usually reached for.
+
+### Existing precedent ON THIS PAGE for default-open vs. default-closed disclosure
+
+OBSERVED (`js/looped-network.js:36241-36268` `multiSection()`, the MULTI-selection popup's own
+grouped `<details>` sections): **`box.open = true`, unconditionally, with Tom's own reasoning
+quoted in the comment**: *"OPEN, ALL OF THEM. Tom's own words are that a mixed selection shows
+both and NEITHER IS HIDDEN, so collapsing is something the reader does, never the default."* This
+is the one place on this exact page that already answers "does a property group start open or
+closed," for a popup in the same family (property display for a selection) as the one this
+brainstorm targets, and the answer is unambiguous: **default open, always.**
+
+A second, narrower precedent cuts the other way in intent but not in mechanism:
+`customPropBox()` (`:29025-29078`) uses one `<details>` per CUSTOM PROPERTY (not per group), and
+each one **remembers its own open state** via `cpOpenKeys[def.key]` (`:29078`) rather than
+defaulting open — but that is a list of N independent, same-shaped items the reader is scanning
+for one KEY by name, a different job from a group of dissimilar fields the reader needs to read
+together (e.g., Diameter beside Length). It is not evidence for collapsing property GROUPS by
+default; it is evidence that per-ITEM remembered state is this page's answer to a long list of
+interchangeable things, which the five-group brainstorm is not.
+
+### Answering the five questions
+
+**1 — is the five-group cut in the right places?** Broadly yes, with one real seam problem Tom
+already flagged himself (Custom appearing twice) and one the orchestrator's own observation 1
+names correctly: **"Flow and pressure" mixes typed inputs (Demand, Emitter, Roughness, K) with
+solved results (Head, Pressure)**, and OBSERVED (`:11898-11929`, `BAND_NODE` vs. `RESULT_NODE`,
+and `:35232-35236` where Head/Pressure are drawn inside an `if (lastSolveResult...)` guard that
+the input rows are not) — **the popup's own existing code already separates these two
+populations structurally.** A group that reunites them would be the first place on this page a
+typed number and a computed one sit inside one visual container, which is a real regression
+against a pattern CLAUDE.md itself states as a suite-wide rule ("a number the user supplied and a
+number we computed are different kinds of thing and must never sit in one field" — the field-level
+version of the same principle observation 1 is naming at group level). **Split it**: "Flow and
+pressure" (inputs) and a computed tail (Head, Pressure, and for a link, Flow/Velocity/Head
+loss/Gradient) — which is exactly the same INPUT/RESULT seam `BAND_NODE`/`RESULT_NODE` already
+draws, so the fix costs no new judgement, only reading the split that is already coded.
+
+Observation 2 (Shut/Included as state, not flow) I'd resolve the same direction Tom's own ID
+group implicitly argues: these decide whether the element PARTICIPATES, which is closer to "what
+the element is" than to "what it does hydraulically." I would fold them into ID rather than give
+them a sixth group — a group of two toggles is a thin group, and `activeField`/`closedField`
+already render immediately beside `tagField`/`pushHereButton` (`:35260-35263`,
+`:35991-35993`), i.e. they are already adjacent to identity-band fields in the code's own order,
+not to the flow fields.
+
+**2 — what collapses by default, and does anything?** Nothing should, and this popup already has
+a same-page, Tom-authored ruling that says so for the sibling popup one function away. CITED
+internally (the `multiSection()` comment, above). SPECULATION, but a narrow one: the reasoning
+that made him rule that way — a reader opening a MULTI-selection box wants to see everything a
+mixed group shares before deciding what to change — applies with equal or greater force to a
+SINGLE element's own full property set, where nothing is being compared across elements and the
+box's whole job is "tell me everything about this one thing." Two testers already look past the
+menu bar (OBSERVED, `dev/ROADMAP.md` Task 616) — a **default-collapsed heading is a second
+instance of exactly the failure this seat was hired over**: a bold word with a caret is easy to
+mistake for a static section label rather than a button, especially the FIRST time a reader meets
+it, which is precisely when they most need to see what's under it. Open by default, every group,
+matching the sibling popup, is the low-risk answer. Where collapsing earns its keep is the
+opposite of "first glance": a RETURNING reader who has learned the shape of the popup and wants to
+suppress a group they never touch (Quality, on a network running no chemical run) — that is a
+real, later win, and it is exactly the shape `multiSection()`'s per-key remembered state already
+models for custom properties. **Ship open-by-default now; consider a remembered-per-group-collapse
+preference later, once real dwell-time or scroll-depth evidence says a specific group is
+consistently skipped** — not before, because guessing which group a reader wants closed is the
+same mistake as guessing which four-second highlight they'll see.
+
+**3 — how many bands can this popup carry?** Five is not obviously too many in the abstract —
+CITED, AutoCAD's Properties palette runs 5-9 categories (General, 3D Visualization, Geometry,
+Misc, and 2-4 more depending on object type) and Figma's right rail runs 6-8 (Position, Layout,
+Appearance, Fill, Stroke, Effects, Export, plus per-object extras) — but **the honest cost here is
+not "five headings," it is "five headings ADDED to a page that already has four lines of chrome
+Tom himself could not resolve, on the one surface (`lpn_`) CLAUDE.md itself calls a full-window
+drawing surface where chrome competes with the drawing.**  A property popup is not suite chrome by
+the taxonomy Tom drew (it is content, opened on demand, not a standing bar) — so it does not
+directly add to the four-bar count — but it IS a fifth attention surface competing for the same
+finite reading budget the moment it is open, and CLAUDE.md's `chore/seat-consult-collapse` brief
+should weigh that the popup's OWN reader has already selected an element and is task-engaged
+(closer to Settings-box attention than to first-glance chrome attention, per my own 2026-09-13
+entry distinguishing an "already opened and engaged" surface from a "never sampled" one). On that
+distinction, five groups on an ENGAGED surface is a much smaller risk than five bars on a
+NEVER-SAMPLED one — this is a genuine gain if it turns a 20-row scroll into five scannable
+labelled chunks, not a loss, PROVIDED nothing defaults closed (see Q2).
+
+**4 — known pattern to defer to?** CITED: this is a **property inspector with labelled sections**,
+the same family as AutoCAD's Properties palette, Figma's right rail, Blender's Properties editor
+tabs, and a browser DevTools Elements/Styles pane. The closest match in SHAPE (grouped, always-
+visible-on-scroll headings inside one scrolling panel, not a tabbed switcher) is AutoCAD's
+Properties palette and Figma's right rail, both of which keep every section visible and let the
+reader collapse a section only as a personal, remembered choice — never a shipped default-closed
+state on first view. Blender's tabbed Properties editor is the WRONG precedent to reach for: tabs
+hide all-but-one category at a time, which this popup does not do and should not start doing (it
+would turn "five groups" into "five clicks to see everything," the opposite of what a full
+property readout is for). **Defer to AutoCAD/Figma's shape: sections, not tabs; open by default;
+collapse as a remembered reader choice, not a shipped default.**
+
+**5 — the coordinate-slot conflict (observation 3): is it real?** **Real, and it is the sharpest
+finding in this brief.** OBSERVED, `dev/agents/interface-designer` reading of the brief itself:
+Tom's own reason for X/Y at popup slots 2-3 was *"one rule, no special case to remember"* — a
+GLOBAL positional promise across the popup AND every node table. A "Dimensions" group starting
+collapsed would put X/Y at slot 1-of-group-3-when-opened rather than slot 2-of-the-popup, which is
+a second special case being reintroduced by the same brainstorm that is supposed to be tidying the
+popup, and it is the worse kind: **it fails exactly the case Sue named — a transposed X/Y balances
+hydraulically and is invisible to the solver, so the popup is the LAST honest place to catch it
+before a GIS overlay or as-built check does, and that is only true if the popup shows it without
+a click.** This is not merely "my Q2 answer (don't default-collapse) happens to cover it" — even
+under my own Q2 recommendation (nothing collapses by default), the coordinate fields would STILL
+be buried one section-heading-and-scroll below Demand/Fire flow/Emitter if "Dimensions" is treated
+as an ordinary mid-list group, because Tom's own five-group order puts Dimensions second, but
+coordinates are currently NOT grouped with elevation/diameter/length at all — OBSERVED,
+`coordFields()` is called at `:35264`/`:36117`, dead last in the function, after `tagField`,
+`customPropFields`, `activeField`, and `pushHereButton`. **The brainstorm's own "Dimensions" group
+(Horiz, Elevation, Length, Diameter) would be the first time X/Y and the rest of the popup's
+geometry sit together at all** — today they are not neighbours. So there are two separable
+questions being asked at once and they want different answers: (a) should coordinates be grouped
+WITH other dimensional fields — yes, that is a legitimate, overdue tidy; (b) should that group,
+wherever it sits, ever be allowed to start closed, or sit lower than slot 2 — no, because that
+directly reopens the exact risk his own coordinate-slot ruling exists to close. **Recommendation:
+keep X/Y visually first inside "Dimensions," and never allow "Dimensions" to be the group a
+remembered-collapse preference (if built per Q2's later phase) is allowed to apply to** — carve
+coordinates out as an exception the way `customPropFields`' per-key remembering already carves out
+Credits-style exceptions elsewhere on this page (`data-set-nofilter`, `:30284`). This is a real,
+citable conflict, not over-reading.
+
+### Where I expect the others to weigh in
+
+**Sue** owns the coordinate-slot argument outright and should have the last word on whether
+"Dimensions" is even the right HOME for X/Y at all, versus keeping coordinates structurally
+separate from Elevation/Length/Diameter the way they are structurally separate from everything
+else today — I am reading her prior ruling, not extending it past what she said. **Declan** should
+be asked directly whether a collapsed-by-default group (if Tom still wants one later) costs a
+keyboard stop per group per element the way slot 2-3 already cost him 800 stray keystrokes over
+400 junctions — a `<details>` element is itself a tab stop, so five sections is five NEW stops
+added to every popup visit regardless of open/closed state, which is a data-entry-volume question
+this seat cannot weigh well. **Mary** has no obvious stake here; this is entirely internal
+convention, not a market comparison question, though the AutoCAD/Figma citations above are exactly
+her kind of evidence if she wants to independently verify them.
+
+No shipped file touched.

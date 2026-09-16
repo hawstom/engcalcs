@@ -1380,3 +1380,147 @@ I found no dated origin for Description/Tag, no GUI-design rationale, and the on
 practice rather than for it.
 
 — Mary
+
+## 2026-09-15 — property grouping: does anyone group, what do they call the groups, and does grouping help
+
+Tom's draft groups a `lpn_` element's properties into ID / Dimensions / Flow and pressure / Quality /
+Custom, following this morning's coordinate-slot ruling. Asked to test three observations: whether
+any comparable tool groups at all, whether grouping helps by evidence rather than opinion, and
+specifically whether anyone mixes inputs and results in one group (my colleague's observation 1 in
+the brief).
+
+### 1. epanet-js DOES group, and the source settles observation 1 outright
+
+**CITED, read directly from source, not a paraphrase.** `apps/app/src/panels/asset-panel/asset-panel.tsx`
+(github.com/epanet-js/epanet-js, `main` branch, fetched 2026-09-15) wraps every property in a
+`<SectionWrapper title={translate(...)} section="...">`. For a Junction (lines 533-721 of the fetched
+file): `activeTopology` (the enable/disable switch), `modelAttributes` (elevation, emitter
+coefficient — the closest analogue to Tom's "Dimensions"), a separate `CustomAttributesSection`,
+`demands`, `quality`, and then, as its **own, separately-headed section**, `simulationResults`
+(head, pressure, demand met — all `readOnly={true}`). The same shape repeats for Pipe, Pump, Valve,
+Tank: one or two input sections, then `simulationResults` (Pipe/Pump/Valve) or `simulationResults`
++ `energyResults` (Pump) as their own trailing sections.
+
+**This directly answers observation 1: epanet-js never puts a typed number and a computed one in the
+same group.** Every asset type gets a dedicated results section, always last, always visually and
+programmatically distinct (`readOnly` at the row level, a separate `hasChanged` comparison target,
+its own collapse-state key). If "Flow and pressure" mixes Demand/Emitter/Roughness/K (inputs) with
+Head/Pressure (results) in one box, it would be the first place I can find, across every tool checked
+this session, that a modeling UI does that on purpose. My colleague's instinct is well-founded, not
+merely plausible.
+
+**Group names, verbatim from source, for whoever writes the category headings:** `activeTopology`,
+`modelAttributes`, `demands`, `quality`, `connections`, `controls`, `simulationResults`, `energy`,
+`energyResults`. None of these is "Dimensions" or "Flow and pressure" — `modelAttributes` is the
+nearest analogue to Dimensions (it holds elevation, but also emitter coefficient, which is not a
+dimension) and epanet-js has no "Flow and pressure" grouping at all: flow-adjacent state (demand) is
+its own `demands` section, separate from quality, separate from results. **I do not read this as a
+term of art to borrow** — `modelAttributes` and `simulationResults` are code-facing i18n keys, and
+`translate("modelAttributes")` in their English UI (I did not fetch their rendered English string,
+only the source key) may or may not read as "Model attributes" to a visitor. Flag rather than claim.
+
+**All sections default OPEN, and this is a specific, checkable number, not an impression.**
+`apps/app/src/state/layout.ts:105-117` (same repo, same fetch):
+
+```
+export const assetPanelSectionsExpandedAtom =
+  atomWithStorage<AssetPanelSectionExpanded>("assetPanelSectionsCollapse", {
+    connections: true, activeTopology: true, modelAttributes: true,
+    customAttributes: true, controls: true, demands: true,
+    quality: true, simulationResults: true,
+    energy: false, energyResults: false,
+  });
+```
+
+**Eight of ten sections open by default across every asset type; the two closed by default
+(`energy`, `energyResults`) are pump-only extras** (efficiency/cost curves, energy results) — the
+one case where epanet-js itself judges a group is niche enough to hide. `simulationResults` is
+OPEN by default, same as everything else: epanet-js does not treat "results" as the collapsible
+half against "inputs" as the pinned half. State is per-browser (`atomWithStorage`, i.e.
+`localStorage`, not the document) and persists across assets and sessions — the same "furniture
+belongs to the browser" shape this suite already applies to `lpn_pane`/`lpn_rpane`/etc.
+(`CLAUDE.md`, "`lpn_` only: a setting belongs to the PROJECT or to the BROWSER").
+
+### 2. WaterGEMS/WaterCAD: could not confirm the live grid, and the one thing found argues the other way
+
+**Could not determine what the actual Properties grid looks like — no screenshot, no UI walkthrough
+reachable without a login.** What I could reach is Bentley's own reference documentation page for
+Pipe Attributes (docs.bentley.com, `GUID-7E022352A26641E7860CC5BFCDBA312B`, fetched 2026-09-15): it
+lists ~150 pipe attributes as **one flat, alphabetized-by-topic list with no category headers at
+all**, and input properties (Material, Diameter, Has User Defined Length?) sit interleaved with
+result properties (Flow, Velocity, Headloss) rather than separated. **I am flagging this as weak
+evidence, not strong** — a reference doc's listing order is not proof of the live grid's layout, and
+Bentley's UI is built on a standard categorized/alphabetic property-grid control that commercial
+Windows engineering software commonly offers as a toggle (I could not confirm WaterGEMS actually
+exposes that toggle, or which mode is default, this session). **What I can say honestly: the one
+artifact I could read shows inputs and results side by side with no grouping device at all**, which
+is a data point against "professional water-modeling tools all group," not for it, though it is the
+weakest-sourced finding in this entry and should be re-checked against an actual screenshot or a
+person with a licence before being relied on.
+
+### 3. QGIS attribute forms: grouping is a named, standard feature — group boxes AND tabs, both supported
+
+**CITED**, github.com/qgis/QGIS issues #33221 and #29063 (QGIS's own bug tracker, describing its
+shipped "drag and drop form designer" feature, fetched via search synopsis 2026-09-15) and
+docs.qfield.org/how-to/project-setup/attributes-form/ (QField, the same form model). QGIS's
+attribute-form designer supports two container types for grouping fields on one feature's form:
+**tabs** and **collapsible group boxes** — both first-class, both configurable per layer, and QGIS's
+own tracker records the two words ("container" vs. "category") were confusingly interchangeable in
+the UI at one point, which is itself a small data point that naming a group well is a known,
+non-trivial UX problem even for a mature open-source GIS. **This is the closest analogue to editing
+one feature's attributes on a map**, and the answer is unambiguous: yes, grouping — including
+collapsible grouping specifically — is standard, established practice there, not a novelty this
+suite would be inventing.
+
+I did not find, in the time available, whether QGIS group boxes default open or closed per layer (it
+is a per-project author choice, not a global default) — flagging as unresolved rather than guessing.
+
+### 4. Progressive disclosure: real literature, and it does NOT bless "collapse everything by default"
+
+**CITED**, Nielsen Norman Group's standing definition (nngroup.com, "Progressive Disclosure," Jakob
+Nielsen's original 1995 formulation, restated on their site and corroborated by secondary summaries
+fetched 2026-09-15): progressive disclosure **defers SECONDARY options to a subsidiary screen or
+control, showing only PRIMARY options by default** — it is a claim about separating common-from-rare,
+not a general licence to collapse. NN/g's own guidance on collapsed content specifically requires
+that **"the collapsed state must communicate enough context that a user can decide whether to
+expand"** — a bare category label with no preview of what is hidden inside fails this test by NN/g's
+own rule, which matters directly for observation 3 below. One 2006 study cited in secondary sources
+(not verified against NN/g's primary text this session) reports 30-50% faster initial task completion
+when advanced options are deferred, while preserving discoverability of the full set — this is
+about ADVANCED-vs-COMMON, not about every field being equally likely to be needed, which is a
+different shape from Tom's five groups (none of which is "advanced," all being core to any element).
+
+**What this literature does NOT claim, stated plainly because it is easy to over-read:** it says
+nothing about which specific fields are safe to hide, and nothing that resolves whether Dimensions
+specifically (coordinates, elevation) belongs in a collapsible group. That is exactly my colleague's
+observation 3, and epanet-js's own choice — leaving every non-niche section, including
+`modelAttributes` which holds elevation, open by default and only defaulting the two truly optional
+pump-financial sections closed — reads as consistent with NN/g's primary/secondary distinction rather
+than with collapsing everything. If Dimensions collapses by default, it would be treating
+load-bearing geometry as a secondary option in a sense no source I found supports; if it starts
+expanded (secondary only after a user's own choice persists it closed), that is squarely inside what
+every tool checked this session actually does.
+
+### Straight answers to the four questions
+
+1. **Yes, grouping is a departure from EPANET's own flat editor but is NOT a departure from the
+   market**: epanet-js groups (verified in source), QGIS's attribute-form pattern supports grouping
+   as a first-class feature, and the one commercial water-modeling artifact I could reach (Bentley's
+   docs page) is the outlier that does not — though that finding is weakly sourced and should not be
+   trusted over a live screenshot.
+2. **No conventional category names found.** Nobody I could check uses "Dimensions" or "Flow and
+   pressure" as a heading; epanet-js's closest equivalents (`modelAttributes`, `demands`,
+   `simulationResults`) are code keys, not confirmed visitor-facing English, and QGIS's groups are
+   author-named per project, not a fixed vocabulary. Tom's own names are not contradicting a term of
+   art, because none was found — this is a "we could not find a convention to defer to" result, which
+   means the CLAUDE.md EPANET-deference rule does not bind here; write the plainest English.
+3. **Progressive disclosure is real, named, NN/g-documented literature, and it distinguishes
+   primary/secondary rather than blessing "collapse by default."** The one directly comparable tool
+   that ships default-collapse state (epanet-js) applies it to exactly two niche, genuinely optional
+   pump-financial sections and leaves everything else, including the section holding elevation, open.
+4. **Confirmed, from source, not opinion: epanet-js keeps inputs and results in strictly separate,
+   always-distinct sections on every asset type, with `simulationResults` never sharing a box with an
+   editable field.** This is the strongest single finding in this entry and it lands squarely behind
+   my colleague's observation 1.
+
+— Mary

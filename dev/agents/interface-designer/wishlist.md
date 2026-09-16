@@ -233,3 +233,36 @@ is answered for the three that remain after the divorce; see item 5 series above
     If item 22 is built, this question disappears (there is no longer a separate box). If the
     popup is kept, decide whether it belongs in the modal family as-is or should be pulled into
     the standing-panel family per item 23's rule. See journal, 2026-09-13.
+
+25. **If the five-group popup collapse is built: split "Flow and pressure" at the input/result
+    seam the code already draws.** `BAND_NODE`/`RESULT_NODE` (`js/looped-network.js:11898-11929`)
+    and the `if (lastSolveResult...)` guard around Head/Pressure (`:35232-35236`) already separate
+    typed inputs from solved results; a merged group would be the popup's first case of a typed and
+    a computed number sharing one visual container, against the suite's own stated rule that the
+    two are different kinds of thing. Costs nothing — the split is already coded, only unread by
+    the grouping brainstorm. See journal, 2026-09-15.
+
+26. **If built: no group ever starts collapsed, matching `multiSection()`'s own ruling one function
+    away** (`js/looped-network.js:36248`, Tom: *"OPEN, ALL OF THEM ... collapsing is something the
+    reader does, never the default"*). A default-closed heading on a 16-20 row popup is a second
+    instance of the exact failure this seat was hired over — a bold word with a caret is easy to
+    mistake for a static label the first time a reader meets it. A remembered-per-group collapse
+    (matching `customPropBox()`'s per-key `cpOpenKeys`) is a legitimate LATER phase once real
+    dwell/scroll evidence names a specific group nobody opens — never a shipped default. See
+    journal, 2026-09-15.
+
+27. **If built: coordinates (X/Y) must stay visually first inside "Dimensions" and must be
+    EXEMPT from any future remembered-collapse preference, the way Credits is exempted from the
+    Settings-box filter (`data-set-nofilter`, `js/looped-network.js:30284`).** Sue's argument for
+    X/Y at popup slots 2-3 — a transposed coordinate balances hydraulically and is invisible to the
+    solver until a GIS overlay or as-built check — is defeated by a collapsed or buried Dimensions
+    group exactly as it would have been defeated by the old scattered layout. Today `coordFields()`
+    is called LAST in both render functions (`:35264`, `:36117`), not grouped with Elevation/
+    Length/Diameter at all, so folding it into Dimensions is a real, overdue tidy — but only if the
+    group can never start closed and coordinates lead it. See journal, 2026-09-15, §5.
+
+28. **Ask Declan before shipping any collapsible group: a `<details>` element is itself a keyboard
+    tab stop, so five sections is five NEW stops per popup visit regardless of open/closed state** —
+    the same shape of cost he measured against coordinate slots 2-3 (800 stray keystrokes over 400
+    junctions). This seat cannot weigh entry-volume cost and should not guess at it. See journal,
+    2026-09-15.

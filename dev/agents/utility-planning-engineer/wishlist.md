@@ -23,6 +23,24 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-09-15 — not a want, a ruling request: the five-group property collapse, answered
+
+Not a row — Tom asked this seat by name whether his five-group popup collapse (ID / Dimensions /
+Flow and pressure / Quality / Custom) matches how an engineer reads an element. Full reasoning:
+journal, 2026-09-15 entry. Short form: **"Flow and pressure" mixes typed inputs with solved
+results, which is the exact conflation `js/looped-network.js`'s own `BAND_NODE`/`RESULT_NODE` split
+already forbids in the sibling Find-panel surface** — not a style disagreement, a rule this project
+already wrote down being proposed to break in a second place. "Dimensions" has a quieter version of
+the same defect: X/Y is identity (my own Task 674 answer, same day), Length/Diameter are design, and
+folding them into one word reads as a drafting category rather than an engineering one. **My own
+finding, the one I'd stand behind most: my slot-2/3 argument for coordinates does NOT survive a
+default-collapsed Dimensions group** — the whole point of slot 2/3 was that a transposed X/Y is on
+the skim, and a collapsed group puts it back behind a click. Recommended fix: keep X/Y outside any
+collapsible group, split Dimensions into a small always-open Location and a collapsible Size, or
+fold Location into ID. Shut/Included: belongs beside ID as state, not with flow — currently sits in
+neither home in the actual popup order (OBSERVED, `closedField()`/`activeField()` positions), so this
+is a real open question and not a status quo I am defending.
+
 ### 2026-09-08 — not a want, a ruling request: the thirteen `lpn_fitting_*` names, answered
 
 Not a row — Tom asked by name for a specification check on the thirteen EPANET Table 3.3 fitting
