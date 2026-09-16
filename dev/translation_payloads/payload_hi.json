@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1871,
-        "delta_key_count": 2,
+        "expected_key_count": 1880,
+        "delta_key_count": 11,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -527,11 +527,29 @@
     },
     "keys_to_translate": {
         "lpn_field_northing_abbr": "N",
-        "lpn_field_easting_abbr": "E"
+        "lpn_field_easting_abbr": "E",
+        "lpn_library_import": "Import from a project file",
+        "lpn_library_import_tip": "Choose another project file and copy what its library holds into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them."
     },
     "keys": {
         "lpn_field_northing_abbr": "N",
-        "lpn_field_easting_abbr": "E"
+        "lpn_field_easting_abbr": "E",
+        "lpn_library_import": "Import from a project file",
+        "lpn_library_import_tip": "Choose another project file and copy what its library holds into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them."
     },
     "key_context": {
         "lpn_field_northing_abbr": {
@@ -563,6 +581,150 @@
                     "key": "lpn_field_text_size",
                     "value": "आकार गुणक",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_curve_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_needs_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "इस फ़िटिंग सूची का उपयोग {count} पाइप करते हैं: {ids}। इसे हटाने से पहले उन्हें इससे अलग करें।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "मात्रा",
+                    "english": "Quantity"
                 }
             }
         }
