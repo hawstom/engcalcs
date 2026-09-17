@@ -52,7 +52,8 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn out; },\n" +
 	"\t\trestores: function () { return switchRestoreCount; },\n" +
 	"\t\tmiss: function () { return keptLayoutMiss; },\n" +
-	"\t\tsetKeepLayout: function (v) { keepLayoutEnabled = v; }"
+	"\t\tsetKeepLayout: function (v) { keepLayoutEnabled = v; },\n" +
+	"\t\tsegIndexBuilds: function () { return linkSegIndexBuilds; }"
 );
 
 let fails = 0;
@@ -213,6 +214,27 @@ console.log('\n--- a restored layout equals a computed one, label by label ---')
 		rebuiltDiffer2.length + ' of ' + keys.length + ' labels move on a switch without the keep');
 	ok('...and with the keep, every label comes back exactly where it was', !moved.length,
 		moved.length + ' changed');
+}
+
+// ================================================================================================
+// **A REBUILD IS LINEAR IN THE PIPES, NOT QUADRATIC.** `linkSegIndex()` indexes every link's
+// segments; unheld it rebuilds that index on every call, and `buildDom()` asks for it once per pipe
+// through `layoutLinkLabel()`. Measured on Tom's machine before the hold: `links 1,156 ms` of a
+// 1,414 ms switch, 9.7 ms a pipe on a 119-pipe drawing; after, 16-30 ms here for the same work.
+// A stopwatch cannot assert that safely on another machine -- the COUNT can.
+// ================================================================================================
+console.log('\n--- a rebuild indexes the pipes once, not once per pipe ---');
+{
+	const fs3 = require('fs');
+	L.openProject(second);
+	L.applySaved(JSON.parse(fs3.readFileSync(
+		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8')));
+	const links = L.getDoc().links.length;
+	const before2 = L.segIndexBuilds();
+	L.buildDom();
+	const built = L.segIndexBuilds() - before2;
+	ok('building a ' + links + '-pipe drawing builds the segment index a handful of times',
+		built <= 4, built + ' index builds for ' + links + ' pipes');
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

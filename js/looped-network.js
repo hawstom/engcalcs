@@ -442,9 +442,12 @@ var EngCalcs = EngCalcs || {};
 			return { key: l.id, pts: linkPointList(l) };
 		}));
 	}
+	// Counted so a harness can see the QUADRATIC shape rather than a slow stopwatch: unheld, this
+	// index is rebuilt once per caller, and `buildDom()` has one caller per pipe.
+	var linkSegIndexBuilds = 0;
 	function linkSegIndex() {
-		if (!linkSegDepth) { return buildLinkSegIndex(); }
-		if (!linkSegIndexHeld) { linkSegIndexHeld = buildLinkSegIndex(); }
+		if (!linkSegDepth) { linkSegIndexBuilds++; return buildLinkSegIndex(); }
+		if (!linkSegIndexHeld) { linkSegIndexBuilds++; linkSegIndexHeld = buildLinkSegIndex(); }
 		return linkSegIndexHeld;
 	}
 	function beginLinkGeomHold() { linkSegDepth++; }
@@ -7956,6 +7959,24 @@ var EngCalcs = EngCalcs || {};
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		labelsByLinkAnchor = {};
+		// **ONE CANVAS MEASUREMENT AND ONE SEGMENT INDEX FOR THE WHOLE REBUILD** (Task 680, and it
+		// is the single biggest thing in a project switch). `relayoutLabels()` and
+		// `refreshLabelText()` have always opened these holds; this function never did, and it is
+		// the one that builds every element on the drawing.
+		//
+		// Unheld, `linkSegIndex()` rebuilds the index of EVERY link's segments on every call, and
+		// `layoutLinkLabel()` asks for it once per link through `alignedSideFor()` -- so a rebuild
+		// was quadratic in the number of pipes. `mapBox()` is the other half: unheld it reads
+		// `svg.clientWidth` each time, which is a LAYOUT READ taken between two appends, so the
+		// browser lays the whole half-built drawing out again to answer it.
+		//
+		// **MEASURED ON TOM'S OWN MACHINE, geographic Net3, 119 pipes: `links 1,156 ms` of a
+		// 1,414 ms switch -- 9.7 ms per pipe.** The drawing is the same either way: a hold changes
+		// WHEN the answer is read, not what it is, and both are pure functions of a drawing that is
+		// not moving while this runs.
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
 		// **?debug=perf BREAKS THIS FUNCTION OPEN** because the browser said it was 3,389 ms of a
 		// 4,628 ms project switch (Tom's own readout, 2026-09-16, switching into a geographic Net3)
 		// while the text measuring it used to be blamed for was down to 334 calls. Four things
@@ -7977,6 +7998,7 @@ var EngCalcs = EngCalcs || {};
 				updateLabelGeometry(doc.labels[i].id);
 			}
 		});
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
 		perfDebugTime('  labelPass', function () {
 			if (!labelPassDeferred) { refreshLabelText(); }
 		});
