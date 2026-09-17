@@ -239,6 +239,15 @@ after that**, measured over five consecutive switches; a re-layout at an unchang
   the right question to answer, and the answer is either to keep each project's drawing and
   hide/show it (memory against time) or to make the per-element build cheaper. **Not attempted; his
   call.**
+- **THE SOLVE AND THE LABEL LAYOUT ARE KEPT PER TAB SINCE 2026-09-16 (Task 680 phase 1), and the
+  switch is 38% faster** -- 636 ms to 395 ms median in real Chrome on his own drawing and zoom, with
+  the label pass running ZERO times and asking the browser for ZERO measurements. Tom: *"in the name
+  of doing the right thing, the solve should be saved, as should the placements."*
+  **TWO THINGS THE BUILD TAUGHT:** the keep must be pinned to the BYTES `saveToStorage()` wrote
+  (serializing the same document twice gives different key order and never matched), and **a plain
+  rebuild does not reproduce the layout it had -- 214 of 216 labels move on a switch away and back**,
+  measured with the keep off. That is a standing defect nobody had seen; the keep hides it and does
+  not explain it.
 - **`?debug=perf` NOW COVERS THE SWITCH** -- per-phase times plus `label passes` and `label
   measurements` counts -- so the next round is measured in the browser that is actually slow rather
   than guessed at. `dev/lpn-spike/label-measure-cache-harness.js` holds the counts.
