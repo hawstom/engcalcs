@@ -1363,6 +1363,12 @@ var EngCalcs = EngCalcs || {};
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
+	// **WHAT INSIDE HERE COSTS TOM A SECOND.** `lk:layout` is 1,000-1,530 ms for 119 pipes on his
+	// machine and 16 ms on this one -- 60x -- while building the NODES, which writes just as much
+	// DOM, is only 1.5x slower there. So the difference is something this function does and that
+	// one does not, and it is not a layout read: there is not one in the whole chain. Timed in
+	// three parts, and the stations are COUNTED, because the only input that varies with the view
+	// is how many copies of a label a long pipe carries.
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
@@ -1373,8 +1379,13 @@ var EngCalcs = EngCalcs || {};
 		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded
 			|| !!le.hiddenCrossed);
 		var single = linkLabelStations(l).length === 1,
-			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
-		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
+			stations = perfDebugAccum('  lkL:stations', function () {
+				return single ? [le.alignedAlong] : drawnLinkLabelStations(l);
+			}), i;
+		perfDebugCount('stations', stations.length);
+		perfDebugAccum('  lkL:repeats', function () {
+			ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
+		});
 		// The link's own elements take the FIRST DRAWN station, not a fixed one: with every copy
 		// pickable they are interchangeable, and a chain whose first stations are off-screen still
 		// renders through the element bbox() and the popup know about.
@@ -1386,10 +1397,16 @@ var EngCalcs = EngCalcs || {};
 		// which is every case except a chain that had to step round something.
 		var sides = le.stationSides || [];
 		le.forceSide = sides[0];
-		layoutLinkLabelAt(l, le, le, stations[0], true, single);
+		perfDebugAccum('  lkL:place', function () {
+			layoutLinkLabelAt(l, le, le, stations[0], true, single);
+		});
 		for (i = 1; i < stations.length; i++) {
 			le.repeats[i - 1].forceSide = sides[i];
-			layoutLinkLabelAt(l, le, le.repeats[i - 1], stations[i], false, false);
+			perfDebugAccum('  lkL:place', (function (k) {
+				return function () {
+					layoutLinkLabelAt(l, le, le.repeats[k - 1], stations[k], false, false);
+				};
+			})(i));
 		}
 	}
 	// Double-click-to-reset: clears a manually-dragged label's offset entirely (n.lx/n.ly back to
@@ -1797,7 +1814,7 @@ var EngCalcs = EngCalcs || {};
 	// between two DOM writes, so each one forces a synchronous layout of the whole drawing -- the
 	// Task 440 finding, in a place that rebuilds every label rather than re-reading them. Counted
 	// only while the instrument is armed, so a shipped page pays one comparison per label.
-	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0 };
+	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0 };
 	function perfDebugCount(what, n) {
 		if (perfDebugOn()) { perfDebugCounts[what] += (n === undefined ? 1 : n); }
 	}
@@ -1872,11 +1889,13 @@ var EngCalcs = EngCalcs || {};
 		var line = '#' + perfDebugN + ' [' + build + ']  ' + perfDebugRows.join('  ') +
 			'  | label passes ' + perfDebugCounts.labelPasses
 			+ '  | label measurements ' + perfDebugCounts.measures
+			+ '  | pipe label copies ' + perfDebugCounts.stations
 			+ '  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
 			'  | s ' + (state.s ? state.s.toExponential(3) : '?') +
 			'  | hold ' + comp;
 		perfDebugRows = [];
 		perfDebugCounts.measures = 0; perfDebugCounts.labelPasses = 0; perfDebugCounts.elements = 0;
+		perfDebugCounts.stations = 0;
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
@@ -23505,7 +23524,33 @@ var EngCalcs = EngCalcs || {};
 	// painted, so a file we can silently reconnect never flashes a warning about itself. A handle
 	// whose project has since been closed is DROPPED rather than restored, or the store grows forever
 	// and closing a project never really lets go of its file.
+	/**
+	 * ---- `?debug=nofiles` : BOOT WITHOUT TOUCHING THE SAVED FILE HANDLES ------------------------
+	 *
+	 * Tom, 2026-09-16: *"Reloading the page crashes Google Chrome"* -- the whole browser, three
+	 * times, on a stable Chrome 153.0.8010.37 with an Intel HD 620. The crash dumps say
+	 * `ptype: browser`, which a WEB PAGE CANNOT CAUSE: the worst a page can do to itself is lose its
+	 * own renderer. So it is a browser bug -- and this function is the best candidate for what
+	 * pokes it, because everything it touches lives in the browser process rather than in ours: the
+	 * File System Access handles, the IndexedDB store they are kept in, and `queryPermission()` on
+	 * each of them. It runs on EVERY load, which is the trigger he describes, and his other symptom
+	 * -- a mouse cursor lost in the file PICKER -- is the same subsystem from the other end.
+	 *
+	 * **THIS IS A DIAGNOSTIC AND AN ESCAPE HATCH, NOT A FIX**, and it is a URL parameter for the
+	 * same reason every other `?debug=` switch is: it exists to answer one question. With it the
+	 * page opens exactly as it always has apart from the file link -- every project is in
+	 * `localStorage` and none of them needs a handle to be read, drawn or edited. What is lost is
+	 * the live link to the file on disk, which one press of Open restores.
+	 */
 	async function restoreHandlesOnBoot() {
+		// `typeof` because this function is reachable from a harness that loads the module without
+		// the page's debug plumbing -- handle-restore-harness.js is exactly that.
+		if (typeof debugOn === 'function' && debugOn('nofiles')) {
+			if (typeof console !== 'undefined' && console.log) {
+				console.log('[lpn] ?debug=nofiles: saved file links not restored this load.');
+			}
+			return;
+		}
 		var handles = await recallHandles();
 		var keys = await recallHandleKeys();
 		if (!handles || !keys || handles.length !== keys.length) { return; }
