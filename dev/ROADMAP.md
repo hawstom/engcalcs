@@ -73,6 +73,51 @@ the block.
     SVG rasterisation under the compensation transform, or the 1.7 MB backdrop data URI.
   - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
     re-init sites are off the settle path; the label collision grid is bounded since Task 668.
+- 75|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
+  Tom, 2026-09-16, on a five-second switch into a geographic Net3: *"why aren't we storing these
+  things when we switch away?"*
+  - **THREE THINGS COULD BE KEPT AND ONLY TWO ARE.** The DOCUMENT is in `localStorage`, and the VIEW
+    is already kept per tab in memory (`tabViews`, keyed on the project id) -- so the precedent for
+    per-tab retention exists and is two lines long. What is thrown away is the DRAWING and the SOLVE:
+    `buildDom()` empties four layers and rebuilds every shape, and `refreshAllFromDocument()` sets
+    `lastSolveResult = null` on the way in. Nothing decided that; the library and its tabs were built
+    on machinery that had only ever held one document.
+  - **THE PRICE OF KEEPING IT IS MEASURED AND IT IS SMALL** (real Chrome, 2026-09-16, driven over the
+    DevTools protocol): **Net3-Novato's whole drawing is 1,931 shapes and about 2 MB of heap**;
+    Net1's is 317 shapes and about 1 MB. Five big projects open at once is on the order of 10 MB.
+    **Note the two counts are different questions**: a switch CREATES about 8,400 elements and KEEPS
+    1,931, because the label pass builds and discards rows as it goes.
+  - **THE PRICE OF NOT KEEPING IT, on his machine:** `buildDom` 3,389 ms of a 4,628 ms switch. Split
+    inside it, measured here at 6x this machine's speed and identical in shape: label pass 56%,
+    building the pipes 29%, the nodes 14%.
+  - **WHAT IT COSTS TO BUILD is not the memory, it is that one drawing becomes several**: four layers
+    and three element indexes (`nodeEls`, `linkEls`, `labelEls`) are singletons today, and every path
+    that walks "the" drawing has to learn which one it means. A hidden subtree still costs style
+    work, so the retained ones want `display:none` rather than visibility.
+  - **A SMALLER FIRST STEP THAT IS ALMOST FREE: keep the SOLVE.** A result belongs to a document, the
+    document has not changed while you were away, and the signature machinery that answers "has this
+    changed" already exists for the dirty asterisk. That alone does not fix the delay -- Tom
+    measured that turning auto-run off changes nothing -- but it is waste with a cheap remedy.
+
+- 75|681| **Economize the label layout: it is half the cost of a project switch.**
+  Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
+  - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
+    switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
+    306 ms.
+  - **THE MEASURING IS ALREADY FIXED AND IS NOT WHAT IS LEFT.** `measuredTextWidth()` banks every answer
+    on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
+    is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
+    and DOM writes, not layout reads.
+  - **THREE CANDIDATES, none measured yet.** (a) The pass runs more than once per switch -- 2 to 4
+    times, the first at the OUTGOING project's scale, which the view restore then supersedes; doing
+    it once, after the view is settled, is the obvious saving and the one to measure first.
+    (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
+    approximation before any search, and we have the search without it. (c) A label whose content
+    and scale have not changed since the last pass could keep its placement, which is the same
+    "keep what you already worked out" argument as Task 680.
+  - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
+    `labelPass` inside `buildDom` and a label-measurement count.
+
 - 75|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
