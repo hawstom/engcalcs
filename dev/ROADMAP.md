@@ -196,20 +196,6 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
-- 100|684| **A thematic map with labels off still lays the labels out.**
-  Tom, 2026-09-17: *"Thematic map (labels off) should not do any label calculations. Off should
-  mean off. Consent, people!"*
-  - **HALF OF IT WAS ALREADY TRUE, which is what made the rest invisible.** `onZoomChanged()` and
-    `scheduleReshed()` both check `dataLabelsHidden` and skip the pipeline, with a comment saying
-    why. But `dataLabelsHidden` is read at only those two places, while `relayoutLabels()` alone has
-    24 call sites -- so a rebuild, a settings change, a solve, a scenario switch and a project-tab
-    switch all still compose, measure and collision-relax annotation that `lpn-labels-hidden` is not
-    drawing.
-  - **THE TRAP IS THAT "LABELS" NAMES TWO THINGS HERE.** The user's own Text objects are content and
-    are NOT suppressed (Task 428); generated annotation is. Work the Text objects need must not be
-    skipped with the rest.
-  - `georefActive()` is the second suppressor and gets the same treatment (Task 145).
-
 - 75|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
