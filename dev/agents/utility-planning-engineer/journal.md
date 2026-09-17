@@ -27,6 +27,107 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-17 — Sue: perpendicular service connections, answered (Task 247, branch `feat/customer-demands`)
+
+Tom, having tested the branch: the initial connection should be perpendicular by default, only an
+intentional drag should change it, and asked whether a non-perpendicular connection should be
+offered AT ALL. Answered from this seat, checked against the worktree code, not against memory.
+
+- **OBSERVED, `feat/customer-demands` worktree, `js/looped-network.js:7669-7681`
+  (`meterOffsetFor`, checked 2026-09-17):** the DEFAULT placement — both the two-click gesture and
+  the one-click "attach directly on the pipe" shortcut — is already perpendicular by construction.
+  `nx, ny` is the unit NORMAL of the pipe segment (`-dy/len, dx/len`), and the offset is that normal
+  scaled by a fixed 18 px (`LPN_METER_OFFSET_PX`, line 7880). So half of Tom's ask is already true
+  today: nothing about the birth of a meter can produce an oblique stub. What he found is the OTHER
+  half — dragging the meter box afterward (`js/looped-network.js:27568-27583`, `drag.type ===
+  'customer'`) writes `cm.x = pos.x - hitm.x; cm.y = pos.y - hitm.y` with `pos` wherever the pointer
+  is, unconstrained to the normal — a free 2D offset, exactly like a Text label's leader offset,
+  which is the precedent the code comment at 7945 cites on purpose. That is the gap: birth is
+  perpendicular, drag is unconstrained, and nothing snaps a small deviation back.
+- **OBSERVED, `js/looped-network.js:7939-7952` (`customerAttachPoint`/`customerPoint`/
+  `customerNodeId`), checked 2026-09-17:** the angle of the stub is drawing-only. The junction a
+  customer's demand lumps at is `EngCalcs.lpnCustomerNode(c, link)`, a function of `link` and `t`
+  (arc-length station) alone — `c.x`/`c.y`, the offset that sets the stub's angle, is read by
+  nothing but `customerPoint()`, which feeds only the box's screen position. **Answering the first
+  question directly: the angle carries no engineering meaning at all, not even cartographically
+  approximate meaning, because nothing downstream reads it — not the solve, not the `.inp` export
+  (§3 of `dev/customer-demands.md`: only `link`, `t` and the demand numbers travel), not the
+  lumping rule.** It is pure decoration on top of an already-complete fact (which pipe, how far
+  along it).
+- **CITED, secondary (search-engine synthesis across several municipal water standards surfaced
+  2026-09-17, not independently confirmed against a primary PDF — this session's WebFetch could not
+  render any of the PDFs it found, the same tool limitation recorded elsewhere in this journal for
+  the EPA manual and the Crane/AWWA specs):** at least one municipal water standard states plainly
+  **"Services shall be installed perpendicular to the main from the tap to the meter pit within the
+  right-of-way."** This is not universal — I did not find and do not claim a single national
+  standard — but it is consistent with ordinary practice: a corporation stop is tapped
+  perpendicular into the main because that is the simplest, strongest tap geometry (shortest
+  drilled path, no bending stress on the corp stop), and every standard detail sheet I could read
+  the thumbnail of draws it that way. **So the real-world object this symbol represents is
+  overwhelmingly perpendicular at the main, as a matter of installation practice, not merely as a
+  drafting convention this suite invented.**
+- **My answer to the actual question — should a non-perpendicular connection be offered at all:
+  no, not as a free hand-drag.** Two independent reasons converge, and either alone would be
+  enough: (1) the angle carries zero information the model, the export or the lumping rule ever
+  reads, so allowing it to vary buys nothing computational; (2) the thing it draws is, in the field,
+  actually perpendicular the great majority of the time, so an oblique stub is more likely to read
+  as a FALSE CLAIM about how the tap is really laid than as an intentional design choice the
+  engineer made. A feature that can only mislead or do nothing is a feature I would remove, not
+  guard with a "the user meant to drag it" excuse.
+- **The one case that would change my mind, and it is real but is not an argument for a free
+  drag.** `dev/customer-demands.md` §4 already names the actual hard case: DENSITY — a dozen
+  services along one short main segment, whose perpendicular stubs and account-number labels
+  collide. That is a genuine reason a stub's rendered angle might need to move a few degrees off
+  true perpendicular — but the right fix is the same one this page already has for a Text leader
+  (`lpn-collide.js`, `snapLeaderOffset`): an AUTOMATIC, system-computed nudge to resolve a
+  collision, snapping back the instant it is no longer needed, never a value the user sets by
+  dragging. I would not call that "offering a non-perpendicular connection" — the user never chose
+  an angle, the renderer chose a small one to keep two labels apart, and the underlying `t`/`link`
+  and the demand accounting are untouched either way.
+- **A corner lot or a service crossing to the far side of a street is NOT a case that changes my
+  answer, and I want to be honest about why I considered and set it aside.** In the real world such
+  a lateral is genuinely not straight-in perpendicular past the corp stop — it doglegs to the curb
+  stop and the meter. But `dev/customer-demands.md` (Tom's own ruling, §"Symbol sizes") has already
+  settled that this symbol is schematic — a 2-4 px dot at system zoom, holding its screen size past
+  1000 m, explicitly NOT a survey plan. A schematic symbol that shows a customer belongs to a
+  specific pipe at a specific station does its whole job; it was never going to show the actual
+  dogleg route of a real lateral, corner lot or not, so the corner-lot case does not argue for
+  letting the STUB'S angle vary — it argues for nothing this symbol is trying to be.
+- **At this suite's own scale: per-service angle is not something anybody sets by hand, and I
+  would say so plainly rather than hedge.** `dev/customer-demands.md`'s own Tom-ruled shape (a
+  meter carries a Type and a Count, "forty-two single-family residential is one line, one symbol")
+  already assumes services are aggregated, not drawn one-by-one, past a handful. A free-angle drag
+  is a control built for the twelve-node subdivision drawing where a designer is placing meters by
+  hand one at a time — it is invisible at the count-of-42-per-symbol scale this suite's own design
+  doc already expects for anything past a small site, and it would never be exercised at a real
+  utility's own thousands-of-services scale because nobody would ever draw that many individual
+  symbols in the first place.
+- **Industry check, honest and narrow: I did not find, and do not believe exists, a market
+  convention of drawing and manually angling individual customer-service stubs in a hydraulic
+  model at all.** The GIS-based demand-allocation tools I have read about in earlier passes
+  (WaterCAD/InfoWater's Demand Allocation Manager, parcel-polygon-to-node join — my own
+  2026-08-25 wishlist row 1990s-citation trail) assign demand to a node by a spatial join with no
+  drawn service line and no angle to set at all. **The whole drawn-stub-with-a-draggable-angle
+  gesture is this suite's own invention, following Tom's own site-plan-drafting instinct
+  (`dev/customer-demands.md`: "I think you pick a point, it draws a meter rectangle... it connects
+  perpendicularly"), not something borrowed from a vendor I can cite** — which is consistent with
+  his own ruling in the same document to stop surveying the market and go by our own wits. I flag
+  this so a later invocation does not go looking for an industry precedent that, on my own read,
+  is not there to find.
+- **On the two related asks, briefly, because Tom invited comment: snap-to-node at close range
+  changes nothing hydraulically** — `EngCalcs.lpnCustomerNode()` already resolves to the nearer end
+  by arc length, so a meter dropped a hair's breadth from a junction already lumps there; snapping
+  the DRAWING to match what the arithmetic already says is a legibility fix, not a modeling
+  question, and I have no objection from this seat. **The small-solid-dot-versus-rectangle and
+  house-versus-meter-box symbol choices are Ida's question, not mine** — from an engineering
+  standpoint a meter box is the more literally correct glyph (it is the billing device that
+  actually sits there), but which glyph a reader parses fastest at a glance is a visual-hierarchy
+  question I am not equipped to rank.
+
+— Sue
+
+---
+
 ## 2026-09-08 — Sue: the thirteen `lpn_fitting_*` names — English is Crane/EPANET catalogue prose, not vocabulary; Turkish was NOT over-cautious on the term it flagged that matters; a multilingual valve-terminology standard exists but does not cover our language set
 
 Tom asked by name whether the thirteen EPANET Table 3.3 fitting names are the right ENGLISH terms,
