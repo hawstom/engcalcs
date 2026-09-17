@@ -803,3 +803,141 @@ two proposals under review here (snapping, per-level caching) do not touch that 
 finding, and I would still rank it above both.
 
 — Franco
+
+## 2026-09-17 — Task 247 (Customer connection angle, snap-to-node, dot symbol): checked against `feat/customer-demands`
+
+Tom, testing the branch: *"The initial default connection to pipe needs to be perpendicular. Only
+an intentional drag away from that should change it. In fact, I am not sure we should offer a
+non-perpendicular connection to link. Check with Mary, Sue, and Franco."* He also wants a close
+connection to SNAP to the nearest node, and the customer drawn as a small solid dot with a
+building/house symbol rather than a rectangle/meter-box. Answering from my own seat, read against
+the worktree at `/home/haws/webdev/worktrees/feat-customer-demands/engcalcs`, checked 2026-09-17
+(read-only, per instruction).
+
+### What the branch does today, grounding before opinion
+
+**OBSERVED**, initial placement is ALREADY perpendicular by construction — `meterOffsetFor()`
+computes the pipe segment's own normal vector and offsets the meter along it
+(`js/looped-network.js:11669-11680`, worktree). So the "leaning stub" case Tom is reacting to is not
+the default placement; it can only exist after a deliberate drag.
+
+**OBSERVED**, once placed, a drag is completely unconstrained — `drag.type === 'customer'` writes
+`cm.x = pos.x - hitm.x; cm.y = pos.y - hitm.y` from the raw pointer position with no angle
+constraint at all (`js/looped-network.js:27568-27584`, worktree). Nothing stops a stub from ending
+up at any angle, including nearly parallel to the main, by accident.
+
+**OBSERVED**, sizes at default settings: a junction dot is a fixed 7 screen px diameter
+(`settings.symbolSize: 7`, `js/looped-network.js:4650`), fixed regardless of zoom. A customer's
+meter box is HYBRID — 2 m real-world diameter, floored at 3 screen px when zoomed out
+(`LPN_METER_REAL_M = 1` half-width, `LPN_METER_MIN_PX = 1.5` half-width,
+`js/looped-network.js:7873-7874`, `meterHalfWorld()` at 7906-7912). So at any wide/system-level
+view the customer symbol is already SMALLER than a junction (3 px vs 7 px), before shape or colour
+are considered.
+
+**OBSERVED**, there is already a precedent on this exact page for "close counts as the same
+target": a tap in add-node mode that lands near an existing node reopens that node instead of
+creating a duplicate (`nearestNodeNearScreen()`, `js/looped-network.js:27186-27196`, comment:
+*"a miss that lands on what you just placed opens it... refusing to place a second node on top of
+an existing one and then doing NOTHING AT ALL is worse"*), and the add-meter tool does the same
+thing for an existing meter (`js/looped-network.js:27200-27206`). Snap-on-proximity is not a new
+idiom for this page; it is the page's standing answer to "a fat finger landed close to something
+real."
+
+### Q1 — does the angle of a service line tell me anything in the street
+
+**No, and I want to be specific about why, because the honest answer is narrower than "angle is
+noise."** What I actually use a stub for is two things: (a) is it connected to a pipe at all — the
+branch already says so out loud when it is not (`⚠ This meter is not connected to a pipe...`,
+`js/looped-network.js:37450`) — and (b) WHICH pipe it touches, which the stub's endpoint on the
+main answers regardless of the angle it takes getting there. I am not reading the stub's angle as a
+fact about the ground; I am reading its two endpoints. A schematic service line on this kind of map
+has never, in my twenty years, been drawn to survey angle — the symbol says "this meter is fed from
+this main," not "the buried pipe runs exactly this compass bearing," and nobody in the field expects
+the second claim from a hydraulic model's map.
+
+**The one case where an angle WOULD carry real information — the true lateral that crosses under
+the street to serve the far side — is not actually served by letting the drag angle vary.** What
+tells me that case is the meter's POSITION (it sits on the opposite side of the street from where
+its main runs), not the compass angle of the line connecting it. A perpendicular stub to a meter
+correctly placed on the far side of the street already reads as "this one is different" just from
+where the dot sits, with no angle cue needed at all.
+
+### Q2 — would uniform perpendicular help or hurt reading
+
+**Help, and by a wide margin — the row-of-parallel-stubs pattern is the useful case, not the risky
+one.** A street of forty perpendicular stubs reads instantly as "one service per address along this
+main," which answers my own top question (which asset is this / what serves it) faster than reading
+any individual label would. The one thing that pattern could hide — the genuine crossing lateral —
+is not hidden by making the OTHERS perpendicular; it is made MORE visible, because it is now the one
+dot sitting on the wrong side of its own street with everything else consistent around it. A field
+of already-random angles (today's unconstrained drag) is the arrangement that actually hides the
+interesting exception, by making every stub equally exceptional-looking.
+
+**My answer to Tom's real question — should any non-perpendicular connection be offered at all —
+is no, for my seat's purposes.** I found no field-reading task this angle serves that the meter's
+POSITION does not already serve better. I would not build a UI affordance for "drag to a custom
+angle" at all; I would let a drag move the meter further from or closer to the main, and move it
+along the main (changing `t`), and change which side of the pipe it is on — all of which change
+useful facts (station, side of street) without ever needing the connecting line itself to leave
+perpendicular.
+
+### Q3 — snap to nearest node on a phone
+
+**Expected, and a snap I did not ask for is a problem only if it is silent or hard to undo — neither
+applies here.** Tapping near a junction on a phone, under a thumb, is imprecise by construction; the
+page already has the convention (Q-grounding above) that "close enough" means "you meant that one."
+A customer that snaps onto a node when dragged very close to it matches that convention and matches
+what I would expect from any map app. The one thing I would ask for, consistent with this suite's
+own undo/reversibility rule: the snap should be visually obvious the instant it happens (the dot
+audibly "catches," the way the existing near-node reopen already commits to a real, visible action)
+and a further small drag should release it — I have not checked whether the branch implements
+release-by-dragging-away, and that is the one behavior I would want confirmed before shipping, not
+a reason to decline the feature.
+
+### Q4 — dot vs rectangle, house/building icon vs meter box, at the sizes this page actually draws
+
+**A small solid dot is the right call; a house/building icon is not, at these sizes, and I would say
+so plainly.** **CITED**, Esri's own cartography guidance states a screen-display minimum symbol size
+of about 10 px for a SIMPLE symbol, and separately that "there is a barrier size at 20×20 pixels,
+below which restrictions become so important that they require different design work" for iconic
+shapes — Imhof's traditional figures cited in the same literature put an iconic (detailed) symbol's
+minimum at roughly 2.5x a simple geometric shape's, because the extra ink that makes a house read as
+a house needs room the smallest cases here do not have (Esri ArcGIS blog, "Guidelines for minimum
+size for text and symbols on maps"; summarized findings from the Cartographic Journal literature on
+minimum legible symbol size, both retrieved via web search 2026-09-17). **The customer symbol on
+this page draws at 3-7 px in the ordinary zoomed-out case** (my own OBSERVED figures above) — well
+under even the 10 px floor for a SIMPLE shape, let alone the 20 px floor an iconic house glyph would
+need to read as a house rather than as a smudge. At arm's length, in sunlight, on a phone, a house
+icon at that size will not look like a house; it will look like a slightly different-coloured dot,
+so choosing it over a plain dot buys nothing for legibility and costs a small amount of rendering
+complexity for no return I can see from this seat.
+
+**Is a dot distinguishable from a junction at these sizes?** Yes, on the evidence already in the
+branch, by two cues that do not depend on shape at all: size (3 px floor vs the junction's fixed
+7 px — the customer is smaller, not larger, which is the correct relative weight for a smaller-
+consequence asset) and POSITION (a junction sits directly on the pipe; a customer sits off it,
+joined by a short perpendicular stub). The stub is what actually carries the "this is a service, not
+a network node" information at a glance, more than either symbol's shape — which is also why keeping
+the stub's presence and its endpoint-on-the-main is more important to my reading than whatever
+shape fills the dot. **One caution to flag if the dot ships:** do not let its floor size grow to
+meet or exceed the junction's floor size for visual "fairness" or balance — the size gap is doing
+real identification work today and should stay.
+
+**What I would NOT weigh in on:** whether "building/house" is the right visual METAPHOR versus a
+meter symbol is a meaning question (does the dot mark the meter or the structure) more than a
+legibility one, and it brushes against a concern that is really Ida's seat (icon meaning, visual
+hierarchy) more than mine. I will only say the field-relevant half: at the sizes actually drawn here,
+no icon choice reads as its intended picture, so the meaning question is close to moot for how the
+map actually looks in the street — a small dot in a consistent colour will read exactly as clearly as
+a small house glyph will, because neither one is big enough to show its shape.
+
+### The one thing I would change first
+
+**Constrain the drag, not just the default.** Perpendicular-by-default already ships
+(`meterOffsetFor()`); the gap is that a drag afterward can put the stub at any angle with nothing
+stopping it. I would rather see the drag limited to moving the meter along the pipe (station),
+across it (distance from main), and to either side, than see a free x/y drag that can accidentally
+produce the very leaning-stub picture Tom is reacting to. That is a smaller, cheaper change than
+adding a house icon, and it is the one that actually answers what he tested.
+
+— Franco
