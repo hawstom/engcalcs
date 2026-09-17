@@ -16,12 +16,39 @@
         "pre-push stamp. That distinction is the whole design. Do not list everything; a gate that",
         "stops all work is a gate somebody switches off."
     ],
+    "_protected_comment": [
+        "EVERY FEATURE BRANCH ALIVE TODAY IS LISTED, and until 2026-09-17 only five were.",
+        "",
+        "The six feat/* branches built on 2026-09-16 were held back by a SENTENCE in",
+        "dev/session-handoff.md -- 'SIX FEATURE BRANCHES ARE BUILT AND AWAIT HIS BROWSER PASS.",
+        "NONE MAY MERGE' -- and by nothing else. That is prose holding a rule, which is the exact",
+        "arrangement this file exists because of: on 2026-09-13 six capability merges landed on",
+        "master, every one of them green, because a session read its own passing build as the",
+        "answer to 'is this done'. A session that skips the handoff -- which has happened, and is",
+        "why that file grew a STOP header -- would have found nothing in its way.",
+        "",
+        "SO THE RULE IS NOW: a branch whose purpose is a FEATURE goes in this list when it is",
+        "made, not when somebody remembers. A defect, tooling or documentation track does not,",
+        "and must not -- a gate that stops all work is a gate somebody switches off, which is",
+        "case 8c of branch_policy_selftest.php and the case that matters most.",
+        "",
+        "customer, graph and custom-property were DELETED on Tom's word (2026-09-16) and their",
+        "names stay here deliberately: a listed branch that does not exist costs nothing, and a",
+        "name that comes back meaning something else must not walk through an open door."
+    ],
     "protected": [
         "customer",
         "graph",
         "projection",
         "custom-property",
-        "674-coordinate-entry"
+        "674-coordinate-entry",
+        "feat/customer-demands",
+        "feat/time-series-graph",
+        "feat/label-gang-search",
+        "feat/survey-import",
+        "feat/library-import",
+        "feat/xy-world-map",
+        "feat/lock-initials-later"
     ],
     "feature_freeze": {
         "active": true,
