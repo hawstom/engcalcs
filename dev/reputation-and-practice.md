@@ -280,12 +280,21 @@ narrated by an AI.** A weekly report written in prose by the same system that ma
 not evidence; it is a second opportunity to be confidently wrong. The report should be boring,
 numeric, and identical in shape every week, so a changed number is visible without reading.
 
-### Phase 3 — close the two remaining merge gaps
+### Phase 3 — CLOSED 2026-09-17, one leg built and one leg declined
 
-- Turn on GitHub branch protection for `master` (section 4, gap 1).
-- Give the two sibling repositories at least a pre-push that refuses a push when their own minimal
-  checks fail. They have no suite today; even "the HTML parses and the claim-check passes" is more
-  than nothing, and `public_claim_check.php` already exists here.
+- **GitHub branch protection for `master` is DECLINED and is no longer an ask.** Tom, 2026-09-16:
+  *"I'm sorry. I can't bring myself to do that."* It is his call. The gap it would have closed is
+  narrow — a clone, or another machine with no hooks — and `hook_install_check.php` already reports
+  that state on every suite run. **A gate he works around would be worse than none**, which is this
+  project's own rule. The FACT that the gap exists stays true; the ASK is struck. Do not re-propose.
+- **The sibling pre-push is BUILT AND INSTALLED in both repositories** (verified 2026-09-17):
+  `~/webdev/librewaternet.org/.git/hooks/pre-push` and the same file in `~/webdev/not-epanet.org`
+  refuse a push unless `sh check.sh` passes. It RUNS the suite rather than reading a stamp, which is
+  a deliberate difference from engcalcs: `check.sh` is under two seconds there, so running it is
+  cheaper than the machinery for not running it, and there is no stale state to get wrong. It is a
+  copy in `.git/hooks`, not `core.hooksPath`, for the reason measured here — hooksPath resolves into
+  the working tree, so a checkout from before the hooks existed deletes every guard, failing open
+  and silently.
 
 ### Phase 4 — the portable kit
 
@@ -403,8 +412,18 @@ was to bring it in here where it can be counted on (`dev/host/`), to PROVE the m
 assuming it (done, at the far end, with Tom confirming), and to add the one thing an alarm silent on
 success cannot do -- **arrive anyway, every day, so that silence stops being ambiguous.**
 
-Still genuinely open: GitHub branch protection on `master` (§4 gap 1), a minimal pre-push for the two
-sibling repositories (§4 gap 2), whether the 622-page watch also wants a six-URL run every fifteen
-minutes (§5 phase 1), and then the portable kit. **Nothing else on this page is urgent, and the
+Still genuinely open: whether the 622-page watch also wants a six-URL run every fifteen minutes
+(§5 phase 1), and then the portable kit. **§4 gap 1 is declined by Tom and gap 2 is built**, both on
+2026-09-17 — see phase 3 above.
+
+**And the thing this plan never named, which he asked for on 2026-09-17: a RELEASE BRANCH.** *"If we
+have a system to manage releases while keeping master as an active trunk, I want to see it in use.
+Where is the EWB release branch in case hot fixes are needed today?"* It is `release/ewb`, cut from
+`81792180` — the SHA he had deployed — and pushed the same day. **That is the honest answer to the
+freeze**, which this plan had treated as the instrument for holding the line: a freeze stops
+everybody, a release branch stops nobody. The procedure is in `CLAUDE.md`'s Git Workflow, together
+with the correction of the 2026-09-13 advice that a clean release could not be extracted from what
+had been merged. **That advice was wrong, it was never owned, and leaving it unowned left him
+believing he had to choose between shipping unfinished work and shipping nothing.** **Nothing else on this page is urgent, and the
 sharpest lesson on it is not in the plan at all: a diagnosis written from inside one tree could not
 see a working machine sitting one directory outside it.**
