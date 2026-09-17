@@ -270,11 +270,15 @@ session's 20 commits did it, which is what the session assumed for an hour. Thre
 narrow it further: `dev/chrome-incognito-crash.md`. **Do not build an incognito DETECTION to work
 around it.**
 
-**AND ONE SYMPTOM BESIDE IT WAS OURS:** his mouse cursor vanished on the first file picker, on the
-new code and not on production's. Exactly one cursor-related line had changed all night -- the
-`?debug=perf` overlay stopped ignoring the mouse so that he could copy it. The box is inert again
-and a small `copy` button does the copying. **An overlay that answers the pointer is not a
-decoration any more**, and this is what that costs.
+**IT IS SETTLED AND IT IS ENTIRELY CHROME'S:** with `?debug=nofiles` -- which skips both the read on
+boot AND the write when a file is opened, so no handle of ours ever reaches IndexedDB -- it still
+crashes. A 14 KB drawing with no image, no scenarios and no map is enough; a project created in the
+window without the picker is clean. **The vanishing mouse cursor is the same bug**, and the obvious
+suspect was innocent: it was pinned on the `?debug=perf` overlay having stopped ignoring the mouse
+(the only cursor-related line in the whole night), and then it happened again under `?debug=nofiles`
+where that overlay does not exist. **"The only line that could have done it" is how a one-sided
+correlation gets promoted to a cause.** `dev/chrome-incognito-crash.md` has the report to file with
+Chrome, ready to paste.
 
 **STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
 is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);

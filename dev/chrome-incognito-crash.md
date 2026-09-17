@@ -61,15 +61,23 @@ opening it through the picker is enough. A project CREATED in the window -- New 
 junctions, no picker -- reloads cleanly. So neither the stored bytes nor the drawing nor the tiles
 are in it.
 
-**NOT KNOWN:** whether the crash is our READ on boot or Chrome's own restoration of an incognito
-IndexedDB holding a serialized handle. `?debug=nofiles` now skips BOTH the read and the WRITE, so
-nothing of ours ever puts a handle in the store. **The test that separates them: `?debug=nofiles`,
-private window, open a file through the picker, reload.**
+**SETTLED, and the answer is that none of it is ours.** `?debug=nofiles` skips BOTH the read on
+boot and the write when a file is opened, so with it on nothing of ours ever puts a
+`FileSystemFileHandle` into IndexedDB. **It still crashes.** By then the only thing that has
+happened is that the picker returned a handle to the page -- so the crash is inside Chrome's own
+handling of that handle in an incognito session, and **there is nothing here to fix**.
 
-- **Survives** -> the handle in our store is what Chrome chokes on, and a guard is at least
-  conceivable on our side.
-- **Still crashes** -> the crash is in Chrome's own handling of a picker handle in an incognito
-  session, nothing of ours is involved by then, and **there is nothing here to fix**.
+## The vanishing mouse cursor is the same bug, and the obvious suspect was innocent
+
+Tom's cursor disappeared in the file picker -- always the FIRST picker of a session, never the
+second. It showed on the new build and not on production's, and exactly one cursor-related line had
+changed all night: the `?debug=perf` overlay had stopped ignoring the mouse so the readout could be
+copied. That fit the evidence and was wrong.
+
+**It vanished again under `?debug=nofiles`, where that overlay is never created at all.** Same
+browser, same picker, same private window as the crash. **A one-sided correlation is not a cause,
+and "the only line that could have done it" is exactly the reasoning that makes one look like one.**
+The overlay kept its new `copy` button, on its own merits.
 
 ## What to do meanwhile
 
@@ -78,3 +86,25 @@ private window, open a file through the picker, reload.**
 - **Do not build a workaround on an incognito DETECTION.** Chrome has deliberately made that
   unreliable, and a wrong guess in a normal window silently breaks the file link for everybody --
   which is a worse defect than the one it dodges, and it would be ours rather than Chrome's.
+- **And do not re-open this as a defect of the suite.** It reproduces on code a week older, with our
+  handle store switched off entirely, on a 14 KB drawing with nothing in it. The next step is
+  Chrome's bug tracker, not this repository.
+
+## The report to file with Chrome
+
+> **Chrome 153.0.8010.37 (stable, Windows), browser process crashes on reload in an Incognito
+> window after a File System Access picker has returned a handle.**
+>
+> 1. Open any page that calls `showOpenFilePicker()` in an **Incognito** window.
+> 2. Pick a file (a 14 KB text file is enough).
+> 3. Reload the page.
+>
+> The entire browser exits instantly -- not the tab. `ptype: browser` in all crash dumps; the
+> annotations carry `indexeddb_num_connections` and `Windows.Storage`. Reloading without having
+> opened a file is clean; a normal profile is clean. Reproduces with the page's own handle
+> persistence disabled, so no `FileSystemFileHandle` is ever written to IndexedDB by the page.
+> Turning off hardware acceleration makes no difference. GPU line in the dumps, for completeness:
+> ANGLE (Intel HD Graphics 620, D3D11-30.0.100.9670).
+>
+> A second symptom on the same machine, same recipe: the mouse cursor is not drawn while the FIRST
+> file picker of a session is open, and is normal on the second.

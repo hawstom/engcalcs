@@ -1901,11 +1901,20 @@ var EngCalcs = EngCalcs || {};
 			perfDebugEl = document.createElement('div');
 			// **THE BOX IGNORES THE MOUSE; A BUTTON ON IT DOES THE COPYING.** It was
 			// `pointer-events:none` (right for an overlay lying across a map), then it took pointer
-			// events so the numbers could be selected and copied -- and **Tom's mouse cursor then
-			// vanished on the first file picker, on this build and not on production's**. One
-			// cursor-related line changed all night and it was that one, so the box goes back to
-			// being inert and the copying moves to a control that is meant to be pointed at.
-			// Reverting the copy instead would take back the fix he asked for.
+			// events so the numbers could be selected and copied.
+			//
+			// **THAT CHANGE WAS BLAMED FOR TOM'S VANISHING MOUSE CURSOR AND WAS INNOCENT.** It was
+			// the only cursor-related line in a 20-commit night, and it appeared to fit -- the
+			// symptom showed on this build and not on production's. **Then the cursor vanished
+			// again with `?debug=nofiles`, where this overlay is never created at all.** So the
+			// cursor belongs with the private-window crash in `dev/chrome-incognito-crash.md`: same
+			// browser, same file picker, same session. **A one-sided correlation is not a cause,
+			// and "the only line that could have done it" is exactly the reasoning that makes one
+			// look like one.**
+			//
+			// The button stays, because it is the better control either way: a click target that
+			// says what it does, reachable by keyboard, on a readout that goes back to lying inert
+			// across the map.
 			perfDebugEl.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3000;max-width:96vw;' +
 				'font:11px/1.35 monospace;background:rgba(0,0,0,.82);color:#0f0;padding:4px 6px;' +
 				'white-space:pre;max-height:40vh;overflow:hidden;pointer-events:none';
