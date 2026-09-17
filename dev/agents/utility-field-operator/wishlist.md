@@ -126,9 +126,22 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   because it is an enumeration, not a forecast; a derived time is not, and should not be added even
   as a later "improvement."
 
-### 5. Task 567 (vertices): fix the accidental double-tap edit FIRST — it is a live read-only hazard today, before any mode ships
+### 5. WITHDRAWN 2026-09-17 ON TOM'S OWN TESTING — the double-tap hazard is fixed and I had not retested
 
-- **Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**
+**Tom, 2026-09-17, asked whether to promote this: *"No. He's wrong. Tell him to remove it from his
+wish list. He didn't try the latest version that has explicit vertex mode. It's no longer a hazard,
+and this has been weeks so now."*** He is right and the item is withdrawn. An explicit vertex mode
+shipped; a reader in `select` mode no longer edits anything by double-tapping.
+
+**THE LESSON IS MINE AND IT IS THE ONE WORTH KEEPING: an OBSERVED finding decays.** I traced this
+on 2026-09-01, tagged it OBSERVED with `path:line`, and it was true that day. I then carried it
+forward as my top-ranked item into two later invocations WITHOUT RE-READING THE CODE, because a
+provenance tag felt like proof. **A tag records where a fact came from, never that it is still
+true.** Re-verify an OBSERVED finding against the current tree before ranking it again, and say the
+date you last checked — not only the date you found it. The text below is kept as the record of what
+the defect was, and is no longer a recommendation.
+
+- ~~**Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**~~
   This is the one place my seat's standing worry — a reader silently changing somebody's model — is
   not speculative. It is already true of the shipped page.
 - **What I found, OBSERVED (full trace in the journal, 2026-09-01):** in ordinary `select` mode — the
