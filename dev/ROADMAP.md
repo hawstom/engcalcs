@@ -136,10 +136,12 @@ the block.
   - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
     save label position and shedding state for every node at every zoom level. And I assume that
     that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
-    hard part: a continuous zoom has no levels to bank against, so this design **presumes Task 683's
-    snapping** and is blocked on it. The seat that has to rule on it is the field operator's, not
-    ours -- banked positions do not slide as you pinch, they JUMP between levels, and whether that
-    reads better or worse in the street is a question about reading a map, not about milliseconds.
+    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
+    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
+    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
+    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
+    to happen is the last half-second before a tap, which is the worst instant for a label to
+    relocate in a tight cluster.
   - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
     scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
     done, because the truth is that zoom performance is not terrible on Net3."* **Check before
@@ -158,10 +160,15 @@ the block.
     arrive at a drawing surface whose only documented zoom is a wheel. **Establish first whether
     that is true** -- read `js/looped-network.js` rather than assuming, and say where you did not
     look.
-  - The conventional bindings are not in dispute where they exist (`+` / `-` / `0` for fit, and
-    the drawing surface having to be focusable before any of them can fire). What needs deciding is
-    whether an on-screen pair of buttons belongs on a toolbar this project has already ruled must
-    not grow, and Ida's seat owns that judgement.
+  - **IT IS TRUE, AND IT WAS MEASURED RATHER THAN ASSUMED (Ida, 2026-09-17).** The zoom function has
+    exactly TWO callers in the whole of `js/looped-network.js`: the wheel (`:26699`) and the
+    two-finger pinch (`:27387`). The only non-gesture control is **Zoom to fit** (`:25343`), which is
+    a reset, not an increment -- press it twice and the second press does nothing. The page's only
+    keydown bindings outside a text field are Ctrl+Z and the 1-9 tool picker. **So a keyboard-only
+    visitor, or anyone with a wheel-less mouse, can reach "fit" and nothing else.**
+  - **EPANET ITSELF ANSWERS THIS WITH TWO ORDINARY BUTTONS, Zoom In and Zoom Out**, and documents no
+    wheel and no keyboard shortcut. That is the model: not a new idiom, the one our own reference
+    application already uses. Full citations in `dev/agents/interface-designer/journal.md`.
 
 - 50|683| **The zoom increment, and whether zoom levels should snap.**
   Tom, 2026-09-17: *"There are a limited number of zoom levels. Even on a phone, zoom level
@@ -172,8 +179,22 @@ the block.
     Deciding which governs is the task; the arithmetic is an afternoon.
   - **IT BLOCKS TASK 681(d)**, because banking a label layout per zoom level presumes there are
     levels to bank against.
-  - Ida and Franco were both asked on 2026-09-17; their answers are in their own journals and wish
-    lists under `dev/agents/`, and no roadmap row was promoted from them.
+  - **BOTH SEATS SAY DO NOT SNAP, and they agree with Tom's own worry** (Ida and Franco,
+    2026-09-17, journals under `dev/agents/`). Franco's is the reason that decides it: he pinches to
+    line the drawing up against the ground he is standing on, and a view that snaps after he lifts
+    his fingers **jumps away from the spot he just placed it on**. Ida's is the desktop half -- the
+    raster argument for snapping is one the tile provider already answers by resampling, so snapping
+    would cost the drawing half something real to fix nothing.
+  - **THE INCREMENT IS A SEPARATE QUESTION AND HIS INSTINCT HAS SUPPORT.** The wheel is a factor of
+    **1.1, ten percent a notch** (`js/looped-network.js:26699`). AutoCAD defaults to 60% and its own
+    users who turn it down for fine control land near 15-20%; QGIS's zoom tool is 200% a click. Ours
+    is below that entire range. Nobody has filed a friction report about it, so this is evidence
+    rather than a defect.
+  - **AND IT DOES NOT BLOCK TASK 681(d) AFTER ALL, WHICH IS THE USEFUL FINDING.** Franco: a label
+    cache can be keyed on a ROUNDED BUCKET of the continuous scale while the view still tracks the
+    fingers exactly. **Building it as "the view snaps to the cache keys" is the easy way to arrive
+    there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
+    key and the view as two separate things from the start.
 
 - 100|684| **A thematic map with labels off still lays the labels out.**
   Tom, 2026-09-17: *"Thematic map (labels off) should not do any label calculations. Off should

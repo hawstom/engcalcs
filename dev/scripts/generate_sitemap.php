@@ -108,7 +108,16 @@ foreach ($pages as $file) {
     // Match ec_canonical_url() exactly, pretty URLs and the /index.php collapse alike.
     $path = ecCanonicalPath('/engcalcs/' . $file);
     if (in_array($file, $englishOnly, true)) {
-        $xml .= "  <url>\n    <loc>" . htmlspecialchars($origin . $path, ENT_XML1) . "</loc>\n"
+        // **?lang=en, NOT the bare path, and this is the whole of the fix made 2026-09-17.** These
+        // two pages have no language variants, so the loop below never runs for them and the bare
+        // path looked like the natural address. It is not the address the PAGE nominates:
+        // echoHTMLHead() self-canonicalises every suite page to `?lang=<current>`, which for an
+        // English-only document is always `?lang=en`. So the sitemap was advertising two URLs whose
+        // own canonical tag pointed somewhere else -- Google's "Alternative page with proper
+        // canonical tag", an exclusion, on exactly 2 of 545 URLs and on nothing else in the file.
+        // **Measured, not reasoned**: every other suite URL in the sitemap already carries ?lang=
+        // and self-canonicalises; these two were the only disagreement in the whole document.
+        $xml .= "  <url>\n    <loc>" . htmlspecialchars($origin . $path . '?lang=en', ENT_XML1) . "</loc>\n"
               . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
               . "  </url>\n";
         $count++;
