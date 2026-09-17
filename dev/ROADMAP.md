@@ -177,6 +177,29 @@ the block.
   - **EPANET ITSELF ANSWERS THIS WITH TWO ORDINARY BUTTONS, Zoom In and Zoom Out**, and documents no
     wheel and no keyboard shortcut. That is the model: not a new idiom, the one our own reference
     application already uses. Full citations in `dev/agents/interface-designer/journal.md`.
+  - **TOM'S OWN DESIGN FOR THE TOOLBAR HALF, 2026-09-17, and it is cheaper than either option he
+    was offered:** *"Make the Zoom to Fit toolbar button do double duty like the select area button.
+    Give it a little triangle indicator. The second time you click it, it changes to Zoom Window.
+    And/or we put + and - on the map in a way that Ida tells us to do it."* **So the toolbar does not
+    grow a button** -- an existing one gains a mode, through a disclosure idiom this page already
+    has. That is the answer to his own standing worry about four lines of chrome.
+  - **AND IDA ANSWERED THE HALF HE GAVE HER: + AND - STACKED VERTICALLY, TOP-RIGHT.** She read all
+    four map corners before placing it, and corrected an assumption that one was empty -- top-left is
+    a growing stack of status messages, bottom-left holds seven things already, and bottom-right
+    carries the tile attribution, which is a legal requirement and cannot be crowded. **Top-right is
+    the only calm corner**, and it is also where Mapbox puts its own zoom buttons. Styled like the
+    scale bar and the legend, so no new visual language; **hidden entirely at the 640px breakpoint**,
+    because fingers pinch.
+    - **IT IS NOT A FIFTH LINE OF CHROME, and she argued that rather than asserting it**: the four
+      bars Tom named are things a reader must get past before doing anything, while this is a small
+      tool found by somebody already looking at the map -- the same family as the scale bar, which
+      nobody has complained about.
+    - **THE TWO HALVES COMPLETE EACH OTHER RATHER THAN COMPETING.** Zoom to Fit resets; Zoom Window
+      drags a box to zoom IN. **Neither gives a one-click zoom OUT**, and the + / - pair is the only
+      thing that does.
+    - **THE KEYS ARE PLAIN `+` AND `-`, NEVER Ctrl.** Every browser has claimed Ctrl+plus for its own
+      page zoom and taking it would surprise people. The "not while somebody is typing" guard the
+      other shortcuts already use is there to reuse.
 
 - 50|683| **The wheel zoom increment, snapping having been ruled out.**
   Tom, 2026-09-17: *"There are a limited number of zoom levels. Even on a phone, zoom level
@@ -207,6 +230,27 @@ the block.
     fingers exactly. **Building it as "the view snaps to the cache keys" is the easy way to arrive
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
+
+- 75|687| **The lock dialog's destructive button sits beside Cancel.**
+  Tom gave the four-button order twice and differently -- 2026-09-14 put **Break lock** second to
+  last, 2026-09-17 put it second -- then handed the question to Ida: *"I am not clear on that point,
+  and I can accept findings from Ida."*
+  - **SHE REJECTED BOTH AND PROPOSED A THIRD: Ask, Open read-only, Cancel, a gap, then a marked
+    Break lock.** Three reasons, and the first is mechanical rather than aesthetic: **the first
+    button takes keyboard focus**, so a bare Enter or a fast double-click hits it -- which is why
+    both of his orders were right to lead with Ask. The two look-but-do-not-touch choices then sit
+    together. **And Cancel belongs BEFORE Break lock**: in the shipped order the destructive answer
+    is one seat from Cancel, where a startled click or Tab-Tab-Enter reaches it.
+  - **A caution glyph on Break lock's label**, the same one the verdict strings already use, so it
+    costs nothing to translate.
+  - **THE "NEVER RESTYLE ONE BUTTON" RULE DOES NOT GOVERN HERE, and she argued it rather than
+    asserting it.** That rule exists because Accept and Reject are two equally legitimate answers, so
+    dressing one up is a dark pattern. Here one of four choices can genuinely force a colleague to
+    redo work by hand: marking it is disclosure, not persuasion. Nothing is hidden and nothing is
+    made harder to choose when it is the right answer, which it sometimes is -- the colleague who
+    has gone home for the weekend.
+  - Built on `feat/lock-initials-later` in the order he gave last; this is the change to make before
+    that branch merges. `dev/agents/interface-designer/journal.md`, 2026-09-17.
 
 - 75|685| **Name every unit dropdown for a screen reader.**
   **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
