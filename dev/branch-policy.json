@@ -51,9 +51,11 @@
         "feat/lock-initials-later"
     ],
     "feature_freeze": {
-        "active": true,
+        "active": false,
         "since": "2026-09-10",
-        "until": null,
+        "until": "2026-09-17",
+        "lifted_by": "Tom, 2026-09-17, answering 'Does the feature freeze come off?' with 'Lift it now', and telling the session in his next turn that his answers were done. His recorded choice -- not an inference from silence, and not an AI reading its own green build as permission.",
+        "lifted_note": "IT CAME OFF BECAUSE release/ewb NOW EXISTS, which is the reason he was given and accepted: a freeze stops everybody, a release branch stops nobody. LIFTING IT MERGES NOTHING BY ITSELF. Every branch in 'protected' still needs his all-clear in dev/branch-all-clears.json, pinned to the exact commit, and that lock is untouched. The two were never one key, which was his own point on 2026-09-15.",
         "why": "Tom, 2026-09-15: \"Remember that we are in a feature freeze. I will test. But even if I were to approve a merge, the scripts must block it until the freeze is removed. Right?\" As built the answer was NO -- an all-clear was the only lock, so his approval and the freeze were one key. It is two locks now.",
         "_comment": [
             "THE FEATURE FREEZE, AND IT IS NOT THE EMERGENCY 'freeze' BELOW.",

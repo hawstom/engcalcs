@@ -142,6 +142,14 @@ the block.
     positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
     to happen is the last half-second before a tap, which is the worst instant for a label to
     relocate in a tight cluster.
+    - **TOM RULED IT AFTER 680's SECOND HALF, 2026-09-17, and gave the design rule that matters:**
+      *"What we need to be vigilant for is unnecessary passes. We have to be aware of whether the
+      pre-placements are final or not. I would agitate for using the next more zoomed out (larger
+      text) bucket and not revisiting it. And of course the buckets should correlate to the PC mouse
+      zoom levels."* **Round OUTWARD, never to nearest**, and treat a bucket's answer as final rather
+      than as a first guess to refine -- a refinement pass is the cost this whole task exists to
+      remove. Bucket boundaries follow the wheel's own notches (Task 683), **as a cache key and never
+      as a view snap** (Task 683 rules the view out).
   - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
     scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
     done, because the truth is that zoom performance is not terrible on Net3."* **Check before
@@ -170,7 +178,7 @@ the block.
     wheel and no keyboard shortcut. That is the model: not a new idiom, the one our own reference
     application already uses. Full citations in `dev/agents/interface-designer/journal.md`.
 
-- 50|683| **The zoom increment, and whether zoom levels should snap.**
+- 50|683| **The wheel zoom increment, snapping having been ruled out.**
   Tom, 2026-09-17: *"There are a limited number of zoom levels. Even on a phone, zoom level
   snapping could be enforced, though that might be anti-idiomatic."* And: *"An argument could be
   made that our mouse wheel zoom increment is too small."*
@@ -179,7 +187,11 @@ the block.
     Deciding which governs is the task; the arithmetic is an afternoon.
   - **IT BLOCKS TASK 681(d)**, because banking a label layout per zoom level presumes there are
     levels to bank against.
-  - **BOTH SEATS SAY DO NOT SNAP, and they agree with Tom's own worry** (Ida and Franco,
+  - **SNAPPING IS RULED OUT BY TOM, 2026-09-17** (*"Close it. No snapping."*), on the two seats'
+    evidence below. **What remains open is only the INCREMENT.** Do not re-propose snapping the view;
+    if a future task needs discrete levels, it needs them as a CACHE KEY, which is Task 681(d) and is
+    a different thing.
+  - **BOTH SEATS SAID DO NOT SNAP, and they agreed with Tom's own worry** (Ida and Franco,
     2026-09-17, journals under `dev/agents/`). Franco's is the reason that decides it: he pinches to
     line the drawing up against the ground he is standing on, and a view that snaps after he lifts
     his fingers **jumps away from the spot he just placed it on**. Ida's is the desktop half -- the
@@ -196,6 +208,33 @@ the block.
     there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
     key and the view as two separate things from the start.
 
+- 75|685| **Name every unit dropdown for a screen reader.**
+  **TOM RULED IT 2026-09-17**, choosing *"name each one after its own field"* from the Task 322
+  survey's finding.
+  - **THE NUMBER IS THE ARGUMENT.** Counted across the rendered suite: of **430** form controls,
+    **272** carry no accessible name, and **226 of those are the unit selects** -- essentially every
+    one in the suite. A screen reader announces *"combo box, feet"* with no way to know which field
+    it belongs to.
+  - **IT IS NOT THE SURVEY'S USUAL PATTERN and that is why it is a task rather than a check.**
+    Nothing here was decided two ways: `echoUnitSelect()` has simply never been handed the label
+    sitting beside it. There is no ratchet to set, because there is no correct half to ratchet to.
+  - **NO NEW WORDING IN ANY LANGUAGE, which is what makes his answer cheap.** The name is the
+    field's own existing label, already written and already translated 26 times. If a design turns
+    out to need new words, stop -- that is a different decision and a different price.
+
+- 100|686| **The progress bar finishes before the work does.**
+  Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
+  progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the
+  progress bar until all the output is available."*
+  - **THE DEFECT IS THE BAR, NOT THE MILLISECONDS.** Reading the reaction rate out of the engine's
+    binary output costs 234 ms on Net3 over 24 hours -- but it runs on the main thread AFTER the run's
+    own progress bar has already reached the end, so it reads as the page hanging rather than as the
+    run still working. **He was offered "accept it" and "hide the rate on big networks" and rejected
+    both**, which was right: neither addresses a bar that lies, and both get worse as networks grow.
+  - Reserve a share of the bar for the read -- his guess is 10% and a guess is explicitly fine -- and
+    do not complete it until the output is in hand. Then the cost stops mattering at any size.
+
+
 - 75|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
@@ -210,9 +249,11 @@ the block.
   - **DO NOT RE-OPEN THE GEOMETRY.** Tom on the favicon: *"my one true love."* The shading rule the
     whole mark follows -- one light above, three surfaces, and the shading follows the SOLID -- is
     in `ship-notes.md`, and `dev/icon-preview/gen-about-icon.js` is the generator.
-  - Worth asking before building: whether "photo-realistic" means gradients and a cast shadow, or
-    simply finer line work and more surfaces. Those are different amounts of work and only he knows
-    which he meant.
+  - **ANSWERED 2026-09-17: BOTH, SHOWN SIDE BY SIDE.** He chose *"Show me both and I will pick"*,
+    so the deliverable is a comparison and not a build. **And he added the detail that decides what
+    "more surfaces" means here:** *"possibly more realistic leg thicknesses and catwalk rendering,
+    where a catwalk consists of a robust deck plus a handrail above it."* A catwalk is therefore TWO
+    elements, not a line -- that is the drawing note, and it is his, not ours.
 
 
 - 100|676| **Watch the sites, and send a derived weekly report.**
@@ -417,17 +458,29 @@ the block.
     and do NOT show a signed rate of our own, even though the coefficients would let us. A number
     that disagrees with the reference implementation is the one an engineer cannot defend in a
     report, which is the same argument Sue made about stationing under Task 643.
-  - **OPEN 1, and the smallest: WHERE DOES THE MAGNITUDE DISCLOSURE LIVE?** A decaying chlorine and
-    a growing one print the same number. A link result has no popup row to hang a tip on, so today
-    only the code comment and `dev/water-quality.md` say so. A tip on the Labels row, a new link
-    result row, or leave it as EPANET leaves it?
-  - **OPEN 2: IS 234 ms ACCEPTABLE?** Measured on Net3 over 24 hours at a 5 minute reporting step
-    (289 periods, 119 links): an 1.56 MB output file, 11 ms to read it out of the engine and 234 ms
-    in `readBinary()`. It scales with links times periods, **on the main thread, after the run's own
-    progress bar has already finished** -- so a utility-scale network at a fine step pays seconds of
-    silence. Accept it, or show no rate on a large chemical run?
-  - **OPEN 3: EPANET'S VALUE IS THE LAST QUALITY STEP BEFORE EACH REPORTING INSTANT**, not an
-    average over the period. Report it as EPANET does and say nothing, or say so on screen?
+  - **ANSWERED 2026-09-17: LEAVE IT AS EPANET LEAVES IT.** A decaying chlorine and a growing one
+    print the same number, and EPANET says nothing about that either. Matching the reference
+    implementation includes matching its silence. The code comment and `dev/water-quality.md` remain
+    the record. **This interacts with his answer below and the two have to be reconciled before
+    anybody builds either.**
+  - **ANSWERED 2026-09-17, AND HE REJECTED BOTH OPTIONS HE WAS OFFERED:** *"We already decided
+    this. Add some arbitrary amount to the progress bar (just guess a percent like 10% based on what
+    you've seen so far) and don't finish the progress bar until all the output is available."* **The
+    question was wrong, not just the options.** 234 ms is not a performance problem to accept or
+    dodge; it is a progress bar that lies, finishing while work is still going on -- so the fix is to
+    make the bar tell the truth, and the milliseconds stop mattering at any network size. Measured on
+    Net3 over 24 hours at a 5 minute step (289 periods, 119 links, a 1.56 MB output file): 11 ms to
+    get it out of the engine and 234 ms in `readBinary()`, scaling with links times periods.
+    **AND "we already decided this" is a finding about this file**, not about him: the decision was
+    not written down anywhere a later session could find it.
+  - **ANSWERED 2026-09-17: SAY SO -- CONDITIONALLY.** EPANET's value is the last quality step
+    before each reporting instant, not an average over the period. Tom chose *"Say so on screen"* and
+    qualified it: *"If there is a tip, say it in the tip."*
+    - **AND THAT CONDITION COLLIDES WITH HIS ANSWER TO OPEN 1, WHICH MUST GO BACK TO HIM.** He ruled
+      no disclosure for the magnitude, which is what a tip would have existed for -- so on the
+      current answers there is no tip, and his "say it in the tip" has nowhere to land. Three ways
+      out and he picks: a tip carrying only the instant fact; both facts in one tip after all; or
+      nothing, matching EPANET on both counts. **Do not guess which.**
   - **AND ONE HE HAS ALREADY ASKED FOR, WHICH IS NOT A QUESTION:** *"Nice, though I would like an
     opportunity to contribute someday."* No pull request was needed for this feature, but the door is
     open and he wants it. `dev/reaction-rate-upstream.md` holds what a PR would contain, that the C

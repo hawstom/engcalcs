@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**97 open tasks.** Next (100): 11 · Soon (75): 25 · Someday (50): 32 · Maybe (25): 11 · Parked (5): 18
+**99 open tasks.** Next (100): 12 · Soon (75): 26 · Someday (50): 32 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (11)
+## 100 — Next (12)
 
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -22,8 +22,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 669 — Show labels at this zoom or closer.
 - Task 674 — Type a node's coordinates instead of only dragging it.
 - Task 676 — Watch the sites, and send a derived weekly report.
+- Task 686 — The progress bar finishes before the work does.
 
-## 75 — Soon (25)
+## 75 — Soon (26)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -50,6 +51,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 682 — Zoom on a PC with no wheel, and from the keyboard.
+- Task 685 — Name every unit dropdown for a screen reader.
 
 ## 50 — Someday (32)
 
@@ -84,7 +86,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
 - Task 664 — A link's status colours correctly and its legend prints numbers.
 - Task 675 — A labelled grid, with the significant digits picked out.
-- Task 683 — The zoom increment, and whether zoom levels should snap.
+- Task 683 — The wheel zoom increment, snapping having been ruled out.
 
 ## 25 — Maybe (11)
 
@@ -125,5 +127,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-89 of 97 titles are within 4–12 words. `!` marks the rest;
+91 of 99 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
