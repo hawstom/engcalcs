@@ -210,15 +210,17 @@ of them distinct -- 87% repeats inside one switch, and 100% of a SECOND switch's
 been answered by the first.** Each is a layout read between two DOM writes, so a browser pays a
 synchronous layout of an 8,400-element drawing for every one; node pays arithmetic, which is why the
 headless switch is 350 ms and his is five seconds. `measuredTextWidth()` banks them on (class, size,
-string) -- **8,140 becomes 1,078, and a re-layout at an unchanged size becomes 0**.
+string) -- **8,140 becomes 1,078 on the visit that first sees solved values, and 100 on every visit
+after that**, measured over five consecutive switches; a re-layout at an unchanged size becomes 0.
 - **IT DOES NOT RESCALE BY FONT SIZE, and real Chrome is why.** The obvious version banks width per
   unit of size, the assumption `labelBoxWidth()` already ships for pixels. Measured before building
   it, eight label strings at thirteen sizes: **a measurement below about one world unit of font size
   is quantised -- 1.19% error at 0.5 units, 5.6% at 0.1, 19.7% at 0.02** -- and a label's world font
   size is `textSize / scale`, so the small end is simply "zoomed in". The size is part of the key.
 - **TWO THINGS ARE STILL ON THE TABLE and both are measured.** (1) **A switch lays the labels out
-  THREE TIMES**, the first at the OUTGOING project's scale, which the fit then throws away: 978 of
-  the remaining 1,078 measurements. (2) **Hiding the labels does not stop any of it** -- with
+  THREE TIMES**, the first at the OUTGOING project's scale, which the fit then throws away -- it no
+  longer costs measurements once the cache is warm, but it is still three passes of composing and
+  placing. (2) **Hiding the labels does not stop any of it** -- with
   thematic colouring on, `dataLabelsHidden` toggles a CSS class and every label is still composed,
   measured and placed (7,825 measurements against 7,822 with them shown). Tom asked for exactly this
   to be confirmed; it is confirmed.

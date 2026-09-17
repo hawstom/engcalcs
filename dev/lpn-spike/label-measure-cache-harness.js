@@ -76,7 +76,8 @@ console.log('    ' + first + ' text measurements');
 // **A RATCHET, NOT AN EQUALITY.** What must never come back is the order of magnitude: 8,140 was
 // one measurement per label per row per pass, three passes deep. The number may fall.
 ok('a switch asks the browser well under a thousand times', first < 1500,
-	first + ' measurements (it was 8,140 before the cache, and 1,078 after)');
+	first + ' measurements (8,140 before the cache; 1,078 on the visit that first sees solved '
+	+ 'values, and about 100 on every visit after that)');
 
 // **THE SAME LABELS AT THE SAME SIZE ARE NEVER RE-MEASURED**, which is the property the whole
 // saving rests on. Two passes back to back, with no fit in between to move the scale: the first may
