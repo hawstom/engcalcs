@@ -1808,6 +1808,28 @@ var EngCalcs = EngCalcs || {};
 		var m = (typeof performance !== 'undefined') && performance.memory;
 		return m ? Math.round(m.usedJSHeapSize / 1048576) + ' MB' : 'n/a';
 	}
+	// **THE SAME TIMER, SUMMED RATHER THAN LISTED.** A stage inside a per-element loop cannot report
+	// one row per call -- 119 pipes would bury the line it is printed on -- so these accumulate and
+	// are flushed as one row each when the report is taken.
+	var perfDebugSums = null;
+	function perfDebugAccum(name, fn) {
+		if (!perfDebugOn()) { return fn(); }
+		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
+		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+		if (!perfDebugSums) { perfDebugSums = {}; }
+		perfDebugSums[name] = (perfDebugSums[name] || 0) + (t1 - t0);
+		return out;
+	}
+	function perfDebugFlushSums() {
+		if (!perfDebugSums) { return; }
+		var k;
+		for (k in perfDebugSums) {
+			if (perfDebugSums.hasOwnProperty(k)) {
+				perfDebugRows.push(k + ' ' + perfDebugSums[k].toFixed(1) + 'ms');
+			}
+		}
+		perfDebugSums = null;
+	}
 	// Times `fn` and records it under `name`. Returns whatever fn returned, so a caller can wrap a
 	// call in place without restructuring anything.
 	function perfDebugTime(name, fn) {
@@ -1835,11 +1857,19 @@ var EngCalcs = EngCalcs || {};
 				'lines appear bottom-left on the map.');
 		}
 		perfDebugN++;
+		perfDebugFlushSums();
 		var tiles = 0, k;
 		for (k in basemapEls) { if (basemapEls.hasOwnProperty(k)) { tiles++; } }
 		var comp = 'none', ml = modelLayer && modelLayer.getAttribute && modelLayer.getAttribute('transform');
 		if (ml) { comp = ml; }
-		var line = '#' + perfDebugN + '  ' + perfDebugRows.join('  ') +
+		// **WHICH BUILD PRODUCED THIS LINE.** Read off the About box, which already prints the
+		// deploy's date and sha (ecDeployIdentity), rather than plumbed through pageConfig: that
+		// would be a non-language key in the language bridge, and the readout is a developer tool.
+		// Without it a pasted readout cannot be told from one taken before the last deploy, which
+		// cost an exchange on 2026-09-16.
+		var bEl = document.querySelector('.lpn-about-build'),
+			build = bEl ? bEl.textContent.replace(/^.*\u00b7\s*/, '') : '?';
+		var line = '#' + perfDebugN + ' [' + build + ']  ' + perfDebugRows.join('  ') +
 			'  | label passes ' + perfDebugCounts.labelPasses
 			+ '  | label measurements ' + perfDebugCounts.measures
 			+ '  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
@@ -7297,6 +7327,10 @@ var EngCalcs = EngCalcs || {};
 		layoutNodeLabel(n.id);
 		paintNodeColor(n.id);   // a rebuilt element starts black; give it its colour immediately
 	}
+	// **WHAT A PIPE COSTS TO BUILD, IN THREE PARTS** -- Tom's machine spends about 10 ms on each
+	// one whether the drawing holds 7 or 119, while this one spends 0.2 ms for the same work, so
+	// the cost is something a real browser does and a headless one does not. Summed across the
+	// loop and flushed as three rows; off unless ?debug=perf is on the URL.
 	function buildLinkEls(l) {
 		// CREATED ONCE, NOT CLEARED: rebuildLink() comes back through here for a link that already
 		// exists, and emptying the bucket would orphan every Text attached to that pipe the first
@@ -7434,10 +7468,16 @@ var EngCalcs = EngCalcs || {};
 			symbolG: symbolG, symbolSvg: symbolSvg, symbolHit: symbolHit, symbolBox: symbolBox
 		};
 		// The words are not the target; this is (see syncLabelHit).
-		linkEls[l.id].lblHit = attachLabelHit(text, linkEls[l.id], labelsLayer, true);
-		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
-		layoutLinkLabel(l.id);
-		paintLinkColor(l.id);   // a rebuilt element starts black; give it its colour immediately
+		perfDebugAccum('  lk:hit', function () {
+			linkEls[l.id].lblHit = attachLabelHit(text, linkEls[l.id], labelsLayer, true);
+		});
+		if (symbolG) {
+			perfDebugAccum('  lk:symbol', function () {
+				resizePumpSymbol(l.id); positionPumpSymbol(l.id);
+			});
+		}
+		perfDebugAccum('  lk:layout', function () { layoutLinkLabel(l.id); });
+		perfDebugAccum('  lk:color', function () { paintLinkColor(l.id); });   // a rebuilt element starts black
 	}
 	// Icon box size for a pump's map symbol, in world units -- same symbolFactor() scaling as every
 	// other symbol. Confirmed right-sized on screen; leave this one alone.
