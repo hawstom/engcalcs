@@ -1,0 +1,147 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
+	"v": 6,
+	"project": {
+		"name": "Standards library",
+		"activeScenario": "base"
+	},
+	"scenarios": [],
+	"nodes": [],
+	"links": [],
+	"labels": [],
+	"nextId": {
+		"J": 1,
+		"R": 1,
+		"T": 1,
+		"L": 1,
+		"P": 1,
+		"V": 1,
+		"X": 1
+	},
+	"origin": {
+		"x": 0,
+		"y": 0
+	},
+	"patterns": [],
+	"defaultPattern": null,
+	"pipeTypes": [
+		{
+			"id": "DIP-8",
+			"note": "Ductile iron, 8 in, new",
+			"props": {
+				"diameter": 8,
+				"roughness": 130,
+				"fittingsId": "Hydrant-lateral"
+			}
+		},
+		{
+			"id": "DIP-12",
+			"note": "Ductile iron, 12 in, new",
+			"props": {
+				"diameter": 12,
+				"roughness": 130
+			}
+		}
+	],
+	"fittingSets": [
+		{
+			"id": "Hydrant-lateral",
+			"note": "Tee off the main, gate valve, two bends",
+			"items": [
+				{
+					"fit": "tee_branch",
+					"qty": 1,
+					"k": 1.8
+				},
+				{
+					"fit": "gate",
+					"qty": 1,
+					"k": 0.2
+				},
+				{
+					"fit": "elbow_medium",
+					"qty": 2,
+					"k": 0.8
+				}
+			]
+		}
+	],
+	"curves": [
+		{
+			"id": "1",
+			"kind": "head",
+			"note": "DIFFERENT pump from Net1 curve 1, same name",
+			"points": [
+				[
+					0,
+					300
+				],
+				[
+					1000,
+					200
+				]
+			],
+			"src": [],
+			"tok": {}
+		},
+		{
+			"id": "Booster-B",
+			"kind": "head",
+			"note": "Five point manufacturer curve",
+			"points": [
+				[
+					0,
+					300
+				],
+				[
+					250,
+					290
+				],
+				[
+					500,
+					260
+				],
+				[
+					750,
+					200
+				],
+				[
+					1000,
+					104
+				]
+			],
+			"src": [
+				";PUMP: Five point manufacturer curve",
+				" Booster-B\t0\t300.0",
+				" Booster-B\t250\t290",
+				" Booster-B\t500\t260",
+				" Booster-B\t750\t200",
+				" Booster-B\t1000\t104."
+			],
+			"tok": {
+				"0y": "300.0",
+				"4y": "104."
+			}
+		}
+	],
+	"profiles": [],
+	"times": null,
+	"controls": [],
+	"rules": [],
+	"inpSections": {},
+	"view": {
+		"x": 0,
+		"y": 0,
+		"scale": 1
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_diameter": "in",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent"
+	}
+}
