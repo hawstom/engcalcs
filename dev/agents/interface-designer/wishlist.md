@@ -289,3 +289,31 @@ is answered for the three that remain after the divorce; see item 5 series above
     free-text identity field the code builds is Tag. His own count table gives this group 5 rows on
     every element type, which needs a Description row nothing currently builds. See journal,
     2026-09-16.
+
+32. **Rank 1st of the zoom question — add a keyboard/no-gesture zoom in and zoom out, beside the
+    existing "Zoom to fit."** Two rows in the Map menu (and, if toolbar room allows, two buttons)
+    calling the existing `zoomAbout()` at a fixed screen-centre point with the wheel's own factor.
+    This is the same class of defect as Task 674 (a value reachable only by dragging): today
+    "Zoom to fit" is the ONE zoom control that needs no wheel and no pinch, and it is a reset, not
+    an increment — a keyboard-only or wheel-less desktop visitor can reach "fit" and nothing else,
+    ever. EPANET itself, our own named reference vocabulary, ships exactly this pair of buttons
+    (Zoom In / Zoom Out) with no wheel and no keyboard shortcut of its own — the fix is not a new
+    idiom, it is the one EPANET already uses. Cheap: no new interaction pattern, reuses the one
+    function every existing zoom path already goes through. See journal, 2026-09-17.
+
+33. **Rank 2nd — widen the mouse-wheel zoom step from 1.1 (10% per notch) toward roughly 1.15-1.2
+    (15-20%).** `js/looped-network.js:26699`. Every sourced comparison (AutoCAD's default 60%, and
+    CAD users' own preferred lower range of 15-20%; QGIS's 200%-per-click default) sits above our
+    10%, and ours is the only one below the whole cluster. Not urgent and not free of judgement —
+    nobody has filed a friction report on it the way Task 674 has a report behind it — so rank this
+    below the no-wheel gap, which is an access failure, not a comfort one. A specific number (1.15
+    vs 1.2 vs something else) is a five-minute tuning decision better made by trying it than by
+    debate; I would not spend more diagnosis on the exact constant. See journal, 2026-09-17.
+
+34. **Do NOT add zoom-level snapping.** Tom's own "anti-idiomatic" instinct is correct: this page
+    is a raster basemap UNDER a hand-placed vector drawing, not a pure slippy map, and the reason
+    slippy maps snap (tiles baked at integer levels) does not apply to our vector half, which wants
+    to land on whatever scale reads cleanly. Snapping would cost the vector drawing a real thing
+    (placing a node to read well at the zoom the user actually wants) to fix a raster problem tile
+    providers already solve by resampling at fractional zoom, which is normal, unremarked behavior
+    on every web map. See journal, 2026-09-17.
