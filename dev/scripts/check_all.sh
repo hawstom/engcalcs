@@ -134,6 +134,11 @@ run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_sel
 # in field count and awk reads positionally, so a reader testing the wrong field prints a number
 # that looks fine.
 run_check "log format selftest"          blocking php dev/scripts/log_format_selftest.php
+# 2026-09-17. The usage report PAGE, which is the same data drawn over time behind HTTP Basic. Same
+# fixture method and the same reason -- a report that reads the wrong field prints a number that
+# looks fine -- plus the leg that matters most: the page must carry no total of the two consent
+# buckets, because one counts people and the other counts page loads.
+run_check "usage report selftest"        blocking php dev/scripts/usage_report_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
