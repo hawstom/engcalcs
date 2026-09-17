@@ -1,15 +1,41 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-15 (eighth session, late)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-17 (ninth session)
 
-## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-15, late.
+## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-17.
 
-**MASTER IS GREEN AT `fc1e4e72` AND PUSHED. PRODUCTION IS AT `e1c0794f` AND HAS NOT PULLED.**
-Production is the SHA somebody last pulled; master can advance for days and ship nothing. Never say
-"it is live" because you pushed.
+**MASTER IS GREEN AT `30b27945` AND PUSHED. PRODUCTION IS AT `81792180` (2026-09-15) AND IS ABOUT
+TWENTY-FIVE COMMITS BEHIND.** Production is the SHA somebody last pulled; master can advance for
+days and ship nothing. Never say "it is live" because you pushed. **Tom has NOT pulled the
+2026-09-16 performance work and should not be pushed to before his EWB meeting** -- see the
+clearance below.
 
-**THE `.claude` EXPOSURE IS FIXED IN THE REPOSITORY AND STILL LIVE UNTIL TOM DEPLOYS.**
-`https://hawsedc.com/engcalcs/.claude/settings.json` answered HTTP 200 -- agent definitions, hook
-scripts, the permission allow-list. An `.htaccess` does nothing until the file is on the server, and
-it was still 500-ing/200-ing when last curled. **One `git pull` closes it.**
+**THE `.claude` EXPOSURE IS CLOSED.** Verified from outside the account 2026-09-16:
+`https://hawsedc.com/engcalcs/.claude/settings.json` and `dev/ROADMAP.md` both answer **403**, and
+the daily page check's new `blocked=6` line is that fix landing. **Delete this paragraph once you
+have read it** -- it is state, and it is now finished state.
+
+**TOM'S EWB MEETING IS 2026-09-17.** He was told to demo from PRODUCTION, normal browser window,
+staying inside one project. Nothing in this repository should be deployed on the morning of it.
+
+## WHAT THE 2026-09-16 SESSION LEFT YOU: A CLEARANCE TO PROCEED ON THE ROADMAP
+
+**EVERY TRACK FROM THAT SESSION IS MERGED, PUSHED, AND ITS BRANCH AND WORKTREE ARE DELETED.** The
+only branches alive are the six capability branches awaiting his browser pass, `projection`,
+`674-coordinate-entry`, `tables-interface`, and two empty refs (`660-dblclick-open`,
+`662-reaction-questions`). `branch_hygiene_check.php` is clean of that session's work.
+
+**SO THE ROADMAP IS OPEN. Start with `dev/ROADMAP.md`'s 100 band.** The two tasks that session
+opened are **680** (keep a project's drawing rather than rebuilding it) and **681** (economize the
+label layout), both at 75 and both carrying measured numbers rather than guesses. **680's remaining
+half is the big one and was deliberately not started 17 hours before his meeting** -- it makes the
+four map layers and the three element indexes stop being singletons.
+
+**THREE THINGS ARE STILL TOM'S, and none of them blocks roadmap work:**
+- **One `?debug=perf` line with DevTools fully CLOSED**, switching into Net-3. His last unexplained
+  number was `lk:layout` at 6.4 ms per label copy against 0.3 ms here for the same 252 copies; the
+  double-layout fix should have removed most of it and was never confirmed on his machine.
+- **The six browser passes.** Ports 8087-8092, descriptions in `~/webdev/worktrees/_panel/ports.conf`.
+- **Whether `projection` is finished.** Unchanged since 2026-09-14: one sentence from him, and do
+  not guess.
 
 **THE FEATURE FREEZE IS TWO LOCKS NOW AND TOM'S OWN APPROVAL DOES NOT OPEN IT** (his choice,
 2026-09-15). `feature_freeze.active` is TRUE in `dev/branch-policy.json`: a `protected` branch is
@@ -202,96 +228,61 @@ carries the case and it fails on the old tree. **The projected branch had the id
 2026-09-14 and this is the local-grid half of it** -- if a third zoom complaint arrives, suspect the
 constant before the arithmetic.
 
-**THE FIVE-SECOND PROJECT-TAB SWITCH IS A MEASUREMENT STORM, and half of it is now gone
-(2026-09-16).** Tom: *"There is a 5-second delay switching to Net-3 project tab"*, and he was right
-that it is not the solve -- turning off auto-run and thematic colouring changed nothing. **Measured:
-one switch into Net3 with every label field on asked the browser for 8,140 text measurements, 1,029
-of them distinct -- 87% repeats inside one switch, and 100% of a SECOND switch's measurements had
-been answered by the first.** Each is a layout read between two DOM writes, so a browser pays a
-synchronous layout of an 8,400-element drawing for every one; node pays arithmetic, which is why the
-headless switch is 350 ms and his is five seconds. `measuredTextWidth()` banks them on (class, size,
-string) -- **8,140 becomes 1,078 on the visit that first sees solved values, and 100 on every visit
-after that**, measured over five consecutive switches; a re-layout at an unchanged size becomes 0.
-- **IT DOES NOT RESCALE BY FONT SIZE, and real Chrome is why.** The obvious version banks width per
-  unit of size, the assumption `labelBoxWidth()` already ships for pixels. Measured before building
-  it, eight label strings at thirteen sizes: **a measurement below about one world unit of font size
-  is quantised -- 1.19% error at 0.5 units, 5.6% at 0.1, 19.7% at 0.02** -- and a label's world font
-  size is `textSize / scale`, so the small end is simply "zoomed in". The size is part of the key.
-- **TWO THINGS ARE STILL ON THE TABLE and both are measured.** (1) **A switch lays the labels out
-  THREE TIMES**, the first at the OUTGOING project's scale, which the fit then throws away -- it no
-  longer costs measurements once the cache is warm, but it is still three passes of composing and
-  placing. (2) **Hiding the labels does not stop any of it** -- with
-  thematic colouring on, `dataLabelsHidden` toggles a CSS class and every label is still composed,
-  measured and placed (7,825 measurements against 7,822 with them shown). Tom asked for exactly this
-  to be confirmed; it is confirmed.
-- **MEASURED IN THE BROWSER, AND THE TEXT MEASURING IS NO LONGER THE STORY.** Tom's own readout
-  (2026-09-16), switching into the geographic Net3 at scale 5.35e3: **`buildDom 3,389ms`,
-  `fontSizes 1,037ms`, whole switch 4,628ms -- with only 334 label measurements left.** Reproduced
-  here in headless Chrome driven over the DevTools protocol (`dev/lpn-spike/` has no harness for it
-  yet; the driver is in this session's scratch): same drawing, same zoom, **762 ms** -- his machine
-  is about 6x slower than this one, and **the SHAPE is identical**: buildDom is 72-73% of the switch
-  on both. Inside it: **label pass 306 ms (56%), building the links 160 ms (29%), the nodes 79 ms
-  (14%)**, texts and selection and visibility together under 3 ms.
-- **SO THE REMAINING COST IS THE REBUILD ITSELF, and the question it raises is architectural rather
-  than a defect**: a project switch destroys every element and builds ~8,400 new ones, because this
-  page keeps ONE drawing and re-derives it from whichever document is open. Tom's instinct --
-  *"we should not be recalculating hydraulics or label positions when switching back to a tab"* -- is
-  the right question to answer, and the answer is either to keep each project's drawing and
-  hide/show it (memory against time) or to make the per-element build cheaper. **Not attempted; his
-  call.**
-- **THE SOLVE AND THE LABEL LAYOUT ARE KEPT PER TAB SINCE 2026-09-16 (Task 680 phase 1), and the
-  switch is 38% faster** -- 636 ms to 395 ms median in real Chrome on his own drawing and zoom, with
-  the label pass running ZERO times and asking the browser for ZERO measurements. Tom: *"in the name
-  of doing the right thing, the solve should be saved, as should the placements."*
-  **TWO THINGS THE BUILD TAUGHT:** the keep must be pinned to the BYTES `saveToStorage()` wrote
-  (serializing the same document twice gives different key order and never matched), and **a plain
-  rebuild does not reproduce the layout it had -- 214 of 216 labels move on a switch away and back**,
-  measured with the keep off. That is a standing defect nobody had seen; the keep hides it and does
-  not explain it.
-- **AND THE REBUILD WAS QUADRATIC IN THE PIPES -- one line fixed it, 2026-09-16.** `buildDom()` was
-  the one drawing-wide function that never opened the two holds `relayoutLabels()` and
-  `refreshLabelText()` have always opened, so `linkSegIndex()` rebuilt the index of EVERY link's
-  segments once per link (**120 builds for 119 pipes**, asserted now) and `mapBox()` re-read the
-  canvas between appends. **Tom's machine: `links` 1,156 ms of a 1,414 ms switch; here 180 ms became
-  16-30 ms and the whole switch 395 ms became ~208 ms.** The count, not a stopwatch, is what
-  `switch-keep-harness.js` asserts -- a timing assertion cannot travel between machines.
-- **THE WHOLE ARC, on his own machine and his own drawing: 4,628 ms -> 1,414 ms -> and this should
-  take it near 450 ms.** Text measuring, then the kept solve and label layout, then the holds.
-- **`?debug=perf` NOW COVERS THE SWITCH** -- per-phase times plus `label passes` and `label
-  measurements` counts -- so the next round is measured in the browser that is actually slow rather
-  than guessed at. `dev/lpn-spike/label-measure-cache-harness.js` holds the counts.
+**THE FIVE-SECOND PROJECT-TAB SWITCH: 4,628 ms TO ~300 ms ON HIS OWN MACHINE, IN FIVE REMOVALS
+(2026-09-16).** Tom: *"There is a 5-second delay switching to Net-3 project tab"*, and later, on
+being offered 3 seconds: *"3 seconds vs 5 seconds is hardly an improvement. Why is anything being
+recalculated at all?"* -- which was the right question and is what produced the rest of it. Every
+one of the five is a REMOVAL OF DUPLICATED WORK, not a cleverness, and each was measured in a real
+browser before and after.
+
+| what was removed | his machine |
+|---|---|
+| re-measuring text the browser had already measured (`measuredTextWidth`, keyed on class+size+string) | 8,140 measurements a switch -> ~100 |
+| re-solving a network that had not changed (`switchKeep`, pinned to the stored BYTES) | one engine run a switch -> none |
+| re-deciding a label layout that had not changed (the same keep) | label passes 2 -> 0 |
+| an index of every pipe's segments rebuilt once PER PIPE (`buildDom` never opened the two holds) | 120 builds -> 1 |
+| every label laid out twice, the first time at the OUTGOING tab's zoom | `lk:layout` 1,618 ms -> gone |
+
+- **THE ONE NUMBER STILL UNEXPLAINED** is that `layoutLinkLabel` cost him 6.4 ms per label copy
+  against 0.3 ms here, for the SAME 252 copies -- his window size, his zoom and his station counts
+  were all eliminated as causes, and LastPass was wrongly accused and cleared by his own
+  measurement. The double-layout fix should have removed most of it. **Unconfirmed: he never sent a
+  reading with DevTools closed.**
+- **`?debug=perf` NOW COVERS THE WHOLE SWITCH** and stamps the BUILD SHA on every line, because an
+  exchange was lost to a readout taken before a deploy. It breaks `buildDom` into nodes/links/texts,
+  a pipe into four parts, and counts label passes, measurements and label copies. `?debug=nofiles`
+  boots without touching saved file handles.
+- **AND THERE IS A BROWSER DRIVER NOW: `dev/lpn-spike/browser-drive.js`.** It speaks the DevTools
+  protocol to a real headless Chrome with no dependency (node's built-in WebSocket), which is what
+  ended the guessing: Task 672 established that THREE headless reproductions of a slowdown had
+  failed, because what costs the seconds -- forced layout, rasterising, style recalculation -- is
+  work the DOM stub does not do. **Absolute milliseconds do not travel between machines; shapes and
+  ratios do**, and every conclusion drawn from it was stated as a proportion and then confirmed on
+  his readout.
+- **WHAT IS LEFT IS TASK 680's OTHER HALF:** the drawing is still destroyed and rebuilt on every
+  switch. Keeping it costs about 2 MB per project (measured) and makes the layers and element
+  indexes stop being singletons.
 
 **CHROME CRASHES ITS OWN BROWSER PROCESS ON THE MAP PAGE IN A PRIVATE WINDOW, AND IT IS NOT OURS**
 (2026-09-16). Recipe, both halves needed: a private window, a project opened THROUGH THE FILE
-PICKER, then a reload. No file opened, no crash; normal profile, no crash. **Production's week-old
-code crashes identically** -- served side by side on local ports and tested -- so none of the
-session's 20 commits did it, which is what the session assumed for an hour. Three dumps all say
-`ptype: browser`, which **a web page cannot cause**. Full evidence and the one test that would
-narrow it further: `dev/chrome-incognito-crash.md`. **Do not build an incognito DETECTION to work
-around it.**
+PICKER, then a reload. A 14 KB drawing with no image, no scenarios and no map is enough; a project
+created in the window without the picker is clean; a normal profile is clean. **Production's
+week-old code crashes identically**, served side by side on local ports -- so none of that session's
+commits did it, which the session assumed for an hour. With `?debug=nofiles`, which skips both the
+read on boot and the WRITE when a file is opened, **it still crashes**, so no handle of ours is
+involved at all. Three dumps, all `ptype: browser`, which **a web page cannot cause**.
+`dev/chrome-incognito-crash.md` holds the evidence and the report to file with Chrome, ready to
+paste. **Do not re-open it as a suite defect, and do not build a workaround on an incognito
+DETECTION.**
 
-**IT IS SETTLED AND IT IS ENTIRELY CHROME'S:** with `?debug=nofiles` -- which skips both the read on
-boot AND the write when a file is opened, so no handle of ours ever reaches IndexedDB -- it still
-crashes. A 14 KB drawing with no image, no scenarios and no map is enough; a project created in the
-window without the picker is clean. **The vanishing mouse cursor is the same bug**, and the obvious
-suspect was innocent: it was pinned on the `?debug=perf` overlay having stopped ignoring the mouse
-(the only cursor-related line in the whole night), and then it happened again under `?debug=nofiles`
-where that overlay does not exist. **"The only line that could have done it" is how a one-sided
-correlation gets promoted to a cause.** `dev/chrome-incognito-crash.md` has the report to file with
-Chrome, ready to paste.
+- **THE VANISHING MOUSE CURSOR IS THE SAME BUG, and the obvious suspect was innocent.** It was
+  pinned on the `?debug=perf` overlay having stopped ignoring the mouse -- the only cursor-related
+  line in a 20-commit night, present on the new build and absent on production's -- and then it
+  happened again under `?debug=nofiles`, where that overlay does not exist. **"The only line that
+  could have done it" is how a one-sided correlation gets promoted to a cause.**
 
-**AND THE LAST BIG ONE: A SWITCH WAS LAYING EVERY LABEL OUT TWICE** (2026-09-16). `buildNodeEls()`
-and `buildLinkEls()` each lay their own label out as they build it, and then the whole drawing is
-laid out again at the end -- restored from the tab's kept layout, or computed in the one deferred
-pass. During a whole-drawing rebuild the first one is thrown away, and it runs BEFORE the camera
-moves, so it was computed at the wrong scale as well. **On Tom's machine that was `lk:layout`
-1,618 ms of a 1,955 ms switch**; here `links` fell from 16-34 ms to 5-19 ms and the label-copy count
-halved, 251 to 132, which is the doubling showing up in a second instrument. Skipped only while
-`labelPassDeferred` is set, so every other caller -- adding a pipe, an edit's rebuildLink() --
-is untouched.
-
-**STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
-is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
+**STILL WAITING ON HIM:** the browser passes; one `?debug=perf` reading with DevTools closed;
+**whether `projection` is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
 Task 663's questions 2 and 3, now that he knows the reaction rate is a LINK label switched on under
 Settings > Labels and needs a chemical and an extended-period run to exist at all; the grouping
 build; and the two remaining empty refs, `660-dblclick-open` and `662-reaction-questions`.
