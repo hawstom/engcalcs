@@ -7,14 +7,12 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**95 open tasks.** Next (100): 13 · Soon (75): 23 · Someday (50): 30 · Maybe (25): 11 · Parked (5): 18
+**98 open tasks.** Next (100): 12 · Soon (75): 25 · Someday (50): 32 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (13)
+## 100 — Next (12)
 
-- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
@@ -24,12 +22,14 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 669 — Show labels at this zoom or closer.
 - Task 674 — Type a node's coordinates instead of only dragging it.
 - Task 676 — Watch the sites, and send a derived weekly report.
+- Task 684 — A thematic map with labels off still lays the labels out.
 
-## 75 — Soon (23)
+## 75 — Soon (25)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
 - Task 612 — [H] · Screenshot 0082 is the centerpiece of any lpn display.
@@ -50,10 +50,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 679 — Narrower strokes on the About mark, and more pixels used.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
+- Task 682 — Zoom on a PC with no wheel, and from the keyboard.
 
-## 50 — Someday (30)
+## 50 — Someday (32)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
+- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
@@ -83,6 +85,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
 - Task 664 — A link's status colours correctly and its legend prints numbers.
 - Task 675 — A labelled grid, with the significant digits picked out.
+- Task 683 — The zoom increment, and whether zoom levels should snap.
 
 ## 25 — Maybe (11)
 
@@ -123,5 +126,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-87 of 95 titles are within 4–12 words. `!` marks the rest;
+90 of 98 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
