@@ -261,6 +261,39 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   column-hide mechanism the table already has (which is Declan's territory, not mine — I am not
   proposing new machinery here, only naming which of "narrow" or "hide" is honest from my seat).
 
+### 8. Zoom: never snap the pinch gesture; if per-level label caching ships, key it on a scale bucket without making the view refuse to land where fingers put it; and add a second named view, "zoom to selection"
+
+- **What, three parts, in order of how much I care:**
+  1. **Do not snap the DISPLAYED scale during pinch, ever.** Snapping button/double-tap steps is
+     fine and unrelated to this objection. Full reasoning and a citation: journal, 2026-09-17, Q1.
+     My job's reason for pinching is lining the drawing up against the ground under my feet; a
+     view that will not land exactly where two fingers put it defeats that, and it is the one part
+     of Tom's two proposals I would flatly decline rather than rank low.
+  2. **If per-level label caching is built (the "almost instantaneous zooming" idea), build the
+     cache key as a rounded bucket of the continuous scale, not as the displayed scale itself** —
+     the view stays continuous and smooth (this page already defers the expensive relayout to
+     settle 120 ms after a gesture, `js/looped-network.js:29159-29160`, so the caching win is about
+     making that settle-moment recompute instant on a REVISIT to a scale, not about removing lag
+     that is not currently there mid-gesture). If a jump is unavoidable for the caching approach
+     chosen, let it happen only in the fast part of a gesture and settle to no-jump in the last
+     slow portion — see journal Q2 for why that specific moment is the one that matters to a
+     reader confirming identity by tap.
+  3. **A second named view, "zoom to selection"** (frame the tapped asset and its immediate
+     neighbors), built the same way `Zoom to fit` already is (`js/looped-network.js:25343`) but
+     from the selection's extent rather than the whole drawing's. This is my actual answer to "how
+     many zoom levels do I use" (journal Q3: two or three PURPOSES, not a ladder of magnitudes) —
+     it is cheaper than a caching ladder and serves the real want directly.
+- **Rank: the snap objection (part 1) is a real "please do not do this," not a low-priority
+  wish — but it is also not urgent, because nothing has shipped yet; I am recording it now so it is
+  on record before any build starts. Parts 2-3 are ordinary feature-shaping, ranked below my
+  existing #1-6 for the same reason those are ranked where they are: this is refinement of a page
+  Tom already found "super solid" on a phone, not a rescue.**
+- **Disagreement with how the proposal was framed, stated once:** Tom's own two sentences read as
+  one idea ("zoom level snapping... and I assume that would give us almost instantaneous zooming"),
+  and I think they are two different changes with very different costs to my task. The caching
+  half is worth having; the snapping half is the one I would ask him to reconsider before it is
+  built, on the finger-tracking argument above, not on taste.
+
 ## Parked
 
 *(none yet)*

@@ -687,3 +687,119 @@ narrowed.** Reasoning from this seat specifically:
   is the one column where truncation reads as a wrong answer rather than an honest omission.
 
 — Franco
+
+## 2026-09-17 — Task: zoom-level snapping and per-level label caching (Tom's two proposals)
+
+Two separate questions from Tom, and I want to keep them separate because my answers differ:
+(1) should the DISPLAYED scale snap to a defined ladder of zoom levels, and (2) should label
+position/shedding be CACHED per zoom level so re-entering a level is instant. The second does not
+require the first — a cache can be keyed on a rounded scale bucket while the displayed scale stays
+continuous — and I think collapsing them is the trap in his own phrasing ("even on a phone, zoom
+level snapping could be enforced... And I assume that would give us almost instantaneous zooming").
+
+### What the code does today (grounding before opinion)
+
+**OBSERVED**, zoom is fully continuous, not leveled, in both input paths: mouse wheel calls
+`zoomAbout(mx, my, e.deltaY < 0 ? 1.1 : 1/1.1)` per notch (`js/looped-network.js:26699`), and pinch
+calls `zoomAbout(mx, my, (d / drag.d0) * drag.s0 / state.s)` on every `touchmove` frame while two
+fingers are down (`js/looped-network.js:27392`) — `state.s` is a float, not an index into a list.
+
+**OBSERVED**, the expensive relayout is already deferred and debounced independent of any level
+idea: `refreshFontSizes(deferLayout)` skips `relayoutLabels()` during the burst and
+`scheduleReshed()` fires it once, ~120 ms after the last notch/frame (`js/looped-network.js:
+29156-29183`, comment at 29159: *"a wheel spin is a BURST whose intermediate frames nobody looks
+at"*). So mid-gesture, nothing is jumping or lagging today; the cost lands once, at the moment you
+stop, and is measured at "most of a wheel notch's ~157 ms" on Net3 (`js/looped-network.js:29158`).
+
+**OBSERVED**, there is already a cache of exactly this shape, but keyed on TAB SWITCH, not on zoom
+level: `captureLabelLayout()`/`rememberSwitchState()` (Task 680, `js/looped-network.js:19636-19679`)
+banks every label's nudge, sides, lines and shed state, keyed on `{scale: state.s, ...}` plus a
+document-content hash, explicitly because *"a layout belongs to the zoom that produced it"*
+(`js/looped-network.js:19648-19649`). Tom's new idea is this same mechanism widened from "one slot
+per tab" to "many slots per document, one per zoom level."
+
+### Q1 — does a snapped zoom help or hurt me
+
+**Hurts, for the gesture that matters most to my job, and Tom's own instinct ("might be
+anti-idiomatic") is correct — I'd go further than "might."** My case is narrower than a general
+UX argument: the reason I pinch-zoom in the street is almost always to line up the DRAWING against
+the GROUND I am standing on — is this the valve at my feet or the one ten feet over — not to admire
+a framing. That only works if the map tracks my fingers exactly. **CITED**, this is the standard,
+well-documented mobile-map complaint about snapping: a Google Maps forum discussion on iPhone
+zoom behavior describes continuous pinch as adjusting "infinitely" and states plainly that when a
+map snaps to a different zoom level right after the fingers lift, "the eyes lose focus" because
+the map jumps away from exactly where the two fingers placed it — and that no major Android map app
+snaps away from a pinch gesture for this reason (community discussion collected via web search,
+2026-09-17, on Google Maps and Android mapping conventions generally). That is precisely my
+complaint stated by someone else first: I am not zooming for a nice picture, I am placing two
+fingers on the exact spot the valve should be and I need the map still there when I let go.
+**The same source is explicit that discrete snapping is fine, and expected, for a DIFFERENT
+gesture — plus/minus buttons and double-tap — because those are already discrete actions with no
+continuous finger-tracking to betray.** So my answer is gesture-specific, not a blanket "no":
+snap the button/double-tap step size if you like (this page already disables double-tap-to-zoom
+for its own reasons, `css/engcalcs.css:299`, per my 2026-09-01 entry below), never the pinch.
+
+**And the caching idea does not need me to accept the snap at all.** A cache can be keyed on a
+rounded bucket of `state.s` (e.g., the nearest of a log-spaced ladder) while the DISPLAYED scale
+stays exactly what your fingers say — the bucket picks which cached layout to interpolate from or
+snap TO INTERNALLY for the label pass, without the view itself ever refusing to land where you put
+it. I would ask that the caching work be built that way from the start, because building it as "the
+view snaps to the cache keys" is the shape that produces the finger-tracking defect above, and it
+would be easy to arrive at that shape by accident since it is the simplest implementation.
+
+### Q2 — fixed-per-level labels (jump) vs continuously interpolated (drift): which reads better in the street
+
+**Drift, for my task, with one exception.** My own 2026-09-08 entry on Task 539 already established
+that I do not read a whole-drawing label layout while zooming — I track ONE label, the one near the
+asset I am walking toward, and I confirm identity by tapping rather than by reading a dense label
+field. A slide keeps that one label under continuous visual tracking as it shrinks/grows with the
+drawing; a jump relocates it (and everything shed around it) in one discrete step. The exact moment
+that matters most — the last half-second of a zoom-in, homing in on the one valve — is also the
+moment a snap-driven relayout is likeliest to trigger, because that is when you cross the most
+zoom-level boundaries per second of real time relative to how far you're moving your eye. A label
+that jumps sideways or a neighbor's label that suddenly appears right as I am about to tap is a
+small version of my own "closer to the wrong node" hazard from the Task 539 entry (this file,
+2026-09-08) — a misattribution risk, not just an aesthetic one, and it lands at the worst possible
+moment: the instant before the tap that was supposed to confirm identity.
+**The exception:** during the FAST part of a pinch, before my eye has locked onto a target, a jump
+costs me nothing because I am not reading yet — I am still placing my fingers. If jumping has to
+happen for the caching win to be worth having, doing it only while the gesture is still moving
+fast, and settling into a slide (or holding still) in the last, slow portion of the gesture, would
+protect the moment I actually rely on. I have not designed that threshold; I am naming it as the
+shape that would make a jump-based cache safe for my task rather than a blanket objection to
+jumping.
+
+### Q3 — how many zoom levels do I actually use
+
+**Two or three framings, named by PURPOSE rather than by magnitude, which is an argument for named
+views over a snap ladder.** From my own prior research (this file, 2026-08-25 and 2026-09-08) and
+from the suite's own declared 300 km / modest-venture scope: my actual field use is (a) an
+orientation view — where am I in the system, usually already served by the existing "Zoom to fit"
+tool (`js/looped-network.js:25343`) — and (b) a close-in view of the one cluster or asset I am
+standing at, arrived at by pinching straight there from wherever I was, not by stepping through
+intermediate magnifications. I do not use a ladder of framings in between; I go from "whole system"
+to "this valve" in one gesture. **SPECULATION, mine:** if the real want behind "instant zooming" is
+"get me back to the framing I actually use, fast," a second NAMED view — something like "zoom to
+selection" (frame the tapped asset and its immediate neighbors, the same neighbors the property
+popup already shows me as upstream/downstream) — answers that want directly and needs no zoom-level
+ladder at all: it is one saved camera position, computed once, not a cache indexed by continuous
+scale. The project already has the instinct (`Zoom to fit` is exactly this, computed from the whole
+drawing's extent); a second one computed from the SELECTION's extent would be the same mechanism
+serving my actual two-framing habit, and it sidesteps both the finger-tracking problem in Q1 and
+the mid-gesture jump problem in Q2 because it is a deliberate button press, not a gesture that has
+to guess which level you meant.
+
+### Q4 — anything else painful on a phone, checked against my own journal first
+
+I re-read my own wish list and journal before answering so as not to repeat myself. My sharpest
+standing finding is already there and is the one I would put ahead of anything zoom-related: the
+accidental double-tap vertex insert/remove in plain `select` mode (wish list #5, journal
+2026-09-01) — a reader tapping twice out of impatience, exactly the gesture a pinch-then-tap
+sequence can produce by accident, silently edits the model with no undo snapshot. **I checked
+whether the zoom-level questions here interact with that hazard and they do not** — pinch uses two
+pointers and the accidental-edit path is a single-pointer `dblclick`, so they are independent
+defects and neither fix changes the other. Nothing new to add this pass beyond flagging that the
+two proposals under review here (snapping, per-level caching) do not touch that older, more urgent
+finding, and I would still rank it above both.
+
+— Franco

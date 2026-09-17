@@ -169,6 +169,8 @@ run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_glob
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
 run_check "canonical path override"      blocking php dev/scripts/canonical_path_check.php
+run_check "sitemap canonical agree"      blocking php dev/scripts/sitemap_canonical_check.php
+run_check "sitemap canonical selftest"   blocking php dev/scripts/sitemap_canonical_selftest.php
 run_check "canonical path selftest"      blocking php dev/scripts/canonical_path_selftest.php
 # The suite nav rides onto every page including the one served at the /app/ rewrite, where a
 # RELATIVE href resolves against /app/ and 404s. The markup is identical on both hosts, so nothing

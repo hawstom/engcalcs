@@ -133,8 +133,82 @@ the block.
     approximation before any search, and we have the search without it. (c) A label whose content
     and scale have not changed since the last pass could keep its placement, which is the same
     "keep what you already worked out" argument as Task 680.
+  - **(d) TOM'S OWN PROPOSAL, 2026-09-17: bank the answer PER ZOOM LEVEL.** *"We should be able to
+    save label position and shedding state for every node at every zoom level. And I assume that
+    that would give us almost instantaneous zooming."* It is (c) with a key, and the key is the
+    hard part. **It does NOT require Task 683's snapping and must not be built as though it does**
+    (Franco, 2026-09-17): key the cache on a ROUNDED BUCKET of the continuous scale and let the view
+    go on tracking the fingers exactly. What still needs his seat is the reading question -- banked
+    positions do not slide as you pinch, they JUMP between buckets, and the moment that is likeliest
+    to happen is the last half-second before a tap, which is the worst instant for a label to
+    relocate in a tight cluster.
+  - **(e) AND A PLACEMENT DELAY WHILE THE WHEEL IS STILL TURNING.** Tom, same day: *"if a person is
+    scrolling fast, there is no label placement recalculation until they stop. Maybe this is already
+    done, because the truth is that zoom performance is not terrible on Net3."* **Check before
+    building** -- `scheduleReshed()` is already deferred and `onZoomChanged()` already skips the
+    whole pipeline while annotation is hidden, so some of this exists. Measure what a fast wheel
+    burst actually costs before adding a second timer.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
+
+- 75|682| **Zoom on a PC with no wheel, and from the keyboard.**
+  Tom, 2026-09-17: *"How would a person zoom on a PC without a mouse wheel or, for that matter,
+  with a keyboard (if that's not too much to ask). Interesting question, nonetheless."*
+  - **THIS IS TASK 674's DEFECT IN ANOTHER CONSTRUCT and that is why it is at 75 rather than 25.**
+    674 exists because a coordinate could be entered by gesture and by nothing else. Zoom may be
+    the same shape: a trackpad, a trackball, a presentation remote and a keyboard-only user all
+    arrive at a drawing surface whose only documented zoom is a wheel. **Establish first whether
+    that is true** -- read `js/looped-network.js` rather than assuming, and say where you did not
+    look.
+  - **IT IS TRUE, AND IT WAS MEASURED RATHER THAN ASSUMED (Ida, 2026-09-17).** The zoom function has
+    exactly TWO callers in the whole of `js/looped-network.js`: the wheel (`:26699`) and the
+    two-finger pinch (`:27387`). The only non-gesture control is **Zoom to fit** (`:25343`), which is
+    a reset, not an increment -- press it twice and the second press does nothing. The page's only
+    keydown bindings outside a text field are Ctrl+Z and the 1-9 tool picker. **So a keyboard-only
+    visitor, or anyone with a wheel-less mouse, can reach "fit" and nothing else.**
+  - **EPANET ITSELF ANSWERS THIS WITH TWO ORDINARY BUTTONS, Zoom In and Zoom Out**, and documents no
+    wheel and no keyboard shortcut. That is the model: not a new idiom, the one our own reference
+    application already uses. Full citations in `dev/agents/interface-designer/journal.md`.
+
+- 50|683| **The zoom increment, and whether zoom levels should snap.**
+  Tom, 2026-09-17: *"There are a limited number of zoom levels. Even on a phone, zoom level
+  snapping could be enforced, though that might be anti-idiomatic."* And: *"An argument could be
+  made that our mouse wheel zoom increment is too small."*
+  - **HE NAMED THE RISK HIMSELF and it is the whole question.** This page is two idioms at once: a
+    slippy map, which snaps to integer tile zooms, and a CAD drawing surface, which never snaps.
+    Deciding which governs is the task; the arithmetic is an afternoon.
+  - **IT BLOCKS TASK 681(d)**, because banking a label layout per zoom level presumes there are
+    levels to bank against.
+  - **BOTH SEATS SAY DO NOT SNAP, and they agree with Tom's own worry** (Ida and Franco,
+    2026-09-17, journals under `dev/agents/`). Franco's is the reason that decides it: he pinches to
+    line the drawing up against the ground he is standing on, and a view that snaps after he lifts
+    his fingers **jumps away from the spot he just placed it on**. Ida's is the desktop half -- the
+    raster argument for snapping is one the tile provider already answers by resampling, so snapping
+    would cost the drawing half something real to fix nothing.
+  - **THE INCREMENT IS A SEPARATE QUESTION AND HIS INSTINCT HAS SUPPORT.** The wheel is a factor of
+    **1.1, ten percent a notch** (`js/looped-network.js:26699`). AutoCAD defaults to 60% and its own
+    users who turn it down for fine control land near 15-20%; QGIS's zoom tool is 200% a click. Ours
+    is below that entire range. Nobody has filed a friction report about it, so this is evidence
+    rather than a defect.
+  - **AND IT DOES NOT BLOCK TASK 681(d) AFTER ALL, WHICH IS THE USEFUL FINDING.** Franco: a label
+    cache can be keyed on a ROUNDED BUCKET of the continuous scale while the view still tracks the
+    fingers exactly. **Building it as "the view snaps to the cache keys" is the easy way to arrive
+    there by accident**, and it is the shape that breaks the finger tracking he depends on. Build the
+    key and the view as two separate things from the start.
+
+- 100|684| **A thematic map with labels off still lays the labels out.**
+  Tom, 2026-09-17: *"Thematic map (labels off) should not do any label calculations. Off should
+  mean off. Consent, people!"*
+  - **HALF OF IT WAS ALREADY TRUE, which is what made the rest invisible.** `onZoomChanged()` and
+    `scheduleReshed()` both check `dataLabelsHidden` and skip the pipeline, with a comment saying
+    why. But `dataLabelsHidden` is read at only those two places, while `relayoutLabels()` alone has
+    24 call sites -- so a rebuild, a settings change, a solve, a scenario switch and a project-tab
+    switch all still compose, measure and collision-relax annotation that `lpn-labels-hidden` is not
+    drawing.
+  - **THE TRAP IS THAT "LABELS" NAMES TWO THINGS HERE.** The user's own Text objects are content and
+    are NOT suppressed (Task 428); generated annotation is. Work the Text objects need must not be
+    skipped with the rest.
+  - `georefActive()` is the second suppressor and gets the same treatment (Task 145).
 
 - 75|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
@@ -274,6 +348,17 @@ the block.
     asking up front *"is too evocative of a login or registration"*, on a site with no login and no
     account. Break lock exists today as "take over"; Cancel and Open read-only exist; **Request
     lock is genuinely new and needs a back channel the broker does not have.**
+    - **HE RESTATED IT 2026-09-17 AND ADDED THE READOUT, which is the part that was missing.** The
+      dialog states three ages, not one: *"This file has been in use for X hours, was last saved Y,
+      and was last edited Z. We can ask the locking user to close the file for you."* Then
+      **Ask, Break lock, Open read-only, Cancel** -- "Ask" is what (b) above calls Request lock, and
+      his shorter word is the one to ship.
+    - **AND HE CONCEDED THE TRADE RATHER THAN DENYING IT**: *"Of course saving initials with the
+      lock is better. But asking user A for their initials the first time they save a file is a bit
+      startling, not to mention easily confused with a login or account registration."* So the
+      design knowingly gives up a nicer message to the second user in order not to ask the first
+      user for a name on a site that has no accounts. Do not re-propose asking up front as an
+      improvement; it is the rejected alternative.
   - **(c) A CLOUD SAVE OPTION, WHICH MEANS A LOGIN.** Parked at the top of nothing: the suite has
     no login, no user table and no session by construction (`no_session_check.php` blocks at
     zero), and reversing that is a consent-version bump, a rewritten banner and 26 retranslations
@@ -472,7 +557,10 @@ the block.
     is in `ship-notes.md` (one light above, three surfaces, and the shading follows the SOLID).
     Do not re-open the geometry: Tom on the favicon, *"my one true love."*
 
-- 100|185| **Match/Copy properties tool (originated during Task 146).**
+- 50|185| **Match/Copy properties tool (originated during Task 146).**
+  **DROPPED TO 50 BY TOM, 2026-09-17** (*"Task 185: Demote to 50"*), which supersedes the
+  promotion below rather than cancelling its reasoning: the feature is still wanted, nothing is
+  waiting on it.
   **RAISED TO 100 BY TOM, 2026-09-07.** The earlier gate -- 100 with Task 186, and only once all of
   the EPANET file is implemented -- is superseded by his own promotion, exactly as Task 186's was.
   - **THE PREMISE IT WAS CONCEIVED UNDER IS GONE, AND HE KEPT IT ANYWAY.** Tom, 2026-09-06: *"This
@@ -568,7 +656,10 @@ the block.
     29 keys reaching the tip helpers' `title=""` were unbound by rule B.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
-- 100|539| **Gang the neighbour labels so their leaders stop crossing.**
+- 75|539| **Gang the neighbour labels so their leaders stop crossing.**
+  **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
+  `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
+  write up** -- so the branch waits on his reading, not on more building.
   Tom, 2026-08-26, on a screenshot of two crossing leaders: *"when it looks so easy (to a human) to
   resolve, it's embarrassing."* All three phases are built and measured; every measured view of
   every shipped example is at **0 crossings**, at a cost of 38 hidden labels across 28 views.

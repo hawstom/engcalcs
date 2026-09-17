@@ -1521,3 +1521,110 @@ all. SPECULATION on the accidental-tap risk specifically (no measured incident),
 argument (OBSERVED numbers above) does not depend on it.
 
 No shipped file touched.
+
+---
+
+## 2026-09-17 — Zoom: snapping, wheel increment, and the no-wheel/keyboard gap (Tom's four points)
+
+Tom raised four things about `lpn_` zoom. Point 4 (fade labels past a zoom threshold) is Task 669,
+already designed, and out of scope here. The other three, ranked by what a reader actually suffers.
+
+### Ranked answer
+
+**1st — the no-wheel/no-touch path is a real, total gap, the same shape as Task 674.**
+OBSERVED: the ONLY non-gesture zoom control on this whole page is one button/menu row, "Zoom to
+fit" (`js/looped-network.js:25343` in `mapMenuRows()`; `:26520-26527` the toolbar button;
+`fn: zoomExtent`). It is an absolute RESET to the network's extent, not an increment — pressing it
+twice does nothing the second time. There is no Zoom In row, no Zoom Out row, no keyboard binding.
+OBSERVED: `js/looped-network.js:37430-37474` is the page's only two `keydown` listeners outside text
+fields — Ctrl/Cmd+Z (undo) and the digit-keys-pick-a-tool binding (Task 595, epanet-js's own 1-9
+scheme). Neither touches zoom, and I found no third handler anywhere in the file binding `+`, `-`,
+`PageUp/Down`, or arrow keys to `zoomAbout`. OBSERVED: `zoomAbout()` (`:9917`) is called from exactly
+two places — the wheel listener (`:26697-26700`) and the two-pointer pinch drag (`:27387-27393`).
+That is the complete set of doors into changing scale by any amount other than "reset to fit."
+**A person with a mouse that has no wheel, a trackpad the browser does not recognize as a pinch
+surface, or a keyboard-only path through the page (assistive tech, or simply no pointing device)
+can get to "fit" and can get to NOTHING ELSE — not zoomed in one notch further, not zoomed out from
+wherever a drag left them.** That is not a taste question; it is the same class of defect as
+Task 674 (a coordinate enterable only by dragging) — one gesture is the only door.
+CITED: EPANET's own desktop UI, which this suite's own comments name as the reference vocabulary
+(`CLAUDE.md`'s `lpn_` section), ships exactly the control this page is missing — two ordinary
+toolbar buttons and two View-menu rows, "Zoom In" and "Zoom Out" (https://usepa.github.io/EPANET2.2/7_map.html,
+fetched 2026-09-17: *"Select View >> Zoom In or click [icon] on the Map Toolbar"* / *"View >> Zoom
+Out"*). EPANET documents no wheel and no keyboard shortcut for either — its answer to "no gesture"
+is two ordinary buttons, nothing fancier. CITED: Figma, a comparable web canvas app, binds
+Cmd/Ctrl+`+`/`-` to zoom in/out and Shift+1 to "zoom to fit" (https://help.figma.com/hc/en-us/articles/360041065034-Adjust-your-zoom-and-view-options,
+fetched 2026-09-17) — this page already has the "zoom to fit" half of that pair and is missing the
+increment half entirely.
+**This is the one I would build first if only one could ship before the 16 September window** — no,
+correction, we are past that date now (today is 2026-09-17) but it is still the one I would build
+first of the three, because it is not a preference, it is an access path with zero doors for one
+class of user, exactly the shape CLAUDE.md's own rule about `lpn_` says to treat seriously
+("Design this page for a pointer; then make a phone survivable" does not say "or nothing at all
+for no pointer"). Cheapest form: two toolbar buttons or two Map-menu rows calling `zoomAbout()`
+with a fixed screen-centre point and the same 1.1/0.909 factor the wheel already uses — zero new
+interaction pattern, reuses the one function every other zoom path already goes through.
+
+**2nd — the wheel increment is on the small side of the comparison set, and Tom's instinct is
+better supported than not, though it is not indefensible taste-wise.**
+OBSERVED: `js/looped-network.js:26699` — `zoomAbout(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1/1.1)`.
+That is a **10% change in scale per wheel notch**, continuous (no snapping — see below), clamped
+between `minScale()`/`maxScale()` (`:9888-9899`). CITED: AutoCAD's `ZOOMFACTOR` defaults to 60 (a
+60% change per notch), range 3-100, and multiple Autodesk/community sources recommend LOWERING it
+to 15-20 for finer control on a modern high-resolution wheel
+(https://help.autodesk.com/view/ACDLT/2024/ENU/?guid=GUID-6A77AD55-6035-42FF-8FB1-FB0D8EFE1278;
+community reports at https://forums.autodesk.com/t5/autocad-forum/mouse-wheel-zoom-rates/td-p/9287210,
+fetched 2026-09-17). CITED: QGIS's own default zoom factor is 200% per zoom-in click of the
+Zoom tool (Settings > Options > Map Tools > Zooming), lower-bounded at 100% by the UI
+(https://www.cadlinecommunity.co.uk/hc/en-us/articles/360013651537-QGIS-Changing-the-Zoom-Factor,
+fetched 2026-09-17) — note this is QGIS's discrete zoom-TOOL click, and I could not find an
+authoritative primary source pinning its separate mouse-WHEEL factor to a specific number in the
+time I spent; flag this as the weaker half of the QGIS citation. **Our number, 10%, sits below every
+sourced default in this set, including the CAD tool whose users complain the factory default (60%)
+is too coarse and turn it down toward numbers closer to ours.** That is not proof 10% is wrong — a
+map-and-drawing hybrid page reasonably wants finer control than a pure CAD canvas, and nobody has
+filed a friction report about it (unlike Task 674, which came from an observed defect). But it is
+evidence Tom's instinct is pointed the right direction rather than groundless: the comparison set
+clusters between 20% and 200% per step, and this page is at 10%, alone below all of it. SPECULATION:
+a factor in the 1.15-1.2 range (15-20% per notch) would land inside the "fine CAD control" zone
+Autodesk's own community recommends without leaving the map-tool cluster far behind — I did not
+build or test this, it is a plausible number, not a measured one.
+
+**3rd, but only because it costs nothing new to answer — zoom-level snapping is the wrong idiom
+for this specific page, and Tom's own "anti-idiomatic" worry is correct.**
+This page draws slippy-map tiles (OBSERVED: OSM/Mapbox basemap layer, `js/lpn-terrain.js` /
+`js/looped-network.js` basemap functions cited elsewhere in this repo's own CLAUDE.md `lpn_`
+section) UNDER a vector drawing placed by hand at arbitrary scale — it is neither a pure slippy map
+(which snaps because its TILES are baked at integer zoom levels and a non-integer zoom must
+resample or blend) nor a pure CAD canvas (which never snaps because nothing behind the drawing is
+raster). OBSERVED: `zoomAbout()`/`minScale()`/`maxScale()` (`:9888-9925`) carry no notion of a
+discrete level at all — scale is a plain float, and the pinch handler (`:27387-27393`) sets it from
+a continuous finger-distance ratio, not from a level index. **Snapping would cost the vector half of
+this page something real (a hand-drawn node can no longer be placed to read cleanly at exactly the
+zoom the person wants) to buy the raster half something it does not need** — our basemap tiles
+already render at whatever fractional zoom the browser asks a slippy-tile CDN for; that resampling
+is the tile provider's problem, already solved, and invisible to a user who has never used this page
+as a pure tile viewer. SPECULATION, but low-risk: I did not find, and would not expect to find, any
+report in this repository of blurry or mismatched tiles at a non-integer zoom, because that is
+normal behavior for every web slippy map at every intermediate scroll position between clicks, not
+a defect. His own phrasing — "even on a phone, though that might be anti-idiomatic" — reads to me as
+him already half-answering himself correctly; I would not spend a build here. Ranked last because
+it is a "don't build this" answer, not a gap.
+
+### Where I did not look
+I did not test in a real browser (no `dev/browser-pass` render this session) — every wheel-factor
+and range number above is read from source, not measured on screen; a `dev/browser-pass` screenshot
+would confirm the ranges feel right but is unlikely to change the code-level finding (no wheel path,
+no keyboard path). I did not check `js/lpn-terrain.js` or the basemap-tile code path for whether it
+ever independently discretizes zoom for a TILE REQUEST (a plausible, unrelated reason a raster
+subsystem might quantize internally without exposing it to `zoomAbout()`) — that would not change
+the finding above (the STATE the user controls is continuous either way) but I have not read that
+file this session. I did not check `dev/browser-pass/` for any existing zoom-behavior test. I did
+not survey mobile-specific double-tap-to-zoom conventions beyond noting `touch-action: none` is
+already set (`:8362` comment) to suppress the browser's own double-tap — checked afterward whether this page offers its own double-tap zoom as a partial answer to
+phone's lack of a wheel: OBSERVED, it does not, and could not without a collision — `svg`'s
+`dblclick` listener (`:26969`) is already spoken for, bending a pipe or deleting a bend
+(comment at `:8358`), so a double-tap-to-zoom convention would need to fight an existing gesture
+on the exact same element, not add one for free.
+
+No shipped file touched.
