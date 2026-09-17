@@ -5979,9 +5979,17 @@ var EngCalcs = EngCalcs || {};
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {},
 		labelsByLinkAnchor = {};
 	// Whether generated annotation is currently suppressed, for ANY of the three reasons
-	// applyLabelVisibility() knows about. Written only there; read by onZoomChanged() and
-	// scheduleReshed(), which skip the label pipeline when nothing readable is drawn.
+	// applyLabelVisibility() knows about. Written only there, and read by the three entry points of
+	// the label pipeline -- refreshLabelText(), relayoutLabels() and refreshFontSizes() -- plus the
+	// zoom path and the debounced re-shed, all of which skip their work when nothing is drawn.
 	var dataLabelsHidden = false;
+	// **OFF MEANS OFF, AND THIS IS THE IOU** (Tom, 2026-09-17: *"Thematic map (labels off) should not
+	// do any label calculations. Off should mean off. Consent, people!"*). Set by whichever entry
+	// point turned around, cleared by reviveSkippedLabelWork() on the way back. Without it a
+	// suppression that outlives a solve, a settings edit or a scenario switch would come back showing
+	// the lettering of a drawing that has moved on -- skipping work while hidden is only correct if
+	// the revival pays it back, which is the same bargain the zoom path already made.
+	var labelWorkSkipped = false;
 	// **THERE IS NO BLANKET "hide all" CHECKBOX** (Tom, 2026-08-22, review: *"There is no such
 	// path as Labels... it has the identical behavior as Thematic map, except that it responds more
 	// slowly. I don't see the value."*). Unticking the field checkboxes is the per-field interface
@@ -7347,8 +7355,15 @@ var EngCalcs = EngCalcs || {};
 			'class': 'lpn-lbl lpn-draglbl', 'data-nodelbl': n.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
 		text.textContent = n.id;
+		// **OFF MEANS OFF, AND THIS ONE IS PER NODE** (Tom, 2026-09-17). getBBox() here is a layout
+		// READ taken between two appends, so each call forces a synchronous layout of the whole
+		// half-built drawing -- 97 of them on Net3 in a rebuild that draws none of this lettering.
+		// The placeholder is what every unmeasured label already starts at, nothing reads it while
+		// annotation is hidden (relayoutLabels() turns around too), and the revival re-measures
+		// every label through measureLabelWidths().
 		var tw = 8;
-		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
+		if (dataLabelsHidden) { labelWorkSkipped = true; }
+		else { try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ } }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
 		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, symbolG: symbolG, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		// The words are not the target; this is (see syncLabelHit).
@@ -11311,8 +11326,13 @@ var EngCalcs = EngCalcs || {};
 	// only elements including text."* Both are read where they are used -- applyLabelVisibility()
 	// and runSolve() ask georefActive() -- so there is no saved flag to restore wrongly; this only
 	// has to make the page re-ask.
+	// **THROUGH refreshLabelSuppression(), NOT applyLabelVisibility().** Finishing or cancelling a
+	// placement is a transition BACK, and the way back owes whatever was skipped while the project
+	// was being aimed -- which is exactly what the comment above refreshLabelSuppression() asks of
+	// every suppressor. It called the lower function until 2026-09-17 and got away with it only
+	// because the solve it schedules happened to end in a content pass.
 	function georefSuspend(on) {
-		applyLabelVisibility();
+		refreshLabelSuppression();
 		if (!on) { scheduleSolve(); }
 	}
 	// ---- step 1 <-> step 2 ----------------------------------------------------------------------
@@ -29166,11 +29186,18 @@ var EngCalcs = EngCalcs || {};
 		// batch of style WRITES followed by a batch of position writes that read geometry -- two
 		// different costs that a single number cannot tell apart.
 		perfDebugTime('  fontWrite', function () {
-			Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
-			Object.keys(linkEls).forEach(function (id) {
-				linkEls[id].text.style.fontSize = fs;
-				(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
-			});
+			// **OFF MEANS OFF.** A font size written onto lettering `.lpn-labels-hidden` is not
+			// drawing buys nothing, and the revival re-applies every one of them
+			// (refreshLabelSuppression), so nothing comes back at the wrong size.
+			if (!dataLabelsHidden) {
+				Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
+				Object.keys(linkEls).forEach(function (id) {
+					linkEls[id].text.style.fontSize = fs;
+					(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
+				});
+			} else { labelWorkSkipped = true; }
+			// **THE USER'S OWN TEXT IS NOT SUPPRESSED** (Task 428) and is sized here whatever is
+			// hidden: it is authored content with its own per-label rule, not annotation we made.
 			Object.keys(labelEls).forEach(function (id) {
 				var le = labelEls[id], lb = labelById(id);
 				le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
@@ -29258,12 +29285,27 @@ var EngCalcs = EngCalcs || {};
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
 		if (wasHidden && !dataLabelsHidden) {
+			reviveSkippedLabelWork();
 			refreshFontSizes(true);
 			// Again, because elements created during the refresh carry no visibility class yet --
 			// the same second call onZoomChanged() makes, for the same reason.
 			applyLabelVisibility();
 			scheduleReshed();
 		}
+	}
+	// **THE ONE PLACE THE SKIPPED WORK IS PAID BACK.** While annotation is hidden the three entry
+	// points of the label pipeline turn around and leave an IOU; everything that would have
+	// invalidated the lettering -- a solve, a settings edit, a rebuild, a scenario switch, a zoom --
+	// happened anyway. So the first thing the way back does is one full content pass, which composes
+	// every label from the document as it stands NOW, measures it, and ends in relayoutLabels() at
+	// the scale on the screen now rather than the one it was hidden at.
+	//
+	// Costs one pass per TRANSITION, against one per trigger before. Cheap where nothing changed
+	// while hidden: the flag is only set by an entry point that really turned around.
+	function reviveSkippedLabelWork() {
+		if (!labelWorkSkipped || dataLabelsHidden) { return; }
+		labelWorkSkipped = false;
+		refreshLabelText();
 	}
 	// Task 330. A saved setting that is merely absent (any project written before this) reads as
 	// undefined and must draw the halo -- `=== false` rather than a truthiness test, so an old document is
@@ -29310,6 +29352,9 @@ var EngCalcs = EngCalcs || {};
 			refreshTextLabelSizes();
 			return;
 		}
+		// The zoom that ENDS a suppression settles the debt first -- a zoom out of a georeferencing
+		// step arrives here rather than through refreshLabelSuppression().
+		reviveSkippedLabelWork();
 		refreshFontSizes(true);   // the relayout rides the reshed debounce below -- see refreshFontSizes()
 		// applyLabelVisibility() again, because refreshFontSizes() can change a Text label's own
 		// width and therefore nothing about the threshold -- but buildDom-time elements created
@@ -38593,10 +38638,27 @@ var EngCalcs = EngCalcs || {};
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
 	function refreshLabelText() {
+		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
+		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
+		// measures each with getBBox() (a forced synchronous layout apiece) and runs the shed
+		// cascades before handing over to the collision pass. Measured switching into a thematic
+		// Net3-Novato in a real Chrome: 306 label measurements and 302 ms of a 509 ms project
+		// switch, all of it placing text `.lpn-labels-hidden` was hiding.
+		//
+		// **THE TAIL IS NOT ABOUT LETTERING AND STILL RUNS.** The audit halos mark overridden
+		// elements and the legend is chrome; both are visible under a thematic map, so they are the
+		// part of this pass a suppressor has no business cancelling.
+		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
 		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+	}
+	// The end of a content pass that is NOT about the lettering, so it can be run on its own when
+	// the lettering is skipped. One definition and two callers rather than two copies.
+	function refreshLabelPassTail() {
+		renderLabelsLegend();
+		refreshScenarioMarks();
 	}
 	function refreshLabelTextPass() {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
@@ -38901,12 +38963,12 @@ var EngCalcs = EngCalcs || {};
 		perfDebugTime('  lblArrows', function () {
 			doc.links.forEach(function (l) { updateArrow(l.id); });
 		});
-		renderLabelsLegend();
+		// The legend and the audit halos, which are the part of this pass that is not lettering.
 		// Called from HERE and not from every caller of it, because the halos are filtered by the
 		// Labels panel and this function is what every label-affecting change already goes through:
 		// a toggle, a solve, a unit switch, a rebuild. Anything that can change which properties are
 		// on screen therefore re-decides which halos are on screen, with nothing to remember.
-		refreshScenarioMarks();
+		refreshLabelPassTail();
 	}
 	// ---- audit halos, and the greying of inactive elements (ROADMAP Task 184) ----
 	// A halo marks an element carrying an override IN THE CURRENT SCENARIO, filtered by the same
@@ -39013,6 +39075,30 @@ var EngCalcs = EngCalcs || {};
 	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
+		// **OFF MEANS OFF: THE COLLISION RELAXATION IS THE SINGLE MOST EXPENSIVE THING ON THIS PAGE**
+		// (Tom, 2026-09-17), and running it over annotation `.lpn-labels-hidden` is not drawing
+		// decides where to put lettering nobody will see. This is the one place it is entered, which
+		// is why the guard is here and not at the 24 callers -- the seam argument
+		// dev/scenario-seam-repair.md was written about.
+		//
+		// **`lastLayoutScale` IS NOT TOUCHED, and that is the point of it.** It records the scale a
+		// real layout was computed at, so a skipped pass must leave it saying what it said -- the
+		// revival is what brings it up to the scale on screen.
+		//
+		// **THE USER'S OWN TEXT STILL GETS ITS GEOMETRY** (Task 428). doc.labels is authored content
+		// with its own size-scaled rule; a Text label's leader and box are derived from a pixel
+		// width, so leaving it un-laid-out across a zoom leaves both at the old scale, and nothing
+		// else lays them out. A drawing holds a handful of them against hundreds of data labels, and
+		// this path does no measuring.
+		if (dataLabelsHidden) {
+			labelWorkSkipped = true;
+			beginMapBoxHold();
+			beginLinkGeomHold();
+			try {
+				doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			} finally { endMapBoxHold(); endLinkGeomHold(); }
+			return;
+		}
 		lastLayoutScale = state.s;
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
