@@ -7950,27 +7950,38 @@ var EngCalcs = EngCalcs || {};
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		labelsByLinkAnchor = {};
-		for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
-		for (i = 0; i < doc.links.length; i++) {
-			incidentLinks[doc.links[i].from].push(doc.links[i].id);
-			incidentLinks[doc.links[i].to].push(doc.links[i].id);
-			buildLinkEls(doc.links[i]);
-		}
-		for (i = 0; i < doc.labels.length; i++) {
-			buildLabelEls(doc.labels[i]);
-			updateLabelGeometry(doc.labels[i].id);
-		}
-		refreshLabelText();
+		// **?debug=perf BREAKS THIS FUNCTION OPEN** because the browser said it was 3,389 ms of a
+		// 4,628 ms project switch (Tom's own readout, 2026-09-16, switching into a geographic Net3)
+		// while the text measuring it used to be blamed for was down to 334 calls. Four things
+		// happen here and they have nothing in common but the loop they sit in, so the split is the
+		// whole question. Off unless the flag is typed.
+		perfDebugTime('  nodes', function () {
+			for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
+		});
+		perfDebugTime('  links', function () {
+			for (i = 0; i < doc.links.length; i++) {
+				incidentLinks[doc.links[i].from].push(doc.links[i].id);
+				incidentLinks[doc.links[i].to].push(doc.links[i].id);
+				buildLinkEls(doc.links[i]);
+			}
+		});
+		perfDebugTime('  texts', function () {
+			for (i = 0; i < doc.labels.length; i++) {
+				buildLabelEls(doc.labels[i]);
+				updateLabelGeometry(doc.labels[i].id);
+			}
+		});
+		perfDebugTime('  labelPass', function () { refreshLabelText(); });
 		// The selection mark rides on elements this function has just replaced (Task 415) -- and an
 		// id that survives a rebuild is the same element, while one that does not is gone.
-		refreshSelection();
+		perfDebugTime('  selection', function () { refreshSelection(); });
 		// Every element here is brand new and therefore carries no visibility class, so visibility
 		// has to be re-applied to it (the per-Text-label half in particular -- the one class on the
 		// <svg> would survive a rebuild, a class on a discarded <text> does not).
-		applyLabelVisibility();
+		perfDebugTime('  visibility', function () { applyLabelVisibility(); });
 		// The fire-flow ring rides on the circle this function has just replaced, for the same
 		// reason and by the same argument as the selection mark above (Task 530).
-		refreshFireFlowMarks();
+		perfDebugTime('  fireflow', function () { refreshFireFlowMarks(); });
 	}
 	// Every Text attached to this link, redrawn where the link's new shape puts it (Task 502).
 	function updateTextOnLink(id) {
@@ -28763,17 +28774,25 @@ var EngCalcs = EngCalcs || {};
 	// (a Text size change, a settings edit) is a single act and still lays out at once.
 	function refreshFontSizes(deferLayout) {
 		var fs = effectiveFontSize() + 'px';
-		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
-		Object.keys(linkEls).forEach(function (id) {
-			linkEls[id].text.style.fontSize = fs;
-			(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
+		// Split for ?debug=perf: 1,037 ms of Tom's 4,628 ms switch was this function, and it is a
+		// batch of style WRITES followed by a batch of position writes that read geometry -- two
+		// different costs that a single number cannot tell apart.
+		perfDebugTime('  fontWrite', function () {
+			Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
+			Object.keys(linkEls).forEach(function (id) {
+				linkEls[id].text.style.fontSize = fs;
+				(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
+			});
+			Object.keys(labelEls).forEach(function (id) {
+				var le = labelEls[id], lb = labelById(id);
+				le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
+			});
 		});
-		Object.keys(labelEls).forEach(function (id) {
-			var le = labelEls[id], lb = labelById(id);
-			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
-		});
-		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
-		if (!deferLayout) { relayoutLabels(); }   // positions only: no recompose, no re-measure
+		perfDebugTime('  symSizes', function () { refreshSymbolSizes(); });
+		// publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
+		if (!deferLayout) {
+			perfDebugTime('  relayout', function () { relayoutLabels(); });
+		}   // positions only: no recompose, no re-measure
 	}
 	// Called from zoomAbout()/zoomExtent(), unconditionally: with text, symbols and pipe width all in
 	// screen pixels every one is state.s-dependent, so a zoom always invalidates all three.

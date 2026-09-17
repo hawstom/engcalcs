@@ -224,6 +224,21 @@ after that**, measured over five consecutive switches; a re-layout at an unchang
   thematic colouring on, `dataLabelsHidden` toggles a CSS class and every label is still composed,
   measured and placed (7,825 measurements against 7,822 with them shown). Tom asked for exactly this
   to be confirmed; it is confirmed.
+- **MEASURED IN THE BROWSER, AND THE TEXT MEASURING IS NO LONGER THE STORY.** Tom's own readout
+  (2026-09-16), switching into the geographic Net3 at scale 5.35e3: **`buildDom 3,389ms`,
+  `fontSizes 1,037ms`, whole switch 4,628ms -- with only 334 label measurements left.** Reproduced
+  here in headless Chrome driven over the DevTools protocol (`dev/lpn-spike/` has no harness for it
+  yet; the driver is in this session's scratch): same drawing, same zoom, **762 ms** -- his machine
+  is about 6x slower than this one, and **the SHAPE is identical**: buildDom is 72-73% of the switch
+  on both. Inside it: **label pass 306 ms (56%), building the links 160 ms (29%), the nodes 79 ms
+  (14%)**, texts and selection and visibility together under 3 ms.
+- **SO THE REMAINING COST IS THE REBUILD ITSELF, and the question it raises is architectural rather
+  than a defect**: a project switch destroys every element and builds ~8,400 new ones, because this
+  page keeps ONE drawing and re-derives it from whichever document is open. Tom's instinct --
+  *"we should not be recalculating hydraulics or label positions when switching back to a tab"* -- is
+  the right question to answer, and the answer is either to keep each project's drawing and
+  hide/show it (memory against time) or to make the per-element build cheaper. **Not attempted; his
+  call.**
 - **`?debug=perf` NOW COVERS THE SWITCH** -- per-phase times plus `label passes` and `label
   measurements` counts -- so the next round is measured in the browser that is actually slow rather
   than guessed at. `dev/lpn-spike/label-measure-cache-harness.js` holds the counts.
