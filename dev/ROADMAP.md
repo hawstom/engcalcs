@@ -243,11 +243,30 @@ the block.
     dead cron are the same silence; the report arriving is what separates them.
   - **`sendmail` EXITED 0 DURING ALL 22,907 BOUNCES**, so an exit code was never evidence of
     delivery. Phase 1a is proven at the far end, with Tom confirming receipt unprompted.
-  - **STILL OPEN, in order:** GitHub branch protection on `master`, which no local hook can
-    substitute for; a minimal pre-push for the two sibling repositories; whether the nightly 622
-    pages also want six URLs every fifteen minutes (a cost question about a shared host, and nobody
-    has been asked); then the portable kit. Clearing the 22,907 bounces is housekeeping nobody has
-    done, and the account is at 96% disk.
+  - **TWO OF THAT LIST ARE CLOSED AND ONE WAS A MISREADING (2026-09-17).**
+    - **GitHub branch protection is DECLINED and is not an ask any more.** Tom, 2026-09-16: *"I'm
+      sorry. I can't bring myself to do that."* His call, and the gap it would have closed is narrow
+      -- a clone or another machine with no hooks -- which `hook_install_check.php` already reports
+      on every suite run. **A gate he works around would be worse than none**, which is this
+      project's own rule. Do not re-propose it.
+    - **THE SIBLING PRE-PUSH IS BUILT AND INSTALLED IN BOTH REPOSITORIES.** Verified 2026-09-17:
+      `~/webdev/librewaternet.org/.git/hooks/pre-push` and the same in `~/webdev/not-epanet.org`
+      refuse a push unless `sh check.sh` passes, and both pass today with nothing unpushed. It runs
+      the suite rather than reading a stamp, deliberately: `check.sh` is under two seconds there, so
+      running it is cheaper than the machinery for not running it.
+    - **"THE ACCOUNT IS AT 96% DISK" WAS A MISREADING OF WHOSE DISK.** Measured on the host
+      2026-09-17: `/dev/md125` is 7.0 TB at 95% with 372 GB free, and that is the SHARED filesystem
+      every tenant sits on. **This account uses 6.3 GB of it and has no quota**, of which 2.3 GB is
+      cPanel's own `~/tmp/analog` stats cache and 1.9 GB is archived access logs. So clearing the
+      22,907 bounces (13 MB of mail in total) frees nothing that matters and is not urgent. **The
+      risk is real and is not ours to fix**: if the shared volume fills, the site goes down whoever
+      filled it. Worth knowing; not worth a task.
+  - **STILL OPEN:** whether the nightly 622 pages also want six URLs every fifteen minutes (a cost
+    question about a shared host, and nobody has been asked); then the portable kit.
+  - **AND THE RELEASE QUESTION IS ANSWERED IN PRACTICE, NOT ONLY ON PAPER.** `release/ewb` is cut
+    from `81792180`, the SHA Tom had deployed, and pushed. CLAUDE.md's Git Workflow carries the
+    procedure and the correction of the 2026-09-13 advice that a clean release could not be
+    extracted.
 
 - 100|674| **Type a node's coordinates instead of only dragging it.**
   Tom, 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
