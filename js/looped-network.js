@@ -1899,37 +1899,42 @@ var EngCalcs = EngCalcs || {};
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
-			// **A READOUT NOBODY CAN COPY IS A READOUT THAT HAS TO BE RETYPED** (Tom, 2026-09-16:
-			// *"I did it. But it's not copyable."*). The overlay was `pointer-events:none`, copied
-			// from the collision-box layer where that is right -- there, the point is not to
-			// swallow a click meant for the map. Here the whole point is to hand the numbers to
-			// somebody, so it takes pointer events, selects like text, and a click copies the lot
-			// through the same door the curve tables use: `navigator.clipboard` where the browser
-			// offers it, and a prompt holding the same text where it does not, which is what a
-			// plain-http deploy gets. It costs a small dead corner of the map WHILE THE FLAG IS ON.
+			// **THE BOX IGNORES THE MOUSE; A BUTTON ON IT DOES THE COPYING.** It was
+			// `pointer-events:none` (right for an overlay lying across a map), then it took pointer
+			// events so the numbers could be selected and copied -- and **Tom's mouse cursor then
+			// vanished on the first file picker, on this build and not on production's**. One
+			// cursor-related line changed all night and it was that one, so the box goes back to
+			// being inert and the copying moves to a control that is meant to be pointed at.
+			// Reverting the copy instead would take back the fix he asked for.
 			perfDebugEl.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3000;max-width:96vw;' +
 				'font:11px/1.35 monospace;background:rgba(0,0,0,.82);color:#0f0;padding:4px 6px;' +
-				'white-space:pre;max-height:40vh;overflow:auto;cursor:pointer;' +
-				'user-select:text;-webkit-user-select:text';
-			perfDebugEl.title = 'Click to copy these lines';
-			perfDebugEl.addEventListener('click', function () {
-				// The rows alone, not the hint line appended below them.
+				'white-space:pre;max-height:40vh;overflow:hidden;pointer-events:none';
+			var copyBtn = document.createElement('button');
+			copyBtn.type = 'button';
+			copyBtn.textContent = 'copy';
+			copyBtn.title = 'Copy these lines';
+			// The one thing on the overlay that answers the pointer, and it is a real button rather
+			// than a click handler on a div -- a keyboard reaches it, and a screen reader names it.
+			copyBtn.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3001;font:11px monospace;' +
+				'background:#0f0;color:#000;border:0;padding:1px 6px;cursor:pointer';
+			copyBtn.addEventListener('click', function () {
 				var txt = perfDebugRowsText(perfDebugEl);
 				if (libCopyOut(txt)) {
-					var was = perfDebugEl.style.color;
-					perfDebugEl.style.color = '#ff0';
-					setTimeout(function () { perfDebugEl.style.color = was; }, 400);
+					copyBtn.textContent = 'copied';
+					setTimeout(function () { copyBtn.textContent = 'copy'; }, 700);
 				}
 			});
 			document.body.appendChild(perfDebugEl);
+			document.body.appendChild(copyBtn);
+			// The rows sit above the button rather than under it, so the newest line is never hidden.
+			perfDebugEl.style.bottom = '22px';
 		}
 		if (perfDebugEl) {
 			// Newest first, and only the last eight: the interesting thing is the TREND across a
 			// handful of gestures, and a list that grows without bound is itself a leak.
 			var prev = perfDebugRowsText(perfDebugEl);
 			prev = prev ? prev.split('\n') : [];
-			perfDebugEl.textContent = [line].concat(prev).slice(0, 8).join('\n')
-				+ '\n' + PERF_COPY_HINT;
+			perfDebugEl.textContent = [line].concat(prev).slice(0, 8).join('\n');
 		}
 	}
 
