@@ -1586,7 +1586,7 @@ $ec_lang['lpn_profile_missing']='The saved path {name} uses nodes that are not i
 // every language it already has them in.
 $ec_lang['lpn_ts_menu']='Time series';
 $ec_lang['lpn_ts_tip']='Graph one or more assets against time across an extended period simulation.';
-$ec_lang['lpn_ts_title']='Values against time';
+$ec_lang['lpn_ts_title']='Values versus time';
 $ec_lang['lpn_ts_group_tip']='Whether the graph shows nodes or links.';
 $ec_lang['lpn_ts_group_nodes']='Nodes';
 $ec_lang['lpn_ts_group_links']='Links';
