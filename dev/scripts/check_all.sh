@@ -167,6 +167,18 @@ run_check "button types declared"        blocking php dev/scripts/button_type_ch
 run_check "button type selftest"         blocking php dev/scripts/button_type_selftest.php
 run_check "bootstrap globals declared"   blocking php dev/scripts/bootstrap_global_check.php
 run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_global_selftest.php
+# Task 322 rows 67-69, the same method a third time: three constructs counted, then asked what
+# writing them 1,363, 125 and 49 times assumes. A language string echoed RAW into a <script> block
+# or into an HTML attribute is one translator's apostrophe or quotation mark away from killing the
+# page's whole inline script or ending the attribute it sits in; a number input with no step uses
+# the HTML default of 1, so the arrow keys snap a quantity somebody typed to a whole number. All
+# three ship silently and none of them is visible from inside this repository.
+run_check "script interpolations"        blocking php dev/scripts/script_interpolation_check.php
+run_check "script interp selftest"       blocking php dev/scripts/script_interpolation_selftest.php
+run_check "attribute escaping"           blocking php dev/scripts/attr_escape_check.php
+run_check "attribute escape selftest"    blocking php dev/scripts/attr_escape_selftest.php
+run_check "number input step"            blocking php dev/scripts/number_step_check.php
+run_check "number step selftest"         blocking php dev/scripts/number_step_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.

@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	<?php if ($flagHideDefaults === false) : ?>
 	<?php // Icon-as-prefix, never icon-only (Task 231): the glyph lives in the markup, not in the
 	      // $ec_lang value, so one decision stays one decision instead of 27 copies of it. ?>
-	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=addslashes($ec_lang['calc_defaults_confirm'])?>')"><?=ecIcon('restore')?><?=$ec_lang['calc_defaults']?></button>
+	<button type="button" id="calc_defaults" onclick="EngCalcs.resetToDefaults('<?=htmlspecialchars(addslashes($ec_lang['calc_defaults_confirm']))?>')"><?=ecIcon('restore')?><?=$ec_lang['calc_defaults']?></button>
 	&nbsp;
 	<?php endif; ?>
 	<?php // SI first, US second (Tom, 2026-07-30): the suite serves a worldwide audience, and the
@@ -450,8 +450,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
-	<input id="printable_title" name="printable_title" type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" onchange="EngCalcs.submitForm();" /><br />
-	<input id="printable_subtitle" name="printable_subtitle" type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" onchange="EngCalcs.submitForm();" />
+	<input id="printable_title" name="printable_title" type="text" style="font-size: 2em; width: 98%" placeholder="<?=htmlspecialchars($ec_lang['template_printable_title'])?>" onchange="EngCalcs.submitForm();" /><br />
+	<input id="printable_subtitle" name="printable_subtitle" type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=htmlspecialchars($ec_lang['template_printable_subtitle'])?>" onchange="EngCalcs.submitForm();" />
 	<?php // **THE SHARE CONTROL IS IN THE NAVBAR, NOT HERE** (ROADMAP Task 228, corrected
       // 2026-08-18). This row briefly held a second "Copy link to this calculation" button,
       // written against a task that asked for a share affordance at the naming moment -- and
