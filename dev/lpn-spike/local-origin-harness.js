@@ -326,8 +326,15 @@ console.log('\n--- one home for the concept ---');
 	// so the shift and the flip apply exactly once to each and cancel in the difference. Two points
 	// is why it is +2 and not +1: converting the vector directly is the mistake this task exists to
 	// catch, and it would have been +1.
-	ok('outwardX has one definition and twenty-five call sites', count(/outwardX\(/g) === 26, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-five call sites', count(/outwardY\(/g) === 26, count(/outwardY\(/g));
+	// **AND ONE MORE ON EACH CONVERTER FOR THE WORLD MAP BEHIND AN XY DRAWING** (Task 646). The
+	// attachment places tiles THROUGH a stored transform instead of rewriting the drawing, so
+	// paintBasemapTiles() asks which patch of Earth is on screen by reading the two screen corners
+	// OUTWARD (one call per axis, both corners in one expression) and places each tile by turning
+	// its own longitude and latitude INWARD (one call per axis). Same boundary as every other one
+	// here: a grid model on State Plane coordinates would otherwise draw its map half a million
+	// units away from its own pipes.
+	ok('outwardX has one definition and twenty-six call sites', count(/outwardX\(/g) === 27, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-six call sites', count(/outwardY\(/g) === 27, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -369,8 +376,8 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH COMING BACK** (Task 668): georefWriteOffsets() maps the captured base and
 	// tip through the transform and differences them, and both halves come home through the one
 	// door, exactly as georefWrite() itself does for a position.
-	ok('inwardX has one definition and twenty-four call sites', count(/inwardX\(/g) === 25, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-five call sites', count(/inwardY\(/g) === 26, count(/inwardY\(/g));
+	ok('inwardX has one definition and twenty-five call sites', count(/inwardX\(/g) === 26, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-six call sites', count(/inwardY\(/g) === 27, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

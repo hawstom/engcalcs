@@ -9093,7 +9093,48 @@ var EngCalcs = EngCalcs || {};
 	 * elevation buttons."* Both are the same question and now they ask it once.
 	 */
 	function projectLocatable() { return isGeoProject() || projectedBasemapOk(); }
-	function basemapOn() { return projectLocatable() && project.basemap !== 'off'; }
+	/**
+	 * **AN XY PROJECT THAT STATES WHERE ON THE EARTH IT IS DRAWN** (ROADMAP Task 646). Tom,
+	 * 2026-09-13: *"Even an arbitrary XY project can have a world map background with a good
+	 * wizard... Attach the world map to this project without changing it any other way."*
+	 *
+	 * **IT IS THE OPPOSITE DOOR TO THE PLACEMENT WIZARD AND IS SAFE FOR EXACTLY THAT REASON.**
+	 * georefStart() rewrites every coordinate in the document, which is why ruling P2 keeps it away
+	 * from a project that declares a coordinate system. This writes NOTHING into the drawing: the
+	 * transform lives on `project.georef`, the tiles are placed THROUGH it, and every x and y in
+	 * the file is the byte it always was. dev/lpn-spike/xy-world-map-harness.js asserts that, which
+	 * is the acceptance criterion rather than a nicety.
+	 *
+	 * It is MODELLING data and therefore the project's, on the rule that governs every other
+	 * declaration beside `coords` and `basemap`: where the drawing sits on the Earth is a fact
+	 * about the document and not about the browser reading it. serializeProject() writes the whole
+	 * of `project`, so it rides along with no new plumbing, and an older reader ignores it.
+	 */
+	function xyGeoref() {
+		var t = project && project.georef;
+		if (isGeoProject() || isProjectedProject() || !t || !t.origin || !t.anchor) { return null; }
+		return (isFinite(t.origin.lon) && isFinite(t.origin.lat) && isFinite(t.anchor.x) &&
+			isFinite(t.anchor.y) && isFinite(t.rotDeg) && t.metersPerUnit > 0) ? t : null;
+	}
+	function xyGeorefOk() { return !!xyGeoref(); }
+	// Which projects may be OFFERED the attachment: the plain grid ones, and nothing else. A
+	// geographic project is already on the Earth and a projected one declares its own plane, so for
+	// both of those the question is answered and the row would be a second answer to it.
+	function xyMapAttachable() { return !isGeoProject() && !isProjectedProject(); }
+	// **THE ONE PREDICATE THE STREET/SATELLITE ROWS AND THE CORNER TEASER SHARE.** It was
+	// `isGeoProject()` written in three places, and widening two of them would have left the corner
+	// tile offering a basemap the menu no longer agreed about -- the drift refreshBasemapTeaser()'s
+	// own comment warns against.
+	function basemapChoosable() { return isGeoProject() || xyGeorefOk(); }
+	// **projectLocatable() IS DELIBERATELY NOT WIDENED, and that is a decision rather than an
+	// oversight.** It gates the place-name search and the DEM elevations as well as the tiles, and
+	// both of those want more than a transform: Go to points a camera whose units are DEGREES in a
+	// geographic project, and the DEM writes numbers into the document. Attaching a backdrop is
+	// meant to change nothing, so it unlocks the tiles and stops there; the other two rows are
+	// Tom's to ask for.
+	function basemapOn() {
+		return (projectLocatable() || xyGeorefOk()) && project.basemap !== 'off';
+	}
 	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
 	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
 	function setBasemapStyle(style) {
@@ -9128,7 +9169,7 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!isGeoProject() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		if (!basemapChoosable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -9211,6 +9252,28 @@ var EngCalcs = EngCalcs || {};
 		// come back through the transform -- from the whole perimeter rather than four corners,
 		// because a projected rectangle's edges bow and a corner-only box leaves a strip of
 		// missing tiles along the top. lpnCrsBounds() states that.
+		// **AND AN XY PROJECT WITH AN ATTACHMENT ASKS IT THROUGH ITS OWN TRANSFORM** (Task 646).
+		// FOUR CORNERS ARE ENOUGH HERE and are not enough in the projected branch below, which is
+		// the one difference worth reading: lpnGeorefToLonLat() freezes its radii at the
+		// transform's origin latitude, so the map from drawing units to lon/lat is AFFINE, a
+		// rectangle maps to a parallelogram, and the bounding box of the four corners is exact. A
+		// real projection bows its edges, which is why lpnCrsBounds() walks the whole perimeter.
+		var xg = xyGeoref(), xbnds = null;
+		if (xg) {
+			var cs = [[tl.x, tl.y], [br.x, tl.y], [br.x, br.y], [tl.x, br.y]].map(function (c) {
+				return EngCalcs.lpnGeorefToLonLat(xg, outwardX(c[0]), outwardY(c[1]));
+			});
+			xbnds = {
+				west: Math.min.apply(null, cs.map(function (p) { return p.lon; })),
+				east: Math.max.apply(null, cs.map(function (p) { return p.lon; })),
+				south: Math.min.apply(null, cs.map(function (p) { return p.lat; })),
+				north: Math.max.apply(null, cs.map(function (p) { return p.lat; }))
+			};
+			if (!isFinite(xbnds.west) || !isFinite(xbnds.south) ||
+					!isFinite(xbnds.east) || !isFinite(xbnds.north)) {
+				basemapLayer.innerHTML = ''; basemapEls = {}; return;
+			}
+		}
 		var proj = projectedBasemapOk(), bnds = null;
 		if (proj) {
 			// outwardX/outwardY, exactly as the geographic branch below uses them: they are the
@@ -9227,14 +9290,16 @@ var EngCalcs = EngCalcs || {};
 		// ask for zoom 0 over a city. So it is converted to the degrees-per-pixel the tile chooser
 		// expects, using the ground width the view actually covers.
 		var scaleForTiles = state.s;
-		if (proj) {
+		if (proj || xg) {
 			var wpx = Math.max(1, r.right - r.left);
-			var degPerPx = (bnds.east - bnds.west) / wpx;
+			var degPerPx = ((proj ? bnds : xbnds).east - (proj ? bnds : xbnds).west) / wpx;
 			scaleForTiles = degPerPx > 0 ? 1 / degPerPx : state.s;
 		}
 		list = proj
 			? basemapTileList(bnds.west, bnds.south, bnds.east, bnds.north, scaleForTiles)
-			: basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
+			: xg
+				? basemapTileList(xbnds.west, xbnds.south, xbnds.east, xbnds.north, scaleForTiles)
+				: basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
 		want = {};
 		list.tiles.forEach(function (t) {
 			want[t.key] = true;
@@ -9260,6 +9325,25 @@ var EngCalcs = EngCalcs || {};
 					transform: 'matrix(' + [
 						inwardX(cn.tr.x) - ax, inwardY(cn.tr.y) - ay,
 						inwardX(cn.bl.x) - ax, inwardY(cn.bl.y) - ay, ax, ay
+					].join(' ') + ')'
+				};
+			} else if (xg) {
+				// **ONE AFFINE PER TILE, for the reason the projected branch above states.** The
+				// transform is a similarity, so the tile's lon/lat box maps to a parallelogram
+				// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
+				// while this frame is linear in latitude, which over one tile is far under the
+				// width of the line a pipe is drawn with.
+				var g = function (lon, lat) {
+					var p = EngCalcs.lpnGeorefFromLonLat(xg, lon, lat);
+					return { x: inwardX(p.x), y: inwardY(p.y) };
+				};
+				var gtl = g(t.lonW, t.latN), gtr = g(t.lonE, t.latN), gbl = g(t.lonW, t.latS);
+				if (!isFinite(gtl.x) || !isFinite(gtl.y)) { return; }
+				place = {
+					x: 0, y: 0, width: 1, height: 1,
+					transform: 'matrix(' + [
+						gtr.x - gtl.x, gtr.y - gtl.y,
+						gbl.x - gtl.x, gbl.y - gtl.y, gtl.x, gtl.y
 					].join(' ') + ')'
 				};
 			} else {
@@ -10954,11 +11038,14 @@ var EngCalcs = EngCalcs || {};
 		// deserves a round default. Four figures keeps any other length unit honest.
 		return +toDisplay(m > 0.5 ? 1000 : 914.4, 'lpn_u_length').toPrecision(4);
 	}
-	function georefAskSize() {
+	// `defSI` is optional and is what the box opens on, in SI: the attachment wizard re-runs with
+	// the width already on file, so adjusting an attachment is an edit rather than a retype.
+	function georefAskSize(defSI) {
 		var pc = EngCalcs.pageConfig || {};
 		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
 			+ ' (' + unitLabel('lpn_u_length') + ')';
-		var v = window.prompt(text, String(georefDefaultSpan()));
+		var def = defSI > 0 ? +toDisplay(defSI, 'lpn_u_length').toPrecision(6) : georefDefaultSpan();
+		var v = window.prompt(text, String(def));
 		if (v === null) { return 0; }
 		var n = parseFloat(String(v).replace(',', '.'));
 		return isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0;
@@ -11425,6 +11512,107 @@ var EngCalcs = EngCalcs || {};
 		georefRefreshBar();
 		refreshAllFromDocument();
 		if (prev.view) { applyView(prev.view); }
+	}
+
+	// ---- THE WORLD MAP BEHIND AN XY DRAWING (ROADMAP Task 646) ----------------------------------
+	//
+	// **THE PROJECT DOES NOT MOVE, AND THAT IS THE WHOLE FEATURE.** Everything above this line
+	// converts: georefStart() holds the file's coordinates aside, maps them through a transform and
+	// writes degrees back, and the project stops being a grid project. This does the opposite --
+	// it states the transform and leaves the drawing alone -- so it is safe on a project whose
+	// numbers somebody measured, and it is reversible by one menu row rather than by closing the
+	// file unsaved.
+	//
+	// **WHAT IT REUSES, AND THE ONE THING IT DOES NOT.** The arithmetic is entirely
+	// js/lpn-georef.js's: lpnGeorefBounds() for the extent, lpnGeorefToLonLat() to ask which patch
+	// of Earth is on screen and lpnGeorefFromLonLat() to place each tile, with georefCapture() and
+	// georefAskSize() reused verbatim for the model's own points and for the site-width question.
+	// What it does NOT touch is georefActive(): that flag means "a placement is in flight, so
+	// suppress the label pass and the solver" (Task 145), and there is nothing to suppress here.
+	// Nothing is held still, nothing is previewed, no coordinate is in an intermediate state, and
+	// labels and the solver stay live throughout. A new state beside it would have been a second
+	// thing for applyLabelVisibility() to read for no gain.
+	//
+	// **THE WIZARD IS TYPED RATHER THAN DRAGGED, deliberately.** In the placement tool the Earth is
+	// fixed and the model is dragged over it; here the DRAWING is fixed -- it is the frame -- so a
+	// drag would have to move the map, and a corner handle on a box that cannot resize means
+	// nothing. Three questions fully determine a similarity: where the middle of the drawing is,
+	// how wide the site is, and which way it is turned. Re-running the row opens each box on the
+	// answer already on file, so correcting an attachment is an edit and not a retype.
+	function mapAttachRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'globe', label: pc.lpn_map_attach_place || 'Attach the world map…',
+				tip: pc.lpn_map_attach_tip, fn: startMapAttach },
+			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Remove',
+				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach, disabled: !xyGeorefOk() }
+		];
+	}
+	function startMapAttach() {
+		var pc = EngCalcs.pageConfig || {}, cur = xyGeoref();
+		if (isGeoProject()) {
+			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+			return;
+		}
+		if (!xyMapAttachable()) { return; }
+		if (!doc.nodes.length) {
+			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
+			return;
+		}
+		if (!EngCalcs.lpnGeorefToLonLat || !EngCalcs.lpnGeorefFromLonLat) {
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		// The model's own extent, in the outward Y-UP frame js/lpn-georef.js is written for.
+		// georefCapture() is that iterator and reads no wizard state, so this is the same answer
+		// the placement tool gets rather than a second opinion about which points are the
+		// document's.
+		var src = georefCapture(), b = EngCalcs.lpnGeorefBounds(src),
+			spanUnits = Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1;
+		// PUBLIC ORDER, latitude first: this is a pair a person reads and types.
+		var typed = window.prompt(
+			pc.lpn_map_attach_where || 'Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space',
+			cur ? (cur.origin.lat + ', ' + cur.origin.lon) : '');
+		if (typed === null) { return; }
+		var ll = parseLatLon(typed);
+		if (!ll) {
+			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
+			return;
+		}
+		var span = georefAskSize(cur ? cur.metersPerUnit * spanUnits : 0);
+		if (!(span > 0)) { return; }
+		var turn = window.prompt(
+			pc.lpn_map_attach_turn || 'Turn of the drawing in degrees, counterclockwise, where 0 puts the top of the drawing to the north',
+			String(cur ? cur.rotDeg : 0));
+		if (turn === null) { return; }
+		var rot = parseFloat(String(turn).replace(',', '.'));
+		if (!isFinite(rot)) { rot = 0; }
+		project.georef = {
+			anchor: { x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 },
+			origin: { lon: ll.lon, lat: ll.lat },
+			metersPerUnit: span / spanUnits,
+			rotDeg: rot
+		};
+		// A project that had the tiles switched off, or has never had them, is asking for them by
+		// pressing this. setBasemapStyle() is not the seam to use: it TOGGLES, so it would turn the
+		// map off for anybody re-running the row to correct a placement.
+		if (!project.basemap || project.basemap === 'off') { project.basemap = 'osm'; }
+		// **NOT AN UNDO SNAPSHOT, and not an oversight.** The stack holds the DOCUMENT, and this
+		// changes not one thing in it; the way back is the Remove row beside this one, which is a
+		// door rather than a net. markEdited() so the attachment is saved with the project.
+		markEdited();
+		refreshBasemap();
+		saveToStorage();
+		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and not one coordinate in the project changed. Use Map, Background map (georeference), Remove to take it away again.');
+	}
+	function removeMapAttach() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!xyGeorefOk()) { return; }
+		delete project.georef;
+		markEdited();
+		refreshBasemap();
+		saveToStorage();
+		setNotice(pc.lpn_map_attach_removed || 'The world map is gone, and the drawing is exactly as it was.');
 	}
 
 	// ---- toolbar mode ----
@@ -25347,6 +25535,14 @@ var EngCalcs = EngCalcs || {};
 			// submenu, so six commands about one picture cost one row.
 			{ icon: 'image', label: pc.lpn_backdrop_menu || 'Background image…',
 				submenu: function () { return backdropRows(false); } },
+			// **AND THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Beside the background image
+			// because it is the same kind of thing said in Tom's own words -- something placed
+			// BEHIND the drawing that changes nothing in it -- and a submenu for the same reason
+			// the picture above has one: two commands about one backdrop cost one row.
+			{ icon: 'globe', hidden: !xyMapAttachable(),
+				label: pc.lpn_map_attach_menu || 'Background map (georeference)…',
+				tip: pc.lpn_map_attach_tip,
+				submenu: function () { return mapAttachRows(); } },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour
@@ -25382,7 +25578,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { EngCalcs.lpnSearchOpen(); }
 			},
 			{
-				hidden: !isGeoProject(), icon: 'view',
+				hidden: !basemapChoosable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'osm')
 					? (pc.lpn_basemap_hide || 'Hide street map')
 					: (pc.lpn_basemap_show || 'Show street map'),
@@ -25393,7 +25589,7 @@ var EngCalcs = EngCalcs || {};
 			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
 			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
 			{
-				hidden: !isGeoProject() || !satelliteAvailable(), icon: 'view',
+				hidden: !basemapChoosable() || !satelliteAvailable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'satellite')
 					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
 					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),

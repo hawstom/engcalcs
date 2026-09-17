@@ -2325,6 +2325,18 @@ $ec_lang['lpn_backdrop_unreadable']='This picture cannot be shown by your web br
 $ec_lang['lpn_backdrop_position']='Move';
 $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
+// **THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Tom's own sentence is the tip, because the
+// point of these rows is that the project's own numbers are untouched, which is the whole of what
+// separates this from the placement wizard that converts a project.
+$ec_lang['lpn_map_attach_menu']='Background map (georeference)…';
+$ec_lang['lpn_map_attach_tip']='Attach the world map to this project without changing it any other way.';
+$ec_lang['lpn_map_attach_place']='Attach the world map…';
+$ec_lang['lpn_map_attach_remove']='Remove';
+$ec_lang['lpn_map_attach_remove_tip']='Take the world map away. The drawing and its coordinates are untouched either way.';
+$ec_lang['lpn_map_attach_where']='Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space';
+$ec_lang['lpn_map_attach_turn']='Turn of the drawing in degrees, counterclockwise, where 0 puts the top of the drawing to the north';
+$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and not one coordinate in the project changed. Use Map, Background map (georeference), Remove to take it away again.';
+$ec_lang['lpn_map_attach_removed']='The world map is gone, and the drawing is exactly as it was.';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read**, of 0 untranslated keys, of 1871 English keys. A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read**, of 9 untranslated keys, of 1880 English keys. A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,4 +25,32 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None. Every English key is present in at least one other language.
+## lpn_  (9, 9 to read @@ NEEDS RULING)
+
+- **`lpn_map_attach_done`**
+  > The world map is behind your drawing now, and not one coordinate in the project changed. Use Map, Background map (georeference), Remove to take it away again.
+  @@ NEEDS RULING
+- **`lpn_map_attach_menu`**
+  > Background map (georeference)…
+  @@ NEEDS RULING
+- **`lpn_map_attach_place`**
+  > Attach the world map…
+  @@ NEEDS RULING
+- **`lpn_map_attach_remove`**
+  > Remove
+  @@ NEEDS RULING
+- **`lpn_map_attach_remove_tip`**
+  > Take the world map away. The drawing and its coordinates are untouched either way.
+  @@ NEEDS RULING
+- **`lpn_map_attach_removed`**
+  > The world map is gone, and the drawing is exactly as it was.
+  @@ NEEDS RULING
+- **`lpn_map_attach_tip`**
+  > Attach the world map to this project without changing it any other way.
+  @@ NEEDS RULING
+- **`lpn_map_attach_turn`**
+  > Turn of the drawing in degrees, counterclockwise, where 0 puts the top of the drawing to the north
+  @@ NEEDS RULING
+- **`lpn_map_attach_where`**
+  > Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space
+  @@ NEEDS RULING
