@@ -34466,7 +34466,7 @@ var EngCalcs = EngCalcs || {};
 	// is what earns the row its override marker inside a scenario.
 	function unitNumberField(fields, labelText, unitId, get, set, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'), v0 = get();
-		input.type = 'number';
+		input.type = 'number'; input.step = 'any';
 		// Printed with trailing zeros stripped rather than a fixed toFixed(4). Under SI storage the
 		// value was the result of a division and 4 places was a reasonable guess at it; now it is the
 		// number the user typed, and showing "8" back as "8.0000" makes their own input look computed.
@@ -34488,7 +34488,7 @@ var EngCalcs = EngCalcs || {};
 	function unitNumberFieldBlank(fields, labelText, unitId, get, set, placeholder, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'),
 			v = get();
-		input.type = 'number';
+		input.type = 'number'; input.step = 'any';
 		input.value = (v === undefined || v === null || v === '') ? '' : String(+(+v).toFixed(6));
 		// A BLANK PLACEHOLDER STAYS BLANK. `+('')` is 0, so formatting unconditionally would print a
 		// fallback of zero into a field whose fallback is simply not known yet.
@@ -34759,7 +34759,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
-		input.type = 'number'; input.value = effective(l, 'length').toFixed(2);
+		input.type = 'number'; input.step = 'any'; input.value = effective(l, 'length').toFixed(2);
 		input.addEventListener('change', function () {
 			setProp(l, 'length', +input.value);
 			// lenAuto IS BASE-OWNED and a scenario must not touch it -- geometry is shared, because a
@@ -36185,7 +36185,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function inheritedField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number';
+		input.type = 'number'; input.step = 'any';
 		input.disabled = true;
 		input.value = (value === undefined || value === null || value === '')
 			? '' : String(+(+value).toFixed(6));
@@ -37231,7 +37231,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number'; input.value = value;
+		input.type = 'number'; input.step = 'any'; input.value = value;
 		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
