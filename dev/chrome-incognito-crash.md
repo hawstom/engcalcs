@@ -55,12 +55,21 @@ connection count and `Windows.Storage`.
 `FileSystemFileHandle` per open project in IndexedDB (`engcalcs-lpn`, store `handles`, Task 212), and
 `restoreHandlesOnBoot()` reads them back and calls `queryPermission()` on each load.
 
-**NOT KNOWN:** whether the crash is our READ on boot or Chrome's own restoration of an in-memory
-incognito database holding a serialized handle. `?debug=nofiles` -- which skips our read entirely --
-did not stop it in one test, but that test is not clean: the handle had already been WRITTEN by the
-file picker in the same session. **The test that separates them is `?debug=nofiles`, private window,
-open a file, reload.** If it survives, the read is ours to guard; if it dies, the write is, and the
-guard has to be not storing a handle we cannot keep.
+**NARROWED FURTHER, same evening.** It is the HANDLE and nothing about the document:
+`Elm-Street-Center-no-image.lwn` is **14 KB with no image, no scenarios and no world map**, and
+opening it through the picker is enough. A project CREATED in the window -- New project, two
+junctions, no picker -- reloads cleanly. So neither the stored bytes nor the drawing nor the tiles
+are in it.
+
+**NOT KNOWN:** whether the crash is our READ on boot or Chrome's own restoration of an incognito
+IndexedDB holding a serialized handle. `?debug=nofiles` now skips BOTH the read and the WRITE, so
+nothing of ours ever puts a handle in the store. **The test that separates them: `?debug=nofiles`,
+private window, open a file through the picker, reload.**
+
+- **Survives** -> the handle in our store is what Chrome chokes on, and a guard is at least
+  conceivable on our side.
+- **Still crashes** -> the crash is in Chrome's own handling of a picker handle in an incognito
+  session, nothing of ours is involved by then, and **there is nothing here to fix**.
 
 ## What to do meanwhile
 

@@ -22241,7 +22241,20 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
+	// **`?debug=nofiles` COVERS THE WRITE AS WELL AS THE READ, and that is the experiment.** Tom's
+	// Chrome takes its whole browser process down on a reload in a PRIVATE window, but only once a
+	// project has been opened through the file picker -- measured down to a 14 KB drawing with no
+	// image, no scenarios and no map, so it is the HANDLE and not the document. Skipping our read on
+	// boot did not stop it, but that test could not be clean: the handle had already been written in
+	// the same session. With the write skipped too, nothing of ours ever puts a
+	// `FileSystemFileHandle` into IndexedDB -- so if it still crashes, the crash belongs to Chrome's
+	// own handling of the picker and there is nothing here to guard.
+	// dev/chrome-incognito-crash.md carries the whole record.
 	function rememberHandle(id, handle) {
+		if (typeof debugOn === 'function' && debugOn('nofiles')) {
+			noteRecentFile(handle);   // a name in a list, which is not a handle
+			return Promise.resolve(null);
+		}
 		// Every route that connects a project to a file lands here -- Open, Save as, and re-opening a
 		// file that is already a tab -- so this is the one chokepoint the recent list needs. Boot
 		// restoration deliberately does NOT come through here (restoreHandlesOnBoot sets the Map
