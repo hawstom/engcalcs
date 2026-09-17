@@ -261,6 +261,21 @@ after that**, measured over five consecutive switches; a re-layout at an unchang
   measurements` counts -- so the next round is measured in the browser that is actually slow rather
   than guessed at. `dev/lpn-spike/label-measure-cache-harness.js` holds the counts.
 
+**CHROME CRASHES ITS OWN BROWSER PROCESS ON THE MAP PAGE IN A PRIVATE WINDOW, AND IT IS NOT OURS**
+(2026-09-16). Recipe, both halves needed: a private window, a project opened THROUGH THE FILE
+PICKER, then a reload. No file opened, no crash; normal profile, no crash. **Production's week-old
+code crashes identically** -- served side by side on local ports and tested -- so none of the
+session's 20 commits did it, which is what the session assumed for an hour. Three dumps all say
+`ptype: browser`, which **a web page cannot cause**. Full evidence and the one test that would
+narrow it further: `dev/chrome-incognito-crash.md`. **Do not build an incognito DETECTION to work
+around it.**
+
+**AND ONE SYMPTOM BESIDE IT WAS OURS:** his mouse cursor vanished on the first file picker, on the
+new code and not on production's. Exactly one cursor-related line had changed all night -- the
+`?debug=perf` overlay stopped ignoring the mouse so that he could copy it. The box is inert again
+and a small `copy` button does the copying. **An overlay that answers the pointer is not a
+decoration any more**, and this is what that costs.
+
 **STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
 is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
 Task 663's questions 2 and 3, now that he knows the reaction rate is a LINK label switched on under
