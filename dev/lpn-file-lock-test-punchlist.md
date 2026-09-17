@@ -173,6 +173,10 @@ automated can test it)*
       [TGH: It worked right this time.]
 
 **H5. The words, which only a person can judge**
+*(SUPERSEDED 2026-09-17 by Task 667(b): the first line now states three ages rather than one, and
+names nobody unless an older record happens to carry a name. The question this box asks — is it the
+sentence you would want to read before deciding whether to interrupt somebody? — is still the right
+one, and is worth asking again of the new words.)*
 - [x] Have a colleague — or a second Chrome profile — hold the file, then open it. The first line of
       the dialog should now carry **a number**: "…the last edit was 20 minutes ago, 5 minutes after
       the last save", or "…and their work is saved to the file", or "…their browser last checked in
@@ -246,6 +250,15 @@ automated can test it)*
 ---
 
 ## 1. First run and the training panel
+
+> **CORRECTED 2026-09-17 (Task 667(b)).** **THE PANEL NO LONGER ASKS FOR INITIALS**, so every box
+> below that types them is history. Tom: *"asking user A for their initials the first time they save
+> a file is a bit startling, not to mention easily confused with a login or account registration."*
+> The lock is now taken anonymously; the question moved to the SECOND user, onto the **Ask** button
+> of the dialog they get when the file is already in use, and what they type is sent to the broker
+> rather than stored. The panel itself stays, and stays for the reason below: it is what makes the
+> native file dialog open from a real user gesture. Reading it and pressing **Continue** is the whole
+> of it now. `dev/lpn-spike/lock-initials-harness.js`.
 
 The panel is what makes the native file dialog open from a real user gesture. It is the riskiest
 single guess in the build.

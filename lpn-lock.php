@@ -8,6 +8,10 @@
  *
  * Four actions, all POST, all same-origin, matching the ROADMAP's named endpoints:
  *   check    — who holds this project, if anyone
+ *   request  — leave a note for the holder that somebody else would like the file ("Ask"). It is a
+ *              BACK CHANNEL and not a lock operation: it never touches the holder, and it never
+ *              refreshes lastActivity, because the asker's keystroke is not evidence the holder is
+ *              at their desk.
  *   acquire  — take the lock if it is free or already ours (also the heartbeat: re-acquiring a lock
  *              we already hold just refreshes lastActivity, which is what the pre-save re-check does)
  *   steal    — take it regardless, recording us as the new holder ("take over from X")
@@ -17,8 +21,10 @@
  * has to explicitly take over. See lib/config.inc.php for the record format and why this is flat
  * files rather than a database.
  *
- * Identity is a random client token plus a free-text friendly name — no login, no user table. The
- * token is what "mine" means; the name is only ever shown to a human, and two people may share one.
+ * Identity is a random client token — no login, no user table, and since Task 667(b) no name is
+ * asked of the person taking the lock. A `name` still travels, but only on a `request`: it is the
+ * initials the ASKER types at the moment they ask, so that the holder is told who wants the file.
+ * Nothing here ever stores a name for the holder unless an older page sent one.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -60,7 +66,7 @@ $name = function_exists('mb_substr') ? mb_substr($name, 0, 60, 'UTF-8') : substr
 $name = trim($name);
 
 $action = isset($_POST['action']) ? (string)$_POST['action'] : '';
-if (!in_array($action, array('check', 'acquire', 'steal', 'release'), true)) {
+if (!in_array($action, array('check', 'acquire', 'steal', 'release', 'request'), true)) {
     lpn_send(array('ok' => false, 'error' => 'action'), 400);
 }
 
@@ -119,6 +125,10 @@ if ($isNewRecord && $kept !== null && $kept >= LPN_LOCK_MAX_RECORDS) {
 if ($action === 'check' && $isNewRecord) {
     lpn_send(array('ok' => true, 'locked' => false, 'mine' => false));
 }
+// Same reasoning for 'request': there is nobody to ask, so there is nothing to write down.
+if ($action === 'request' && $isNewRecord) {
+    lpn_send(array('ok' => true, 'requested' => false));
+}
 
 // One flock() held across the whole read-decide-write. Read-modify-write is the only thing that
 // matters here: two colleagues pressing "take over" in the same second must not both come away
@@ -145,6 +155,19 @@ $currentHolder = isset($record['holder']) ? (string)$record['holder'] : '';
 $editedAt = isset($_POST['editedAt']) ? (int)$_POST['editedAt'] : 0;
 $savedAt  = isset($_POST['savedAt'])  ? (int)$_POST['savedAt']  : 0;
 $heldBySomeoneElse = ($currentHolder !== '' && $currentHolder !== $holder);
+// HOW LONG THE FILE HAS BEEN IN USE -- the one of Tom's three ages the broker can measure itself,
+// and the one it did not keep until Task 667(b). editedAt and savedAt are the holder's clock and
+// arrive with every heartbeat; this is OUR clock, stamped once when the lock changes hands and
+// carried unchanged through every heartbeat after it. A record written before this shipped has no
+// acquiredAt, and the page then says nothing about that age rather than guessing one.
+$acquiredAt  = isset($record['acquiredAt'])  ? (int)$record['acquiredAt']  : 0;
+// The back channel. One pending ask per record: a second asker replaces the first rather than
+// queueing, because what the holder has to do about it is the same either way.
+$requestedBy = isset($record['requestedBy']) ? (string)$record['requestedBy'] : '';
+$requestedAt = isset($record['requestedAt']) ? (int)$record['requestedAt'] : 0;
+// The holder saying "I have shown that to my user". Matched on the timestamp so that acknowledging
+// one ask cannot swallow a newer one that arrived in between.
+$ack = isset($_POST['ack']) ? (int)$_POST['ack'] : 0;
 
 $write = null;
 $expire = false;   // back-date this record on the way out, so the next sweep collects it
@@ -157,13 +180,15 @@ if ($action === 'check') {
     $response['lastActivity'] = isset($record['lastActivity']) ? (int)$record['lastActivity'] : 0;
     $response['editedAt'] = isset($record['editedAt']) ? (int)$record['editedAt'] : 0;
     $response['savedAt'] = isset($record['savedAt']) ? (int)$record['savedAt'] : 0;
+    $response['acquiredAt'] = $acquiredAt;
 } elseif ($action === 'release') {
     // Releasing a lock someone else holds is a no-op, not an error: the usual way to reach it is
     // closing a tab that was taken over while you were away, and that is not a failure worth saying
     // anything about.
     if (!$heldBySomeoneElse) {
         $write = array('projectId' => $id, 'holder' => '', 'lockedBy' => '', 'lastActivity' => time(),
-                       'editedAt' => 0, 'savedAt' => 0);
+                       'editedAt' => 0, 'savedAt' => 0, 'acquiredAt' => 0,
+                       'requestedBy' => '', 'requestedAt' => 0);
         // AND mark it for the next sweep. A released record carries no information -- a 'check'
         // against a missing record and against an empty one give byte-identical answers -- but it
         // used to sit here for 30 days with its mtime REFRESHED by the release itself, so the
@@ -185,11 +210,43 @@ if ($action === 'check') {
     $response['lastActivity'] = isset($record['lastActivity']) ? (int)$record['lastActivity'] : 0;
     $response['editedAt'] = isset($record['editedAt']) ? (int)$record['editedAt'] : 0;
     $response['savedAt'] = isset($record['savedAt']) ? (int)$record['savedAt'] : 0;
+    $response['acquiredAt'] = $acquiredAt;
+} elseif ($action === 'request') {
+    // "Ask" (Task 667(b)). Writes ONLY the note and rewrites every other field with what it found,
+    // so a colleague pressing Ask can neither take the lock nor make the holder look more recently
+    // active than they are. Asking for a file nobody holds is not an error -- it is simply nothing
+    // to do, and the page will have offered Open instead.
+    if ($heldBySomeoneElse) {
+        $write = array('projectId' => $id, 'holder' => $currentHolder,
+                       'lockedBy' => isset($record['lockedBy']) ? $record['lockedBy'] : '',
+                       'lastActivity' => isset($record['lastActivity']) ? (int)$record['lastActivity'] : 0,
+                       'editedAt' => isset($record['editedAt']) ? (int)$record['editedAt'] : 0,
+                       'savedAt' => isset($record['savedAt']) ? (int)$record['savedAt'] : 0,
+                       'acquiredAt' => $acquiredAt,
+                       'requestedBy' => $name, 'requestedAt' => time());
+    }
+    $response['requested'] = $heldBySomeoneElse;
 } else {
     // acquire on a free-or-ours lock (which doubles as the heartbeat), or steal on any lock.
+    // The lock changing hands is what starts the in-use clock; a heartbeat from the holder we
+    // already have carries the old stamp through untouched, which is what makes "in use for 3 hours"
+    // mean three hours rather than one minute since the last poll.
+    $sameHolder = ($currentHolder === $holder);
+    $heldSince = ($sameHolder && $acquiredAt) ? $acquiredAt : time();
+    // A pending ask belongs to the holder it was aimed at. A new holder answers it by existing, and
+    // the holder themselves answers it by acknowledging that they have seen it.
+    $keepReqBy = $requestedBy;
+    $keepReqAt = $requestedAt;
+    if (!$sameHolder || ($ack && $ack === $requestedAt)) { $keepReqBy = ''; $keepReqAt = 0; }
     $write = array('projectId' => $id, 'holder' => $holder, 'lockedBy' => $name, 'lastActivity' => time(),
-                   'editedAt' => $editedAt, 'savedAt' => $savedAt);
+                   'editedAt' => $editedAt, 'savedAt' => $savedAt, 'acquiredAt' => $heldSince,
+                   'requestedBy' => $keepReqBy, 'requestedAt' => $keepReqAt);
     $response['held'] = true;
+    $response['acquiredAt'] = $heldSince;
+    // Reported AFTER the acknowledgement has been applied, so a holder who has just said "seen it"
+    // is not handed the same note back on the same breath.
+    $response['requestedBy'] = $keepReqBy;
+    $response['requestedAt'] = $keepReqAt;
     if ($action === 'steal') {
         $response['stolenFrom'] = isset($record['lockedBy']) ? $record['lockedBy'] : '';
     }

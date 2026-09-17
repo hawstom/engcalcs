@@ -22604,49 +22604,42 @@ var EngCalcs = EngCalcs || {};
 	// so a blocking dialog works for a fast reader and throws "must be handling a user gesture" for a
 	// careful one. Continue is a fresh click with an activation of its own.
 	var pendingFileAction = null;
+	// **THE PANEL IS THE EXPLANATION, NOT A REGISTRATION** (Task 667(b), Tom 2026-09-17). It used to
+	// end in an initials box, and having a name was therefore the same fact as having read the panel.
+	// Since the lock is now taken anonymously, an identity can be minted by ordinary locking without
+	// anyone having seen a word of this -- so "have they been told" is its own flag on the same
+	// record. A legacy identity carries no flag at all and counts as told, because it was.
 	function requireFileIdentity(action) {
-		if (loadIdentity()) { return true; }
+		var idn = loadIdentity();
+		if (idn && idn.trained !== false) { return true; }
 		pendingFileAction = action;
 		showFileTraining();
 		return false;
 	}
 	function showFileTraining() {
-		var pc = EngCalcs.pageConfig || {}, input = null;
+		var pc = EngCalcs.pageConfig || {};
 		openDialog(function (body) {
-			[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_permission, pc.lpn_file_training_3].forEach(function (t) {
+			// **NO INITIALS BOX** (Task 667(b)). Asking a lone user to identify themselves before
+			// they have done anything, on a site with no login and no account, reads as a
+			// registration -- and the name it collected was for a colleague who in most cases never
+			// arrives. The question now happens where it is useful: to the SECOND user, on the Ask
+			// button of the dialog that tells them the file is in use.
+			[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_permission].forEach(function (t) {
 				if (!t) { return; }
 				var p = document.createElement('p');
 				p.style.margin = '0 0 8px';
 				p.textContent = t;
 				body.appendChild(p);
 			});
-			var label = document.createElement('label');
-			label.textContent = (pc.lpn_file_training_name || 'Your initials') + ' ';
-			input = document.createElement('input');
-			input.type = 'text'; input.maxLength = 60; input.style.marginLeft = '4px';
-			// **ENTER IS CONTINUE** (Tom, 2026-08-19: "After entering initials, can the [Enter] key
-			// close the box?"). A one-field dialog whose only real answer is the thing you just
-			// typed should not require a trip to the mouse. Wired to the button rather than to a
-			// copy of its handler, so the two can never do different things -- and the button is
-			// found by its own label so a rename cannot silently unwire the key.
-			input.addEventListener('keydown', function (e) {
-				if (e.key !== 'Enter') { return; }
-				e.preventDefault();
-				var go = Array.prototype.filter.call(
-					document.querySelectorAll('#lpn_dialog button'),
-					function (b) { return b.textContent === (pc.lpn_file_training_continue || 'Continue'); })[0];
-				if (go) { go.click(); }
-			});
-			label.appendChild(input);
-			body.appendChild(label);
 		}, [
 			{
 				label: pc.lpn_file_training_continue || 'Continue',
 				fn: function () {
-					// An empty name is allowed. Colleagues then see lpn_lock_somebody, which is worse
-					// for them but is the user's call to make -- refusing to continue would be a gate
-					// on a feature whose whole point is that there is no login.
-					identity = { holder: randomToken(24), name: input.value.trim().slice(0, 60) };
+					// The token is what "mine" means; the name stays empty for as long as this
+					// browser only ever HOLDS locks. Colleagues then read lpn_lock_somebody, which is
+					// the trade Tom made with his eyes open.
+					identity = loadIdentity() || { holder: randomToken(24), name: '' };
+					identity.trained = true;
 					writeJSON(LPN_IDENTITY_KEY, identity);
 					var next = pendingFileAction;
 					pendingFileAction = null;
@@ -22661,7 +22654,6 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { pendingFileAction = null; }
 			}
 		]);
-		if (input) { input.focus(); }
 	}
 	// A file project's project NAME is its file's base name -- one name, not two (Task 211). A Rename
 	// that renames the project and a Save that writes the file are each correct alone and a permanent
@@ -23015,67 +23007,90 @@ var EngCalcs = EngCalcs || {};
 		if (hrs < 48) { return (pc.lpn_ago_hours || '{n} hours').replace('{n}', hrs); }
 		return (pc.lpn_ago_days || '{n} days').replace('{n}', Math.max(2, Math.round(hrs / 24)));
 	}
-	// The stale-claim conversation. THREE choices, in the order a decent colleague tries them: Cancel
-	// and go ask FIRST, break it last, and the prose enumeration and the button row in the SAME
-	// order. No "Create a copy": read-only allows every edit, so open-read-only-then-Save-as IS one.
+	// The stale-claim conversation, rebuilt for Task 667(b) (Tom, 2026-09-17). FOUR answers now, and
+	// a readout of THREE AGES rather than one sentence: *"This file has been in use for X hours, was
+	// last saved Y, and was last edited Z. We can ask the locking user to close the file for you."*
 	//
 	// **Breaking a lock is not overwriting a file**, structurally rather than by promise:
-	// writeOpenProjectToFile() checks the bytes on disk before every write.
+	// writeOpenProjectToFile() reads the bytes on disk before every write, and nothing on this path
+	// writes anything at all -- Break lock takes the CLAIM and lands the project, and the holder's
+	// file is exactly as they left it.
 	//
-	// **"{name} has this file open." on its own is not enough to decide anything.** The judgment is
-	// entirely about time, so each case says the most it truthfully can:
-	//   unsaved work   -- matters most: interrupting them costs them that work.
-	//   all saved      -- safest to break; nothing of theirs is at risk.
-	//   nothing edited -- they may only have it open; `lastActivity` says whether anyone is home.
-	//   no numbers     -- an old record, or a broker that answered without them.
-	// `lastActivity` is the broker's own clock in SECONDS (`time()`); editedAt/savedAt are the
-	// holder's clock in MILLISECONDS. Mixing the two silently turns "5 minutes" into "7 weeks".
-
-
-	function lockHeadingText(who, info) {
-		var pc = EngCalcs.pageConfig || {}, now = Date.now();
+	// **AN AGE THAT IS NOT KNOWN IS NOT STATED.** This is the dialog on which somebody decides
+	// whether to interrupt a colleague or step on their afternoon, so a plausible invented number is
+	// worse here than a missing one. `acquiredAt` is the broker's own clock in SECONDS (`time()`) and
+	// did not exist before this task, so an older record simply has no in-use age; `editedAt` and
+	// `savedAt` are the HOLDER's clock in MILLISECONDS, reported with every heartbeat, and are zero
+	// until they have edited and saved. Mixing the two units silently turns "5 minutes" into "7 weeks".
+	function lockReadoutLines(info) {
+		var pc = EngCalcs.pageConfig || {}, now = Date.now(), lines = [], ages = [];
+		// A NAME ONLY WHERE THERE GENUINELY IS ONE. Nobody is asked for initials to take a lock any
+		// more, so the named sentence is now the exception -- an older page, or a record written
+		// before this shipped -- rather than the rule.
+		var named = (info && info.lockedBy) ? String(info.lockedBy) : '';
+		lines.push((named
+			? (pc.lpn_lock_open_heading || '{name} has this file open.').replace('{name}', named)
+			: (pc.lpn_lock_open_inuse || 'This file appears to be in use.'))
+			+ ' ' + (pc.lpn_lock_open_care || 'To avoid data loss, choose carefully from the options below.'));
+		var heldFor = now - (((info && info.acquiredAt) || 0) * 1000);
 		var editedAt = (info && info.editedAt) || 0, savedAt = (info && info.savedAt) || 0;
-		var seenAt = ((info && info.lastActivity) || 0) * 1000;
-		var s;
-		if (editedAt && savedAt && editedAt > savedAt) {
-			s = (pc.lpn_lock_open_heading_times || '{name} has this file open; the last edit was {x} ago, {y} after the last save.')
-				.replace('{x}', agoText(now - editedAt)).replace('{y}', agoText(editedAt - savedAt));
-		} else if (editedAt && !savedAt) {
-			s = (pc.lpn_lock_open_heading_unsaved || '{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.')
-				.replace('{x}', agoText(now - editedAt));
-		} else if (editedAt) {
-			s = (pc.lpn_lock_open_heading_saved || '{name} has this file open; the last edit was {x} ago, and their work is saved to the file.')
-				.replace('{x}', agoText(now - editedAt));
-		} else if (seenAt) {
-			s = (pc.lpn_lock_open_heading_seen || '{name} has this file open but has not edited it. Their browser last checked in {x} ago.')
-				.replace('{x}', agoText(now - seenAt));
-		} else {
-			s = pc.lpn_lock_open_heading || '{name} has this file open.';
+		if ((info && info.acquiredAt) && heldFor > 0) {
+			ages.push((pc.lpn_lock_age_inuse || 'It has been in use for {x}.').replace('{x}', agoText(heldFor)));
 		}
-		return s.replace('{name}', who);
+		// His order: how long it has been in use, when it was last saved, when it was last edited.
+		if (savedAt && now - savedAt > 0) {
+			ages.push((pc.lpn_lock_age_saved || 'It was last saved {x} ago.').replace('{x}', agoText(now - savedAt)));
+		} else if (editedAt) {
+			// Edited but never written to the file: the one case where the absence of a number is
+			// itself the fact a colleague most needs, because breaking the lock is at its costliest.
+			ages.push(pc.lpn_lock_age_never_saved || 'Nothing has been saved to this file yet.');
+		}
+		if (editedAt && now - editedAt > 0) {
+			ages.push((pc.lpn_lock_age_edited || 'It was last edited {x} ago.').replace('{x}', agoText(now - editedAt)));
+		}
+		if (!ages.length) {
+			ages.push(pc.lpn_lock_age_unknown || 'There is no record of how long it has been in use, or when it was last saved or edited.');
+		}
+		lines.push(ages.join(' '));
+		lines.push(pc.lpn_lock_open_choices_ask || 'Ask tells whoever has this file open that you would like it, and changes nothing else. Break lock lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. Open read-only lets you look at it and change anything you like, without being able to save here.');
+		return lines;
+	}
+	// **ASK SENDS INITIALS AND STORES NOTHING.** They are typed here, at the one moment they are
+	// useful to anybody, and go straight to the broker for the holder to read. Nothing new is written
+	// to this device for them -- which is the whole reason the question moved here from the first
+	// save (Task 667(b)).
+	async function askForLockedFile(saved) {
+		var pc = EngCalcs.pageConfig || {};
+		var docId = saved.project && saved.project.docId;
+		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'What should we tell them? Your initials are ideal. They are sent to whoever has the file open, and are not kept on this computer.', '');
+		if (initials === null) { return; }   // backed out: nothing sent, and nothing opened
+		var r = docId ? await postLock('request', docId, { name: initials.trim().slice(0, 60) }) : null;
+		setNotice((r && r.ok && r.requested)
+			? (pc.lpn_lock_ask_sent || 'We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.')
+			: (pc.lpn_lock_ask_failed || 'Your message could not be passed on. Either nobody has this file open now, or the server could not be reached.'));
 	}
 	function presentOpenChoice(saved, handle, who, info) {
 		var pc = EngCalcs.pageConfig || {};
 		openDialog(function (body) {
-			var p = document.createElement('p');
-			p.style.margin = '0 0 8px';
-			p.textContent = lockHeadingText(who, info);
-			body.appendChild(p);
-			var q = document.createElement('p');
-			q.style.margin = '0';
-			q.textContent = pc.lpn_lock_open_choices || 'Your choices: (1) Cancel and ask them to open it if necessary and then close it properly (closing the browser does not close the project), (2) Open read-only, or (3) if all else fails, you can break their lock. Their unsaved work is not lost, but they will not be able to save over your changes, and somebody may have to merge the two by hand.';
-			body.appendChild(q);
+			lockReadoutLines(info).forEach(function (t, n) {
+				var p = document.createElement('p');
+				p.style.margin = n === 2 ? '0' : '0 0 8px';
+				p.textContent = t;
+				body.appendChild(p);
+			});
 		}, [
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
-			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
+			// Tom's own order, 2026-09-17: Ask, Break lock, Open read-only, Cancel.
+			{ label: pc.lpn_lock_ask || 'Ask', fn: function () { askForLockedFile(saved); } },
 			{
-				label: pc.lpn_lock_break || 'Break their lock',
+				label: pc.lpn_lock_break || 'Break lock',
 				fn: async function () {
 					var docId = saved.project && saved.project.docId;
 					if (docId) { await postLock('steal', docId); }
 					landOpenedFile(saved, handle, false);
 				}
-			}
+			},
+			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
 		]);
 	}
 	// Which open project, if any, IS this document? Reads the docId out of each stored project rather
@@ -23195,9 +23210,10 @@ var EngCalcs = EngCalcs || {};
 		if (!project.docId) { project.docId = newDocId(); saveToStorage(); }
 		return project.docId;
 	}
-	// Identity is per BROWSER, not per project: an opaque token that decides what "mine" means, plus
-	// a friendly name that is only ever shown to a human. No login, no server-side user table.
-	// Returns null if the user declines to give a name, which simply means no locking for them.
+	// Identity is per BROWSER, not per project: an opaque token that decides what "mine" means. No
+	// login, no server-side user table -- and since Task 667(b) no NAME either, because nobody is
+	// asked for one in order to take a lock. `name` survives as a field so that an identity written
+	// by an older page keeps working; nothing writes a new one into it.
 	var identity = null;
 	function loadIdentity() {
 		if (identity) { return identity; }
@@ -23205,12 +23221,13 @@ var EngCalcs = EngCalcs || {};
 		if (saved && saved.holder) { identity = saved; }
 		return identity;
 	}
+	// **MINTED SILENTLY, AND IT CANNOT FAIL ANY MORE** (Task 667(b)). This used to be a window.prompt
+	// for initials, and returning null from it meant "no locking for this person at all" -- a whole
+	// safety feature switched off by somebody pressing Escape on a question they did not understand.
+	// A random token needs no permission and no keystroke, so locking now simply works.
 	function ensureIdentity() {
 		if (loadIdentity()) { return identity; }
-		var pc = EngCalcs.pageConfig || {};
-		var name = window.prompt(pc.lpn_lock_prompt_name || 'What should colleagues see when you have this project open? Your initials are ideal. Anyone who opens the same file can see it, so do not use anything private.', '');
-		if (name === null) { return null; } // declined -- no locking, and we will not ask again this action
-		identity = { holder: randomToken(24), name: name.trim().slice(0, 60) };
+		identity = { holder: randomToken(24), name: '', trained: false };
 		writeJSON(LPN_IDENTITY_KEY, identity);
 		return identity;
 	}
@@ -23220,7 +23237,11 @@ var EngCalcs = EngCalcs || {};
 	// useful than silence, and used to be flattened into the same null as a dead network. That cost
 	// Tom an hour on 2026-08-05: lpn-locks/ was not writable by the web server user, every acquire
 	// 500'd, and the page said only "could not reach the server".
-	async function postLock(action, docId) {
+	//
+	// `opts` carries the two things that are not facts about this browser: `name`, the initials the
+	// user typed into Ask at the moment they asked (SENT, never stored -- that is the whole point of
+	// Task 667(b)), and `ack`, the timestamp of a request the holder has now been shown.
+	async function postLock(action, docId, opts) {
 		var idn = loadIdentity();
 		// **"We never asked" is not "the server is down."** Returning the same null for both let the
 		// page announce a server outage when the real state was a missing docId or missing initials
@@ -23234,7 +23255,10 @@ var EngCalcs = EngCalcs || {};
 				method: 'POST',
 				credentials: 'same-origin',
 				body: new URLSearchParams({
-				action: action, id: docId, holder: idn.holder, name: idn.name,
+				action: action, id: docId, holder: idn.holder,
+				// Empty for a holder, and the asker's own initials on a 'request'.
+				name: (opts && opts.name) || idn.name || '',
+				ack: String((opts && opts.ack) || 0),
 				// What a colleague needs to judge a stale claim. `lastActivity` on the server only
 				// says "we heard from them", which a throttled background tab makes meaningless.
 				editedAt: String(lastEditAt || 0), savedAt: String(lastSaveAt || 0)
@@ -23452,7 +23476,7 @@ var EngCalcs = EngCalcs || {};
 	function lockUnavailableMessage() {
 		var pc = EngCalcs.pageConfig || {};
 		return lockErrorCode === 'notasked'
-			? (pc.lpn_lock_not_asked || 'Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This browser has no name recorded for you yet, or the project has no identifier — saving the project to a file sets both.')
+			? (pc.lpn_lock_not_asked || 'Locking is not running for this project, so nothing is stopping a colleague from editing the same file at the same time. This project has no identifier yet, and saving it to a file gives it one.')
 			: lockErrorCode === 'full'
 			? (pc.lpn_lock_full_error || 'Beware: this site has run out of room to record who has which project open, so nothing is stopping a colleague from editing the same file at the same time. This is a setup fault on the server, not something you can fix here.')
 			: lockErrorCode === 'storage'
@@ -23470,6 +23494,29 @@ var EngCalcs = EngCalcs || {};
 			dismissable: true
 		};
 		renderBanner();
+	}
+	// **THE OTHER END OF "ASK"** (Task 667(b)). A colleague has left a note on our lock; the heartbeat
+	// is what collects it. Acknowledged IMMEDIATELY rather than on the next beat, because the note
+	// sits in the record until somebody says it has been read and a minute of unacknowledged polling
+	// would raise the same banner again.
+	//
+	// It is a NOTICE, never a modal and never anything that takes the file away: somebody asking for
+	// a file does not get it, and the holder is entitled to finish what they are doing.
+	var lockRequestSeen = new Map();   // project id -> the requestedAt we have already shown
+	async function noteLockRequest(id, docId, r) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!r || !r.held || !r.requestedAt) { return; }
+		if (lockRequestSeen.get(id) === r.requestedAt) { return; }
+		lockRequestSeen.set(id, r.requestedAt);
+		var msg = (pc.lpn_lock_requested || '{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.')
+			.replace('{name}', r.requestedBy || (pc.lpn_lock_somebody || 'Somebody else'));
+		if (id === library.openId) {
+			bannerWarn = { kind: 'request', message: msg, action: null, dismissable: true };
+			renderBanner();
+		} else {
+			setNotice(msg);
+		}
+		await postLock('acquire', docId, { ack: r.requestedAt });
 	}
 	function lockHolderName(r) {
 		var pc = EngCalcs.pageConfig || {};
@@ -23494,7 +23541,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		lockUnavailable = false;
 		setLockUnavailable(false);
-		if (r.held) { heldLocks.set(id, docId); return; }
+		if (r.held) { heldLocks.set(id, docId); await noteLockRequest(id, docId, r); return; }
 		// Somebody took it between the open-time check and here. Rare, but it is exactly the race the
 		// pre-save re-check exists for, and the same read-only state answers it.
 		enterReadOnly(lockHolderName(r));
@@ -23518,6 +23565,7 @@ var EngCalcs = EngCalcs || {};
 		for (var i = 0; i < pending.length; i++) {
 			var id = pending[i][0], r = await postLock('acquire', pending[i][1]);
 			if (!r || !r.ok) { continue; }  // unreachable; the banner stays as it is, say nothing
+			await noteLockRequest(id, pending[i][1], r);
 			if (!r.held) {
 				// Lost it while we were away. If it is the tab on screen the banner says so now;
 				// otherwise the tab simply becomes read-only and will say so when it is next looked at.
@@ -23678,6 +23726,7 @@ var EngCalcs = EngCalcs || {};
 			if (!r || !r.ok) { continue; }   // unreachable or a server fault; the banner covers it
 			if (r.held) {
 				heldLocks.set(id, docId);
+				await noteLockRequest(id, docId, r);
 			} else {
 				lockedByName.set(id, lockHolderName(r));
 				roProjects.add(id);
