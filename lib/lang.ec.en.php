@@ -1876,13 +1876,13 @@ $ec_lang['lpn_lock_age_saved']='It was last saved {x} ago.';
 $ec_lang['lpn_lock_age_never_saved']='Nothing has been saved to this file yet.';
 $ec_lang['lpn_lock_age_unknown']='There is no record of how long it has been in use, or when it was last saved or edited.';
 // Four answers now, in Tom's own order, so the prose and the button row read the same way.
-$ec_lang['lpn_lock_open_choices_ask']='Ask tells whoever has this file open that you would like it, and changes nothing else. Break lock lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. Open read-only lets you look at it and change anything you like, without being able to save here.';
+$ec_lang['lpn_lock_open_choices_ask']='"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. "Open read-only" lets you look at it and change anything you like, without being able to save here.';
 $ec_lang['lpn_lock_ask']='Ask';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='What should we tell them? Your initials are ideal. They are sent to whoever has the file open, and are not kept on this computer.';
+$ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.';
 $ec_lang['lpn_lock_ask_sent']='We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.';
-$ec_lang['lpn_lock_ask_failed']='Your message could not be passed on. Either nobody has this file open now, or the server could not be reached.';
+$ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
