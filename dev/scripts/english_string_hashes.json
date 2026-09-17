@@ -2515,9 +2515,7 @@
         "lpn_file_saveas_tip_download": "cb5039d5267ff838c56004cc3cee315bfca30572",
         "lpn_file_training_1": "b537acd1629d66b3c5390fe08973e1a3fa63c5fb",
         "lpn_file_training_2": "d2013b525a17ab9d9e20b577edffffd1d9061513",
-        "lpn_file_training_3": "ce2d62b5c23d62cc51df4afe93c630c40a9c88b1",
         "lpn_file_training_continue": "2e02623966f9391facf6eaefc8b079ed5b630bee",
-        "lpn_file_training_name": "4c5a5d976b11cb610712f0f64ec9cad4aa8458a5",
         "lpn_file_training_permission": "42799f70378f8a7a7b916e1f95b1329bd2c363c5",
         "lpn_file_type_desc": "803ed44f8e2e9ad6dec8241b8b5073137485d8be",
         "lpn_file_upload_explain": "7ef942147ae13399f21e6bb3aefc115f91439103",
@@ -2776,15 +2774,8 @@
         "lpn_lock_dismiss": "16c50c7f1a0153d2a4f024f805685ef60cef96bd",
         "lpn_lock_full_error": "2a5baa65d0e99359a18c7209b9777ab269cd3d56",
         "lpn_lock_not_asked": "14bf8335b0a2e043961360a7797f2da0461ea214",
-        "lpn_lock_open_choices": "ec15223440c14cdd1105f5fba1f07741836b1dba",
-        "lpn_lock_open_copy": "86250ffe0e10a7e99725a71cb100679b877c0dd1",
         "lpn_lock_open_heading": "f442529d9a82957a6eb3fdd479784b3f5a98b8f5",
-        "lpn_lock_open_heading_saved": "0d3cdbaadd95e0e3220b1cc602e07c05c79df97d",
-        "lpn_lock_open_heading_seen": "49faa8c53d4d96d9a8bc26da92745de1e365e232",
-        "lpn_lock_open_heading_times": "70f2c225eeef57f5fea66b13e1d56703fd90edff",
-        "lpn_lock_open_heading_unsaved": "9ecf3113a6639ef2058bf08fee2f0c66a66081cf",
         "lpn_lock_open_readonly": "1e057f95a2d7dc951898ad32a7ce304f2414661e",
-        "lpn_lock_prompt_name": "2bd1caa27300057222a40ad387a4346d6031fa8b",
         "lpn_lock_readonly_banner": "ac4c87f5a676ffd9f7e4ab2845a4a7a31c0c013f",
         "lpn_lock_restored": "4319b622bc58b3ae6c1c25f49005b014a7613f7c",
         "lpn_lock_somebody": "8115c76d478a7e1ce12fc42adb46d854c630f845",
@@ -6440,16 +6431,8 @@
             "words": 40,
             "ends_sentence": true
         },
-        "lpn_file_training_3": {
-            "words": 29,
-            "ends_sentence": true
-        },
         "lpn_file_training_continue": {
             "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_file_training_name": {
-            "words": 2,
             "ends_sentence": false
         },
         "lpn_file_training_permission": {
@@ -7484,41 +7467,13 @@
             "words": 46,
             "ends_sentence": true
         },
-        "lpn_lock_open_choices": {
-            "words": 66,
-            "ends_sentence": true
-        },
-        "lpn_lock_open_copy": {
-            "words": 3,
-            "ends_sentence": false
-        },
         "lpn_lock_open_heading": {
             "words": 5,
-            "ends_sentence": true
-        },
-        "lpn_lock_open_heading_saved": {
-            "words": 19,
-            "ends_sentence": true
-        },
-        "lpn_lock_open_heading_seen": {
-            "words": 17,
-            "ends_sentence": true
-        },
-        "lpn_lock_open_heading_times": {
-            "words": 16,
-            "ends_sentence": true
-        },
-        "lpn_lock_open_heading_unsaved": {
-            "words": 22,
             "ends_sentence": true
         },
         "lpn_lock_open_readonly": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_lock_prompt_name": {
-            "words": 29,
-            "ends_sentence": true
         },
         "lpn_lock_readonly_banner": {
             "words": 27,

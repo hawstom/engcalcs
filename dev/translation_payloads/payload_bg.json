@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1871,
-        "delta_key_count": 2,
+        "expected_key_count": 1875,
+        "delta_key_count": 15,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -521,14 +521,248 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_lock_open_inuse": "This file appears to be in use.",
+        "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
+        "lpn_lock_age_inuse": "It has been in use for {x}.",
+        "lpn_lock_age_edited": "It was last edited {x} ago.",
+        "lpn_lock_age_saved": "It was last saved {x} ago.",
+        "lpn_lock_age_never_saved": "Nothing has been saved to this file yet.",
+        "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
+        "lpn_lock_open_choices_ask": "Ask tells whoever has this file open that you would like it, and changes nothing else. Break lock lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. Open read-only lets you look at it and change anything you like, without being able to save here.",
+        "lpn_lock_ask": "Ask",
+        "lpn_lock_ask_prompt": "What should we tell them? Your initials are ideal. They are sent to whoever has the file open, and are not kept on this computer.",
+        "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+        "lpn_lock_ask_failed": "Your message could not be passed on. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E"
     },
     "keys": {
+        "lpn_lock_open_inuse": "This file appears to be in use.",
+        "lpn_lock_open_care": "To avoid data loss, choose carefully from the options below.",
+        "lpn_lock_age_inuse": "It has been in use for {x}.",
+        "lpn_lock_age_edited": "It was last edited {x} ago.",
+        "lpn_lock_age_saved": "It was last saved {x} ago.",
+        "lpn_lock_age_never_saved": "Nothing has been saved to this file yet.",
+        "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
+        "lpn_lock_open_choices_ask": "Ask tells whoever has this file open that you would like it, and changes nothing else. Break lock lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. Open read-only lets you look at it and change anything you like, without being able to save here.",
+        "lpn_lock_ask": "Ask",
+        "lpn_lock_ask_prompt": "What should we tell them? Your initials are ideal. They are sent to whoever has the file open, and are not kept on this computer.",
+        "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+        "lpn_lock_ask_failed": "Your message could not be passed on. Either nobody has this file open now, or the server could not be reached.",
+        "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E"
     },
     "key_context": {
+        "lpn_lock_open_inuse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_open_care": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_inuse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_edited": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_never_saved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_age_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_open_choices_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_sent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_ask_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
+        "lpn_lock_requested": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_break",
+                    "value": "Разбий заключването",
+                    "english": "Break lock"
+                },
+                "next_translated": {
+                    "key": "lpn_ago_seconds",
+                    "value": "{n} секунди",
+                    "english": "{n} seconds"
+                }
+            }
+        },
         "lpn_field_northing_abbr": {
             "reason": "equal_to_english",
             "current_value": "N",
