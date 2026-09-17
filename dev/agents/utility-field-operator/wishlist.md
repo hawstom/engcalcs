@@ -307,6 +307,35 @@ the defect was, and is no longer a recommendation.
   half is worth having; the snapping half is the one I would ask him to reconsider before it is
   built, on the finger-tracking argument above, not on taste.
 
+### 9. Customer service connections: constrain the DRAG, not only the default — and skip the house icon at these sizes
+
+- **What:** on `feat/customer-demands` (Task 247), lock a customer's service-line drag to station
+  (along the pipe) and standoff distance/side (perpendicular to it), rather than a free x/y drag
+  that can land the stub at any angle. Full reasoning and citation: journal, 2026-09-17. I agree
+  with Tom's instinct not to offer a non-perpendicular connection at all — I found no field-reading
+  task the angle serves that the meter's position does not already serve better, and a uniform
+  perpendicular pattern makes the one real exception (a lateral crossing the street) MORE visible,
+  not less, because it is the one dot sitting on the wrong side of an otherwise consistent row.
+- **Snap to the nearest node on close approach: yes, no reservation** — the page already snaps a
+  near-miss onto an existing node/meter elsewhere (`nearestNodeNearScreen()`,
+  `js/looped-network.js:27186-27196`, worktree), so this is the page's own standing idiom, not a
+  new one. The one thing I'd want confirmed, not a reason to decline: the catch is visually obvious
+  and a further drag releases it.
+- **Small solid dot: yes. House/building icon: no, at the sizes this page actually draws.**
+  **CITED**, Esri's own minimum-symbol-size guidance puts a simple symbol's screen floor near 10 px
+  and names 20×20 px as the size below which an iconic (detailed) shape needs different design work
+  entirely (Esri ArcGIS blog, "Guidelines for minimum size for text and symbols on maps," retrieved
+  2026-09-17). **OBSERVED**, this page's customer symbol draws at 3-7 px in the ordinary zoomed-out
+  case (`LPN_METER_MIN_PX = 1.5` half-width vs. the junction's fixed `symbolSize: 7`,
+  `js/looped-network.js:7873-7874`, `4650`, worktree) — under even the simple-shape floor, so a
+  house glyph will not read as a house there; it reads as a slightly different dot, at extra
+  rendering cost for no legibility gain I can find. Keep the size and position cues (smaller than a
+  junction, off the pipe on a stub) that already do the real identification work.
+- **Rank: low, and mostly already built.** The perpendicular default ships today
+  (`meterOffsetFor()`); the only gap is the unconstrained drag afterward, which is a small, cheap
+  fix layered on a feature already in flight — not a new want of mine. I answer it because Tom asked
+  the seats directly, not because it is where I would have pointed the team's attention unprompted.
+
 ## Parked
 
 *(none yet)*
