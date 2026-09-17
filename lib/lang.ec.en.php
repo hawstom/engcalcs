@@ -2132,7 +2132,7 @@ $ec_lang['lpn_field_desc']='Description';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='A line of your own words about this part, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part\'s own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.';
+$ec_lang['lpn_field_desc_tip']='For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part\'s own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2249,10 +2249,10 @@ $ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as sh
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
 // when the node is dragged.
-$ec_lang['lpn_field_coord_tip']='Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.';
+$ec_lang['lpn_field_coord_tip']='Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.';
 // Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
 // finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
-$ec_lang['lpn_coord_off_world']='That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.';
+$ec_lang['lpn_coord_off_world']='That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
