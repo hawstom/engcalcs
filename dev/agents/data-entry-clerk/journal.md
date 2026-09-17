@@ -1263,3 +1263,153 @@ territory, not mine); I have no gesture-cost stake in it and would not spend Tom
 him to reconsider it for my sake.
 
 — Declan
+
+## Eleventh invocation, 2026-09-17 — three questions: customer entry order, per-entry library import, and a survey file format chooser
+
+Tom asked me by name on the first question; the other two were routed to me. Read
+`dev/customer-demands.md` in full and re-read `js/looped-network.js` on both `master` and the
+`feat/customer-demands` worktree (`/home/haws/webdev/worktrees/feat-customer-demands/engcalcs`,
+read-only) before answering. Dates below are all today's check.
+
+### Q1 — "location, link, location, link, location, link"
+
+**OBSERVED**, `feat/customer-demands` worktree, `js/looped-network.js:16062-16066` (checked
+2026-09-17): the Customer table's `link` and `atNode` columns already exist as columns with a `get`
+and no `set` — they are DERIVED and read-only in the table today, matching the design doc's model
+(`dev/customer-demands.md` §2: store `link` + `t`, derive the node). So the question is not whether
+a customer table has a location column and a link column — it already does — the question is
+whether a BULK IMPORT surface (a pasted or typed block creating many customer rows at once, which is
+Task 610's still-open row-creation gap applied to a fourth element kind) should present them as
+alternating pairs.
+
+**I have no strong disagreement, with one condition that decides whether this is good or bad, and
+Tom's own phrase is ambiguous about which one he means.**
+
+- **If it means one ROW per customer with two CELLS — a location cell, then a link cell, then the
+  next row's location cell, then its link cell — that is just an ordinary two-column table, and it
+  is fine.** It is also the CHEAPER of the two shapes to type: `js/looped-network.js:17008` (master,
+  checked 2026-09-17) confirms Enter still moves straight down a column (`r+1, c`, unchanged since my
+  tenth-invocation finding), so a clerk can type every location down column 1, Enter-Enter-Enter, then
+  every link down column 2 — column-major, the shape my tenth-invocation correction already
+  established costs nothing extra for slot position. Two typed columns, however many rows, is not a
+  new rhythm — it is what every table on this page already is.
+- **If it means a single FLAT LIST where consecutive ROWS alternate meaning — row 1 is a location,
+  row 2 is that customer's link, row 3 is the next location, row 4 its link — that is a different and
+  worse thing.** It halves the visible row count against the true customer count (400 customers read
+  as 800 "rows"), breaks the one-cell-one-field convention every other table and the paste mechanism
+  (`panePasteAt()`) already assumes, and defeats Enter-down-column entirely, because column-major
+  typing requires every cell in a column to mean the same thing — alternating meaning by row parity
+  is a row-major-only shape, and it is the row-major shape my tenth-invocation retraction already
+  found to be the more expensive one where it is avoidable.
+- **A file already existing in a flattened, alternating shape is not a reason the TYPING SURFACE has
+  to match it.** This is exactly the "a number that came from a file is the user's; we display and
+  solve from a copy" principle CLAUDE.md already states for numeric values, read across to STRUCTURE:
+  an importer is free to read whatever shape the source file is actually in and lay it into two real
+  columns on screen; the parser's job is to absorb that shape once, not to make a clerk re-encounter
+  it 400 times. I would ask which of the two Tom means before building, and recommend the two-column
+  row shape if there is any doubt — it is strictly better for typing and is what the rest of this
+  page already does everywhere else.
+
+**Is LINK something a person should type at all, or is nearest-pipe a safe guess?** My answer: type
+or match it, never silently substitute a guess, and here is the concrete reason rather than an
+appeal to caution in general. `dev/customer-demands.md` §2 already computes the nearest node from
+"nearest POINT ON THE POLYLINE, arc length to each end" — that is nearest-pipe geometry, and it is
+exactly the kind of thing that goes wrong in the case that matters most for a plan-set clerk: two
+parallel mains a few feet apart (common on a distribution loop, or an old main paralleled by a
+replacement), or a service crossing near an intersection of three or four pipes. A purely geometric
+nearest-pipe answer picks confidently and wrong in exactly those cases, and the error is silent —
+the meter still draws, the table still fills, the demand still solves, and it is attached to the
+wrong main. This is the same shape of danger CLAUDE.md already names for elevation-fill ("never
+overwrite a value the user has without their having asked for exactly that") and for units ("never
+guess a unit needed for a solve") — a value that changes the ANSWER must never be quietly
+substituted. **So: LINK is the one field in a customer bulk-import row that must never be guessed.**
+A plan set already states which main serves which service (that is exactly the information a
+nearest-pipe geometric guess cannot recover reliably at an intersection), so asking for it is asking
+for information the clerk already has in hand, not busywork. I would still compute and SHOW the
+geometric nearest-pipe as a suggestion next to an empty or ambiguous cell, the way the elevation-fill
+feature states its own accuracy in the interface rather than the comments — visible, never silently
+accepted.
+
+**What would the file actually look like, honestly:** I would expect a real plan-set transcription to
+be closer to `account, x, y, link, demand` as five real columns — one row per customer, in the shape
+every other table on this page already uses — rather than a flattened alternating sequence. If the
+underlying file Tom has in mind is genuinely pair-flattened (which is a shape I have seen in some
+legacy fixed-format exports, though I did not go looking for one specifically for this session — see
+"where I did not look" below), the importer reading it is a one-time parsing decision and the on-
+screen columns should still be two real columns, per the file-numbers-are-the-user's-but-display-is-
+ours principle above.
+
+### Q2 — per-entry checkboxes for a library import: per-library is enough; 200 checkboxes is the wrong instrument
+
+**SPECULATION**, reasoned from the same arithmetic as everything else in this seat, since I have not
+read the importing branch's own code this session (did not go looking for it; the branch name was
+not given to me). Someone importing a colleague's pipe-type table wants ALL of it or NEARLY all of
+it, in the overwhelmingly common case — the reason to import a library at all is "I don't want to
+retype these," and a library somebody maintained is a library somebody uses most of. A 200-row
+checkbox list defaults every box to a state (checked or unchecked) and either way it is wrong for
+most importers: default-checked costs one click per row you DON'T want (rare, so cheap in total but
+still a hunt-and-uncheck task across 200 rows to find the few); default-unchecked costs one click per
+row you DO want (the common case, so it is 195 clicks to get what "import the library" already meant
+for free). **Per-library selection, plus ordinary post-hoc pruning through the existing Tables pane
+selection-and-delete mechanism** (the same one Task 610/paste already gives every other element kind)
+is cheaper in the common case and no worse in the rare one: import everything, then multi-select and
+delete the handful you did not want, which is a task this page's own table selection already does
+well (drag/Shift-click a range, Delete). I would not build a 200-checkbox picker at all. If Tom wants
+a half-measure, a text filter box ABOVE a checkbox list (type "PVC" to narrow 200 rows to 12, then
+check/uncheck those) is worth it only if the library is large enough that scrolling to find items is
+itself the cost — and even then, import-then-prune is probably still cheaper, because it reuses a
+mechanism that already exists rather than asking for a new one.
+
+### Q3 — a file-format chooser for surveyed points: yes, and it is the SAFE answer, not merely a convenient one
+
+**CITED**: PNEZD = Point, Northing, Easting, Elevation(Z), Description; PENZD swaps the two
+coordinate fields to Point, Easting, Northing, Elevation, Description — both real, named,
+documented Civil 3D / survey conventions (Cadline Community, "Civil 3D Survey - What is a PENZD
+point file," https://www.cadlinecommunity.co.uk/hc/en-us/articles/201758902-Civil-3D-Survey-What-is-a-PENZD-point-file;
+Autodesk Community forum thread confirming both are shipped and the difference is real enough to
+confuse Civil 3D's own users, "C3D 2013: Creating a Surface-Using PNEZD, not PENZD. Why?",
+https://forums.autodesk.com/t5/civil-3d-forum/c3d-2013-creating-a-surface-using-pnezd-not-penzd-why/td-p/4480667).
+**CITED**, wider list checked today: CivilGEO's own supported-formats documentation
+(https://knowledge.civilgeo.com/supported-external-data-formats/) names at minimum ENZ, ENZD, NEZ,
+NEZD, PENZ, PENZD, PNEZ, PNEZD and plain XYZ as distinct, named orderings it accepts — i.e., the
+axis that varies is not just "where does Description go," it is (a) whether a point ID/name column
+exists at all, (b) whether a description trails, and (c) **which of Easting/Northing comes first**,
+independently of the other two.
+
+**The one that actually bites is (c), and it is silent.** An ID or a missing description is
+obviously wrong the moment you look at the imported points — a point named "" or "12.4" reads as
+broken immediately. A NORTHING/EASTING swap does not: both are ordinary-looking numbers in a
+plausible range for the region, the imported points still draw, they still look like a network, and
+on a roughly square or oblong site the swap can put the whole survey in a position that looks
+locally sane and is not where the plan set says it is — this is the exact same class of danger
+CLAUDE.md's own coordinate-order rule already names for lon/lat vs. lat/lon ("system order is
+lon,lat; public order is lat,lon... a bare `coords` or `point` is the defect"). This suite has
+already had to write a rule for exactly this shape of ambiguity once; a survey import is the same
+shape again, from a different door.
+
+**So yes — a chooser is the right instrument, and I would not try to auto-detect the order from the
+data.** A magnitude-based heuristic (e.g., "whichever column has the larger typical value is probably
+Easting, because UTM eastings run bigger than northings in some zones") is exactly the kind of clever
+guess that works on the examples you tried it on and fails silently on the plan set you didn't. Given
+the honest choice between building a chooser and guessing, guessing is the one that can quietly put
+a distribution system in the wrong place. Minimum viable chooser, in my own ranked order of value:
+(1) which convention — N-before-E or E-before-N — is the one field that must be explicit, asked in
+plain language ("first coordinate column is: Northing / Easting") rather than by acronym, since
+PNEZD/PENZD is jargon my seat can use in this journal but a form label should not assume the clerk
+already knows which is which; (2) whether an ID/point-number column and a description column are
+present, which is lower-stakes (wrong guess there is visible immediately, per above) but still worth
+one radio button each rather than a full acronym picker; (3) **read the header row when one exists**
+— most data-collector CSV exports do carry a header naming its own columns (`Northing`, `Easting` or
+`N`, `E`), and a header that states its own order should be trusted over any chooser default, the
+same as this suite already reads a `.inp` file's own units rather than assuming. Fall back to the
+chooser only when there is no header to read, and never let a present header be silently overridden
+by a stale chooser default from click 1 of a multi-file import session.
+
+**Where I did not look this session:** I did not read the actual library-import branch's code (Q2)
+or the CSV-import branch's code (Q3) — both questions were answered from the design record and from
+external citation, not from the branches' own current state, because neither branch path was given
+to me and I was asked to answer in advance of the build. A future invocation reviewing the built
+code should re-verify against what actually shipped before repeating these as findings rather than
+recommendations.
+
+— Declan
