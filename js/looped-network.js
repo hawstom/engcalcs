@@ -1814,6 +1814,13 @@ var EngCalcs = EngCalcs || {};
 		perfDebugRows.push(name + ' ' + (t1 - t0).toFixed(1) + 'ms');
 		return out;
 	}
+	// The hint is part of the box and not part of the DATA, so it is stripped before the rows are
+	// read back -- otherwise eight switches would stack eight copies of it into the history.
+	var PERF_COPY_HINT = '(click to copy)';
+	function perfDebugRowsText(el) {
+		var t = (el && el.textContent) || '';
+		return t.split('\n').filter(function (l) { return l && l !== PERF_COPY_HINT; }).join('\n');
+	}
 	function perfDebugReport() {
 		if (!perfDebugOn()) { perfDebugRows = []; return; }
 		// **SAY ONCE, OUT LOUD, THAT IT IS ARMED.** Tom ran with the flag and reported seeing no
@@ -1840,16 +1847,37 @@ var EngCalcs = EngCalcs || {};
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
+			// **A READOUT NOBODY CAN COPY IS A READOUT THAT HAS TO BE RETYPED** (Tom, 2026-09-16:
+			// *"I did it. But it's not copyable."*). The overlay was `pointer-events:none`, copied
+			// from the collision-box layer where that is right -- there, the point is not to
+			// swallow a click meant for the map. Here the whole point is to hand the numbers to
+			// somebody, so it takes pointer events, selects like text, and a click copies the lot
+			// through the same door the curve tables use: `navigator.clipboard` where the browser
+			// offers it, and a prompt holding the same text where it does not, which is what a
+			// plain-http deploy gets. It costs a small dead corner of the map WHILE THE FLAG IS ON.
 			perfDebugEl.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3000;max-width:96vw;' +
 				'font:11px/1.35 monospace;background:rgba(0,0,0,.82);color:#0f0;padding:4px 6px;' +
-				'white-space:pre;pointer-events:none;max-height:40vh;overflow:hidden';
+				'white-space:pre;max-height:40vh;overflow:auto;cursor:pointer;' +
+				'user-select:text;-webkit-user-select:text';
+			perfDebugEl.title = 'Click to copy these lines';
+			perfDebugEl.addEventListener('click', function () {
+				// The rows alone, not the hint line appended below them.
+				var txt = perfDebugRowsText(perfDebugEl);
+				if (libCopyOut(txt)) {
+					var was = perfDebugEl.style.color;
+					perfDebugEl.style.color = '#ff0';
+					setTimeout(function () { perfDebugEl.style.color = was; }, 400);
+				}
+			});
 			document.body.appendChild(perfDebugEl);
 		}
 		if (perfDebugEl) {
 			// Newest first, and only the last eight: the interesting thing is the TREND across a
 			// handful of gestures, and a list that grows without bound is itself a leak.
-			var prev = perfDebugEl.textContent ? perfDebugEl.textContent.split('\n') : [];
-			perfDebugEl.textContent = [line].concat(prev).slice(0, 8).join('\n');
+			var prev = perfDebugRowsText(perfDebugEl);
+			prev = prev ? prev.split('\n') : [];
+			perfDebugEl.textContent = [line].concat(prev).slice(0, 8).join('\n')
+				+ '\n' + PERF_COPY_HINT;
 		}
 	}
 
