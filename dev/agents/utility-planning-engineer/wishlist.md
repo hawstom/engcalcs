@@ -23,6 +23,20 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-09-17 — not a want, a ruling request: perpendicular-only service connections, answered
+
+Not a row — Tom tested `feat/customer-demands` and asked whether a non-perpendicular service
+connection should be offered at all. Full reasoning: journal, 2026-09-17 entry. Short form: **no,
+remove the free-angle drag.** The default gesture is already perpendicular by construction
+(OBSERVED, `meterOffsetFor()`); the drag afterward is the unconstrained one. The angle carries no
+engineering meaning at all — nothing downstream reads `c.x`/`c.y`, only `link` and `t` do — and real
+installation practice is overwhelmingly perpendicular at the main (CITED, secondary), so an oblique
+stub is more likely to misstate a real lateral than to record a deliberate choice. The one real case
+(dense clustering needing a label-collision nudge) argues for an automatic, system-computed
+adjustment like `lpn-collide.js` already does for Text leaders, never a user-set angle. I found no
+industry precedent for a draggable per-service stub angle at all — this whole gesture appears to be
+this suite's own invention of Tom's site-plan-drafting instinct, not a borrowed market feature.
+
 ### 2026-09-16 — not a want, a ruling request: Tom's final Dry/Water cut, answered
 
 Not a row — Tom rebuilt the grouping around "Dry properties" vs "Water properties," overruling my
