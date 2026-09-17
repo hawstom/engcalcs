@@ -248,6 +248,15 @@ after that**, measured over five consecutive switches; a re-layout at an unchang
   rebuild does not reproduce the layout it had -- 214 of 216 labels move on a switch away and back**,
   measured with the keep off. That is a standing defect nobody had seen; the keep hides it and does
   not explain it.
+- **AND THE REBUILD WAS QUADRATIC IN THE PIPES -- one line fixed it, 2026-09-16.** `buildDom()` was
+  the one drawing-wide function that never opened the two holds `relayoutLabels()` and
+  `refreshLabelText()` have always opened, so `linkSegIndex()` rebuilt the index of EVERY link's
+  segments once per link (**120 builds for 119 pipes**, asserted now) and `mapBox()` re-read the
+  canvas between appends. **Tom's machine: `links` 1,156 ms of a 1,414 ms switch; here 180 ms became
+  16-30 ms and the whole switch 395 ms became ~208 ms.** The count, not a stopwatch, is what
+  `switch-keep-harness.js` asserts -- a timing assertion cannot travel between machines.
+- **THE WHOLE ARC, on his own machine and his own drawing: 4,628 ms -> 1,414 ms -> and this should
+  take it near 450 ms.** Text measuring, then the kept solve and label layout, then the holds.
 - **`?debug=perf` NOW COVERS THE SWITCH** -- per-phase times plus `label passes` and `label
   measurements` counts -- so the next round is measured in the browser that is actually slow rather
   than guessed at. `dev/lpn-spike/label-measure-cache-harness.js` holds the counts.
