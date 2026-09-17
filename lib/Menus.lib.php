@@ -130,11 +130,11 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<?=$ec_lang['menu_main_hydraulics']?>
 				</a>
 				<div class="dropdown-menu" aria-labelledby="dropdown-calc">
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Pipe-Flow.php" title="<?=$ec_lang['mpf_main_desc']?>"><?=$ec_lang['mpf_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Pipe-Head-Loss.php" title="<?=$ec_lang['mphl_main_desc']?>"><?=$ec_lang['mphl_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Hazen-Williams.php" title="<?=$ec_lang['hw_main_desc']?>"><?=$ec_lang['hw_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Darcy-Weisbach.php" title="<?=$ec_lang['dw_main_desc']?>"><?=$ec_lang['dw_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Branched-Network.php" title="<?=$ec_lang['bpn_main_desc']?>"><?=$ec_lang['bpn_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Pipe-Flow.php" title="<?=htmlspecialchars($ec_lang['mpf_main_desc'])?>"><?=$ec_lang['mpf_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Pipe-Head-Loss.php" title="<?=htmlspecialchars($ec_lang['mphl_main_desc'])?>"><?=$ec_lang['mphl_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Hazen-Williams.php" title="<?=htmlspecialchars($ec_lang['hw_main_desc'])?>"><?=$ec_lang['hw_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Darcy-Weisbach.php" title="<?=htmlspecialchars($ec_lang['dw_main_desc'])?>"><?=$ec_lang['dw_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Branched-Network.php" title="<?=htmlspecialchars($ec_lang['bpn_main_desc'])?>"><?=$ec_lang['bpn_main_menu']?></a>
 <?php // **THE MAP IS A DIFFERENT PRODUCT ON A DIFFERENT SITE NOW** (Task 625, Tom 2026-09-10:
       // *"Change it to LibreWaterNet.org as label and link to it without a link back"*). The
       // label is the SITE, not the calculator, because that is where the reader is going.
@@ -146,26 +146,26 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
       // "Water Supply Network" and is now read by nothing; that is Tom's call to delete.
       //
       // Same tab: Back is the way back, and EC_LWN_APP_URL's own note says why. ?>
-					<a class="dropdown-item" href="<?=EC_LWN_APP_URL?>" title="<?=$ec_lang['lpn_main_desc']?>">LibreWaterNet.org</a>
+					<a class="dropdown-item" href="<?=EC_LWN_APP_URL?>" title="<?=htmlspecialchars($ec_lang['lpn_main_desc'])?>">LibreWaterNet.org</a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Trap.php" title="<?=$ec_lang['mtc_main_desc']?>"><?=$ec_lang['mtc_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Irregular.php" title="<?=$ec_lang['mi_main_desc']?>"><?=$ec_lang['mi_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Rock-Chute.php" title="<?=$ec_lang['rc_main_desc']?>"><?=$ec_lang['rc_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Trap.php" title="<?=htmlspecialchars($ec_lang['mtc_main_desc'])?>"><?=$ec_lang['mtc_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Irregular.php" title="<?=htmlspecialchars($ec_lang['mi_main_desc'])?>"><?=$ec_lang['mi_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Rock-Chute.php" title="<?=htmlspecialchars($ec_lang['rc_main_desc'])?>"><?=$ec_lang['rc_main_menu']?></a>
 					<div class="dropdown-divider"></div>
-										<a class="dropdown-item" href="<?=EC_SW_BASE?>Micro-Hydro-Power.php" title="<?=$ec_lang['mhp_main_desc']?>"><?=$ec_lang['mhp_main_menu']?></a>
+										<a class="dropdown-item" href="<?=EC_SW_BASE?>Micro-Hydro-Power.php" title="<?=htmlspecialchars($ec_lang['mhp_main_desc'])?>"><?=$ec_lang['mhp_main_menu']?></a>
 					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Orifice.php" title="<?=$ec_lang['or_main_desc']?>"><?=$ec_lang['or_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Orifice-Drain-Time.php" title="<?=$ec_lang['odt_main_desc']?>"><?=$ec_lang['odt_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Weir-Flow-Simple.php" title="<?=$ec_lang['ws_main_desc']?>"><?=$ec_lang['ws_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Weir-Flow-Irregular.php" title="<?=$ec_lang['wi_main_desc']?>"><?=$ec_lang['wi_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Orifice.php" title="<?=htmlspecialchars($ec_lang['or_main_desc'])?>"><?=$ec_lang['or_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Orifice-Drain-Time.php" title="<?=htmlspecialchars($ec_lang['odt_main_desc'])?>"><?=$ec_lang['odt_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Weir-Flow-Simple.php" title="<?=htmlspecialchars($ec_lang['ws_main_desc'])?>"><?=$ec_lang['ws_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Weir-Flow-Irregular.php" title="<?=htmlspecialchars($ec_lang['wi_main_desc'])?>"><?=$ec_lang['wi_menu']?></a>
 					<div class="dropdown-divider"></div>
 					<?php // Irrigation.php is deliberately absent from this menu (Task 232, 2026-08-08).
 					      // Every other item here is a calculator; that page is a card index pointing
 					      // back at this very dropdown, so as a plain "Irrigation" entry it read as a
 					      // calculator and wasn't one. The page still exists and is still in the
 					      // sitemap -- only the menu entry is gone. ?>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Canal-Seepage.php" title="<?=$ec_lang['cs_main_desc']?>"><?=$ec_lang['cs_main_menu']?></a>
-					<a class="dropdown-item" href="<?=EC_SW_BASE?>Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Canal-Seepage.php" title="<?=htmlspecialchars($ec_lang['cs_main_desc'])?>"><?=$ec_lang['cs_main_menu']?></a>
+					<a class="dropdown-item" href="<?=EC_SW_BASE?>Irrigation-Pressure.php" title="<?=htmlspecialchars($ec_lang['ip_main_desc'])?>"><?=$ec_lang['ip_main_menu']?></a>
 				</div>
 			</li>
 		</ul>
