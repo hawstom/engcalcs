@@ -310,6 +310,42 @@ is answered for the three that remain after the divorce; see item 5 series above
     vs 1.2 vs something else) is a five-minute tuning decision better made by trying it than by
     debate; I would not spend more diagnosis on the exact constant. See journal, 2026-09-17.
 
+34a. **Task 667(b) — reorder the four lock-dialog buttons to Ask, Open read-only, Cancel, [gap],
+   ⚠ Break lock — a third order, neither of Tom's two.** `js/looped-network.js:23072-23095`
+   (`feat/lock-initials-later` worktree). Puts the two safe non-Ask options between the default
+   focus and the destructive one, matching Apple HIG's explicit rule (don't default-focus a
+   destructive action; space it apart from the others) rather than this codebase's own live
+   counter-example (`closeTab()`'s Save/Discard/Cancel puts Discard next to Cancel, which is the
+   adjacency to avoid, not a precedent to repeat — it had no second safe button to buffer with,
+   and this dialog does). Mark Break lock with the suite's own existing `⚠` verdict glyph rather
+   than inventing a coloured-button component — zero new translated words. Do not add a second
+   "are you sure" confirmation step on top of Break lock; the three-age readout already states the
+   consequence in specific words, and NN/g's own research says a second confirmation teaches
+   click-through rather than caution. See journal, 2026-09-17.
+
+34b. **Task 682 second half — an on-map `+`/`−` zoom chip, top-right, registered in the existing
+   `overlayOccupants()` dodge system, hidden below 640px.** Top-right is the calmest of the four
+   map corners (its only default occupant, the labels legend, is one box frequently set to Off);
+   the other three are busier than they look — top-left is a growing multi-line column, bottom-left
+   is already the busiest strip on the page, bottom-right carries required, non-movable tile
+   attribution. Matches Mapbox GL's own default control position (the one mapping vendor already
+   integrated here), reuses the existing translucent-chip visual language, adds no third button
+   (Zoom to Fit already lives on the toolbar per Tom's own settled half of this task). Not a fifth
+   line of chrome by Tom's own four-bar taxonomy — it is engaged-surface furniture, the same
+   category as the scale bar and the legends, discovered by someone already looking at the map, not
+   a first-glance competitor. Worth building alongside item 32's Map-menu Zoom In/Out rows, not
+   instead of them — the menu rows are the more keyboard/screen-reader-reachable route, the chip is
+   the more discoverable one for an ordinary pointer user, and both call the one `zoomAbout()`
+   function the wheel and pinch handlers already share. See journal, 2026-09-17.
+
+34c. **Bind bare `+`/`-`/`=` keys to zoom, guarded by the existing `isTextEntry()` function
+   (`js/looped-network.js:37469-37474`) — not `Ctrl`/`Cmd` + `+`/`-`.** The bare-key shape matches
+   this page's own existing digit-key tool-picker binding; the modifier shape (Figma's own choice)
+   would override a shortcut every browser already reserves for its own page zoom, which is a
+   bigger and newer claim on the keyboard than anything else this page has bound. Cheap — reuses a
+   guard already written for the same reason (a typed `-` must not be read as a command). See
+   journal, 2026-09-17.
+
 34. **Do NOT add zoom-level snapping.** Tom's own "anti-idiomatic" instinct is correct: this page
     is a raster basemap UNDER a hand-placed vector drawing, not a pure slippy map, and the reason
     slippy maps snap (tiles baked at integer levels) does not apply to our vector half, which wants
