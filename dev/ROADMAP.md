@@ -74,6 +74,23 @@ the block.
   - Ruled out by reading, each with its evidence: basemap tiles do not accumulate; the tooltip
     re-init sites are off the settle path; the label collision grid is bounded since Task 668.
 - 75|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
+  **PHASE 1 SHIPPED 2026-09-16: the solve and the label layout are kept, and the switch is 38%
+  faster.** Measured in real Chrome on the geographic Net3 at his own zoom: **636 ms to 395 ms
+  median**, `lblPlace` 210 ms and `fontSizes` 65 ms gone entirely, **label passes 1 -> 0 and label
+  measurements 737 -> 0**. What is left is the element building -- `nodes` 77-128 ms and `links`
+  125-226 ms -- which is the rest of this task.
+  - **THE KEEP IS PINNED TO THE BYTES ON DISK.** `storedSignature()` hashes what `saveToStorage()
+    wrote`, on both sides of the switch. A first version hashed `serializeProject()` at each end and
+    **never matched once on a real drawing**: the same document through `JSON.stringify` and back
+    through `applySaved()` is the same data in a different key order.
+  - **AND IT FOUND A STANDING DEFECT, which is the finding to keep:** a plain rebuild does not
+    reproduce the layout it had. Measured with the keep switched off, **214 of 216 labels move on a
+    switch away and back**, same document, same zoom, same settings. So labels have always jumped on
+    a tab switch; the keep is the only thing that holds them still, and the cause is still unknown.
+    `dev/lpn-spike/switch-keep-harness.js` asserts both halves.
+  - The remaining phase is the big one: several drawings alive at once, `nodeEls`/`linkEls`/
+    `labelEls` and the four layers stop being singletons. Memory measured at ~2 MB for Net3-Novato.
+
   Tom, 2026-09-16, on a five-second switch into a geographic Net3: *"why aren't we storing these
   things when we switch away?"*
   - **THREE THINGS COULD BE KEPT AND ONLY TWO ARE.** The DOCUMENT is in `localStorage`, and the VIEW
@@ -108,9 +125,10 @@ the block.
     on (class, size, string): 8,140 browser measurements a switch became 100 once warm. What remains
     is composing the rows, the first-fit, the ring pass, the gang repair and the shed -- arithmetic
     and DOM writes, not layout reads.
-  - **THREE CANDIDATES, none measured yet.** (a) The pass runs more than once per switch -- 2 to 4
-    times, the first at the OUTGOING project's scale, which the view restore then supersedes; doing
-    it once, after the view is settled, is the obvious saving and the one to measure first.
+  - **(a) IS DONE, 2026-09-16.** The pass ran at the outgoing project's zoom and was superseded by
+    the view restore moments later; `buildDom()` now defers it and `refreshAllFromDocument()` runs
+    it once, after the camera is where it belongs. With Task 680's keep on top, a switch runs the
+    pass ZERO times.
     (b) `dev/label-placement-algorithms.md` section 1 says the published engines run a cheap first
     approximation before any search, and we have the search without it. (c) A label whose content
     and scale have not changed since the last pass could keep its placement, which is the same

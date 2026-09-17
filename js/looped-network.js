@@ -7926,6 +7926,12 @@ var EngCalcs = EngCalcs || {};
 		return textLabelPoint(lb).x;
 	}
 
+	// **A REBUILD DOES NOT HAVE TO LAY THE LABELS OUT WHERE IT STANDS.** On a project switch the
+	// view is restored AFTER the rebuild, so a pass run here is computed at the OUTGOING project's
+	// zoom and superseded moments later -- and a label's footprint is a pixel size divided by the
+	// scale, so that pass is not merely early, it is answering a different question. Set by
+	// refreshAllFromDocument(), which runs the one pass itself once the camera is where it belongs.
+	var labelPassDeferred = false;
 	function buildDom() {
 		var i;
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
@@ -7971,7 +7977,9 @@ var EngCalcs = EngCalcs || {};
 				updateLabelGeometry(doc.labels[i].id);
 			}
 		});
-		perfDebugTime('  labelPass', function () { refreshLabelText(); });
+		perfDebugTime('  labelPass', function () {
+			if (!labelPassDeferred) { refreshLabelText(); }
+		});
 		// The selection mark rides on elements this function has just replaced (Task 415) -- and an
 		// id that survives a rebuild is the same element, while one that does not is gone.
 		perfDebugTime('  selection', function () { refreshSelection(); });
@@ -19451,7 +19459,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **WHAT COUNTS AS A CHANGE TO THE DOCUMENT.** This is what puts the asterisk on a tab, so
 	// anything included here is something the user will be asked to save.
-	function docSignature() {
+	/**
+	 * **TWO SIGNATURES OUT OF ONE SNAPSHOT, AND THE VIEW IS THE DIFFERENCE.** `docSignature()` is
+	 * what puts the asterisk on a tab, and the view belongs in it -- moving the camera is an edit
+	 * somebody may want saved. `modelSignature()` answers a different question: *is this the same
+	 * document I computed something for*, asked of a stored solve or a stored label placement when a
+	 * project is switched back to. Panning between two visits must not throw those away, so the
+	 * view is left out of that one.
+	 */
+	function projectSnapshotHash(withView) {
 		var snap = serializeProject();
 		// The backdrop's data URL is megabytes and changes only when the image itself is replaced, so
 		// it is represented by its LENGTH plus its placement rather than hashed. Hashing it would put
@@ -19464,9 +19480,210 @@ var EngCalcs = EngCalcs || {};
 			// in order to excuse an automatic one. The paradigm forbids automatic zooms and refits,
 			// and an AUTOMATIC fit re-baselines the clean signature rather than dirtying the project
 			// -- see zoomExtent()'s `auto` argument.
-			view: snap.view
+			view: withView ? snap.view : null
 		});
 		return hash32(JSON.stringify(snap));
+	}
+	function docSignature() { return projectSnapshotHash(true); }
+	/**
+	 * **THE BYTES ON DISK, NOT A SECOND SERIALIZATION OF THE SAME DOCUMENT.** The first version of
+	 * the keep hashed `serializeProject()` on the way out and again on the way in, and it never
+	 * matched once on a real drawing: a document that goes out through `JSON.stringify` and comes
+	 * back through `applySaved()` is the same DATA in a different key ORDER, so the two strings
+	 * differ and so do their hashes. Hashing what was actually written removes the question -- both
+	 * sides read the same bytes, and anything that rewrites them (another window, a hand edit, an
+	 * import) changes the answer, which is exactly the event this has to notice.
+	 */
+	function storedSignature(id) {
+		if (!id) { return ''; }
+		try {
+			var raw = localStorage.getItem(projectKey(id));
+			return raw ? hash32(raw) : '';
+		} catch (err) { return ''; }   // private mode: no keep, and no crash
+	}
+	/**
+	 * ---- WHAT A TAB KEEPS WHILE YOU ARE LOOKING AT ANOTHER ONE (ROADMAP Task 680) --------------
+	 *
+	 * Tom, 2026-09-16, on a five-second switch: *"why aren't we storing these things when we switch
+	 * away?"* Three things could be kept and only two were: the DOCUMENT is in `localStorage` and
+	 * the VIEW is already kept per tab in `tabViews`. The SOLVE was thrown away by construction --
+	 * `refreshAllFromDocument()` opened with `lastSolveResult = null` -- so every return to a tab
+	 * re-solved a network that had not changed while you were away.
+	 *
+	 * **THE GUARD IS A SIGNATURE, NOT A PROMISE.** A kept result is used only when the incoming
+	 * document hashes to what it was computed for, so an edit made in another window, an undo, a
+	 * file re-opened underneath, or a unit change all miss and re-solve. That is the same mechanism
+	 * the dirty asterisk runs on, minus the view.
+	 *
+	 * **AND KEEPING IT REMOVES A WHOLE LABEL PASS, which is most of the point.** Labels compose
+	 * their VALUES out of `lastSolveResult`; with it nulled, a switch drew every label empty, then
+	 * drew them again 300 ms later when the solve landed. Restored, the first pass is the only one.
+	 *
+	 * Bounded at eight projects, oldest dropped: a result is a few hundred numbers, but a library
+	 * can hold any number of tabs and nothing else here would ever let go.
+	 */
+	var switchKeep = Object.create(null), switchKeepOrder = [];
+	var SWITCH_KEEP_MAX = 8;
+	/**
+	 * **THE LABEL LAYOUT, AS THE PASS LEFT IT** (Task 680, second half). Tom, 2026-09-16: *"in the
+	 * name of doing the right thing, the solve should be saved, as should the placements."* And the
+	 * placements are where the time is: measured in real Chrome on a warm switch into the
+	 * geographic Net3, `lblPlace` 198-217 ms and `lblShed` 42-54 ms of a 640 ms switch -- half of
+	 * it, against 30 ms for composing the text and 210 ms for creating the shapes.
+	 *
+	 * **WHAT IS KEPT IS EVERY DECISION THE PASS MADE AND NOTHING IT CAN RE-DERIVE.** The content
+	 * decisions (`lines`, which values survived the shed) and the position decisions (`nudge`, which
+	 * side) both, because both come out of the same pass: shedding a value is what makes room, so
+	 * keeping the position without the content it was computed for would place a label that no
+	 * longer fits. The measured widths ride along, so a restore asks the browser nothing.
+	 *
+	 * **THE KEY IS THE DOCUMENT AND THE SCALE.** A label's footprint is a pixel size divided by the
+	 * scale, so a layout belongs to the zoom that produced it -- the comment above relayoutLabels()
+	 * has the measurement: a layout computed at scale 1 has a median nudge of 43 world units on a
+	 * model 37 units across. The document half is `modelSignature()`, which covers the settings and
+	 * the label choices too, since both are serialized.
+	 */
+	function captureLabelLayout() {
+		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
+		function grab(h) {
+			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
+				nudgeManual: !!h.nudgeManual, placedSide: h.placedSide,
+				lines: h.lines ? h.lines.slice() : null, rows: h.rows ? h.rows.slice() : null,
+				allLines: h.allLines ? h.allLines.slice() : null,
+				lineCount: h.lineCount, empty: !!h.empty, shedCount: h.shedCount || 0,
+				hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded,
+				hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+				tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+				rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
+				segW: h.segW ? h.segW.slice() : null };
+		}
+		Object.keys(nodeEls).forEach(function (id) { out.nodes[id] = grab(nodeEls[id]); });
+		Object.keys(linkEls).forEach(function (id) { out.links[id] = grab(linkEls[id]); });
+		Object.keys(labelEls).forEach(function (id) { out.texts[id] = grab(labelEls[id]); });
+		return out;
+	}
+	function rememberSwitchState() {
+		var id = library.openId;
+		if (!id) { return; }
+		if (!switchKeep[id]) { switchKeepOrder.push(id); }
+		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+			layout: captureLabelLayout() };
+		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
+			delete switchKeep[switchKeepOrder.shift()];
+		}
+	}
+	// Called with the INCOMING document already installed, so the signature describes what is about
+	// to be drawn rather than what is leaving.
+	function keptStateForOpenProject() {
+		var k = switchKeep[library.openId], sig;
+		if (!k) { return null; }
+		sig = storedSignature(library.openId);
+		return (sig && k.sig === sig) ? k : null;
+	}
+	/**
+	 * **PUTTING A KEPT LAYOUT BACK, or saying it cannot be.** Everything is checked BEFORE anything
+	 * is written: a half-applied layout would be worse than none, because the labels the restore ran
+	 * out of would keep whatever the rebuild left them with while the rest showed the kept answer.
+	 *
+	 * Returns true when the drawing now carries the layout the pass would have computed, so the
+	 * caller can skip the pass. False means "this changed under us" and nothing has been touched.
+	 */
+	// Why a kept layout was refused, for a harness and for ?debug=perf. A restore that quietly never
+	// happens is indistinguishable from one that works, which is how the first version of this
+	// passed its own test.
+	var keptLayoutMiss = '';
+	function keptLayoutFits(L) {
+		if (!L) { keptLayoutMiss = 'nothing kept'; return false; }
+		if (!(L.scale > 0)) { keptLayoutMiss = 'no scale'; return false; }
+		if (L.scale !== state.s) {
+			keptLayoutMiss = 'scale ' + L.scale + ' vs ' + state.s;
+			return false;
+		}
+		var ok = true, why = '';
+		function check(what, map, els) {
+			Object.keys(els).forEach(function (id) {
+				if (!map[id]) { ok = false; why = why || (what + ' ' + id + ' not kept'); }
+			});
+			Object.keys(map).forEach(function (id) {
+				if (!els[id]) { ok = false; why = why || (what + ' ' + id + ' gone'); }
+			});
+		}
+		check('node', L.nodes, nodeEls); check('link', L.links, linkEls);
+		check('text', L.texts, labelEls);
+		keptLayoutMiss = ok ? '' : why;
+		return ok;
+	}
+	function restoreHolderFields(h, c) {
+		h.nudge = c.nudge ? { x: c.nudge.x, y: c.nudge.y } : { x: 0, y: 0 };
+		h.nudgeManual = c.nudgeManual;
+		h.placedSide = c.placedSide;
+		h.shedCount = c.shedCount;
+		h.hiddenShort = c.hiddenShort;
+		h.hiddenCrowded = c.hiddenCrowded;
+		h.hiddenCrossed = c.hiddenCrossed;
+		h.hiddenDropped = c.hiddenDropped;
+		// The measured widths, so a restore asks the browser nothing at all.
+		if (c.tw !== undefined) { h.tw = c.tw; }
+		if (c.twPx !== undefined) { h.twPx = c.twPx; }
+		if (c.width !== undefined) { h.width = c.width; }
+		if (c.widthPx !== undefined) { h.widthPx = c.widthPx; }
+		if (c.rowW) { h.rowW = c.rowW.slice(); }
+		if (c.rowWPx) { h.rowWPx = c.rowWPx.slice(); }
+		if (c.segW) { h.segW = c.segW.slice(); }
+	}
+	// Counted so a harness can tell a restore from a recomputation that happens to agree with it --
+	// without this, "the restored layout equals the computed one" passes trivially when no restore
+	// ever ran, which is the shape of test that has died of success here before.
+	var switchRestoreCount = 0;
+	// A harness switch, so the SAME session can be asked what the page does without the keep. Not
+	// reachable from any control: the question it answers is "is the restore faithful", and that is
+	// asked by comparing the two answers, not by offering a user a choice between them.
+	var keepLayoutEnabled = true;
+	function applyKeptLabelLayout(kept) {
+		var L = kept && kept.layout;
+		if (!keepLayoutEnabled) { keptLayoutMiss = 'switched off'; return false; }
+		if (!keptLayoutFits(L)) { return false; }
+		switchRestoreCount++;
+		var fsNow = effectiveFontSize() + 'px';
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			doc.nodes.forEach(function (n) {
+				var ne = nodeEls[n.id], c = L.nodes[n.id];
+				if (!ne || !c) { return; }
+				// The glyphs have to be WRITTEN -- these are new elements -- but they are written
+				// from the content the shed already decided, so no cascade runs and nothing is
+				// measured.
+				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines, fsNow); }
+				ne.allLines = c.allLines || (c.lines ? c.lines.slice() : ne.allLines);
+				restoreHolderFields(ne, c);
+			});
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], c = L.links[l.id];
+				if (!le || !c) { return; }
+				if (c.lines && !c.empty) { writeLabelGlyphs(le, l, c.lines, fsNow); }
+				restoreHolderFields(le, c);
+			});
+			Object.keys(L.texts).forEach(function (id) {
+				var te = labelEls[id]; if (te) { restoreHolderFields(te, L.texts[id]); }
+			});
+			// The same three loops relayoutLabels() ends with -- every label laid out for real at
+			// the position it already had -- and then the arrows and the legend, which
+			// refreshLabelTextPass() does after it.
+			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
+			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
+			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		doc.links.forEach(function (l) { updateArrow(l.id); });
+		renderLabelsLegend();
+		refreshScenarioMarks();
+		lastLayoutScale = state.s;
+		return true;
+	}
+	function forgetSwitchState(id) {
+		if (!switchKeep[id]) { return; }
+		delete switchKeep[id];
+		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 	}
 	// Autosave. Writes the OPEN project's document first and the index second, deliberately: if the
 	// document write fails on quota, the index still describes the last state that actually made it
@@ -20369,7 +20586,13 @@ var EngCalcs = EngCalcs || {};
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
-		lastSolveResult = null;
+		// **THE SOLVE SURVIVES A SWITCH IF THE DOCUMENT DID** (Task 680). Restored HERE, before
+		// buildDom(), because the labels compose their values out of it: set after the build, every
+		// label would be drawn empty and drawn again when the values arrived.
+		var kept = keptStateForOpenProject();
+		lastSolveResult = (kept && kept.solve) || null;
+		// The labels wait for the camera -- see buildDom() and the restore below.
+		labelPassDeferred = true;
 		closePopup();
 		perfDebugTime('buildDom', function () { buildDom(); });
 		seedDefaultInputs();
@@ -20396,7 +20619,9 @@ var EngCalcs = EngCalcs || {};
 		// The one document-driven thing that CAN change it is the tab strip's own height, when enough
 		// projects are open to wrap it onto another line. That is chrome, and renderTabs() re-measures.
 
-		perfDebugTime('fontSizes', function () { refreshFontSizes(); });
+		// `true` is deferLayout: while the label pass is deferred there is nothing placed to
+		// re-place, and running it here is the duplicate pass this whole change removes.
+		perfDebugTime('fontSizes', function () { refreshFontSizes(labelPassDeferred); });
 		refreshSymbolSizes();
 		refreshValueColors();
 		renderLabelsLegend();
@@ -20414,12 +20639,24 @@ var EngCalcs = EngCalcs || {};
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
 		perfDebugTime('viewOrFit', function () { restoreViewOrFit(); });
+		// **AND NOW THE LABELS, ONCE, AT THE ZOOM THEY WILL BE READ AT** -- restored whole if this
+		// tab worked them out already and nothing has moved since, and computed from scratch
+		// otherwise. Either way it happens exactly once per switch.
+		labelPassDeferred = false;
+		perfDebugTime('  lblRestore', function () {
+			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
+		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
 		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
 		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
 		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
-		perfDebugTime('scheduleSolve', function () { scheduleSolve(); });
+		// **AND NOTHING IS RE-SOLVED WHEN THE ANSWER IS ALREADY ON SCREEN.** The fire-flow run is
+		// still dropped, which is the one thing scheduleSolve() does besides the arithmetic: its
+		// rings describe the network they were run on, and this is a different project.
+		perfDebugTime('scheduleSolve', function () {
+			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleSolve(); }
+		});
 		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
 		// re-opening after a page load, or neither.
@@ -20543,6 +20780,9 @@ var EngCalcs = EngCalcs || {};
 		if (id === library.openId) { return true; }
 		rememberCurrentView();   // ...and where we were looking in it
 		saveToStorage(); // flush the outgoing project before switching away from it
+		// AFTER the flush, deliberately: what is kept is pinned to the bytes that were just
+		// written, which is the only thing both sides of the switch can agree on.
+		rememberSwitchState();   // ...and what we worked out about it (Task 680)
 		flushOutgoingFile();
 		var doc2 = readDocument(projectKey(id));
 		if (!doc2) { return false; }
@@ -23339,6 +23579,7 @@ var EngCalcs = EngCalcs || {};
 		lockedByName.delete(id);
 		fileHandles.delete(id);
 		forgetHandle(id);
+		forgetSwitchState(id);   // what this tab had worked out goes with the tab (Task 680)
 		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
@@ -38499,16 +38740,20 @@ var EngCalcs = EngCalcs || {};
 		// runLabelCollisionAvoidance() does this too and did it first, which put the node shed of
 		// the LAST pass inside the seed of this one -- one more memory in a pass that must be a
 		// function of the drawing. Cheap where nothing shed: one scan and no DOM work.
-		unshedNodeLabels(fsNow);
-		shedAlignedForConflicts(fsNow, effectiveFontSize());
+		perfDebugTime('  lblShed', function () {
+			unshedNodeLabels(fsNow);
+			shedAlignedForConflicts(fsNow, effectiveFontSize());
+		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
 		// marks need no third pass of their own any more (Task 333): they are text-decoration on the
 		// tspans set above, so they move with the text whatever moves it.
 		// `true` is the node shed cascade (Task 469): this is a CONTENT pass, so it is allowed to
 		// decide content.
-		relayoutLabels(true);
-		doc.links.forEach(function (l) { updateArrow(l.id); });
+		perfDebugTime('  lblPlace', function () { relayoutLabels(true); });
+		perfDebugTime('  lblArrows', function () {
+			doc.links.forEach(function (l) { updateArrow(l.id); });
+		});
 		renderLabelsLegend();
 		// Called from HERE and not from every caller of it, because the halos are filtered by the
 		// Labels panel and this function is what every label-affecting change already goes through:
