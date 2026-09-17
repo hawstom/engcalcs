@@ -7357,7 +7357,9 @@ var EngCalcs = EngCalcs || {};
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
 		positionNodeSymbol(n.id);
-		layoutNodeLabel(n.id);
+		// Same as the link half below: during a whole-drawing rebuild the layout happens once at
+		// the end, at the scale the reader will actually see.
+		if (!labelPassDeferred) { layoutNodeLabel(n.id); }
 		paintNodeColor(n.id);   // a rebuilt element starts black; give it its colour immediately
 	}
 	// **WHAT A PIPE COSTS TO BUILD, IN THREE PARTS** -- Tom's machine spends about 10 ms on each
@@ -7509,7 +7511,18 @@ var EngCalcs = EngCalcs || {};
 				resizePumpSymbol(l.id); positionPumpSymbol(l.id);
 			});
 		}
-		perfDebugAccum('  lk:layout', function () { layoutLinkLabel(l.id); });
+		// **NOT WHILE THE WHOLE DRAWING IS BEING REBUILT.** A project switch lays every label out
+		// once at the end -- restored from what this tab had worked out, or computed in the one
+		// deferred pass -- so laying this one out HERE is work that is thrown away a moment later,
+		// and it is done before the camera has moved, which is to say at the wrong scale anyway.
+		// Measured on Tom's machine: `lk:layout` 1,618 ms of a 1,955 ms switch.
+		//
+		// Only during THAT rebuild: every other caller of buildLinkEls() -- adding a pipe, a
+		// rebuildLink() after an edit -- holds one element and lays it out itself, which is why the
+		// flag is checked rather than the call being moved.
+		if (!labelPassDeferred) {
+			perfDebugAccum('  lk:layout', function () { layoutLinkLabel(l.id); });
+		}
 		perfDebugAccum('  lk:color', function () { paintLinkColor(l.id); });   // a rebuilt element starts black
 	}
 	// Icon box size for a pump's map symbol, in world units -- same symbolFactor() scaling as every

@@ -280,6 +280,16 @@ where that overlay does not exist. **"The only line that could have done it" is 
 correlation gets promoted to a cause.** `dev/chrome-incognito-crash.md` has the report to file with
 Chrome, ready to paste.
 
+**AND THE LAST BIG ONE: A SWITCH WAS LAYING EVERY LABEL OUT TWICE** (2026-09-16). `buildNodeEls()`
+and `buildLinkEls()` each lay their own label out as they build it, and then the whole drawing is
+laid out again at the end -- restored from the tab's kept layout, or computed in the one deferred
+pass. During a whole-drawing rebuild the first one is thrown away, and it runs BEFORE the camera
+moves, so it was computed at the wrong scale as well. **On Tom's machine that was `lk:layout`
+1,618 ms of a 1,955 ms switch**; here `links` fell from 16-34 ms to 5-19 ms and the label-copy count
+halved, 251 to 132, which is the doubling showing up in a second instrument. Skipped only while
+`labelPassDeferred` is set, so every other caller -- adding a pipe, an edit's rebuildLink() --
+is untouched.
+
 **STILL WAITING ON HIM:** the Apache reload; the browser passes; **whether `projection`
 is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
 Task 663's questions 2 and 3, now that he knows the reaction rate is a LINK label switched on under
