@@ -22778,15 +22778,19 @@ var EngCalcs = EngCalcs || {};
 			// The surveyed name, where the document can take it. A name it cannot take is reported
 			// and the junction keeps the name this page minted -- never a name repaired by adding a
 			// digit, which would put a point on the map under a name nobody wrote down.
+			// **THE LINE NUMBER AND THE LINE COME WITH THE POINT** (Tom, 2026-09-17). These two are
+			// the only refusals discovered here rather than in js/lpn-survey.js, and a reader owes
+			// nothing to that distinction: they get the same line number and the same printed line
+			// as every other one, which is why a point carries both.
 			if (want) {
-				if (/[\s'"]/.test(want)) { notes.push({ code: 'id-invalid', ids: [want], detail: null }); }
-				else if (allIds().indexOf(want) !== -1) { notes.push({ code: 'id-taken', ids: [want], detail: null }); }
+				if (/[\s'"]/.test(want)) { notes.push({ code: 'id-invalid', line: p.line, raw: p.raw, detail: want }); }
+				else if (allIds().indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
 				else { applyNodeRename(n.id, want); }
 			}
 			created++;
 		});
 		if (!elevSame) {
-			notes.push({ code: 'elev-converted', ids: [],
+			notes.push({ code: 'elev-converted',
 				detail: parsed.elevUnit === 'm' ? (EngCalcs.pageConfig || {}).lpn_survey_unit_m : (EngCalcs.pageConfig || {}).lpn_survey_unit_ft });
 		}
 		// **THE ORIGIN IS RE-DERIVED, for the reason Task 439 gives**: a geographic document's
@@ -22819,11 +22823,24 @@ var EngCalcs = EngCalcs || {};
 			h.style.fontWeight = 'bold';
 			h.textContent = (pc.lpn_survey_report_heading || 'Imported {file}').replace('{file}', fileName);
 			body.appendChild(h);
-			lines.forEach(function (text) {
+			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
+			// should print the entire line with a much shorter message"*). The line is drawn in a
+			// fixed-width face and indented, because it is a QUOTATION of the file and not more of
+			// our prose -- what the reader is doing with it is matching it against the window they
+			// have the file open in. `pre-wrap` so a long line wraps rather than widening the box,
+			// and keeps its own runs of spaces, which in a fixed-column file are the columns.
+			lines.forEach(function (entry) {
 				var p = document.createElement('p');
-				p.style.margin = '0 0 6px';
-				p.textContent = text;
+				p.style.margin = entry.raw === null ? '0 0 6px' : '0';
+				p.textContent = entry.text;
 				body.appendChild(p);
+				if (entry.raw === null) { return; }
+				var q = document.createElement('p');
+				q.style.margin = '0 0 8px 1.5em';
+				q.style.fontFamily = 'monospace';
+				q.style.whiteSpace = 'pre-wrap';
+				q.textContent = entry.raw;
+				body.appendChild(q);
 			});
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}

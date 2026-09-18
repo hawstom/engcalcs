@@ -145,11 +145,19 @@ ok('six of its seven rows became points', csv.points.length === 6, String(csv.po
 ok('...and the comment lines above the header were not read as rows',
 	csv.counts.rows === 7, String(csv.counts.rows));
 ok('the deliberately swapped row is REPORTED and made no point',
-	noteCodes(csv).indexOf('lat-range') >= 0 && !csv.points.some(p => p.id === 'PT-6'));
+	noteCodes(csv).indexOf('coord-range') >= 0 && !csv.points.some(p => p.id === 'PT-6'));
 ok('...and its own number is printed in the note, not a paraphrase',
-	(csv.notes.find(n => n.code === 'lat-range') || {}).detail === '-111.830400');
-ok('...and the note names the row by the name the file gave it',
-	((csv.notes.find(n => n.code === 'lat-range') || {}).ids || [])[0] === 'PT-6');
+	(csv.notes.find(n => n.code === 'coord-range') || {}).detail === '-111.830400');
+// **THE NOTE NAMES THE LINE, NOT THE POINT** (Tom, 2026-09-17: *"The import report needs to list
+// line numbers."*). It used to carry the surveyor's own name for the point, which is what a person
+// RECOGNISES and not what they can FIND -- the reader has the file open in another window and is
+// about to put the cursor on a line.
+ok('...and the note names the LINE the row is on, counted the way an editor counts',
+	(csv.notes.find(n => n.code === 'coord-range') || {}).line === 11,
+	String((csv.notes.find(n => n.code === 'coord-range') || {}).line));
+ok('...and carries the line itself, character for character, for printing underneath',
+	(csv.notes.find(n => n.code === 'coord-range') || {}).raw === 'PT-6,-111.830400,33.415910,1247.00',
+	JSON.stringify((csv.notes.find(n => n.code === 'coord-range') || {}).raw));
 // **THE SAME FILE, READ WITH NO BOUNDS, KEEPS ALL SEVEN.** That is not a bug: on a projected or a
 // grid project -111.83 is a perfectly good northing, and refusing it would be the georeferenced-only
 // rule stated as a number instead of as a sentence.
@@ -197,13 +205,15 @@ ok('...and the note says WHICH axis it was, in the project\'s own word for it',
 	(() => { const r = EC.lpnSurveyParse('lat,lon\n33.5N,-111.8\n33.6,-111.9\n');
 		const n = r.notes.find(x => x.code === 'bad-coord');
 		return n.axis === 'north' &&
-			/Northing/.test(EC.lpnSurveyNoteText(n, { north: 'Northing', east: 'Easting' })); })());
+			/Northing/.test(EC.lpnSurveyNoteText(n, { north: 'Northing', east: 'Easting' }).text); })());
 ok('a short row is reported as a short row, which is a different fix',
 	noteCodes(EC.lpnSurveyParse('id,lat,lon\nA,33.5\nB,33.6,-111.9\n')).indexOf('row-short') >= 0);
 ok('an empty coordinate cell is reported as empty, not as unreadable',
 	noteCodes(EC.lpnSurveyParse('id,lat,lon\nA,,-111.8\nB,33.6,-111.9\n')).indexOf('coord-missing') >= 0);
 ok('an out-of-range east is refused for the same reason an out-of-range north is, WHEN there are bounds',
-	noteCodes(EC.lpnSurveyParse('lat,lon\n33.5,999\n33.6,-111.9\n', GEO_LIMITS)).indexOf('lon-range') >= 0);
+	(() => { const n = EC.lpnSurveyParse('lat,lon\n33.5,999\n33.6,-111.9\n', GEO_LIMITS)
+		.notes.find(x => x.code === 'coord-range');
+		return !!n && n.axis === 'east'; })());
 ok('a name used twice keeps one and reports the other',
 	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,33.5,-111.8\nA,33.6,-111.9\n');
 		return r.points.length === 2 && r.points[1].id === '' && noteCodes(r).indexOf('id-duplicate') >= 0; })());
@@ -232,6 +242,7 @@ ok('a mapping handed in overrides the detection',
 section('4b. what it says');
 // What this project calls its two axes -- the page's own axisNames(), handed in.
 const AX = { north: 'Latitude', east: 'Longitude' };
+const texts = (r, o) => EC.lpnSurveyReportLines(r, o || { created: 6 }, AX).map(e => e.text);
 ok('the confirm names how many junctions it is about to make',
 	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf(PC.lpn_survey_confirm.replace('{n}', 6)) >= 0);
 ok('...and names the mapping, which is the whole column-mapping step',
@@ -242,21 +253,57 @@ ok('...in the words the PROJECT uses for its axes, not in the file\'s',
 ok('...and says that no pipes are drawn',
 	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf(PC.lpn_survey_confirm_pipes) >= 0);
 ok('a clean file is told that it was clean, so silence never means two things',
-	EC.lpnSurveyReportLines(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 }, AX)
+	texts(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 })
 		.indexOf(PC.lpn_survey_report_clean) >= 0);
-ok('a file with a bad row gets the lead-in that says nothing was thrown away',
-	EC.lpnSurveyReportLines(csv, { created: 6 }, AX).indexOf(PC.lpn_survey_report_lead) >= 0);
-ok('...and every note is printed, each with the rows it is about',
-	EC.lpnSurveyReportLines(csv, { created: 6 }, AX).some(t => /PT-6/.test(t)));
-// Two rows that failed the same way in the same WORDS are one line naming both; two that each
-// print their own number are two lines, because the number is the useful half.
-ok('two rows failing identically are ONE line naming both',
+ok('a file with a bad line gets the lead-in that says nothing was thrown away',
+	texts(csv).indexOf(PC.lpn_survey_report_lead) >= 0);
+
+// ---- THE SHAPE TOM ASKED FOR, which is the whole of this section ------------------------------
+//
+// *"The import report needs to list line numbers. And it should print the entire line with a much
+// shorter message. Remember we are interfacing with humans, not AI."* (2026-09-17). Three claims,
+// and each is its own assertion because each can break on its own: the NUMBER is there, the LINE is
+// printed underneath, and the sentence is SHORT.
+{
+	const rep = EC.lpnSurveyReportLines(csv, { created: 6 }, AX);
+	const bad = rep.find(e => /33\.415910/.test(e.raw || ''));
+	ok('the refusal for the swapped row leads with its line number',
+		!!bad && new RegExp('^' + PC.lpn_survey_note_coord_range.split('{')[0].trim()).test(bad.text),
+		bad && bad.text);
+	ok('...and prints the reader\'s own line underneath, verbatim',
+		!!bad && bad.raw === 'PT-6,-111.830400,33.415910,1247.00', bad && bad.raw);
+	ok('...and the sentence itself is SHORT -- a person scanning for a line, not a paragraph',
+		!!bad && bad.text.split(/\s+/).length <= 14, bad && String(bad.text.split(/\s+/).length));
+	ok('...and no refusal anywhere in this report runs longer than that',
+		rep.filter(e => e.raw !== null).every(e => e.text.split(/\s+/).length <= 16));
+	ok('a note about the FILE rather than a line prints nothing underneath it',
+		rep.filter(e => e.raw === null).length >= 2);
+	ok('the unreadable elevation is reported on its own line, with the cell it could not read',
+		!!rep.find(e => e.raw === 'PT-7,33.414700,-111.830400,about 1240' &&
+			e.text.indexOf('about 1240') >= 0), JSON.stringify(rep.map(e => e.text)));
+}
+// **TWO ROWS THAT FAILED THE SAME WAY ARE NOW TWO LINES, NOT ONE.** That reverses what this report
+// did, and deliberately: pooling them into one sentence with both names in brackets is shorter and
+// cannot carry either line number, which is the one thing the reader came for.
+ok('two lines failing identically are TWO entries, each with its own number and its own line',
 	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,,-111.8\nB,,-111.9\nC,33.5,-111.7\n');
-		return EC.lpnSurveyReportLines(r, { created: 1 }, AX).filter(t => /A, B/.test(t)).length === 1; })());
-ok('...but two that print their own numbers stay two lines',
-	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,999,-111.8\nB,998,-111.9\nC,33.5,-111.7\n', GEO_LIMITS);
-		const lines = EC.lpnSurveyReportLines(r, { created: 1 }, AX);
-		return lines.some(t => /\(A\)/.test(t)) && lines.some(t => /\(B\)/.test(t)); })());
+		const rep = EC.lpnSurveyReportLines(r, { created: 1 }, AX);
+		return rep.filter(e => e.raw !== null).length === 2 &&
+			rep.some(e => e.raw === 'A,,-111.8') && rep.some(e => e.raw === 'B,,-111.9'); })());
+ok('...and a note with no line of its own is still said ONCE however many lines caused it',
+	(() => { const r = EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n\n\n33.6,-111.9\n');
+		return texts(r, { created: 2 }).filter(t => t === PC.lpn_survey_note_blank_rows
+			.replace('{detail}', '2')).length === 1; })());
+ok('the refusals come out in LINE ORDER, whatever order they were found in',
+	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,33.5,-111.8\nB,x,-111.9\nC,,-111.7\nD,33.6,y\n');
+		const nums = EC.lpnSurveyReportLines(r, { created: 1 }, AX)
+			.filter(e => e.raw !== null).map(e => e.raw.charAt(0));
+		return nums.join('') === 'BCD'; })());
+// A line number is only useful if it is the one the reader's editor shows. Counted from 1, over the
+// file as it is -- comment lines and blank lines included, because they are lines in the file.
+ok('a line number counts the file\'s own lines, comments and blanks included',
+	(() => { const r = EC.lpnSurveyParse('# a note\nlat,lon\n\n33.5,-111.8\nx,y\n');
+		return (r.notes.find(n => n.code === 'bad-coord') || {}).line === 5; })());
 
 // ================================================================================================
 // 5. THE DOCUMENT, through the real page

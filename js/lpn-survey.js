@@ -235,10 +235,6 @@
 		return String(cell === undefined || cell === null ? '' : cell).trim();
 	}
 
-	function rowLabel(row) {
-		return (PC.lpn_survey_row || 'row {n}').replace('{n}', row);
-	}
-
 	/**
 	 * Read a surveyed point list.
 	 *
@@ -293,7 +289,12 @@
 			cells = splitRow(lines[i], delim);
 			if (isBlankRow(cells)) { blank++; continue; }
 			rows++;
-			readCsvRow(cells, i + 1, mapping, seen, points, notes, opts.limits);
+			// **THE LINE NUMBER AND THE LINE ITSELF, CARRIED FROM HERE** (Tom, 2026-09-17: *"The
+			// import report needs to list line numbers. And it should print the entire line with a
+			// much shorter message. Remember we are interfacing with humans, not AI."*). This is
+			// the only place in the module that still knows either, so a note that does not take
+			// them here can never get them back. `i + 1` is the number an editor shows.
+			readCsvRow(cells, i + 1, lines[i], mapping, seen, points, notes, opts.limits);
 		}
 		if (blank) { notes.push({ code: 'blank-rows', ids: [], detail: String(blank) }); }
 		if (!points.length) { return { ok: false, error: 'no-points', detail: String(rows) }; }
@@ -305,28 +306,37 @@
 	/**
 	 * One row. `limits` is `{north, east}` where the CALLER's kind of project has a bound, and
 	 * absent where it has none -- see the note at the top of this file.
+	 *
+	 * **EVERY REFUSAL CARRIES THE LINE NUMBER AND THE LINE** (Tom, 2026-09-17). A note used to name
+	 * the row by the surveyor's own point name, on the argument that a name is what a person
+	 * recognises. It is not what a person can FIND: the reader has the file open in another window
+	 * and wants to put the cursor on the line. So `line` is the number an editor shows and `raw` is
+	 * the line's own characters, printed underneath the sentence rather than described in it.
 	 */
-	function readCsvRow(cells, lineNumber, mapping, seen, points, notes, limits) {
+	function readCsvRow(cells, lineNumber, rawLine, mapping, seen, points, notes, limits) {
 		var id = mapping.id === null ? '' : readId(cells[mapping.id]),
-			label = id || rowLabel(lineNumber),
 			north, east, ele, desc;
+		// One refusal, in the one shape they all take: which line, the one thing wrong, the value
+		// that is wrong, and the line itself. Nothing else -- a note that explains is a note the
+		// reader has to read before they can start looking.
+		function refuse(code, detail, axis) {
+			notes.push({ code: code, line: lineNumber, raw: rawLine, detail: detail, axis: axis });
+		}
 		// A row too short to hold the coordinate columns at all. Reported as its own case rather
 		// than as an unreadable number, because the reader's fix is different: a ragged file is one
 		// a spreadsheet wrote badly, not one with a typo in it.
 		if (cells.length <= Math.max(mapping.north, mapping.east)) {
-			notes.push({ code: 'row-short', ids: [label], detail: String(cells.length) });
+			refuse('row-short', String(cells.length));
 			return;
 		}
 		north = readNumber(cells[mapping.north]);
 		east = readNumber(cells[mapping.east]);
 		if (!north.ok) {
-			notes.push({ code: north.blank ? 'coord-missing' : 'bad-coord', axis: 'north',
-				ids: [label], detail: north.tok });
+			refuse(north.blank ? 'coord-missing' : 'bad-coord', north.tok, 'north');
 			return;
 		}
 		if (!east.ok) {
-			notes.push({ code: east.blank ? 'coord-missing' : 'bad-coord', axis: 'east',
-				ids: [label], detail: east.tok });
+			refuse(east.blank ? 'coord-missing' : 'bad-coord', east.tok, 'east');
 			return;
 		}
 		// **THE RANGE TEST IS SUGGESTIVE AND IS USED ONLY TO REFUSE, NEVER TO SWAP.** A latitude of
@@ -338,17 +348,17 @@
 		// **THERE IS NO BOUND AT ALL WITHOUT `limits`**, which is the whole of what dropping the
 		// georeferenced-only rule cost: a northing of 700,000 is an ordinary northing.
 		if (limits && isFinite(limits.north) && Math.abs(north.value) > limits.north) {
-			notes.push({ code: 'lat-range', ids: [label], detail: north.tok || String(north.value) });
+			refuse('coord-range', north.tok || String(north.value), 'north');
 			return;
 		}
 		if (limits && isFinite(limits.east) && Math.abs(east.value) > limits.east) {
-			notes.push({ code: 'lon-range', ids: [label], detail: east.tok || String(east.value) });
+			refuse('coord-range', east.tok || String(east.value), 'east');
 			return;
 		}
 		if (id !== '') {
 			// A name repeated inside the file. The point is still created -- it is a real surveyed
 			// place -- and it takes a name of ours, which is said out loud.
-			if (seen[id]) { notes.push({ code: 'id-duplicate', ids: [label], detail: null }); id = ''; }
+			if (seen[id]) { refuse('id-duplicate', id); id = ''; }
 			else { seen[id] = 1; }
 		}
 		ele = mapping.elev === null || mapping.elev >= cells.length
@@ -356,10 +366,15 @@
 		if (!ele.ok && !ele.blank) {
 			// The junction is still created. An elevation we could not read is left for the
 			// new-asset setting to answer, which is the same thing a blank column gets.
-			notes.push({ code: 'bad-elev', ids: [label], detail: ele.tok });
+			refuse('bad-elev', ele.tok);
 		}
 		desc = (mapping.desc === null || mapping.desc >= cells.length) ? '' : readId(cells[mapping.desc]);
-		points.push({ row: lineNumber, id: id, north: north.value, east: east.value,
+		// `line` and `raw` ride on the POINT as well, because two of the refusals -- a name the
+		// document already holds, and a name it cannot spell -- are only discovered by
+		// js/looped-network.js once the junction is being made, and they owe the reader the same
+		// line number as every other one.
+		points.push({ row: lineNumber, line: lineNumber, raw: rawLine, id: id,
+			north: north.value, east: east.value,
 			northTok: north.tok, eastTok: east.tok, desc: desc,
 			elev: ele.ok ? ele.value : null, elevTok: ele.ok ? ele.tok : null });
 	}
@@ -386,27 +401,43 @@
 		return which === 'east' ? (PC.lpn_survey_axis_east || 'Easting')
 			: (PC.lpn_survey_axis_north || 'Northing');
 	}
-	function fill(text, detail, axis) {
+	function fill(text, detail, axis, line) {
 		return String(text)
 			.replace(/\{detail\}/g, detail === null || detail === undefined ? '' : detail)
-			.replace(/\{axis\}/g, axis === null || axis === undefined ? '' : axis);
+			.replace(/\{axis\}/g, axis === null || axis === undefined ? '' : axis)
+			.replace(/\{line\}/g, line === null || line === undefined ? '' : line);
 	}
+	/**
+	 * One note as the reader sees it: `{text, raw}`.
+	 *
+	 * **SHORT SENTENCE, THEN THE LINE ITSELF** (Tom, 2026-09-17: *"it should print the entire line
+	 * with a much shorter message. Remember we are interfacing with humans, not AI."*). A refusal
+	 * names the line number, the one thing wrong and the value that is wrong, and then gets out of
+	 * the way -- the line underneath says everything a paragraph of ours was trying to say about it,
+	 * in the reader's own file's words, and it is what they will be looking for in the other window.
+	 *
+	 * `raw` is null for a note about the FILE rather than about a line, which has no line to print.
+	 */
 	EngCalcs.lpnSurveyNoteText = function (note, axes) {
 		var code = (note && note.code) || '', d = note && note.detail,
-			ax = axisWord(axes, (note && note.axis) || 'north');
-		if (code === 'row-short') { return fill(PC.lpn_survey_note_row_short || 'This row does not have enough columns to hold a position, so no junction was made for it.', d, ax); }
-		if (code === 'coord-missing') { return fill(PC.lpn_survey_note_coord_missing || 'The {axis} column is empty on this row, so no junction was made for it.', d, ax); }
-		if (code === 'bad-coord') { return fill(PC.lpn_survey_note_bad_coord || 'The {axis} on this row does not read as a plain decimal number ({detail}), so no junction was made for it. Degrees, minutes and seconds are not read; convert them to decimal degrees first.', d, ax); }
-		if (code === 'lat-range') { return fill(PC.lpn_survey_note_lat_range || 'This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, say so in the column order above: this page will not swap them for you, because it cannot tell a mistake from a place.', d, ax); }
-		if (code === 'lon-range') { return fill(PC.lpn_survey_note_lon_range || 'This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.', d, ax); }
-		if (code === 'bad-elev') { return fill(PC.lpn_survey_note_bad_elev || 'The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.', d, ax); }
-		if (code === 'id-duplicate') { return fill(PC.lpn_survey_note_id_duplicate || 'This name is used more than once in the file, so this junction was given a name of ours instead.', d, ax); }
-		if (code === 'id-taken') { return fill(PC.lpn_survey_note_id_taken || 'This name already belongs to something in the project, so this junction was given a name of ours instead.', d, ax); }
-		if (code === 'id-invalid') { return fill(PC.lpn_survey_note_id_invalid || 'This name cannot be used as an ID here, so this junction was given a name of ours instead.', d, ax); }
-		if (code === 'ambiguous-elev') { return fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d, ax); }
-		if (code === 'blank-rows') { return fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d, ax); }
-		if (code === 'elev-converted') { return fill(PC.lpn_survey_note_elev_converted || 'The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d, ax); }
-		return code;
+			line = note && note.line,
+			ax = axisWord(axes, (note && note.axis) || 'north'),
+			raw = (note && note.raw !== undefined && note.raw !== null) ? String(note.raw) : null,
+			text = code;
+		if (code === 'row-short') { text = fill(PC.lpn_survey_note_row_short || 'Line {line} too few columns: {detail} See entire line below.', d, ax, line); }
+		else if (code === 'coord-missing') { text = fill(PC.lpn_survey_note_coord_missing || 'Line {line} empty {axis}. See entire line below.', d, ax, line); }
+		else if (code === 'bad-coord') { text = fill(PC.lpn_survey_note_bad_coord || 'Line {line} invalid {axis}: {detail} See entire line below.', d, ax, line); }
+		else if (code === 'coord-range') { text = fill(PC.lpn_survey_note_coord_range || 'Line {line} {axis} out of range: {detail} See entire line below.', d, ax, line); }
+		else if (code === 'bad-elev') { text = fill(PC.lpn_survey_note_bad_elev || 'Line {line} unreadable elevation: {detail} Junction made. See entire line below.', d, ax, line); }
+		else if (code === 'id-duplicate') { text = fill(PC.lpn_survey_note_id_duplicate || 'Line {line} repeated name: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
+		else if (code === 'id-taken') { text = fill(PC.lpn_survey_note_id_taken || 'Line {line} name already in this project: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
+		else if (code === 'id-invalid') { text = fill(PC.lpn_survey_note_id_invalid || 'Line {line} name cannot be an ID here: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
+		// The rest are about the FILE and not about a line, so they carry no number and nothing
+		// is printed underneath them.
+		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d, ax, line); }
+		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d, ax, line); }
+		else if (code === 'elev-converted') { text = fill(PC.lpn_survey_note_elev_converted || 'The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d, ax, line); }
+		return { text: text, raw: raw };
 	};
 
 	/**
@@ -475,33 +506,47 @@
 	}
 
 	/**
-	 * The import report, as lines of text. The caller puts them on screen.
+	 * The import report, as a list of `{text, raw}`. The caller puts them on screen; `raw` is the
+	 * reader's own line, printed under the sentence, and null where the note is about the file.
 	 *
 	 * **IT SPEAKS EVEN WHEN NOTHING WENT WRONG**, for the reason js/lpn-inp.js's report does: "what
 	 * came across" is the question, and an answer only on failure makes silence mean two things.
+	 *
+	 * **A LINE-NUMBERED NOTE IS NEVER POOLED WITH ANOTHER, and that reverses what this function did**
+	 * (Tom, 2026-09-17: *"The import report needs to list line numbers."*). Two rows that failed the
+	 * same way used to become one sentence with both point names in brackets after it, which is
+	 * shorter and is the wrong shape: the reader is going line by line through their own file, and a
+	 * sentence about two lines at once cannot carry either of them. So they are printed in LINE
+	 * ORDER, one each. Pooling survives only for the notes that have no line -- there is exactly one
+	 * blank-lines note however many blank lines there were.
 	 */
 	EngCalcs.lpnSurveyReportLines = function (parsed, outcome, axes) {
-		var out = [], byText = [], seen = {};
-		out.push((PC.lpn_survey_report_counts || '{n} junction(s) created.')
-			.replace('{n}', (outcome && outcome.created) || 0));
+		var out = [], perLine = [], fileWide = [], seen = {};
+		out.push({ text: (PC.lpn_survey_report_counts || '{n} junction(s) created.')
+			.replace('{n}', (outcome && outcome.created) || 0), raw: null });
 		if (outcome && outcome.elevFromFile) {
-			out.push((PC.lpn_survey_report_elev || '{n} of them took an elevation from the file.')
-				.replace('{n}', outcome.elevFromFile));
+			out.push({ text: (PC.lpn_survey_report_elev || '{n} of them took an elevation from the file.')
+				.replace('{n}', outcome.elevFromFile), raw: null });
 		}
 		((parsed && parsed.notes) || []).concat((outcome && outcome.notes) || []).forEach(function (d) {
-			var text = EngCalcs.lpnSurveyNoteText(d, axes), at = seen[text];
-			if (at === undefined) { seen[text] = byText.length; byText.push({ text: text, ids: (d.ids || []).slice() }); }
-			else { byText[at].ids = byText[at].ids.concat(d.ids || []); }
+			var said = EngCalcs.lpnSurveyNoteText(d, axes);
+			if (d && d.line) { perLine.push({ line: d.line, text: said.text, raw: said.raw }); return; }
+			if (seen[said.text]) { return; }
+			seen[said.text] = 1;
+			fileWide.push({ text: said.text, raw: null });
 		});
-		if (!byText.length) {
-			out.push(PC.lpn_survey_report_clean || 'Every point in the file came across, and nothing was changed on the way in.');
+		// **LINE ORDER, AND STABLE WITHIN A LINE.** One line can produce two notes -- a repeated
+		// name and an unreadable elevation on the same row -- and they must stay in the order they
+		// were found rather than being reordered by a comparison that cannot tell them apart.
+		perLine = perLine.map(function (n, i) { return { n: n, i: i }; })
+			.sort(function (a, b) { return (a.n.line - b.n.line) || (a.i - b.i); })
+			.map(function (w) { return { text: w.n.text, raw: w.n.raw }; });
+		if (!perLine.length && !fileWide.length) {
+			out.push({ text: PC.lpn_survey_report_clean || 'Every point in the file came across, and nothing was changed on the way in.', raw: null });
 			return out;
 		}
-		out.push(PC.lpn_survey_report_lead || 'Nothing in your file was thrown away quietly. Below is every row that could not be taken as it stands, and everything that was changed on the way in:');
-		byText.forEach(function (rowNote) {
-			out.push(rowNote.ids.length ? rowNote.text + ' (' + rowNote.ids.join(', ') + ')' : rowNote.text);
-		});
-		return out;
+		out.push({ text: PC.lpn_survey_report_lead || 'Below is every line that could not be taken as it stands, and everything that was changed on the way in. Nothing was thrown away quietly.', raw: null });
+		return out.concat(perLine, fileWide);
 	};
 
 }(typeof window !== 'undefined' ? window : globalThis));

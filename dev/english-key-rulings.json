@@ -2817,7 +2817,7 @@
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
         },
-        "lpn_survey_note_lat_range": {
+        "lpn_survey_note_coord_range": {
             "on": "This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, swap them in your own file: this page will not swap them for you, because it cannot tell a mistake from a place.",
             "ruled": "2026-09-17",
             "answer": "OK."
