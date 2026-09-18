@@ -996,6 +996,70 @@ like it.
 
 ---
 
+## 13. Why three field sets look like three different drawings (Tom's screenshots, 2026-09-18)
+
+He sent three pictures of the same view -- node ID only, ID plus Demand, Demand only -- and asked:
+*"I can't account for the drastic change. Can you? Here's what I would expect that didn't happen:
+(1) if the Demand and ID can't both fit, we would drop one. (2) Demand only and ID only would look
+very similar; but I find that all properties other than ID don't stack as well, which makes no
+geometric sense."*
+
+**It makes geometric sense, and (1) is a real defect.** Both halves are measured, not argued.
+`dev/lpn-spike/label-fieldset-measure.js` is the tool; it is `label-crossing-measure.js` with a
+field set as an input, which nothing could supply before -- every figure in sections 8 to 12 was
+taken with EVERY FIELD ON, so no recorded number could compare two field sets.
+
+### 13a. The numbers
+
+Net3-Novato-CA-World, 1400x900, solved through EPANET, the shipped route (`all+shed`), at the fit
+zoom and three steps in. Geometry is the MEDIAN of each node label's whole footprint -- the union of
+its stacked rows, in world units -- because reading the first row alone reports the ID's width for a
+label whose demand row is three times wider, which is exactly the misreading being asked about.
+
+| field set | zoom | labels shown | hidden | of | median width | median height | **median area** |
+|---|---|---|---|---|---|---|---|
+| ID only | fit | 82 | **15** | 97 | 0.00349 | 0.00235 | **8.19e-6** |
+| ID + Demand | fit | 52 | **45** | 97 | 0.00931 | 0.00491 | **4.57e-5** |
+| Demand only | fit | 56 | **36** | 92 | 0.00902 | 0.00227 | **2.05e-5** |
+| ID only | 2x | 94 | 3 | 97 | | | |
+| ID + Demand | 2x | 81 | 16 | 97 | | | |
+| Demand only | 2x | 83 | 9 | 92 | | | |
+| all three | 4x and 8x | | 0 or 1 | | | | |
+
+**THE WHOLE OF (2) IS THE FIRST TWO COLUMNS OF GEOMETRY.** A demand reads `Q=236.01`; an ID on this
+drawing is two or three characters. Measured, a demand row is **2.6 times wider** than an ID row.
+Label placement is a packing problem, so 2.6 times the width is 2.5 times the area to find room for,
+and the drawing hides 36 labels where the ID drawing hides 15. Tom's intuition that the two should
+look alike is the one thing here that is simply mistaken: they differ by the only quantity the
+packing cares about. **ID plus Demand is worse than either alone for the obvious reason and it is
+worth stating, because it is not a subtlety: the box is 2.7 times wider AND two rows tall, so it is
+5.6 times the area of the ID label.** Nothing about the placement is behaving oddly.
+
+**One more difference he can see and no code caused: Demand only draws 92 labels, not 97.** Five
+junctions have no demand, so their label has nothing in it at all.
+
+### 13b. (1) IS RIGHT, AND THE CODE CANNOT DO IT
+
+*"If the Demand and ID can't both fit, we would drop one."* It does not. `nodeShedRec()` refuses a
+shed when `gone >= order.length - 1` -- dropping the LAST ranked value is not a shed, it is the
+hide -- and **a node's ID carries no rank at all** (`nodeFieldRank()` answers -Infinity, and
+`nodeShedOrder()` leaves unranked lines out of the order entirely). So with ID and Demand switched
+on there is exactly ONE ranked value on the label, the cascade has nothing it is allowed to give up,
+and the only move left is to hide the label whole.
+
+**Measured, and this is the proof rather than a reading of the source:** `valueShed`, the count of
+node labels that gave up a value instead of going whole, is **0 at every zoom for all three of his
+field sets**. Switch Pressure on as well -- ID + Pressure + Demand, two ranked values -- and it is
+**87 of 97 at the fit zoom**, and the drawing that results is geometrically identical to the ID +
+Demand one (same median width, height and area; 48 hidden against 45). The cascade works. It is
+simply forbidden to reach the case he is looking at.
+
+**The fix is the one he asked for in the same message**, in the Drop-order respecification: give the
+node ID a Drop rank. With ID ranked, ID + Demand is two ranked values and the cascade can drop one
+and keep the other, which is his expectation (1) exactly. That is why the missing Node ID Drop
+spinner and this question are one item and not two.
+
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.

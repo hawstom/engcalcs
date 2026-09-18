@@ -174,9 +174,23 @@ async function measure(file, mode, opts) {
 	// EVERY FIELD ON, which is the crowded end of what a user can ask for and the state Tom's own
 	// screenshots were taken in. A drawing with two fields per label has fewer conflicts and would
 	// flatter the number.
+	//
+	// **opts.fields OVERRIDES IT, for the one question the all-on drawing cannot answer** (Task 539,
+	// 2026-09-18): Tom compared three screenshots -- node ID only, ID plus demand, demand only --
+	// and asked why the third is so much worse than the first. Two drawings that differ in ONE field
+	// cannot be compared unless the field set is an input. `{ node: ['id'], link: [] }` turns on
+	// exactly those and nothing else; omit it and every field is on, which is what every recorded
+	// figure in dev/label-placement-algorithms.md was taken with.
 	const ls = L.labelSettings();
-	Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });
-	Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
+	if (opts.fields) {
+		['node', 'link'].forEach(function (g) {
+			const want = opts.fields[g] || [];
+			Object.keys(ls[g]).forEach(function (k) { ls[g][k] = want.indexOf(k) >= 0; });
+		});
+	} else {
+		Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });
+		Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
+	}
 
 	// **SOLVED NUMBERS, THROUGH THE REAL ENGINE.** A node label carries head and pressure only once
 	// a solve has produced them, and a label with two fewer rows is a smaller box: measuring the
@@ -299,12 +313,54 @@ async function measure(file, mode, opts) {
 		});
 		return { total: total, hidden: hidden };
 	}
+	// **HOW MANY NODE LABELS GAVE UP A VALUE RATHER THAN GOING WHOLE** (Task 469's cascade). Zero
+	// here beside a large hidden count is the signature of a label set the value shed cannot help:
+	// it refuses to drop the LAST ranked value, so a drawing showing the ID and one number has
+	// nothing to give and the only move left is to hide the label entire.
+	function valueShedCount() {
+		let shed = 0;
+		doc.nodes.forEach(function (n) {
+			const h = nodeEls[n.id];
+			if (!h || h.empty || !h.allLines || !h.lines) { return; }
+			if (h.lines.length < h.allLines.length) { shed++; }
+		});
+		return shed;
+	}
 	// **LABEL ON LABEL IS A SEPARATE READING AND IS NOT A CROSSING.** Collide.labelCrossings()
 	// answers Tom's two triggers -- crossed leaders, and a label lying on somebody's leader -- and
 	// two labels printed on top of each other trips neither of them. He sent a screenshot of
 	// exactly that on 2026-09-09, so the number is taken here beside the crossings rather than
 	// inferred from them. Counted over the STAIRCASE on both sides (Task 406), unordered, once
 	// per pair.
+	// Node labels only -- the subject of the three-screenshot question -- in world units, with the
+	// leader read from the DOM exactly as everything else here reads it.
+	function nodeGeometry(drawn) {
+		const w = [], h = [], area = [], rows = [], lead = [];
+		drawn.forEach(function (p) {
+			if (p.id.charAt(0) !== 'n') { return; }
+			// **THE WHOLE FOOTPRINT, NOT THE FIRST ROW.** A node label STACKS, so boxes[] is a
+			// staircase of rows and boxes[0] is only the top one -- reading it reports the ID row's
+			// width for a label whose demand row is three times wider, which is exactly the
+			// misreading the three-screenshot question was about.
+			let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+			p.boxes.forEach(function (b) {
+				x0 = Math.min(x0, b.cx - b.w / 2); x1 = Math.max(x1, b.cx + b.w / 2);
+				y0 = Math.min(y0, b.cy - b.h / 2); y1 = Math.max(y1, b.cy + b.h / 2);
+			});
+			w.push(x1 - x0); h.push(y1 - y0); area.push((x1 - x0) * (y1 - y0));
+			rows.push(p.boxes.length);
+			lead.push(p.leader ? Math.hypot(p.leader.bx - p.leader.ax, p.leader.by - p.leader.ay) : 0);
+		});
+		function stat(a) {
+			if (!a.length) { return { n: 0, med: 0, max: 0, mean: 0 }; }
+			const s2 = a.slice().sort(function (x, y) { return x - y; });
+			return { n: a.length, med: s2[Math.floor(s2.length / 2)], max: s2[s2.length - 1],
+				mean: a.reduce(function (x, y) { return x + y; }, 0) / a.length };
+		}
+		return { width: stat(w), height: stat(h), area: stat(area), rows: stat(rows),
+			leader: stat(lead),
+			withLeader: lead.filter(function (v) { return v > 0; }).length };
+	}
 	function overlapPairs(drawn) {
 		const overlaps = [];
 		for (let a = 0; a < drawn.length; a++) {
@@ -340,6 +396,11 @@ async function measure(file, mode, opts) {
 			// that hid behind counting once already.
 			seen.push({ sig: signature(pl), pairs: r.counts.pairs, drawn: pl.length,
 				hidden: hc.hidden, labels: hc.total, ms: passMs,
+				// **THE GEOMETRY OF WHAT WAS DRAWN, not only how much of it.** A node label's box
+				// WIDTH and the length of the leader it ended up trailing are what separate two
+				// field sets that place the same number of labels; nothing here could report them
+				// before 2026-09-18.
+				geom: nodeGeometry(pl), valueShed: valueShedCount(),
 				shed: shedHidden.slice().sort().join(' ') });
 			if (i === 0) {
 				first = r; firstShed = shedHidden.slice(); firstResidual = shedResidual.slice();
