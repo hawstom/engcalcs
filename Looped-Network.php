@@ -369,6 +369,20 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
 			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
 		</div>
+		<?php // THE CUSTOM GEOREFERENCE WIZARD (Tom, 2026-09-18). Its own bar and not a second mode of
+		      // the placement bar above: that one ends by converting every coordinate in the project and
+		      // this one ends by converting none, so a shared strip would be one set of buttons meaning
+		      // two opposite things. Go to and Place name search are the placement bar's own labels
+		      // reused whole, because they are the same two commands. ?>
+		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+			<div id="lpn_mapgeo_step" style="margin-bottom:2px;font-weight:bold"></div>
+			<div id="lpn_mapgeo_hint" style="margin-bottom:4px"></div>
+			<button type="button" id="lpn_mapgeo_search"><?=$ec_lang['lpn_crs_place']?></button>
+			<button type="button" id="lpn_mapgeo_goto"><?=$ec_lang['lpn_georef_goto']?></button>
+			<button type="button" id="lpn_mapgeo_place"><?=$ec_lang['lpn_mapgeo_place']?></button>
+			<button type="button" id="lpn_mapgeo_finish" style="display:none"><?=$ec_lang['lpn_mapgeo_finish']?></button>
+			<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+		</div>
 		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
 		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
 		      // for whichever fields are toggled on needs a separate, always-visible home to survive
@@ -2372,6 +2386,16 @@ EngCalcs.pageConfig = {
 	lpn_map_attach_turn: <?=json_encode($ec_lang['lpn_map_attach_turn'])?>,
 	lpn_map_attach_done: <?=json_encode($ec_lang['lpn_map_attach_done'])?>,
 	lpn_map_attach_removed: <?=json_encode($ec_lang['lpn_map_attach_removed'])?>,
+	lpn_mapgeo_replace: <?=json_encode($ec_lang['lpn_mapgeo_replace'])?>,
+	lpn_mapgeo_intro: <?=json_encode($ec_lang['lpn_mapgeo_intro'])?>,
+	lpn_mapgeo_step1: <?=json_encode($ec_lang['lpn_mapgeo_step1'])?>,
+	lpn_mapgeo_step2: <?=json_encode($ec_lang['lpn_mapgeo_step2'])?>,
+	lpn_mapgeo_hint1: <?=json_encode($ec_lang['lpn_mapgeo_hint1'])?>,
+	lpn_mapgeo_hint2: <?=json_encode($ec_lang['lpn_mapgeo_hint2'])?>,
+	lpn_mapgeo_place: <?=json_encode($ec_lang['lpn_mapgeo_place'])?>,
+	lpn_mapgeo_finish: <?=json_encode($ec_lang['lpn_mapgeo_finish'])?>,
+	lpn_mapgeo_cancelled: <?=json_encode($ec_lang['lpn_mapgeo_cancelled'])?>,
+	lpn_mapgeo_locked: <?=json_encode($ec_lang['lpn_mapgeo_locked'])?>,
 	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,
 	lpn_backdrop_scale: <?=json_encode($ec_lang['lpn_backdrop_scale'])?>,
 	lpn_backdrop_scale_entry: <?=json_encode($ec_lang['lpn_backdrop_scale_entry'])?>,

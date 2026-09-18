@@ -349,8 +349,14 @@ console.log('\n--- one home for the concept ---');
 	// two retired: nodeCoordAxis() and nodeLonLat() now ask effective(), which is the SAME
 	// consolidation the DEM lists made twice above -- one reader of "where is this node" rather than
 	// three.
-	ok('outwardX has one definition and 28 call sites', count(/outwardX\(/g) === 29, count(/outwardX\(/g));
-	ok('outwardY has one definition and 28 call sites', count(/outwardY\(/g) === 29, count(/outwardY\(/g));
+	// **THE CUSTOM GEOREFERENCE WIZARD ADDED ONE SITE TO EACH PAIR, AND THEY ARE ONE ROUND TRIP.**
+	// mapgeoPointerSrc() reads where the pointer is in the drawing's own outward terms, because a
+	// gesture there is measured against the ground rather than against the screen; mapgeoInward()
+	// puts the rectangle back into the drawing frame to be drawn. The wizard writes no coordinate
+	// at all -- it edits the transform -- so these two are the whole of its boundary, and having
+	// them here is what stops a third one reaching for cartesianY() on its own.
+	ok('outwardX has one definition and 29 call sites', count(/outwardX\(/g) === 30, count(/outwardX\(/g));
+	ok('outwardY has one definition and 29 call sites', count(/outwardY\(/g) === 30, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -404,8 +410,8 @@ console.log('\n--- one home for the concept ---');
 	// there is no override they return the field untouched, so a Base drawing still pays nothing at
 	// all. writeNodeCoord() is the other: a typed box hands it the public number and it converts
 	// once, which is what keeps a typed 38.5 stored as 38.5.
-	ok('inwardX has one definition and 28 call sites', count(/inwardX\(/g) === 29, count(/inwardX\(/g));
-	ok('inwardY has one definition and 29 call sites', count(/inwardY\(/g) === 30, count(/inwardY\(/g));
+	ok('inwardX has one definition and 29 call sites', count(/inwardX\(/g) === 30, count(/inwardX\(/g));
+	ok('inwardY has one definition and 30 call sites', count(/inwardY\(/g) === 31, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

@@ -1,27 +1,32 @@
-// THE WORLD MAP BEHIND AN XY DRAWING, AND THE ONE THING IT MAY NOT DO -- ROADMAP Task 646.
+// THE CUSTOM GEOREFERENCE WIZARD, AND THE ONE THING IT MAY NOT DO -- ROADMAP Task 646.
 //
 //   node dev/lpn-spike/xy-world-map-harness.js
 //
-// Tom, 2026-09-13: *"Even an arbitrary XY project can have a world map background with a good
-// wizard... Attach the world map to this project without changing it any other way."*
+// Tom, 2026-09-18, in three steps: *"(1) Show the world map with our project in the middle of the
+// Atlantic Ocean or near Nigeria (0,0)... Let the user Zoom and Pan, Search by name, or use Goto to
+// find the location of their project on the world map. When they are happy, they 'Place
+// approximately'. (2) We show a drag, scale rotate rectangle/square that controls the world map,
+// not their project... Then they click 'Georeference here'. (3) We show 'unnamed' in the map status
+// bar."*
 //
 // **THE ACCEPTANCE CRITERION IS BYTE IDENTITY, NOT A TOLERANCE**, exactly as it is for an `.inp`
 // round trip in inp-export-harness.js. CLAUDE.md's absolute rule is that only the user touches a
 // file's numbers; the placement wizard beside this one (georefStart) rewrites every coordinate in
-// the document and is fenced off from a project that declares a coordinate system for that reason,
-// and this door is safe only while it writes nothing at all. So what is compared here is the WHOLE
-// SERIALIZED PROJECT -- the bytes that would be saved -- before attaching, after attaching and
-// after removing, with only the `project.georef` declaration itself allowed to differ.
+// the document, and this door is safe only while it writes nothing at all. So what is compared here
+// is the WHOLE SERIALIZED PROJECT -- the bytes that would be saved -- before the wizard, at every
+// step of it, after Georeference here and after Remove, with only the `project.georef` declaration
+// itself allowed to differ.
 //
-// **AND THE ATTACHMENT HAS TO BE WORTH SOMETHING, or a no-op would pass every assertion above.**
-// So the transform is also graded: the middle of the drawing lands on the latitude and longitude
-// the user typed, the site comes out the ground width they gave, and a turn turns. Those are read
-// through js/lpn-georef.js, which is the same arithmetic the tiles are placed with.
+// **AND THE PLACEMENT HAS TO BE WORTH SOMETHING, or a no-op would pass every assertion above.** So
+// the transform is graded too: the middle of the drawing lands where Go to was told, a corner drag
+// scales the map about the OPPOSITE corner and leaves that corner's ground point exactly where it
+// was, and a turn of the handle turns the map and nothing else. Those are read through
+// js/lpn-georef.js, which is the same arithmetic the tiles are placed with.
 //
 // **THE MUTATION LEG IS A SECOND RUN, NOT AN ASSERTION.** `XY_WORLD_MAP_MUTATE=1` patches the page
-// source so that attaching moves one node by a hair, and the run must go RED. A harness whose
-// invariant is "nothing changed" passes trivially if it is comparing the wrong thing, which is the
-// failure mode this exists to rule out.
+// source so that every frame of the wizard moves one node by a hair, and the run must go RED. A
+// harness whose invariant is "nothing changed" passes trivially if it is comparing the wrong thing,
+// which is the failure mode this exists to rule out.
 
 const { ROOT, byId, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
@@ -29,15 +34,7 @@ require(ROOT + 'js/lpn-georef.js');
 
 global.confirm = global.window.confirm = function () { return true; };
 global.alert = global.window.alert = function () { };
-
-// The three answers the wizard asks for, in order: where the middle is, how wide the site is, and
-// which way it is turned. Queued rather than matched on the prompt text, because the text is a
-// language string and harness_wording_check.php is right that pinning one here is a tax on
-// rewording it.
-let answers = [];
-global.prompt = global.window.prompt = function () {
-	return answers.length ? answers.shift() : null;
-};
+global.prompt = global.window.prompt = function () { return null; };
 
 const MUTATE = process.env.XY_WORLD_MAP_MUTATE === '1';
 
@@ -45,10 +42,21 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getProject: function () { return project; },\n" +
 	"\t\taddNode: addNode, addLink: addLink,\n" +
 	"\t\tserialize: serializeProject,\n" +
-	"\t\tstartMapAttach: startMapAttach, removeMapAttach: removeMapAttach,\n" +
+	"\t\tremoveMapAttach: removeMapAttach, crsDisplayName: crsDisplayName,\n" +
 	"\t\txyGeoref: xyGeoref, xyGeorefOk: xyGeorefOk, xyMapAttachable: xyMapAttachable,\n" +
 	"\t\tbasemapOn: basemapOn, basemapChoosable: basemapChoosable,\n" +
-	"\t\tmapMenuRows: mapMenuRows, mapAttachRows: mapAttachRows,\n" +
+	"\t\tmapMenuRows: mapMenuRows,\n" +
+	"\t\tmapgeoStart: mapgeoStart, mapgeoPlace: mapgeoPlaceApproximately,\n" +
+	"\t\tmapgeoFinish: mapgeoFinish, mapgeoCancel: mapgeoCancel,\n" +
+	"\t\tmapgeoActive: mapgeoActive, mapgeoGoTo: mapgeoGoTo, mapgeoZoom: mapgeoZoomAbout,\n" +
+	"\t\tmapgeoApplyDrag: mapgeoApplyDrag, mapgeoRectSrc: mapgeoRectSrc,\n" +
+	"\t\tmapgeoStep: function () { return mapgeo && mapgeo.step; },\n" +
+	"\t\tsetDrag: function (d) { drag = d; },\n" +
+	// Screen point of a point in the drawing's own OUTWARD coordinates, which is the inverse of
+	// screenToWorld() at the stub's canvas origin. A gesture is aimed in ground terms here, so the
+	// assertions can say where the pointer went rather than which pixel it was.
+	"\t\tscreenOf: function (ox, oy) {\n" +
+	"\t\t\treturn { x: inwardX(ox) * state.s + state.tx, y: inwardY(oy) * state.s + state.ty }; },\n" +
 	"\t\toutwardX: outwardX, outwardY: outwardY,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -59,16 +67,17 @@ const L = loadLoopedNetwork(
 	"\t\t\trubberBandEl = el('line', {}, world); }, ",
 	null,
 	MUTATE ? function (src) {
-		// ONE NODE, ONE ULP-ISH NUDGE -- the smallest thing this harness must still catch, and the
-		// shape the defect would really take: a coordinate rewritten by a conversion that is not
-		// quite the identity.
+		// ONE NODE, ONE ULP-ISH NUDGE, ON EVERY FRAME OF THE WIZARD -- the smallest thing this
+		// harness must still catch, and the shape the defect would really take: a coordinate
+		// rewritten by a placement that is not quite the identity.
+		//
+		// **NOT nodes[0]**: the first node of this fixture sits at the origin, and a multiplicative
+		// nudge of zero is zero. A mutation that cannot change anything proves nothing about the
+		// harness, and the first run of this leg said exactly that.
 		return src.replace(
-			'\t\tif (!project.basemap || project.basemap === \'off\') { project.basemap = \'osm\'; }',
-			// **NOT nodes[0]**: the first node of this fixture sits at the origin, and a
-			// multiplicative nudge of zero is zero. A mutation that cannot change anything proves
-			// nothing about the harness, and the first run of this leg said exactly that.
+			'\t\tproject.georef = t;\n\t\trefreshBasemap();',
 			'\t\tif (doc.nodes[1]) { doc.nodes[1].x = doc.nodes[1].x * (1 + 1e-12); }\n' +
-			'\t\tif (!project.basemap || project.basemap === \'off\') { project.basemap = \'osm\'; }');
+			'\t\tproject.georef = t;\n\t\trefreshBasemap();');
 	} : null
 );
 L.buildLayers();
@@ -106,70 +115,130 @@ function snapshot() {
 	return JSON.stringify(s);
 }
 
-const before = snapshot();
-
-ok('an xy grid project is offered the attachment', L.xyMapAttachable() === true);
-ok('and has none to start with', L.xyGeorefOk() === false);
-
-// Petaluma, and a 3,000 ft site turned 30 degrees counterclockwise.
-const LAT = 38.2324, LON = -122.6367, SPAN_FT = 3000, TURN = 30;
-answers = [LAT + ', ' + LON, String(SPAN_FT), String(TURN)];
-L.startMapAttach();
-
-ok('the world map is attached', L.xyGeorefOk() === true);
-ok('and the tiles are switched on', L.basemapOn() === true);
-ok('the street map and satellite rows now appear', L.basemapChoosable() === true);
-
-const after = snapshot();
-ok('ATTACHING CHANGES NOT ONE STORED BYTE', after === before,
-	after === before ? '' : 'the saved project differs');
-
-// ---- the attachment is worth something ------------------------------------------------------
-const t = L.xyGeoref();
 const G = global.EngCalcs;
+const before = snapshot();
 const bMinX = 0, bMaxX = 2000, bMinY = 0, bMaxY = 800;   // outward, y-up
 const midX = (bMinX + bMaxX) / 2, midY = (bMinY + bMaxY) / 2;
-const mid = G.lpnGeorefToLonLat(t, midX, midY);
-ok('the middle of the drawing lands on the typed latitude',
+
+ok('an xy grid project is offered the wizard', L.xyMapAttachable() === true);
+ok('and has no georeferencing to start with', L.xyGeorefOk() === false);
+
+// ---- STEP 1: the whole world, and the drawing in the Gulf of Guinea ---------------------------
+L.mapgeoStart();
+ok('the wizard is running', L.mapgeoActive() === true);
+ok('and it opens at step 1', L.mapgeoStep() === 1);
+ok('the tiles are switched on', L.basemapOn() === true);
+ok('the street map and satellite rows now appear', L.basemapChoosable() === true);
+
+let t = L.xyGeoref();
+let mid = G.lpnGeorefToLonLat(t, midX, midY);
+ok('the drawing starts at zero latitude and zero longitude',
+	Math.abs(mid.lat) < 1e-9 && Math.abs(mid.lon) < 1e-9, mid.lat + ', ' + mid.lon);
+ok('and it starts the whole world wide',
+	Math.abs(t.metersPerUnit * Math.max(bMaxX - bMinX, bMaxY - bMinY) - 40075017) < 1,
+	(t.metersPerUnit * 2000).toFixed(0) + ' m');
+ok('STEP 1 CHANGES NOT ONE STORED BYTE', snapshot() === before);
+
+// Go to, which in this wizard moves the GROUND and not the camera. Petaluma, California.
+const LAT = 38.2324, LON = -122.6367;
+L.mapgeoGoTo({ lat: LAT, lon: LON });
+t = L.xyGeoref();
+mid = G.lpnGeorefToLonLat(t, midX, midY);
+ok('Go to puts the middle of the drawing on the typed latitude',
 	Math.abs(mid.lat - LAT) < 1e-9, mid.lat);
 ok('...and on the typed longitude', Math.abs(mid.lon - LON) < 1e-9, mid.lon);
 
-const FT_M = 0.3048;
-const spanUnits = Math.max(bMaxX - bMinX, bMaxY - bMinY);
-ok('the site is the ground width the user gave',
-	Math.abs(t.metersPerUnit * spanUnits - SPAN_FT * FT_M) < 1e-6,
-	(t.metersPerUnit * spanUnits).toFixed(6) + ' m');
-ok('the turn is the one the user gave', t.rotDeg === TURN);
+// The wheel, spent on the map. Zooming the map IN by two halves the ground a drawing unit covers.
+const mpuBeforeZoom = t.metersPerUnit;
+const midScreen = L.screenOf(midX, midY);
+L.mapgeoZoom(midScreen.x, midScreen.y, 2);
+t = L.xyGeoref();
+ok('a wheel zoom halves the ground under one drawing unit',
+	Math.abs(t.metersPerUnit - mpuBeforeZoom / 2) < 1e-9 * mpuBeforeZoom, t.metersPerUnit);
+mid = G.lpnGeorefToLonLat(t, midX, midY);
+ok('...about the point under the pointer, which does not move',
+	Math.abs(mid.lat - LAT) < 1e-9 && Math.abs(mid.lon - LON) < 1e-9);
+ok('STEP 1 STILL CHANGES NOT ONE STORED BYTE', snapshot() === before);
 
-// A point due +y of the middle in the drawing is, at 30 degrees counterclockwise, WEST of north on
-// the ground -- the sense lpnGeorefWithRotation() documents. Checked as a bearing so the assertion
-// survives any change to the projection's internals.
-const up = G.lpnGeorefToLonLat(t, midX, midY + 400);
-const mpd = G.lpnGeorefMetersPerDegree(t.origin.lat);
-const east = (up.lon - mid.lon) * mpd.lon, north = (up.lat - mid.lat) * mpd.lat;
-const bearing = Math.atan2(east, north) * 180 / Math.PI;
-ok('a turn of 30 degrees counterclockwise swings the drawing 30 degrees west of north',
-	Math.abs(bearing + TURN) < 1e-6, bearing.toFixed(9));
+// ---- STEP 2: the rectangle that controls the map -----------------------------------------------
+L.mapgeoPlace();
+ok('Place approximately moves to step 2', L.mapgeoStep() === 2);
+let rect = L.mapgeoRectSrc();
+ok('and the rectangle starts on the drawing itself',
+	rect && Math.abs(rect[0].x - bMinX) < 1e-6 && Math.abs(rect[2].y - bMaxY) < 1e-6);
 
-// The inverse is exact algebra, which is what places every tile.
-const back = G.lpnGeorefFromLonLat(t, mid.lon, mid.lat);
-ok('the transform inverts at the anchor',
-	Math.abs(back.x - midX) < 1e-9 && Math.abs(back.y - midY) < 1e-9);
+// A CORNER DRAG scales the map about the opposite corner. Grab the north-east corner (index 2) and
+// pull it to twice its distance from the south-west one (index 0).
+t = L.xyGeoref();
+const pivot = rect[0], grab = rect[2];
+const far = { x: pivot.x + (grab.x - pivot.x) * 2, y: pivot.y + (grab.y - pivot.y) * 2 };
+const pivotGround = G.lpnGeorefToLonLat(t, pivot.x, pivot.y);
+const mpuBeforeDrag = t.metersPerUnit;
+L.setDrag({ type: 'mapgeo', kind: 'scale', corner: 2, t0: t, rect: rect,
+	start: { x: grab.x, y: grab.y } });
+L.mapgeoApplyDrag(L.screenOf(far.x, far.y));
+t = L.xyGeoref();
+ok('a corner drag of two halves the ground under one drawing unit',
+	Math.abs(t.metersPerUnit - mpuBeforeDrag / 2) < 1e-9 * mpuBeforeDrag, t.metersPerUnit);
+let back = G.lpnGeorefFromLonLat(t, pivotGround.lon, pivotGround.lat);
+ok('...and the opposite corner of the ground stays exactly where it was',
+	Math.abs(back.x - pivot.x) < 1e-6 && Math.abs(back.y - pivot.y) < 1e-6,
+	back.x.toFixed(6) + ', ' + back.y.toFixed(6));
 
-// ---- and it is reversible ---------------------------------------------------------------------
+// THE TURN HANDLE. A quarter turn counterclockwise about the middle of the rectangle.
+rect = L.mapgeoRectSrc();
+t = L.xyGeoref();
+const centre = { x: (rect[0].x + rect[2].x) / 2, y: (rect[0].y + rect[2].y) / 2 };
+const centreGround = G.lpnGeorefToLonLat(t, centre.x, centre.y);
+const rotBefore = t.rotDeg, armLen = 500;
+L.setDrag({ type: 'mapgeo', kind: 'rotate', corner: -1, t0: t, rect: rect,
+	start: { x: centre.x + armLen, y: centre.y } });
+L.mapgeoApplyDrag(L.screenOf(centre.x, centre.y + armLen));
+t = L.xyGeoref();
+ok('turning the handle a quarter turn turns the map a quarter turn',
+	Math.abs(t.rotDeg - (rotBefore - 90)) < 1e-6, t.rotDeg);
+back = G.lpnGeorefFromLonLat(t, centreGround.lon, centreGround.lat);
+ok('...about the middle of the rectangle, which does not move',
+	Math.abs(back.x - centre.x) < 1e-6 && Math.abs(back.y - centre.y) < 1e-6);
+ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
+
+// ---- Georeference here -------------------------------------------------------------------------
+const placed = JSON.parse(JSON.stringify(L.xyGeoref()));
+L.mapgeoFinish();
+ok('the wizard is finished', L.mapgeoActive() === false);
+ok('and the georeferencing is on the project', L.xyGeorefOk() === true);
+ok('GEOREFERENCE HERE CHANGES NOT ONE STORED BYTE', snapshot() === before,
+	snapshot() === before ? '' : 'the saved project differs');
+ok('the placement it keeps is the one on the screen',
+	JSON.stringify(L.xyGeoref()) === JSON.stringify(placed));
+
+// ---- and a cancelled second run puts the first one back ----------------------------------------
+L.mapgeoStart();
+L.mapgeoGoTo({ lat: -33.8688, lon: 151.2093 });
+ok('the wizard moved the map away', JSON.stringify(L.xyGeoref()) !== JSON.stringify(placed));
+L.mapgeoCancel();
+ok('CANCEL PUTS THE EARLIER GEOREFERENCING BACK EXACTLY',
+	JSON.stringify(L.xyGeoref()) === JSON.stringify(placed));
+ok('and it changed not one stored byte either', snapshot() === before);
+
+// ---- and it is reversible ----------------------------------------------------------------------
 L.removeMapAttach();
-ok('the attachment is gone', L.xyGeorefOk() === false);
-const removed = snapshot();
-ok('REMOVING LEAVES THE PROJECT EXACTLY AS IT WAS', removed === before,
-	removed === before ? '' : 'the saved project differs');
+ok('the georeferencing is gone', L.xyGeorefOk() === false);
+ok('REMOVING LEAVES THE PROJECT EXACTLY AS IT WAS', snapshot() === before,
+	snapshot() === before ? '' : 'the saved project differs');
 
-// ---- the menu says what Tom asked it to say ---------------------------------------------------
-const rows = L.mapMenuRows().filter(function (r) { return !r.hidden && r.submenu; });
-ok('the Map menu carries the background map row',
+// ---- the menu says what Tom asked it to say ----------------------------------------------------
+const rows = L.mapMenuRows().filter(function (r) { return !r.hidden && r.fn; });
+ok('the Map menu carries the custom georeference row',
 	rows.some(function (r) { return /georeference/i.test(String(r.label)); }),
 	rows.map(function (r) { return r.label; }).join(' | '));
-const sub = L.mapAttachRows();
-ok('its submenu attaches and removes', sub.length === 2 && sub[1].disabled === true);
+// Read off pageConfig rather than typed here: harness_wording_check.php is right that a pinned
+// literal taxes rewording, and the stub fills pageConfig from the real language file.
+const REMOVE = (global.EngCalcs.pageConfig || {}).lpn_map_attach_remove;
+ok('and the Remove row hides itself when there is nothing to remove',
+	L.mapMenuRows().every(function (r) {
+		return String(r.label) !== REMOVE || r.hidden === true;
+	}));
 
 if (MUTATE) {
 	console.log('');

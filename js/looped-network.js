@@ -10245,6 +10245,14 @@ var EngCalcs = EngCalcs || {};
 		if (svg && svg.classList) { svg.classList.toggle('lpn-panning', !!on); }
 	}
 	var dragDirty = false;
+	// **ONE DOOR FOR "THE USER ASKED TO ZOOM", because the wizard spends it differently.** Outside
+	// the custom georeference wizard a zoom moves the camera; inside it the camera is what holds the
+	// drawing still, so the same gesture magnifies the map behind it instead. Both the wheel and the
+	// pinch come through here, so the two cannot come to different ideas about which is happening.
+	function wheelZoom(sx, sy, factor) {
+		if (mapgeoActive()) { mapgeoZoomAbout(sx, sy, factor); return; }
+		zoomAbout(sx, sy, factor);
+	}
 	function zoomAbout(sx, sy, factor) {
 		var r = svg.getBoundingClientRect(), lx = sx - r.left, ly = sy - r.top,
 			wx = (lx - state.tx) / state.s, wy = (ly - state.ty) / state.s;
@@ -11010,7 +11018,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function goToLatLon() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!isGeoProject()) { return; }
+		if (!isGeoProject() && !mapgeoActive()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -11027,6 +11035,10 @@ var EngCalcs = EngCalcs || {};
 	// `extent` is optional and is the geocoder's `{south, north, west, east}`. Absent means "I know
 	// where, not how big" -- see the zoom note below.
 	function goToPoint(ll, extent) {
+		// **THE CUSTOM GEOREFERENCE WIZARD TRAVELS BY MOVING THE GROUND, not the camera** -- see
+		// mapgeoGoTo(). First, because everything below this moves the view, which during that
+		// wizard would carry the drawing off the map it is being placed on.
+		if (mapgeoActive()) { mapgeoGoTo(ll, extent); return; }
 		// **WHILE PLACING, IT ASKS THE SECOND HALF OF THE QUESTION TOO.** Tom, 2026-08-18: *"In the
 		// Go to... box, ask for lat/lon and approximate size of project area in project length
 		// units. Provide a default of either 1000m or 3000 ft."* That is the half we do NOT have --
@@ -11851,22 +11863,105 @@ var EngCalcs = EngCalcs || {};
 	// nothing. Three questions fully determine a similarity: where the middle of the drawing is,
 	// how wide the site is, and which way it is turned. Re-running the row opens each box on the
 	// answer already on file, so correcting an attachment is an edit and not a retype.
-	function mapAttachRows() {
-		var pc = EngCalcs.pageConfig || {};
-		return [
-			{ icon: 'globe', label: pc.lpn_map_attach_place || 'Attach the world map…',
-				tip: pc.lpn_map_attach_tip, fn: startMapAttach },
-			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Remove',
-				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach, disabled: !xyGeorefOk() }
-		];
+	// ---- THE CUSTOM GEOREFERENCE WIZARD (Tom, 2026-09-18) ---------------------------------------
+	//
+	// **THE DEFAULT WAY TO GEOREFERENCE, AND IT CONVERTS NOTHING.**
+	// dev/tom-coordinate-vocabulary-2026-09-16.md: *"Converting coordinates is no longer the default
+	// way to georeference a local coordinate system. The default way to georeference is as easy to
+	// the user as attaching a background map... Their project does not become a lat/lon project.
+	// Their coordinates do not change."* So this writes one declaration, `project.georef`, and not
+	// one number in the drawing -- which dev/lpn-spike/xy-world-map-harness.js asserts by comparing
+	// the whole serialized project byte for byte before, during and after.
+	//
+	// **THE INVERSION IS THE WHOLE SAFETY ARGUMENT, and it is his own, step by step:** *"(1) Show
+	// the world map with our project in the middle of the Atlantic Ocean or near Nigeria (0,0)...
+	// Let the user Zoom and Pan, Search by name, or use Goto... When they are happy, they 'Place
+	// approximately'. (2) We show a drag, scale rotate rectangle/square that controls THE WORLD MAP,
+	// NOT THEIR PROJECT... Then they click 'Georeference here'. (3) We show 'unnamed' in the map
+	// status bar."* Every gesture here therefore edits the TRANSFORM and never the document: the
+	// drawing is the fixed frame and the Earth is what slides under it. georefStart(), the wizard
+	// beside this one, is the opposite and rewrites every coordinate -- which is why that one is
+	// now the exception path reached from File, Convert coordinates as.
+	//
+	// **WHICH ANSWERS HIS OWN WORRY ABOUT ZOOMING AWAY** (*"I am not sure what we do about the
+	// absurdity of zooming away from their project"*): here you cannot. The VIEW never moves during
+	// the wizard -- a pan or a wheel is spent on the map -- so the drawing stays on screen at the
+	// size it was fitted to, and what travels is the ground behind it. Going to the other side of
+	// the world is one press of Go to and puts the drawing's own middle there.
+	//
+	// **THE TRANSFORM IS A SIMILARITY ON A TANGENT PLANE, so a custom georeference is only
+	// reasonably correct over a limited patch of the Earth** -- the same thing that is true of any
+	// EPSG coordinate system, and the reason js/lpn-georef.js freezes its radii at the origin's own
+	// latitude. Nothing here refuses a large one; what to do about lengths at that size is Tom's
+	// open question and is not answered by a number this file could invent.
+	var mapgeo = null;
+	var MAPGEO_STEP_WORLD = 1, MAPGEO_STEP_FINE = 2;
+	// The equator, in metres. The FIRST placement makes the drawing that wide, so that a project
+	// fitted to the window is a project with the whole world behind it -- "project and map both
+	// Zoomed to Fit", which is where his step 1 opens.
+	var MAPGEO_EARTH_M = 40075017;
+	var MAPGEO_HANDLE_PX = 9;
+	var mapgeoLayer = null;
+
+	function mapgeoActive() { return !!mapgeo; }
+	function mapgeoT() { return (project && project.georef) || null; }
+	// The drawing's own extent, through the ONE iterator the placement wizard uses, so the two
+	// cannot come to different ideas about which points are the document's.
+	function mapgeoExtent() {
+		var b = EngCalcs.lpnGeorefBounds(georefCapture());
+		return { b: b, span: Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1,
+			cx: (b.minX + b.maxX) / 2, cy: (b.minY + b.maxY) / 2 };
 	}
-	function startMapAttach() {
-		var pc = EngCalcs.pageConfig || {}, cur = xyGeoref();
+	// ---- the three edits, and they are the whole of the arithmetic -------------------------------
+	//
+	// The transform maps a drawing point to a place: `lonlat = origin + R(rotDeg)·metersPerUnit·
+	// (q - anchor)`. Moving the MAP under a still drawing is the inverse of moving the drawing over
+	// a still map, so each of these is stated as "the transform that puts the old ground where the
+	// gesture says", and each keeps its pivot EXACTLY fixed by construction rather than by a
+	// compensating translation somebody has to get right.
+	function mapgeoTranslated(t, dx, dy) {
+		return { anchor: { x: t.anchor.x + dx, y: t.anchor.y + dy },
+			origin: { lon: t.origin.lon, lat: t.origin.lat },
+			metersPerUnit: t.metersPerUnit, rotDeg: t.rotDeg };
+	}
+	function mapgeoScaled(t, f, c) {
+		if (!(f > 0) || !isFinite(f)) { return t; }
+		return { anchor: { x: c.x + (t.anchor.x - c.x) * f, y: c.y + (t.anchor.y - c.y) * f },
+			origin: { lon: t.origin.lon, lat: t.origin.lat },
+			metersPerUnit: t.metersPerUnit / f, rotDeg: t.rotDeg };
+	}
+	function mapgeoTurned(t, rad, c) {
+		var cos = Math.cos(rad), sin = Math.sin(rad),
+			dx = t.anchor.x - c.x, dy = t.anchor.y - c.y;
+		return { anchor: { x: c.x + dx * cos - dy * sin, y: c.y + dx * sin + dy * cos },
+			origin: { lon: t.origin.lon, lat: t.origin.lat },
+			metersPerUnit: t.metersPerUnit, rotDeg: t.rotDeg - rad * 180 / Math.PI };
+	}
+	// The one write seam for "the map moved". Nothing below it touches the document, which is why
+	// there is no snapshot, no markEdited() and no solve on this path.
+	function mapgeoSet(t) {
+		if (!mapgeo || !t || !(t.metersPerUnit > 0) || !isFinite(t.metersPerUnit) ||
+			!isFinite(t.anchor.x) || !isFinite(t.anchor.y) ||
+			!isFinite(t.origin.lon) || !isFinite(t.origin.lat) || !isFinite(t.rotDeg)) { return; }
+		project.georef = t;
+		refreshBasemap();
+		mapgeoDrawFrame();
+		mapgeoRefreshBar();
+	}
+	function mapgeoStart() {
+		var pc = EngCalcs.pageConfig || {}, ext;
+		if (mapgeo || georefActive()) { return; }
 		if (isGeoProject()) {
 			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
 			return;
 		}
-		if (!xyMapAttachable()) { return; }
+		// A project that STATES a coordinate system already says where it is, and a second answer
+		// to that question is the drift ruling P2 exists to stop.
+		if (!xyMapAttachable()) {
+			setNotice(pc.lpn_georef_projected ||
+				'This project already states a map projection, so its coordinates cannot be placed on the map a second time.');
+			return;
+		}
 		if (!doc.nodes.length) {
 			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
@@ -11875,47 +11970,244 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		// The model's own extent, in the outward Y-UP frame js/lpn-georef.js is written for.
-		// georefCapture() is that iterator and reads no wizard state, so this is the same answer
-		// the placement tool gets rather than a second opinion about which points are the
-		// document's.
-		var src = georefCapture(), b = EngCalcs.lpnGeorefBounds(src),
-			spanUnits = Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1;
-		// PUBLIC ORDER, latitude first: this is a pair a person reads and types.
-		var typed = window.prompt(
-			pc.lpn_map_attach_where || 'Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space',
-			cur ? (cur.origin.lat + ', ' + cur.origin.lon) : '');
-		if (typed === null) { return; }
-		var ll = parseLatLon(typed);
-		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
-			return;
-		}
-		var span = georefAskSize(cur ? cur.metersPerUnit * spanUnits : 0);
-		if (!(span > 0)) { return; }
-		var turn = window.prompt(
-			pc.lpn_map_attach_turn || 'Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map',
-			String(cur ? cur.rotDeg : 0));
-		if (turn === null) { return; }
-		var rot = parseFloat(String(turn).replace(',', '.'));
-		if (!isFinite(rot)) { rot = 0; }
-		project.georef = {
-			anchor: { x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 },
-			origin: { lon: ll.lon, lat: ll.lat },
-			metersPerUnit: span / spanUnits,
-			rotDeg: rot
+		// **IT CONFIRMS BEFORE IT REPLACES ONE**, which is the first thing his own summary asks of
+		// this row: the georeferencing already on file is an answer somebody gave, and starting the
+		// wizard throws it away the moment the first frame is drawn.
+		if (xyGeorefOk() && !window.confirm(pc.lpn_mapgeo_replace ||
+				'This project already has the world map attached. Replace that georeferencing?')) { return; }
+		ext = mapgeoExtent();
+		mapgeo = {
+			step: MAPGEO_STEP_WORLD,
+			openId: library ? library.openId : null,
+			rect: null,
+			// Everything Cancel puts back. The wizard marks nothing edited and saves nothing until
+			// Georeference here, so cancelling is an assignment rather than an undo.
+			prev: {
+				georef: project.georef ? JSON.parse(JSON.stringify(project.georef)) : null,
+				basemap: project.basemap, view: currentView()
+			}
 		};
-		// A project that had the tiles switched off, or has never had them, is asking for them by
-		// pressing this. setBasemapStyle() is not the seam to use: it TOGGLES, so it would turn the
-		// map off for anybody re-running the row to correct a placement.
 		if (!project.basemap || project.basemap === 'off') { project.basemap = 'osm'; }
-		// **NOT AN UNDO SNAPSHOT, and not an oversight.** The stack holds the DOCUMENT, and this
-		// changes not one thing in it; the way back is the Remove row beside this one, which is a
-		// door rather than a net. markEdited() so the attachment is saved with the project.
+		setMode('select');
+		// 0 N 0 E: the Gulf of Guinea, which is where a drawing with no georeferencing honestly
+		// sits, and the whole equator wide so that the fit below shows the whole world.
+		project.georef = { anchor: { x: ext.cx, y: ext.cy }, origin: { lon: 0, lat: 0 },
+			metersPerUnit: MAPGEO_EARTH_M / ext.span, rotDeg: 0 };
+		zoomExtent(true);
+		mapgeoSet(project.georef);
+		refreshMapStatus();
+		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
+	}
+	// **STEP 2 NAILS A RECTANGLE TO THE GROUND.** It is stated in latitude and longitude, so it
+	// belongs to the Earth and not to the drawing: when the map moves, the rectangle moves with it,
+	// which is what makes dragging it read as dragging the map. It starts as the drawing's own
+	// extent, which is the one rectangle the user can already see the meaning of.
+	function mapgeoPlaceApproximately() {
+		var pc = EngCalcs.pageConfig || {}, t = mapgeoT(), ext;
+		if (!mapgeo || mapgeo.step !== MAPGEO_STEP_WORLD || !t) { return; }
+		ext = mapgeoExtent();
+		mapgeo.step = MAPGEO_STEP_FINE;
+		mapgeoCaptureRect();
+		mapgeoSet(t);
+		setNotice(pc.lpn_mapgeo_hint2 || 'Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+	}
+	function mapgeoCaptureRect() {
+		var t = mapgeoT(), b;
+		if (!mapgeo || !t) { return; }
+		b = mapgeoExtent().b;
+		// South-west, south-east, north-east, north-west: index + 2 is the opposite corner, so a
+		// corner drag finds its own pivot without a table saying which handle means which.
+		mapgeo.rect = [
+			{ x: b.minX, y: b.minY }, { x: b.maxX, y: b.minY },
+			{ x: b.maxX, y: b.maxY }, { x: b.minX, y: b.maxY }
+		].map(function (p) { return EngCalcs.lpnGeorefToLonLat(t, p.x, p.y); });
+	}
+	// The rectangle where it is NOW, in the drawing's own coordinates: its latitudes and longitudes
+	// read back through the live transform.
+	function mapgeoRectSrc() {
+		var t = mapgeoT();
+		if (!mapgeo || !mapgeo.rect || !t) { return null; }
+		return mapgeo.rect.map(function (ll) {
+			return EngCalcs.lpnGeorefFromLonLat(t, ll.lon, ll.lat);
+		});
+	}
+	function mapgeoRectCentre(r) {
+		return { x: (r[0].x + r[2].x) / 2, y: (r[0].y + r[2].y) / 2 };
+	}
+	function mapgeoInward(p) { return { x: inwardX(p.x), y: inwardY(p.y) }; }
+	function mapgeoClearLayer() {
+		if (mapgeoLayer && mapgeoLayer.parentNode) { mapgeoLayer.parentNode.removeChild(mapgeoLayer); }
+		mapgeoLayer = null;
+	}
+	function mapgeoDrawFrame() {
+		var s = state.s || 1, r = mapgeoRectSrc(), pts, attr, rot, mid;
+		mapgeoClearLayer();
+		if (!mapgeo || mapgeo.step !== MAPGEO_STEP_FINE || !r || !world) { return; }
+		pts = r.map(mapgeoInward);
+		if (!pts.every(function (p) { return isFinite(p.x) && isFinite(p.y); })) { return; }
+		mapgeoLayer = el('g', { 'class': 'lpn-georef' }, world);
+		attr = pts.map(function (p) { return p.x + ',' + p.y; }).join(' ');
+		el('polygon', {
+			points: attr, 'data-mapgeo': 'move',
+			fill: 'rgba(0,90,200,0.06)', stroke: '#05a', 'stroke-width': 1.5 / s,
+			'stroke-dasharray': (6 / s) + ' ' + (4 / s)
+		}, mapgeoLayer);
+		// The turn handle stands off the NORTH edge of the rectangle, which is index 2 to 3.
+		mid = { x: (pts[2].x + pts[3].x) / 2, y: (pts[2].y + pts[3].y) / 2 };
+		rot = { x: mid.x + (mid.x - (pts[0].x + pts[1].x) / 2) * GEOREF_ROTATE_GAP,
+			y: mid.y + (mid.y - (pts[0].y + pts[1].y) / 2) * GEOREF_ROTATE_GAP };
+		el('line', { x1: mid.x, y1: mid.y, x2: rot.x, y2: rot.y,
+			stroke: '#05a', 'stroke-width': 1.5 / s }, mapgeoLayer);
+		el('circle', { cx: rot.x, cy: rot.y, r: MAPGEO_HANDLE_PX / s, 'data-mapgeo': 'rotate',
+			fill: '#fff', stroke: '#05a', 'stroke-width': 2 / s }, mapgeoLayer);
+		pts.forEach(function (p, i) {
+			var h = MAPGEO_HANDLE_PX / s;
+			el('rect', { x: p.x - h, y: p.y - h, width: h * 2, height: h * 2,
+				'data-mapgeo': 'scale', 'data-mapgeo-corner': i,
+				fill: '#fff', stroke: '#05a', 'stroke-width': 2 / s }, mapgeoLayer);
+		});
+	}
+	// ---- the gestures ---------------------------------------------------------------------------
+	//
+	// Through the existing `drag` record and the existing rAF tick, so pointer capture, the pinch
+	// guard and the pointerup cleanup are the proven ones. **Every frame is computed from the
+	// transform the drag STARTED with**, never from the previous frame: an incremental gesture
+	// accumulates the pointer's own jitter into the rotation, and an absolute one is idempotent.
+	function mapgeoPointerSrc(clientX, clientY) {
+		var w = screenToWorld(clientX, clientY);
+		return { x: outwardX(w.x), y: outwardY(w.y) };
+	}
+	function mapgeoPointerDown(e) {
+		var t = mapgeoT(), target, kind;
+		if (!mapgeo || !t) { return false; }
+		target = document.elementFromPoint(e.clientX, e.clientY);
+		kind = target && target.dataset ? target.dataset.mapgeo : null;
+		drag = {
+			type: 'mapgeo', kind: kind || 'move', pointerId: e.pointerId,
+			startX: e.clientX, startY: e.clientY, t0: t,
+			start: mapgeoPointerSrc(e.clientX, e.clientY),
+			corner: kind === 'scale' ? +target.dataset.mapgeoCorner : -1,
+			rect: mapgeoRectSrc()
+		};
+		return true;
+	}
+	function mapgeoApplyDrag(p) {
+		var t0 = drag.t0, now = mapgeoPointerSrc(p.x, p.y), t = null, piv, c, d0, d1, th;
+		if (!mapgeo || !t0) { return; }
+		if (drag.kind === 'scale' && drag.rect) {
+			piv = drag.rect[(drag.corner + 2) % 4];
+			d0 = Math.hypot(drag.start.x - piv.x, drag.start.y - piv.y);
+			d1 = Math.hypot(now.x - piv.x, now.y - piv.y);
+			// A UNIFORM factor off the diagonal, never one per axis: the map is a picture of the
+			// ground and stretching it would be a lie about the ground.
+			if (!(d0 > 0) || !(d1 > 0)) { return; }
+			t = mapgeoScaled(t0, d1 / d0, piv);
+		} else if (drag.kind === 'rotate' && drag.rect) {
+			c = mapgeoRectCentre(drag.rect);
+			th = Math.atan2(now.y - c.y, now.x - c.x) -
+				Math.atan2(drag.start.y - c.y, drag.start.x - c.x);
+			t = mapgeoTurned(t0, th, c);
+		} else {
+			// The body of the rectangle, and the bare canvas in step 1, are the same gesture: the
+			// ground the pointer grabbed follows the pointer.
+			t = mapgeoTranslated(t0, now.x - drag.start.x, now.y - drag.start.y);
+		}
+		if (t) { mapgeoSet(t); }
+	}
+	// The wheel and the pinch, spent on the map instead of on the view. zoomAbout() is left alone:
+	// moving the camera during the wizard is what would let somebody zoom away from their project.
+	function mapgeoZoomAbout(sx, sy, factor) {
+		var t = mapgeoT();
+		if (!mapgeo || !t) { return; }
+		mapgeoSet(mapgeoScaled(t, factor, mapgeoPointerSrc(sx, sy)));
+	}
+	/**
+	 * **WHERE Go to AND Place name search LAND WHILE THE WIZARD IS OPEN.** goToPoint() is the one
+	 * door to a place on the Earth and it moves the CAMERA, which during this wizard would move the
+	 * drawing off the map it is being placed on. So the same request is spent on the transform: the
+	 * middle of the drawing is put at the place, and an extent -- which only the geocoder has --
+	 * also sets how wide the drawing is on the ground.
+	 */
+	function mapgeoGoTo(ll, extent) {
+		var t = mapgeoT(), ext = mapgeoExtent(), mpu = t ? t.metersPerUnit : 1, mpd, wide, high;
+		if (!mapgeo) { return; }
+		if (extent && isFinite(extent.east) && isFinite(extent.west) &&
+				isFinite(extent.north) && isFinite(extent.south) &&
+				extent.east >= extent.west && extent.north >= extent.south) {
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(ll.lat);
+			wide = (extent.east - extent.west) * mpd.lon;
+			high = (extent.north - extent.south) * mpd.lat;
+			if (Math.max(wide, high) > 0) { mpu = Math.max(wide, high) / ext.span; }
+		}
+		mapgeoSet({ anchor: { x: ext.cx, y: ext.cy }, origin: { lon: ll.lon, lat: ll.lat },
+			metersPerUnit: mpu, rotDeg: t ? t.rotDeg : 0 });
+		// The rectangle belongs to the ground, and the ground just changed underneath it.
+		if (mapgeo.step === MAPGEO_STEP_FINE) { mapgeoCaptureRect(); mapgeoSet(mapgeoT()); }
+	}
+	function mapgeoFinish() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!mapgeo) { return; }
+		if (!xyGeorefOk()) { mapgeoCancel(); return; }
+		mapgeo = null;
+		mapgeoClearLayer();
+		// **THE FIRST AND ONLY WRITE.** markEdited() so the declaration is saved with the project;
+		// no undo snapshot, because the stack holds the DOCUMENT and not one thing in it moved --
+		// the way back is Map, Remove the world map.
 		markEdited();
-		refreshBasemap();
 		saveToStorage();
-		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.');
+		refreshBasemap();
+		refreshMapStatus();
+		mapgeoRefreshBar();
+		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, Remove the world map to take it away again.');
+	}
+	function mapgeoCancel() {
+		var pc = EngCalcs.pageConfig || {}, prev = mapgeo ? mapgeo.prev : null;
+		if (!mapgeo) { return; }
+		mapgeo = null;
+		mapgeoClearLayer();
+		if (prev) {
+			if (prev.georef) { project.georef = prev.georef; } else { delete project.georef; }
+			project.basemap = prev.basemap;
+			if (prev.view) { applyView(prev.view); }
+		}
+		refreshBasemap();
+		refreshMapStatus();
+		mapgeoRefreshBar();
+		setNotice(pc.lpn_mapgeo_cancelled || 'The world map is back where it was, and your drawing never moved.');
+	}
+	// ---- the bar ---------------------------------------------------------------------------------
+	function mapgeoBarEl(id) { return document.getElementById(id); }
+	function mapgeoShow(id, on) {
+		var b = mapgeoBarEl(id);
+		if (b) { b.style.display = on ? '' : 'none'; }
+	}
+	function mapgeoRefreshBar() {
+		var pc = EngCalcs.pageConfig || {}, bar = mapgeoBarEl('lpn_mapgeo_bar'), world1;
+		if (!bar) { return; }
+		bar.style.display = mapgeo ? 'block' : 'none';
+		if (!mapgeo) { return; }
+		world1 = mapgeo.step === MAPGEO_STEP_WORLD;
+		mapgeoBarEl('lpn_mapgeo_step').textContent = world1
+			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find your place in the world')
+			: (pc.lpn_mapgeo_step2 || 'Step 2 of 2: fit the map behind your drawing');
+		mapgeoBarEl('lpn_mapgeo_hint').textContent = world1
+			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.')
+			: (pc.lpn_mapgeo_hint2 || 'Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+		mapgeoShow('lpn_mapgeo_search', world1);
+		mapgeoShow('lpn_mapgeo_goto', world1);
+		mapgeoShow('lpn_mapgeo_place', world1);
+		mapgeoShow('lpn_mapgeo_finish', !world1);
+	}
+	function mapgeoWireBar() {
+		var place = mapgeoBarEl('lpn_mapgeo_place'), b;
+		if (!place) { return; }
+		place.addEventListener('click', mapgeoPlaceApproximately);
+		mapgeoBarEl('lpn_mapgeo_finish').addEventListener('click', mapgeoFinish);
+		mapgeoBarEl('lpn_mapgeo_cancel').addEventListener('click', mapgeoCancel);
+		b = mapgeoBarEl('lpn_mapgeo_goto');
+		if (b) { b.addEventListener('click', goToLatLon); }
+		b = mapgeoBarEl('lpn_mapgeo_search');
+		if (b) { b.addEventListener('click', function () { EngCalcs.lpnSearchOpen(); }); }
 	}
 	function removeMapAttach() {
 		var pc = EngCalcs.pageConfig || {};
@@ -24594,6 +24886,14 @@ var EngCalcs = EngCalcs || {};
 	// true of a save, and a refusal that describes the wrong act teaches the wrong thing.
 	function georefBlocksProjectSwitch(reason) {
 		var pc = EngCalcs.pageConfig || {};
+		// **THE CUSTOM GEOREFERENCE WIZARD TAKES THE SAME REFUSAL, in its own words.** Its
+		// placement is provisional until Georeference here, so a save would write a world map the
+		// user has not agreed to and a tab switch would leave it behind on a project nobody is
+		// looking at. One sentence for both acts, because the actionable half is the same button.
+		if (mapgeoActive()) {
+			setNotice(pc.lpn_mapgeo_locked || 'Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.');
+			return true;
+		}
 		if (!georefActive()) { return false; }
 		setNotice(reason || pc.lpn_georef_tab_locked || 'Finish the placement with the "Keep this placement" button, or press Cancel, before you switch projects. The placement belongs to this project and cannot follow you to another one.');
 		return true;
@@ -26107,14 +26407,21 @@ var EngCalcs = EngCalcs || {};
 			// submenu, so six commands about one picture cost one row.
 			{ icon: 'image', label: pc.lpn_backdrop_menu || 'Background image…',
 				submenu: function () { return backdropRows(false); } },
-			// **AND THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Beside the background image
-			// because it is the same kind of thing said in Tom's own words -- something placed
-			// BEHIND the drawing that changes nothing in it -- and a submenu for the same reason
-			// the picture above has one: two commands about one backdrop cost one row.
+			// **AND THE WORLD MAP BEHIND A GRID DRAWING** (Task 646, and Tom's own menu name,
+			// 2026-09-18: *"Map, Custom georeference"*). Beside the background image because it is
+			// the same kind of thing said in his words -- something placed BEHIND the drawing that
+			// changes nothing in it.
+			//
+			// **TWO TOP-LEVEL ROWS RATHER THAN A SUBMENU, and the second one hides itself.** Setting
+			// the map up is a wizard and taking it away is one press; burying either under a parent
+			// row costs a click on the only two commands this feature has. Remove appears only when
+			// there is something to remove, so the menu is never a list of things that do nothing.
 			{ icon: 'globe', hidden: !xyMapAttachable(),
-				label: pc.lpn_map_attach_menu || 'Background map (georeference)…',
-				tip: pc.lpn_map_attach_tip,
-				submenu: function () { return mapAttachRows(); } },
+				label: pc.lpn_map_attach_menu || 'Custom georeference…',
+				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
+			{ icon: 'del', hidden: !xyMapAttachable() || !xyGeorefOk(),
+				label: pc.lpn_map_attach_remove || 'Remove the world map',
+				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour
@@ -26842,6 +27149,7 @@ var EngCalcs = EngCalcs || {};
 		setTransform();
 		wireToolbar();
 		georefWireBar();
+		mapgeoWireBar();
 		buildLabelBench();   // no-op unless ?debug=labels is on the URL
 		// The toolbar is built here, AFTER Calculators.lib.js's own DOMContentLoaded listener
 		// already ran EngCalcs.initTips(document) once (script load order puts that listener
@@ -27465,7 +27773,7 @@ var EngCalcs = EngCalcs || {};
 	function wirePointerEvents() {
 		svg.addEventListener('wheel', function (e) {
 			e.preventDefault();
-			zoomAbout(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1 / 1.1);
+			wheelZoom(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1 / 1.1);
 		}, { passive: false });
 
 		// Corner coordinate tracker (Tom) -- PC-oriented (hover-driven); the popup's read-only
@@ -27543,6 +27851,10 @@ var EngCalcs = EngCalcs || {};
 			// above: one flag, checked once, and every editing gesture below is simply not reached.
 			// Panning still works on empty canvas -- it is how you look at where you are putting the
 			// model -- so a miss falls through to a pan rather than to nothing.
+			// **AND THE CUSTOM GEOREFERENCE WIZARD TAKES EVERY PRESS**, because in that wizard the
+			// drawing is the fixed frame: a press on bare canvas slides the MAP rather than the
+			// camera, which is what stops anybody zooming away from the project they are placing.
+			if (mapgeoActive()) { mapgeoPointerDown(e); return; }
 			if (georefActive()) {
 				if (!georefPointerDown(e)) { drag = { type: 'pan', tx0: state.tx, ty0: state.ty }; Object.assign(drag, common); }
 				return;
@@ -28159,7 +28471,7 @@ var EngCalcs = EngCalcs || {};
 			var pts = Array.from(pointers.values());
 			var d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
 			var mx = (pts[0].x + pts[1].x) / 2, my = (pts[0].y + pts[1].y) / 2;
-			zoomAbout(mx, my, (d / drag.d0) * drag.s0 / state.s);
+			wheelZoom(mx, my, (d / drag.d0) * drag.s0 / state.s);
 			return;
 		}
 		var p = pointers.get(drag.pointerId);
@@ -28168,6 +28480,8 @@ var EngCalcs = EngCalcs || {};
 		// drawing rather than one element of it, and because nothing below it applies while the model
 		// is locked.
 		if (drag.type === 'georef') { georefApplyDrag(p); return; }
+		// Its opposite number: the custom georeference wizard, where the gesture moves the ground.
+		if (drag.type === 'mapgeo') { mapgeoApplyDrag(p); return; }
 		// The path handle (Task 509). Early, beside georef, because it edits no element at all -- it
 		// re-routes a reader's path -- so none of the snapshot, label or element machinery below
 		// applies to it.
@@ -41998,7 +42312,11 @@ var EngCalcs = EngCalcs || {};
 	// what a geographic project is, how to travel to a point, and where to speak. The geocoder, its
 	// usage-policy budget, its own consent gate and every string in them live in that file.
 	if (EngCalcs.lpnSearchInit) {
-		EngCalcs.lpnSearchInit({ locatable: projectLocatable, goTo: goToPoint, notice: setNotice });
+		// **THE WIZARD IS LOCATABLE WHILE IT RUNS**, which is what makes Tom's step 1 offer Search
+		// by name on a project that states no coordinate system at all: the place is what the
+		// wizard is asking for, so refusing to look one up would refuse the question.
+		EngCalcs.lpnSearchInit({ locatable: function () { return projectLocatable() || mapgeoActive(); },
+			goTo: goToPoint, notice: setNotice });
 	}
 	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
 	// can say where on the Earth a point of it is, the token that decides whether the feature

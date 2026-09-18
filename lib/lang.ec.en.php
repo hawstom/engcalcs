@@ -2353,15 +2353,29 @@ $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
 // **THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Tom's own sentence is the tip, because the
 // point of these rows is that the project's own numbers are untouched, which is the whole of what
 // separates this from the placement wizard that converts a project.
-$ec_lang['lpn_map_attach_menu']='Background map (georeference)…';
+$ec_lang['lpn_map_attach_menu']='Custom georeference…';
 $ec_lang['lpn_map_attach_tip']='Attach the world map to this project without changing it any other way.';
 $ec_lang['lpn_map_attach_place']='Attach the world map…';
-$ec_lang['lpn_map_attach_remove']='Remove';
+$ec_lang['lpn_map_attach_remove']='Remove the world map';
 $ec_lang['lpn_map_attach_remove_tip']='Take the world map away. The drawing and its coordinates are untouched either way.';
 $ec_lang['lpn_map_attach_where']='Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space';
 $ec_lang['lpn_map_attach_turn']='Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map';
-$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.';
+$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and your project is unchanged. Use Map, Remove the world map to take it away again.';
 $ec_lang['lpn_map_attach_removed']='The world map is gone, and the drawing is exactly as it was.';
+// **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
+// dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
+// never converting a coordinate, so every sentence below says what stays still as well as what
+// moves: the drawing does not move, the ground does.
+$ec_lang['lpn_mapgeo_replace']='This project already has the world map attached. Replace that georeferencing?';
+$ec_lang['lpn_mapgeo_intro']='Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.';
+$ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
+$ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';
+$ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.';
+$ec_lang['lpn_mapgeo_hint2']='Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_place']='Place approximately';
+$ec_lang['lpn_mapgeo_finish']='Georeference here';
+$ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';
+$ec_lang['lpn_mapgeo_locked']='Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
 // Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
