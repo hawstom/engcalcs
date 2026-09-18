@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 5 untranslated keys, of 1876 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 10 untranslated keys, of 1879 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,11 +25,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (5, all ruled)
+## lpn_  (10, 5 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
+- **`lpn_crs_unplaceable`**
+  > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
+  @@ NEEDS RULING
+- **`lpn_crs_unplaceable_mark`**
+  > (no map)
+  @@ NEEDS RULING
 - **`lpn_field_coord_tip`**
   > Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.
   _Ruled OK 2026-09-17._
@@ -42,12 +48,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
+- **`lpn_terrain_http`**
+  > The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.
+  @@ NEEDS RULING
+- **`lpn_terrain_no_place`**
+  > None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.
+  @@ NEEDS RULING
+- **`lpn_terrain_rate_limited`**
+  > The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**5 still to read**, of 120 new keys across 10 unmerged branch(es).
+**33 still to read**, of 138 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -58,7 +73,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-demands (`bd17fa89`) — 24 new, all ruled
+### feat/customer-demands (`ac505d3d`) — 28 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_customer_detached`**
   > ⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.
@@ -123,9 +138,21 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mode_add_meter`**
   > Meter: click the pipe that serves this customer, or click open ground and then click its pipe. Escape leaves the tool.
   _Ruled 2026-09-17: I like the "Click pipe" method of adding a customer. But it has some problems. (1) the offset would need to be in settings and (2) it will never be clear to the user which side is left (negative) and which is right (positive) unless there are arrows. Obviously side is not arbitrary or unimportant. Possibilities: (1) toolbar/menu button could include two modes, left and right, and they are relative to the direction of the flow arrow or low to high node number, and users have to learn by trial and error if they want to use this method, and offset is in Settings, Values._
+- **`lpn_node_customers`**
+  > Demand added here by meters
+  @@ NEEDS RULING
+- **`lpn_node_customers_tip`**
+  > Every meter whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A meter is edited where it sits on the map or in the Customers table.
+  @@ NEEDS RULING
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
 - **`lpn_tool_add_meter`**
   > Meter
   _Ruled OK 2026-09-17._
@@ -133,9 +160,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Click the pipe that serves a customer to put a meter on it, or click open ground and then click the pipe. The demand you give the meter is added to the junction at the near end of that pipe.
   _Ruled 2026-09-17: See comment for lpn_mode_add_meter_
 
-### feat/label-gang-search (`2a31d4f1`) — adds no English strings
+### feat/label-gang-search (`2a31d4f1`) — 2 new, 2 to read @@ NEEDS RULING
 
-### feat/library-import (`c7b63ddd`) — 9 new, all ruled
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
+
+### feat/library-import (`c7b63ddd`) — 11 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_library_import`**
   > Import from a project file
@@ -164,8 +198,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_library_import_units`**
   > The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them.
   _Ruled 2026-09-17: This is one situation where we may need to offer conversion._
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
 
-### feat/lock-initials-later (`1e2c3377`) — 13 new, all ruled
+### feat/lock-initials-later (`1e2c3377`) — 15 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_lock_age_edited`**
   > It was last edited {x} ago.
@@ -206,18 +246,33 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_lock_requested`**
   > {name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.
   _Ruled OK 2026-09-17._
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
 
-### feat/survey-import (`460e4821`) — 44 new, all ruled
+### feat/survey-import (`7a1ec37b`) — 49 new, 15 to read @@ NEEDS RULING
 
-- **`lpn_survey_btn`**
-  > Import surveyed points
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_btn_tip`**
-  > Read a list of surveyed points from a CSV or GPX file and make one junction at each point, using the new-asset values above. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.
-  _Ruled 2026-09-17: I disagree with "has to be". See my prompt comments._
+- **`lpn_file_import_survey`**
+  > Import surveyed points…
+  @@ NEEDS RULING
+- **`lpn_file_import_survey_tip`**
+  > Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.
+  @@ NEEDS RULING
+- **`lpn_survey_axis_east`**
+  > Easting
+  @@ NEEDS RULING
+- **`lpn_survey_axis_north`**
+  > Northing
+  @@ NEEDS RULING
 - **`lpn_survey_cancelled`**
   > Nothing was created and nothing was changed.
   _Ruled OK 2026-09-17._
+- **`lpn_survey_column_n`**
+  > column {n}
+  @@ NEEDS RULING
 - **`lpn_survey_confirm`**
   > Create {n} junction(s) from this surveyed point list?
   _Ruled OK 2026-09-17._
@@ -228,11 +283,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > The file does not say what unit its elevations are in, so they are read as {project}, which is the unit this project is showing.
   _Ruled OK 2026-09-17._
 - **`lpn_survey_elev_unit`**
-  > Elevations in the file are read as {file}, and this project is showing {project}.
-  _Ruled 2026-09-17: Under what condition would we know the units of the file?_
-- **`lpn_survey_err_ambiguous_lat`**
-  > More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
+  > The elevation column in your file is named for {file}, and this project is showing {project}.
+  @@ NEEDS RULING
+- **`lpn_survey_err_ambiguous_coord`**
+  > More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.
+  @@ NEEDS RULING
 - **`lpn_survey_err_ambiguous_lon`**
   > More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
@@ -242,9 +297,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_err_gpx_no_wpt`**
   > That GPX file holds no waypoints, so there is nothing to make junctions from.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_err_no_latlon`**
-  > This page could not find a latitude column and a longitude column in that file. Name two of the columns latitude and longitude, in the first row of the file, and try again. The first row reads: {detail}
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
+- **`lpn_survey_err_no_coords`**
+  > This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}
+  @@ NEEDS RULING
 - **`lpn_survey_err_no_points`**
   > Not one row of that file could be read as a surveyed point. Rows read: {detail}
   _Ruled OK 2026-09-17._
@@ -258,8 +313,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
   _Ruled OK 2026-09-17._
 - **`lpn_survey_map_lines`**
-  > Latitude comes from the column {lat}, longitude from {lon}, the name from {id}, and the elevation from {elev}.
-  _Ruled OK 2026-09-17._
+  > {first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.
+  @@ NEEDS RULING
 - **`lpn_survey_map_none`**
   > not used
   _Ruled OK 2026-09-17._
@@ -269,21 +324,24 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_note_ambiguous_elev`**
   > More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.
   _Ruled OK 2026-09-17._
+- **`lpn_survey_note_bad_coord`**
+  > The {axis} on this row does not read as a plain decimal number ({detail}), so no junction was made for it. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
+  @@ NEEDS RULING
 - **`lpn_survey_note_bad_elev`**
   > The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_note_bad_lat`**
-  > The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_bad_lon`**
   > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_blank_rows`**
   > Blank lines were passed over: {detail}.
   _Ruled OK 2026-09-17._
+- **`lpn_survey_note_coord_missing`**
+  > The {axis} column is empty on this row, so no junction was made for it.
+  @@ NEEDS RULING
 - **`lpn_survey_note_elev_converted`**
-  > The elevations in the file are in {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
-  _Ruled 2026-09-17: How do we know?_
+  > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
+  @@ NEEDS RULING
 - **`lpn_survey_note_gpx_rtept`**
   > The file also holds {detail} route point(s), which were not made into junctions.
   _Ruled OK 2026-09-17._
@@ -299,12 +357,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_note_id_taken`**
   > This name already belongs to something in the project, so this junction was given a name of ours instead.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_note_lat_missing`**
-  > The latitude column is empty on this row, so no junction was made for it.
-  _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_lat_range`**
-  > This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, swap them in your own file: this page will not swap them for you, because it cannot tell a mistake from a place.
-  _Ruled OK 2026-09-17._
+  > This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, say so in the column order above: this page will not swap them for you, because it cannot tell a mistake from a place.
+  @@ NEEDS RULING
 - **`lpn_survey_note_lon_missing`**
   > The longitude column is empty on this row, so no junction was made for it.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
@@ -341,9 +396,21 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_unit_m`**
   > meters
   _Ruled OK 2026-09-17._
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
 
-### feat/time-series-graph (`079cbf80`) — 16 new, all ruled
+### feat/time-series-graph (`2386a844`) — 18 new, 2 to read @@ NEEDS RULING
 
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
 - **`lpn_ts_add`**
   > Add selected
   _Ruled OK 2026-09-17._
@@ -393,7 +460,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Values versus time
   _Ruled OK 2026-09-17._
 
-### feat/xy-world-map (`3866b64f`) — 9 new, all ruled
+### feat/xy-world-map (`3866b64f`) — 11 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_map_attach_done`**
   > The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.
@@ -422,25 +489,27 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_map_attach_where`**
   > Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space
   _Ruled OK 2026-09-17._
-
-### fix/meeting-failures (`bac01d59`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_crs_unplaceable`**
-  > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
   @@ NEEDS RULING
-- **`lpn_crs_unplaceable_mark`**
-  > (no map)
-  @@ NEEDS RULING
-- **`lpn_terrain_http`**
-  > The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.
-  @@ NEEDS RULING
-- **`lpn_terrain_no_place`**
-  > None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.
-  @@ NEEDS RULING
-- **`lpn_terrain_rate_limited`**
-  > The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### projection (`2a7e6dad`) — adds no English strings
+### projection (`2a7e6dad`) — 2 new, 2 to read @@ NEEDS RULING
 
-### tables-interface (`e34970bc`) — adds no English strings
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
+
+### tables-interface (`e34970bc`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_terrain_no_nodes`**
+  > There are no nodes to fill in yet.
+  @@ NEEDS RULING
+- **`lpn_terrain_none_needed`**
+  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING

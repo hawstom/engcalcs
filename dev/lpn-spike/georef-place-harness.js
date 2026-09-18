@@ -227,13 +227,25 @@ console.log('\n--- the command is findable, and a coordinate is what a map gives
 		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: pickGeoFile/.test(row), row.split('\n')[1]);
 	ok('...never disabled: opening a file always makes a new tab, whatever is on screen',
 		!/disabled/.test(row));
-	// **THIRD, AND THE ORDER IS THE POINT** (Tom, 2026-08-19: "make it third since it is truly our
-	// fallback option"). It rescues a file the two rows above opened as the wrong kind, and a
-	// fallback listed above the thing it falls back from reads as an equal alternative.
-	ok('...and the three Open rows run Open, Import EPANET, Import xy to lat/lon',
+	// **TWO OF TOM'S RULINGS COLLIDE HERE AND THE LATER ONE WINS, WHICH IS WHY THIS ASSERTION
+	// CHANGED ON 2026-09-17 RATHER THAN THE MENU.**
+	//
+	// 2026-08-19, on the xy-on-map row: "make it third since it is truly our fallback option" -- it
+	// rescues a file the two rows above opened as the wrong kind, and a fallback listed ABOVE the
+	// thing it falls back from reads as an equal alternative. That put it after Open and after
+	// Import EPANET.
+	//
+	// 2026-09-17, after the EWB meeting: "I couldn't find Export EPANET file. Let's move Import
+	// EPANET file to just above it." Import EPANET therefore moves DOWN to sit against Export, which
+	// pulls it below the xy row and inverts the August order.
+	//
+	// **Both cannot hold.** Export's findability is the live complaint, made while demonstrating to a
+	// room, so it wins; the August reasoning is not wrong, it is outranked. What survives from it is
+	// the half that still applies: the fallback sits BELOW Open. **If Tom would rather keep the
+	// August order, the menu changes back and this comment is the record of what that costs.**
+	ok('...the xy fallback sits below Open, and Import EPANET sits against Export',
 		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_open |') &&
-		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_import_inp') &&
-		lnSrc.indexOf('pc.lpn_file_import_geo') < lnSrc.indexOf('pc.lpn_file_export_inp'));
+		lnSrc.indexOf('pc.lpn_file_import_inp') < lnSrc.indexOf('pc.lpn_file_export_inp'));
 	ok('the in-place "Convert to lat/lon" command is gone, key and all',
 		lnSrc.indexOf('lpn_georef_menu') === -1 && lnSrc.indexOf('lpn_georef_tip') === -1);
 	// A GeoMap has to zoom out far enough to FIND a site, not just to look at one.
