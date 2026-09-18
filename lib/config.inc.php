@@ -775,11 +775,14 @@ if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC
 // Looped-network project locks (ROADMAP Task 195 Phase 2) — one small JSON record per project
 // document id, written by lpn-lock.php, blocked from HTTP by lpn-locks/.htaccess exactly as log/ is.
 // Each record: {"projectId":…,"holder":…,"lockedBy":…,"lastActivity":unix-ts,
-//               "acquiredAt":unix-ts,"editedAt":ms,"savedAt":ms,"requestedBy":…,"requestedAt":unix-ts}
+//               "acquiredAt":unix-ts,"editedAt":ms,"savedAt":ms,
+//               "requestedBy":…,"requestedAt":unix-ts,"requestedOf":holder-token}
 // `acquiredAt` is the only age the server measures itself -- how long this holder has had the file.
 // `requestedBy`/`requestedAt` are the "Ask" back channel (Task 667(b)): a colleague's initials,
 // typed at the moment they ask and sent rather than stored on their device, waiting for the holder's
-// next heartbeat to collect them.
+// next heartbeat to collect them. `requestedOf` is the holder token that note is ADDRESSED to, so a
+// holder reloading their page -- which releases the lock and takes it straight back -- cannot
+// destroy a note left for them in the gap, while somebody else taking the file still clears it.
 // Deliberately flat files rather than a database: this suite's stated architecture is "no database,
 // no authentication" (CLAUDE.md), and MySQL here would be a new dev-environment dependency and a
 // hurdle for contributors, bought for a few hundred bytes of coordination state.

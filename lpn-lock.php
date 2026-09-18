@@ -165,6 +165,14 @@ $acquiredAt  = isset($record['acquiredAt'])  ? (int)$record['acquiredAt']  : 0;
 // queueing, because what the holder has to do about it is the same either way.
 $requestedBy = isset($record['requestedBy']) ? (string)$record['requestedBy'] : '';
 $requestedAt = isset($record['requestedAt']) ? (int)$record['requestedAt'] : 0;
+// **WHO THE ASK IS ADDRESSED TO, and it is the whole reason a reload no longer eats it.** The note
+// used to be kept for whoever the record said was holding at the moment it was read, and that broke
+// on the commonest thing a holder does: RELOADING releases the lock and takes it again a second
+// later, so the note was read against a record holding nobody, the re-acquire counted as a new
+// holder, and the note was thrown away unseen -- while the colleague who asked had been told they
+// would be heard. Measured in a real browser on 2026-09-18. Addressing the note to a holder TOKEN
+// carries it across that gap and still clears itself the moment somebody else genuinely takes over.
+$requestedOf = isset($record['requestedOf']) ? (string)$record['requestedOf'] : '';
 // The holder saying "I have shown that to my user". Matched on the timestamp so that acknowledging
 // one ask cannot swallow a newer one that arrived in between.
 $ack = isset($_POST['ack']) ? (int)$_POST['ack'] : 0;
@@ -186,9 +194,14 @@ if ($action === 'check') {
     // closing a tab that was taken over while you were away, and that is not a failure worth saying
     // anything about.
     if (!$heldBySomeoneElse) {
+        // **THE PENDING ASK SURVIVES A RELEASE, and everything else about the holder goes.** A
+        // release is nearly always a page unloading, and a page unloading is nearly always a
+        // RELOAD -- so wiping the note here is wiping it in the one-second gap before the same
+        // browser takes the lock straight back.
         $write = array('projectId' => $id, 'holder' => '', 'lockedBy' => '', 'lastActivity' => time(),
                        'editedAt' => 0, 'savedAt' => 0, 'acquiredAt' => 0,
-                       'requestedBy' => '', 'requestedAt' => 0);
+                       'requestedBy' => $requestedBy, 'requestedAt' => $requestedAt,
+                       'requestedOf' => $requestedOf);
         // AND mark it for the next sweep. A released record carries no information -- a 'check'
         // against a missing record and against an empty one give byte-identical answers -- but it
         // used to sit here for 30 days with its mtime REFRESHED by the release itself, so the
@@ -199,7 +212,12 @@ if ($action === 'check') {
         // Back-dating rather than unlinking on purpose: another request may already be blocked on
         // flock() for this inode, and deleting it underneath them would strand their acquire on an
         // orphaned file. Back-dating is race-free and the next sweep collects it.
-        $expire = true;
+        //
+        // **UNLESS A COLLEAGUE IS WAITING.** Expiring here deletes the file, and with it the note --
+        // which is the same defect as wiping the fields above, reached by the other door. A record
+        // kept for a pending ask is one record per ask, it is collected by the ordinary 30-day
+        // sweep, and it costs nothing the moment anybody takes the lock again.
+        $expire = ($requestedAt === 0);
     }
     $response['released'] = !$heldBySomeoneElse;
 } elseif ($action === 'acquire' && $heldBySomeoneElse) {
@@ -223,7 +241,8 @@ if ($action === 'check') {
                        'editedAt' => isset($record['editedAt']) ? (int)$record['editedAt'] : 0,
                        'savedAt' => isset($record['savedAt']) ? (int)$record['savedAt'] : 0,
                        'acquiredAt' => $acquiredAt,
-                       'requestedBy' => $name, 'requestedAt' => time());
+                       'requestedBy' => $name, 'requestedAt' => time(),
+                       'requestedOf' => $currentHolder);
     }
     $response['requested'] = $heldBySomeoneElse;
 } else {
@@ -233,14 +252,18 @@ if ($action === 'check') {
     // mean three hours rather than one minute since the last poll.
     $sameHolder = ($currentHolder === $holder);
     $heldSince = ($sameHolder && $acquiredAt) ? $acquiredAt : time();
-    // A pending ask belongs to the holder it was aimed at. A new holder answers it by existing, and
-    // the holder themselves answers it by acknowledging that they have seen it.
+    // A pending ask belongs to the holder it was ADDRESSED to, never to whoever happens to be
+    // holding when it is read -- see $requestedOf above. Somebody else taking the file answers the
+    // ask by existing; the addressee answers it by acknowledging that they have seen it. A record
+    // written before requestedOf shipped has none, and falls back to the old same-holder test.
     $keepReqBy = $requestedBy;
     $keepReqAt = $requestedAt;
-    if (!$sameHolder || ($ack && $ack === $requestedAt)) { $keepReqBy = ''; $keepReqAt = 0; }
+    $forUs = $requestedOf !== '' ? ($requestedOf === $holder) : $sameHolder;
+    if (!$forUs || ($ack && $ack === $requestedAt)) { $keepReqBy = ''; $keepReqAt = 0; $requestedOf = ''; }
     $write = array('projectId' => $id, 'holder' => $holder, 'lockedBy' => $name, 'lastActivity' => time(),
                    'editedAt' => $editedAt, 'savedAt' => $savedAt, 'acquiredAt' => $heldSince,
-                   'requestedBy' => $keepReqBy, 'requestedAt' => $keepReqAt);
+                   'requestedBy' => $keepReqBy, 'requestedAt' => $keepReqAt,
+                   'requestedOf' => $requestedOf);
     $response['held'] = true;
     $response['acquiredAt'] = $heldSince;
     // Reported AFTER the acknowledgement has been applied, so a holder who has just said "seen it"

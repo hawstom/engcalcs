@@ -23233,7 +23233,13 @@ var EngCalcs = EngCalcs || {};
 	// **It fails OPEN.** If the broker cannot be reached, editing continues normally and nothing is
 	// read-only. Locking is a courtesy layer over an in-office honor system, and failing closed would
 	// let an unreachable server take away a calculator that has always worked without one.
-	var LPN_LOCK_URL = '/engcalcs/lpn-lock.php';
+	// **ADDRESSED FROM THE ORIGIN THROUGH THE ONE DOOR, never spelled out here.** This was a literal
+	// '/engcalcs/lpn-lock.php', which is right on hawsedc.com and 404 at librewaternet.org/app/ --
+	// `js_page_url_check.php`'s finding in the one construct it cannot see, because it fails a
+	// RELATIVE url and this one was absolute and simply wrong. Every lock call would have failed
+	// there, and failing OPEN means the page says "could not reach the server" and carries on, so
+	// the whole feature would have been off on one of the two mounts with nothing to see.
+	function lockUrl() { return suiteUrl('lpn-lock.php'); }
 	var LPN_IDENTITY_KEY = 'lpn_identity';
 	// The document id is baked into the FILE, not into our per-browser project id: two people
 	// opening the same file off a share have different local project ids and must still compute the
@@ -23293,7 +23299,7 @@ var EngCalcs = EngCalcs || {};
 			return { ok: false, error: 'notasked', asked: false };
 		}
 		try {
-			var resp = await fetch(LPN_LOCK_URL, {
+			var resp = await fetch(lockUrl(), {
 				method: 'POST',
 				credentials: 'same-origin',
 				body: new URLSearchParams({
@@ -23414,14 +23420,20 @@ var EngCalcs = EngCalcs || {};
 			// What replaces the permanence is `lockWarnDismissed`: the dismissal is remembered for
 			// THIS project and THIS fault only, so a different fault, a different project, or
 			// locking starting to work all bring the banner back on their own.
+			//
+			// **DISMISSING ONE WARNING REPAINTS THE STANDING STATE rather than leaving the bar
+			// empty.** One slot, several things that can want it: putting away a passing note
+			// ("somebody wants this file") must bring back a condition that is still true, such as
+			// a file whose connection needs re-making. Before this, whichever arrived last simply
+			// won and the other was gone for the session.
 			if (bannerWarn.kind === 'lock') {
 				action(pc.lpn_lock_dismiss || 'Hide this message', function () {
 					lockWarnDismissed = lockWarnKey();
 					bannerWarn = null;
-					renderBanner();
+					syncReadOnlyToOpenProject();
 				});
 			} else if (bannerWarn.dismissable) {
-				action(pc.lpn_lock_dismiss || 'Hide this message', function () { bannerWarn = null; renderBanner(); });
+				action(pc.lpn_lock_dismiss || 'Hide this message', function () { bannerWarn = null; syncReadOnlyToOpenProject(); });
 			}
 		}
 		banner.style.display = 'block';
@@ -23445,9 +23457,17 @@ var EngCalcs = EngCalcs || {};
 		}
 		// A file project whose handle died with the last page load. We still know the file's NAME --
 		// that is why entry.fileName lives in the index -- so the tab keeps its identity rather than
-		// silently demoting itself to a browser project, and this says what to do about it. Only ever
-		// replaces a warning of its own kind, so it cannot stomp a missing-file or no-server banner.
-		if (!readOnly && entry && isFileProject(entry) && !isLinked(id)) {
+		// silently demoting itself to a browser project, and this says what to do about it.
+		//
+		// **IT ONLY EVER REPLACES A WARNING OF ITS OWN KIND, AND UNTIL 2026-09-18 IT SAID SO AND DID
+		// NOT.** The sentence above this one has claimed that since the banner was written, while
+		// the assignment underneath it was unconditional -- so a standing condition quietly stamped
+		// on the news. What it cost was "somebody wants this file": that note is raised once, and a
+		// tab switch, a reconnect or a boot with a dead handle wiped it off the screen having
+		// already told the server it had been read. The colleague who asked was told they had been
+		// heard. Dismissing whatever IS on screen calls back here, so nothing is lost either way.
+		if (!readOnly && entry && isFileProject(entry) && !isLinked(id)
+			&& (!bannerWarn || bannerWarn.kind === 'reopen')) {
 			bannerWarn = {
 				kind: 'reopen',
 				message: (pendingHandles.has(id)
@@ -23600,7 +23620,22 @@ var EngCalcs = EngCalcs || {};
 	// and is worth naming, because nobody will ever guess it from "could not reach the server".
 	var lockErrorCode = '';
 	var LPN_HEARTBEAT_MS = 60000;
+	// **THE MINUTE IS A CEILING ON A TIMER, AND A HIDDEN TAB HAS NO SUCH CEILING.** A browser slows
+	// the timers of a page nobody is looking at, so the one minute this page promises whoever presses
+	// Ask is only true of a tab in front of somebody -- and the holder is the one person most likely
+	// to have the map in a background tab while they do something else. Coming back to the tab is
+	// therefore its own reason to check, and it is the exact moment the holder can read an answer.
+	// Throttled, because a page can be shown and hidden many times a minute and this must not become
+	// a second heartbeat.
+	var lastPollAt = 0;
+	var LPN_POLL_MIN_GAP_MS = 5000;
+	function pollLockedFilesOnReturn() {
+		if (document.visibilityState === 'hidden') { return; }
+		if (Date.now() - lastPollAt < LPN_POLL_MIN_GAP_MS) { return; }
+		pollLockedFiles();
+	}
 	async function pollLockedFiles() {
+		lastPollAt = Date.now();
 		var pc = EngCalcs.pageConfig || {};
 		var pending = [];
 		heldLocks.forEach(function (docId, id) { pending.push([id, docId]); });
@@ -23639,7 +23674,7 @@ var EngCalcs = EngCalcs || {};
 		// during unload is not guaranteed to be sent. Same reason the usage logs use it.
 		if (idn && navigator.sendBeacon) {
 			try {
-				navigator.sendBeacon(LPN_LOCK_URL, new URLSearchParams({
+				navigator.sendBeacon(lockUrl(), new URLSearchParams({
 					action: 'release', id: docId, holder: idn.holder, name: idn.name
 				}));
 			} catch (err) { /* nothing to do; the record expires on its own eventually */ }
@@ -26370,6 +26405,10 @@ var EngCalcs = EngCalcs || {};
 		// pollLockedFiles() for why that decoupling was the whole answer to Tom's "why must there be
 		// limits at all?".
 		setInterval(pollLockedFiles, LPN_HEARTBEAT_MS);
+		// ...and again the moment the tab comes back to the front, because a hidden tab's timers are
+		// slowed by the browser and the holder is exactly the person likely to have this in the
+		// background. See pollLockedFilesOnReturn().
+		document.addEventListener('visibilitychange', pollLockedFilesOnReturn);
 		// **BOOT GOES THROUGH THE SAME DOOR AS EVERY OTHER OPEN.** Calling zoomExtent() outright here
 		// makes a reload IGNORE the document's saved view and re-fit -- an outlawed autozoom, and the
 		// one path where a user most expects to come back to where they were. refreshAllFromDocument()
