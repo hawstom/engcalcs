@@ -24372,11 +24372,13 @@ var EngCalcs = EngCalcs || {};
 			// files, which is what puts it beside the three rows above rather than anywhere near the
 			// Libraries box in the Water menu.
 			//
-			// **IT DOES NOT REPLACE THE BUTTON IN EACH LIBRARY SECTION, AND THAT IS HIS OTHER
-			// SENTENCE**: *"there should be a single 'Import libraries...' wizard available from
-			// every applicable library."* One wizard, several doors. The section a person happens to
-			// be looking at when they press it decides nothing at all -- the file says what is on
-			// offer -- so a second door costs no second behaviour to keep in step.
+			// **AND IT IS THE ONLY DOOR** (Tom, 2026-09-18: *"Remove buttons except at the File
+			// menu."*). The Libraries box carried the same button in each of its three sections
+			// until he used it, on his own earlier sentence asking for the wizard *"available from
+			// every applicable library"*; his later word wins, and the earlier one should have been
+			// questioned rather than built. **Do not put a button back in the Libraries box.** The
+			// section somebody happens to be looking at decides nothing -- the FILE says what is on
+			// offer -- so a second door bought nothing but a second control to notice.
 			//
 			// FOURTH, below the three rows that open a whole project, because this one does not open
 			// anything: it copies into the project already on screen, and a row that changes the
@@ -31730,15 +31732,6 @@ var EngCalcs = EngCalcs || {};
 			});
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
-	// The button, identical in every section because it is the same act and takes no argument from
-	// the section it sits in -- see the concept-level label rule in CLAUDE.md: one whole label
-	// reused, never composed per section. The tip has to be true of all of them, so it names none.
-	function libImportButton(host) {
-		var pc = EngCalcs.pageConfig || {};
-		host.appendChild(libButton(pc.lpn_library_import || 'Import libraries…',
-			function () { libImportPick(); }, pc.lpn_library_import_tip));
-	}
-
 	// ---- PATTERNS --------------------------------------------------------------------------------
 	//
 	// **A PATTERN IS A SERIES, AND IT IS EDITED AS ONE FIELD OF NUMBERS.** Twenty-four separate
@@ -32645,7 +32638,6 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libImportButton(host);
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -32836,7 +32828,6 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libImportButton(host);
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -33050,7 +33041,6 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libImportButton(host);
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;

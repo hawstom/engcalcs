@@ -7,7 +7,9 @@
 // available from every applicable library"*, *"Move the button to the File menu"*, *"SI: I don't see
 // any line saying the file does not show its numbers in this project's units"*, and -- the one that
 // matters most, because an import a person cannot undo is one they cannot safely try --
-// *"Undo doesn't work."*
+// *"Undo doesn't work."* Then 2026-09-18, after using it again: *"Remove buttons except at the File
+// menu."* and *"This is too wordy and confusing. Have mercy on the humans."* -- the first reverses
+// his own *"every applicable library"* sentence, and the later word wins.
 //
 // **THE TWO THINGS THAT GO WRONG HERE ARE BOTH SILENT, AND SECTIONS 2 AND 4 ARE THEM.**
 //
@@ -29,11 +31,11 @@
 //   5. a pipe type whose fittings list did not come with it is reported, not repaired
 //   6. a curve a run cannot use is still copied in, and named
 //   7. differing units are disclosed BEFORE the import, and NOTHING is converted
-//   8. the button is in all three sections, and the picker is wired
+//   8. the Libraries box carries NO import button of its own, and the picker is wired
 //   9. the chooser: one wizard, a checkbox per library the file holds, with its count
 //  10. several libraries out of one file are ONE act -- one undo snapshot, one receipt
 //  11. one undo puts the document AND the Libraries box back
-//  12. the wizard has its own row in the File menu, and the library buttons stay
+//  12. the wizard has its own row in the File menu, and that row is the only door
 
 const fs = require('fs');
 const path = require('path');
@@ -398,10 +400,15 @@ head('7. differing units are disclosed BEFORE the import, and nothing is convert
 }());
 
 // ---- 8. THE BUTTON AND THE PICKER --------------------------------------------------------------
-head('8. the button is in all three sections, and the picker is wired');
+head('8. the Libraries box carries NO import button, and the picker is wired');
 (function () {
 	const pc = EngCalcs.pageConfig || {};
 	L.setDoc({ nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } });
+	// **ONE DOOR, AND IT IS THE FILE MENU** (Tom, 2026-09-18: *"Remove buttons except at the File
+	// menu."*). Each of the three sections carried the same button until he used it; a control
+	// repeated in three places is three places to notice it and one behaviour to keep in step, and
+	// the file rather than the section decides what is on offer anyway. THIS ASSERTION IS THE
+	// RATCHET: a button put back in any section fails here.
 	[['curves', L.buildCurveSection], ['pipetypes', L.buildPipeTypeSection],
 		['fittings', L.buildFittingSection]].forEach(function (pair) {
 		const host = L.libEl('div');
@@ -410,9 +417,9 @@ head('8. the button is in all three sections, and the picker is wired');
 			return String(e.tagName).toLowerCase() === 'button'
 				&& e.textContent === pc.lpn_library_import;
 		});
-		check(hit.length === 1, `the ${pair[0]} section carries exactly one Import button`);
+		check(hit.length === 0, `the ${pair[0]} section carries no Import button of its own`);
 	});
-	// ONE LABEL, REUSED. Three sections, one concept, one key -- CLAUDE.md's concept-level rule.
+	// ONE LABEL, ONE KEY, and it is still supplied rather than falling back to a literal.
 	check(typeof pc.lpn_library_import === 'string' && pc.lpn_library_import !== '',
 		'and its label is supplied through pageConfig rather than a fallback literal');
 	// The picker is a hidden input in the page, and the section that asked is remembered across
@@ -608,9 +615,10 @@ head('11. one undo puts the document AND the Libraries box back');
 // ---- 12. THE FILE MENU --------------------------------------------------------------------------
 //
 // Tom, 2026-09-17: *"Move the button to the File menu. I thought you already did that."* It reads
-// one of our own project files, so it belongs beside the rows that open one -- and it does NOT
-// replace the button in each library section, because his other sentence asks for the wizard to be
-// *"available from every applicable library"*. One wizard, several doors.
+// one of our own project files, so it belongs beside the rows that open one. It ALSO replaces the
+// button that stood in each library section -- 2026-09-18, after using it: *"Remove buttons except
+// at the File menu."* That reverses his earlier *"available from every applicable library"*, and
+// the later word wins. One wizard, ONE door.
 head('12. the wizard has a row in the File menu, beside the rows that open a project file');
 (function () {
 	const pc = EngCalcs.pageConfig || {};
@@ -629,12 +637,11 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 		.map(p => p[1])[0];
 	check(at(pc.lpn_library_import) > at(pc.lpn_file_import_geo),
 		'below Open xy file on map, which is the last row that opens a project');
-	// AND THE LIBRARY SECTIONS KEEP THEIRS. Section 8 asserts the three buttons; this asserts that
-	// adding the menu row did not quietly become a MOVE.
-	const host = L.libEl('div', '');
-	L.buildPipeTypeSection(host);
-	check(walk(host).some(e => String(e.textContent || '') === String(pc.lpn_library_import)),
-		'and the library section still has its own button, because it is one wizard with two doors');
+	// AND IT IS THE ONLY ROW ANYWHERE THAT OPENS THE WIZARD. Section 8 asserts the Libraries box
+	// has none; this asserts the menu row is genuinely there to have taken their place, so the
+	// removal cannot leave the wizard unreachable.
+	check(rows.filter(t => t.indexOf(String(pc.lpn_library_import)) >= 0).length >= 1,
+		'and the File menu row is the door that remains');
 }());
 
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));

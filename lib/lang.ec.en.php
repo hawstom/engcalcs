@@ -3162,9 +3162,10 @@ $ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
 $ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.';
-// Importing libraries out of another project file (ROADMAP Task 611). One wizard, reached from
-// every library that can receive an import, so the button label is one whole label reused by all
-// of them and the tip has to be true of all of them, which is why it names none of them.
+// Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
+// Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
+// buttons except at the File menu.'). The label and its tip name no particular library, because
+// the FILE decides what is on offer rather than whatever section anybody was looking at.
 $ec_lang['lpn_library_import']='Import libraries…';
 $ec_lang['lpn_library_import_tip']='Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
 // The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
