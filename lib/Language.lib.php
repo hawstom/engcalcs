@@ -330,8 +330,13 @@ function ec_canonical_url($lang = null) {
     // The PATH is ecCanonicalPath()'s to decide, not this function's: a page served at a pretty
     // URL states that URL in lib/Canonical.lib.php, and SCRIPT_NAME under such a rewrite is the
     // script the rewrite landed on rather than the address anybody reads (ROADMAP Task 479.01).
-    $path = ecCanonicalPath(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '/engcalcs/index.php');
-    return CANONICAL_ORIGIN . $path . '?lang=' . $lang;
+    $script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '/engcalcs/index.php';
+    $path = ecCanonicalPath($script);
+    // The ORIGIN is a per-page declaration too, since 2026-09-17: the calculators are hawsedc.com's
+    // and the map application is LibreWaterNet's. CANONICAL_ORIGIN is the host whitelist's answer
+    // and is the FALLBACK; a page naming its own in ecCanonicalOrigins() wins on every host. This
+    // one function feeds canonical, all 27 hreflang alternates and og:url, so they cannot disagree.
+    return ecCanonicalOrigin($script, CANONICAL_ORIGIN) . $path . '?lang=' . $lang;
 }
 
 $clanguage=chooseLanguage($all_language_settings);

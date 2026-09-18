@@ -716,6 +716,21 @@
 			}
 		}
 
+		// **THE TRAILING COMMENT, READ AS THE ELEMENT'S DESCRIPTION** (Task 674). Six sections mean
+		// a description by it -- [JUNCTIONS], [RESERVOIRS], [TANKS], [PIPES], [PUMPS], [VALVES] --
+		// and every other read section that means something by a comment already reads its own:
+		// [DEMANDS] a demand category, [CURVES] a `;PUMP:`-style type line. So this is called at
+		// those six sites and nowhere else, rather than applied to every row from the main loop,
+		// where it would give [CONTROLS], [PATTERNS], [OPTIONS] and [STATUS] a description nothing
+		// means by them. See EngCalcs.lpnDescText for what is refused.
+		// EPANET's own writer emits a bare trailing `;` on every row of Net1/2/3, so an EMPTY
+		// comment must read as no description at all -- which is what lpnDescText's trim gives.
+		function readDesc(el, r) {
+			var d = EngCalcs.lpnDescText(r.cmt);
+			if (d) { el.desc = d; }
+			return el;
+		}
+
 		// ---- nodes ----
 		var nodes = [], nodeIndex = {};
 		function addNode(n) { nodes.push(n); nodeIndex[n.id] = n; return n; }
@@ -753,6 +768,7 @@
 			// here would put a number the file never wrote on this junction into a field labelled
 			// as the file's, which is the confusion CLAUDE.md's number rule is about. Read it as
 			// `jn.demandPattern || parsed.defaultPattern`.
+			readDesc(jn, r);
 			jn.demandPattern = r[3] || null;
 			if (r[3]) { drop('demand-pattern', [r[0]], r[3], 'node'); }
 		}
@@ -774,6 +790,7 @@
 			// of the file, and it is the shape this whole task is about: one field, one meaning.
 			var rn = addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, head: num(r[1]) });
 			// One token for one column, under the name the DOCUMENT stores it as.
+			readDesc(rn, r);
 			mergeTok(rn, 'head', r[1], rn.head);
 			rn.headPattern = r[2] || null;
 			if (r[2]) { drop('head-pattern', [r[0]], r[2], 'node'); }
@@ -804,6 +821,7 @@
 				// the split is that such a number never carries the user's text.
 				head: num(r[1]) + num(r[2])
 			});
+			readDesc(tn, r);
 			mergeTok(tn, 'elev', r[1], tn.elev);
 			mergeTok(tn, 'level', r[2], tn.level);
 			mergeTok(tn, 'minLevel', r[3], tn.minLevel);
@@ -936,6 +954,7 @@
 				status: st === 'CLOSED' ? 'closed' : 'open',
 				verts: []
 			};
+			readDesc(pipe, r);
 			mergeTok(pipe, 'length', r[3], pipe.length);
 			mergeTok(pipe, 'diameter', r[4], pipe.diameter);
 			mergeTok(pipe, 'roughness', r[5], pipe.roughness);
@@ -1063,6 +1082,7 @@
 					j++;
 				}
 			}
+			readDesc(pump, r);
 			links.push(pump); linkIndex[pump.id] = pump;
 		}
 
@@ -1160,6 +1180,7 @@
 			mergeTok(vlink, 'diameter', r[3], vlink.diameter);
 			mergeTok(vlink, 'k', r[6], vlink.k);
 			if (vlink.type === 'valve') { mergeTok(vlink, 'setting', r[5], vlink.setting); }
+			readDesc(vlink, r);
 			links.push(vlink); linkIndex[vlink.id] = vlink;
 		}
 		if (tcvIds.length) { drop('valve-tcv', tcvIds, null, 'link'); }
@@ -2007,6 +2028,35 @@
 		});
 		return out;
 	};
+	/**
+	 * **THE ELEMENT'S DESCRIPTION** (ROADMAP Task 674, Tom 2026-09-15 on finding it nowhere in the
+	 * interface: *"Description: Isn't this new to us? ... All that is a bit embarrassing."*).
+	 *
+	 * EPANET carries a description as the TRAILING COMMENT on the element's own row -- `J1 100 50
+	 * ;Corner of Elm and Main` -- and until this existed this reader split that comment into `cmt`
+	 * and no node or link reader touched it. **The description was discarded and `dropped` was
+	 * EMPTY**, which is this module's one contract broken: import takes the supported subset and
+	 * reports every difference, never dropping silently. Measured through this parser on a
+	 * six-element fixture before the fix; every one of the six lost its text.
+	 *
+	 * **THE MACHINERY WAS ALREADY ONE SECTION OVER.** `[DEMANDS]` reads its trailing comment as the
+	 * demand CATEGORY, deliberately, and its own note records that stripping comments and stopping
+	 * there is what threw the categories away before Task 468. This is that reading, applied to the
+	 * six sections whose comment EPANET means as a description and to no others -- `[DEMANDS]`
+	 * already means a category by it, `[CURVES]` types a curve with a `;PUMP:`-style line, and
+	 * `[TAGS]` is carried as text.
+	 *
+	 * **ONLY THE LINE BREAK IS REFUSED, AND THAT IS ALL THE FORMAT CANNOT HOLD.** A trailing comment
+	 * runs to the end of the line, so a `;` inside a description round-trips exactly (everything
+	 * after the FIRST `;` is the description, a second one included) and so does a tab. A newline
+	 * cannot be written as a trailing comment at all, so it is collapsed to one space at this one
+	 * door -- which the popup applies as the user types, the way the tag's space rule is applied.
+	 * Trimmed, because the reader trims: a leading space could not survive a round trip either, and
+	 * storing what the file cannot hold is how a field comes to disagree with its own document.
+	 */
+	EngCalcs.lpnDescText = function (v) {
+		return ((v === undefined || v === null) ? '' : String(v)).replace(/[\r\n]+/g, ' ').trim();
+	};
 	/** One word, because EPANET's reader stops at whitespace. Empty means the element has no tag. */
 	EngCalcs.lpnTagText = function (v) {
 		var t = (v === undefined || v === null) ? '' : String(v).trim();
@@ -2294,6 +2344,7 @@
 	 *
 	 *   doc   the saved document shape (docFromInp / serializeProject)
 	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
+	 *         .coordOverride(id)    {x, y} the ACTIVE SCENARIO moved this node to, or null
 	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
 	 *         .labelSize(label)     {w, h} of the rendered label IN MAP UNITS, for the corner shift
 	 *         .title                [TITLE] text; default doc.project.name
@@ -2309,6 +2360,18 @@
 		var eff = typeof opts.effective === 'function'
 			? opts.effective
 			: function (el, prop) { return el['_' + prop]; };
+		/**
+		 * **A NODE THE ACTIVE SCENARIO HAS MOVED** (ROADMAP Task 674). Deliberately NOT through
+		 * `eff()`, and the reason is the frame: this writer is handed the SERIALIZED document, whose
+		 * coordinates are already absolute in the file's own frame, while `effective()` reads the
+		 * LIVE document and adds the live origin to whatever it finds. Asking it here would add an
+		 * origin twice.
+		 *
+		 * The override is itself an absolute outward pair, which is the frame these rows are written
+		 * in, so it goes straight into the row.
+		 */
+		var covOf = typeof opts.coordOverride === 'function' ? opts.coordOverride : function () { return null; };
+		var movedByScenario = [];
 		function isActive(el) {
 			var a = eff(el, 'active');
 			return a === undefined || a === null || a === true;
@@ -2385,6 +2448,27 @@
 			return out;
 		}
 
+		/**
+		 * **THE DESCRIPTION, BACK ON THE END OF THE ROW WHERE EPANET PUTS IT** (Task 674). One
+		 * function, so the six sections that carry one cannot come to six conclusions about how a
+		 * description is written -- and so `\t;` is spelled once.
+		 *
+		 * `lpnDescText()` again rather than the stored string: the popup, the table and Find and
+		 * replace all clean at their own doors, so this is a no-op for anything typed on this page
+		 * -- but a hand-edited project file can hold a newline, and a newline here would BREAK THE
+		 * FILE, turning the rest of a description into a data row EPANET would reject. Nothing is
+		 * reported because nothing typed here can reach this state; see lpnDescText's own note for
+		 * what is refused and why a `;` and a tab are not.
+		 *
+		 * EPANET's own writer emits a bare `;` on every row and this one writes none, exactly as it
+		 * writes no column-heading comment: both are decoration, and inp-export-harness.js compares
+		 * tokens with comments stripped.
+		 */
+		function descOf(el) {
+			var d = EngCalcs.lpnDescText(el && el.desc);
+			return d ? '\t;' + d : '';
+		}
+
 		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
 			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
 			demandRows = [],
@@ -2454,9 +2538,9 @@
 				// really does mean "no pattern" and writing one would state what the user never did.
 				var rpat = nd.headPattern ? [String(nd.headPattern)] : [];
 				if (rh === undefined || rh === null || rh === '') {
-					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)].concat(rpat)));
+					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)].concat(rpat)) + descOf(nd));
 				} else {
-					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)].concat(rpat)));
+					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)].concat(rpat)) + descOf(nd));
 				}
 			} else if (nd.type === 'tank') {
 				// ID Elev InitLvl MinLvl MaxLvl Diam MinVol. Every one in the ELEVATION unit, the
@@ -2474,7 +2558,7 @@
 				if (nd.volCurve) {
 					tankRow.push(String(nd.volCurve));
 				}
-				tanks.push(row(tankRow));
+				tanks.push(row(tankRow) + descOf(nd));
 			} else {
 				// **THE PATTERN COLUMN IS THE JUNCTION'S OWN OR NOTHING** (Task 423). A blank column
 				// means [OPTIONS] Pattern applies, which is written once below -- so writing the
@@ -2499,7 +2583,7 @@
 				// least two. A junction with NO customers is untouched by this, which is what
 				// keeps every Net1/2/3 token identical (dev/lpn-spike/inp-export-harness.js).
 				if (EngCalcs.lpnDemandItemized(nd) || crows.length) {
-					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]));
+					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]) + descOf(nd));
 					for (j = 0; j < drows.length; j++) {
 						// The CATEGORY is a trailing comment, not a column -- see the reader's note
 						// at [DEMANDS]. Written verbatim, with anything that would start a second
@@ -2515,7 +2599,7 @@
 					junctions.push(row([nd.id,
 						n(cHead, nd, 'elev', nd.elev || 0),
 						n(cFlow, nd, '_demand', drows[0].base || 0)].concat(
-						nd.demandPattern ? [String(nd.demandPattern)] : [])));
+						nd.demandPattern ? [String(nd.demandPattern)] : [])) + descOf(nd));
 				}
 				var em = eff(nd, 'emitter');
 				if (em > 0) {
@@ -2529,10 +2613,24 @@
 						FLOW_UNITS[flowKey].toSI)]));
 				}
 			}
-			coords.push(row([nd.id,
-				n(PLAIN, nd, 'x', (nd.x || 0) + origin.x),
-				n(PLAIN, nd, 'y', (nd.y || 0) + origin.y)]));
+			// **AN EPANET FILE HOLDS ONE POSITION PER NODE, so it states the one on screen and says
+			// so.** That is the rule every other property here already follows -- the export writes
+			// the scenario the user is looking at -- and a position is no different in kind from a
+			// demand. What the format cannot hold is the OTHER scenarios' positions, which is a
+			// difference, and a difference is reported rather than dropped in silence.
+			//
+			// Still through `n(PLAIN, nd, ...)`: lpnNumText() hands a kept token back only while it
+			// still states the value it was read for, so an overridden coordinate loses the file's
+			// own characters by itself and a Base one keeps them.
+			var cov = covOf(nd.id), cx = (nd.x || 0) + origin.x, cy = (nd.y || 0) + origin.y;
+			if (cov && (typeof cov.x === 'number' || typeof cov.y === 'number')) {
+				if (typeof cov.x === 'number') { cx = cov.x; }
+				if (typeof cov.y === 'number') { cy = cov.y; }
+				movedByScenario.push(nd.id);
+			}
+			coords.push(row([nd.id, n(PLAIN, nd, 'x', cx), n(PLAIN, nd, 'y', cy)]));
 		}
+		if (movedByScenario.length) { diff('node-coords-scenario', movedByScenario); }
 
 		// ---- links ----
 		for (i = 0; i < (doc.links || []).length; i++) {
@@ -2577,7 +2675,7 @@
 				// A TCV's minor-loss column is IGNORED by EPANET (measured -- see EngCalcs.lpnLinkK),
 				// so writing anything but 0 there states a number the engine discards.
 				valves.push(row([lk.id, lk.from, lk.to, dia, vt, settingText,
-					vt === 'TCV' ? '0' : n(PLAIN, lk, '_k', eff(lk, 'k') || 0)]));
+					vt === 'TCV' ? '0' : n(PLAIN, lk, '_k', eff(lk, 'k') || 0)]) + descOf(lk));
 				// A valve row has no status column; a closed one is stated in [STATUS].
 				if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
 			} else if (lk.type === 'pump') {
@@ -2600,7 +2698,7 @@
 						pumpRow.push('SPEED ' + n(PLAIN, lk, 'speed', psp));
 					}
 					if (lk.speedPattern) { pumpRow.push('PATTERN ' + String(lk.speedPattern)); }
-					pumps.push(row(pumpRow));
+					pumps.push(row(pumpRow) + descOf(lk));
 					if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
 				} else {
 					// A PUMP WITH NO CURVE IS THE ONE ELEMENT THAT CANNOT ROUND-TRIP. It is this
@@ -2609,7 +2707,7 @@
 					// smooth pipe whose head loss is below solver tolerance, and it is reported.
 					// Reading that file back gives a pipe, not a pump.
 					pipes.push(row([lk.id, lk.from, lk.to, '0.01', sys === 'us' ? '40' : '1000',
-						roughStandIn(settings.method), '0', status]));
+						roughStandIn(settings.method), '0', status]) + descOf(lk));
 					diff('pump-no-curve-as-pipe', [lk.id]);
 				}
 			} else {
@@ -2625,7 +2723,7 @@
 					dia,
 					n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
 					minorLossText(lk),
-					status]));
+					status]) + descOf(lk));
 			}
 			for (j = 0; j < (lk.verts || []).length; j++) {
 				verts.push(row([lk.id,

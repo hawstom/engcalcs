@@ -171,15 +171,20 @@ ok('and NOT under Text, which carries no tag', L.propKeys('text').indexOf('tag')
 	JSON.stringify(L.propKeys('text')));
 // Band 1: identity. A tag is not a value you typed ABOUT the asset, it is what somebody else's
 // records CALL the asset -- so it belongs beside the ID and above Elevation, not among the inputs.
-ok('it sits in band 1, immediately after ID', L.propKeys('junction').slice(0, 2).join(',') === 'id,tag',
+// **DESCRIPTION JOINED IT IN BAND 1 ON 2026-09-15** (Task 674, Tom's identity-band ruling), ahead
+// of the tag and behind the ID, so the band is `id, desc, tag` on every scope that has one. What is
+// asserted is still the same fact -- the tag is in band 1 and above Elevation -- said against the
+// band rather than against a fixed slot 2.
+ok('it sits in band 1, with the ID and the description', L.propKeys('junction').slice(0, 3).join(',') === 'id,desc,tag',
 	JSON.stringify(L.propKeys('junction')));
-ok('and on a pipe too', L.propKeys('pipe').slice(0, 2).join(',') === 'id,tag',
+ok('and on a pipe too', L.propKeys('pipe').slice(0, 3).join(',') === 'id,desc,tag',
 	JSON.stringify(L.propKeys('pipe')));
-ok('under Everything it is between ID and Connection',
-	L.propKeys('all').join(',') === 'id,tag,connection', JSON.stringify(L.propKeys('all')));
+ok('under Everything it is between the band and Connection',
+	L.propKeys('all').join(',') === 'id,desc,tag,connection', JSON.stringify(L.propKeys('all')));
 // The popup's own whole label, reused rather than re-keyed (CLAUDE.md's concept-level reuse rule).
-ok('the row is labelled with the popup\'s own word', L.propLabels('pipe')[1] === 'Tag',
-	JSON.stringify(L.propLabels('pipe')[1]));
+ok('the row is labelled with the popup\'s own word',
+	L.propLabels('pipe')[L.propKeys('pipe').indexOf('tag')] === (global.EngCalcs.pageConfig || {}).lpn_field_tag,
+	JSON.stringify(L.propLabels('pipe')));
 // **A TAG IS TEXT, SO IT GETS THE TEXT CONDITIONS** -- contains and equals, the two extremes, and
 // since Task 598 above and below as well, which on a word means DICTIONARY ORDER in the reader's
 // own language (Tom, 2026-09-06: *"ID, Tag, and Text should also allow Below and Above"*). "every

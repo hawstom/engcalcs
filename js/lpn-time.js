@@ -491,6 +491,26 @@
 	};
 
 	/**
+	 * **THE WHOLE RUN, ONE FRAME AT A TIME** (ROADMAP Task 599) -- lpnTimeCurrentFrame() asked of
+	 * every reporting step rather than only of `now`, so a chart of a value against time reads the
+	 * same shape the scrubber reads and the two cannot come to different conclusions about a frame.
+	 *
+	 * Each entry carries its own `t`, so a caller needs no second opinion about which frame is
+	 * which. Mapped over `run.frames` rather than over lpnReportTimes(), because the frames ARE the
+	 * stops the engine actually reported: a stop with no frame would otherwise repeat its
+	 * predecessor and draw a flat step nothing computed.
+	 *
+	 * **AN EMPTY LIST IS THE HONEST ANSWER WITH NO RUN**, and there is no third state to check --
+	 * the built-in solver has no time dimension, so a page whose engine was unreachable holds one
+	 * instant and has nothing to plot against time.
+	 */
+	EC.lpnTimeRunFrames = function () {
+		var run = state.run;
+		if (!run || !run.frames || !run.frames.length) { return []; }
+		return run.frames.map(function (f) { return EC.lpnTimeFrameResult(run, f.t); });
+	};
+
+	/**
 	 * Hang the document's clock on a model on its way to the solver. One line in assembleModel().
 	 * Absent host or absent js/lpn-patterns.js leaves the model exactly as it was, which is the
 	 * pre-Task-248 model -- so nothing on this page depends on this file having loaded.

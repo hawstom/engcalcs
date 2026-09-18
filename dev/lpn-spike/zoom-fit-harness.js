@@ -30,6 +30,7 @@ const L = loadLoopedNetwork(
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
 	"\t\tzoomExtent: zoomExtent, bbox: bbox, reserve: overlayReserve,\n" +
+	"\t\tminScale: minScale,\n" +
 	// The canvas is authored 10000px tall and only becomes real when applyMapHeight() sizes it.
 	// A harness that never calls that has to say so, exactly as the page does.
 	"\t\tmarkSized: noteMapSized, isSized: function () { return mapSized; },\n" +
@@ -270,6 +271,58 @@ console.log('\n--- a zoom re-measures nothing ---');
 // question picks the dimension -- min because "must all of it fit" is decided by the tighter side,
 // max because a repeat should not crowd a wide window. What was wrong was that none of them said
 // so. This asserts they still do.
+// **A BIG LOCAL DRAWING MUST FIT ON A LAPTOP, AND THE ZOOM FLOOR MUST NOT STOP IT** (Tom,
+// 2026-09-16, on the EWB demo file he was presenting the next morning: *"my zoom out is limited"*
+// and *"Zoom to fit ... does not show the entire network. It's close, but it's not what we aim
+// for."* Both symptoms, one cause.)
+//
+// `MIN_SCALE_GRID` is 0.05 whatever a drawing unit means, which caps the window at 20,000 units
+// across. A sketch in inches never notices; a real site surveyed in feet -- his is about 13,000
+// units across -- hits it, and then TWO things go wrong at once. The zoom stops, and Zoom to fit
+// stops with it: `fitScaleFor()` answers the floor when nothing fits even there, so the fit is
+// pinned at 0.05 and the network hangs off the top and the bottom of the window.
+//
+// **THE SHAPE IS MEASURED, NOT IMAGINED: 13,000 x 13,000 drawing units** is his file's extent to
+// the nearest thousand, and 1400 x 640 is a laptop browser's map area. The case fails on the tree
+// as it stood: fit 0.05, network 650 px tall, 10 px off each edge.
+console.log('\n--- a big local drawing fits a laptop window, and can be pulled back from ---');
+{
+	L.getDoc().nodes.length = 0; L.getDoc().links.length = 0;
+	L.setCanvas(1400, 640);
+	const a = L.addNode('junction', 0, 0), b = L.addNode('junction', 13000, 0),
+		c = L.addNode('junction', 13000, 13000), d = L.addNode('junction', 0, 13000);
+	L.addLink('pipe', a.id, b.id); L.addLink('pipe', b.id, c.id);
+	L.addLink('pipe', c.id, d.id); L.addLink('pipe', d.id, a.id);
+	L.setZoom(0.05);
+	L.zoomExtent();
+	const v = L.view(), sc = v.s;
+	// The four corners, on screen, against the window. A fit that does not show all four is not a
+	// fit however close it looks.
+	const px = (x) => v.tx + sc * x, py = (y) => v.ty + sc * y;
+	const xs = [px(0), px(13000)], ys = [py(0), py(13000)];
+	ok('the whole network is on screen after Zoom to fit',
+		Math.min.apply(null, xs) >= 0 && Math.max.apply(null, xs) <= 1400 &&
+		Math.min.apply(null, ys) >= 0 && Math.max.apply(null, ys) <= 640,
+		'scale ' + sc.toExponential(3) + ', x ' + xs.map(Math.round).join('..')
+			+ ', y ' + ys.map(Math.round).join('..') + ' in 1400x640');
+	// **AND THE FLOOR IS THE OTHER HALF OF THE SAME BUG.** A fit that fits is no use if the reader
+	// cannot then pull back to see the ground around it; 0.05 was 10% away from the fit on his file.
+	ok('...and the zoom can still be pulled a long way back from there',
+		L.minScale() < sc / 4,
+		'fit ' + sc.toExponential(3) + ' against a floor of ' + L.minScale().toExponential(3));
+	// **THE FLOOR MAY ONLY EVER LOOSEN, NEVER TIGHTEN**, which is the property that makes this safe
+	// to change at all: no drawing loses zoom range it has today. A 100-unit sketch gets a slightly
+	// LOWER floor than the old constant (4 px / 100 units = 0.04), which is the same rule applied
+	// honestly rather than an exception -- it is still the scale at which the drawing is a four
+	// pixel mark.
+	L.getDoc().nodes.length = 0; L.getDoc().links.length = 0;
+	const s1 = L.addNode('junction', 0, 0), s2 = L.addNode('junction', 100, 100);
+	L.addLink('pipe', s1.id, s2.id);
+	ok('...and no drawing is given a TIGHTER floor than the old fixed one',
+		L.minScale() <= 0.05, String(L.minScale()));
+	L.setCanvas(1400, 700);
+}
+
 console.log('\n--- every "map size" names its own dimension ---');
 {
 	const fs2 = require('fs');

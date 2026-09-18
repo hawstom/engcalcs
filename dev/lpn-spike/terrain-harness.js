@@ -271,11 +271,22 @@ const L = loadLoopedNetwork(
 	// Task 542's two new doors, and the queue between the first one and the tiles.
 	"\t\tsetElevSource: function (v) { settings.defaults.nodeElevSource = v; },\n" +
 	"\t\tflushNewNodes: flushTerrainForNewNodes,\n" +
+	// The three lists EC.lpnTerrainFill() used to consult before it was deleted; see decideFill().
+	"\t\tneeding: terrainNodesNeedingElevation, withElev: terrainNodesWithElevation,\n" +
+	"\t\tatDefault: terrainNodesAtDefaultElevation,\n" +
 	"\t\tlastRead: function (id) { return terrainLastRead[id]; },\n" +
 	"\t\trenderNode: renderNodeFields,\n" +
+	// **THE POPUP IS OPENED THE WAY THE PAGE OPENS IT, AND THAT IS NOT A DETAIL.** This wrote
+	// `display = 'block'` until 2026-09-17 -- its own opinion about what an open popup looks like --
+	// while openPopupAt() has opened it as a flex column ever since the body had to scroll inside a
+	// dragged height. refreshPopupIfOpen() tested for 'block', so on the real page it returned on
+	// its first line for all ~70 of its callers, and here it did not: the stub was holding constant
+	// the very thing the bug varied, which is dev/testing-notes.md's leading lesson. Pressing Read
+	// DEM in a browser therefore read the height, recorded it, and changed nothing on screen.
 	"\t\topenPopupFor: function (id) { currentPopup = { kind: 'node', id: id };\n" +
-	"\t\t\tdocument.getElementById('lpn_popup').style.display = 'block';\n" +
+	"\t\t\topenPopupAt(10, 10);\n" +
 	"\t\t\trenderNodeFields(id); },\n" +
+	"\t\tpopupDisplay: function () { return document.getElementById('lpn_popup').style.display; },\n" +
 	"\t\tpopupText: function () { return document.getElementById('lpn_popup_fields').textContent || ''; },\n" +
 	"\t\tpopupButtons: function () { var out = []; (function walk(e) { (e.children || []).forEach(function (c) {\n" +
 	"\t\t\tif (c.tagName === 'BUTTON') { out.push(c); } walk(c); }); })(document.getElementById('lpn_popup_fields')); return out; },\n" +
@@ -340,11 +351,39 @@ global.confirm = global.window.confirm = function (m) { confirmTexts.push(m); re
 function settle() {
 	return new Promise(function (r) { setImmediate(function () { setImmediate(r); }); });
 }
+// **THE LIST THE DELETED MENU ROW USED TO DECIDE, DECIDED HERE INSTEAD.**
+//
+// `EC.lpnTerrainFill()` was removed on 2026-09-17. Task 542 had already deleted the Map-menu row
+// that pressed it -- Tom's own "a cool new button that I found" -- and nothing on the page called
+// it afterwards, so the only two sentences it could emit were unreachable while being maintained
+// in 27 languages. Tom, reading one of them: *"When could that possibly display?"*
+//
+// What it did was pick a list and hand it to `lpnTerrainFillFor()`. **Everything below that pick
+// is what these sections are really about** -- the consent gate, the plan and its counts, the tile
+// budget, the write, the single undo -- and all of it is reached by the three live doors (a node
+// born on a geographic project, Find and replace with Elevation set to From DEM, and the node
+// popup's own two buttons). So the pick moves here, as a fixture, and every assertion below keeps
+// testing shipped code rather than being deleted with the entry point.
+function decideFill() {
+	var want = L.needing(), keep = L.withElev(), replacing;
+	if (!want.length) {
+		var atDefault = L.atDefault();
+		if (atDefault.points.length) {
+			want = atDefault.points;
+			replacing = atDefault.value;
+			var moving = {};
+			want.forEach(function (p) { moving[p.id] = true; });
+			keep = keep.filter(function (id) { return !moving[id]; });
+		}
+	}
+	return { want: want, keep: keep, replacing: replacing };
+}
 function runFill(answers) {
 	confirmAnswers = answers.slice();
 	confirmTexts = [];
 	tileRequests = 0;
-	EC.lpnTerrainFill();
+	var d = decideFill();
+	EC.lpnTerrainFillFor(d.want, { keep: d.keep, replacing: d.replacing, confirm: true });
 	return settle();
 }
 
@@ -519,14 +558,11 @@ function runFill(answers) {
 		L.elev('J2') + ', ' + L.elev('J3'));
 	ok('...and leaves the typed one where it was', L.elev('J1') === 123.45);
 
-	// ---- 5e. NOTHING LEFT TO DO SAYS SO, AND SENDS NOTHING --------------------------------------
-	buildSite();
-	SITE.forEach(function (s, i) { L.setElev(s.id, 100 + i); });
-	await runFill([true]);
-	ok('a network whose elevations are all set sends nothing',
-		tileRequests === 0, tileRequests + ' tile requests');
-	ok('...and none of them moved',
-		L.elev('J1') === 100 && L.elev('J2') === 101 && L.elev('J3') === 102);
+	// ---- 5e. **DELETED WITH EC.lpnTerrainFill() ON 2026-09-17** ----------------------------------
+	// It asserted lpn_terrain_none_needed, the sentence a whole-drawing fill said when every node
+	// already had an elevation somebody had set. No live door can reach that state: Find and
+	// replace hands over the set its own query found, and a node being born hands over itself. The
+	// key is gone from all 27 language files with the entry point that alone could show it.
 
 	// ---- 5f. THE STARTING ELEVATION IS A SEPARATE QUESTION ---------------------------------------
 	// A node drawn on the map is born at 0, so a freshly drawn network has no blanks at all -- only
@@ -564,6 +600,8 @@ function runFill(answers) {
 	await runFill([true, true]);
 	ok('a grid project asks nothing and sends nothing',
 		tileRequests === 0 && confirmTexts.length === 0, tileRequests + ' requests');
+	ok('...because it can offer no node a place on the Earth', L.needing().length === 0,
+		JSON.stringify(L.needing()));
 
 	// ---- 6. TASK 542: TWO ORDINARY CONTROLS, AND THE MENU ROW GONE ------------------------------
 	//
@@ -821,6 +859,108 @@ function runFill(answers) {
 			tileRequests + ' requests, elev ' + L.elev(nid2));
 		ok('...and says which height it used', msgRe('lpn_elev_dem_said').test(L.popupText()),
 			JSON.stringify(L.popupText().slice(0, 90)));
+	}
+
+	// ---- 5i. WHAT THE PERSON WHO PRESSED THE BUTTON IS TOLD -------------------------------------
+	//
+	// **THE FAILURE TOM TOOK TO AN ENGINEERS WITHOUT BORDERS CHAPTER ON 2026-09-17.** He pressed
+	// Read DEM on a geographic project and nothing at all happened -- no number, no message.
+	// Reproduced on https://librewaternet.org/app/ with dev/lpn-spike/browser-drive.js: the
+	// request went out, Mapbox answered with a real height, the reading was recorded, and the
+	// popup was never redrawn, because refreshPopupIfOpen() tested for a display value the box
+	// had stopped using. The first assertion here is that the box is opened by the page's own
+	// opener; the ones above in 5g are what actually go red when the guard is wrong.
+	//
+	// The rest is the other half: a press that produces NO height must say WHICH no it was. Four
+	// kinds, and only one of them is about the reader's connection.
+	section('what the person who pressed the button is told');
+	{
+		jar.value = 'ec_terrain=1.1755000000.1';
+		L.reset(L.GEO);
+		const nid = L.addNode('junction', 0, 0).id;
+		L.place(nid, -122.5, 37.9);
+		L.setElev(nid, 42);
+		L.openPopupFor(nid);
+		await settle();
+		// **THE STUB HOLDS NO OPINION ABOUT WHAT AN OPEN POPUP LOOKS LIKE.** openPopupAt() decides,
+		// and a harness that decided for itself is what hid the defect above for as long as it
+		// existed. Asserted as "not hidden" rather than as a literal, for the same reason the page
+		// itself now asks it that way.
+		ok('the popup is opened by the page, and is not hidden',
+			L.popupDisplay() !== 'none' && L.popupDisplay() !== '', JSON.stringify(L.popupDisplay()));
+
+		const realStub = EC.lpnTerrainFetchPixels;
+		function pressReadDem() {
+			byId.lpn_map_notice.textContent = '';
+			L.openPopupFor(nid);
+			const b = L.popupButtons().filter(x => /Read DEM/.test(x.textContent))[0];
+			b._listeners.click[0]();
+			return settle().then(settle);
+		}
+		function failWith(err) { EC.lpnTerrainFetchPixels = function () { return Promise.reject(err); }; }
+
+		// A 403 is a refusal. It must never be worded as being offline, and it must appear UNDER
+		// THE BUTTON as well as in the map notice -- an unread notice at the far side of the
+		// screen is indistinguishable from silence, which is the whole of Tom's report.
+		failWith({ kind: 'http', status: 403 });
+		await pressReadDem();
+		ok('a refused request says it was refused, in the notice',
+			noticeText() === PC.lpn_terrain_denied.replace('{status}', '403'), noticeText());
+		ok('...and does NOT tell the reader they may be offline',
+			!/offline/i.test(noticeText()), noticeText());
+		ok('...and the same reason is under the button that was pressed',
+			L.popupText().indexOf(PC.lpn_terrain_denied.replace('{status}', '403')) >= 0,
+			JSON.stringify(L.popupText().slice(0, 160)));
+		ok('...and the line no longer claims the DEM simply has no data here',
+			L.popupText().indexOf(PC.lpn_elev_dem_none) < 0, JSON.stringify(L.popupText().slice(0, 160)));
+
+		// A 429 is neither a refusal nor a lost network: the same request works in a minute.
+		failWith({ kind: 'http', status: 429 });
+		await pressReadDem();
+		ok('a rate limit gets its own sentence', noticeText() === PC.lpn_terrain_rate_limited, noticeText());
+		ok('...which is not the refusal one and not the offline one',
+			noticeText() !== PC.lpn_terrain_denied && !/offline/i.test(noticeText()), noticeText());
+
+		// Any other status is reported as the number it was, and explicitly not as the network.
+		failWith({ kind: 'http', status: 500 });
+		await pressReadDem();
+		ok('another status is reported as that status',
+			noticeText() === PC.lpn_terrain_http.replace('{status}', '500'), noticeText());
+
+		// And the one case where "you may be offline" is the truth.
+		failWith(new TypeError('Failed to fetch'));
+		await pressReadDem();
+		ok('a lost network IS reported as a lost network', noticeText() === PC.lpn_terrain_failed, noticeText());
+
+		// A read that succeeds clears the reason, so a stale failure cannot sit under a good number.
+		EC.lpnTerrainFetchPixels = realStub;
+		await pressReadDem();
+		ok('a later success shows the height and not the last failure',
+			msgRe('lpn_elev_dem_said').test(L.popupText()) &&
+			L.popupText().indexOf(PC.lpn_terrain_failed) < 0,
+			JSON.stringify(L.popupText().slice(0, 120)));
+	}
+	{
+		// **AN EMPTY LIST IS AN ANSWER, NOT A NO-OP.** Four places handle it and two of them used
+		// to `return` in silence -- lpnTerrainSample() (the node popup's two buttons) and
+		// lpnTerrainFillFor() (a node born on a geographic project, and Find and replace with
+		// Elevation set to From DEM). A projected project whose coordinate system this page has no
+		// transform for hands back exactly that empty list, so the press did nothing and said
+		// nothing.
+		jar.value = 'ec_terrain=1.1755000000.1';
+		L.reset(L.GEO);
+		tileRequests = 0;
+		byId.lpn_map_notice.textContent = '';
+		EC.lpnTerrainSample([], function () {});
+		await settle();
+		ok('Read DEM on nodes with no place on the Earth says so rather than nothing',
+			noticeText() === PC.lpn_terrain_no_place, JSON.stringify(noticeText()));
+		byId.lpn_map_notice.textContent = '';
+		EC.lpnTerrainFillFor([], {});
+		await settle();
+		ok('...and so does the fill door that Find and replace and a new node use',
+			noticeText() === PC.lpn_terrain_no_place, JSON.stringify(noticeText()));
+		ok('...and neither of them sent anything', tileRequests === 0, tileRequests + ' requests');
 	}
 
 	// ---- 5h. THE ONE STRUCTURAL ASSERTION ABOUT THE NETWORK --------------------------------------

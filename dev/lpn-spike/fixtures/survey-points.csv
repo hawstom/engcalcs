@@ -1,0 +1,12 @@
+# Elm Street Center, Mesa AZ -- a made-up field survey, for testing the import (ROADMAP Task 592).
+# Row PT-6 is deliberately WRONG: its latitude and longitude are the other way round, so the
+# import reports that row and creates nothing for it. Row PT-7 has an unreadable elevation, so the
+# junction is made and its elevation follows the Elevation setting for new assets.
+Point,Latitude,Longitude,Elevation_ft
+PT-1,33.415300,-111.831400,1243.50
+PT-2,33.415910,-111.831400,1245.20
+PT-3,33.416520,-111.830780,1248.00
+PT-4,33.416520,-111.829950,1251.75
+PT-5,33.415300,-111.829950,1246.10
+PT-6,-111.830400,33.415910,1247.00
+PT-7,33.414700,-111.830400,about 1240

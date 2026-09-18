@@ -1,6 +1,7 @@
 <?php
 /**
- * Canonical.lib.php -- the ONE place that says which URL a page nominates as its own.
+ * Canonical.lib.php -- the ONE place that says which URL a page nominates as its own: the PATH
+ * (ecCanonicalPaths()) and, since 2026-09-17, the ORIGIN (ecCanonicalOrigins()).
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -62,6 +63,58 @@ function ecCanonicalPaths() {
 }
 
 /**
+ * Pages whose canonical ORIGIN is not the suite's own, and the origin each one nominates.
+ *
+ * **THE DIVORCE DID NOT GIVE LibreWaterNet THE CALCULATORS** (Tom, 2026-09-17: *"We don't want to
+ * squander a 15-year legacy... The terms of the divorce were not that LWN gets all the calculators.
+ * They were only that LWN walks away free. hawsedc.com/engcalcs should stay canonical for what it
+ * is."*). Between 2026-09-06 and 2026-09-17 every page in the suite -- all sixteen calculators
+ * included -- nominated librewaternet.org, because CANONICAL_ORIGIN was ONE constant for the whole
+ * tree and the map application needed that origin. **The cost was measured in Search Console over
+ * three months: hawsedc.com 7,575 clicks with Manning Pipe Flow at position 9.7; librewaternet.org
+ * 68 clicks in nine days at position 34.1.** We were telling Google the authoritative copy of a
+ * page on page one lived on a three-week-old domain on page four.
+ *
+ * So the origin is a PER-PAGE decision exactly as the pretty path above is, and it is declared in
+ * the same place for the same reason: a second catalogue of one fact is the arrangement that
+ * drifts. The calculators are hawsedc.com's; the map application is LibreWaterNet's.
+ *
+ * **IT IS A DECLARATION AND NEVER AN INFERENCE FROM THE REQUEST.** CANONICAL_ORIGIN remains the
+ * host -> origin WHITELIST canonical_origin_check.php exists to keep, and this map is consulted
+ * before it: a page named here nominates its declared origin on every host, and every other page
+ * falls through to the whitelist. Nothing a client sends can introduce a third answer, which is
+ * the property that makes a spoofed Host header harmless.
+ *
+ * **EVERYTHING THE CANONICAL FEEDS MUST FOLLOW IT, and there are five readers, not one:** the
+ * <link rel="canonical">, all 27 hreflang alternates, og:url, og:image, and the sitemap. An hreflang
+ * set pointing at an origin the page's own canonical disowns is the reciprocity failure Google
+ * reports by name -- worse than emitting no hreflang at all.
+ *
+ * @return array<string,string> page filename => absolute origin, scheme and host, no trailing slash.
+ */
+function ecCanonicalOrigins() {
+    return array(
+        'Looped-Network.php' => 'https://librewaternet.org',
+    );
+}
+
+/**
+ * The canonical ORIGIN for a script: its declared one, or the host's whitelisted one.
+ *
+ * @param string $scriptName  $_SERVER['SCRIPT_NAME'], a '/engcalcs/<page>' path, or a bare filename.
+ * @param string $hostOrigin  CANONICAL_ORIGIN -- the whitelist's answer for the host being served.
+ * @return string             absolute origin, no trailing slash.
+ */
+function ecCanonicalOrigin($scriptName, $hostOrigin) {
+    $path = (string)$scriptName;
+    if ($path === '') { $path = '/engcalcs/index.php'; }
+    $declared = ecCanonicalOrigins();
+    $page = basename($path);
+    if (isset($declared[$page])) { return $declared[$page]; }
+    return (string)$hostOrigin;
+}
+
+/**
  * The absolute URL a page served at its SCRIPT path should be redirected to, or null for "stay".
  *
  * **THE APACHE-LEVEL REDIRECT IS A LOOP AND THAT IS WHY THIS IS IN PHP** (Tom, 2026-09-10, asking
@@ -85,7 +138,7 @@ function ecCanonicalPaths() {
  * @param string $scriptName    $_SERVER['SCRIPT_NAME'].
  * @param string $requestUri    $_SERVER['REQUEST_URI'], query string and all.
  * @param bool   $hostDeclared  EC_CANONICAL_HOST_DECLARED.
- * @param string $origin        CANONICAL_ORIGIN.
+ * @param string $origin        CANONICAL_ORIGIN -- the fallback; a page declaring its own wins.
  * @return string|null          absolute URL to 301 to, or null to serve the page.
  */
 function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $origin) {
@@ -101,7 +154,12 @@ function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $ori
     $query = '';
     $cut = strpos((string)$requestUri, '?');
     if ($cut !== false) { $query = substr((string)$requestUri, $cut); }
-    return $origin . $pretty . $query;
+    // **THE ORIGIN IS THE PAGE'S, NOT THE HOST'S, and that stopped being the same thing on
+    // 2026-09-17.** hawsedc.com's whitelist entry now answers hawsedc.com, so passing $origin
+    // straight through would move a visitor to hawsedc.com/app/ -- an address that does not exist,
+    // because /app/ is a rewrite librewaternet.org alone carries. A redirect is the one reader here
+    // that MOVES somebody, so getting this from the declaration rather than the host is not tidiness.
+    return ecCanonicalOrigin($script, $origin) . $pretty . $query;
 }
 
 /**

@@ -81,6 +81,11 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_coord_off_world": {
+            "on": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+            "ruled": "2026-09-17",
+            "answer": "Edited."
+        },
         "lpn_cp_add": {
             "on": "Add custom property",
             "ruled": "2026-09-14",
@@ -462,6 +467,26 @@
         "lpn_curve_volume_col": {
             "on": "Volume",
             "ruled": "2026-09-05"
+        },
+        "lpn_customer_detached": {
+            "on": "⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_customer_detached_count": {
+            "on": "{n} meters are no longer connected to a pipe. Their demand is not in the answers.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_customer_fixed_head": {
+            "on": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+            "ruled": "2026-09-17",
+            "answer": "Can you clarify the case? Like a reservoir?"
+        },
+        "lpn_customer_heading": {
+            "on": "Customer {id}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
         },
         "lpn_demand_add": {
             "on": "Add demand category",
@@ -973,9 +998,24 @@
             "on": "Working: {done} of {total} junctions.",
             "ruled": "2026-09-01"
         },
+        "lpn_field_account": {
+            "on": "Account number",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_account_tip": {
+            "on": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
         "lpn_field_base_demand": {
             "on": "Base demand",
             "ruled": "2026-08-29"
+        },
+        "lpn_field_coord_tip": {
+            "on": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+            "ruled": "2026-09-17",
+            "answer": "Edited"
         },
         "lpn_field_demand_category": {
             "on": "Description",
@@ -984,6 +1024,16 @@
         "lpn_field_demand_category_tip": {
             "on": "Name or description of the category.",
             "ruled": "2026-08-29"
+        },
+        "lpn_field_desc": {
+            "on": "Description",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_desc_tip": {
+            "on": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
+            "ruled": "2026-09-17",
+            "answer": "Edited."
         },
         "lpn_field_easting": {
             "on": "Easting",
@@ -1014,6 +1064,66 @@
             "on": "A list of fittings from the project library. Its quantities and coefficients are added up into this pipe’s minor loss coefficient, and the coefficient box is then read only. Leave this unselected to type the coefficient yourself.",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_field_meter_count": {
+            "on": "Services at this meter",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_meter_count_tip": {
+            "on": "How many identical services this one meter stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_meter_demand": {
+            "on": "Demand per service",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_meter_demand_tip": {
+            "on": "What one service at this meter draws. With the count below at 1, this is the whole of it. An empty box is a meter you have not given a demand to yet, which is not the same as a meter that draws nothing.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_meter_lumped": {
+            "on": "Added to node",
+            "ruled": "2026-09-17",
+            "answer": "Edited."
+        },
+        "lpn_field_meter_lumped_tip": {
+            "on": "The node that this meter's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+            "ruled": "2026-09-17",
+            "answer": "Edited. This is strictly for accounting, not necessarily physical."
+        },
+        "lpn_field_meter_pipe": {
+            "on": "Connected asset",
+            "ruled": "2026-09-17",
+            "answer": "Edited. We want to allow connecting directly to a node."
+        },
+        "lpn_field_meter_pipe_tip": {
+            "on": "The asset that this service connects to. Drag the service line onto another asset to change it, and drag the circle on the pipe to move where along it the service connects.",
+            "ruled": "2026-09-17",
+            "answer": "We need to rule on whether we allow non-perpendicular connections."
+        },
+        "lpn_field_meter_station": {
+            "on": "Station along the pipe (%)",
+            "ruled": "2026-09-17",
+            "answer": "OK. We need to rule on whether we allow non-perpendicular connections."
+        },
+        "lpn_field_meter_station_tip": {
+            "on": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
+            "ruled": "2026-09-17",
+            "answer": "We need to rule on whether we allow non-perpendicular connections."
+        },
+        "lpn_field_meter_total": {
+            "on": "Total demand",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_field_meter_total_tip": {
+            "on": "The demand per service times the number of services. This is the number added to the junction named below.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
         },
         "lpn_field_northing": {
             "on": "Northing",
@@ -1408,6 +1518,16 @@
             "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
             "ruled": "2026-09-02"
         },
+        "lpn_inp_export_flat_coords": {
+            "on": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
+            "ruled": "2026-09-17",
+            "answer": "This is unclear. Please proofread and reword."
+        },
+        "lpn_inp_export_flat_customers": {
+            "on": "An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
         "lpn_inp_export_flat_fittings": {
             "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
             "ruled": "2026-09-09",
@@ -1540,6 +1660,51 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_library_import": {
+            "on": "Import from a project file",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_added": {
+            "on": "Copied in: {names}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_conflict": {
+            "on": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_curve_shape": {
+            "on": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+            "ruled": "2026-09-17",
+            "answer": "Can you clarify \"first column rises from each point to the next\"?"
+        },
+        "lpn_library_import_heading": {
+            "on": "Imported from {file}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_needs_fittings": {
+            "on": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_none": {
+            "on": "That project file has none of these to copy.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_tip": {
+            "on": "Choose another project file and copy what its library holds into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_library_import_units": {
+            "on": "The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them.",
+            "ruled": "2026-09-17",
+            "answer": "This is one situation where we may need to offer conversion."
+        },
         "lpn_library_pipetype_add": {
             "on": "Add a pipe type",
             "ruled": "2026-09-07",
@@ -1611,6 +1776,116 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_lock_age_edited": {
+            "on": "It was last edited {x} ago.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_age_inuse": {
+            "on": "It has been in use for {x}.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_age_never_saved": {
+            "on": "Nothing has been saved to this file yet.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_age_saved": {
+            "on": "It was last saved {x} ago.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_age_unknown": {
+            "on": "There is no record of how long it has been in use, or when it was last saved or edited.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_ask": {
+            "on": "Ask",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_ask_failed": {
+            "on": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
+            "ruled": "2026-09-17",
+            "answer": "Edited."
+        },
+        "lpn_lock_ask_prompt": {
+            "on": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
+            "ruled": "2026-09-17",
+            "answer": "Edited. Please review."
+        },
+        "lpn_lock_ask_sent": {
+            "on": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_open_care": {
+            "on": "To avoid data loss, choose carefully from the options below.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_open_choices_ask": {
+            "on": "\"Ask\" tells whoever has this file open that you would like it, and changes nothing else. \"Break lock\" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. \"Open read-only\" lets you look at it and change anything you like, without being able to save here.",
+            "ruled": "2026-09-17",
+            "answer": "Edited"
+        },
+        "lpn_lock_open_inuse": {
+            "on": "This file appears to be in use.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_lock_requested": {
+            "on": "{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_done": {
+            "on": "The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.",
+            "ruled": "2026-09-17",
+            "answer": "Edited."
+        },
+        "lpn_map_attach_menu": {
+            "on": "Background map (georeference)…",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_place": {
+            "on": "Attach the world map…",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_remove": {
+            "on": "Remove",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_remove_tip": {
+            "on": "Take the world map away. The drawing and its coordinates are untouched either way.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_removed": {
+            "on": "The world map is gone, and the drawing is exactly as it was.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_tip": {
+            "on": "Attach the world map to this project without changing it any other way.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_map_attach_turn": {
+            "on": "Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map",
+            "ruled": "2026-09-17",
+            "answer": "Edited. Changed meaning. Please review carefully."
+        },
+        "lpn_map_attach_where": {
+            "on": "Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
         "lpn_map_unmeasurable": {
             "on": "This page could not work out the size of the drawing area, so the map is showing the last view it was able to compute. Resizing the window makes it try again. If it keeps happening, a browser extension that blocks page measurements is the usual cause.",
             "ruled": "2026-09-10",
@@ -1624,6 +1899,11 @@
         "lpn_menu_map": {
             "on": "Map",
             "ruled": "2026-08-29"
+        },
+        "lpn_meter_pick_pipe": {
+            "on": "Now click the pipe that serves this meter. Press Escape to cancel.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
         },
         "lpn_mixing_2comp": {
             "on": "Two-compartment mixing",
@@ -1658,6 +1938,11 @@
             "on": "How the water already in this tank mixes with the water coming in. Complete mixing stirs the whole tank at once. Two-compartment mixing fills an inlet zone first and passes the rest on. FIFO plug flow moves the water through in the order it arrived. LIFO plug flow stacks it, so the last water in is the first water out. The choice changes the water age and the residual, and it does not change any pressure or flow.",
             "ruled": "2026-09-06",
             "answer": "OK."
+        },
+        "lpn_mode_add_meter": {
+            "on": "Meter: click the pipe that serves this customer, or click open ground and then click its pipe. Escape leaves the tool.",
+            "ruled": "2026-09-17",
+            "answer": "I like the \"Click pipe\" method of adding a customer. But it has some problems. (1) the offset would need to be in settings and (2) it will never be clear to the user which side is left (negative) and which is right (positive) unless there are arrows. Obviously side is not arbitrary or unimportant. Possibilities: (1) toolbar/menu button could include two modes, left and right, and they are relative to the direction of the flow arrow or low to high node number, and users have to learn by trial and error if they want to use this method, and offset is in Settings, Values."
         },
         "lpn_multi_applied": {
             "on": "Set {prop} on {n}.",
@@ -1768,6 +2053,11 @@
             "on": "Pasted {n} cells. {skipped} were not changed.",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_pane_tab_customers": {
+            "on": "Customers",
+            "ruled": "2026-09-17",
+            "answer": "OK."
         },
         "lpn_pane_text_attached": {
             "on": "Attached",
@@ -2372,6 +2662,226 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_survey_btn": {
+            "on": "Import surveyed points",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_btn_tip": {
+            "on": "Read a list of surveyed points from a CSV or GPX file and make one junction at each point, using the new-asset values above. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.",
+            "ruled": "2026-09-17",
+            "answer": "I disagree with \"has to be\". See my prompt comments."
+        },
+        "lpn_survey_cancelled": {
+            "on": "Nothing was created and nothing was changed.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_confirm": {
+            "on": "Create {n} junction(s) from this surveyed point list?",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_confirm_pipes": {
+            "on": "No pipes are drawn. A surveyed list says where the points are, not which of them are joined.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_elev_assumed": {
+            "on": "The file does not say what unit its elevations are in, so they are read as {project}, which is the unit this project is showing.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_elev_unit": {
+            "on": "Elevations in the file are read as {file}, and this project is showing {project}.",
+            "ruled": "2026-09-17",
+            "answer": "Under what condition would we know the units of the file?"
+        },
+        "lpn_survey_err_ambiguous_lat": {
+            "on": "More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_err_ambiguous_lon": {
+            "on": "More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_err_empty": {
+            "on": "That file has nothing in it.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_err_gpx_no_wpt": {
+            "on": "That GPX file holds no waypoints, so there is nothing to make junctions from.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_err_no_latlon": {
+            "on": "This page could not find a latitude column and a longitude column in that file. Name two of the columns latitude and longitude, in the first row of the file, and try again. The first row reads: {detail}",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_err_no_points": {
+            "on": "Not one row of that file could be read as a surveyed point. Rows read: {detail}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_err_plane": {
+            "on": "That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_err_unreadable": {
+            "on": "That file could not be read as a surveyed point list.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_map_gpx": {
+            "on": "Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_map_lines": {
+            "on": "Latitude comes from the column {lat}, longitude from {lon}, the name from {id}, and the elevation from {elev}.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_map_none": {
+            "on": "not used",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_not_geo": {
+            "on": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_note_ambiguous_elev": {
+            "on": "More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_bad_elev": {
+            "on": "The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_bad_lat": {
+            "on": "The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_note_bad_lon": {
+            "on": "The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_note_blank_rows": {
+            "on": "Blank lines were passed over: {detail}.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_elev_converted": {
+            "on": "The elevations in the file are in {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.",
+            "ruled": "2026-09-17",
+            "answer": "How do we know?"
+        },
+        "lpn_survey_note_gpx_rtept": {
+            "on": "The file also holds {detail} route point(s), which were not made into junctions.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_gpx_trkpt": {
+            "on": "The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_id_duplicate": {
+            "on": "This name is used more than once in the file, so this junction was given a name of ours instead.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_id_invalid": {
+            "on": "This name cannot be used as an ID here, so this junction was given a name of ours instead.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_id_taken": {
+            "on": "This name already belongs to something in the project, so this junction was given a name of ours instead.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_lat_missing": {
+            "on": "The latitude column is empty on this row, so no junction was made for it.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_note_lat_range": {
+            "on": "This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, swap them in your own file: this page will not swap them for you, because it cannot tell a mistake from a place.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_lon_missing": {
+            "on": "The longitude column is empty on this row, so no junction was made for it.",
+            "ruled": "2026-09-17",
+            "answer": "Needs discussion and design concept planning."
+        },
+        "lpn_survey_note_lon_range": {
+            "on": "This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_note_row_short": {
+            "on": "This row does not have enough columns to hold a position, so no junction was made for it.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_read_error": {
+            "on": "That file could not be read from your disk.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_report_clean": {
+            "on": "Every point in the file came across, and nothing was changed on the way in.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_report_counts": {
+            "on": "{n} junction(s) created.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_report_elev": {
+            "on": "{n} of them took an elevation from the file.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_report_heading": {
+            "on": "Imported {file}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_report_lead": {
+            "on": "Nothing in your file was thrown away quietly. Below is every row that could not be taken as it stands, and everything that was changed on the way in:",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_row": {
+            "on": "row {n}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_unit_ft": {
+            "on": "feet",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_survey_unit_m": {
+            "on": "meters",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
         "lpn_terrain_blank_ids": {
             "on": "These nodes are still blank: {ids}",
             "ruled": "2026-08-29"
@@ -2420,6 +2930,16 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_tool_add_meter": {
+            "on": "Meter",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_tool_add_meter_tip": {
+            "on": "Click the pipe that serves a customer to put a meter on it, or click open ground and then click the pipe. The demand you give the meter is added to the junction at the near end of that pipe.",
+            "ruled": "2026-09-17",
+            "answer": "See comment for lpn_mode_add_meter"
+        },
         "lpn_tool_area_lasso": {
             "on": "Select a lasso",
             "ruled": "2026-09-09",
@@ -2449,6 +2969,86 @@
             "on": "Shortcut: press {key} or {key2}.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_ts_add": {
+            "on": "Add selected",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_add_none": {
+            "on": "Nothing of that kind is chosen on the map.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_add_tip": {
+            "on": "Put everything now chosen on the map onto the graph.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_axis_time": {
+            "on": "Elapsed time",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_chip_tip": {
+            "on": "Take {id} off the graph",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_clear": {
+            "on": "Remove all",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_group_links": {
+            "on": "Links",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_group_nodes": {
+            "on": "Nodes",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_group_tip": {
+            "on": "Whether the graph shows nodes or links.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_menu": {
+            "on": "Time series",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_no_frames": {
+            "on": "No extended period results yet. Press Calculate to run the simulation.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_none": {
+            "on": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_quantity_tip": {
+            "on": "Which value to graph against time.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_summary": {
+            "on": "Assets: {n}, reporting times: {steps}",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_tip": {
+            "on": "Graph one or more assets against time across an extended period simulation.",
+            "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_ts_title": {
+            "on": "Values versus time",
+            "ruled": "2026-09-17",
+            "answer": "OK."
         },
         "lpn_wrong_btn": {
             "on": "Something wrong here?",

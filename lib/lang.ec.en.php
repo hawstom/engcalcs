@@ -1611,6 +1611,36 @@ $ec_lang['lpn_profile_prompt_name']='Name for this path';
 $ec_lang['lpn_profile_delete_confirm']='Delete the saved path {name}? The drawing itself is not changed.';
 $ec_lang['lpn_profile_none_saved']='No saved paths yet';
 $ec_lang['lpn_profile_missing']='The saved path {name} uses nodes that are not in this project: {ids}';
+// ---- the time-series chart (ROADMAP Task 599) -------------------------------------------------
+// One or more assets' chosen value against time across an extended period simulation. {id} is an
+// asset name the user gave, {n} a count and {steps} a count of reporting times; all substituted,
+// never concatenated, so a language that puts them somewhere else can.
+//
+// **THE Y AXIS HAS NO KEY OF ITS OWN, AND THAT IS DELIBERATE.** Its title is the quantity's own
+// whole label with the project's unit in parentheses, built by the same expression the map's color
+// key already uses -- so the chart and the key name one quantity the same way and there is no
+// second place a wording could drift. The quantity labels themselves are the Labels popover's, in
+// every language it already has them in.
+$ec_lang['lpn_ts_menu']='Time series';
+$ec_lang['lpn_ts_tip']='Graph one or more assets against time across an extended period simulation.';
+$ec_lang['lpn_ts_title']='Values versus time';
+$ec_lang['lpn_ts_group_tip']='Whether the graph shows nodes or links.';
+$ec_lang['lpn_ts_group_nodes']='Nodes';
+$ec_lang['lpn_ts_group_links']='Links';
+$ec_lang['lpn_ts_quantity_tip']='Which value to graph against time.';
+$ec_lang['lpn_ts_add']='Add selected';
+$ec_lang['lpn_ts_add_tip']='Put everything now chosen on the map onto the graph.';
+// Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
+$ec_lang['lpn_ts_add_none']='Nothing of that kind is chosen on the map.';
+$ec_lang['lpn_ts_clear']='Remove all';
+$ec_lang['lpn_ts_chip_tip']='Take {id} off the graph';
+$ec_lang['lpn_ts_none']='Nothing to graph yet. Choose assets on the map and press Add selected.';
+// The run belongs to EPANET alone, so this is also what a page whose engine is unreachable lands
+// on; the status bar says why in that case, and lpn_time_no_period covers the project that has set
+// no run time at all.
+$ec_lang['lpn_ts_no_frames']='No extended period results yet. Press Calculate to run the simulation.';
+$ec_lang['lpn_ts_summary']='Assets: {n}, reporting times: {steps}';
+$ec_lang['lpn_ts_axis_time']='Elapsed time';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';
@@ -1690,6 +1720,12 @@ $ec_lang['lpn_crs_choose']='Select';
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
 $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.';
+// Shown beside a projection in the chooser, and beside the chosen one in the New project box, when
+// this page has no transform for it. Short on purpose: it sits at the end of a register name that
+// can already run to 50 characters.
+$ec_lang['lpn_crs_unplaceable_mark']='(no map)';
+// The same fact in a sentence, under the chooser's list and again if such a project is created.
+$ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 $ec_lang['lpn_crs_none']='Not georeferenced';
@@ -2159,6 +2195,17 @@ $ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says 
 //
 // {name} and {percent} are placeholders and not concatenation (Task 193): a language that puts the
 // curve name first, or wraps a percentage in its own punctuation, cannot express a prefix sandwich.
+// **THE ELEMENT'S DESCRIPTION** (Task 674). EPANET's own word, and EPANET's own Property Editor row:
+// the terminology rule decides it, and there is no vocabulary collision here of the kind Label and
+// Text have. EPANET carries it as the trailing comment on the element's own row in the file, which is
+// where this page now reads and writes it; until Task 674 it was read nowhere and every imported
+// description was discarded in silence.
+$ec_lang['lpn_field_desc']='Description';
+// THE THREE THINGS SOMEBODY HAS TO KNOW, and the third is the one nothing else on the page says: a
+// description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
+// be written as a trailing comment and is turned into a space. The tip says what the field is for
+// first, because that is what a reader of a blank box wants.
+$ec_lang['lpn_field_desc_tip']='For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part\'s own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2271,6 +2318,14 @@ $ec_lang['lpn_field_northing_abbr']='N';
 $ec_lang_syn['lpn_field_northing_abbr']='Northing | abbreviation of Northing, as short as the language has a short form for; the full word where it has none.';
 $ec_lang['lpn_field_easting_abbr']='E';
 $ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as short as the language has a short form for; the full word where it has none.';
+// Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
+// INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
+// states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
+// when the node is dragged.
+$ec_lang['lpn_field_coord_tip']='Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.';
+// Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
+// finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
+$ec_lang['lpn_coord_off_world']='That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
@@ -3199,6 +3254,38 @@ $ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
 $ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.';
+// Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
+// Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
+// buttons except at the File menu.'). The label and its tip name no particular library, because
+// the FILE decides what is on offer rather than whatever section anybody was looking at.
+$ec_lang['lpn_library_import']='Import libraries…';
+$ec_lang['lpn_library_import_tip']='Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
+// The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
+// beside each name is the only thing on that screen that says what the file actually has in it.
+$ec_lang['lpn_library_import_choose']='Choose what to copy from {file}';
+$ec_lang['lpn_library_import_count']='{name} ({count})';
+$ec_lang['lpn_library_import_note']='Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.';
+$ec_lang['lpn_library_import_go']='Import';
+$ec_lang['lpn_library_import_no_libraries']='That project file has no libraries to copy.';
+$ec_lang['lpn_library_import_heading']='Imported from {file}';
+$ec_lang['lpn_library_import_added']='Copied in: {names}';
+$ec_lang['lpn_library_import_conflict']='Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.';
+// Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
+// case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
+$ec_lang['lpn_library_import_none']='That project file has none of these to copy.';
+$ec_lang['lpn_library_import_curve_shape']='These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}';
+$ec_lang['lpn_library_import_needs_fittings']='These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.';
+// Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
+// before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
+// convert, because changing a unit on this page reinterprets a typed number rather than converting
+// it, and a number that came from a file is the user's. {name} is the quantity, {mine} and {theirs}
+// the two unit labels, each read off this project's own unit selector.
+// WORDED BY TOM, 2026-09-18, after using it: 'This is too wordy and confusing. Have mercy on the
+// humans.' It opens with the word Warning and says Not recommended because he wants the
+// discouragement explicit; the per-quantity lines below carry the whole of the detail. Do not
+// restore the longer explanation, and do not add a convert button it would read as offering.
+$ec_lang['lpn_library_import_units']='Warning: Units mismatch. Will be imported as is. Not recommended.';
+$ec_lang['lpn_library_import_units_line']='{name}: this project shows {mine}, the file shows {theirs}.';
 $ec_lang['lpn_fitting_qty']='Quantity';
 $ec_lang['lpn_fitting_name']='Fitting';
 $ec_lang['lpn_fitting_k']='Coefficient';
@@ -3239,6 +3326,7 @@ $ec_lang['lpn_fitting_other']='Other fitting';
 $ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
 $ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
 $ec_lang['lpn_inp_export_flat_types']='{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.';
+$ec_lang['lpn_inp_export_flat_coords']='An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.';
 $ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
@@ -3362,8 +3450,6 @@ $ec_lang['lpn_terrain_keep']='{k} node(s) already have an elevation and will not
 $ec_lang['lpn_terrain_undo']='One Undo (Ctrl-Z) puts every one of them back.';
 $ec_lang['lpn_terrain_requests']='{n} request(s) to api.mapbox.com.';
 $ec_lang['lpn_terrain_busy']='Elevations are already being filled in. Wait for them.';
-$ec_lang['lpn_terrain_none_needed']='Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.';
-$ec_lang['lpn_terrain_no_nodes']='There are no nodes to fill in yet.';
 $ec_lang['lpn_terrain_offmap']='These node positions are not on the terrain map, so nothing was sent.';
 $ec_lang['lpn_terrain_too_wide']='These nodes are spread over too much of the Earth to read in one go ({n} tile requests). Nothing was sent.';
 $ec_lang['lpn_terrain_cancelled']='Nothing was changed and nothing was sent.';
@@ -3372,6 +3458,14 @@ $ec_lang['lpn_terrain_working']='Reading the land surface…';
 // {status} is a number the service sent back, such as 403.
 $ec_lang['lpn_terrain_denied']='The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.';
 $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.';
+// A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
+// gets its own sentence: the same request works in a minute.
+$ec_lang['lpn_terrain_rate_limited']='The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.';
+// Any other status the service sent back. {status} is that number.
+$ec_lang['lpn_terrain_http']='The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.';
+// Said when the nodes asked about have no position on the Earth at all, which is what a projected
+// project reports when this page has no transform for its coordinate system.
+$ec_lang['lpn_terrain_no_place']='None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.';
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
 $ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';
