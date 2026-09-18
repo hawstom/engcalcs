@@ -44,6 +44,7 @@ const L = loadLoopedNetwork(
 	"\t\tpendingDot: function () { return pendingMeterEl; },\n" +
 	"\t\tcustHandle: function () { return custHandleEl; },\n" +
 	"\t\tcustBox: function (id) { return custEls[id] && custEls[id].box; },\n" +
+	"\t\tcustomersOnLink: function (id) { return (customersByLink[id] || []).slice(); },\n" +
 	"\t\tsetSelection: setSelection, selectedRef: selectedRef,\n" +
 	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
 	"\t\tapplyDrag: function () { if (drag && dragDirty) { applyDrag(); dragDirty = false; } },\n" +
@@ -168,6 +169,96 @@ console.log('\n--- 1. the placement band draws a connection or nothing at all --
 	doc.customers.length = 0;
 	L.buildDom();
 	L.setMode('select');
+}
+
+// ---------------------------------------------------------------------------
+console.log('\n--- 2. the connection grip re-serves a customer from another asset ---');
+// ---------------------------------------------------------------------------
+{
+	L.setMode('select');
+	const c = L.addCustomer(350, 260, { link: main.id });
+	L.setSelection('customer', c.id);
+	const grip = L.custHandle();
+	ok('2.1 selecting a customer draws a connection grip', !!grip);
+	ok('2.2 ...on its own connection point, not on the customer',
+		!!grip && near(+grip.getAttribute('cx'), 350, 1e-6) && near(+grip.getAttribute('cy'), 200, 1e-6),
+		grip ? grip.getAttribute('cx') + ',' + grip.getAttribute('cy') : 'none');
+
+	const start = L.worldToScreen(350, 200);
+	down(start.x, start.y, grip);
+	const dg = L.dragNow();
+	ok('2.3 pressing the grip begins a connection drag, not a customer drag',
+		!!dg && dg.type === 'custanchor' && dg.id === c.id, dg && (dg.type + ' ' + dg.id));
+
+	// **OVER BARE MAP, NOTHING MOVES.** This is the clause that makes the gesture readable, and it
+	// is the one a rubber-band implementation would fail while looking plausible on screen.
+	const mid = L.worldToScreen(350, 500);
+	move(mid.x, mid.y);
+	L.applyDrag();
+	ok('2.4 halfway across open ground the service has not moved at all',
+		L.customerLink(c).id === main.id && near(L.customerAttachPoint(c).y, 200, 1e-6),
+		L.customerLink(c).id + ' at ' + JSON.stringify(L.customerAttachPoint(c)));
+	ok('2.5 ...and neither has the customer', near(L.customerPoint(c).x, 350, 1e-6) &&
+		near(L.customerPoint(c).y, 260, 1e-6), JSON.stringify(L.customerPoint(c)));
+
+	// **ARRIVING AT ANOTHER PIPE SNAPS THE SERVICE TO IT, SQUARE.**
+	const onOther = L.worldToScreen(500, 800);
+	move(onOther.x, onOther.y);
+	L.applyDrag();
+	ok('2.6 arriving at another pipe re-serves the customer from it',
+		L.customerLink(c).id === other.id, L.customerLink(c).id);
+	ok('2.7 ...at the foot of the perpendicular from the house, not under the pointer',
+		near(L.customerAttachPoint(c).x, 350, 1e-6) && near(L.customerAttachPoint(c).y, 800, 1e-6),
+		JSON.stringify(L.customerAttachPoint(c)));
+	// The index moves WITH the connection, asserted here rather than only at the end: a drag that
+	// goes out and comes back would leave the original entry in place and look correct.
+	ok('2.7b ...and the index moved with it',
+		L.customersOnLink(other.id).indexOf(c.id) >= 0 &&
+		L.customersOnLink(main.id).indexOf(c.id) < 0,
+		'other: ' + L.customersOnLink(other.id).join(',') + '  main: ' + L.customersOnLink(main.id).join(','));
+	ok('2.8 ...and the customer is still exactly where it stood',
+		near(L.customerPoint(c).x, 350, 1e-6) && near(L.customerPoint(c).y, 260, 1e-6),
+		JSON.stringify(L.customerPoint(c)));
+
+	// **AND IT REPEATS.** Back over the first main, and the service goes back -- the drop is not a
+	// separate commit, it merely stops the asking.
+	const backOnMain = L.worldToScreen(200, 200);
+	move(backOnMain.x, backOnMain.y);
+	L.applyDrag();
+	ok('2.9 passing back over the first main returns the service to it',
+		L.customerLink(c).id === main.id && near(L.customerAttachPoint(c).x, 350, 1e-6),
+		L.customerLink(c).id + ' at ' + JSON.stringify(L.customerAttachPoint(c)));
+
+	// **A NODE IS THE OTHER LEGAL TARGET**, and it is an exact station rather than a near miss.
+	const onNode = L.worldToScreen(600, 200);
+	move(onNode.x + 2, onNode.y + 2);
+	L.applyDrag();
+	ok('2.10 arriving at a junction snaps the connection exactly onto the node',
+		L.customerT(c) === 1 && near(L.customerAttachPoint(c).x, 600, 1e-6) &&
+		near(L.customerAttachPoint(c).y, 200, 1e-6),
+		L.customerT(c) + ' at ' + JSON.stringify(L.customerAttachPoint(c)));
+	ok('2.11 ...and the customer STILL has not moved, through five moves of the grip',
+		near(L.customerPoint(c).x, 350, 1e-6) && near(L.customerPoint(c).y, 260, 1e-6),
+		JSON.stringify(L.customerPoint(c)));
+
+	up(onNode.x + 2, onNode.y + 2);
+	ok('2.12 the drop ends the drag', L.dragNow() === null);
+	ok('2.13 ...and leaves the connection where the last asset put it',
+		L.customerLink(c).id === main.id && L.customerT(c) === 1);
+
+	// The grip follows its own connection, or the next drag starts from a ring drawn on the pipe
+	// the service has left.
+	const after = L.custHandle();
+	ok('2.14 the grip is redrawn on the new connection point',
+		!!after && near(+after.getAttribute('cx'), 600, 1e-6) && near(+after.getAttribute('cy'), 200, 1e-6),
+		after ? after.getAttribute('cx') + ',' + after.getAttribute('cy') : 'none');
+	// **THE INDEX HAS TO MOVE WITH THE CONNECTION.** customersByLink is what makes a service follow
+	// its pipe when the pipe is reshaped, so an entry left on the old main is invisible until
+	// somebody drags a node a week later and one house stays behind.
+	ok('2.15 the customer is indexed against the pipe it is now served from',
+		L.customersOnLink(main.id).indexOf(c.id) >= 0, L.customersOnLink(main.id).join(','));
+	ok('2.16 ...and is no longer indexed against the one it left',
+		L.customersOnLink(other.id).indexOf(c.id) < 0, L.customersOnLink(other.id).join(','));
 }
 
 console.log('');

@@ -8548,6 +8548,33 @@ var EngCalcs = EngCalcs || {};
 		t = customerT(c);
 		return t === 0 || t === 1;
 	}
+	/**
+	 * **THE ONE WRITE SEAM FOR WHAT SERVES A METER**, as setCustomerPerp() below is the one for
+	 * where the meter is. It moves the connection to another pipe -- or to another station on the
+	 * same one -- and leaves the house standing exactly where it stands, which is the half of Tom's
+	 * two-grip design that separates the gestures (2026-09-18).
+	 *
+	 * The index has to move with it: customersByLink is what makes a meter follow its pipe when the
+	 * pipe is reshaped, so a re-connection that forgot it would leave the service hanging off the
+	 * old main's geometry with nothing on screen to explain it.
+	 *
+	 * **THE OFFSET IS REWRITTEN, NOT THE POSITION.** `c.x`/`c.y` is an offset from the attachment
+	 * point, so a new attachment means a new offset for the SAME drawn point -- which is why the
+	 * meter's current position is read before anything is written and handed to the one offset
+	 * writer afterwards.
+	 */
+	function setCustomerConnection(c, l, t) {
+		var pt;
+		if (!c || !l || !nodeById(l.from) || !nodeById(l.to)) { return false; }
+		pt = customerPoint(c);
+		if (c.link && customersByLink[c.link]) {
+			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
+		}
+		c.link = l.id;
+		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
+		customersByLink[l.id].push(c.id);
+		return setCustomerOffsetTo(c, l, t, pt.x, pt.y);
+	}
 	// **THE ONE WRITE SEAM FOR WHERE A METER IS**, taking the two things a drag is now allowed to
 	// change: the station ALONG the pipe, and the distance TOWARD or AWAY from it. Every gesture and
 	// every typed box goes through it, so there is no path left that can write an angle.
@@ -8658,7 +8685,10 @@ var EngCalcs = EngCalcs || {};
 	// here, and building it would be answering a condition as though it were a request.
 	var custEls = {}, customersByLink = {};
 	function buildCustomerEls(c) {
-		var stub = el('line', { 'class': 'lpn-service' }, labelsLayer),
+		// The connector names its customer too, though it is not pickable: an element that says
+		// whose it is can be found and read -- by a probe driving a real browser, and by anybody
+		// reading the drawing in the inspector -- and "which service is this" has no other answer.
+		var stub = el('line', { 'class': 'lpn-service', 'data-cust': c.id }, labelsLayer),
 			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
 		custEls[c.id] = { stub: stub, box: box };
 		if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
@@ -12604,7 +12634,10 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!pendingMeterBand) {
-			pendingMeterBand = el('line', { 'class': 'lpn-rubberband' }, world);
+			// **ITS OWN CLASS BESIDE THE SHARED ONE.** The half-drawn PIPE uses lpn-rubberband too,
+			// and one selector that finds either is how a probe ends up reading the wrong line's
+			// attributes -- measured in the browser probe, which found the pipe's band first.
+			pendingMeterBand = el('line', { 'class': 'lpn-rubberband lpn-meter-band' }, world);
 		}
 		if (!pendingMeterEl) {
 			pendingMeterEl = el('circle', { 'class': 'lpn-meter lpn-meter-pending' }, world);
@@ -29036,10 +29069,11 @@ var EngCalcs = EngCalcs || {};
 				drag = { type: 'label', id: t.dataset.lbl, offX: lbPt.x - w2.x, offY: lbPt.y - w2.y };
 				Object.assign(drag, common);
 			} else if (t.dataset.custhandle !== undefined) {
-				// **THE SLIDE HANDLE MOVES THE ATTACHMENT AND NOTHING ELSE** (Task 247, Tom's own
-				// *"temporary draggable circle that slides along the pipe"*). Read before the box
-				// below it because it is the more specific thing to have grabbed.
-				drag = { type: 'custanchor', id: t.dataset.custhandle };
+				// **THE CONNECTION GRIP MOVES THE CONNECTION AND NOTHING ELSE** (Task 247; Tom,
+				// 2026-09-18, naming the second of the two grips: *"you can drag the connection
+				// point to a different asset"*). Read before the box below it because it is the
+				// more specific thing to have grabbed.
+				drag = { type: 'custanchor', id: t.dataset.custhandle, touch: e.pointerType === 'touch' };
 				Object.assign(drag, common);
 			} else if (t.dataset.cust !== undefined) {
 				// Dragging the METER moves the meter, and its attachment follows to the nearest
@@ -29732,17 +29766,44 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 			refreshPopupIfOpen();
 		} else if (drag.type === 'custanchor') {
+			/**
+			 * **THE SERVICE IS RE-CONNECTED TO ANOTHER ASSET, AND THE LINE STAYS PUT UNTIL IT GETS
+			 * THERE** (Task 247; Tom, 2026-09-18, in his own words: *"while you drag, only the
+			 * connection point drags. The line stays where it is until you arrive at another asset,
+			 * and at that point the service line snaps to the new asset, repeating this until you
+			 * drop the connection point on a new asset, all always either perp to link or snapped
+			 * to node."*).
+			 *
+			 * **NOTHING HAPPENS OVER BARE MAP, AND THAT IS THE DESIGN RATHER THAN A GUARD.** A grip
+			 * that tracked the pointer would draw a service to a point in the street, at an angle,
+			 * for as long as the hand was between two mains -- which is the same false promise the
+			 * placement band was carrying, in the other gesture. So the drawing only ever shows
+			 * connections that exist, and a drag that ends in the middle of nowhere leaves the
+			 * customer exactly as it was.
+			 *
+			 * **THE METER DOES NOT MOVE.** That is grip one's job (`drag.type === 'customer'`), and
+			 * keeping them apart is the whole of what Tom asked for: one gesture moves the house,
+			 * the other moves what serves it. The station on the new pipe is therefore DERIVED --
+			 * the foot of the perpendicular from where the house already stands -- and never taken
+			 * from the pointer.
+			 *
+			 * **AND IT REPEATS.** Every move re-asks, so passing over three mains shows the service
+			 * on each in turn and the drop merely stops asking. There is no separate commit.
+			 */
+			var ca = customerById(drag.id), hit;
+			if (!ca) { return; }
+			hit = customerConnectionAt(p.x, p.y, customerPoint(ca),
+				drag.touch ? TOUCH_REACH_PX : POINTER_REACH_PX);
+			if (!hit) { return; }
+			// The same connection again is not a change: re-writing it every frame would put a
+			// snapshot on the undo stack for a drag that moved nothing.
+			if (ca.link === hit.link.id && customerT(ca) === hit.t) { return; }
 			snapshotDragOnce();
-			var wa = screenToWorld(p.x, p.y), ca = customerById(drag.id), la = ca ? customerLink(ca) : null;
-			if (!ca || !la) { return; }
-			// **THE HANDLE SLIDES THE WHOLE SERVICE ALONG THE MAIN** -- the connection point and the
-			// meter together, at the same distance out and on the same side. It used to leave the
-			// meter where it was drawn, which was the one gesture on this page that could make a
-			// service point sideways; linkNormalAt() carries why that is no longer offered.
-			setCustomerStation(ca, customerSnapT(la,
-				Geom.nearestFractionOnPolyline(linkPointList(la), wa.x, wa.y).f));
+			setCustomerConnection(ca, hit.link, hit.t);
 			updateCustomerGeometry(drag.id);
 			refreshCustomerHandle();
+			// The junction this demand lumps at can change with the asset, so the answers have to
+			// follow exactly as they do when the meter itself is dragged past the middle of a main.
 			scheduleSolve();
 			refreshPopupIfOpen();
 		} else if (drag.type === 'label') {
