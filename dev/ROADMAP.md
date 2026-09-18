@@ -403,47 +403,6 @@ the block.
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
 
-- 100|674| **Type a node's coordinates instead of only dragging it.**
-  Tom, 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
-  tables. I may need to be dissuaded from this, but at the moment I can scarcely believe that we
-  and epanetjs don't expose this already."*
-  - **HE SHOULD NOT BE DISSUADED, and the reason is in this repo's own rules.** A coordinate is a
-    number the user supplied, and every other such number on this page is typeable: elevation,
-    demand, diameter, length, roughness. Position is the only one that can be entered by gesture
-    alone, which makes it the only one that cannot be entered EXACTLY. A surveyed junction has a
-    northing to two decimals and the page currently asks you to drag until you are close.
-  - **THE UNIT LABELS MUST FOLLOW THE PROJECT, which is the real work.** Three modes and three
-    vocabularies -- lat/lon for a geographic project, easting/northing for a projected one, x/y
-    for a grid -- and `axisNames()` already answers exactly that question for the status bar, so
-    the fields borrow it rather than growing a fourth opinion. Public order is lat,lon and system
-    order is lon,lat (`coord_order_check.php` is blocking), so the FIELD ORDER is decided before
-    anybody writes a row.
-  - **AND IT MUST GO THROUGH `setProp()`**, or typing a coordinate inside a scenario edits Base --
-    the seam `scenario_seam_check.php` exists for. Elevation (`z`) is already a property; only the
-    two horizontal ones are new.
-  - Worth checking before designing: epanet-js exposes coordinates in its property panel, and
-    EPANET's own `[COORDINATES]` section is plain text people hand-edit today. If we are alone in
-    not offering it, that is evidence rather than an argument, but it is the kind Tom asked for.
-
-  - **WHERE THE TWO ROWS SIT IS OPEN AND IS TOM'S DECISION, narrowed by him to two options on
-    2026-09-15.** They ship at the END of the popup and of each node table today, which is neither
-    option. **Option 1: slots 2 and 3, immediately after ID** -- *"in order of fundamentalism, and
-    position-elevation is standard"*, and it matches EPANET, whose Junction order is ID,
-    X-Coordinate, Y-Coordinate, Description, Tag, Elevation. Against it: *"it uses prime real estate
-    for something that people don't usually change/edit"*, it pushes toward collapsible property
-    sections, and customizable table columns are coming anyway. **Option 2: at the end** -- out of
-    sight, but *"distinctly unorderly"*. **He leans to Option 1** *"with the foresight of some
-    collapsing and adjustments in our future"*.
-    - **A POPUP ROW AND A TABLE COLUMN MAY NOT BE ONE DECISION.** He framed them together; the
-      table is where volume entry happens and a column nobody edits in slot 2 is a tab stop paid
-      four hundred times, which is the `data-entry-clerk`'s arithmetic and not a matter of taste.
-    - **AND EPANET PUTS DESCRIPTION AND TAG BEFORE ELEVATION**, which Tom spotted in the same
-      breath (*"yet another surprise from EPANET ... !!!"*): two optional free-text fields ahead of
-      the most important hydraulic number a junction has. **Whether that is deliberate or an
-      accident of EPANET's own interface history decides how much authority its order carries
-      here** -- this project defers to EPANET's TERMINOLOGY, which is a settled rule, and has never
-      agreed to defer to its LAYOUT.
-    - Put to Declan, Sue and Mary on 2026-09-15; their answers land in their own journals.
 - 50|675| **A labelled grid, with the significant digits picked out.**
   Tom, 2026-09-15: a grid in Settings with *"options for density and opacity"*, labelled *"at the
   lower and left map edges aligned with each grid line"*, showing three significant digits large
