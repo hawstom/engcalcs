@@ -37800,7 +37800,7 @@ var EngCalcs = EngCalcs || {};
 			' (' + unitLabel('lpn_u_flow') + ')', customerFlow(c), pc.lpn_field_meter_total_tip);
 
 		if (l) {
-			readonlyField(fields, pc.lpn_field_meter_pipe || 'Pipe that serves it', l.id,
+			readonlyField(fields, pc.lpn_field_meter_pipe || 'Connected asset', l.id,
 				pc.lpn_field_meter_pipe_tip);
 			// **THE STATION, AS A PERCENTAGE OF THE WAY ALONG THE PIPE.** A percentage rather than a
 			// length because `t` is a fraction of ARC LENGTH and a pipe's stated length is the
@@ -37827,7 +37827,7 @@ var EngCalcs = EngCalcs || {};
 			stLabel.appendChild(stInput);
 			fields.appendChild(stLabel);
 			fields.appendChild(document.createElement('br'));
-			readonlyField(fields, pc.lpn_field_meter_lumped || 'Added to junction',
+			readonlyField(fields, pc.lpn_field_meter_lumped || 'Added to node',
 				nid === null || nid === undefined ? '' : nid, pc.lpn_field_meter_lumped_tip);
 			// **A DEMAND ON A FIXED HEAD CHANGES NOTHING, AND IT IS REPORTED RATHER THAN REROUTED.**
 			// A reservoir's and a tank's water surface is the level the document states, so the
