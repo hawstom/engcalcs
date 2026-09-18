@@ -795,8 +795,8 @@ $ec_lang['lpn_tool_vertices']='Vertices';
 // here three times. "Station along the pipe" is the survey word for a distance measured along a
 // route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='Meter';
-$ec_lang['lpn_tool_add_meter_tip']='Click the pipe that serves a customer to put a meter on it, or click open ground and then click the pipe. The demand you give the meter is added to the junction at the near end of that pipe.';
-$ec_lang['lpn_mode_add_meter']='Meter: click the pipe that serves this customer, or click open ground and then click its pipe. Escape leaves the tool.';
+$ec_lang['lpn_tool_add_meter_tip']='Click where the meter is, then click the pipe or the node that serves it. The demand you give the meter is added to the junction at the near end of that pipe.';
+$ec_lang['lpn_mode_add_meter']='Meter: click where the meter is, then click the pipe or the node that serves it. Escape leaves the tool.';
 $ec_lang['lpn_pane_tab_customers']='Customers';
 $ec_lang['lpn_customer_heading']='Customer {id}';
 $ec_lang['lpn_field_account']='Account number';

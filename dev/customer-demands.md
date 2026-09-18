@@ -205,9 +205,13 @@ The gesture:
   *pick the pipe that serves it.* Hovering a pipe highlights it and previews the perpendicular stub
   and the junction it would lump at. Click attaches. Escape or a click on nothing cancels and removes
   the meter — never leave a half-made object on the drawing.
-- **Click directly on a pipe → one click is enough:** attach there and place the meter one default
-  offset out on the open side. A row of twelve houses along one main is the common case, and it should
-  not cost twenty-four clicks.
+- **REMOVED 2026-09-18: the one-click door.** A press straight onto a pipe used to attach a meter
+  there and place it one default offset out on the side of the press. Tom had it taken out --
+  *"I did not ask for it, it could be difficult to manage... Let's remove it. It's of questionable
+  value."* It is recorded here so it is not rebuilt: he liked it for a day (2026-09-17), listed the
+  two things wrong with it -- the offset would have to become a Settings row, and left-versus-right
+  was decided by a fraction of a pixel with nothing on screen to say so -- and then answered his own
+  question in the other direction. **The later word wins.** The tool is two presses, always.
 - The stub is drawn perpendicular from the meter to its attachment point. Dragging the meter moves the
   attachment; dragging past mid-pipe flips the assigned junction, which is why the readout in §2 is
   not optional.
@@ -263,8 +267,8 @@ literal and names no element and no field. `dev/cookie-storage-inventory.md` car
   rows, because a customer turned out to be cheap enough to build whole. A junction's total picks
   every meter up through `demandRowsOf()`, which is the one door the map labels, the colour ramp, the
   Tables column, the popup's resolved Demand and both solvers already read a demand through.
-- **Slice 2 — the drawn meter. SHIPPED 2026-09-15.** The meter object, the two-click gesture and its
-  one-click door, the derived-node rule, the count, the detached state, the slide handle on the pipe
+- **Slice 2 — the drawn meter. SHIPPED 2026-09-15.** The meter object, the two-click gesture (its
+  one-click door was removed 2026-09-18, §4), the derived-node rule, the count, the detached state, the slide handle on the pipe
   and a Customers tab in the bottom pane. **`linkAnchor {link, t}` was NOT extracted into a shared
   function** -- a Text already stores `anchorLink`/`anchorT` and a customer stores `link`/`t`, so the
   seam Task 502 is meant to build is still two spellings of one idea and is still that task's to

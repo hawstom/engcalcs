@@ -7874,10 +7874,6 @@ var EngCalcs = EngCalcs || {};
 	var LPN_METER_MIN_PX = 1.5;        // half-width, so a 3 px dot at the floor
 	var LPN_SERVICE_REAL_M = 0.2;      // the service connector's stroke, full width
 	var LPN_SERVICE_MIN_PX = 0.75;
-	// The default distance a meter is placed OUT from its pipe by the one-click gesture, in screen
-	// pixels: far enough that the box and the pipe are two things, close enough that a row of twelve
-	// along one main reads as a row.
-	var LPN_METER_OFFSET_PX = 18;
 
 	// How many metres one world unit is, HERE. In a grid project a world unit IS the display length
 	// unit, so this is one conversion. In a geographic project a world unit is a DEGREE, and how
@@ -11842,9 +11838,17 @@ var EngCalcs = EngCalcs || {};
 	// abandoned placement leaves no element and owes no undo snapshot. Escape and a click on
 	// nothing both cancel, which is what keeps a half-made object off the drawing.
 	//
-	// **AND A CLICK STRAIGHT ONTO A PIPE IS ENOUGH ON ITS OWN.** A row of twelve houses along one
-	// main is the common case and it must not cost twenty-four clicks, so the one-click door places
-	// the meter a default offset out on the side the press was on.
+	// **AND THERE IS NO ONE-CLICK DOOR. IT WAS BUILT, IT SHIPPED, AND TOM HAD IT TAKEN OUT**
+	// (2026-09-18: *"I did not ask for it, it could be difficult to manage... Let's remove it. It's
+	// of questionable value."*). A press straight onto a pipe used to make a meter then and there,
+	// one default offset out on the side the press was on -- which bought a row of twelve houses
+	// twelve clicks instead of twenty-four and cost two things nobody could see: the offset was a
+	// constant with no control anywhere, and which side of the main the meter landed on was decided
+	// by a fraction of a pixel. **Do not rebuild it.** He liked it for a day, listed what was wrong
+	// with it, and then answered his own question in the other direction; the later word wins.
+	//
+	// So the tool is two presses, always, and they are two different statements: where the meter
+	// is, and what serves it.
 	var pendingMeter = null;        // {x, y} in world units, or null
 	var pendingMeterEl = null;      // the preview dot
 	var pendingMeterBand = null;    // the dashed line to the live pointer
@@ -11883,27 +11887,6 @@ var EngCalcs = EngCalcs || {};
 		pendingMeterBand.setAttribute('y1', pendingMeter.y);
 		pendingMeterBand.setAttribute('x2', isFinite(tx) ? tx : pendingMeter.x);
 		pendingMeterBand.setAttribute('y2', isFinite(ty) ? ty : pendingMeter.y);
-	}
-	// **WHICH SIDE OF THE PIPE THE METER GOES, on a one-click placement: the side the press was
-	// on.** A press is almost never exactly on the centreline, so the answer is nearly always the
-	// one the hand meant; dead on it, the left normal is taken deterministically, because a symbol
-	// that lands on a different side for two identical presses is worse than one that always lands
-	// above.
-	//
-	// The offset is a SCREEN distance turned into world units, so the box sits the same distance
-	// from its main at every zoom -- which is what makes a row of them read as a row.
-	function meterOffsetFor(l, t, w) {
-		var pts = linkPointList(l), seg = Geom.segmentAtFraction(pts, t), i = seg.index,
-			dx, dy, len, nx, ny, an, side, d;
-		if (!pts[i] || !pts[i + 1]) { return { x: 0, y: LPN_METER_OFFSET_PX / (state.s || 1) }; }
-		dx = pts[i + 1].x - pts[i].x; dy = pts[i + 1].y - pts[i].y;
-		len = Math.hypot(dx, dy) || 1;
-		nx = -dy / len; ny = dx / len;
-		an = Geom.pointAlongPolyline(pts, t);
-		side = (w.x - an.x) * nx + (w.y - an.y) * ny;
-		d = LPN_METER_OFFSET_PX / (state.s || 1);
-		if (side < 0) { d = -d; }
-		return { x: nx * d, y: ny * d };
 	}
 	// **ESCAPE ABANDONS A HALF-PLACED METER, on the same capture-phase argument the link below it
 	// makes** -- it is the newest thing on screen, and the key is consumed only when there is
@@ -27498,6 +27481,11 @@ var EngCalcs = EngCalcs || {};
 					openCustomerPopup(onMeter.id, e.clientX, e.clientY);
 					return;
 				}
+				// **THE FIRST PRESS IS WHERE THE METER IS, AND IT IS NOTHING ELSE.** A pipe under it
+				// is not a target here: a meter often sits right over a main on the drawing, and the
+				// press that used to attach one there is the door Tom had removed (see
+				// setPendingMeter above). Nothing is written to the document yet.
+				if (!pendingMeter) { setPendingMeter({ x: w.x, y: w.y }); return; }
 				// **A PRESS ON A NODE CONNECTS THE SERVICE TO THAT NODE** (Tom, 2026-09-17: *"I
 				// don't see a way to connect directly to a node."*). There was genuinely no way:
 				// this tool asked for a PIPE and a node is not one, so pressing a junction did
@@ -27511,8 +27499,7 @@ var EngCalcs = EngCalcs || {};
 				// the Customers table shows which pipe it landed on so a wrong guess is visible and
 				// typeable rather than silent.
 				var mNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)),
-					mPt = pendingMeter ? pendingMeter : w,
-					mLink = mNode ? customerAttachAtNode(mNode, mPt) : null;
+					mLink = mNode ? customerAttachAtNode(mNode, pendingMeter) : null;
 				// The pipe under the press, by the browser's own hit test on its wide stroke,
 				// falling back to the same finder every other tool uses.
 				if (!mLink) {
@@ -27527,13 +27514,7 @@ var EngCalcs = EngCalcs || {};
 				if (mLink && mLink.link) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					var off = pendingMeter ? null : meterOffsetFor(mLink.link, mLink.t, w),
-						an2 = Geom.pointAlongPolyline(linkPointList(mLink.link), mLink.t),
-						// The SECOND click of the two-click gesture keeps the point the FIRST one
-						// chose; a one-click placement takes the default offset out on the side the
-						// press was on.
-						mx = pendingMeter ? pendingMeter.x : an2.x + off.x,
-						my = pendingMeter ? pendingMeter.y : an2.y + off.y;
+					var mx = pendingMeter.x, my = pendingMeter.y;
 					setPendingMeter(null);
 					var madeC = addCustomer(mx, my, { link: mLink.link.id, t: mLink.t });
 					setSelection('customer', madeC.id);
@@ -27552,11 +27533,9 @@ var EngCalcs = EngCalcs || {};
 						.split('{id}').join(madeC.id));
 					return;
 				}
-				// **A CLICK IN OPEN SPACE EITHER STARTS THE GESTURE OR CANCELS IT.** Starting is
-				// Tom's own *"you pick a point"*; cancelling is what keeps a half-made object off
-				// the drawing, and nothing has been written, so there is nothing to undo.
-				if (pendingMeter) { setPendingMeter(null); }
-				else { setPendingMeter({ x: w.x, y: w.y }); }
+				// **A SECOND PRESS THAT NAMES NOTHING CANCELS.** It is what keeps a half-made
+				// object off the drawing, and nothing has been written, so there is nothing to undo.
+				setPendingMeter(null);
 			}
 			else if (mode === 'add-text') {
 				// **THE OTHER HALF OF THE FAT-FINGER RULE.** Without a guard here, a tap on the Text
