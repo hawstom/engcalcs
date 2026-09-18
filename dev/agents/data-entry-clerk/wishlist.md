@@ -246,3 +246,163 @@ kind today (item 1/610's still-open half), so a projected-CRS mode would be buil
 feature that does not exist yet. No urgency, per Tom's own framing (a development branch, not a
 near-term ship) — I agree with that framing from my own seat, more strongly than I expected to
 before writing the review.
+
+## 7. Task 674 (already largely built): move the table's coordinate columns to the END of the typed fields, not right after Elevation
+
+**Already built, branch `674-coordinate-entry`** — not a new feature request, a placement correction
+before merge. Full arithmetic: journal, eighth invocation, 2026-09-15.
+
+As built, the Junctions/Reservoirs/Tanks tables put X and Y in slots 4-5, directly between Elevation
+and every other typed field (Demand, Fire flow, Level...). Because coordinate cells are real, typeable
+`<input>`s (unlike a plain/result cell, which the table already excludes from Tab via `tabIndex = -1`),
+this interrupts the one continuous keyboard run the table gives a clerk today, on every one of 400
+rows, for the ordinary clerk who positions nodes by pointer and never types a coordinate — measured at
+roughly 800 unwanted Tab stops for 400 junctions, landing in a box that actually moves the node if
+mistyped. **Moving the same two columns to the end of the typed fields (after Fire flow, before the
+read-only results) removes the interruption entirely for that clerk**, because a trailing unwanted
+column can be skipped by simply not tabbing that far and clicking the next row instead, where a middle
+one cannot be skipped without leaving the keyboard. This costs nothing to a clerk who DOES want to
+paste surveyed coordinates in bulk, since paste-onto-existing-rows already works by clicking the drop
+cell directly, independent of column position.
+
+**I would NOT ask the popup to match** — see the disagreement recorded below. The table and the popup
+are used at different volumes and, on my own metric, do not have to agree.
+
+**Size:** trivial — reordering `cols:` array entries in three specs (`buildPaneTables()`), no new
+mechanism, no `js_module_wiring_check.php`/`focus_order_check.php` implications I can see (worth a
+second look by whoever ships it, since `focus_order_check.php` is exactly the check that watches
+per-row keyboard-stop cost).
+
+## 8. Popup group collapsing: build it, but open by default and remembered per browser — ranked as a small, cheap correctness item, not a volume-entry fix
+
+Full arithmetic and citations: journal, ninth invocation, 2026-09-15. Short version: collapsible
+`<details>`-style groups in the property popup (ID / Dimensions / Flow and pressure / Quality /
+Custom) cost a volume clerk **nothing** if they ship open by default and stay open unless the
+reader collapses one — which is the page's own existing rule for the two places it already uses this
+exact element (`customPropBox()`, `multiSection()`, both `js/looped-network.js`, both commented
+"OPEN... collapsing is something the reader does, never the default"), and matches Tom's own
+2026-08-18 ruling against the old Settings-box accordion (*"No need ever to collapse; just
+scroll/jump to your section"*). Shipped collapsed-by-default with no memory, the same feature costs
+up to 800 extra clicks across 400 elements — arithmetically the same shape as my table finding
+below, on a different surface.
+
+**It does NOT pay back the 800-keystroke table debt** (item 7 / Task 674) — that is a Tables-pane
+column-order question and this is a popup field-grouping question, and I found no code path where
+one touches the other. Tom's own sentence ties them together ("accepted that cost until columns
+become customizable... is collapsible grouping the thing that pays it back") and my answer is no:
+name the two as separate remedies rather than let one stand in for the other.
+
+**Ranked low** — it is real, and I would ship it (open-by-default, remembered per browser in a
+furniture-shaped `localStorage` key, never in `serializeProject()`), but it saves at most a handful
+of clicks a session for someone who collapses a group they never use, not a per-row or per-element
+cost the way items 1, 2 and 7 are. I would not build it before anything else on this list.
+
+## UPDATE 2026-09-16 to item 7: the 800-keystroke number was row-major only — Enter-down (already shipped) removes most of it, column hide/reorder removes the rest
+
+**OBSERVED**, journal tenth invocation: `js/looped-network.js:16668-16670` already moves focus DOWN
+the same column on Enter, not across the row — shipped, not proposed. My eighth-invocation
+800-keystroke count assumed a clerk tabs across a full row per element (row-major); it says nothing
+about a clerk filling one property down a whole column at a time (column-major), which the page's own
+"place by pointer, fill properties second" structure already pushes a clerk toward. **Column-major
+pays zero for coordinate slot position, at any placement.** Row-major still pays a real, smaller cost
+— unchanged from the eighth-invocation number for that one workflow only.
+
+**Re-ranking, honestly, against myself:** item 7 (reorder coordinates to the trailing end) is no
+longer the strongest available fix — see item 9 below, column hide/reorder, which a row-major clerk
+can use to remove coordinate columns from their Tab path entirely rather than merely moving them
+somewhere cheap to skip. I would still ship a sane default order (late, not mid-row) since a
+first-time clerk has not found the hide control yet, but I am retracting the claim that reordering
+alone is the fix — it is the cheap partial fix; hiding is the complete one.
+
+## 9. Column hide and reorder for the Tables pane — Tom has agreed in principle; full design in journal, tenth invocation
+
+Not previously on this list under this name — Tom proposed it himself, 2026-09-16 ("if things are
+radically spreadsheet-like, Declan can hide and reorder any columns he wants to hide"), directly
+answering my own repeated "customizable panes" framing from the seat's own opening brief. Full design
+in the journal: per-table scope, one furniture key (`LPN_PANECOLS_KEY`, outside
+`serializeProject()`, matching the pattern `lpn_furniture_check.php` already enforces), ID pinned
+non-hideable, a per-table "Columns" popover plus a header-right-click "Hide this column" shortcut for
+speed, and — the question only this seat asked — **paste onto a table with hidden columns SKIPS
+them** by removing a hidden column from `paneCols(spec)` entirely, which means `panePasteAt()`'s
+existing "ran off the last column: dropped and COUNTED" behavior already covers it with no new code
+path. Rejected REFUSE (punishes the clerk the feature is for) and rejected Excel's own actual
+hidden-column paste behaviour (writes into cells you cannot see — a documented user trap, and the
+opposite of how this codebase already treats a filtered-out row).
+
+**Ranking: above item 7 (which it supersedes as the complete fix rather than the partial one), below
+items 1/610's still-open row-creation half and the market-researcher's import row** — it is real and
+Tom has already agreed to it, but it still only removes a Tab-crossing cost for the row-major
+workflow; it does not remove a round trip the way row creation by paste or a mapped import would.
+
+## Disagreement with Tom's own framing of Task 674 (2026-09-15), stated once
+
+Tom's question treated table placement and popup placement as one decision — "Option 1... put
+coordinates immediately after ID... Option 2... at the end" — and leaned toward Option 1 for both. My
+own reading of the built code says these are two different questions with two different right answers
+for my seat: the table pays a real, row-multiplied cost for a middle placement that the popup does not
+pay at all, because the popup is opened once per element rather than typed down many times. I would
+keep coordinates early in the popup (Option 1 there is genuinely harmless, and it is where the
+EPANET/PNEZD "order of fundamentalism" argument actually applies) and move them to the end of the
+typed columns in the table (functionally Option 2, but past every OTHER input, not merely past
+Elevation) — not because Tom's instinct toward Option 1 is wrong, but because it is being asked to
+answer two questions that do not have the same answer.
+
+## 10. Customer bulk-entry (Task 247): typed LINK column, never a silent nearest-pipe guess — a condition on the build, not a new row
+
+Raised 2026-09-17, answering Tom's direct question about the "location, link, location, link" input
+shape (journal, eleventh invocation). Not a request for a new feature — Task 247's own design
+document already stores `link` + `t` and derives the node, so this is a condition on HOW customers
+get created in bulk, not a new mechanism.
+
+**The two-column-per-row shape (location cell, link cell, one row per customer) is fine and is what
+this page already does everywhere else** — no disagreement there, and Enter-down-column
+(`js/looped-network.js:17008`, master, checked 2026-09-17) makes it cheap to type. **The condition:
+LINK must be an explicit, typed/matched value on import, never a silent nearest-pipe geometric guess**
+— a plan set already states which main serves which service, which is exactly the information a
+geometric guess cannot recover reliably at a parallel-main or intersection case, and the failure is
+silent (the meter still draws, the demand still solves, it is on the wrong main). This is the same
+class of danger CLAUDE.md already names for elevation fill and for units: a value that changes the
+solved answer must never be quietly substituted for what the user actually has.
+
+**Ranking: below item 1/610 (row creation generally) since it depends on that shipping first for any
+element kind, and it is a condition on that build rather than a separate one — I am not asking for
+separate work, only that whoever builds Task 247's bulk-entry path reads this before writing the
+importer.**
+
+## 11. Library import: per-library checkboxes, not per-entry — do not build a 200-row picker
+
+Raised 2026-09-17, journal eleventh invocation, **SPECULATION** (did not read the importing branch's
+own code this session; the branch was not given to me). Someone importing a colleague's pipe-type
+library wants nearly all of it, which makes a checkbox-per-entry picker the wrong-shaped tool in the
+common case: default-checked costs a hunt-and-uncheck across 200 rows to find the few you don't want,
+default-unchecked costs ~195 clicks to get what "import the library" already meant for free.
+**Per-library selection, then ordinary multi-select-and-delete in the Tables pane to prune the few
+unwanted entries**, is cheaper in the common case and no worse in the rare one, and it reuses a
+mechanism (row selection/delete) this page already has rather than asking for a new one.
+
+**Ranking: low — this is a "don't build it this way" flag, not a feature I am asking for.** If a
+filter box above a checkbox list is wanted for a genuinely large library, I would want to see the
+library's real size before agreeing it earns the extra control; import-then-prune may still win.
+
+## 12. CSV/point-file import: a format chooser is the SAFE answer for northing/easting order, and should not be replaced by a magnitude guess
+
+Raised 2026-09-17, journal eleventh invocation. **CITED** (full citations in the journal): PNEZD and
+PENZD are both real, named Civil 3D/survey conventions and differ only in which of
+Northing/Easting comes first; a wider survey (CivilGEO's own documentation) names at least eight
+distinct orderings varying independently on point-ID presence, description presence, and
+coordinate order. **The coordinate-order axis is the one that matters** — a wrong point-ID or
+description guess is visibly wrong the moment you look at the import; a Northing/Easting swap is
+not, and can place a whole survey at a plausible-looking wrong position. This is the same shape of
+danger CLAUDE.md's own lon/lat-vs-lat/lon rule already exists to guard against, from a different
+door.
+
+**I would build: (1) a plain-language (not acronym) chooser for coordinate order as the one
+mandatory question; (2) simple ID/description presence toggles, lower priority since a wrong guess
+there is self-evident; (3) read a header row when present and trust it over any chooser default,
+falling back to the chooser only when there is none.** I would NOT try to auto-detect coordinate
+order from value magnitude — it is exactly the kind of guess that passes on the examples you tried
+and fails silently on the plan set you didn't.
+
+**Ranking: this is a correctness condition on the CSV-import branch, not a new priority of my own —
+I would not delay that branch to build it elaborately, but I would treat skipping the coordinate-
+order question as a defect, not a simplification, given how silent the failure is.**

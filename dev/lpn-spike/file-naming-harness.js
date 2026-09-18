@@ -142,13 +142,14 @@ report(/^https:\/\//.test(APP), 'the app value is an https URL', APP);
 // Not `www.` — no origin in lib/config.inc.php's whitelist has one, and a marker pointing at a
 // hostname that redirects is a marker that will one day point at nothing.
 //
-// CANONICAL_ORIGIN became a host -> origin lookup when the suite gained a second domain (Task 479),
-// so the origin to compare against is CANONICAL_ORIGIN_DEFAULT: the marker is baked into a saved
-// FILE, which outlives the request that wrote it and has no Host header of its own. It must name the
-// indexed address, not whichever domain the author happened to be on.
+// The marker is baked into a saved FILE, which outlives the request that wrote it and has no Host
+// header of its own, so it must name the app's own indexed address rather than whichever domain the
+// author happened to be on. That address is EC_LWN_ORIGIN, not CANONICAL_ORIGIN_DEFAULT: as of
+// 2026-09-17 the two differ, because the calculators nominate hawsedc.com again and the map
+// application alone stays on librewaternet.org (ecCanonicalOrigins() in lib/Canonical.lib.php).
 const config = fs.readFileSync(path.join(__dirname, '../../lib/config.inc.php'), 'utf8');
-const origin = (config.match(/define\('CANONICAL_ORIGIN_DEFAULT',\s*'([^']+)'\)/) || [])[1];
-report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under CANONICAL_ORIGIN_DEFAULT', `${APP} vs ${origin}`);
+const origin = (config.match(/define\('EC_LWN_ORIGIN',\s*'([^']+)'\)/) || [])[1];
+report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under EC_LWN_ORIGIN', `${APP} vs ${origin}`);
 
 console.log('\n-- the pickers: write one extension, read both --');
 {

@@ -15,5 +15,13 @@
         "file is edited in the same session that merges the branch, and Tom's words are not in the",
         "transcript, the gate has been walked around rather than passed."
     ],
-    "cleared": {}
+    "cleared": {
+        "674-coordinate-entry": {
+            "date": "2026-09-17",
+            "words": "I think this branch can be merged and deleted.",
+            "context": "Said after he tested it, in the same message as his ruling that the Properties box does not need collapsing yet: \"We discussed making Properties collapsible. To be honest, I don't think they are too long (long/numerous enough to need collapsing) yet.\"",
+            "pin_note": "HE CLEARED IT AT bfd05abf AND THE PIN IS ONE COMMIT LATER, WHICH IS STATED RATHER THAN GLOSSED. The extra commit is 690a67c0, which applies HIS OWN three wording edits to lib/lang.ec.en.php -- lpn_coord_off_world, lpn_field_coord_tip and lpn_field_desc_tip -- harvested from the marks he wrote on dev/new-english-keys.md the same day. So the content of the commit he did not see is text he wrote himself. Recorded here because an all-clear is supposed to lapse when the branch moves, and this one was extended by a judgement rather than by him; if that judgement was wrong, the place to catch it is this line.",
+            "head": "690a67c0f6415a1b557236a92c608801384cbcd2"
+        }
+    }
 }

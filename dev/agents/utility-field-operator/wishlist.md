@@ -126,9 +126,22 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   because it is an enumeration, not a forecast; a derived time is not, and should not be added even
   as a later "improvement."
 
-### 5. Task 567 (vertices): fix the accidental double-tap edit FIRST — it is a live read-only hazard today, before any mode ships
+### 5. WITHDRAWN 2026-09-17 ON TOM'S OWN TESTING — the double-tap hazard is fixed and I had not retested
 
-- **Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**
+**Tom, 2026-09-17, asked whether to promote this: *"No. He's wrong. Tell him to remove it from his
+wish list. He didn't try the latest version that has explicit vertex mode. It's no longer a hazard,
+and this has been weeks so now."*** He is right and the item is withdrawn. An explicit vertex mode
+shipped; a reader in `select` mode no longer edits anything by double-tapping.
+
+**THE LESSON IS MINE AND IT IS THE ONE WORTH KEEPING: an OBSERVED finding decays.** I traced this
+on 2026-09-01, tagged it OBSERVED with `path:line`, and it was true that day. I then carried it
+forward as my top-ranked item into two later invocations WITHOUT RE-READING THE CODE, because a
+provenance tag felt like proof. **A tag records where a fact came from, never that it is still
+true.** Re-verify an OBSERVED finding against the current tree before ranking it again, and say the
+date you last checked — not only the date you found it. The text below is kept as the record of what
+the defect was, and is no longer a recommendation.
+
+- ~~**Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**~~
   This is the one place my seat's standing worry — a reader silently changing somebody's model — is
   not speculative. It is already true of the shipped page.
 - **What I found, OBSERVED (full trace in the journal, 2026-09-01):** in ordinary `select` mode — the
@@ -222,6 +235,106 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   HIDES a misattribution rather than showing one) is not what the priority bump's own language is
   about. This is not a claim the task is misconceived — Tom's own test for it is fair — only that its
   sizing does not match what my seat sees as the risk.
+
+### 7. The property popup grouping (2026-09-15 brief): a phone-specific default, and a group order that differs from a designer's
+
+- **What: on a phone specifically, default "Dry" and "Results and quick graph" CLOSED; default
+  "Description and state" and "Water" OPEN; keep desktop's default of everything open, unchanged.**
+  Full reasoning in the journal (2026-09-16). This is not a request to redesign the four groups
+  Tom already settled — it accepts them as given — it is a request for a per-breakpoint DEFAULT,
+  which the brief's four groups alone do not decide.
+- **Why: the desktop no-collapse ruling was measured against a screen that shows the whole list
+  near the fold; a phone popup does not** — `.lpn-setbox` runs to `min(46rem, 92dvh)`
+  (**OBSERVED** `css/engcalcs.css:1532`) and a full inventory is a page-length scroll inside a box
+  already consuming most of the viewport. "Nobody is complaining" is true of the screen it was
+  said about; it is not evidence about the smaller one, and I do not think it was weighed against
+  it.
+- **Group order: mine is Description and state, then Water, not Dry.** I want identity and
+  Shut/Active first, then whether the asset is live (Demand, Head, Fire flow); Dry (length,
+  diameter, roughness, K) is what a design engineer checks a run against, and it is my third
+  question, not my second. A real, stated disagreement with the order Tom's list implies — see
+  the journal for the full case.
+- **Rank, honestly, against my own other rows: LOW.** Per row 3 above, the honest baseline is that
+  I mostly do not open this box at all — real isolation/condition work runs through a GIS trace and
+  a work order, and when I do read the model it is for identity and topology, which the map and
+  tap-to-select already answer before the popup's own field order matters
+  (`dev/agents/utility-field-operator/wishlist.md:64-80`, this file). I answer this question
+  because Tom asked the team directly and named a real open problem (Results falling to 2 rows on
+  a reservoir/tank), not because it is where I would have pointed the team's attention unprompted.
+  A per-breakpoint default is a small, cheap addition to a grouping already being built, which is
+  why it is worth stating even at low priority — it costs little on top of work already happening.
+- **Shut vs. Active: no build here, a confirmation.** Tom's own distinction (Shut = what a person
+  or a `[CONTROLS]` action does; Active = a planning-table decision nobody in the field makes) reads
+  correctly to me and needs no change. The only thing I flagged is a rendering caution — two
+  identical-looking toggles side by side inviting the wrong one to be hit — worth a glance when the
+  row is built, not a design question.
+- **The two new Pipes-table columns: no build, a caution against narrowing Description.** A
+  truncated Description looks like an answer to "which asset is this" and is not one; if a
+  phone-specific default is wanted at all, hide it rather than narrow it, through whatever
+  column-hide mechanism the table already has (which is Declan's territory, not mine — I am not
+  proposing new machinery here, only naming which of "narrow" or "hide" is honest from my seat).
+
+### 8. Zoom: never snap the pinch gesture; if per-level label caching ships, key it on a scale bucket without making the view refuse to land where fingers put it; and add a second named view, "zoom to selection"
+
+- **What, three parts, in order of how much I care:**
+  1. **Do not snap the DISPLAYED scale during pinch, ever.** Snapping button/double-tap steps is
+     fine and unrelated to this objection. Full reasoning and a citation: journal, 2026-09-17, Q1.
+     My job's reason for pinching is lining the drawing up against the ground under my feet; a
+     view that will not land exactly where two fingers put it defeats that, and it is the one part
+     of Tom's two proposals I would flatly decline rather than rank low.
+  2. **If per-level label caching is built (the "almost instantaneous zooming" idea), build the
+     cache key as a rounded bucket of the continuous scale, not as the displayed scale itself** —
+     the view stays continuous and smooth (this page already defers the expensive relayout to
+     settle 120 ms after a gesture, `js/looped-network.js:29159-29160`, so the caching win is about
+     making that settle-moment recompute instant on a REVISIT to a scale, not about removing lag
+     that is not currently there mid-gesture). If a jump is unavoidable for the caching approach
+     chosen, let it happen only in the fast part of a gesture and settle to no-jump in the last
+     slow portion — see journal Q2 for why that specific moment is the one that matters to a
+     reader confirming identity by tap.
+  3. **A second named view, "zoom to selection"** (frame the tapped asset and its immediate
+     neighbors), built the same way `Zoom to fit` already is (`js/looped-network.js:25343`) but
+     from the selection's extent rather than the whole drawing's. This is my actual answer to "how
+     many zoom levels do I use" (journal Q3: two or three PURPOSES, not a ladder of magnitudes) —
+     it is cheaper than a caching ladder and serves the real want directly.
+- **Rank: the snap objection (part 1) is a real "please do not do this," not a low-priority
+  wish — but it is also not urgent, because nothing has shipped yet; I am recording it now so it is
+  on record before any build starts. Parts 2-3 are ordinary feature-shaping, ranked below my
+  existing #1-6 for the same reason those are ranked where they are: this is refinement of a page
+  Tom already found "super solid" on a phone, not a rescue.**
+- **Disagreement with how the proposal was framed, stated once:** Tom's own two sentences read as
+  one idea ("zoom level snapping... and I assume that would give us almost instantaneous zooming"),
+  and I think they are two different changes with very different costs to my task. The caching
+  half is worth having; the snapping half is the one I would ask him to reconsider before it is
+  built, on the finger-tracking argument above, not on taste.
+
+### 9. Customer service connections: constrain the DRAG, not only the default — and skip the house icon at these sizes
+
+- **What:** on `feat/customer-demands` (Task 247), lock a customer's service-line drag to station
+  (along the pipe) and standoff distance/side (perpendicular to it), rather than a free x/y drag
+  that can land the stub at any angle. Full reasoning and citation: journal, 2026-09-17. I agree
+  with Tom's instinct not to offer a non-perpendicular connection at all — I found no field-reading
+  task the angle serves that the meter's position does not already serve better, and a uniform
+  perpendicular pattern makes the one real exception (a lateral crossing the street) MORE visible,
+  not less, because it is the one dot sitting on the wrong side of an otherwise consistent row.
+- **Snap to the nearest node on close approach: yes, no reservation** — the page already snaps a
+  near-miss onto an existing node/meter elsewhere (`nearestNodeNearScreen()`,
+  `js/looped-network.js:27186-27196`, worktree), so this is the page's own standing idiom, not a
+  new one. The one thing I'd want confirmed, not a reason to decline: the catch is visually obvious
+  and a further drag releases it.
+- **Small solid dot: yes. House/building icon: no, at the sizes this page actually draws.**
+  **CITED**, Esri's own minimum-symbol-size guidance puts a simple symbol's screen floor near 10 px
+  and names 20×20 px as the size below which an iconic (detailed) shape needs different design work
+  entirely (Esri ArcGIS blog, "Guidelines for minimum size for text and symbols on maps," retrieved
+  2026-09-17). **OBSERVED**, this page's customer symbol draws at 3-7 px in the ordinary zoomed-out
+  case (`LPN_METER_MIN_PX = 1.5` half-width vs. the junction's fixed `symbolSize: 7`,
+  `js/looped-network.js:7873-7874`, `4650`, worktree) — under even the simple-shape floor, so a
+  house glyph will not read as a house there; it reads as a slightly different dot, at extra
+  rendering cost for no legibility gain I can find. Keep the size and position cues (smaller than a
+  junction, off the pipe on a stub) that already do the real identification work.
+- **Rank: low, and mostly already built.** The perpendicular default ships today
+  (`meterOffsetFor()`); the only gap is the unconstrained drag afterward, which is a small, cheap
+  fix layered on a feature already in flight — not a new want of mine. I answer it because Tom asked
+  the seats directly, not because it is where I would have pointed the team's attention unprompted.
 
 ## Parked
 

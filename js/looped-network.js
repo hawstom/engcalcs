@@ -97,14 +97,17 @@ var EngCalcs = EngCalcs || {};
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
 	function nodeLabelBase(n) {
 		var d = defaultLabelOffset();
-		return { x: n.x + (n.lx !== undefined ? n.lx : d.x),
-			y: n.y + (n.ly !== undefined ? n.ly : d.y) };
+		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),
+			y: nodeDrawY(n) + (n.ly !== undefined ? n.ly : d.y) };
 	}
 	// A link's centerline as a point list: its two end nodes with any user vertices between.
 	// This is the one place link topology becomes plain geometry, and everything in
 	// EngCalcs.lpnGeom takes its input in this form.
+	// **THE ONE PLACE A PIPE LEARNS WHERE ITS ENDS ARE**, so an overridden position carries into the
+	// polyline, the Auto length, the geodesic length, the arrows and every label station for nothing
+	// (Task 674). A point, not the node itself: the node's own x/y is Base's.
 	function linkPointList(l) {
-		return [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]);
+		return [nodeAt(nodeById(l.from))].concat(l.verts, [nodeAt(nodeById(l.to))]);
 	}
 	// The point a fraction `f` of the way along the WHOLE polyline, by arc length -- not the
 	// midpoint of some chosen segment. Returns the point plus the along-distance it sits at, so
@@ -353,7 +356,7 @@ var EngCalcs = EngCalcs || {};
 		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
-		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n),
+		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
 		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
@@ -376,7 +379,7 @@ var EngCalcs = EngCalcs || {};
 			if (d < bestD) { bestD = d; best = { ax: ax, ay: ay, bx: bx, by: by }; }
 		}
 		if (best) { return best; }
-		var a = nodeById(l.from), b = nodeById(l.to);
+		var a = nodeAt(nodeById(l.from)), b = nodeAt(nodeById(l.to));
 		return a && b ? { ax: a.x, ay: a.y, bx: b.x, by: b.y } : { ax: 0, ay: 0, bx: 1, by: 0 };
 	}
 	// TRUE when this link's label should be drawn ALONG the pipe (the GIS way) rather than
@@ -442,9 +445,12 @@ var EngCalcs = EngCalcs || {};
 			return { key: l.id, pts: linkPointList(l) };
 		}));
 	}
+	// Counted so a harness can see the QUADRATIC shape rather than a slow stopwatch: unheld, this
+	// index is rebuilt once per caller, and `buildDom()` has one caller per pipe.
+	var linkSegIndexBuilds = 0;
 	function linkSegIndex() {
-		if (!linkSegDepth) { return buildLinkSegIndex(); }
-		if (!linkSegIndexHeld) { linkSegIndexHeld = buildLinkSegIndex(); }
+		if (!linkSegDepth) { linkSegIndexBuilds++; return buildLinkSegIndex(); }
+		if (!linkSegIndexHeld) { linkSegIndexBuilds++; linkSegIndexHeld = buildLinkSegIndex(); }
 		return linkSegIndexHeld;
 	}
 	function beginLinkGeomHold() { linkSegDepth++; }
@@ -563,10 +569,83 @@ var EngCalcs = EngCalcs || {};
 		le.lines = lines;
 		return rows;
 	}
+	/**
+	 * ---- THE TAPE MEASURE'S MEMORY (Tom, 2026-09-16: *"a 5-second delay switching to Net-3"*) -----
+	 *
+	 * **A TEXT MEASUREMENT IS A FUNCTION OF THE STRING AND THE FONT SIZE, and this page asks the
+	 * same question thousands of times for one project switch.** Measured on Net3 with every label
+	 * field on: **8,140 measurements in a single switch, 1,029 of them distinct -- 87% repeats** --
+	 * and of a SECOND switch's 7,822 measurements, **100% asked a question the first switch had
+	 * already answered**. Each one is a LAYOUT READ taken between two DOM writes, so a browser
+	 * services it with a synchronous layout of an 8,400-element drawing; node does not, which is why
+	 * the headless switch is 350 ms and his is five seconds.
+	 *
+	 * Task 331 and Task 440 already banked each label's PIXEL width so that a ZOOM costs no
+	 * measurement. A project switch throws that away by construction: `buildDom()` builds new
+	 * elements, and a new element has no bank. **This is the same banking one level up** -- keyed on
+	 * what the answer actually depends on rather than on the element that happens to be asking.
+	 *
+	 * **IT DOES NOT RESCALE, AND CHROME IS WHY.** The obvious form of this banks width PER UNIT of
+	 * font size, which is the assumption `labelBoxWidth()` already ships for pixels. Measured in real
+	 * Chrome before building it -- eight label-shaped strings at thirteen sizes, against the ratio at
+	 * 2000px -- **a measurement taken below about one world unit of font size is QUANTISED**: 0.150%
+	 * error at 4 units, 1.19% at 0.5, 5.6% at 0.1 and **19.7% at 0.02**. A label's font size in world
+	 * units is `textSize / scale`, so the small end is simply "zoomed in", which is an ordinary place
+	 * to be -- and a ratio banked there and reused at any other zoom would be wrong by that much.
+	 *
+	 * So the SIZE IS PART OF THE KEY and nothing is ever rescaled: a hit returns a number this
+	 * browser measured for this string at this exact size, and a zoom is a miss that measures again,
+	 * exactly as today. That costs nothing that matters, because the repeats this exists to kill are
+	 * all at ONE size -- every data label on the map shares `effectiveFontSize()` -- which is why the
+	 * 87% and 100% above were counted with the size in the key.
+	 *
+	 * **THE KEY CARRIES THE CLASS as cheap insurance.** One font serves every map label today -- no
+	 * `.lpn-lbl` rule sets a family, weight or letter-spacing -- but a future rule that did would
+	 * otherwise make two different strings share an answer, which is the quietest kind of wrong.
+	 *
+	 * Bounded, and cleared whole rather than evicted one by one: a drawing whose labels are all
+	 * distinct gets one lookup per measurement and nothing worse.
+	 */
+	var textMeasureCache = Object.create(null), textMeasureKeys = 0;
+	var TEXT_MEASURE_MAX = 20000;
+	// `fontWorld` is the size the string is drawn at. Zero or missing means the answer cannot be
+	// attributed to a size, so the real measurement is taken and nothing is banked.
+	function measuredTextWidth(el, str, fontWorld, measure) {
+		if (!(fontWorld > 0) || !str) { return measure(); }
+		// **THE SIZE IS ROUNDED INTO THE KEY, and it has to be.** `effectiveFontSize()` is
+		// `textSize / scale`, and a fit that lands a hair from where it landed last time produces a
+		// size differing in the last bits -- which is a different key, and a measured 87% of the
+		// hits lost for a size difference of one part in ten million. Six significant figures is
+		// four orders of magnitude finer than the quantisation the measurement itself carries.
+		var k = ((el && el.getAttribute && el.getAttribute('class')) || '')
+			+ '\u0000' + fontWorld.toPrecision(6) + '\u0000' + str,
+			hit = textMeasureCache[k], w;
+		if (hit !== undefined) { return hit; }
+		w = measure();
+		if (isFinite(w) && w >= 0) {
+			if (textMeasureKeys >= TEXT_MEASURE_MAX) {
+				textMeasureCache = Object.create(null); textMeasureKeys = 0;
+			}
+			textMeasureCache[k] = w;
+			textMeasureKeys++;
+		}
+		return w;
+	}
+	// The font size a text element is drawn at, in world units -- written inline by every label
+	// writer (see writeNodeLabelGlyphs) precisely so the measurement and the size belong to the
+	// same moment.
+	function textElFontSize(el) {
+		var v = el && el.style && el.style.fontSize;
+		return v ? parseFloat(v) : 0;
+	}
 	// The read half, and the ONLY place a data label's banked widths come from. Node labels use it
 	// too: the two halves of a label's measurement have always been these same two calls.
 	function measureLabelWidths(holder) {
-		try { noteMeasuredWidth(holder, holder.text.getBBox().width); }
+		try {
+			var t = holder.text;
+			noteMeasuredWidth(holder, measuredTextWidth(t, t.textContent, textElFontSize(t),
+				function () { return t.getBBox().width; }));
+		}
 		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
 		noteRowWidths(holder);
 	}
@@ -723,9 +802,9 @@ var EngCalcs = EngCalcs || {};
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
-			sides = Collide.cardinalSides({ x: n.x, y: n.y }, d,
+			sides = Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
-		return { id: nodeLabelKey(n.id), anchor: { x: n.x, y: n.y }, home: nodeLabelBase(n),
+		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			lines: labelRowWidths(ne) };
@@ -830,7 +909,7 @@ var EngCalcs = EngCalcs || {};
 			// link label against ground nothing occupies, clearing a conflict that is really there.
 			var at = nodeLabelBase(n),
 				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
-				b = Collide.boxFromRect({ x: at.x >= n.x ? at.x : at.x - w,
+				b = Collide.boxFromRect({ x: at.x >= nodeDrawX(n) ? at.x : at.x - w,
 					y: at.y - fs * 0.85, w: w, h: h });
 			b.kind = 'label';
 			obs.boxes.push(b);
@@ -1287,6 +1366,12 @@ var EngCalcs = EngCalcs || {};
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
+	// **WHAT INSIDE HERE COSTS TOM A SECOND.** `lk:layout` is 1,000-1,530 ms for 119 pipes on his
+	// machine and 16 ms on this one -- 60x -- while building the NODES, which writes just as much
+	// DOM, is only 1.5x slower there. So the difference is something this function does and that
+	// one does not, and it is not a layout read: there is not one in the whole chain. Timed in
+	// three parts, and the stations are COUNTED, because the only input that varies with the view
+	// is how many copies of a label a long pipe carries.
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
@@ -1297,8 +1382,13 @@ var EngCalcs = EngCalcs || {};
 		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded
 			|| !!le.hiddenCrossed);
 		var single = linkLabelStations(l).length === 1,
-			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
-		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
+			stations = perfDebugAccum('  lkL:stations', function () {
+				return single ? [le.alignedAlong] : drawnLinkLabelStations(l);
+			}), i;
+		perfDebugCount('stations', stations.length);
+		perfDebugAccum('  lkL:repeats', function () {
+			ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
+		});
 		// The link's own elements take the FIRST DRAWN station, not a fixed one: with every copy
 		// pickable they are interchangeable, and a chain whose first stations are off-screen still
 		// renders through the element bbox() and the popup know about.
@@ -1310,10 +1400,16 @@ var EngCalcs = EngCalcs || {};
 		// which is every case except a chain that had to step round something.
 		var sides = le.stationSides || [];
 		le.forceSide = sides[0];
-		layoutLinkLabelAt(l, le, le, stations[0], true, single);
+		perfDebugAccum('  lkL:place', function () {
+			layoutLinkLabelAt(l, le, le, stations[0], true, single);
+		});
 		for (i = 1; i < stations.length; i++) {
 			le.repeats[i - 1].forceSide = sides[i];
-			layoutLinkLabelAt(l, le, le.repeats[i - 1], stations[i], false, false);
+			perfDebugAccum('  lkL:place', (function (k) {
+				return function () {
+					layoutLinkLabelAt(l, le, le.repeats[k - 1], stations[k], false, false);
+				};
+			})(i));
 		}
 	}
 	// Double-click-to-reset: clears a manually-dragged label's offset entirely (n.lx/n.ly back to
@@ -1467,7 +1563,7 @@ var EngCalcs = EngCalcs || {};
 	// bent pipe that linkDirectionAt() already establishes as the correct one: a pipe that leaves
 	// eastward and turns north occupies the east of this node, whatever its other end is doing.
 	function incidentBearings(n) {
-		var ids = incidentLinks[n.id] || [], out = [], i, l, pts, next;
+		var ids = incidentLinks[n.id] || [], out = [], i, l, pts, next, at = nodeAt(n);
 		for (i = 0; i < ids.length; i++) {
 			l = linkById(ids[i]); if (!l) { continue; }
 			pts = linkPointList(l);
@@ -1475,8 +1571,8 @@ var EngCalcs = EngCalcs || {};
 			if (!next) { continue; }
 			// A zero-length link has no direction and must not contribute a spurious bearing of 0,
 			// which would read as "east is occupied" at a node where nothing is.
-			if (next.x === n.x && next.y === n.y) { continue; }
-			out.push(Math.atan2(next.y - n.y, next.x - n.x) * 180 / Math.PI);
+			if (next.x === at.x && next.y === at.y) { continue; }
+			out.push(Math.atan2(next.y - at.y, next.x - at.x) * 180 / Math.PI);
 		}
 		return out;
 	}
@@ -1528,7 +1624,7 @@ var EngCalcs = EngCalcs || {};
 		var out = { boxes: [], segments: [] };
 		doc.nodes.forEach(function (n) {
 			var r = nodeRadius(n);
-			var sb = Collide.box(n.x, n.y, r * 2, r * 2, 0);
+			var sb = Collide.box(nodeDrawX(n), nodeDrawY(n), r * 2, r * 2, 0);
 			sb.kind = 'symbol';
 			out.boxes.push(sb);
 		});
@@ -1717,12 +1813,42 @@ var EngCalcs = EngCalcs || {};
 	 * Off unless asked for, so it costs a shipped page one regex on load.
 	 */
 	var perfDebugEl = null, perfDebugRows = [], perfDebugN = 0;
+	// **WHAT THE BROWSER PAYS FOR AND NODE DOES NOT.** A label measurement is a LAYOUT READ taken
+	// between two DOM writes, so each one forces a synchronous layout of the whole drawing -- the
+	// Task 440 finding, in a place that rebuilds every label rather than re-reading them. Counted
+	// only while the instrument is armed, so a shipped page pays one comparison per label.
+	var perfDebugCounts = { measures: 0, labelPasses: 0, elements: 0, stations: 0 };
+	function perfDebugCount(what, n) {
+		if (perfDebugOn()) { perfDebugCounts[what] += (n === undefined ? 1 : n); }
+	}
 	function perfDebugOn() {
 		return typeof location !== 'undefined' && /(\?|&)debug=perf(&|$)/.test(location.search || '');
 	}
 	function perfDebugMem() {
 		var m = (typeof performance !== 'undefined') && performance.memory;
 		return m ? Math.round(m.usedJSHeapSize / 1048576) + ' MB' : 'n/a';
+	}
+	// **THE SAME TIMER, SUMMED RATHER THAN LISTED.** A stage inside a per-element loop cannot report
+	// one row per call -- 119 pipes would bury the line it is printed on -- so these accumulate and
+	// are flushed as one row each when the report is taken.
+	var perfDebugSums = null;
+	function perfDebugAccum(name, fn) {
+		if (!perfDebugOn()) { return fn(); }
+		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
+		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+		if (!perfDebugSums) { perfDebugSums = {}; }
+		perfDebugSums[name] = (perfDebugSums[name] || 0) + (t1 - t0);
+		return out;
+	}
+	function perfDebugFlushSums() {
+		if (!perfDebugSums) { return; }
+		var k;
+		for (k in perfDebugSums) {
+			if (perfDebugSums.hasOwnProperty(k)) {
+				perfDebugRows.push(k + ' ' + perfDebugSums[k].toFixed(1) + 'ms');
+			}
+		}
+		perfDebugSums = null;
 	}
 	// Times `fn` and records it under `name`. Returns whatever fn returned, so a caller can wrap a
 	// call in place without restructuring anything.
@@ -1732,6 +1858,13 @@ var EngCalcs = EngCalcs || {};
 		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
 		perfDebugRows.push(name + ' ' + (t1 - t0).toFixed(1) + 'ms');
 		return out;
+	}
+	// The hint is part of the box and not part of the DATA, so it is stripped before the rows are
+	// read back -- otherwise eight switches would stack eight copies of it into the history.
+	var PERF_COPY_HINT = '(click to copy)';
+	function perfDebugRowsText(el) {
+		var t = (el && el.textContent) || '';
+		return t.split('\n').filter(function (l) { return l && l !== PERF_COPY_HINT; }).join('\n');
 	}
 	function perfDebugReport() {
 		if (!perfDebugOn()) { perfDebugRows = []; return; }
@@ -1744,27 +1877,75 @@ var EngCalcs = EngCalcs || {};
 				'lines appear bottom-left on the map.');
 		}
 		perfDebugN++;
+		perfDebugFlushSums();
 		var tiles = 0, k;
 		for (k in basemapEls) { if (basemapEls.hasOwnProperty(k)) { tiles++; } }
 		var comp = 'none', ml = modelLayer && modelLayer.getAttribute && modelLayer.getAttribute('transform');
 		if (ml) { comp = ml; }
-		var line = '#' + perfDebugN + '  ' + perfDebugRows.join('  ') +
-			'  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
+		// **WHICH BUILD PRODUCED THIS LINE.** Read off the About box, which already prints the
+		// deploy's date and sha (ecDeployIdentity), rather than plumbed through pageConfig: that
+		// would be a non-language key in the language bridge, and the readout is a developer tool.
+		// Without it a pasted readout cannot be told from one taken before the last deploy, which
+		// cost an exchange on 2026-09-16.
+		var bEl = document.querySelector('.lpn-about-build'),
+			build = bEl ? bEl.textContent.replace(/^.*\u00b7\s*/, '') : '?';
+		var line = '#' + perfDebugN + ' [' + build + ']  ' + perfDebugRows.join('  ') +
+			'  | label passes ' + perfDebugCounts.labelPasses
+			+ '  | label measurements ' + perfDebugCounts.measures
+			+ '  | pipe label copies ' + perfDebugCounts.stations
+			+ '  | tiles ' + tiles + '  | heap ' + perfDebugMem() +
 			'  | s ' + (state.s ? state.s.toExponential(3) : '?') +
 			'  | hold ' + comp;
 		perfDebugRows = [];
+		perfDebugCounts.measures = 0; perfDebugCounts.labelPasses = 0; perfDebugCounts.elements = 0;
+		perfDebugCounts.stations = 0;
 		if (typeof console !== 'undefined' && console.log) { console.log('[lpn perf] ' + line); }
 		if (!perfDebugEl && document.body) {
 			perfDebugEl = document.createElement('div');
+			// **THE BOX IGNORES THE MOUSE; A BUTTON ON IT DOES THE COPYING.** It was
+			// `pointer-events:none` (right for an overlay lying across a map), then it took pointer
+			// events so the numbers could be selected and copied.
+			//
+			// **THAT CHANGE WAS BLAMED FOR TOM'S VANISHING MOUSE CURSOR AND WAS INNOCENT.** It was
+			// the only cursor-related line in a 20-commit night, and it appeared to fit -- the
+			// symptom showed on this build and not on production's. **Then the cursor vanished
+			// again with `?debug=nofiles`, where this overlay is never created at all.** So the
+			// cursor belongs with the private-window crash in `dev/chrome-incognito-crash.md`: same
+			// browser, same file picker, same session. **A one-sided correlation is not a cause,
+			// and "the only line that could have done it" is exactly the reasoning that makes one
+			// look like one.**
+			//
+			// The button stays, because it is the better control either way: a click target that
+			// says what it does, reachable by keyboard, on a readout that goes back to lying inert
+			// across the map.
 			perfDebugEl.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3000;max-width:96vw;' +
 				'font:11px/1.35 monospace;background:rgba(0,0,0,.82);color:#0f0;padding:4px 6px;' +
-				'white-space:pre;pointer-events:none;max-height:40vh;overflow:hidden';
+				'white-space:pre;max-height:40vh;overflow:hidden;pointer-events:none';
+			var copyBtn = document.createElement('button');
+			copyBtn.type = 'button';
+			copyBtn.textContent = 'copy';
+			copyBtn.title = 'Copy these lines';
+			// The one thing on the overlay that answers the pointer, and it is a real button rather
+			// than a click handler on a div -- a keyboard reaches it, and a screen reader names it.
+			copyBtn.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:3001;font:11px monospace;' +
+				'background:#0f0;color:#000;border:0;padding:1px 6px;cursor:pointer';
+			copyBtn.addEventListener('click', function () {
+				var txt = perfDebugRowsText(perfDebugEl);
+				if (libCopyOut(txt)) {
+					copyBtn.textContent = 'copied';
+					setTimeout(function () { copyBtn.textContent = 'copy'; }, 700);
+				}
+			});
 			document.body.appendChild(perfDebugEl);
+			document.body.appendChild(copyBtn);
+			// The rows sit above the button rather than under it, so the newest line is never hidden.
+			perfDebugEl.style.bottom = '22px';
 		}
 		if (perfDebugEl) {
 			// Newest first, and only the last eight: the interesting thing is the TREND across a
 			// handful of gestures, and a list that grows without bound is itself a leak.
-			var prev = perfDebugEl.textContent ? perfDebugEl.textContent.split('\n') : [];
+			var prev = perfDebugRowsText(perfDebugEl);
+			prev = prev ? prev.split('\n') : [];
 			perfDebugEl.textContent = [line].concat(prev).slice(0, 8).join('\n');
 		}
 	}
@@ -2501,7 +2682,7 @@ var EngCalcs = EngCalcs || {};
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			ne.hiddenDropped = false;
 			if (n.lx !== undefined) {
-				addDataLabel(nodeLabelKey(n.id), ne, { x: n.x, y: n.y }, nodeLabelBase(n), true, ne.lineCount);
+				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount);
 				return;
 			}
 			addNodeFirstFit(n, ne);
@@ -2749,13 +2930,19 @@ var EngCalcs = EngCalcs || {};
 	// in pixels does not change with the zoom, so re-measuring on every wheel notch is a forced
 	// synchronous layout per label per notch, and Net3 has ~220 of them.
 	function noteRowWidths(holder) {
-		var t = holder && holder.text, out = [], seg = [], i, c, w, hasX;
+		var t = holder && holder.text, out = [], seg = [], i, c, w, hasX, fs;
+		perfDebugCount('measures');
 		if (!t || !t.childNodes) { holder.rowW = null; holder.rowWPx = null; holder.segW = null; return; }
+		// The size is read ONCE for the whole label: every tspan inherits it from the <text>.
+		fs = textElFontSize(t);
 		for (i = 0; i < t.childNodes.length; i++) {
 			c = t.childNodes[i];
 			if (c.nodeType !== 1 || !c.getAttribute) { continue; }
 			w = 0;
-			try { w = c.getComputedTextLength(); } catch (err) { w = 0; }
+			try {
+				w = measuredTextWidth(t, c.textContent, fs,
+					function () { return c.getComputedTextLength(); });
+			} catch (err) { w = 0; }
 			// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
 			// every tspan; keeping the individual figures as well as the row sums costs one array
 			// and no extra layout, and it is what lets the shed cascade below stop redrawing.
@@ -3378,9 +3565,175 @@ var EngCalcs = EngCalcs || {};
 				secondShort: pc.lpn_field_easting_abbr || 'E'
 			};
 		}
-		return { first: 'X', second: 'Y' };
+		// **THROUGH THE LANGUAGE FILE LIKE THE OTHER FOUR.** These two were the only hardcoded
+		// literals in this function, and `lpn_field_x` / `lpn_field_y` have existed and been
+		// translated the whole time -- coordFields() was already reading them. One opinion about
+		// what an axis is called (Task 674), so a typed coordinate's label and the status strip's
+		// cannot come to spell the same axis two ways.
+		return { first: pc.lpn_field_x || 'X', second: pc.lpn_field_y || 'Y' };
 	}
 	function readsNorthFirst() { return isGeoProject() || isProjectedProject(); }
+	// **WHICH DOCUMENT AXIS THE FIRST-READ FIELD IS.** The pair is read north first wherever there
+	// is a north (readsNorthFirst()), so slot 1 is the document's y there and its x on a grid --
+	// the same fork coordReadoutAt() makes, asked once so an entry site and a display site cannot
+	// disagree about which number the top box holds.
+	function coordSlotIsY(slot) { return readsNorthFirst() ? (slot === 1) : (slot === 2); }
+	// The OUTWARD value of one read slot: what a person sees, origin added back and a geographic
+	// y already unprojected -- and the ACTIVE SCENARIO'S own position where it has one (Task 674).
+	// See the seam note beside inwardY(), and writeNodeCoord() below for the override's frame.
+	function nodeCoordAxis(n, slot) {
+		if (!n) { return undefined; }
+		return effective(n, coordSlotIsY(slot) ? 'y' : 'x');
+	}
+	/**
+	 * **WHERE A NODE IS, IN THE SCENARIO ON SCREEN** (ROADMAP Task 674) -- the drawing's own frame,
+	 * so the renderer, the label pass, the bounding box and every length read one function and the
+	 * fast path is the field itself.
+	 *
+	 * **AN OVERRIDE HOLDS THE PUBLIC, OUTWARD PAIR** -- a latitude and a longitude, a northing and
+	 * an easting -- never the drawing-frame number the element stores. Three things follow, and each
+	 * of them is a defect avoided rather than a preference:
+	 *
+	 *   1. **EXACTNESS IS STRUCTURAL, so an override needs no `_xsrc`/`_ysrc` of its own.** A typed
+	 *      38.5 is STORED as 38.5, because the override IS the number the user typed -- there is no
+	 *      projection, no origin and no round trip between the box and the file. That channel exists
+	 *      because a BASE latitude cannot make that claim: measured before it was written, typing
+	 *      38.5 saved 38.49999999999999, since mercLat(mercY(lat)) differs in the last bits for
+	 *      69.8% of latitudes. The node's own `_xsrc`/`_ysrc` are untouched by an override and stay
+	 *      true, because Base's coordinate has not moved.
+	 *   2. **IT SURVIVES EVERY FRAME CHANGE, AND THE DRAWING FRAME IS NOT STABLE.** A geographic
+	 *      document DERIVES its origin from its own extent at load and states {0, 0} in the file
+	 *      (Task 439); a grid document can be rebased at any time (Task 354); the file is Cartesian
+	 *      and flips y on the way out. A stored override measured from the origin would be measured
+	 *      from a number the file does not state, so it would move the node the next time anybody
+	 *      opened the document. An absolute pair is measured from nothing and cannot.
+	 *   3. **IT IS THE VOCABULARY EVERY COORDINATE EDITOR HERE ALREADY SPEAKS.** nodeCoordAxis()
+	 *      reads outward and setNodeCoordAxis() takes outward, so the popup, the tables, the status
+	 *      strip and the `.inp` exporter all meet the override in the units they already use.
+	 *
+	 * The one thing an absolute pair does NOT survive is georeferencing an XY drawing onto the map,
+	 * which changes what every coordinate in the document MEANS -- so georefWrite() maps the
+	 * overrides through the same transform, and georefCancel() puts them back.
+	 */
+	function coordOverridesOf(n) { return (n && activeScenario().overrides[ovKey(n)]) || null; }
+	function nodeDrawX(n) {
+		var ov = coordOverridesOf(n);
+		return (ov && typeof ov.x === 'number') ? inwardX(ov.x) : (n ? n.x : undefined);
+	}
+	function nodeDrawY(n) {
+		var ov = coordOverridesOf(n);
+		return (ov && typeof ov.y === 'number') ? inwardY(ov.y) : (n ? n.y : undefined);
+	}
+	// The pair, for the many readers that want a point rather than one axis. **A FALSY NODE PASSES
+	// STRAIGHT THROUGH**: linkPointList() puts a dangling link's missing end into its own point list
+	// and the geometry pass already knows what that means, so this must not invent a point there.
+	function nodeAt(n) { return n ? { x: nodeDrawX(n), y: nodeDrawY(n) } : n; }
+	// Whether this scenario has moved this node at all -- what the `.inp` exporter reports and what
+	// a harness counts.
+	function nodeHasCoordOverride(n) {
+		var ov = coordOverridesOf(n);
+		return !!(ov && (typeof ov.x === 'number' || typeof ov.y === 'number'));
+	}
+	// Whether THIS scenario has moved either end of this link -- which is the only case in which its
+	// Auto length differs from the one Base stores. Keyed through ovKeyFor(), never by spelling the
+	// prefix (Task 324).
+	function linkEndIsMoved(l) {
+		var ovs = activeScenario().overrides;
+		function moved(id) {
+			var ov = ovs[ovKeyFor('node', id)];
+			return !!(ov && (typeof ov.x === 'number' || typeof ov.y === 'number'));
+		}
+		return !!l && (moved(l.from) || moved(l.to));
+	}
+	/**
+	 * **THE ONE PLACE A NODE'S POSITION IS WRITTEN** -- the typed boxes, the table cells and the
+	 * DRAG all end here, so a typed coordinate and a dragged one cannot come to mean different
+	 * things (dev/scenario-seam-repair.md is the same lesson about `setProp()`, which this is the
+	 * position half of). In Base it writes the element, which IS the propagation in a delta model;
+	 * in a scenario it records an override.
+	 *
+	 * Takes the DRAWING-FRAME number, the OUTWARD one, or both. A drag has only the first and a
+	 * typed box has only the second, and each is handed on without a conversion it does not need --
+	 * which is what keeps a typed 38.5 exact and keeps a drag off the projection on every frame.
+	 */
+	function writeNodeCoord(n, isY, inward, outward) {
+		if (!n) { return; }
+		if (!inBaseScenario()) {
+			if (outward === undefined) { outward = isY ? outwardY(inward) : outwardX(inward); }
+			setOverride(n, isY ? 'y' : 'x', outward);
+			return;
+		}
+		if (inward === undefined) { inward = isY ? inwardY(outward) : inwardX(outward); }
+		if (isY) { n.y = inward; }   // base-write: in Base the drawing IS the document -- see this function's note
+		else { n.x = inward; }       // base-write: the same, on the other axis
+	}
+	// A geographic document is the only kind with a bound, and it has two: Web Mercator has no
+	// finite y at the poles, and a longitude outside 180 degrees either way is off the world. A
+	// projected or grid coordinate is whatever the survey says, so nothing here invents a range
+	// for one.
+	function coordValueOk(isY, v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return false; }
+		if (!isGeoProject()) { return true; }
+		return isY ? Math.abs(v) <= LPN_MERC_MAX_LAT : Math.abs(v) <= 180;
+	}
+	/**
+	 * **A TYPED COORDINATE, AND THIS IS THE ONE WRITE SEAM FOR ONE** (ROADMAP Task 674; Tom,
+	 * 2026-09-15: *"Add coordinates inputs (N, E, z or X, Y, z or Lat, Lon, z) to properties and
+	 * tables."*). The property popup's two boxes and the node tables' two columns both come
+	 * through here, so the popup and the table cannot come to two ideas of what placing a node
+	 * means -- the rule the tables' own header states about every other property.
+	 *
+	 * **IN A SCENARIO IT RECORDS THAT SCENARIO'S OWN POSITION, exactly as a drag in a scenario now
+	 * does** (Tom, 2026-09-15: *"Give the people their overrides!"*). Both go through
+	 * writeNodeCoord(), which is the one place a node's position is written; see LPN_OVERRIDABLE for
+	 * why x and y belong there and why they are stored bare.
+	 *
+	 * **ONLY THE AXIS THE USER TYPED IS WRITTEN**, and that is the coordinate-exactness rule rather
+	 * than tidiness: reading a geographic y outward and writing it straight back in again runs the
+	 * latitude through `mercLat(mercY(lat))`, which differs in the last bits for 69.8% of latitudes
+	 * (CLAUDE.md), so rewriting the unchanged axis would perturb a number the user never touched.
+	 *
+	 * The `.inp` token record needs nothing: it is believed only while the drawn number is still the
+	 * one derived from it, so an edit invalidates it by itself.
+	 */
+	function setNodeCoordAxis(n, slot, v) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!n || !nodeEls[n.id]) { return false; }
+		if (!coordValueOk(coordSlotIsY(slot), v)) {
+			// **REFUSED OUT LOUD.** A latitude past the Mercator cut-off has no finite y at all, so
+			// accepting one would put the node at Infinity and take the whole drawing with it; and
+			// a silent refusal is indistinguishable from a control that does nothing.
+			setNotice(pc.lpn_coord_off_world ||
+				'That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.');
+			return false;
+		}
+		var isY = coordSlotIsY(slot);
+		// **BOTH NUMBERS ARE HANDED OVER, so neither branch of writeNodeCoord() has to convert.** In
+		// Base the drawing-frame number goes onto the element; in a scenario the OUTWARD one -- the
+		// characters the user typed -- becomes the override, and that is where a typed 38.5 stays
+		// exactly 38.5.
+		writeNodeCoord(n, isY, isY ? inwardY(v) : inwardX(v), v);
+		// **A TYPED LATITUDE IS THE USER'S NUMBER AND GETS THE SAME SOURCE RECORD A FILE'S DOES**
+		// (the `_xsrc`/`_ysrc` channel beside inwardY()). Measured before this line existed: typing
+		// 38.5 saved 38.49999999999999, and 0.1 saved 0.09999999999999677 -- the projection is not
+		// invertible in doubles, which is the whole reason that channel is there. It was built for a
+		// number that arrived in a file; a number typed into this box is the same kind of thing, and
+		// the invariant is unchanged, so the file's own reader hands it straight back. GEOGRAPHIC
+		// ONLY: nothing else projects, and these two keys are stripped from the snapshot by
+		// unprojectStoredGeo(), which no other kind of project runs -- so writing one here would put
+		// it in the file.
+		//
+		// **IN A SCENARIO THERE IS NOTHING TO RECORD AND THE NODE'S OWN RECORD MUST BE LEFT ALONE**
+		// (Task 674). The override IS the typed characters, so it needs no source of its own; and
+		// Base's coordinate has not moved, so Base's `_xsrc`/`_ysrc` is still true. Writing one here
+		// from inside a scenario would file a source record for a number the element does not hold.
+		if (isGeoProject() && inBaseScenario()) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
+		updateNode(n.id);
+		// Every other label on the map is an obstacle to this node's, and the node has just moved --
+		// the same call every node drag ends in.
+		relayoutLabels();
+		return true;
+	}
 	function coordReadout(a, b) {
 		var n = axisNames();
 		return (n.firstShort || n.first) + ': ' + a + '  ' + (n.secondShort || n.second) + ': ' + b;
@@ -3439,10 +3792,35 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// Overridable-property whitelist -- cheap to widen, expensive to narrow (Task 184). The line is
-	// MEMBERSHIP is overridable, IDENTITY is not: a node's x/y and a link's from/to and `verts` (its
-	// intermediate bend points -- the drawn shape of the pipe, nothing to do with water levels) are
-	// Base-owned and never override (a node cannot be in two places at once in one rendered map),
-	// and so are id and type. Junction `elev` is survey data, not a design variable. A tank's `level`
+	// MEMBERSHIP is overridable, IDENTITY is not: a link's from/to and `verts` (its intermediate
+	// bend points -- the drawn shape of the pipe, nothing to do with water levels) are Base-owned,
+	// and so are id and type. Junction `elev` is survey data, not a design variable.
+	//
+	// **A NODE'S POSITION IS OVERRIDABLE, AND THAT REVERSES A RULE THIS PROJECT INVENTED FOR
+	// ITSELF** (Tom, 2026-09-15: *"We've completely miscommunicated, and I apologize. What I meant
+	// to say is, 'Give the people their overrides!' Whether coordinate or any other property, what's
+	// gained by denying them an override?"*). x and y were left out on the argument that a node
+	// cannot be in two places at once in one rendered map. **That argument is false, and a scenario
+	// is why: a scenario IS one rendered map.** Switching scenarios rebuilds the drawing
+	// (applyScenarioChange), so there is no instant at which one node is drawn in two places -- and
+	// "what if we move the pump station across the road" is exactly the question a scenario exists
+	// to ask. It is also the same answer Task 636 gave for a custom property (*"Are we trying to be
+	// control freaks? No! Let the people do the things!"*).
+	//
+	// **POSITION IS THE ONE OVERRIDABLE PROPERTY STORED WITHOUT ITS UNDERSCORE, AND IT STAYS THAT
+	// WAY.** The file states `x` and `y`, EPANET's [COORDINATES] states x and y, and every
+	// coordinate walker here reads those two names -- eachStoredPoint, flipStoredY,
+	// projectStoredGeo, the importer, the exporter. Renaming them to `_x`/`_y` to satisfy the
+	// convention would be a document-format change across six modules to move no number. So the
+	// seam knows the two BY NAME (LPN_COORD_PROP) and effective(), baseValue() and setProp() each
+	// fork on it in one place. Two consequences, both deliberate:
+	//   1. The v1 migration's renameOverridable() SKIPS them. Renaming there would move every
+	//      coordinate in an old autosave to a field nothing reads, and the drawing would land at
+	//      undefined.
+	//   2. **dev/scripts/scenario_seam_check.php CANNOT SEE A POSITION WRITE**, because it looks for
+	//      `el._x =`. What stands in its place is that there is exactly ONE writer --
+	//      writeNodeCoord() -- and dev/lpn-spike/node-coord-entry-harness.js counts the call sites,
+	//      the same way local-origin-harness.js counts the frame boundaries. A tank's `level`
 	// and a reservoir's `head` are the opposite case and ARE overridable -- see the note below.
 	// `active` is an ordinary boolean here and is how topology varies: a proposed loop lives in Base
 	// inactive and a scenario overrides it active. ABSENT reads as true -- effective() is the one
@@ -3476,7 +3854,7 @@ var EngCalcs = EngCalcs || {};
 	// because it is a design variable in the way a reservoir's head is.
 	var LPN_OVERRIDABLE = {
 		node: { demand: true, emitter: true, head: true, level: true, active: true, fireFlow: true,
-			initQuality: true, tankCoeff: true,
+			initQuality: true, tankCoeff: true, x: true, y: true,
 			sourceType: true, sourceQuality: true, sourcePattern: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
@@ -3520,6 +3898,9 @@ var EngCalcs = EngCalcs || {};
 
 		label: { text: true, active: true }
 	};
+	// The two overridable properties stored WITHOUT their underscore -- see the note above. Read by
+	// effective(), baseValue() and setProp(), which is every fork there is.
+	var LPN_COORD_PROP = { x: true, y: true };
 
 	// The one resolver seam. Solver, renderer, labels and popups read element properties through
 	// this, so adding scenarios changes only what this function finds, not its callers.
@@ -3546,8 +3927,25 @@ var EngCalcs = EngCalcs || {};
 	// layer at all, and an untyped pipe leaves it after reading one undefined field.
 	function effective(el, prop) {
 		if (!el) { return undefined; }
+		// **POSITION IS STORED WITHOUT ITS UNDERSCORE** and resolves to the PUBLIC, outward
+		// coordinate -- see LPN_OVERRIDABLE and writeNodeCoord(). Asked first and answered in three
+		// lines, so no other property pays for it; the drawing does not come through here at all,
+		// it reads nodeDrawX/nodeDrawY, which skip the outward conversion entirely.
+		if (LPN_COORD_PROP[prop]) {
+			var oc = activeScenario().overrides[ovKey(el)];
+			if (oc && typeof oc[prop] === 'number') { return oc[prop]; }
+			return prop === 'y' ? outwardY(el.y) : outwardX(el.x);
+		}
 		var ov = activeScenario().overrides[ovKey(el)], tid, t;
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
+		// **AN AUTO LENGTH IN A SCENARIO THAT MOVED AN END IS DERIVED, AND STORED NOWHERE** (Task
+		// 674) -- the same treatment the three-point pump fit gets, and for the same reason: the
+		// alternative is a second copy of a number the drawing already states. Asked AFTER the
+		// override above, so a length the user typed in this scenario still wins; and gated on an
+		// END having moved, so the ordinary case is two hash lookups and no polyline walk.
+		if (prop === 'length' && el.lenAuto && !inBaseScenario() && linkEndIsMoved(el)) {
+			return linkGeomLength(el);
+		}
 		if (LPN_TYPE_PROP_SET[prop]) {
 			tid = (ov && Object.prototype.hasOwnProperty.call(ov, 'typeId')) ? ov.typeId : el._typeId;
 			if (tid) {
@@ -3898,6 +4296,9 @@ var EngCalcs = EngCalcs || {};
 	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
 	// popup shows beside an overridden field, and what clearing a marker returns the field to.
 	function baseValue(el, prop) {
+		// Base's own position, outward, for the "Base scenario: {value}" line beside an overridden
+		// coordinate row. Stored bare, so it cannot come out of `el['_' + prop]`.
+		if (LPN_COORD_PROP[prop]) { return prop === 'y' ? outwardY(el.y) : outwardX(el.x); }
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
 		return el['_' + prop];
 	}
@@ -3925,6 +4326,14 @@ var EngCalcs = EngCalcs || {};
 	// an override. A call site that writes `el._diameter` directly is therefore not merely
 	// impolite: inside a scenario it silently edits Base under every other scenario at once.
 	function setProp(el, prop, value) {
+		// A POSITION IS WRITTEN BY ONE FUNCTION, whichever scenario is showing, and `value` is the
+		// outward coordinate every editor of it already holds (Task 674). Routed here so the
+		// override marker's own tick -- setOverride(el, prop, effective(el, prop)) -- and any future
+		// generic writer reach the same door the typed boxes and the drag do.
+		if (LPN_COORD_PROP[prop] && elGroup(el) === 'node') {
+			writeNodeCoord(el, prop === 'y', undefined, value);
+			return;
+		}
 		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
 		el['_' + prop] = value;
 	}
@@ -4019,7 +4428,7 @@ var EngCalcs = EngCalcs || {};
 		// multiplier row reads a different home in Base and in a scenario, a switch made while it is
 		// open would leave that field showing the number belonging to the scenario you just left --
 		// and the next keystroke would write it into the wrong place.
-		rebuildSettingsBox();
+		perfDebugTime('settings', function () { rebuildSettingsBox(); });
 		scheduleSolve();
 		saveToStorage();
 	}
@@ -5418,7 +5827,7 @@ var EngCalcs = EngCalcs || {};
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
 		for (i = 0; i < doc.nodes.length; i++) {
 			n = doc.nodes[i];
-			dPx = Math.hypot(n.x - w.x, n.y - w.y) * state.s;
+			dPx = Math.hypot(nodeDrawX(n) - w.x, nodeDrawY(n) - w.y) * state.s;
 			if (dPx <= bestPx) { best = n; bestPx = dPx; }
 		}
 		return best;
@@ -5795,9 +6204,17 @@ var EngCalcs = EngCalcs || {};
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {},
 		labelsByLinkAnchor = {};
 	// Whether generated annotation is currently suppressed, for ANY of the three reasons
-	// applyLabelVisibility() knows about. Written only there; read by onZoomChanged() and
-	// scheduleReshed(), which skip the label pipeline when nothing readable is drawn.
+	// applyLabelVisibility() knows about. Written only there, and read by the three entry points of
+	// the label pipeline -- refreshLabelText(), relayoutLabels() and refreshFontSizes() -- plus the
+	// zoom path and the debounced re-shed, all of which skip their work when nothing is drawn.
 	var dataLabelsHidden = false;
+	// **OFF MEANS OFF, AND THIS IS THE IOU** (Tom, 2026-09-17: *"Thematic map (labels off) should not
+	// do any label calculations. Off should mean off. Consent, people!"*). Set by whichever entry
+	// point turned around, cleared by reviveSkippedLabelWork() on the way back. Without it a
+	// suppression that outlives a solve, a settings edit or a scenario switch would come back showing
+	// the lettering of a drawing that has moved on -- skipping work while hidden is only correct if
+	// the revival pays it back, which is the same bargain the zoom path already made.
+	var labelWorkSkipped = false;
 	// **THERE IS NO BLANKET "hide all" CHECKBOX** (Tom, 2026-08-22, review: *"There is no such
 	// path as Labels... it has the identical behavior as Thematic map, except that it responds more
 	// slowly. I don't see the value."*). Unticking the field checkboxes is the per-field interface
@@ -5929,12 +6346,12 @@ var EngCalcs = EngCalcs || {};
 			box = nodeSymbolSize(n);
 			kx = box.w / 24; ky = box.h / 24;
 			hit.setAttribute('transform',
-				'translate(' + (n.x - box.w / 2) + ',' + (n.y - box.h / 2) + ') scale(' + kx + ',' + ky + ')');
+				'translate(' + (nodeDrawX(n) - box.w / 2) + ',' + (nodeDrawY(n) - box.h / 2) + ') scale(' + kx + ',' + ky + ')');
 			// Local units: the path lives inside that scale, so a screen pixel is 1 / (s * kx) of one.
 			hit.style.setProperty('--lpn-nhit', LPN_NODE_HIT_PX / (s * kx));
 			return;
 		}
-		hit.setAttribute('cx', n.x); hit.setAttribute('cy', n.y);
+		hit.setAttribute('cx', nodeDrawX(n)); hit.setAttribute('cy', nodeDrawY(n));
 		hit.setAttribute('r', nodeRadius(n));
 		hit.style.setProperty('--lpn-nhit', LPN_NODE_HIT_PX / s);
 	}
@@ -5961,7 +6378,7 @@ var EngCalcs = EngCalcs || {};
 		var n = nodeById(id), ne = nodeEls[id];
 		if (!ne || !ne.symbolG) { return; }
 		var s = nodeSymbolSize(n);
-		ne.symbolG.setAttribute('transform', symbolBoxTransform(n.x - s.w / 2, n.y - s.h / 2, s.w, s.h));
+		ne.symbolG.setAttribute('transform', symbolBoxTransform(nodeDrawX(n) - s.w / 2, nodeDrawY(n) - s.h / 2, s.w, s.h));
 	}
 	// ---- THE 1/60 RULE: A WORLD COORDINATE NEVER GOES ON A NESTED <svg> ------------------------
 	//
@@ -7122,7 +7539,7 @@ var EngCalcs = EngCalcs || {};
 			: el('circle', { 'class': 'lpn-node-hit', 'data-node': n.id }, nodesLayer);
 		syncNodeHit(n, hit);
 		var circle = el('circle', {
-			cx: n.x, cy: n.y, r: nodeRadius(n),
+			cx: nodeDrawX(n), cy: nodeDrawY(n), r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
 		}, nodesLayer);
 		// Reservoir renders as an open-top tank, not a circle: told apart from a junction only by
@@ -7163,8 +7580,15 @@ var EngCalcs = EngCalcs || {};
 			'class': 'lpn-lbl lpn-draglbl', 'data-nodelbl': n.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
 		text.textContent = n.id;
+		// **OFF MEANS OFF, AND THIS ONE IS PER NODE** (Tom, 2026-09-17). getBBox() here is a layout
+		// READ taken between two appends, so each call forces a synchronous layout of the whole
+		// half-built drawing -- 97 of them on Net3 in a rebuild that draws none of this lettering.
+		// The placeholder is what every unmeasured label already starts at, nothing reads it while
+		// annotation is hidden (relayoutLabels() turns around too), and the revival re-measures
+		// every label through measureLabelWidths().
 		var tw = 8;
-		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
+		if (dataLabelsHidden) { labelWorkSkipped = true; }
+		else { try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ } }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
 		nodeEls[n.id] = { circle: circle, hit: hit, symbol: symbol, symbolG: symbolG, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		// The words are not the target; this is (see syncLabelHit).
@@ -7173,9 +7597,15 @@ var EngCalcs = EngCalcs || {};
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
 		positionNodeSymbol(n.id);
-		layoutNodeLabel(n.id);
+		// Same as the link half below: during a whole-drawing rebuild the layout happens once at
+		// the end, at the scale the reader will actually see.
+		if (!labelPassDeferred) { layoutNodeLabel(n.id); }
 		paintNodeColor(n.id);   // a rebuilt element starts black; give it its colour immediately
 	}
+	// **WHAT A PIPE COSTS TO BUILD, IN THREE PARTS** -- Tom's machine spends about 10 ms on each
+	// one whether the drawing holds 7 or 119, while this one spends 0.2 ms for the same work, so
+	// the cost is something a real browser does and a headless one does not. Summed across the
+	// loop and flushed as three rows; off unless ?debug=perf is on the URL.
 	function buildLinkEls(l) {
 		// CREATED ONCE, NOT CLEARED: rebuildLink() comes back through here for a link that already
 		// exists, and emptying the bucket would orphan every Text attached to that pipe the first
@@ -7313,10 +7743,27 @@ var EngCalcs = EngCalcs || {};
 			symbolG: symbolG, symbolSvg: symbolSvg, symbolHit: symbolHit, symbolBox: symbolBox
 		};
 		// The words are not the target; this is (see syncLabelHit).
-		linkEls[l.id].lblHit = attachLabelHit(text, linkEls[l.id], labelsLayer, true);
-		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
-		layoutLinkLabel(l.id);
-		paintLinkColor(l.id);   // a rebuilt element starts black; give it its colour immediately
+		perfDebugAccum('  lk:hit', function () {
+			linkEls[l.id].lblHit = attachLabelHit(text, linkEls[l.id], labelsLayer, true);
+		});
+		if (symbolG) {
+			perfDebugAccum('  lk:symbol', function () {
+				resizePumpSymbol(l.id); positionPumpSymbol(l.id);
+			});
+		}
+		// **NOT WHILE THE WHOLE DRAWING IS BEING REBUILT.** A project switch lays every label out
+		// once at the end -- restored from what this tab had worked out, or computed in the one
+		// deferred pass -- so laying this one out HERE is work that is thrown away a moment later,
+		// and it is done before the camera has moved, which is to say at the wrong scale anyway.
+		// Measured on Tom's machine: `lk:layout` 1,618 ms of a 1,955 ms switch.
+		//
+		// Only during THAT rebuild: every other caller of buildLinkEls() -- adding a pipe, a
+		// rebuildLink() after an edit -- holds one element and lays it out itself, which is why the
+		// flag is checked rather than the call being moved.
+		if (!labelPassDeferred) {
+			perfDebugAccum('  lk:layout', function () { layoutLinkLabel(l.id); });
+		}
+		perfDebugAccum('  lk:color', function () { paintLinkColor(l.id); });   // a rebuilt element starts black
 	}
 	// Icon box size for a pump's map symbol, in world units -- same symbolFactor() scaling as every
 	// other symbol. Confirmed right-sized on screen; leave this one alone.
@@ -7364,7 +7811,7 @@ var EngCalcs = EngCalcs || {};
 	function positionPumpSymbol(id) {
 		var l = linkById(id), le = linkEls[id];
 		if (!le || !le.symbolG) { return; }
-		var a = nodeById(l.from), b = nodeById(l.to),
+		var a = nodeAt(nodeById(l.from)), b = nodeAt(nodeById(l.to)),
 			mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2,
 			angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI,
 			flip = (b.x - a.x) < 0;
@@ -7808,6 +8255,12 @@ var EngCalcs = EngCalcs || {};
 		return textLabelPoint(lb).x;
 	}
 
+	// **A REBUILD DOES NOT HAVE TO LAY THE LABELS OUT WHERE IT STANDS.** On a project switch the
+	// view is restored AFTER the rebuild, so a pass run here is computed at the OUTGOING project's
+	// zoom and superseded moments later -- and a label's footprint is a pixel size divided by the
+	// scale, so that pass is not merely early, it is answering a different question. Set by
+	// refreshAllFromDocument(), which runs the one pass itself once the camera is where it belongs.
+	var labelPassDeferred = false;
 	function buildDom() {
 		var i;
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
@@ -7832,27 +8285,59 @@ var EngCalcs = EngCalcs || {};
 		if (linkSymbolLayer) { linkSymbolLayer.innerHTML = ''; }
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		labelsByLinkAnchor = {};
-		for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
-		for (i = 0; i < doc.links.length; i++) {
-			incidentLinks[doc.links[i].from].push(doc.links[i].id);
-			incidentLinks[doc.links[i].to].push(doc.links[i].id);
-			buildLinkEls(doc.links[i]);
-		}
-		for (i = 0; i < doc.labels.length; i++) {
-			buildLabelEls(doc.labels[i]);
-			updateLabelGeometry(doc.labels[i].id);
-		}
-		refreshLabelText();
+		// **ONE CANVAS MEASUREMENT AND ONE SEGMENT INDEX FOR THE WHOLE REBUILD** (Task 680, and it
+		// is the single biggest thing in a project switch). `relayoutLabels()` and
+		// `refreshLabelText()` have always opened these holds; this function never did, and it is
+		// the one that builds every element on the drawing.
+		//
+		// Unheld, `linkSegIndex()` rebuilds the index of EVERY link's segments on every call, and
+		// `layoutLinkLabel()` asks for it once per link through `alignedSideFor()` -- so a rebuild
+		// was quadratic in the number of pipes. `mapBox()` is the other half: unheld it reads
+		// `svg.clientWidth` each time, which is a LAYOUT READ taken between two appends, so the
+		// browser lays the whole half-built drawing out again to answer it.
+		//
+		// **MEASURED ON TOM'S OWN MACHINE, geographic Net3, 119 pipes: `links 1,156 ms` of a
+		// 1,414 ms switch -- 9.7 ms per pipe.** The drawing is the same either way: a hold changes
+		// WHEN the answer is read, not what it is, and both are pure functions of a drawing that is
+		// not moving while this runs.
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+		// **?debug=perf BREAKS THIS FUNCTION OPEN** because the browser said it was 3,389 ms of a
+		// 4,628 ms project switch (Tom's own readout, 2026-09-16, switching into a geographic Net3)
+		// while the text measuring it used to be blamed for was down to 334 calls. Four things
+		// happen here and they have nothing in common but the loop they sit in, so the split is the
+		// whole question. Off unless the flag is typed.
+		perfDebugTime('  nodes', function () {
+			for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
+		});
+		perfDebugTime('  links', function () {
+			for (i = 0; i < doc.links.length; i++) {
+				incidentLinks[doc.links[i].from].push(doc.links[i].id);
+				incidentLinks[doc.links[i].to].push(doc.links[i].id);
+				buildLinkEls(doc.links[i]);
+			}
+		});
+		perfDebugTime('  texts', function () {
+			for (i = 0; i < doc.labels.length; i++) {
+				buildLabelEls(doc.labels[i]);
+				updateLabelGeometry(doc.labels[i].id);
+			}
+		});
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		perfDebugTime('  labelPass', function () {
+			if (!labelPassDeferred) { refreshLabelText(); }
+		});
 		// The selection mark rides on elements this function has just replaced (Task 415) -- and an
 		// id that survives a rebuild is the same element, while one that does not is gone.
-		refreshSelection();
+		perfDebugTime('  selection', function () { refreshSelection(); });
 		// Every element here is brand new and therefore carries no visibility class, so visibility
 		// has to be re-applied to it (the per-Text-label half in particular -- the one class on the
 		// <svg> would survive a rebuild, a class on a discarded <text> does not).
-		applyLabelVisibility();
+		perfDebugTime('  visibility', function () { applyLabelVisibility(); });
 		// The fire-flow ring rides on the circle this function has just replaced, for the same
 		// reason and by the same argument as the selection mark above (Task 530).
-		refreshFireFlowMarks();
+		perfDebugTime('  fireflow', function () { refreshFireFlowMarks(); });
 	}
 	// Every Text attached to this link, redrawn where the link's new shape puts it (Task 502).
 	function updateTextOnLink(id) {
@@ -7874,7 +8359,13 @@ var EngCalcs = EngCalcs || {};
 		// links), a vertex dragged (updateVertex), a rebuild -- so there is no second listener and
 		// nothing to forget to call.
 		updateTextOnLink(id);
-		if (l.lenAuto) { l._length = linkGeomLength(l); }   // base-write: auto length follows the drawing, and geometry is Base-owned
+		// **AN AUTO LENGTH IS WRITTEN ONLY WHILE BASE IS SHOWING** (Task 674). This line runs on
+		// every geometry update, and buildDom() runs it for every link on a scenario switch -- so
+		// without the guard, merely LOOKING at a scenario that moves a node would write that
+		// scenario's length into Base under every other scenario at once. That is defect 2 of
+		// dev/scenario-seam-repair.md, against this same line, arriving by a new door. In a scenario
+		// the auto length is DERIVED instead and stored nowhere: see effective()'s `length` fork.
+		if (l.lenAuto && inBaseScenario()) { l._length = linkGeomLength(l); }   // base-write: in Base the drawing IS the document
 		updateArrow(id);
 		positionPumpSymbol(id);
 	}
@@ -8043,7 +8534,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
-		ne.circle.setAttribute('cx', n.x); ne.circle.setAttribute('cy', n.y);
+		ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
 		if (ne.hit) { syncNodeHit(n); }
 		positionNodeSymbol(id);
 		layoutNodeLabel(id);
@@ -8156,8 +8647,9 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.nodes.length; i++) {
 			var n = doc.nodes[i], r = nodeRadius(n) + 0.2, ne = nodeEls[n.id] || {},
 				tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
-				nlx = ne.text ? +ne.text.getAttribute('x') : n.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : n.y - 2;
-			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
+				nat = nodeAt(n),
+				nlx = ne.text ? +ne.text.getAttribute('x') : nat.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : nat.y - 2;
+			inc(nat.x - r, nat.y - r); inc(nat.x + r, nat.y + r);
 			// **A LABEL THAT IS NOT DRAWN RESERVES NO ROOM.** Zoom-to-fit is a question about what is
 			// on the screen, so it asks the same question the renderer just answered, and settles at
 			// the state the user could SEE when they pressed the button. Fitting can zoom in far
@@ -8274,16 +8766,16 @@ var EngCalcs = EngCalcs || {};
 
 
 		doc.nodes.forEach(function (n) {
-			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {};
-			fitItem(out, n.x, n.y, rad, rad, rad, rad);
+			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {}, nat = nodeAt(n);
+			fitItem(out, nat.x, nat.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
 			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
 			// from the last layout, so a fit arriving from a 0.02x view sees labels banked on the
 			// opposite side from one arriving at 1x and lands 24 px away in tx. Derived here the way
 			// dataLabelOrigin() derives it for an auto-placed label, from the HOME position.
 			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
-				lx = (base.x >= n.x) ? base.x : base.x - tw;
-			boxFor(n.x, n.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
+				lx = (base.x >= nat.x) ? base.x : base.x - tw;
+			boxFor(nat.x, nat.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
@@ -8642,8 +9134,25 @@ var EngCalcs = EngCalcs || {};
 
 		items = fitItems(state.s, true);
 		s = solve(labelTuning().fitRoom * settings.textSize);
+		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
+		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
+		// drawing, where step 2's answer is a statement about the drawing plus its lettering.
+		var modelFit = s;
 		items = fitItems(s);
 		s = solve();
+		// **A LABEL WIDER THAN THE WINDOW MUST NOT DECIDE THE ZOOM** (Tom, 2026-09-16, on his EWB
+		// demo file: *"Zoom to fit ... does not show the entire network. It's close, but it's not
+		// what we aim for."*). `fitScaleFor()` answers `minScale()` when nothing fits even at the
+		// floor -- "take the floor and let it overhang" -- which was a reasonable last resort while
+		// the floor was a fixed 0.05 and is a useless one now that the floor is the drawing's own
+		// size: it would pull back until the whole network was a four-pixel mark to make room for
+		// one label. Measured on his file at a 1500x650 canvas: the fit was pinned at the floor and
+		// the network hung 4 px off the top and 3 px off the bottom.
+		//
+		// So a step-2 answer that bottomed out is not an answer. Fall back to the model fit and let
+		// the lettering overhang, which is the trade the original branch intended: **the NETWORK is
+		// what Zoom to fit is for.**
+		if (!(s > minScale())) { s = modelFit; }
 		apply(s);
 		if (auto) { rebaseSignatureIfClean(); }
 	}
@@ -9557,6 +10066,60 @@ var EngCalcs = EngCalcs || {};
 	 * for the Earth one tile at a time.
 	 */
 	var LPN_PLANE_SPAN_M = 40075000;   // the equator, so no network can reach the floor
+	/**
+	 * **AND THE LOCAL GRID HAD THE SAME ACCIDENT, ONE DOOR OVER** (Tom, 2026-09-16, on his EWB demo
+	 * file: *"my zoom out is limited on master"*). `MIN_SCALE_GRID` is 0.05 whatever the drawing is
+	 * measured in, so it caps the window at 20,000 drawing units across -- which is generous for a
+	 * sketch drawn in inches and **nothing at all for a drawing surveyed in feet or metres**, where
+	 * 20,000 units is a few city blocks. The constant was never a decision about big local drawings;
+	 * it predates there being any.
+	 *
+	 * **HIS FILE PROVES IT WITH A WORSE SYMPTOM THAN THE ONE HE REPORTED: zoom-to-fit could not fit
+	 * it.** `NMG-Waterline-EWB.lwn` spans about 13,600 units with its background image, and
+	 * `fitScaleFor()` returned exactly 0.05 -- its own "not even the smallest allowed zoom fits it,
+	 * take the floor and let it overhang" branch. So the drawing hung off the edge of the window at
+	 * every zoom the page would allow, and Zoom to fit could not cure it.
+	 *
+	 * **THE FLOOR IS NOW THE DRAWING'S OWN SIZE, and it is the SAME NUMBER that decides whether a
+	 * stored view is worth restoring** -- `LPN_VIEW_MIN_MODEL_PX`. You may pull back until the
+	 * drawing is a four-pixel mark and no further, which is the point past which there is nothing to
+	 * look at, and every view you can reach is therefore a view that can be restored. `Math.min`,
+	 * for the same reason the projected branch above uses it: this may only ever LOOSEN the existing
+	 * floor, never tighten it: no drawing loses range it has today. A drawing smaller than about 80
+	 * units across gets a slightly lower floor than the old constant, which is the same rule applied
+	 * honestly rather than an exception -- it is still the scale at which the drawing is a four
+	 * pixel mark, and there was never anything to see past it.
+	 *
+	 * **THE BACKGROUND IMAGE COUNTS AS PART OF THE DRAWING HERE**, which is what his file needs: a
+	 * short pipe run over a large aerial is a real shape of project, and a floor measured from the
+	 * network alone would refuse to show the picture the network was drawn on.
+	 *
+	 * **NOTHING WAS BEING PROTECTED BY THE OLD FLOOR.** Measured 2026-09-16, laying Net3 out at 1,
+	 * 1/2, 1/5 ... 1/200 of its fit scale: 376, 849, 294, 274, 217, 212, 247, 299 ms. The cost FALLS
+	 * as the drawing shrinks and then flattens -- there is no cliff on the other side of this floor,
+	 * which was the one thing worth checking before moving it.
+	 */
+	function localContentSpan() {
+		var e = modelExtent(), lo = {}, hi = {}, span = 0;
+		if (e) {
+			lo.x = e.minx; hi.x = e.maxx; lo.y = e.miny; hi.y = e.maxy;
+		}
+		if (backdrop && isFinite(backdrop.width) && isFinite(backdrop.height)) {
+			// The placed rectangle, in world units: the image's own box moved by its placement.
+			var bx = backdrop.tx + backdrop.x * backdrop.s,
+				by = backdrop.ty + backdrop.y * backdrop.s,
+				bw = backdrop.width * backdrop.s, bh = backdrop.height * backdrop.s;
+			[[bx, by], [bx + bw, by - bh], [bx, by - bh], [bx + bw, by]].forEach(function (c) {
+				if (lo.x === undefined || c[0] < lo.x) { lo.x = c[0]; }
+				if (hi.x === undefined || c[0] > hi.x) { hi.x = c[0]; }
+				if (lo.y === undefined || c[1] < lo.y) { lo.y = c[1]; }
+				if (hi.y === undefined || c[1] > hi.y) { hi.y = c[1]; }
+			});
+		}
+		if (lo.x === undefined) { return 0; }
+		span = Math.max(hi.x - lo.x, hi.y - lo.y);
+		return isFinite(span) && span > 0 ? span : 0;
+	}
 	function planeUnitsPerMetre() {
 		if (!projectLocatable() || !isProjectedProject()) { return 0; }
 		var code = projectCrsCode(), c = crsExtent(code), lat, lon, a, b;
@@ -9576,6 +10139,8 @@ var EngCalcs = EngCalcs || {};
 			var per = planeUnitsPerMetre();
 			if (per > 0) { return Math.min(MIN_SCALE_GRID, w / (LPN_PLANE_SPAN_M * per)); }
 		}
+		var span = localContentSpan();
+		if (span > 0) { return Math.min(MIN_SCALE_GRID, LPN_VIEW_MIN_MODEL_PX / span); }
 		return MIN_SCALE_GRID;
 	}
 	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
@@ -9694,6 +10259,52 @@ var EngCalcs = EngCalcs || {};
 			out.push({ x: outwardX(p.x), y: outwardY(p.y) });
 		});
 		return out;
+	}
+	/**
+	 * **A SCENARIO'S OWN POSITIONS COME ALONG TOO** (ROADMAP Task 674). A coordinate override is an
+	 * ABSOLUTE, outward pair, so it is already in the frame georefCapture() captures -- and being
+	 * absolute is exactly why it needs this pass: it is measured from nothing, and this wizard
+	 * changes what every coordinate in the document MEANS. Left behind, a node moved in a scenario
+	 * would stay at a State Plane northing read as a latitude, which is off the world.
+	 *
+	 * **THE PAIR IS COMPLETED FROM BASE.** An override may hold one axis only -- typing a northing
+	 * and leaving the easting alone is the ordinary case -- and the transform needs a point, so the
+	 * missing half comes from the node's own position. Only the axes the scenario actually holds are
+	 * written back.
+	 *
+	 * eachStoredPoint() is deliberately NOT extended to reach these: its other callers rebase and
+	 * flip the document's own frame, and an absolute pair must not move when the origin does.
+	 */
+	function georefCaptureCoordOverrides() {
+		var out = [];
+		scenarios.forEach(function (scn) {
+			if (scn.isBase) { return; }
+			Object.keys(scn.overrides || {}).forEach(function (key) {
+				var ov = scn.overrides[key], n;
+				if (!ov || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
+				n = doc.nodes.filter(function (nd) { return ovKey(nd) === key; })[0];
+				if (!n) { return; }
+				out.push({
+					ov: ov,
+					hasX: typeof ov.x === 'number', hasY: typeof ov.y === 'number',
+					was: { x: ov.x, y: ov.y },
+					src: { x: typeof ov.x === 'number' ? ov.x : outwardX(n.x),
+						y: typeof ov.y === 'number' ? ov.y : outwardY(n.y) }
+				});
+			});
+		});
+		return out;
+	}
+	// Re-derived from the capture on every transform, exactly as georefWrite() re-derives every
+	// stored point -- so dragging the frame moves a scenario's own positions with it.
+	function georefWriteCoordOverrides(t) {
+		var list = (georef && georef.ovs) || [];
+		list.forEach(function (o) {
+			var ll = EngCalcs.lpnGeorefToLonLat(t, o.src.x, o.src.y);
+			if (!ll || !isFinite(ll.lon) || !isFinite(ll.lat)) { return; }
+			if (o.hasX) { o.ov.x = ll.lon; }
+			if (o.hasY) { o.ov.y = ll.lat; }
+		});
 	}
 	// **THE BACKGROUND IMAGE COMES ALONG, AND eachStoredPoint() CANNOT REACH IT HERE.** Tom,
 	// 2026-08-24: *"it didn't occur to me that anybody would use a backdrop for a geographic
@@ -9833,6 +10444,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function georefWrite(t) {
 		var i = 0;
+		georefWriteCoordOverrides(t);
 		eachStoredPoint(doc, function (pt, get, set) {
 			var s = georef.src[i++];
 			if (!s) { return; }
@@ -10479,7 +11091,9 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function nodeLonLat(n) {
 		if (!n) { return null; }
-		var x = outwardX(n.x), y = outwardY(n.y);
+		// The position the SCENARIO shows, so a node moved in a scenario samples the ground it is
+		// standing on there rather than the ground Base left it on (Task 674).
+		var x = effective(n, 'x'), y = effective(n, 'y');
 		if (isGeoProject()) { return { lon: x, lat: y }; }
 		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
 		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
@@ -10830,7 +11444,7 @@ var EngCalcs = EngCalcs || {};
 		// can read while you work beats a modal you must dismiss before you can start.
 		georef = {
 			step: GEOREF_STEP_DETACHED, src: georefCapture(), bd: georefCaptureBackdrop(),
-			offs: georefCaptureOffsets(), t: null,
+			offs: georefCaptureOffsets(), ovs: georefCaptureCoordOverrides(), t: null,
 			frozen: null, rotDeg: 0,
 			// **WHAT UNDO GETS BACK IF THE USER FINISHES** (Task 436). Taken HERE, before one number
 			// has moved, because the wizard's whole run is one act to the person pressing Ctrl+Z --
@@ -10949,6 +11563,11 @@ var EngCalcs = EngCalcs || {};
 		// coordinates backwards through it once makes the forward map reproduce them, and without
 		// this the user's first drag would jump the model sideways by exactly that ratio.
 		georef.src = georef.src.map(function (s) { return EngCalcs.lpnGeorefFromLonLat(t, s.x, s.y); });
+		// A scenario's own positions are captured in the same frame and take the same re-expression,
+		// or the user's first drag would move them by exactly the ratio this corrects (Task 674).
+		(georef.ovs || []).forEach(function (o) {
+			o.src = EngCalcs.lpnGeorefFromLonLat(t, o.src.x, o.src.y);
+		});
 		// The backdrop is re-expressed in the same frame for the same reason, and its SCALE with it:
 		// reinterpret's promise is that nothing moves, so the picture has to come out the size it
 		// already is. georefWriteBackdrop() multiplies by metersPerUnit / mpd.lon, and this is the
@@ -10993,8 +11612,13 @@ var EngCalcs = EngCalcs || {};
 	// only elements including text."* Both are read where they are used -- applyLabelVisibility()
 	// and runSolve() ask georefActive() -- so there is no saved flag to restore wrongly; this only
 	// has to make the page re-ask.
+	// **THROUGH refreshLabelSuppression(), NOT applyLabelVisibility().** Finishing or cancelling a
+	// placement is a transition BACK, and the way back owes whatever was skipped while the project
+	// was being aimed -- which is exactly what the comment above refreshLabelSuppression() asks of
+	// every suppressor. It called the lower function until 2026-09-17 and got away with it only
+	// because the solve it schedules happened to end in a content pass.
 	function georefSuspend(on) {
-		applyLabelVisibility();
+		refreshLabelSuppression();
 		if (!on) { scheduleSolve(); }
 	}
 	// ---- step 1 <-> step 2 ----------------------------------------------------------------------
@@ -11090,6 +11714,12 @@ var EngCalcs = EngCalcs || {};
 			if (!s) { return; }
 			if (set) { set(inwardX(s.x), inwardY(s.y)); }
 			else { pt.x = inwardX(s.x); pt.y = inwardY(s.y); }
+		});
+		// A scenario's own positions go back verbatim rather than back through the transform, which
+		// is Cancel's promise for every other coordinate too (Task 674).
+		(georef.ovs || []).forEach(function (o) {
+			if (o.hasX) { o.ov.x = o.was.x; }
+			if (o.hasY) { o.ov.y = o.was.y; }
 		});
 		// The picture goes back to the numbers it had, not to a number derived back through the
 		// transform: `prev` is the three it arrived with, so Cancel is `===` for the backdrop on the
@@ -11618,10 +12248,10 @@ var EngCalcs = EngCalcs || {};
 		var out = [];
 		if (!ring || ring.length < 3) { return out; }
 		doc.nodes.forEach(function (n) {
-			if (inArea(ring, n.x, n.y)) { out.push({ kind: 'node', id: n.id }); }
+			if (inArea(ring, nodeDrawX(n), nodeDrawY(n))) { out.push({ kind: 'node', id: n.id }); }
 		});
 		doc.links.forEach(function (l) {
-			var a = nodeById(l.from), b = nodeById(l.to);
+			var a = nodeAt(nodeById(l.from)), b = nodeAt(nodeById(l.to));
 			// BOTH ends, and a link missing one of them is not caught at all: a dangling link is a
 			// defect of the document and a marquee is not the place to make a decision about it.
 			if (a && b && inArea(ring, a.x, a.y) && inArea(ring, b.x, b.y)) {
@@ -11868,6 +12498,15 @@ var EngCalcs = EngCalcs || {};
 		// the connection exception being widened, it is the same honesty the ID row has.
 		//
 		// The label is `lpn_field_tag`, the popup's own whole label, reused rather than re-keyed.
+		// **DESCRIPTION IS BAND 1 TOO, AHEAD OF THE TAG** (Task 674), and it needs no gate here for
+		// the same reason the tag does not: every scope still running is a node scope, a link scope
+		// or "Everything", and both groups carry one. It misses only a Text object, which is the
+		// standing of `id` here already.
+		//
+		// **AND IT IS THE PROPERTY THIS PANEL MOST WANTED.** A description is a sentence about where
+		// the asset is -- "Corner of Elm and Main" -- so `contains` on it is how somebody finds the
+		// four junctions on Elm, which no other property on this page can answer at all.
+		out.push(['desc', pc.lpn_field_desc || 'Description', 'Description']);
 		out.push(['tag', pc.lpn_field_tag || 'Tag', 'Tag']);
 		// **THE ORDER IS A RULE, AND THIS IS THE SECOND ATTEMPT AT IT** (Tom, 2026-09-04: *"I see
 		// results mixed with asset properties. So you didn't try the rules I gave you. And, for
@@ -12142,7 +12781,8 @@ var EngCalcs = EngCalcs || {};
 		// values, so an empty column still gets the conditions its author intended.
 		var d = customPropDefs().length ? customPropDefByKey(prop) : null;
 		if (d) { return !customPropIsNumeric(d); }
-		return prop === 'id' || prop === 'text' || prop === 'demandCategory' || prop === 'tag';
+		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
+			prop === 'tag' || prop === 'desc';
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -12362,6 +13002,14 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'tag') {
 			return cand.group === 'label' ? undefined : (cand.el.tag || undefined);
 		}
+		// **THE SAME READING FOR THE DESCRIPTION** (Task 674), straight off the element rather than
+		// through effective(): it is base-owned on purpose (descField()), so there is no override to
+		// resolve and asking for one would invent a `_desc` nothing writes. An empty or absent
+		// description reads as undefined, so `contains` with an empty box lists exactly the assets
+		// that HAVE one -- which is how "what have we written up so far" gets asked.
+		if (prop === 'desc') {
+			return cand.group === 'label' ? undefined : (cand.el.desc || undefined);
+		}
 		// **A CUSTOM PROPERTY IS READ THROUGH effective(), LIKE EVERY OTHER INPUT HERE** (Task 636),
 		// so a scenario's override is what a search inside that scenario finds. Above the label
 		// bail-out below, because a Text object carries custom properties too (Tom, 2026-09-13:
@@ -12566,9 +13214,9 @@ var EngCalcs = EngCalcs || {};
 	// midpoint of its ends -- good enough to put a pipe on screen, and it needs no vertex walk.
 	function findPointOf(cand) {
 		var a, b;
-		if (cand.group === 'node') { return { x: cand.el.x, y: cand.el.y }; }
+		if (cand.group === 'node') { return nodeAt(cand.el); }
 		if (cand.group === 'link') {
-			a = nodeById(cand.el.from); b = nodeById(cand.el.to);
+			a = nodeAt(nodeById(cand.el.from)); b = nodeAt(nodeById(cand.el.to));
 			if (!a || !b) { return null; }
 			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 		}
@@ -12590,14 +13238,14 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < ids.length; i++) {
 				var l = linkById(ids[i]);
 				if (!l) { continue; }
-				other = nodeById(l.from === el.id ? l.to : l.from);
+				other = nodeAt(nodeById(l.from === el.id ? l.to : l.from));
 				if (!other) { continue; }
-				sum += Math.hypot(other.x - el.x, other.y - el.y); n++;
+				sum += Math.hypot(other.x - nodeDrawX(el), other.y - nodeDrawY(el)); n++;
 			}
 			return n ? 2 * sum / n : 0;
 		}
 		if (group === 'link') {
-			a = nodeById(el.from); b = nodeById(el.to);
+			a = nodeAt(nodeById(el.from)); b = nodeAt(nodeById(el.to));
 			return (a && b) ? 2 * Math.hypot(b.x - a.x, b.y - a.y) : 0;
 		}
 		// A Text borrows the neighbourhood of whatever it is attached to -- its node's, or its own
@@ -13575,12 +14223,13 @@ var EngCalcs = EngCalcs || {};
 	 * **WRITABLE HERE, AND NOWHERE ELSE** -- the Replace side's counterpart to
 	 * FIND_EXTRA_LINK_FIELDS, which is the same shape of answer on the search side.
 	 *
-	 * `pushSpecList()` stays the source of truth for everything that is a starting VALUE, and the
-	 * tag is not one: nothing seeds a tag from a default and nothing pushes one onto every scenario,
-	 * because a tag is what somebody else's records call this asset. It also cannot be written in
-	 * that list's shape, and the reason is the interesting one: every spec there belongs to ONE
-	 * group, and a tag is carried by nodes AND links. Two specs both named Tag would put the word
-	 * twice in one pull-down and `replaceSpec()` would write only whichever came first.
+	 * `pushSpecList()` stays the source of truth for everything that is a starting VALUE, and
+	 * neither the description nor the tag is one: nothing seeds either from a default and nothing
+	 * pushes one onto every scenario, because both say what this asset IS rather than how it is
+	 * designed. They also cannot be written in that list's shape, and the reason is the interesting
+	 * one: every spec there belongs to ONE group, and both of these are carried by nodes AND links.
+	 * Two specs both named Tag would put the word twice in one pull-down and `replaceSpec()` would
+	 * write only whichever came first.
 	 *
 	 * So `group: 'any'` -- read by replaceSpecGroupOk() alone -- and a spec in the identical shape,
 	 * concatenated rather than kept as a rival list. `text: true` says the value box holds words
@@ -13595,6 +14244,25 @@ var EngCalcs = EngCalcs || {};
 	function replaceExtraSpecs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
+			// **THE DESCRIPTION IS WRITABLE HERE ON EXACTLY THE TAG'S TERMS** (Task 674): carried by
+			// nodes AND links, so `group: 'any'`; base-owned, so a plain `set` with no `prop`; and
+			// seeded by nothing and pushed onto no scenario, so it is not a `pushSpecList()` entry.
+			//
+			// **`str` RATHER THAN `text`, AND THAT IS THE ONE DIFFERENCE.** `text` puts the value
+			// through lpnTagText() and keeps one word, which is right for a tag EPANET truncates at
+			// the first space and wrong for a sentence. `str` hands the bytes over, so
+			// "Corner of Elm and Main" survives a bulk write -- and replaceValueOf() still refuses
+			// an empty box under either flag, because erasing a description on 400 assets must not
+			// be spelled the same way as leaving the box alone. The newline a paste could carry is
+			// refused by lpnDescText() at the write below, the one place that rule lives.
+			{ key: 'desc', group: 'any', field: 'desc', str: true,
+				label: pc.lpn_field_desc || 'Description',
+				applies: function () { return true; },
+				get: function (el) { return el.desc || ''; },
+				set: function (el, v) {
+					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
+					if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is an identity, not an overridable property -- see descField()
+				} },
 			{ key: 'tag', group: 'any', field: 'tag', text: true, label: pc.lpn_field_tag || 'Tag',
 				applies: function () { return true; },
 				get: function (el) { return el.tag || ''; },
@@ -13603,9 +14271,10 @@ var EngCalcs = EngCalcs || {};
 				} }
 		];
 	}
-	// A spec's group against a candidate's. Only the tag answers 'any', and only to the two groups
-	// that can hold one: a Text label is not an asset and carries no tag, so "everything" here
-	// means every NODE and every LINK, exactly as it does in findPropDefs().
+	// A spec's group against a candidate's. Only the identity band -- the description and the tag --
+	// answers 'any', and only to the two groups that can hold one: a Text label is not an asset and
+	// carries neither, so "everything" here means every NODE and every LINK, exactly as it does in
+	// findPropDefs().
 	function replaceSpecGroupOk(spec, group) {
 		if (spec.group === 'any') { return group === 'node' || group === 'link'; }
 		return spec.group === group;
@@ -15357,6 +16026,79 @@ var EngCalcs = EngCalcs || {};
 			get: function (n) { return n.elev; },
 			set: function (n, v) { n.elev = v; updateNode(n.id); } };
 	}
+	/**
+	 * **A NODE'S POSITION AS TWO COLUMNS** (ROADMAP Task 674), the property popup's own two rows
+	 * in the table, through the same setNodeCoordAxis() seam so the two editors of one position
+	 * cannot have two ideas of what placing a node means.
+	 *
+	 * **THE KEYS ARE SLOTS AND THE HEADINGS ARE FUNCTIONS, BECAUSE THE SPEC IS BUILT ONCE.**
+	 * paneTables() caches, and the vocabulary follows the PROJECT -- lat/lon, northing/easting or
+	 * x/y -- so a heading resolved at build time would be whichever kind of project happened to be
+	 * open first and would stay that way for the life of the tab. A function is re-asked on every
+	 * render, and paneTableSignature() already carries the headings, so changing project kind
+	 * rebuilds these two columns by itself.
+	 *
+	 * So the key cannot be `lat` or `northing` either: it is the SELECTION and SORT identity, and
+	 * it has to survive a project whose axes are called something else. `axis1` is the first-read
+	 * slot in the sense coordSlotIsY() gives it.
+	 *
+	 * 5.5em, wider than the 3.5 an elevation gets: a state-plane northing is seven digits and two
+	 * decimals, which is the case this feature exists for.
+	 */
+	function paneColCoord(slot) {
+		return {
+			key: 'axis' + slot, em: 5.5,
+			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
+			get: function (n) { return nodeCoordAxis(n, slot); },
+			set: function (n, v) { setNodeCoordAxis(n, slot, v); },
+			// **A FUNCTION, NOT A STRING, and for the reason the heading above it is one**: the spec
+			// is built once and cached by paneTables(), while which document axis this column writes
+			// follows the KIND of project (coordSlotIsY). A literal `prop` resolved at build time
+			// would be whichever kind happened to be open first and would stay that way for the life
+			// of the tab -- and it decides which property an edit here counts as (Task 674).
+			propFn: function () { return coordSlotIsY(slot) ? 'y' : 'x'; }
+		};
+	}
+	/**
+	 * **THE IDENTITY BAND'S OTHER TWO COLUMNS** (ROADMAP Task 674). Tom, 2026-09-15: *"Tag is at the
+	 * bottom like we really don't care about it, which is true. Also Tag is not in Tables. All that
+	 * is a bit embarrassing. We need a consistent approach."* **There was no Tag column ANYWHERE
+	 * before this** -- a property with a popup row, a Find scope and a round trip through `[TAGS]`,
+	 * and no way to read four hundred of them at once, which is what a table is for.
+	 *
+	 * `str: true`, so paneCellText() prints the words verbatim and paneParseCellText() takes
+	 * anything a pasted spreadsheet cell can hold -- which is the whole point of putting these two
+	 * in the table: a tag register and a street-corner description arrive from somewhere else, by
+	 * the column, and they are the two properties most likely to be pasted rather than typed.
+	 *
+	 * **BOTH SETTERS GO THROUGH THE SAME ONE-PLACE RULE THE POPUP USES**, so the two editors of one
+	 * property cannot disagree: `lpnDescText()` refuses the line break a trailing comment cannot
+	 * hold, `lpnTagText()` keeps the one word EPANET's reader stops at. A paste is where that
+	 * matters -- a spreadsheet cell really can carry a newline, and a popup field cannot.
+	 *
+	 * **NO `prop`**: neither is in LPN_OVERRIDABLE (see descField() and tagField()), so a plain
+	 * write is correct here in Base and in a scenario alike.
+	 *
+	 * 8em for a description and 5em for a tag. A description is a sentence -- "Corner of Elm and
+	 * Main" -- and column width is king everywhere in this pane, so it gets the widest box in it
+	 * and no more; a tag is one token of somebody's asset register.
+	 */
+	function paneColDesc() {
+		return { key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+			get: function (el) { return el.desc || ''; },
+			set: function (el, v) {
+				var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
+				if (t) { el.desc = t; } else { delete el.desc; }   // base-write: identity, as in the popup -- see descField()
+			} };
+	}
+	function paneColTag() {
+		return { key: 'tag', label: 'lpn_field_tag', str: true, em: 5,
+			get: function (el) { return el.tag || ''; },
+			set: function (el, v) {
+				var t = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(v) : String(v || '').trim().split(/\s+/)[0];
+				if (t) { el.tag = t; } else { delete el.tag; }   // base-write: identity, as in the popup -- see tagField()
+			} };
+	}
 	// A link's two ends, read-only and as TEXT: which node a pipe lands on is identity, and identity
 	// is never overridable (a node cannot be in two places at once in one rendered map). Re-drawing
 	// the pipe is how it changes.
@@ -15583,7 +16325,16 @@ var EngCalcs = EngCalcs || {};
 				id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
 				group: 'node', type: 'junction',
 				cols: [
-					paneColId(), paneColActive(), paneColElev(),
+					// **THE WHOLE IDENTITY BAND, MATCHING THE POPUP**: `ID | X | Y |
+					// Description | Tag | Elevation`. Tom, 2026-09-15: one rule for both
+					// surfaces, and Tag had never been a column anywhere. See
+					// renderNodeFields() for the reasoning, for why it is EPANET's dialog
+					// order rather than its file order, and for Declan's measured dissent
+					// about the coordinates, which stands and is revisited when columns
+					// become customizable.
+					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColDesc(), paneColTag(),
+					paneColActive(), paneColElev(),
 					// **THE TYPED ONE IS THE EDITABLE ONE, AND IT IS THE ONLY EDITABLE ONE** -- see
 					// resolvedDemand(). The Demand column beside it is a plain cell with no control
 					// in it at all, so there is no path by which the resolved number could be typed
@@ -15613,7 +16364,16 @@ var EngCalcs = EngCalcs || {};
 				id: 'reservoirs', panel: 'lpn_pane_reservoirs', label: 'lpn_pane_tab_reservoirs',
 				group: 'node', type: 'reservoir',
 				cols: [
-					paneColId(), paneColActive(), paneColElev(),
+					// **THE WHOLE IDENTITY BAND, MATCHING THE POPUP**: `ID | X | Y |
+					// Description | Tag | Elevation`. Tom, 2026-09-15: one rule for both
+					// surfaces, and Tag had never been a column anywhere. See
+					// renderNodeFields() for the reasoning, for why it is EPANET's dialog
+					// order rather than its file order, and for Declan's measured dissent
+					// about the coordinates, which stands and is revisited when columns
+					// become customizable.
+					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColDesc(), paneColTag(),
+					paneColActive(), paneColElev(),
 					// BLANK MEANS "follow the elevation", exactly as in the popup, where the
 					// elevation is this field's placeholder. So an empty cell here is a reservoir
 					// whose water surface is its ground, not a reservoir with no head.
@@ -15632,7 +16392,16 @@ var EngCalcs = EngCalcs || {};
 				id: 'tanks', panel: 'lpn_pane_tanks', label: 'lpn_pane_tab_tanks',
 				group: 'node', type: 'tank',
 				cols: [
-					paneColId(), paneColActive(), paneColElev(),
+					// **THE WHOLE IDENTITY BAND, MATCHING THE POPUP**: `ID | X | Y |
+					// Description | Tag | Elevation`. Tom, 2026-09-15: one rule for both
+					// surfaces, and Tag had never been a column anywhere. See
+					// renderNodeFields() for the reasoning, for why it is EPANET's dialog
+					// order rather than its file order, and for Declan's measured dissent
+					// about the coordinates, which stands and is revisited when columns
+					// become customizable.
+					paneColId(), paneColCoord(1), paneColCoord(2),
+					paneColDesc(), paneColTag(),
+					paneColActive(), paneColElev(),
 					{ key: 'level', em: 3.5, label: 'lpn_field_tank_level', unit: paneUnitElevHead,
 						prop: 'level', get: function (n) { return effective(n, 'level'); },
 						set: function (n, v) { setProp(n, 'level', v); } },
@@ -15663,7 +16432,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
@@ -15711,7 +16480,7 @@ var EngCalcs = EngCalcs || {};
 				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
 				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
 				// cell and the label beside the symbol cannot disagree.
-				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
 				])
@@ -15719,7 +16488,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
 				group: 'link', type: 'valve',
-				cols: [paneColId(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
 					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
 					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
 					// valve's setting is a different physical quantity per type -- a pressure, a
@@ -15930,6 +16699,10 @@ var EngCalcs = EngCalcs || {};
 	// A result rounds to 2 decimals; a typed number reads back exactly as it is stored; an
 	// identity reads verbatim. Two of these written separately is how a sheet in somebody's hand
 	// comes to round differently from the screen it was taken off.
+	// **WHICH OVERRIDABLE PROPERTY A COLUMN WRITES.** A literal for every column but the two
+	// coordinates, whose axis follows the kind of project and is therefore a function (paneColCoord).
+	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
+	function paneColProp(c) { return c.prop || (c.propFn ? c.propFn() : undefined); }
 	function paneCellText(c, el) {
 		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
 		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
@@ -16527,7 +17300,7 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		c.set(el, p.v);
-		completeEdit(c.prop ? { el: el, prop: c.prop } : null);
+		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
 		refreshPopupIfOpen();
 		paneLeaveEdit(input);
 		return true;
@@ -16993,7 +17766,7 @@ var EngCalcs = EngCalcs || {};
 			var nd = id && nodeById(id);
 			if (!nd) { return; }
 			el('circle', {
-				cx: nd.x, cy: nd.y, r: (nodeRadius(nd) + 5 / sc), fill: 'none',
+				cx: nodeDrawX(nd), cy: nodeDrawY(nd), r: (nodeRadius(nd) + 5 / sc), fill: 'none',
 				stroke: '#f60', 'stroke-opacity': 0.9, 'stroke-width': 2 / sc
 			}, profilePathLayer);
 		});
@@ -17019,13 +17792,13 @@ var EngCalcs = EngCalcs || {};
 				// colour-blind reader: solid is a stop you chose, hollow is a node the route passes
 				// through and dragging it makes it one.
 				el('circle', {
-					cx: hn.x, cy: hn.y, r: (h.stop >= 0 ? 8 : 6.5) / sc,
+					cx: nodeDrawX(hn), cy: nodeDrawY(hn), r: (h.stop >= 0 ? 8 : 6.5) / sc,
 					fill: h.stop >= 0 ? '#f60' : '#fff',
 					stroke: '#fff', 'stroke-width': 4 / sc, 'stroke-opacity': 0.85,
 					'class': 'lpn-profile-handle-halo'
 				}, profilePathLayer);
 				el('circle', {
-					cx: hn.x, cy: hn.y, r: (h.stop >= 0 ? 8 : 6.5) / sc,
+					cx: nodeDrawX(hn), cy: nodeDrawY(hn), r: (h.stop >= 0 ? 8 : 6.5) / sc,
 					fill: h.stop >= 0 ? '#f60' : '#fff', stroke: '#f60', 'stroke-width': 2.5 / sc,
 					'class': 'lpn-profile-handle'
 				}, profilePathLayer);
@@ -17037,7 +17810,7 @@ var EngCalcs = EngCalcs || {};
 			var hn = nodeById(dr.hover);
 			if (hn) {
 				el('circle', {
-					cx: hn.x, cy: hn.y, r: (nodeRadius(hn) + 5 / sc), fill: 'none',
+					cx: nodeDrawX(hn), cy: nodeDrawY(hn), r: (nodeRadius(hn) + 5 / sc), fill: 'none',
 					stroke: '#f60', 'stroke-opacity': 0.55, 'stroke-width': 2 / sc,
 					'stroke-dasharray': (4 / sc) + ',' + (3 / sc), 'class': 'lpn-profile-ghost'
 				}, profilePathLayer);
@@ -19135,8 +19908,11 @@ var EngCalcs = EngCalcs || {};
 	// `app` is a URL rather than a product name: the product name is unsettled, and a URL stays
 	// useful to somebody who finds this file knowing nothing. Old readers ignore unknown keys.
 	var LPN_FILE_FORMAT = 'hawsedc-lpn';
-	// The CANONICAL address of this page: CANONICAL_ORIGIN_DEFAULT in lib/config.inc.php plus the
-	// pretty URL lib/Canonical.lib.php declares for it (no `www`). HARDCODED, not derived from
+	// The CANONICAL address of this page: EC_LWN_ORIGIN in lib/config.inc.php plus the pretty URL
+	// lib/Canonical.lib.php declares for it (no `www`). **EC_LWN_ORIGIN and NOT
+	// CANONICAL_ORIGIN_DEFAULT: the two stopped being the same string on 2026-09-17**, when the
+	// calculators went back to nominating hawsedc.com and this page alone stayed on
+	// librewaternet.org (ecCanonicalOrigins()). HARDCODED, not derived from
 	// location.origin: a file saved from a dev host would record the dev host forever, and this key
 	// says where the format lives, not where one save happened. It must be the INDEXED address for
 	// the same reason -- the marker outlives the request that wrote it and has no Host header of its
@@ -19249,7 +20025,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **WHAT COUNTS AS A CHANGE TO THE DOCUMENT.** This is what puts the asterisk on a tab, so
 	// anything included here is something the user will be asked to save.
-	function docSignature() {
+	/**
+	 * **TWO SIGNATURES OUT OF ONE SNAPSHOT, AND THE VIEW IS THE DIFFERENCE.** `docSignature()` is
+	 * what puts the asterisk on a tab, and the view belongs in it -- moving the camera is an edit
+	 * somebody may want saved. `modelSignature()` answers a different question: *is this the same
+	 * document I computed something for*, asked of a stored solve or a stored label placement when a
+	 * project is switched back to. Panning between two visits must not throw those away, so the
+	 * view is left out of that one.
+	 */
+	function projectSnapshotHash(withView) {
 		var snap = serializeProject();
 		// The backdrop's data URL is megabytes and changes only when the image itself is replaced, so
 		// it is represented by its LENGTH plus its placement rather than hashed. Hashing it would put
@@ -19262,9 +20046,210 @@ var EngCalcs = EngCalcs || {};
 			// in order to excuse an automatic one. The paradigm forbids automatic zooms and refits,
 			// and an AUTOMATIC fit re-baselines the clean signature rather than dirtying the project
 			// -- see zoomExtent()'s `auto` argument.
-			view: snap.view
+			view: withView ? snap.view : null
 		});
 		return hash32(JSON.stringify(snap));
+	}
+	function docSignature() { return projectSnapshotHash(true); }
+	/**
+	 * **THE BYTES ON DISK, NOT A SECOND SERIALIZATION OF THE SAME DOCUMENT.** The first version of
+	 * the keep hashed `serializeProject()` on the way out and again on the way in, and it never
+	 * matched once on a real drawing: a document that goes out through `JSON.stringify` and comes
+	 * back through `applySaved()` is the same DATA in a different key ORDER, so the two strings
+	 * differ and so do their hashes. Hashing what was actually written removes the question -- both
+	 * sides read the same bytes, and anything that rewrites them (another window, a hand edit, an
+	 * import) changes the answer, which is exactly the event this has to notice.
+	 */
+	function storedSignature(id) {
+		if (!id) { return ''; }
+		try {
+			var raw = localStorage.getItem(projectKey(id));
+			return raw ? hash32(raw) : '';
+		} catch (err) { return ''; }   // private mode: no keep, and no crash
+	}
+	/**
+	 * ---- WHAT A TAB KEEPS WHILE YOU ARE LOOKING AT ANOTHER ONE (ROADMAP Task 680) --------------
+	 *
+	 * Tom, 2026-09-16, on a five-second switch: *"why aren't we storing these things when we switch
+	 * away?"* Three things could be kept and only two were: the DOCUMENT is in `localStorage` and
+	 * the VIEW is already kept per tab in `tabViews`. The SOLVE was thrown away by construction --
+	 * `refreshAllFromDocument()` opened with `lastSolveResult = null` -- so every return to a tab
+	 * re-solved a network that had not changed while you were away.
+	 *
+	 * **THE GUARD IS A SIGNATURE, NOT A PROMISE.** A kept result is used only when the incoming
+	 * document hashes to what it was computed for, so an edit made in another window, an undo, a
+	 * file re-opened underneath, or a unit change all miss and re-solve. That is the same mechanism
+	 * the dirty asterisk runs on, minus the view.
+	 *
+	 * **AND KEEPING IT REMOVES A WHOLE LABEL PASS, which is most of the point.** Labels compose
+	 * their VALUES out of `lastSolveResult`; with it nulled, a switch drew every label empty, then
+	 * drew them again 300 ms later when the solve landed. Restored, the first pass is the only one.
+	 *
+	 * Bounded at eight projects, oldest dropped: a result is a few hundred numbers, but a library
+	 * can hold any number of tabs and nothing else here would ever let go.
+	 */
+	var switchKeep = Object.create(null), switchKeepOrder = [];
+	var SWITCH_KEEP_MAX = 8;
+	/**
+	 * **THE LABEL LAYOUT, AS THE PASS LEFT IT** (Task 680, second half). Tom, 2026-09-16: *"in the
+	 * name of doing the right thing, the solve should be saved, as should the placements."* And the
+	 * placements are where the time is: measured in real Chrome on a warm switch into the
+	 * geographic Net3, `lblPlace` 198-217 ms and `lblShed` 42-54 ms of a 640 ms switch -- half of
+	 * it, against 30 ms for composing the text and 210 ms for creating the shapes.
+	 *
+	 * **WHAT IS KEPT IS EVERY DECISION THE PASS MADE AND NOTHING IT CAN RE-DERIVE.** The content
+	 * decisions (`lines`, which values survived the shed) and the position decisions (`nudge`, which
+	 * side) both, because both come out of the same pass: shedding a value is what makes room, so
+	 * keeping the position without the content it was computed for would place a label that no
+	 * longer fits. The measured widths ride along, so a restore asks the browser nothing.
+	 *
+	 * **THE KEY IS THE DOCUMENT AND THE SCALE.** A label's footprint is a pixel size divided by the
+	 * scale, so a layout belongs to the zoom that produced it -- the comment above relayoutLabels()
+	 * has the measurement: a layout computed at scale 1 has a median nudge of 43 world units on a
+	 * model 37 units across. The document half is `modelSignature()`, which covers the settings and
+	 * the label choices too, since both are serialized.
+	 */
+	function captureLabelLayout() {
+		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
+		function grab(h) {
+			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
+				nudgeManual: !!h.nudgeManual, placedSide: h.placedSide,
+				lines: h.lines ? h.lines.slice() : null, rows: h.rows ? h.rows.slice() : null,
+				allLines: h.allLines ? h.allLines.slice() : null,
+				lineCount: h.lineCount, empty: !!h.empty, shedCount: h.shedCount || 0,
+				hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded,
+				hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+				tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+				rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
+				segW: h.segW ? h.segW.slice() : null };
+		}
+		Object.keys(nodeEls).forEach(function (id) { out.nodes[id] = grab(nodeEls[id]); });
+		Object.keys(linkEls).forEach(function (id) { out.links[id] = grab(linkEls[id]); });
+		Object.keys(labelEls).forEach(function (id) { out.texts[id] = grab(labelEls[id]); });
+		return out;
+	}
+	function rememberSwitchState() {
+		var id = library.openId;
+		if (!id) { return; }
+		if (!switchKeep[id]) { switchKeepOrder.push(id); }
+		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+			layout: captureLabelLayout() };
+		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
+			delete switchKeep[switchKeepOrder.shift()];
+		}
+	}
+	// Called with the INCOMING document already installed, so the signature describes what is about
+	// to be drawn rather than what is leaving.
+	function keptStateForOpenProject() {
+		var k = switchKeep[library.openId], sig;
+		if (!k) { return null; }
+		sig = storedSignature(library.openId);
+		return (sig && k.sig === sig) ? k : null;
+	}
+	/**
+	 * **PUTTING A KEPT LAYOUT BACK, or saying it cannot be.** Everything is checked BEFORE anything
+	 * is written: a half-applied layout would be worse than none, because the labels the restore ran
+	 * out of would keep whatever the rebuild left them with while the rest showed the kept answer.
+	 *
+	 * Returns true when the drawing now carries the layout the pass would have computed, so the
+	 * caller can skip the pass. False means "this changed under us" and nothing has been touched.
+	 */
+	// Why a kept layout was refused, for a harness and for ?debug=perf. A restore that quietly never
+	// happens is indistinguishable from one that works, which is how the first version of this
+	// passed its own test.
+	var keptLayoutMiss = '';
+	function keptLayoutFits(L) {
+		if (!L) { keptLayoutMiss = 'nothing kept'; return false; }
+		if (!(L.scale > 0)) { keptLayoutMiss = 'no scale'; return false; }
+		if (L.scale !== state.s) {
+			keptLayoutMiss = 'scale ' + L.scale + ' vs ' + state.s;
+			return false;
+		}
+		var ok = true, why = '';
+		function check(what, map, els) {
+			Object.keys(els).forEach(function (id) {
+				if (!map[id]) { ok = false; why = why || (what + ' ' + id + ' not kept'); }
+			});
+			Object.keys(map).forEach(function (id) {
+				if (!els[id]) { ok = false; why = why || (what + ' ' + id + ' gone'); }
+			});
+		}
+		check('node', L.nodes, nodeEls); check('link', L.links, linkEls);
+		check('text', L.texts, labelEls);
+		keptLayoutMiss = ok ? '' : why;
+		return ok;
+	}
+	function restoreHolderFields(h, c) {
+		h.nudge = c.nudge ? { x: c.nudge.x, y: c.nudge.y } : { x: 0, y: 0 };
+		h.nudgeManual = c.nudgeManual;
+		h.placedSide = c.placedSide;
+		h.shedCount = c.shedCount;
+		h.hiddenShort = c.hiddenShort;
+		h.hiddenCrowded = c.hiddenCrowded;
+		h.hiddenCrossed = c.hiddenCrossed;
+		h.hiddenDropped = c.hiddenDropped;
+		// The measured widths, so a restore asks the browser nothing at all.
+		if (c.tw !== undefined) { h.tw = c.tw; }
+		if (c.twPx !== undefined) { h.twPx = c.twPx; }
+		if (c.width !== undefined) { h.width = c.width; }
+		if (c.widthPx !== undefined) { h.widthPx = c.widthPx; }
+		if (c.rowW) { h.rowW = c.rowW.slice(); }
+		if (c.rowWPx) { h.rowWPx = c.rowWPx.slice(); }
+		if (c.segW) { h.segW = c.segW.slice(); }
+	}
+	// Counted so a harness can tell a restore from a recomputation that happens to agree with it --
+	// without this, "the restored layout equals the computed one" passes trivially when no restore
+	// ever ran, which is the shape of test that has died of success here before.
+	var switchRestoreCount = 0;
+	// A harness switch, so the SAME session can be asked what the page does without the keep. Not
+	// reachable from any control: the question it answers is "is the restore faithful", and that is
+	// asked by comparing the two answers, not by offering a user a choice between them.
+	var keepLayoutEnabled = true;
+	function applyKeptLabelLayout(kept) {
+		var L = kept && kept.layout;
+		if (!keepLayoutEnabled) { keptLayoutMiss = 'switched off'; return false; }
+		if (!keptLayoutFits(L)) { return false; }
+		switchRestoreCount++;
+		var fsNow = effectiveFontSize() + 'px';
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			doc.nodes.forEach(function (n) {
+				var ne = nodeEls[n.id], c = L.nodes[n.id];
+				if (!ne || !c) { return; }
+				// The glyphs have to be WRITTEN -- these are new elements -- but they are written
+				// from the content the shed already decided, so no cascade runs and nothing is
+				// measured.
+				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines, fsNow); }
+				ne.allLines = c.allLines || (c.lines ? c.lines.slice() : ne.allLines);
+				restoreHolderFields(ne, c);
+			});
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], c = L.links[l.id];
+				if (!le || !c) { return; }
+				if (c.lines && !c.empty) { writeLabelGlyphs(le, l, c.lines, fsNow); }
+				restoreHolderFields(le, c);
+			});
+			Object.keys(L.texts).forEach(function (id) {
+				var te = labelEls[id]; if (te) { restoreHolderFields(te, L.texts[id]); }
+			});
+			// The same three loops relayoutLabels() ends with -- every label laid out for real at
+			// the position it already had -- and then the arrows and the legend, which
+			// refreshLabelTextPass() does after it.
+			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
+			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
+			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
+		doc.links.forEach(function (l) { updateArrow(l.id); });
+		renderLabelsLegend();
+		refreshScenarioMarks();
+		lastLayoutScale = state.s;
+		return true;
+	}
+	function forgetSwitchState(id) {
+		if (!switchKeep[id]) { return; }
+		delete switchKeep[id];
+		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 	}
 	// Autosave. Writes the OPEN project's document first and the index second, deliberately: if the
 	// document write fails on quota, the index still describes the last state that actually made it
@@ -19593,6 +20578,11 @@ var EngCalcs = EngCalcs || {};
 			// absent rather than being defaulted -- that is loadFromStorage()'s job, not this one's.
 			function renameOverridable(el, whitelist) {
 				Object.keys(whitelist).forEach(function (prop) {
+					// **EXCEPT A POSITION** (Task 674). x and y are overridable and are stored BARE,
+					// because the file states them and so does EPANET -- so renaming them here would
+					// move every coordinate in a v1 autosave to a field nothing reads, and the whole
+					// drawing would open at undefined. See LPN_OVERRIDABLE.
+					if (LPN_COORD_PROP[prop]) { return; }
 					if (Object.prototype.hasOwnProperty.call(el, prop)) {
 						el['_' + prop] = el[prop];
 						delete el[prop];
@@ -20151,6 +21141,14 @@ var EngCalcs = EngCalcs || {};
 	// Everything a freshly-installed document has to push back out to the UI. Shared by
 	// openProject() and newProject() so the two can never drift into repainting different subsets.
 	function refreshAllFromDocument() {
+		// **?debug=perf NOW COVERS THE PROJECT SWITCH** (Tom, 2026-09-16: *"There is a 5-second delay
+		// switching to Net-3 project tab"*). Task 672 built this instrument for the georeferencing
+		// wizard on exactly the reasoning that applies again here: three headless reproductions of
+		// that slowdown failed, because what costs the seconds -- forced synchronous layout, SVG
+		// rasterising, tile decoding -- is work node does not do. Measured headless, one switch into
+		// Net3 is 457 ms and builds 8,405 elements with 1,091 label measurements in among them; the
+		// browser is the only place that can say which of those is the five seconds.
+		var perfT0 = perfDebugOn() && typeof performance !== 'undefined' ? performance.now() : 0;
 		backdropImg = null;
 		backdropLayer.innerHTML = '';
 		if (backdrop) { buildBackdropImg(); }
@@ -20159,9 +21157,15 @@ var EngCalcs = EngCalcs || {};
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
-		lastSolveResult = null;
+		// **THE SOLVE SURVIVES A SWITCH IF THE DOCUMENT DID** (Task 680). Restored HERE, before
+		// buildDom(), because the labels compose their values out of it: set after the build, every
+		// label would be drawn empty and drawn again when the values arrived.
+		var kept = keptStateForOpenProject();
+		lastSolveResult = (kept && kept.solve) || null;
+		// The labels wait for the camera -- see buildDom() and the restore below.
+		labelPassDeferred = true;
 		closePopup();
-		buildDom();
+		perfDebugTime('buildDom', function () { buildDom(); });
 		seedDefaultInputs();
 		// EVERY section, not two of them: a different project brings its own units, its own colour
 		// field and its own friction method, and all four sections carry one or more of those.
@@ -20176,7 +21180,7 @@ var EngCalcs = EngCalcs || {};
 		//
 		// Safe when the box has never been opened: rebuildLibraryBox() returns at once if its
 		// content element is not in the page.
-		rebuildLibraryBox();
+		perfDebugTime('libraries', function () { rebuildLibraryBox(); });
 		applyLegendPosition();
 		// **NO applyMapHeight() HERE. THE BOTTOM OF THE MAP DOES NOT DEPEND ON THE MODEL.** The canvas
 		// height is a fact about the WINDOW and the page's chrome, so re-deriving it on every open
@@ -20186,7 +21190,9 @@ var EngCalcs = EngCalcs || {};
 		// The one document-driven thing that CAN change it is the tab strip's own height, when enough
 		// projects are open to wrap it onto another line. That is chrome, and renderTabs() re-measures.
 
-		refreshFontSizes();
+		// `true` is deferLayout: while the label pass is deferred there is nothing placed to
+		// re-place, and running it here is the duplicate pass this whole change removes.
+		perfDebugTime('fontSizes', function () { refreshFontSizes(labelPassDeferred); });
 		refreshSymbolSizes();
 		refreshValueColors();
 		renderLabelsLegend();
@@ -20203,20 +21209,36 @@ var EngCalcs = EngCalcs || {};
 		// A project or an .inp may ARRIVE holding a PRV/PSV/FCV, with the user never having picked a
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
-		restoreViewOrFit();
+		perfDebugTime('viewOrFit', function () { restoreViewOrFit(); });
+		// **AND NOW THE LABELS, ONCE, AT THE ZOOM THEY WILL BE READ AT** -- restored whole if this
+		// tab worked them out already and nothing has moved since, and computed from scratch
+		// otherwise. Either way it happens exactly once per switch.
+		labelPassDeferred = false;
+		perfDebugTime('  lblRestore', function () {
+			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
+		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
 		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
 		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
 		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
-		scheduleSolve();
-		renderTabs();
+		// **AND NOTHING IS RE-SOLVED WHEN THE ANSWER IS ALREADY ON SCREEN.** The fire-flow run is
+		// still dropped, which is the one thing scheduleSolve() does besides the arithmetic: its
+		// rings describe the network they were run on, and this is a different project.
+		perfDebugTime('scheduleSolve', function () {
+			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleSolve(); }
+		});
+		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
 		// re-opening after a page load, or neither.
 		syncReadOnlyToOpenProject();
 		// LAST, and only after the network is drawn: the question it asks is about the numbers the
 		// user can now see.
 		offerUnitRestore();
+		if (perfT0) {
+			perfDebugRows.push('SWITCH ' + (performance.now() - perfT0).toFixed(1) + 'ms');
+			perfDebugReport();
+		}
 	}
 	// ---- one-time restore of a pre-Task-263 project ----
 	//
@@ -20329,6 +21351,9 @@ var EngCalcs = EngCalcs || {};
 		if (id === library.openId) { return true; }
 		rememberCurrentView();   // ...and where we were looking in it
 		saveToStorage(); // flush the outgoing project before switching away from it
+		// AFTER the flush, deliberately: what is kept is pinned to the bytes that were just
+		// written, which is the only thing both sides of the switch can agree on.
+		rememberSwitchState();   // ...and what we worked out about it (Task 680)
 		flushOutgoingFile();
 		var doc2 = readDocument(projectKey(id));
 		if (!doc2) { return false; }
@@ -20510,13 +21535,23 @@ var EngCalcs = EngCalcs || {};
 	// It reports what could not be said in EPANET's language rather than saying it wrongly, using
 	// the SAME notice channel the importer uses for the reverse direction. A file that quietly loses
 	// a pump curve is the failure this whole module exists to prevent, in both directions.
-	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, out;
-		saveToStorage();   // export what is on screen, including edits not yet saved
-		out = EngCalcs.lpnExportInp(serializeProject(), {
+	// **THE HALF A HARNESS CAN DRIVE.** Named rather than inline so the wiring between this page and
+	// the writer -- which scenario's numbers, which positions, how big a label is -- can be asserted
+	// without a download; dev/lpn-spike/node-coord-entry-harness.js drives it. A writer handed
+	// options it did not get from here would be right only by accident.
+	function inpExportOptions() {
+		return {
 			// The scenario the user is looking at, through the one resolver -- so an export from
 			// inside a scenario writes that scenario's numbers and not Base's.
 			effective: effective,
+			// **AND ITS OWN POSITIONS** (Task 674). Separate from `effective` because the exporter
+			// is handed the SERIALIZED document, whose coordinates are already absolute, while
+			// effective() adds the live origin -- see the note at covOf() in js/lpn-inp.js. Returns
+			// the absolute pair the scenario holds, or null.
+			coordOverride: function (id) {
+				var n = nodeById(id);
+				return (n && nodeHasCoordOverride(n)) ? coordOverridesOf(n) : null;
+			},
 			// The same rule for the one DOCUMENT-level option a scenario can carry: the export
 			// writes the scenario the user is looking at, so a max-day export states max day's
 			// multiplier. Undefined where the scenario inherits, which leaves the document's own
@@ -20528,7 +21563,12 @@ var EngCalcs = EngCalcs || {};
 				var le = labelEls[lb.id];
 				return le ? { w: textLabelWidth(le), h: textLabelHeight(lb) } : null;
 			}
-		});
+		};
+	}
+	function exportInpFile() {
+		var pcX = EngCalcs.pageConfig || {}, out;
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		out = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions());
 		if (!out || !out.ok) {
 			setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
 				.replace('{detail}', (out && out.detail) || '?'));
@@ -20558,9 +21598,10 @@ var EngCalcs = EngCalcs || {};
 	 * the discipline js/lpn-inp.js already applies on IMPORT, pointed the other way: report the
 	 * difference, never drop it silently.
 	 *
-	 * **TWO THINGS FLATTEN AND THEY DO NOT SHARE A MESSAGE.** A pipe type loses its INDIRECTION and
-	 * not one number; a fittings list loses its ITEMISATION and not the total. One sentence covering
-	 * both would say something untrue of each, which is the failure the import report's own
+	 * **THREE THINGS FLATTEN AND THEY DO NOT SHARE A MESSAGE.** A pipe type loses its INDIRECTION
+	 * and not one number; a fittings list loses its ITEMISATION and not the total; and a scenario
+	 * that has MOVED a node loses every position but the one on screen (Task 674). One sentence
+	 * covering them would say something untrue of each, which is the failure the import report's own
 	 * quality-and-energy message already had once.
 	 *
 	 * **IT SAYS HOW MANY ELEMENTS EACH AFFECTS**, the way Find and replace states its count before
@@ -20572,15 +21613,20 @@ var EngCalcs = EngCalcs || {};
 	 * the status line and are deliberately not raised to a dialog here.
 	 */
 	function showInpExportFlattening(differences, fileName) {
-		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, said = [];
+		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, coords = null, said = [];
 		(differences || []).forEach(function (d) {
 			if (d.code === 'pipe-type-flattened') { types = d; }
 			if (d.code === 'fittings-flattened') { fittings = d; }
+			if (d.code === 'node-coords-scenario') { coords = d; }
 		});
-		if (!types && !fittings) { return; }
+		if (!types && !fittings && !coords) { return; }
 		if (types) {
 			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
+		}
+		if (coords) {
+			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.')
+				.replace('{n}', String(coords.ids.length)));
 		}
 		if (fittings) {
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
@@ -20868,6 +21914,13 @@ var EngCalcs = EngCalcs || {};
 				// for it (Task 390). See the note in js/lpn-inp.js for why the old elevation=head
 				// write was a claim the file never made.
 				var rz = { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head };
+				// **THE FILE'S OWN DESCRIPTION** (Task 674), the trailing comment on the element's
+				// row. Base-owned and written with no underscore, on the same limb as the tag read
+				// out of [TAGS]: a description is what this asset IS CALLED in words, not a design
+				// variable a scenario asks a question about. Absent where the file stated none, so
+				// no element gains an empty key.
+				if (n.desc) { rz.desc = n.desc; }   // base-write: import builds Base, and a description is identity
+
 				// **THE FILE'S OWN COLUMN, AND ONLY THAT** (Task 248.02), exactly as a junction's
 				// demand pattern below. EPANET has no [OPTIONS]-level default for a head pattern, so
 				// a blank column here means no pattern at all and nothing is resolved later.
@@ -20879,7 +21932,7 @@ var EngCalcs = EngCalcs || {};
 				// vertical distances on the same staff, the diameter included, which is the one that
 				// surprises people. Nothing here is blank-means-follow the way a reservoir's head is:
 				// EPANET states every one, so every one is written.
-				return withInpNotes(carryInpTokens(n, {
+				var tk = carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
@@ -20894,7 +21947,9 @@ var EngCalcs = EngCalcs || {};
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
 					tankDiameter: n.diameter
-				}, LPN_INP_TOK_TANK), inpNodeNotes[n.id]);
+				}, LPN_INP_TOK_TANK);
+				if (n.desc) { tk.desc = n.desc; }   // base-write: see the reservoir above
+				return withInpNotes(tk, inpNodeNotes[n.id]);
 			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
@@ -20910,6 +21965,7 @@ var EngCalcs = EngCalcs || {};
 			// `n.demandPattern || doc.defaultPattern` happens at the solve. Writing the default onto
 			// the junction here would put a name the file never wrote at this row into a field
 			// labelled as the file's.
+			if (n.desc) { j.desc = n.desc; }   // base-write: see the reservoir above
 			if (n.demandPattern) { j.demandPattern = n.demandPattern; }
 			// **THE DEMAND CATEGORIES, ONE ROW EACH** (Task 468). Row 0 is the three fields above;
 			// these are the rest, in the file's order, each with its own token bag so a category's
@@ -20943,6 +21999,7 @@ var EngCalcs = EngCalcs || {};
 				_status: l.status,
 				_k: l.k || 0
 			};
+			if (l.desc) { out.desc = l.desc; }   // base-write: see the reservoir above
 			if (l.type === 'valve') {
 				// A PRV/PSV setting is a pressure and an FCV's a flow (js/lpn-inp.js's
 				// valveSettingUnit names which); a throttle's is dimensionless. The pressure is psi
@@ -21849,7 +22906,20 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
+	// **`?debug=nofiles` COVERS THE WRITE AS WELL AS THE READ, and that is the experiment.** Tom's
+	// Chrome takes its whole browser process down on a reload in a PRIVATE window, but only once a
+	// project has been opened through the file picker -- measured down to a 14 KB drawing with no
+	// image, no scenarios and no map, so it is the HANDLE and not the document. Skipping our read on
+	// boot did not stop it, but that test could not be clean: the handle had already been written in
+	// the same session. With the write skipped too, nothing of ours ever puts a
+	// `FileSystemFileHandle` into IndexedDB -- so if it still crashes, the crash belongs to Chrome's
+	// own handling of the picker and there is nothing here to guard.
+	// dev/chrome-incognito-crash.md carries the whole record.
 	function rememberHandle(id, handle) {
+		if (typeof debugOn === 'function' && debugOn('nofiles')) {
+			noteRecentFile(handle);   // a name in a list, which is not a handle
+			return Promise.resolve(null);
+		}
 		// Every route that connects a project to a file lands here -- Open, Save as, and re-opening a
 		// file that is already a tab -- so this is the one chokepoint the recent list needs. Boot
 		// restoration deliberately does NOT come through here (restoreHandlesOnBoot sets the Map
@@ -23137,7 +24207,33 @@ var EngCalcs = EngCalcs || {};
 	// painted, so a file we can silently reconnect never flashes a warning about itself. A handle
 	// whose project has since been closed is DROPPED rather than restored, or the store grows forever
 	// and closing a project never really lets go of its file.
+	/**
+	 * ---- `?debug=nofiles` : BOOT WITHOUT TOUCHING THE SAVED FILE HANDLES ------------------------
+	 *
+	 * Tom, 2026-09-16: *"Reloading the page crashes Google Chrome"* -- the whole browser, three
+	 * times, on a stable Chrome 153.0.8010.37 with an Intel HD 620. The crash dumps say
+	 * `ptype: browser`, which a WEB PAGE CANNOT CAUSE: the worst a page can do to itself is lose its
+	 * own renderer. So it is a browser bug -- and this function is the best candidate for what
+	 * pokes it, because everything it touches lives in the browser process rather than in ours: the
+	 * File System Access handles, the IndexedDB store they are kept in, and `queryPermission()` on
+	 * each of them. It runs on EVERY load, which is the trigger he describes, and his other symptom
+	 * -- a mouse cursor lost in the file PICKER -- is the same subsystem from the other end.
+	 *
+	 * **THIS IS A DIAGNOSTIC AND AN ESCAPE HATCH, NOT A FIX**, and it is a URL parameter for the
+	 * same reason every other `?debug=` switch is: it exists to answer one question. With it the
+	 * page opens exactly as it always has apart from the file link -- every project is in
+	 * `localStorage` and none of them needs a handle to be read, drawn or edited. What is lost is
+	 * the live link to the file on disk, which one press of Open restores.
+	 */
 	async function restoreHandlesOnBoot() {
+		// `typeof` because this function is reachable from a harness that loads the module without
+		// the page's debug plumbing -- handle-restore-harness.js is exactly that.
+		if (typeof debugOn === 'function' && debugOn('nofiles')) {
+			if (typeof console !== 'undefined' && console.log) {
+				console.log('[lpn] ?debug=nofiles: saved file links not restored this load.');
+			}
+			return;
+		}
 		var handles = await recallHandles();
 		var keys = await recallHandleKeys();
 		if (!handles || !keys || handles.length !== keys.length) { return; }
@@ -23273,6 +24369,7 @@ var EngCalcs = EngCalcs || {};
 		lockedByName.delete(id);
 		fileHandles.delete(id);
 		forgetHandle(id);
+		forgetSwitchState(id);   // what this tab had worked out goes with the tab (Task 680)
 		try { localStorage.removeItem(projectKey(id)); } catch (err) { /* private mode */ }
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
@@ -26423,7 +27520,8 @@ var EngCalcs = EngCalcs || {};
 			if (e.shiftKey) { toggleFromHit(t); } else { selectFromHit(t); }
 			if (t.dataset.node) {
 				var n = nodeById(t.dataset.node), w0 = screenToWorld(e.clientX, e.clientY);
-				drag = { type: 'node', id: t.dataset.node, offX: n.x - w0.x, offY: n.y - w0.y };
+				drag = { type: 'node', id: t.dataset.node,
+					offX: nodeDrawX(n) - w0.x, offY: nodeDrawY(n) - w0.y };
 				Object.assign(drag, common);
 			} else if (t.dataset.link !== undefined && t.classList.contains('lpn-vhandle')) {
 				var v = linkById(t.dataset.link).verts[+t.dataset.vidx], w1 = screenToWorld(e.clientX, e.clientY);
@@ -26993,7 +28091,12 @@ var EngCalcs = EngCalcs || {};
 		} else if (drag.type === 'node') {
 			snapshotDragOnce();
 			var w = screenToWorld(p.x, p.y), n = nodeById(drag.id);
-			n.x = w.x + drag.offX; n.y = w.y + drag.offY; updateNode(drag.id);
+			// **A DRAGGED POSITION AND A TYPED ONE GO THROUGH THE SAME DOOR** (Task 674), so inside
+			// a scenario a drag records that scenario's own position exactly as the boxes do, and
+			// neither editor can come to a different idea of what placing a node means.
+			writeNodeCoord(n, false, w.x + drag.offX);
+			writeNodeCoord(n, true, w.y + drag.offY);
+			updateNode(drag.id);
 			relayoutLabels();
 		} else if (drag.type === 'vertex') {
 			snapshotDragOnce();
@@ -28718,17 +29821,32 @@ var EngCalcs = EngCalcs || {};
 	// (a Text size change, a settings edit) is a single act and still lays out at once.
 	function refreshFontSizes(deferLayout) {
 		var fs = effectiveFontSize() + 'px';
-		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
-		Object.keys(linkEls).forEach(function (id) {
-			linkEls[id].text.style.fontSize = fs;
-			(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
+		// Split for ?debug=perf: 1,037 ms of Tom's 4,628 ms switch was this function, and it is a
+		// batch of style WRITES followed by a batch of position writes that read geometry -- two
+		// different costs that a single number cannot tell apart.
+		perfDebugTime('  fontWrite', function () {
+			// **OFF MEANS OFF.** A font size written onto lettering `.lpn-labels-hidden` is not
+			// drawing buys nothing, and the revival re-applies every one of them
+			// (refreshLabelSuppression), so nothing comes back at the wrong size.
+			if (!dataLabelsHidden) {
+				Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
+				Object.keys(linkEls).forEach(function (id) {
+					linkEls[id].text.style.fontSize = fs;
+					(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
+				});
+			} else { labelWorkSkipped = true; }
+			// **THE USER'S OWN TEXT IS NOT SUPPRESSED** (Task 428) and is sized here whatever is
+			// hidden: it is authored content with its own per-label rule, not annotation we made.
+			Object.keys(labelEls).forEach(function (id) {
+				var le = labelEls[id], lb = labelById(id);
+				le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
+			});
 		});
-		Object.keys(labelEls).forEach(function (id) {
-			var le = labelEls[id], lb = labelById(id);
-			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
-		});
-		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
-		if (!deferLayout) { relayoutLabels(); }   // positions only: no recompose, no re-measure
+		perfDebugTime('  symSizes', function () { refreshSymbolSizes(); });
+		// publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
+		if (!deferLayout) {
+			perfDebugTime('  relayout', function () { relayoutLabels(); });
+		}   // positions only: no recompose, no re-measure
 	}
 	// Called from zoomAbout()/zoomExtent(), unconditionally: with text, symbols and pipe width all in
 	// screen pixels every one is state.s-dependent, so a zoom always invalidates all three.
@@ -28806,12 +29924,27 @@ var EngCalcs = EngCalcs || {};
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
 		if (wasHidden && !dataLabelsHidden) {
+			reviveSkippedLabelWork();
 			refreshFontSizes(true);
 			// Again, because elements created during the refresh carry no visibility class yet --
 			// the same second call onZoomChanged() makes, for the same reason.
 			applyLabelVisibility();
 			scheduleReshed();
 		}
+	}
+	// **THE ONE PLACE THE SKIPPED WORK IS PAID BACK.** While annotation is hidden the three entry
+	// points of the label pipeline turn around and leave an IOU; everything that would have
+	// invalidated the lettering -- a solve, a settings edit, a rebuild, a scenario switch, a zoom --
+	// happened anyway. So the first thing the way back does is one full content pass, which composes
+	// every label from the document as it stands NOW, measures it, and ends in relayoutLabels() at
+	// the scale on the screen now rather than the one it was hidden at.
+	//
+	// Costs one pass per TRANSITION, against one per trigger before. Cheap where nothing changed
+	// while hidden: the flag is only set by an entry point that really turned around.
+	function reviveSkippedLabelWork() {
+		if (!labelWorkSkipped || dataLabelsHidden) { return; }
+		labelWorkSkipped = false;
+		refreshLabelText();
 	}
 	// Task 330. A saved setting that is merely absent (any project written before this) reads as
 	// undefined and must draw the halo -- `=== false` rather than a truthiness test, so an old document is
@@ -28858,6 +29991,9 @@ var EngCalcs = EngCalcs || {};
 			refreshTextLabelSizes();
 			return;
 		}
+		// The zoom that ENDS a suppression settles the debt first -- a zoom out of a georeferencing
+		// step arrives here rather than through refreshLabelSuppression().
+		reviveSkippedLabelWork();
 		refreshFontSizes(true);   // the relayout rides the reshed debounce below -- see refreshFontSizes()
 		// applyLabelVisibility() again, because refreshFontSizes() can change a Text label's own
 		// width and therefore nothing about the threshold -- but buildDom-time elements created
@@ -34025,7 +35161,7 @@ var EngCalcs = EngCalcs || {};
 	// is what earns the row its override marker inside a scenario.
 	function unitNumberField(fields, labelText, unitId, get, set, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'), v0 = get();
-		input.type = 'number';
+		input.type = 'number'; input.step = 'any';
 		// Printed with trailing zeros stripped rather than a fixed toFixed(4). Under SI storage the
 		// value was the result of a division and 4 places was a reasonable guess at it; now it is the
 		// number the user typed, and showing "8" back as "8.0000" makes their own input look computed.
@@ -34047,7 +35183,7 @@ var EngCalcs = EngCalcs || {};
 	function unitNumberFieldBlank(fields, labelText, unitId, get, set, placeholder, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'),
 			v = get();
-		input.type = 'number';
+		input.type = 'number'; input.step = 'any';
 		input.value = (v === undefined || v === null || v === '') ? '' : String(+(+v).toFixed(6));
 		// A BLANK PLACEHOLDER STAYS BLANK. `+('')` is 0, so formatting unconditionally would print a
 		// fallback of zero into a field whose fallback is simply not known yet.
@@ -34121,24 +35257,84 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
-	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
-	// the touch answer to "show coordinates of the selected element": the corner tracker
-	// below is hover-driven (PC only), but this field is visible in the popup on any device.
 	// The two coordinate rows every popup shows, in the vocabulary THIS project uses (Task 145).
-	// One function, so a node's popup and a label's popup cannot come to different conclusions about
-	// what x means -- and so a third caller gets it right by not deciding.
+	// One function, so a node's popup and a Text's popup cannot come to different conclusions about
+	// what x means -- and so a third caller gets it right by not deciding. It also doubles as the
+	// touch answer to "show coordinates of the selected element": the corner tracker is
+	// hover-driven (pointer only), but these rows are visible in the popup on any device.
+	//
 	// **AND A GEOGRAPHIC PROJECT PUTS LATITUDE FIRST HERE TOO** (Tom, 2026-08-24). The popup and
 	// the status readout are the two places a coordinate is read, and they must agree; an X/Y
-	// project keeps x first, because there the pair really is x then y.
+	// project keeps x first, because there the pair really is x then y. Both halves of that come
+	// from axisNames() and readsNorthFirst(), which are the status strip's own two answers.
+	//
+	// **NO UNIT IN THE LABEL, AND THE NAME IS WHY** (Task 674). "Latitude" states degrees;
+	// "Northing" states whatever linear unit the declared CRS is in, which is the CRS's business
+	// and is a name this build does not hold for all 5,346 of them; "X" states a grid unit, which
+	// is declared rather than measured (see lengthField()). Naming one would be asserting something
+	// we do not know, and the status strip beside it names none either.
 	function coordFields(fields, x, y) {
-		var pc = EngCalcs.pageConfig || {}, geo = isGeoProject();
-		if (geo) {
-			readonlyField(fields, pc.lpn_field_lat || 'Latitude', coordText(y));
-			readonlyField(fields, pc.lpn_field_lon || 'Longitude', coordText(x));
-			return;
-		}
-		readonlyField(fields, pc.lpn_field_x || 'X', coordText(x));
-		readonlyField(fields, pc.lpn_field_y || 'Y', coordText(y));
+		var names = axisNames();
+		readonlyField(fields, names.first, coordText(readsNorthFirst() ? y : x));
+		readonlyField(fields, names.second, coordText(readsNorthFirst() ? x : y));
+	}
+	/**
+	 * **THE SAME TWO ROWS, TYPEABLE, ON A NODE** (ROADMAP Task 674). Tom, 2026-09-15: *"I can
+	 * scarcely believe that we and epanetjs don't expose this already."*
+	 *
+	 * A surveyed junction has a northing to two decimals, and until this existed position was the
+	 * ONLY number on this page that could be entered by gesture alone -- so the only one that could
+	 * not be entered exactly. Elevation, demand, diameter, length and roughness are all typed.
+	 *
+	 * Read-only rows stay on a TEXT object's popup, which is why this is a second function rather
+	 * than a flag on the first: a Text is placed relative to what it annotates, and `lb.x/lb.y` on
+	 * an attached one is an OFFSET from its anchor rather than a position on the map (see the label
+	 * drag). Two different quantities must not share one box.
+	 *
+	 * The value is printed the way the tables print a typed number -- six decimals with the
+	 * trailing zeros stripped -- rather than coordText()'s two, because this is now the user's own
+	 * field and a field must show what is stored. A state-plane northing rounded to 2 dp for
+	 * display and then committed back on the next edit would quietly truncate it.
+	 */
+	function nodeCoordFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, names = axisNames();
+		[1, 2].forEach(function (slot) {
+			var label = document.createElement('label'), input = document.createElement('input'),
+				v = nodeCoordAxis(n, slot);
+			input.type = 'number';
+			// step="any", unlike the elevation rows beside it: a latitude is six decimal places and
+			// the default step of 1 makes every one of them fail the browser's own validity test.
+			input.step = 'any';
+			input.value = (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
+			input.addEventListener('change', function () {
+				saveUndoSnapshot();
+				// A refusal puts the document's own number back, rather than leaving the box
+				// showing a value nothing accepted.
+				if (!setNodeCoordAxis(n, slot, +input.value)) {
+					var back = nodeCoordAxis(n, slot);
+					input.value = (typeof back === 'number' && isFinite(back)) ? String(+back.toFixed(6)) : '';
+					return;
+				}
+				// **THE `prop` IS RESOLVED HERE AND NOT ONCE, because which document axis the top box
+				// holds depends on the kind of project** (coordSlotIsY): in a geographic or projected
+				// one slot 1 is the document's y, on a grid it is its x. Asked at the moment of the
+				// edit, so a popup opened in one kind of project and a project whose kind changed
+				// under it cannot mark the wrong axis.
+				completeEdit({ el: n, prop: coordSlotIsY(slot) ? 'y' : 'x' });
+				refreshPopupIfOpen();
+			});
+			setFieldLabel(label, slot === 1 ? names.first : names.second, pc.lpn_field_coord_tip);
+			label.appendChild(input);
+			fields.appendChild(label);
+			fields.appendChild(document.createElement('br'));
+			// **AND THE ROW EARNS ITS OVERRIDE MARKER** (Task 674). x and y are in LPN_OVERRIDABLE
+			// now, so this is the same tick every other overridable row carries -- and ticking it
+			// records the position already showing, which is Base's, because the tick is a claim
+			// about intent and must move nothing by itself.
+			// No `format` argument: formatPropValue() already prints a number at six decimals, which
+			// is exactly what these two boxes show.
+			overrideMarker(fields, n, coordSlotIsY(slot) ? 'y' : 'x');
+		});
 	}
 	/**
 	 * **TWO BUTTONS UNDER ELEVATION: Sample DEM, and Use DEM** (ROADMAP Task 542).
@@ -34318,7 +35514,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
-		input.type = 'number'; input.value = effective(l, 'length').toFixed(2);
+		input.type = 'number'; input.step = 'any'; input.value = effective(l, 'length').toFixed(2);
 		input.addEventListener('change', function () {
 			setProp(l, 'length', +input.value);
 			// lenAuto IS BASE-OWNED and a scenario must not touch it -- geometry is shared, because a
@@ -35233,6 +36429,42 @@ var EngCalcs = EngCalcs || {};
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); });
 		clearFields(fields);
+		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
+		// above writes the popup's header, so first in `fields` IS slot 2. His reason for one order
+		// across the popup AND the tables rather than two: *"one rule, no special case to
+		// remember."* It is also the order of fundamentalism, EPANET's own Property Editor order
+		// for all five object types, and PNEZD -- Point, Northing, Easting, Elevation, Description
+		// -- which is a decades-old surveying convention the trade already reads.
+		//
+		// **SUE'S ARGUMENT IS THE ONE THAT INVERTS THE OBVIOUS OBJECTION.** "People rarely edit it"
+		// is the wrong test: a transposed X/Y or a wrong datum is INVISIBLE TO THE SOLVER -- the
+		// network still balances -- and surfaces only on a GIS overlay or an as-built check. Rarely
+		// touched AND load-bearing is exactly what belongs where a reviewer's eye lands.
+		//
+		// **DECLAN DISSENTED, MEASURED, AND WAS OVERRULED WITH A REASON -- so his number stands and
+		// is not deleted.** In a TABLE these are real typeable inputs, not the `tabIndex=-1` cells
+		// the pane uses for computed columns, so a clerk who places nodes by pointer and never
+		// types a coordinate pays two unskippable tab stops on every row: about 800 stray keystrokes
+		// over 400 junctions. A TRAILING column can be skipped by clicking the next row instead of
+		// tabbing on; a middle one cannot. He recommended splitting the two surfaces. **That cost
+		// becomes payable the day table columns are customizable (Task 186's neighbourhood), and it
+		// is the first thing to revisit then.** Full reasoning: dev/agents/data-entry-clerk/.
+		nodeCoordFields(fields, n);
+		// **DESCRIPTION AND TAG COMPLETE THE IDENTITY BAND, IN EPANET'S OWN ORDER** (Task 674; Tom,
+		// 2026-09-15: the Description row was missing from the interface entirely and Tag sat at the
+		// bottom *"like we really don't care about it"*). `ID | X | Y | Description | Tag |
+		// Elevation`, the same five slots on this popup and in all three node tables -- one rule,
+		// which is the reason he gave for the coordinates above.
+		//
+		// **IT IS EPANET'S PROPERTY EDITOR ORDER AND NOT ITS FILE ORDER, and that is deliberate.**
+		// The file disagrees with the dialog: `[JUNCTIONS]` is `ID Elev Demand Pattern`, a
+		// description is a trailing comment and a tag is its own `[TAGS]` section. Tom noticed the
+		// dialog order himself; all three consulting seats read it as GUI archaeology with no EPA
+		// rationale behind it, and CLAUDE.md's settled rule already decides the case -- we defer to
+		// EPANET's TERMINOLOGY, never to its layout. What carries the order here is his ruling and
+		// PNEZD, the surveying convention the trade already reads.
+		descField(fields, n);
+		tagField(fields, n);
 		if (n.type === 'tank') {
 			// FIVE INPUTS AND ONE COMPUTED ROW, in the order a person builds a tank: where the
 			// bottom sits, how much water is in it right now, how far it can go either way, and how
@@ -35426,11 +36658,9 @@ var EngCalcs = EngCalcs || {};
 			sourceFields(fields, n, cu);
 		}
 		qualityResultRow(fields, n);
-		tagField(fields, n);
 		customPropFields(fields, n);
 		activeField(fields, n);
 		pushHereButton(fields, n);
-		coordFields(fields, outwardX(n.x), outwardY(n.y));
 		importNotesField(fields, n);
 		tipsIn(fields);
 	}
@@ -35744,7 +36974,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function inheritedField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number';
+		input.type = 'number'; input.step = 'any';
 		input.disabled = true;
 		input.value = (value === undefined || value === null || value === '')
 			? '' : String(+(+value).toFixed(6));
@@ -35903,6 +37133,60 @@ var EngCalcs = EngCalcs || {};
 		if (libBoxIsOpen()) { rebuildLibraryBox(); } else { openLibraryBox(); }
 	}
 
+	/**
+	 * **THE ELEMENT'S DESCRIPTION** (ROADMAP Task 674). Tom, 2026-09-15: *"Description: Isn't this
+	 * new to us? I don't see it in our current UI. And Tag is at the bottom like we really don't
+	 * care about it, which is true. Also Tag is not in Tables. All that is a bit embarrassing. We
+	 * need a consistent approach."* His ruling is the full identity band on BOTH surfaces, in
+	 * EPANET's own order: ID, X, Y, Description, Tag, Elevation.
+	 *
+	 * **THERE WAS A DATA-LOSS DEFECT UNDERNEATH IT AND THAT WAS THE LARGER HALF.** EPANET carries a
+	 * description as the trailing comment on the element's row and js/lpn-inp.js split it into a
+	 * local and no reader touched it, so every description in every imported file was discarded and
+	 * `dropped` was empty -- the one contract that module has, broken in the one module whose
+	 * contract is that there is none. Both ends are wired now.
+	 *
+	 * **BASE-OWNED, NOT OVERRIDABLE, AND THAT IS A RULING RATHER THAN AN OVERSIGHT.** Same argument
+	 * the tag below makes, and the band is the point: a scenario asks what if this pipe were bigger,
+	 * not what if it were a different asset written up differently. So it is not in
+	 * `LPN_OVERRIDABLE`, `setProp()` would write a `_desc` nothing reads, and it needs no override
+	 * marker. **The argument on the other side is Tom's own, the same day** (*"Give the people their
+	 * overrides! Whether coordinate or any other property, what's gained by denying them an
+	 * override?"*), which is what put x and y into LPN_OVERRIDABLE. It is recorded here rather than
+	 * argued away: what it is weighed against is that Description and Tag are ONE BAND on his other
+	 * ruling, an EPANET file holds one description per element, and Tag overridable-while-Description-is-not
+	 * or the reverse is exactly the inconsistency he called embarrassing. Making both overridable is
+	 * a one-line change at each of two write sites if he rules that way.
+	 *
+	 * **FREE TEXT, AND ONLY THE LINE BREAK IS REFUSED** -- unlike the tag beside it, which EPANET
+	 * truncates at the first space. A trailing comment runs to the end of its line, so a `;` inside
+	 * a description round-trips exactly and so does a tab; a newline cannot be written as one at all.
+	 * `lpnDescText()` states that in the one place the exporter reads it from, exactly as
+	 * `lpnTagText()` does for the space, and it is applied on `input` so the rule is visible at the
+	 * moment somebody pastes a paragraph in rather than after they have looked away.
+	 */
+	function descField(fields, el) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'text';
+		input.value = el.desc || '';
+		function commit() {
+			var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(input.value) : String(input.value || '').trim();
+			if (input.value !== t) { input.value = t; }
+			if (t === (el.desc || '')) { return; }
+			saveUndoSnapshot();
+			if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is identity, not an overridable property -- see this function's own note
+		}
+		input.addEventListener('input', commit);
+		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
+		// `input` -- a value restored by the browser, or an autofill.
+		input.addEventListener('change', function () { commit(); refreshPopupIfOpen(); });
+		setFieldLabel(label, pc.lpn_field_desc || 'Description', pc.lpn_field_desc_tip);
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	/**
 	 * **THE ELEMENT'S TAG** (Task 579, `[TAGS]`). One free-text word on any node or link, the join
 	 * key to whatever system the utility already keeps its assets in.
@@ -36082,6 +37366,13 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); });
 		clearFields(fields);
+		// **THE IDENTITY BAND, AND A LINK HAS NO COORDINATES TO PUT BETWEEN** (Task 674) -- so it is
+		// ID, Description, Tag, then everything the link is. The same two rows a node gets, at the
+		// same place in the same order, which is the whole of Tom's ruling: one rule, no special
+		// case to remember. See renderNodeFields() for why EPANET's dialog order and not its file
+		// order.
+		descField(fields, l);
+		tagField(fields, l);
 		if (l.type === 'valve') {
 			renderValveFields(fields, l, linkId);
 		} else if (l.type === 'pump') {
@@ -36156,7 +37447,6 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		closedField(fields, l, linkId);
-		tagField(fields, l);
 		customPropFields(fields, l);
 		activeField(fields, l);
 		pushHereButton(fields, l);
@@ -36391,7 +37681,7 @@ var EngCalcs = EngCalcs || {};
 			if (c.bool) { input.indeterminate = false; }
 			// A property the element is DRAWN from (presence, the words) redraws each element, as
 			// the popup's own row does; anything else only needs the solve.
-			if (c.prop) { els.forEach(function (el) { afterPropertyEdit(el); }); } else { completeEdit(null); }
+			if (paneColProp(c)) { els.forEach(function (el) { afterPropertyEdit(el); }); } else { completeEdit(null); }
 			// **IT STATES ITS COUNT, exactly as Find and replace does before it writes.** A bulk
 			// edit whose reach is invisible is the one gesture on this page that can quietly be
 			// wrong about four hundred elements.
@@ -36790,7 +38080,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov, href) {
 		var label = document.createElement('label'), input = document.createElement('input');
-		input.type = 'number'; input.value = value;
+		input.type = 'number'; input.step = 'any'; input.value = value;
 		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
@@ -36923,7 +38213,7 @@ var EngCalcs = EngCalcs || {};
 		// Only ids present on both sides: a node the undo brought back or took away has not MOVED,
 		// and marking a resurrection would say the wrong thing about it.
 		var wasAt = {};
-		doc.nodes.forEach(function (n) { wasAt[n.id] = n.x + ',' + n.y; });
+		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
@@ -36963,7 +38253,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		buildDom();
 		doc.nodes.forEach(function (n) {
-			if (wasAt[n.id] !== undefined && wasAt[n.id] !== n.x + ',' + n.y) { markNodeMoved(n.id); }
+			if (wasAt[n.id] !== undefined && wasAt[n.id] !== nodeDrawX(n) + ',' + nodeDrawY(n)) { markNodeMoved(n.id); }
 		});
 		updateEmptyHint();
 		refreshScenarioStatus();
@@ -38152,9 +39442,27 @@ var EngCalcs = EngCalcs || {};
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
 	function refreshLabelText() {
+		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
+		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
+		// measures each with getBBox() (a forced synchronous layout apiece) and runs the shed
+		// cascades before handing over to the collision pass. Measured switching into a thematic
+		// Net3-Novato in a real Chrome: 306 label measurements and 302 ms of a 509 ms project
+		// switch, all of it placing text `.lpn-labels-hidden` was hiding.
+		//
+		// **THE TAIL IS NOT ABOUT LETTERING AND STILL RUNS.** The audit halos mark overridden
+		// elements and the legend is chrome; both are visible under a thematic map, so they are the
+		// part of this pass a suppressor has no business cancelling.
+		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
+		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
 		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+	}
+	// The end of a content pass that is NOT about the lettering, so it can be run on its own when
+	// the lettering is skipped. One definition and two callers rather than two copies.
+	function refreshLabelPassTail() {
+		renderLabelsLegend();
+		refreshScenarioMarks();
 	}
 	function refreshLabelTextPass() {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
@@ -38445,22 +39753,26 @@ var EngCalcs = EngCalcs || {};
 		// runLabelCollisionAvoidance() does this too and did it first, which put the node shed of
 		// the LAST pass inside the seed of this one -- one more memory in a pass that must be a
 		// function of the drawing. Cheap where nothing shed: one scan and no DOM work.
-		unshedNodeLabels(fsNow);
-		shedAlignedForConflicts(fsNow, effectiveFontSize());
+		perfDebugTime('  lblShed', function () {
+			unshedNodeLabels(fsNow);
+			shedAlignedForConflicts(fsNow, effectiveFontSize());
+		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
 		// marks need no third pass of their own any more (Task 333): they are text-decoration on the
 		// tspans set above, so they move with the text whatever moves it.
 		// `true` is the node shed cascade (Task 469): this is a CONTENT pass, so it is allowed to
 		// decide content.
-		relayoutLabels(true);
-		doc.links.forEach(function (l) { updateArrow(l.id); });
-		renderLabelsLegend();
+		perfDebugTime('  lblPlace', function () { relayoutLabels(true); });
+		perfDebugTime('  lblArrows', function () {
+			doc.links.forEach(function (l) { updateArrow(l.id); });
+		});
+		// The legend and the audit halos, which are the part of this pass that is not lettering.
 		// Called from HERE and not from every caller of it, because the halos are filtered by the
 		// Labels panel and this function is what every label-affecting change already goes through:
 		// a toggle, a solve, a unit switch, a rebuild. Anything that can change which properties are
 		// on screen therefore re-decides which halos are on screen, with nothing to remember.
-		refreshScenarioMarks();
+		refreshLabelPassTail();
 	}
 	// ---- audit halos, and the greying of inactive elements (ROADMAP Task 184) ----
 	// A halo marks an element carrying an override IN THE CURRENT SCENARIO, filtered by the same
@@ -38567,6 +39879,30 @@ var EngCalcs = EngCalcs || {};
 	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
+		// **OFF MEANS OFF: THE COLLISION RELAXATION IS THE SINGLE MOST EXPENSIVE THING ON THIS PAGE**
+		// (Tom, 2026-09-17), and running it over annotation `.lpn-labels-hidden` is not drawing
+		// decides where to put lettering nobody will see. This is the one place it is entered, which
+		// is why the guard is here and not at the 24 callers -- the seam argument
+		// dev/scenario-seam-repair.md was written about.
+		//
+		// **`lastLayoutScale` IS NOT TOUCHED, and that is the point of it.** It records the scale a
+		// real layout was computed at, so a skipped pass must leave it saying what it said -- the
+		// revival is what brings it up to the scale on screen.
+		//
+		// **THE USER'S OWN TEXT STILL GETS ITS GEOMETRY** (Task 428). doc.labels is authored content
+		// with its own size-scaled rule; a Text label's leader and box are derived from a pixel
+		// width, so leaving it un-laid-out across a zoom leaves both at the old scale, and nothing
+		// else lays them out. A drawing holds a handful of them against hundreds of data labels, and
+		// this path does no measuring.
+		if (dataLabelsHidden) {
+			labelWorkSkipped = true;
+			beginMapBoxHold();
+			beginLinkGeomHold();
+			try {
+				doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			} finally { endMapBoxHold(); endLinkGeomHold(); }
+			return;
+		}
 		lastLayoutScale = state.s;
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()

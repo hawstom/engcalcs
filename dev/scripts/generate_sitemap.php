@@ -22,12 +22,20 @@
 
 $repoRoot   = dirname(__DIR__, 2);              // .../hawsedc/engcalcs
 $siteRoot   = dirname($repoRoot);               // .../hawsedc          (parent site, not a repo)
-$origin     = 'https://librewaternet.org';       // keep in step with CANONICAL_ORIGIN_DEFAULT
-// The PARENT SITE's own pages did not move and could not: /sewslope.php and /peakfact.php are
-// hawsedc.com documents that exist nowhere else, and the suite consolidating onto LibreWaterNet
-// (Task 479.01) says nothing about them. Listing them under $origin would advertise three URLs
-// that 404. Two origins in one sitemap is therefore correct here and is not drift -- see the note
-// this script prints at the end about what that costs in Search Console.
+// **READ, NEVER RETYPED** (2026-09-17). This was a literal with a comment asking whoever edited
+// lib/config.inc.php to remember this file too, and that is exactly the arrangement that drifts.
+// It is now lifted out of config.inc.php itself, so the sitemap cannot advertise an origin the
+// pages disown; canonical_origin_check.php fails if this stops being a read.
+$configSrc = file_get_contents($repoRoot . '/lib/config.inc.php');
+if (!preg_match("/define\('CANONICAL_ORIGIN_DEFAULT',\s*'([^']*)'\)/", $configSrc, $originMatch)) {
+    fwrite(STDERR, "CANONICAL_ORIGIN_DEFAULT is not a literal define in lib/config.inc.php.\n");
+    exit(1);
+}
+$origin = $originMatch[1];
+// The PARENT SITE's own pages: /sewslope.php and /peakfact.php are hawsedc.com documents that exist
+// nowhere else and belong to no mount of this suite. They are listed under $parentOrigin rather
+// than under whatever the suite nominates, and that stays a separate literal even now that the two
+// happen to be equal -- they are two different facts and have been unequal before.
 $parentOrigin = 'https://hawsedc.com';
 $outFile    = $siteRoot . '/sitemap.xml';
 $toStdout   = in_array('--stdout', $argv, true);
@@ -105,17 +113,30 @@ foreach ($parentPages as $p) {
 
 $count = count($parentPages);
 foreach ($pages as $file) {
-    // Match ec_canonical_url() exactly, pretty URLs and the /index.php collapse alike.
+    // Match ec_canonical_url() exactly: the pretty URL, the /index.php collapse, AND the per-page
+    // ORIGIN. Since 2026-09-17 the suite does not have one origin -- Looped-Network.php nominates
+    // librewaternet.org and everything else hawsedc.com -- so a sitemap built on a single $origin
+    // would disown one page or the other. sitemap_canonical_check.php holds both halves.
     $path = ecCanonicalPath('/engcalcs/' . $file);
+    $pageOrigin = ecCanonicalOrigin('/engcalcs/' . $file, $origin);
     if (in_array($file, $englishOnly, true)) {
-        $xml .= "  <url>\n    <loc>" . htmlspecialchars($origin . $path, ENT_XML1) . "</loc>\n"
+        // **?lang=en, NOT the bare path, and this is the whole of the fix made 2026-09-17.** These
+        // two pages have no language variants, so the loop below never runs for them and the bare
+        // path looked like the natural address. It is not the address the PAGE nominates:
+        // echoHTMLHead() self-canonicalises every suite page to `?lang=<current>`, which for an
+        // English-only document is always `?lang=en`. So the sitemap was advertising two URLs whose
+        // own canonical tag pointed somewhere else -- Google's "Alternative page with proper
+        // canonical tag", an exclusion, on exactly 2 of 545 URLs and on nothing else in the file.
+        // **Measured, not reasoned**: every other suite URL in the sitemap already carries ?lang=
+        // and self-canonicalises; these two were the only disagreement in the whole document.
+        $xml .= "  <url>\n    <loc>" . htmlspecialchars($pageOrigin . $path . '?lang=en', ENT_XML1) . "</loc>\n"
               . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
               . "  </url>\n";
         $count++;
         continue;
     }
     foreach ($languages as $lang) {
-        $loc = $origin . $path . '?lang=' . $lang;
+        $loc = $pageOrigin . $path . '?lang=' . $lang;
         $xml .= "  <url>\n    <loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc>\n"
               . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
               . "  </url>\n";
@@ -133,11 +154,19 @@ file_put_contents($outFile, $xml);
 printf("Wrote %s\n  %d URLs (%d pages x %d languages, plus %d parent-site pages)\n",
     $outFile, $count, count($pages), count($languages), count($parentPages));
 echo "  Excluded: " . implode(', ', array_keys($excluded)) . "\n";
-echo "\nNot done by this script (server-side, and CHANGED by Task 479.01):\n";
-echo "  This file is written to the hawsedc.com site root and now lists $origin URLs for\n";
-echo "  every suite page, because that is the address those pages nominate. A sitemap listing\n";
-echo "  another host's URLs is CROSS-SUBMISSION: Google honours it only when both properties are\n";
-echo "  verified by the same owner, so librewaternet.org must be a verified property alongside\n";
-echo "  hawsedc.com, or the suite's 540 URLs are simply ignored.\n";
+$lwnPages = array();
+foreach ($pages as $file) {
+    if (ecCanonicalOrigin('/engcalcs/' . $file, $origin) !== $origin) { $lwnPages[] = $file; }
+}
+echo "\nNot done by this script (server-side):\n";
+echo "  This file is written to the hawsedc.com site root and lists $origin URLs for every\n";
+echo "  suite page, because that is the address those pages nominate again as of 2026-09-17.\n";
+if ($lwnPages) {
+    echo "  Listed under another origin, by declaration in lib/Canonical.lib.php: "
+       . implode(', ', $lwnPages) . ".\n";
+    echo "  That is CROSS-SUBMISSION: Google honours another host's URLs in this sitemap only when\n";
+    echo "  both properties are verified by the same owner, so librewaternet.org must stay a\n";
+    echo "  verified property in Search Console alongside hawsedc.com.\n";
+}
 echo "  robots.txt at each host needs the line:  Sitemap: $parentOrigin/sitemap.xml\n";
 echo "  and the sitemap should be re-submitted in Google Search Console after this move.\n";

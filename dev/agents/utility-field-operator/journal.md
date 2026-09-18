@@ -568,3 +568,376 @@ spend it on (a) the crossed-leader fan-out, which is unambiguously good on every
 the gang-stacking route, whose main measured payoff is a desktop screenshot and whose phone cost is
 untested. This is a genuine disagreement with the roadmap's sizing, not a claim the task is wrong to
 exist.
+
+## 2026-09-16 — Tom's final property grouping (2026-09-15): asked for a phone answer, options not complaints
+
+Read the brief in full before answering (`grouping-brief.md`, scratchpad, superseding an earlier
+draft). Tom asks for counter-proposals, not objections, and has already overruled several arguments —
+I checked I am not re-making one of them before writing this.
+
+**Honest framing first, per my own standing conclusion:** my 2026-08-25 research (above) found that
+in the field, this exact box is rarely the document I reach for at all — real isolation and condition
+work runs through a GIS trace and a work order, not a hydraulic model (CITED, journal 2026-08-25).
+That holds here too. **But Tom is not asking whether I'd open the box; he is asking, given that
+someone with this seat's habits sometimes will, how it should read when they do** — the rare
+new-development-turnover or post-mortem case my own wishlist row #3 already named as real. I am
+answering that narrower, real question, not manufacturing a broader want.
+
+### Q1 — grouped vs. long scroll, on a phone specifically, and does my answer differ from desktop's
+
+**Yes, my answer differs from the desktop answer, and I think that is worth Tom hearing plainly
+rather than folded into "no collapse anywhere."** The desktop seats concluded nothing should collapse
+by default, and Tom's own reasoning for that (*"Everything is all together now and nobody is
+complaining"*) is a fair description of a screen where all 16-20 rows are visible without scrolling
+past the fold, or nearly so. **OBSERVED**, a phone popup is not that screen: `.lpn-setbox` — the
+chrome the fire-flow box borrows, and the shape the property popup is built from — runs to
+`min(46rem, 92dvh)` at the 640px breakpoint (`css/engcalcs.css:1532`, my own 2026-08-30 entry above),
+and a junction/tank inventory of 4-8 Dry rows plus 3-5 Water rows plus a Results block is a page-length
+scroll inside a box already consuming most of the viewport. **The claim "nobody is complaining" is
+true of a desktop screen that shows the whole list at once; it says nothing about a screen that
+cannot.** A long uncollapsed scroll on a 6-inch phone is not the same object as a long uncollapsed
+scroll on a 27-inch monitor, and I do not think the no-collapse ruling was weighed against the
+smaller one.
+
+**My actual answer: default OPEN on desktop (agreeing with the standing ruling — nothing there is
+broken), and default two of the four groups CLOSED on a phone specifically — "Dry" and "Results and
+quick graph."** Not because grouping fixes a defect (it does not, per Tom's own correct point that
+headings organize what is already there rather than solving crowding), but because on the one screen
+where scroll length is a real cost, closing the two groups I am least likely to need on first look
+buys back most of that screen for the one I am. This is a genuinely different default per breakpoint,
+which is more than the brief's four groups alone settle, and I am naming it because nobody else's
+seat has the phone-scroll-cost argument to make it from.
+
+**Why those two, and not "Description and state" or "Water": see Q2.** I would not collapse
+"Description and state" ever, anywhere — five rows, always short, and it is the group that answers my
+own top-listed question ("which asset is this"). I would not collapse "Water" on a phone by default
+either, for the same reason Q2 gives.
+
+### Q2 — which group is mine first, and does it differ from a designer's
+
+**Mine: "Description and state," then "Water," not "Dry."** Standing at a valve or a hydrant, I want
+identity and Shut/Active first (am I looking at the right asset, and is it currently closed) and then
+the water-side facts that tell me whether the asset is live and what it is doing (Demand, Head,
+Fire flow) — those are the numbers that would make me second-guess what I am seeing on the ground.
+**"Dry" — length, diameter, roughness, K — is a designer's first group, not mine.** Those are sizing
+inputs a design engineer reads to check a run; I read them, if ever, only after identity and state
+have already told me I am looking at the right thing and it is doing something worth investigating
+further. This is a real order disagreement and not a small one: Tom's own list puts Dry second, ahead
+of Water, and from this seat I would swap them.
+
+**SPECULATION, mine, to be re-derived:** this is also consistent with `utility-planning-engineer`'s
+own 2026-08-25 guess about me (quoted and flagged, above, as not mine to cite as settled) —
+"read-heavy and location-anchored." A designer reads Dry first because Dry is what they are checking
+FOR CORRECTNESS against a plan sheet; I read Water first because Water is what tells me whether what
+I am standing at matches what I expect the network to be doing right now. Same box, two different
+first questions, because we are not asking the same question of it.
+
+**But this is a genuinely narrow finding, and I want to rank it as such rather than oversell it.** Per
+my own wishlist row #3, the honest baseline is that I mostly do not open this box, and when I do it is
+for identity and topology, both of which the map and the tap-to-select already answer before the
+popup's field order ever matters (`dev/agents/utility-field-operator/wishlist.md:64-80`). Group order
+inside the popup is a real but second-order question for my seat; I answer it because Tom asked, not
+because it is where I would have spent the team's attention.
+
+### Q3 — Shut vs. Active, legible from the street, and do I care about either
+
+**Legible: yes, and I think Tom's own distinction is exactly right, stated in language closer to mine
+than to a modeler's.** Shut is what I DO — I turn a wrench, the asset's operating state changes, and
+if the model tracks that at all it should track it as a fact about what happened, changeable by an
+action during a run. Active is a decision about whether the asset is even PART of the network being
+modeled at all, which is a planning-table question, not a street one — nobody in the field "makes a
+pipe inactive," they close a valve or a main breaks and gets isolated, both of which are Shut. **I
+would go further than "legible": from this seat, Active is close to invisible, and that is correct,
+not a gap.** I have never in twenty years thought in the category "is this pipe part of the system
+right now" separately from "is it flowing" — that is a modeler's abstraction for representing a
+future phase or a decommissioned segment, and it belongs where Tom put it, beside Shut in the same
+group but doing none of the work Shut does for me.
+
+**One caution, small, worth naming:** if the two ever render as visually equal-weight controls (two
+identical-looking toggles side by side), a reader unfamiliar with the distinction could plausibly
+toggle the wrong one — SPECULATION, mine, not observed in any current markup, since I have not found
+the popup's Active control rendered yet in this worktree to check its current weight against Shut's.
+Naming it so whoever builds the row watches for it, not asking for a redesign.
+
+### Q4 — the two new Pipes-table columns (Description, Tag) at 640px
+
+**Recommendation: do not hide them, and do not build bespoke 640px narrowing logic for this table —
+let Declan's column-hide-and-reorder mechanism (named in the brief as the answer for tables generally)
+cover it, and if a phone-specific default is wanted, default Description and Tag OFF rather than
+narrowed.** Reasoning from this seat specifically:
+
+- **Narrowing Description defeats its own purpose for me.** Free text truncated to a few characters
+  under 640px answers no identity question at all — a Description clipped to "Main line to..." is
+  worse than no Description column, because it looks like an answer and is not one. My own top
+  question is "which asset is this," and a column that exists to answer it in prose should not be the
+  one column squeezed to illegibility on the narrowest screen.
+- **A HIDDEN Description, chosen deliberately, is honest; a NARROWED one is not.** If Declan's
+  column mechanism already lets a table default to fewer visible columns on a phone (I have not
+  checked whether it is width-aware or purely a user choice — that is his seat's question, not mine,
+  per my brief's own instruction not to answer for the data-entry clerk), a phone default that hides
+  Description and Tag and leaves ID plus the short numeric columns is the shape I would want: it does
+  not lie about what it is showing.
+- **Sideways scroll is the fallback I would accept, not the one I would design for.** A table that
+  scrolls sideways with ID pinned is workable one-handed if ID stays visible while scrolling — I have
+  not checked whether this table's ID column is sticky under horizontal scroll, and that is the one
+  thing I would ask to be true before accepting sideways scroll as the phone answer at all.
+- **I would not spend new engineering on a bespoke 640px rule here.** The brief itself says tables
+  get no grouping and no collapsing, with Declan's per-column hide as the stated escape hatch — I
+  read that as already deciding this question one level up, and my only addition is that Description
+  is the one column where truncation reads as a wrong answer rather than an honest omission.
+
+— Franco
+
+## 2026-09-17 — Task: zoom-level snapping and per-level label caching (Tom's two proposals)
+
+Two separate questions from Tom, and I want to keep them separate because my answers differ:
+(1) should the DISPLAYED scale snap to a defined ladder of zoom levels, and (2) should label
+position/shedding be CACHED per zoom level so re-entering a level is instant. The second does not
+require the first — a cache can be keyed on a rounded scale bucket while the displayed scale stays
+continuous — and I think collapsing them is the trap in his own phrasing ("even on a phone, zoom
+level snapping could be enforced... And I assume that would give us almost instantaneous zooming").
+
+### What the code does today (grounding before opinion)
+
+**OBSERVED**, zoom is fully continuous, not leveled, in both input paths: mouse wheel calls
+`zoomAbout(mx, my, e.deltaY < 0 ? 1.1 : 1/1.1)` per notch (`js/looped-network.js:26699`), and pinch
+calls `zoomAbout(mx, my, (d / drag.d0) * drag.s0 / state.s)` on every `touchmove` frame while two
+fingers are down (`js/looped-network.js:27392`) — `state.s` is a float, not an index into a list.
+
+**OBSERVED**, the expensive relayout is already deferred and debounced independent of any level
+idea: `refreshFontSizes(deferLayout)` skips `relayoutLabels()` during the burst and
+`scheduleReshed()` fires it once, ~120 ms after the last notch/frame (`js/looped-network.js:
+29156-29183`, comment at 29159: *"a wheel spin is a BURST whose intermediate frames nobody looks
+at"*). So mid-gesture, nothing is jumping or lagging today; the cost lands once, at the moment you
+stop, and is measured at "most of a wheel notch's ~157 ms" on Net3 (`js/looped-network.js:29158`).
+
+**OBSERVED**, there is already a cache of exactly this shape, but keyed on TAB SWITCH, not on zoom
+level: `captureLabelLayout()`/`rememberSwitchState()` (Task 680, `js/looped-network.js:19636-19679`)
+banks every label's nudge, sides, lines and shed state, keyed on `{scale: state.s, ...}` plus a
+document-content hash, explicitly because *"a layout belongs to the zoom that produced it"*
+(`js/looped-network.js:19648-19649`). Tom's new idea is this same mechanism widened from "one slot
+per tab" to "many slots per document, one per zoom level."
+
+### Q1 — does a snapped zoom help or hurt me
+
+**Hurts, for the gesture that matters most to my job, and Tom's own instinct ("might be
+anti-idiomatic") is correct — I'd go further than "might."** My case is narrower than a general
+UX argument: the reason I pinch-zoom in the street is almost always to line up the DRAWING against
+the GROUND I am standing on — is this the valve at my feet or the one ten feet over — not to admire
+a framing. That only works if the map tracks my fingers exactly. **CITED**, this is the standard,
+well-documented mobile-map complaint about snapping: a Google Maps forum discussion on iPhone
+zoom behavior describes continuous pinch as adjusting "infinitely" and states plainly that when a
+map snaps to a different zoom level right after the fingers lift, "the eyes lose focus" because
+the map jumps away from exactly where the two fingers placed it — and that no major Android map app
+snaps away from a pinch gesture for this reason (community discussion collected via web search,
+2026-09-17, on Google Maps and Android mapping conventions generally). That is precisely my
+complaint stated by someone else first: I am not zooming for a nice picture, I am placing two
+fingers on the exact spot the valve should be and I need the map still there when I let go.
+**The same source is explicit that discrete snapping is fine, and expected, for a DIFFERENT
+gesture — plus/minus buttons and double-tap — because those are already discrete actions with no
+continuous finger-tracking to betray.** So my answer is gesture-specific, not a blanket "no":
+snap the button/double-tap step size if you like (this page already disables double-tap-to-zoom
+for its own reasons, `css/engcalcs.css:299`, per my 2026-09-01 entry below), never the pinch.
+
+**And the caching idea does not need me to accept the snap at all.** A cache can be keyed on a
+rounded bucket of `state.s` (e.g., the nearest of a log-spaced ladder) while the DISPLAYED scale
+stays exactly what your fingers say — the bucket picks which cached layout to interpolate from or
+snap TO INTERNALLY for the label pass, without the view itself ever refusing to land where you put
+it. I would ask that the caching work be built that way from the start, because building it as "the
+view snaps to the cache keys" is the shape that produces the finger-tracking defect above, and it
+would be easy to arrive at that shape by accident since it is the simplest implementation.
+
+### Q2 — fixed-per-level labels (jump) vs continuously interpolated (drift): which reads better in the street
+
+**Drift, for my task, with one exception.** My own 2026-09-08 entry on Task 539 already established
+that I do not read a whole-drawing label layout while zooming — I track ONE label, the one near the
+asset I am walking toward, and I confirm identity by tapping rather than by reading a dense label
+field. A slide keeps that one label under continuous visual tracking as it shrinks/grows with the
+drawing; a jump relocates it (and everything shed around it) in one discrete step. The exact moment
+that matters most — the last half-second of a zoom-in, homing in on the one valve — is also the
+moment a snap-driven relayout is likeliest to trigger, because that is when you cross the most
+zoom-level boundaries per second of real time relative to how far you're moving your eye. A label
+that jumps sideways or a neighbor's label that suddenly appears right as I am about to tap is a
+small version of my own "closer to the wrong node" hazard from the Task 539 entry (this file,
+2026-09-08) — a misattribution risk, not just an aesthetic one, and it lands at the worst possible
+moment: the instant before the tap that was supposed to confirm identity.
+**The exception:** during the FAST part of a pinch, before my eye has locked onto a target, a jump
+costs me nothing because I am not reading yet — I am still placing my fingers. If jumping has to
+happen for the caching win to be worth having, doing it only while the gesture is still moving
+fast, and settling into a slide (or holding still) in the last, slow portion of the gesture, would
+protect the moment I actually rely on. I have not designed that threshold; I am naming it as the
+shape that would make a jump-based cache safe for my task rather than a blanket objection to
+jumping.
+
+### Q3 — how many zoom levels do I actually use
+
+**Two or three framings, named by PURPOSE rather than by magnitude, which is an argument for named
+views over a snap ladder.** From my own prior research (this file, 2026-08-25 and 2026-09-08) and
+from the suite's own declared 300 km / modest-venture scope: my actual field use is (a) an
+orientation view — where am I in the system, usually already served by the existing "Zoom to fit"
+tool (`js/looped-network.js:25343`) — and (b) a close-in view of the one cluster or asset I am
+standing at, arrived at by pinching straight there from wherever I was, not by stepping through
+intermediate magnifications. I do not use a ladder of framings in between; I go from "whole system"
+to "this valve" in one gesture. **SPECULATION, mine:** if the real want behind "instant zooming" is
+"get me back to the framing I actually use, fast," a second NAMED view — something like "zoom to
+selection" (frame the tapped asset and its immediate neighbors, the same neighbors the property
+popup already shows me as upstream/downstream) — answers that want directly and needs no zoom-level
+ladder at all: it is one saved camera position, computed once, not a cache indexed by continuous
+scale. The project already has the instinct (`Zoom to fit` is exactly this, computed from the whole
+drawing's extent); a second one computed from the SELECTION's extent would be the same mechanism
+serving my actual two-framing habit, and it sidesteps both the finger-tracking problem in Q1 and
+the mid-gesture jump problem in Q2 because it is a deliberate button press, not a gesture that has
+to guess which level you meant.
+
+### Q4 — anything else painful on a phone, checked against my own journal first
+
+I re-read my own wish list and journal before answering so as not to repeat myself. My sharpest
+standing finding is already there and is the one I would put ahead of anything zoom-related: the
+accidental double-tap vertex insert/remove in plain `select` mode (wish list #5, journal
+2026-09-01) — a reader tapping twice out of impatience, exactly the gesture a pinch-then-tap
+sequence can produce by accident, silently edits the model with no undo snapshot. **I checked
+whether the zoom-level questions here interact with that hazard and they do not** — pinch uses two
+pointers and the accidental-edit path is a single-pointer `dblclick`, so they are independent
+defects and neither fix changes the other. Nothing new to add this pass beyond flagging that the
+two proposals under review here (snapping, per-level caching) do not touch that older, more urgent
+finding, and I would still rank it above both.
+
+— Franco
+
+## 2026-09-17 — Task 247 (Customer connection angle, snap-to-node, dot symbol): checked against `feat/customer-demands`
+
+Tom, testing the branch: *"The initial default connection to pipe needs to be perpendicular. Only
+an intentional drag away from that should change it. In fact, I am not sure we should offer a
+non-perpendicular connection to link. Check with Mary, Sue, and Franco."* He also wants a close
+connection to SNAP to the nearest node, and the customer drawn as a small solid dot with a
+building/house symbol rather than a rectangle/meter-box. Answering from my own seat, read against
+the worktree at `/home/haws/webdev/worktrees/feat-customer-demands/engcalcs`, checked 2026-09-17
+(read-only, per instruction).
+
+### What the branch does today, grounding before opinion
+
+**OBSERVED**, initial placement is ALREADY perpendicular by construction — `meterOffsetFor()`
+computes the pipe segment's own normal vector and offsets the meter along it
+(`js/looped-network.js:11669-11680`, worktree). So the "leaning stub" case Tom is reacting to is not
+the default placement; it can only exist after a deliberate drag.
+
+**OBSERVED**, once placed, a drag is completely unconstrained — `drag.type === 'customer'` writes
+`cm.x = pos.x - hitm.x; cm.y = pos.y - hitm.y` from the raw pointer position with no angle
+constraint at all (`js/looped-network.js:27568-27584`, worktree). Nothing stops a stub from ending
+up at any angle, including nearly parallel to the main, by accident.
+
+**OBSERVED**, sizes at default settings: a junction dot is a fixed 7 screen px diameter
+(`settings.symbolSize: 7`, `js/looped-network.js:4650`), fixed regardless of zoom. A customer's
+meter box is HYBRID — 2 m real-world diameter, floored at 3 screen px when zoomed out
+(`LPN_METER_REAL_M = 1` half-width, `LPN_METER_MIN_PX = 1.5` half-width,
+`js/looped-network.js:7873-7874`, `meterHalfWorld()` at 7906-7912). So at any wide/system-level
+view the customer symbol is already SMALLER than a junction (3 px vs 7 px), before shape or colour
+are considered.
+
+**OBSERVED**, there is already a precedent on this exact page for "close counts as the same
+target": a tap in add-node mode that lands near an existing node reopens that node instead of
+creating a duplicate (`nearestNodeNearScreen()`, `js/looped-network.js:27186-27196`, comment:
+*"a miss that lands on what you just placed opens it... refusing to place a second node on top of
+an existing one and then doing NOTHING AT ALL is worse"*), and the add-meter tool does the same
+thing for an existing meter (`js/looped-network.js:27200-27206`). Snap-on-proximity is not a new
+idiom for this page; it is the page's standing answer to "a fat finger landed close to something
+real."
+
+### Q1 — does the angle of a service line tell me anything in the street
+
+**No, and I want to be specific about why, because the honest answer is narrower than "angle is
+noise."** What I actually use a stub for is two things: (a) is it connected to a pipe at all — the
+branch already says so out loud when it is not (`⚠ This meter is not connected to a pipe...`,
+`js/looped-network.js:37450`) — and (b) WHICH pipe it touches, which the stub's endpoint on the
+main answers regardless of the angle it takes getting there. I am not reading the stub's angle as a
+fact about the ground; I am reading its two endpoints. A schematic service line on this kind of map
+has never, in my twenty years, been drawn to survey angle — the symbol says "this meter is fed from
+this main," not "the buried pipe runs exactly this compass bearing," and nobody in the field expects
+the second claim from a hydraulic model's map.
+
+**The one case where an angle WOULD carry real information — the true lateral that crosses under
+the street to serve the far side — is not actually served by letting the drag angle vary.** What
+tells me that case is the meter's POSITION (it sits on the opposite side of the street from where
+its main runs), not the compass angle of the line connecting it. A perpendicular stub to a meter
+correctly placed on the far side of the street already reads as "this one is different" just from
+where the dot sits, with no angle cue needed at all.
+
+### Q2 — would uniform perpendicular help or hurt reading
+
+**Help, and by a wide margin — the row-of-parallel-stubs pattern is the useful case, not the risky
+one.** A street of forty perpendicular stubs reads instantly as "one service per address along this
+main," which answers my own top question (which asset is this / what serves it) faster than reading
+any individual label would. The one thing that pattern could hide — the genuine crossing lateral —
+is not hidden by making the OTHERS perpendicular; it is made MORE visible, because it is now the one
+dot sitting on the wrong side of its own street with everything else consistent around it. A field
+of already-random angles (today's unconstrained drag) is the arrangement that actually hides the
+interesting exception, by making every stub equally exceptional-looking.
+
+**My answer to Tom's real question — should any non-perpendicular connection be offered at all —
+is no, for my seat's purposes.** I found no field-reading task this angle serves that the meter's
+POSITION does not already serve better. I would not build a UI affordance for "drag to a custom
+angle" at all; I would let a drag move the meter further from or closer to the main, and move it
+along the main (changing `t`), and change which side of the pipe it is on — all of which change
+useful facts (station, side of street) without ever needing the connecting line itself to leave
+perpendicular.
+
+### Q3 — snap to nearest node on a phone
+
+**Expected, and a snap I did not ask for is a problem only if it is silent or hard to undo — neither
+applies here.** Tapping near a junction on a phone, under a thumb, is imprecise by construction; the
+page already has the convention (Q-grounding above) that "close enough" means "you meant that one."
+A customer that snaps onto a node when dragged very close to it matches that convention and matches
+what I would expect from any map app. The one thing I would ask for, consistent with this suite's
+own undo/reversibility rule: the snap should be visually obvious the instant it happens (the dot
+audibly "catches," the way the existing near-node reopen already commits to a real, visible action)
+and a further small drag should release it — I have not checked whether the branch implements
+release-by-dragging-away, and that is the one behavior I would want confirmed before shipping, not
+a reason to decline the feature.
+
+### Q4 — dot vs rectangle, house/building icon vs meter box, at the sizes this page actually draws
+
+**A small solid dot is the right call; a house/building icon is not, at these sizes, and I would say
+so plainly.** **CITED**, Esri's own cartography guidance states a screen-display minimum symbol size
+of about 10 px for a SIMPLE symbol, and separately that "there is a barrier size at 20×20 pixels,
+below which restrictions become so important that they require different design work" for iconic
+shapes — Imhof's traditional figures cited in the same literature put an iconic (detailed) symbol's
+minimum at roughly 2.5x a simple geometric shape's, because the extra ink that makes a house read as
+a house needs room the smallest cases here do not have (Esri ArcGIS blog, "Guidelines for minimum
+size for text and symbols on maps"; summarized findings from the Cartographic Journal literature on
+minimum legible symbol size, both retrieved via web search 2026-09-17). **The customer symbol on
+this page draws at 3-7 px in the ordinary zoomed-out case** (my own OBSERVED figures above) — well
+under even the 10 px floor for a SIMPLE shape, let alone the 20 px floor an iconic house glyph would
+need to read as a house rather than as a smudge. At arm's length, in sunlight, on a phone, a house
+icon at that size will not look like a house; it will look like a slightly different-coloured dot,
+so choosing it over a plain dot buys nothing for legibility and costs a small amount of rendering
+complexity for no return I can see from this seat.
+
+**Is a dot distinguishable from a junction at these sizes?** Yes, on the evidence already in the
+branch, by two cues that do not depend on shape at all: size (3 px floor vs the junction's fixed
+7 px — the customer is smaller, not larger, which is the correct relative weight for a smaller-
+consequence asset) and POSITION (a junction sits directly on the pipe; a customer sits off it,
+joined by a short perpendicular stub). The stub is what actually carries the "this is a service, not
+a network node" information at a glance, more than either symbol's shape — which is also why keeping
+the stub's presence and its endpoint-on-the-main is more important to my reading than whatever
+shape fills the dot. **One caution to flag if the dot ships:** do not let its floor size grow to
+meet or exceed the junction's floor size for visual "fairness" or balance — the size gap is doing
+real identification work today and should stay.
+
+**What I would NOT weigh in on:** whether "building/house" is the right visual METAPHOR versus a
+meter symbol is a meaning question (does the dot mark the meter or the structure) more than a
+legibility one, and it brushes against a concern that is really Ida's seat (icon meaning, visual
+hierarchy) more than mine. I will only say the field-relevant half: at the sizes actually drawn here,
+no icon choice reads as its intended picture, so the meaning question is close to moot for how the
+map actually looks in the street — a small dot in a consistent colour will read exactly as clearly as
+a small house glyph will, because neither one is big enough to show its shape.
+
+### The one thing I would change first
+
+**Constrain the drag, not just the default.** Perpendicular-by-default already ships
+(`meterOffsetFor()`); the gap is that a drag afterward can put the stub at any angle with nothing
+stopping it. I would rather see the drag limited to moving the meter along the pipe (station),
+across it (distance from main), and to either side, than see a free x/y drag that can accidentally
+produce the very leaning-stub picture Tom is reacting to. That is a smaller, cheaper change than
+adding a house icon, and it is the one that actually answers what he tested.
+
+— Franco

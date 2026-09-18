@@ -1259,8 +1259,10 @@ console.log('\n--- Settings panel stays in sync ---');
   {
     const node = L.getDoc().nodes.find(n => n.type === 'junction');
     const PCX = EngCalcs.pageConfig;
-    // readonlyField() builds <label>[label text]<span>value</span></label>. Walk the labels, match
-    // the one whose text is exactly "Y", and read the span beside it.
+    // **THE ROW IS AN INPUT SINCE TASK 674**, not a readonly span: nodeCoordFields() builds
+    // <label>[label text]<input value></label>, because a coordinate is now typeable. The span
+    // branch is kept rather than deleted -- coordFields() still builds one for a Text object's
+    // popup, and this walk is the only reader either shape has here.
     function popupY(id) {
       L.renderNodeFields(id);
       const rows = byId.lpn_popup_fields.children.filter(c => c.tagName === 'LABEL');
@@ -1271,6 +1273,8 @@ console.log('\n--- Settings panel stays in sync ---');
         // was reading a stub that stored textContent as a plain property; it stopped being true the
         // moment the stub started behaving like a DOM (Task 403).
         if (!(r.textContent || '').trim().startsWith(PCX.lpn_field_y)) { continue; }
+        const box = (r.children || []).find(c => c.tagName === 'INPUT');
+        if (box) { return parseFloat(box.value); }
         const span = (r.children || []).find(c => c.tagName === 'SPAN');
         return span ? parseFloat(span.textContent) : NaN;
       }

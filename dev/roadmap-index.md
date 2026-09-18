@@ -7,30 +7,28 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**93 open tasks.** Next (100): 14 · Soon (75): 20 · Someday (50): 30 · Maybe (25): 11 · Parked (5): 18
+**103 open tasks.** Next (100): 11 · Soon (75): 30 · Someday (50): 33 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (14)
+## 100 — Next (11)
 
-- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
 - Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
-- Task 618 — WYSIWYG hit areas: what you can click is what you can see.
 - Task 646 — Attach the world map to an XY project without changing the project.
 - Task 663 — Three questions about the reaction rate that only Tom can answer.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
 - Task 669 — Show labels at this zoom or closer.
-- Task 674 — Type a node's coordinates instead of only dragging it.
 - Task 676 — Watch the sites, and send a derived weekly report.
+- Task 686 — The progress bar finishes before the work does.
 
-## 75 — Soon (20)
+## 75 — Soon (30)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
 - Task 612 — [H] · Screenshot 0082 is the centerpiece of any lpn display.
@@ -48,10 +46,20 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
 - Task 665 — Make draggable and resizable the standard for a standing box.
+- Task 679 — Narrower strokes on the About mark, and more pixels used.
+- Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
+- ! Task 681 — Economize the label layout: it is half the cost of a project switch.
+- Task 682 — Zoom on a PC with no wheel, and from the keyboard.
+- Task 685 — Name every unit dropdown for a screen reader.
+- Task 687 — The lock dialog's destructive button sits beside Cancel.
+- Task 688 — File, Convert units as: US to work in, SI to hand over.
+- Task 689 — Undo does not work inside a table, only on the map.
+- Task 691 — Banner messages are annoying, and one of them is a trap.
 
-## 50 — Someday (30)
+## 50 — Someday (33)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
+- Task 185 — Match/Copy properties tool (originated during Task 146).
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
 - Task 218 — Find advisors and proteges: a standing, nagged commitment.
 - Task 221 — Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.
@@ -74,13 +82,15 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 633 — The project tab strip, and whether it could collapse into the toolbar.
 - Task 636 — A custom properties UI, designed in a table.
 - Task 639 — Layers: the first heading under Map and page.
-- Task 640 — A Graphs submenu under Water, holding five plots.
+- Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
 - Task 641 — Choose a real EPSG projection in the new project box.
 - Task 645 — The app icon's legs are leggier than the favicon's.
 - Task 648 — The About icon's outlines are too heavy for its scale.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
 - Task 664 — A link's status colours correctly and its legend prints numbers.
 - Task 675 — A labelled grid, with the significant digits picked out.
+- Task 683 — The wheel zoom increment, snapping having been ruled out.
+- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 
 ## 25 — Maybe (11)
 
@@ -121,5 +131,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-86 of 93 titles are within 4–12 words. `!` marks the rest;
+95 of 103 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

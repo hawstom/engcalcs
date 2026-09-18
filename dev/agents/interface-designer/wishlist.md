@@ -233,3 +233,123 @@ is answered for the three that remain after the divorce; see item 5 series above
     If item 22 is built, this question disappears (there is no longer a separate box). If the
     popup is kept, decide whether it belongs in the modal family as-is or should be pulled into
     the standing-panel family per item 23's rule. See journal, 2026-09-13.
+
+25. **If the five-group popup collapse is built: split "Flow and pressure" at the input/result
+    seam the code already draws.** `BAND_NODE`/`RESULT_NODE` (`js/looped-network.js:11898-11929`)
+    and the `if (lastSolveResult...)` guard around Head/Pressure (`:35232-35236`) already separate
+    typed inputs from solved results; a merged group would be the popup's first case of a typed and
+    a computed number sharing one visual container, against the suite's own stated rule that the
+    two are different kinds of thing. Costs nothing — the split is already coded, only unread by
+    the grouping brainstorm. See journal, 2026-09-15.
+
+26. **If built: no group ever starts collapsed, matching `multiSection()`'s own ruling one function
+    away** (`js/looped-network.js:36248`, Tom: *"OPEN, ALL OF THEM ... collapsing is something the
+    reader does, never the default"*). A default-closed heading on a 16-20 row popup is a second
+    instance of the exact failure this seat was hired over — a bold word with a caret is easy to
+    mistake for a static label the first time a reader meets it. A remembered-per-group collapse
+    (matching `customPropBox()`'s per-key `cpOpenKeys`) is a legitimate LATER phase once real
+    dwell/scroll evidence names a specific group nobody opens — never a shipped default. See
+    journal, 2026-09-15.
+
+27. **If built: coordinates (X/Y) must stay visually first inside "Dimensions" and must be
+    EXEMPT from any future remembered-collapse preference, the way Credits is exempted from the
+    Settings-box filter (`data-set-nofilter`, `js/looped-network.js:30284`).** Sue's argument for
+    X/Y at popup slots 2-3 — a transposed coordinate balances hydraulically and is invisible to the
+    solver until a GIS overlay or as-built check — is defeated by a collapsed or buried Dimensions
+    group exactly as it would have been defeated by the old scattered layout. Today `coordFields()`
+    is called LAST in both render functions (`:35264`, `:36117`), not grouped with Elevation/
+    Length/Diameter at all, so folding it into Dimensions is a real, overdue tidy — but only if the
+    group can never start closed and coordinates lead it. See journal, 2026-09-15, §5.
+
+28. **Ask Declan before shipping any collapsible group: a `<details>` element is itself a keyboard
+    tab stop, so five sections is five NEW stops per popup visit regardless of open/closed state** —
+    the same shape of cost he measured against coordinate slots 2-3 (800 stray keystrokes over 400
+    junctions). This seat cannot weigh entry-volume cost and should not guess at it. See journal,
+    2026-09-15.
+
+29. **Build all five Properties-popup groups as plain headings, never `<details>`/`<summary>`.**
+    Nothing in this popup collapses by default (Tom's ruling, narrowed to Settings but the reasoning
+    — a box this short does not need a navigation aid — applies at least as strongly to Properties);
+    a `<details>` that never closes buys a caret and a keyboard tab stop for zero realized benefit.
+    This is also what dissolves the "Results and quick graph falls to 2 rows" problem: the cost his
+    three-row rule is pricing is a disclosure widget's, and a plain heading over 2 rows costs nothing
+    a plain heading over 20 rows doesn't. Self-resolving further once Task 637 (Graph button) ships
+    and Results reaches 3. See journal, 2026-09-16.
+
+30. **Two small, named, zero-string-cost order fixes inside the new grouping, if he wants the "no
+    reorder" claim to hold row-for-row and not just block-for-block:** swap `tagField()` before
+    `closedField()` in `renderLinkFields()` (`js/looped-network.js:36550/35752`) so Tag precedes
+    Shut, matching his own written list; and do NOT move Length ahead of Diameter to match the same
+    list's "Length, Diameter, Roughness, K" — Diameter's position is anchored to the pipe-type
+    chooser by Task 465's own settled ruling and should not be overturned by an illustrative bullet
+    order. See journal, 2026-09-16.
+
+31. **Open question for Tom, not decided here: does "Description" in "Description and state" name a
+    row that exists?** `idField()` renders in the popup title, outside the field list; the only
+    free-text identity field the code builds is Tag. His own count table gives this group 5 rows on
+    every element type, which needs a Description row nothing currently builds. See journal,
+    2026-09-16.
+
+32. **Rank 1st of the zoom question — add a keyboard/no-gesture zoom in and zoom out, beside the
+    existing "Zoom to fit."** Two rows in the Map menu (and, if toolbar room allows, two buttons)
+    calling the existing `zoomAbout()` at a fixed screen-centre point with the wheel's own factor.
+    This is the same class of defect as Task 674 (a value reachable only by dragging): today
+    "Zoom to fit" is the ONE zoom control that needs no wheel and no pinch, and it is a reset, not
+    an increment — a keyboard-only or wheel-less desktop visitor can reach "fit" and nothing else,
+    ever. EPANET itself, our own named reference vocabulary, ships exactly this pair of buttons
+    (Zoom In / Zoom Out) with no wheel and no keyboard shortcut of its own — the fix is not a new
+    idiom, it is the one EPANET already uses. Cheap: no new interaction pattern, reuses the one
+    function every existing zoom path already goes through. See journal, 2026-09-17.
+
+33. **Rank 2nd — widen the mouse-wheel zoom step from 1.1 (10% per notch) toward roughly 1.15-1.2
+    (15-20%).** `js/looped-network.js:26699`. Every sourced comparison (AutoCAD's default 60%, and
+    CAD users' own preferred lower range of 15-20%; QGIS's 200%-per-click default) sits above our
+    10%, and ours is the only one below the whole cluster. Not urgent and not free of judgement —
+    nobody has filed a friction report on it the way Task 674 has a report behind it — so rank this
+    below the no-wheel gap, which is an access failure, not a comfort one. A specific number (1.15
+    vs 1.2 vs something else) is a five-minute tuning decision better made by trying it than by
+    debate; I would not spend more diagnosis on the exact constant. See journal, 2026-09-17.
+
+34a. **Task 667(b) — reorder the four lock-dialog buttons to Ask, Open read-only, Cancel, [gap],
+   ⚠ Break lock — a third order, neither of Tom's two.** `js/looped-network.js:23072-23095`
+   (`feat/lock-initials-later` worktree). Puts the two safe non-Ask options between the default
+   focus and the destructive one, matching Apple HIG's explicit rule (don't default-focus a
+   destructive action; space it apart from the others) rather than this codebase's own live
+   counter-example (`closeTab()`'s Save/Discard/Cancel puts Discard next to Cancel, which is the
+   adjacency to avoid, not a precedent to repeat — it had no second safe button to buffer with,
+   and this dialog does). Mark Break lock with the suite's own existing `⚠` verdict glyph rather
+   than inventing a coloured-button component — zero new translated words. Do not add a second
+   "are you sure" confirmation step on top of Break lock; the three-age readout already states the
+   consequence in specific words, and NN/g's own research says a second confirmation teaches
+   click-through rather than caution. See journal, 2026-09-17.
+
+34b. **Task 682 second half — an on-map `+`/`−` zoom chip, top-right, registered in the existing
+   `overlayOccupants()` dodge system, hidden below 640px.** Top-right is the calmest of the four
+   map corners (its only default occupant, the labels legend, is one box frequently set to Off);
+   the other three are busier than they look — top-left is a growing multi-line column, bottom-left
+   is already the busiest strip on the page, bottom-right carries required, non-movable tile
+   attribution. Matches Mapbox GL's own default control position (the one mapping vendor already
+   integrated here), reuses the existing translucent-chip visual language, adds no third button
+   (Zoom to Fit already lives on the toolbar per Tom's own settled half of this task). Not a fifth
+   line of chrome by Tom's own four-bar taxonomy — it is engaged-surface furniture, the same
+   category as the scale bar and the legends, discovered by someone already looking at the map, not
+   a first-glance competitor. Worth building alongside item 32's Map-menu Zoom In/Out rows, not
+   instead of them — the menu rows are the more keyboard/screen-reader-reachable route, the chip is
+   the more discoverable one for an ordinary pointer user, and both call the one `zoomAbout()`
+   function the wheel and pinch handlers already share. See journal, 2026-09-17.
+
+34c. **Bind bare `+`/`-`/`=` keys to zoom, guarded by the existing `isTextEntry()` function
+   (`js/looped-network.js:37469-37474`) — not `Ctrl`/`Cmd` + `+`/`-`.** The bare-key shape matches
+   this page's own existing digit-key tool-picker binding; the modifier shape (Figma's own choice)
+   would override a shortcut every browser already reserves for its own page zoom, which is a
+   bigger and newer claim on the keyboard than anything else this page has bound. Cheap — reuses a
+   guard already written for the same reason (a typed `-` must not be read as a command). See
+   journal, 2026-09-17.
+
+34. **Do NOT add zoom-level snapping.** Tom's own "anti-idiomatic" instinct is correct: this page
+    is a raster basemap UNDER a hand-placed vector drawing, not a pure slippy map, and the reason
+    slippy maps snap (tiles baked at integer levels) does not apply to our vector half, which wants
+    to land on whatever scale reads cleanly. Snapping would cost the vector drawing a real thing
+    (placing a node to read well at the zoom the user actually wants) to fix a raster problem tile
+    providers already solve by resampling at fractional zoom, which is normal, unremarked behavior
+    on every web map. See journal, 2026-09-17.

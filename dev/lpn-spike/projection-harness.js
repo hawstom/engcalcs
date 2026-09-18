@@ -185,8 +185,12 @@ setUnitSet('si');
 {
 	console.log('\n--- the axis names ---');
 	L.reset();
+	// Against the language file, not against the letters: since Task 674 axisNames() reads
+	// lpn_field_x / lpn_field_y like its other four names, and a language that spells its own
+	// abscissa differently must not redden this line.
 	ok('an unprojected grid reads X and Y',
-		L.axisNames().first === 'X' && L.axisNames().second === 'Y');
+		L.axisNames().first === PC.lpn_field_x && L.axisNames().second === PC.lpn_field_y,
+		L.axisNames().first + '/' + L.axisNames().second);
 
 	L.reset(L.GEO);
 	ok('a geographic project reads latitude first',

@@ -168,3 +168,40 @@ a wrong group on purge (3), a migration preferring the link (2), a rename using 
 
 **Ask what shape of input a harness's fixtures cannot express.** That is where its next blind spot
 is, and it is a different question from what vocabulary it never uses.
+
+---
+
+# The one overridable property this guard cannot see: a node's position (Task 674)
+
+2026-09-15. Tom made a node's position scenario-overridable -- *"Give the people their overrides!
+Whether coordinate or any other property, what's gained by denying them an override?"* -- reversing
+a rule an AI session had invented for itself (that a node cannot be in two places at once in one
+rendered map, which a scenario disproves: a scenario IS one rendered map).
+
+`scenario_seam_check.php` derives its property list from `LPN_OVERRIDABLE` and then looks for
+`el._x =`. **There is no such write, and there never will be**: `x` and `y` are stored BARE, because
+the file states `x` and `y` and so does EPANET's `[COORDINATES]`, and every coordinate walker in
+`js/looped-network.js` reads those two names. So adding them to the whitelist widened the check's
+list and gave it nothing to police.
+
+What stands in its place, and why it is not merely weaker:
+
+- **One writer, `writeNodeCoord()`.** The typed boxes, the table cells and the DRAG all end there.
+  A second writer is a code review away from being noticed because there is nothing else to copy.
+- **`dev/lpn-spike/node-coord-entry-harness.js` asserts the seam from both editors and the drag**,
+  including that Base is not edited from inside a scenario -- which is the defect this document is
+  about, asked of a position.
+- **`dev/lpn-spike/local-origin-harness.js` counts the frame-conversion call sites.** A new reader
+  of a node's coordinates that skipped the resolver would almost certainly add or move one of those
+  four calls, and the census fails when the total changes without somebody saying why.
+
+**And the derived value nearly re-created defect 2 above, by a new door.** `updateLinkGeometry()`
+ends in `if (l.lenAuto) { l._length = linkGeomLength(l); }` -- a Base write that runs on every
+geometry update, and `buildDom()` runs it for every link on a scenario SWITCH. With positions
+overridable, merely LOOKING at a scenario that moved a node would have written that scenario's
+length into Base under every other scenario at once. It is now guarded on `inBaseScenario()`, and in
+a scenario the auto length is DERIVED in `effective()` and stored nowhere -- gated on an end having
+actually moved, so the ordinary case is two hash lookups.
+
+**The lesson is the one this file keeps finding: a write seam protects what is written THROUGH it,
+never what is DERIVED from it.** Ask what else a property feeds.

@@ -27,6 +27,107 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-09-17 — Sue: perpendicular service connections, answered (Task 247, branch `feat/customer-demands`)
+
+Tom, having tested the branch: the initial connection should be perpendicular by default, only an
+intentional drag should change it, and asked whether a non-perpendicular connection should be
+offered AT ALL. Answered from this seat, checked against the worktree code, not against memory.
+
+- **OBSERVED, `feat/customer-demands` worktree, `js/looped-network.js:7669-7681`
+  (`meterOffsetFor`, checked 2026-09-17):** the DEFAULT placement — both the two-click gesture and
+  the one-click "attach directly on the pipe" shortcut — is already perpendicular by construction.
+  `nx, ny` is the unit NORMAL of the pipe segment (`-dy/len, dx/len`), and the offset is that normal
+  scaled by a fixed 18 px (`LPN_METER_OFFSET_PX`, line 7880). So half of Tom's ask is already true
+  today: nothing about the birth of a meter can produce an oblique stub. What he found is the OTHER
+  half — dragging the meter box afterward (`js/looped-network.js:27568-27583`, `drag.type ===
+  'customer'`) writes `cm.x = pos.x - hitm.x; cm.y = pos.y - hitm.y` with `pos` wherever the pointer
+  is, unconstrained to the normal — a free 2D offset, exactly like a Text label's leader offset,
+  which is the precedent the code comment at 7945 cites on purpose. That is the gap: birth is
+  perpendicular, drag is unconstrained, and nothing snaps a small deviation back.
+- **OBSERVED, `js/looped-network.js:7939-7952` (`customerAttachPoint`/`customerPoint`/
+  `customerNodeId`), checked 2026-09-17:** the angle of the stub is drawing-only. The junction a
+  customer's demand lumps at is `EngCalcs.lpnCustomerNode(c, link)`, a function of `link` and `t`
+  (arc-length station) alone — `c.x`/`c.y`, the offset that sets the stub's angle, is read by
+  nothing but `customerPoint()`, which feeds only the box's screen position. **Answering the first
+  question directly: the angle carries no engineering meaning at all, not even cartographically
+  approximate meaning, because nothing downstream reads it — not the solve, not the `.inp` export
+  (§3 of `dev/customer-demands.md`: only `link`, `t` and the demand numbers travel), not the
+  lumping rule.** It is pure decoration on top of an already-complete fact (which pipe, how far
+  along it).
+- **CITED, secondary (search-engine synthesis across several municipal water standards surfaced
+  2026-09-17, not independently confirmed against a primary PDF — this session's WebFetch could not
+  render any of the PDFs it found, the same tool limitation recorded elsewhere in this journal for
+  the EPA manual and the Crane/AWWA specs):** at least one municipal water standard states plainly
+  **"Services shall be installed perpendicular to the main from the tap to the meter pit within the
+  right-of-way."** This is not universal — I did not find and do not claim a single national
+  standard — but it is consistent with ordinary practice: a corporation stop is tapped
+  perpendicular into the main because that is the simplest, strongest tap geometry (shortest
+  drilled path, no bending stress on the corp stop), and every standard detail sheet I could read
+  the thumbnail of draws it that way. **So the real-world object this symbol represents is
+  overwhelmingly perpendicular at the main, as a matter of installation practice, not merely as a
+  drafting convention this suite invented.**
+- **My answer to the actual question — should a non-perpendicular connection be offered at all:
+  no, not as a free hand-drag.** Two independent reasons converge, and either alone would be
+  enough: (1) the angle carries zero information the model, the export or the lumping rule ever
+  reads, so allowing it to vary buys nothing computational; (2) the thing it draws is, in the field,
+  actually perpendicular the great majority of the time, so an oblique stub is more likely to read
+  as a FALSE CLAIM about how the tap is really laid than as an intentional design choice the
+  engineer made. A feature that can only mislead or do nothing is a feature I would remove, not
+  guard with a "the user meant to drag it" excuse.
+- **The one case that would change my mind, and it is real but is not an argument for a free
+  drag.** `dev/customer-demands.md` §4 already names the actual hard case: DENSITY — a dozen
+  services along one short main segment, whose perpendicular stubs and account-number labels
+  collide. That is a genuine reason a stub's rendered angle might need to move a few degrees off
+  true perpendicular — but the right fix is the same one this page already has for a Text leader
+  (`lpn-collide.js`, `snapLeaderOffset`): an AUTOMATIC, system-computed nudge to resolve a
+  collision, snapping back the instant it is no longer needed, never a value the user sets by
+  dragging. I would not call that "offering a non-perpendicular connection" — the user never chose
+  an angle, the renderer chose a small one to keep two labels apart, and the underlying `t`/`link`
+  and the demand accounting are untouched either way.
+- **A corner lot or a service crossing to the far side of a street is NOT a case that changes my
+  answer, and I want to be honest about why I considered and set it aside.** In the real world such
+  a lateral is genuinely not straight-in perpendicular past the corp stop — it doglegs to the curb
+  stop and the meter. But `dev/customer-demands.md` (Tom's own ruling, §"Symbol sizes") has already
+  settled that this symbol is schematic — a 2-4 px dot at system zoom, holding its screen size past
+  1000 m, explicitly NOT a survey plan. A schematic symbol that shows a customer belongs to a
+  specific pipe at a specific station does its whole job; it was never going to show the actual
+  dogleg route of a real lateral, corner lot or not, so the corner-lot case does not argue for
+  letting the STUB'S angle vary — it argues for nothing this symbol is trying to be.
+- **At this suite's own scale: per-service angle is not something anybody sets by hand, and I
+  would say so plainly rather than hedge.** `dev/customer-demands.md`'s own Tom-ruled shape (a
+  meter carries a Type and a Count, "forty-two single-family residential is one line, one symbol")
+  already assumes services are aggregated, not drawn one-by-one, past a handful. A free-angle drag
+  is a control built for the twelve-node subdivision drawing where a designer is placing meters by
+  hand one at a time — it is invisible at the count-of-42-per-symbol scale this suite's own design
+  doc already expects for anything past a small site, and it would never be exercised at a real
+  utility's own thousands-of-services scale because nobody would ever draw that many individual
+  symbols in the first place.
+- **Industry check, honest and narrow: I did not find, and do not believe exists, a market
+  convention of drawing and manually angling individual customer-service stubs in a hydraulic
+  model at all.** The GIS-based demand-allocation tools I have read about in earlier passes
+  (WaterCAD/InfoWater's Demand Allocation Manager, parcel-polygon-to-node join — my own
+  2026-08-25 wishlist row 1990s-citation trail) assign demand to a node by a spatial join with no
+  drawn service line and no angle to set at all. **The whole drawn-stub-with-a-draggable-angle
+  gesture is this suite's own invention, following Tom's own site-plan-drafting instinct
+  (`dev/customer-demands.md`: "I think you pick a point, it draws a meter rectangle... it connects
+  perpendicularly"), not something borrowed from a vendor I can cite** — which is consistent with
+  his own ruling in the same document to stop surveying the market and go by our own wits. I flag
+  this so a later invocation does not go looking for an industry precedent that, on my own read,
+  is not there to find.
+- **On the two related asks, briefly, because Tom invited comment: snap-to-node at close range
+  changes nothing hydraulically** — `EngCalcs.lpnCustomerNode()` already resolves to the nearer end
+  by arc length, so a meter dropped a hair's breadth from a junction already lumps there; snapping
+  the DRAWING to match what the arithmetic already says is a legibility fix, not a modeling
+  question, and I have no objection from this seat. **The small-solid-dot-versus-rectangle and
+  house-versus-meter-box symbol choices are Ida's question, not mine** — from an engineering
+  standpoint a meter box is the more literally correct glyph (it is the billing device that
+  actually sits there), but which glyph a reader parses fastest at a glance is a visual-hierarchy
+  question I am not equipped to rank.
+
+— Sue
+
+---
+
 ## 2026-09-08 — Sue: the thirteen `lpn_fitting_*` names — English is Crane/EPANET catalogue prose, not vocabulary; Turkish was NOT over-cautious on the term it flagged that matters; a multilingual valve-terminology standard exists but does not cover our language set
 
 Tom asked by name whether the thirteen EPANET Table 3.3 fitting names are the right ENGLISH terms,
@@ -2100,5 +2201,266 @@ itself is a small animal next to C-factor and demand uncertainty. **My one concr
 the roadmap block Tom should read before deciding: label whichever length this produces distinctly
 from the plan/stationed length, and do not make slope distance the reported "length" by default**
 — that is the one way this feature could make a report LESS defensible instead of more.
+
+— Sue
+
+## 2026-09-15 — Sue: Task 674 property order — coordinates are identity, not design variables; and EPANET's Tag position is not evidence of anything
+
+Tom asked two questions by name on where typed coordinates land in the popup/tables (Task 674).
+
+**Q1 — slot 2/3 (after ID) vs. end of the list.** I lean the same direction Tom leans, Option 1,
+but for a different reason than his: a coordinate is not in the same CLASS as a design variable
+(demand, diameter, roughness). It is part of the asset's spatial IDENTITY, paired with the ID the
+way a parcel number is paired with a legal description — SPECULATION, my own framing, but grounded
+in how a coordinate is actually used at system scale: the one workflow that touches it deliberately
+is checking a developer's submittal or a survey deliverable against the utility's own coordinate
+system, ID-by-ID. That is exactly the moment ID and coordinate sitting next to each other earns its
+keep, and it is a QA moment, not an editing moment. "People don't usually edit it" is true and is
+the wrong test — a transposed X/Y or a wrong datum is invisible in a solve (the network still
+balances) and visible only in a GIS overlay or an as-built check, which makes it precisely the kind
+of rarely-touched, load-bearing number that belongs where a reviewer's eye lands, not where it
+doesn't. I hold the same view about coefficient rows in my own wish list — availability of a number
+is not a ranking criterion for whether it should be found easily; correctness risk is. SPECULATION,
+my own inference, not measured against any actual submittal review.
+Tom's own foresight — collapsible sections, and "we know we are headed toward customizable table
+columns" — is, in my seat's terms, the actual system-scale answer already: a reviewer wants ID+
+coordinates+elevation for a survey check, a designer wants ID+diameter+roughness+demand for a
+capacity check, and no fixed popup order serves both at 2,000 nodes. WaterGEMS/OpenFlows FlexTables
+and similar mid-size-utility tools solve this with user-defined, reorderable, savable column sets
+rather than one designed order — SPECULATION/general professional recollection, not a citation I
+verified for this session. Popup field order is a stopgap worth getting right for months, not years;
+don't over-invest past what Option 1 already buys.
+
+**Q2 — EPANET puts Description and Tag before Elevation. Is that evidence of intent?** I do not
+think it holds up, and I would not lean on EPANET's dialog layout as authority here. **OBSERVED**,
+this repo's own importer (`js/lpn-inp.js:1894-1911`): EPANET's plain `.inp` `[JUNCTIONS]` data
+record is `ID Elev Demand Pattern` — Description and Tag are not IN that record at all. Tag lives
+in its own separate `[TAGS]` section (`NODE|LINK id tag`), decoupled from the physical junction
+data, and our own comment there calls it correctly: *"a tag is the join key to whatever system the
+utility already keeps its assets in."* That separation reads to me as the OPPOSITE of Tom's
+reading — a field bolted onto the format and the GUI later, as a cross-reference convenience, not
+one EPANET's authors placed above elevation on purpose. A single-author, decades-incremental public
+tool's dialog order is ordinary software archaeology (when a field was added to the form) far more
+often than a considered priority ranking — SPECULATION, I have no source for EPANET's own UI design
+history and did not find one searching this session; I would not repeat this as fact without one.
+Where I agree with the instinct underneath his question: Tag genuinely deserves identity-class
+treatment, and this project has already ruled that way independently of EPANET's layout —
+`js/lpn-inp.js:1908-1911`, "A TAG IS AN IDENTITY, SO IT IS BASE-OWNED AND NOT OVERRIDABLE... Same
+limb the element's own id sits on." That is the right authority to cite for Tag's prominence, not
+EPANET's dialog order — this project defers to EPANET's terminology, not its layout, per CLAUDE.md
+itself, and I think that line applies exactly here.
+
+— Sue
+
+---
+
+## 2026-09-15 — Sue: the five-group property collapse — "Flow and pressure" mixes what the code itself forbids mixing; "Dimensions" quietly does the same thing
+
+Tom asked this seat by name, following the coordinate-slot ruling above. Full brief:
+`/tmp/.../collapse-brief.md` (his draft, verbatim, plus three observations of mine to test).
+
+- **OBSERVED, `js/looped-network.js:11879-11893`** (the Find-panel's own property-band comment,
+  written for a different UI surface but stating the rule this question is really about): *"THE
+  RULE, IN FOUR BANDS, ORDERED BY WHAT A NUMBER IS RATHER THAN WHERE IT CAME FROM... a number the
+  user supplied and a number we computed are different kinds of thing and must never sit in one
+  field."* That sentence is CLAUDE.md's own unit-paradigm rule (`## Unit Sets`, "A calculator
+  stores what the user typed... conversion happens at the solver... and nowhere else") applied to
+  LAYOUT rather than to arithmetic, and it is already enforced in code: `BAND_NODE` (typed:
+  demand, fire flow, initial quality) and `RESULT_NODE` (computed: demand-actual, head, pressure,
+  quality) are two separate arrays, offered in two separate passes (`js/looped-network.js:11962-
+  11964`). **Tom's "Flow and pressure" group puts `Demand`/`Emitter`/`Roughness`/`K` (typed) and
+  `Head`/`Pressure` (computed) in one box.** That is not a style choice I am weighing against
+  another style choice — it is the exact conflation this project already named and already split
+  in the sibling surface, now proposed for the popup.
+- **My answer to Q1/Q2, direct: yes, this is a real problem, and it is structural, not cosmetic.**
+  An engineer reading a model to review a submittal asks two different questions of these two
+  populations — "what did the designer state" and "what did the network do about it" — and a
+  reviewer's whole method is comparing the first against the second. A box that already contains
+  both answers removes the ability to ask "does the stated demand match the resulting head" as a
+  comparison, because both numbers read as one undifferentiated fact. **My honest read of "how an
+  engineer holds this in their head": not one idea.** I check a pipe's SIZE against a catalogue and
+  a code minimum; I check its RESULT against a criterion (velocity, pressure). Those are different
+  verbs — specify vs. verify — done at different points in a review, usually with the drawing
+  closed for the first and the model run for the second. **OBSERVED,** the popup's own comment
+  names the same split for the demand pair specifically (`js/looped-network.js:11886-11893`, "the
+  answer to shouldn't all the Demand options be together") and Tom ruled it the split way when he
+  asked the identical question about Demand alone on 2026-09-04 — this is that ruling, generalized,
+  now being asked to reverse itself for the group as a whole.
+- **"Dimensions" has a quieter version of the same defect, and it is why I would not wave the group
+  through even though nothing in it LOOKS like a result.** Elevation, Length, Diameter are all
+  typed — genuinely one population, band 2 in the code's own words. But **Horiz (X/Y) is not a
+  DESIGN variable in the sense the other three are; it is IDENTITY**, per my own answer to Task 674
+  this morning (journal, above, same date): "a coordinate is part of the asset's spatial identity,
+  paired with the ID the way a parcel number is paired with a legal description," and the workflow
+  that touches it is a QA check against a survey or a developer's submittal, not a sizing decision.
+  Length and Diameter are read to size a pipe against a criterion; X/Y and Elevation are read to
+  confirm the asset is where the plan says it is. **"Dimensions" as a single word papers over that
+  difference** — it reads as a drafting-sheet category (everything with a number and a unit on a
+  plan view) rather than an engineering one, and a drafting category is exactly the kind of grouping
+  this project has repeatedly found does not survive contact with a real review (the same lesson as
+  the BAND_NODE/RESULT_NODE split, one door over).
+- **Q3 — Shut/Included: OBSERVED, they already sit apart from both candidate homes today, and
+  neither is obviously right.** `closedField()` (`js/looped-network.js:35989`, "Shut") sits between
+  the typed design fields and Tag; `activeField()` (`:36660`, "Part of this network" — Tom's
+  "Included") sits after Tag and custom properties, on both nodes and links. Today's actual
+  position is neither "beside ID" nor "with flow." **My own vote: beside ID, not with flow, and not
+  their own group.** Whether an element participates AT ALL is the most upstream fact about it —
+  more fundamental than what it is sized or what it carries — and answering it wrong (a link
+  quietly `active: false` while every other field looks normal) is the review failure closest in
+  shape to the transposed-coordinate risk I argued for slot 2/3: invisible to a skim, visible only
+  when someone asks "why doesn't this pipe show up in the solve." Putting it in "Flow and pressure"
+  compounds Tom's own observation 1 rather than answering it — it adds a THIRD population (state) to
+  a box that already mixes two.
+- **Q4 — does a collapsed group threaten a review, and does my slot-2/3 argument survive
+  collapsing: it does not survive, and this is the finding I'd stand behind most.** My argument for
+  coordinates in slot 2 was explicitly about visibility on the SKIM — a reviewer scanning a popup or
+  a table row sees ID, X, Y before they see anything else, so a transposed pair or a wrong datum is
+  in the first three things read rather than the last. **A default-collapsed "Dimensions" group
+  puts X/Y back behind a click**, which is precisely the state slot 2/3 was chosen to end. This is
+  not a hypothetical tension — it is the same axis (does the reviewer have to ask for it, or does it
+  arrive) that decided the coordinate-slot question a few hours ago, now reopened by a different
+  door. **If Dimensions collapses, X/Y should not be inside it** — either it stays outside every
+  collapsible group (paired with ID, always open, exactly where today's ruling already put it), or
+  "Dimensions" is split into a small always-open "Location" (X, Y, Elevation) and a collapsible
+  "Size" (Length, Diameter) — the same identity/design line Q1-Q2 already draws, applied to this
+  group's own name.
+- **Q5 — what a submitted report or handoff needs: grouping helps a walk IF it matches the order a
+  reviewer actually works in, and today's draft does not, quite.** Every master-plan/submittal
+  review I have reasoned about from this seat (journal, 2026-08-24 onward) runs roughly: confirm
+  the asset is what and where it claims to be (ID + location) → check it is sized to a standard
+  (design inputs) → check the model's answer against a criterion (results) → check compliance
+  (quality) — which is the code's own four-band order, restated. **Tom's draft gets three of five
+  groups right (ID, Quality, Custom) and blurs the middle two** by putting location inside "Size"
+  and results inside "Inputs." My recommended shape, same five-group budget, same spirit as his
+  draft: **ID (id, description, tag, state — Shut/Included belongs here) → Location (X, Y,
+  elevation, always open) → Design (length, diameter, roughness, K, demand, emitter, fire flow) →
+  Results (head, pressure — read-only, own visual treatment so nobody mistakes one for the other) →
+  Quality → Custom (trailing).** That is six groups against his five, and I say so honestly rather
+  than force a fit — Location is small enough (2-3 rows) that folding it back into ID rather than
+  giving it its own header is a reasonable compression if five is a hard budget, and I would not
+  fight for the sixth group if he wants five.
+- **Custom, twice — my own opinion, held loosely.** Trailing only, not also under ID. A custom
+  property is open-ended by design (Task 636, no registry, no validation) and ID is the one group
+  on this list that IS validated (an id must be unique, a tag has rules). Mixing an unbounded list
+  into the one bounded group is a smaller version of the Dimensions problem — a box whose contents
+  are no longer predictable by its name. **Low-confidence, small want, first instinct only.**
+
+**Where I expect disagreement:** Ida on whether six groups (my count) or five (his) is the right
+visual budget, and on whether "Location" earns a header of its own at three rows — that is her
+call, not mine, and I would defer to her on the pixel question even though I hold the underlying
+identity/design split firmly. Declan may push back on Location-as-its-own-group if it adds a
+collapse/expand click to a table row he is trying to fill fast — my Q4 answer already says X/Y
+should stay OUTSIDE any collapsible group for that same reason, so I do not think we actually
+disagree, but he should say so himself. Mary has no stake here.
+
+— Sue
+
+---
+
+## 2026-09-16 — Sue: Tom's final Dry/Water cut, tested against the four hard cases; options for the 2-row problem; review order re-checked
+
+Tom overruled my transposed-coordinate reasoning with a fact I did not have (it is obvious on the
+map, not invisible), rebuilt the grouping around Dry/Water, and asked this seat for options, not
+objections. Absorbed the correction; not re-arguing coordinate slot. Brief:
+`/tmp/.../grouping-brief.md`.
+
+- **The Dry/Water cut is the right engineering cut, and it survives all four hard cases, on one
+  underlying rule: Dry answers "what is this object," Water answers "what is happening to/in/at
+  the water there."** That is NOT the same axis as typed-vs-computed (Results already carries that
+  axis alone, see below) — it is asset-vs-medium, and I hold that distinction the way I hold a
+  pipe's catalogue sheet apart from its flow test report. SPECULATION, my own framing, tested
+  against the four named cases rather than asserted:
+  - **Emitter — Dry, and correctly so, on the same logic as K and Roughness already there.** An
+    emitter coefficient describes the DEVICE's built-in capacity to pass flow (Q = C·P^0.5, a
+    property of the orifice's geometry), not a fact about the water passing through it at any
+    moment. That it is "for" flow does not move it any more than K or Roughness moves — all three
+    are already accepted in Dry with the identical property (their only USE is a water calc, their
+    definition is not). This is the strongest evidence the cut is coherent rather than convenient:
+    it is not "does this affect flow" (everything in Dry affects flow), it is "does this describe
+    the object or the water."
+  - **Fire flow — Water, and I would not move it.** It is a quantity of water, same population as
+    Demand, not a different kind of thing because it is a design REQUIREMENT rather than an
+    operating condition. A design engineer reads Demand and Fire flow with the identical verb
+    ("what water quantity did I state here") whether the number came from a fixture count or a code
+    minimum. Filing it by its SOURCE (a criterion vs. a load) rather than its KIND (a water
+    quantity) would be the drafting-category mistake I flagged against "Dimensions" — same trap, a
+    different door.
+  - **Head on a reservoir — Water, and it EXPOSES something true about a reservoir rather than
+    breaking the rule.** A reservoir is close to nothing but a boundary condition on the water; it
+    barely has an "asset" in the Dry sense (the table below shows 3 Dry rows against a pipe's 6).
+    That its defining fact and its water fact are the same number is a property of what a reservoir
+    IS, not a flaw in a cut that assumes the two are usually different. I would not manufacture a
+    Dry row for a reservoir just to balance the table.
+  - **Roughness — Dry, textbook case, no tension.** A material/finish property of the pipe wall,
+    independent of what is flowing at the moment read. Same shape as Emitter above.
+  - **The WALL/BULK split he made on his own is the same rule stated for reaction coefficients
+    specifically, and it is right: WALL is a property of the PIPE surface (Dry), BULK is a property
+    of the WATER's own chemistry (Water) — this is also physically how EPANET's own two reaction
+    terms are defined (a wall-surface-area-dependent term vs. a concentration-dependent term), so
+    the cut matches the underlying physics, not just our taxonomy. I did not need to go looking for
+    this one; it is the same distinction I would draw unprompted.
+
+- **The 2-row problem — my recommendation: exempt "Results and quick graph" from the three-row
+  minimum by name, rather than merging or padding it.** The three-row rule exists to stop a header
+  from being pure overhead over a thin PROPERTY list — but Results is not a property list, it is a
+  heading over an ACTION (the graph button, Task 637) that exists identically on every element type
+  regardless of how many result rows that type happens to produce. A pipe's seven result rows and a
+  reservoir's two are the same control with a different amount of data under it; the group's reason
+  to exist is the button, not the row count. **What I would NOT do:** fold a two-row Results into
+  Water on a reservoir/tank to hit three, because that re-introduces the exact BAND_NODE/RESULT_NODE
+  conflation Tom already avoided by separating Results in the first place (see the axis note below) —
+  fixing a cosmetic rule by breaking the structural one it was never meant to override. **Second
+  option, weaker, offered because he asked for options plural:** if the three-row rule must hold
+  literally everywhere, add nothing invented — instead show the ONE most-checked derived fact
+  (pressure for a junction-like read, or the tank's current volume/level) inline in Description-and-
+  state as a live readout, the way a dashboard states one number beside a name, and leave "Results
+  and quick graph" for the full table + button. I rank my first answer above this one; the second
+  adds a new UI idea (a live readout) this brief did not ask for and Ida should weigh in before it
+  is treated as more than an option.
+
+- **Does the grouping serve a review — yes, and better than the draft I proposed on 2026-09-15,
+  because the axis I was defending is now handled a different way than I proposed.** My own
+  2026-09-15 objection was that mixing typed and computed values in one box removes a reviewer's
+  ability to compare "what was specified" against "what happened." **Tom's actual shape already
+  answers that: Results stands alone, separate from BOTH Dry and Water, so the specify/verify axis
+  I cared about is preserved — it is just drawn as Dry+Water (inputs) vs. Results (outputs) instead
+  of my proposed Location+Design (inputs) vs. Results, and that is a cleaner two-way split than my
+  own three/four-way one.** I withdraw my 2026-09-15 recommendation to also split Location out of
+  Design as its own group — that recommendation was built on the transposed-coordinate premise Tom
+  has now corrected, and once X/Y no longer needs skim-visibility protection in the popup, folding
+  Location into Dry costs nothing and matches his stated economy rule.
+  Where my review walk and his order genuinely differ, one point: my own walk (2026-08-24 onward,
+  and restated 2026-09-15) checks the model's ANSWER against a criterion fairly early, right after
+  confirming what was specified — not last, after Custom. Results sitting last in a five-group POPUP
+  is less costly than it would be in a five-TAB interface, because nothing here is hidden behind a
+  page change, only a scroll or a collapsed header — so **position matters less than DEFAULT STATE.
+  My actual ask, if this brief wants one concrete change: Results should not default-collapsed.** I
+  check it on every element, every review; Dry and Water I sometimes skip once I've confirmed an
+  asset is unremarkable. A group I open every time belongs open every time, wherever it sits in the
+  list.
+
+- **Naming — workable, with one collision worth a cheap check before shipping, not a blocker.**
+  "Water properties" reads immediately right to me; it is what I would call the section if asked
+  cold. **"Dry properties" I would understand instantly in context (it is the ANSWER to "not
+  water"), but SPECULATION, mine, worth testing rather than asserting: "dry" already carries two
+  settled meanings in this trade that are not this one** — "dry utilities" (electric/gas/telecom, as
+  opposed to "wet utilities" water/sewer, a real and common site-plan-review term) and a "dry" pipe
+  or line meaning one with no water in it at all (a dead stub, or NFPA 13's own "dry pipe sprinkler
+  system"). Neither collision breaks understanding once you read the row contents — nobody will
+  think Diameter belongs to electric service — but a header is read before its rows, in the half-
+  second a skim takes, and "dry" is the one word here that means something ELSE first in the trade
+  rather than nothing at all. **If Tom wants a safer word with the identical meaning, "Asset
+  properties" against "Water properties" is my offered alternative** — "asset" is already standard
+  utility vocabulary (asset management, asset inventory, the exact word this repo's own submittal-
+  review framing uses) and collides with nothing. I would not fight for this; "Dry" is his own word,
+  chosen audaciously and on purpose, and the collision I found is real but modest — worth a five-
+  minute gut check with him, not a redesign.
+
+| Group | Junction | Pipe | Reservoir | Tank |
+|---|---|---|---|---|
+| Description and state | 5 | 5 | 5 | 5 |
+| Dry | 4 | 6 | 3 | 8 |
+| Water | 5 | 0 (absent) | 4 | 3 |
+| Results and quick graph | ok | 7 | 2 (exempt from 3-row rule) | 2 (exempt) |
 
 — Sue

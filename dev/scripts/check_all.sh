@@ -134,6 +134,11 @@ run_check "log bucket selftest"          blocking php dev/scripts/log_bucket_sel
 # in field count and awk reads positionally, so a reader testing the wrong field prints a number
 # that looks fine.
 run_check "log format selftest"          blocking php dev/scripts/log_format_selftest.php
+# 2026-09-17. The usage report PAGE, which is the same data drawn over time behind HTTP Basic. Same
+# fixture method and the same reason -- a report that reads the wrong field prints a number that
+# looks fine -- plus the leg that matters most: the page must carry no total of the two consent
+# buckets, because one counts people and the other counts page loads.
+run_check "usage report selftest"        blocking php dev/scripts/usage_report_selftest.php
 run_check "new-tab links"                blocking php dev/scripts/blank_target_check.php
 run_check "new-tab link selftest"        blocking php dev/scripts/blank_target_selftest.php
 # Task 322 row 43, the method a seventh time. 147 sites name an icon and nothing checked that the
@@ -162,6 +167,18 @@ run_check "button types declared"        blocking php dev/scripts/button_type_ch
 run_check "button type selftest"         blocking php dev/scripts/button_type_selftest.php
 run_check "bootstrap globals declared"   blocking php dev/scripts/bootstrap_global_check.php
 run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_global_selftest.php
+# Task 322 rows 67-69, the same method a third time: three constructs counted, then asked what
+# writing them 1,363, 125 and 49 times assumes. A language string echoed RAW into a <script> block
+# or into an HTML attribute is one translator's apostrophe or quotation mark away from killing the
+# page's whole inline script or ending the attribute it sits in; a number input with no step uses
+# the HTML default of 1, so the arrow keys snap a quantity somebody typed to a whole number. All
+# three ship silently and none of them is visible from inside this repository.
+run_check "script interpolations"        blocking php dev/scripts/script_interpolation_check.php
+run_check "script interp selftest"       blocking php dev/scripts/script_interpolation_selftest.php
+run_check "attribute escaping"           blocking php dev/scripts/attr_escape_check.php
+run_check "attribute escape selftest"    blocking php dev/scripts/attr_escape_selftest.php
+run_check "number input step"            blocking php dev/scripts/number_step_check.php
+run_check "number step selftest"         blocking php dev/scripts/number_step_selftest.php
 # Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
 # backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
@@ -169,6 +186,8 @@ run_check "bootstrap global selftest"    blocking php dev/scripts/bootstrap_glob
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 run_check "canonical origin whitelist"   blocking php dev/scripts/canonical_origin_check.php
 run_check "canonical path override"      blocking php dev/scripts/canonical_path_check.php
+run_check "sitemap canonical agree"      blocking php dev/scripts/sitemap_canonical_check.php
+run_check "sitemap canonical selftest"   blocking php dev/scripts/sitemap_canonical_selftest.php
 run_check "canonical path selftest"      blocking php dev/scripts/canonical_path_selftest.php
 # The suite nav rides onto every page including the one served at the /app/ rewrite, where a
 # RELATIVE href resolves against /app/ and 404s. The markup is identical on both hosts, so nothing

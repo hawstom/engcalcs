@@ -869,3 +869,547 @@ times). Fine as a development branch, per Tom's own framing of the ask; not a ne
 seat's own case.
 
 — Declan
+
+## Eighth invocation, 2026-09-15 — Tom asked me by name, alongside Sue and Mary: Task 674 column/row placement (X1) and the EPANET Description/Tag-before-Elevation order (X2)
+
+### What 674 actually built, read on branch `674-coordinate-entry`, not assumed from the prompt
+
+**OBSERVED** (`js/looped-network.js` on `674-coordinate-entry`, not yet merged) — the two surfaces do
+NOT currently sit in the same place, and the brief's framing ("currently placed at the END of both")
+undersells the table's real position. `buildPaneTables()`'s Junctions/Reservoirs/Tanks specs read
+`paneColId(), paneColActive(), paneColElev(), paneColCoord(1), paneColCoord(2), ...` — coordinates sit
+in slots 4-5, **immediately after Elevation, ahead of every other typed field** (Demand, Fire flow,
+Level, etc.), not at the end. Only the **popup** (`nodeCoordFields(fields, n)`, called from the node
+branch of the property-popup builder) is genuinely last — after Tag, custom properties, Active and the
+push-here button, just before the import-notes field. I read this directly rather than trusting the
+brief's summary; it changes the table math below.
+
+### The table's actual DOM tab order, read cell by cell, not assumed
+
+**OBSERVED** `paneTableRow()` (`js/looped-network.js` on the branch): the ID cell is a real `<button>`
+with no `tabIndex` override, so it IS in the browser's default tab order — the older journal claim
+("Elevation → Demand → Fire flow → (next row) Elevation" with nothing else in between) predates
+today's code and is not currently accurate; both ID and the Active checkbox are real tab stops. A
+"plain" cell (a result column, or an identity/computed-total cell) is explicitly given `tabIndex = -1`
+so Tab skips it while End/Ctrl+End can still land on it (`:16495-16498`, commented for exactly that
+reason). **Coordinate cells are real `<input>` elements with no such exclusion** — they are typeable,
+by design, and therefore ARE stopped at by Tab regardless of where they sit in the row.
+
+### The arithmetic Tom's question actually turns on: MIDDLE placement forces a cost that TRAILING placement lets a clerk opt out of
+
+**OBSERVED, derived from the two facts above.** The clerk who never types a coordinate — the ordinary
+case today, since `addNode()` still has only a pointer caller (first invocation) — has a real, wanted
+tab sequence per junction row: Elevation → Demand → Fire flow → (skip plain results) → Initial
+quality. As built, X and Y sit BETWEEN Elevation and Demand, so every one of those 400 rows forces two
+unwanted stops (a real `<input>`, not a skippable plain cell) in the MIDDLE of a run the clerk actually
+wants — 800 extra Tab presses across 400 junctions, and worse than a wasted keystroke: landing focus in
+a live coordinate box mid-sequence is a place a stray keystroke actually moves the node.
+
+**If the same two columns sat at the END of the row instead** (after every other typed and result
+column), the identical clerk's wanted sequence — Elevation → Demand → Fire flow → Quality — is now
+CONTIGUOUS and uninterrupted, and reaching the next row does not require finishing the row: a
+spreadsheet-literate clerk who is done with a row simply clicks the next row's Elevation cell rather
+than tabbing through trailing columns they don't want, the way nobody tabs past column Z to reach row
+2 of a real spreadsheet. **A trailing unwanted column costs nothing because it can be skipped by
+stopping; a middle unwanted column costs something on every row because it cannot be skipped without
+leaving the keyboard.** This is the concrete reason the CURRENT build (coordinates right after
+Elevation) is arithmetically the worst of the three shapes discussed — worse than either of Tom's
+own two named options — for the clerk who is not touching position.
+
+### The other side, cited rather than assumed: PNEZD is a real, decades-old survey convention, and it does not agree with what's built either
+
+**CITED** — PNEZD ("Point, Northing, Easting, Z/elevation, Description") is Autodesk Civil 3D's and
+the surveying trade's standard flat-file point format: "PNEZD represents the order of the data columns
+in the text file: Point number, Northing, Easting, Z coordinate (elevation), and Description"
+(Cadline Community, "Civil 3D Survey - What is a PENZD point file",
+https://www.cadlinecommunity.co.uk/hc/en-us/articles/201758902-Civil-3D-Survey-What-is-a-PENZD-point-file;
+corroborated by Eyasco's own "Survey (PNEZD) File Format" page,
+https://www.eyascopublic.com/mehelp/survey__pnezd__file_format.htm). **This is the exact shape "a
+surveyed junction has a northing to two decimals" (Task 674's own text) produces as raw material** —
+a clerk transcribing a survey deliverable reads point, then northing, then easting, then elevation, in
+that order. Note it puts coordinates BEFORE elevation, same as EPANET's GUI and Tom's option 1 — but
+the table as built puts Elevation BEFORE coordinates, matching neither EPANET's editor nor PNEZD.
+
+### Q1 — my answer, and why table and popup should NOT be forced to agree
+
+**Split the decision, because the two surfaces cost differently for my seat's metric.** In the
+**table**, the loss from a middling position is measured above at 800 keystrokes for 400 junctions and
+is avoidable by choosing an END; in the **popup**, no comparable cost exists — a popup opened once per
+element does not have a continuous same-column-many-rows keyboard run to interrupt, and the whole
+premise of Tom's own "order of fundamentalism" argument (ID, X, Y is how EPANET orders things, and
+matches PNEZD) is much better suited to a form filled top-to-bottom once per object than to a
+spreadsheet-shaped table where MOST rows, MOST of the time, never touch two of the columns.
+
+**For the table specifically: put coordinates LAST among the typed columns** (after every editable
+field, ahead of nothing but the read-only result columns, which are already tabIndex=-1 and therefore
+free regardless of where they sit) — not "at the end" vaguely, but specifically after Fire flow/Level/
+Demand and before Head/Pressure/Quality results. This is the one placement that lets the majority
+clerk (positions already set by the only door that creates a node — a pointer click) tab straight down
+the fields they actually type with zero interruption, while a clerk who DOES want to paste or type
+surveyed coordinates in bulk can still reach the columns directly by clicking into them — paste-onto-
+existing-rows (`panePasteAt()`, already shipped) does not care about column position at all, since the
+clerk clicks the drop cell first regardless of where it sits.
+
+**For the popup: I have no objection to option 1**, and it is where the PNEZD/EPANET "order of
+fundamentalism" argument actually fits — a form read top-to-bottom once per node, not a table typed
+down many times. If it must be one decision rather than two, I would rather pay the popup's smaller,
+one-time-per-element onboarding cost than the table's row-multiplied one — but I would rather Tom keep
+them separate, on the record that this is exactly the kind of case my seat exists to flag: a decision
+that reads as one question is actually two, with different right answers, because the two surfaces are
+used at different volumes.
+
+### Q2 — EPANET's Description/Tag-before-Elevation: my seat's read
+
+**Not defensible as a model to imitate, and there is real evidence it is a GUI-only artifact rather
+than a considered ordering.** CITED: the EPANET `.inp` text format's own `[JUNCTIONS]` section is
+ID, Elevation, Demand, Pattern — Description and Tag are not columns of that section at all (Description
+travels as a trailing `;`-comment; Tag lives in a wholly separate `[TAGS]` section) — confirmed against
+the EPANET 2.2 User Manual's own file-format appendix
+(https://19january2021snapshot.epa.gov/sites/static/files/2020-05/documents/epanet_userss_manual_2.2.0.pdf).
+So the ENGINE's own canonical record of a junction puts Elevation second, right after ID, with no
+Description or Tag anywhere near it — it is only the desktop GUI's property-EDITOR dialog that
+interleaves two rarely-touched free-text fields ahead of the one hydraulic number nearly every junction
+states. That the file format and the editor disagree is evidence the editor's order was not derived
+from the file's own logical structure; SPECULATION beyond that (I cannot cite EPANET's dialog-layout
+history or say it was accidental rather than deliberate — I found no source for GUI design intent,
+only the disagreement itself).
+
+**From my seat specifically:** yes, it is actively bad if copied literally, and it is bad for exactly
+the reason my seat exists to name. Description and Tag are optional, free-text, and — per my own
+gesture counts across every invocation of this journal — among the fields a volume clerk touches
+least (nothing I have measured this session or any prior one shows a clerk typing a Tag for 400
+junctions; ID, Elevation, Demand, Fire flow and now position are the ones that recur). Any popup or
+table order that makes a clerk pass over two fields they are not filling in before reaching the one
+they fill in on nearly every row pays a small tax on every element, for no offsetting benefit —
+unlike position, which at least has the PNEZD citation behind an early placement, Description/Tag
+have no comparable case for sitting ahead of Elevation. **Do not adopt this specific piece of EPANET's
+order.** Elevation belongs early (right after ID, ahead of anything optional or rarely filled),
+whether or not coordinates also go there.
+
+— Declan
+
+## Ninth invocation, 2026-09-15 (same day, later) — Tom's collapsing-groups brainstorm
+
+Asked by name again on the question that follows the slot decision I lost (eighth invocation): does
+collapsible grouping in the property popup help or hurt at volume, and does it pay back the 800
+keystrokes I measured against the TABLE's coordinate slots.
+
+### The load-bearing find: the page already ruled on default-collapsed once, twice, and both times said no
+
+**OBSERVED** `js/looped-network.js:4632`, on the old Settings-box accordion: *"the Settings box does
+not collapse anything (Tom: 'No need ever to collapse')"* — and the fuller quote at `:28739`, Tom,
+2026-08-18: *"No need ever to collapse; just scroll/jump to your section."* The accordion was
+removed and replaced by a two-pane box whose left pane is the navigation, specifically because
+collapse-by-default was the wrong answer for exactly this shape of problem (many named sections, one
+box).
+
+**OBSERVED** Two places on this page already use the `<details>`/`<summary>` disclosure element —
+the exact HTML idiom Tom's brainstorm would need — and both default it **open**, on record, for a
+reason that is my seat's reason too even though neither comment was written by me:
+
+- `customPropBox()`, `js/looped-network.js:29034-29037`: *"`<details>` rather than a button and a
+  hidden div: it is the WAI-ARIA disclosure pattern for free, it is the idiom `multiSection()`
+  already uses on this page, and **every row inside it is built eagerly, so a collapsed property is
+  still searchable... and still reachable by Find**."* And on adding a new one, `:29214`: *"OPEN,
+  because a collapsed blank line says nothing at all about what the user has just been given."*
+- `multiSection()`, `js/looped-network.js:36246-36248`, on a mixed-element-type popup: *"**OPEN, ALL
+  OF THEM.** Tom's own words are that a mixed selection shows both and NEITHER IS HIDDEN, so
+  collapsing is something the reader does, never the default."*
+
+**This settles Q4 for me, from evidence the page already carries rather than from my own
+inference.** "Muffleable" here has an existing, working referent: `<details>` open by default, DOM
+content built eagerly so nothing is functionally hidden (searchable, reachable, present for a
+screen reader), and the reader — never the page — decides to collapse it. That is muffling exactly
+as my seat's own definition wants it: the capability to shrink a group is there for whoever wants
+it, and costs the volume clerk who never touches it literally nothing, because open is the state
+they never had to ask for.
+
+### Q1 — arithmetic: collapsed-by-default would cost roughly what the table's coordinate slots cost; open-by-default costs nothing
+
+A group collapsed by default that a clerk needs open costs one click to expand, **per element, per
+session, unless the open/closed state is remembered** — that is the entire question, and it collapses
+(no pun intended) to the same shape as my eighth-invocation table finding: a middle interruption
+that cannot be skipped, multiplied by 400. If a clerk routinely fills Dimensions and Flow and
+pressure but never Quality, and all three ship collapsed by default with no memory, that is up to
+two unwanted expand-clicks **per element, every single time the popup opens** — worse than the table
+case, because a click costs more attention than a Tab press and there is no way to skip it the way a
+trailing table column can be skipped by not tabbing that far (the popup is one small box; the field
+you want may sit below the collapsed one). At 400 elements that is a very real 400-800 extra clicks,
+arithmetically closer to my table finding than a fresh problem.
+
+**Open by default removes the cost entirely for the volume clerk and adds nothing measurable**: a
+`<summary>` heading with a `▸`/rotated-caret visual is one more line of scannable text, not a
+gesture. The only volume-relevant question left is whether GROUPING BOUNDARIES THEMSELVES slow Tab
+— they do not, if `<details open>` renders its body inline in normal flow (which is the element's
+own default rendering; `multiSection()` and `customPropBox()` both already rely on this), because
+Tab still walks the DOM in order and a `<summary>` is itself one extra, harmless stop (arguably a
+small win — it reads as a landmark the way a spreadsheet's frozen header row does, not a delay).
+
+**Verdict on Q1: helps, if and only if it ships open by default and stays that way unless the reader
+acts** — which is not a new position for this page to take, it is the position it already took twice.
+
+### Q2 — does it pay back the table's 800 keystrokes? No. Different surface, different mechanism.
+
+**OBSERVED** Grouping and `<details>` are constructs inside the property **popup**'s field-building
+code (`customPropBox`, `multiSection`, and by extension whatever renders Tom's five named groups).
+The Tables pane's six specs (`buildPaneTables()`) are flat column arrays with no heading hierarchy
+and no disclosure element anywhere in `paneTableRow()`/`renderPaneTable()` — grouping a popup's
+vertical field list into named `<details>` sections has no code path that touches a table's column
+order at all. **The two features do not share a write seam or a render seam; they are unrelated
+mechanisms on separate surfaces**, confirmed by reading rather than assumed from the brief.
+
+Tom accepted the 800-keystroke cost specifically "until columns become customizable" — that is a
+statement about **column order/visibility in a table**, and the thing that pays it back is
+column reordering or a trailing default placement (my own item 7, already filed and partly built on
+`674-coordinate-entry`), not anything a popup's field grouping can reach. **If this brainstorm is
+read as "the answer to the table debt," that is the wrong remedy for the right complaint** — worth
+saying plainly because Tom's own framing ties the two together in one sentence in the brief
+("Tom accepted that cost until columns become customizable. Is collapsible grouping the thing that
+pays it back") and my answer is no, name the different mechanism.
+
+### Q3 — popup and tables stay separate designs; grouping implies nothing about the table
+
+Consistent with my eighth-invocation disagreement (recorded in the wishlist): the table is typed
+down many times per session and pays a cost a form filled out once per element does not. A grouped
+**popup** heading is a vertical-flow convenience for a single object's form. **There is no version of
+"grouped columns" for the table that is not strictly worse for a volume clerk than today's flat row**
+— a spreadsheet-literate clerk tabbing across a row wants every editable cell reachable in one
+uninterrupted run (my own repeated finding), and a column-group boundary that could be
+collapsed would either (a) do nothing if always open, in which case it is decoration with no
+volume cost either way, or (b) hide columns the clerk needs to type into, which is strictly worse
+than today, never better. **My recommendation: do not extend this brainstorm to the table at all**,
+not even as a "grouped header row" — there is no version of it that helps volume entry, and version
+(b) actively regresses it.
+
+### Q4 — see the load-bearing find above. Collapsible, open-by-default, reader-controlled, satisfies "muffleable."
+
+Restated once: not removable (the field is still there, still in the DOM, still reachable by Find,
+per the page's own existing comment about exactly this), not a per-user DEFAULT the suite chooses
+for anyone, but a control the reader can act on that costs nothing to the reader who never acts on
+it. That is the definition, and this page already has two working instances of it to copy rather
+than invent.
+
+### Q5 — state persistence: browser furniture, keyed on the group's name, never inside `serializeProject()`
+
+**OBSERVED** the existing furniture-key convention: `LPN_PANE_KEY = 'lpn_pane'`
+(`js/looped-network.js:14213`), `LPN_RPANE_KEY` (`:14577`), `LPN_SETBOX_KEY` (`:30020`),
+`LPN_FINDBOX_KEY` (`:14008`), `LPN_FFBOX_KEY` (`:39519`), `LPN_ENERGYBOX_KEY` (`:39965`),
+`LPN_CMPBOX_KEY` (`:39927`), `LPN_RPTBOX_KEY` (`:40055`) — one `localStorage` key per remembered
+window-furniture fact, guarded by `lpn_furniture_check.php` because CLAUDE.md's own rule is that a
+setting belongs to the PROJECT or the BROWSER and never both, and a collapse state is screen-shaped
+furniture in exactly the sense that a pane width is: whether Quality is worth seeing every time is a
+fact about the CLERK'S OWN habitual workflow on THEIR OWN SCREEN, not a fact about the network, and a
+colleague opening the same file must not inherit somebody else's collapsed Quality group any more
+than they should inherit a 32-inch pane width.
+
+**My recommendation, concretely:** one `localStorage` key (e.g. `lpn_popgroups`) holding an object
+keyed on the GROUP NAME (`'ID'`, `'Dimensions'`, `'Flow and pressure'`, `'Quality'`, `'Custom'`) to a
+boolean, shared across every element type that offers that group name, remembered across elements
+AND across sessions (a clerk who collapses Quality once should never have to do it again, in this
+project or the next one they open) — the `<details>` `toggle` event already fires when the reader
+acts, so writing to storage is a one-line hook onto an event this element gives for free. **It must
+NOT be per-element** (would defeat the whole saving — see Q1 arithmetic) **and must NOT be
+per-project** (would violate the furniture rule the same way a stored unit-set almost did — CLAUDE.md
+is explicit that this is the one page with no per-browser unit cookie for exactly the reason a
+setting must not silently follow the wrong thing). Default state on first visit: open, per the
+precedent above.
+
+### Where I expect disagreement
+
+**Sue** owns whether "Flow and pressure" mixing typed Demand/Roughness/K with solved Head/Pressure is
+a defect — I flagged it only because a collapsed RESULT group (if this page ever did ship
+collapsed-by-default) would hide a post-solve answer, which is exactly her transposed-X/Y argument
+in a different shape; with open-by-default that concern mostly dissolves, but the INPUT/RESULT mixing
+itself is hers to rule on, not mine. **Ida** owns the visual-hierarchy question the brainstorm is
+really asking (does five named groups read better than one flat list) — my seat has nothing to say
+about whether grouping helps a reader SCAN, only about what it costs a typist who is not scanning,
+and those can point different directions on the SAME feature. I would not be surprised if Ida
+recommends grouping for legibility while I recommend it stay open-by-default for volume — both can be
+true at once and are not actually in tension, which is worth saying since the brief poses the
+question as if one seat must win.
+
+— Declan
+
+## Tenth invocation, 2026-09-16 — Tom's final grouping brief: re-cost with Enter-down, design column hide/reorder
+
+Tom read my eighth/ninth-invocation numbers and asked one question that dissolves most of them:
+*"What if tab moves downward, not rightward?"* He is right to ask it as a question rather than an
+objection to my count, because the count was never wrong about what it measured — it was wrong about
+which WORKFLOW it assumed. This entry corrects that.
+
+### First, verify the premise myself rather than take the brief's word for it
+
+**OBSERVED** `js/looped-network.js:16668-16670`, `paneHandleKey()`: `Enter` maps to
+`at = { r: r + (ext ? -1 : 1), c: c }` — same column, next row (Shift+Enter goes back up). The
+comment beside it: *"Enter commits and drops a row; Shift+Enter goes back up. The spreadsheet's own
+ending, and the reason a column of forty numbers can be typed without touching the mouse."* This is
+real and already shipped, not a proposal — confirmed by reading the function myself, not by trusting
+the brief's paraphrase of it.
+
+### Re-costing the two workflows honestly
+
+**COLUMN-major (fill one property for every row, e.g. 400 elevations off a survey printout):**
+click the first Elevation cell, type, Enter, type, Enter... The clerk never leaves the Elevation
+column. **Slot order is now completely irrelevant to this workflow — the 800-keystroke number I
+derived at the eighth invocation does not apply to it at all**, because that number counted Tab
+presses crossing a middle column, and this workflow uses no Tab and crosses nothing. This is the
+workflow the page's own UX already pushes a clerk toward without saying so: nodes are placed by
+pointer first (first invocation — `addNode()` has only a canvas-click caller), so properties are
+filled in as a SECOND pass over already-existing rows, which is naturally "one property, all rows,"
+not "all properties, one row." I did not previously credit that this second-pass structure is
+column-shaped by default; it is.
+
+**ROW-major (walk one element's full line — the PNEZD shape, one line of a marked-up plan set typed
+left to right before moving to the next point):** here slot order still matters, because this
+workflow genuinely uses Tab across a row, and Tab still walks DOM/array order — a coordinate cell
+sitting mid-row (as the current `674-coordinate-entry` branch has it, right after Elevation) still
+costs two unwanted stops per row for a clerk who is not touching position, exactly as I measured at
+the eighth invocation. **Enter-down does not help this workflow; it is orthogonal to it.**
+
+**The honest retraction:** my item 7 (move X/Y to the trailing end of the typed columns) was solving
+the row-major case only, and I did not previously separate the two cases — I wrote the 800-keystroke
+number as if it applied to "the table," when it only ever applied to one of two real workflows the
+table supports. Column-major pays nothing regardless of where coordinates sit. Row-major pays a real,
+smaller-than-I-first-scoped cost, and only for a clerk who both (a) fills several properties per
+element in one pass and (b) does not use whatever column-hiding exists. **Once hide/reorder ships
+(below), item 7's specific fix — reorder to the end — becomes the WEAKER of two available remedies**:
+a row-major clerk who never touches coordinates can just hide the two columns, which removes them
+from the Tab path entirely rather than merely moving them to a position that is cheap to skip. I
+would still take a sane default order (coordinates late, not mid-row) as the out-of-the-box state,
+since a first-time clerk has not yet found the hide control — but I am no longer arguing item 7 is
+load-bearing on its own. **The retracted number is honest: "nearly nothing," not "nearly nothing
+except when it still is a lot," because the case where it is still a lot is now avoidable by the
+clerk's own hand, not a fixed cost of the page.**
+
+### Column hide and reorder — the design Tom has agreed to in principle
+
+**Where the control lives:** one small button per table (not on the main toolbar — "the most
+expensive space on the page" per this file's own earlier reading of Tom's toolbar comments), sitting
+beside each table's existing sort/filter row. Opens a short popover: one row per column, a checkbox
+(visible/hidden) and up/down reorder (arrows or drag — arrows are cheaper to build and are keyboard-
+operable, which matters for this seat specifically; a drag-only reorder control would be the one
+piece of this whole feature a keyboard-first clerk could not use). **Also give the fast, spreadsheet-
+native shortcut**: right-click (or long-press) a column header for a one-item "Hide this column"
+menu entry, mirroring the gesture Sheets/Excel users already have and costing nothing to build beyond
+what the popover's own hide toggle already does — the header context menu and the popover checkbox
+write the same state.
+
+**One column is not hideable: ID.** It is the row's own identity, the only door `findGoTo()` gives a
+click-to-pan action through, and hiding it would strand a row with no way to identify which element
+it is. Every other column — Active included — is fair game.
+
+**Scope: per table, not global.** The six tables have different column sets and different clerk
+habits per asset type (a clerk might always hide Tag on Pipes and never touch it on Junctions where a
+survey deliverable states one) — a single global hidden-set forces one clerk's Pipe preference onto
+their Junction table for no reason. State keyed on the table id.
+
+**State: browser furniture, one constant, one write site** — the pattern `lpn_furniture_check.php`
+already expects (`LPN_PANE_KEY`, `LPN_SETBOX_KEY`, etc., each one `localStorage.setItem` outside
+`serializeProject()`). Propose `LPN_PANECOLS_KEY = 'lpn_panecols'` holding one object keyed on table
+id: `{ junctions: { order: [...col keys...], hidden: [...col keys...] }, pipes: {...}, ... }`. This
+must be OUTSIDE `serializeProject()`, checked by the same script that already caught `lpn_libbox` and
+`lpn_show_titles` being written but undeclared — a colleague opening the same file on their own
+screen must not inherit somebody else's hidden Diameter column any more than a 32-inch pane width.
+
+**What happens on paste with hidden columns — the question only this seat asks, answered: SKIP, and
+it is nearly free to build because the mechanism already exists.** `panePasteAt()` already tiles a
+pasted block positionally into `cols = paneCols(spec)` and already drops-and-counts anything past
+`cols.length` (`js/looped-network.js:16565-16568`, "IT CANNOT GROW THE TABLE... dropped and
+COUNTED"). If a hidden column is simply removed from the array `paneCols(spec)` returns for every
+interactive purpose — tabbing, arrow-jump, Home/End, AND paste — then a clerk who pastes a 6-column
+spreadsheet block starting at a visible cell fills only the VISIBLE columns from that point forward,
+and the rest silently falls into the same "dropped and COUNTED" bucket that already exists for
+running off the table's right edge. **No new code path — the paste mechanism already treats
+"nothing more to write to" as a normal, reported outcome; hiding a column just makes that boundary
+arrive sooner.** This mirrors the codebase's own existing choice for filtered rows exactly
+(`paneTableRowsInOrder(spec)` already excludes filtered-out rows from the DOM entirely, which is why
+copy of a filtered table is already "the SAFE side of a well-documented Excel trap," per my own
+fourth-invocation Q2) — hidden columns should be absent from the array, not merely CSS-hidden, so the
+same safety falls out by construction rather than needing a second rule.
+
+I considered REFUSE (block the whole paste until the clerk unhides) and reject it: it punishes the
+exact clerk the feature exists to help, forcing them to temporarily undo the customization to use it.
+I considered "paste into the hidden column anyway" (Excel's own actual behaviour for hidden columns,
+which is a documented user trap, unlike its safer behaviour for filtered rows) and reject it for the
+same reason CLAUDE.md's filtered-row precedent already rejects the Excel-default on rows: our table
+can make hidden mean ABSENT rather than merely invisible, and absent is the position that cannot
+silently write into a column that isn't there. **SKIP, not REFUSE, not Excel's own trap.**
+
+### Popup grouping, Q3 and Q4 answered directly
+
+**A five-group popup, nothing collapsed, is better than today's flat 16-20 rows — but only if the
+group heading is NOT a `<summary>`.** I flagged in my ninth invocation that `<details>` open by
+default "costs nothing," and that was true for CLICK cost but I had not yet checked TAB cost.
+**OBSERVED, checked now:** a `<summary>` element is natively focusable — it is the browser's own
+toggle control — so an open `<details>` still inserts a real Tab stop at every group boundary, even
+though nothing about it is collapsed. A clerk tabbing from Elevation (Dry) to Demand (Water) on a
+junction crosses exactly one such boundary per element; at 400 junctions that is 400 extra Tab
+presses landing on a heading with nothing to type into — the identical shape as my coordinate-slot
+finding, smaller in size (one stop, not two) but the same mechanism, and I did not name it until
+asked directly. **With nothing collapsible by default, there is no reason to pay for the toggle
+control's own Tab stop.** Two ways to avoid it, in order of preference: (1) plain, non-interactive
+headings (a styled `<div>`/`<h4>`, no `<details>`) if no reader-controlled collapse is wanted at all;
+(2) if `<details>` is kept for some future collapse affordance, give its `<summary>` `tabindex="-1"`
+— the exact idiom this file already uses for plain/result table cells (`:16495-16498`) to keep a
+control reachable by click and by End/Ctrl+End-style jumps while removing it from the ordinary Tab
+path. **Plain headings are strictly better for my seat if disclosure is never going to be used; a
+tabindex-suppressed `<summary>` is the fallback if Tom wants the toggle kept for later.**
+
+**Q4, the three-row rule breaking on Results-and-quick-graph (2 rows, reservoir and tank): I do not
+care, and I am saying so plainly rather than manufacturing an objection.** A two-row group costs my
+seat nothing extra either way, given the tabindex fix above — a heading with no Tab stop costs the
+same whether it sits over two rows or twelve. The three-row minimum is a visual-economy rule (Ida's
+territory, not mine); I have no gesture-cost stake in it and would not spend Tom's attention asking
+him to reconsider it for my sake.
+
+— Declan
+
+## Eleventh invocation, 2026-09-17 — three questions: customer entry order, per-entry library import, and a survey file format chooser
+
+Tom asked me by name on the first question; the other two were routed to me. Read
+`dev/customer-demands.md` in full and re-read `js/looped-network.js` on both `master` and the
+`feat/customer-demands` worktree (`/home/haws/webdev/worktrees/feat-customer-demands/engcalcs`,
+read-only) before answering. Dates below are all today's check.
+
+### Q1 — "location, link, location, link, location, link"
+
+**OBSERVED**, `feat/customer-demands` worktree, `js/looped-network.js:16062-16066` (checked
+2026-09-17): the Customer table's `link` and `atNode` columns already exist as columns with a `get`
+and no `set` — they are DERIVED and read-only in the table today, matching the design doc's model
+(`dev/customer-demands.md` §2: store `link` + `t`, derive the node). So the question is not whether
+a customer table has a location column and a link column — it already does — the question is
+whether a BULK IMPORT surface (a pasted or typed block creating many customer rows at once, which is
+Task 610's still-open row-creation gap applied to a fourth element kind) should present them as
+alternating pairs.
+
+**I have no strong disagreement, with one condition that decides whether this is good or bad, and
+Tom's own phrase is ambiguous about which one he means.**
+
+- **If it means one ROW per customer with two CELLS — a location cell, then a link cell, then the
+  next row's location cell, then its link cell — that is just an ordinary two-column table, and it
+  is fine.** It is also the CHEAPER of the two shapes to type: `js/looped-network.js:17008` (master,
+  checked 2026-09-17) confirms Enter still moves straight down a column (`r+1, c`, unchanged since my
+  tenth-invocation finding), so a clerk can type every location down column 1, Enter-Enter-Enter, then
+  every link down column 2 — column-major, the shape my tenth-invocation correction already
+  established costs nothing extra for slot position. Two typed columns, however many rows, is not a
+  new rhythm — it is what every table on this page already is.
+- **If it means a single FLAT LIST where consecutive ROWS alternate meaning — row 1 is a location,
+  row 2 is that customer's link, row 3 is the next location, row 4 its link — that is a different and
+  worse thing.** It halves the visible row count against the true customer count (400 customers read
+  as 800 "rows"), breaks the one-cell-one-field convention every other table and the paste mechanism
+  (`panePasteAt()`) already assumes, and defeats Enter-down-column entirely, because column-major
+  typing requires every cell in a column to mean the same thing — alternating meaning by row parity
+  is a row-major-only shape, and it is the row-major shape my tenth-invocation retraction already
+  found to be the more expensive one where it is avoidable.
+- **A file already existing in a flattened, alternating shape is not a reason the TYPING SURFACE has
+  to match it.** This is exactly the "a number that came from a file is the user's; we display and
+  solve from a copy" principle CLAUDE.md already states for numeric values, read across to STRUCTURE:
+  an importer is free to read whatever shape the source file is actually in and lay it into two real
+  columns on screen; the parser's job is to absorb that shape once, not to make a clerk re-encounter
+  it 400 times. I would ask which of the two Tom means before building, and recommend the two-column
+  row shape if there is any doubt — it is strictly better for typing and is what the rest of this
+  page already does everywhere else.
+
+**Is LINK something a person should type at all, or is nearest-pipe a safe guess?** My answer: type
+or match it, never silently substitute a guess, and here is the concrete reason rather than an
+appeal to caution in general. `dev/customer-demands.md` §2 already computes the nearest node from
+"nearest POINT ON THE POLYLINE, arc length to each end" — that is nearest-pipe geometry, and it is
+exactly the kind of thing that goes wrong in the case that matters most for a plan-set clerk: two
+parallel mains a few feet apart (common on a distribution loop, or an old main paralleled by a
+replacement), or a service crossing near an intersection of three or four pipes. A purely geometric
+nearest-pipe answer picks confidently and wrong in exactly those cases, and the error is silent —
+the meter still draws, the table still fills, the demand still solves, and it is attached to the
+wrong main. This is the same shape of danger CLAUDE.md already names for elevation-fill ("never
+overwrite a value the user has without their having asked for exactly that") and for units ("never
+guess a unit needed for a solve") — a value that changes the ANSWER must never be quietly
+substituted. **So: LINK is the one field in a customer bulk-import row that must never be guessed.**
+A plan set already states which main serves which service (that is exactly the information a
+nearest-pipe geometric guess cannot recover reliably at an intersection), so asking for it is asking
+for information the clerk already has in hand, not busywork. I would still compute and SHOW the
+geometric nearest-pipe as a suggestion next to an empty or ambiguous cell, the way the elevation-fill
+feature states its own accuracy in the interface rather than the comments — visible, never silently
+accepted.
+
+**What would the file actually look like, honestly:** I would expect a real plan-set transcription to
+be closer to `account, x, y, link, demand` as five real columns — one row per customer, in the shape
+every other table on this page already uses — rather than a flattened alternating sequence. If the
+underlying file Tom has in mind is genuinely pair-flattened (which is a shape I have seen in some
+legacy fixed-format exports, though I did not go looking for one specifically for this session — see
+"where I did not look" below), the importer reading it is a one-time parsing decision and the on-
+screen columns should still be two real columns, per the file-numbers-are-the-user's-but-display-is-
+ours principle above.
+
+### Q2 — per-entry checkboxes for a library import: per-library is enough; 200 checkboxes is the wrong instrument
+
+**SPECULATION**, reasoned from the same arithmetic as everything else in this seat, since I have not
+read the importing branch's own code this session (did not go looking for it; the branch name was
+not given to me). Someone importing a colleague's pipe-type table wants ALL of it or NEARLY all of
+it, in the overwhelmingly common case — the reason to import a library at all is "I don't want to
+retype these," and a library somebody maintained is a library somebody uses most of. A 200-row
+checkbox list defaults every box to a state (checked or unchecked) and either way it is wrong for
+most importers: default-checked costs one click per row you DON'T want (rare, so cheap in total but
+still a hunt-and-uncheck task across 200 rows to find the few); default-unchecked costs one click per
+row you DO want (the common case, so it is 195 clicks to get what "import the library" already meant
+for free). **Per-library selection, plus ordinary post-hoc pruning through the existing Tables pane
+selection-and-delete mechanism** (the same one Task 610/paste already gives every other element kind)
+is cheaper in the common case and no worse in the rare one: import everything, then multi-select and
+delete the handful you did not want, which is a task this page's own table selection already does
+well (drag/Shift-click a range, Delete). I would not build a 200-checkbox picker at all. If Tom wants
+a half-measure, a text filter box ABOVE a checkbox list (type "PVC" to narrow 200 rows to 12, then
+check/uncheck those) is worth it only if the library is large enough that scrolling to find items is
+itself the cost — and even then, import-then-prune is probably still cheaper, because it reuses a
+mechanism that already exists rather than asking for a new one.
+
+### Q3 — a file-format chooser for surveyed points: yes, and it is the SAFE answer, not merely a convenient one
+
+**CITED**: PNEZD = Point, Northing, Easting, Elevation(Z), Description; PENZD swaps the two
+coordinate fields to Point, Easting, Northing, Elevation, Description — both real, named,
+documented Civil 3D / survey conventions (Cadline Community, "Civil 3D Survey - What is a PENZD
+point file," https://www.cadlinecommunity.co.uk/hc/en-us/articles/201758902-Civil-3D-Survey-What-is-a-PENZD-point-file;
+Autodesk Community forum thread confirming both are shipped and the difference is real enough to
+confuse Civil 3D's own users, "C3D 2013: Creating a Surface-Using PNEZD, not PENZD. Why?",
+https://forums.autodesk.com/t5/civil-3d-forum/c3d-2013-creating-a-surface-using-pnezd-not-penzd-why/td-p/4480667).
+**CITED**, wider list checked today: CivilGEO's own supported-formats documentation
+(https://knowledge.civilgeo.com/supported-external-data-formats/) names at minimum ENZ, ENZD, NEZ,
+NEZD, PENZ, PENZD, PNEZ, PNEZD and plain XYZ as distinct, named orderings it accepts — i.e., the
+axis that varies is not just "where does Description go," it is (a) whether a point ID/name column
+exists at all, (b) whether a description trails, and (c) **which of Easting/Northing comes first**,
+independently of the other two.
+
+**The one that actually bites is (c), and it is silent.** An ID or a missing description is
+obviously wrong the moment you look at the imported points — a point named "" or "12.4" reads as
+broken immediately. A NORTHING/EASTING swap does not: both are ordinary-looking numbers in a
+plausible range for the region, the imported points still draw, they still look like a network, and
+on a roughly square or oblong site the swap can put the whole survey in a position that looks
+locally sane and is not where the plan set says it is — this is the exact same class of danger
+CLAUDE.md's own coordinate-order rule already names for lon/lat vs. lat/lon ("system order is
+lon,lat; public order is lat,lon... a bare `coords` or `point` is the defect"). This suite has
+already had to write a rule for exactly this shape of ambiguity once; a survey import is the same
+shape again, from a different door.
+
+**So yes — a chooser is the right instrument, and I would not try to auto-detect the order from the
+data.** A magnitude-based heuristic (e.g., "whichever column has the larger typical value is probably
+Easting, because UTM eastings run bigger than northings in some zones") is exactly the kind of clever
+guess that works on the examples you tried it on and fails silently on the plan set you didn't. Given
+the honest choice between building a chooser and guessing, guessing is the one that can quietly put
+a distribution system in the wrong place. Minimum viable chooser, in my own ranked order of value:
+(1) which convention — N-before-E or E-before-N — is the one field that must be explicit, asked in
+plain language ("first coordinate column is: Northing / Easting") rather than by acronym, since
+PNEZD/PENZD is jargon my seat can use in this journal but a form label should not assume the clerk
+already knows which is which; (2) whether an ID/point-number column and a description column are
+present, which is lower-stakes (wrong guess there is visible immediately, per above) but still worth
+one radio button each rather than a full acronym picker; (3) **read the header row when one exists**
+— most data-collector CSV exports do carry a header naming its own columns (`Northing`, `Easting` or
+`N`, `E`), and a header that states its own order should be trusted over any chooser default, the
+same as this suite already reads a `.inp` file's own units rather than assuming. Fall back to the
+chooser only when there is no header to read, and never let a present header be silently overridden
+by a stale chooser default from click 1 of a multi-file import session.
+
+**Where I did not look this session:** I did not read the actual library-import branch's code (Q2)
+or the CSV-import branch's code (Q3) — both questions were answered from the design record and from
+external citation, not from the branches' own current state, because neither branch path was given
+to me and I was asked to answer in advance of the build. A future invocation reviewing the built
+code should re-verify against what actually shipped before repeating these as findings rather than
+recommendations.
+
+— Declan

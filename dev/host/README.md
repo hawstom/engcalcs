@@ -13,6 +13,7 @@ that compares them when it can reach the host and says it checked nothing when i
 |---|---|---|
 | `check.sh` | `~/check.sh` | Fetches every page on the account and fails on a bad status **or a PHP diagnostic inside a 200**. Silent on success. |
 | `check.exclude` | `~/check.exclude` | Declared non-pages, each line carrying its reason. |
+| `check.mustblock` | `~/check.mustblock` | The INVERSE list: URLs that must NOT be reachable. A 200 there is a failure. |
 | `cronmail.sh` | `~/cronmail.sh` | Mails a job's output with an envelope sender that Gmail accepts. Sends nothing on empty input. |
 | `daily-report-cron.sh` | `~/daily-report-cron.sh` | The nightly wrapper: refresh the mirror, run `dev/scripts/daily_report.sh` out of a current checkout, mail it unconditionally. |
 
@@ -91,3 +92,31 @@ not. One digit fixes it if the winter hour matters.
 
 The page check is at 04:20 server time and was there first; the two are deliberately far apart on a
 shared host.
+
+## The inverse leg, and why the first fix made the alarm worse
+
+`check.sh` asks *"does this page answer?"*. **Nothing asked *"does this path refuse?"*, and that gap
+was opened by fixing an exposure rather than by ignoring one.**
+
+The 2026-09-15 run found `/engcalcs/.claude/hooks/guard-wait-loops.php` at HTTP 500, which is how
+anybody learned `/engcalcs/.claude/settings.json` was served as a plain 200. Once blocked, those
+paths answer **403** -- which this script also counts as a failure -- so a working fix would have
+mailed a failure every morning for ever. The walk therefore skips dot-directories as a class, which
+is right, and which also means **the walk can no longer see that class of exposure at all, whether
+or not the fix has been deployed.** A guard that goes quiet while the thing it guards is still
+broken is worse than no guard.
+
+`check.mustblock` is the half that can see it. A pass is 401, 403 or 404; a 200 names the URL. It is
+a short TYPED list with a reason per line, deliberately: the derived-list argument that governs the
+rest of this script does not apply, because no rule a machine can read says which URLs *ought* to be
+unreachable. That is a judgement, and a judgement belongs in a declaration beside its reason.
+
+**It closes the deploy gap by construction.** An `.htaccess` does nothing until the file is on the
+server, so this stays red from the moment a fix is written until somebody pulls it. Measured
+2026-09-15: two paths reachable, four refusing, with the fix committed to master for hours.
+
+**What it taught about the root `.htaccess`, which is worth knowing:** `.github/` and `dev/` refuse
+a `.md` because the root file blocks that EXTENSION. `.github` was never protected by a rule about
+directories -- it was protected by extension luck. `.vscode/settings.json` and
+`.claude/settings.json` were exposed for the same reason in reverse: `.json` is not blocked, and
+`<FilesMatch "^\.">` matches FILENAMES, not the directories they sit in.

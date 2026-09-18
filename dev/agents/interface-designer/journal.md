@@ -1278,3 +1278,592 @@ to spend a post-demo cycle rebuilding the custom-property editor as an expander 
 priority call), and the one edge-case classification above.
 
 No shipped file touched. Ranked build items added to `dev/agents/interface-designer/wishlist.md`.
+
+---
+
+## 2026-09-15 — Consult: Tom's five-group popup-collapse brainstorm, and Sue's coordinate-slot conflict
+
+Asked by the orchestrator, alongside Declan, Sue and Mary, whether Tom's draft grouping (ID /
+Dimensions / Flow and pressure / Quality / Custom) is the right set of cuts for the element
+property popup, whether anything should be collapsed by default, how many bands the popup can
+carry, what precedent this most resembles, and whether a default-collapsed Dimensions group
+re-hides the coordinate-transposition risk Sue argued into slot 2/3.
+
+### What the popup actually is today, checked rather than assumed
+
+OBSERVED (`js/looped-network.js:35063-35267` `renderNodeFields()`, `:35912-36010`
+`renderLinkFields()`): **there is no grouping of any kind in the popup today.** It is one flat,
+ungrouped, always-fully-visible column of rows, built by sequential function calls with no section
+`<div>`, no heading, no `<details>`. The only structural comment describing an ORDER (not a
+grouping) is at `:11879-11884`, inside `findPropertyOffer()` — a different feature (the Find and
+colour-by property picker) — with four informal bands: identity, what-you-typed, what-the-model-
+worked-out, questions-about-the-drawing. That is close in spirit to Tom's five groups but is not
+wired to the popup at all; nobody has yet connected the two.
+
+OBSERVED, counting `renderNodeFields()`'s calls for an ordinary junction with a chemical run
+active: id, elevation, elevation-demand row, demand-category table (1+ rows), resolved demand,
+fire flow, emitter coefficient, head, pressure, initial quality, source fields, quality result,
+tag, custom properties (0+), active/shut, push-here, coordinates (2 fields), import notes — **16
+to 20+ rows for one element**, more for a tank (5 dedicated fields plus reaction, mixing, head) or
+a pipe with fittings and reaction coefficients shown. This is a genuinely long, ungrouped list, so
+Tom's brainstorm is answering a real problem and not inventing one.
+
+OBSERVED, popup CSS (`grep` for `max-height`/`overflow-y` scoped to `#lpn_popup`): **none found.**
+The box has no scroll clamp — it grows to fit its content and is dragged/repositioned by the
+reader, unlike the Settings box, which has a fixed frame, a search box and a side index
+(`lpn_setbox_index`, `js/looped-network.js:30160-30196`). The popup has neither. So today's
+failure mode for a 20-row popup is not "the wrong thing is hidden" — nothing is hidden — it is
+"the box is now taller than the window and the reader scrolls past what they want," which is a
+different defect from the one collapsing is usually reached for.
+
+### Existing precedent ON THIS PAGE for default-open vs. default-closed disclosure
+
+OBSERVED (`js/looped-network.js:36241-36268` `multiSection()`, the MULTI-selection popup's own
+grouped `<details>` sections): **`box.open = true`, unconditionally, with Tom's own reasoning
+quoted in the comment**: *"OPEN, ALL OF THEM. Tom's own words are that a mixed selection shows
+both and NEITHER IS HIDDEN, so collapsing is something the reader does, never the default."* This
+is the one place on this exact page that already answers "does a property group start open or
+closed," for a popup in the same family (property display for a selection) as the one this
+brainstorm targets, and the answer is unambiguous: **default open, always.**
+
+A second, narrower precedent cuts the other way in intent but not in mechanism:
+`customPropBox()` (`:29025-29078`) uses one `<details>` per CUSTOM PROPERTY (not per group), and
+each one **remembers its own open state** via `cpOpenKeys[def.key]` (`:29078`) rather than
+defaulting open — but that is a list of N independent, same-shaped items the reader is scanning
+for one KEY by name, a different job from a group of dissimilar fields the reader needs to read
+together (e.g., Diameter beside Length). It is not evidence for collapsing property GROUPS by
+default; it is evidence that per-ITEM remembered state is this page's answer to a long list of
+interchangeable things, which the five-group brainstorm is not.
+
+### Answering the five questions
+
+**1 — is the five-group cut in the right places?** Broadly yes, with one real seam problem Tom
+already flagged himself (Custom appearing twice) and one the orchestrator's own observation 1
+names correctly: **"Flow and pressure" mixes typed inputs (Demand, Emitter, Roughness, K) with
+solved results (Head, Pressure)**, and OBSERVED (`:11898-11929`, `BAND_NODE` vs. `RESULT_NODE`,
+and `:35232-35236` where Head/Pressure are drawn inside an `if (lastSolveResult...)` guard that
+the input rows are not) — **the popup's own existing code already separates these two
+populations structurally.** A group that reunites them would be the first place on this page a
+typed number and a computed one sit inside one visual container, which is a real regression
+against a pattern CLAUDE.md itself states as a suite-wide rule ("a number the user supplied and a
+number we computed are different kinds of thing and must never sit in one field" — the field-level
+version of the same principle observation 1 is naming at group level). **Split it**: "Flow and
+pressure" (inputs) and a computed tail (Head, Pressure, and for a link, Flow/Velocity/Head
+loss/Gradient) — which is exactly the same INPUT/RESULT seam `BAND_NODE`/`RESULT_NODE` already
+draws, so the fix costs no new judgement, only reading the split that is already coded.
+
+Observation 2 (Shut/Included as state, not flow) I'd resolve the same direction Tom's own ID
+group implicitly argues: these decide whether the element PARTICIPATES, which is closer to "what
+the element is" than to "what it does hydraulically." I would fold them into ID rather than give
+them a sixth group — a group of two toggles is a thin group, and `activeField`/`closedField`
+already render immediately beside `tagField`/`pushHereButton` (`:35260-35263`,
+`:35991-35993`), i.e. they are already adjacent to identity-band fields in the code's own order,
+not to the flow fields.
+
+**2 — what collapses by default, and does anything?** Nothing should, and this popup already has
+a same-page, Tom-authored ruling that says so for the sibling popup one function away. CITED
+internally (the `multiSection()` comment, above). SPECULATION, but a narrow one: the reasoning
+that made him rule that way — a reader opening a MULTI-selection box wants to see everything a
+mixed group shares before deciding what to change — applies with equal or greater force to a
+SINGLE element's own full property set, where nothing is being compared across elements and the
+box's whole job is "tell me everything about this one thing." Two testers already look past the
+menu bar (OBSERVED, `dev/ROADMAP.md` Task 616) — a **default-collapsed heading is a second
+instance of exactly the failure this seat was hired over**: a bold word with a caret is easy to
+mistake for a static section label rather than a button, especially the FIRST time a reader meets
+it, which is precisely when they most need to see what's under it. Open by default, every group,
+matching the sibling popup, is the low-risk answer. Where collapsing earns its keep is the
+opposite of "first glance": a RETURNING reader who has learned the shape of the popup and wants to
+suppress a group they never touch (Quality, on a network running no chemical run) — that is a
+real, later win, and it is exactly the shape `multiSection()`'s per-key remembered state already
+models for custom properties. **Ship open-by-default now; consider a remembered-per-group-collapse
+preference later, once real dwell-time or scroll-depth evidence says a specific group is
+consistently skipped** — not before, because guessing which group a reader wants closed is the
+same mistake as guessing which four-second highlight they'll see.
+
+**3 — how many bands can this popup carry?** Five is not obviously too many in the abstract —
+CITED, AutoCAD's Properties palette runs 5-9 categories (General, 3D Visualization, Geometry,
+Misc, and 2-4 more depending on object type) and Figma's right rail runs 6-8 (Position, Layout,
+Appearance, Fill, Stroke, Effects, Export, plus per-object extras) — but **the honest cost here is
+not "five headings," it is "five headings ADDED to a page that already has four lines of chrome
+Tom himself could not resolve, on the one surface (`lpn_`) CLAUDE.md itself calls a full-window
+drawing surface where chrome competes with the drawing.**  A property popup is not suite chrome by
+the taxonomy Tom drew (it is content, opened on demand, not a standing bar) — so it does not
+directly add to the four-bar count — but it IS a fifth attention surface competing for the same
+finite reading budget the moment it is open, and CLAUDE.md's `chore/seat-consult-collapse` brief
+should weigh that the popup's OWN reader has already selected an element and is task-engaged
+(closer to Settings-box attention than to first-glance chrome attention, per my own 2026-09-13
+entry distinguishing an "already opened and engaged" surface from a "never sampled" one). On that
+distinction, five groups on an ENGAGED surface is a much smaller risk than five bars on a
+NEVER-SAMPLED one — this is a genuine gain if it turns a 20-row scroll into five scannable
+labelled chunks, not a loss, PROVIDED nothing defaults closed (see Q2).
+
+**4 — known pattern to defer to?** CITED: this is a **property inspector with labelled sections**,
+the same family as AutoCAD's Properties palette, Figma's right rail, Blender's Properties editor
+tabs, and a browser DevTools Elements/Styles pane. The closest match in SHAPE (grouped, always-
+visible-on-scroll headings inside one scrolling panel, not a tabbed switcher) is AutoCAD's
+Properties palette and Figma's right rail, both of which keep every section visible and let the
+reader collapse a section only as a personal, remembered choice — never a shipped default-closed
+state on first view. Blender's tabbed Properties editor is the WRONG precedent to reach for: tabs
+hide all-but-one category at a time, which this popup does not do and should not start doing (it
+would turn "five groups" into "five clicks to see everything," the opposite of what a full
+property readout is for). **Defer to AutoCAD/Figma's shape: sections, not tabs; open by default;
+collapse as a remembered reader choice, not a shipped default.**
+
+**5 — the coordinate-slot conflict (observation 3): is it real?** **Real, and it is the sharpest
+finding in this brief.** OBSERVED, `dev/agents/interface-designer` reading of the brief itself:
+Tom's own reason for X/Y at popup slots 2-3 was *"one rule, no special case to remember"* — a
+GLOBAL positional promise across the popup AND every node table. A "Dimensions" group starting
+collapsed would put X/Y at slot 1-of-group-3-when-opened rather than slot 2-of-the-popup, which is
+a second special case being reintroduced by the same brainstorm that is supposed to be tidying the
+popup, and it is the worse kind: **it fails exactly the case Sue named — a transposed X/Y balances
+hydraulically and is invisible to the solver, so the popup is the LAST honest place to catch it
+before a GIS overlay or as-built check does, and that is only true if the popup shows it without
+a click.** This is not merely "my Q2 answer (don't default-collapse) happens to cover it" — even
+under my own Q2 recommendation (nothing collapses by default), the coordinate fields would STILL
+be buried one section-heading-and-scroll below Demand/Fire flow/Emitter if "Dimensions" is treated
+as an ordinary mid-list group, because Tom's own five-group order puts Dimensions second, but
+coordinates are currently NOT grouped with elevation/diameter/length at all — OBSERVED,
+`coordFields()` is called at `:35264`/`:36117`, dead last in the function, after `tagField`,
+`customPropFields`, `activeField`, and `pushHereButton`. **The brainstorm's own "Dimensions" group
+(Horiz, Elevation, Length, Diameter) would be the first time X/Y and the rest of the popup's
+geometry sit together at all** — today they are not neighbours. So there are two separable
+questions being asked at once and they want different answers: (a) should coordinates be grouped
+WITH other dimensional fields — yes, that is a legitimate, overdue tidy; (b) should that group,
+wherever it sits, ever be allowed to start closed, or sit lower than slot 2 — no, because that
+directly reopens the exact risk his own coordinate-slot ruling exists to close. **Recommendation:
+keep X/Y visually first inside "Dimensions," and never allow "Dimensions" to be the group a
+remembered-collapse preference (if built per Q2's later phase) is allowed to apply to** — carve
+coordinates out as an exception the way `customPropFields`' per-key remembering already carves out
+Credits-style exceptions elsewhere on this page (`data-set-nofilter`, `:30284`). This is a real,
+citable conflict, not over-reading.
+
+### Where I expect the others to weigh in
+
+**Sue** owns the coordinate-slot argument outright and should have the last word on whether
+"Dimensions" is even the right HOME for X/Y at all, versus keeping coordinates structurally
+separate from Elevation/Length/Diameter the way they are structurally separate from everything
+else today — I am reading her prior ruling, not extending it past what she said. **Declan** should
+be asked directly whether a collapsed-by-default group (if Tom still wants one later) costs a
+keyboard stop per group per element the way slot 2-3 already cost him 800 stray keystrokes over
+400 junctions — a `<details>` element is itself a tab stop, so five sections is five NEW stops
+added to every popup visit regardless of open/closed state, which is a data-entry-volume question
+this seat cannot weigh well. **Mary** has no obvious stake here; this is entirely internal
+convention, not a market comparison question, though the AutoCAD/Figma citations above are exactly
+her kind of evidence if she wants to independently verify them.
+
+No shipped file touched.
+
+---
+
+## 2026-09-16 — Tom's audacious rebuild: options, not objections
+
+He rejected the input/result-mixing argument (correctly — everything is already one ungrouped
+list, OBSERVED `js/looped-network.js:35150-35270` node popup, `:35908-35998` link popup, both
+interleave typed and computed rows today) and built five groups himself: Description and state /
+Dry properties / Water properties / Custom / Results and quick graph. He asked for counter-
+proposals on the one open problem (Results falls to 2 rows on a reservoir/tank) and two standing
+questions (disclosure vs. plain heading; order within group). Answered in full to the orchestrator;
+recorded here for continuity.
+
+**The row-count problem dissolves once the INSTRUMENT changes, and that is my headline finding.**
+His "fewer than three rows under a heading is bad" rule is a real cost judgement, but the cost it is
+pricing is a `<details>`/`<summary>` disclosure's: a caret that promises interactivity, and — OBSERVED,
+`js/looped-network.js:16669`-family and my own 2026-09-15 wishlist item 28 — a genuine keyboard tab
+stop, one per group per popup visit. **A plain, non-interactive heading (`<h4>` or a rule+label) is
+not a tab stop and promises nothing**, so the "underfilled disclosure looks broken" complaint a
+2-row group raises under `<details>` does not exist under a plain heading — there is nothing for the
+reader to feel cheated by. Given his own standing ruling that nothing in this popup collapses by
+default (`js/looped-network.js:36248`, and now confirmed narrowed to Settings specifically, not
+Properties, by his own words: *"Settings is infinitely long and deep... Properties is not"*), a
+`<details>` element that is ALWAYS open and NEVER meant to close buys exactly nothing today except
+the caret glyph and the tab stop. **Recommend: all five groups render as plain headings, not
+`<details>`, in the single-element Properties popup** (the already-shipped `multiSection()` at
+`:36241`, used for the DIFFERENT multi-select edit box, is untouched by this — that box's per-type
+sections over a variable-length selection are a different judgement and out of scope here). This is
+also my answer to his Q2, and it is the thing that makes Q1 stop being a live problem rather than a
+tradeoff.
+
+**Order-within-group: found one real mismatch between Tom's own written list and the shipped code,
+worth a named counter-proposal rather than a shrug.** OBSERVED `js/looped-network.js:36550/35752/
+36660` (link popup): `closedField()` (Shut) renders BEFORE `tagField()` (Tag), which is Shut-then-
+Tag; his own list order is `ID, Description, Tag, Shut, Enabled/active`, Tag-before-Shut. Proposed:
+swap the two calls in `renderLinkFields()` so the shipped order matches his own sketch exactly — a
+two-line, zero-string-cost change, the actual meaning of "grouped as it stands" at the row level and
+not just the block level. Separately (OBSERVED `:35931-35998` vs. his list's `Length, Diameter,
+Roughness, K`): code renders Diameter first via the pipe-type chooser's own adjacency
+(`pipeTypeChooser` immediately after ID is Task 465's own ruling, already settled), Length last. Did
+**not** propose moving Length ahead of Diameter — that would silently overturn a named, dated ruling
+on the strength of an illustrative bullet list that was never claimed to be pixel-precise. Flagged
+the tension and recommended keeping Diameter anchored to the type chooser.
+
+**Named but did not resolve: ID and Description don't obviously exist as two separate rows today.**
+`idField()` renders in the popup TITLE, outside `fields[]` entirely; the only free-text identity
+field in the code is `tagField()` (Tag). His count table gives "Description and state" 5 rows on
+every type, which only works if "Description" names a row nothing in the codebase currently builds.
+Did not guess at this — it is a content question (does a Description field get built, or does
+"Description" mean something already named differently) and named it rather than silently deciding
+it. SPECULATION, worth someone confirming before a five-row group is built expecting a row that
+does not exist.
+
+**Phone: grouping helps at least as much as desktop, and the disclosure-vs-heading choice matters
+MORE there, not less.** OBSERVED `Looped-Network.php:635`, `css/engcalcs.css:1543`
+(`.lpn-propbox { min-width: min(17rem, 94vw) }`): the property popup is a narrow, draggable,
+resizable floating box capped to viewport width on any screen, and its fields have always been a
+single vertical column, one property per line (`js/looped-network.js` comment at the `multiRow`
+site, quoting Tom 2026-09-08: *"One property per line, as every other popup on this page"*). A
+plain heading costs one line of vertical space regardless of viewport — phone has more of that
+dimension to spend than width, via scroll — so grouping is not fighting the phone the way a wide
+table would; there is no second dimension being asked for. If anything the case for plain-over-
+`<details>` strengthens on touch: a `<summary>` genuinely toggles on tap, and a thumb landing on one
+while scrolling a small draggable box is a more plausible accident than a mouse click landing on a
+menu row by mistake — an accidental collapse mid-scroll is a cost a plain heading cannot incur at
+all. SPECULATION on the accidental-tap risk specifically (no measured incident), but the geometry
+argument (OBSERVED numbers above) does not depend on it.
+
+No shipped file touched.
+
+---
+
+## 2026-09-17 — Zoom: snapping, wheel increment, and the no-wheel/keyboard gap (Tom's four points)
+
+Tom raised four things about `lpn_` zoom. Point 4 (fade labels past a zoom threshold) is Task 669,
+already designed, and out of scope here. The other three, ranked by what a reader actually suffers.
+
+### Ranked answer
+
+**1st — the no-wheel/no-touch path is a real, total gap, the same shape as Task 674.**
+OBSERVED: the ONLY non-gesture zoom control on this whole page is one button/menu row, "Zoom to
+fit" (`js/looped-network.js:25343` in `mapMenuRows()`; `:26520-26527` the toolbar button;
+`fn: zoomExtent`). It is an absolute RESET to the network's extent, not an increment — pressing it
+twice does nothing the second time. There is no Zoom In row, no Zoom Out row, no keyboard binding.
+OBSERVED: `js/looped-network.js:37430-37474` is the page's only two `keydown` listeners outside text
+fields — Ctrl/Cmd+Z (undo) and the digit-keys-pick-a-tool binding (Task 595, epanet-js's own 1-9
+scheme). Neither touches zoom, and I found no third handler anywhere in the file binding `+`, `-`,
+`PageUp/Down`, or arrow keys to `zoomAbout`. OBSERVED: `zoomAbout()` (`:9917`) is called from exactly
+two places — the wheel listener (`:26697-26700`) and the two-pointer pinch drag (`:27387-27393`).
+That is the complete set of doors into changing scale by any amount other than "reset to fit."
+**A person with a mouse that has no wheel, a trackpad the browser does not recognize as a pinch
+surface, or a keyboard-only path through the page (assistive tech, or simply no pointing device)
+can get to "fit" and can get to NOTHING ELSE — not zoomed in one notch further, not zoomed out from
+wherever a drag left them.** That is not a taste question; it is the same class of defect as
+Task 674 (a coordinate enterable only by dragging) — one gesture is the only door.
+CITED: EPANET's own desktop UI, which this suite's own comments name as the reference vocabulary
+(`CLAUDE.md`'s `lpn_` section), ships exactly the control this page is missing — two ordinary
+toolbar buttons and two View-menu rows, "Zoom In" and "Zoom Out" (https://usepa.github.io/EPANET2.2/7_map.html,
+fetched 2026-09-17: *"Select View >> Zoom In or click [icon] on the Map Toolbar"* / *"View >> Zoom
+Out"*). EPANET documents no wheel and no keyboard shortcut for either — its answer to "no gesture"
+is two ordinary buttons, nothing fancier. CITED: Figma, a comparable web canvas app, binds
+Cmd/Ctrl+`+`/`-` to zoom in/out and Shift+1 to "zoom to fit" (https://help.figma.com/hc/en-us/articles/360041065034-Adjust-your-zoom-and-view-options,
+fetched 2026-09-17) — this page already has the "zoom to fit" half of that pair and is missing the
+increment half entirely.
+**This is the one I would build first if only one could ship before the 16 September window** — no,
+correction, we are past that date now (today is 2026-09-17) but it is still the one I would build
+first of the three, because it is not a preference, it is an access path with zero doors for one
+class of user, exactly the shape CLAUDE.md's own rule about `lpn_` says to treat seriously
+("Design this page for a pointer; then make a phone survivable" does not say "or nothing at all
+for no pointer"). Cheapest form: two toolbar buttons or two Map-menu rows calling `zoomAbout()`
+with a fixed screen-centre point and the same 1.1/0.909 factor the wheel already uses — zero new
+interaction pattern, reuses the one function every other zoom path already goes through.
+
+**2nd — the wheel increment is on the small side of the comparison set, and Tom's instinct is
+better supported than not, though it is not indefensible taste-wise.**
+OBSERVED: `js/looped-network.js:26699` — `zoomAbout(e.clientX, e.clientY, e.deltaY < 0 ? 1.1 : 1/1.1)`.
+That is a **10% change in scale per wheel notch**, continuous (no snapping — see below), clamped
+between `minScale()`/`maxScale()` (`:9888-9899`). CITED: AutoCAD's `ZOOMFACTOR` defaults to 60 (a
+60% change per notch), range 3-100, and multiple Autodesk/community sources recommend LOWERING it
+to 15-20 for finer control on a modern high-resolution wheel
+(https://help.autodesk.com/view/ACDLT/2024/ENU/?guid=GUID-6A77AD55-6035-42FF-8FB1-FB0D8EFE1278;
+community reports at https://forums.autodesk.com/t5/autocad-forum/mouse-wheel-zoom-rates/td-p/9287210,
+fetched 2026-09-17). CITED: QGIS's own default zoom factor is 200% per zoom-in click of the
+Zoom tool (Settings > Options > Map Tools > Zooming), lower-bounded at 100% by the UI
+(https://www.cadlinecommunity.co.uk/hc/en-us/articles/360013651537-QGIS-Changing-the-Zoom-Factor,
+fetched 2026-09-17) — note this is QGIS's discrete zoom-TOOL click, and I could not find an
+authoritative primary source pinning its separate mouse-WHEEL factor to a specific number in the
+time I spent; flag this as the weaker half of the QGIS citation. **Our number, 10%, sits below every
+sourced default in this set, including the CAD tool whose users complain the factory default (60%)
+is too coarse and turn it down toward numbers closer to ours.** That is not proof 10% is wrong — a
+map-and-drawing hybrid page reasonably wants finer control than a pure CAD canvas, and nobody has
+filed a friction report about it (unlike Task 674, which came from an observed defect). But it is
+evidence Tom's instinct is pointed the right direction rather than groundless: the comparison set
+clusters between 20% and 200% per step, and this page is at 10%, alone below all of it. SPECULATION:
+a factor in the 1.15-1.2 range (15-20% per notch) would land inside the "fine CAD control" zone
+Autodesk's own community recommends without leaving the map-tool cluster far behind — I did not
+build or test this, it is a plausible number, not a measured one.
+
+**3rd, but only because it costs nothing new to answer — zoom-level snapping is the wrong idiom
+for this specific page, and Tom's own "anti-idiomatic" worry is correct.**
+This page draws slippy-map tiles (OBSERVED: OSM/Mapbox basemap layer, `js/lpn-terrain.js` /
+`js/looped-network.js` basemap functions cited elsewhere in this repo's own CLAUDE.md `lpn_`
+section) UNDER a vector drawing placed by hand at arbitrary scale — it is neither a pure slippy map
+(which snaps because its TILES are baked at integer zoom levels and a non-integer zoom must
+resample or blend) nor a pure CAD canvas (which never snaps because nothing behind the drawing is
+raster). OBSERVED: `zoomAbout()`/`minScale()`/`maxScale()` (`:9888-9925`) carry no notion of a
+discrete level at all — scale is a plain float, and the pinch handler (`:27387-27393`) sets it from
+a continuous finger-distance ratio, not from a level index. **Snapping would cost the vector half of
+this page something real (a hand-drawn node can no longer be placed to read cleanly at exactly the
+zoom the person wants) to buy the raster half something it does not need** — our basemap tiles
+already render at whatever fractional zoom the browser asks a slippy-tile CDN for; that resampling
+is the tile provider's problem, already solved, and invisible to a user who has never used this page
+as a pure tile viewer. SPECULATION, but low-risk: I did not find, and would not expect to find, any
+report in this repository of blurry or mismatched tiles at a non-integer zoom, because that is
+normal behavior for every web slippy map at every intermediate scroll position between clicks, not
+a defect. His own phrasing — "even on a phone, though that might be anti-idiomatic" — reads to me as
+him already half-answering himself correctly; I would not spend a build here. Ranked last because
+it is a "don't build this" answer, not a gap.
+
+### Where I did not look
+I did not test in a real browser (no `dev/browser-pass` render this session) — every wheel-factor
+and range number above is read from source, not measured on screen; a `dev/browser-pass` screenshot
+would confirm the ranges feel right but is unlikely to change the code-level finding (no wheel path,
+no keyboard path). I did not check `js/lpn-terrain.js` or the basemap-tile code path for whether it
+ever independently discretizes zoom for a TILE REQUEST (a plausible, unrelated reason a raster
+subsystem might quantize internally without exposing it to `zoomAbout()`) — that would not change
+the finding above (the STATE the user controls is continuous either way) but I have not read that
+file this session. I did not check `dev/browser-pass/` for any existing zoom-behavior test. I did
+not survey mobile-specific double-tap-to-zoom conventions beyond noting `touch-action: none` is
+already set (`:8362` comment) to suppress the browser's own double-tap — checked afterward whether this page offers its own double-tap zoom as a partial answer to
+phone's lack of a wheel: OBSERVED, it does not, and could not without a collision — `svg`'s
+`dblclick` listener (`:26969`) is already spoken for, bending a pipe or deleting a bend
+(comment at `:8358`), so a double-tap-to-zoom convention would need to fight an existing gesture
+on the exact same element, not add one for free.
+
+No shipped file touched.
+
+---
+
+## 2026-09-17 — Two direct questions: the lock-dialog button order, and the shape of a zoom control
+
+Per the standing rule written today ("re-read the code before ranking anything from an earlier
+sitting"), everything below is read fresh from `feat/lock-initials-later`
+(`/home/haws/webdev/worktrees/feat-lock-initials-later/engcalcs`, checked 2026-09-17) and from
+`master`'s own `js/looped-network.js` / `Looped-Network.php` for the map-corner survey. Nothing
+here is carried forward unchecked from an earlier entry, though wishlist item 32 (zoom in/out
+gap) is the same finding, re-verified rather than assumed.
+
+### Question 1 — the four-button lock dialog
+
+OBSERVED (`js/looped-network.js:23072-23095` in the worktree, `presentOpenChoice()`): the shipped
+dialog is generic `openDialog()` machinery — every button is a plain `<button>`, identical style,
+`marginLeft: 6px` and nothing else (`:25861-25868`); there is no CSS class distinguishing one
+button from another anywhere in `css/engcalcs.css` (grepped for `lpn_dialog`/`lpn-dialog`, found
+only the backdrop/body/max-height rules at `:1326-1358`). **The only asymmetry the code already
+gives one button over the others is keyboard focus**: `openDialog()` calls `.focus()` on
+`bar.querySelector('button')` — literally the FIRST button in the array (`:25877-25878`). Whichever
+label is listed first is what a bare Enter-press, or a fast double-click before the eyes have
+read the text, activates.
+
+**A live sibling in this same file is worth reading before ranking anything, because it is this
+codebase's own answer to the identical genre of question.** OBSERVED (`:25822-25846`,
+`closeTab()`'s Save/Discard/Cancel dialog — Apple's own "Do you want to save changes?" shape):
+order is **Save (safe, default-focused) → Close without saving (destructive) → Cancel (safe)**.
+Two things to take from it: (1) this codebase already puts the safe, wanted-most-often action
+first and gives it the default focus, which both of Tom's two lock-dialog orders already do (Ask
+first in both); (2) it puts its ONE destructive option immediately next to Cancel, which is
+exactly the adjacency that every external guideline below warns against — a real, live
+counter-example inside this file, not a hypothetical. I did not touch it and am not asked to; it
+is a 3-button dialog with no second safe option to buffer with, so it had nowhere else to put
+Discard. The 4-button lock dialog does not have that excuse — it has TWO safe non-Ask options
+(Open read-only, Cancel), which is room the Close-tab dialog never had.
+
+**CITED** (Apple, Human Interface Guidelines, Alerts —
+developer.apple.com/design/human-interface-guidelines/alerts, and the buttons page under
+Menus and actions, fetched 2026-09-17): *"Don't assign the primary role to a button that performs
+a destructive action, even if that action is the most likely choice,"* and Apple's own worked
+example for "Do you want to save changes?" is **Don't Save / Cancel / Save** — the destructive
+option is neither the default (rightmost, blue) nor adjacent to nothing; Apple's guidance
+elsewhere on the same family of dialogs is to add visible SPACE around a destructive button so it
+cannot be reached by the same rote sequence of clicks or tabs that reaches the safe ones, and to
+mark it with the system's own destructive (red) styling so it reads as different in KIND, not
+just in position.
+
+**CITED** (Nielsen Norman Group, "Confirmation Dialogs Can Prevent User Errors,"
+nngroup.com/articles/confirmation-dialog, fetched 2026-09-17): confirmation dialogs work when they
+are rare and specific; used too often, or worded generically, they train a reader to click through
+without reading — "cry wolf too many times… the confirmation dialog will lose its power." Read
+studies cited there put the miss rate on unread confirmations above half. **This argues against a
+second, extra "are you sure you want to break the lock?" confirmation step layered on top of the
+dialog that is already open** — the three-age readout (`lockReadoutLines()`,
+`:23025-23057`) already states the consequence in specific, non-generic words before any button is
+reachable; a second modal on top of it adds friction without adding information, which is exactly
+the shape NN/g's own research says teaches a reader to stop reading rather than to read more
+carefully.
+
+**Is `.ec-consent-btn`'s "never restyle one to stand out" rule the same case? No, and the reason is
+what each dialog is FOR.** The consent banner styles Accept and Reject identically because the two
+answers are equally legitimate expressions of one visitor's own preference — restyling either
+would be steering someone toward the answer that serves this suite rather than them, which is the
+dark pattern the rule exists to forbid. **The lock dialog's four options are not four equally
+weighted answers to a preference question; they carry objectively different, stated risk** — three
+change nothing recoverable and one can force a colleague's file into an unmergeable state. Marking
+that difference is not persuasion toward an answer this suite wants; it is honest disclosure of a
+fact already written out in the paragraph above the buttons, the same job the suite's own verdict
+glyph already does elsewhere (CLAUDE.md's "Verdict / check-string convention": a leading `✓`/`⚠`
+glyph, decorative, RTL-safe, no translated marker word, used precisely so a reader can tell a safe
+result from a caution one before reading the sentence). Extending that existing, already-approved
+convention to one button label is a smaller and more consistent move than either leaving all four
+buttons identical (which every external source above treats as the mistake, not the neutral
+choice) or inventing a new red-button CSS component for one dialog.
+
+**The frightening option being sometimes correct is the argument for keeping it fully visible and
+legibly labelled, not for hiding or burying it** — nothing recommended here removes it from the
+row, shrinks it, or requires an extra click to reach. The only things changed are (a) which
+position it sits in relative to the two safe non-Ask options, (b) a small amount of extra spacing
+before it, and (c) a leading `⚠`. A reader who has decided their colleague has gone home for the
+weekend can still read all four labels in the same glance and press the one they mean; what the
+change defends against is a Tab-Tab-Enter or a startled double-click landing there BY ACCIDENT,
+which is a different harm than a deliberate, informed choice.
+
+**Recommendation — a third order, not either of Tom's two:**
+
+> **Ask · Open read-only · Cancel** [gap] **⚠ Break lock**
+
+Reasoning for each move: Ask stays first, unchanged from both of Tom's orders and matching the
+codebase's own standing default-focus convention (Save/Ask, whichever is safest, always leads).
+Open read-only moves next to Ask because both are "look, don't touch" answers and reads as a
+natural pair to someone scanning left to right. Cancel moves to third, ahead of Break lock, so a
+reader tabbing forward from the default focus meets only safe options before ever reaching the
+destructive one — this is the opposite of the Close-tab dialog's own adjacency and is possible
+here specifically because this dialog has two safe non-Ask buttons to spend on the buffer, which
+the 3-button sibling did not. Break lock sits last, set apart by a visible gap (CSS: extra
+`margin-left`, no other change) and its label carries a leading `⚠` reusing the suite's own
+existing glyph convention (`pc.lpn_lock_break` becomes `⚠ ' + (pc.lpn_lock_break || 'Break lock')`,
+or the glyph baked into the English string itself the way a verdict string already carries it) —
+zero new translated words, one glyph.
+
+**What I would NOT do:** repaint Break lock as a solid red/coloured button. This suite has no
+existing coloured-button component anywhere I found (`grep` for a `.lpn-*-danger`/`.btn-danger`-
+style class in `css/engcalcs.css` turned up nothing), and building one costs a new visual idiom for
+a single dialog rather than reusing the ✓/⚠ language the reader already meets in results tables
+and status readouts elsewhere on this exact page. A colour would also do the SAME job the glyph
+does, just with a bespoke component instead of a five-minute reuse — no reason to pay for both.
+
+No shipped file touched (I read the worktree; I did not edit it, per the brief).
+
+### Question 2 — the shape and home of an on-map zoom control
+
+**The map's corners are NOT free, and I was wrong to assume otherwise before checking — worth
+recording the correction rather than silently fixing it, since the same mistake is exactly the
+kind the 2026-09-17 "re-read before ranking" rule was written to catch.** OBSERVED
+(`Looped-Network.php:264-322`, `#lpn_map_overlay_tl`), checked 2026-09-17: top-left already carries
+a live, growing flex column — the mode hint (which itself wraps to two lines in several
+languages, by its own comment), the select-area instruction bubble, the solver's standing
+diagnostic with its own grievance button, and the EPANET engine-wait banner, PLUS a separate
+absolutely-positioned one-shot notice box (`#lpn_map_notice`, `:334`) that deliberately COVERS this
+same corner when a transient message fires. This is not a quiet corner; it is dynamic,
+multi-line, and already the seam this suite's own comments say a wrongly-placed second thing
+already pushed "an inch down the map" once (`:268-271`, the fix Tom ordered in 2026-08-27).
+Bottom-left (`#lpn_map_footer`, `:416-474`) is the busiest of the four by cell count — seven
+widgets today (satellite teaser, scenario button, status readout, coordinates, CRS name, scale
+bar, one-tap grievance link) and already wraps on a narrow window by its own comment. Bottom-right
+(`#lpn_basemap_credit`, `:498`) is the one corner that CANNOT move or share casually — required
+OSM/Mapbox attribution, non-dismissible — and is also the DEFAULT parking spot for the colour
+legend (`colorLegendPosition: … 'bottom-right'`, `:4924`), which already has to dodge the credit
+via `placeLegends()`/`overlayOccupants()` (`:29116-29135`). **Top-right is the calmest of the four**
+— OBSERVED, its only default occupant is the labels legend (`legendPosition: … 'top-right'`,
+`:4877`), a single box that is frequently set to Off by design (Tom, 2026-08-25: *"the legend is of
+less value now"*) and is not growing or multi-line the way the other three corners' content is.
+
+**CITED** (Mapbox, `Map#addControl` API reference, docs.mapbox.com/mapbox-gl-js/api/map, fetched
+2026-09-17): the default position for any control, including `NavigationControl` (the vendor's own
++/− zoom stack), when no position is given, is **`'top-right'`**. This is the one mapping vendor
+already integrated on this page (satellite tiles, terrain), so it is not an arbitrary citation —
+it is the convention of the library whose OWN tiles this page already draws. CITED (Leaflet's own
+`zoomControl` option defaults to `'topleft'`, per Leaflet's documented API) as the other half of a
+genuinely split convention in this space — OpenLayers and Leaflet both default top-left,
+Mapbox GL defaults top-right, and Google Maps' own consumer product stacks its zoom control
+directly above its attribution strip at bottom-right. **There is no single universal answer across
+the industry; the deciding fact here is which corner is actually free on THIS page, and that is
+top-right, which happens to also match the one vendor convention this suite already inherited.**
+
+**Recommendation: a small vertical two-button stack, `+` over `−`, fixed at top-right, styled as
+one more chip in the same visual language every other map-corner control already uses** — the
+`rgba(255,255,255,.85)` translucent background, thin border, the same font-size class as the
+legends and the footer readouts (`css/engcalcs.css`'s existing chip rules, not a new component).
+No third button (no on-stack "reset to fit" — that lives on the toolbar per Tom's own settled
+half of this task, and a third instrument for the same function on the same page would be the
+exact redundancy the four-bar brief exists to catch). Not draggable, not resizable — every zoom
+control I found in every cited product is fixed, and this page's own draggable/resizable
+convention (wishlist item 23) is reserved for STANDING PANELS a reader leaves open, not a
+two-button chip pressed and released. **Register it as a new occupant in the existing
+`overlayOccupants()` function** (`:29116-29131`) — a four-line addition matching the pattern
+already there for `#lpn_basemap_credit` — so a labels legend a user has moved to top-right dodges
+around the new chip exactly as legends already dodge the mode-hint column and the footer strip.
+This is not new infrastructure; it is one more line in a dodge system that already exists for
+this exact purpose.
+
+**Is this a fifth line of chrome, on top of the four Tom named?** No, and the distinction is the
+same one I drew on 2026-09-13 about panel drag handles: the four-bar diagnosis is about
+ALWAYS-VISIBLE, FIRST-GLANCE surfaces a reader's eye has to find before they have done anything —
+suite chrome, menus, toolbar, tab strip. A map-corner zoom chip is discovered by someone who has
+already opened the map and is already looking at it to navigate it, the same category as the
+scale bar, the coordinate readout and the two legends already living there without complaint —
+it adds one more chip to an existing population of roughly a dozen, not a new competitor for the
+first-glance budget the four bars already spend. The real cost is smaller and different: corner
+crowding, which the survey above says is genuine (every corner already has content) but
+manageable at top-right specifically, and mitigated by reusing the existing visual idiom rather
+than inventing a new one.
+
+**Phone: hide it below the existing 640px breakpoint, and the reason is a ruling Tom already
+made, not a new one.** Tom, 2026-08-22, cited in my own 2026-09-10 entry: *"on a phone, zoom in is
+the answer. You can't see through your finger… A finger is not a mouse!"* — pinch-to-zoom is
+already the phone's native, always-available answer to "how do I change scale," which is exactly
+why the whole justification for an on-map +/- chip (no wheel, no keyboard, no pinch surface) does
+not apply on a touchscreen. Hiding it at the breakpoint that already collapses the toolbar's
+non-transport groups (CLAUDE.md, `css/engcalcs.css` `max-width: 640px` block) also sidesteps the
+one real collision I found: `legendPosition` defaults to `'top-left'` on a small screen
+(`:4877`/`:4924`, `smallScreen()` branch), not top-right — so the corner this control would want on
+a phone is a different corner than on desktop, and the cheapest correct answer is to not need one
+there at all.
+
+**Is this worth building at all, given the toolbar half of Tom's own design (Zoom to Fit /
+Zoom Window double duty) is already settled?** Yes, and it is not redundant with it: the toolbar
+pair gives a RESET (fit) and a DRAG-A-RECTANGLE zoom-in (Window) — both still gestures, and neither
+gives a plain, one-click zoom OUT from wherever the reader already is. The on-map chip is the only
+one of the three instruments that answers "zoom out one step, right now, with one click, no drag."
+Rank it below the toolbar half (already decided) and roughly level with wishlist item 32's
+Map-menu Zoom In/Out rows — the menu rows are the more keyboard/screen-reader-reachable route
+(an ordinary focusable menu item, not a bespoke SVG button needing its own accessible markup)
+and cost nothing in map-corner space; the on-map chip is the more DISCOVERABLE route for the
+ordinary pointer user who will never open the Map menu looking for it. Building both is not
+double work — the menu rows and the on-map chip and the existing wheel/pinch handlers all call the
+same `zoomAbout()` function, so it is a third and fourth door onto a function that already has two.
+
+### The cheaper question: is the conventional keyboard binding worth adding, and what has to be
+true of the drawing surface
+
+**Yes, worth adding, and cheaply — but bind the BARE `+`/`-` keys, not `Ctrl`/`Cmd` + `+`/`-`.**
+OBSERVED (`js/looped-network.js:37430-37474`), checked 2026-09-17: this page's only two `keydown`
+listeners outside a text field are both on `document`, unscoped to any focused element — Ctrl/Cmd+Z
+for undo and a bare-digit-key tool picker (Task 595). **Both are guarded by the same function,
+`isTextEntry(e.target)`** (`:37469-37474`, checking `input`/`textarea`/`select`/
+`contentEditable`), which is the answer to "what has to be true of the drawing surface for a key
+press to reach it at all": nothing about focus — the listener is global and does not need the
+canvas to hold focus — but the handler MUST check that the reader is not currently typing into a
+field, or a bare `-` would zoom the map out every time somebody typed a negative elevation, and a
+bare `+` every time somebody typed into a field that happens to accept one. This guard already
+exists in this file for exactly this reason and a zoom binding should reuse it rather than write a
+second copy.
+
+**CITED** (Figma, "Adjust your zoom and view options," help.figma.com, fetched 2026-09-17): Figma
+binds `Cmd/Ctrl` + `+`/`-` to zoom, which means it deliberately overrides the browser's OWN
+reserved page-zoom shortcut inside its canvas. **That is a bigger claim on the keyboard than this
+page has made anywhere else** — Ctrl+Z and the digit keys are not shortcuts a browser reserves for
+itself, so intercepting `Ctrl`/`Cmd` + `+`/`-` would be a new kind of commitment (every browser
+binds that combination to its own text/page zoom, and a user who has learned that expectation
+gets a different, undocumented behaviour the moment focus is on this page). Recommend the bare
+keys instead — `+` (and `=`, since `+` is the shifted form of `=` on a US layout and QGIS-style
+tools bind both) and `-`, no modifier — which is closer to what a CAD-style tool (not a
+browser-embedded design tool like Figma) does, avoids the browser-reserved collision entirely, and
+matches the SHAPE of the existing digit-key binding (bare key, guarded by `isTextEntry`) rather
+than inventing a new pattern.
+
+### Where I did not look
+I did not render either dialog or the map corners in a real browser this session — every finding
+above is read from source (`js/looped-network.js`, `Looped-Network.php`, `css/engcalcs.css`), not
+measured on screen. I did not check whether `overlayOccupants()`'s four-line addition is
+mechanically trivial beyond reading the function once; I did not attempt the edit. I did not check
+Google Maps' or Bing Maps' own source for their zoom-control default position — both citations
+above rest on the public-facing product behaviour and Mapbox's own documented default, not on
+reading either company's source.
+
+No shipped file touched.
