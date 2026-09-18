@@ -7,14 +7,13 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**107 open tasks.** Next (100): 12 · Soon (75): 31 · Someday (50): 35 · Maybe (25): 11 · Parked (5): 18
+**108 open tasks.** Next (100): 12 · Soon (75): 31 · Someday (50): 36 · Maybe (25): 11 · Parked (5): 18
 
 ## 100 — Next (12)
 
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
-- Task 599 — Graph a value against time across an extended-period run.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
 - Task 646 — Attach the world map to an XY project without changing the project.
 - Task 663 — Three questions about the reaction rate that only Tom can answer.
@@ -23,6 +22,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 686 — The progress bar finishes before the work does.
 - ! Task 692 — Satellite view is refused on a projected project, and it is the DEM bug again.
+- Task 696 — File, Convert coordinates as: a working menu item, as a new project.
 
 ## 75 — Soon (31)
 
@@ -58,7 +58,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 691 — Banner messages are annoying, and one of them is a trap.
 - Task 693 — "Length and map coordinates" is a lie on an EPSG project.
 
-## 50 — Someday (35)
+## 50 — Someday (36)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -95,6 +95,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - Task 694 — Export a map animation as an animated picture.
 - Task 695 — The daily status mail has columns with no headings.
+- Task 697 — EPANET++ as a competing front door, on its own two domains.
 
 ## 25 — Maybe (11)
 
@@ -135,5 +136,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-98 of 107 titles are within 4–12 words. `!` marks the rest;
+99 of 108 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
