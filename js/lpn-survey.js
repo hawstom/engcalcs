@@ -264,12 +264,26 @@
 		return true;
 	}
 
-	// A comment line, so a survey file can carry a note above its header. `#` and `;` are what
-	// people actually write; a `;` line cannot be confused with a semicolon-delimited data row
-	// because a data row does not START with one.
+	// A comment line, so a survey file can carry a note above its header.
+	//
+	// **A DUMB PREFIX TEST, AND NOTHING CLEVERER** (Tom, 2026-09-18: *"I hope you are using prefixes
+	// ! # / to detect a comment line and not some more sophisticated detector."*). It is a prefix
+	// test, and the four prefixes are the ones below. **This is the whole list and it is closed**:
+	// anything that tried to decide from a line's CONTENT whether it was meant as prose would be a
+	// heuristic that eats somebody's data the first time a description column reads like a sentence.
+	// A line either starts with one of these four characters or it is a row.
+	//
+	// `;` is EPANET's own comment character, which this page's readers already write. A `;` line
+	// cannot be confused with a semicolon-delimited data row, because a data row does not START
+	// with its delimiter. `!` and `//` were added on his instruction; `//` is two characters rather
+	// than one and is tested as a prefix all the same.
+	//
+	// **AND THIS IS A DIFFERENT TEST FROM looksLikeHeader() BELOW.** That one asks whether the
+	// file's first row is a header or its first point, and it has already been wrong once. Neither
+	// test is allowed to answer the other's question.
 	function isCommentLine(line) {
-		var t = String(line).trim();
-		return t.charAt(0) === '#' || t.charAt(0) === ';';
+		var t = String(line).trim(), c = t.charAt(0);
+		return c === '#' || c === ';' || c === '!' || t.slice(0, 2) === '//';
 	}
 
 	/**

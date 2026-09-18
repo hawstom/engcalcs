@@ -149,6 +149,22 @@ ok('the fixture reads', csv.ok === true, csv.error || '');
 ok('six of its seven rows became points', csv.points.length === 6, String(csv.points.length));
 ok('...and the comment lines above the header were not read as rows',
 	csv.counts.rows === 7, String(csv.counts.rows));
+// **THE FOUR COMMENT PREFIXES, AND THE PROOF THAT IT IS A PREFIX TEST** (Tom, 2026-09-18: *"I hope
+// you are using prefixes ! # / to detect a comment line and not some more sophisticated
+// detector."*). The second assertion is the one that matters: a line that READS like prose but does
+// not start with one of the four is a data row, and is refused as one rather than silently eaten.
+{
+	const r = EC.lpnSurveyParse('# hash\n; semicolon\n! bang\n// slashes\nA,1000,2000,55\n',
+		{ format: 'PNEZD' });
+	ok('all four comment prefixes are passed over, and the data row after them is read',
+		r.ok && r.points.length === 1 && r.points[0].line === 5,
+		JSON.stringify(r.points.map(p => p.line)));
+	const q = EC.lpnSurveyParse('A,1000,2000,55\nthis line is a note somebody typed,,,\n',
+		{ format: 'PNEZD' });
+	ok('...and a prose line with NO prefix is a bad row, not a guessed-at comment',
+		q.ok && q.points.length === 1 && q.notes.some(n => n.line === 2 && (n.code === 'bad-coord' || n.code === 'coord-missing')),
+		JSON.stringify(q.notes.map(n => n.code + '@' + n.line)));
+}
 ok('the deliberately swapped row is REPORTED and made no point',
 	noteCodes(csv).indexOf('coord-range') >= 0 && !csv.points.some(p => p.id === 'PT-6'));
 ok('...and its own number is printed in the note, not a paraphrase',
