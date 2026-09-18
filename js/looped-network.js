@@ -11894,7 +11894,7 @@ var EngCalcs = EngCalcs || {};
 		var span = georefAskSize(cur ? cur.metersPerUnit * spanUnits : 0);
 		if (!(span > 0)) { return; }
 		var turn = window.prompt(
-			pc.lpn_map_attach_turn || 'Turn of the drawing in degrees, counterclockwise, where 0 puts the top of the drawing to the north',
+			pc.lpn_map_attach_turn || 'Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map',
 			String(cur ? cur.rotDeg : 0));
 		if (turn === null) { return; }
 		var rot = parseFloat(String(turn).replace(',', '.'));
@@ -11915,7 +11915,7 @@ var EngCalcs = EngCalcs || {};
 		markEdited();
 		refreshBasemap();
 		saveToStorage();
-		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and not one coordinate in the project changed. Use Map, Background map (georeference), Remove to take it away again.');
+		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.');
 	}
 	function removeMapAttach() {
 		var pc = EngCalcs.pageConfig || {};
