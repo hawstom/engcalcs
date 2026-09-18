@@ -24381,7 +24381,12 @@ var EngCalcs = EngCalcs || {};
 		// pointer, and the register's names got a great deal longer on 2026-09-14.
 		b.disabled = off;
 		if (n) {
-			n.textContent = crsLabel(newBoxGeo.crs);
+			// **THE WARNING FOLLOWS THE CHOICE OUT OF THE PICKER.** The box where it was made is
+			// closed by the time Create is pressed, and this line is the last thing describing the
+			// projection before the project exists.
+			n.textContent = crsLabel(newBoxGeo.crs) + (crsCannotBePlaced(newBoxGeo.crs)
+				? ' ' + ((EngCalcs.pageConfig || {}).lpn_crs_unplaceable_mark || '(no map)')
+				: '');
 			// Greyed with the button rather than hidden: the projection is still what this radio
 			// WOULD use, and blanking it would read as "none chosen" to somebody who is about to
 			// switch back.
@@ -24631,10 +24636,15 @@ var EngCalcs = EngCalcs || {};
 						refreshBasemap();
 						return;
 					}
-					// **THE 2% STILL GET THE SENTENCE, AND IT IS STILL TRUE FOR THEM.** A CRS
-					// whose projection method proj4 does not implement cannot be placed, and
-					// saying so is better than a plane pretending to be somewhere.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+					// **THE 2% STILL GET THE SENTENCE, AND IT NAMES WHOSE FAULT IT IS.** It used
+					// to reach for lpn_crs_place_projected, which says the transform is something
+					// "this page does not have yet" -- true of the module being absent and false
+					// here, where the page has 5,240 transforms and not this one. A reader who
+					// has just watched a blank plane arrive at 0,0 concludes the feature is
+					// broken rather than that another projection over the same ground would work,
+					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
+					// the choice as well; this is the same sentence, after it.
+					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
 				});
 			}
 		}
@@ -24740,12 +24750,50 @@ var EngCalcs = EngCalcs || {};
 	 * number; this is the OpenStreetMap-credit rule, and the filter already searches both halves
 	 * so somebody who types 26929 lands on it.
 	 */
+	/**
+	 * **A PROJECTION THIS PAGE CANNOT PUT ON THE EARTH, ASKED BEFORE IT IS CHOSEN.**
+	 *
+	 * 5,240 of the register's 5,346 live projected systems have a proj4 definition and 106 do not
+	 * -- js/lpn-crs.js states the ratio and answers honestly. What nothing did until 2026-09-17
+	 * was ask the question at the moment somebody picks one, so the wizard offered all 5,346 and
+	 * the difference only showed up afterwards, as a project that opened on a blank plane.
+	 *
+	 * **THAT IS TOM'S OWN REPRODUCTION FROM THE ENGINEERS WITHOUT BORDERS DEMONSTRATION**: *"New
+	 * project, Geographic projection, Place name search, 'Fotobi, Ghana', Accra / Ghana National
+	 * Grid (EPSG: 2136), US units, Create, bring up blank map centered at 0,0."* EPSG:2136 is the
+	 * SECOND row the place filter offers for Fotobi and is one of the 106 -- its axes are in Gold
+	 * Coast feet, which proj.db carries no conversion for -- so createProjectFrom()'s forward
+	 * transform returned null, the camera stayed where a new plane starts, and no tile could be
+	 * placed behind it. Driven and measured against https://librewaternet.org/app/ with
+	 * dev/lpn-spike/browser-drive.js: 0 basemap tiles, view at 0,0.
+	 *
+	 * **THE FIX IS A WARNING, NEVER A SUBSTITUTE PROJECTION.** Falling back to a near-enough
+	 * system would put a map under somebody's network tens of metres out, and a wrong map is read
+	 * as the truth -- js/lpn-crs.js's own standing ruling. The 106 stay choosable, because the
+	 * coordinates are still the user's and the project still opens; what changes is that the
+	 * consequence is stated before the choice rather than discovered after it.
+	 *
+	 * **UNKNOWN IS NOT NO.** Until the definitions have loaded, lpnCrsHas() answers false for
+	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
+	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
+	 */
+	function crsCannotBePlaced(code) {
+		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
+	}
 	function crsOptionText(entry) {
 		if (!entry) { return ''; }
-		var name = String(entry.name || ''), code = String(entry.code || '');
-		if (!code) { return name; }
-		if (!name) { return code; }
-		return name + ' (' + code + ')';
+		var pc = EngCalcs.pageConfig || {},
+			name = String(entry.name || ''), code = String(entry.code || ''), text;
+		if (!code) { text = name; }
+		else if (!name) { text = code; }
+		else { text = name + ' (' + code + ')'; }
+		// Appended rather than made a prefix: the list is sorted and scanned by NAME, and a mark in
+		// front of it would put the 106 out of alphabetical reach of somebody typing a name filter.
+		if (crsCannotBePlaced(code)) {
+			text += ' ' + (pc.lpn_crs_unplaceable_mark || '(no map)');
+		}
+		return text;
 	}
 	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
 	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
@@ -24795,6 +24843,14 @@ var EngCalcs = EngCalcs || {};
 			// all. It appears only while the register is the thing being listed, because the
 			// built-in 183 rows are our own hand-typed table and credit nobody.
 			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
+			// **AND THE CONSEQUENCE OF THE ROW THAT IS ACTUALLY SELECTED, IN A SENTENCE.** The
+			// "(no map)" mark in the option is what a person scanning the list sees; this is what
+			// they read once their choice has settled on one. Two sizes of the same fact, because
+			// the mark has to be short enough not to push a 50-character register name out of the
+			// select and the sentence has to be long enough to say what is lost.
+			if (crsCannotBePlaced(crsBox.code)) {
+				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+			}
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -24899,12 +24955,25 @@ var EngCalcs = EngCalcs || {};
 		// from the built-in table, so the box opens at once and grows to the full register when it
 		// arrives; the callback re-renders, and renderCrsBoxList() keeps the current choice across
 		// a rebuild wherever the filters still admit it. A failure is silent and leaves the 183.
+		box.style.display = 'block';
 		crsRegisterLoad(function () {
 			// Only if the box is still the one on screen -- a load that lands after the user has
 			// closed it must not repaint a hidden panel.
-			if (crsBoxEl() && crsBoxEl().style.display === 'block') { renderCrsBoxList(); }
+			if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
 		});
-		box.style.display = 'block';
+		// **THE TRANSFORMS ARE FETCHED HERE TOO, AND THIS IS THE ONE PLACE THEY ARE WORTH IT.**
+		// js/lpn-crs.js is deliberately not loaded at page load -- 190 KB that most visitors never
+		// need -- but somebody who has opened this box is choosing a projection, and whether we
+		// have a transform for it is the difference between a project with a map behind it and a
+		// project on a blank plane. Asking after the choice is what produced Tom's blank map at
+		// 0,0; asking here costs one fetch on a box that is already fetching the register.
+		// A failure is silent and simply leaves every row unmarked, which is the honest state:
+		// lpnCrsReady() is false, so crsCannotBePlaced() answers false for all of them.
+		if (EngCalcs.lpnCrsLoad) {
+			EngCalcs.lpnCrsLoad(function () {
+				if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
+			});
+		}
 		raisePanel(box);
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();

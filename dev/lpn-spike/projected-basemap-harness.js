@@ -24,7 +24,7 @@
 'use strict';
 
 const path = require('path');
-const { ROOT, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
+const { ROOT, byId, ensure, loadLoopedNetwork, setUnitSet } = require('./lpn-dom-stub.js');
 // **THE ALIAS BEFORE THE REQUIRE, and it is not ceremony.** The stub keeps `window` and `global`
 // as two objects; js/lpn-crs.js attaches to `window` the way every lpn_ module does. Without this
 // line it would build a SECOND, empty EngCalcs and js/looped-network.js would find no transform
@@ -40,7 +40,17 @@ global.window.proj4 = require(path.join(ROOT, 'js', 'vendor', 'proj4.js'));
 const DEFS = JSON.parse(require('fs').readFileSync(path.join(ROOT, 'js', 'data', 'epsg-proj4.json'), 'utf8'));
 // The loader's job is fetching; it is not what is under test, so the state it produces is handed
 // over directly. Everything below this line is the real module.
-global.fetch = () => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(DEFS) });
+// **TWO FILES ARE FETCHED BY THIS PAGE AND THEY ARE NOT THE SAME FILE.** js/lpn-crs.js asks for
+// the 5,240 proj4 definitions; crsRegisterLoad() asks for the 5,346-row catalogue the chooser
+// lists. A stub that served one of them to both requests would hand the chooser a document with
+// no `crs` array and leave it on the built-in 183 rows -- which happens to exclude the very code
+// section 12 below is about. So it dispatches on the URL, as the server does.
+const CATALOGUE = JSON.parse(require('fs').readFileSync(
+	path.join(ROOT, 'js', 'data', 'epsg-projected.json'), 'utf8'));
+global.fetch = (url) => Promise.resolve({
+	ok: true, status: 200,
+	json: () => Promise.resolve(/epsg-projected/.test(String(url)) ? CATALOGUE : DEFS)
+});
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getProject: function () { return project; },\n" +
@@ -63,6 +73,12 @@ const L = loadLoopedNetwork(
 	"\t\tdemOffered: function () { return projectLocatable() && !!mapboxToken()\n" +
 	"\t\t\t&& !!EngCalcs.lpnTerrainFillFor; },\n" +
 	"\t\tcreateProjectFrom: createProjectFrom,\n" +
+	// The chooser and the wizard line that now warn BEFORE a projection is committed to.
+	"\t\tcrsRegisterLoad: crsRegisterLoad, renderCrsBoxList: renderCrsBoxList,\n" +
+	"\t\tcrsBoxState: function () { return crsBox; },\n" +
+	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced,\n" +
+	"\t\tnewBoxGeo: function () { return newBoxGeo; },\n" +
+	"\t\tsyncNewBoxCrsPick: syncNewBoxCrsPick,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); basemapLayer = el('g', {}, world);\n" +
@@ -443,6 +459,81 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		const n2 = L.addNode('junction', 10, 10);
 		ok('...and no node is offered to the terrain server', L.terrainPoints([n2.id]).length === 0);
 		ok('...nor does nodeLonLat invent a place for it', L.nodeLonLat(n2) === null);
+	}
+
+	head('12. ...and the wizard says so BEFORE the projection is chosen');
+	{
+		// **TOM'S OWN REPRODUCTION FROM THE ENGINEERS WITHOUT BORDERS DEMONSTRATION, 2026-09-17**:
+		// *"New project, Geographic projection, Place name search, 'Fotobi, Ghana', Accra / Ghana
+		// National Grid (EPSG: 2136), US units, Create, bring up blank map centered at 0,0."*
+		//
+		// Section 11 above proves the page REFUSES such a project honestly once it exists. This is
+		// the half that was missing: the chooser offered EPSG:2136 as the second row for that place
+		// with nothing to distinguish it from the 5,240 that work, so the consequence was met as a
+		// blank plane rather than read as a sentence. Driven on https://librewaternet.org/app/ with
+		// dev/lpn-spike/browser-drive.js: 0 basemap tiles, camera at 0,0.
+		const PC = global.EngCalcs.pageConfig;
+		const ACCRA = 'EPSG:2136';       // Accra / Ghana National Grid -- axes in Gold Coast feet
+		await new Promise((res) => L.crsRegisterLoad(res));
+		// The catalogue file states a bare number; the page speaks 'EPSG:nnnn'. Compared here the
+		// way js/lpn-crs.js's own key() does, rather than assuming either spelling.
+		ok('the register is listed, so the row Tom picked is reachable at all',
+			CATALOGUE.crs.some((r) => String(r[0]) === ACCRA.slice(5)));
+		ok('...and this page genuinely has no transform for it',
+			global.EngCalcs.lpnCrsHas(ACCRA) === false);
+		ok('...which is what crsCannotBePlaced answers', L.crsCannotBePlaced(ACCRA) === true);
+		ok('...while a projection that works is not marked',
+			L.crsCannotBePlaced(ZONE12N) === false);
+
+		// The mark is in the option text, which is the only thing a person scanning the list sees.
+		ok('the chooser marks it in the row itself',
+			L.crsOptionText({ code: ACCRA, name: 'Accra / Ghana National Grid' })
+				.indexOf(PC.lpn_crs_unplaceable_mark) >= 0,
+			L.crsOptionText({ code: ACCRA, name: 'Accra / Ghana National Grid' }));
+		ok('...and leaves a working projection\'s row alone',
+			L.crsOptionText({ code: ZONE12N, name: 'WGS 84 / UTM zone 12N' })
+				.indexOf(PC.lpn_crs_unplaceable_mark) < 0,
+			L.crsOptionText({ code: ZONE12N, name: 'WGS 84 / UTM zone 12N' }));
+
+		// And the sentence under the list, for the row that is actually selected.
+		byId.lpn_crsbox_name.value = '2136';
+		L.crsBoxState().code = ACCRA;
+		L.renderCrsBoxList();
+		ok('the note under the list says what such a project loses',
+			byId.lpn_crsbox_note.textContent.indexOf(PC.lpn_crs_unplaceable) >= 0,
+			byId.lpn_crsbox_note.textContent);
+		byId.lpn_crsbox_name.value = '32612';
+		L.crsBoxState().code = ZONE12N;
+		L.renderCrsBoxList();
+		ok('...and says nothing of the kind about a projection that works',
+			byId.lpn_crsbox_note.textContent.indexOf(PC.lpn_crs_unplaceable) < 0,
+			byId.lpn_crsbox_note.textContent);
+
+		// The warning has to survive the chooser closing: the New project box is the last thing
+		// describing the projection before Create is pressed.
+		ensure('lpn_new_crs_pick');
+		ensure('lpn_new_crs_name');
+		L.newBoxGeo().crs = ACCRA;
+		L.syncNewBoxCrsPick();
+		ok('the New project box repeats the mark beside the chosen projection',
+			byId.lpn_new_crs_name.textContent.indexOf(PC.lpn_crs_unplaceable_mark) >= 0,
+			byId.lpn_new_crs_name.textContent);
+		L.newBoxGeo().crs = ZONE12N;
+		L.syncNewBoxCrsPick();
+		ok('...and does not mark one that works',
+			byId.lpn_new_crs_name.textContent.indexOf(PC.lpn_crs_unplaceable_mark) < 0,
+			byId.lpn_new_crs_name.textContent);
+
+		// **AND IF SOMEBODY CREATES IT ANYWAY, THE SENTENCE NAMES THE PROJECTION'S LIMIT AND NOT
+		// THE PAGE'S.** lpn_crs_place_projected says the transform is something this page "does
+		// not have yet", which is true when js/lpn-crs.js is absent and false here, where the page
+		// has 5,240 transforms and not this one.
+		byId.lpn_map_notice.textContent = '';
+		L.createProjectFrom({ geo: false, crs: ACCRA, units: {}, method: 'hw', place: PHOENIX });
+		await new Promise((res) => setTimeout(res, 20));
+		ok('creating one anyway states the projection\'s own limit',
+			byId.lpn_map_notice.textContent === PC.lpn_crs_unplaceable,
+			byId.lpn_map_notice.textContent);
 	}
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall projected-basemap checks passed');
