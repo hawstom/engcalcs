@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 1879,
-        "delta_key_count": 10,
+        "expected_key_count": 1895,
+        "delta_key_count": 26,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -526,6 +526,22 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values versus time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
         "lpn_field_desc": "Description",
@@ -538,6 +554,22 @@
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "keys": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values versus time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
         "lpn_field_desc": "Description",
@@ -550,6 +582,262 @@
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "key_context": {
+        "lpn_ts_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_quantity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_chip_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_no_frames": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_axis_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Spremljena ruta {name} koristi čvorove kojih nema u ovom projektu: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
         "lpn_crs_unplaceable_mark": {
             "reason": "missing",
             "current_value": null,

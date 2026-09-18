@@ -385,6 +385,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves', 'lpn_pane_text',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
+  // The time-series tab and its three boxes (ROADMAP Task 599), the profile's twin. Absent from
+  // this list, rebuildTsForm() and renderTimeSeries() return at their first line and the chart
+  // is invisible to every harness -- the pane's own "a missing host is a silent no-op" shape.
+  'lpn_pane_timeseries', 'lpn_ts_form', 'lpn_ts_chart', 'lpn_ts_note',
   // The Find panel's two hosts (ROADMAP Tasks 353/420, and the disconnected report of 540). Absent
   // from this list, rebuildFindForm() and renderFindResults() return at their first line and every
   // control on that panel -- the pull-downs, the query line, the result rows -- is invisible to
