@@ -550,7 +550,11 @@ the block.
   - `gridLayer`'s neighbour: the thematic toggle hides labels outright and label SHEDDING drops
     label CONTENT when the drawing is crowded. This is a third thing and must not be folded into
     either.
-- 100|667| **Tom's reflections on saving, locking and who can see your work.**
+- 50|667| **Tom's reflections on saving, locking and who can see your work.**
+  **DROPPED TO 50 BY TOM, 2026-09-18.** Its urgent leg shipped -- (b), asking for initials only when
+  a colleague wants in, is built on `feat/lock-initials-later` -- and (f) was extracted to Task 696
+  because he could not find it here. What is left is (c) a cloud save, (d2) an in-app connector and
+  (e) concurrent editing, all of which he parked himself.
   Written down 2026-09-14 from a testing exchange with JHB, at Tom's instruction ("For roadmap,
   not now"). **Not one task -- four, deliberately kept together because they are one
   conversation**, and the first is the cheapest and the most urgent.
@@ -626,49 +630,6 @@ the block.
   - **(e) CONCURRENT EDITING, THE GOOGLE DOCS SHAPE.** Tom already priced it himself in the
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.
-
-- 100|663| **Three questions about the reaction rate that only Tom can answer.**
-  Raised when Task 652 shipped the number on 2026-09-13, and written down HERE because they were
-  first put to him in a chat message, which is the one place a question he has to answer later
-  cannot survive. He asked *"Where are the five questions?"* -- this is the answer, and two of the
-  five he has already closed.
-  - **ANSWERED, and recorded so they are not re-asked.** *Is only the RATE an absolute value, or are
-    concentrations at risk too?* Only the rate: the `fabs` is inside EPANET's own `reactpipes()` and
-    applies to `PipeRateCoeff` alone, so concentrations travel a different path and are untouched.
-    On that basis Tom ruled *"I agree. Leave it alone"* -- so we report **EPANET's number exactly**
-    and do NOT show a signed rate of our own, even though the coefficients would let us. A number
-    that disagrees with the reference implementation is the one an engineer cannot defend in a
-    report, which is the same argument Sue made about stationing under Task 643.
-  - **ANSWERED 2026-09-17: LEAVE IT AS EPANET LEAVES IT.** A decaying chlorine and a growing one
-    print the same number, and EPANET says nothing about that either. Matching the reference
-    implementation includes matching its silence. The code comment and `dev/water-quality.md` remain
-    the record. **This interacts with his answer below and the two have to be reconciled before
-    anybody builds either.**
-  - **ANSWERED 2026-09-17, AND HE REJECTED BOTH OPTIONS HE WAS OFFERED:** *"We already decided
-    this. Add some arbitrary amount to the progress bar (just guess a percent like 10% based on what
-    you've seen so far) and don't finish the progress bar until all the output is available."* **The
-    question was wrong, not just the options.** 234 ms is not a performance problem to accept or
-    dodge; it is a progress bar that lies, finishing while work is still going on -- so the fix is to
-    make the bar tell the truth, and the milliseconds stop mattering at any network size. Measured on
-    Net3 over 24 hours at a 5 minute step (289 periods, 119 links, a 1.56 MB output file): 11 ms to
-    get it out of the engine and 234 ms in `readBinary()`, scaling with links times periods.
-    **AND "we already decided this" is a finding about this file**, not about him: the decision was
-    not written down anywhere a later session could find it.
-  - **ANSWERED 2026-09-17: SAY SO -- CONDITIONALLY.** EPANET's value is the last quality step
-    before each reporting instant, not an average over the period. Tom chose *"Say so on screen"* and
-    qualified it: *"If there is a tip, say it in the tip."*
-    - **AND THAT CONDITION COLLIDES WITH HIS ANSWER TO OPEN 1, WHICH MUST GO BACK TO HIM.** He ruled
-      no disclosure for the magnitude, which is what a tip would have existed for -- so on the
-      current answers there is no tip, and his "say it in the tip" has nowhere to land. Three ways
-      out and he picks: a tip carrying only the instant fact; both facts in one tip after all; or
-      nothing, matching EPANET on both counts. **Do not guess which.**
-  - **AND ONE HE HAS ALREADY ASKED FOR, WHICH IS NOT A QUESTION:** *"Nice, though I would like an
-    opportunity to contribute someday."* No pull request was needed for this feature, but the door is
-    open and he wants it. `dev/reaction-rate-upstream.md` holds what a PR would contain, that the C
-    toolkit and the wrapper we vendor are both MIT, and that the FSL-1.1-MIT terms are on the
-    epanet-js WEB APP and not on the toolkit. **Cloning an external repository was blocked on the git
-    organization question, and that is now answered**: an upstream clone goes to `~/src/<project>`,
-    never into `~/webdev`, which is for things we serve. See `dev/git-organization-recommendation.md`.
 
 - 100|646| **Attach the world map to an XY project without changing the project.**
   **THE BRANCH ABSORBED `projection` ON 2026-09-18 AND `projection` IS DELETED**, on Tom's own call:
