@@ -378,6 +378,19 @@ const finite = (s) => s.points.filter((p) => p.y !== undefined).map((p) => p.y);
 	check(tsOptionValues('lpn_ts_quantity')[0] === 'pressure',
 		`with the NODE fields offered again: ${tsOptionValues('lpn_ts_quantity').join(', ')}`);
 
+	// **AN INITIAL CONDITION IS NOT A SERIES** (Tom, 2026-09-17: *"Initial quality: This is the
+	// wrong property to offer for nodes, since it's 'Initial'. Instead, offer Concentration."*). A
+	// node's initial quality is one typed number the run never revisits, so its graph is a flat line
+	// that means nothing, and `quality` -- the concentration the engine integrates -- is the reading
+	// beside it that anybody asking for it wanted.
+	check(tsOptionValues('lpn_ts_quantity').indexOf('initQuality') < 0,
+		'Initial quality is not offered for nodes');
+	check(tsOptionValues('lpn_ts_quantity').indexOf('quality') >= 0,
+		'while Concentration, which the run really does move, still is');
+	// Removed from THIS pull-down and from nothing else: it is still a node property and still a
+	// colour field on the map, where a single instant is all a map ever shows.
+	check(L.colorFieldOptions('node').map((o) => o[0]).indexOf('initQuality') >= 0,
+		'and it is still a field the MAP can be colored by, which is untouched');
 
 	// ---- 8. the pane, and what is NOT stored ---------------------------------------------------
 	head('8. A TAB IN THE STRIP, AND NO NEW STORAGE');

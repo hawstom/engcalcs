@@ -18219,7 +18219,7 @@ var EngCalcs = EngCalcs || {};
 		// profileLayout() applies to the station title, and for the same reason.
 		LPN_TS_MIN_PLOT_H = 110;
 
-	// `group` is 'node' or 'link'; `field` is one of colorFieldOptions()'s keys. Both per group, so
+	// `group` is 'node' or 'link'; `field` is one of tsFieldOptions()'s keys. Both per group, so
 	// switching to Links and back does not throw away the question that was being asked about nodes.
 	var tsState = { group: 'node', fields: { node: '', link: '' }, picks: { node: [], link: [] } };
 	function tsGroup() { return tsState.group === 'link' ? 'link' : 'node'; }
@@ -18234,8 +18234,28 @@ var EngCalcs = EngCalcs || {};
 		var group = tsGroup();
 		return tsState.picks[group].filter(function (id) { return !!tsElementById(group, id); });
 	}
+	// **WHAT THE GRAPH OFFERS IS THE MAP'S LIST MINUS WHAT CANNOT BE A SERIES** (Tom, 2026-09-17:
+	// *"Initial quality: This is the wrong property to offer for nodes, since it's 'Initial'.
+	// Instead, offer Concentration ... all we must do is remove 'Initial quality'."*). A node's
+	// initial quality is the CONDITION THE RUN STARTS FROM -- one typed number that the run never
+	// revisits -- so a chart of it is a flat line at every reporting step, and it sits in the
+	// pull-down one row below `quality`, the concentration the engine actually integrates, which is
+	// the reading anybody asking for it wanted. Offering both is a trap rather than a choice.
+	//
+	// **REMOVED FROM THIS PULL-DOWN ONLY.** It is still a property of a node, still edited in the
+	// popup, still a colour field on the map -- where a single instant is exactly what a map shows,
+	// and where the starting condition is a fair thing to paint. COLOR_FIELD_ORDER is untouched.
+	//
+	// Nothing else is dropped, deliberately: a pipe's diameter and roughness are constants across a
+	// run too, but they are its identity rather than a condition it starts from, a flat line for
+	// them says something true, and Tom named one field.
+	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
+	function tsFieldOptions(group) {
+		var skip = TS_FIELD_SKIP[group] || {};
+		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+	}
 	function tsField() {
-		var group = tsGroup(), opts = colorFieldOptions(group), f = tsState.fields[group], i;
+		var group = tsGroup(), opts = tsFieldOptions(group), f = tsState.fields[group], i;
 		for (i = 0; i < opts.length; i++) { if (opts[i][0] === f) { return f; } }
 		return opts.length ? opts[0][0] : '';
 	}
@@ -18381,7 +18401,7 @@ var EngCalcs = EngCalcs || {};
 		fieldSel.id = 'lpn_ts_quantity';
 		fieldSel.className = 'lpn-ts-pick ec-help';
 		fieldSel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
-		colorFieldOptions(group).forEach(function (o) {
+		tsFieldOptions(group).forEach(function (o) {
 			var op = document.createElement('option');
 			op.value = o[0]; op.textContent = o[1];
 			fieldSel.appendChild(op);
