@@ -8856,7 +8856,7 @@ var EngCalcs = EngCalcs || {};
 			// typing slip takes its demand out of the answers with nothing on screen to say so.
 			if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
 			setNotice(String(pc.lpn_meter_pipe_unknown ||
-				'Nothing in this project is named {id}, so the meter was left where it was.')
+				'Nothing in this project is named {id}, so the customer was left where it was.')
 				.split('{id}').join(id));
 			return false;
 		}
@@ -12571,7 +12571,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		drawPendingMeter(pendingMeter.x, pendingMeter.y);
 		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
-			'Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.');
+			'Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
 	}
 	// The preview box, plus the band from it to wherever the pointer is now. `to` is omitted on the
 	// first press, when there is nowhere yet for the band to reach.
@@ -20901,7 +20901,7 @@ var EngCalcs = EngCalcs || {};
 		var loose = detachCustomersFromLink(id);
 		if (loose) {
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
-				'{n} meters are no longer connected to a pipe. Their demand is not in the answers.')
+				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
 				.replace('{n}', String(loose)));
 		}
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
@@ -23090,7 +23090,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
@@ -27167,7 +27167,7 @@ var EngCalcs = EngCalcs || {};
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
-			{ icon: 'meter', label: pc.lpn_tool_add_meter || 'Meter', fn: function () { setMode('add-meter'); } },
+			{ icon: 'meter', label: pc.lpn_tool_add_meter || 'Customer', fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
@@ -29311,7 +29311,7 @@ var EngCalcs = EngCalcs || {};
 					// so rather than leaving the reader to find it. Selecting a meter still opens
 					// its own box for the one-off case.
 					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
-						'Meter {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.')
+						'Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.')
 						.split('{id}').join(madeC.id));
 					return;
 				}
@@ -38877,7 +38877,7 @@ var EngCalcs = EngCalcs || {};
 		box.className = 'lpn-node-customers';
 		sum = document.createElement('summary');
 		sum.className = 'lpn-node-customers-sum';
-		setFieldLabel(sum, pc.lpn_node_customers || 'Demand added here by meters',
+		setFieldLabel(sum, pc.lpn_node_customers || 'Customer demands',
 			pc.lpn_node_customers_tip);
 		// **THE COUNT AND THE TOTAL ARE THE LINE, AND THE METERS ARE BEHIND IT** (Tom, 2026-09-18:
 		// *"We need to lump the meters with an expansion to see the connected customers and their
@@ -38888,7 +38888,7 @@ var EngCalcs = EngCalcs || {};
 		// from the meters: how many, and how much.
 		count = document.createElement('span');
 		count.className = 'lpn-node-customers-count';
-		count.textContent = (pc.lpn_node_customers_sum || 'Meters: {n}, demand: {total} {unit}')
+		count.textContent = (pc.lpn_node_customers_sum || '{total} {unit} from {n} Customers')
 			.split('{n}').join(String(list.length))
 			.split('{total}').join(String(+total.toFixed(6)))
 			.split('{unit}').join(unitLabel('lpn_u_flow'));
@@ -38907,7 +38907,7 @@ var EngCalcs = EngCalcs || {};
 		hrow = document.createElement('tr');
 		// The headings are the keys the meter's own box and the Customers table already use, so the
 		// three places a customer is read name its fields the same way in all 27 languages.
-		[pc.lpn_tool_add_meter || 'Meter',
+		[pc.lpn_tool_add_meter || 'Customer',
 			pc.lpn_field_account || 'Account number',
 			(pc.lpn_field_meter_total || 'Total demand') + ' (' + unitLabel('lpn_u_flow') + ')'
 		].forEach(function (text) {
@@ -40215,7 +40215,7 @@ var EngCalcs = EngCalcs || {};
 			customerEdited(c);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Services at this meter', pc.lpn_field_meter_count_tip);
+		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Services at this customer', pc.lpn_field_meter_count_tip);
 		cntLabel.appendChild(cntInput);
 		fields.appendChild(cntLabel);
 		fields.appendChild(document.createElement('br'));
@@ -40276,7 +40276,7 @@ var EngCalcs = EngCalcs || {};
 			warn = document.createElement('p');
 			warn.className = 'lpn-set-note';
 			warn.textContent = pc.lpn_customer_detached ||
-				'⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.';
+				'⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
 			fields.appendChild(warn);
 		}
 		tipsIn(fields);
