@@ -474,7 +474,9 @@
 		}
 		if (id !== '') {
 			// A name repeated inside the file. The point is still created -- it is a real surveyed
-			// place -- and it takes a name of ours, which is said out loud.
+			// place -- and this page assigns it a new name, which is said out loud. **NOT "a name of
+			// ours"** (Tom, 2026-09-18, asked what that meant): it was our own coinage and it named
+			// nothing a reader could picture. A new name was assigned. That is the whole fact.
 			if (seen[id]) { refuse('id-duplicate', id); id = ''; }
 			else { seen[id] = 1; }
 		}
@@ -524,6 +526,40 @@
 			.replace(/\{axis\}/g, axis === null || axis === undefined ? '' : axis)
 			.replace(/\{line\}/g, line === null || line === undefined ? '' : line);
 	}
+
+	// ---- THE SHAPE OF A LINE ERROR (Tom, 2026-09-18) -------------------------------------------
+	//
+	// *"Change format pattern to 'Line 6 (see below): DUPLICATE_NAME - Name already in project, new
+	// name assigned.'"* One shell, filled once, so every refusal in the report reads the same way
+	// down the left-hand edge and a reader scanning for their line number never has to parse a
+	// sentence to find it.
+	//
+	// **THE CODE IS A JS LITERAL AND NOT A LANGUAGE KEY, in any of the 27 files.** It is a symbol
+	// rather than a word -- the thing somebody quotes into a mail or searches this page for -- and a
+	// symbol that reads differently in Turkish is no longer the same symbol. The SENTENCE beside it
+	// is the translated half, and it carries the whole meaning on its own: the code is a handle,
+	// never the only statement of what went wrong.
+	//
+	// **AND THE VALUE IS NOT IN THE SENTENCE ANY MORE.** Every one of these used to quote the
+	// offending cell back -- `repeated name: PT-1` -- while the reader's own line was already being
+	// printed directly underneath, holding that same text in its own columns. Saying it twice is
+	// what made these read as prose rather than as a report.
+	var NOTE_CODE = {
+		'row-short': 'TOO_FEW_COLUMNS',
+		'coord-missing': 'MISSING_COORDINATE',
+		'bad-coord': 'BAD_COORDINATE',
+		'coord-range': 'COORDINATE_OUT_OF_RANGE',
+		'bad-elev': 'BAD_ELEVATION',
+		'id-duplicate': 'DUPLICATE_NAME',
+		'id-taken': 'DUPLICATE_NAME',
+		'id-invalid': 'INVALID_NAME'
+	};
+	function lineNote(code, sentence, axis, line) {
+		return (PC.lpn_survey_note_line || 'Line {line} (see below): {code} - {text}')
+			.replace('{line}', line === null || line === undefined ? '' : line)
+			.replace('{code}', NOTE_CODE[code] || '')
+			.replace('{text}', fill(sentence, null, axis, line));
+	}
 	/**
 	 * One note as the reader sees it: `{text, raw}`.
 	 *
@@ -541,19 +577,19 @@
 			ax = axisWord(axes, (note && note.axis) || 'north'),
 			raw = (note && note.raw !== undefined && note.raw !== null) ? String(note.raw) : null,
 			text = code;
-		if (code === 'row-short') { text = fill(PC.lpn_survey_note_row_short || 'Line {line} too few columns: {detail} See entire line below.', d, ax, line); }
-		else if (code === 'coord-missing') { text = fill(PC.lpn_survey_note_coord_missing || 'Line {line} empty {axis}. See entire line below.', d, ax, line); }
-		else if (code === 'bad-coord') { text = fill(PC.lpn_survey_note_bad_coord || 'Line {line} invalid {axis}: {detail} See entire line below.', d, ax, line); }
-		else if (code === 'coord-range') { text = fill(PC.lpn_survey_note_coord_range || 'Line {line} {axis} out of range: {detail} See entire line below.', d, ax, line); }
-		else if (code === 'bad-elev') { text = fill(PC.lpn_survey_note_bad_elev || 'Line {line} non-numeric elevation: {detail} Junction made. See entire line below.', d, ax, line); }
-		else if (code === 'id-duplicate') { text = fill(PC.lpn_survey_note_id_duplicate || 'Line {line} repeated name: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
-		else if (code === 'id-taken') { text = fill(PC.lpn_survey_note_id_taken || 'Line {line} name already in this project: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
-		else if (code === 'id-invalid') { text = fill(PC.lpn_survey_note_id_invalid || 'Line {line} name cannot be an ID here: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
-		// The rest are about the FILE and not about a line, so they carry no number and nothing
-		// is printed underneath them.
-		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d, ax, line); }
-		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line of the file names columns this page does not know, so it was passed over and the column order you chose was used. It reads: {detail}', d, ax, line); }
-		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d, ax, line); }
+		if (code === 'row-short') { text = lineNote(code, PC.lpn_survey_note_row_short || 'Too few columns for the file format above.', ax, line); }
+		else if (code === 'coord-missing') { text = lineNote(code, PC.lpn_survey_note_coord_missing || 'The {axis} cell is empty.', ax, line); }
+		else if (code === 'bad-coord') { text = lineNote(code, PC.lpn_survey_note_bad_coord || 'The {axis} does not read as a number.', ax, line); }
+		else if (code === 'coord-range') { text = lineNote(code, PC.lpn_survey_note_coord_range || 'The {axis} is outside the range this project allows.', ax, line); }
+		else if (code === 'bad-elev') { text = lineNote(code, PC.lpn_survey_note_bad_elev || 'The elevation does not read as a number. Junction made without one.', ax, line); }
+		else if (code === 'id-duplicate') { text = lineNote(code, PC.lpn_survey_note_id_duplicate || 'Name already used earlier in this file, new name assigned.', ax, line); }
+		else if (code === 'id-taken') { text = lineNote(code, PC.lpn_survey_note_id_taken || 'Name already in project, new name assigned.', ax, line); }
+		else if (code === 'id-invalid') { text = lineNote(code, PC.lpn_survey_note_id_invalid || 'Name cannot be used here, new name assigned.', ax, line); }
+		// The rest are about the FILE and not about a line, so they carry no number, no code and
+		// nothing printed underneath them: there is no line to point at.
+		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation, so none of them was read.', d, ax, line); }
+		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line was passed over: it names no columns this page knows.', d, ax, line); }
+		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines passed over: {detail}.', d, ax, line); }
 		return { text: text, raw: raw };
 	};
 

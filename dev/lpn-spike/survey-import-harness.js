@@ -264,39 +264,46 @@ ok('a file with a bad line gets the lead-in that says nothing was thrown away',
 
 // ---- THE SHAPE TOM ASKED FOR, which is the whole of this section ------------------------------
 //
-// *"The import report needs to list line numbers. And it should print the entire line with a much
-// shorter message. Remember we are interfacing with humans, not AI."* (2026-09-17). Three claims,
-// and each is its own assertion because each can break on its own: the NUMBER is there, the LINE is
-// printed underneath, and the sentence is SHORT.
+// *"Change format pattern to 'Line 6 (see below): DUPLICATE_NAME - Name already in project, new
+// name assigned.'"* (2026-09-18, replacing his 2026-09-17 instruction that the report list line
+// numbers and print the whole line). Four claims, and each is its own assertion because each can
+// break on its own: the shell is the shell, the CODE is in it, the reader's line is printed
+// underneath, and the sentence is SHORT.
 {
 	const rep = EC.lpnSurveyReportLines(csv, { created: 6 }, AX);
 	const bad = rep.find(e => /33\.415910/.test(e.raw || ''));
-	ok('the refusal for the swapped row leads with its line number',
-		!!bad && new RegExp('^' + PC.lpn_survey_note_coord_range.split('{')[0].trim()).test(bad.text),
-		bad && bad.text);
+	// Built from the shell key itself rather than from English typed here, so rewording the shell
+	// in lib/lang.ec.en.php is free -- that freedom is what dev/english-key-rulings.json is built on.
+	const shellHead = PC.lpn_survey_note_line.split('{line}')[0];
+	const shellMid = PC.lpn_survey_note_line.split('{line}')[1].split('{code}')[0];
+	ok('a refusal is written in the shell, leading with its line number',
+		!!bad && bad.text.indexOf(shellHead + '11' + shellMid) === 0, bad && bad.text);
+	ok('...and carries the machine-readable CODE, which is never translated',
+		!!bad && bad.text.indexOf('COORDINATE_OUT_OF_RANGE') >= 0, bad && bad.text);
 	ok('...and prints the reader\'s own line underneath, verbatim',
 		!!bad && bad.raw === 'PT-6,-111.830400,33.415910,1247.00', bad && bad.raw);
-	ok('...and the sentence itself is SHORT -- a person scanning for a line, not a paragraph',
-		!!bad && bad.text.split(/\s+/).length <= 14, bad && String(bad.text.split(/\s+/).length));
+	ok('...and the sentence after the code is SHORT -- one plain statement, not a paragraph',
+		!!bad && bad.text.split(' - ').slice(1).join(' - ').split(/\s+/).length <= 12,
+		bad && bad.text.split(' - ').slice(1).join(' - '));
 	ok('...and no refusal anywhere in this report runs longer than that',
-		rep.filter(e => e.raw !== null).every(e => e.text.split(/\s+/).length <= 16));
+		rep.filter(e => e.raw !== null)
+			.every(e => e.text.split(' - ').slice(1).join(' - ').split(/\s+/).length <= 12));
 	ok('a note about the FILE rather than a line prints nothing underneath it',
 		rep.filter(e => e.raw === null).length >= 2);
-	// **THE ONE MESSAGE TOM CALLED WRONG RATHER THAN MERELY LONG** (2026-09-17: *"This error seems
-	// wrong: 'The elevation here does not read as a number (about 1240).' "*). If it does not read
-	// as a number we cannot then say it IS about 1240. The code was already right -- what comes
-	// back is the cell's own characters and nothing parsed them -- so this pins the two halves the
-	// sentence has to keep apart: the text is the FILE's, verbatim, and it is introduced as a
-	// quotation rather than dropped into a parenthesis where every other number on this page is a
-	// value.
-	ok('the elevation it could not read is quoted verbatim, never reported as a number',
+	// **THE VALUE IS NO LONGER QUOTED INTO THE SENTENCE** (Tom, 2026-09-18). It used to be, and the
+	// reader's own line was already being printed directly underneath holding that same text -- so
+	// the report said everything twice. The record still CARRIES the cell verbatim, which is what
+	// stops the old defect coming back the day somebody wants to print it again: Tom's own finding
+	// (2026-09-17, *"This error seems wrong: 'The elevation here does not read as a number (about
+	// 1240).' "*) was that we must never parse that text into a number.
+	ok('the elevation it could not read is carried verbatim on the record, never as a number',
 		(() => { const n = csv.notes.find(x => x.code === 'bad-elev');
 			return n.detail === 'about 1240' && typeof n.detail === 'string'; })());
 	ok('...and the line it is on still became a junction, which the sentence has to say',
 		csv.points.some(p => p.line === 12 && p.elev === null));
-	ok('the unreadable elevation is reported on its own line, with the cell it could not read',
-		!!rep.find(e => e.raw === 'PT-7,33.414700,-111.830400,about 1240' &&
-			e.text.indexOf('about 1240') >= 0), JSON.stringify(rep.map(e => e.text)));
+	ok('...and the sentence does not repeat the cell, because the line below already holds it',
+		!!rep.find(e => e.raw === 'PT-7,33.414700,-111.830400,about 1240'
+			&& e.text.indexOf('about 1240') < 0), JSON.stringify(rep.map(e => e.text)));
 }
 // **TWO ROWS THAT FAILED THE SAME WAY ARE NOW TWO LINES, NOT ONE.** That reverses what this report
 // did, and deliberately: pooling them into one sentence with both names in brackets is shorter and
@@ -515,7 +522,7 @@ L.reset(L.GEO);
 L.addNode('junction', 0, 0);
 L.node('J1').id = 'PT-1';
 importCsv();
-ok('a name already in the project is reported, and the junction keeps a name of ours',
+ok('a name already in the project is reported, and the junction keeps the name this page minted',
 	L.getDoc().nodes.length === 7 && !!L.node('J2'),
 	L.getDoc().nodes.map(n => n.id).join(','));
 // **AND IT OWES THE READER THE SAME LINE NUMBER AS EVERY OTHER REFUSAL.** These two -- a name the
