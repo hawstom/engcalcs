@@ -60,3 +60,19 @@ dev/screenshots/*
 # Shortcut.lnk` appeared on 2026-09-15 and blocked the pre-push stamp, which needs a clean tree,
 # so every push had to move it aside and put it back. Nothing here is ever a deliberate artifact.
 *.lnk
+
+# **THE SAFETY COPY `new_english_keys.php --write --force` LEAVES BEHIND.**
+#
+# --force refuses to clobber a hand-edited dev/new-english-keys.md silently: it writes what was
+# there to dev/new-english-keys.rejected.md first, so a mark of Tom's can always be recovered. That
+# guard exists because the file has eaten his work before (Task 545).
+#
+# **IT IS AN ARTEFACT AND NEVER SOURCE, AND LEAVING IT UNTRACKED HAD A COST NOBODY PREDICTED.**
+# check_all.sh stamps a commit as verified ONLY on a clean tree -- "a pass measured against
+# uncommitted edits says nothing about the commit that will actually be pushed" -- so this one
+# untracked file made the suite pass and then refuse its own push, twice on 2026-09-18, each time
+# costing a full re-run to diagnose. Ignoring it keeps the stamp rule strict about SOURCE while not
+# letting a recovery copy masquerade as an uncommitted change.
+#
+# If you need what it holds, it is still on disk; it is simply not a thing git reports.
+dev/new-english-keys.rejected.md

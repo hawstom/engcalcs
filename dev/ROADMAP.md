@@ -330,6 +330,116 @@ the block.
   - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
     original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
 
+- 100|692| **Satellite view is refused on a projected project, and it is the DEM bug again.**
+  Tom, 2026-09-18, after making projects in Mesa AZ and Fotobi, Ghana: *"Satellite view is only
+  available for lat/lon CRS."*
+  - **IT IS THE SAME SINGLE WORD THAT BROKE Read DEM, IN THE CONTROL NEXT DOOR.** The satellite row
+    is gated on `isGeoProject()` (`js/looped-network.js:9378` and `:25968`), which means lat/lon and
+    nothing else. The elevation controls asked the same question until 2026-09-14, when `cc894f98`
+    replaced it with **"can this project say where on the Earth a point of it is"** --
+    `projectLocatable()` -- precisely because the row appeared on a projected project and then did
+    nothing. **That fix was applied to its own three entry points and not to its neighbour.**
+  - A project on an EPSG plane knows exactly where it is on the Earth; that is what the plane is for.
+    There is no reason a satellite tile cannot be drawn behind it.
+  - **SO THE REAL TASK IS WIDER THAN THE SYMPTOM: find every OTHER reader of `isGeoProject()` and
+    ask, of each, whether it means "lat/lon" or means "locatable".** Two have now been wrong for the
+    same reason, which is the signature this project keeps finding.
+
+- 75|693| **"Length and map coordinates" is a lie on an EPSG project.**
+  Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
+  Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
+  Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
+  is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
+  - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
+    project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
+    geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
+    unit, which need not be the one pipes are measured in.
+  - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
+    'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
+    an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
+    rest of this page treats a number it knows rather than one the user states.
+  - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
+    convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
+    DISPLAY of what the coordinate system already says, never an input that rewrites anything.
+  - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
+    Save-as side.
+
+- 50|694| **Export a map animation as an animated picture.**
+  Tom, 2026-09-18: *"It would be very fun to export a map animation to a gif. And I bet it would not
+  be hard for you. That could be another export item for the file menu. And if we get a lot of export
+  and import items, we can put them in submenus."* And: *"With EWB finished, we can just enjoy
+  ourselves building cool things for a while."*
+  - The extended-period run already draws every frame, and the transport already steps them, so the
+    frames exist -- what is missing is capturing them and writing a file.
+  - **THE SUBMENU HALF IS THE PART THAT IS ALREADY EARNED.** The File menu now carries Open, Import
+    EPANET, Export EPANET, Import libraries and the xy-on-map row, and he could not find Export
+    EPANET at all (Task 685's sibling complaint, 2026-09-17). Grouping imports and exports is worth
+    doing whether or not the animation is.
+  - **NO THIRD-PARTY REQUEST AND NO VENDORED LIBRARY WITHOUT A DECISION.** The suite makes exactly
+    four outside requests, all on this page, all opt-in; `vendor_integrity_check.php` governs anything
+    added to `js/vendor/`. Encoding in the browser with no new dependency is the shape to aim for.
+
+- 50|695| **The daily status mail has columns with no headings.**
+  Tom, 2026-09-18, of the nightly report: *"Headings for this would help"*, quoting a table whose
+  columns he had to guess at -- he wrote them as `??? ????`. The two numbers are almost certainly
+  the two consent buckets, which is exactly the pair CLAUDE.md forbids summing, so a reader guessing
+  at them is the failure this is about.
+  - `log/lang-log-stats.sh` builds it and `dev/host/` holds the deployed copy;
+    `log_format_selftest.php` pins its output shape, so the headings go in with the test.
+  - **NAME WHAT EACH COLUMN COUNTS, NOT JUST WHAT IT IS.** One column counts PEOPLE (consented,
+    deduplicated) and the other counts PAGE LOADS (everyone else, undeduplicated). A heading that
+    says only "visits" would be worse than none.
+
+- 100|696| **File, Convert coordinates as: a working menu item, as a new project.**
+  **TOM HAS ASKED FOR THIS REPEATEDLY AND IT HAS NEVER HAD A TASK OF ITS OWN**, 2026-09-18: *"You
+  have reminded me about this goal, and I have asked you repeatedly about this goal, and yet I don't
+  find it in the road map. We need a working menu item to convert coordinates as a new project. We
+  should be able to finish this promptly."*
+  - **HE IS RIGHT AND THE CAUSE IS WHERE IT WAS FILED.** The design is complete and has been since
+    2026-09-15, but it lives as leg (f) of Task 667, whose title is *"Tom's reflections on saving,
+    locking and who can see your work"* -- so a search for the thing finds nothing and the index
+    shows a title about file locking. **A design buried under an unrelated title is a design nobody
+    can find, which is this file's own length rule working in reverse.** Extracted here; 667(f) now
+    points at this.
+  - **HIS DESIGN, IN HIS OWN WORDS AND IN THREE STEPS:** *"(1) the row becomes File, Convert
+    coordinates as...; (2) it offers a file picker OR makes a duplicate tab named `Copy of
+    {project_name}`; (3) the redesigned conversion wizard runs."*
+  - **"CONVERT" IS THE HONEST WORD AND THIS REVERSES WHAT THIS REPO HAD WRITTEN DOWN.** Tom: *"let's
+    not fool ourselves, conversion of all coordinates is happening."* He is right and the code agrees:
+    `georefWrite()` re-derives every stored point. **The rule we actually hold is never convert IN
+    PLACE**, and a Save-as does not -- the original file is untouched. That is why this belongs to the
+    **File, Save as...** family, beside Task 688's *Convert units as...*.
+  - **WHAT WE BUILT WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ CORRECTLY.** The shipped
+    row is `Open xy file on map…`, which opens a FILE; he wants a row that converts THIS project.
+    That is the whole of the redesign, and it is his diagnosis: *"we've been neglecting to use a
+    standard paradigm because our design is wrong."*
+  - **IT BELONGS ON `feat/xy-world-map`**, which now holds every piece of the coordinate work, and it
+    is the exception path there: `dev/tom-coordinate-vocabulary-2026-09-16.md` rules that converting
+    is *"no longer the default way to georeference"* -- the default is the Custom georeference wizard
+    that changes no coordinate at all. **This is the dabbler action, offered because we already built
+    and debugged the wizard, and not recommended in most situations.**
+
+- 50|697| **EPANET++ as a competing front door, on its own two domains.**
+  Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
+  called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
+  - **BOTH DOMAINS ALREADY EXIST ON THE ACCOUNT** -- `~/addon_html/epanet-plus-plus.org` and
+    `~/addon_html/epanetpp.org` were both seen there on 2026-09-17.
+  - **"CANONICAL TO THEMSELVES" IS THE WHOLE TECHNICAL REQUIREMENT AND IT IS NOW CHEAP.** As of
+    2026-09-18 the canonical origin is a PER-PAGE declaration in `lib/Canonical.lib.php` rather than
+    one global constant, so a third and fourth front door is a declaration rather than a rewrite.
+    **But read the Search Console lesson first:** every calculator page had been nominating
+    librewaternet.org, a three-week-old domain at position 34, while hawsedc.com earned 7,575 clicks
+    a quarter at position 9.7. **A page can nominate only ONE canonical address**, so a genuine A/B
+    test of two front doors is not two canonicals over one page -- decide what each site actually
+    serves before writing a line.
+  - **AND THE NAME IS A PUBLIC CLAIM, WHICH IS THE PART THAT NEEDS CARE.** `dev/positioning.md` is the
+    authority for every public claim, `public_claim_check.php` holds four sentences Tom has already
+    struck, and `dev/not-epanet.org` exists as a sibling site with its own claim rules. **"EPANET++"
+    asserts a relationship to EPANET** -- read `dev/positioning.md` and the `not-epanet.org` CLAIMS
+    file before drafting a word of it, and expect the completeness question (never a completeness
+    claim against EPANET) to be the first one asked.
+  - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
+
 - 100|686| **The progress bar finishes before the work does.**
   Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
   progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the
@@ -440,7 +550,11 @@ the block.
   - `gridLayer`'s neighbour: the thematic toggle hides labels outright and label SHEDDING drops
     label CONTENT when the drawing is crowded. This is a third thing and must not be folded into
     either.
-- 100|667| **Tom's reflections on saving, locking and who can see your work.**
+- 50|667| **Tom's reflections on saving, locking and who can see your work.**
+  **DROPPED TO 50 BY TOM, 2026-09-18.** Its urgent leg shipped -- (b), asking for initials only when
+  a colleague wants in, is built on `feat/lock-initials-later` -- and (f) was extracted to Task 696
+  because he could not find it here. What is left is (c) a cloud save, (d2) an in-app connector and
+  (e) concurrent editing, all of which he parked himself.
   Written down 2026-09-14 from a testing exchange with JHB, at Tom's instruction ("For roadmap,
   not now"). **Not one task -- four, deliberately kept together because they are one
   conversation**, and the first is the cheapest and the most urgent.
@@ -490,6 +604,10 @@ the block.
     scope), but each is **a NEW third-party request with its own consent gate and its own paragraph
     in `privacy.php`, one build per provider** -- against a folder-sync route that is free and
     provider-agnostic. Revisit on demand, not on interest.
+  - **(f) EXTRACTED TO TASK 696 ON 2026-09-18** because Tom could not find it here, and he was
+    right: a coordinate-conversion menu item filed under a task about file locking is unfindable.
+    The full design is there. What follows is kept only so a reader of this block is not left
+    wondering.
   - **(f) THE CONVERSION IS A "SAVE AS" AND THE MENU SHOULD SAY SO** (Tom, 2026-09-15, and this
     supersedes the wording argument that preceded it). His diagnosis is that the naming fight was
     a symptom: *"we've been neglecting to use a standard paradigm because our design is wrong."*
@@ -513,50 +631,34 @@ the block.
     exchange: *"That would be a huge project with lots of questions to answer."* Recorded so the
     want is not lost, parked because he parked it.
 
-- 100|663| **Three questions about the reaction rate that only Tom can answer.**
-  Raised when Task 652 shipped the number on 2026-09-13, and written down HERE because they were
-  first put to him in a chat message, which is the one place a question he has to answer later
-  cannot survive. He asked *"Where are the five questions?"* -- this is the answer, and two of the
-  five he has already closed.
-  - **ANSWERED, and recorded so they are not re-asked.** *Is only the RATE an absolute value, or are
-    concentrations at risk too?* Only the rate: the `fabs` is inside EPANET's own `reactpipes()` and
-    applies to `PipeRateCoeff` alone, so concentrations travel a different path and are untouched.
-    On that basis Tom ruled *"I agree. Leave it alone"* -- so we report **EPANET's number exactly**
-    and do NOT show a signed rate of our own, even though the coefficients would let us. A number
-    that disagrees with the reference implementation is the one an engineer cannot defend in a
-    report, which is the same argument Sue made about stationing under Task 643.
-  - **ANSWERED 2026-09-17: LEAVE IT AS EPANET LEAVES IT.** A decaying chlorine and a growing one
-    print the same number, and EPANET says nothing about that either. Matching the reference
-    implementation includes matching its silence. The code comment and `dev/water-quality.md` remain
-    the record. **This interacts with his answer below and the two have to be reconciled before
-    anybody builds either.**
-  - **ANSWERED 2026-09-17, AND HE REJECTED BOTH OPTIONS HE WAS OFFERED:** *"We already decided
-    this. Add some arbitrary amount to the progress bar (just guess a percent like 10% based on what
-    you've seen so far) and don't finish the progress bar until all the output is available."* **The
-    question was wrong, not just the options.** 234 ms is not a performance problem to accept or
-    dodge; it is a progress bar that lies, finishing while work is still going on -- so the fix is to
-    make the bar tell the truth, and the milliseconds stop mattering at any network size. Measured on
-    Net3 over 24 hours at a 5 minute step (289 periods, 119 links, a 1.56 MB output file): 11 ms to
-    get it out of the engine and 234 ms in `readBinary()`, scaling with links times periods.
-    **AND "we already decided this" is a finding about this file**, not about him: the decision was
-    not written down anywhere a later session could find it.
-  - **ANSWERED 2026-09-17: SAY SO -- CONDITIONALLY.** EPANET's value is the last quality step
-    before each reporting instant, not an average over the period. Tom chose *"Say so on screen"* and
-    qualified it: *"If there is a tip, say it in the tip."*
-    - **AND THAT CONDITION COLLIDES WITH HIS ANSWER TO OPEN 1, WHICH MUST GO BACK TO HIM.** He ruled
-      no disclosure for the magnitude, which is what a tip would have existed for -- so on the
-      current answers there is no tip, and his "say it in the tip" has nowhere to land. Three ways
-      out and he picks: a tip carrying only the instant fact; both facts in one tip after all; or
-      nothing, matching EPANET on both counts. **Do not guess which.**
-  - **AND ONE HE HAS ALREADY ASKED FOR, WHICH IS NOT A QUESTION:** *"Nice, though I would like an
-    opportunity to contribute someday."* No pull request was needed for this feature, but the door is
-    open and he wants it. `dev/reaction-rate-upstream.md` holds what a PR would contain, that the C
-    toolkit and the wrapper we vendor are both MIT, and that the FSL-1.1-MIT terms are on the
-    epanet-js WEB APP and not on the toolkit. **Cloning an external repository was blocked on the git
-    organization question, and that is now answered**: an upstream clone goes to `~/src/<project>`,
-    never into `~/webdev`, which is for things we serve. See `dev/git-organization-recommendation.md`.
-
 - 100|646| **Attach the world map to an XY project without changing the project.**
+  **THE BRANCH ABSORBED `projection` ON 2026-09-18 AND `projection` IS DELETED**, on Tom's own call:
+  *"Maybe we could merge projection into it and then delete projection? The merge may require some
+  manual conflict resolution. But I think it's the right paper trail."* One branch,
+  `feat/xy-world-map`, now holds every piece of the coordinate work, and Task 641 is part of it.
+  - **AND THE BRANCH'S REAL SPECIFICATION IS `dev/tom-coordinate-vocabulary-2026-09-16.md`**, which
+    is his own 17,000-word message recovered from a session transcript on 2026-09-17 after he asked
+    where it had gone. It had never been written to a file. **It is bigger than this task's title**:
+    *"We no longer want to expose the word 'projection'"*, and *"Georeferencing is still
+    georeferencing, but it means to attach the world map, not to convert your coordinate system."*
+  - **HIS WIZARD, IN THREE STEPS, stated twice because the first time was not recorded:** show the
+    world map with the project near 0,0, both zoomed to fit; let the user zoom, pan, search by name
+    or Go to, until they press **Place approximately**; then a drag-scale-rotate rectangle that moves
+    **the map, not their project**, until they press **Georeference here**; then the status bar reads
+    **unnamed**.
+  - **"unnamed" ANSWERS TWO THINGS AT ONCE AND THAT IS DELIBERATE** (Tom, 2026-09-17, correcting a
+    recommendation of ours that it should answer one): the three status values are `{EPSG name}`,
+    **unnamed**, and **not georeferenced** -- where *unnamed* means georeferenced but not to any named
+    CRS, *"probably only an approximate anchor point and convergence angle from our UI."*
+  - **THE 65 STRING EDITS SPLIT THREE WAYS** (measured 2026-09-17, and he approved the split): 17
+    already match master; **13 are pure vocabulary on shipped controls and go to master**, because an
+    EPSG projected CRS genuinely IS a coordinate reference system and renaming it is not a lie; **2
+    would be a lie on master** (`lpn_file_import_geo` and `lpn_new_coordsys_local_tip` describe
+    behaviour master does not have) and wait for this branch; and **33 `lpn_transform_*` are the
+    wizard** and belong here by definition. The 13 include `lpn_geomap` and `lpn_xymap`, which are the
+    canonical mode names `mode_name_check.php` holds every other string to, so they move as one
+    coordinated pass and the check guarantees it cannot be half-done.
+  - Cost of the master half, so it is not a surprise: about 390 retranslations.
   Tom, 2026-09-13, thinking past Task 641: *"even an arbitrary XY project can have a world map
   background with a good wizard. Our Map menu can have a new Background map (georeference) 'Attach
   the world map to this project without changing it any other way.'"* That sentence is the feature
@@ -824,21 +926,6 @@ the block.
     person reads lat,lon.
   - **The one design question is the same one the `.inp` importer already answered:** a row that
     cannot be honoured is reported, never dropped and never guessed at.
-
-- 100|599| **Graph a value against time across an extended-period run.**
-  Tom, 2026-09-06: *"We haven't added anything for time series reporting or graphing such as one or
-  more nodes' pressure or head across an EPS."* Correct, and it is the gap that costs most: the run
-  ships (`js/lpn-time.js`), the frames are already kept, and the only way to read one node across
-  them is to scrub the transport and watch a number change.
-  - **THE DATA IS ALREADY THERE, WHICH IS WHY THIS RANKS ABOVE THE OTHER PLOTS.** A run holds every
-    reporting step; nothing has to be re-solved, re-fetched or stored differently. This is a reader
-    over state we already have.
-  - **DRAW IT THE WAY THE PROFILE IS DRAWN.** `lpn_profile_*` already owns an axis pair, a unit
-    label per axis, a legend and a hand-rolled plot -- no chart library, nothing vendored, and it
-    survives `vendor_integrity_check.php` by having nothing to declare. A second plotting idiom on
-    this page would be the expensive mistake.
-  - **MULTI-SERIES IS THE POINT** (*"one or more nodes' pressure or head"*): one node over time is a
-    number, several on one axis is the comparison an operator is actually making.
 
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project

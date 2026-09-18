@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 19 untranslated keys, of 1888 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 62 untranslated keys, of 1931 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,11 +25,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (19, 5 to read @@ NEEDS RULING)
+## lpn_  (62, 29 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
+- **`lpn_copy_of`**
+  > Copy of {name}
+  @@ NEEDS RULING
+- **`lpn_crs_unnamed`**
+  > unnamed
+  @@ NEEDS RULING
 - **`lpn_crs_unplaceable`**
   > This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.
   @@ NEEDS RULING
@@ -48,18 +54,63 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
+- **`lpn_library_import`**
+  > Import libraries…
+  @@ NEEDS RULING
+- **`lpn_library_import_added`**
+  > Copied in: {names}
+  _Ruled OK 2026-09-17._
+- **`lpn_library_import_choose`**
+  > Choose what to copy from {file}
+  @@ NEEDS RULING
+- **`lpn_library_import_conflict`**
+  > Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.
+  _Ruled OK 2026-09-17._
+- **`lpn_library_import_count`**
+  > {name} ({count})
+  @@ NEEDS RULING
+- **`lpn_library_import_curve_shape`**
+  > These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}
+  _Ruled 2026-09-17: Can you clarify "first column rises from each point to the next"?_
+- **`lpn_library_import_go`**
+  > Import
+  @@ NEEDS RULING
+- **`lpn_library_import_heading`**
+  > Imported from {file}
+  _Ruled OK 2026-09-17._
+- **`lpn_library_import_needs_fittings`**
+  > These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.
+  _Ruled OK 2026-09-17._
+- **`lpn_library_import_no_libraries`**
+  > That project file has no libraries to copy.
+  @@ NEEDS RULING
+- **`lpn_library_import_none`**
+  > That project file has none of these to copy.
+  _Ruled OK 2026-09-17._
+- **`lpn_library_import_note`**
+  > Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.
+  @@ NEEDS RULING
+- **`lpn_library_import_tip`**
+  > Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.
+  @@ NEEDS RULING
+- **`lpn_library_import_units`**
+  > Warning: Units mismatch. Will be imported as is. Not recommended.
+  @@ NEEDS RULING
+- **`lpn_library_import_units_line`**
+  > {name}: this project shows {mine}, the file shows {theirs}.
+  @@ NEEDS RULING
 - **`lpn_map_attach_done`**
-  > The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.
-  _Ruled OK 2026-09-17._
+  > The world map is behind your drawing now, and your project is unchanged. Use Map, Remove the world map to take it away again.
+  @@ NEEDS RULING
 - **`lpn_map_attach_menu`**
-  > Background map (georeference)…
-  _Ruled OK 2026-09-17._
+  > Custom georeference…
+  @@ NEEDS RULING
 - **`lpn_map_attach_place`**
   > Attach the world map…
   _Ruled OK 2026-09-17._
 - **`lpn_map_attach_remove`**
-  > Remove
-  _Ruled OK 2026-09-17._
+  > Remove the world map
+  @@ NEEDS RULING
 - **`lpn_map_attach_remove_tip`**
   > Take the world map away. The drawing and its coordinates are untouched either way.
   _Ruled OK 2026-09-17._
@@ -75,6 +126,36 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_map_attach_where`**
   > Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space
   _Ruled OK 2026-09-17._
+- **`lpn_mapgeo_cancelled`**
+  > The world map is back where it was, and your drawing never moved.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_finish`**
+  > Georeference here
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint1`**
+  > Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint2`**
+  > Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_intro`**
+  > Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_locked`**
+  > Finish with the Georeference here button, or press Cancel, before you switch projects or save. The world map is still being placed.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_place`**
+  > Place approximately
+  @@ NEEDS RULING
+- **`lpn_mapgeo_replace`**
+  > This project already has the world map attached. Replace that georeferencing?
+  @@ NEEDS RULING
+- **`lpn_mapgeo_step1`**
+  > Step 1 of 2: find your place in the world
+  @@ NEEDS RULING
+- **`lpn_mapgeo_step2`**
+  > Step 2 of 2: fit the map behind your drawing
+  @@ NEEDS RULING
 - **`lpn_terrain_http`**
   > The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.
   @@ NEEDS RULING
@@ -84,12 +165,60 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_terrain_rate_limited`**
   > The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.
   @@ NEEDS RULING
+- **`lpn_ts_add`**
+  > Add selected
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_add_none`**
+  > Nothing of that kind is chosen on the map.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_add_tip`**
+  > Put everything now chosen on the map onto the graph.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_axis_time`**
+  > Elapsed time
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_chip_tip`**
+  > Take {id} off the graph
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_clear`**
+  > Remove all
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_group_links`**
+  > Links
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_group_nodes`**
+  > Nodes
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_group_tip`**
+  > Whether the graph shows nodes or links.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_menu`**
+  > Time series
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_no_frames`**
+  > No extended period results yet. Press Calculate to run the simulation.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_none`**
+  > Nothing to graph yet. Choose assets on the map and press Add selected.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_quantity_tip`**
+  > Which value to graph against time.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_summary`**
+  > Assets: {n}, reporting times: {steps}
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_tip`**
+  > Graph one or more assets against time across an extended period simulation.
+  _Ruled OK 2026-09-17._
+- **`lpn_ts_title`**
+  > Values versus time
+  _Ruled OK 2026-09-17._
 
 ---
 
 # Strings waiting on a branch
 
-**65 still to read**, of 150 new keys across 9 unmerged branch(es).
+**59 still to read**, of 112 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -100,7 +229,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-demands (`ad8eadc2`) — 31 new, 8 to read @@ NEEDS RULING
+### feat/customer-demands (`51c7cfec`) — 32 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_customer_detached`**
   > ⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.
@@ -163,8 +292,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.
   _Ruled OK 2026-09-17._
 - **`lpn_meter_pick_pipe`**
-  > Now click the pipe that serves this meter. Press Escape to cancel.
-  _Ruled OK 2026-09-17._
+  > Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.
+  @@ NEEDS RULING
 - **`lpn_meter_pipe_unknown`**
   > Nothing in this project is named {id}, so the meter was left where it was.
   @@ NEEDS RULING
@@ -172,10 +301,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Meter {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.
   @@ NEEDS RULING
 - **`lpn_mode_add_meter`**
-  > Meter: click the pipe that serves this customer, or click open ground and then click its pipe. Escape leaves the tool.
-  _Ruled 2026-09-17: I like the "Click pipe" method of adding a customer. But it has some problems. (1) the offset would need to be in settings and (2) it will never be clear to the user which side is left (negative) and which is right (positive) unless there are arrows. Obviously side is not arbitrary or unimportant. Possibilities: (1) toolbar/menu button could include two modes, left and right, and they are relative to the direction of the flow arrow or low to high node number, and users have to learn by trial and error if they want to use this method, and offset is in Settings, Values._
+  > Meter: click where the meter is, then click the pipe or the node that serves it. Escape leaves the tool.
+  @@ NEEDS RULING
 - **`lpn_node_customers`**
   > Demand added here by meters
+  @@ NEEDS RULING
+- **`lpn_node_customers_sum`**
+  > Meters: {n}, demand: {total} {unit}
   @@ NEEDS RULING
 - **`lpn_node_customers_tip`**
   > Every meter whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A meter is edited where it sits on the map or in the Customers table.
@@ -193,73 +325,12 @@ build for that would be a gate nobody keeps. Refresh it with
   > Meter
   _Ruled OK 2026-09-17._
 - **`lpn_tool_add_meter_tip`**
-  > Click the pipe that serves a customer to put a meter on it, or click open ground and then click the pipe. The demand you give the meter is added to the junction at the near end of that pipe.
-  _Ruled 2026-09-17: See comment for lpn_mode_add_meter_
-
-### feat/label-gang-search (`2a31d4f1`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  > Click where the meter is, then click the pipe or the node that serves it. The demand you give the meter is added to the junction at the near end of that pipe.
   @@ NEEDS RULING
 
-### feat/library-import (`b8deed22`) — 17 new, 11 to read @@ NEEDS RULING
+### feat/label-gang-search (`84a527a1`) — adds no English strings
 
-- **`lpn_library_import`**
-  > Import libraries…
-  @@ NEEDS RULING
-- **`lpn_library_import_added`**
-  > Copied in: {names}
-  _Ruled OK 2026-09-17._
-- **`lpn_library_import_choose`**
-  > Choose what to copy from {file}
-  @@ NEEDS RULING
-- **`lpn_library_import_conflict`**
-  > Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.
-  _Ruled OK 2026-09-17._
-- **`lpn_library_import_count`**
-  > {name} ({count})
-  @@ NEEDS RULING
-- **`lpn_library_import_curve_shape`**
-  > These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}
-  _Ruled 2026-09-17: Can you clarify "first column rises from each point to the next"?_
-- **`lpn_library_import_go`**
-  > Import
-  @@ NEEDS RULING
-- **`lpn_library_import_heading`**
-  > Imported from {file}
-  _Ruled OK 2026-09-17._
-- **`lpn_library_import_needs_fittings`**
-  > These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.
-  _Ruled OK 2026-09-17._
-- **`lpn_library_import_no_libraries`**
-  > That project file has no libraries to copy.
-  @@ NEEDS RULING
-- **`lpn_library_import_none`**
-  > That project file has none of these to copy.
-  _Ruled OK 2026-09-17._
-- **`lpn_library_import_note`**
-  > Each library you check is copied in whole. Anything whose name is already taken here is skipped and listed. Delete what you do not want afterwards, the way you delete any other row.
-  @@ NEEDS RULING
-- **`lpn_library_import_tip`**
-  > Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.
-  @@ NEEDS RULING
-- **`lpn_library_import_units`**
-  > The file does not show its numbers in the units this project shows. Nothing is converted. Every number is copied exactly as the file wrote it, so it will mean the unit this project shows.
-  @@ NEEDS RULING
-- **`lpn_library_import_units_line`**
-  > {name}: this project shows {mine}, the file shows {theirs}.
-  @@ NEEDS RULING
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
-
-### feat/lock-initials-later (`6f40ffa7`) — 15 new, 3 to read @@ NEEDS RULING
+### feat/lock-initials-later (`37f05c7e`) — 15 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_lock_age_edited`**
   > It was last edited {x} ago.
@@ -307,7 +378,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/survey-import (`121b4405`) — 63 new, 35 to read @@ NEEDS RULING
+### feat/survey-import (`4bed8672`) — 63 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_file_import_survey`**
   > Import surveyed points…
@@ -327,20 +398,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_column_n`**
   > column {n}
   @@ NEEDS RULING
-- **`lpn_survey_confirm`**
-  > Create {n} junction(s) from this surveyed point list?
-  _Ruled OK 2026-09-17._
+- **`lpn_survey_confirm_junction`**
+  > {n} junction(s) found. Proceed?
+  @@ NEEDS RULING
 - **`lpn_survey_confirm_pipes`**
   > No pipes are drawn. A surveyed list says where the points are, not which of them are joined.
   _Ruled OK 2026-09-17._
+- **`lpn_survey_confirm_reservoir`**
+  > {n} reservoir(s) found. Proceed?
+  @@ NEEDS RULING
+- **`lpn_survey_confirm_tank`**
+  > {n} tank(s) found. Proceed?
+  @@ NEEDS RULING
 - **`lpn_survey_create`**
   > Create junctions
-  @@ NEEDS RULING
-- **`lpn_survey_elev_assumed`**
-  > The file does not say what unit its elevations are in, so they are read as {project}, which is the unit this project is showing.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_elev_unit`**
-  > The elevation column in your file is named for {file}, and this project is showing {project}.
   @@ NEEDS RULING
 - **`lpn_survey_err_ambiguous_coord`**
   > More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.
@@ -390,14 +461,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_fmt_pnezd`**
   > Point name, northing, easting, elevation, description (PNEZD)
   @@ NEEDS RULING
-- **`lpn_survey_format_hint`**
-  > This says which of the two coordinate columns comes first, the northing or the easting. If the first line of your file names its columns, those names are used and this is left alone.
+- **`lpn_survey_format_internal`**
+  > {format} specified internally
   @@ NEEDS RULING
 - **`lpn_survey_format_label`**
-  > Column order, for a file that does not name its own columns
-  @@ NEEDS RULING
-- **`lpn_survey_from_format`**
-  > Your file does not name its own columns, so they were read in this order: {format}
+  > File format:
   @@ NEEDS RULING
 - **`lpn_survey_from_header`**
   > The first line of your file names its own columns, so those names were used and the column order below was not needed.
@@ -405,9 +473,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_map_gpx`**
   > Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_map_lines`**
-  > {first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.
-  @@ NEEDS RULING
 - **`lpn_survey_map_none`**
   > not used
   _Ruled OK 2026-09-17._
@@ -415,25 +480,25 @@ build for that would be a gate nobody keeps. Refresh it with
   > A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_ambiguous_elev`**
-  > More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.
-  _Ruled OK 2026-09-17._
+  > More than one column could be the elevation, so none of them was read.
+  @@ NEEDS RULING
 - **`lpn_survey_note_bad_coord`**
-  > Line {line} invalid {axis}: {detail} See entire line below.
+  > The {axis} does not read as a number.
   @@ NEEDS RULING
 - **`lpn_survey_note_bad_elev`**
-  > Line {line} non-numeric elevation: {detail} Junction made. See entire line below.
+  > Non-numeric elevation. Imported without elevation.
   @@ NEEDS RULING
 - **`lpn_survey_note_bad_lon`**
   > The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.
   _Ruled 2026-09-17: Needs discussion and design concept planning._
 - **`lpn_survey_note_blank_rows`**
-  > Blank lines were passed over: {detail}.
-  _Ruled OK 2026-09-17._
+  > Blank lines passed over: {detail}.
+  @@ NEEDS RULING
 - **`lpn_survey_note_coord_missing`**
-  > Line {line} empty {axis}. See entire line below.
+  > The {axis} cell is empty.
   @@ NEEDS RULING
 - **`lpn_survey_note_coord_range`**
-  > Line {line} {axis} out of range: {detail} See entire line below.
+  > The {axis} is outside the range this project allows.
   @@ NEEDS RULING
 - **`lpn_survey_note_elev_converted`**
   > The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.
@@ -445,16 +510,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.
   _Ruled OK 2026-09-17._
 - **`lpn_survey_note_header_unread`**
-  > The first line of the file names columns this page does not know, so it was passed over and the column order you chose was used. It reads: {detail}
+  > The first line was passed over: it names no columns this page knows.
   @@ NEEDS RULING
 - **`lpn_survey_note_id_duplicate`**
-  > Line {line} repeated name: {detail} Junction made, under a name of ours. See entire line below.
+  > Name already used earlier in this file, new name assigned.
   @@ NEEDS RULING
 - **`lpn_survey_note_id_invalid`**
-  > Line {line} name cannot be an ID here: {detail} Junction made, under a name of ours. See entire line below.
+  > Name cannot be used here, new name assigned.
   @@ NEEDS RULING
 - **`lpn_survey_note_id_taken`**
-  > Line {line} name already in this project: {detail} Junction made, under a name of ours. See entire line below.
+  > Name already in project, new name assigned.
+  @@ NEEDS RULING
+- **`lpn_survey_note_line`**
+  > Line {line}: {sev}: {code}: {text}
   @@ NEEDS RULING
 - **`lpn_survey_note_lon_missing`**
   > The longitude column is empty on this row, so no junction was made for it.
@@ -463,7 +531,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.
   _Ruled OK 2026-09-17._
 - **`lpn_survey_note_row_short`**
-  > Line {line} too few columns: {detail} See entire line below.
+  > Too few columns for the file format above.
   @@ NEEDS RULING
 - **`lpn_survey_read_error`**
   > That file could not be read from your disk.
@@ -471,101 +539,38 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_report_clean`**
   > Every point in the file came across, and nothing was changed on the way in.
   _Ruled OK 2026-09-17._
-- **`lpn_survey_report_counts`**
-  > {n} junction(s) created.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_report_elev`**
-  > {n} of them took an elevation from the file.
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_report_heading`**
-  > Imported {file}
-  _Ruled OK 2026-09-17._
-- **`lpn_survey_report_lead`**
-  > Below is every line that could not be taken as it stands, and everything that was changed on the way in. Nothing was thrown away quietly.
+- **`lpn_survey_report_junction`**
+  > {n} junction(s) imported, {m} with elevation.
+  @@ NEEDS RULING
+- **`lpn_survey_report_notes`**
+  > Import errors and notes:
+  @@ NEEDS RULING
+- **`lpn_survey_report_reservoir`**
+  > {n} reservoir(s) imported, {m} with elevation.
+  @@ NEEDS RULING
+- **`lpn_survey_report_tank`**
+  > {n} tank(s) imported, {m} with elevation.
   @@ NEEDS RULING
 - **`lpn_survey_row`**
   > row {n}
   _Ruled OK 2026-09-17._
+- **`lpn_survey_sev_error`**
+  > error
+  @@ NEEDS RULING
+- **`lpn_survey_sev_warning`**
+  > warning
+  @@ NEEDS RULING
+- **`lpn_survey_type_label`**
+  > Asset type:
+  @@ NEEDS RULING
 - **`lpn_survey_unit_ft`**
   > feet
   _Ruled OK 2026-09-17._
 - **`lpn_survey_unit_m`**
   > meters
   _Ruled OK 2026-09-17._
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
 
-### feat/time-series-graph (`c8a92948`) — 18 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
-- **`lpn_ts_add`**
-  > Add selected
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_add_none`**
-  > Nothing of that kind is chosen on the map.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_add_tip`**
-  > Put everything now chosen on the map onto the graph.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_axis_time`**
-  > Elapsed time
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_chip_tip`**
-  > Take {id} off the graph
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_clear`**
-  > Remove all
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_group_links`**
-  > Links
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_group_nodes`**
-  > Nodes
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_group_tip`**
-  > Whether the graph shows nodes or links.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_menu`**
-  > Time series
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_no_frames`**
-  > No extended period results yet. Press Calculate to run the simulation.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_none`**
-  > Nothing to graph yet. Choose assets on the map and press Add selected.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_quantity_tip`**
-  > Which value to graph against time.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_summary`**
-  > Assets: {n}, reporting times: {steps}
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_tip`**
-  > Graph one or more assets against time across an extended period simulation.
-  _Ruled OK 2026-09-17._
-- **`lpn_ts_title`**
-  > Values versus time
-  _Ruled OK 2026-09-17._
-
-### feat/xy-world-map (`151546cf`) — adds no English strings
-
-### projection (`2a7e6dad`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
+### feat/xy-world-map (`4be05921`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 2 new, 2 to read @@ NEEDS RULING
 

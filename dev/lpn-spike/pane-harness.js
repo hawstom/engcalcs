@@ -337,9 +337,16 @@ console.log('\n--- six tabs, one renderer ---');
 	report(L.paneTabIds()[0] === 'junctions',
 		'...so the strip OPENS on a table, which is what the Print button beside it acts on',
 		L.paneTabIds()[0]);
-	report(L.paneTabIds().length === 8, 'eight tabs in all', String(L.paneTabIds().length));
+	// **NINE SINCE TASK 599**: Time series joined, the second DRAWING in the strip. It sits with
+	// the profile rather than before the tables, which keeps the shape Tom's ordering rule is about
+	// -- the seven tables together, the drawings at the end -- and leaves Profile in the position he
+	// named. The count is asserted so that a tenth tab is a decision somebody makes rather than one
+	// that lands.
+	report(L.paneTabIds().length === 9, 'nine tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
-		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before Profile');
+		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
+	report(L.paneTabIds().indexOf('timeseries') === 7,
+		'Time series is the drawing BEFORE Profile (Task 599)', L.paneTabIds().join(','));
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.
 	L.paneTabIds().slice(1).forEach((id) => {

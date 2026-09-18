@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1888,
-        "delta_key_count": 21,
+        "expected_key_count": 1910,
+        "delta_key_count": 43,
         "exempt_key_count": 51,
         "exempt_keys": [
             "u_depthFrac",
@@ -542,6 +542,22 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values versus time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
         "lpn_field_desc": "Description",
@@ -550,21 +566,43 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
-        "lpn_map_attach_menu": "Background map (georeference)…",
-        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
-        "lpn_map_attach_place": "Attach the world map…",
-        "lpn_map_attach_remove": "Remove",
-        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
-        "lpn_map_attach_where": "Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space",
-        "lpn_map_attach_turn": "Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map",
-        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.",
-        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
+        "lpn_library_import": "Import libraries…",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_choose": "Choose what to copy from {file}",
+        "lpn_library_import_count": "{name} ({count})",
+        "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
+        "lpn_library_import_go": "Import",
+        "lpn_library_import_no_libraries": "That project file has no libraries to copy.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "Warning: Units mismatch. Will be imported as is. Not recommended.",
+        "lpn_library_import_units_line": "{name}: this project shows {mine}, the file shows {theirs}.",
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "keys": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values versus time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
         "lpn_crs_unplaceable_mark": "(no map)",
         "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
         "lpn_field_desc": "Description",
@@ -573,21 +611,283 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
-        "lpn_map_attach_menu": "Background map (georeference)…",
-        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
-        "lpn_map_attach_place": "Attach the world map…",
-        "lpn_map_attach_remove": "Remove",
-        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
-        "lpn_map_attach_where": "Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space",
-        "lpn_map_attach_turn": "Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map",
-        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.",
-        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
+        "lpn_library_import": "Import libraries…",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_choose": "Choose what to copy from {file}",
+        "lpn_library_import_count": "{name} ({count})",
+        "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
+        "lpn_library_import_go": "Import",
+        "lpn_library_import_no_libraries": "That project file has no libraries to copy.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "Warning: Units mismatch. Will be imported as is. Not recommended.",
+        "lpn_library_import_units_line": "{name}: this project shows {mine}, the file shows {theirs}.",
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "key_context": {
+        "lpn_ts_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_quantity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_chip_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_no_frames": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_axis_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "Le trajet enregistré {name} utilise des nœuds absents de ce projet : {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Unités",
+                    "english": "Units"
+                }
+            }
+        },
         "lpn_crs_unplaceable_mark": {
             "reason": "missing",
             "current_value": null,
@@ -716,147 +1016,243 @@
                 }
             }
         },
-        "lpn_map_attach_menu": {
+        "lpn_library_import": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_tip": {
+        "lpn_library_import_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_place": {
+        "lpn_library_import_choose": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_remove": {
+        "lpn_library_import_count": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_remove_tip": {
+        "lpn_library_import_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_where": {
+        "lpn_library_import_go": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_turn": {
+        "lpn_library_import_no_libraries": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_done": {
+        "lpn_library_import_heading": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },
-        "lpn_map_attach_removed": {
+        "lpn_library_import_added": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_backdrop_remove_confirm",
-                    "value": "Retirer l'image de fond ?",
-                    "english": "Remove the background image?"
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
                 },
                 "next_translated": {
-                    "key": "lpn_backdrop_scale_prompt1",
-                    "value": "Cliquez sur deux points de l'image de fond, par exemple les deux extrémités d'une échelle graphique. Puis saisissez la distance réelle entre eux.",
-                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_curve_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_needs_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Cette liste de raccords est utilisée par {count} conduites : {ids}. Détachez-la d'elles avant de la supprimer.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Quantité",
+                    "english": "Quantity"
                 }
             }
         },

@@ -2061,7 +2061,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* `min-height: 0` matters as much as `min-width`: a flex item's default minimum is its CONTENT,
    and without this the chart could not be measured smaller than the SVG already drawn in it, so a
    pane dragged shorter would leave the chart overflowing rather than reflowing. */
-#lpn_profile_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
+#lpn_profile_chart, #lpn_ts_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
 @media (max-width: 40rem) {
 	.lpn-profile-panel { flex-direction: column; overflow: auto; }
 	.lpn-profile-controls { flex: 0 0 auto; }
@@ -3682,7 +3682,9 @@ tr.lpn-ff-error { background: #f2f2f2; }
 .lpn-profile-controls > * { margin: 0; }
 /* The commentary line is the only thing left that CHANGES, so it is the one allowed to take the
    rest of the row -- and to be the item that wraps to a line of its own when the pane is narrow. */
-#lpn_profile_form { flex: 1 1 16em; min-width: 12em; display: flex; flex-wrap: wrap;
+/* #lpn_ts_form is the same row in the same panel (Task 599): two pull-downs, a button and one chip
+   per plotted asset, wrapping on a narrow pane exactly as the profile's commentary does. */
+#lpn_profile_form, #lpn_ts_form { flex: 1 1 16em; min-width: 12em; display: flex; flex-wrap: wrap;
 	align-items: baseline; gap: .1em .6em; }
 .lpn-profile-say { margin: 0; }
 /* ---- The Edit door and the box behind it (Task 509) -----------------------------------------
@@ -3711,6 +3713,33 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	border: 1px solid #bbb; border-radius: 10px; background: #f6f6f6; cursor: pointer;
 }
 .lpn-profile-chip:hover, .lpn-profile-chip:focus { background: #eaeaea; border-color: #888; }
+
+/* ---- The time-series chart (Task 599) -------------------------------------------------------
+   The panel, the control row and every piece of axis furniture are the PROFILE's -- .lpn-ts-panel
+   is on the same element as .lpn-profile-panel, and the SVG uses .lpn-profile-svg, -frame, -grid,
+   -axis, -tick and -axistitle unchanged. What is left here is only what a chart of N lines has and
+   a chart of two fixed ones does not.
+
+   **A SERIES COLOR IS AN INLINE ATTRIBUTE AND CANNOT BE A CLASS**, which is the one place this
+   chart leaves the stylesheet: the number of lines is the number of assets somebody chose, so the
+   color is assigned by INDEX in js/looped-network.js (LPN_TS_COLORS, ColorBrewer Dark2) and written
+   onto the element. Everything about the line that is NOT its color is here, so a weight or a join
+   is still changed in one place. */
+.lpn-ts-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; }
+.lpn-ts-dot { stroke: none; }
+/* Where the transport is parked. Dashed and grey on purpose: it is the one mark on the chart that
+   is not a reading, so it must not read as a series. */
+.lpn-ts-now { stroke: #888; stroke-width: 1; stroke-dasharray: 3, 3; }
+/* The two pull-downs sit on the control row's baseline with the chips and the buttons, so they take
+   the row's own type size rather than the browser's default form size. */
+.lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
+/* The chip IS the key, so it carries its line's color. A dash rather than a block: the thing it
+   names is a line, and a square would read as a filled band the way the profile's pressure key
+   deliberately does. */
+.lpn-ts-swatch {
+	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;
+	border-top: 2px solid currentColor; vertical-align: middle;
+}
 /* ---- The saved-path menu on the Profile tab (Task 510) ---------------------------------------
    An arrow ON the tab, not a second tab and not a toolbar button: Tom's placement, 2026-08-24, and
    it puts the list of names where the thing they name already lives.

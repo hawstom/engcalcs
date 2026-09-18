@@ -22,6 +22,18 @@
             "context": "Said after he tested it, in the same message as his ruling that the Properties box does not need collapsing yet: \"We discussed making Properties collapsible. To be honest, I don't think they are too long (long/numerous enough to need collapsing) yet.\"",
             "pin_note": "HE CLEARED IT AT bfd05abf AND THE PIN IS ONE COMMIT LATER, WHICH IS STATED RATHER THAN GLOSSED. The extra commit is 690a67c0, which applies HIS OWN three wording edits to lib/lang.ec.en.php -- lpn_coord_off_world, lpn_field_coord_tip and lpn_field_desc_tip -- harvested from the marks he wrote on dev/new-english-keys.md the same day. So the content of the commit he did not see is text he wrote himself. Recorded here because an all-clear is supposed to lapse when the branch moves, and this one was extended by a judgement rather than by him; if that judgement was wrong, the place to catch it is this line.",
             "head": "690a67c0f6415a1b557236a92c608801384cbcd2"
+        },
+        "feat/time-series-graph": {
+            "head": "c8a929486e459c81840fb523582306064cc56863",
+            "date": "2026-09-18",
+            "words": "Merge and delete",
+            "context": "Said after testing, in the same message as his earlier verdict on the branch: \"This is exciting. Bravo! Well done.\" The two defects he had reported -- the Links selector that could not switch, and Initial quality offered as a node field -- were both fixed before he cleared it. His axis labels, pressure unit and selector-tracking verdicts were confirmed as already right and were not touched."
+        },
+        "feat/library-import": {
+            "head": "825d760e5cb8202f29e8c55a1f2e64eb2ce66225",
+            "date": "2026-09-18",
+            "words": "feat/library-import: Done. Merge and delete.",
+            "context": "Cleared after his second round of testing. His three findings from the first round were all built before he cleared it: undo did not work (the document WAS being restored; the Libraries box was never rebuilt by undo, so it still listed rows that had gone), the wizard was not under File, and nothing said the incoming file's numbers were in different units. His own wording for the units warning was used verbatim, opening with 'Warning' and 'Not recommended', and the per-section buttons were removed so the File menu row is the only door -- which reversed an earlier instruction of his asking for both."
         }
     }
 }
