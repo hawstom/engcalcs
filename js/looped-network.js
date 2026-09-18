@@ -22674,7 +22674,6 @@ var EngCalcs = EngCalcs || {};
 	// LATITUDE and not a surveyed point list. The file holds two coordinates in whatever system the
 	// project is already in, and surveyLimits() is the whole of what the distinction still costs:
 	// a georeferenced project has a range to be outside of and no other kind does.
-	var LPN_SURVEY_ELEV_UNIT = { m: 'mh2o', ft: 'fth2o' };
 	function pickSurveyFile() {
 		var input = document.getElementById('lpn_survey_file');
 		if (input) { input.click(); }
@@ -22817,14 +22816,7 @@ var EngCalcs = EngCalcs || {};
 	 * both are believed only while the drawn number is still the one derived from them.
 	 */
 	function createSurveyJunctions(parsed) {
-		var notes = [], created = 0, elevFromFile = 0,
-			fileUnit = parsed.elevUnit ? LPN_SURVEY_ELEV_UNIT[parsed.elevUnit] : null,
-			// **PASS-THROUGH WHEN THE UNITS ALREADY AGREE, WHICH IS THE ONLY EXACT ANSWER** (the
-			// unit rule in CLAUDE.md, and js/lpn-inp.js's inpFlow() is the same line). Where they
-			// do not agree the number has to be converted to be displayable at all, and that is
-			// REPORTED rather than done quietly -- and the converted number keeps no token, because
-			// the text no longer says the number.
-			elevSame = !fileUnit || unitKey('lpn_u_elevhead') === fileUnit;
+		var notes = [], created = 0, elevFromFile = 0;
 		var geo = isGeoProject();
 		saveUndoSnapshot();
 		parsed.points.forEach(function (p) {
@@ -22847,13 +22839,16 @@ var EngCalcs = EngCalcs || {};
 			// identity rather than an overridable property, so it is written to the element -- the
 			// same base-write descField() makes.
 			if (p.desc) { n.desc = p.desc; }   // base-write: a description is identity -- see descField()
+			// **THE ELEVATION IS TAKEN EXACTLY AS THE FILE STATES IT, AND IS NEVER CONVERTED**
+			// (Tom, 2026-09-18: *"I don't think it's wise to build in any units detection. We take
+			// what we are given, and we provide a robust undo feature."*). This used to read the
+			// file's vertical unit off the elevation column's NAME and convert where it disagreed
+			// with the project -- a guess from a header most point lists do not even have, and a
+			// guess that rewrote the user's own numbers. So the number goes in as written, in
+			// whatever unit the project is showing, and the file's own text rides with it.
 			if (typeof p.elev === 'number') {
-				if (elevSame) {
-					n.elev = p.elev;
-					if (p.elevTok) { (n.tok || (n.tok = {})).elev = p.elevTok; }
-				} else {
-					n.elev = p.elev / EngCalcs.unitFactor(fileUnit) * unitFactor('lpn_u_elevhead');
-				}
+				n.elev = p.elev;
+				if (p.elevTok) { (n.tok || (n.tok = {})).elev = p.elevTok; }
 				elevFromFile++;
 			}
 			// The surveyed name, where the document can take it. A name it cannot take is reported
@@ -22870,10 +22865,6 @@ var EngCalcs = EngCalcs || {};
 			}
 			created++;
 		});
-		if (!elevSame) {
-			notes.push({ code: 'elev-converted',
-				detail: parsed.elevUnit === 'm' ? (EngCalcs.pageConfig || {}).lpn_survey_unit_m : (EngCalcs.pageConfig || {}).lpn_survey_unit_ft });
-		}
 		// **THE ORIGIN IS RE-DERIVED, for the reason Task 439 gives**: a geographic document's
 		// coordinates are shifted onto a 1/128-degree grid near the network so float32 rasterising
 		// cannot lose a pipe, and a batch of points dropped into an empty project is exactly the

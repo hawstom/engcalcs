@@ -97,7 +97,12 @@ section('1. the column mapping');
 	ok('the fixture header maps to id, north, east and elevation',
 		m.matched && m.mapping.id === 0 && m.mapping.north === 1 && m.mapping.east === 2 && m.mapping.elev === 3,
 		JSON.stringify(m.mapping));
-	ok('...and the elevation column states its own unit', m.elevUnit === 'ft', String(m.elevUnit));
+	// **AND IT SAYS NOTHING ABOUT WHAT THE ELEVATION IS MEASURED IN** (Tom, 2026-09-18). A column
+	// called `Elevation_ft` used to be read as a claim that the file is in feet, and the import
+	// converted on the strength of it. A point list usually has no header at all, so the guess
+	// answered a question almost no file asks, and where it fired it rewrote the user's numbers.
+	ok('...and NOTHING is inferred about the unit from the column name',
+		m.elevUnit === undefined, String(m.elevUnit));
 }
 // **THE CHANGE TOM ASKED FOR, IN ONE ASSERTION.** A northing and an easting used to be refused BY
 // NAME, on the argument that a plane coordinate is not a latitude. He disagreed: the file is in
@@ -115,9 +120,9 @@ ok('a plain grid file writes Y and X, and those are the same two columns',
 		return m.matched && m.mapping.north === 1 && m.mapping.east === 2; })());
 ok('a header written in other words still maps',
 	(() => { const m = EC.lpnSurveyColumnMap(['name', 'LAT_DD', 'lon_dd', 'elev (m)']);
-		return m.mapping.id === 0 && m.mapping.north === 1 && m.mapping.east === 2 && m.elevUnit === 'm'; })());
-ok('a header with no unit on its elevation says so, rather than assuming one',
-	EC.lpnSurveyColumnMap(['id', 'lat', 'lon', 'height']).elevUnit === null);
+		return m.mapping.id === 0 && m.mapping.north === 1 && m.mapping.east === 2; })());
+ok('...and a unit written into the column name is still not read as one',
+	EC.lpnSurveyColumnMap(['id', 'lat', 'lon', 'elev (m)']).elevUnit === undefined);
 ok('the trailing D of PNEZD is read as the description',
 	EC.lpnSurveyColumnMap(['P', 'N', 'E', 'Z', 'Description']).mapping.desc === 4);
 // **THE REFUSAL THAT REMAINS IS THE ONE WHERE AN ANSWER WOULD BE A GUESS.**
@@ -360,6 +365,7 @@ function clearBox() {
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\tland: landSurveyText, undo: undo,\n" +
+	"\t\tundoDepth: function () { return undoStack.length; },\n" +
 	"\t\tserialize: serializeProject,\n" +
 	"\t\taddNode: addNode,\n" +
 	"\t\tlonOf: function (id) { return outwardX(nodeById(id).x); },\n" +
@@ -470,8 +476,15 @@ importCsv();
 }
 
 section('7. one undo, and the refusals');
+// **AND IT MATTERS MORE SINCE 2026-09-18 THAN IT DID BEFORE.** Undo is now the ONLY remedy for an
+// elevation that came in under the wrong unit -- Tom traded the header-name detection away for it
+// in terms (*"We take what we are given, and we provide a robust undo feature."*) -- so the depth
+// is asserted as well as the effect: one snapshot for the whole file, whatever it holds.
 L.reset(L.GEO);
+const depthBefore = L.undoDepth();
 importCsv();
+ok('the whole import is exactly ONE snapshot on the undo stack',
+	L.undoDepth() === depthBefore + 1, String(L.undoDepth() - depthBefore));
 L.undo();
 ok('ONE undo takes the whole import back, not one junction of it',
 	L.getDoc().nodes.length === 0, String(L.getDoc().nodes.length));
@@ -514,20 +527,25 @@ ok('...naming the LINE it is on and printing that line, like every other refusal
 	/\b6\b/.test(boxText().split('PT-1,33.415300')[0].split('\n').slice(-2)[0]),
 	boxText());
 
-// ---- the elevation unit, which is the one place a number may be touched ------------------------
-section('8. the elevation unit, and the only conversion there is');
+// ---- the elevation, which is taken exactly as the file writes it -------------------------------
+//
+// **THERE IS NO CONVERSION LEFT AND THERE MUST NOT BE ONE** (Tom, 2026-09-18: *"I don't think it's
+// wise to build in any units detection. We take what we are given, and we provide a robust undo
+// feature."*). The fixture's elevation column is called `Elevation_ft`, which used to be read as a
+// claim that the file is in feet: opening it into a project showing meters converted 1243.50 to
+// 379.0188. That is the page rewriting the user's own number off a column name, which is the one
+// thing CLAUDE.md forbids outright, and a point list usually has no header to read anyway.
+section('8. the elevation, taken as written');
 L.reset(L.GEO);
 setUnitSet('si');
 importCsv();
 {
 	const e = L.node('PT-1').elev;
-	// 1243.50 ft is 379.0188 m, computed by hand from ft = 0.3048 m exactly -- not read off this
-	// code, which would agree with any mistake in it.
-	ok('a file stating feet into a project showing meters is CONVERTED, not read raw',
-		Math.abs(e - 379.0188) < 1e-6, String(e));
+	ok('a file naming its elevation column for feet is NOT converted into a project showing meters',
+		e === 1243.5, String(e));
 	const n1 = L.serialize().nodes.find(n => n.id === 'PT-1');
-	ok('...and the converted number keeps no token, because the text no longer says the number',
-		!n1.tok || n1.tok.elev === undefined, JSON.stringify(n1.tok || {}));
+	ok('...and the file\'s own text for it rides through untouched',
+		!!n1.tok && n1.tok.elev === '1243.50', JSON.stringify(n1.tok || {}));
 	ok('...and the coordinates are untouched by any of that',
 		n1.x === -111.8314 && n1.y === 33.4153);
 }

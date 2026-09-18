@@ -153,21 +153,22 @@
 			.toLowerCase().replace(/[^a-z0-9]/g, '');
 	}
 
-	// The unit a header states for itself, or null for "it does not say". Only the two vertical
-	// units this page can name, and only as a SUFFIX of the column name -- `elev_m`, `Elevation
-	// (ft)`. Anything else is not read as a unit at all, which is the honest answer: a column
-	// called `height` says nothing about what it is measured in.
-	function headerUnit(nameText) {
-		var n = norm(nameText);
-		if (/(?:^|[a-z0-9])(?:m|meter|meters|metre|metres)$/.test(n) && n !== 'm') { return 'm'; }
-		if (/(?:^|[a-z0-9])(?:ft|foot|feet)$/.test(n) && n !== 'ft') { return 'ft'; }
-		return null;
-	}
+	// **NOTHING HERE READS A UNIT OFF A COLUMN NAME, AND NOTHING MAY LEARN TO** (Tom, 2026-09-18:
+	// *"that's not typically the case for a PNEZD file. They often lack even a header. I don't think
+	// it's wise to build in any units detection. We take what we are given, and we provide a robust
+	// undo feature."*). A `headerUnit()` used to read `elev_m` and `Elevation (ft)` as claims about
+	// the file's vertical unit, and the import then CONVERTED on the strength of a column name.
+	// Two things are wrong with that and only one is about accuracy. A point list usually has no
+	// header at all, so the feature answers a question almost no real file asks; and where it does
+	// fire it rewrites the user's own numbers off a guess, which is the one thing CLAUDE.md forbids
+	// outright -- only the user touches a file's numbers. The elevation is now taken exactly as the
+	// file states it, in whatever unit the project is showing, and the reader's remedy if that is
+	// wrong is one press of Undo.
 
 	/**
 	 * Which column is which, read out of a header row.
 	 *
-	 * Returns `{mapping, notes, elevUnit}`, or `{error, detail, axis}` where the header itself is
+	 * Returns `{mapping, notes}`, or `{error, detail, axis}` where the header itself is
 	 * the problem. `mapping` holds the column INDEX for each of id/north/east/elev/desc, with null
 	 * where the header names none.
 	 *
@@ -207,7 +208,7 @@
 		// or one whose header is written in words nobody listed -- and either way the FORMAT the
 		// reader chose says where the columns are. `matched` is how the caller tells the two apart.
 		if (mapping.north === null || mapping.east === null) {
-			return { matched: false, mapping: null, notes: [], elevUnit: null,
+			return { matched: false, mapping: null, notes: [],
 				detail: (header || []).join(', ') };
 		}
 		if (hits.elev.length > 1) {
@@ -218,8 +219,7 @@
 			mapping.elev = null;
 		}
 		if (hits.desc.length > 1) { mapping.desc = null; }
-		return { matched: true, mapping: mapping, notes: notes,
-			elevUnit: mapping.elev === null ? null : headerUnit(header[mapping.elev]) };
+		return { matched: true, mapping: mapping, notes: notes };
 	};
 
 	// ---- CSV ------------------------------------------------------------------------------------
@@ -338,11 +338,10 @@
 	 * Read a surveyed point list.
 	 *
 	 * `opts.mapping` overrides the column detection for a CSV (indices for id/lat/lon/elev), and
-	 * `opts.elevUnit` overrides what the elevation column says about itself -- both so a mapping
 	 * control can hand back what a person chose without this file growing a second opinion about
 	 * which column is which.
 	 *
-	 * On success: `{ok: true, kind, header, mapping, elevUnit, points, notes, counts}`. Every point
+	 * On success: `{ok: true, kind, header, mapping, points, notes, counts}`. Every point
 	 * carries the file's own text for each number it read (`latTok`, `lonTok`, `elevTok`), null
 	 * where the plain rendering of the number already reproduces it.
 	 *
@@ -359,7 +358,7 @@
 
 	function parseCsv(src, opts) {
 		var lines = src.split(/\r\n|\r|\n/), notes = [], points = [],
-			delim = null, header = null, mapping = null, elevUnit = null, headerRead = false,
+			delim = null, header = null, mapping = null, headerRead = false,
 			firstIsData = false, seen = {}, blank = 0, rows = 0, i, cells, lineNo, map;
 		// The header is the first line that is neither blank nor a comment.
 		for (i = 0; i < lines.length; i++) {
@@ -374,7 +373,7 @@
 		// counted, so `blank` means what a person reading their own file would mean by it.
 		while (lines.length && lines[lines.length - 1] === '') { lines.pop(); }
 		if (header === null) { return { ok: false, error: 'empty' }; }
-		map = opts.mapping ? { matched: true, mapping: opts.mapping, notes: [], elevUnit: opts.elevUnit || null }
+		map = opts.mapping ? { matched: true, mapping: opts.mapping, notes: [] }
 			: EngCalcs.lpnSurveyColumnMap(header);
 		if (map.error) { return { ok: false, error: map.error, detail: map.detail, axis: map.axis }; }
 		// **THE HEADER WINS WHERE THERE IS ONE, AND THE CHOSEN ORDER ANSWERS WHERE THERE IS NOT.**
@@ -397,10 +396,8 @@
 			} else {
 				firstIsData = true;
 			}
-			elevUnit = (opts.elevUnit !== undefined && opts.elevUnit !== null) ? opts.elevUnit : null;
 		} else {
 			mapping = map.mapping;
-			elevUnit = (opts.elevUnit !== undefined && opts.elevUnit !== null) ? opts.elevUnit : map.elevUnit;
 			(map.notes || []).forEach(function (n) { notes.push(n); });
 		}
 		for (i = firstIsData ? lineNo : lineNo + 1; i < lines.length; i++) {
@@ -419,7 +416,7 @@
 		if (!points.length) { return { ok: false, error: 'no-points', detail: String(rows) }; }
 		return { ok: true, kind: 'csv', delimiter: delim, header: header, headerRead: headerRead,
 			format: headerRead ? null : (opts.format || EngCalcs.LPN_SURVEY_DEFAULT_FORMAT),
-			mapping: mapping, elevUnit: elevUnit, points: points, notes: notes,
+			mapping: mapping, points: points, notes: notes,
 			counts: { rows: rows, points: points.length, blank: blank } };
 	}
 
@@ -557,7 +554,6 @@
 		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d, ax, line); }
 		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line of the file names columns this page does not know, so it was passed over and the column order you chose was used. It reads: {detail}', d, ax, line); }
 		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d, ax, line); }
-		else if (code === 'elev-converted') { text = fill(PC.lpn_survey_note_elev_converted || 'The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d, ax, line); }
 		return { text: text, raw: raw };
 	};
 
