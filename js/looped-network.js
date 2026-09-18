@@ -22720,6 +22720,23 @@ var EngCalcs = EngCalcs || {};
 	 * opening the file must not inherit it. Guarded, because in a browser set to block site data the
 	 * property access itself throws.
 	 */
+	// **THE ASSET KINDS A SURVEYED POINT CAN BECOME, and there are exactly three** (Tom, 2026-09-18:
+	// *"Since once a node is imported its asset type cannot be changed, we should offer asset type as
+	// a first selector."*). They are the page's own NODE types -- a pipe, a pump and a valve are
+	// links between two points and a surveyed list states no connections at all, so they are not
+	// candidates and never will be. The order is the toolbar's order, which is where the reader has
+	// already met these three words.
+	//
+	// **THE LABELS ARE THE TOOLBAR'S OWN KEYS, reused whole.** Concept-level label reuse is what
+	// CLAUDE.md asks for and the toolbar owns the concept; a second set of keys saying Junction,
+	// Reservoir and Tank would be three more strings in 27 files saying what three already say.
+	var LPN_SURVEY_TYPES = ['junction', 'reservoir', 'tank'];
+	function surveyTypeLabel(t) {
+		var pc = EngCalcs.pageConfig || {};
+		if (t === 'reservoir') { return pc.lpn_tool_add_reservoir || 'Reservoir'; }
+		if (t === 'tank') { return pc.lpn_tool_add_tank || 'Tank'; }
+		return pc.lpn_tool_add_junction || 'Junction';
+	}
 	var LPN_SURVEY_FORMAT_KEY = 'lpn_survey_format';
 	function surveyFormatPref() {
 		try {
@@ -22736,7 +22753,14 @@ var EngCalcs = EngCalcs || {};
 	// carried unread.
 	function landSurveyText(text) {
 		var pc = EngCalcs.pageConfig || {}, axes = surveyAxes(), limits = surveyLimits(),
-			format = surveyFormatPref(), parsed;
+			format = surveyFormatPref(), parsed,
+			// **NOT REMEMBERED, DELIBERATELY, unlike the format beside it.** Which way round a data
+			// collector writes its columns is a standing fact about that person's equipment, which
+			// is why the format is browser furniture. What a particular file holds is a fact about
+			// that file: a reader who imported three tanks last week and drops in a point list this
+			// week must not find 200 tanks on the map because a control remembered something.
+			// Junction is the hard-coded default, which is what a surveyed point usually is.
+			assetType = 'junction';
 		function read() {
 			return EngCalcs.lpnSurveyParse
 				? EngCalcs.lpnSurveyParse(text, { limits: limits, format: format }) : { ok: false };
@@ -22747,7 +22771,28 @@ var EngCalcs = EngCalcs || {};
 		if (!parsed.ok && parsed.error === 'empty') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		openDialog(function (body) {
-			var wrap = document.createElement('div'), sel, note, preview;
+			var wrap = document.createElement('div'), sel, note, preview, typeSel, typeNote;
+			// **THE ASSET KIND COMES FIRST, AND THE REASON IS THAT IT IS IRREVERSIBLE** (Tom,
+			// 2026-09-18: *"Since once a node is imported its asset type cannot be changed, we
+			// should offer asset type as a first selector."*). Everything else this box asks can be
+			// answered again afterwards -- the format by re-importing, an elevation by typing one --
+			// and this one cannot be answered again at all, because this page has no command that
+			// turns a junction into a tank. So it is the first thing in the box, above the file,
+			// and the reader meets it before they meet anything they could undo.
+			typeNote = document.createElement('p');
+			typeNote.style.margin = '0 0 6px';
+			typeNote.textContent = pc.lpn_survey_type_label || 'Asset type:';
+			wrap.appendChild(typeNote);
+			typeSel = document.createElement('select');
+			typeSel.id = 'lpn_survey_type';
+			LPN_SURVEY_TYPES.forEach(function (t) {
+				var o = document.createElement('option');
+				o.value = t;
+				o.textContent = surveyTypeLabel(t);
+				if (t === assetType) { o.selected = true; }
+				typeSel.appendChild(o);
+			});
+			wrap.appendChild(typeSel);
 			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
 			// SAID** (Tom, 2026-09-18, writing the box: *"File format: / PNEZD specified
 			// internally"*). It used to grey out beside a sentence of ours explaining that a header
@@ -22799,7 +22844,7 @@ var EngCalcs = EngCalcs || {};
 				preview.innerHTML = '';
 				fillChooser();
 				var text2 = parsed.ok
-					? EngCalcs.lpnSurveyConfirmText(parsed)
+					? EngCalcs.lpnSurveyConfirmText(parsed, assetType)
 					: EngCalcs.lpnSurveyErrorText(parsed, axes);
 				text2.split('\n\n').forEach(function (para) {
 					var p = document.createElement('p');
@@ -22815,12 +22860,19 @@ var EngCalcs = EngCalcs || {};
 				parsed = read();
 				draw();
 			});
+			// The question at the bottom of the box names the kind, so turning this control has to
+			// rewrite it -- a box that asks about junctions and then makes tanks is the disagreement
+			// the re-read above exists to stop, in the other control.
+			typeSel.addEventListener('change', function () {
+				assetType = typeSel.value;
+				draw();
+			});
 			draw();
 		}, [
 			{ label: pc.lpn_survey_create || 'Create junctions', fn: function () {
 				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
-				showSurveyReport(parsed, createSurveyJunctions(parsed));
+				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
 				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
@@ -22828,7 +22880,7 @@ var EngCalcs = EngCalcs || {};
 		]);
 	}
 	/**
-	 * One junction per surveyed point, under ONE undo snapshot.
+	 * One node per surveyed point, all of the one chosen kind, under ONE undo snapshot.
 	 *
 	 * **THE FILE'S OWN NUMBERS GO IN AND COME BACK OUT UNCHANGED.** A coordinate is stored in the
 	 * drawing frame, which for a geographic document is Web Mercator, and `mercLat(mercY(lat))` is a
@@ -22838,16 +22890,23 @@ var EngCalcs = EngCalcs || {};
 	 * already reads. Neither is a new mechanism and neither needs a call site to remember anything:
 	 * both are believed only while the drawn number is still the one derived from them.
 	 */
-	function createSurveyJunctions(parsed) {
+	function createSurveyNodes(parsed, assetType) {
 		var notes = [], created = 0, elevFromFile = 0;
 		var geo = isGeoProject();
+		var type = LPN_SURVEY_TYPES.indexOf(assetType) >= 0 ? assetType : 'junction';
 		saveUndoSnapshot();
 		parsed.points.forEach(function (p) {
 			// **THE EAST COLUMN IS THE DOCUMENT'S x AND THE NORTH COLUMN IS ITS y, in every kind of
 			// project** -- a longitude on a georeferenced one, an easting on a projected one, a
 			// plain X on a grid. inwardX/inwardY is the one door either number comes through, and it
 			// is the door that knows whether this project projects.
-			var n = addNode('junction', inwardX(p.east), inwardY(p.north)), want = p.id;
+			// **EVERY POINT IN ONE IMPORT TAKES THE ONE CHOSEN KIND.** addNode() is the same door
+			// the toolbar uses, so a reservoir born here carries the same new-asset defaults as one
+			// drawn by hand, and a tank arrives with its level, its bounds and its diameter already
+			// set -- none of which a point list states, and all of which the reader can edit. An
+			// ELEVATION is the one field all three share, which is why the file's own number needs
+			// no case below.
+			var n = addNode(type, inwardX(p.east), inwardY(p.north)), want = p.id;
 			// **THE SOURCE RECORD IS GEOGRAPHIC ONLY, for the reason setNodeCoordAxis() states**:
 			// these two keys are stripped from the snapshot by unprojectStoredGeo(), which no other
 			// kind of project runs -- so writing one here would put it in the saved file. A grid
@@ -22907,7 +22966,11 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		scheduleSolve();
 		saveToStorage();
-		return { created: created, elevFromFile: elevFromFile, notes: notes };
+		// `type` rides back out so the report's own counts line can name what was made. The module
+		// holds three whole sentences for it rather than a noun it drops into one -- see
+		// assetSentence() in js/lpn-survey.js, and CLAUDE.md on why a label is never composed from
+		// fragments at render time.
+		return { created: created, elevFromFile: elevFromFile, notes: notes, type: type };
 	}
 	// **THE REPORT OPENS ON THE COUNT, AND ON NOTHING ELSE** (Tom, 2026-09-18, writing it out:
 	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It

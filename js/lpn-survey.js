@@ -687,6 +687,26 @@
 		return fill(PC.lpn_survey_err_unreadable || 'That file could not be read as a surveyed point list.', d, ax);
 	};
 
+	// ---- ONE ASSET KIND PER IMPORT, AND THREE WHOLE SENTENCES FOR IT ---------------------------
+	//
+	// **THE KIND IS CHOSEN BEFORE ANYTHING IS MADE, BECAUSE IT CANNOT BE CHOSEN AFTERWARDS** (Tom,
+	// 2026-09-18: *"Since once a node is imported its asset type cannot be changed, we should offer
+	// asset type as a first selector."*). That is the whole design argument: every other thing this
+	// box asks about can be undone by editing the element, and this one cannot, so it is the first
+	// control in the box rather than an afterthought under the format.
+	//
+	// **AND EACH KIND GETS ITS OWN COMPLETE SENTENCE, never a noun dropped into a shared one.**
+	// CLAUDE.md forbids composing a label from fragments at render time in terms: the original
+	// word-level design broke in gendered, word-order and right-to-left languages, and `{n} {noun}(s)
+	// found` is exactly that design -- a translator cannot inflect a noun they never see, cannot
+	// move it, and cannot make the plural agree with a number that arrives at render time. Three
+	// keys is the price, and it is the price CLAUDE.md already decided to pay.
+	function assetSentence(type, junction, reservoir, tank) {
+		if (type === 'reservoir') { return reservoir; }
+		if (type === 'tank') { return tank; }
+		return junction;
+	}
+
 	/**
 	 * What the import is about to do, for the box that stands in front of it.
 	 *
@@ -708,8 +728,11 @@
 	 * mechanism: a file naming its own columns is still read by those names, and the chooser is still
 	 * disabled while that is so, which says the same thing without a sentence.
 	 */
-	EngCalcs.lpnSurveyConfirmText = function (parsed) {
-		return (PC.lpn_survey_confirm || '{n} junction(s) found. Proceed?')
+	EngCalcs.lpnSurveyConfirmText = function (parsed, type) {
+		return assetSentence(type,
+			PC.lpn_survey_confirm_junction || '{n} junction(s) found. Proceed?',
+			PC.lpn_survey_confirm_reservoir || '{n} reservoir(s) found. Proceed?',
+			PC.lpn_survey_confirm_tank || '{n} tank(s) found. Proceed?')
 			.replace('{n}', parsed.points.length);
 	};
 
@@ -735,7 +758,10 @@
 		// name, how many junctions, and how many of them took an elevation -- where the reader's
 		// question is one question. The elevation count is stated even when it is zero, because a
 		// number that appears only when it is interesting makes its absence mean two things.
-		out.push({ text: (PC.lpn_survey_report_counts || '{n} junction(s) imported, {m} with elevation.')
+		out.push({ text: assetSentence(outcome && outcome.type,
+			PC.lpn_survey_report_junction || '{n} junction(s) imported, {m} with elevation.',
+			PC.lpn_survey_report_reservoir || '{n} reservoir(s) imported, {m} with elevation.',
+			PC.lpn_survey_report_tank || '{n} tank(s) imported, {m} with elevation.')
 			.replace('{n}', (outcome && outcome.created) || 0)
 			.replace('{m}', (outcome && outcome.elevFromFile) || 0), raw: null });
 		((parsed && parsed.notes) || []).concat((outcome && outcome.notes) || []).forEach(function (d) {

@@ -268,7 +268,7 @@ const texts = (r, o) => EC.lpnSurveyReportLines(r, o || { created: 6 }, AX).map(
 // unit and the fact that no pipes are drawn; all four are cut, so what is asserted is that the
 // count is there and that the paragraphs are NOT -- a cut nothing tests grows back.
 ok('the confirm names how many junctions it is about to make',
-	EC.lpnSurveyConfirmText(csv) === PC.lpn_survey_confirm.replace('{n}', 6),
+	EC.lpnSurveyConfirmText(csv, 'junction') === PC.lpn_survey_confirm_junction.replace('{n}', 6),
 	EC.lpnSurveyConfirmText(csv));
 ok('...and says nothing else at all: no mapping, no axes, no unit, no note about pipes',
 	EC.lpnSurveyConfirmText(csv).split('\n').length === 1);
@@ -284,10 +284,10 @@ ok('a file with a bad line gets the heading that names what follows',
 {
 	const lines = texts(csv, { created: 6, elevFromFile: 5 });
 	ok('the report opens on the count, with nothing above it',
-		lines[0] === PC.lpn_survey_report_counts.replace('{n}', 6).replace('{m}', 5), lines[0]);
+		lines[0] === PC.lpn_survey_report_junction.replace('{n}', 6).replace('{m}', 5), lines[0]);
 	const none = texts(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 });
 	ok('...and says how many took an elevation even when none did',
-		none[0] === PC.lpn_survey_report_counts.replace('{n}', 1).replace('{m}', 0), none[0]);
+		none[0] === PC.lpn_survey_report_junction.replace('{n}', 1).replace('{m}', 0), none[0]);
 	ok('...and the heading comes straight after it, with no paragraph between',
 		lines[1] === PC.lpn_survey_report_notes, lines[1]);
 }
@@ -431,7 +431,19 @@ function press(label) {
 	if (!btn) { throw new Error('no button: ' + label + ' of ' + boxButtons().map(b => b.textContent)); }
 	(btn._listeners.click || []).forEach(f => f());
 }
-function boxSelect() { return byId.lpn_dialog_body.querySelector('select'); }
+// Every <select> the box draws, in order. TWO now, and their ORDER is the design: the asset kind
+// comes first because it is the one choice that cannot be made again afterwards.
+function boxSelects() {
+	const out = [];
+	const walk = (el) => {
+		if (el.tagName === 'SELECT') { out.push(el); }
+		(el.children || []).forEach(walk);
+	};
+	walk(byId.lpn_dialog_body);
+	return out;
+}
+function boxTypeSelect() { return boxSelects()[0]; }
+function boxSelect() { return boxSelects()[1]; }
 function clearBox() {
 	byId.lpn_dialog_body.children.length = 0;
 	byId.lpn_dialog_buttons.children.length = 0;
@@ -739,7 +751,7 @@ L.land(PNEZD_TEXT, 'points.txt');
 	// time, and the next paragraph would have no assertion written against it.
 	ok('...under the short label, with no paragraph explaining it',
 		boxText().indexOf(PC.lpn_survey_format_label) >= 0
-			&& boxParagraphs().length === 2,
+			&& boxParagraphs().length === 3,
 		boxParagraphs().join(' | '));
 	// Turn it, and the file must be re-read: what the box stands for has to be what pressing the
 	// button will DO. The box says only a count now, so the PLACEMENT below is the proof.
@@ -796,7 +808,7 @@ ok('the junctions landed in the order the reader chose, not the one it opened on
 	// The label is the same short one either way: the parenthetical it used to carry -- *(if not
 	// specified internally)* -- was the same explanation in the other half of the box.
 	ok('...under the same short label, which no longer explains the case it is in',
-		boxText().indexOf(PC.lpn_survey_format_label) >= 0 && boxParagraphs().length === 2,
+		boxText().indexOf(PC.lpn_survey_format_label) >= 0 && boxParagraphs().length === 3,
 		boxParagraphs().join(' | '));
 	press(PC.lpn_cancel);
 	clearBox();
@@ -809,6 +821,95 @@ ok('the order chosen is remembered for the next file',
 	String(global.localStorage.getItem('lpn_survey_format')));
 ok('...and never rides in the saved project',
 	JSON.stringify(L.serialize()).indexOf('lpn_survey_format') < 0);
+
+// ---- THE ASSET KIND, WHICH IS THE ONE CHOICE THAT CANNOT BE MADE AGAIN -------------------------
+//
+// **FIRST IN THE BOX BECAUSE IT IS IRREVERSIBLE** (Tom, 2026-09-18: *"Since once a node is imported
+// its asset type cannot be changed, we should offer asset type as a first selector."*). The POSITION
+// is asserted and not just the presence: a control that drifts under the format is a control the
+// reader meets after they have stopped reading.
+section('9c. the asset kind');
+L.reset(L.GEO);
+alerts = []; clearBox();
+L.land(CSV, 'survey-points.csv');
+{
+	const sels = boxSelects();
+	ok('the box carries two choosers, and the asset kind is the FIRST of them',
+		sels.length === 2 && sels[0].id === 'lpn_survey_type', sels.map(x => x.id).join(' '));
+	ok('...offering the three kinds a surveyed point can become, and no link kind',
+		sels[0].children.map(o => o.value).join(' ') === 'junction reservoir tank',
+		sels[0].children.map(o => o.value).join(' '));
+	// The toolbar's own labels, reused whole. Read off pageConfig rather than typed here, so
+	// rewording Junction stays a one-line edit -- dev/scripts/harness_wording_check.php's rule.
+	ok('...named by the words the toolbar already uses for them',
+		sels[0].children.map(o => o.textContent).join('|')
+			=== [PC.lpn_tool_add_junction, PC.lpn_tool_add_reservoir, PC.lpn_tool_add_tank].join('|'),
+		sels[0].children.map(o => o.textContent).join('|'));
+	ok('...opening on junction every time, never on what the last import chose',
+		sels[0].children.find(o => o.selected).value === 'junction');
+	// **THE QUESTION NAMES THE KIND, AND IT IS A WHOLE SENTENCE PER KIND.** Never a noun dropped
+	// into a shared one: CLAUDE.md forbids composing a label from fragments at render time, and a
+	// translator who never sees the noun cannot inflect it, move it or agree its plural.
+	ok('the question at the foot of the box names junctions while junction is chosen',
+		boxText().indexOf(PC.lpn_survey_confirm_junction.replace('{n}', 6)) >= 0, boxText());
+	boxTypeSelect().value = 'reservoir';
+	(boxTypeSelect()._listeners.change || []).forEach(f => f());
+	ok('...and re-asks itself in reservoirs the moment the kind is turned',
+		boxText().indexOf(PC.lpn_survey_confirm_reservoir.replace('{n}', 6)) >= 0, boxText());
+	ok('...out of its own key, not out of the junction sentence with a word swapped',
+		PC.lpn_survey_confirm_reservoir !== PC.lpn_survey_confirm_junction
+			&& PC.lpn_survey_confirm_tank !== PC.lpn_survey_confirm_junction);
+	press(PC.lpn_survey_create);
+}
+ok('every point in the import arrived as the kind that was chosen',
+	L.getDoc().nodes.length === 6 && L.getDoc().nodes.every(n => n.type === 'reservoir'),
+	L.getDoc().nodes.map(n => n.type).join(' '));
+// A reservoir minted here is the toolbar's reservoir: addNode() is the one door, so the id prefix
+// is the reservoir prefix. Shown on a file that names no points, because where the file DOES name
+// them the surveyor's own names win -- which is the rule above this one and not an exception to it.
+{
+	const before = L.getDoc().nodes.map(n => n.id).join(' ');
+	ok('...under the surveyor\'s own names, where the file states them', /PT-1/.test(before), before);
+	L.reset(L.GEO);
+	clearBox();
+	L.land('lat,lon\n33.5,-111.8\n33.6,-111.9\n');
+	boxTypeSelect().value = 'reservoir';
+	(boxTypeSelect()._listeners.change || []).forEach(f => f());
+	press(PC.lpn_survey_create);
+	ok('...and through the same door a hand-drawn one comes through, so a nameless point is minted R',
+		L.getDoc().nodes.every(n => /^R/.test(n.id)), L.getDoc().nodes.map(n => n.id).join(' '));
+	L.reset(L.GEO);
+	clearBox();
+	L.land(CSV, 'survey-points.csv');
+	boxTypeSelect().value = 'reservoir';
+	(boxTypeSelect()._listeners.change || []).forEach(f => f());
+	press(PC.lpn_survey_create);
+}
+// And the REPORT names them too. The counts line is per kind for the same reason the question is.
+ok('the report counts reservoirs, in the sentence written for reservoirs',
+	boxText().indexOf(PC.lpn_survey_report_reservoir.replace('{n}', 6).replace('{m}', 5)) >= 0,
+	boxText());
+{
+	// Tanks, which carry a level and bounds a point list says nothing about: they come from the
+	// new-asset settings, exactly as they would if the reader had drawn one.
+	L.reset(L.GEO);
+	clearBox();
+	L.land(CSV, 'survey-points.csv');
+	boxTypeSelect().value = 'tank';
+	(boxTypeSelect()._listeners.change || []).forEach(f => f());
+	press(PC.lpn_survey_create);
+	ok('a tank import makes tanks, each with the level and bounds a new tank is born with',
+		L.getDoc().nodes.every(n => n.type === 'tank' && typeof n.maxLevel === 'number'),
+		L.getDoc().nodes.map(n => n.type).join(' '));
+	ok('...and the report says tanks, out of the key written for tanks',
+		boxText().indexOf(PC.lpn_survey_report_tank.replace('{n}', 6).replace('{m}', 5)) >= 0,
+		boxText());
+	// The file's own elevations still land, on all three kinds: an elevation is the one field they
+	// share, which is why nothing in createSurveyNodes() branches on the kind to write it.
+	ok('...and the file\'s own elevations came across onto them',
+		L.getDoc().nodes.filter(n => typeof n.elev === 'number').length >= 5,
+		String(L.getDoc().nodes.filter(n => typeof n.elev === 'number').length));
+}
 
 console.log('');
 if (fails) { console.log(`${fails} FAILED`); process.exit(1); }
