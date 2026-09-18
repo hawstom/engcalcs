@@ -1060,6 +1060,42 @@ and keep the other, which is his expectation (1) exactly. That is why the missin
 spinner and this question are one item and not two.
 
 
+## 14. The two boxes in the basins, and the constant that put them there (2026-09-18)
+
+Tom marked two labels sitting in the **Deer Island Basin** and the **Lynwood Stormwater Basin** on
+Net3-World with nothing near them. **That is the spot search working exactly as written, and the
+basins are the evidence rather than a coincidence**: `spotPrime()` looks for the largest empty
+rectangle within reach, and on a geographic drawing the largest empty rectangle is a body of water.
+
+**The number that decided how far it may look was `SPOT.reachFactor`, and it was 2.** Measured on
+Net3-World, switching the spot route on more than doubled the longest leader in a view -- 0.01258
+degrees to **0.02656**, about **2.3 km of leader** at Novato's latitude, roughly six label widths.
+`score()` ranks a trial `[crossings, blocked, hits, yielding, linkX, len]`, so leader LENGTH is the
+LAST tiebreak: a spot two reaches out that removes a crossing beats a near one that does not, and
+nothing else in the tuple can stop that trade.
+
+**Narrowing it to 1.25 was expected to cost hidden labels and it BUYS them, on both scopes.**
+
+| `reachFactor` | 28 views, labels hidden | labels drawn | Net3-World longest leader |
+|---|---|---|---|
+| 2 | 38 | 1,757 | 0.02656 |
+| **1.25** | **34** | **1,762** | **0.01905** |
+
+Crossings stay at 0 on both, and the four residual pairs are the same hand-placed ones. The reading
+is that a spot far out wins its own trial and then stands on ground the labels around it needed, so
+the pass pays for it one gang later -- **the search reaching further does not find more, it finds
+worse**. 1.25 was the first value tried below 2; 1.5 was also tried (13 hidden on Net3-World's four
+views, but a 0.07726 outlier leader at the fit zoom), so this is not a value fitted to a drawing.
+
+**IT IS ALSO PARTLY A SYMPTOM OF THE MISSING THRESHOLD, WHICH IS TOM'S OWN POINT** (section 15).
+Lettering is drawn in screen pixels, so a label's size in MAP units grows without bound as the view
+widens; the gang reach is derived from label size, and the spot reach is a multiple of the gang
+reach. With no widest-view limit there is no bound on any of the three, which is his sentence
+*"Without this threshold, we have no limit for outer boxes"* stated as arithmetic. The threshold
+caps the largest a box and a leader can ever be; `reachFactor` decides how far out the search goes
+inside that cap. Both were needed and neither substitutes for the other.
+
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.

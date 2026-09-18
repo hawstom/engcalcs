@@ -93,8 +93,8 @@ ids.forEach(function (id) { L.setLabelPx(id, 60); });
 L.relayout();
 
 // **THE SPOT SEARCH IS ALLOWED PAST THE FIRST-FIT REACH, AND SAYS SO** (Task 539 phase four).
-// `SPOT.reachFactor` in js/lpn-collide.js is 2: the whole point of searching for open ground is to
-// look where the candidate list does not, so a spot trial may stand at twice the gang's own reach
+// `SPOT.reachFactor` in js/lpn-collide.js is 1.25: the whole point of searching for open ground is
+// to look where the candidate list does not, so a spot trial may stand past the gang's own reach
 // and the leader is what carries the association back. So the bound asserted here is the first-fit
 // reach TIMES that factor, and the three labels that cross 1.0 on this fixture (at 1.13 to 1.21) are
 // spot placements rather than clipped ones.
@@ -104,7 +104,7 @@ L.relayout();
 // three of them through the spot search for the first time. Nothing about the placement moved. If
 // this ever exceeds the factor, that IS a defect -- a label further out than the search is allowed
 // to look has been carried there by something that does not know the rule.
-const SPOT_REACH_FACTOR = 2;
+const SPOT_REACH_FACTOR = 1.25;
 console.log('--- no label is carried further than the search is allowed to look, at any zoom ---');
 {
 	[8, 22, 60, 150].forEach(function (s) {

@@ -1355,7 +1355,28 @@ EngCalcs.lpnCollide = (function () {
 		// neighborhood and the placements-in-reach set are both widened to match** -- a raster
 		// reaching past the obstacles it was given would call occupied ground free, and score()
 		// would not see the crossing it made out there.
-		reachFactor: 2,
+		//
+		// **IT WAS 2 AND IT IS 1.25, MEASURED, AND THE SURPRISE IS THAT REACHING LESS FAR FINDS
+		// MORE** (2026-09-18). Tom marked two labels sitting in the Deer Island Basin and the
+		// Lynwood Stormwater Basin with nothing near them, which is what a search for the largest
+		// empty rectangle does when it is allowed to look a long way: those basins ARE the open
+		// ground. Measured on Net3-World, turning the spot route on more than doubled the longest
+		// leader in a view, 0.01258 to 0.02656 degrees -- about 2.3 km of leader at Novato's
+		// latitude, roughly six label widths.
+		//
+		// Narrowing it was expected to cost hidden labels and it BUYS them, on both scopes:
+		//
+		//   | reachFactor | 28 views hidden | drawn | Net3-World longest leader |
+		//   |---|---|---|---|
+		//   | 2    | 38 | 1,757 | 0.02656 |
+		//   | 1.25 | **34** | **1,762** | **0.01905** |
+		//
+		// Crossings stay at 0 on both. The reading: a spot far out wins its own trial on the
+		// crossing count and then stands on ground the labels around it needed, so the pass pays for
+		// it one gang later -- and leader LENGTH is only the last tiebreak in score(), so nothing
+		// stops that trade being made. It is not tuned to a drawing: 1.25 was the first value tried
+		// below 2, and 1.5 was tried too (13 hidden on Net3-World, but a 0.07726 outlier leader).
+		reachFactor: 1.25,
 		// Spots tried per gang, nearest first, and the two column edges of each: 8 trials.
 		maxSpots: 4,
 		// **A SAFETY VALVE THAT CANNOT BIND, AND IT DID BIND.** The histogram scan emits at most

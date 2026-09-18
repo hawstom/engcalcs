@@ -38,7 +38,7 @@ const SHIPPED = 'all+shed';
 // route. A ceiling rather than an equality because the shed is greedy over a graph that moves with
 // the view, and pinning the exact count would go red on any placement change that did not make the
 // drawing worse. The number may FALL and may not RISE -- lower it when it falls.
-const SHED_CEILING_ALL = 38;
+const SHED_CEILING_ALL = 34;   // was 38; SPOT.reachFactor 2 -> 1.25 bought four back (2026-09-18)
 // **THE HEADLINE CEILING WENT UP ON 2026-09-18, AND THE REASON IS A PREFERENCE, NOT A REGRESSION.**
 // It was 16 (5/7/4/0 over Net3-World's four views) and is 18 (6/7/5/0). Tom rewrote both Drop
 // columns that day, row by row, and his node order keeps the PRESSURE longest where the old one
@@ -48,7 +48,7 @@ const SHED_CEILING_ALL = 38;
 // as Net3-World went this way, which is what says this is the drawing rearranging rather than the
 // placement getting worse. The ratchet rule stands for every change that is not a deliberate
 // restatement of what the user wants to see: lower it when it falls.
-const SHED_CEILING_HEADLINE = 18;      // 6 / 7 / 5 / 0 over Net3-World's four views
+const SHED_CEILING_HEADLINE = 14;      // 6 / 3 / 4 / 1 over Net3-World's four views
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
