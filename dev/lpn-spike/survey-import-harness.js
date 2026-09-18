@@ -42,11 +42,10 @@ function ok(label, cond, detail) {
 }
 function section(name) { console.log(`\n--- ${name} ---`); }
 
-// The two files a person can actually pick, shipped so Tom can import something real rather than
+// The file a person can actually pick, shipped so Tom can import something real rather than
 // inventing one. The harness reads the SAME bytes the browser would.
 const FIX = ROOT + 'dev/lpn-spike/fixtures/';
 const CSV = fs.readFileSync(FIX + 'survey-points.csv', 'utf8');
-const GPX = fs.readFileSync(FIX + 'survey-points.gpx', 'utf8');
 
 function noteCodes(parsed) { return (parsed.notes || []).map(n => n.code); }
 
@@ -157,29 +156,6 @@ ok('a mapping handed in overrides the detection',
 	(() => { const r = EC.lpnSurveyParse('a,b,c\nP1,33.5,-111.8\n',
 		{ mapping: { id: 0, lat: 1, lon: 2, elev: null } });
 		return r.ok && r.points[0].id === 'P1' && r.points[0].lat === 33.5; })());
-
-// ================================================================================================
-// 4. THE GPX, which needs no mapping step because the format states its own schema
-// ================================================================================================
-section('4. the GPX fixture');
-const gpx = EC.lpnSurveyParse(GPX);
-ok('the fixture reads as GPX from its CONTENT, not from a file name', gpx.ok && gpx.kind === 'gpx');
-ok('four of its five waypoints became points', gpx.points.length === 4, String(gpx.points.length));
-ok('the waypoint with no latitude is reported and made no point',
-	noteCodes(gpx).indexOf('bad-lat') >= 0 && !gpx.points.some(p => p.id === 'WP-4'));
-ok('a waypoint with no elevation is a point with no elevation',
-	(gpx.points.find(p => p.id === 'WP-5') || {}).elev === null);
-ok('an elevation is in meters BY THE FORMAT, so nothing is asked and nothing is guessed',
-	gpx.elevUnit === 'm');
-ok('...and it keeps its own text', (gpx.points.find(p => p.id === 'WP-1') || {}).elevTok === '379.0');
-ok('the track point is REPORTED rather than turned into a junction or ignored',
-	noteCodes(gpx).indexOf('gpx-trkpt') >= 0 &&
-	(gpx.notes.find(n => n.code === 'gpx-trkpt') || {}).detail === '1');
-ok('a GPX with no waypoints at all says so',
-	EC.lpnSurveyParse('<gpx version="1.1"><trk><trkseg><trkpt lat="1" lon="2"/></trkseg></trk></gpx>')
-		.error === 'gpx-no-waypoints');
-ok('a self-closing waypoint is read',
-	EC.lpnSurveyParse('<gpx><wpt lat="33.5" lon="-111.8"/></gpx>').points.length === 1);
 
 // ================================================================================================
 // 4b. THE SENTENCES, against the language file rather than against English typed here
@@ -343,12 +319,6 @@ importCsv();
 	ok('...and the coordinates are untouched by any of that',
 		n1.x === -111.8314 && n1.y === 33.4153);
 }
-L.reset(L.GEO);
-alerts = []; confirms = [];
-L.land(GPX, 'survey-points.gpx');
-ok('a GPX elevation in meters passes straight through a project showing meters',
-	L.node('WP-1').elev === 379 && L.serialize().nodes.find(n => n.id === 'WP-1').tok.elev === '379.0',
-	String(L.node('WP-1').elev));
 setUnitSet('us');
 
 console.log('');

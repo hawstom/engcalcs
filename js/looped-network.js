@@ -22678,8 +22678,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function importSurveyFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
-		// TEXT, not bytes: a CSV and a GPX are both text, and which one this is gets decided from
-		// the content rather than the name -- see EngCalcs.lpnSurveyLooksLikeGpx().
+		// TEXT, not bytes: a surveyed point list is a text file whatever extension it carries, and
+		// what is in it is decided by reading it rather than by believing the name.
 		reader.onload = function (ev) { landSurveyText(String(ev.target.result), file.name); };
 		reader.onerror = function () {
 			alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.');

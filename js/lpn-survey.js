@@ -1,7 +1,7 @@
 // Looped Pipe Network -- READING A SURVEYED POINT LIST (ROADMAP Task 592).
 //
-// WHAT THIS IS FOR. A field survey produces a flat list of id, latitude and longitude -- a GPS
-// receiver's waypoint export, or a column of numbers typed off a level book. It never produces an
+// WHAT THIS IS FOR. A field survey produces a flat list of a point name and two coordinates -- a
+// column of numbers typed off a level book, or a data collector's own export. It never produces an
 // EPANET `.inp`, and EPANET itself has no path for one either, which is why the forum answer to
 // "how do I get my survey into a model" is always somebody's ad hoc workaround. This module is the
 // reading half: text in, a list of surveyed points and a list of everything that could not be
@@ -213,87 +213,6 @@
 		return String(cell === undefined || cell === null ? '' : cell).trim();
 	}
 
-	/**
-	 * Is this text a GPX file? Read from the content, never from the file name, for the reason
-	 * js/lpn-inp.js reads EPANET's two formats from their first bytes: an extension is a hint the
-	 * user typed and a wrong answer to it is silent.
-	 */
-	EngCalcs.lpnSurveyLooksLikeGpx = function (text) {
-		var head = String(text || '').slice(0, 4096);
-		return /<gpx[\s>]/i.test(head) || (/<\?xml/i.test(head) && /<wpt[\s>]/i.test(head));
-	};
-
-	function attrNumber(tagText, attr) {
-		var m = new RegExp(attr + '\\s*=\\s*"([^"]*)"', 'i').exec(tagText);
-		if (!m) { m = new RegExp(attr + "\\s*=\\s*'([^']*)'", 'i').exec(tagText); }
-		return m ? readNumber(m[1]) : { ok: false, blank: true, tok: '' };
-	}
-
-	function childText(blockText, tag) {
-		var m = new RegExp('<' + tag + '(?:\\s[^>]*)?>([\\s\\S]*?)<\\/' + tag + '\\s*>', 'i').exec(blockText);
-		if (!m) { return ''; }
-		return m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
-			.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-			.replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
-	}
-
-	// ---- GPX ------------------------------------------------------------------------------------
-	//
-	// **THE CHEAPER HALF, AND THAT IS WHY IT NEEDS NO MAPPING STEP.** GPX states its own schema:
-	// `<wpt lat="" lon="">` with an optional `<name>` and an `<ele>` that is metres BY DEFINITION
-	// (GPX 1.1: "Elevation (in meters) of the point"). So there is nothing to ask the user.
-	//
-	// A track or a route is NOT read, and is reported rather than ignored: `<trkpt>` is a breadcrumb
-	// trail a receiver recorded while somebody walked, not a list of places they surveyed, and
-	// turning a thousand of them into a thousand junctions is not what anybody meant. Saying so is
-	// the whole difference between a limit and a defect.
-	function parseGpx(text) {
-		var points = [], notes = [], re = /<wpt\b([\s\S]*?)(\/>|>([\s\S]*?)<\/wpt\s*>)/gi,
-			m, attrs, body, lat, lon, ele, id, row = 0, trk = 0, rte = 0, mm;
-		mm = String(text).match(/<trkpt\b/gi);
-		trk = mm ? mm.length : 0;
-		mm = String(text).match(/<rtept\b/gi);
-		rte = mm ? mm.length : 0;
-		while ((m = re.exec(text)) !== null) {
-			row++;
-			attrs = m[1] || '';
-			body = m[3] || '';
-			lat = attrNumber(attrs, 'lat');
-			lon = attrNumber(attrs, 'lon');
-			id = childText(body, 'name');
-			if (!lat.ok || !lon.ok) {
-				notes.push({ code: !lat.ok ? 'bad-lat' : 'bad-lon',
-					ids: [id || rowLabel(row)], detail: (!lat.ok ? lat.tok : lon.tok) || '' });
-				continue;
-			}
-			if (Math.abs(lat.value) > 90) {
-				notes.push({ code: 'lat-range', ids: [id || rowLabel(row)], detail: lat.tok || String(lat.value) });
-				continue;
-			}
-			if (Math.abs(lon.value) > 180) {
-				notes.push({ code: 'lon-range', ids: [id || rowLabel(row)], detail: lon.tok || String(lon.value) });
-				continue;
-			}
-			ele = childText(body, 'ele');
-			ele = ele === '' ? { ok: false, blank: true, tok: '' } : readNumber(ele);
-			if (!ele.ok && !ele.blank) {
-				notes.push({ code: 'bad-elev', ids: [id || rowLabel(row)], detail: ele.tok || '' });
-			}
-			points.push({ row: row, id: id, lat: lat.value, lon: lon.value,
-				latTok: lat.tok, lonTok: lon.tok,
-				elev: ele.ok ? ele.value : null, elevTok: ele.ok ? ele.tok : null });
-		}
-		if (!points.length) {
-			return { ok: false, error: 'gpx-no-waypoints', detail: String(trk + rte) };
-		}
-		if (trk) { notes.push({ code: 'gpx-trkpt', ids: [], detail: String(trk) }); }
-		if (rte) { notes.push({ code: 'gpx-rtept', ids: [], detail: String(rte) }); }
-		// **METERS, BY THE FORMAT'S OWN DEFINITION.** Not a guess and not a setting: a GPX
-		// elevation that is not in metres is not a GPX elevation.
-		return { ok: true, kind: 'gpx', header: null, mapping: null, elevUnit: 'm',
-			points: points, notes: notes, counts: { rows: row, points: points.length, blank: 0 } };
-	}
-
 	function rowLabel(row) {
 		return (PC.lpn_survey_row || 'row {n}').replace('{n}', row);
 	}
@@ -318,7 +237,6 @@
 		var src = String(text === undefined || text === null ? '' : text);
 		if (src.replace(/^﻿/, '').trim() === '') { return { ok: false, error: 'empty' }; }
 		src = src.replace(/^﻿/, '');
-		if (EngCalcs.lpnSurveyLooksLikeGpx(src)) { return parseGpx(src); }
 		return parseCsv(src, opts);
 	};
 
@@ -441,8 +359,6 @@
 		if (code === 'id-invalid') { return fill(PC.lpn_survey_note_id_invalid || 'This name cannot be used as an ID here, so this junction was given a name of ours instead.', d); }
 		if (code === 'ambiguous-elev') { return fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d); }
 		if (code === 'blank-rows') { return fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d); }
-		if (code === 'gpx-trkpt') { return fill(PC.lpn_survey_note_gpx_trkpt || 'The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.', d); }
-		if (code === 'gpx-rtept') { return fill(PC.lpn_survey_note_gpx_rtept || 'The file also holds {detail} route point(s), which were not made into junctions.', d); }
 		if (code === 'elev-converted') { return fill(PC.lpn_survey_note_elev_converted || 'The elevations in the file are in {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d); }
 		return code;
 	};
@@ -458,7 +374,6 @@
 		if (code === 'ambiguous-lat') { return fill(PC.lpn_survey_err_ambiguous_lat || 'More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.', d); }
 		if (code === 'ambiguous-lon') { return fill(PC.lpn_survey_err_ambiguous_lon || 'More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.', d); }
 		if (code === 'plane-columns') { return fill(PC.lpn_survey_err_plane || 'That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.', d); }
-		if (code === 'gpx-no-waypoints') { return fill(PC.lpn_survey_err_gpx_no_wpt || 'That GPX file holds no waypoints, so there is nothing to make junctions from.', d); }
 		if (code === 'no-points') { return fill(PC.lpn_survey_err_no_points || 'Not one row of that file could be read as a surveyed point. Rows read: {detail}', d); }
 		return fill(PC.lpn_survey_err_unreadable || 'That file could not be read as a surveyed point list.', d);
 	};
@@ -484,8 +399,6 @@
 				.replace('{lon}', parsed.header[m.lon])
 				.replace('{id}', m.id === null ? none : parsed.header[m.id])
 				.replace('{elev}', m.elev === null ? none : parsed.header[m.elev]));
-		} else if (parsed.kind === 'gpx') {
-			lines.push(PC.lpn_survey_map_gpx || 'Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.');
 		}
 		if (unitText && parsed.elevUnit) {
 			lines.push((PC.lpn_survey_elev_unit || 'Elevations in the file are read as {file}, and this project is showing {project}.')

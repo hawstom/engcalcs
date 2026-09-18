@@ -216,11 +216,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
 	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
-	<?php // Settings > New assets > Import surveyed points (Task 592). A FOURTH picker, and its own for
-	      // the reason the three above are their own: this one lands points in the OPEN project
-	      // instead of making a new tab, so an input shared with them would have to guess which act
-	      // was meant. CSV or GPX, decided from the file's own content and never from its name. ?>
-	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.gpx,text/csv,text/plain,application/gpx+xml" style="display:none">
+	<?php // File > Import surveyed points (Task 592). A FOURTH picker, and its own for the reason the
+	      // three above are their own: this one lands points in the OPEN project instead of making a
+	      // new tab, so an input shared with them would have to guess which act was meant. A text
+	      // point list; the accept list only tidies the picker, as it does for the three above. ?>
+	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -2678,11 +2678,9 @@ EngCalcs.pageConfig = {
 	lpn_survey_err_ambiguous_lat: <?=json_encode($ec_lang['lpn_survey_err_ambiguous_lat'])?>,
 	lpn_survey_err_ambiguous_lon: <?=json_encode($ec_lang['lpn_survey_err_ambiguous_lon'])?>,
 	lpn_survey_err_plane: <?=json_encode($ec_lang['lpn_survey_err_plane'])?>,
-	lpn_survey_err_gpx_no_wpt: <?=json_encode($ec_lang['lpn_survey_err_gpx_no_wpt'])?>,
 	lpn_survey_err_no_points: <?=json_encode($ec_lang['lpn_survey_err_no_points'])?>,
 	lpn_survey_confirm: <?=json_encode($ec_lang['lpn_survey_confirm'])?>,
 	lpn_survey_map_lines: <?=json_encode($ec_lang['lpn_survey_map_lines'])?>,
-	lpn_survey_map_gpx: <?=json_encode($ec_lang['lpn_survey_map_gpx'])?>,
 	lpn_survey_map_none: <?=json_encode($ec_lang['lpn_survey_map_none'])?>,
 	lpn_survey_elev_unit: <?=json_encode($ec_lang['lpn_survey_elev_unit'])?>,
 	lpn_survey_elev_assumed: <?=json_encode($ec_lang['lpn_survey_elev_assumed'])?>,
@@ -2707,8 +2705,6 @@ EngCalcs.pageConfig = {
 	lpn_survey_note_id_duplicate: <?=json_encode($ec_lang['lpn_survey_note_id_duplicate'])?>,
 	lpn_survey_note_id_taken: <?=json_encode($ec_lang['lpn_survey_note_id_taken'])?>,
 	lpn_survey_note_id_invalid: <?=json_encode($ec_lang['lpn_survey_note_id_invalid'])?>,
-	lpn_survey_note_gpx_trkpt: <?=json_encode($ec_lang['lpn_survey_note_gpx_trkpt'])?>,
-	lpn_survey_note_gpx_rtept: <?=json_encode($ec_lang['lpn_survey_note_gpx_rtept'])?>,
 	lpn_survey_note_elev_converted: <?=json_encode($ec_lang['lpn_survey_note_elev_converted'])?>
 };
 </script>
@@ -2768,7 +2764,7 @@ EngCalcs.pageConfig = {
       // tag, and BEFORE looped-network.js, which reads EngCalcs.lpnFireFlowDefaults when the box
       // is opened. ?>
 <script src="/engcalcs/js/lpn-fireflow.js?v=<?=filemtime(__DIR__.'/js/lpn-fireflow.js')?>"></script>
-<?php // Reading a surveyed point list -- CSV and GPX (ROADMAP Task 592). Pure parsing and column
+<?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column
       // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
       // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the
       // file could not be read, which is a lie about the file. ?>
