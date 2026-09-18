@@ -24367,6 +24367,22 @@ var EngCalcs = EngCalcs || {};
 			// had to be greyed whenever that project was already on the map, is gone with it.
 			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR** (Task 611, Tom 2026-09-17: *"Move the button
+			// to the File menu. I thought you already did that."*). It reads one of our own project
+			// files, which is what puts it beside the three rows above rather than anywhere near the
+			// Libraries box in the Water menu.
+			//
+			// **IT DOES NOT REPLACE THE BUTTON IN EACH LIBRARY SECTION, AND THAT IS HIS OTHER
+			// SENTENCE**: *"there should be a single 'Import libraries...' wizard available from
+			// every applicable library."* One wizard, several doors. The section a person happens to
+			// be looking at when they press it decides nothing at all -- the file says what is on
+			// offer -- so a second door costs no second behaviour to keep in step.
+			//
+			// FOURTH, below the three rows that open a whole project, because this one does not open
+			// anything: it copies into the project already on screen, and a row that changes the
+			// open document sitting above the rows that replace it would read as one of them.
+			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
@@ -25326,15 +25342,15 @@ var EngCalcs = EngCalcs || {};
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
 		// file still fires a change event.
-		// **A FOURTH PICKER, FOR ONE LIBRARY OUT OF ANOTHER PROJECT FILE** (Task 611). Wired AHEAD
-		// of the three below rather than after them, because each of those bails the whole function
-		// on a missing input, and a library import has no business depending on whether the EPANET
-		// picker happens to be in the page.
+		// **A FOURTH PICKER, FOR THE LIBRARY IMPORT WIZARD** (Task 611). Wired AHEAD of the three
+		// below rather than after them, because each of those bails the whole function on a missing
+		// input, and a library import has no business depending on whether the EPANET picker
+		// happens to be in the page.
 		//
 		// Its own input rather than a second use of #lpn_project_file, on that input's own argument:
-		// the two feed different readers -- one lands a whole new project, the other copies three
-		// fields into the project already open -- and an input serving both would have to remember
-		// which, which is exactly the state libImportKind keeps and nothing else should have to.
+		// the two feed different readers -- one lands a whole new project, the other copies chosen
+		// libraries into the project already open -- and an input serving both would have to
+		// remember which, which is state nothing here should have to keep.
 		var libFileInput = document.getElementById('lpn_library_file');
 		if (libFileInput) {
 			libFileInput.addEventListener('change', function () {
@@ -31286,14 +31302,26 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 	}
 
-	// ---- IMPORTING A LIBRARY FROM ANOTHER PROJECT FILE (ROADMAP Task 611) ------------------------
+	// ---- IMPORTING LIBRARIES FROM ANOTHER PROJECT FILE (ROADMAP Task 611) ------------------------
 	//
-	// Tom, 2026-09-08, and this is the whole specification: *"If the Libraries have Import buttons
-	// that ask for selecting another project file, then import anything that is not a name
-	// conflict, that probably would be all that's needed."*
+	// **ONE WIZARD, REACHED FROM EVERY LIBRARY THAT CAN RECEIVE AN IMPORT** (Tom, 2026-09-17: *"I
+	// think that there should be a single 'Import libraries...' wizard available from every
+	// applicable library. 1. File picker. 2. Analyze the file and show checkboxes for which
+	// libraries"*). The button is the same act wherever it is pressed, so the section it was pressed
+	// in decides nothing: the FILE says what is on offer and the user says which of it to take.
+	// A per-section import asked somebody who wants a colleague's pipe types AND the fittings lists
+	// those types refer to to make the trip twice -- and let them make the first trip and not the
+	// second, which is the dangling reference reported at the bottom of this file's own report.
+	//
+	// **PER LIBRARY, NEVER PER ENTRY**, which was the open half of his note and is Declan's answer:
+	// almost nobody importing a colleague's pipe type table wants three of them, and a 200-row
+	// checkbox list is wrong whichever way it opens -- all checked means hunting for the few you do
+	// not want, all unchecked means 195 clicks for what "import the library" should have given free.
+	// The whole library comes in and the few rows nobody wants are deleted with the select-and-delete
+	// every one of these tables already has. Cheaper, and no new control.
 	//
 	// **THERE IS NO EXPORT BUTTON AND THERE IS NOT GOING TO BE ONE.** `serializeProject()` already
-	// writes every library whole, so `File, Save as` IS the export -- his own reading. A second
+	// writes every library whole, so `File, Save as` IS the export -- Tom's own reading. A second
 	// writer would be a second format to keep in step for no capability at all, and the first time
 	// the two disagreed about a curve's tokens the round trip would stop being byte-identical.
 	//
@@ -31325,35 +31353,39 @@ var EngCalcs = EngCalcs || {};
 	// object and an element holds only a reference, so a curve nothing points at is the ordinary
 	// product of the Add button beside this one.
 	//
-	// **ONE PICKER, ONE ACT, A PARAMETER FOR WHICH LIBRARY.** `from` is the field the source
-	// document states the list under; `read` never materialises and `write` does, which is the split
-	// every library on this page is under -- an import that finds nothing must not write
-	// `curves: []` into a document that stated none. `units` names the unit selections these numbers
-	// depend on; a fittings list names none, because a minor loss coefficient is dimensionless.
+	// `from` is the field the source document states the list under; `read` never materialises and
+	// `write` does, which is the split every library on this page is under -- an import that finds
+	// nothing must not write `curves: []` into a document that stated none. `label` is the library's
+	// own name, so the chooser and the receipt call it what the box behind them calls it. `units`
+	// names the unit selections these numbers depend on; a fittings list names none, because a minor
+	// loss coefficient is dimensionless.
 	var LIB_IMPORTABLE = {
-		curves: { from: 'curves', read: libCurvesRead, write: libCurves,
-			units: ['lpn_u_flow', 'lpn_u_elevhead'] },
-		pipetypes: { from: 'pipeTypes', read: libPipeTypesRead, write: libPipeTypes,
-			units: ['lpn_u_diameter'] },
-		fittings: { from: 'fittingSets', read: libFittingSetsRead, write: libFittingSets,
-			units: [] }
+		curves: { from: 'curves', label: 'lpn_library_curves',
+			read: libCurvesRead, write: libCurves, units: ['lpn_u_flow', 'lpn_u_elevhead'] },
+		pipetypes: { from: 'pipeTypes', label: 'lpn_library_pipetypes',
+			read: libPipeTypesRead, write: libPipeTypes, units: ['lpn_u_diameter'] },
+		fittings: { from: 'fittingSets', label: 'lpn_library_fittings',
+			read: libFittingSetsRead, write: libFittingSets, units: [] }
 	};
-	// Which section asked. A module variable rather than an argument because the journey goes out
-	// through a hidden <input type=file> and comes back in a change event, which carries nothing of
-	// ours -- the same shape #lpn_project_file's own handler has. Cleared the moment it is read, so
-	// a cancelled pick cannot make the NEXT one land in the wrong library.
-	var libImportKind = null;
-	function libImportPick(kind) {
+	// The order the chooser and the receipt list them in: the Libraries box's OWN section order, so
+	// the dialog reads down in the same order as the index behind it. Not the object's key order,
+	// which is nobody's decision.
+	var LIB_IMPORT_ORDER = ['curves', 'pipetypes', 'fittings'];
+	// A record with no id is not a definition: nothing could ever have referred to it, so it is
+	// neither offered, counted, copied nor reported. The one place that judgement is made, because
+	// the count in the chooser has to be the number of things the import will actually consider.
+	function libImportUsable(rec) {
+		return !!rec && typeof rec === 'object' && rec.id !== undefined && rec.id !== null
+			&& String(rec.id) !== '';
+	}
+	function libImportPick() {
 		var input = document.getElementById('lpn_library_file');
 		if (!input) { return; }
-		libImportKind = kind;
 		input.click();
 	}
 	function libImportFromFile(file) {
-		var kind = libImportKind, reader = new FileReader();
-		libImportKind = null;
-		if (!kind || !LIB_IMPORTABLE[kind]) { return; }
-		reader.onload = function (ev) { libImportText(ev.target.result, file.name, kind); };
+		var reader = new FileReader();
+		reader.onload = function (ev) { libImportText(ev.target.result, file.name); };
 		reader.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
 			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
@@ -31366,10 +31398,120 @@ var EngCalcs = EngCalcs || {};
 	// at all: mintCurveLibrary() lifts a v10 document's pump curves into `curves` on the way past.
 	// Nothing is APPLIED: the libraries are frame-independent, so the projection and the Y flip
 	// applySaved() would do are neither needed nor wanted over the project on screen.
-	function libImportText(text, fileName, kind) {
+	function libImportText(text, fileName) {
 		var saved = acceptImportedText(text);
 		if (!saved) { return; }
-		libImportRun(saved, fileName, kind);
+		libImportChoose(saved, fileName);
+	}
+	// Step 2 of the wizard's analysis: which libraries does this file actually hold, and how many
+	// definitions in each. A library the file does not state is simply not offered -- an unchecked
+	// row reading zero is a question about nothing.
+	function libImportOffer(saved) {
+		return LIB_IMPORT_ORDER.map(function (kind) {
+			var spec = LIB_IMPORTABLE[kind],
+				source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [];
+			return { kind: kind, count: source.filter(libImportUsable).length };
+		}).filter(function (o) { return o.count > 0; });
+	}
+	/**
+	 * **THE CHOOSER, AND EVERY BOX OPENS CHECKED.** Somebody who picked a colleague's file and
+	 * pressed a button called Import libraries has already said what they want; the boxes are there
+	 * to take something OUT of that, which is the rarer half. The count is beside each name because
+	 * it is the only thing on this screen that says what the file actually holds -- a person who
+	 * chose the wrong file finds out here rather than after it has landed.
+	 *
+	 * Nothing checked and Import pressed does nothing at all, and says nothing: it is the same
+	 * answer as Cancel given a longer way round, and a receipt reporting an import that never
+	 * happened would read as a failure.
+	 *
+	 * **AND IT SAYS, BEFORE ANYTHING IS TAKEN, THAT THE FILE'S NUMBERS ARE NOT IN THIS PROJECT'S
+	 * UNITS** (Tom, 2026-09-17, reading the wizard over an SI file: *"SI: I don't see any line
+	 * saying the file does not show its numbers in this project's units."*). It used to be said in
+	 * the RECEIPT, which is the wrong end of the act: by then the definitions are in the document
+	 * and the only remedy left is Undo. Said here it is what it has to be, a fact the user weighs
+	 * before pressing Import.
+	 *
+	 * **IT IS A DISCLOSURE AND NEVER AN OFFER TO CONVERT.** Changing a unit on this page
+	 * reinterprets the typed number rather than converting it, and a number that came from a file is
+	 * the user's -- both absolute (CLAUDE.md). So the wizard states the two declarations, side by
+	 * side and in the user's own unit names, and leaves the decision where it belongs. There is no
+	 * convert button here and there is not going to be one.
+	 *
+	 * **IT FOLLOWS THE CHECKBOXES, because whether it is TRUE depends on what is being taken.** A
+	 * fittings list carries no unit at all, so a file in millimetres has nothing to disclose to
+	 * somebody taking only the fittings, and a warning that stands there anyway is one the reader
+	 * learns to look past.
+	 */
+	function libImportChoose(saved, fileName) {
+		var pc = EngCalcs.pageConfig || {}, offer = libImportOffer(saved), boxes = [];
+		if (!offer.length) {
+			showLibraryImportReport(fileName, [{ title: '', lines: [pc.lpn_library_import_no_libraries
+				|| 'That project file has no libraries to copy.'] }]);
+			return;
+		}
+		openDialog(function (body) {
+			var h = document.createElement('p'), note = document.createElement('p'),
+				unitBox = document.createElement('div');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_library_import_choose || 'Choose what to copy from {file}')
+				.replace('{file}', String(fileName || ''));
+			body.appendChild(h);
+			// Rebuilt whole rather than shown and hidden, because the LINES change with the boxes
+			// too: taking the curves as well as the pipe types can add a second quantity to the
+			// list, and a box that only learned to disappear would go on naming one of them.
+			function syncUnits() {
+				var diffs = libImportUnitDiffs(saved, boxes.filter(function (b) {
+					return b.input.checked;
+				}).map(function (b) { return b.kind; }));
+				unitBox.innerHTML = '';
+				if (!diffs.length) { return; }
+				var lead = document.createElement('p'), ul = document.createElement('ul');
+				lead.style.margin = '8px 0 2px';
+				lead.textContent = pc.lpn_library_import_units || 'The file does not show its numbers in the units this project shows. Nothing is converted. Every number is copied exactly as the file wrote it, so it will mean the unit this project shows.';
+				unitBox.appendChild(lead);
+				ul.style.margin = '0';
+				ul.style.paddingLeft = '20px';
+				diffs.forEach(function (d) {
+					var li = document.createElement('li');
+					li.textContent = (pc.lpn_library_import_units_line
+						|| '{name}: this project shows {mine}, the file shows {theirs}.')
+						.replace('{name}', d.name).replace('{mine}', d.mine)
+						.replace('{theirs}', d.theirs);
+					ul.appendChild(li);
+				});
+				unitBox.appendChild(ul);
+			}
+			offer.forEach(function (o) {
+				var row = document.createElement('label'), input = document.createElement('input'),
+					span = document.createElement('span');
+				row.style.display = 'block';
+				row.style.marginBottom = '4px';
+				input.type = 'checkbox';
+				input.checked = true;
+				input.addEventListener('change', syncUnits);
+				span.textContent = (pc.lpn_library_import_count || '{name} ({count})')
+					.replace('{name}', String(pc[LIB_IMPORTABLE[o.kind].label] || o.kind))
+					.replace('{count}', String(o.count));
+				row.appendChild(input);
+				row.appendChild(document.createTextNode(' '));
+				row.appendChild(span);
+				body.appendChild(row);
+				boxes.push({ kind: o.kind, input: input });
+			});
+			body.appendChild(unitBox);
+			syncUnits();
+			note.style.margin = '8px 0 0';
+			note.textContent = pc.lpn_library_import_note || 'Each library you check is copied in whole. Anything whose name is already taken here is skipped and listed. Delete what you do not want afterwards, the way you delete any other row.';
+			body.appendChild(note);
+		}, [
+			{ label: pc.lpn_library_import_go || 'Import', fn: function () {
+				var kinds = boxes.filter(function (b) { return b.input.checked; })
+					.map(function (b) { return b.kind; });
+				if (kinds.length) { libImportRun(saved, fileName, kinds); }
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
 	}
 	/**
 	 * **CAN A RUN USE THIS CURVE'S POINTS?** EPANET reads a curve's abscissa as strictly increasing
@@ -31393,20 +31535,58 @@ var EngCalcs = EngCalcs || {};
 		}
 		return true;
 	}
-	// Do the numbers in this library mean the same thing in both documents? Read off the two
-	// declarations rather than off the selects, because the FILE's declaration is what its numbers
-	// were typed under. A selection the source file does not state is not a difference -- an older
-	// document that named no units is not making a claim we can contradict.
-	function libImportUnitsDiffer(saved, spec) {
-		var mine = readUnitSelections(), theirs = (saved && saved.units) || {};
-		return (spec.units || []).some(function (id) {
-			return theirs[id] && mine[id] && theirs[id] !== mine[id];
+	// The quantity each unit selector is ABOUT, in the words the units strip already uses on it.
+	// Named here rather than derived, because the strip builds its labels in PHP and nothing in this
+	// file can read one back; and named at all because "this project shows in, the file shows mm"
+	// is a sentence about diameters and does not say so.
+	var LIB_IMPORT_UNIT_NAMES = {
+		lpn_u_diameter: 'lpn_field_diameter',
+		lpn_u_flow: 'lpn_units_flow',
+		lpn_u_elevhead: 'lpn_units_elevhead'
+	};
+	/**
+	 * **WHICH OF THESE LIBRARIES' NUMBERS MEAN SOMETHING DIFFERENT IN THE TWO DOCUMENTS**, as a list
+	 * the wizard can read out, one entry per quantity.
+	 *
+	 * Read off the two DECLARATIONS rather than off the selects, because the file's declaration is
+	 * what its numbers were typed under. A selector the source file does not state is not a
+	 * difference: an older document that named no units is not making a claim we can contradict, and
+	 * inventing one for it would be this page telling the user something it does not know.
+	 *
+	 * **THE LABELS ARE THE OPTION TEXT OFF OUR OWN SELECT, WHICH IS WHY unitLabelFor() TAKES A KEY.**
+	 * A unit is a label and a magnitude, and only the label is wanted here -- nothing is converted,
+	 * so no factor is ever looked up. A unit key this browser does not offer falls back to the key
+	 * itself, which is the honest answer and the same one every other readout on this page gives.
+	 *
+	 * Deduplicated across the chosen libraries: the elevation unit reaches this list through the
+	 * curves alone today, but two libraries naming one quantity must produce one line, not two.
+	 */
+	function libImportUnitDiffs(saved, kinds) {
+		var mine = readUnitSelections(), theirs = (saved && saved.units) || {},
+			pc = EngCalcs.pageConfig || {}, seen = {}, out = [];
+		(kinds || []).forEach(function (kind) {
+			var spec = LIB_IMPORTABLE[kind];
+			if (!spec) { return; }
+			(spec.units || []).forEach(function (id) {
+				if (seen[id] || !theirs[id] || !mine[id] || theirs[id] === mine[id]) { return; }
+				seen[id] = true;
+				var sel = unitEl(id);
+				out.push({
+					id: id,
+					name: String(pc[LIB_IMPORT_UNIT_NAMES[id]] || id),
+					mine: String(unitLabelFor(sel, mine[id])),
+					theirs: String(unitLabelFor(sel, theirs[id]))
+				});
+			});
 		});
+		return out;
 	}
 	/**
-	 * **THE IMPORT ITSELF.** Everything is decided before anything is written, which is what lets
-	 * the undo snapshot sit exactly one statement before the first mutation and lets an import that
-	 * turns out to be empty touch the document not at all.
+	 * **THE IMPORT ITSELF, OVER EVERY LIBRARY THE USER CHECKED.** `kinds` is an array because the
+	 * wizard hands one: several libraries out of one file are ONE act, so they share one undo
+	 * snapshot and produce one receipt. Everything is decided before anything is written, which is
+	 * what lets that snapshot sit exactly one statement before the first mutation and lets an import
+	 * that turns out to be empty touch the document not at all.
 	 *
 	 * **A DEFINITION IS CLONED, NEVER ADOPTED.** `JSON.parse(JSON.stringify())` is the whole of it:
 	 * the incoming object is a live part of a parsed document this function is about to drop, and
@@ -31419,37 +31599,36 @@ var EngCalcs = EngCalcs || {};
 	 * The taken set grows as the import proceeds, so a malformed file stating `T1` twice lands its
 	 * first `T1` and reports the second, rather than quietly keeping whichever came last.
 	 */
-	function libImportRun(saved, fileName, kind) {
-		var pc = EngCalcs.pageConfig || {}, spec = LIB_IMPORTABLE[kind],
-			source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [],
-			taken = {}, clones = [], added = [], clashed = [], unusable = [], orphan = [],
-			lines = [];
-		if (!source.length) {
-			showLibraryImportReport(fileName, [pc.lpn_library_import_none
-				|| 'That project file has none of these to copy.']);
-			return;
-		}
-		spec.read().forEach(function (rec) {
-			if (rec && rec.id !== undefined && rec.id !== null) { taken[String(rec.id)] = true; }
+	function libImportRun(saved, fileName, kinds) {
+		var pc = EngCalcs.pageConfig || {}, plan = [], blocks = [];
+		(kinds || []).forEach(function (kind) {
+			var spec = LIB_IMPORTABLE[kind];
+			if (!spec) { return; }
+			var source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [],
+				taken = {}, clones = [], added = [], clashed = [];
+			spec.read().forEach(function (rec) {
+				if (libImportUsable(rec)) { taken[String(rec.id)] = true; }
+			});
+			source.forEach(function (rec) {
+				if (!libImportUsable(rec)) { return; }
+				var id = String(rec.id), clone;
+				if (taken[id]) { clashed.push(id); return; }
+				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
+				taken[id] = true;
+				clones.push(clone);
+				added.push(id);
+			});
+			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed });
 		});
-		source.forEach(function (rec) {
-			if (!rec || typeof rec !== 'object' || rec.id === undefined || rec.id === null
-					|| String(rec.id) === '') {
-				// Not a definition at all. Nothing to name in a report and nothing lost: a record
-				// with no id is a record nothing could ever have referred to.
-				return;
-			}
-			var id = String(rec.id), clone;
-			if (taken[id]) { clashed.push(id); return; }
-			try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
-			taken[id] = true;
-			clones.push(clone);
-			added.push(id);
-		});
-		if (clones.length) {
+		if (plan.some(function (p) { return p.clones.length > 0; })) {
+			// ONE snapshot for the whole wizard: the user pressed one button, so one Undo puts the
+			// project back where it was, whether that took in one library or three.
 			saveUndoSnapshot();
-			var dest = spec.write();
-			clones.forEach(function (clone) { dest.push(clone); });
+			plan.forEach(function (p) {
+				if (!p.clones.length) { return; }
+				var dest = p.spec.write();
+				p.clones.forEach(function (clone) { dest.push(clone); });
+			});
 			libCommit();
 			rebuildLibraryBox();
 			refreshPopupIfOpen();
@@ -31457,42 +31636,54 @@ var EngCalcs = EngCalcs || {};
 		// Said AFTER the push, and against the project as it now stands, so the two questions a
 		// reader has -- is a run going to be able to use this, and is this reference going to
 		// resolve -- are answered about what they can actually see in the box behind the dialog.
-		if (kind === 'curves') {
-			clones.forEach(function (c) { if (!libCurveRunnable(c)) { unusable.push(String(c.id)); } });
+		// A pipe type's fittings list may have arrived in the same act, which is exactly why the
+		// question is asked here rather than while that library was being planned.
+		plan.forEach(function (p) {
+			var lines = [], unusable = [], orphan = [];
+			if (p.kind === 'curves') {
+				p.clones.forEach(function (c) { if (!libCurveRunnable(c)) { unusable.push(String(c.id)); } });
+			}
+			if (p.kind === 'pipetypes') {
+				p.clones.forEach(function (t) {
+					if (pipeTypeStates(t, 'fittingsId') && !fittingSetById(t.props.fittingsId)) {
+						orphan.push(String(t.id));
+					}
+				});
+			}
+			if (p.added.length) {
+				lines.push((pc.lpn_library_import_added || 'Copied in: {names}')
+					.replace('{names}', p.added.join(', ')));
+			}
+			if (p.clashed.length) {
+				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
+					.replace('{names}', p.clashed.join(', ')));
+			}
+			if (unusable.length) {
+				lines.push((pc.lpn_library_import_curve_shape || 'These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}')
+					.replace('{names}', unusable.join(', ')));
+			}
+			if (orphan.length) {
+				lines.push((pc.lpn_library_import_needs_fittings || 'These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.')
+					.replace('{names}', orphan.join(', ')));
+			}
+			// A library the user checked whose every record turned out to be nameless says nothing
+			// above, and a heading with no body under it would read as a failure of this box rather
+			// than as a fact about the file. Every block has at least one sentence.
+			if (!lines.length) {
+				lines.push(pc.lpn_library_import_none || 'That project file has none of these to copy.');
+			}
+			blocks.push({ title: String(pc[p.spec.label] || ''), lines: lines });
+		});
+		// **THE UNIT DIFFERENCE IS NOT REPEATED HERE, AND THAT IS THE POINT OF MOVING IT.** It used
+		// to be the last line of this receipt, which told the user about a decision they could no
+		// longer make. It is now the last thing the CHOOSER says before the Import button, where it
+		// is a fact to weigh rather than a note to regret. Saying it in both places would turn a
+		// disclosure the user has already read and acted on into a warning about what they chose.
+		if (!blocks.length) {
+			blocks.push({ title: '', lines: [pc.lpn_library_import_no_libraries
+				|| 'That project file has no libraries to copy.'] });
 		}
-		if (kind === 'pipetypes') {
-			clones.forEach(function (t) {
-				if (pipeTypeStates(t, 'fittingsId') && !fittingSetById(t.props.fittingsId)) {
-					orphan.push(String(t.id));
-				}
-			});
-		}
-		if (added.length) {
-			lines.push((pc.lpn_library_import_added || 'Copied in: {names}')
-				.replace('{names}', added.join(', ')));
-		}
-		if (clashed.length) {
-			lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
-				.replace('{names}', clashed.join(', ')));
-		}
-		if (unusable.length) {
-			lines.push((pc.lpn_library_import_curve_shape || 'These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}')
-				.replace('{names}', unusable.join(', ')));
-		}
-		if (orphan.length) {
-			lines.push((pc.lpn_library_import_needs_fittings || 'These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.')
-				.replace('{names}', orphan.join(', ')));
-		}
-		if (added.length && libImportUnitsDiffer(saved, spec)) {
-			lines.push(pc.lpn_library_import_units || 'The file you chose does not show its numbers in the same units as this project. Every number came across exactly as the file wrote it, so each one now means the unit this project is showing. Check them.');
-		}
-		// A file whose list holds only records with no id says nothing above, and a dialog with a
-		// heading and no body would read as a failure of this box rather than as a fact about the
-		// file. There is always at least one sentence.
-		if (!lines.length) {
-			lines.push(pc.lpn_library_import_none || 'That project file has none of these to copy.');
-		}
-		showLibraryImportReport(fileName, lines);
+		showLibraryImportReport(fileName, blocks);
 	}
 	/**
 	 * **IT ALWAYS SPEAKS, WHICH IS THE OPPOSITE OF showInpExportFlattening()'S RULE AND DELIBERATE.**
@@ -31501,36 +31692,49 @@ var EngCalcs = EngCalcs || {};
 	 * what landed is the whole of what makes the skip rule visible: an import that reported nothing
 	 * would leave a name conflict indistinguishable from a file with nothing in it.
 	 *
+	 * One block per library, under the library's own name, because the wizard can take three at
+	 * once and `Copied in: DIP-8, 1, Hydrant-lateral` says nothing about where any of them went.
+	 *
 	 * #lpn_dialog_body already scrolls at 60vh, so a long list of names is not truncated -- a
 	 * definition left out of the receipt is a definition the user does not know they have.
 	 */
-	function showLibraryImportReport(fileName, lines) {
+	function showLibraryImportReport(fileName, blocks) {
 		var pc = EngCalcs.pageConfig || {};
 		openDialog(function (body) {
-			var h = document.createElement('p'), ul = document.createElement('ul');
+			var h = document.createElement('p');
 			h.style.margin = '0 0 8px';
 			h.style.fontWeight = 'bold';
 			h.textContent = (pc.lpn_library_import_heading || 'Imported from {file}')
 				.replace('{file}', String(fileName || ''));
 			body.appendChild(h);
-			ul.style.margin = '0';
-			ul.style.paddingLeft = '20px';
-			(lines || []).forEach(function (text) {
-				var li = document.createElement('li');
-				li.style.marginBottom = '4px';
-				li.textContent = text;
-				ul.appendChild(li);
+			(blocks || []).forEach(function (blk) {
+				var ul = document.createElement('ul'), title;
+				if (blk.title) {
+					title = document.createElement('p');
+					title.style.margin = '8px 0 2px';
+					title.style.fontWeight = 'bold';
+					title.textContent = blk.title;
+					body.appendChild(title);
+				}
+				ul.style.margin = '0';
+				ul.style.paddingLeft = '20px';
+				(blk.lines || []).forEach(function (text) {
+					var li = document.createElement('li');
+					li.style.marginBottom = '4px';
+					li.textContent = text;
+					ul.appendChild(li);
+				});
+				body.appendChild(ul);
 			});
-			body.appendChild(ul);
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
-	// The button, identical in all three sections because it is the same act -- see the concept-level
-	// label rule in CLAUDE.md: one whole label reused, never composed per section. The tip has to be
-	// true of all three, so it names neither pipe types nor curves.
-	function libImportButton(host, kind) {
+	// The button, identical in every section because it is the same act and takes no argument from
+	// the section it sits in -- see the concept-level label rule in CLAUDE.md: one whole label
+	// reused, never composed per section. The tip has to be true of all of them, so it names none.
+	function libImportButton(host) {
 		var pc = EngCalcs.pageConfig || {};
-		host.appendChild(libButton(pc.lpn_library_import || 'Import from a project file',
-			function () { libImportPick(kind); }, pc.lpn_library_import_tip));
+		host.appendChild(libButton(pc.lpn_library_import || 'Import libraries…',
+			function () { libImportPick(); }, pc.lpn_library_import_tip));
 	}
 
 	// ---- PATTERNS --------------------------------------------------------------------------------
@@ -32439,7 +32643,7 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libImportButton(host, 'pipetypes');
+		libImportButton(host);
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -32630,7 +32834,7 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libImportButton(host, 'fittings');
+		libImportButton(host);
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -32844,7 +33048,7 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libImportButton(host, 'curves');
+		libImportButton(host);
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -37065,6 +37269,20 @@ var EngCalcs = EngCalcs || {};
 		});
 		updateEmptyHint();
 		refreshScenarioStatus();
+		// **THE LIBRARIES BOX IS PART OF THE DOCUMENT ON SCREEN, AND UNTIL TASK 611 NOTHING PUT IT
+		// BACK.** Tom, 2026-09-17, on the library import: *"Undo doesn't work."* It did -- the
+		// snapshot deep-clones `doc`, and `doc.curves`, `doc.pipeTypes` and `doc.fittingSets` ride
+		// in it like everything else, so the restored document was correct the whole time. What was
+		// wrong was the only place a person can SEE those three: this box is built once and rebuilt
+		// by the paths that edit it, and undo is not one of those paths, so Ctrl+Z put the document
+		// back and left the box listing rows the project no longer had. From the outside that is
+		// indistinguishable from an undo that did nothing -- and worse than that, because the next
+		// press of Delete on one of those rows was aimed at a list that no longer held it.
+		//
+		// Unconditional, exactly as every library edit calls it: rebuildLibraryBox() returns at its
+		// first line when the box is not in the page, so a project undone with the box closed costs
+		// nothing. It is buildDom()'s opposite number for the three lists the drawing never shows.
+		rebuildLibraryBox();
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
 		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp

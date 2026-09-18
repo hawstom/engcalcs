@@ -1634,6 +1634,11 @@ EngCalcs.pageConfig = {
 <?php // Importing one library out of another project file (Task 611). ?>
 	lpn_library_import: <?=json_encode($ec_lang['lpn_library_import'])?>,
 	lpn_library_import_tip: <?=json_encode($ec_lang['lpn_library_import_tip'])?>,
+	lpn_library_import_choose: <?=json_encode($ec_lang['lpn_library_import_choose'])?>,
+	lpn_library_import_count: <?=json_encode($ec_lang['lpn_library_import_count'])?>,
+	lpn_library_import_note: <?=json_encode($ec_lang['lpn_library_import_note'])?>,
+	lpn_library_import_go: <?=json_encode($ec_lang['lpn_library_import_go'])?>,
+	lpn_library_import_no_libraries: <?=json_encode($ec_lang['lpn_library_import_no_libraries'])?>,
 	lpn_library_import_heading: <?=json_encode($ec_lang['lpn_library_import_heading'])?>,
 	lpn_library_import_added: <?=json_encode($ec_lang['lpn_library_import_added'])?>,
 	lpn_library_import_conflict: <?=json_encode($ec_lang['lpn_library_import_conflict'])?>,
@@ -1641,6 +1646,11 @@ EngCalcs.pageConfig = {
 	lpn_library_import_curve_shape: <?=json_encode($ec_lang['lpn_library_import_curve_shape'])?>,
 	lpn_library_import_needs_fittings: <?=json_encode($ec_lang['lpn_library_import_needs_fittings'])?>,
 	lpn_library_import_units: <?=json_encode($ec_lang['lpn_library_import_units'])?>,
+	lpn_library_import_units_line: <?=json_encode($ec_lang['lpn_library_import_units_line'])?>,
+<?php // The quantity each unit selector is ABOUT, in the words the units strip already uses on it,
+      // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_units_flow are
+      // already supplied further up this object; the elevation one was not supplied by anything. ?>
+	lpn_units_elevhead: <?=json_encode($ec_lang['lpn_units_elevhead'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,
