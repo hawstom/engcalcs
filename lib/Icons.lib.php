@@ -240,16 +240,26 @@ $ec_icons = array(
 	// A run between two nodes — the thing you are actually about to place.
 	'pipe'       => '<path d="M5 12H19" stroke-linecap="butt"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
-	// A METER BOX, DRAWN AS A DOUBLE-LINE RECTANGLE AND WITH NO CIRCLE IN IT (Tom, 2026-09-17:
-	// *"The toolbar icon is to be a house or a meter box (no circle, and double-line rectangle)."*).
-	// The lid inside the box is what says meter box rather than plain rectangle, and it is the thing
-	// a reader recognises from the parkway: a box in the ground with a lid in it.
+	// **A HOUSE, IN EIGHT STRAIGHT LINES** (Tom, 2026-09-18: *"Let's go with a very simple 8-line
+	// house icon. Much easier and more recognizeable."*, with his own sketch in
+	// dev/icon-preview/tgh-icon-concepts.png). Two roof slopes, two walls, a floor and three sides
+	// of a door: nothing else, because the count IS the brief.
 	//
-	// **THE FIRST DRAWING HAD A DIAL AND A SERVICE STUB AND BOTH ARE STRUCK.** The dial was read as
-	// a pump volute at 14 px, and the stub made the icon a picture of the GESTURE rather than of the
-	// thing. The map symbol is where the service connection is shown; it is a solid dot there,
-	// because at three to seven pixels a picture of anything is a smudge.
-	'meter'      => '<path d="M3.5 6.5h17v11h-17z"/><path d="M7 10h10v4H7z"/>',
+	// **THE METER BOX IT REPLACES WAS THE SECOND WRONG ANSWER HERE, and both are recorded so that
+	// neither comes back.** The first drawing had a dial and a service stub; the dial read as a pump
+	// volute at 14 px and the stub made the icon a picture of the GESTURE rather than of the thing.
+	// The double-line box that replaced it read as a plain rectangle beside a strip of other
+	// rectangles. A house is the one shape in this set nobody has to be taught.
+	//
+	// Proportions are Ida's (the interface-designer seat): 14 wide by 17 tall, so it stands as a
+	// vertical silhouette beside `valve` rather than squatting like the box did; the eaves are
+	// FLUSH with the walls, because an overhang in a stroke-only drawing is either a visible gap or
+	// a ninth line; the apex over a 14-wide base is a 51 degree pitch, which reads as a roof and not
+	// as a lid; and the door is 4 by 5, centered under the apex, small enough to stay a door.
+	//
+	// The MAP symbol is not this and must not become it: it is a solid dot, because at three to
+	// seven pixels a picture of anything is a smudge.
+	'customer'   => '<path d="M12 4L5 12L5 21L19 21L19 12Z"/><path d="M10 21L10 16L14 16L14 21"/>',
 
 	// ---- Backdrop ----
 	'image'      => '<path d="M3 5h18v14H3z"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',

@@ -27167,7 +27167,7 @@ var EngCalcs = EngCalcs || {};
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
-			{ icon: 'meter', label: pc.lpn_tool_add_meter || 'Customer', fn: function () { setMode('add-meter'); } },
+			{ icon: 'customer', label: pc.lpn_tool_add_meter || 'Customer', fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
@@ -28593,7 +28593,7 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
-			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'meter', tip: pc.lpn_tool_add_meter_tip },
+			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
