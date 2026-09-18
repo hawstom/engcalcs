@@ -444,6 +444,18 @@ function boxSelects() {
 }
 function boxTypeSelect() { return boxSelects()[0]; }
 function boxSelect() { return boxSelects()[1]; }
+// The element carrying the note that sits BESIDE the format chooser, found by its own id rather
+// than by position -- the point of the note is that it is not in the chooser, so a helper that
+// found it by counting children of the chooser would be asserting the opposite of the rule.
+function boxById(id) {
+	let found = null;
+	const walk = (el) => {
+		if (el.id === id) { found = el; }
+		(el.children || []).forEach(walk);
+	};
+	walk(byId.lpn_dialog_body);
+	return found;
+}
 function clearBox() {
 	byId.lpn_dialog_body.children.length = 0;
 	byId.lpn_dialog_buttons.children.length = 0;
@@ -798,18 +810,47 @@ ok('the junctions landed in the order the reader chose, not the one it opened on
 	alerts = []; clearBox();
 	L.land(CSV, 'survey-points.csv');
 	const sel = boxSelect();
-	const said = (PC.lpn_survey_format_internal || '').replace('{format}', 'PNEZ');
 	ok('a file that states its own order offers no choice at all, only what it states',
 		!!sel && sel.children.length === 1 && sel.disabled === true,
 		sel && (sel.children.length + ' options, disabled=' + sel.disabled));
-	ok('...and the control itself carries the order, read back out of the file\'s own header',
-		!!sel && sel.children[0].textContent === said,
+	// **AND THE OPTION IS THE FORMAT, FULL STOP** (Tom, 2026-09-18: *"The selector option should not
+	// be reworded when a format is specified internally. Simply show the specified format, disable
+	// the selector, and print 'specified internally' outside the selector (right or below)."*). It
+	// read `PNEZ specified internally`, so the control's VALUE carried a sentence about the control.
+	// Asserted as an exact equality against the letters alone, which is what kills the old shape:
+	// a substring test would have passed on both.
+	ok('...and the control itself carries the order and NOTHING else, read out of the file\'s header',
+		!!sel && sel.children[0].textContent === 'PNEZ',
 		sel && sel.children[0].textContent);
+	{
+		// The explanation is its own text, beside the greyed control. Read off pageConfig so the
+		// wording stays a one-line edit, and asserted to be OUTSIDE the select -- which is the
+		// whole instruction: a disabled control plus a sentence next to it, not one string
+		// pretending to be a value.
+		const beside = boxById('lpn_survey_format_internal');
+		ok('...while the words specified internally stand beside it as their own text',
+			!!beside && beside.textContent === PC.lpn_survey_format_internal
+				&& beside.tagName !== 'SELECT' && beside.tagName !== 'OPTION',
+			beside && (beside.tagName + ': ' + beside.textContent));
+		ok('...and that text is nowhere inside the chooser',
+			sel.children.every(o => o.textContent.indexOf(PC.lpn_survey_format_internal) < 0),
+			sel.children.map(o => o.textContent).join(' | '));
+	}
 	// The label is the same short one either way: the parenthetical it used to carry -- *(if not
 	// specified internally)* -- was the same explanation in the other half of the box.
 	ok('...under the same short label, which no longer explains the case it is in',
 		boxText().indexOf(PC.lpn_survey_format_label) >= 0 && boxParagraphs().length === 3,
 		boxParagraphs().join(' | '));
+	press(PC.lpn_cancel);
+	clearBox();
+	// ...and where the reader DOES get the choice, the note is not there to be read. A sentence that
+	// is always on screen says nothing, and this one is the reason the control is greyed.
+	L.reset();
+	L.land(PNEZD_TEXT, 'points.txt');
+	ok('...and a file that states nothing leaves the chooser live and the note off the screen',
+		boxSelect().disabled === false
+			&& (boxById('lpn_survey_format_internal') || {}).textContent === '',
+		boxSelect().disabled + ' / ' + JSON.stringify((boxById('lpn_survey_format_internal') || {}).textContent));
 	press(PC.lpn_cancel);
 	clearBox();
 }

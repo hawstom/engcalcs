@@ -23287,7 +23287,7 @@ var EngCalcs = EngCalcs || {};
 		if (!parsed.ok && parsed.error === 'empty') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		openDialog(function (body) {
-			var wrap = document.createElement('div'), sel, note, preview, typeSel, typeNote;
+			var wrap = document.createElement('div'), sel, note, preview, typeSel, typeNote, internalNote;
 			// **THE ASSET KIND COMES FIRST, AND THE REASON IS THAT IT IS IRREVERSIBLE** (Tom,
 			// 2026-09-18: *"Since once a node is imported its asset type cannot be changed, we
 			// should offer asset type as a first selector."*). Everything else this box asks can be
@@ -23315,8 +23315,9 @@ var EngCalcs = EngCalcs || {};
 			// had won -- the fact in our prose, and the control standing empty above it holding a
 			// stale preference that had nothing to do with the file in front of the reader. **THE
 			// FACT LIVES IN THE CONTROL.** The order the file states is read back out of its own
-			// column map by lpnSurveyFormatLetters(), so the chooser's one row says PNEZD, and it
-			// is disabled because there is nothing left to choose.
+			// column map by lpnSurveyFormatLetters(), so the chooser's one row says PNEZD and
+			// nothing else, and it is disabled because there is nothing left to choose. Why it is
+			// disabled is said beside it, not in it -- see the note built under the chooser.
 			note = document.createElement('p');
 			note.style.margin = '0 0 6px';
 			note.textContent = pc.lpn_survey_format_label || 'File format:';
@@ -23324,6 +23325,17 @@ var EngCalcs = EngCalcs || {};
 			sel = document.createElement('select');
 			sel.id = 'lpn_survey_format';
 			wrap.appendChild(sel);
+			// **THE EXPLANATION SITS BESIDE THE CONTROL, NEVER INSIDE IT** (Tom, 2026-09-18: *"The
+			// selector option should not be reworded when a format is specified internally. Simply
+			// show the specified format, disable the selector, and print 'specified internally'
+			// outside the selector."*). The option used to read `PNEZD specified internally`, which
+			// put a sentence about the control into the control's own value. A value is the value:
+			// somebody reading the box off a screenshot, or reading it back to a colleague, says
+			// PNEZD, and the greyed control already says it was not theirs to choose.
+			internalNote = document.createElement('span');
+			internalNote.id = 'lpn_survey_format_internal';
+			internalNote.style.marginLeft = '8px';
+			wrap.appendChild(internalNote);
 			// **AND NO PARAGRAPH UNDER IT** (Tom, 2026-09-18). A sentence explaining that the
 			// chooser says which coordinate comes first, and that a header beats it, was three lines
 			// of ours teaching a reader who already reads PNEZD. The label names the control, the
@@ -23340,11 +23352,12 @@ var EngCalcs = EngCalcs || {};
 				var internal = parsed.ok && parsed.headerRead, o;
 				sel.innerHTML = '';
 				sel.disabled = !!internal;
+				internalNote.textContent = internal
+					? (pc.lpn_survey_format_internal || 'specified internally') : '';
 				if (internal) {
 					o = document.createElement('option');
 					o.value = '';
-					o.textContent = (pc.lpn_survey_format_internal || '{format} specified internally')
-						.replace('{format}', EngCalcs.lpnSurveyFormatLetters(parsed.mapping));
+					o.textContent = EngCalcs.lpnSurveyFormatLetters(parsed.mapping);
 					sel.appendChild(o);
 					return;
 				}
