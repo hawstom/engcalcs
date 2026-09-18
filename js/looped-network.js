@@ -14140,9 +14140,11 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Cheap: two rects and, only when it is too tall, one style write. It runs on each keystroke in
 	// the query line, which is the same budget the panel already spends re-rendering its results.
+	// The open test is panelIsOpen() and NOT `display === 'block'`: this box opens as a flex
+	// column, so the literal test had been false since the day it did. See panelIsOpen().
 	function refitFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
-		if (!popup || popup.style.display !== 'block') { return; }
+		if (!panelIsOpen(popup)) { return; }
 		capPanelToRoomBelow(popup, popup.getBoundingClientRect().top);
 	}
 	// ---- REPLACE: the same query, plus a write (ROADMAP Task 389) --------------------------------
@@ -24854,7 +24856,12 @@ var EngCalcs = EngCalcs || {};
 		// pointer, and the register's names got a great deal longer on 2026-09-14.
 		b.disabled = off;
 		if (n) {
-			n.textContent = crsLabel(newBoxGeo.crs);
+			// **THE WARNING FOLLOWS THE CHOICE OUT OF THE PICKER.** The box where it was made is
+			// closed by the time Create is pressed, and this line is the last thing describing the
+			// projection before the project exists.
+			n.textContent = crsLabel(newBoxGeo.crs) + (crsCannotBePlaced(newBoxGeo.crs)
+				? ' ' + ((EngCalcs.pageConfig || {}).lpn_crs_unplaceable_mark || '(no map)')
+				: '');
 			// Greyed with the button rather than hidden: the projection is still what this radio
 			// WOULD use, and blanking it would read as "none chosen" to somebody who is about to
 			// switch back.
@@ -25104,10 +25111,15 @@ var EngCalcs = EngCalcs || {};
 						refreshBasemap();
 						return;
 					}
-					// **THE 2% STILL GET THE SENTENCE, AND IT IS STILL TRUE FOR THEM.** A CRS
-					// whose projection method proj4 does not implement cannot be placed, and
-					// saying so is better than a plane pretending to be somewhere.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+					// **THE 2% STILL GET THE SENTENCE, AND IT NAMES WHOSE FAULT IT IS.** It used
+					// to reach for lpn_crs_place_projected, which says the transform is something
+					// "this page does not have yet" -- true of the module being absent and false
+					// here, where the page has 5,240 transforms and not this one. A reader who
+					// has just watched a blank plane arrive at 0,0 concludes the feature is
+					// broken rather than that another projection over the same ground would work,
+					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
+					// the choice as well; this is the same sentence, after it.
+					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
 				});
 			}
 		}
@@ -25213,12 +25225,50 @@ var EngCalcs = EngCalcs || {};
 	 * number; this is the OpenStreetMap-credit rule, and the filter already searches both halves
 	 * so somebody who types 26929 lands on it.
 	 */
+	/**
+	 * **A PROJECTION THIS PAGE CANNOT PUT ON THE EARTH, ASKED BEFORE IT IS CHOSEN.**
+	 *
+	 * 5,240 of the register's 5,346 live projected systems have a proj4 definition and 106 do not
+	 * -- js/lpn-crs.js states the ratio and answers honestly. What nothing did until 2026-09-17
+	 * was ask the question at the moment somebody picks one, so the wizard offered all 5,346 and
+	 * the difference only showed up afterwards, as a project that opened on a blank plane.
+	 *
+	 * **THAT IS TOM'S OWN REPRODUCTION FROM THE ENGINEERS WITHOUT BORDERS DEMONSTRATION**: *"New
+	 * project, Geographic projection, Place name search, 'Fotobi, Ghana', Accra / Ghana National
+	 * Grid (EPSG: 2136), US units, Create, bring up blank map centered at 0,0."* EPSG:2136 is the
+	 * SECOND row the place filter offers for Fotobi and is one of the 106 -- its axes are in Gold
+	 * Coast feet, which proj.db carries no conversion for -- so createProjectFrom()'s forward
+	 * transform returned null, the camera stayed where a new plane starts, and no tile could be
+	 * placed behind it. Driven and measured against https://librewaternet.org/app/ with
+	 * dev/lpn-spike/browser-drive.js: 0 basemap tiles, view at 0,0.
+	 *
+	 * **THE FIX IS A WARNING, NEVER A SUBSTITUTE PROJECTION.** Falling back to a near-enough
+	 * system would put a map under somebody's network tens of metres out, and a wrong map is read
+	 * as the truth -- js/lpn-crs.js's own standing ruling. The 106 stay choosable, because the
+	 * coordinates are still the user's and the project still opens; what changes is that the
+	 * consequence is stated before the choice rather than discovered after it.
+	 *
+	 * **UNKNOWN IS NOT NO.** Until the definitions have loaded, lpnCrsHas() answers false for
+	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
+	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
+	 */
+	function crsCannotBePlaced(code) {
+		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
+	}
 	function crsOptionText(entry) {
 		if (!entry) { return ''; }
-		var name = String(entry.name || ''), code = String(entry.code || '');
-		if (!code) { return name; }
-		if (!name) { return code; }
-		return name + ' (' + code + ')';
+		var pc = EngCalcs.pageConfig || {},
+			name = String(entry.name || ''), code = String(entry.code || ''), text;
+		if (!code) { text = name; }
+		else if (!name) { text = code; }
+		else { text = name + ' (' + code + ')'; }
+		// Appended rather than made a prefix: the list is sorted and scanned by NAME, and a mark in
+		// front of it would put the 106 out of alphabetical reach of somebody typing a name filter.
+		if (crsCannotBePlaced(code)) {
+			text += ' ' + (pc.lpn_crs_unplaceable_mark || '(no map)');
+		}
+		return text;
 	}
 	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
 	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
@@ -25268,6 +25318,14 @@ var EngCalcs = EngCalcs || {};
 			// all. It appears only while the register is the thing being listed, because the
 			// built-in 183 rows are our own hand-typed table and credit nobody.
 			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
+			// **AND THE CONSEQUENCE OF THE ROW THAT IS ACTUALLY SELECTED, IN A SENTENCE.** The
+			// "(no map)" mark in the option is what a person scanning the list sees; this is what
+			// they read once their choice has settled on one. Two sizes of the same fact, because
+			// the mark has to be short enough not to push a 50-character register name out of the
+			// select and the sentence has to be long enough to say what is lost.
+			if (crsCannotBePlaced(crsBox.code)) {
+				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+			}
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -25372,12 +25430,25 @@ var EngCalcs = EngCalcs || {};
 		// from the built-in table, so the box opens at once and grows to the full register when it
 		// arrives; the callback re-renders, and renderCrsBoxList() keeps the current choice across
 		// a rebuild wherever the filters still admit it. A failure is silent and leaves the 183.
+		box.style.display = 'block';
 		crsRegisterLoad(function () {
 			// Only if the box is still the one on screen -- a load that lands after the user has
 			// closed it must not repaint a hidden panel.
-			if (crsBoxEl() && crsBoxEl().style.display === 'block') { renderCrsBoxList(); }
+			if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
 		});
-		box.style.display = 'block';
+		// **THE TRANSFORMS ARE FETCHED HERE TOO, AND THIS IS THE ONE PLACE THEY ARE WORTH IT.**
+		// js/lpn-crs.js is deliberately not loaded at page load -- 190 KB that most visitors never
+		// need -- but somebody who has opened this box is choosing a projection, and whether we
+		// have a transform for it is the difference between a project with a map behind it and a
+		// project on a blank plane. Asking after the choice is what produced Tom's blank map at
+		// 0,0; asking here costs one fetch on a box that is already fetching the register.
+		// A failure is silent and simply leaves every row unmarked, which is the honest state:
+		// lpnCrsReady() is false, so crsCannotBePlaced() answers false for all of them.
+		if (EngCalcs.lpnCrsLoad) {
+			EngCalcs.lpnCrsLoad(function () {
+				if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
+			});
+		}
 		raisePanel(box);
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();
@@ -25437,12 +25508,6 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
-			// our own documents, with everything that comes with it -- a lock, a live file handle, a
-			// Save that writes back. An .inp has none of that and never will, so hiding it behind
-			// the same word would promise a round trip we cannot make. Import says what it is.
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
-			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
 			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
 			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
@@ -25464,6 +25529,18 @@ var EngCalcs = EngCalcs || {};
 			// had to be greyed whenever that project was already on the map, is gone with it.
 			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
+			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
+			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was
+			// the last row of a five-row block and read as belonging to none of them; beside the
+			// row it is the other direction of, it is found by looking for its own pair.
+			//
+			// This costs Task 447's "third, below both rows it rescues": Open xy file on map… now
+			// sits above Import rather than below it. Kept deliberately -- the fallback is still
+			// below Open…, which is the row people actually reach for first, and a control nobody
+			// can find is a worse defect than a fallback reading one place too high.
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
@@ -25906,9 +25983,10 @@ var EngCalcs = EngCalcs || {};
 			// existing is touched; and Find and replace with Elevation set to From Mapbox DEM, where
 			// the user has already chosen the set and Replace already owns the preview and the undo.
 			// **Do not restore a third door.** Keeping it is what made the feature a cool button
-			// nobody asked for. EngCalcs.lpnTerrainFill() itself stays in js/lpn-terrain.js -- it is
-			// still the code that decides a list and it is still exercised by its harness -- with no
-			// caller on the page.
+			// nobody asked for. The command behind it was deleted from js/lpn-terrain.js on
+			// 2026-09-17, having had no caller but a harness since the day this row went: the two
+			// sentences only it could say were being translated into 27 languages for a state no
+			// visitor could reach. See dev/geographic-projects.md for what went with it.
 		];
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
@@ -35242,8 +35320,16 @@ var EngCalcs = EngCalcs || {};
 			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
 				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
 		} else if (terrainAsked[nodeId]) {
-			// Asked and got nothing. The map notice carries the reason; this says the press landed.
-			said.textContent = pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
+			// **THE REASON, HERE, NOT ONLY IN THE NOTICE AT THE OTHER SIDE OF THE SCREEN.** This
+			// line used to say "The DEM has no elevation for this node" whatever had happened,
+			// which is a claim about GHANA when the truth was a refused request or a lost network
+			// -- and it is the sentence somebody reads, because it is under the button they just
+			// pressed. js/lpn-terrain.js owns the wording for a failure and hands it over, so the
+			// two places cannot come to different opinions. Only when the service genuinely
+			// answered and had no height there is the original sentence the true one.
+			said.textContent = (EngCalcs.lpnTerrainLastFailureText
+				&& EngCalcs.lpnTerrainLastFailureText())
+				|| pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
 		} else {
 			said.textContent = '';
 		}
@@ -37968,9 +38054,31 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, el, 'active');
 	}
+	/**
+	 * **A PANEL IS OPEN WHEN IT IS NOT HIDDEN, AND THAT IS THE ONLY TEST THAT SURVIVES A LAYOUT
+	 * CHANGE.** hidePanel() writes `display: none` and the markup ships with it, so "not none" is
+	 * decidable from one fact. Asking whether it equals a PARTICULAR display value asks a second
+	 * question -- what kind of box is this -- which the caller has no business knowing and whose
+	 * answer changes the day somebody makes the box a flex column.
+	 *
+	 * **WHICH IS EXACTLY WHAT HAPPENED, AND IT COST A DEMONSTRATION.** The properties popup and
+	 * the Find box were both opened with `display: block` when their guards were written; both
+	 * became `flex` so the body could scroll inside a dragged height (openPopupAt() and
+	 * openFindPopup() each say so in a comment), and both guards still asked for `block`. From
+	 * that moment refreshPopupIfOpen() returned on its first line for every one of its ~70
+	 * callers, and refitFindPopup() for all of its.
+	 *
+	 * The failure is silent and reads as the feature being broken: press Read DEM on a node, the
+	 * request goes out, Mapbox answers, the height is recorded -- and the popup in front of you
+	 * does not change, because redrawing it is the thing that never happened. Close the node and
+	 * open it again and the number is there. Measured on https://librewaternet.org/app/ with
+	 * dev/lpn-spike/browser-drive.js after Tom reported it to an Engineers Without Borders
+	 * chapter as "Read DEM didn't work ... There is no indication why not."
+	 */
+	function panelIsOpen(el) { return !!el && el.style.display !== 'none'; }
 	function refreshPopupIfOpen() {
 		var popup = document.getElementById('lpn_popup');
-		if (!currentPopup || popup.style.display !== 'block') { return; }
+		if (!currentPopup || !panelIsOpen(popup)) { return; }
 		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
 		else if (currentPopup.kind === 'link') { renderLinkFields(currentPopup.id); }
 		// The multi-properties box has no single id to re-render; it is rebuilt from the subject,
@@ -41696,19 +41804,25 @@ var EngCalcs = EngCalcs || {};
 	if (EngCalcs.lpnSearchInit) {
 		EngCalcs.lpnSearchInit({ locatable: projectLocatable, goTo: goToPoint, notice: setNotice });
 	}
-	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). Six functions: what a geographic project
-	// is, the token that decides whether the feature exists at all, which nodes have no elevation,
-	// WHICH already have one, how to write a batch of them under one undo (returning WHICH it
-	// wrote), and where to speak. The two "which" answers are lists of ids rather than counts
-	// because that file names the nodes in both directions; see terrainNodesWithElevation().
+	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
+	// can say where on the Earth a point of it is, the token that decides whether the feature
+	// exists at all, how to write a batch of elevations under one undo (returning WHICH it wrote),
+	// how to record a reading without writing anything, and where to speak.
+	//
+	// **THE THREE "WHICH NODES" ANSWERS WENT ON 2026-09-17 WITH THE ONLY THING THAT ASKED THEM.**
+	// EC.lpnTerrainFill() was the whole-drawing command behind the Map-menu row Task 542 deleted,
+	// and it was the only reader of nodesNeedingElevation, nodesWithElevation and
+	// nodesAtDefaultElevation. Every door that remains arrives holding its own list, so the seam
+	// no longer has to answer a question nobody asks. terrainNodesNeedingElevation() and its two
+	// siblings are still in this file and are now read only by the harnesses -- kept deliberately,
+	// because whether a whole-drawing fill ever comes back is a product decision and the
+	// at-default arithmetic in them is the part that would be expensive to write again.
+	//
 	// The tile scheme, the Terrain-RGB decode, the request budget, the consent gate and every
 	// string live in that file.
 	if (EngCalcs.lpnTerrainInit) {
 		EngCalcs.lpnTerrainInit({
 			locatable: projectLocatable, token: mapboxToken, notice: setNotice,
-			nodesNeedingElevation: terrainNodesNeedingElevation,
-			nodesWithElevation: terrainNodesWithElevation,
-			nodesAtDefaultElevation: terrainNodesAtDefaultElevation,
 			fill: terrainFillElevations,
 			// **RECORD, WHICH IS THE SEAM THAT WRITES NOTHING** (Task 542). lpnTerrainSample() hands
 			// its readings here instead of to `fill`, so the page can SHOW what the DEM says and let

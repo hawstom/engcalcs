@@ -243,10 +243,28 @@ whole drawing. It is now:
   being changed is Elevation. The user has already chosen the set, and Replace already owns the
   preview and the single undo step.
 
-**Do not add a third door.** Keeping the menu row beside these is what made the feature a cool
-button nobody asked for. `EngCalcs.lpnTerrainFill()` — the function that decides its OWN list —
-survives with no caller on the page; `lpnTerrainFillFor(points, opts)` is everything from the
-consent gate down, taking the nodes as an argument, so all doors are one behaviour.
+- **`Read DEM` and `Use DEM` under Elevation in the node popup** (Task 542's third shape). One node,
+  read before anything is overwritten.
+
+**Do not add a fourth door.** Keeping the Map-menu row beside these is what made the feature a cool
+button nobody asked for. `lpnTerrainFillFor(points, opts)` and `lpnTerrainSample(points, done)` are
+everything from the consent gate down, taking the nodes as an argument, so all doors are one
+behaviour.
+
+**`EngCalcs.lpnTerrainFill()` was DELETED on 2026-09-17** and this file described it as live until
+then. It was the Map-menu row's own command — the one thing that decided its OWN list — and Task 542
+removed the row without removing it, so from that day its only caller was a harness. The cost was
+not the dead code: the two sentences only it could emit, `lpn_terrain_no_nodes` ("There are no nodes
+to fill in yet.") and `lpn_terrain_none_needed` ("Every node already has an elevation you have
+set…"), were being maintained in 27 languages for a state no visitor could reach. Tom, on the first:
+*"When could that possibly display?"* Both keys are gone from all 27 files. What outlives it and has
+no live caller either: `opts.confirm` and `lpnTerrainPlanText()`, the plan a whole-drawing fill would
+have to show, and with them `lpn_terrain_confirm`, `lpn_terrain_confirm_default_1`,
+`lpn_terrain_confirm_default_2`, `lpn_terrain_keep`, `lpn_terrain_keep_ids`, `lpn_terrain_will_ids`,
+`lpn_terrain_undo` and `lpn_terrain_requests`. Whether those are debt or a half-built control is
+Tom's call. `terrainNodesNeedingElevation()`, `terrainNodesWithElevation()` and
+`terrainNodesAtDefaultElevation()` in `js/looped-network.js` are likewise now read only by the
+harnesses; they left the `lpnTerrainInit` seam and were kept in the file.
 
 - **Mapbox Terrain-RGB, because it is already paid for.** `EC_MAPBOX_TOKEN` already gates satellite;
   terrain is ordinary raster tiles on the same host through the same account, and the height decodes

@@ -3242,9 +3242,7 @@
         "lpn_terrain_keep": "9b2cb9c3f05b68d64b904ad01fdfeab9e08099d4",
         "lpn_terrain_keep_ids": "3b2e154e11ed15138cb2a271a7e7505f94492a7f",
         "lpn_terrain_missed": "0b3b296e71913c44717bcce2dee4357f04e9a964",
-        "lpn_terrain_no_nodes": "ed765fb95faa2965f4a18a209ab76366fa6585ae",
         "lpn_terrain_nofetch": "4cf1a820fb7f09124413827c3f9e34d816dcfc88",
-        "lpn_terrain_none_needed": "d4bda181c50062aed6cab7ad996839800bb52c22",
         "lpn_terrain_offmap": "9d733ad2e415f1175ef500bd7a2d44bdc065807c",
         "lpn_terrain_partial": "a290d25c4273c79dbaf8cb4ddb8b23cfe8410f64",
         "lpn_terrain_refused": "591b295957cd019cb58861284e7815c2f5fbecc5",
@@ -9348,16 +9346,8 @@
             "words": 9,
             "ends_sentence": true
         },
-        "lpn_terrain_no_nodes": {
-            "words": 8,
-            "ends_sentence": true
-        },
         "lpn_terrain_nofetch": {
             "words": 7,
-            "ends_sentence": true
-        },
-        "lpn_terrain_none_needed": {
-            "words": 26,
             "ends_sentence": true
         },
         "lpn_terrain_offmap": {

@@ -1653,6 +1653,12 @@ $ec_lang['lpn_crs_choose']='Select';
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
 $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.';
+// Shown beside a projection in the chooser, and beside the chosen one in the New project box, when
+// this page has no transform for it. Short on purpose: it sits at the end of a register name that
+// can already run to 50 characters.
+$ec_lang['lpn_crs_unplaceable_mark']='(no map)';
+// The same fact in a sentence, under the chooser's list and again if such a project is created.
+$ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 $ec_lang['lpn_crs_none']='Not georeferenced';
@@ -3345,8 +3351,6 @@ $ec_lang['lpn_terrain_keep']='{k} node(s) already have an elevation and will not
 $ec_lang['lpn_terrain_undo']='One Undo (Ctrl-Z) puts every one of them back.';
 $ec_lang['lpn_terrain_requests']='{n} request(s) to api.mapbox.com.';
 $ec_lang['lpn_terrain_busy']='Elevations are already being filled in. Wait for them.';
-$ec_lang['lpn_terrain_none_needed']='Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.';
-$ec_lang['lpn_terrain_no_nodes']='There are no nodes to fill in yet.';
 $ec_lang['lpn_terrain_offmap']='These node positions are not on the terrain map, so nothing was sent.';
 $ec_lang['lpn_terrain_too_wide']='These nodes are spread over too much of the Earth to read in one go ({n} tile requests). Nothing was sent.';
 $ec_lang['lpn_terrain_cancelled']='Nothing was changed and nothing was sent.';
@@ -3355,6 +3359,14 @@ $ec_lang['lpn_terrain_working']='Reading the land surface…';
 // {status} is a number the service sent back, such as 403.
 $ec_lang['lpn_terrain_denied']='The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.';
 $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.';
+// A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
+// gets its own sentence: the same request works in a minute.
+$ec_lang['lpn_terrain_rate_limited']='The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.';
+// Any other status the service sent back. {status} is that number.
+$ec_lang['lpn_terrain_http']='The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.';
+// Said when the nodes asked about have no position on the Earth at all, which is what a projected
+// project reports when this page has no transform for its coordinate system.
+$ec_lang['lpn_terrain_no_place']='None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.';
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
 $ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';
