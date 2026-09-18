@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1879,
-        "delta_key_count": 10,
+        "expected_key_count": 1888,
+        "delta_key_count": 19,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -525,6 +525,15 @@
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_map_attach_menu": "Background map (georeference)…",
+        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
+        "lpn_map_attach_place": "Attach the world map…",
+        "lpn_map_attach_remove": "Remove",
+        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
+        "lpn_map_attach_where": "Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space",
+        "lpn_map_attach_turn": "Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map",
+        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.",
+        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
@@ -537,6 +546,15 @@
         "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_map_attach_menu": "Background map (georeference)…",
+        "lpn_map_attach_tip": "Attach the world map to this project without changing it any other way.",
+        "lpn_map_attach_place": "Attach the world map…",
+        "lpn_map_attach_remove": "Remove",
+        "lpn_map_attach_remove_tip": "Take the world map away. The drawing and its coordinates are untouched either way.",
+        "lpn_map_attach_where": "Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space",
+        "lpn_map_attach_turn": "Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map",
+        "lpn_map_attach_done": "The world map is behind your drawing now, and your project is unchanged. Use Map, Background map (georeference), Remove to take it away again.",
+        "lpn_map_attach_removed": "The world map is gone, and the drawing is exactly as it was.",
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
@@ -636,6 +654,150 @@
                     "key": "lpn_field_text_size",
                     "value": "מכפיל גודל",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_map_attach_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_place": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_remove_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_where": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_turn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
+                }
+            }
+        },
+        "lpn_map_attach_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_remove_confirm",
+                    "value": "להסיר את תמונת הרקע?",
+                    "english": "Remove the background image?"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_scale_prompt1",
+                    "value": "לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.",
+                    "english": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them."
                 }
             }
         },

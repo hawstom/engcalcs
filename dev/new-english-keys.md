@@ -89,7 +89,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**67 still to read**, of 152 new keys across 9 unmerged branch(es).
+**65 still to read**, of 150 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -556,14 +556,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Values versus time
   _Ruled OK 2026-09-17._
 
-### feat/xy-world-map (`3866b64f`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
+### feat/xy-world-map (`151546cf`) — adds no English strings
 
 ### projection (`2a7e6dad`) — 2 new, 2 to read @@ NEEDS RULING
 
