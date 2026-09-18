@@ -8499,6 +8499,46 @@ var EngCalcs = EngCalcs || {};
 		if (!best) { return null; }
 		return { link: best, t: best.from === n.id ? 0 : 1 };
 	}
+	/**
+	 * **THE ONE PLACE A SCREEN POINT BECOMES A CONNECTION** (Task 247; Tom, 2026-09-18: *"the
+	 * rubber band after customer placement step 1 should be constrained to link perpendiculars and
+	 * nodes"*, and *"all always either perp to link or snapped to node"*).
+	 *
+	 * Given where the pointer is and where the METER is, it answers the only two connections this
+	 * page offers: the foot of a perpendicular dropped from the meter onto a pipe, or a node. It
+	 * returns `{link, t, point}` or null, and null genuinely means *there is no legal connection
+	 * here* rather than *ask again differently*.
+	 *
+	 * **THE PREVIEW AND THE COMMIT READ THE SAME ANSWER, WHICH IS THE WHOLE POINT.** A band drawn
+	 * to the raw pointer promised a connection at an angle we do not offer, at a station the press
+	 * would not use -- so the line a person aimed with was not the line they got. Both now call
+	 * this, so the preview cannot be wrong about the press.
+	 *
+	 * **THE STATION COMES FROM THE METER, NEVER FROM THE POINTER.** That is the correction Tom
+	 * already made once (*"Put the meter where user clicks"*): the pointer names WHICH pipe, and
+	 * the meter's own position names where along it, which is what makes the stub square.
+	 *
+	 * A node wins a tie, on the finger-fallback's own argument: every pipe ends at a node, so near
+	 * a junction both are in reach and the node is the more specific thing the user can have meant.
+	 */
+	function customerConnectionAt(clientX, clientY, pt, pxTolerance, target) {
+		var n = nearestNodeNearScreen(clientX, clientY, pxTolerance),
+			a = n ? customerAttachAtNode(n, pt) : null, l, p;
+		if (!a) {
+			// The pipe under the press by the browser's own hit test on its wide stroke, falling
+			// back to the same finder every other tool on this page uses.
+			l = (target && target.dataset && target.dataset.link !== undefined &&
+					!(target.classList && target.classList.contains('lpn-vhandle')))
+				? { link: linkById(target.dataset.link) }
+				: nearestLinkNearScreen(clientX, clientY, pxTolerance);
+			if (!l || !l.link) { return null; }
+			a = { link: l.link, t: customerSnapT(l.link,
+				Geom.nearestFractionOnPolyline(linkPointList(l.link), pt.x, pt.y).f) };
+		}
+		if (!a.link || !nodeById(a.link.from) || !nodeById(a.link.to)) { return null; }
+		p = Geom.pointAlongPolyline(linkPointList(a.link), a.t);
+		return { link: a.link, t: a.t, point: { x: p.x, y: p.y } };
+	}
 	// Whether this meter's service lands exactly on a node, which is what the drawing says out loud
 	// (see updateCustomerGeometry). A station of exactly 0 or 1 IS the pipe's end node, and only the
 	// snap above and a typed 0 or 100 can produce one.
@@ -12569,13 +12609,23 @@ var EngCalcs = EngCalcs || {};
 		if (!pendingMeterEl) {
 			pendingMeterEl = el('circle', { 'class': 'lpn-meter lpn-meter-pending' }, world);
 		}
-		drawPendingMeter(pendingMeter.x, pendingMeter.y);
+		drawPendingMeter(null);
 		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
 			'Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
 	}
-	// The preview box, plus the band from it to wherever the pointer is now. `to` is omitted on the
-	// first press, when there is nowhere yet for the band to reach.
-	function drawPendingMeter(tx, ty) {
+	/**
+	 * The preview dot, plus the band from it to the connection the next press would make. `to` is
+	 * null before the pointer has found one, and on the first press, when there is nothing yet for
+	 * the band to reach.
+	 *
+	 * **THE BAND ONLY EVER DRAWS A CONNECTION THAT COULD BE MADE** (Tom, 2026-09-18: *"the rubber
+	 * band after customer placement step 1 should be constrained to link perpendiculars and
+	 * nodes"*). It used to follow the raw pointer, which drew a line at whatever angle the hand
+	 * was at, from the meter to a point in open space -- a picture of two things this page does
+	 * not offer: a service at an angle, and a service to nowhere. Over bare map there is now no
+	 * band at all, which is the honest drawing of "this press would cancel".
+	 */
+	function drawPendingMeter(to) {
 		var half;
 		if (!pendingMeter || !pendingMeterEl) { return; }
 		// The preview is the same dot the placed meter will be, so what the reader sees before the
@@ -12586,10 +12636,26 @@ var EngCalcs = EngCalcs || {};
 		pendingMeterEl.setAttribute('r', half);
 		pendingMeterEl.setAttribute('stroke-width', serviceStrokeWorld(pendingMeter.x, pendingMeter.y));
 		if (!pendingMeterBand) { return; }
+		// Hidden rather than collapsed to a zero-length line: a line from the dot to itself is a
+		// dot-sized smudge on top of the preview, which reads as a mark rather than as nothing.
+		if (!to || !isFinite(to.x) || !isFinite(to.y)) {
+			pendingMeterBand.setAttribute('visibility', 'hidden');
+			return;
+		}
+		pendingMeterBand.setAttribute('visibility', 'visible');
 		pendingMeterBand.setAttribute('x1', pendingMeter.x);
 		pendingMeterBand.setAttribute('y1', pendingMeter.y);
-		pendingMeterBand.setAttribute('x2', isFinite(tx) ? tx : pendingMeter.x);
-		pendingMeterBand.setAttribute('y2', isFinite(ty) ? ty : pendingMeter.y);
+		pendingMeterBand.setAttribute('x2', to.x);
+		pendingMeterBand.setAttribute('y2', to.y);
+	}
+	// Where the next press would connect this half-placed meter, or null over bare map. The one
+	// reader of customerConnectionAt() for the preview; the press itself calls it again rather than
+	// trusting a remembered answer, because the drawing may have moved between the two.
+	function pendingMeterConnection(e, target) {
+		if (!pendingMeter) { return null; }
+		// **THE PREVIEW'S REACH IS THE PRESS'S REACH**, one number per hand, so the band cannot
+		// promise a pipe a finger's press would miss or refuse one it would catch.
+		return customerConnectionAt(e.clientX, e.clientY, pendingMeter, reachPx(e), target);
 	}
 	// **ESCAPE ABANDONS A HALF-PLACED METER, on the same capture-phase argument the link below it
 	// makes** -- it is the newest thing on screen, and the key is consumed only when there is
@@ -28812,10 +28878,10 @@ var EngCalcs = EngCalcs || {};
 		// below it has one: the shapes both track the pointer between clicks and neither should
 		// depend on the other being wired.
 		svg.addEventListener('pointermove', function (e) {
-			var w;
+			var hit;
 			if (!pendingMeter) { return; }
-			w = screenToWorld(e.clientX, e.clientY);
-			drawPendingMeter(w.x, w.y);
+			hit = pendingMeterConnection(e, e.target);
+			drawPendingMeter(hit ? hit.point : null);
 		});
 		// The select-area ring, which follows the pointer with NO BUTTON DOWN (Task 266). Its own
 		// listener beside the rubber band's, and for the same reason: the two shapes both track the
@@ -29272,27 +29338,14 @@ var EngCalcs = EngCalcs || {};
 				// whichever was drawn first; a genuine tie takes the first, deterministically, and
 				// the Customers table shows which pipe it landed on so a wrong guess is visible and
 				// typeable rather than silent.
-				var mNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)),
-					mLink = mNode ? customerAttachAtNode(mNode, pendingMeter) : null;
-				// The pipe under the press, by the browser's own hit test on its wide stroke,
-				// falling back to the same finder every other tool uses.
-				if (!mLink) {
-					mLink = (t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle'))
-						? { link: linkById(t.dataset.link) }
-						: nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
-					// **THIS PRESS NAMES THE PIPE AND NOTHING ELSE** (Tom, 2026-09-18: *"You are
-					// putting the meter at the pipe point instead of at the meter point. Put the
-					// meter where user clicks."*). It states no station, so addCustomer() drops one
-					// from the METER -- square to the main, and leaving the symbol exactly where the
-					// first press put it however far up the pipe the second one was. Taking the
-					// station from this press instead is what used to move it, by the distance
-					// between the two presses measured along the main.
-					//
-					// A station that lands near the END of a pipe is the node there, which is the
-					// half of the node rule that catches a press the junction's own symbol missed,
-					// and it happens inside that same derivation (customerSnapT()).
-					if (mLink && mLink.link) { mLink = { link: mLink.link }; }
-				}
+				//
+				// **THAT READING, AND THE PERPENDICULAR ONTO A PIPE BESIDE IT, ARE NOT WRITTEN HERE
+				// ANY MORE**: both are customerConnectionAt(), which is also what the band the user
+				// aimed with was drawn from. A press can no longer land anywhere the preview did
+				// not show. Its station comes from the METER and not from this press, which is Tom's
+				// own correction of 2026-09-18 (*"Put the meter where user clicks"*) now stated once
+				// rather than twice.
+				var mLink = customerConnectionAt(e.clientX, e.clientY, pendingMeter, reachPx(e), t);
 				if (mLink && mLink.link) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
