@@ -353,3 +353,28 @@ is answered for the three that remain after the divorce; see item 5 series above
     (placing a node to read well at the zoom the user actually wants) to fix a raster problem tile
     providers already solve by resampling at fractional zoom, which is normal, unremarked behavior
     on every web map. See journal, 2026-09-17.
+
+35. **Scope the Properties/Settings/Libraries Escape-close to focus, not to a page-wide keydown.**
+   `js/looped-network.js:25258-25305` closes `#lpn_popup`/`#lpn_setbox`/`#lpn_libbox` on ANY Escape
+   anywhere on the page, whether or not the reader's focus is inside the box — the exact shape of
+   Tom's 2026-09-18 complaint. Guard the three close calls on `document.activeElement` being inside
+   the relevant box; leave the menu/popover half of the same handler untouched (a different pattern,
+   already correctly page-wide per the 2026-08-13 "these are menus, not boxes" ruling). Cheaper than
+   his own blunter "never closable by Escape" proposal and keeps a real keyboard exit for the one
+   reader who tabbed INTO the box — the × buttons are ordinary focusable `<button>`s either way, so
+   neither version strands a keyboard-only visitor, but the focus-scoped version costs nothing a
+   reader can feel and the blunt version removes a working shortcut for no visible gain. See
+   journal, 2026-09-18.
+
+36. **Before `feat/lock-initials-later` merges, get Tom's explicit yes on storing the Ask-typed
+   name, since his 2026-09-18 proposal reverses a line the branch draws on purpose.**
+   `js/looped-network.js:23289-23291` on that branch (checked 2026-09-18) calls the name being
+   sent-never-stored "the whole point of Task 667(b)." His new want — remember it once per browser,
+   reuse it to label who holds a lock — is good thinking on the "ask once" half and is a real,
+   if milder, repeat of the thing he rejected on the "reuse everywhere afterward" half: a name
+   given once for one purpose becomes a standing per-browser label. Not a reason to drop the idea —
+   I read it as passing the existing storage exemption test the identity token already relies on —
+   but it is a reversal of a decision made days ago on the same branch, and the person who should
+   say so out loud is Tom, not whoever implements it next. Pair it with a visible "not you?" way to
+   correct a stale or borrowed name, since a wrong name on a break-lock decision is the kind of
+   defect only the person NOT holding the lock ever notices. See journal, 2026-09-18.
