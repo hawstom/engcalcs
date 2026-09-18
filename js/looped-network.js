@@ -3704,7 +3704,7 @@ var EngCalcs = EngCalcs || {};
 			// accepting one would put the node at Infinity and take the whole drawing with it; and
 			// a silent refusal is indistinguishable from a control that does nothing.
 			setNotice(pc.lpn_coord_off_world ||
-				'That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.');
+				'That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.');
 			return false;
 		}
 		var isY = coordSlotIsY(slot);
