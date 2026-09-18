@@ -24962,12 +24962,6 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
-			// our own documents, with everything that comes with it -- a lock, a live file handle, a
-			// Save that writes back. An .inp has none of that and never will, so hiding it behind
-			// the same word would promise a round trip we cannot make. Import says what it is.
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
-			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
 			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
 			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
@@ -24989,6 +24983,18 @@ var EngCalcs = EngCalcs || {};
 			// had to be greyed whenever that project was already on the map, is gone with it.
 			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
+			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
+			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was
+			// the last row of a five-row block and read as belonging to none of them; beside the
+			// row it is the other direction of, it is found by looking for its own pair.
+			//
+			// This costs Task 447's "third, below both rows it rescues": Open xy file on map… now
+			// sits above Import rather than below it. Kept deliberately -- the fallback is still
+			// below Open…, which is the row people actually reach for first, and a control nobody
+			// can find is a worse defect than a fallback reading one place too high.
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
