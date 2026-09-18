@@ -93,6 +93,10 @@ function storageKeys() {
 	return out.sort().join(',');
 }
 
+// The caution glyph this suite already means by caution -- the verdict strings' own, prepended by
+// the renderer rather than carried in the language file. Written once here so a harness reading
+// the button row is not the place somebody has to retype it.
+const CAUTION = '\u26a0';
 // --- reading the dialog the way a person reads it -------------------------
 function dialogParagraphs() {
 	return byId.lpn_dialog_body.children.map(c => c.textContent);
@@ -130,10 +134,24 @@ console.log('\n--- 1. the first user is asked nothing at all ---');
 		dialogParagraphs().every(t => t.toLowerCase().indexOf('initials') < 0),
 		JSON.stringify(dialogParagraphs()));
 	ok('...and does not prompt either', prompts === 0);
-	ok('the panel still explains the file, the lock and the browser permission',
-		dialogParagraphs().indexOf(PC.lpn_file_training_1) >= 0 &&
-		dialogParagraphs().indexOf(PC.lpn_file_training_2) >= 0 &&
-		dialogParagraphs().indexOf(PC.lpn_file_training_permission) >= 0);
+	// **ONE PARAGRAPH, AND IT IS THE BROWSER-PERMISSION ONE** (Tom, 2026-09-17: *"I waffle on 'drop
+	// the pre-Open message entirely'. The browser message about saving could be alarming without an
+	// introduction (the last paragraph I mentioned keeping)."*). The panel survives because of a
+	// prompt that comes from the BROWSER and not from us; the two paragraphs that went recited
+	// expectations a person already brings -- that a file is saved when they ask, and that software
+	// watches for two people in one file.
+	//
+	// Asserted as an exact list rather than as three separate presences, because "the panel is
+	// short" is the whole finding: a fourth paragraph added later is a regression this must catch,
+	// and three `indexOf >= 0` tests never could.
+	ok('the panel is exactly one paragraph',
+		JSON.stringify(dialogParagraphs()) === JSON.stringify([PC.lpn_file_training_permission]),
+		JSON.stringify(dialogParagraphs()));
+	ok('...and it is the one about the browser asking permission',
+		dialogParagraphs()[0] === PC.lpn_file_training_permission);
+	ok('...the two that recited ordinary expectations are gone',
+		dialogParagraphs().indexOf(PC.lpn_file_training_1) < 0 &&
+		dialogParagraphs().indexOf(PC.lpn_file_training_2) < 0);
 
 	press(PC.lpn_file_training_continue);
 	const idn = L.loadIdentity();
@@ -201,10 +219,43 @@ console.log('\n--- 3. four answers, and each does what it says ---');
 	posted.length = 0; global.__LANDED.length = 0;
 	L.presentOpenChoice(saved, handle, 'Somebody else', { lockedBy: '', acquiredAt: 1, editedAt: 0, savedAt: 0 });
 	ok('the dialog offers exactly four answers', dialogButtons().length === 4, JSON.stringify(dialogButtons()));
-	ok('...in Tom\'s own order: Ask, Break lock, Open read-only, Cancel',
+	// **ASK, OPEN READ-ONLY, CANCEL, THEN BREAK LOCK.** The interface-designer's row, which Tom took
+	// on 2026-09-17: *"I agree with Ask . Open read-only . Cancel . -- gap -- . warning Break
+	// lock"*. It replaces Ask, Break lock, Open read-only, Cancel. Three separate assertions
+	// follow, because the row has three properties and a single string comparison would let a
+	// future edit trade one for another silently.
+	ok('...in the order Tom agreed: Ask, Open read-only, Cancel, then Break lock',
 		JSON.stringify(dialogButtons()) === JSON.stringify(
-			[PC.lpn_lock_ask, PC.lpn_lock_break, PC.lpn_lock_open_readonly, PC.lpn_cancel]),
+			[PC.lpn_lock_ask, PC.lpn_lock_open_readonly, PC.lpn_cancel, CAUTION + ' ' + PC.lpn_lock_break]),
 		JSON.stringify(dialogButtons()));
+	// **THE FIRST BUTTON TAKES KEYBOARD FOCUS**, which is why Ask leads: a bare Enter, or the second
+	// half of a fast double-click, lands on whatever is first, so what is first must be the answer
+	// that changes nothing.
+	ok('...and the answer that changes nothing is the one a stray Enter reaches',
+		dialogButtons()[0] === PC.lpn_lock_ask);
+	// **CANCEL SITS BEFORE BREAK LOCK, NOT AFTER IT.** In the shipped order the destructive answer
+	// was one seat from Cancel, where a startled click or a Tab-Tab-Enter reaches it.
+	ok('...with Cancel between the safe answers and the destructive one',
+		dialogButtons().indexOf(PC.lpn_cancel)
+			< dialogButtons().indexOf(CAUTION + ' ' + PC.lpn_lock_break));
+	// THE GAP, AND THE GLYPH, AND NOTHING ELSE. This suite does not dress one answer to stand out;
+	// what a data-loss answer earns over a consent answer is distance and a caution mark.
+	const breakBtn = byId.lpn_dialog_buttons.children[3];
+	const others = byId.lpn_dialog_buttons.children.slice(0, 3);
+	ok('Break lock is set apart by a gap', breakBtn.style.marginLeft !== others[0].style.marginLeft
+		&& parseInt(breakBtn.style.marginLeft, 10) > parseInt(others[0].style.marginLeft, 10),
+		breakBtn.style.marginLeft + ' vs ' + others[0].style.marginLeft);
+	ok('...and leads with the caution glyph the verdict strings already use',
+		breakBtn.textContent.indexOf(CAUTION) === 0, breakBtn.textContent);
+	// **THE GLYPH IS PREPENDED, NOT TRANSLATED.** A marker word in its place would be a word to
+	// translate into 26 languages and one more thing to get wrong in the five that read right to
+	// left. The language file must carry the words alone.
+	ok('...which is not in the language file, so it costs nothing to translate',
+		String(PC.lpn_lock_break).indexOf(CAUTION) < 0, PC.lpn_lock_break);
+	// AND NOTHING ELSE IS DIFFERENT ABOUT IT: no colour, no border, no size.
+	ok('...and it is not dressed to stand out in any other way',
+		!breakBtn.style.background && !breakBtn.style.color && !breakBtn.style.border
+		&& !breakBtn.style.fontWeight && !breakBtn.className);
 
 	// --- Cancel: the project never lands, and nothing is said to the server.
 	press(PC.lpn_cancel);
@@ -251,7 +302,7 @@ console.log('\n--- 3. four answers, and each does what it says ---');
 	global.__LANDED.length = 0; posted.length = 0;
 	brokerReply = { ok: true, held: true };
 	L.presentOpenChoice(saved, handle, 'Somebody else', { lockedBy: '' });
-	press(PC.lpn_lock_break); await settle();
+	press(CAUTION + ' ' + PC.lpn_lock_break); await settle();
 	ok('Break lock takes the claim', posted.length === 1 && posted[0].action === 'steal', JSON.stringify(posted));
 	ok('...and lands the project editable', global.__LANDED.length === 1 && global.__LANDED[0].asReadOnly === false);
 	ok('BREAKING A LOCK WRITES NOTHING TO THE HOLDER\'S FILE', handle.writes === 0,

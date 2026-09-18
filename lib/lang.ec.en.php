@@ -1876,7 +1876,11 @@ $ec_lang['lpn_lock_age_saved']='It was last saved {x} ago.';
 $ec_lang['lpn_lock_age_never_saved']='Nothing has been saved to this file yet.';
 $ec_lang['lpn_lock_age_unknown']='There is no record of how long it has been in use, or when it was last saved or edited.';
 // Four answers now, in Tom's own order, so the prose and the button row read the same way.
-$ec_lang['lpn_lock_open_choices_ask']='"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. "Open read-only" lets you look at it and change anything you like, without being able to save here.';
+// **IN THE BUTTON ROW'S OWN ORDER** (2026-09-17): Ask, Open read-only, Break lock. The prose and
+// the row have to read the same way down the page, or the sentence a person is reading is about
+// a different button from the one their eye has landed on. Cancel is not described, because a
+// Cancel that needed a sentence would not be a Cancel.
+$ec_lang['lpn_lock_open_choices_ask']='"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.';
 $ec_lang['lpn_lock_ask']='Ask';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.

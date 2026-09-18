@@ -35,6 +35,12 @@ exports.run = async function ({ browser, report }) {
 			'the panel asks for NO initials -- that question moved to the colleague who wants the file');
 		report.ok(!/initials/i.test((panel && panel.text) || ''), '...and does not mention them either');
 		report.ok((panel.buttons || []).includes('Continue'), 'and offers Continue');
+		// **AND IT IS ONE PARAGRAPH** (Tom, 2026-09-17: *"I waffle on 'drop the pre-Open message
+		// entirely'. The browser message about saving could be alarming without an introduction (the
+		// last paragraph I mentioned keeping)."*). The two that went recited expectations a person
+		// already brings; the one that stayed is about a prompt that comes from the BROWSER.
+		report.eq(await a.page.locator('#lpn_dialog_body p').count(), 1,
+			'the panel is one paragraph, not three');
 
 		// Continue is a fresh click with a user activation of its own, which is the whole reason this is
 		// a panel and not a confirm(): the save that follows is the proof it reached the picker.

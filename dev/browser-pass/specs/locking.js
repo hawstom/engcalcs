@@ -55,9 +55,15 @@ exports.run = async function ({ browser, report }) {
 		report.has(dlg && dlg.text, 'in use for', '...and says how long it has been in use');
 		report.ok(/seconds|minutes|hours|days/.test(dlg.text), 'and carries a NUMBER',
 			(dlg.text || '').slice(0, 200));
+		// **REORDERED 2026-09-17, and the order is the assertion.** Ask leads because the
+		// first button takes keyboard focus, so a stray Enter must land on the answer that changes
+		// nothing; the two look-but-do-not-touch answers sit together; and Cancel goes BEFORE Break
+		// lock, because in the shipped order the destructive answer sat one seat from Cancel. The
+		// caution glyph is prepended by the renderer, so it is in the rendered label and not in the
+		// language file.
 		report.eq(JSON.stringify(dlg.buttons),
-			JSON.stringify(['Ask', 'Break lock', 'Open read-only', 'Cancel']),
-			'four choices, in Tom\'s own order, and still no AUTOMATIC take-over');
+			JSON.stringify(['Ask', 'Open read-only', 'Cancel', '\u26a0 Break lock']),
+			'four choices, in the order Tom agreed, and still no AUTOMATIC take-over');
 
 		// --- read-only means read-only, and nothing else ----------------------
 		await b.dialogClick('Open read-only');
@@ -120,7 +126,7 @@ exports.run = async function ({ browser, report }) {
 		await b.menuClick('Open…');
 		const dlg2 = await b.waitDialog();
 		report.ok(!!dlg2, 'B is asked again on a second open');
-		await b.dialogClick('Break lock');
+		await b.dialogClick('\u26a0 Break lock');
 		report.ok(await b.banner() === null, 'after breaking the lock B is editable');
 
 		await b.makeEdit();

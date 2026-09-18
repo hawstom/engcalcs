@@ -46,10 +46,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Ask
   @@ NEEDS RULING
 - **`lpn_lock_ask_failed`**
-  > Your message could not be passed on. Either nobody has this file open now, or the server could not be reached.
+  > Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.
   @@ NEEDS RULING
 - **`lpn_lock_ask_prompt`**
-  > What should we tell them? Your initials are ideal. They are sent to whoever has the file open, and are not kept on this computer.
+  > Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.
   @@ NEEDS RULING
 - **`lpn_lock_ask_sent`**
   > We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.
@@ -58,7 +58,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > To avoid data loss, choose carefully from the options below.
   @@ NEEDS RULING
 - **`lpn_lock_open_choices_ask`**
-  > Ask tells whoever has this file open that you would like it, and changes nothing else. Break lock lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. Open read-only lets you look at it and change anything you like, without being able to save here.
+  > "Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.
   @@ NEEDS RULING
 - **`lpn_lock_open_inuse`**
   > This file appears to be in use.

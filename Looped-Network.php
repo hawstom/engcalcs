@@ -2350,6 +2350,12 @@ EngCalcs.pageConfig = {
 	lpn_file_upload_explain: <?=json_encode($ec_lang['lpn_file_upload_explain'])?>,
 	lpn_status_uploaded: <?=json_encode($ec_lang['lpn_status_uploaded'])?>,
 	lpn_status_downloaded: <?=json_encode($ec_lang['lpn_status_downloaded'])?>,
+<?php // **THESE TWO ARE NO LONGER DRAWN** (2026-09-17). The pre-Save panel is one paragraph now,
+      // and that paragraph is lpn_file_training_permission below. They are still supplied because
+      // dev/lpn-spike/lock-initials-harness.js asserts their ABSENCE from the panel and needs their
+      // text to do it -- a check that cannot name what it is looking for is no check. Whether the
+      // keys themselves are debt is a judgement for Tom rather than a sweep: they are 27
+      // translations of prose that may yet be wanted somewhere else. ?>
 	lpn_file_training_1: <?=json_encode($ec_lang['lpn_file_training_1'])?>,
 	lpn_file_training_2: <?=json_encode($ec_lang['lpn_file_training_2'])?>,
 	lpn_file_training_permission: <?=json_encode($ec_lang['lpn_file_training_permission'])?>,

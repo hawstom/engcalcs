@@ -22624,7 +22624,21 @@ var EngCalcs = EngCalcs || {};
 			// registration -- and the name it collected was for a colleague who in most cases never
 			// arrives. The question now happens where it is useful: to the SECOND user, on the Ask
 			// button of the dialog that tells them the file is in use.
-			[pc.lpn_file_training_1, pc.lpn_file_training_2, pc.lpn_file_training_permission].forEach(function (t) {
+			//
+			// **AND ONE PARAGRAPH, NOT THREE** (Tom, 2026-09-17). He first said to drop the panel
+			// entirely and then took half of that back: *"I waffle on 'drop the pre-Open message
+			// entirely'. The browser message about saving could be alarming without an introduction
+			// (the last paragraph I mentioned keeping)."* So what survives is the one paragraph that
+			// exists for a reason outside this page -- the BROWSER's own permission prompt, which is
+			// alarming if it arrives unannounced. The two that went recited expectations a person
+			// brings with them: that a file is saved when they ask, and that two people editing one
+			// file is a thing software watches for.
+			//
+			// **THE PANEL ITSELF STAYS, AND NOT FOR ITS WORDS.** showSaveFilePicker() needs a live
+			// user activation, and Chrome's expires while a careful reader is still reading, so
+			// Continue is a fresh click with an activation of its own. A shorter panel is a better
+			// one for that too: less to read before the gesture that matters.
+			[pc.lpn_file_training_permission].forEach(function (t) {
 				if (!t) { return; }
 				var p = document.createElement('p');
 				p.style.margin = '0 0 8px';
@@ -23052,7 +23066,7 @@ var EngCalcs = EngCalcs || {};
 			ages.push(pc.lpn_lock_age_unknown || 'There is no record of how long it has been in use, or when it was last saved or edited.');
 		}
 		lines.push(ages.join(' '));
-		lines.push(pc.lpn_lock_open_choices_ask || 'Ask tells whoever has this file open that you would like it, and changes nothing else. Break lock lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand. Open read-only lets you look at it and change anything you like, without being able to save here.');
+		lines.push(pc.lpn_lock_open_choices_ask || '"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.');
 		return lines;
 	}
 	// **ASK SENDS INITIALS AND STORES NOTHING.** They are typed here, at the one moment they are
@@ -23062,12 +23076,12 @@ var EngCalcs = EngCalcs || {};
 	async function askForLockedFile(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
-		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'What should we tell them? Your initials are ideal. They are sent to whoever has the file open, and are not kept on this computer.', '');
+		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.', '');
 		if (initials === null) { return; }   // backed out: nothing sent, and nothing opened
 		var r = docId ? await postLock('request', docId, { name: initials.trim().slice(0, 60) }) : null;
 		setNotice((r && r.ok && r.requested)
 			? (pc.lpn_lock_ask_sent || 'We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.')
-			: (pc.lpn_lock_ask_failed || 'Your message could not be passed on. Either nobody has this file open now, or the server could not be reached.'));
+			: (pc.lpn_lock_ask_failed || 'Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.'));
 	}
 	function presentOpenChoice(saved, handle, who, info) {
 		var pc = EngCalcs.pageConfig || {};
@@ -23079,18 +23093,46 @@ var EngCalcs = EngCalcs || {};
 				body.appendChild(p);
 			});
 		}, [
-			// Tom's own order, 2026-09-17: Ask, Break lock, Open read-only, Cancel.
+			// **ASK, OPEN READ-ONLY, CANCEL, A GAP, THEN BREAK LOCK.** The interface-designer's row,
+			// which Tom took on 2026-09-17: *"I agree with Ask . Open read-only . Cancel . -- gap --
+			// . warning Break lock"*. It replaces Ask, Break lock, Open read-only, Cancel, and the
+			// three reasons are each about a hand rather than about taste.
+			// (The roadmap block for this is on master and not on this branch, so it is not cited by
+			// number here -- a citation a reader cannot follow is worse than none.)
+			//
+			//   * **THE FIRST BUTTON TAKES KEYBOARD FOCUS** -- openDialog() focuses it -- so a bare
+			//     Enter, or the second half of a fast double-click that opened the file, lands on
+			//     whatever leads. Ask leads because Ask is the answer that changes nothing.
+			//   * **THE TWO LOOK-BUT-DO-NOT-TOUCH ANSWERS SIT TOGETHER.** Ask and Open read-only
+			//     both leave the holder's file exactly as it is.
+			//   * **CANCEL GOES BEFORE BREAK LOCK, not after it.** In the shipped order the
+			//     destructive answer sat one seat from Cancel, where a startled click or a
+			//     Tab-Tab-Enter reaches it.
+			//
+			// **AND THE STYLING STOPS AT THE GLYPH AND THE GAP.** This suite has a standing rule
+			// against making one answer stand out -- `.ec-consent-btn` styles both consent answers
+			// identically on purpose, because a coloured Accept beside a grey Reject is a dark
+			// pattern. That rule is about a dialog that wants an answer FROM you; this one is about
+			// losing somebody else's afternoon, which is what licenses separating the destructive
+			// answer from the rest. It licenses exactly that much and no colour.
 			{ label: pc.lpn_lock_ask || 'Ask', fn: function () { askForLockedFile(saved); } },
+			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } },
 			{
-				label: pc.lpn_lock_break || 'Break lock',
+				// **THE GLYPH IS THE VERDICT STRINGS' OWN, AND IT IS PREPENDED HERE RATHER THAN
+				// WRITTEN INTO THE LANGUAGE FILE.** `⚠` is decorative, international and RTL-safe,
+				// it is already what this suite means by caution, and prepending it costs nothing in
+				// 26 languages -- the same arrangement writeCheckHTML() is under. A translated
+				// marker word in its place would be a word to translate and one more thing to get
+				// wrong in five right-to-left languages.
+				gapBefore: true,
+				label: '⚠ ' + (pc.lpn_lock_break || 'Break lock'),
 				fn: async function () {
 					var docId = saved.project && saved.project.docId;
 					if (docId) { await postLock('steal', docId); }
 					landOpenedFile(saved, handle, false);
 				}
-			},
-			{ label: pc.lpn_lock_open_readonly || 'Open read-only', fn: function () { landOpenedFile(saved, handle, true, who); } },
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+			}
 		]);
 	}
 	// Which open project, if any, IS this document? Reads the docId out of each stored project rather
@@ -25861,7 +25903,11 @@ var EngCalcs = EngCalcs || {};
 		buttons.forEach(function (b) {
 			var btn = document.createElement('button');
 			btn.type = 'button';
-			btn.style.marginLeft = '6px';
+			// **A `gapBefore` BUTTON IS SET APART FROM THE ROW, AND THAT IS THE WHOLE OF IT.**
+			// No colour, no border, no size: this suite's standing rule is that one answer
+			// must not be dressed to stand out, and the only thing a data-loss answer earns over a
+			// consent answer is distance from the hand that was reaching for Cancel.
+			btn.style.marginLeft = b.gapBefore ? '28px' : '6px';
 			btn.textContent = b.label;
 			btn.addEventListener('click', function () { closeDialog(); b.fn(); });
 			bar.appendChild(btn);

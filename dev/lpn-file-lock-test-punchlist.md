@@ -249,6 +249,14 @@ one, and is worth asking again of the new words.)*
 
 ---
 
+> **BUTTON ORDER CHANGED 2026-09-17.** Every box below that names the open-time dialog's
+> answers was written against **Ask / Break lock / Open read-only / Cancel**. It is now
+> **Ask / Open read-only / Cancel / (gap) / ⚠ Break lock**, which Tom agreed: the first button takes
+> keyboard focus, so a stray Enter must land on the answer that changes nothing; the two
+> look-but-do-not-touch answers sit together; and Cancel goes before Break lock rather than one seat
+> from it. The glyph is prepended by the renderer and is not in the language file. `dev/browser-pass/
+> specs/locking.js` asserts the whole row, so no box below needs re-running for it.
+
 ## 1. First run and the training panel
 
 > **CORRECTED 2026-09-17 (Task 667(b)).** **THE PANEL NO LONGER ASKS FOR INITIALS**, so every box
@@ -259,6 +267,15 @@ one, and is worth asking again of the new words.)*
 > rather than stored. The panel itself stays, and stays for the reason below: it is what makes the
 > native file dialog open from a real user gesture. Reading it and pressing **Continue** is the whole
 > of it now. `dev/lpn-spike/lock-initials-harness.js`.
+>
+> **AND IT IS ONE PARAGRAPH, NOT THREE, SINCE THE SAME DAY.** Tom first said to drop the panel
+> entirely and then took half of that back: *"I waffle on 'drop the pre-Open message entirely'. The
+> browser message about saving could be alarming without an introduction (the last paragraph I
+> mentioned keeping)."* What survives is the paragraph about the BROWSER's own permission prompt,
+> which is the one thing on that panel a person cannot predict. The two that went said a file is
+> saved when you ask, and that two people editing one file is watched for. Asserted as an exact
+> list in the harness and as a paragraph count in `dev/browser-pass/specs/files.js`, because
+> "the panel is short" is the finding and three presence tests could never catch a fourth.
 
 The panel is what makes the native file dialog open from a real user gesture. It is the riskiest
 single guess in the build.
