@@ -2710,6 +2710,13 @@ $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 $ec_lang['lpn_settings_leader_snap']='Snap leader lines to set angles';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label away from its asset.';
+// **THE LABELING THRESHOLD** (Task 669). Restored 2026-09-18 after Tom asked for it back three
+// times. Three strings: the row's name, its tip, and the capture button beside the box. The fourth,
+// the placeholder, is the only place on screen that says what a blank box means.
+$ec_lang['lpn_settings_label_max_width']='Widest view that shows labels (map units)';
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. Leave the box blank to always show them. A text object you added shows until the view is this much wider than its own size multiplier.';
+$ec_lang['lpn_settings_label_use_view']='Use current view';
+$ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';

@@ -135,11 +135,10 @@ let cx = 0, cy = 0;
 doc.nodes.forEach(function (n) { cx += n.x; cy += n.y; });
 cx /= doc.nodes.length; cy /= doc.nodes.length;
 const READ_ZOOM = 30000;
-// The ceiling section 3 holds the revival to. A label is nudged in WORLD units, so the honest
-// figure is pixels: on this drawing at this zoom the worst auto-placed node label lands ~64 px
-// from home. Laid out at the scale it was HIDDEN at -- a quarter of this one -- the same nudges
-// read four times as far, which is the whole failure mode.
-const NUDGE_PX_MAX = 150;   // one of the four zooms node-shed-harness.js uses; Net3-World is read here
+// Section 3 prints the nudge in PIXELS -- a nudge is stored in WORLD units, so pixels is the figure
+// that does not depend on the zoom, and a layout carried over from a quarter of this scale reads
+// four times as far. It is a statistic there and no longer a gate: see the comment beside the
+// assertion for why a pixel ceiling stopped being able to answer the question it was proxying.
 
 // One scenario to switch into, and one Text object of the user's own for section 4.
 const sTest = L.createScenario('Test');
@@ -242,16 +241,32 @@ ok(L.layoutScale() === L.scale(), 'the layout belongs to the scale on screen now
 	// **A NUDGE IS IN WORLD UNITS AND BELONGS TO THE SCALE THAT PRODUCED IT** (see relayoutLabels()).
 	// Read it back in PIXELS -- nudge x scale -- and the figure stops depending on the zoom, so a
 	// layout computed at a quarter of this zoom shows up as four times the pixel displacement.
-	const px = doc.nodes.map(function (n) {
-		const ne = nodeEl(n.id);
-		if (!ne || ne.empty || ne.hiddenDropped || !ne.nudge) { return null; }
-		return Math.hypot(ne.nudge.x, ne.nudge.y) * L.scale();
-	}).filter(function (v) { return v !== null; });
-	px.sort(function (a, b) { return a - b; });
+	function nudgesPx() {
+		return doc.nodes.map(function (n) {
+			const ne = nodeEl(n.id);
+			if (!ne || ne.empty || ne.hiddenDropped || !ne.nudge) { return null; }
+			return Math.hypot(ne.nudge.x, ne.nudge.y) * L.scale();
+		}).filter(function (v) { return v !== null; });
+	}
+	const px = nudgesPx().slice().sort(function (a, b) { return a - b; });
 	const worst = px.length ? px[px.length - 1] : 0, med = px.length ? px[Math.floor(px.length / 2)] : 0;
 	console.log('      node label nudge, in pixels: median ' + med.toFixed(1) + ', worst ' + worst.toFixed(1));
-	ok(worst <= NUDGE_PX_MAX, 'no label is placed for a scale other than this one',
-		'worst nudge ' + worst.toFixed(1) + ' px against a ceiling of ' + NUDGE_PX_MAX);
+	// **THE TEST IS AGREEMENT WITH A FRESH LAYOUT, NOT A PIXEL CEILING** (changed 2026-09-18).
+	// A ceiling was a PROXY for the real question -- was this layout computed at the scale it is
+	// being drawn at -- and the proxy stopped tracking the question the moment a placement route
+	// that deliberately reaches further arrived: Task 539's spot search puts a node label on the
+	// best open ground it can find, which on Net3-World at this zoom is 215 px from home and is
+	// correct. A ceiling raised to admit it would be a number chosen to make a run pass.
+	//
+	// So ask the question directly: lay the drawing out AGAIN at the scale on screen and compare.
+	// A layout carried over from the scale it was hidden at disagrees with a fresh one; a correct
+	// revival is byte-identical to it, because a layout is a pure function of the drawing and the
+	// scale (label-stability-harness.js is the standing proof of that determinism).
+	const before = nudgesPx().map(function (v) { return v.toPrecision(9); }).join(' ');
+	L.relayoutLabels(true);
+	const after = nudgesPx().map(function (v) { return v.toPrecision(9); }).join(' ');
+	ok(before === after, 'no label is placed for a scale other than this one',
+		'a fresh layout at this scale moves nothing; worst nudge ' + worst.toFixed(1) + ' px');
 }
 
 // ---- 4. THE USER'S OWN TEXT IS NOT SUPPRESSED (Task 428) ---------------------------------------
