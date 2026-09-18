@@ -224,6 +224,16 @@ The gesture:
   **On a node the offset is kept whole rather than squared**, because a junction is where several
   mains meet and there is no one of them to be perpendicular to.
 
+**THE JUNCTION'S OWN BOX LUMPS THEM** (Tom, 2026-09-18: *"We need to lump the meters with an
+expansion to see the connected customers and their demands."*). The property box listed every meter
+serving the junction, which is fine at two and pushes the elevation, the demand rows and the resolved
+answer off the bottom at forty -- the density problem below, arriving in the property box rather than
+on the map. One shut line now states the count and the total, which are the two numbers the list was
+being read for, and the meters are behind an expander. **Which junction's list is open is BROWSER
+furniture** by CLAUDE.md's project-versus-browser rule: it is remembered for the life of the page so
+a rebuild does not shut it under the reader's hand, and it reaches neither `serializeProject()` nor
+`localStorage`.
+
 Hit-testing and drawing:
 
 - The meter rectangle is a real sized target and joins the pick list ahead of label boxes. The service

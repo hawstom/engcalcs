@@ -818,6 +818,7 @@ $ec_lang['lpn_field_meter_lumped']='Added to node';
 $ec_lang['lpn_field_meter_lumped_tip']='The node that this meter\'s demands are added to through, on top of whatever the junction states itself. It\'s the node closest to this connection.';
 $ec_lang['lpn_node_customers']='Demand added here by meters';
 $ec_lang['lpn_node_customers_tip']='Every meter whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A meter is edited where it sits on the map or in the Customers table.';
+$ec_lang['lpn_node_customers_sum']='Meters: {n}, demand: {total} {unit}';
 $ec_lang['lpn_customer_detached']='⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.';
 $ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
 $ec_lang['lpn_customer_detached_count']='{n} meters are no longer connected to a pipe. Their demand is not in the answers.';

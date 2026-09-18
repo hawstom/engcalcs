@@ -1255,6 +1255,12 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-table input[type="number"] { width: 5em; }
 .lpn-demand-table input[type="text"] { width: 7em; }
 .lpn-demand-table select { max-width: 7em; }
+/* THE METERS A JUNCTION CARRIES, LUMPED BEHIND ONE LINE (Tom, 2026-09-18). The summary is the
+   count and the total, so it must read as one line of the box and not as a heading over an empty
+   space; the table under it keeps the demand-table treatment it already had. */
+.lpn-node-customers { margin: 2px 0; }
+.lpn-node-customers-sum { cursor: pointer; }
+.lpn-node-customers-count { font-weight: normal; }
 /* A glyph, not a button: the same treatment the toolbar's icons get, so a row of data does not
    carry a row of push-button relief. It lights up under the pointer, which is where the "this is a
    control" signal belongs. */

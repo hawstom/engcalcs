@@ -36553,16 +36553,59 @@ var EngCalcs = EngCalcs || {};
 	 * Absent, not empty, on a junction with no customers: nearly every junction in nearly every
 	 * network has none, and a permanently empty table on all of them is the clutter Task 553
 	 * removed from this same box.
+	 *
+	 * **AND LUMPED BEHIND ONE LINE SINCE 2026-09-18** (Tom: *"We need to lump the meters with an
+	 * expansion to see the connected customers and their demands."*). It listed every meter, which
+	 * is fine at two and pushes the elevation, the demand rows and the answer off the bottom of the
+	 * box at forty. The shut line says how many and how much; opening it is the reader's.
 	 */
+	// **WHICH JUNCTION'S METER LIST IS EXPANDED, FOR THE LIFE OF THIS PAGE AND NO LONGER.** The
+	// property box is rebuilt on every commit, so without this the list a reader had just opened
+	// would shut itself the moment they typed anything. It is FURNITURE by CLAUDE.md's
+	// project-versus-browser rule -- which box somebody has open is a fact about the screen they
+	// are sitting at -- so it is NOT in serializeProject() and NOT in localStorage; it is the same
+	// answer, for the same reason, that cpOpenKeys gives for a custom property.
+	var nodeCustomersOpen = {};
 	function nodeCustomerFields(fields, n) {
 		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
-			head, table, thead, hrow, tbody;
+			box, sum, count, total = 0, table, thead, hrow, tbody;
 		if (!list.length) { return; }
-		head = document.createElement('p');
-		head.className = 'lpn-set-note';
-		setFieldLabel(head, pc.lpn_node_customers || 'Demand added here by meters',
+		list.forEach(function (c) {
+			var f = customerFlow(c);
+			if (typeof f === 'number' && isFinite(f)) { total += f; }
+		});
+		// **`<details>` RATHER THAN A BUTTON AND A HIDDEN DIV**, which is the idiom this page
+		// already uses twice (multiSection() and the custom-property rows): the disclosure pattern
+		// for free, and every row built eagerly, so a shut list is still found by the browser's own
+		// Find and still read by a screen reader that opens it.
+		box = document.createElement('details');
+		box.className = 'lpn-node-customers';
+		sum = document.createElement('summary');
+		sum.className = 'lpn-node-customers-sum';
+		setFieldLabel(sum, pc.lpn_node_customers || 'Demand added here by meters',
 			pc.lpn_node_customers_tip);
-		fields.appendChild(head);
+		// **THE COUNT AND THE TOTAL ARE THE LINE, AND THE METERS ARE BEHIND IT** (Tom, 2026-09-18:
+		// *"We need to lump the meters with an expansion to see the connected customers and their
+		// demands."*). A junction on a residential main carries tens of services and each one was a
+		// row here, so the rows the reader came for -- the elevation, the junction's own demand,
+		// the resolved answer -- were pushed off the bottom of the box by a list they had not asked
+		// to read. What the shut line has to say is exactly what the junction's arithmetic borrows
+		// from the meters: how many, and how much.
+		count = document.createElement('span');
+		count.className = 'lpn-node-customers-count';
+		count.textContent = (pc.lpn_node_customers_sum || 'Meters: {n}, demand: {total} {unit}')
+			.split('{n}').join(String(list.length))
+			.split('{total}').join(String(+total.toFixed(6)))
+			.split('{unit}').join(unitLabel('lpn_u_flow'));
+		sum.appendChild(count);
+		box.appendChild(sum);
+		// **SHUT UNLESS THIS READER OPENED IT**, which is the opposite default from multiSection()
+		// and deliberately so: a mixed selection is something you asked for and every group in it
+		// is the answer, while a junction's services are context beside the fields you came to
+		// edit.
+		if (nodeCustomersOpen[n.id]) { box.open = true; }
+		box.addEventListener('toggle', function () { nodeCustomersOpen[n.id] = !!box.open; });
+		fields.appendChild(box);
 		table = document.createElement('table');
 		table.className = 'lpn-demand-table';
 		thead = document.createElement('thead');
@@ -36596,7 +36639,7 @@ var EngCalcs = EngCalcs || {};
 			tbody.appendChild(tr);
 		});
 		table.appendChild(tbody);
-		fields.appendChild(table);
+		box.appendChild(table);
 	}
 	// ONE ROW OF THE DEMAND TABLE, whichever kind it is. `acc` is six accessors and a remove; the
 	// caller supplies row 0's (which go through setProp and promote on delete) or a category row's

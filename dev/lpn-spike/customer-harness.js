@@ -73,7 +73,7 @@ const L = loadLoopedNetwork(
 	"\t\tprepareDocument: prepareDocument,\n" +
 	"\t\tsetSelection: setSelection, selectionCount: selectionCount,\n" +
 	"\t\trenderCustomerFields: renderCustomerFields, renderNodeFields: renderNodeFields,\n" +
-	"\t\tcustomersAtNode: customersAtNode,\n" +
+	"\t\tcustomersAtNode: customersAtNode, unitLabel: unitLabel,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tpaneTables: paneTables, paneCols: paneCols,\n" +
 	"\t\tsuggestCustomerLink: suggestCustomerLink, setCustomerLink: setCustomerLink,\n" +
@@ -467,6 +467,22 @@ function popupText() {
 	})(L.popupFields());
 	return out;
 }
+// The first element in a subtree that answers a predicate, and whether one element is under
+// another. Structure rather than text: section 5C's question is which side of a disclosure the
+// meter rows are built on, and a text walk cannot tell -- a shut <details> still holds every word
+// of its contents, here and in a browser.
+function findIn(root, pred) {
+	if (!root) { return null; }
+	if (pred(root)) { return root; }
+	for (const c of (root.children || [])) {
+		const hit = findIn(c, pred);
+		if (hit) { return hit; }
+	}
+	return null;
+}
+function findInPopup(pred) { return findIn(L.popupFields(), pred); }
+function isInside(root, el) { return !!findIn(root, e => e === el); }
+function flowUnitLabel() { return L.unitLabel('lpn_u_flow'); }
 L.renderCustomerFields(m1.id);
 ok('5.1 a detached meter is told it is out of the answers',
 	popupText().indexOf(PC.lpn_customer_detached) >= 0);
@@ -548,6 +564,93 @@ L.renderCustomerFields(m1.id);
 		ok('5B.9 a junction with no customers is not given an empty table',
 			popupText().indexOf(PC.lpn_node_customers) < 0, bare.id);
 	}
+}
+
+// ---- 5C. THE METERS LUMP INTO ONE LINE, AND THE LINE EXPANDS ---------------------------------
+//
+// Tom, 2026-09-18: *"Junction itemization: We need to lump the meters with an expansion to see the
+// connected customers and their demands."*
+//
+// **THE BOX HAS A FIXED BUDGET AND A JUNCTION'S SERVICES ARE NOT WHAT THE READER CAME FOR.** On a
+// residential main a junction carries tens of meters, and each one was a row here, so the elevation,
+// the junction's own demand rows and the resolved answer were pushed off the bottom by a list
+// nobody had asked to read. **The failure is invisible to whoever built it**: two meters fit, and
+// forty do not, and nothing in the arithmetic changes either way.
+//
+// So the assertions are structural rather than about wording: the individual meters must be INSIDE
+// the disclosure, the disclosure must be SHUT to begin with, and the one line left showing must
+// carry both numbers a reader would otherwise open it for -- how many, and how much.
+{
+	const m = (L.getDoc().customers || [])[0];
+	const nid = L.customerNodeId(m);
+	const lc = L.customerLink(m);
+	const pts = L.linkPointList(lc);
+	const second = L.addCustomer(pts[0].x + 5, pts[0].y + 40, { link: lc.id });
+	second.demand = 7; second.count = 2;
+	L.setCustomerStation(second, 0.1);
+	L.customerEdited(second);
+	ok('5C.0 a second meter on the same pipe lumps at the same junction',
+		L.customerNodeId(second) === nid);
+
+	L.renderNodeFields(nid);
+	const box = findInPopup(e => e._tag === 'details' && e.className === 'lpn-node-customers');
+	ok('5C.1 the junction draws the meters as one expandable line', !!box);
+	ok('5C.2 ...and it is shut, so forty services cost one line and not forty', !box.open);
+	// **THE ROWS ARE BEHIND THE LINE AND NOT BESIDE IT.** This is the assertion that fails if the
+	// table is appended to the property box itself -- which draws identically while the disclosure
+	// happens to be open, and is the whole defect while it is shut.
+	ok('5C.3 every meter is inside the expansion, not beside it',
+		!!findIn(box, e => e.textContent === m.id) && !!findIn(box, e => e.textContent === second.id));
+	ok('5C.4 ...and nothing about the individual meters is outside it',
+		!findInPopup(e => e !== box && !isInside(box, e) && e.textContent === second.id));
+
+	// **THE LINE CARRIES THE COUNT AND THE TOTAL**, which are exactly the two things the expansion
+	// would otherwise have to be opened for. Asserted against the language key, never the English.
+	const want = PC.lpn_node_customers_sum
+		.split('{n}').join('2')
+		.split('{total}').join(String(+(L.customerFlow(m) + L.customerFlow(second)).toFixed(6)))
+		.split('{unit}').join(flowUnitLabel());
+	const line = findIn(box, e => e.className === 'lpn-node-customers-count');
+	ok('5C.5 the shut line states how many meters and how much they add', !!line && line.textContent === want,
+		line ? line.textContent + '   wanted ' + want : 'no line');
+	// A total that is one meter's flow, or a count that is 1, passes 5C.5 only by arithmetic
+	// accident on a junction with one meter -- so the fixture deliberately has two, with different
+	// demands.
+	ok('5C.6 ...and the total is the sum rather than either meter on its own',
+		L.customerFlow(m) !== L.customerFlow(second) &&
+		want.indexOf(String(+(L.customerFlow(m) + L.customerFlow(second)).toFixed(6))) >= 0);
+
+	// **OPENING IT STICKS ACROSS A REBUILD**, which is what makes the expansion usable at all: the
+	// property box is rebuilt on every commit, so a list that shut itself on every keystroke would
+	// be worse than no expansion.
+	const before = JSON.stringify(L.serializeProject());
+	box.open = true;
+	(box._listeners.toggle || []).forEach(f => f({}));
+	L.renderNodeFields(nid);
+	const again = findInPopup(e => e._tag === 'details' && e.className === 'lpn-node-customers');
+	ok('5C.7 a list the reader opened is still open after the box is rebuilt', !!again && !!again.open);
+	// **AND NONE OF IT REACHES THE FILE.** Which box somebody has open is a fact about the screen
+	// they are sitting at, so CLAUDE.md's project-versus-browser rule keeps it out of
+	// serializeProject() -- a colleague opening this project on a laptop must not inherit it.
+	ok('5C.9 opening a list changed nothing in the project bytes',
+		JSON.stringify(L.serializeProject()) === before);
+
+	// **AND IT IS KEYED ON THE JUNCTION**, not one flag for the page: opening one junction's list
+	// must not open the next junction's, which is a different reader's question about a different
+	// node.
+	{
+		const far = L.addCustomer(pts[1].x + 5, pts[1].y + 40, { link: lc.id });
+		L.setCustomerStation(far, 0.95);
+		L.customerEdited(far);
+		const other = L.customerNodeId(far);
+		ok('5C.8a the far meter lumps at the other end of the pipe', other !== nid, other + ' vs ' + nid);
+		L.renderNodeFields(other);
+		const ob = findInPopup(e => e._tag === 'details' && e.className === 'lpn-node-customers');
+		ok('5C.8b another junction opened nothing of its own', !!ob && !ob.open, other);
+		L.deleteElement('customer', far.id);
+	}
+	L.deleteElement('customer', second.id);
+	L.renderNodeFields(nid);
 }
 
 // ---- 6. THE SYMBOL SIZE IS ONE max(), AND THE THRESHOLD FALLS OUT OF IT ----------------------

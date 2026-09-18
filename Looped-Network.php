@@ -1363,6 +1363,7 @@ EngCalcs.pageConfig = {
 	lpn_field_meter_lumped_tip: <?=json_encode($ec_lang['lpn_field_meter_lumped_tip'])?>,
 	lpn_node_customers: <?=json_encode($ec_lang['lpn_node_customers'])?>,
 	lpn_node_customers_tip: <?=json_encode($ec_lang['lpn_node_customers_tip'])?>,
+	lpn_node_customers_sum: <?=json_encode($ec_lang['lpn_node_customers_sum'])?>,
 	lpn_customer_detached: <?=json_encode($ec_lang['lpn_customer_detached'])?>,
 	lpn_customer_fixed_head: <?=json_encode($ec_lang['lpn_customer_fixed_head'])?>,
 	lpn_customer_detached_count: <?=json_encode($ec_lang['lpn_customer_detached_count'])?>,
