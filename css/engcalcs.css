@@ -1059,6 +1059,19 @@ html[lang="zh"] .ec-welcome {
    red the other temporary marks on this map use, and both lose it the moment a drag pulls away. */
 .lpn-service-snapped { stroke: #d32f2f; }
 .lpn-meter-snapped { fill: #d32f2f; stroke: #d32f2f; }
+/* **A SELECTED CUSTOMER IS A HIGHLIGHTED DOT** (Tom, 2026-09-18: dragging one works "except that
+   it's highlighted wrong (red circle instead of highlighted dot)"). It wore no mark of its own at
+   all: the class was applied, and nothing here answered it, so the only thing that changed on
+   screen when a customer was selected was the red ring appearing on its pipe -- which is what the
+   ring was being read as. The selection blue every other selected thing on this map takes
+   (.lpn-node.lpn-selected above), on the symbol itself.
+
+   Two classes, so it outranks the snap red and the loose white above it while a customer is
+   selected, and they come back the moment it is not. Neither signal is lost meanwhile: a service
+   connected at a node keeps the snap red on its LINE (.lpn-service-snapped), and a customer
+   connected to nothing keeps its dashes, which is the half of each signal a reader is looking
+   at anyway. */
+.lpn-meter.lpn-selected { fill: #1976d2; stroke: #1976d2; }
 /* THE CONNECTION GRIP: on the pipe, only while its customer is selected, and grabbable.
 
    **IT WAS RED, AND RED IS WHAT MADE IT UNREADABLE** (Tom, 2026-09-18: "The red circle at the pipe
