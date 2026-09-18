@@ -390,6 +390,56 @@ the block.
     deduplicated) and the other counts PAGE LOADS (everyone else, undeduplicated). A heading that
     says only "visits" would be worse than none.
 
+- 100|696| **File, Convert coordinates as: a working menu item, as a new project.**
+  **TOM HAS ASKED FOR THIS REPEATEDLY AND IT HAS NEVER HAD A TASK OF ITS OWN**, 2026-09-18: *"You
+  have reminded me about this goal, and I have asked you repeatedly about this goal, and yet I don't
+  find it in the road map. We need a working menu item to convert coordinates as a new project. We
+  should be able to finish this promptly."*
+  - **HE IS RIGHT AND THE CAUSE IS WHERE IT WAS FILED.** The design is complete and has been since
+    2026-09-15, but it lives as leg (f) of Task 667, whose title is *"Tom's reflections on saving,
+    locking and who can see your work"* -- so a search for the thing finds nothing and the index
+    shows a title about file locking. **A design buried under an unrelated title is a design nobody
+    can find, which is this file's own length rule working in reverse.** Extracted here; 667(f) now
+    points at this.
+  - **HIS DESIGN, IN HIS OWN WORDS AND IN THREE STEPS:** *"(1) the row becomes File, Convert
+    coordinates as...; (2) it offers a file picker OR makes a duplicate tab named `Copy of
+    {project_name}`; (3) the redesigned conversion wizard runs."*
+  - **"CONVERT" IS THE HONEST WORD AND THIS REVERSES WHAT THIS REPO HAD WRITTEN DOWN.** Tom: *"let's
+    not fool ourselves, conversion of all coordinates is happening."* He is right and the code agrees:
+    `georefWrite()` re-derives every stored point. **The rule we actually hold is never convert IN
+    PLACE**, and a Save-as does not -- the original file is untouched. That is why this belongs to the
+    **File, Save as...** family, beside Task 688's *Convert units as...*.
+  - **WHAT WE BUILT WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ CORRECTLY.** The shipped
+    row is `Open xy file on map…`, which opens a FILE; he wants a row that converts THIS project.
+    That is the whole of the redesign, and it is his diagnosis: *"we've been neglecting to use a
+    standard paradigm because our design is wrong."*
+  - **IT BELONGS ON `feat/xy-world-map`**, which now holds every piece of the coordinate work, and it
+    is the exception path there: `dev/tom-coordinate-vocabulary-2026-09-16.md` rules that converting
+    is *"no longer the default way to georeference"* -- the default is the Custom georeference wizard
+    that changes no coordinate at all. **This is the dabbler action, offered because we already built
+    and debugged the wizard, and not recommended in most situations.**
+
+- 50|697| **EPANET++ as a competing front door, on its own two domains.**
+  Tom, 2026-09-18: *"Create competitor or A/B testing web sites to deliver lpn as EPANET++. They are
+  called epanet-plus-plus.org and epanetpp.org, and they are canonical to themselves."*
+  - **BOTH DOMAINS ALREADY EXIST ON THE ACCOUNT** -- `~/addon_html/epanet-plus-plus.org` and
+    `~/addon_html/epanetpp.org` were both seen there on 2026-09-17.
+  - **"CANONICAL TO THEMSELVES" IS THE WHOLE TECHNICAL REQUIREMENT AND IT IS NOW CHEAP.** As of
+    2026-09-18 the canonical origin is a PER-PAGE declaration in `lib/Canonical.lib.php` rather than
+    one global constant, so a third and fourth front door is a declaration rather than a rewrite.
+    **But read the Search Console lesson first:** every calculator page had been nominating
+    librewaternet.org, a three-week-old domain at position 34, while hawsedc.com earned 7,575 clicks
+    a quarter at position 9.7. **A page can nominate only ONE canonical address**, so a genuine A/B
+    test of two front doors is not two canonicals over one page -- decide what each site actually
+    serves before writing a line.
+  - **AND THE NAME IS A PUBLIC CLAIM, WHICH IS THE PART THAT NEEDS CARE.** `dev/positioning.md` is the
+    authority for every public claim, `public_claim_check.php` holds four sentences Tom has already
+    struck, and `dev/not-epanet.org` exists as a sibling site with its own claim rules. **"EPANET++"
+    asserts a relationship to EPANET** -- read `dev/positioning.md` and the `not-epanet.org` CLAIMS
+    file before drafting a word of it, and expect the completeness question (never a completeness
+    claim against EPANET) to be the first one asked.
+  - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
+
 - 100|686| **The progress bar finishes before the work does.**
   Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
   progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the
@@ -550,6 +600,10 @@ the block.
     scope), but each is **a NEW third-party request with its own consent gate and its own paragraph
     in `privacy.php`, one build per provider** -- against a folder-sync route that is free and
     provider-agnostic. Revisit on demand, not on interest.
+  - **(f) EXTRACTED TO TASK 696 ON 2026-09-18** because Tom could not find it here, and he was
+    right: a coordinate-conversion menu item filed under a task about file locking is unfindable.
+    The full design is there. What follows is kept only so a reader of this block is not left
+    wondering.
   - **(f) THE CONVERSION IS A "SAVE AS" AND THE MENU SHOULD SAY SO** (Tom, 2026-09-15, and this
     supersedes the wording argument that preceded it). His diagnosis is that the naming fight was
     a symptom: *"we've been neglecting to use a standard paradigm because our design is wrong."*
@@ -911,21 +965,6 @@ the block.
     person reads lat,lon.
   - **The one design question is the same one the `.inp` importer already answered:** a row that
     cannot be honoured is reported, never dropped and never guessed at.
-
-- 100|599| **Graph a value against time across an extended-period run.**
-  Tom, 2026-09-06: *"We haven't added anything for time series reporting or graphing such as one or
-  more nodes' pressure or head across an EPS."* Correct, and it is the gap that costs most: the run
-  ships (`js/lpn-time.js`), the frames are already kept, and the only way to read one node across
-  them is to scrub the transport and watch a number change.
-  - **THE DATA IS ALREADY THERE, WHICH IS WHY THIS RANKS ABOVE THE OTHER PLOTS.** A run holds every
-    reporting step; nothing has to be re-solved, re-fetched or stored differently. This is a reader
-    over state we already have.
-  - **DRAW IT THE WAY THE PROFILE IS DRAWN.** `lpn_profile_*` already owns an axis pair, a unit
-    label per axis, a legend and a hand-rolled plot -- no chart library, nothing vendored, and it
-    survives `vendor_integrity_check.php` by having nothing to declare. A second plotting idiom on
-    this page would be the expensive mistake.
-  - **MULTI-SERIES IS THE POINT** (*"one or more nodes' pressure or head"*): one node over time is a
-    number, several on one axis is the comparison an operator is actually making.
 
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
