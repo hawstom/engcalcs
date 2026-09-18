@@ -2662,12 +2662,12 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_survey_btn": {
+        "lpn_file_import_survey": {
             "on": "Import surveyed points",
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_btn_tip": {
+        "lpn_file_import_survey_tip": {
             "on": "Read a list of surveyed points from a CSV or GPX file and make one junction at each point, using the new-asset values above. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.",
             "ruled": "2026-09-17",
             "answer": "I disagree with \"has to be\". See my prompt comments."

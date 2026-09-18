@@ -2666,8 +2666,8 @@ EngCalcs.pageConfig = {
         // dev/scripts/js_fallback_string_check.php holds each English literal in that file against
         // lib/lang.ec.en.php -- which is why this block is not the bracket-lookup arrangement the
         // search and terrain blocks above it are. ?>
-	lpn_survey_btn: <?=json_encode($ec_lang['lpn_survey_btn'])?>,
-	lpn_survey_btn_tip: <?=json_encode($ec_lang['lpn_survey_btn_tip'])?>,
+	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
+	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
 	lpn_survey_not_geo: <?=json_encode($ec_lang['lpn_survey_not_geo'])?>,
 	lpn_survey_read_error: <?=json_encode($ec_lang['lpn_survey_read_error'])?>,
 	lpn_survey_cancelled: <?=json_encode($ec_lang['lpn_survey_cancelled'])?>,

@@ -22647,18 +22647,24 @@ var EngCalcs = EngCalcs || {};
 		if (input) { input.click(); }
 	}
 
-	// ---- Settings > New assets > Import surveyed points (ROADMAP Task 592) -----------------------
+	// ---- File > Import surveyed points (ROADMAP Task 592) ---------------------------------------
 	//
 	// **THE READING IS js/lpn-survey.js's AND THE DOCUMENT IS OURS.** That file takes text and
 	// returns a list of surveyed points plus a list of everything it could not honour; it makes
 	// nothing, draws nothing and asks nothing. Everything below is the half only this file can do:
 	// one undo snapshot, one junction per point at the position the file states, and the report.
 	//
-	// **IT SITS BEHIND THE New assets DOOR AND NOT A NEW ONE** (Task 592, and Task 542 is why). A
-	// menu row that filled the whole drawing in one press is the defect 542 exists to have removed
-	// -- Tom's own words, *"a cool new button that I found"* -- and this command makes new assets
-	// that take the new-asset values sitting directly above it, the elevation source included. So
-	// it belongs in that section rather than in a File menu that would be a third door.
+	// **IT IS A FILE ROW, AND IT WAS A Settings > New assets BUTTON UNTIL TOM USED IT** (2026-09-17:
+	// *"Probably Settings is a bad place for Import survey points. That traditionally goes under
+	// File or Water. But Map might make sense. My vote is File since they come from a file."*). The
+	// old argument -- it makes new assets and takes the new-asset values, so it belongs beside them
+	// -- describes what the command DOES and not where anybody looks for it. It still takes those
+	// values; the door is named after the file, because the user is holding a file.
+	//
+	// **Task 542's lesson survives the move and is not an argument against it.** What 542 removed
+	// was a row that filled the whole drawing in one press with no question asked -- *"a cool new
+	// button that I found"*. This one reads a file the user chose, shows what it is about to make,
+	// and does nothing until they say so. The guard was never the menu it hid in.
 	//
 	// **A GEOGRAPHIC PROJECT ONLY, AND IT SAYS SO RATHER THAN PROJECTING SILENTLY.** A latitude has
 	// no meaning on an XY grid and this page has no forward projection for a projected plane
@@ -25612,6 +25618,19 @@ var EngCalcs = EngCalcs || {};
 			// had to be greyed whenever that project was already on the map, is gone with it.
 			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
+			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
+			// under File or Water. But Map might make sense. My vote is File since they come from a
+			// file."*). It lived under Settings > New assets, on the argument that it makes new
+			// assets and takes the new-asset values; that argument is still true and is not where a
+			// person looks. A command named after a FILE belongs with the other file commands.
+			//
+			// **LAST OF THE READING ROWS, because it is the one that does NOT make a tab.** Open,
+			// Open example, Import EPANET and Open xy file all end in a project switch; this one
+			// drops points into the project already on screen. Grouping it with them says what kind
+			// of act it is; putting it last keeps the four that share an outcome together.
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
@@ -30668,17 +30687,6 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		defBody.appendChild(pushBtn);
-		defBody.appendChild(document.createElement('br'));
-		// **READING A SURVEYED POINT LIST (Task 592), BEHIND THIS DOOR AND NOT A NEW ONE.** It makes
-		// new assets and it takes the new-asset values above it, the Elevation source included, so
-		// this section is where it belongs; see pickSurveyFile() for why it is not a menu row and
-		// why it is drawn even on a project that has to refuse it.
-		var surveyBtn = document.createElement('button');
-		surveyBtn.type = 'button';
-		surveyBtn.textContent = pc.lpn_survey_btn || 'Import surveyed points';
-		helpTip(surveyBtn, pc.lpn_survey_btn_tip);
-		surveyBtn.addEventListener('click', pickSurveyFile);
-		defBody.appendChild(surveyBtn);
 		defBody.appendChild(document.createElement('br'));
 		// ---- 3. Map display ----
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop

@@ -3534,8 +3534,8 @@ $ec_lang['lpn_ff_err_unknown']='No answer. The code reported was {code}.';
 // probably a longitude in the wrong column, and this page says so and changes nothing, because it
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
-$ec_lang['lpn_survey_btn']='Import surveyed points';
-$ec_lang['lpn_survey_btn_tip']='Read a list of surveyed points from a CSV or GPX file and make one junction at each point, using the new-asset values above. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.';
+$ec_lang['lpn_file_import_survey']='Import surveyed points…';
+$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.';
 $ec_lang['lpn_survey_not_geo']='A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.';
 $ec_lang['lpn_survey_read_error']='That file could not be read from your disk.';
 $ec_lang['lpn_survey_cancelled']='Nothing was created and nothing was changed.';

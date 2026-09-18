@@ -49,6 +49,37 @@ const CSV = fs.readFileSync(FIX + 'survey-points.csv', 'utf8');
 
 function noteCodes(parsed) { return (parsed.notes || []).map(n => n.code); }
 
+// The page's own source, for the one question that is about WHERE a command is rather than what it
+// does. Same idiom as dev/lpn-spike/recent-files-harness.js.
+const PAGE_SRC = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+function bodyOf(name) {
+	const at = PAGE_SRC.search(new RegExp('(?:async )?function ' + name + '\\s*\\('));
+	if (at < 0) { throw new Error('not found: ' + name); }
+	let i = PAGE_SRC.indexOf('{', at), depth = 0, end = i;
+	for (; end < PAGE_SRC.length; end++) {
+		if (PAGE_SRC[end] === '{') { depth++; }
+		else if (PAGE_SRC[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+	}
+	return PAGE_SRC.slice(at, end);
+}
+
+// ================================================================================================
+// 0. WHERE THE COMMAND LIVES -- the File menu, by Tom's own vote (2026-09-17)
+// ================================================================================================
+//
+// It was a button in Settings > New assets, on the argument that it makes new assets and takes the
+// new-asset values. Tom used it and disagreed: *"My vote is File since they come from a file."* A
+// harness assertion rather than a comment, because a menu row is exactly the kind of thing a later
+// edit moves without noticing that its placement was a decision.
+section('0. the File menu is where it is reached from');
+ok('the File menu carries the row', /pickSurveyFile/.test(bodyOf('openFileMenu')));
+ok('...and no other menu does, the Settings panel that used to hold it included',
+	['openEditMenu', 'mapMenuRows', 'openHelpMenu', 'rebuildSettingsFields']
+		.every(n => !/pickSurveyFile/.test(bodyOf(n))));
+ok('the whole page names the picker in exactly two places: the menu row and the definition',
+	(PAGE_SRC.match(/pickSurveyFile/g) || []).length === 2,
+	String((PAGE_SRC.match(/pickSurveyFile/g) || []).length));
+
 // ================================================================================================
 // 1. WHICH COLUMN IS WHICH, and the two questions it refuses to answer
 // ================================================================================================
