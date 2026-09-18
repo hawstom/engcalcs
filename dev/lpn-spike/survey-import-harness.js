@@ -322,9 +322,30 @@ ok('a line number counts the file\'s own lines, comments and blanks included',
 // ================================================================================================
 section('5. the junctions, through the real page');
 
-let alerts = [], confirms = [], confirmAnswer = true;
+let alerts = [], confirmAnswer = true;
 global.window.alert = global.alert = function (m) { alerts.push(String(m)); };
-global.window.confirm = global.confirm = function (m) { confirms.push(String(m)); return confirmAnswer; };
+
+// **THE QUESTION IS A DIALOG NOW, NOT window.confirm()** (Task 592's format chooser). A confirm can
+// only be answered yes or no; this one has a control in it, so it had to become the page's own
+// openDialog() -- the same box the `.inp` importer's report uses, driven here the way a person
+// drives it. `boxText()` reads what is on screen; `press()` finds a button by its label and clicks
+// the real listener, so nothing about the box is taken on trust.
+function boxText() {
+	const walk = (el) => (!el.children || !el.children.length)
+		? (el.textContent || '') : el.children.map(walk).join('\n');
+	return walk(byId.lpn_dialog_body);
+}
+function boxButtons() { return byId.lpn_dialog_buttons.children || []; }
+function press(label) {
+	const btn = boxButtons().find(b => b.textContent === label);
+	if (!btn) { throw new Error('no button: ' + label + ' of ' + boxButtons().map(b => b.textContent)); }
+	(btn._listeners.click || []).forEach(f => f());
+}
+function boxSelect() { return byId.lpn_dialog_body.querySelector('select'); }
+function clearBox() {
+	byId.lpn_dialog_body.children.length = 0;
+	byId.lpn_dialog_buttons.children.length = 0;
+}
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
@@ -355,11 +376,20 @@ const L = loadLoopedNetwork(
 byId.lpn_toolbar.querySelectorAll = () => [];
 setUnitSet('us');
 
-function importCsv() { alerts = []; confirms = []; L.land(CSV, 'survey-points.csv'); }
+// One import, the whole way through: the box opens, and the reader answers it. `confirmAnswer` is
+// which button they press, so the two paths are the same call with one flag.
+function importCsv(text, name) {
+	alerts = []; clearBox();
+	L.land(text === undefined ? CSV : text, name || 'survey-points.csv');
+	if (!boxButtons().length) { return false; }
+	press(confirmAnswer ? PC.lpn_survey_create : PC.lpn_cancel);
+	return true;
+}
 
 L.reset(L.GEO);
 importCsv();
-ok('the confirm was asked BEFORE anything was created', confirms.length === 1);
+ok('the box was put up BEFORE anything was created, and says what it is about to make',
+	L.getDoc().nodes.length === 6);
 ok('six junctions arrived', L.getDoc().nodes.length === 6, String(L.getDoc().nodes.length));
 ok('NO pipes were invented between them', L.getDoc().links.length === 0);
 ok('every junction is a junction', L.getDoc().nodes.every(n => n.type === 'junction'));
@@ -373,9 +403,8 @@ ok('...and at its latitude, within the projection round trip',
 // The surveyor's own note about the point, which is the D of PNEZD and the thing a clerk most wants
 // to keep. Written as a description, which is a field this page already has.
 {
-	alerts = []; confirms = [];
 	L.reset(L.GEO);
-	L.land('P,N,E,Z,D\nA,33.5,-111.8,10,Fire hydrant at Elm and 1st\n', 'd.csv');
+	importCsv('P,N,E,Z,D\nA,33.5,-111.8,10,Fire hydrant at Elm and 1st\n', 'd.csv');
 	ok('a description column lands on the junction as its description',
 		L.node('A').desc === 'Fire hydrant at Elm and 1st', String(L.node('A').desc));
 	L.reset(L.GEO);
@@ -414,6 +443,22 @@ section('6. the user\'s numbers, on the way back out');
 		String(after.x));
 }
 
+// **AND THE REPORT ON SCREEN, not merely the list of lines it is built from.** Mutation-testing
+// found this gap: the whole of section 4b passed with js/looped-network.js printing the sentence and
+// silently dropping the reader's own line under it, because nothing here had ever looked at the box.
+section('6b. the report as it reaches the screen');
+L.reset(L.GEO);
+importCsv();
+{
+	const shown = boxText();
+	ok('the report box carries the refusal sentence for the swapped line',
+		shown.indexOf(PC.lpn_survey_note_coord_range.split('{')[0].trim()) >= 0);
+	ok('...and the reader\'s own line, verbatim, underneath it',
+		shown.indexOf('PT-6,-111.830400,33.415910,1247.00') >= 0, shown);
+	ok('...and the line for the elevation it could not read',
+		shown.indexOf('PT-7,33.414700,-111.830400,about 1240') >= 0);
+}
+
 section('7. one undo, and the refusals');
 L.reset(L.GEO);
 importCsv();
@@ -424,7 +469,7 @@ ok('ONE undo takes the whole import back, not one junction of it',
 L.reset(L.GEO);
 confirmAnswer = false;
 importCsv();
-ok('answering no to the confirm creates nothing at all', L.getDoc().nodes.length === 0);
+ok('answering Cancel creates nothing at all', L.getDoc().nodes.length === 0);
 confirmAnswer = true;
 
 // **AN XY PROJECT NOW TAKES THE FILE, and this is the assertion Tom's second instruction is** (he
@@ -450,6 +495,14 @@ importCsv();
 ok('a name already in the project is reported, and the junction keeps a name of ours',
 	L.getDoc().nodes.length === 7 && !!L.node('J2'),
 	L.getDoc().nodes.map(n => n.id).join(','));
+// **AND IT OWES THE READER THE SAME LINE NUMBER AS EVERY OTHER REFUSAL.** These two -- a name the
+// document already holds, and a name it cannot spell -- are the only ones discovered while the
+// junction is being made rather than while the file is being read, and mutation-testing found that
+// nothing here could see them lose it. A reader does not know or care where we noticed.
+ok('...naming the LINE it is on and printing that line, like every other refusal',
+	boxText().indexOf('PT-1,33.415300,-111.831400,1243.50') >= 0 &&
+	/\b6\b/.test(boxText().split('PT-1,33.415300')[0].split('\n').slice(-2)[0]),
+	boxText());
 
 // ---- the elevation unit, which is the one place a number may be touched ------------------------
 section('8. the elevation unit, and the only conversion there is');
@@ -469,6 +522,146 @@ importCsv();
 		n1.x === -111.8314 && n1.y === 33.4153);
 }
 setUnitSet('us');
+
+// ================================================================================================
+// 9. THE FILE FORMAT CHOOSER (Tom, 2026-09-17)
+// ================================================================================================
+//
+// *"We will need to include a file format chooser (PNEZD, PENZD, or whatever format is useful for
+// Declan."* PNEZD and PENZD are the same five columns and differ in ONE thing: whether the northing
+// or the easting comes first. So the assertion this whole section is built on is that the SAME FIVE
+// NUMBERS read under the two orders give DIFFERENT ANSWERS -- if they did not, the chooser would be
+// decoration and nothing would be able to tell.
+//
+// **NOTHING MAY BE INFERRED FROM THE SIZE OF THE NUMBERS**, which is the rule the chooser exists to
+// keep. A magnitude rule is right on the file it was written against and silently wrong on the next
+// one, so the fixtures below are deliberately chosen to be plausible either way round.
+//
+// Tom overruled half of Declan's case for it: a swapped northing and easting is immediately obvious
+// on the map, so this is a convenience and not a guard against a silent catastrophe. Nothing here
+// asserts any scare wording, because there is none to assert.
+section('9. the file format chooser');
+
+// Five columns, no header line at all, and numbers that are a perfectly good survey either way
+// round. 1,000 and 2,000 are both ordinary plane coordinates.
+const PNEZD_TEXT = 'A,1000.00,2000.00,55.5,Hydrant\nB,1010.00,2015.00,56.0,Valve\n';
+
+ok('PNEZD and PENZD put the two coordinates in different columns, which is the whole difference',
+	(() => { const a = EC.lpnSurveyFormatMapping('PNEZD'), b = EC.lpnSurveyFormatMapping('PENZD');
+		return a.north === 1 && a.east === 2 && b.north === 2 && b.east === 1
+			&& a.id === b.id && a.elev === b.elev && a.desc === b.desc; })());
+ok('...and every order the chooser offers maps to real columns',
+	EC.lpnSurveyFormats.every(f => { const m = EC.lpnSurveyFormatMapping(f);
+		return m.north !== null && m.east !== null; }), EC.lpnSurveyFormats.join(' '));
+ok('an order with no point-name column says so, rather than reading a coordinate as a name',
+	EC.lpnSurveyFormatMapping('NEZ').id === null && EC.lpnSurveyFormatMapping('NEZ').north === 0);
+ok('a stored order this version does not know falls back rather than stopping a file opening',
+	EC.lpnSurveyFormatMapping('WHATEVER').north === EC.lpnSurveyFormatMapping(EC.LPN_SURVEY_DEFAULT_FORMAT).north);
+
+// ---- THE CLAIM: the same file, the two orders, two different answers ---------------------------
+{
+	const asN = EC.lpnSurveyParse(PNEZD_TEXT, { format: 'PNEZD' });
+	const asE = EC.lpnSurveyParse(PNEZD_TEXT, { format: 'PENZD' });
+	ok('a headerless file reads under the chosen order, keeping every line',
+		asN.ok && asN.points.length === 2 && asE.ok && asE.points.length === 2,
+		String(asN.points.length) + ' / ' + String(asE.points.length));
+	ok('THE SAME FILE READ AS PNEZD AND AS PENZD GIVES DIFFERENT COORDINATES',
+		asN.points[0].north === 1000 && asN.points[0].east === 2000 &&
+		asE.points[0].north === 2000 && asE.points[0].east === 1000,
+		JSON.stringify([asN.points[0].north, asN.points[0].east, asE.points[0].north, asE.points[0].east]));
+	ok('...and everything that is NOT the coordinate pair is untouched by the choice',
+		asN.points[0].id === 'A' && asE.points[0].id === 'A' &&
+		asN.points[0].elev === 55.5 && asE.points[0].elev === 55.5 &&
+		asN.points[0].desc === 'Hydrant' && asE.points[0].desc === 'Hydrant');
+	ok('...and the file\'s own text survives under either order',
+		asN.points[0].northTok === '1000.00' && asE.points[0].eastTok === '1000.00');
+	ok('the reading says which order it used, so the confirm can name it',
+		asN.format === 'PNEZD' && asE.format === 'PENZD');
+}
+// **THE FIRST LINE OF A HEADERLESS FILE IS DATA AND MUST NOT BE EATEN.** The old reader always
+// started on line two, because it always had a header; a file that begins with its first point
+// would have lost that point with nothing said.
+ok('a headerless file loses no line to a header that is not there',
+	EC.lpnSurveyParse('1000,2000\n1010,2015\n', { format: 'NEZ' }).points.length === 2);
+// **AND A HEADER IN WORDS THIS PAGE DOES NOT KNOW IS A HEADER, not a bad row.** Told about, passed
+// over, and the chosen order used underneath it.
+{
+	const r = EC.lpnSurveyParse('Pt,Nor,Eas,Elv,Rem\nA,1000,2000,55.5,H\n', { format: 'PNEZD' });
+	ok('an unrecognised header line is passed over and SAID, never read as a point',
+		r.ok && r.points.length === 1 && noteCodes(r).indexOf('header-unread') >= 0,
+		noteCodes(r).join(','));
+	ok('...and that note is about the file, so it prints no line underneath it',
+		EC.lpnSurveyReportLines(r, { created: 1 }, AX)
+			.filter(e => e.raw === null).length >= 2);
+}
+// ---- A HEADER BEATS THE CHOOSER, which is the one rule Declan ranked above the chooser itself ---
+{
+	const r = EC.lpnSurveyParse('P,Northing,Easting,Z\nA,1000,2000,55.5\n', { format: 'PENZD' });
+	ok('a file that names its own columns IGNORES the chosen order entirely',
+		r.headerRead === true && r.points[0].north === 1000 && r.points[0].east === 2000,
+		JSON.stringify([r.points[0].north, r.points[0].east]));
+	ok('...and says so, so the reader can see the header won rather than trusting that it did',
+		EC.lpnSurveyConfirmText(r, 'ft', AX).indexOf(PC.lpn_survey_from_header) >= 0);
+	const h = EC.lpnSurveyParse(PNEZD_TEXT, { format: 'PENZD' });
+	ok('...and a file with no names of its own names the order it was read in',
+		EC.lpnSurveyConfirmText(h, 'ft', AX)
+			.indexOf(EC.lpnSurveyFormatLabel('PENZD')) >= 0);
+}
+// **NOT FROM THE SIZE OF THE NUMBERS.** A file whose eastings are far larger than its northings,
+// which is what a State Plane survey looks like, still reads in the order that was CHOSEN.
+{
+	const r = EC.lpnSurveyParse('A,250000.00,1500.00,55.5,H\n', { format: 'PNEZD' });
+	ok('a lopsided pair is NOT quietly re-ordered to the plausible reading',
+		r.points[0].north === 250000 && r.points[0].east === 1500,
+		JSON.stringify([r.points[0].north, r.points[0].east]));
+}
+
+// ---- and through the real page, where the reader actually turns the control --------------------
+section('9b. the chooser, in the box the reader sees');
+L.reset();
+alerts = []; clearBox();
+L.land(PNEZD_TEXT, 'points.txt');
+{
+	const sel = boxSelect();
+	ok('the box carries a chooser', !!sel);
+	ok('...offering exactly the orders the module declares, in that order',
+		!!sel && sel.children.map(o => o.value).join(' ') === EC.lpnSurveyFormats.join(' '),
+		sel && sel.children.map(o => o.value).join(' '));
+	ok('...each spelled out in words, with the trade name only identifying it',
+		!!sel && sel.children[0].textContent === PC.lpn_survey_fmt_pnezd,
+		sel && sel.children[0].textContent);
+	ok('...and the box asks the coordinate-order question in plain words',
+		boxText().indexOf(PC.lpn_survey_format_hint) >= 0);
+	// Turn it, and the box must re-read: what it SAYS has to be what pressing the button will DO.
+	const before = boxText();
+	sel.value = 'PENZD';
+	(sel._listeners.change || []).forEach(f => f());
+	ok('turning the chooser re-reads the file, so the preview cannot disagree with the result',
+		boxText() !== before && boxText().indexOf(EC.lpnSurveyFormatLabel('PENZD')) >= 0);
+	press(PC.lpn_survey_create);
+}
+ok('the junctions landed in the order the reader chose, not the one it opened on',
+	L.node('A').y === -2000 && L.node('A').x === 1000,
+	L.node('A').x + ' / ' + L.node('A').y);
+{
+	// The same file again, left on the default. The two runs must differ, which is the whole point.
+	L.reset();
+	clearBox();
+	L.land(PNEZD_TEXT, 'points.txt');
+	boxSelect().value = 'PNEZD';
+	(boxSelect()._listeners.change || []).forEach(f => f());
+	press(PC.lpn_survey_create);
+	ok('...and the other order puts the same point somewhere else, which is why the control exists',
+		L.node('A').y === -1000 && L.node('A').x === 2000,
+		L.node('A').x + ' / ' + L.node('A').y);
+}
+// The chooser is remembered for the next file, and it is BROWSER furniture: it says which way round
+// this person's data collector writes, not anything about this network.
+ok('the order chosen is remembered for the next file',
+	global.localStorage.getItem('lpn_survey_format') === 'PNEZD',
+	String(global.localStorage.getItem('lpn_survey_format')));
+ok('...and never rides in the saved project',
+	JSON.stringify(L.serialize()).indexOf('lpn_survey_format') < 0);
 
 console.log('');
 if (fails) { console.log(`${fails} FAILED`); process.exit(1); }

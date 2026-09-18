@@ -84,6 +84,76 @@
 	var DESC_NAMES = { d: 1, desc: 1, descr: 1, description: 1, note: 1, notes: 1, remark: 1,
 		remarks: 1, comment: 1, comments: 1, code: 1 };
 
+	// ---- the named column orders (ROADMAP Task 592; Tom, 2026-09-17) ---------------------------
+	//
+	// **A CHOOSER, AND DELIBERATELY NOT A GUESS** (Tom: *"We will need to include a file format
+	// chooser (PNEZD, PENZD, or whatever format is useful for Declan."*). Declan's own answer, from
+	// the data-entry-clerk seat and cited in his journal, is that the one field that MUST be
+	// explicit is which of the two coordinates comes first, and that the way NOT to answer it is to
+	// infer it from the size of the numbers -- a magnitude rule works on the file you tried it on
+	// and fails silently on the next one.
+	//
+	// **THE LIST IS THE ONE THE TRADE ALREADY USES.** PNEZD and PENZD are Autodesk Civil 3D's own
+	// names; CivilGEO's supported-formats page names at least eight of these as distinct orderings
+	// it accepts. Three things vary independently -- whether there is a point-name column, whether a
+	// description trails, and which coordinate comes first -- and these eight are that cross.
+	//
+	// **A HEADER ROW BEATS EVERY ONE OF THEM.** See lpnSurveyColumnMap(): a file that names its own
+	// columns needs nobody to be asked, and a chooser left over from the last file somebody opened
+	// is exactly the stale default Declan warned about.
+	//
+	// P = point name, N = northing, E = easting, Z = elevation, D = description. The letters ARE the
+	// mapping, so adding an order is adding a row here and one label in lib/lang.ec.en.php; nothing
+	// else in this file knows the list exists.
+	var FORMAT_ROLE = { P: 'id', N: 'north', E: 'east', Z: 'elev', D: 'desc' };
+	var FORMATS = ['PNEZD', 'PENZD', 'PNEZ', 'PENZ', 'NEZD', 'ENZD', 'NEZ', 'ENZ'];
+	EngCalcs.lpnSurveyFormats = FORMATS.slice();
+	EngCalcs.LPN_SURVEY_DEFAULT_FORMAT = 'PNEZD';
+
+	/**
+	 * The column indices a named order states. Unknown names fall back to the default rather than
+	 * throwing: this is read from a stored preference, and a preference from an older version must
+	 * not be able to stop a file opening.
+	 */
+	EngCalcs.lpnSurveyFormatMapping = function (format) {
+		var letters = String(format || '').toUpperCase(),
+			mapping = { id: null, north: null, east: null, elev: null, desc: null }, i, role;
+		if (FORMATS.indexOf(letters) < 0) { letters = EngCalcs.LPN_SURVEY_DEFAULT_FORMAT; }
+		for (i = 0; i < letters.length; i++) {
+			role = FORMAT_ROLE[letters.charAt(i)];
+			if (role) { mapping[role] = i; }
+		}
+		return mapping;
+	};
+
+	/**
+	 * What the chooser's row for one order says, in plain words.
+	 *
+	 * **THE QUESTION IS ASKED IN WORDS AND THE ACRONYM ONLY IDENTIFIES THE ANSWER** -- Declan's
+	 * point, and Tom's: a clerk who has the file in front of them knows what is in each column and
+	 * may well not know which of PNEZD and PENZD puts the northing first. So the label spells the
+	 * columns out and carries the trade name in brackets for whoever does recognise it.
+	 */
+	//
+	// **EIGHT LITERAL READS AND NOT A COMPUTED KEY.** `PC['lpn_survey_fmt_' + name]` would be
+	// invisible to dev/scripts/pageconfig_check.php and to
+	// dev/scripts/js_fallback_string_check.php alike, which is exactly how js/lpn-search.js came to
+	// carry English nothing compares. Spelled out, each one is held against lib/lang.ec.en.php.
+	var FORMAT_LABEL = {
+		PNEZD: function () { return PC.lpn_survey_fmt_pnezd || 'Point name, northing, easting, elevation, description (PNEZD)'; },
+		PENZD: function () { return PC.lpn_survey_fmt_penzd || 'Point name, easting, northing, elevation, description (PENZD)'; },
+		PNEZ: function () { return PC.lpn_survey_fmt_pnez || 'Point name, northing, easting, elevation (PNEZ)'; },
+		PENZ: function () { return PC.lpn_survey_fmt_penz || 'Point name, easting, northing, elevation (PENZ)'; },
+		NEZD: function () { return PC.lpn_survey_fmt_nezd || 'Northing, easting, elevation, description (NEZD)'; },
+		ENZD: function () { return PC.lpn_survey_fmt_enzd || 'Easting, northing, elevation, description (ENZD)'; },
+		NEZ: function () { return PC.lpn_survey_fmt_nez || 'Northing, easting, elevation (NEZ)'; },
+		ENZ: function () { return PC.lpn_survey_fmt_enz || 'Easting, northing, elevation (ENZ, also written XYZ)'; }
+	};
+	EngCalcs.lpnSurveyFormatLabel = function (format) {
+		var f = FORMAT_LABEL[String(format || '').toUpperCase()];
+		return f ? f() : String(format || '');
+	};
+
 	function norm(s) {
 		return String(s === undefined || s === null ? '' : s)
 			.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -208,6 +278,32 @@
 		return t.charAt(0) === '#' || t.charAt(0) === ';';
 	}
 
+	/**
+	 * Is this first row a HEADER, or is it the file's first point?
+	 *
+	 * **DECIDED ON THE TWO COORDINATE CELLS ALONE, and on nothing else.** The question is asked only
+	 * of a file whose first row named no columns this page knows, so the chosen order is already the
+	 * mapping: a row is a HEADER when BOTH of the cells that order calls coordinates fail to read as
+	 * numbers, and DATA otherwise.
+	 *
+	 * **THE FIRST VERSION OF THIS ASKED WHETHER ANY CELL WAS TEXT, AND THAT ATE THE FIRST POINT OF
+	 * EVERY PNEZD FILE** -- found by dev/lpn-spike/survey-import-harness.js and by nothing else. A
+	 * PNEZD row is `A,1000.00,2000.00,55.5,Hydrant`: the point name and the description are text by
+	 * definition of the format, so "holds a cell that is not a number" is true of every data row
+	 * there is. The row was passed over, a note said a header had been skipped, and the file came in
+	 * one point short with the reader told something that was not true about it.
+	 *
+	 * **STILL NOTHING FROM THE SIZE OF A NUMBER**, here or anywhere in this file: this is TEXT
+	 * versus NUMBER, which is decidable. The one thing it costs is a first data row with a typo in
+	 * BOTH its coordinates, which is read as a header rather than reported as a bad row -- and the
+	 * report says the line was passed over and prints it, so nothing vanishes in silence.
+	 */
+	function looksLikeHeader(cells, mapping) {
+		var a = (cells || [])[mapping.north], b = (cells || [])[mapping.east];
+		if (a === undefined && b === undefined) { return false; }
+		return !readNumber(a).ok && !readNumber(b).ok;
+	}
+
 	// ---- reading one number, and keeping its text ------------------------------------------------
 	//
 	// Returns `{ok, value, tok}`. `tok` is the cell's own characters with surrounding space
@@ -269,8 +365,8 @@
 
 	function parseCsv(src, opts) {
 		var lines = src.split(/\r\n|\r|\n/), notes = [], points = [],
-			delim = null, header = null, mapping = null, elevUnit = null,
-			seen = {}, blank = 0, rows = 0, i, cells, lineNo, map;
+			delim = null, header = null, mapping = null, elevUnit = null, headerRead = false,
+			firstIsData = false, seen = {}, blank = 0, rows = 0, i, cells, lineNo, map;
 		// The header is the first line that is neither blank nor a comment.
 		for (i = 0; i < lines.length; i++) {
 			if (lines[i].trim() === '' || isCommentLine(lines[i])) { continue; }
@@ -287,13 +383,33 @@
 		map = opts.mapping ? { matched: true, mapping: opts.mapping, notes: [], elevUnit: opts.elevUnit || null }
 			: EngCalcs.lpnSurveyColumnMap(header);
 		if (map.error) { return { ok: false, error: map.error, detail: map.detail, axis: map.axis }; }
-		if (!map.matched) {
-			return { ok: false, error: 'no-coords', detail: (header || []).join(', ') };
+		// **THE HEADER WINS WHERE THERE IS ONE, AND THE CHOSEN ORDER ANSWERS WHERE THERE IS NOT.**
+		// Three cases and they are decidable, which is the whole reason nothing here has to guess:
+		//
+		//   1. The first row names two coordinate columns -- read it, and the chooser is not needed.
+		//   2. The first row is not all numbers -- it is a header written in words this page does
+		//      not know. SKIPPED rather than read as data (reading it would report a bad row for a
+		//      line that is not a row at all), said out loud, and the chosen order is used.
+		//   3. The first row is all numbers -- there is no header and the file starts here. The
+		//      chosen order is used and NOTHING is skipped.
+		//
+		// **CASE 3 IS THE ONE THAT MUST NOT LOSE A ROW**, so `firstIsData` decides where the loop
+		// starts rather than a blanket "data begins on line two".
+		headerRead = map.matched;
+		if (!headerRead) {
+			mapping = EngCalcs.lpnSurveyFormatMapping(opts.format);
+			if (looksLikeHeader(header, mapping)) {
+				notes.push({ code: 'header-unread', ids: [], detail: header.join(', ') });
+			} else {
+				firstIsData = true;
+			}
+			elevUnit = (opts.elevUnit !== undefined && opts.elevUnit !== null) ? opts.elevUnit : null;
+		} else {
+			mapping = map.mapping;
+			elevUnit = (opts.elevUnit !== undefined && opts.elevUnit !== null) ? opts.elevUnit : map.elevUnit;
+			(map.notes || []).forEach(function (n) { notes.push(n); });
 		}
-		mapping = map.mapping;
-		elevUnit = (opts.elevUnit !== undefined && opts.elevUnit !== null) ? opts.elevUnit : map.elevUnit;
-		(map.notes || []).forEach(function (n) { notes.push(n); });
-		for (i = lineNo + 1; i < lines.length; i++) {
+		for (i = firstIsData ? lineNo : lineNo + 1; i < lines.length; i++) {
 			if (isCommentLine(lines[i])) { continue; }
 			cells = splitRow(lines[i], delim);
 			if (isBlankRow(cells)) { blank++; continue; }
@@ -307,7 +423,8 @@
 		}
 		if (blank) { notes.push({ code: 'blank-rows', ids: [], detail: String(blank) }); }
 		if (!points.length) { return { ok: false, error: 'no-points', detail: String(rows) }; }
-		return { ok: true, kind: 'csv', delimiter: delim, header: header, headerRead: true,
+		return { ok: true, kind: 'csv', delimiter: delim, header: header, headerRead: headerRead,
+			format: headerRead ? null : (opts.format || EngCalcs.LPN_SURVEY_DEFAULT_FORMAT),
 			mapping: mapping, elevUnit: elevUnit, points: points, notes: notes,
 			counts: { rows: rows, points: points.length, blank: blank } };
 	}
@@ -444,6 +561,7 @@
 		// The rest are about the FILE and not about a line, so they carry no number and nothing
 		// is printed underneath them.
 		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d, ax, line); }
+		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line of the file names columns this page does not know, so it was passed over and the column order you chose was used. It reads: {detail}', d, ax, line); }
 		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d, ax, line); }
 		else if (code === 'elev-converted') { text = fill(PC.lpn_survey_note_elev_converted || 'The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d, ax, line); }
 		return { text: text, raw: raw };
@@ -457,7 +575,6 @@
 		var code = (parsed && parsed.error) || '', d = (parsed && parsed.detail) || '',
 			ax = axisWord(axes, (parsed && parsed.axis) || 'north');
 		if (code === 'empty') { return fill(PC.lpn_survey_err_empty || 'That file has nothing in it.', d, ax); }
-		if (code === 'no-coords') { return fill(PC.lpn_survey_err_no_coords || 'This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}', d, ax); }
 		if (code === 'ambiguous-coord') { return fill(PC.lpn_survey_err_ambiguous_coord || 'More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.', d, ax); }
 		if (code === 'no-points') { return fill(PC.lpn_survey_err_no_points || 'Not one row of that file could be read as a surveyed point. Rows read: {detail}', d, ax); }
 		return fill(PC.lpn_survey_err_unreadable || 'That file could not be read as a surveyed point list.', d, ax);
@@ -477,6 +594,13 @@
 		var lines = [], m = parsed.mapping, none = PC.lpn_survey_map_none || 'not used';
 		lines.push((PC.lpn_survey_confirm || 'Create {n} junction(s) from this surveyed point list?')
 			.replace('{n}', parsed.points.length));
+		// **WHERE THE READING CAME FROM, BEFORE WHAT IT SAYS.** Declan's third point is that a
+		// header must beat the chooser; saying WHICH of the two answered is what lets the reader
+		// see that it did, instead of taking it on trust.
+		lines.push(parsed.headerRead
+			? (PC.lpn_survey_from_header || 'The first line of your file names its own columns, so those names were used and the column order below was not needed.')
+			: (PC.lpn_survey_from_format || 'Your file does not name its own columns, so they were read in this order: {format}')
+				.replace('{format}', EngCalcs.lpnSurveyFormatLabel(parsed.format)));
 		if (m) {
 			lines.push((PC.lpn_survey_map_lines || '{first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.')
 				.replace('{first}', axisWord(axes, 'north'))

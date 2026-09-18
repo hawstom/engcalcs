@@ -22711,20 +22711,102 @@ var EngCalcs = EngCalcs || {};
 		};
 		reader.readAsText(file);
 	}
+	/**
+	 * **THE FORMAT CHOOSER (Task 592; Tom, 2026-09-17: *"We will need to include a file format
+	 * chooser (PNEZD, PENZD, or whatever format is useful for Declan."*).**
+	 *
+	 * The order the reader last chose, remembered for the next file. **BROWSER FURNITURE, NOT
+	 * PROJECT DATA** (the rule Task 584 settled): which way round the last CSV somebody opened was
+	 * written is a fact about that person's data collector, not about this network, and a colleague
+	 * opening the file must not inherit it. Guarded, because in a browser set to block site data the
+	 * property access itself throws.
+	 */
+	var LPN_SURVEY_FORMAT_KEY = 'lpn_survey_format';
+	function surveyFormatPref() {
+		try {
+			var v = localStorage.getItem(LPN_SURVEY_FORMAT_KEY);
+			if (v) { return v; }
+		} catch (e) { /* storage blocked: the default is a perfectly good answer */ }
+		return EngCalcs.LPN_SURVEY_DEFAULT_FORMAT;
+	}
+	function rememberSurveyFormat(v) {
+		try { localStorage.setItem(LPN_SURVEY_FORMAT_KEY, v); } catch (e) { /* see above */ }
+	}
 	function landSurveyText(text, fileName) {
-		var pc = EngCalcs.pageConfig || {}, axes = surveyAxes(), parsed, outcome;
-		parsed = EngCalcs.lpnSurveyParse
-			? EngCalcs.lpnSurveyParse(text, { limits: surveyLimits() }) : { ok: false };
-		if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
-		// The confirm NAMES THE MAPPING, which is the whole column-mapping step: the reader sees
-		// which of their own columns became which coordinate before a single junction exists, so a
-		// wrong reading of ours costs a Cancel rather than an undo.
-		if (!window.confirm(EngCalcs.lpnSurveyConfirmText(parsed, unitLabel('lpn_u_elevhead'), axes))) {
-			setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
-			return;
+		var pc = EngCalcs.pageConfig || {}, axes = surveyAxes(), limits = surveyLimits(),
+			format = surveyFormatPref(), parsed;
+		function read() {
+			return EngCalcs.lpnSurveyParse
+				? EngCalcs.lpnSurveyParse(text, { limits: limits, format: format }) : { ok: false };
 		}
-		outcome = createSurveyJunctions(parsed);
-		showSurveyReport(parsed, outcome, fileName);
+		parsed = read();
+		// A file nothing can be read out of at all gets the sentence and no box: there is no
+		// question to ask about it, and a chooser over an empty file teaches nothing.
+		if (!parsed.ok && parsed.error === 'empty') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		openDialog(function (body) {
+			var wrap = document.createElement('div'), sel, note, preview;
+			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND DISABLED.** Hiding it would
+			// make the two cases look like two different features; showing it greyed, above a
+			// sentence saying the header won, is what teaches the rule Declan asked for -- a header
+			// beats the chooser -- in the one place anybody will meet it.
+			note = document.createElement('p');
+			note.style.margin = '0 0 6px';
+			note.textContent = pc.lpn_survey_format_label ||
+				'Column order, for a file that does not name its own columns';
+			wrap.appendChild(note);
+			sel = document.createElement('select');
+			sel.id = 'lpn_survey_format';
+			(EngCalcs.lpnSurveyFormats || []).forEach(function (f) {
+				var o = document.createElement('option');
+				o.value = f;
+				o.textContent = EngCalcs.lpnSurveyFormatLabel(f);
+				if (f === format) { o.selected = true; }
+				sel.appendChild(o);
+			});
+			wrap.appendChild(sel);
+			// **THE QUESTION IN PLAIN WORDS, under the control that asks it** -- Declan's own
+			// ranking: the one field that must be explicit is which coordinate comes first, and the
+			// label must not assume the reader knows which of PNEZD and PENZD that is.
+			var hint = document.createElement('p');
+			hint.style.margin = '6px 0 10px';
+			hint.textContent = pc.lpn_survey_format_hint ||
+				'This says which of the two coordinate columns comes first, the northing or the easting. If the first line of your file names its columns, those names are used and this is left alone.';
+			wrap.appendChild(hint);
+			preview = document.createElement('div');
+			wrap.appendChild(preview);
+			body.appendChild(wrap);
+			function draw() {
+				preview.innerHTML = '';
+				sel.disabled = !!(parsed.ok && parsed.headerRead);
+				var text2 = parsed.ok
+					? EngCalcs.lpnSurveyConfirmText(parsed, unitLabel('lpn_u_elevhead'), axes)
+					: EngCalcs.lpnSurveyErrorText(parsed, axes);
+				text2.split('\n\n').forEach(function (para) {
+					var p = document.createElement('p');
+					p.style.margin = '0 0 6px';
+					p.textContent = para;
+					preview.appendChild(p);
+				});
+			}
+			// **RE-READ ON EVERY CHANGE, so what the box says is what pressing the button will do.**
+			// A preview computed once and a creation computed again is two chances to disagree.
+			sel.addEventListener('change', function () {
+				format = sel.value;
+				parsed = read();
+				draw();
+			});
+			draw();
+		}, [
+			{ label: pc.lpn_survey_create || 'Create junctions', fn: function () {
+				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+				rememberSurveyFormat(format);
+				showSurveyReport(parsed, createSurveyJunctions(parsed), fileName);
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
+				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
+			} }
+		]);
 	}
 	/**
 	 * One junction per surveyed point, under ONE undo snapshot.

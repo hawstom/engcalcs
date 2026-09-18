@@ -3555,6 +3555,32 @@ $ec_lang['lpn_survey_err_ambiguous_lon']='More than one column in that file coul
 $ec_lang['lpn_survey_err_plane']='That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.';
 $ec_lang['lpn_survey_err_gpx_no_wpt']='That GPX file holds no waypoints, so there is nothing to make junctions from.';
 $ec_lang['lpn_survey_err_no_points']='Not one row of that file could be read as a surveyed point. Rows read: {detail}';
+// THE FILE FORMAT CHOOSER (Tom, 2026-09-17: "We will need to include a file format chooser
+// (PNEZD, PENZD, or whatever format is useful for Declan."). PNEZD and PENZD are the same five
+// columns and differ only in which coordinate comes first, and the trade has at least eight named
+// orderings between them. The QUESTION is asked in plain words and the trade name only identifies
+// the answer, because the person holding the file knows what is in each column and may well not
+// know which acronym puts the northing first.
+//
+// A file whose first line names its own columns is read from those names and the chooser is left
+// alone. Nothing is ever worked out from the size of the numbers: that is right on the file it was
+// tried against and wrong on the next one.
+$ec_lang['lpn_survey_format_label']='Column order, for a file that does not name its own columns';
+$ec_lang['lpn_survey_format_hint']='This says which of the two coordinate columns comes first, the northing or the easting. If the first line of your file names its columns, those names are used and this is left alone.';
+$ec_lang['lpn_survey_create']='Create junctions';
+$ec_lang['lpn_survey_fmt_pnezd']='Point name, northing, easting, elevation, description (PNEZD)';
+$ec_lang['lpn_survey_fmt_penzd']='Point name, easting, northing, elevation, description (PENZD)';
+$ec_lang['lpn_survey_fmt_pnez']='Point name, northing, easting, elevation (PNEZ)';
+$ec_lang['lpn_survey_fmt_penz']='Point name, easting, northing, elevation (PENZ)';
+$ec_lang['lpn_survey_fmt_nezd']='Northing, easting, elevation, description (NEZD)';
+$ec_lang['lpn_survey_fmt_enzd']='Easting, northing, elevation, description (ENZD)';
+$ec_lang['lpn_survey_fmt_nez']='Northing, easting, elevation (NEZ)';
+$ec_lang['lpn_survey_fmt_enz']='Easting, northing, elevation (ENZ, also written XYZ)';
+// Which of the two answered for THIS file, said out loud, so the reader can see that a header beat
+// the chooser rather than taking it on trust.
+$ec_lang['lpn_survey_from_header']='The first line of your file names its own columns, so those names were used and the column order below was not needed.';
+$ec_lang['lpn_survey_from_format']='Your file does not name its own columns, so they were read in this order: {format}';
+$ec_lang['lpn_survey_note_header_unread']='The first line of the file names columns this page does not know, so it was passed over and the column order you chose was used. It reads: {detail}';
 $ec_lang['lpn_survey_confirm']='Create {n} junction(s) from this surveyed point list?';
 $ec_lang['lpn_survey_map_lines']='{first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.';
 $ec_lang['lpn_survey_map_gpx']='Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.';
