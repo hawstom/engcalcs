@@ -1,97 +1,84 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-18 (eleventh session)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-18 late (twelfth session)
 
-## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-18.
+## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-18, late.
 
-**MASTER IS GREEN AT `e7956d80` AND PUSHED.** **PRODUCTION IS WHATEVER TOM LAST PULLED AND YOU MUST
-NOT GUESS IT.** Read it: `ssh -p 15554 jconstru` then `cd ~/addon_html/hawsedc.com/engcalcs && git
-rev-parse --short HEAD`. **His test box is `~/dev_html/hawsedc.com/engcalcs`, served at
-dev.hawsedc.com, and that is where he now tests trunk.** On 2026-09-17 a session took production's
-SHA from a stale line in THIS file, never verified it, and cut a release branch from the wrong
-commit. One ssh command was all it needed.
+**MASTER IS GREEN AT `cb57d4c5` AND PUSHED. NEVER GUESS PRODUCTION'S SHA** -- read it:
+`ssh -p 15554 jconstru` then `cd ~/addon_html/hawsedc.com/engcalcs && git rev-parse --short HEAD`.
+**There are FOUR checkouts on the host and they are different repositories**, which cost real
+confusion today: `~/addon_html/hawsedc.com/engcalcs` (production), `~/dev_html/hawsedc.com/engcalcs`
+(his trunk testing, dev.hawsedc.com), `~/addon_html/librewaternet.org`, `~/addon_html/not-epanet.org`.
+A pull in one is not a pull in another.
 
-**THE CALCULATORS NOMINATE hawsedc.com AGAIN, AND THIS IS THE BIGGEST CHANGE OF THE WEEK.** Every
-page had been canonicalising to librewaternet.org -- a three-week-old domain at search position 34 --
-while hawsedc.com earns **7,575 clicks a quarter at position 9.7**. Tom: *"We don't want to squander a
-15-year legacy. The terms of the divorce were not that LWN gets all the calculators. They were only
-that LWN walks away free."* The canonical origin is now a PER-PAGE declaration in
-`lib/Canonical.lib.php`: sixteen calculators and every ordinary page claim `hawsedc.com/engcalcs/`,
-the map application alone claims `librewaternet.org/app/`, and it holds whichever host served the
-page. **Six readers follow it** -- canonical, og:url, all 28 hreflang alternates, og:image, the
-sitemap, and the redirect from the map's script address to `/app/`, which is the one that would have
-sent a person to an address that does not exist.
-- **THE SITEMAP IS NOT TRACKED BY GIT AND MUST BE RE-UPLOADED BY HAND.** Regenerate with
-  `php dev/scripts/generate_sitemap.php` -- **that is the ORCHESTRATOR'S job, not Tom's** (his own
-  instruction: *"You do that. I don't."*) -- then he uploads `~/webdev/hawsedc.com/sitemap.xml` to the
-  hawsedc.com root and re-submits it in Search Console. **He uploaded the PRE-FIX file once already**,
-  so check what is deployed before assuming.
-- **librewaternet.org needs no sitemap of its own**, and it HAD no robots.txt at all until
-  2026-09-17 -- it answered 404, so nothing on that property pointed Google at the sitemap. Written
-  and pushed; it arrives when he pulls that site.
+**FIVE PUBLIC EXPOSURES WERE FOUND AND CLOSED TODAY, ALL ON THE SIBLING SITES, AND TOM FOUND THE
+FIRST ONE BY ACCIDENT.** He ran `git status` in what he thought was the wrong folder and saw an
+untracked `tools/error_log`. That log was written by a PHP fatal while the directory holding it was
+**executing build scripts over HTTP**. Measured live before the fix:
+`librewaternet.org/tools/` 200 with a full index, `build-chrome.php` 200 EXECUTED,
+`build-features.php` 500 EXECUTED, `build_claims.py` 200 downloadable; `/docs/` 200 with an index;
+**`/docs/apache/librewaternet-ssl.conf` 200 -- the Apache virtual-host config, downloadable**; and on
+not-epanet.org `/tools/` and `/hooks/` both reachable.
+- **Every directory in both sibling repos is now DECLARED served or denied, and a new undeclared one
+  FAILS.** Each site's own `check.sh` runs it; `dev/scripts/sibling_exposure_check.php` here is an
+  advisory that notices when a sibling goes unguarded. It reads DECLARATIONS, never the live site.
+- **`Require all denied`, NEVER `Options -Indexes`** -- an Options directive without the grant
+  returns 500 for every request under the path.
+- **A blanket dot-path rule is written as `RedirectMatch`, not `<FilesMatch "^\.">`**, because that
+  form matches FILENAMES only -- which is exactly how `.claude/settings.json` reached the open web in
+  September. That is now the THIRD time this distinction has mattered.
+- **THE LESSON, and it is the same one twice: every one of these was found from OUTSIDE, by a person,
+  while every check inside the repositories passed.** That is Task 676's whole argument.
 
-**`projection` AND `release/ewb` ARE DELETED. `674-coordinate-entry` IS MERGED AND CLOSED.**
-`feat/xy-world-map` absorbed `projection` on his own call (*"I think it's the right paper trail"*) and
-is now the whole coordinate programme.
-
-**`dev/tom-coordinate-vocabulary-2026-09-16.md` IS THE SPECIFICATION FOR THAT BRANCH AND IT WAS
-NEARLY LOST.** 17,000 characters and 65 string edits that Tom pasted into a prompt on 2026-09-16; the
-session acted on parts and never wrote it to a file. He asked where it had gone -- *"If you really did
-lose the content I painstakingly created and gave to you, that is very sad"* -- and it was recovered
-from the session transcript. **THE LESSON IS GENERAL: when Tom pastes a design into a prompt, COMMIT
-IT AS A FILE BEFORE ACTING ON IT.** The same guard already exists for `dev/new-english-keys.md` and
-nobody had extended it to prompts.
-
-**HE READ AND RULED ON ALL 120 BRANCH STRINGS, AND GETTING THEM STORED EXPOSED TWO BUGS OF OURS.**
-`dev/new-english-keys.md` was blind to every unmerged branch, which under branch work is where new
-wording lives -- it reported zero while 120 waited. It now has a branch section, advisory and
-deliberately outside `--check`, since a branch tip moves whenever anybody commits. **And the
-harvester could not see his marks once they were committed** -- CLAUDE.md says to commit them first,
-and doing exactly that made the harvester read them as pre-existing. It printed "nothing unharvested"
-and exited 0. Both fixed; 679 rulings now on file.
-
-**A STRING TOM REWORDS HAS A JAVASCRIPT TWIN, AND IT WAS MISSED THREE TIMES IN ONE DAY.** Applying an
-edit to `lib/lang.ec.en.php` alone leaves the `pc.key || 'English literal'` fallback holding the old
-words, and `js_fallback_string_check.php` is a ratchet at zero, so master went RED twice. **When you
-apply one of his wording edits, grep `js/` for the old sentence in the same breath.**
-
-**FIVE BRANCHES ARE BUILT AND AWAIT HIS BROWSER PASS. NONE MAY MERGE WITHOUT HIS ALL-CLEAR.**
+**THREE BRANCHES ARE BUILT AND AWAIT HIS BROWSER PASS:**
 
 | Where | Branch | Task |
 |---|---|---|
 | 8088 | `feat/customer-demands` | 247 |
-| 8089 | `feat/time-series-graph` | 599 |
 | 8091 | `feat/survey-import` | 592 |
-| 8092 | `feat/library-import` | 611 |
-| **dev.hawsedc.com** | `feat/lock-initials-later` | 667b -- pushed at his request; needs TWO browser profiles |
+| **dev.hawsedc.com** | `feat/lock-initials-later` | 667b -- PUSHED; needs TWO browser profiles |
 
-**AN ALL-CLEAR'S PIN FIELD IS `head`, NOT `commit`.** Written wrong on 2026-09-17, and the gate
-refused a branch he had cleared. `dev/scripts/branch_gate.php:91` is the authority.
+**`feat/xy-world-map` IS THE WHOLE COORDINATE PROGRAMME NOW** -- it absorbed `projection`, which is
+deleted, on his own call (*"I think it's the right paper trail"*). **Its specification is
+`dev/tom-coordinate-vocabulary-2026-09-16.md`, which is HIS OWN 17,000-character message, recovered
+from a session transcript after it was nearly lost.** It rules that *"we no longer want to expose the
+word 'projection'"* and gives the three-step Custom georeference wizard. **WHEN TOM PASTES A DESIGN
+INTO A PROMPT, COMMIT IT AS A FILE BEFORE ACTING ON IT.**
 
-**THE FEATURE FREEZE IS OFF** (his word, 2026-09-17). That removed the SECOND lock only; every branch
-in `protected` still refuses until his all-clear is pinned. Do not read an absent freeze as
-permission.
+**THE THING THAT WENT WRONG REPEATEDLY TODAY, IN HIS WORDS: *"What do I need to do so that this stops
+happening?"*** Three separate times an instruction of his was dropped -- a feature he asked removed
+was shipped, three items in one message never became a track, and he was asked twice for jobs he had
+already done. **The cause is acting on the most recent thing in front of you: an agent's report
+arrives vivid and complete, and his sentence from four messages back does not.** The correction is to
+check HIS words against the code yourself before reporting a branch ready, not the agent's summary.
 
-**`isGeoProject()` MEANS LAT/LON AND IS BEING USED WHERE `projectLocatable()` IS MEANT.** It broke
-Read DEM (fixed 2026-09-14, `cc894f98`) and it is why satellite view is refused on a projected
-project (Task 692, open). **Two wrong for the same reason is this project's signature: audit every
-other reader of it.**
+**A TASK LEFT OPEN AFTER HE CLEARS IT IS THE SAME FAILURE.** Task 599 sat open after its branch
+merged on his all-clear. **Closing the task is part of the merge, not a later tidy-up.**
 
-**DO NOT RUN MORE THAN ABOUT THREE `check_all.sh` AT ONCE.** Five concurrent runs on this 7 GB
-machine got one killed with exit 144 after printing 122 clean lines -- output that looks green with a
-failing exit code.
+**AND THE ROADMAP INDEX MYSTERY WAS NOT OURS, WHICH TOOK TOO LONG TO ESTABLISH.** He reported the
+index stale for days; it was current in every checkout on disk. **He had `~/webdev/hawsedc.subset/`
+open in his editor -- a directory that NO LONGER EXISTS.** Stale editor buffers of deleted files look
+exactly like current files. If he reports a file stale that checks call fresh, ask for its PATH early.
 
-**AND DO NOT PUT CONCURRENT AGENTS IN THE MAIN CHECKOUT.** Three seats shared it on 2026-09-17 and
-one had to cherry-pick its own commit back off another's branch. Worktrees, always -- even for an
-agent that only writes its own journal.
+**EVERY DEFECT THAT SURVIVED READING WAS FOUND BY DRIVING A REAL BROWSER.** Four today: the graph's
+Links selector (two controls sharing one scratch name, so choosing Links read the other control and
+reset), the DEM popup never redrawing, and THREE separate Ask failures. **In each case the source
+reads correctly and the existing tests passed with the defect restored.**
+`dev/lpn-spike/browser-drive.js` and `dev/lpn-spike/lock-ask-browser-drive.js` are the instruments.
 
-**A PREVIEW PORT MUST BE FREE BEFORE IT GOES IN `ports.conf`.** Port 8093 was assigned without
-checking; a `php -S` left running by an earlier session held it, and Tom's Apache reload then **shut
-Apache down entirely** rather than skipping that port, taking the panel and nine branches with it.
-`ss -ltn | grep :<port>` before adding a line, and kill every `php -S` a session starts.
+**`js_fallback_string_check.php` TURNED MASTER RED TWICE.** Applying one of Tom's wording edits to
+`lib/lang.ec.en.php` alone leaves the `pc.key || 'English literal'` twin holding the old words.
+**Grep `js/` for the old sentence in the same breath, every time.**
 
-**HIS WORKFLOW PREFERENCE, STATED 2026-09-18:** *"we get more done with large prompts from me and
-large responses from you, and from me gone while you work."* Long autonomous stretches, not
-turn-by-turn. He also had repeated accidental interrupts this session and did not know he had caused
-them; if agents stop for no reason, ask before assuming he meant it.
+**THE VERIFICATION STAMP NEEDS A CLEAN TREE**, and `dev/new-english-keys.rejected.md` -- the safety
+copy `--write --force` leaves -- blocked it twice before being gitignored. If a push is refused after
+a green suite, check `git status --porcelain` first.
+
+**DO NOT RUN MORE THAN ABOUT THREE `check_all.sh` AT ONCE** (5 GB machine; one was killed with exit
+144 after printing 122 clean lines). **AND NEVER PUT CONCURRENT AGENTS IN THE MAIN CHECKOUT** -- one
+had to cherry-pick its commit back off another's branch. Worktrees, always.
+
+**HIS WORKFLOW PREFERENCE:** *"we get more done with large prompts from me and large responses from
+you, and from me gone while you work."* He also had many accidental interrupts today and did not know
+he had caused them; **if agents stop for no reason, ask before assuming he meant it.**
 
 **DELETE A LINE IN THIS BLOCK ONCE YOU HAVE CHECKED IT AND IT IS NO LONGER NEWS.**
 
