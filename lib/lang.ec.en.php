@@ -3217,6 +3217,38 @@ $ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
 $ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.';
+// Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
+// Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
+// buttons except at the File menu.'). The label and its tip name no particular library, because
+// the FILE decides what is on offer rather than whatever section anybody was looking at.
+$ec_lang['lpn_library_import']='Import libraries…';
+$ec_lang['lpn_library_import_tip']='Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
+// The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
+// beside each name is the only thing on that screen that says what the file actually has in it.
+$ec_lang['lpn_library_import_choose']='Choose what to copy from {file}';
+$ec_lang['lpn_library_import_count']='{name} ({count})';
+$ec_lang['lpn_library_import_note']='Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.';
+$ec_lang['lpn_library_import_go']='Import';
+$ec_lang['lpn_library_import_no_libraries']='That project file has no libraries to copy.';
+$ec_lang['lpn_library_import_heading']='Imported from {file}';
+$ec_lang['lpn_library_import_added']='Copied in: {names}';
+$ec_lang['lpn_library_import_conflict']='Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.';
+// Said under ONE library's heading in the receipt, where 'these' is that library. The whole-file
+// case is lpn_library_import_no_libraries above, which has no heading over it to lean on.
+$ec_lang['lpn_library_import_none']='That project file has none of these to copy.';
+$ec_lang['lpn_library_import_curve_shape']='These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}';
+$ec_lang['lpn_library_import_needs_fittings']='These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.';
+// Said in the CHOOSER, above the Import button, and never in the receipt: it is a fact to weigh
+// before importing, not a note about what has already been done. A DISCLOSURE and not an offer to
+// convert, because changing a unit on this page reinterprets a typed number rather than converting
+// it, and a number that came from a file is the user's. {name} is the quantity, {mine} and {theirs}
+// the two unit labels, each read off this project's own unit selector.
+// WORDED BY TOM, 2026-09-18, after using it: 'This is too wordy and confusing. Have mercy on the
+// humans.' It opens with the word Warning and says Not recommended because he wants the
+// discouragement explicit; the per-quantity lines below carry the whole of the detail. Do not
+// restore the longer explanation, and do not add a convert button it would read as offering.
+$ec_lang['lpn_library_import_units']='Warning: Units mismatch. Will be imported as is. Not recommended.';
+$ec_lang['lpn_library_import_units_line']='{name}: this project shows {mine}, the file shows {theirs}.';
 $ec_lang['lpn_fitting_qty']='Quantity';
 $ec_lang['lpn_fitting_name']='Fitting';
 $ec_lang['lpn_fitting_k']='Coefficient';

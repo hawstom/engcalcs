@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1895,
-        "delta_key_count": 28,
+        "expected_key_count": 1910,
+        "delta_key_count": 43,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -545,6 +545,21 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_library_import": "Import libraries…",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_choose": "Choose what to copy from {file}",
+        "lpn_library_import_count": "{name} ({count})",
+        "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
+        "lpn_library_import_go": "Import",
+        "lpn_library_import_no_libraries": "That project file has no libraries to copy.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "Warning: Units mismatch. Will be imported as is. Not recommended.",
+        "lpn_library_import_units_line": "{name}: this project shows {mine}, the file shows {theirs}.",
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
@@ -575,6 +590,21 @@
         "lpn_field_easting_abbr": "E",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_library_import": "Import libraries…",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_choose": "Choose what to copy from {file}",
+        "lpn_library_import_count": "{name} ({count})",
+        "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
+        "lpn_library_import_go": "Import",
+        "lpn_library_import_no_libraries": "That project file has no libraries to copy.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "Warning: Units mismatch. Will be imported as is. Not recommended.",
+        "lpn_library_import_units_line": "{name}: this project shows {mine}, the file shows {theirs}.",
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
@@ -962,6 +992,246 @@
                     "key": "lpn_field_text_size",
                     "value": "Коефициент за размер",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_choose": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_no_libraries": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_curve_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_needs_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Този списък с фитинги се използва от {count} тръби: {ids}. Прекратете връзката с тях, преди да го изтриете.",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "Количество",
+                    "english": "Quantity"
                 }
             }
         },
