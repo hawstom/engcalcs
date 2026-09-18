@@ -617,6 +617,33 @@ the block.
     never into `~/webdev`, which is for things we serve. See `dev/git-organization-recommendation.md`.
 
 - 100|646| **Attach the world map to an XY project without changing the project.**
+  **THE BRANCH ABSORBED `projection` ON 2026-09-18 AND `projection` IS DELETED**, on Tom's own call:
+  *"Maybe we could merge projection into it and then delete projection? The merge may require some
+  manual conflict resolution. But I think it's the right paper trail."* One branch,
+  `feat/xy-world-map`, now holds every piece of the coordinate work, and Task 641 is part of it.
+  - **AND THE BRANCH'S REAL SPECIFICATION IS `dev/tom-coordinate-vocabulary-2026-09-16.md`**, which
+    is his own 17,000-word message recovered from a session transcript on 2026-09-17 after he asked
+    where it had gone. It had never been written to a file. **It is bigger than this task's title**:
+    *"We no longer want to expose the word 'projection'"*, and *"Georeferencing is still
+    georeferencing, but it means to attach the world map, not to convert your coordinate system."*
+  - **HIS WIZARD, IN THREE STEPS, stated twice because the first time was not recorded:** show the
+    world map with the project near 0,0, both zoomed to fit; let the user zoom, pan, search by name
+    or Go to, until they press **Place approximately**; then a drag-scale-rotate rectangle that moves
+    **the map, not their project**, until they press **Georeference here**; then the status bar reads
+    **unnamed**.
+  - **"unnamed" ANSWERS TWO THINGS AT ONCE AND THAT IS DELIBERATE** (Tom, 2026-09-17, correcting a
+    recommendation of ours that it should answer one): the three status values are `{EPSG name}`,
+    **unnamed**, and **not georeferenced** -- where *unnamed* means georeferenced but not to any named
+    CRS, *"probably only an approximate anchor point and convergence angle from our UI."*
+  - **THE 65 STRING EDITS SPLIT THREE WAYS** (measured 2026-09-17, and he approved the split): 17
+    already match master; **13 are pure vocabulary on shipped controls and go to master**, because an
+    EPSG projected CRS genuinely IS a coordinate reference system and renaming it is not a lie; **2
+    would be a lie on master** (`lpn_file_import_geo` and `lpn_new_coordsys_local_tip` describe
+    behaviour master does not have) and wait for this branch; and **33 `lpn_transform_*` are the
+    wizard** and belong here by definition. The 13 include `lpn_geomap` and `lpn_xymap`, which are the
+    canonical mode names `mode_name_check.php` holds every other string to, so they move as one
+    coordinated pass and the check guarantees it cannot be half-done.
+  - Cost of the master half, so it is not a surprise: about 390 retranslations.
   Tom, 2026-09-13, thinking past Task 641: *"even an arbitrary XY project can have a world map
   background with a good wizard. Our Map menu can have a new Background map (georeference) 'Attach
   the world map to this project without changing it any other way.'"* That sentence is the feature
