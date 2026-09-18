@@ -330,6 +330,66 @@ the block.
   - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
     original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
 
+- 100|692| **Satellite view is refused on a projected project, and it is the DEM bug again.**
+  Tom, 2026-09-18, after making projects in Mesa AZ and Fotobi, Ghana: *"Satellite view is only
+  available for lat/lon CRS."*
+  - **IT IS THE SAME SINGLE WORD THAT BROKE Read DEM, IN THE CONTROL NEXT DOOR.** The satellite row
+    is gated on `isGeoProject()` (`js/looped-network.js:9378` and `:25968`), which means lat/lon and
+    nothing else. The elevation controls asked the same question until 2026-09-14, when `cc894f98`
+    replaced it with **"can this project say where on the Earth a point of it is"** --
+    `projectLocatable()` -- precisely because the row appeared on a projected project and then did
+    nothing. **That fix was applied to its own three entry points and not to its neighbour.**
+  - A project on an EPSG plane knows exactly where it is on the Earth; that is what the plane is for.
+    There is no reason a satellite tile cannot be drawn behind it.
+  - **SO THE REAL TASK IS WIDER THAN THE SYMPTOM: find every OTHER reader of `isGeoProject()` and
+    ask, of each, whether it means "lat/lon" or means "locatable".** Two have now been wrong for the
+    same reason, which is the signature this project keeps finding.
+
+- 75|693| **"Length and map coordinates" is a lie on an EPSG project.**
+  Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
+  Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
+  Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
+  is a lie."* The string is `lpn_units_length` (`lib/lang.ec.en.php:1016`).
+  - **HE IS RIGHT AND THE CAUSE IS THAT ONE SETTING USED TO ANSWER TWO QUESTIONS.** When every
+    project was a local grid, the length unit WAS the coordinate unit and one label was honest. A
+    geographic project reads coordinates in degrees and an EPSG project reads them in the plane's own
+    unit, which need not be the one pipes are measured in.
+  - **HIS OWN PROPOSAL, and it needs deciding before anything is built:** *"Should the lang say
+    'Length'? And we have a separate 'Map coordinates' unit input that is disabled and autofilled for
+    an EPSG CRS?"* That is one honest label plus one derived, read-only field, which matches how the
+    rest of this page treats a number it knows rather than one the user states.
+  - **DO NOT BUILD IT AS A CONVERSION.** Changing a unit reinterprets the typed number and does not
+    convert it, and only the user touches a file's numbers. A read-only Map coordinates field is a
+    DISPLAY of what the coordinate system already says, never an input that rewrites anything.
+  - Read with Task 688: this is the same paradigm gap arriving from the display side rather than the
+    Save-as side.
+
+- 50|694| **Export a map animation as an animated picture.**
+  Tom, 2026-09-18: *"It would be very fun to export a map animation to a gif. And I bet it would not
+  be hard for you. That could be another export item for the file menu. And if we get a lot of export
+  and import items, we can put them in submenus."* And: *"With EWB finished, we can just enjoy
+  ourselves building cool things for a while."*
+  - The extended-period run already draws every frame, and the transport already steps them, so the
+    frames exist -- what is missing is capturing them and writing a file.
+  - **THE SUBMENU HALF IS THE PART THAT IS ALREADY EARNED.** The File menu now carries Open, Import
+    EPANET, Export EPANET, Import libraries and the xy-on-map row, and he could not find Export
+    EPANET at all (Task 685's sibling complaint, 2026-09-17). Grouping imports and exports is worth
+    doing whether or not the animation is.
+  - **NO THIRD-PARTY REQUEST AND NO VENDORED LIBRARY WITHOUT A DECISION.** The suite makes exactly
+    four outside requests, all on this page, all opt-in; `vendor_integrity_check.php` governs anything
+    added to `js/vendor/`. Encoding in the browser with no new dependency is the shape to aim for.
+
+- 50|695| **The daily status mail has columns with no headings.**
+  Tom, 2026-09-18, of the nightly report: *"Headings for this would help"*, quoting a table whose
+  columns he had to guess at -- he wrote them as `??? ????`. The two numbers are almost certainly
+  the two consent buckets, which is exactly the pair CLAUDE.md forbids summing, so a reader guessing
+  at them is the failure this is about.
+  - `log/lang-log-stats.sh` builds it and `dev/host/` holds the deployed copy;
+    `log_format_selftest.php` pins its output shape, so the headings go in with the test.
+  - **NAME WHAT EACH COLUMN COUNTS, NOT JUST WHAT IT IS.** One column counts PEOPLE (consented,
+    deduplicated) and the other counts PAGE LOADS (everyone else, undeduplicated). A heading that
+    says only "visits" would be worse than none.
+
 - 100|686| **The progress bar finishes before the work does.**
   Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
   progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the

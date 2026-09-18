@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**103 open tasks.** Next (100): 11 · Soon (75): 30 · Someday (50): 33 · Maybe (25): 11 · Parked (5): 18
+**107 open tasks.** Next (100): 12 · Soon (75): 31 · Someday (50): 35 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (11)
+## 100 — Next (12)
 
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
@@ -22,8 +22,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 669 — Show labels at this zoom or closer.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 686 — The progress bar finishes before the work does.
+- ! Task 692 — Satellite view is refused on a projected project, and it is the DEM bug again.
 
-## 75 — Soon (30)
+## 75 — Soon (31)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -55,8 +56,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 688 — File, Convert units as: US to work in, SI to hand over.
 - Task 689 — Undo does not work inside a table, only on the map.
 - Task 691 — Banner messages are annoying, and one of them is a trap.
+- Task 693 — "Length and map coordinates" is a lie on an EPSG project.
 
-## 50 — Someday (33)
+## 50 — Someday (35)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -91,6 +93,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 675 — A labelled grid, with the significant digits picked out.
 - Task 683 — The wheel zoom increment, snapping having been ruled out.
 - Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
+- Task 694 — Export a map animation as an animated picture.
+- Task 695 — The daily status mail has columns with no headings.
 
 ## 25 — Maybe (11)
 
@@ -131,5 +135,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-95 of 103 titles are within 4–12 words. `!` marks the rest;
+98 of 107 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
