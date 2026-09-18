@@ -7057,7 +7057,31 @@ var EngCalcs = EngCalcs || {};
 		if (field === 'demandActual') { return isFixedHeadNode(n) ? undefined : resolvedDemand(n); }
 		if (field === 'head') {
 			// Derived from typed numbers, so it crosses into the RESULT unit like every other head.
-			if (isFixedHeadNode(n)) { return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead')); }
+			//
+			// **EXCEPT INSIDE A RUN, WHERE A TANK'S WATER SURFACE IS A RESULT AND NOT AN INPUT**
+			// (Task 599). The stored level is the initial condition; the level at 14:00 is what the
+			// engine integrated, and it is in the frame. Read the document's number here and a
+			// tank's head is flat across the whole day -- which is not a chart nobody looks at, it
+			// is the map label and the profile saying the tank never moved while the transport
+			// plays.
+			//
+			// **GATED ON `t`, WHICH ONLY A FRAME OF A RUN CARRIES** (js/lpn-time.js's
+			// lpnTimeFrameResult sets it; a steady-state solve does not). So nothing about a
+			// single-instant page changes -- there the document IS the answer -- and this cannot
+			// become a path by which a solved number is believed over a typed one at t=0.
+			//
+			// **NOT `pressure`'s branch too.** fixedHeadPressure() is where "a node with no ground
+			// has no pressure" lives (Task 390), and EPANET states an imported reservoir's
+			// elevation as 0, so believing its pressure array would assert a head above a ground
+			// the file never gave. A tank's pressure therefore still follows its stored level; the
+			// head above is the reading that moves.
+			if (isFixedHeadNode(n)) {
+				if (lastSolveResult && typeof lastSolveResult.t === 'number' &&
+					lastSolveResult.heads && typeof lastSolveResult.heads[n.id] === 'number') {
+					return toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead'));
+				}
+				return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'));
+			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
 		if (field === 'pressure') {
@@ -14140,9 +14164,11 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Cheap: two rects and, only when it is too tall, one style write. It runs on each keystroke in
 	// the query line, which is the same budget the panel already spends re-rendering its results.
+	// The open test is panelIsOpen() and NOT `display === 'block'`: this box opens as a flex
+	// column, so the literal test had been false since the day it did. See panelIsOpen().
 	function refitFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
-		if (!popup || popup.style.display !== 'block') { return; }
+		if (!panelIsOpen(popup)) { return; }
 		capPanelToRoomBelow(popup, popup.getBoundingClientRect().top);
 	}
 	// ---- REPLACE: the same query, plus a write (ROADMAP Task 389) --------------------------------
@@ -14904,6 +14930,22 @@ var EngCalcs = EngCalcs || {};
 			show: function () { paneTableReset(spec); renderPaneTable(spec); },
 			refresh: function () { renderPaneTable(spec); }
 		});
+	});
+	// **TIME SERIES SITS WITH THE PROFILE, AFTER THE TABLES AND BEFORE IT** (Task 599). Tom's
+	// ordering rule is "making Profile the last tab" and the reason he gave for it was that a
+	// DRAWING among six tables belongs at the end -- so a second drawing goes beside the first,
+	// inside the same stretch, and Profile keeps the position he named. Task 640 will gather all
+	// five plots under a Graphs menu; that is a second door to these tabs and not a reordering of
+	// the strip.
+	paneTabs.push({
+		id: 'timeseries', panel: 'lpn_pane_timeseries', label: 'lpn_ts_menu', tip: 'lpn_ts_tip',
+		show: function () { tsTabShow(); },
+		// Every solve and every document change while this is the tab on show -- and that includes
+		// every step of the transport, which is what keeps the `now` line under the scrubber.
+		refresh: function () { tsTabRefresh(); }
+		// NO `hide`: this tab draws nothing on the map, so there is nothing to take away with it.
+		// (The profile's hide() exists because its route highlight would otherwise outlive the
+		// panel that explains it.)
 	});
 	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
 	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
@@ -18891,6 +18933,480 @@ var EngCalcs = EngCalcs || {};
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
 
+	}
+
+
+	// ---- TIME SERIES (ROADMAP Task 599) -----------------------------------------------------------
+	//
+	// One or more assets' chosen value against time across an extended-period run. Tom, 2026-09-06:
+	// *"We haven't added anything for time series reporting or graphing such as one or more nodes'
+	// pressure or head across an EPS."* Before this the only way to read one node across the day was
+	// to scrub the transport and watch a number change.
+	//
+	// **IT IS A READER AND NOTHING ELSE.** The run already holds every reporting step
+	// (js/lpn-time.js keeps the frames), so nothing here solves, re-fetches, or stores anything: the
+	// whole feature is a second view of state the page already has. That is why it ranked above the
+	// three plots we still lack.
+	//
+	// **THE SAME DRAWING AS THE PROFILE, AND THE SAME PURE MODULE.** Every axis decision --
+	// truncation, the 1/2/2.5/5 step, how many gridlines the room will carry, which of a row of
+	// labels there is space for, data space to pixel space -- is EngCalcs.lpnProfile's, called and
+	// not copied. A second plotting idiom on this page is the expensive mistake, and the cheapest
+	// guard against one is that the second chart cannot answer an axis question for itself.
+	// js/lpn-profile.js did not have to move: its axis half was already pure, already unaware of a
+	// station, and already exported.
+	//
+	// **EVERY VALUE COMES THROUGH colorValueOf(), WHICH IS THE PAGE'S ONE VALUE-AND-UNIT SEAM.**
+	// The same expression that paints the map, fills the asset tables and prints the label beside
+	// the symbol -- so a point on this chart cannot disagree with the number the reader can see on
+	// the drawing. What makes that possible for a whole run rather than for one instant is
+	// tsAsOfFrame() below, and the two things it swaps are the only two the accessors read.
+	//
+	// **A WINDOW IS NOT A PROJECT AND A GRAPH SELECTION IS NEITHER** (Task 584). What is plotted is
+	// this reader's question in this session -- the same standing as which node the profile starts
+	// from, and as which saved path is selected, which Task 510 deliberately does not store. So
+	// there is no new localStorage key and nothing new in serializeProject(): tsState lives and dies
+	// with the page, exactly as profileState does.
+	//
+	// What is NOT here, and is named so it is not read as an oversight: an Export (PNG, PDF, CSV,
+	// ODS) and a time-range selector belong to Task 637's tab shape, and the Graphs submenu that
+	// gathers all five plots is Task 640. dev/graphs-scope.md holds both.
+
+	// **A QUALITATIVE SET, WHICH IS NOT WHAT js/lpn-ramps.js HOLDS.** Those are ColorBrewer
+	// SEQUENTIAL ramps and they answer "how big is this number"; a line per asset asks "which asset
+	// is this", where the only requirement is that neighbours be told apart. ColorBrewer Dark2, in
+	// its published order, on the same authority the ramps already stand on. It CYCLES rather than
+	// running out: the chip beside each line carries the asset's own name, so a ninth line sharing
+	// the first one's color is still identified, where refusing to draw it would not be.
+	var LPN_TS_COLORS = ['#1b9e77', '#d95f02', '#7570b3', '#e7298a',
+		'#66a61e', '#e6ab02', '#a6761d', '#666666'];
+	// Beyond this many reporting steps the per-point dots and their hover text are left off. They
+	// are the chart's readout of an exact number, and at 25 steps on EPA's Net3 they are worth
+	// having; at 500 they are more SVG elements than the lines they sit on and they merge into a
+	// band. The lines, the axes and the labels are unchanged -- only the ink nobody could aim at.
+	var LPN_TS_DOT_MAX = 60;
+	var LPN_TS_MARGIN = { left: 58, top: 12, right: 12, bottom: 44 },
+		LPN_TS_W = 560, LPN_TS_H = 340,
+		// Against .lpn-profile-tick's 10px, reused: a y label needs clearance above and below, and
+		// an elapsed time reads up to `120:00`.
+		LPN_TS_Y_LABEL_PX = 22, LPN_TS_X_LABEL_PX = 52,
+		// Below this much plot the axis title gives way rather than the drawing -- the same rule
+		// profileLayout() applies to the station title, and for the same reason.
+		LPN_TS_MIN_PLOT_H = 110;
+
+	// `group` is 'node' or 'link'; `field` is one of tsFieldOptions()'s keys. Both per group, so
+	// switching to Links and back does not throw away the question that was being asked about nodes.
+	var tsState = { group: 'node', fields: { node: '', link: '' }, picks: { node: [], link: [] } };
+	function tsGroup() { return tsState.group === 'link' ? 'link' : 'node'; }
+	function tsElementsOf(group) {
+		return (group === 'link' ? doc.links : doc.nodes).filter(isActive);
+	}
+	function tsElementById(group, id) { return group === 'link' ? linkById(id) : nodeById(id); }
+	// **PRUNED ON EVERY READ, NEVER WRITTEN BACK.** An id whose element has been deleted is dropped
+	// from what is DRAWN and left in tsState, because a delete is one undo away and a list quietly
+	// rewritten could not come back with it. Same shape as profileStops().
+	function tsPicks() {
+		var group = tsGroup();
+		return tsState.picks[group].filter(function (id) { return !!tsElementById(group, id); });
+	}
+	// **WHAT THE GRAPH OFFERS IS THE MAP'S LIST MINUS WHAT CANNOT BE A SERIES** (Tom, 2026-09-17:
+	// *"Initial quality: This is the wrong property to offer for nodes, since it's 'Initial'.
+	// Instead, offer Concentration ... all we must do is remove 'Initial quality'."*). A node's
+	// initial quality is the CONDITION THE RUN STARTS FROM -- one typed number that the run never
+	// revisits -- so a chart of it is a flat line at every reporting step, and it sits in the
+	// pull-down one row below `quality`, the concentration the engine actually integrates, which is
+	// the reading anybody asking for it wanted. Offering both is a trap rather than a choice.
+	//
+	// **REMOVED FROM THIS PULL-DOWN ONLY.** It is still a property of a node, still edited in the
+	// popup, still a colour field on the map -- where a single instant is exactly what a map shows,
+	// and where the starting condition is a fair thing to paint. COLOR_FIELD_ORDER is untouched.
+	//
+	// Nothing else is dropped, deliberately: a pipe's diameter and roughness are constants across a
+	// run too, but they are its identity rather than a condition it starts from, a flat line for
+	// them says something true, and Tom named one field.
+	var TS_FIELD_SKIP = { node: { initQuality: 1 }, link: {} };
+	function tsFieldOptions(group) {
+		var skip = TS_FIELD_SKIP[group] || {};
+		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+	}
+	function tsField() {
+		var group = tsGroup(), opts = tsFieldOptions(group), f = tsState.fields[group], i;
+		for (i = 0; i < opts.length; i++) { if (opts[i][0] === f) { return f; } }
+		return opts.length ? opts[0][0] : '';
+	}
+	// A panel that opens on an empty frame asks the reader to do work before it can show them
+	// anything, so it opens on a real graph where it can -- the same rule profileSeedStops()
+	// follows. The map SELECTION first, because if anything is chosen that is what the reader came
+	// to ask about; otherwise the first few assets of the group, which is a real reading of a real
+	// network and not a placeholder. Only ever fills a BLANK list.
+	var LPN_TS_SEED = 4;
+	function tsSeedPicks() {
+		var group = tsGroup(), kept = tsPicks(), fromSel;
+		tsState.picks[group] = kept;
+		if (kept.length) { return; }
+		fromSel = selectedRefs().filter(function (s) { return s.kind === group; })
+			.map(function (s) { return s.id; });
+		if (fromSel.length) { tsState.picks[group] = fromSel; return; }
+		tsState.picks[group] = tsElementsOf(group).slice(0, LPN_TS_SEED)
+			.map(function (e) { return e.id; });
+	}
+
+	// **READ THE PAGE'S OWN ACCESSORS AS OF ONE FRAME OF THE RUN.** Two things decide what
+	// colorNodeValue()/colorLinkValue() answer, and this swaps both: `lastSolveResult`, which is
+	// every solved quantity, and the pattern clock, which is every quantity resolved from a
+	// multiplier (a junction's resolved demand is the one that bites). Restored in a `finally`, so a
+	// throw inside the accessors cannot leave the page believing it is parked at another time --
+	// which would be a wrong number on the MAP, not just on the chart.
+	//
+	// Writing to `lastSolveResult` is what makes this the one seam rather than a second opinion: the
+	// alternative was reading `frame.heads[id]` here, which is a second implementation of every unit
+	// decision in colorNodeValue() and would drift from it the first time either changed.
+	function tsAsOfFrame(frame, fn) {
+		var wasResult = lastSolveResult, wasTime = readTimeOverride;
+		lastSolveResult = frame;
+		readTimeOverride = (frame && typeof frame.t === 'number') ? frame.t : null;
+		try { return fn(); }
+		finally { lastSolveResult = wasResult; readTimeOverride = wasTime; }
+	}
+	// One entry per plotted asset: its id, its color, and its points in reporting-step order.
+	//
+	// **A MISSING VALUE IS A BREAK AND NEVER AN INTERPOLATION**, which is why the points carry
+	// `y: undefined` rather than being dropped: a pump has no velocity, and a run whose engine lost
+	// a node has no head for it. The renderer breaks its polyline there. Joining across the gap
+	// would draw a straight line through a number nobody computed -- the same rule
+	// EngCalcs.lpnProfile.profileSeries() applies to a closed link.
+	function tsSeries(frames) {
+		var group = tsGroup(), field = tsField(), ids = tsPicks();
+		return ids.map(function (id, k) {
+			var e = tsElementById(group, id);
+			return {
+				id: id,
+				color: LPN_TS_COLORS[k % LPN_TS_COLORS.length],
+				points: frames.map(function (f) {
+					var v = tsAsOfFrame(f, function () { return colorValueOf(group, e, field); });
+					return { t: f.t, y: (typeof v === 'number' && isFinite(v)) ? v : undefined };
+				})
+			};
+		});
+	}
+
+	// The drawing surface for the size the host currently is -- profileLayout()'s twin, and
+	// deliberately its own function rather than a shared one with a flag: the two charts reserve
+	// different things under the axis (rotated node names there, elapsed times here) and a single
+	// layout taking a mode argument would be one function pretending to be general.
+	function tsLayout(host) {
+		var r = host && host.getBoundingClientRect ? host.getBoundingClientRect() : null,
+			w = r && r.width > 0 ? Math.round(r.width) : LPN_TS_W,
+			h = r && r.height > 0 ? Math.round(r.height) : LPN_TS_H,
+			title, bottom, height;
+		title = (h - LPN_TS_MARGIN.top - LPN_TS_MARGIN.bottom) >= LPN_TS_MIN_PLOT_H;
+		bottom = title ? LPN_TS_MARGIN.bottom : 22;
+		height = Math.max(40, h - LPN_TS_MARGIN.top - bottom);
+		return {
+			w: w, h: h, axisTitle: title, titleY: h - 6,
+			y: EngCalcs.lpnProfile.fitTicks(height, LPN_TS_Y_LABEL_PX),
+			box: {
+				left: LPN_TS_MARGIN.left, top: LPN_TS_MARGIN.top,
+				width: Math.max(40, w - LPN_TS_MARGIN.left - LPN_TS_MARGIN.right),
+				height: height
+			}
+		};
+	}
+	// **THE PANE IS DRAGGED, SO THE CHART IS REDRAWN** -- profileResizeWatch()'s argument, in its
+	// own observer because it watches its own host. Guarded on a real change of at least a pixel:
+	// renderTimeSeries() writes into the host, and an observer firing on its own output is a loop.
+	var tsLastSize = null;
+	function tsResizeWatch() {
+		var host = document.getElementById('lpn_ts_chart');
+		if (!host || !window.ResizeObserver) { return; }
+		new window.ResizeObserver(function () {
+			var r = host.getBoundingClientRect();
+			if (!(r.width > 0) || !(r.height > 0)) { return; }
+			if (tsLastSize && Math.abs(tsLastSize.w - r.width) < 1 &&
+				Math.abs(tsLastSize.h - r.height) < 1) { return; }
+			tsLastSize = { w: r.width, h: r.height };
+			renderTimeSeries();
+		}).observe(host);
+	}
+
+	function tsTabShow() { tsSeedPicks(); rebuildTsForm(); renderTimeSeries(); }
+	function tsTabRefresh() { rebuildTsForm(); renderTimeSeries(); }
+	// Everything in the control row, rebuilt from tsState on every change: the two pull-downs, the
+	// Add button, and one chip per plotted asset.
+	//
+	// **THE CHIPS ARE THE LEGEND AND THE PICKER AT ONCE**, and that is what keeps this panel one
+	// wrapping line tall. A key drawn inside the chart and a list of what is plotted beside it would
+	// be two statements of one fact, and the pane's scarcest dimension is its height (see
+	// .lpn-profile-controls in css/engcalcs.css for where that argument was made the first time).
+	// Each chip wears its own line's color, names its asset, and takes it off the graph when
+	// pressed.
+	//
+	// **EACH CONTROL HAS ITS OWN VARIABLE, AND THAT IS THE DEFECT THIS SHAPE CLOSES** (Tom,
+	// 2026-09-17: *"I am not able to change Nodes to Links."*). Both pull-downs were built into one
+	// `var sel` reused down the function, and `var` is scoped to the FUNCTION rather than to the
+	// block -- so the group control's change handler closed over a name that, by the time anybody
+	// could press it, held the QUANTITY control. It read a field name where it expected 'link',
+	// wrote 'node' every time, and rebuilt the row: the pull-down snapped straight back and half
+	// the feature was unreachable. Nothing threw, nothing was logged, and the handler is correct
+	// read on its own line -- which is why `rebuildTsForm()` never names one control with another
+	// control's variable again.
+	function rebuildTsForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_ts_form'),
+			group = tsGroup(), field = tsField(), groupSel, fieldSel, btn;
+		if (!box) { return; }
+		box.innerHTML = '';
+		groupSel = document.createElement('select');
+		groupSel.id = 'lpn_ts_group';
+		groupSel.className = 'lpn-ts-pick ec-help';
+		groupSel.title = pc.lpn_ts_group_tip || 'Whether the graph shows nodes or links.';
+		[['node', pc.lpn_ts_group_nodes || 'Nodes'], ['link', pc.lpn_ts_group_links || 'Links']]
+			.forEach(function (o) {
+				var op = document.createElement('option');
+				op.value = o[0]; op.textContent = o[1];
+				groupSel.appendChild(op);
+			});
+		groupSel.value = group;
+		groupSel.addEventListener('change', function () {
+			tsState.group = groupSel.value === 'link' ? 'link' : 'node';
+			tsSeedPicks(); rebuildTsForm(); renderTimeSeries();
+		});
+		box.appendChild(groupSel);
+
+		fieldSel = document.createElement('select');
+		fieldSel.id = 'lpn_ts_quantity';
+		fieldSel.className = 'lpn-ts-pick ec-help';
+		fieldSel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
+		tsFieldOptions(group).forEach(function (o) {
+			var op = document.createElement('option');
+			op.value = o[0]; op.textContent = o[1];
+			fieldSel.appendChild(op);
+		});
+		fieldSel.value = field;
+		fieldSel.addEventListener('change', function () {
+			tsState.fields[tsGroup()] = fieldSel.value;
+			renderTimeSeries();
+		});
+		box.appendChild(fieldSel);
+
+		btn = document.createElement('button');
+		btn.type = 'button';
+		btn.id = 'lpn_ts_add';
+		btn.className = 'lpn-profile-edit ec-help';
+		btn.textContent = pc.lpn_ts_add || 'Add selected';
+		btn.title = pc.lpn_ts_add_tip || 'Put everything now chosen on the map onto the graph.';
+		btn.addEventListener('click', tsAddSelection);
+		box.appendChild(btn);
+
+		tsPicks().forEach(function (id, k) {
+			var chip = document.createElement('button'), sw = document.createElement('i');
+			chip.type = 'button';
+			chip.className = 'lpn-profile-chip lpn-ts-chip ec-help';
+			chip.title = String(pc.lpn_ts_chip_tip || 'Take {id} off the graph').replace('{id}', id);
+			sw.className = 'lpn-ts-swatch';
+			// `color`, not `background`: the swatch is a DASH drawn as a border-top in currentColor
+			// (see .lpn-ts-swatch), because the thing it names is a line and not a filled band.
+			sw.style.color = LPN_TS_COLORS[k % LPN_TS_COLORS.length];
+			chip.appendChild(sw);
+			chip.appendChild(document.createTextNode(id));
+			chip.addEventListener('click', function () { tsRemove(id); });
+			box.appendChild(chip);
+		});
+		if (tsPicks().length) {
+			btn = document.createElement('button');
+			btn.type = 'button';
+			btn.id = 'lpn_ts_clear';
+			btn.className = 'lpn-profile-edit';
+			btn.textContent = pc.lpn_ts_clear || 'Remove all';
+			btn.addEventListener('click', function () {
+				tsState.picks[tsGroup()] = [];
+				rebuildTsForm(); renderTimeSeries();
+			});
+			box.appendChild(btn);
+		}
+		initTipsIn(box);
+	}
+	// **THE SELECTION IS THE GESTURE, because the reader already has it.** This page has had
+	// multi-select since Task 266, so "which assets" needs no picker of its own: choose them on the
+	// drawing, where they are, and press one button. An asset already on the graph is not added
+	// twice -- the same rule setSelectionList() keeps about a doubled subject.
+	//
+	// Nothing of the current group chosen is SAID, not ignored: a button that does nothing is
+	// indistinguishable from a button that is broken.
+	function tsAddSelection() {
+		var group = tsGroup(), pc = EngCalcs.pageConfig || {}, note, added = 0;
+		selectedRefs().forEach(function (s) {
+			if (s.kind !== group || tsState.picks[group].indexOf(s.id) >= 0) { return; }
+			tsState.picks[group].push(s.id);
+			added++;
+		});
+		rebuildTsForm();
+		renderTimeSeries();
+		if (added) { return; }
+		note = document.getElementById('lpn_ts_note');
+		if (note) {
+			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is chosen on the map.';
+		}
+	}
+	function tsRemove(id) {
+		var group = tsGroup(), i = tsState.picks[group].indexOf(id);
+		if (i >= 0) { tsState.picks[group].splice(i, 1); }
+		rebuildTsForm();
+		renderTimeSeries();
+	}
+	function tsText(parent, x, y, s, attrs) {
+		var t = el('text', attrs || {}, parent);
+		t.setAttribute('x', x); t.setAttribute('y', y);
+		t.appendChild(document.createTextNode(s));
+		return t;
+	}
+	// **HOURS ON THE AXIS, H:MM ON THE LABEL.** The bounds and the nice step are worked out in
+	// hours, because a step chosen on seconds is a number like 9000 that rounds to nothing a person
+	// reads; the label is then the transport's own format, so the axis and the scrubber say the same
+	// thing about the same moment.
+	function tsHours(t) { return (t || 0) / 3600; }
+	function renderTimeSeries() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
+			note = document.getElementById('lpn_ts_note'),
+			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		group = tsGroup();
+		field = tsField();
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		// **NOTHING TO GRAPH IS SAID IN WORDS, NEVER AS EMPTY AXES.** A frame with a labelled axis
+		// pair and no line in it reads as a chart that failed, and the three ways of having nothing
+		// are three different things to do about it: set a duration, press Calculate, or choose an
+		// asset. An extended-period run is EPANET's alone, so a page whose engine is unreachable
+		// lands on the middle message and js/lpn-time.js's own status note says why.
+		if (!frames.length) {
+			if (note) {
+				note.textContent = (EngCalcs.lpnTimeIsExtended && !EngCalcs.lpnTimeIsExtended(doc.times))
+					? (pc.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.')
+					: (pc.lpn_ts_no_frames || 'No extended period results yet. Press Calculate to run the simulation.');
+			}
+			return;
+		}
+		series = tsSeries(frames);
+		if (!series.length) {
+			if (note) {
+				note.textContent = pc.lpn_ts_none ||
+					'Nothing to graph yet. Choose assets on the map and press Add selected.';
+			}
+			return;
+		}
+		series.forEach(function (s) {
+			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
+		});
+		// **SAID BEFORE THE CHART IS MEASURED**, which is load-bearing and is Task 527's lesson
+		// restated: this line shares the panel with the chart and wraps on a narrow one, so writing
+		// it afterwards would take height off the host the chart had just been laid out for, and the
+		// ResizeObserver would then redraw, blank it, grow the host and start again.
+		if (note) {
+			note.textContent = String(pc.lpn_ts_summary || 'Assets: {n}, reporting times: {steps}')
+				.replace('{n}', String(series.length))
+				.replace('{steps}', String(frames.length));
+		}
+		lay = tsLayout(host);
+		tsLastSize = { w: lay.w, h: lay.h };
+		box = lay.box;
+		// The horizontal axis is TRUNCATED for the same reason the profile's vertical one is: a run
+		// may report only its later part (js/lpn-time.js's reportStart), and an axis anchored at
+		// zero would then spend its left half on hours the engine never reported.
+		xB = EngCalcs.lpnProfile.axisBounds(
+			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
+		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
+		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v),
+				class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		// The tick is drawn; its number may not be. labelStride() answers on the DRAWN positions,
+		// so the axis keeps its structure at every width and loses only ink that would have landed
+		// on its neighbour.
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), LPN_TS_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4,
+				class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
+			tsText(svg, X(v), box.top + box.height + 14,
+				EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(v * 3600) : String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height,
+			class: 'lpn-profile-frame' }, svg);
+
+		// **WHERE THE TRANSPORT IS PARKED, drawn on the chart.** It is the one mark that ties the
+		// two readings of the same run together: the map shows one instant and this shows the whole
+		// day, and without it a reader has no way to tell which column of the chart the drawing
+		// beside it is. Inside the frame only -- a run whose report starts late has moments the
+		// chart honestly does not cover.
+		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
+		if (now >= xB.min && now <= xB.max) {
+			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
+				class: 'lpn-ts-now' }, svg);
+		}
+
+		dots = frames.length <= LPN_TS_DOT_MAX;
+		series.forEach(function (s) {
+			var run = [], i, p;
+			function flush() {
+				if (run.length > 1) {
+					el('polyline', {
+						points: run.map(function (q) { return q.x + ',' + q.y; }).join(' '),
+						class: 'lpn-ts-line', stroke: s.color
+					}, svg);
+				} else if (run.length === 1) {
+					// A single reporting step with its neighbours missing is still a reading, and a
+					// polyline of one point draws nothing at all.
+					el('circle', { cx: run[0].x, cy: run[0].y, r: 2,
+						class: 'lpn-ts-dot', fill: s.color }, svg);
+				}
+				run = [];
+			}
+			for (i = 0; i < s.points.length; i++) {
+				p = s.points[i];
+				if (p.y === undefined) { flush(); continue; }
+				run.push({ x: X(tsHours(p.t)), y: Y(p.y) });
+			}
+			flush();
+			if (!dots) { return; }
+			s.points.forEach(function (q) {
+				var c, ttl;
+				if (q.y === undefined) { return; }
+				c = el('circle', { cx: X(tsHours(q.t)), cy: Y(q.y), r: 2,
+					class: 'lpn-ts-dot', fill: s.color }, svg);
+				// A <title>, not a tooltip of our own: it is the one every browser already has, and
+				// it is where the exact number lives -- the axis is rounded to a step a person
+				// reads, which is the whole point of the step.
+				ttl = el('title', {}, c);
+				ttl.appendChild(document.createTextNode(
+					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
+					'   ' + plainRound(q.y, 2)));
+			});
+		});
+
+		// Axis titles. The y one is the quantity and its unit, built the way renderColorLegend()
+		// builds its heading -- the same whole label and the same parenthesised unit, so the chart
+		// and the map key name one quantity the same way. THE UNIT IS THE PROJECT'S: every value
+		// above came through colorValueOf(), which converts a solved number into whatever the units
+		// strip currently says, and colorFieldUnitText() is that strip read for this one field.
+		unit = colorFieldUnitText(group, field);
+		tsText(svg, 0, 0, colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : ''),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+		if (lay.axisTitle) {
+			tsText(svg, box.left + box.width / 2, lay.titleY,
+				pc.lpn_ts_axis_time || 'Elapsed time',
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -25209,7 +25725,12 @@ var EngCalcs = EngCalcs || {};
 		// pointer, and the register's names got a great deal longer on 2026-09-14.
 		b.disabled = off;
 		if (n) {
-			n.textContent = crsLabel(newBoxGeo.crs);
+			// **THE WARNING FOLLOWS THE CHOICE OUT OF THE PICKER.** The box where it was made is
+			// closed by the time Create is pressed, and this line is the last thing describing the
+			// projection before the project exists.
+			n.textContent = crsLabel(newBoxGeo.crs) + (crsCannotBePlaced(newBoxGeo.crs)
+				? ' ' + ((EngCalcs.pageConfig || {}).lpn_crs_unplaceable_mark || '(no map)')
+				: '');
 			// Greyed with the button rather than hidden: the projection is still what this radio
 			// WOULD use, and blanking it would read as "none chosen" to somebody who is about to
 			// switch back.
@@ -25459,10 +25980,15 @@ var EngCalcs = EngCalcs || {};
 						refreshBasemap();
 						return;
 					}
-					// **THE 2% STILL GET THE SENTENCE, AND IT IS STILL TRUE FOR THEM.** A CRS
-					// whose projection method proj4 does not implement cannot be placed, and
-					// saying so is better than a plane pretending to be somewhere.
-					setNotice((EngCalcs.pageConfig || {}).lpn_crs_place_projected || 'A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.');
+					// **THE 2% STILL GET THE SENTENCE, AND IT NAMES WHOSE FAULT IT IS.** It used
+					// to reach for lpn_crs_place_projected, which says the transform is something
+					// "this page does not have yet" -- true of the module being absent and false
+					// here, where the page has 5,240 transforms and not this one. A reader who
+					// has just watched a blank plane arrive at 0,0 concludes the feature is
+					// broken rather than that another projection over the same ground would work,
+					// which is what Tom concluded on 2026-09-17. The picker now says it BEFORE
+					// the choice as well; this is the same sentence, after it.
+					setNotice((EngCalcs.pageConfig || {}).lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
 				});
 			}
 		}
@@ -25568,12 +26094,50 @@ var EngCalcs = EngCalcs || {};
 	 * number; this is the OpenStreetMap-credit rule, and the filter already searches both halves
 	 * so somebody who types 26929 lands on it.
 	 */
+	/**
+	 * **A PROJECTION THIS PAGE CANNOT PUT ON THE EARTH, ASKED BEFORE IT IS CHOSEN.**
+	 *
+	 * 5,240 of the register's 5,346 live projected systems have a proj4 definition and 106 do not
+	 * -- js/lpn-crs.js states the ratio and answers honestly. What nothing did until 2026-09-17
+	 * was ask the question at the moment somebody picks one, so the wizard offered all 5,346 and
+	 * the difference only showed up afterwards, as a project that opened on a blank plane.
+	 *
+	 * **THAT IS TOM'S OWN REPRODUCTION FROM THE ENGINEERS WITHOUT BORDERS DEMONSTRATION**: *"New
+	 * project, Geographic projection, Place name search, 'Fotobi, Ghana', Accra / Ghana National
+	 * Grid (EPSG: 2136), US units, Create, bring up blank map centered at 0,0."* EPSG:2136 is the
+	 * SECOND row the place filter offers for Fotobi and is one of the 106 -- its axes are in Gold
+	 * Coast feet, which proj.db carries no conversion for -- so createProjectFrom()'s forward
+	 * transform returned null, the camera stayed where a new plane starts, and no tile could be
+	 * placed behind it. Driven and measured against https://librewaternet.org/app/ with
+	 * dev/lpn-spike/browser-drive.js: 0 basemap tiles, view at 0,0.
+	 *
+	 * **THE FIX IS A WARNING, NEVER A SUBSTITUTE PROJECTION.** Falling back to a near-enough
+	 * system would put a map under somebody's network tens of metres out, and a wrong map is read
+	 * as the truth -- js/lpn-crs.js's own standing ruling. The 106 stay choosable, because the
+	 * coordinates are still the user's and the project still opens; what changes is that the
+	 * consequence is stated before the choice rather than discovered after it.
+	 *
+	 * **UNKNOWN IS NOT NO.** Until the definitions have loaded, lpnCrsHas() answers false for
+	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
+	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
+	 */
+	function crsCannotBePlaced(code) {
+		return !!code && !!EngCalcs.lpnCrsReady && EngCalcs.lpnCrsReady() &&
+			!!EngCalcs.lpnCrsHas && !EngCalcs.lpnCrsHas(code);
+	}
 	function crsOptionText(entry) {
 		if (!entry) { return ''; }
-		var name = String(entry.name || ''), code = String(entry.code || '');
-		if (!code) { return name; }
-		if (!name) { return code; }
-		return name + ' (' + code + ')';
+		var pc = EngCalcs.pageConfig || {},
+			name = String(entry.name || ''), code = String(entry.code || ''), text;
+		if (!code) { text = name; }
+		else if (!name) { text = code; }
+		else { text = name + ' (' + code + ')'; }
+		// Appended rather than made a prefix: the list is sorted and scanned by NAME, and a mark in
+		// front of it would put the 106 out of alphabetical reach of somebody typing a name filter.
+		if (crsCannotBePlaced(code)) {
+			text += ' ' + (pc.lpn_crs_unplaceable_mark || '(no map)');
+		}
+		return text;
 	}
 	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
 	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
@@ -25623,6 +26187,14 @@ var EngCalcs = EngCalcs || {};
 			// all. It appears only while the register is the thing being listed, because the
 			// built-in 183 rows are our own hand-typed table and credit nobody.
 			if (crsRegisterCredit()) { note.textContent += '  ·  ' + crsRegisterCredit(); }
+			// **AND THE CONSEQUENCE OF THE ROW THAT IS ACTUALLY SELECTED, IN A SENTENCE.** The
+			// "(no map)" mark in the option is what a person scanning the list sees; this is what
+			// they read once their choice has settled on one. Two sizes of the same fact, because
+			// the mark has to be short enough not to push a 50-character register name out of the
+			// select and the sentence has to be long enough to say what is lost.
+			if (crsCannotBePlaced(crsBox.code)) {
+				note.textContent += '  ·  ' + (pc.lpn_crs_unplaceable || 'This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.');
+			}
 		}
 	}
 	// **THE SUITE'S ONE GEOCODER, THROUGH ITS OWN CONSENT GATE** -- js/lpn-search.js, reached by its
@@ -25727,12 +26299,25 @@ var EngCalcs = EngCalcs || {};
 		// from the built-in table, so the box opens at once and grows to the full register when it
 		// arrives; the callback re-renders, and renderCrsBoxList() keeps the current choice across
 		// a rebuild wherever the filters still admit it. A failure is silent and leaves the 183.
+		box.style.display = 'block';
 		crsRegisterLoad(function () {
 			// Only if the box is still the one on screen -- a load that lands after the user has
 			// closed it must not repaint a hidden panel.
-			if (crsBoxEl() && crsBoxEl().style.display === 'block') { renderCrsBoxList(); }
+			if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
 		});
-		box.style.display = 'block';
+		// **THE TRANSFORMS ARE FETCHED HERE TOO, AND THIS IS THE ONE PLACE THEY ARE WORTH IT.**
+		// js/lpn-crs.js is deliberately not loaded at page load -- 190 KB that most visitors never
+		// need -- but somebody who has opened this box is choosing a projection, and whether we
+		// have a transform for it is the difference between a project with a map behind it and a
+		// project on a blank plane. Asking after the choice is what produced Tom's blank map at
+		// 0,0; asking here costs one fetch on a box that is already fetching the register.
+		// A failure is silent and simply leaves every row unmarked, which is the honest state:
+		// lpnCrsReady() is false, so crsCannotBePlaced() answers false for all of them.
+		if (EngCalcs.lpnCrsLoad) {
+			EngCalcs.lpnCrsLoad(function () {
+				if (panelIsOpen(crsBoxEl())) { renderCrsBoxList(); }
+			});
+		}
 		raisePanel(box);
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();
@@ -25792,12 +26377,6 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
-			// our own documents, with everything that comes with it -- a lock, a live file handle, a
-			// Save that writes back. An .inp has none of that and never will, so hiding it behind
-			// the same word would promise a round trip we cannot make. Import says what it is.
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
-			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
 			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
 			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
@@ -25826,17 +26405,48 @@ var EngCalcs = EngCalcs || {};
 			// assets and takes the new-asset values; that argument is still true and is not where a
 			// person looks. A command named after a FILE belongs with the other file commands.
 			//
-			// **LAST OF THE READING ROWS, because it is the one that does NOT make a tab.** Open,
+			// **AFTER THE ROWS THAT MAKE A TAB, because it is the one that does NOT.** Open,
 			// Open example, Import EPANET and Open xy file all end in a project switch; this one
 			// drops points into the project already on screen. Grouping it with them says what kind
-			// of act it is; putting it last keeps the four that share an outcome together.
+			// of act it is; sitting after them keeps the ones that share an outcome together. It
+			// goes ABOVE the Import/Export EPANET pair rather than below Import, because those two
+			// are adjacent by Tom's own instruction and a row wedged between them breaks the pair.
 			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
+			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
+			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
+			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was
+			// the last row of a five-row block and read as belonging to none of them; beside the
+			// row it is the other direction of, it is found by looking for its own pair.
+			//
+			// This costs Task 447's "third, below both rows it rescues": Open xy file on map… now
+			// sits above Import rather than below it. Kept deliberately -- the fallback is still
+			// below Open…, which is the row people actually reach for first, and a control nobody
+			// can find is a worse defect than a fallback reading one place too high.
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
+			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
+			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
+			// same button in each of its three sections until he used it, on his own earlier sentence
+			// asking for the wizard *"available from every applicable library"*; his later word wins,
+			// and the earlier one should have been questioned rather than built. **Do not put a
+			// button back in the Libraries box.** The section somebody happens to be looking at
+			// decides nothing -- the FILE says what is on offer -- so a second door bought nothing
+			// but a second control to notice.
+			//
+			// **LAST, AND BELOW THE EPANET PAIR, WHICH IS A MERGE DECISION WORTH STATING.** It does
+			// not open anything: it copies into the project already on screen, so it cannot sit among
+			// the rows that REPLACE what is open. And Import EPANET has to stay directly above Export
+			// EPANET, because he could not find Export at all while it ended a five-row block
+			// (2026-09-17, at the EWB meeting). Both hold only in this order.
+			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -26274,9 +26884,10 @@ var EngCalcs = EngCalcs || {};
 			// existing is touched; and Find and replace with Elevation set to From Mapbox DEM, where
 			// the user has already chosen the set and Replace already owns the preview and the undo.
 			// **Do not restore a third door.** Keeping it is what made the feature a cool button
-			// nobody asked for. EngCalcs.lpnTerrainFill() itself stays in js/lpn-terrain.js -- it is
-			// still the code that decides a list and it is still exercised by its harness -- with no
-			// caller on the page.
+			// nobody asked for. The command behind it was deleted from js/lpn-terrain.js on
+			// 2026-09-17, having had no caller but a harness since the day this row went: the two
+			// sentences only it could say were being translated into 27 languages for a state no
+			// visitor could reach. See dev/geographic-projects.md for what went with it.
 		];
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
@@ -26791,6 +27402,23 @@ var EngCalcs = EngCalcs || {};
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
 		// file still fires a change event.
+		// **A FOURTH PICKER, FOR THE LIBRARY IMPORT WIZARD** (Task 611). Wired AHEAD of the three
+		// below rather than after them, because each of those bails the whole function on a missing
+		// input, and a library import has no business depending on whether the EPANET picker
+		// happens to be in the page.
+		//
+		// Its own input rather than a second use of #lpn_project_file, on that input's own argument:
+		// the two feed different readers -- one lands a whole new project, the other copies chosen
+		// libraries into the project already open -- and an input serving both would have to
+		// remember which, which is state nothing here should have to keep.
+		var libFileInput = document.getElementById('lpn_library_file');
+		if (libFileInput) {
+			libFileInput.addEventListener('change', function () {
+				var f = libFileInput.files[0];
+				libFileInput.value = '';
+				if (f) { libImportFromFile(f); }
+			});
+		}
 		var fileInput = document.getElementById('lpn_project_file');
 		if (!fileInput) { return; }
 		fileInput.addEventListener('change', function () {
@@ -26961,6 +27589,7 @@ var EngCalcs = EngCalcs || {};
 		// After wirePane(), because the observer needs the chart's host to be in its final place in
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
+		tsResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and
@@ -32783,6 +33412,434 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 	}
 
+	// ---- IMPORTING LIBRARIES FROM ANOTHER PROJECT FILE (ROADMAP Task 611) ------------------------
+	//
+	// **ONE WIZARD, REACHED FROM EVERY LIBRARY THAT CAN RECEIVE AN IMPORT** (Tom, 2026-09-17: *"I
+	// think that there should be a single 'Import libraries...' wizard available from every
+	// applicable library. 1. File picker. 2. Analyze the file and show checkboxes for which
+	// libraries"*). The button is the same act wherever it is pressed, so the section it was pressed
+	// in decides nothing: the FILE says what is on offer and the user says which of it to take.
+	// A per-section import asked somebody who wants a colleague's pipe types AND the fittings lists
+	// those types refer to to make the trip twice -- and let them make the first trip and not the
+	// second, which is the dangling reference reported at the bottom of this file's own report.
+	//
+	// **PER LIBRARY, NEVER PER ENTRY**, which was the open half of his note and is Declan's answer:
+	// almost nobody importing a colleague's pipe type table wants three of them, and a 200-row
+	// checkbox list is wrong whichever way it opens -- all checked means hunting for the few you do
+	// not want, all unchecked means 195 clicks for what "import the library" should have given free.
+	// The whole library comes in and the few rows nobody wants are deleted with the select-and-delete
+	// every one of these tables already has. Cheaper, and no new control.
+	//
+	// **THERE IS NO EXPORT BUTTON AND THERE IS NOT GOING TO BE ONE.** `serializeProject()` already
+	// writes every library whole, so `File, Save as` IS the export -- Tom's own reading. A second
+	// writer would be a second format to keep in step for no capability at all, and the first time
+	// the two disagreed about a curve's tokens the round trip would stop being byte-identical.
+	//
+	// **A NAME CONFLICT IS REPORTED AND SKIPPED, NEVER RENAMED AND NEVER MERGED.** His instruction,
+	// and the answer this tree already gives everywhere else a definition is named: the reference
+	// stored on a pipe or a pump is the id, so quietly merging two definitions that happen to share
+	// a label is precisely Bentley's Engineering Libraries defect (*"Items are synchronized based on
+	// their label"*, dev/pipe-library-design.md §4) -- every reference re-points and nothing looks
+	// wrong from the software's side. Renaming the incoming one silently would be the same failure
+	// wearing the other hat: the user would have two definitions where they expected one, under a
+	// name they never chose. So the clash is named on screen and the user decides.
+	//
+	// **NOTHING IS REPAIRED AND NOTHING IS CONVERTED.** A definition is copied across exactly as the
+	// file wrote it -- a curve's `kind`, its `note`, its `src` lines and its per-coordinate `tok`
+	// bag included -- because those numbers are the user's and came out of a file
+	// (CLAUDE.md, "ONLY THE USER TOUCHES A FILE'S NUMBERS"). The tokens are the load-bearing half:
+	// `parseFloat()` threw the text away at the one place text became number, so a `220.0` that
+	// arrives without its token can only ever leave as `220`, and an untouched curve stops
+	// round-tripping character for character.
+	//
+	// **THE UNITS ARE THEREFORE THE USER'S QUESTION AND THE REPORT ASKS IT.** Changing a unit on
+	// this page reinterprets a typed number and does not convert it, which is absolute; a definition
+	// arriving from a file that showed millimetres into a project showing inches follows the same
+	// rule, so the number lands as written and now means inches. Converting it here would be the
+	// third conversion site CLAUDE.md warns about. What we owe the user is to SAY SO, and only when
+	// a unit that these numbers actually depend on differs.
+	//
+	// **AN IMPORTED CURVE REFERENCES NOTHING, AND THAT IS FINE** (Task 586): a curve is a document
+	// object and an element holds only a reference, so a curve nothing points at is the ordinary
+	// product of the Add button beside this one.
+	//
+	// `from` is the field the source document states the list under; `read` never materialises and
+	// `write` does, which is the split every library on this page is under -- an import that finds
+	// nothing must not write `curves: []` into a document that stated none. `label` is the library's
+	// own name, so the chooser and the receipt call it what the box behind them calls it. `units`
+	// names the unit selections these numbers depend on; a fittings list names none, because a minor
+	// loss coefficient is dimensionless.
+	var LIB_IMPORTABLE = {
+		curves: { from: 'curves', label: 'lpn_library_curves',
+			read: libCurvesRead, write: libCurves, units: ['lpn_u_flow', 'lpn_u_elevhead'] },
+		pipetypes: { from: 'pipeTypes', label: 'lpn_library_pipetypes',
+			read: libPipeTypesRead, write: libPipeTypes, units: ['lpn_u_diameter'] },
+		fittings: { from: 'fittingSets', label: 'lpn_library_fittings',
+			read: libFittingSetsRead, write: libFittingSets, units: [] }
+	};
+	// The order the chooser and the receipt list them in: the Libraries box's OWN section order, so
+	// the dialog reads down in the same order as the index behind it. Not the object's key order,
+	// which is nobody's decision.
+	var LIB_IMPORT_ORDER = ['curves', 'pipetypes', 'fittings'];
+	// A record with no id is not a definition: nothing could ever have referred to it, so it is
+	// neither offered, counted, copied nor reported. The one place that judgement is made, because
+	// the count in the chooser has to be the number of things the import will actually consider.
+	function libImportUsable(rec) {
+		return !!rec && typeof rec === 'object' && rec.id !== undefined && rec.id !== null
+			&& String(rec.id) !== '';
+	}
+	function libImportPick() {
+		var input = document.getElementById('lpn_library_file');
+		if (!input) { return; }
+		input.click();
+	}
+	function libImportFromFile(file) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { libImportText(ev.target.result, file.name); };
+		reader.onerror = function () {
+			var pc = EngCalcs.pageConfig || {};
+			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+		};
+		reader.readAsText(file);
+	}
+	// **THE FILE IS READ THROUGH acceptImportedText(), NOT THROUGH A SECOND READER.** It is the one
+	// place "is this one of our documents" is answered -- it reports a bad file and a too-new file
+	// itself -- and it runs migrateSaved(), which is what makes a pre-library project file importable
+	// at all: mintCurveLibrary() lifts a v10 document's pump curves into `curves` on the way past.
+	// Nothing is APPLIED: the libraries are frame-independent, so the projection and the Y flip
+	// applySaved() would do are neither needed nor wanted over the project on screen.
+	function libImportText(text, fileName) {
+		var saved = acceptImportedText(text);
+		if (!saved) { return; }
+		libImportChoose(saved, fileName);
+	}
+	// Step 2 of the wizard's analysis: which libraries does this file actually hold, and how many
+	// definitions in each. A library the file does not state is simply not offered -- an unchecked
+	// row reading zero is a question about nothing.
+	function libImportOffer(saved) {
+		return LIB_IMPORT_ORDER.map(function (kind) {
+			var spec = LIB_IMPORTABLE[kind],
+				source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [];
+			return { kind: kind, count: source.filter(libImportUsable).length };
+		}).filter(function (o) { return o.count > 0; });
+	}
+	/**
+	 * **THE CHOOSER, AND EVERY BOX OPENS CHECKED.** Somebody who picked a colleague's file and
+	 * pressed a button called Import libraries has already said what they want; the boxes are there
+	 * to take something OUT of that, which is the rarer half. The count is beside each name because
+	 * it is the only thing on this screen that says what the file actually holds -- a person who
+	 * chose the wrong file finds out here rather than after it has landed.
+	 *
+	 * Nothing checked and Import pressed does nothing at all, and says nothing: it is the same
+	 * answer as Cancel given a longer way round, and a receipt reporting an import that never
+	 * happened would read as a failure.
+	 *
+	 * **AND IT SAYS, BEFORE ANYTHING IS TAKEN, THAT THE FILE'S NUMBERS ARE NOT IN THIS PROJECT'S
+	 * UNITS** (Tom, 2026-09-17, reading the wizard over an SI file: *"SI: I don't see any line
+	 * saying the file does not show its numbers in this project's units."*). It used to be said in
+	 * the RECEIPT, which is the wrong end of the act: by then the definitions are in the document
+	 * and the only remedy left is Undo. Said here it is what it has to be, a fact the user weighs
+	 * before pressing Import. **ITS WORDING IS TOM'S OWN** (2026-09-18: *"This is too wordy and
+	 * confusing. Have mercy on the humans."*) -- it leads with Warning, says Not recommended, and
+	 * leaves every particular to the one line per quantity below it. Shorter is the requirement.
+	 *
+	 * **IT IS A DISCLOSURE AND NEVER AN OFFER TO CONVERT.** Changing a unit on this page
+	 * reinterprets the typed number rather than converting it, and a number that came from a file is
+	 * the user's -- both absolute (CLAUDE.md). So the wizard states the two declarations, side by
+	 * side and in the user's own unit names, and leaves the decision where it belongs. There is no
+	 * convert button here and there is not going to be one.
+	 *
+	 * **IT FOLLOWS THE CHECKBOXES, because whether it is TRUE depends on what is being taken.** A
+	 * fittings list carries no unit at all, so a file in millimetres has nothing to disclose to
+	 * somebody taking only the fittings, and a warning that stands there anyway is one the reader
+	 * learns to look past.
+	 */
+	function libImportChoose(saved, fileName) {
+		var pc = EngCalcs.pageConfig || {}, offer = libImportOffer(saved), boxes = [];
+		if (!offer.length) {
+			showLibraryImportReport(fileName, [{ title: '', lines: [pc.lpn_library_import_no_libraries
+				|| 'That project file has no libraries to copy.'] }]);
+			return;
+		}
+		openDialog(function (body) {
+			var h = document.createElement('p'), note = document.createElement('p'),
+				unitBox = document.createElement('div');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_library_import_choose || 'Choose what to copy from {file}')
+				.replace('{file}', String(fileName || ''));
+			body.appendChild(h);
+			// Rebuilt whole rather than shown and hidden, because the LINES change with the boxes
+			// too: taking the curves as well as the pipe types can add a second quantity to the
+			// list, and a box that only learned to disappear would go on naming one of them.
+			function syncUnits() {
+				var diffs = libImportUnitDiffs(saved, boxes.filter(function (b) {
+					return b.input.checked;
+				}).map(function (b) { return b.kind; }));
+				unitBox.innerHTML = '';
+				if (!diffs.length) { return; }
+				var lead = document.createElement('p'), ul = document.createElement('ul');
+				lead.style.margin = '8px 0 2px';
+				lead.textContent = pc.lpn_library_import_units || 'Warning: Units mismatch. Will be imported as is. Not recommended.';
+				unitBox.appendChild(lead);
+				ul.style.margin = '0';
+				ul.style.paddingLeft = '20px';
+				diffs.forEach(function (d) {
+					var li = document.createElement('li');
+					li.textContent = (pc.lpn_library_import_units_line
+						|| '{name}: this project shows {mine}, the file shows {theirs}.')
+						.replace('{name}', d.name).replace('{mine}', d.mine)
+						.replace('{theirs}', d.theirs);
+					ul.appendChild(li);
+				});
+				unitBox.appendChild(ul);
+			}
+			offer.forEach(function (o) {
+				var row = document.createElement('label'), input = document.createElement('input'),
+					span = document.createElement('span');
+				row.style.display = 'block';
+				row.style.marginBottom = '4px';
+				input.type = 'checkbox';
+				input.checked = true;
+				input.addEventListener('change', syncUnits);
+				span.textContent = (pc.lpn_library_import_count || '{name} ({count})')
+					.replace('{name}', String(pc[LIB_IMPORTABLE[o.kind].label] || o.kind))
+					.replace('{count}', String(o.count));
+				row.appendChild(input);
+				row.appendChild(document.createTextNode(' '));
+				row.appendChild(span);
+				body.appendChild(row);
+				boxes.push({ kind: o.kind, input: input });
+			});
+			body.appendChild(unitBox);
+			syncUnits();
+			note.style.margin = '8px 0 0';
+			note.textContent = pc.lpn_library_import_note || 'Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.';
+			body.appendChild(note);
+		}, [
+			{ label: pc.lpn_library_import_go || 'Import', fn: function () {
+				var kinds = boxes.filter(function (b) { return b.input.checked; })
+					.map(function (b) { return b.kind; });
+				if (kinds.length) { libImportRun(saved, fileName, kinds); }
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
+	}
+	/**
+	 * **CAN A RUN USE THIS CURVE'S POINTS?** EPANET reads a curve's abscissa as strictly increasing
+	 * whatever the kind, and refuses one that is not.
+	 *
+	 * **IT DECIDES WHAT IS SAID, NEVER WHAT IS KEPT.** A curve that fails is still copied in exactly
+	 * as the file wrote it and is named in the report instead -- dropping it would be silent loss in
+	 * the one direction this whole task is about, and repairing it would be rewriting a number that
+	 * came from a file. That is js/lpn-inp.js's own behaviour: it keeps every `[CURVES]` row,
+	 * including the ones nothing references.
+	 *
+	 * **THE VOLUME-CURVE CONDITIONS ARE DELIBERATELY NOT HERE.** A level-to-volume curve must also
+	 * never fall and must rise overall, and js/lpn-time.js asks that at the one place a tank
+	 * actually uses one. A second copy of that rule would be a second opinion about the same curve.
+	 */
+	function libCurveRunnable(c) {
+		var pts = curvePointsOf(c), i;
+		if (!pts.length) { return false; }
+		for (i = 1; i < pts.length; i++) {
+			if (!(pts[i][0] > pts[i - 1][0])) { return false; }
+		}
+		return true;
+	}
+	// The quantity each unit selector is ABOUT, in the words the units strip already uses on it.
+	// Named here rather than derived, because the strip builds its labels in PHP and nothing in this
+	// file can read one back; and named at all because "this project shows in, the file shows mm"
+	// is a sentence about diameters and does not say so.
+	var LIB_IMPORT_UNIT_NAMES = {
+		lpn_u_diameter: 'lpn_field_diameter',
+		lpn_u_flow: 'lpn_units_flow',
+		lpn_u_elevhead: 'lpn_units_elevhead'
+	};
+	/**
+	 * **WHICH OF THESE LIBRARIES' NUMBERS MEAN SOMETHING DIFFERENT IN THE TWO DOCUMENTS**, as a list
+	 * the wizard can read out, one entry per quantity.
+	 *
+	 * Read off the two DECLARATIONS rather than off the selects, because the file's declaration is
+	 * what its numbers were typed under. A selector the source file does not state is not a
+	 * difference: an older document that named no units is not making a claim we can contradict, and
+	 * inventing one for it would be this page telling the user something it does not know.
+	 *
+	 * **THE LABELS ARE THE OPTION TEXT OFF OUR OWN SELECT, WHICH IS WHY unitLabelFor() TAKES A KEY.**
+	 * A unit is a label and a magnitude, and only the label is wanted here -- nothing is converted,
+	 * so no factor is ever looked up. A unit key this browser does not offer falls back to the key
+	 * itself, which is the honest answer and the same one every other readout on this page gives.
+	 *
+	 * Deduplicated across the chosen libraries: the elevation unit reaches this list through the
+	 * curves alone today, but two libraries naming one quantity must produce one line, not two.
+	 */
+	function libImportUnitDiffs(saved, kinds) {
+		var mine = readUnitSelections(), theirs = (saved && saved.units) || {},
+			pc = EngCalcs.pageConfig || {}, seen = {}, out = [];
+		(kinds || []).forEach(function (kind) {
+			var spec = LIB_IMPORTABLE[kind];
+			if (!spec) { return; }
+			(spec.units || []).forEach(function (id) {
+				if (seen[id] || !theirs[id] || !mine[id] || theirs[id] === mine[id]) { return; }
+				seen[id] = true;
+				var sel = unitEl(id);
+				out.push({
+					id: id,
+					name: String(pc[LIB_IMPORT_UNIT_NAMES[id]] || id),
+					mine: String(unitLabelFor(sel, mine[id])),
+					theirs: String(unitLabelFor(sel, theirs[id]))
+				});
+			});
+		});
+		return out;
+	}
+	/**
+	 * **THE IMPORT ITSELF, OVER EVERY LIBRARY THE USER CHECKED.** `kinds` is an array because the
+	 * wizard hands one: several libraries out of one file are ONE act, so they share one undo
+	 * snapshot and produce one receipt. Everything is decided before anything is written, which is
+	 * what lets that snapshot sit exactly one statement before the first mutation and lets an import
+	 * that turns out to be empty touch the document not at all.
+	 *
+	 * **A DEFINITION IS CLONED, NEVER ADOPTED.** `JSON.parse(JSON.stringify())` is the whole of it:
+	 * the incoming object is a live part of a parsed document this function is about to drop, and
+	 * sharing a reference into it would leave two projects editing one array of points the day
+	 * anything else held on to the source. The clone carries every field the file stated, named or
+	 * not -- `kind`, `note`, `points`, `src`, `tok` -- because a field we do not understand is still
+	 * the user's.
+	 *
+	 * **A NAME ALREADY TAKEN HERE IS SKIPPED, AND SO IS A SECOND COPY OF ONE NAME INSIDE THE SOURCE.**
+	 * The taken set grows as the import proceeds, so a malformed file stating `T1` twice lands its
+	 * first `T1` and reports the second, rather than quietly keeping whichever came last.
+	 */
+	function libImportRun(saved, fileName, kinds) {
+		var pc = EngCalcs.pageConfig || {}, plan = [], blocks = [];
+		(kinds || []).forEach(function (kind) {
+			var spec = LIB_IMPORTABLE[kind];
+			if (!spec) { return; }
+			var source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [],
+				taken = {}, clones = [], added = [], clashed = [];
+			spec.read().forEach(function (rec) {
+				if (libImportUsable(rec)) { taken[String(rec.id)] = true; }
+			});
+			source.forEach(function (rec) {
+				if (!libImportUsable(rec)) { return; }
+				var id = String(rec.id), clone;
+				if (taken[id]) { clashed.push(id); return; }
+				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
+				taken[id] = true;
+				clones.push(clone);
+				added.push(id);
+			});
+			plan.push({ kind: kind, spec: spec, clones: clones, added: added, clashed: clashed });
+		});
+		if (plan.some(function (p) { return p.clones.length > 0; })) {
+			// ONE snapshot for the whole wizard: the user pressed one button, so one Undo puts the
+			// project back where it was, whether that took in one library or three.
+			saveUndoSnapshot();
+			plan.forEach(function (p) {
+				if (!p.clones.length) { return; }
+				var dest = p.spec.write();
+				p.clones.forEach(function (clone) { dest.push(clone); });
+			});
+			libCommit();
+			rebuildLibraryBox();
+			refreshPopupIfOpen();
+		}
+		// Said AFTER the push, and against the project as it now stands, so the two questions a
+		// reader has -- is a run going to be able to use this, and is this reference going to
+		// resolve -- are answered about what they can actually see in the box behind the dialog.
+		// A pipe type's fittings list may have arrived in the same act, which is exactly why the
+		// question is asked here rather than while that library was being planned.
+		plan.forEach(function (p) {
+			var lines = [], unusable = [], orphan = [];
+			if (p.kind === 'curves') {
+				p.clones.forEach(function (c) { if (!libCurveRunnable(c)) { unusable.push(String(c.id)); } });
+			}
+			if (p.kind === 'pipetypes') {
+				p.clones.forEach(function (t) {
+					if (pipeTypeStates(t, 'fittingsId') && !fittingSetById(t.props.fittingsId)) {
+						orphan.push(String(t.id));
+					}
+				});
+			}
+			if (p.added.length) {
+				lines.push((pc.lpn_library_import_added || 'Copied in: {names}')
+					.replace('{names}', p.added.join(', ')));
+			}
+			if (p.clashed.length) {
+				lines.push((pc.lpn_library_import_conflict || 'Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.')
+					.replace('{names}', p.clashed.join(', ')));
+			}
+			if (unusable.length) {
+				lines.push((pc.lpn_library_import_curve_shape || 'These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}')
+					.replace('{names}', unusable.join(', ')));
+			}
+			if (orphan.length) {
+				lines.push((pc.lpn_library_import_needs_fittings || 'These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.')
+					.replace('{names}', orphan.join(', ')));
+			}
+			// A library the user checked whose every record turned out to be nameless says nothing
+			// above, and a heading with no body under it would read as a failure of this box rather
+			// than as a fact about the file. Every block has at least one sentence.
+			if (!lines.length) {
+				lines.push(pc.lpn_library_import_none || 'That project file has none of these to copy.');
+			}
+			blocks.push({ title: String(pc[p.spec.label] || ''), lines: lines });
+		});
+		// **THE UNIT DIFFERENCE IS NOT REPEATED HERE, AND THAT IS THE POINT OF MOVING IT.** It used
+		// to be the last line of this receipt, which told the user about a decision they could no
+		// longer make. It is now the last thing the CHOOSER says before the Import button, where it
+		// is a fact to weigh rather than a note to regret. Saying it in both places would turn a
+		// disclosure the user has already read and acted on into a warning about what they chose.
+		if (!blocks.length) {
+			blocks.push({ title: '', lines: [pc.lpn_library_import_no_libraries
+				|| 'That project file has no libraries to copy.'] });
+		}
+		showLibraryImportReport(fileName, blocks);
+	}
+	/**
+	 * **IT ALWAYS SPEAKS, WHICH IS THE OPPOSITE OF showInpExportFlattening()'S RULE AND DELIBERATE.**
+	 * That box fires on a Save nobody asked a question with, so it stays silent where there is
+	 * nothing to say. This one answers a button somebody pressed on purpose, and the receipt naming
+	 * what landed is the whole of what makes the skip rule visible: an import that reported nothing
+	 * would leave a name conflict indistinguishable from a file with nothing in it.
+	 *
+	 * One block per library, under the library's own name, because the wizard can take three at
+	 * once and `Copied in: DIP-8, 1, Hydrant-lateral` says nothing about where any of them went.
+	 *
+	 * #lpn_dialog_body already scrolls at 60vh, so a long list of names is not truncated -- a
+	 * definition left out of the receipt is a definition the user does not know they have.
+	 */
+	function showLibraryImportReport(fileName, blocks) {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_library_import_heading || 'Imported from {file}')
+				.replace('{file}', String(fileName || ''));
+			body.appendChild(h);
+			(blocks || []).forEach(function (blk) {
+				var ul = document.createElement('ul'), title;
+				if (blk.title) {
+					title = document.createElement('p');
+					title.style.margin = '8px 0 2px';
+					title.style.fontWeight = 'bold';
+					title.textContent = blk.title;
+					body.appendChild(title);
+				}
+				ul.style.margin = '0';
+				ul.style.paddingLeft = '20px';
+				(blk.lines || []).forEach(function (text) {
+					var li = document.createElement('li');
+					li.style.marginBottom = '4px';
+					li.textContent = text;
+					ul.appendChild(li);
+				});
+				body.appendChild(ul);
+			});
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
 	// ---- PATTERNS --------------------------------------------------------------------------------
 	//
 	// **A PATTERN IS A SERIES, AND IT IS EDITED AS ONE FIELD OF NUMBERS.** Twenty-four separate
@@ -35620,8 +36677,16 @@ var EngCalcs = EngCalcs || {};
 			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
 				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
 		} else if (terrainAsked[nodeId]) {
-			// Asked and got nothing. The map notice carries the reason; this says the press landed.
-			said.textContent = pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
+			// **THE REASON, HERE, NOT ONLY IN THE NOTICE AT THE OTHER SIDE OF THE SCREEN.** This
+			// line used to say "The DEM has no elevation for this node" whatever had happened,
+			// which is a claim about GHANA when the truth was a refused request or a lost network
+			// -- and it is the sentence somebody reads, because it is under the button they just
+			// pressed. js/lpn-terrain.js owns the wording for a failure and hands it over, so the
+			// two places cannot come to different opinions. Only when the service genuinely
+			// answered and had no height there is the original sentence the true one.
+			said.textContent = (EngCalcs.lpnTerrainLastFailureText
+				&& EngCalcs.lpnTerrainLastFailureText())
+				|| pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
 		} else {
 			said.textContent = '';
 		}
@@ -38346,9 +39411,31 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, el, 'active');
 	}
+	/**
+	 * **A PANEL IS OPEN WHEN IT IS NOT HIDDEN, AND THAT IS THE ONLY TEST THAT SURVIVES A LAYOUT
+	 * CHANGE.** hidePanel() writes `display: none` and the markup ships with it, so "not none" is
+	 * decidable from one fact. Asking whether it equals a PARTICULAR display value asks a second
+	 * question -- what kind of box is this -- which the caller has no business knowing and whose
+	 * answer changes the day somebody makes the box a flex column.
+	 *
+	 * **WHICH IS EXACTLY WHAT HAPPENED, AND IT COST A DEMONSTRATION.** The properties popup and
+	 * the Find box were both opened with `display: block` when their guards were written; both
+	 * became `flex` so the body could scroll inside a dragged height (openPopupAt() and
+	 * openFindPopup() each say so in a comment), and both guards still asked for `block`. From
+	 * that moment refreshPopupIfOpen() returned on its first line for every one of its ~70
+	 * callers, and refitFindPopup() for all of its.
+	 *
+	 * The failure is silent and reads as the feature being broken: press Read DEM on a node, the
+	 * request goes out, Mapbox answers, the height is recorded -- and the popup in front of you
+	 * does not change, because redrawing it is the thing that never happened. Close the node and
+	 * open it again and the number is there. Measured on https://librewaternet.org/app/ with
+	 * dev/lpn-spike/browser-drive.js after Tom reported it to an Engineers Without Borders
+	 * chapter as "Read DEM didn't work ... There is no indication why not."
+	 */
+	function panelIsOpen(el) { return !!el && el.style.display !== 'none'; }
 	function refreshPopupIfOpen() {
 		var popup = document.getElementById('lpn_popup');
-		if (!currentPopup || popup.style.display !== 'block') { return; }
+		if (!currentPopup || !panelIsOpen(popup)) { return; }
 		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
 		else if (currentPopup.kind === 'link') { renderLinkFields(currentPopup.id); }
 		// The multi-properties box has no single id to re-render; it is rebuilt from the subject,
@@ -38466,6 +39553,20 @@ var EngCalcs = EngCalcs || {};
 		});
 		updateEmptyHint();
 		refreshScenarioStatus();
+		// **THE LIBRARIES BOX IS PART OF THE DOCUMENT ON SCREEN, AND UNTIL TASK 611 NOTHING PUT IT
+		// BACK.** Tom, 2026-09-17, on the library import: *"Undo doesn't work."* It did -- the
+		// snapshot deep-clones `doc`, and `doc.curves`, `doc.pipeTypes` and `doc.fittingSets` ride
+		// in it like everything else, so the restored document was correct the whole time. What was
+		// wrong was the only place a person can SEE those three: this box is built once and rebuilt
+		// by the paths that edit it, and undo is not one of those paths, so Ctrl+Z put the document
+		// back and left the box listing rows the project no longer had. From the outside that is
+		// indistinguishable from an undo that did nothing -- and worse than that, because the next
+		// press of Delete on one of those rows was aimed at a list that no longer held it.
+		//
+		// Unconditional, exactly as every library edit calls it: rebuildLibraryBox() returns at its
+		// first line when the box is not in the page, so a project undone with the box closed costs
+		// nothing. It is buildDom()'s opposite number for the three lists the drawing never shows.
+		rebuildLibraryBox();
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
 		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
@@ -38568,7 +39669,17 @@ var EngCalcs = EngCalcs || {};
 	// function rather than a literal so that Task 248's clock has ONE place to become real. EPANET
 	// itself reports t=0 as a hydraulic result like any other, so a steady-state page and an
 	// extended-period one agree here by construction rather than by coincidence.
-	function modelTimeSeconds() { return EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0; }
+	// **AND IT CAN BE ASKED AS OF A FRAME OTHER THAN THE ONE ON SHOW** (Task 599). A time-series
+	// chart reads the page's own value accessors once per reporting step, and a pattern-derived
+	// reading -- a resolved demand is the one that matters -- resolves its multiplier at THIS
+	// function. Left alone, every point of such a line would carry the multiplier for wherever the
+	// transport happens to be parked, so a demand graph would be a flat line at today's hour and
+	// nothing on screen would say so. Null means "the transport", which is every other caller.
+	var readTimeOverride = null;
+	function modelTimeSeconds() {
+		if (readTimeOverride !== null) { return readTimeOverride; }
+		return EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0;
+	}
 
 	// The multiplier a junction's demand carries at `t`, resolved the way EPANET resolves it.
 	//
@@ -42074,19 +43185,25 @@ var EngCalcs = EngCalcs || {};
 	if (EngCalcs.lpnSearchInit) {
 		EngCalcs.lpnSearchInit({ locatable: projectLocatable, goTo: goToPoint, notice: setNotice });
 	}
-	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). Six functions: what a geographic project
-	// is, the token that decides whether the feature exists at all, which nodes have no elevation,
-	// WHICH already have one, how to write a batch of them under one undo (returning WHICH it
-	// wrote), and where to speak. The two "which" answers are lists of ids rather than counts
-	// because that file names the nodes in both directions; see terrainNodesWithElevation().
+	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
+	// can say where on the Earth a point of it is, the token that decides whether the feature
+	// exists at all, how to write a batch of elevations under one undo (returning WHICH it wrote),
+	// how to record a reading without writing anything, and where to speak.
+	//
+	// **THE THREE "WHICH NODES" ANSWERS WENT ON 2026-09-17 WITH THE ONLY THING THAT ASKED THEM.**
+	// EC.lpnTerrainFill() was the whole-drawing command behind the Map-menu row Task 542 deleted,
+	// and it was the only reader of nodesNeedingElevation, nodesWithElevation and
+	// nodesAtDefaultElevation. Every door that remains arrives holding its own list, so the seam
+	// no longer has to answer a question nobody asks. terrainNodesNeedingElevation() and its two
+	// siblings are still in this file and are now read only by the harnesses -- kept deliberately,
+	// because whether a whole-drawing fill ever comes back is a product decision and the
+	// at-default arithmetic in them is the part that would be expensive to write again.
+	//
 	// The tile scheme, the Terrain-RGB decode, the request budget, the consent gate and every
 	// string live in that file.
 	if (EngCalcs.lpnTerrainInit) {
 		EngCalcs.lpnTerrainInit({
 			locatable: projectLocatable, token: mapboxToken, notice: setNotice,
-			nodesNeedingElevation: terrainNodesNeedingElevation,
-			nodesWithElevation: terrainNodesWithElevation,
-			nodesAtDefaultElevation: terrainNodesAtDefaultElevation,
 			fill: terrainFillElevations,
 			// **RECORD, WHICH IS THE SEAM THAT WRITES NOTHING** (Task 542). lpnTerrainSample() hands
 			// its readings here instead of to `fill`, so the page can SHOW what the DEM says and let

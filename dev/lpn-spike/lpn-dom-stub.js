@@ -385,6 +385,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves', 'lpn_pane_text',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
+  // The time-series tab and its three boxes (ROADMAP Task 599), the profile's twin. Absent from
+  // this list, rebuildTsForm() and renderTimeSeries() return at their first line and the chart
+  // is invisible to every harness -- the pane's own "a missing host is a silent no-op" shape.
+  'lpn_pane_timeseries', 'lpn_ts_form', 'lpn_ts_chart', 'lpn_ts_note',
   // The Find panel's two hosts (ROADMAP Tasks 353/420, and the disconnected report of 540). Absent
   // from this list, rebuildFindForm() and renderFindResults() return at their first line and every
   // control on that panel -- the pull-downs, the query line, the result rows -- is invisible to
@@ -446,7 +450,11 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // fourth box that remembers where it was left, how big it was made and whether it was open.
   // Absent from this list, wireLibraryBox() and openLibraryBox() both return at their first line,
   // so nothing about that memory could be asked at all.
-  'lpn_library_box', 'lpn_libbox_close', 'lpn_libbox_index', 'lpn_libbox_content'
+  'lpn_library_box', 'lpn_libbox_close', 'lpn_libbox_index', 'lpn_libbox_content',
+  // The Libraries box's own hidden file picker (Task 611). Its own input rather than a second use
+  // of #lpn_project_file, because the two feed different readers; absent from this list,
+  // libImportPick() returns at its first line and the plumbing cannot be asked anything.
+  'lpn_library_file'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

@@ -144,8 +144,28 @@ function ecJsFunctionUnits($src)
  * @param array $dynamicPrefixes  families the runtime assembles by prefix (finding 1's list)
  * @return array ['candidates' => [[key, readers]], 'dead' => [id => unit], 'turned' => [why => n]]
  */
-function ecReachabilityCandidates(array $jsSources, array $phpSources, array $langKeys, array $dynamicPrefixes)
+/**
+ * `$harnessSources` is OPTIONAL and, when given, is held apart from `$phpSources` rather than
+ * mixed into it. Both still ROOT a function -- a function `dev/lpn-spike` calls is a test seam,
+ * not a corpse, and listing it as dead is the noise this walk exists to avoid -- but a function
+ * rooted ONLY by a harness is worth NAMING, which is a different claim from calling it dead.
+ *
+ * **WHY THE DISTINCTION EARNED ITS KEEP.** `EC.lpnTerrainFill()` lost its caller when Task 542
+ * deleted the Map-menu row, and from that day the only thing invoking it was
+ * `dev/lpn-spike/terrain-harness.js`. The two sentences only it could emit went on being
+ * translated into 27 languages for a state no visitor could reach, for weeks, with this check
+ * reporting 0 while looking straight at it -- Tom found it by reading, and asked of one of them,
+ * *"When could that possibly display?"*
+ *
+ * **IT IS A WORKLIST AND NOT A VERDICT, and most rows on it are correct code.** A seam exists
+ * precisely so a harness can reach past a closure, and this tree has many: lpnTerrainPolicy(),
+ * lpnEpanetSignatureForTest(), lpnCrsCount(). What the list is for is one question a person can
+ * answer in seconds and no scan can: **could a visitor ever see what this function SAYS?** If it
+ * emits no visitor-facing string, being harness-only is fine and permanent.
+ */
+function ecReachabilityCandidates(array $jsSources, array $phpSources, array $langKeys, array $dynamicPrefixes, array $harnessSources = [])
 {
+    $harnessOnly = [];
     $turned = [];
     $bump = function ($why, $n = 1) use (&$turned) { $turned[$why] = ($turned[$why] ?? 0) + $n; };
 
@@ -225,6 +245,17 @@ function ecReachabilityCandidates(array $jsSources, array $phpSources, array $la
                 }
             }
         }
+        // **THE HARNESS SET IS ASKED LAST, AND ONLY OF A FUNCTION NOTHING SHIPPED MENTIONS AT
+        // ALL.** It roots exactly as a page does -- a seam is not a corpse -- but a function whose
+        // ONLY root is a harness is worth NAMING, which is a weaker and different claim from
+        // calling it dead. Asking last is what keeps the list to that claim: a function some other
+        // shipped function calls has a holder here already and never reaches this line, however
+        // many harnesses also drive it.
+        if (!$holders) {
+            foreach ($harnessSources as $hf => $hs) {
+                if (preg_match($re, $hs)) { $holders[] = null; $harnessOnly[$name] = basename($hf); break; }
+            }
+        }
         $refsInto[$id] = $holders;
         foreach ($holders as $h) { if ($h === null) { $reached[$id] = true; break; } }
     }
@@ -272,5 +303,7 @@ function ecReachabilityCandidates(array $jsSources, array $phpSources, array $la
         $candidates[] = [$k, implode(', ', array_keys($readers))];
     }
 
-    return ['candidates' => $candidates, 'dead' => $dead, 'turned' => $turned];
+    ksort($harnessOnly);
+    return ['candidates' => $candidates, 'dead' => $dead, 'turned' => $turned,
+        'harnessOnly' => $harnessOnly];
 }

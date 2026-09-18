@@ -91,15 +91,17 @@ foreach ($keys as $k) {
 // reference. Rationale, and every conservatism the walk trades coverage for, is in the include.
 // The harnesses go in as ROOT text, not as analysed code: a function `dev/lpn-spike` calls is a
 // test seam, not a corpse, and listing it as dead is exactly the noise this walk exists to avoid.
-$rootSources = $phpSources;
+$harnessSources = [];
 foreach (array_merge(
     glob($root . '/dev/lpn-spike/*.js'), glob($root . '/dev/calc-spike/*.js'),
     glob($root . '/dev/browser-pass/*.js'), glob($root . '/dev/browser-pass/specs/*.js')) as $f) {
     // NOT dev/scripts: this check and its own include NAME the dead functions in their comments, so
     // reading themselves would root the very corpse they were written to find.
-    $rootSources[$f] = file_get_contents($f);
+    $harnessSources[$f] = file_get_contents($f);
 }
-$walk = ecReachabilityCandidates($jsSources, $rootSources, $keys, $dynamicPrefixes);
+// HELD APART from the pages since 2026-09-17, so that a function ONLY a harness reaches can be
+// NAMED. It is still rooted -- a seam is not a corpse -- but see finding 1c.
+$walk = ecReachabilityCandidates($jsSources, $phpSources, $keys, $dynamicPrefixes, $harnessSources);
 
 // ---------------------------------------------------------------------------------------------
 // 2. Suffix vocabulary that has drifted
@@ -207,6 +209,18 @@ if ($walk['candidates']) {
     echo "\n";
     foreach ($walk['candidates'] as [$k, $readers]) { printf("   %-42s read only by %s\n", $k, $readers); }
 }
+echo "\n";
+
+printf("1c. REACHED ONLY FROM A HARNESS: %d\n", count($walk['harnessOnly']));
+echo "   A WORKLIST, NOT A VERDICT, and most rows here are correct code. These functions are\n";
+echo "   never called by a page — only by something under dev/ — so finding 1b roots them and\n";
+echo "   will never list them. A test seam is exactly that shape on purpose.\n";
+echo "   THE QUESTION A PERSON CAN ANSWER AND NO SCAN CAN: could a visitor ever see what this\n";
+echo "   function SAYS? If it emits no visitor-facing string, harness-only is fine and permanent.\n";
+echo "   If it does, every one of those strings is being translated into 27 languages for a\n";
+echo "   state nobody can reach. EC.lpnTerrainFill() was this shape from the day Task 542 deleted\n";
+echo "   the menu row until 2026-09-17, and two keys went with it when Tom found it by reading.\n";
+foreach ($walk['harnessOnly'] as $fn => $where) { printf("   %-36s rooted by %s\n", $fn . '()', $where); }
 echo "\n";
 
 printf("2. SUFFIX DRIFT: %d key(s) spell a suffix differently from their siblings\n", count($strays));
