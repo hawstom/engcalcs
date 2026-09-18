@@ -23,6 +23,59 @@ The rules that keep it honest:
 - **A known-but-unbuilt item is not a miss.** Tom: *"it's not really a gap if it's on our radar."*
   Deepening something already listed counts as a contribution; ranking it is still useful.
 
+### 2026-09-17 — not a want, a ruling request: perpendicular-only service connections, answered
+
+Not a row — Tom tested `feat/customer-demands` and asked whether a non-perpendicular service
+connection should be offered at all. Full reasoning: journal, 2026-09-17 entry. Short form: **no,
+remove the free-angle drag.** The default gesture is already perpendicular by construction
+(OBSERVED, `meterOffsetFor()`); the drag afterward is the unconstrained one. The angle carries no
+engineering meaning at all — nothing downstream reads `c.x`/`c.y`, only `link` and `t` do — and real
+installation practice is overwhelmingly perpendicular at the main (CITED, secondary), so an oblique
+stub is more likely to misstate a real lateral than to record a deliberate choice. The one real case
+(dense clustering needing a label-collision nudge) argues for an automatic, system-computed
+adjustment like `lpn-collide.js` already does for Text leaders, never a user-set angle. I found no
+industry precedent for a draggable per-service stub angle at all — this whole gesture appears to be
+this suite's own invention of Tom's site-plan-drafting instinct, not a borrowed market feature.
+
+### 2026-09-16 — not a want, a ruling request: Tom's final Dry/Water cut, answered
+
+Not a row — Tom rebuilt the grouping around "Dry properties" vs "Water properties," overruling my
+transposed-coordinate argument with a correct fact (it's obvious on the map, not invisible), and
+asked for options rather than objections. Full reasoning: journal, 2026-09-16 entry. Short form:
+**the Dry/Water cut holds under all four named hard cases** (Emitter and Roughness are Dry because
+they describe the object, not the water, same as K already there; Fire flow is Water because it is
+a water quantity like Demand regardless of whether it comes from a load or a code minimum; Head on
+a reservoir being Water exposes that a reservoir barely has a Dry asset at all, rather than breaking
+the rule). **The 2-row "Results" problem: exempt it from the three-row minimum by name** — it is a
+heading over a persistent action (Task 637's graph button), not a property list, so its row count is
+the wrong test for whether it earns a header. **My 2026-09-15 recommendation to also split Location
+out as its own group is withdrawn** — it was built on the coordinate-visibility premise Tom has
+since corrected, and his actual shape (Dry+Water as inputs vs. Results alone as outputs) already
+answers the structural objection I raised then, better than my own four-group proposal did. One
+concrete ask if the brief wants one: Results should not default-collapsed, since it is the one group
+I check on every element in a review regardless of position in the list. Naming: "Water properties"
+reads right immediately; "Dry properties" collides mildly with "dry utilities" (non-water service)
+and a "dry" pipe/line (one with no water in it) — real but modest, worth a five-minute check with
+Tom, offered "Asset properties" as a collision-free alternative if he wants one, not campaigning for it.
+
+### 2026-09-15 — not a want, a ruling request: the five-group property collapse, answered
+
+Not a row — Tom asked this seat by name whether his five-group popup collapse (ID / Dimensions /
+Flow and pressure / Quality / Custom) matches how an engineer reads an element. Full reasoning:
+journal, 2026-09-15 entry. Short form: **"Flow and pressure" mixes typed inputs with solved
+results, which is the exact conflation `js/looped-network.js`'s own `BAND_NODE`/`RESULT_NODE` split
+already forbids in the sibling Find-panel surface** — not a style disagreement, a rule this project
+already wrote down being proposed to break in a second place. "Dimensions" has a quieter version of
+the same defect: X/Y is identity (my own Task 674 answer, same day), Length/Diameter are design, and
+folding them into one word reads as a drafting category rather than an engineering one. **My own
+finding, the one I'd stand behind most: my slot-2/3 argument for coordinates does NOT survive a
+default-collapsed Dimensions group** — the whole point of slot 2/3 was that a transposed X/Y is on
+the skim, and a collapsed group puts it back behind a click. Recommended fix: keep X/Y outside any
+collapsible group, split Dimensions into a small always-open Location and a collapsible Size, or
+fold Location into ID. Shut/Included: belongs beside ID as state, not with flow — currently sits in
+neither home in the actual popup order (OBSERVED, `closedField()`/`activeField()` positions), so this
+is a real open question and not a status quo I am defending.
+
 ### 2026-09-08 — not a want, a ruling request: the thirteen `lpn_fitting_*` names, answered
 
 Not a row — Tom asked by name for a specification check on the thirteen EPANET Table 3.3 fitting
@@ -810,3 +863,18 @@ Task 643 poses to this seat:
   300 km scope is 206 ppm (CLAUDE.md, `scope-of-service-harness.js`), a further order of magnitude
   below even a 5% grade's slope-distance error. Both are small; the camel is still bigger than the
   gnat.
+
+### 2026-09-15 — not a new row, a ranking note on Task 674's follow-on
+
+Asked for a ruling on where Task 674's typed coordinates land in the popup and tables. My answer,
+in full: journal, 2026-09-15 entry. The one thing worth a wish-list line rather than only a journal
+line: **reorderable/user-defined table columns** would resolve the popup-order tension Tom named
+himself (identity fields vs. design fields, wanting both near the top for different tasks) better
+than any fixed order can, at the scale I care about. Not a new want — Tom's own Task 674 block
+already names it as foreseen ("we know that we are headed toward customizable table columns"), so
+per this file's own rule a known-but-unbuilt item is not a miss. Ranking it low deliberately: it is
+a real want but a multi-week UI investment, and the fixed-order Option 1 already gets 90% of the
+value for the submittal-review workflow I actually care about. Do not build this before it is asked
+for on its own.
+
+— Sue

@@ -34,6 +34,7 @@ USER_NAME=jconstru
 UD=/var/cpanel/userdata/$USER_NAME          # cPanel's own vhost table
 LOGFILE=$HOME/check.log
 EXCLUDE=$HOME/check.exclude          # declared non-pages; see the file
+MUSTBLOCK=$HOME/check.mustblock      # URLs that must NOT be reachable; see the file
 STATEDIR=${TMPDIR:-/tmp}/check.$$
 MAXTIME=25                                  # seconds per URL
 PAUSE=0.15                                  # seconds between URLs -- see RATE below
@@ -217,6 +218,11 @@ TOTAL=$(wc -l < "$URLS" | tr -d ' ')
 if [ "$LISTONLY" = 1 ]; then
   echo "# $TOTAL URLs from $(wc -l < "$SITES" | tr -d ' ') docroots; $SKIPPED skipped as non-pages; $EXCLUDED excused by check.exclude"
   cat "$URLS"
+  if [ -s "$MUSTBLOCK" ]; then
+    echo "#"
+    echo "# and these MUST NOT be reachable (a 200 here is a failure):"
+    grep -Ev '^[[:space:]]*(#|$)' "$MUSTBLOCK" | sed 's/^/#   /'
+  fi
   exit 0
 fi
 
@@ -273,16 +279,56 @@ while read -r url; do
 done < "$URLS"
 
 # ---------------------------------------------------------------------------
+# 5b. THE INVERSE LEG: URLs THAT MUST NOT BE REACHABLE.
+#
+# Everything above asks "does this page answer?". This asks "does this path REFUSE?", and it exists
+# because the fix for an exposure silenced the alarm that found it. The walk skips dot-directories
+# as a class now -- correct, because a blocked path answers 403 and would otherwise nag every
+# morning about a fix working -- but that also means the walk can no longer SEE that class of
+# exposure at all. This is the half that can.
+#
+# A PASS is 401, 403 or 404. A 200 is a failure and names the URL. It also closes the deploy gap by
+# construction: an .htaccess does nothing until the file is on the server, so this stays red from
+# the moment a fix is written until somebody pulls it -- which nothing else here could report.
+#
+# Counted into $fails so the exit code and the mail already carry it; no second reporting path.
+# ---------------------------------------------------------------------------
+BLOCKED_N=0
+if [ -s "$MUSTBLOCK" ]; then
+  while read -r url; do
+    case "$url" in ''|\#*) continue ;; esac
+    BLOCKED_N=$((BLOCKED_N + 1))
+    hostpath=${url#https://}
+    host=${hostpath%%/*}
+    code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time "$MAXTIME" \
+                --resolve "$host:443:$SERVERIP" -A "$UA" "$url" 2>/dev/null)
+    [ -n "$code" ] || code=000
+    case "$code" in
+      401|403|404) [ "$VERBOSE" = 1 ] && echo "ok   $code REFUSED $url" ;;
+      000)         fails=$((fails + 1))
+                   printf '%s\n    %s\n' "$url" \
+                     "no answer, so whether it is blocked is UNKNOWN -- treat as exposed" >> "$FAILFILE"
+                   [ "$VERBOSE" = 1 ] && echo "FAIL 000 $url" ;;
+      *)           fails=$((fails + 1))
+                   printf '%s\n    %s\n' "$url" \
+                     "REACHABLE (HTTP $code) and it must not be. Either the block is missing, or it is written and NOT YET DEPLOYED -- an .htaccess does nothing until the file is on the server." >> "$FAILFILE"
+                   [ "$VERBOSE" = 1 ] && echo "FAIL $code REACHABLE $url" ;;
+    esac
+    sleep "$PAUSE"
+  done < "$MUSTBLOCK"
+fi
+
+# ---------------------------------------------------------------------------
 # 6. REPORT. Always a line in the log so "did it run?" has an answer; on stdout
 # (and therefore in mail) only when something is wrong.
 # ---------------------------------------------------------------------------
 stamp=$(date '+%Y-%m-%d %H:%M:%S')
-echo "$stamp	checked=$TOTAL	failed=$fails" >> "$LOGFILE" 2>/dev/null
+echo "$stamp	checked=$TOTAL	blocked=$BLOCKED_N	failed=$fails" >> "$LOGFILE" 2>/dev/null
 
 if [ "$fails" -gt 0 ]; then
   REPORT=$STATEDIR/report
   {
-    echo "$fails of $TOTAL pages FAILED  ($stamp)"
+    echo "$fails failure(s) across $TOTAL pages and $BLOCKED_N must-not-be-reachable paths  ($stamp)"
     echo
     cat "$FAILFILE"
     echo
@@ -305,7 +351,7 @@ fi
 
 if [ "$VERBOSE" = 1 ]; then
   echo
-  echo "all $TOTAL pages passed  ($stamp)"
+  echo "all $TOTAL pages passed, and all $BLOCKED_N declared-blocked paths refused  ($stamp)"
   echo "$SKIPPED files skipped as non-pages; $EXCLUDED URLs excused by ~/check.exclude"
 fi
 exit 0

@@ -72,6 +72,12 @@ if (!$origins) {
     echo "\nFAIL: social card\n";
     exit(1);
 }
+// **AND THE PER-PAGE OVERRIDES, since 2026-09-17.** The whitelist is the host's answer; a page may
+// declare its own origin in ecCanonicalOrigins(), and og:image rides on the page's rather than the
+// host's so that a card's picture and its URL never name two domains. Read, not retyped, for the
+// same reason as above.
+require_once $root . '/lib/Canonical.lib.php';
+$origins = array_values(array_unique(array_merge($origins, array_values(ecCanonicalOrigins()))));
 
 /** Real pixel size of a PNG or JPEG, without an image library. array(w, h, 'image/png') or null. */
 function image_size($path)

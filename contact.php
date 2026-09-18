@@ -67,7 +67,7 @@ within a few days.</p>
   <p>
     <input
       type="submit"
-      value="<?php echo $ec_lang['contactSubmitButton'];?>"
+      value="<?php echo htmlspecialchars($ec_lang['contactSubmitButton']);?>"
     >
     <input
       type="hidden"

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1871,
-        "delta_key_count": 3,
+        "expected_key_count": 1910,
+        "delta_key_count": 44,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -526,16 +526,418 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values versus time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crs_unplaceable_mark": "(no map)",
+        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_field_desc": "Description",
+        "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
-        "lpn_cp_key": "Key"
+        "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_cp_key": "Key",
+        "lpn_library_import": "Import libraries…",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_choose": "Choose what to copy from {file}",
+        "lpn_library_import_count": "{name} ({count})",
+        "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
+        "lpn_library_import_go": "Import",
+        "lpn_library_import_no_libraries": "That project file has no libraries to copy.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "Warning: Units mismatch. Will be imported as is. Not recommended.",
+        "lpn_library_import_units_line": "{name}: this project shows {mine}, the file shows {theirs}.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
+        "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
+        "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
+        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "keys": {
+        "lpn_ts_menu": "Time series",
+        "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
+        "lpn_ts_title": "Values versus time",
+        "lpn_ts_group_tip": "Whether the graph shows nodes or links.",
+        "lpn_ts_group_nodes": "Nodes",
+        "lpn_ts_group_links": "Links",
+        "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_ts_add": "Add selected",
+        "lpn_ts_add_tip": "Put everything now chosen on the map onto the graph.",
+        "lpn_ts_add_none": "Nothing of that kind is chosen on the map.",
+        "lpn_ts_clear": "Remove all",
+        "lpn_ts_chip_tip": "Take {id} off the graph",
+        "lpn_ts_none": "Nothing to graph yet. Choose assets on the map and press Add selected.",
+        "lpn_ts_no_frames": "No extended period results yet. Press Calculate to run the simulation.",
+        "lpn_ts_summary": "Assets: {n}, reporting times: {steps}",
+        "lpn_ts_axis_time": "Elapsed time",
+        "lpn_crs_unplaceable_mark": "(no map)",
+        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_field_desc": "Description",
+        "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
-        "lpn_cp_key": "Key"
+        "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_cp_key": "Key",
+        "lpn_library_import": "Import libraries…",
+        "lpn_library_import_tip": "Choose another project file and copy whole libraries out of it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+        "lpn_library_import_choose": "Choose what to copy from {file}",
+        "lpn_library_import_count": "{name} ({count})",
+        "lpn_library_import_note": "Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.",
+        "lpn_library_import_go": "Import",
+        "lpn_library_import_no_libraries": "That project file has no libraries to copy.",
+        "lpn_library_import_heading": "Imported from {file}",
+        "lpn_library_import_added": "Copied in: {names}",
+        "lpn_library_import_conflict": "Skipped, because this project already has one of the same name: {names}. Nothing here was changed. Rename either one and import again if you want both.",
+        "lpn_library_import_none": "That project file has none of these to copy.",
+        "lpn_library_import_curve_shape": "These curves came across exactly as the file wrote them, and a run cannot use one until its first column rises from each point to the next: {names}",
+        "lpn_library_import_needs_fittings": "These pipe types refer to a fittings list this project does not have: {names}. Import the fittings library from the same file and they will find it.",
+        "lpn_library_import_units": "Warning: Units mismatch. Will be imported as is. Not recommended.",
+        "lpn_library_import_units_line": "{name}: this project shows {mine}, the file shows {theirs}.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
+        "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
+        "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
+        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "key_context": {
+        "lpn_ts_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_nodes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_group_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_quantity_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_add_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_chip_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_no_frames": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_ts_axis_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_missing",
+                    "value": "সংরক্ষিত পথ {name} এমন নোড ব্যবহার করে যা এই প্রকল্পে নেই: {ids}",
+                    "english": "The saved path {name} uses nodes that are not in this project: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "একক",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_crs_unplaceable_mark": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_place_projected",
+                    "value": "একটি প্রক্ষেপিত প্রকল্প আপনার খোঁজা স্থানে নয়, নিজস্ব সমতলে খোলে। সেই সমতলটিকে পৃথিবীর উপর বসাতে একটি স্থানাঙ্ক রূপান্তর প্রয়োজন, যা এই পাতায় এখনও নেই।",
+                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "জিওরেফারেন্সড নয়",
+                    "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_crs_unplaceable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_place_projected",
+                    "value": "একটি প্রক্ষেপিত প্রকল্প আপনার খোঁজা স্থানে নয়, নিজস্ব সমতলে খোলে। সেই সমতলটিকে পৃথিবীর উপর বসাতে একটি স্থানাঙ্ক রূপান্তর প্রয়োজন, যা এই পাতায় এখনও নেই।",
+                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "জিওরেফারেন্সড নয়",
+                    "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_field_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_source_tip",
+                    "value": "লাইব্রেরি বাক্সে থাকা কার্ভ যা বলে এই পাম্প প্রতিটি প্রবাহে কতটা জলশীর্ষ যোগ করে। একাধিক পাম্প একই কার্ভ ব্যবহার করতে পারে, এবং সেখানে এটি পরিবর্তন করলে সবগুলোই বদলে যায়। এই পাম্প শুধু রেফারেন্স ধরে রাখে; বিন্দুগুলো নিজে লাইব্রেরি, কার্ভ-এর অধীনে পড়া ও পরিবর্তন করা হয়।",
+                    "english": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them."
+                },
+                "next_translated": {
+                    "key": "lpn_field_tag",
+                    "value": "ট্যাগ",
+                    "english": "Tag"
+                }
+            }
+        },
+        "lpn_field_desc_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_source_tip",
+                    "value": "লাইব্রেরি বাক্সে থাকা কার্ভ যা বলে এই পাম্প প্রতিটি প্রবাহে কতটা জলশীর্ষ যোগ করে। একাধিক পাম্প একই কার্ভ ব্যবহার করতে পারে, এবং সেখানে এটি পরিবর্তন করলে সবগুলোই বদলে যায়। এই পাম্প শুধু রেফারেন্স ধরে রাখে; বিন্দুগুলো নিজে লাইব্রেরি, কার্ভ-এর অধীনে পড়া ও পরিবর্তন করা হয়।",
+                    "english": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them."
+                },
+                "next_translated": {
+                    "key": "lpn_field_tag",
+                    "value": "ট্যাগ",
+                    "english": "Tag"
+                }
+            }
+        },
         "lpn_field_northing_abbr": {
             "reason": "equal_to_english",
             "current_value": "N",
@@ -568,6 +970,38 @@
                 }
             }
         },
+        "lpn_field_coord_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "ইস্টিং",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "আকার গুণক",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_coord_off_world": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "ইস্টিং",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "আকার গুণক",
+                    "english": "Size multiplier"
+                }
+            }
+        },
         "lpn_cp_key": {
             "reason": "equal_to_english",
             "current_value": "Key",
@@ -581,6 +1015,310 @@
                     "key": "lpn_cp_key_tip",
                     "value": "Key: একটি বৈশিষ্ট্য এই নামে সংরক্ষিত হয়। স্পেস অনুমোদিত নয়, এবং আপনার জন্য একটি প্রিফিক্স যোগ করা হয় যাতে আপনার Key কখনো কোনো বিল্ট-ইন ক্ষেত্রের সাথে সংঘর্ষ না করে।",
                     "english": "Key: A property is stored under this name. Spaces are not allowed, and a prefix is added for you so that your key can never collide with a built-in field."
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_choose": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_go": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_no_libraries": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_curve_shape": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_needs_fittings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_library_import_units_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "এই ফিটিংস তালিকা {count}টি পাইপ ব্যবহার করে: {ids}। মুছে ফেলার আগে এটি তাদের থেকে বিচ্ছিন্ন করুন।",
+                    "english": "This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_fitting_qty",
+                    "value": "পরিমাণ",
+                    "english": "Quantity"
+                }
+            }
+        },
+        "lpn_inp_export_flat_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_flat_types",
+                    "value": "এখানে {n}টি পাইপ {t}টি পাইপের ধরন নির্দেশ করে। ফাইলে ওই প্রতিটি পাইপ সংখ্যাগুলোর নিজস্ব একটি কপি বহন করে, তাই উত্তরগুলো একই থাকে। ফাইলটি যা ধরে রাখতে পারে না তা হলো পাইপের ধরনটি নিজেই, তাই একটি সংজ্ঞা সম্পাদনা করলে প্রতিটি পাইপ তা অনুসরণ করে — এমন কিছু শুধু আপনার নিজের প্রকল্প ফাইলেই রেকর্ড হয়।",
+                    "english": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_flat_fittings",
+                    "value": "একটি EPANET ফাইল আপনার প্রকল্প ফাইলের এলবো, ভালভ ও টি-এর তালিকা ধরে রাখতে পারে না। এখানে {n}টি পাইপের স্থানীয় ক্ষতি সহগ একটি ফিটিংস তালিকা থেকে যোগ করা হয়। মোটটি ফাইলে ঠিক যেমন আছে তেমনই যায়, তাই উত্তরগুলো সম্পর্কে কিছুই পরিবর্তিত হয় না।",
+                    "english": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes."
+                }
+            }
+        },
+        "lpn_terrain_rate_limited": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "আমরা ভূমিরূপ সেবাটিতে পৌঁছাতে পারিনি, তাই কোনো উচ্চতা পরিবর্তিত হয়নি। আপনি হয়তো অফলাইনে আছেন। এই পাতার বাকি সবকিছু এটি ছাড়াই কাজ করে।",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_done",
+                    "value": "{n}টি উচ্চতা পূরণ করা হয়েছে।",
+                    "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_terrain_http": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "আমরা ভূমিরূপ সেবাটিতে পৌঁছাতে পারিনি, তাই কোনো উচ্চতা পরিবর্তিত হয়নি। আপনি হয়তো অফলাইনে আছেন। এই পাতার বাকি সবকিছু এটি ছাড়াই কাজ করে।",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_done",
+                    "value": "{n}টি উচ্চতা পূরণ করা হয়েছে।",
+                    "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_terrain_no_place": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "আমরা ভূমিরূপ সেবাটিতে পৌঁছাতে পারিনি, তাই কোনো উচ্চতা পরিবর্তিত হয়নি। আপনি হয়তো অফলাইনে আছেন। এই পাতার বাকি সবকিছু এটি ছাড়াই কাজ করে।",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_done",
+                    "value": "{n}টি উচ্চতা পূরণ করা হয়েছে।",
+                    "english": "{n} elevation(s) filled in."
                 }
             }
         }

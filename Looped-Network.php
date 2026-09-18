@@ -216,6 +216,14 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
 	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
+	<?php // Library import (Task 611). A FOURTH picker, and it takes the same two extensions
+	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
+	      // else entirely: it copies one library (pipe types, fittings or curves) into the project
+	      // already open, rather than opening the file as a project of its own. One input per
+	      // destination, which is the rule the three above are already on. Here in the page rather
+	      // than in the Libraries box body, because that body is rebuilt wholesale on every add,
+	      // delete and section change and would take a wired change handler with it. ?>
+	<input type="file" id="lpn_library_file" accept=".lwn,.json,application/json" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -600,6 +608,27 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<div id="lpn_profile_note"></div>
 			</div>
 			<div id="lpn_profile_chart"></div>
+		</div>
+		<?php // ---- Tab: Time series (ROADMAP Task 599) ----
+		      // One or more assets' chosen value across a whole extended-period run. The panel and
+		      // the control row wear the PROFILE's own classes, which is the reuse the task asked
+		      // for: the two charts are the same kind of thing in the same place, so the layout
+		      // argument .lpn-profile-panel carries (a wrapping header row, the drawing taking the
+		      // rest) is already made and is not made twice. Everything inside #lpn_ts_form is
+		      // built in JS, because the asset list and the quantity list are both the document's.
+		      //
+		      // NO STATIC KEY BESIDE THE CHART, unlike the profile's three fixed lines: there is one
+		      // line per chosen asset, so the key is the chips in the form row, each wearing its own
+		      // line's color. See rebuildTsForm() for why that is one thing and not two. ?>
+		<div id="lpn_pane_timeseries" class="lpn-pane-panel lpn-profile-panel lpn-ts-panel" role="tabpanel" aria-labelledby="lpn_pane_tab_timeseries">
+			<div class="lpn-profile-controls">
+				<?php // The tab says "Time series"; this says WHICH series -- values against time,
+				      // for the assets named beside it. The panel's own title, as the profile's is. ?>
+				<div class="lpn-profile-heading"><?=$ec_lang['lpn_ts_title']?></div>
+				<div id="lpn_ts_form"></div>
+				<div id="lpn_ts_note" class="lpn-profile-say"></div>
+			</div>
+			<div id="lpn_ts_chart"></div>
 		</div>
 		<?php // ---- Tabs: one ASSET TABLE per type (Task 434, all six since Task 455) ----
 		      // The document as a spreadsheet, built entirely in JS: the rows are the network and
@@ -1389,10 +1418,14 @@ EngCalcs.pageConfig = {
 	lpn_field_northing_abbr: <?=json_encode($ec_lang['lpn_field_northing_abbr'])?>,
 	lpn_field_easting_abbr: <?=json_encode($ec_lang['lpn_field_easting_abbr'])?>,
 	lpn_field_easting: <?=json_encode($ec_lang['lpn_field_easting'])?>,
+	lpn_field_coord_tip: <?=json_encode($ec_lang['lpn_field_coord_tip'])?>,
+	lpn_coord_off_world: <?=json_encode($ec_lang['lpn_coord_off_world'])?>,
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,
+	lpn_crs_unplaceable_mark: <?=json_encode($ec_lang['lpn_crs_unplaceable_mark'])?>,
+	lpn_crs_unplaceable: <?=json_encode($ec_lang['lpn_crs_unplaceable'])?>,
 	lpn_valve_type_pbv: <?=json_encode($ec_lang['lpn_valve_type_pbv'])?>,
 	lpn_valve_type_gpv: <?=json_encode($ec_lang['lpn_valve_type_gpv'])?>,
 	lpn_field_valve_setting_drop: <?=json_encode($ec_lang['lpn_field_valve_setting_drop'])?>,
@@ -1511,6 +1544,22 @@ EngCalcs.pageConfig = {
 	lpn_profile_delete_confirm: <?=json_encode($ec_lang['lpn_profile_delete_confirm'])?>,
 	lpn_profile_none_saved: <?=json_encode($ec_lang['lpn_profile_none_saved'])?>,
 	lpn_profile_missing: <?=json_encode($ec_lang['lpn_profile_missing'])?>,
+	<?php // ---- the time-series chart (Task 599) ---- ?>
+	lpn_ts_menu: <?=json_encode($ec_lang['lpn_ts_menu'])?>,
+	lpn_ts_tip: <?=json_encode($ec_lang['lpn_ts_tip'])?>,
+	lpn_ts_group_tip: <?=json_encode($ec_lang['lpn_ts_group_tip'])?>,
+	lpn_ts_group_nodes: <?=json_encode($ec_lang['lpn_ts_group_nodes'])?>,
+	lpn_ts_group_links: <?=json_encode($ec_lang['lpn_ts_group_links'])?>,
+	lpn_ts_quantity_tip: <?=json_encode($ec_lang['lpn_ts_quantity_tip'])?>,
+	lpn_ts_add: <?=json_encode($ec_lang['lpn_ts_add'])?>,
+	lpn_ts_add_tip: <?=json_encode($ec_lang['lpn_ts_add_tip'])?>,
+	lpn_ts_add_none: <?=json_encode($ec_lang['lpn_ts_add_none'])?>,
+	lpn_ts_clear: <?=json_encode($ec_lang['lpn_ts_clear'])?>,
+	lpn_ts_chip_tip: <?=json_encode($ec_lang['lpn_ts_chip_tip'])?>,
+	lpn_ts_none: <?=json_encode($ec_lang['lpn_ts_none'])?>,
+	lpn_ts_no_frames: <?=json_encode($ec_lang['lpn_ts_no_frames'])?>,
+	lpn_ts_summary: <?=json_encode($ec_lang['lpn_ts_summary'])?>,
+	lpn_ts_axis_time: <?=json_encode($ec_lang['lpn_ts_axis_time'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
@@ -1623,6 +1672,26 @@ EngCalcs.pageConfig = {
 	lpn_library_fittings_used_by: <?=json_encode($ec_lang['lpn_library_fittings_used_by'])?>,
 	lpn_library_fittings_unused: <?=json_encode($ec_lang['lpn_library_fittings_unused'])?>,
 	lpn_library_fittings_in_use: <?=json_encode($ec_lang['lpn_library_fittings_in_use'])?>,
+<?php // Importing one library out of another project file (Task 611). ?>
+	lpn_library_import: <?=json_encode($ec_lang['lpn_library_import'])?>,
+	lpn_library_import_tip: <?=json_encode($ec_lang['lpn_library_import_tip'])?>,
+	lpn_library_import_choose: <?=json_encode($ec_lang['lpn_library_import_choose'])?>,
+	lpn_library_import_count: <?=json_encode($ec_lang['lpn_library_import_count'])?>,
+	lpn_library_import_note: <?=json_encode($ec_lang['lpn_library_import_note'])?>,
+	lpn_library_import_go: <?=json_encode($ec_lang['lpn_library_import_go'])?>,
+	lpn_library_import_no_libraries: <?=json_encode($ec_lang['lpn_library_import_no_libraries'])?>,
+	lpn_library_import_heading: <?=json_encode($ec_lang['lpn_library_import_heading'])?>,
+	lpn_library_import_added: <?=json_encode($ec_lang['lpn_library_import_added'])?>,
+	lpn_library_import_conflict: <?=json_encode($ec_lang['lpn_library_import_conflict'])?>,
+	lpn_library_import_none: <?=json_encode($ec_lang['lpn_library_import_none'])?>,
+	lpn_library_import_curve_shape: <?=json_encode($ec_lang['lpn_library_import_curve_shape'])?>,
+	lpn_library_import_needs_fittings: <?=json_encode($ec_lang['lpn_library_import_needs_fittings'])?>,
+	lpn_library_import_units: <?=json_encode($ec_lang['lpn_library_import_units'])?>,
+	lpn_library_import_units_line: <?=json_encode($ec_lang['lpn_library_import_units_line'])?>,
+<?php // The quantity each unit selector is ABOUT, in the words the units strip already uses on it,
+      // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_units_flow are
+      // already supplied further up this object; the elevation one was not supplied by anything. ?>
+	lpn_units_elevhead: <?=json_encode($ec_lang['lpn_units_elevhead'])?>,
 	lpn_fitting_qty: <?=json_encode($ec_lang['lpn_fitting_qty'])?>,
 	lpn_fitting_name: <?=json_encode($ec_lang['lpn_fitting_name'])?>,
 	lpn_fitting_k: <?=json_encode($ec_lang['lpn_fitting_k'])?>,
@@ -1650,6 +1719,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_export_flat_lead: <?=json_encode($ec_lang['lpn_inp_export_flat_lead'])?>,
 	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
 	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,
+	lpn_inp_export_flat_coords: <?=json_encode($ec_lang['lpn_inp_export_flat_coords'])?>,
 	lpn_library_controls: <?=json_encode($ec_lang['lpn_library_controls'])?>,
 	lpn_library_controls_tip: <?=json_encode($ec_lang['lpn_library_controls_tip'])?>,
 	lpn_library_pattern_add: <?=json_encode($ec_lang['lpn_library_pattern_add'])?>,
@@ -1821,6 +1891,8 @@ EngCalcs.pageConfig = {
 	lpn_curve_kind_volume: <?=json_encode($ec_lang['lpn_curve_kind_volume'])?>,
 	lpn_curve_kind_generic: <?=json_encode($ec_lang['lpn_curve_kind_generic'])?>,
 	lpn_curve_volume_col: <?=json_encode($ec_lang['lpn_curve_volume_col'])?>,
+	lpn_field_desc: <?=json_encode($ec_lang['lpn_field_desc'])?>,
+	lpn_field_desc_tip: <?=json_encode($ec_lang['lpn_field_desc_tip'])?>,
 	lpn_field_tag: <?=json_encode($ec_lang['lpn_field_tag'])?>,
 	lpn_field_tag_tip: <?=json_encode($ec_lang['lpn_field_tag_tip'])?>,
 	lpn_pump_effic_curve: <?=json_encode($ec_lang['lpn_pump_effic_curve'])?>,
@@ -2634,8 +2706,6 @@ EngCalcs.pageConfig = {
 	lpn_terrain_undo: <?=json_encode($ec_lang['lpn_terrain_undo'])?>,
 	lpn_terrain_requests: <?=json_encode($ec_lang['lpn_terrain_requests'])?>,
 	lpn_terrain_busy: <?=json_encode($ec_lang['lpn_terrain_busy'])?>,
-	lpn_terrain_none_needed: <?=json_encode($ec_lang['lpn_terrain_none_needed'])?>,
-	lpn_terrain_no_nodes: <?=json_encode($ec_lang['lpn_terrain_no_nodes'])?>,
 	lpn_terrain_offmap: <?=json_encode($ec_lang['lpn_terrain_offmap'])?>,
 	lpn_terrain_too_wide: <?=json_encode($ec_lang['lpn_terrain_too_wide'])?>,
 	lpn_terrain_cancelled: <?=json_encode($ec_lang['lpn_terrain_cancelled'])?>,
@@ -2643,6 +2713,9 @@ EngCalcs.pageConfig = {
 	lpn_terrain_working: <?=json_encode($ec_lang['lpn_terrain_working'])?>,
 	lpn_terrain_denied: <?=json_encode($ec_lang['lpn_terrain_denied'])?>,
 	lpn_terrain_failed: <?=json_encode($ec_lang['lpn_terrain_failed'])?>,
+	lpn_terrain_rate_limited: <?=json_encode($ec_lang['lpn_terrain_rate_limited'])?>,
+	lpn_terrain_http: <?=json_encode($ec_lang['lpn_terrain_http'])?>,
+	lpn_terrain_no_place: <?=json_encode($ec_lang['lpn_terrain_no_place'])?>,
 	lpn_terrain_done: <?=json_encode($ec_lang['lpn_terrain_done'])?>,
 	lpn_terrain_missed: <?=json_encode($ec_lang['lpn_terrain_missed'])?>,
 	lpn_terrain_partial: <?=json_encode($ec_lang['lpn_terrain_partial'])?>,

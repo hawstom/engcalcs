@@ -1,108 +1,363 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-15 (seventh session)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-18 late (twelfth session)
 
-## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-15.
+## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-18, late.
 
-**MASTER IS GREEN AND FOUR ORDINARY TRACKS LANDED 2026-09-15.** Task 676 phases 1, 1a and 2; Task
-677; Task 322 half B's second pass; and the market researcher's two answers. **PRODUCTION HAS NOT
-PULLED THEM.** Production is the SHA somebody last pulled, and on the evening of 09-15 that was
-`e1c0794f`, several commits behind. Never say "it is live" because you pushed.
+**MASTER IS GREEN AT `cb57d4c5` AND PUSHED. NEVER GUESS PRODUCTION'S SHA** -- read it:
+`ssh -p 15554 jconstru` then `cd ~/addon_html/hawsedc.com/engcalcs && git rev-parse --short HEAD`.
+**There are FOUR checkouts on the host and they are different repositories**, which cost real
+confusion today: `~/addon_html/hawsedc.com/engcalcs` (production), `~/dev_html/hawsedc.com/engcalcs`
+(his trunk testing, dev.hawsedc.com), `~/addon_html/librewaternet.org`, `~/addon_html/not-epanet.org`.
+A pull in one is not a pull in another.
 
-**THE `.claude` EXPOSURE IS FIXED IN THE REPOSITORY AND STILL LIVE UNTIL TOM DEPLOYS.**
-`https://hawsedc.com/engcalcs/.claude/settings.json` answered HTTP 200 -- the agent definitions, the
-hook scripts and the permission allow-list. An `.htaccess` only takes effect once the file is on the
-server. If you are reading this before he has pulled, that URL is still readable.
+**FIVE PUBLIC EXPOSURES WERE FOUND AND CLOSED TODAY, ALL ON THE SIBLING SITES, AND TOM FOUND THE
+FIRST ONE BY ACCIDENT.** He ran `git status` in what he thought was the wrong folder and saw an
+untracked `tools/error_log`. That log was written by a PHP fatal while the directory holding it was
+**executing build scripts over HTTP**. Measured live before the fix:
+`librewaternet.org/tools/` 200 with a full index, `build-chrome.php` 200 EXECUTED,
+`build-features.php` 500 EXECUTED, `build_claims.py` 200 downloadable; `/docs/` 200 with an index;
+**`/docs/apache/librewaternet-ssl.conf` 200 -- the Apache virtual-host config, downloadable**; and on
+not-epanet.org `/tools/` and `/hooks/` both reachable.
+- **Every directory in both sibling repos is now DECLARED served or denied, and a new undeclared one
+  FAILS.** Each site's own `check.sh` runs it; `dev/scripts/sibling_exposure_check.php` here is an
+  advisory that notices when a sibling goes unguarded. It reads DECLARATIONS, never the live site.
+- **`Require all denied`, NEVER `Options -Indexes`** -- an Options directive without the grant
+  returns 500 for every request under the path.
+- **A blanket dot-path rule is written as `RedirectMatch`, not `<FilesMatch "^\.">`**, because that
+  form matches FILENAMES only -- which is exactly how `.claude/settings.json` reached the open web in
+  September. That is now the THIRD time this distinction has mattered.
+- **THE LESSON, and it is the same one twice: every one of these was found from OUTSIDE, by a person,
+  while every check inside the repositories passed.** That is Task 676's whole argument.
 
-**THE UPTIME WATCH IS REAL, IT IS ON THE HOST, AND IT IS NOW IN `dev/host/`.** `~/check.sh` fetches
-every page on all nine domains daily at 04:20 server time -- 620 URLs, body as well as status -- and
-mails only on failure. **The report at 22:00 server time (20:00 in Phoenix) mails EVERY night
-whether or not anything is wrong**, and that is the design, not an oversight: the alarm is silent on
-success, so a healthy site and a dead cron are the same silence, and cron mail here was dead for
-years. `dev/host/README.md` has the whole thing.
+**THREE BRANCHES ARE BUILT AND AWAIT HIS BROWSER PASS:**
 
-- **`sendmail` EXITED 0 DURING ALL 22,907 BOUNCES.** An exit code has never been evidence of
-  delivery on this account. Confirm arrival at the far end.
-- **The report runs out of `~/tgh/engcalcs-report`, a SEPARATE checkout, and reads production with
-  `git rev-parse HEAD` and nothing else. NOTHING MAY `git fetch` IN THE PRODUCTION CHECKOUT** --
-  `ecDeployIdentity()` dates the About box from `filemtime()` on `packed-refs` among others, and a
-  fetch can rewrite it, advancing the displayed build date with nothing deployed.
-- **No `node` on the host**, so no harness and no `check_all.sh` can run there. The report says so
-  every night rather than implying coverage it has not got.
+| Where | Branch | Task |
+|---|---|---|
+| 8088 | `feat/customer-demands` | 247 |
+| 8091 | `feat/survey-import` | 592 |
+| **dev.hawsedc.com** | `feat/lock-initials-later` | 667b -- PUSHED; needs TWO browser profiles |
 
-**A DIAGNOSIS WRITTEN FROM INSIDE THIS TREE COULD NOT SEE A WORKING MACHINE ONE DIRECTORY OUTSIDE
-IT.** `dev/reputation-and-practice.md` proposed building an uptime watch that had been running for
-six days. It is corrected in place. That is the lesson to carry, not the scripts.
+**`feat/xy-world-map` IS THE WHOLE COORDINATE PROGRAMME NOW** -- it absorbed `projection`, which is
+deleted, on his own call (*"I think it's the right paper trail"*). **Its specification is
+`dev/tom-coordinate-vocabulary-2026-09-16.md`, which is HIS OWN 17,000-character message, recovered
+from a session transcript after it was nearly lost.** It rules that *"we no longer want to expose the
+word 'projection'"* and gives the three-step Custom georeference wizard. **WHEN TOM PASTES A DESIGN
+INTO A PROMPT, COMMIT IT AS A FILE BEFORE ACTING ON IT.**
 
-**THE FEATURE FREEZE IS A SECOND LOCK NOW, AND TOM'S OWN APPROVAL DOES NOT OPEN IT** (his choice,
+**THE THING THAT WENT WRONG REPEATEDLY TODAY, IN HIS WORDS: *"What do I need to do so that this stops
+happening?"*** Three separate times an instruction of his was dropped -- a feature he asked removed
+was shipped, three items in one message never became a track, and he was asked twice for jobs he had
+already done. **The cause is acting on the most recent thing in front of you: an agent's report
+arrives vivid and complete, and his sentence from four messages back does not.** The correction is to
+check HIS words against the code yourself before reporting a branch ready, not the agent's summary.
+
+**A TASK LEFT OPEN AFTER HE CLEARS IT IS THE SAME FAILURE.** Task 599 sat open after its branch
+merged on his all-clear. **Closing the task is part of the merge, not a later tidy-up.**
+
+**AND THE ROADMAP INDEX MYSTERY WAS NOT OURS, WHICH TOOK TOO LONG TO ESTABLISH.** He reported the
+index stale for days; it was current in every checkout on disk. **He had `~/webdev/hawsedc.subset/`
+open in his editor -- a directory that NO LONGER EXISTS.** Stale editor buffers of deleted files look
+exactly like current files. If he reports a file stale that checks call fresh, ask for its PATH early.
+
+**EVERY DEFECT THAT SURVIVED READING WAS FOUND BY DRIVING A REAL BROWSER.** Four today: the graph's
+Links selector (two controls sharing one scratch name, so choosing Links read the other control and
+reset), the DEM popup never redrawing, and THREE separate Ask failures. **In each case the source
+reads correctly and the existing tests passed with the defect restored.**
+`dev/lpn-spike/browser-drive.js` and `dev/lpn-spike/lock-ask-browser-drive.js` are the instruments.
+
+**`js_fallback_string_check.php` TURNED MASTER RED TWICE.** Applying one of Tom's wording edits to
+`lib/lang.ec.en.php` alone leaves the `pc.key || 'English literal'` twin holding the old words.
+**Grep `js/` for the old sentence in the same breath, every time.**
+
+**THE VERIFICATION STAMP NEEDS A CLEAN TREE**, and `dev/new-english-keys.rejected.md` -- the safety
+copy `--write --force` leaves -- blocked it twice before being gitignored. If a push is refused after
+a green suite, check `git status --porcelain` first.
+
+**DO NOT RUN MORE THAN ABOUT THREE `check_all.sh` AT ONCE** (5 GB machine; one was killed with exit
+144 after printing 122 clean lines). **AND NEVER PUT CONCURRENT AGENTS IN THE MAIN CHECKOUT** -- one
+had to cherry-pick its commit back off another's branch. Worktrees, always.
+
+**HIS WORKFLOW PREFERENCE:** *"we get more done with large prompts from me and large responses from
+you, and from me gone while you work."* He also had many accidental interrupts today and did not know
+he had caused them; **if agents stop for no reason, ask before assuming he meant it.**
+
+**DELETE A LINE IN THIS BLOCK ONCE YOU HAVE CHECKED IT AND IT IS NO LONGER NEWS.**
+
+## WHAT THE 2026-09-16 SESSION LEFT YOU: A CLEARANCE TO PROCEED ON THE ROADMAP
+
+**EVERY TRACK FROM THAT SESSION IS MERGED, PUSHED, AND ITS BRANCH AND WORKTREE ARE DELETED.** The
+only branches alive are the six capability branches awaiting his browser pass, `projection`,
+`674-coordinate-entry`, `tables-interface`, and two empty refs (`660-dblclick-open`,
+`662-reaction-questions`). `branch_hygiene_check.php` is clean of that session's work.
+
+**SO THE ROADMAP IS OPEN. Start with `dev/ROADMAP.md`'s 100 band.** The two tasks that session
+opened are **680** (keep a project's drawing rather than rebuilding it) and **681** (economize the
+label layout), both at 75 and both carrying measured numbers rather than guesses. **680's remaining
+half is the big one and was deliberately not started 17 hours before his meeting** -- it makes the
+four map layers and the three element indexes stop being singletons.
+
+**THREE THINGS ARE STILL TOM'S, and none of them blocks roadmap work:**
+- **One `?debug=perf` line with DevTools fully CLOSED**, switching into Net-3. His last unexplained
+  number was `lk:layout` at 6.4 ms per label copy against 0.3 ms here for the same 252 copies; the
+  double-layout fix should have removed most of it and was never confirmed on his machine.
+- **The six browser passes.** Ports 8087-8092, descriptions in `~/webdev/worktrees/_panel/ports.conf`.
+- **Whether `projection` is finished.** Unchanged since 2026-09-14: one sentence from him, and do
+  not guess.
+
+**THE FEATURE FREEZE IS TWO LOCKS NOW AND TOM'S OWN APPROVAL DOES NOT OPEN IT** (his choice,
 2026-09-15). `feature_freeze.active` is TRUE in `dev/branch-policy.json`: a `protected` branch is
-refused **even with a correctly pinned all-clear**, and the approval keeps standing until the freeze
-lifts. **ONLY HE LIFTS IT.** He asked *"even if I were to approve a merge, the scripts must block it
-until the freeze is removed. Right?"* and the honest answer then was no; it is yes now.
-- **IT IS NOT `freeze.active`.** That is the EMERGENCY STOP refusing every merge but a `hotfix:`,
-  and it stays OFF: its one outing cost a day of bug fixes he was waiting for. `feature_freeze`
-  refuses only what `protected` names, so **a defect or tooling track merges exactly as before.**
-  `branch_policy_selftest.php` case 8c asserts that and is the case that matters most.
+refused **even with a correctly pinned all-clear**, and the approval keeps standing until he lifts
+the freeze. **ONLY HE LIFTS IT.** It is NOT `freeze.active`, the emergency stop, which stays OFF
+because its one outing cost a day of bug fixes. `branch_policy_selftest.php` case 8c asserts a
+defect track still merges; four mutations of the new leg are killed.
 
-**`674-coordinate-entry` IS A FEATURE AND MAY NOT MERGE.** Listed in `dev/branch-policy.json` on its
-own branch, so the gate refuses it without touching master's policy. It wants Tom's browser test at
-`http://127.0.0.1:8087/engcalcs/Looped-Network.php`, which needs one `sudo systemctl reload apache2`
-he has not yet run. It adds language keys, so its own `check_all.sh` reports `payload freshness` and
-that failure is EXPECTED on the branch; the orchestrator regenerates once, when the keys reach
-master.
+**SIX FEATURE BRANCHES ARE BUILT AND AWAIT HIS BROWSER PASS. NONE MAY MERGE.** Each has a preview
+port and its own test script in this session's transcript; `~/webdev/worktrees/_panel/ports.conf`
+now carries a one-line description per branch and the panel says **"nothing to test"** for a branch
+whose file count against master is zero.
 
-**`tables-interface` still EXISTS AND IS NOT ON master, ON HIS INSTRUCTION.** Copy and paste in the
-tables is BROKEN and is the defect inside that programme.
+| Port | Branch | Task |
+|---|---|---|
+| 8087 | `674-coordinate-entry` | 674 typed coordinates, slots 2-3, scenario overrides, identity band |
+| 8088 | `feat/customer-demands` | 247 |
+| 8089 | `feat/time-series-graph` | 599 |
+| 8090 | `feat/label-gang-search` | 539 |
+| 8091 | `feat/survey-import` | 592 |
+| 8092 | `feat/library-import` | 611 |
+
+**THE APACHE RELOAD IS DONE (Tom, 2026-09-16), so the six preview ports answer.** The command it
+needed, kept because a new port needs it again:
+`sudo cp ~/webdev/worktrees/_panel/branch-preview.conf /etc/apache2/sites-available/ && sudo a2ensite branch-preview && sudo apache2ctl configtest && sudo systemctl reload apache2`
+
+**NEW BRANCHES TAKE CONVENTIONAL BRANCH PREFIXES** (`feat/`, `fix/`, `hotfix/`, `chore/`,
+`release/` -- conventionalbranch.org), as a RATCHET on new work. `projection` and
+`674-coordinate-entry` keep their names until they land. **`dev/reputation-and-practice.md` §3 says
+branch naming is recommended AGAINST and it is answering a DIFFERENT question** -- names indicating
+psychological distance from master, which go stale. A type prefix does not: a fix never becomes a
+feature. Tom raised it twice; under CLAUDE.md's own rule the rule was the suspect.
+
+**HE ASKED FOR AN INDUSTRY ANSWER TO FREEZING AND IT IS A RELEASE BRANCH, NOT A FREEZE.** Trunk-based
+development cuts `release/x.y` a few days out; that branch takes only fixes while the trunk keeps
+taking features. **He already has most of this for free, because deployment is a pull he performs** --
+the thing a freeze was protecting against is that you cannot pull half of master. Next time the line
+needs holding, cut `release/<name>` and nothing needs freezing. Not yet proposed to him as a change.
+
+**THREE DEFECTS FOUND BY BUILDING, EACH IN CODE THAT ALREADY SHIPPED:**
+- **A TANK'S HEAD WAS FLAT ACROSS A WHOLE RUN** -- on the map label and in the Profile, not only on
+  the new chart. `colorNodeValue()`'s head branch read the DOCUMENT for a fixed-head node; a tank's
+  water surface is an input to a steady state and a RESULT of a run. Fixed on
+  `feat/time-series-graph`, gated on `lastSolveResult.t` which only a run frame has. **`pressure` is
+  deliberately NOT changed** -- `fixedHeadPressure()` is where "a node with no ground has no
+  pressure" lives (Task 390) and EPANET states an imported reservoir's elevation as 0, so a tank's
+  head moves and its pressure is still flat. That is the honest gap, not an oversight.
+- **`updateLinkGeometry()` WOULD HAVE WRITTEN A SCENARIO'S PIPE LENGTH INTO BASE** merely by LOOKING
+  at a scenario that had moved a node, once positions became overridable -- `buildDom()` runs it on
+  every scenario switch. Defect 2 of `dev/scenario-seam-repair.md` by a new door. Guarded on
+  `inBaseScenario()` on `674-coordinate-entry`.
+- **EPANET DESCRIPTIONS ARE SILENTLY DISCARDED ON IMPORT.** Measured through the page's own parser: a
+  junction commented `;Corner of Elm and Main` imports with no description and `res.dropped` is
+  EMPTY. That breaks the one contract `js/lpn-inp.js` has. Being fixed with the identity band on
+  `674-coordinate-entry`; the machinery exists one section over, where `[DEMANDS]` reads its trailing
+  comment as the demand category on purpose.
+
+**`scenario_seam_check.php` CANNOT POLICE A POSITION WRITE, and that is declared rather than
+papered over.** It looks for `el._x =`; position is the one overridable property stored WITHOUT the
+underscore, because the file says `x`/`y` and so does EPANET's `[COORDINATES]`, and ten coordinate
+walkers read those names. One writer (`writeNodeCoord()`) plus harness coverage replaces it. Written
+into `dev/scenario-seam-repair.md`.
+
+**TOM RULED ON ELEVEN THINGS ON 2026-09-15 AND THE ROADMAP CARRIES ALL OF IT.** Closed: **659** (the
+cursor already carries the map/element distinction and the roadmap's claim that `default` shipped
+everywhere was WRONG -- one grep of `css/engcalcs.css` disproves it), **650**, **660**, **618**.
+**672** to 25, not manifesting. **669 DID SHIP** -- `fe51b8a7`, his own commit of 2026-08-19,
+"Remove zoom-based label hiding and its Always show labels setting", and **the original design
+answers the open unit question better than anything proposed**: `settings.labelMaxWidth` in MAP
+UNITS of view width, blank meaning always, a **"Use current view" button** so nobody computes a
+number, and a Text label's threshold scaled by its own `sizeMult`. **640 is the graphs umbrella**
+(599, 600, 637 are its children). **679** opened for the About mark. **667(d)**: synced folders
+already work and he uses them; a connector is Someday.
+
+**A NEGATIVE FINDING IS ONLY AS WIDE AS THE PLACES IT LOOKED.** The 669 search said "I cannot find
+that it ever shipped" having searched `js/`, the language files, `dev/*.md` and `git log -S` -- and
+never `examples/`, where a Text object reading "Zoom in to see labels" sits in `Net3.lwn`. **Say
+where you did not look.**
+
+**THE DAILY REPORT MAILS AT 22:00 SERVER TIME = 20:00 PHOENIX, EVERY NIGHT, WHETHER OR NOT ANYTHING
+IS WRONG.** That is the design: the 04:20 page check is silent on success, and that silence cannot
+be told from cron having died, which on this account it had been for years. `dev/host/` holds the
+scripts, `host_script_parity_check.php` compares the two copies. **Tom approved the From line as
+shipped** (`jconstru cron <tom@hawsedc.com>`) -- the address he originally asked for could not be
+proven: two test messages vanished with no bounce and the account cannot read `/var/log/exim_mainlog`.
+**Do not switch it without reading the far end.**
+
+**`~/mail/new` IS THE CATCH-ALL AND IT IS CLOSED NOW** -- `:fail: No Such User Here`, like every
+other domain on the account. **UAPI `Email::set_default_address` REFUSES EVEN A NO-OP** with
+"Invalid options specified"; `cpapi2 Email setdefaultaddress domain=… fwdopt=fail failmsgs=…` works.
+
+**SIXTY NEW ENGLISH KEYS SIT ON UNMERGED BRANCHES** -- 44 on `feat/survey-import` (each a distinct
+row-level refusal), 16 on `feat/time-series-graph`. **His reading is the critical path, not the
+building**, and a sprint before he has read them is paid work thrown away -- that is what sprint 459
+recorded. **Do not launch one on a general "proceed".**
+
+**FOUR SEATS ANSWERED TWO DESIGN QUESTIONS AND THEIR JOURNALS ARE ON master.** On the coordinate
+slots he chose **Option 1 everywhere** and **Declan's measured dissent stands**: coordinate cells are
+real typeable inputs, not the `tabIndex=-1` cells the pane uses for computed columns, so a clerk who
+places nodes by pointer pays about 800 stray keystrokes over 400 rows. **Revisit it when columns
+become customizable.** On property collapsing all four said **split "Flow and pressure"** (it is the
+only place in his draft putting a typed number and a computed one in one box, and `BAND_NODE` /
+`RESULT_NODE` already draw that seam) and **open by default** -- and **he has ruled against
+collapsing once already**, `js/looped-network.js:28739`, 2026-08-18: *"No need ever to collapse; just
+scroll/jump to your section."* Nothing is built from that brainstorm.
+
+**EPANET'S LAYOUT CARRIES NO AUTHORITY HERE EVEN THOUGH ITS TERMINOLOGY DOES.** Its Property Editor
+puts Description and Tag ahead of Elevation; its own `[JUNCTIONS]` record is `ID Elev Demand Pattern`
+with Description a trailing comment and Tag its own section. **The two disagree**, and no EPA
+rationale exists for the dialog order. Established independently by Sue and Mary.
+
+**`tables-interface` STILL EXISTS AND IS NOT ON master, ON HIS INSTRUCTION.** Copy and paste in the
+tables is BROKEN and is the defect inside that programme; Task 186 as scoped does not cover creating
+rows from a paste, which is Declan's item 1.
 
 **TWO STRINGS ARE DELIBERATELY DIFFERENT ON master AND ON `projection`, AND THAT IS NOT DRIFT.**
-`lpn_new_coordsys_local` and its tip. master carries the short honest pair; `projection` carries the
-full pair. When `projection` merges the branch's wording wins. Do not "fix" either side.
+`lpn_new_coordsys_local` and its tip. When `projection` merges the branch's wording wins.
 
-**THE FREEZE IS A FEATURE FREEZE. `freeze.active` IS false AND MUST STAY SO WITHOUT HIS WORD.**
-Reading it as a merge freeze cost a day of bug-fixing on 09-13.
+**THE PROPERTY GROUPING IS DECIDED IN SUBSTANCE AND NOT BUILT.** Tom's final shape, after two
+rounds with five seats: **Description and state / Dry properties / Water properties / Custom /
+Results and quick graph**, with WALL reaction coefficient dry and BULK in water, on his own ruling.
+Shut and Active BOTH stay -- a `[CONTROLS]` action changes `status` during a run
+(`js/lpn-time.js:220`, and every frame carries `statuses`) while nothing schedules `active`, so Shut
+is a state the ENGINE changes and Active is a modelling decision only a PERSON makes.
 
-**YOU MAY NOT MERGE A CAPABILITY BRANCH ON YOUR OWN JUDGEMENT, EVER.** `customer`, `graph`,
-`projection`, `custom-property` are declared in `dev/branch-policy.json`; an all-clear goes in
-`dev/branch-all-clears.json` in his words, pinned to the commit, and lapses when the branch moves.
+- **A GROUP MUST BE ABLE TO FOLD, AND THE SEATS NEARLY TALKED US OUT OF THE FEATURE.** Asked whether
+  groups should collapse BY DEFAULT they said no, on good grounds; Ida and Declan then reasoned that
+  an always-open disclosure buys a caret and a keyboard stop and no hiding, so use a plain heading.
+  Valid logic, wrong premise. **Tom, 2026-09-16: *"If the headings are non-interactive, we ditch
+  them. The entire purpose of this was the question of how to skip over X, Y, Description, and Tag
+  and get straight to the good stuff."*** He is right, and the orchestrator had recommended the
+  plain headings -- that was a synthesis error, not the seats'.
+- **THE ANSWER IS REMEMBERED FOLDING, NOT A DEFAULT.** Open the first time anybody sees it; once TOM
+  folds a group it stays folded for every element he opens afterwards. **Declan's keyboard objection
+  INVERTS once a group is shut** -- fields inside a closed section are not reachable at all, so
+  folding removes stops rather than adding one. He measured the always-open case because that is
+  what he was asked about, and he separately RETRACTED his 800-keystroke table figure after
+  verifying `js/looped-network.js:16669`: Enter already moves DOWN a column, so a clerk filling 400
+  elevations never crosses X, Y, Description or Tag. He demoted his own reorder-to-end wish to a
+  nicety and named COLUMN HIDE as the real fix, with a design in his journal.
+- **HALF THE MECHANISM EXISTS.** `cpOpenKeys` (`js/looped-network.js:3658`) already remembers which
+  custom-property sections are open, and its own comment says *"memory within one rebuild and not
+  storage."* Only the persistence is missing: one browser-furniture `localStorage` key per group
+  name, never in `serializeProject()` (`lpn_furniture_check.php` is blocking).
+- **Sue exempts "Results and quick graph" from his three-row rule BY NAME**, because that group's
+  reason to exist is the graph button (Task 637), identical on every element type; Ida confirmed the
+  2-row count is a STRUCTURAL FLOOR, since a fixed-head node solves to at most head, pressure and
+  quality. Task 637 retires the problem when it ships.
+- **Two concrete moves and one non-move:** the link popup renders Shut BEFORE Tag while his list has
+  Tag first (a two-line swap); do NOT move Diameter after Length, because the code order is anchored
+  to the pipe-type chooser under Task 465's dated ruling and an illustrative bullet list must not
+  silently overturn one. **Sue flags "Dry properties" against the trade's "dry utilities"** (gas,
+  electric, telecom, as against wet) and offered "Asset properties" without campaigning -- his ear,
+  not ours. **Franco alone wants folding ON A PHONE by default** (Dry and Results shut, Description
+  and Water open), measured against a popup running to `min(46rem, 92dvh)`; that is unresolved and
+  is a separate question with its own evidence.
 
-**FOUR OF THOSE BRANCH REFS NOW HOLD NOTHING master LACKS** -- `custom-property`, `customer`,
-`graph`, `660-dblclick-open`, `662-reaction-questions` all read 0 ahead. That is the residue of the
-six unsanctioned merges of 09-13. Whether each is landed work whose ref should die, or work that
-never started, is a judgement `branch_hygiene_check.php` will not make for you. **Ask him.**
+**GITHUB BRANCH PROTECTION IS DECLINED. DO NOT RE-PROPOSE IT.** Tom, 2026-09-16: *"I'm sorry. I
+can't bring myself to do that."* It is his call and the gap it would have closed is narrow -- a
+clone or another machine with no hooks -- which `hook_install_check.php` already reports whenever the
+suite runs. **A gate he works around would be worse than none**, which is this project's own rule.
+Strike it from `dev/reputation-and-practice.md` §4 gap 1 as an ASK; the fact stays true.
 
-**AND THAT ADVISORY WAS BLIND IN EVERY WORKTREE UNTIL 2026-09-15.** It tested `is_dir('.git')`,
-which is false when `.git` is a FILE -- which it is in all five worktrees -- so it printed "not a
-git checkout, nothing to report" and a blind run looked exactly like a clean tree. Fixed to ask
-`git rev-parse --git-dir`. **The shape is the one that has already cost this project a guard: failing
-open, silently.**
+**HE IS CONFUSED ABOUT WHAT master MEANS AND HAS DELEGATED IT** (*"I confess I am confused. I will
+have to run tests with you to see how it works. Just do it the best way you find."*). The practice
+given him in one paragraph, and the one to hold: **master is where finished work lives, a branch is
+where unfinished work lives, production is whatever he last pulled.** Every change starts on a
+branch; nothing reaches master until the suite passes ON THE MERGED RESULT; a FEATURE additionally
+waits for him to have used it and said so, a defect or tooling change does not. **He wants a
+testing session** -- he picks a branch, you walk it with him, and he sees what clearing one costs.
+Offer it; do not lecture.
 
-**HE RULED ON EIGHT TASKS ON 2026-09-15 AND THE ROADMAP CARRIES ALL OF IT.** Closed on his word:
-**659** (the cursor already carries the distinction and the roadmap's claim that `default` shipped
-everywhere was simply WRONG -- one grep of `css/engcalcs.css` disproves it), **650** and **660**
-(Ubuntu Chrome under WSLg only, *"Best to close the issue"*). **672** dropped to 25, not
-manifesting. **669 DID SHIP** and the search that said otherwise never looked in `examples/` --
-`Net3.lwn` carries a Text object reading "Zoom in to see labels". **539**: start the branch, on his
-own better reason (*"a better network model could improve our performance placing labels"*).
-**667(d)**: the synced-folder route already works and he is using it; an in-app connector is
-Someday.
+**TRANSLATE BEFORE RELAYING. HE DOES NOT READ CODE AND SAID SO.** Tom, 2026-09-16: *"I don't know
+what those are. Your in-house with the subagents is developing a language of its own, and I don't
+know if I need to understand it."* -- about `<details>`/`<summary>`, used a dozen times as though
+they were ordinary words. **A subagent writes to another machine's standard and forwarding that
+vocabulary makes him do the one job he cannot do.** Name a thing by what it DOES (*"a collapsible
+section, the little triangle you click to fold a block away"*), keep a path or a line number only
+where he could act on it, and leave provenance citations in the journals.
 
-**STILL WAITING ON HIM:** Task 663's three reaction-rate questions, which he says are unfamiliar and
-asked to be re-put; GitHub branch protection on `master`, which no local hook can substitute for;
-one `sudo systemctl reload apache2` for port 8087; and the browser pass on `674-coordinate-entry`.
+**THE ZOOM FLOOR WAS COSTING BOTH ZOOM-OUT AND ZOOM-TO-FIT ON A BIG LOCAL DRAWING, and it is fixed
+on master (2026-09-16).** `MIN_SCALE_GRID` is 0.05 whatever a drawing unit means, so a site surveyed
+in feet -- Tom's EWB demo file is ~13,000 units across -- stopped zooming out at a window 20,000
+units wide, **and Zoom to fit stopped with it**: `fitScaleFor()` answers the floor when nothing fits
+even there, so the fit pinned at 0.05 and the network hung off both edges of a laptop-height window.
+Two symptoms, one cause, and he reported them separately. The floor is the drawing's own size now
+(`LPN_VIEW_MIN_MODEL_PX / span`, the same number that decides whether a stored view is worth
+restoring) and a step-2 fit that bottoms out falls back to the MODEL fit. `zoom-fit-harness.js`
+carries the case and it fails on the old tree. **The projected branch had the identical accident on
+2026-09-14 and this is the local-grid half of it** -- if a third zoom complaint arrives, suspect the
+constant before the arithmetic.
 
-**THE REPORT'S SENDER ADDRESS IS UNPROVEN AND WAS NOT SHIPPED.** He asked for
-`jconstru@constructionnotesmanager.com`. Two test messages on 2026-09-15 -- one fully on that
-domain, one with that header and the proven envelope -- **ARRIVED NOWHERE AND BOUNCED NOWHERE.** The
-account cannot read `/var/log/exim_mainlog`, so why is unknowable from here. `cronmail.sh` therefore
-carries his DISPLAY NAME on the proven address. **Do not switch it without reading the far end.**
+**THE FIVE-SECOND PROJECT-TAB SWITCH: 4,628 ms TO ~300 ms ON HIS OWN MACHINE, IN FIVE REMOVALS
+(2026-09-16).** Tom: *"There is a 5-second delay switching to Net-3 project tab"*, and later, on
+being offered 3 seconds: *"3 seconds vs 5 seconds is hardly an improvement. Why is anything being
+recalculated at all?"* -- which was the right question and is what produced the rest of it. Every
+one of the five is a REMOVAL OF DUPLICATED WORK, not a cleverness, and each was measured in a real
+browser before and after.
 
-**THE CATCH-ALL IS CLOSED.** `constructionnotesmanager.com` routed unrouted mail to the system user,
-which is what filled `~/mail/new` with 22,907 bounces; it is `:fail: No Such User Here` now, like
-every other domain on the account. **And UAPI `Email::set_default_address` REFUSES EVEN A NO-OP**
-with "Invalid options specified" -- `cpapi2 Email setdefaultaddress domain=… fwdopt=fail
-failmsgs=…` is what works. A fifth entry for the cPanel-traps list.
+| what was removed | his machine |
+|---|---|
+| re-measuring text the browser had already measured (`measuredTextWidth`, keyed on class+size+string) | 8,140 measurements a switch -> ~100 |
+| re-solving a network that had not changed (`switchKeep`, pinned to the stored BYTES) | one engine run a switch -> none |
+| re-deciding a label layout that had not changed (the same keep) | label passes 2 -> 0 |
+| an index of every pipe's segments rebuilt once PER PIPE (`buildDom` never opened the two holds) | 120 builds -> 1 |
+| every label laid out twice, the first time at the OUTGOING tab's zoom | `lk:layout` 1,618 ms -> gone |
 
-**NOTHING TO DELETE IN THE LANGUAGE FILES.** Two keys are rendered by nothing and both are the
-canonical mode names `mode_name_check.php` holds every other string against. Suffix drift 0, dead
-readers 0.
+- **THE ONE NUMBER STILL UNEXPLAINED** is that `layoutLinkLabel` cost him 6.4 ms per label copy
+  against 0.3 ms here, for the SAME 252 copies -- his window size, his zoom and his station counts
+  were all eliminated as causes, and LastPass was wrongly accused and cleared by his own
+  measurement. The double-layout fix should have removed most of it. **Unconfirmed: he never sent a
+  reading with DevTools closed.**
+- **`?debug=perf` NOW COVERS THE WHOLE SWITCH** and stamps the BUILD SHA on every line, because an
+  exchange was lost to a readout taken before a deploy. It breaks `buildDom` into nodes/links/texts,
+  a pipe into four parts, and counts label passes, measurements and label copies. `?debug=nofiles`
+  boots without touching saved file handles.
+- **AND THERE IS A BROWSER DRIVER NOW: `dev/lpn-spike/browser-drive.js`.** It speaks the DevTools
+  protocol to a real headless Chrome with no dependency (node's built-in WebSocket), which is what
+  ended the guessing: Task 672 established that THREE headless reproductions of a slowdown had
+  failed, because what costs the seconds -- forced layout, rasterising, style recalculation -- is
+  work the DOM stub does not do. **Absolute milliseconds do not travel between machines; shapes and
+  ratios do**, and every conclusion drawn from it was stated as a proportion and then confirmed on
+  his readout.
+- **WHAT IS LEFT IS TASK 680's OTHER HALF:** the drawing is still destroyed and rebuilt on every
+  switch. Keeping it costs about 2 MB per project (measured) and makes the layers and element
+  indexes stop being singletons.
+
+**CHROME CRASHES ITS OWN BROWSER PROCESS ON THE MAP PAGE IN A PRIVATE WINDOW, AND IT IS NOT OURS**
+(2026-09-16). Recipe, both halves needed: a private window, a project opened THROUGH THE FILE
+PICKER, then a reload. A 14 KB drawing with no image, no scenarios and no map is enough; a project
+created in the window without the picker is clean; a normal profile is clean. **Production's
+week-old code crashes identically**, served side by side on local ports -- so none of that session's
+commits did it, which the session assumed for an hour. With `?debug=nofiles`, which skips both the
+read on boot and the WRITE when a file is opened, **it still crashes**, so no handle of ours is
+involved at all. Three dumps, all `ptype: browser`, which **a web page cannot cause**.
+`dev/chrome-incognito-crash.md` holds the evidence and the report to file with Chrome, ready to
+paste. **Do not re-open it as a suite defect, and do not build a workaround on an incognito
+DETECTION.**
+
+- **THE VANISHING MOUSE CURSOR IS THE SAME BUG, and the obvious suspect was innocent.** It was
+  pinned on the `?debug=perf` overlay having stopped ignoring the mouse -- the only cursor-related
+  line in a 20-commit night, present on the new build and absent on production's -- and then it
+  happened again under `?debug=nofiles`, where that overlay does not exist. **"The only line that
+  could have done it" is how a one-sided correlation gets promoted to a cause.**
+
+**STILL WAITING ON HIM:** the browser passes; one `?debug=perf` reading with DevTools closed;
+**whether `projection` is FINISHED (one sentence from him, and do not guess -- guessing is what went wrong on 09-13);
+Task 663's questions 2 and 3, now that he knows the reaction rate is a LINK label switched on under
+Settings > Labels and needs a chemical and an extended-period run to exist at all; the grouping
+build; and the two remaining empty refs, `660-dblclick-open` and `662-reaction-questions`.
+**`custom-property`, `customer` and `graph` are DELETED on his word, local and remote.**
+
+**CLOSING A TASK MAKES THREE FILES STALE, NOT ONE** -- `dev/ROADMAP.md`, then
+`generate_roadmap_index.php` AND `generate_features.php`, because `dev/features.md` carries the
+closed-ID count in its opening sentence. That cost three red builds in one day before anybody wrote
+it down; it is at the top of `dev/roadmap-closed-ids.md` now.
 ---
 
 **Read this, then `dev/ROADMAP.md`, then `dev/new-english-keys.md`.** It is a snapshot of dense days

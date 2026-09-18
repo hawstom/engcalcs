@@ -118,8 +118,8 @@ files — which is, by construction, every string that has been written and not 
     // opens and one they put off.
     $unruled = 0;
     foreach ($new as $nk => $nv) { if (ecRulingLine($nk, $nv) === '') { $unruled++; } }
-    $out .= "**" . $unruled . " still to read**, of " . count($new) . " untranslated keys, of "
-        . $total . " English keys. A key already marked _Ruled OK_ below needs nothing from you;\n"
+    $out .= "**" . $unruled . " still to read on master**, of " . count($new) . " untranslated keys, of "
+        . $total . " English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;\n"
         . "the ruling lapses by itself if the wording changes.
 
 "
@@ -136,9 +136,12 @@ files — which is, by construction, every string that has been written and not 
         . "Write your answer on the flag's own line. Anything is fine; \"OK\" is enough.
 ";
     $out .= ecFrictionSection($root, $langCount);
-    if (!$new) { return $out . "
-None. Every English key is present in at least one other language.
-"; }
+    if (!$new) {
+        return $out . "
+None on master. Every English key here is present in at least one other language.
+"
+            . ecBranchSection($root, $GLOBALS['english']);
+    }
     $groups = array();
     foreach ($new as $k => $v) {
         $p = (strpos($k, '_') !== false) ? substr($k, 0, strpos($k, '_')) : $k;
@@ -169,7 +172,103 @@ None. Every English key is present in at least one other language.
 ");
         }
     }
+    return $out . ecBranchSection($root, $GLOBALS['english']);
+}
+
+/**
+ * **HIS READING LIST WAS BLIND TO EVERY BRANCH, WHICH IS NOW WHERE THE WORK LIVES.**
+ *
+ * Tom, 2026-09-17: *"dev/new-english-keys.md is empty. Please check."* It was, and it was CORRECT:
+ * the derivation above compares the English file against the other 26 IN THE CHECKED-OUT TREE, and
+ * on master there were genuinely no new keys. The 24 strings awaiting him were on two unmerged
+ * feature branches.
+ *
+ * **THAT USED TO BE FINE AND STOPPED BEING FINE ON 2026-09-12.** Under the old paradigm new strings
+ * landed on master and appeared here. Under branch work a FEATURE waits on its branch until he has
+ * used it and said so -- so the list went structurally blind to exactly the work that is waiting for
+ * him, which is the opposite of what it is for. His reading is the critical path; a reading list
+ * that cannot see the unread work is worse than none, because it reports zero and reads as done.
+ *
+ * **IT IS ADVISORY AND IT IS DELIBERATELY OUTSIDE `--check`.** A branch tip moves whenever anybody
+ * commits on it, so blocking on this section would fail master's build for work happening somewhere
+ * else entirely -- a gate that fires on somebody else's commit is a gate that gets switched off.
+ * `--check` still blocks on the master-derived part exactly as before; this section carries each
+ * branch's SHA so a reader can see for themselves whether it is current, and `--check` PRINTS a
+ * note when it has drifted without failing.
+ *
+ * A branch with no new English keys is named and dismissed in one line, because "this branch adds
+ * none" is a real answer and silence is not.
+ */
+function ecBranchNewKeys(string $root): array {
+    $out = array();
+    $branches = array();
+    exec('cd ' . escapeshellarg($root) . ' && git branch --no-merged master --format="%(refname:short)" 2>/dev/null', $branches);
+    foreach ($branches as $b) {
+        $b = trim($b);
+        if ($b === '' || $b === 'master') { continue; }
+        $sha = array();
+        exec('cd ' . escapeshellarg($root) . ' && git rev-parse --short ' . escapeshellarg($b) . ' 2>/dev/null', $sha);
+        $src = array();
+        $rc = 0;
+        exec('cd ' . escapeshellarg($root) . ' && git show ' . escapeshellarg($b . ':lib/lang.ec.en.php') . ' 2>/dev/null', $src, $rc);
+        if ($rc !== 0 || !$src) { continue; }
+        // The branch's English file is PARSED, never required: requiring it would run another
+        // commit's PHP in this process and let the later file win in $ec_lang. A token scan cannot
+        // do that, and a single-quoted assignment is the only form rule D allows anyway.
+        $keys = array();
+        foreach ($src as $line) {
+            if (preg_match("/^\\\$ec_lang\\['([A-Za-z0-9_]+)'\\]\\s*=\\s*'(.*)';\\s*$/", $line, $m)) {
+                $keys[$m[1]] = str_replace(array("\\'", "\\\\"), array("'", "\\"), $m[2]);
+            }
+        }
+        $out[$b] = array('sha' => isset($sha[0]) ? $sha[0] : '?', 'keys' => $keys);
+    }
+    ksort($out);
     return $out;
+}
+
+function ecBranchSection(string $root, array $masterEnglish): string {
+    $branches = ecBranchNewKeys($root);
+    if (!$branches) { return ''; }
+
+    $body = '';
+    $totalUnruled = 0;
+    $totalNew = 0;
+    foreach ($branches as $b => $info) {
+        $added = array();
+        foreach ($info['keys'] as $k => $v) {
+            if (!array_key_exists($k, $masterEnglish)) { $added[$k] = $v; }
+        }
+        ksort($added);
+        if (!$added) {
+            $body .= "\n### " . $b . " (`" . $info['sha'] . "`) — adds no English strings\n";
+            continue;
+        }
+        $unruled = 0;
+        foreach ($added as $k => $v) { if (ecRulingLine($k, $v) === '') { $unruled++; } }
+        $totalUnruled += $unruled;
+        $totalNew += count($added);
+        $body .= "\n### " . $b . " (`" . $info['sha'] . "`) — " . count($added) . " new, "
+            . ($unruled > 0 ? $unruled . " to read " . EC_RULING_FLAG : "all ruled") . "\n\n";
+        foreach ($added as $k => $v) {
+            $ruled = ecRulingLine($k, $v);
+            $body .= "- **`" . $k . "`**\n  > " . str_replace("\n", "\n  > ", $v) . "\n"
+                . ($ruled !== '' ? $ruled : "  " . EC_RULING_FLAG . "\n");
+        }
+    }
+
+    $head = "\n---\n\n# Strings waiting on a branch\n\n"
+        . "**" . $totalUnruled . " still to read**, of " . $totalNew . " new keys across "
+        . count($branches) . " unmerged branch(es).\n\n"
+        . "A feature waits on its branch until you have used it and said so, so this is where new\n"
+        . "wording lives before it reaches master. **These strings are real and are not on master**,\n"
+        . "which is why the list above can honestly say none while there is reading to do here.\n\n"
+        . "Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held\n"
+        . "fresh by the build — a branch moves whenever anybody commits on it, and failing master's\n"
+        . "build for that would be a gate nobody keeps. Refresh it with\n"
+        . "`php dev/scripts/new_english_keys.php --write`.\n";
+
+    return $head . $body;
 }
 
 /**
@@ -228,14 +327,46 @@ function ecRulingLine(string $key, string $value): string
 // The untranslated count is a sprint's size; the unruled count is what a person still owes.
 $ecUnruled = 0;
 foreach ($new as $k => $v) { if (ecRulingLine($k, $v) === '') { $ecUnruled++; } }
-$ecCounts = $ecUnruled . ' still to read, ' . count($new) . ' untranslated';
+/* **THE HEADLINE COUNTS BRANCHES TOO, OR IT REPORTS ZERO WHILE THERE IS READING TO DO.** On
+ * 2026-09-17 this line said "0 still to read" while 120 new strings sat on seven unmerged branches,
+ * and Tom read the zero and asked what was wrong with the file. Nothing was: the number was true
+ * about master and useless as an answer to "is there anything for me?". */
+$ecBranchWaiting = 0;
+foreach (ecBranchNewKeys($root) as $bInfo) {
+    foreach ($bInfo['keys'] as $bk => $bv) {
+        if (array_key_exists($bk, $english)) { continue; }
+        if (ecRulingLine($bk, $bv) === '') { $ecBranchWaiting++; }
+    }
+}
+$ecCounts = $ecUnruled . ' still to read on master, ' . count($new) . ' untranslated'
+    . ($ecBranchWaiting > 0 ? '; ' . $ecBranchWaiting . ' more waiting on branches' : '');
 
 if ($write || $check) {
     $file = $root . '/dev/new-english-keys.md';
     $want = newKeysMarkdown($new, count($english), $langCount);
     $have = is_file($file) ? file_get_contents($file) : '';
     if ($check) {
-        if ($have === $want) { echo "FRESH (" . $ecCounts . ")\n"; exit(0); }
+        /* **THE BRANCH SECTION IS COMPARED BUT NEVER BLOCKS, AND THAT SPLIT IS THE WHOLE DESIGN.**
+         * A branch tip moves whenever anybody commits on it, so blocking on that half would fail
+         * MASTER's build because of work happening somewhere else -- and a gate that fires on
+         * somebody else's commit is a gate somebody switches off, which is this project's own rule.
+         * So the master-derived half keeps the guarantee it has always had, and the branch half is
+         * reported as a note. Split on the section's own heading, which no key name or English
+         * string can contain. */
+        $cut = function ($text) {
+            $i = strpos($text, "\n---\n\n# Strings waiting on a branch");
+            return $i === false ? array($text, '') : array(substr($text, 0, $i), substr($text, $i));
+        };
+        list($wantMain, $wantBranch) = $cut($want);
+        list($haveMain, $haveBranch) = $cut($have);
+        if ($wantMain === $haveMain) {
+            echo "FRESH (" . $ecCounts . ")\n";
+            if ($wantBranch !== $haveBranch) {
+                echo "  note: the branch section has drifted (a branch moved). Advisory, never blocking.\n"
+                   . "        Refresh it with:  php dev/scripts/new_english_keys.php --write\n";
+            }
+            exit(0);
+        }
         fwrite(STDERR, "STALE: dev/new-english-keys.md does not match lib/lang.ec.en.php.\n\n");
         fwrite(STDERR, "    Regenerate it:  php dev/scripts/new_english_keys.php --write\n\n");
         fwrite(STDERR, "This file is generated, never hand-edited. It is the list Tom reads; a stale one is\n");
