@@ -170,7 +170,12 @@ if (preg_match('/^[A-Za-z0-9-]+$/', $og_page)) {
 	}
 	unset($og_tries, $og_try);
 }
-$og_image = CANONICAL_ORIGIN . '/engcalcs/' . $og_card;
+// **THE CARD RIDES ON THE PAGE'S OWN ORIGIN, not the host's.** og:url and og:image naming two
+// different domains is a card that argues with itself, and since 2026-09-17 the origin is a
+// per-page declaration (ecCanonicalOrigins()): the map application is on librewaternet.org and
+// everything else on hawsedc.com. The image file itself exists under /engcalcs/ on both hosts.
+$og_image = ecCanonicalOrigin(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
+	CANONICAL_ORIGIN) . '/engcalcs/' . $og_card;
 ?>
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="<?=htmlspecialchars(strip_tags((string)$ec_lang['menu_brand']), ENT_QUOTES, 'UTF-8')?>" />
