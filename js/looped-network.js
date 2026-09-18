@@ -7976,6 +7976,64 @@ var EngCalcs = EngCalcs || {};
 		n = linkNormalAt(l, customerT(c));
 		return (c.x || 0) * n.x + (c.y || 0) * n.y;
 	}
+	/**
+	 * **A SERVICE THAT COMES OFF THE MAIN RIGHT AT A NODE SNAPS TO THE NODE** (Tom, 2026-09-17:
+	 * *"I don't see a way to connect directly to a node. I think that a very close connection
+	 * should snap to the nearest node."*).
+	 *
+	 * **IT IS THE SAME SNAP-ON-CREATE THIS PAGE ALREADY MAKES**, in the same one knob: a press
+	 * within reach of an existing junction reuses that junction rather than dropping a second one
+	 * on top of it, and a station within reach of a pipe's end is the same sentence about the same
+	 * tolerance (see TOUCH_REACH_PX's note on there being exactly two reach numbers on this page,
+	 * one per hand). No third constant is invented here.
+	 *
+	 * **WHAT IT ACTUALLY BUYS IS AN EXACT STATION, NOT A NEW KIND OF ATTACHMENT.** A customer is
+	 * always attached to a PIPE; `t` of 0 or 1 puts the connection exactly on that pipe's end node,
+	 * and the lumping rule then names that node with no near-miss arithmetic left in it. So there
+	 * is no new field, nothing to migrate, and an `.inp` export is unchanged.
+	 *
+	 * **AND IT IS RELEASED BY DRAGGING AWAY**, because it is judged on the CURRENT position every
+	 * time rather than remembered: leave the reach and the station is whatever the pointer says.
+	 */
+	function customerSnapT(l, t) {
+		var pts, p, sc = state.s || 1, a, b;
+		if (!l) { return t; }
+		pts = linkPointList(l);
+		if (!pts.length) { return t; }
+		p = Geom.pointAlongPolyline(pts, Math.max(0, Math.min(1, t)));
+		a = pts[0]; b = pts[pts.length - 1];
+		if (Math.hypot(p.x - a.x, p.y - a.y) * sc <= POINTER_REACH_PX) { return 0; }
+		if (Math.hypot(p.x - b.x, p.y - b.y) * sc <= POINTER_REACH_PX) { return 1; }
+		return t;
+	}
+	// **WHICH PIPE A SERVICE CONNECTED TO A NODE HANGS OFF, and the station that IS that node.**
+	// The node itself cannot hold the attachment -- a customer attaches to a pipe and lumps at a
+	// node, which is the whole model (dev/customer-demands.md) -- so connecting "to a node" means
+	// picking one of the pipes it is on and landing on its end.
+	//
+	// The pipe picked is the one running nearest the meter's own position, which is the one the
+	// service physically runs along; a node with no pipes on it at all answers null rather than
+	// inventing one, and the caller then treats the press as it treated it before.
+	function customerAttachAtNode(n, pt) {
+		var ids = (n && incidentLinks[n.id]) || [], best = null, bestD = Infinity, i, l, d;
+		for (i = 0; i < ids.length; i++) {
+			l = linkById(ids[i]);
+			if (!l || !nodeById(l.from) || !nodeById(l.to)) { continue; }
+			d = Geom.nearestFractionOnPolyline(linkPointList(l), pt.x, pt.y).dist;
+			if (d < bestD) { bestD = d; best = l; }
+		}
+		if (!best) { return null; }
+		return { link: best, t: best.from === n.id ? 0 : 1 };
+	}
+	// Whether this meter's service lands exactly on a node, which is what the drawing says out loud
+	// (see updateCustomerGeometry). A station of exactly 0 or 1 IS the pipe's end node, and only the
+	// snap above and a typed 0 or 100 can produce one.
+	function customerAtNodeEnd(c) {
+		var t;
+		if (!customerLink(c)) { return false; }
+		t = customerT(c);
+		return t === 0 || t === 1;
+	}
 	// **THE ONE WRITE SEAM FOR WHERE A METER IS**, taking the two things a drag is now allowed to
 	// change: the station ALONG the pipe, and the distance TOWARD or AWAY from it. Every gesture and
 	// every typed box goes through it, so there is no path left that can write an angle.
@@ -8085,6 +8143,14 @@ var EngCalcs = EngCalcs || {};
 		// support. The class is the same idiom .lpn-lbl-hidden already is.
 		ce.stub.classList[an ? 'remove' : 'add']('lpn-service-off');
 		ce.box.classList[an ? 'remove' : 'add']('lpn-meter-loose');
+		// **A SNAP THAT CAUGHT SAYS SO WHILE IT IS CAUGHT** (Task 247; Tom, 2026-09-17). A service
+		// landing exactly on a node is the one attachment a reader cannot verify by eye -- a
+		// connection one pixel short of the junction draws identically and lumps by the near-miss
+		// rule instead -- so the connector is marked while it is on the node and unmarked the moment
+		// a drag takes it off. Painted here, in the one pass every move goes through, rather than at
+		// each gesture: a mark applied by a drag and cleared by nobody is the defect this avoids.
+		ce.stub.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-service-snapped');
+		ce.box.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-meter-snapped');
 	}
 	// Every meter on this pipe, redrawn where the pipe's new shape puts it. Replayed from
 	// updateLinkGeometry(), which is the one pass every reshaping goes through -- so there is no
@@ -27263,11 +27329,32 @@ var EngCalcs = EngCalcs || {};
 					openCustomerPopup(onMeter.id, e.clientX, e.clientY);
 					return;
 				}
+				// **A PRESS ON A NODE CONNECTS THE SERVICE TO THAT NODE** (Tom, 2026-09-17: *"I
+				// don't see a way to connect directly to a node."*). There was genuinely no way:
+				// this tool asked for a PIPE and a node is not one, so pressing a junction did
+				// nothing at all and the reader could not tell that from a press the page missed.
+				//
+				// It is still an attachment to a pipe -- a customer has no other kind -- at the
+				// station that IS that node: `t` of 0 or 1 on one of the pipes the node is on. The
+				// pipe chosen is the one that passes nearest the meter's own position, so a corner
+				// where four mains meet takes the one the service actually runs along rather than
+				// whichever was drawn first; a genuine tie takes the first, deterministically, and
+				// the Customers table shows which pipe it landed on so a wrong guess is visible and
+				// typeable rather than silent.
+				var mNode = nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)),
+					mPt = pendingMeter ? pendingMeter : w,
+					mLink = mNode ? customerAttachAtNode(mNode, mPt) : null;
 				// The pipe under the press, by the browser's own hit test on its wide stroke,
 				// falling back to the same finder every other tool uses.
-				var mLink = (t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle'))
-					? { link: linkById(t.dataset.link), t: Geom.nearestFractionOnPolyline(linkPointList(linkById(t.dataset.link)), w.x, w.y).f }
-					: nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (!mLink) {
+					mLink = (t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle'))
+						? { link: linkById(t.dataset.link), t: Geom.nearestFractionOnPolyline(linkPointList(linkById(t.dataset.link)), w.x, w.y).f }
+						: nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
+					// A press near the END of a pipe means the node there, on exactly the reading the
+					// branch above makes -- and this is the half that catches it where the node's own
+					// symbol was not what the press landed on.
+					if (mLink && mLink.link) { mLink.t = customerSnapT(mLink.link, mLink.t); }
+				}
 				if (mLink && mLink.link) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
@@ -27624,7 +27711,7 @@ var EngCalcs = EngCalcs || {};
 			relayoutLabels();
 		} else if (drag.type === 'customer') {
 			snapshotDragOnce();
-			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos, hitm, nm;
+			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos, hitm, nm, tm, am;
 			if (!cm) { return; }
 			lm = customerLink(cm);
 			pos = { x: wm.x + drag.offX, y: wm.y + drag.offY };
@@ -27638,9 +27725,13 @@ var EngCalcs = EngCalcs || {};
 				// two -- a station, and a signed distance along the normal there -- so a drag can
 				// never produce an angle, whatever direction the hand moves in. See linkNormalAt().
 				hitm = Geom.nearestFractionOnPolyline(linkPointList(lm), pos.x, pos.y);
-				nm = linkNormalAt(lm, hitm.f);
-				setCustomerPerp(cm, hitm.f,
-					(pos.x - hitm.x) * nm.x + (pos.y - hitm.y) * nm.y);
+				// **AND A NEAR MISS ON EITHER END OF THE PIPE IS A CONNECTION TO THAT NODE**, judged
+				// afresh on every move, so dragging away releases it (customerSnapT()).
+				tm = customerSnapT(lm, hitm.f);
+				am = Geom.pointAlongPolyline(linkPointList(lm), tm);
+				nm = linkNormalAt(lm, tm);
+				setCustomerPerp(cm, tm,
+					(pos.x - am.x) * nm.x + (pos.y - am.y) * nm.y);
 			} else {
 				cm.x = pos.x; cm.y = pos.y;
 			}
@@ -27659,7 +27750,8 @@ var EngCalcs = EngCalcs || {};
 			// meter together, at the same distance out and on the same side. It used to leave the
 			// meter where it was drawn, which was the one gesture on this page that could make a
 			// service point sideways; linkNormalAt() carries why that is no longer offered.
-			setCustomerStation(ca, Geom.nearestFractionOnPolyline(linkPointList(la), wa.x, wa.y).f);
+			setCustomerStation(ca, customerSnapT(la,
+				Geom.nearestFractionOnPolyline(linkPointList(la), wa.x, wa.y).f));
 			updateCustomerGeometry(drag.id);
 			refreshCustomerHandle();
 			scheduleSolve();

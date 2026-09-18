@@ -55,6 +55,9 @@ const L = loadLoopedNetwork(
 	"\t\tsetCustomerStation: setCustomerStation, customerEdited: customerEdited,\n" +
 	"\t\tsetCustomerPerp: setCustomerPerp, customerPerpDistance: customerPerpDistance,\n" +
 	"\t\tlinkNormalAt: linkNormalAt, customerLink: customerLink,\n" +
+	"\t\tcustomerSnapT: customerSnapT, customerAtNodeEnd: customerAtNodeEnd,\n" +
+	"\t\tcustomerAttachAtNode: customerAttachAtNode, linkPointList: linkPointList,\n" +
+	"\t\tnodeById: nodeById, linkById: linkById,\n" +
 	"\t\tmeterHalfWorld: meterHalfWorld, serviceStrokeWorld: serviceStrokeWorld,\n" +
 	"\t\tdetachedCustomers: detachedCustomers,\n" +
 	"\t\tlabelsLayerTexts: function () {\n" +
@@ -265,6 +268,81 @@ ok('3.4 and back again', L.customerNodeId(m1) === jA.id);
 		L.setCustomerStation(m1, 0.2);
 		L.customerEdited(m1);
 	}
+}
+
+// ---- 3B. A VERY CLOSE CONNECTION SNAPS TO THE NEAREST NODE -----------------------------------
+//
+// Tom, 2026-09-17: *"I don't see a way to connect directly to a node. I think that a very close
+// connection should snap to the nearest node."*
+//
+// **THE FAILURE THE SNAP PREVENTS IS INVISIBLE ON THE SCREEN.** A service landing one pixel short
+// of a junction is drawn exactly like one landing on it, and it lumps by the near-miss rule
+// instead -- which is the same junction here and the WRONG one the moment somebody bends the pipe
+// or drags the node. So these fixtures assert the STATION, which is the thing that differs, and
+// they assert the release as hard as the catch: a snap that cannot be got out of is a trap.
+{
+	const l = L.customerLink(m1);
+	const pts = L.linkPointList(l);
+	const st = L.getState();
+	const wasS = st.s;
+	st.s = 1;                                    // one world unit per pixel, so reach reads directly
+	// 3 units from the start of a pipe hundreds of units long: a hair, at this zoom.
+	const nearStart = 3 / pts.reduce((a, p, i) => i ? a + Math.hypot(p.x - pts[i - 1].x, p.y - pts[i - 1].y) : 0, 0);
+	ok('3B.1 a station a few pixels off the end snaps exactly onto it',
+		L.customerSnapT(l, nearStart) === 0, String(L.customerSnapT(l, nearStart)));
+	ok('3B.2 ...and the far end snaps the same way', L.customerSnapT(l, 1 - nearStart) === 1);
+	// **RELEASED BY MOVING AWAY**, because it is judged on the current position every time rather
+	// than remembered. This is the assertion that says the snap is not a trap.
+	ok('3B.3 a station well clear of both ends is left exactly where it is',
+		L.customerSnapT(l, 0.5) === 0.5, String(L.customerSnapT(l, 0.5)));
+	// The reach is a SCREEN distance, so zooming in far enough must let a service sit genuinely
+	// close to a node without being swallowed -- which is how somebody draws the short stub that
+	// really is 3 units from the corner.
+	st.s = 200;
+	ok('3B.4 the reach is in pixels, so zooming in releases the same station',
+		L.customerSnapT(l, nearStart) !== 0, String(L.customerSnapT(l, nearStart)));
+	st.s = wasS;
+	// **AND THE SNAP IS SAID OUT LOUD ON THE DRAWING.** A snapped connector carries a class the
+	// stylesheet colours; an unsnapped one does not, and the same one pass paints both.
+	{
+		L.setCustomerPerp(m1, 0, 40);
+		L.customerEdited(m1);
+		const els = L.custEls()[m1.id];
+		ok('3B.5 a service on a node is marked on the map',
+			els.stub.classList.contains('lpn-service-snapped') && L.customerAtNodeEnd(m1) === true);
+		ok('3B.6 ...and it lumps at that very node',
+			L.customerNodeId(m1) === L.linkById(m1.link).from);
+		L.setCustomerPerp(m1, 0.4, 40);
+		L.customerEdited(m1);
+		ok('3B.7 ...and the mark goes when the service moves off it',
+			!els.stub.classList.contains('lpn-service-snapped') && L.customerAtNodeEnd(m1) === false);
+	}
+	// **CONNECTING AT A NODE IS STILL AN ATTACHMENT TO A PIPE**, which is what keeps the document,
+	// the solver and the .inp writer unchanged. Where four pipes meet, the one taken is the one
+	// running nearest the meter, and it is a real pipe of the node's.
+	{
+		const n = L.nodeById(L.linkById(m1.link).from);
+		const near = L.customerAttachAtNode(n, L.customerPoint(m1));
+		ok('3B.8 connecting at a node picks one of that node\'s own pipes',
+			!!near && (near.link.from === n.id || near.link.to === n.id), near && near.link.id);
+		ok('3B.9 ...at the station that IS the node', near && (near.t === 0 || near.t === 1),
+			near && String(near.t));
+		ok('3B.10 ...and it is the end of that pipe where the node actually is',
+			near && (near.t === 0 ? near.link.from : near.link.to) === n.id);
+		// **BOTH ENDS, because a station is 0 at one and 1 at the other** and a rule that always
+		// answered 0 would pass every fixture built on a pipe's starting node while putting every
+		// service at the far end of the network on the wrong junction.
+		const n2 = L.nodeById(L.linkById(m1.link).to);
+		const far = L.customerAttachAtNode(n2, L.customerPoint(m1));
+		ok('3B.11 the other end of the same pipe answers the other station',
+			far && (far.t === 0 ? far.link.from : far.link.to) === n2.id,
+			far && (far.link.id + ' t=' + far.t));
+		ok('3B.12 ...and the two ends do not answer the same station',
+			far && near && !(far.link.id === near.link.id && far.t === near.t),
+			far && near && (near.link.id + ':' + near.t + ' vs ' + far.link.id + ':' + far.t));
+	}
+	L.setCustomerPerp(m1, 0.2, 40);
+	L.customerEdited(m1);
 }
 
 // RENAMING THE PIPE carries the meter with it. Left out, the service would name an id the document

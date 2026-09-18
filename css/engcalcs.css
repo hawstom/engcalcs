@@ -1053,6 +1053,12 @@ html[lang="zh"] .ec-welcome {
 /* The preview dot of a half-placed meter, which is view state and not an element yet. The same
    red the rubber band it hangs off is, so the two read as one gesture in progress. */
 .lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
+/* A SERVICE CONNECTED EXACTLY TO A NODE SAYS SO WHILE IT IS (Task 247; Tom, 2026-09-17: "a very
+   close connection should snap to the nearest node"). A snap that catches and looks identical to
+   one that missed by a pixel is a snap nobody can trust, so the connector and the dot take the same
+   red the other temporary marks on this map use, and both lose it the moment a drag pulls away. */
+.lpn-service-snapped { stroke: #d32f2f; }
+.lpn-meter-snapped { fill: #d32f2f; stroke: #d32f2f; }
 /* The slide handle: on the pipe, only while its meter is selected, and grabbable. */
 .lpn-custhandle { fill: #fff; stroke: #d32f2f; cursor: grab; }
 /* A METER CARRIES NO LABEL ON THE MAP (Tom, 2026-09-17: "I don't think we want labels on
