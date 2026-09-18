@@ -1661,6 +1661,11 @@ $ec_lang['lpn_crs_unplaceable_mark']='(no map)';
 $ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
+// **AND WHAT IT SAYS WHEN THE WORLD MAP IS ATTACHED BUT NAMES NO COORDINATE SYSTEM** (Tom,
+// 2026-09-17). The custom georeference wizard defines a coordinate system of its own -- an anchor
+// point, a scale and a turn -- and no register has a name or a number for it, so the strip says
+// that it has one and that it is nobody's. Lower case: it is not a proper name.
+$ec_lang['lpn_crs_unnamed']='unnamed';
 $ec_lang['lpn_crs_none']='Not georeferenced';
 // Edited by TGH 2026-09-07
 // Task 584: the page-wide rule stated where it is decided. A new project gets the hard-coded

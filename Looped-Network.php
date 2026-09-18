@@ -1406,6 +1406,7 @@ EngCalcs.pageConfig = {
 	lpn_field_coord_tip: <?=json_encode($ec_lang['lpn_field_coord_tip'])?>,
 	lpn_coord_off_world: <?=json_encode($ec_lang['lpn_coord_off_world'])?>,
 	lpn_crs_none: <?=json_encode($ec_lang['lpn_crs_none'])?>,
+	lpn_crs_unnamed: <?=json_encode($ec_lang['lpn_crs_unnamed'])?>,
 	lpn_crs_noview: <?=json_encode($ec_lang['lpn_crs_noview'])?>,
 	lpn_crs_count: <?=json_encode($ec_lang['lpn_crs_count'])?>,
 	lpn_crs_place_projected: <?=json_encode($ec_lang['lpn_crs_place_projected'])?>,

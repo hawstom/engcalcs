@@ -3540,8 +3540,21 @@ var EngCalcs = EngCalcs || {};
 			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
 		}
 		code = projectCrsCode();
-		return code ? crsOptionText({ code: code, name: crsLabel(code) })
-			: (pc.lpn_crs_none || 'Not georeferenced');
+		if (code) { return crsOptionText({ code: code, name: crsLabel(code) }); }
+		/**
+		 * **THREE VALUES, NOT TWO, AND THE MIDDLE ONE ANSWERS TWO QUESTIONS ON PURPOSE** (Tom,
+		 * 2026-09-17, overruling a recommendation of ours that this strip should answer only one):
+		 * *"I think that it does answer two questions. 'unnamed' means that the world map is
+		 * attached (the project is georeferenced), but that it's not any named CRS. It's probably
+		 * only an approximate anchor point and convergence angle from our UI."*
+		 *
+		 * So: the EPSG name and number where the project states one, `unnamed` where the custom
+		 * georeference wizard has put the drawing on the Earth without naming the coordinate
+		 * system it thereby defines, and `Not georeferenced` where the drawing sits nowhere at all.
+		 * Lower case, because it is not a proper name -- that is the whole of what it is saying.
+		 */
+		if (xyGeorefOk()) { return pc.lpn_crs_unnamed || 'unnamed'; }
+		return pc.lpn_crs_none || 'Not georeferenced';
 	}
 	// **THE AXES ARE NAMED FOR THE COORDINATE SYSTEM AND READ IN PUBLIC ORDER** (Task 641, and
 	// CLAUDE.md's coordinate-order rule). Latitude before longitude, northing before easting: both

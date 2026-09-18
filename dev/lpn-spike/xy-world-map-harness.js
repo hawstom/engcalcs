@@ -212,6 +212,11 @@ ok('GEOREFERENCE HERE CHANGES NOT ONE STORED BYTE', snapshot() === before,
 ok('the placement it keeps is the one on the screen',
 	JSON.stringify(L.xyGeoref()) === JSON.stringify(placed));
 
+// **(3) THE STATUS BAR SAYS `unnamed`** -- Tom's own third step, and the middle of three values.
+const PC0 = global.EngCalcs.pageConfig || {};
+ok('the map status reads unnamed once the world map is attached',
+	L.crsDisplayName() === PC0.lpn_crs_unnamed, L.crsDisplayName());
+
 // ---- and a cancelled second run puts the first one back ----------------------------------------
 L.mapgeoStart();
 L.mapgeoGoTo({ lat: -33.8688, lon: 151.2093 });
@@ -226,6 +231,8 @@ L.removeMapAttach();
 ok('the georeferencing is gone', L.xyGeorefOk() === false);
 ok('REMOVING LEAVES THE PROJECT EXACTLY AS IT WAS', snapshot() === before,
 	snapshot() === before ? '' : 'the saved project differs');
+ok('...and the map status goes back to saying it is not georeferenced',
+	L.crsDisplayName() === PC0.lpn_crs_none, L.crsDisplayName());
 
 // ---- the menu says what Tom asked it to say ----------------------------------------------------
 const rows = L.mapMenuRows().filter(function (r) { return !r.hidden && r.fn; });
