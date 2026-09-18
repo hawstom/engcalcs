@@ -317,6 +317,68 @@ const finite = (s) => s.points.filter((p) => p.y !== undefined).map((p) => p.y);
 	check(L.tsPicks().length === 1 && S.picks.node.length === 2,
 		'an id whose element is gone is not drawn, and not forgotten either');
 
+	// ---- 7b. the two pull-downs, driven ---------------------------------------------------------
+	//
+	// **THE DEFECT THIS SECTION EXISTS FOR** (Tom, 2026-09-17: *"I am not able to change Nodes to
+	// Links."*). Section 7 above sets `tsState` DIRECTLY and every check in it passed while half the
+	// feature was unreachable, because writing the state is not the gesture -- the gesture is a
+	// pull-down, and the handler on it read the wrong variable. So everything below goes through the
+	// controls the reader actually meets, and nothing here touches tsState by hand.
+	//
+	// Found by walking the form the page built, never through getElementById: the stub answers that
+	// only for the ids it pre-creates, and rebuildTsForm() makes its controls with createElement.
+	head('7b. THE PULL-DOWNS, PRESSED RATHER THAN SET');
+	function tsControl(id) {
+		return (byId.lpn_ts_form.children || []).filter((c) => c.id === id)[0] || null;
+	}
+	function tsOptionValues(id) {
+		const c = tsControl(id);
+		return c ? (c.children || []).map((o) => o.value) : [];
+	}
+	function fire(el, type) {
+		((el && el._listeners && el._listeners[type]) || []).forEach((f) => f({ type: type, target: el }));
+	}
+	S.group = 'node';
+	S.fields.node = 'pressure';
+	S.fields.link = '';
+	L.rebuildTsForm();
+	check(tsControl('lpn_ts_group') && tsControl('lpn_ts_group').value === 'node',
+		'the group control opens on Nodes');
+	check(tsOptionValues('lpn_ts_group').join(',') === 'node,link',
+		`and offers both groups: ${tsOptionValues('lpn_ts_group').join(', ')}`);
+	// The gesture: choose Links, exactly as a pointer does -- the browser writes the value, then the
+	// change event runs the page's own handler.
+	const groupSel = tsControl('lpn_ts_group');
+	groupSel.value = 'link';
+	fire(groupSel, 'change');
+	check(L.tsState().group === 'link',
+		`choosing Links really switches the graph to links: group is now "${L.tsState().group}"`);
+	// **AND THE CONTROL DOES NOT SNAP BACK**, which is what a reader sees. The handler rebuilds the
+	// row, so this is the rebuilt control and not the one that was pressed.
+	check(tsControl('lpn_ts_group') && tsControl('lpn_ts_group').value === 'link',
+		'and the control still reads Links after the row is rebuilt');
+	check(tsOptionValues('lpn_ts_quantity')[0] === 'velocity',
+		`the quantity list becomes the LINK fields: ${tsOptionValues('lpn_ts_quantity').join(', ')}`);
+	check(L.tsPicks().length > 0,
+		`and the graph seeds itself with links rather than opening blank: ${L.tsPicks().join(', ')}`);
+	// The quantity control, driven the same way -- it worked, and it is one line from the one that
+	// did not, so it is held here rather than assumed.
+	const fieldSel = tsControl('lpn_ts_quantity');
+	fieldSel.value = 'flow';
+	fire(fieldSel, 'change');
+	check(L.tsState().fields.link === 'flow' && L.tsField() === 'flow',
+		`choosing a quantity sticks: ${L.tsField()}`);
+	// Back to Nodes, which must bring the node question back rather than a default: the two groups
+	// keep their own field and their own picks.
+	const groupSel2 = tsControl('lpn_ts_group');
+	groupSel2.value = 'node';
+	fire(groupSel2, 'change');
+	check(L.tsState().group === 'node' && L.tsField() === 'pressure',
+		`and switching back restores the node question: ${L.tsField()}`);
+	check(tsOptionValues('lpn_ts_quantity')[0] === 'pressure',
+		`with the NODE fields offered again: ${tsOptionValues('lpn_ts_quantity').join(', ')}`);
+
+
 	// ---- 8. the pane, and what is NOT stored ---------------------------------------------------
 	head('8. A TAB IN THE STRIP, AND NO NEW STORAGE');
 	const ids = L.paneTabIds();

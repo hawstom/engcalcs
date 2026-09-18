@@ -18345,43 +18345,53 @@ var EngCalcs = EngCalcs || {};
 	// .lpn-profile-controls in css/engcalcs.css for where that argument was made the first time).
 	// Each chip wears its own line's color, names its asset, and takes it off the graph when
 	// pressed.
+	//
+	// **EACH CONTROL HAS ITS OWN VARIABLE, AND THAT IS THE DEFECT THIS SHAPE CLOSES** (Tom,
+	// 2026-09-17: *"I am not able to change Nodes to Links."*). Both pull-downs were built into one
+	// `var sel` reused down the function, and `var` is scoped to the FUNCTION rather than to the
+	// block -- so the group control's change handler closed over a name that, by the time anybody
+	// could press it, held the QUANTITY control. It read a field name where it expected 'link',
+	// wrote 'node' every time, and rebuilt the row: the pull-down snapped straight back and half
+	// the feature was unreachable. Nothing threw, nothing was logged, and the handler is correct
+	// read on its own line -- which is why `rebuildTsForm()` never names one control with another
+	// control's variable again.
 	function rebuildTsForm() {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_ts_form'),
-			group = tsGroup(), field = tsField(), sel, btn;
+			group = tsGroup(), field = tsField(), groupSel, fieldSel, btn;
 		if (!box) { return; }
 		box.innerHTML = '';
-		sel = document.createElement('select');
-		sel.id = 'lpn_ts_group';
-		sel.className = 'lpn-ts-pick ec-help';
-		sel.title = pc.lpn_ts_group_tip || 'Whether the graph shows nodes or links.';
+		groupSel = document.createElement('select');
+		groupSel.id = 'lpn_ts_group';
+		groupSel.className = 'lpn-ts-pick ec-help';
+		groupSel.title = pc.lpn_ts_group_tip || 'Whether the graph shows nodes or links.';
 		[['node', pc.lpn_ts_group_nodes || 'Nodes'], ['link', pc.lpn_ts_group_links || 'Links']]
 			.forEach(function (o) {
 				var op = document.createElement('option');
 				op.value = o[0]; op.textContent = o[1];
-				sel.appendChild(op);
+				groupSel.appendChild(op);
 			});
-		sel.value = group;
-		sel.addEventListener('change', function () {
-			tsState.group = sel.value === 'link' ? 'link' : 'node';
+		groupSel.value = group;
+		groupSel.addEventListener('change', function () {
+			tsState.group = groupSel.value === 'link' ? 'link' : 'node';
 			tsSeedPicks(); rebuildTsForm(); renderTimeSeries();
 		});
-		box.appendChild(sel);
+		box.appendChild(groupSel);
 
-		sel = document.createElement('select');
-		sel.id = 'lpn_ts_quantity';
-		sel.className = 'lpn-ts-pick ec-help';
-		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
+		fieldSel = document.createElement('select');
+		fieldSel.id = 'lpn_ts_quantity';
+		fieldSel.className = 'lpn-ts-pick ec-help';
+		fieldSel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
 		colorFieldOptions(group).forEach(function (o) {
 			var op = document.createElement('option');
 			op.value = o[0]; op.textContent = o[1];
-			sel.appendChild(op);
+			fieldSel.appendChild(op);
 		});
-		sel.value = field;
-		sel.addEventListener('change', function () {
-			tsState.fields[tsGroup()] = sel.value;
+		fieldSel.value = field;
+		fieldSel.addEventListener('change', function () {
+			tsState.fields[tsGroup()] = fieldSel.value;
 			renderTimeSeries();
 		});
-		box.appendChild(sel);
+		box.appendChild(fieldSel);
 
 		btn = document.createElement('button');
 		btn.type = 'button';
