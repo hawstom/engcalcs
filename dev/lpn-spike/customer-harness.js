@@ -71,7 +71,8 @@ const L = loadLoopedNetwork(
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
 	"\t\tprepareDocument: prepareDocument,\n" +
 	"\t\tsetSelection: setSelection, selectionCount: selectionCount,\n" +
-	"\t\trenderCustomerFields: renderCustomerFields,\n" +
+	"\t\trenderCustomerFields: renderCustomerFields, renderNodeFields: renderNodeFields,\n" +
+	"\t\tcustomersAtNode: customersAtNode,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tpaneTables: paneTables, paneCols: paneCols,\n" +
 	"\t\tpaneTableAllElements: paneTableAllElements,\n" +
@@ -414,6 +415,54 @@ L.renderCustomerFields(m1.id);
 		PC.lpn_customer_fixed_head.charAt(0) === '⚠');
 	L.deleteElement('customer', m2.id);
 	L.deleteElement('link', feeder.id);
+}
+
+// ---- 5B. THE JUNCTION'S OWN PROPERTY BOX NAMES ITS CUSTOMERS ---------------------------------
+//
+// Tom, 2026-09-17: *"The customer doesn't appear in the properties for its representative node.
+// Fix/add that."*
+//
+// **THE NUMBER WAS ALREADY IN THE TOTAL AND THE REASON FOR IT WAS NOWHERE ON THE SCREEN.** A
+// junction drawing 22 with 10 typed into its own demand rows is the page contradicting itself as
+// far as a reader can tell, and the only way to find the missing 12 was to guess which meter it
+// came from. So the assertion is that the meter is NAMED in the junction's box, not merely that
+// the total is right -- the total was right all along.
+{
+	const m5 = (L.getDoc().customers || [])[0];
+	const nid = L.customerNodeId(m5);
+	L.renderNodeFields(nid);
+	const txt = popupText();
+	ok('5B.1 the junction names the meter that is adding to it', txt.indexOf(m5.id) >= 0);
+	ok('5B.2 ...and the account number it is filed under', txt.indexOf(m5.account) >= 0,
+		JSON.stringify(m5.account));
+	ok('5B.3 ...and what that meter adds', txt.indexOf(String(L.customerFlow(m5))) >= 0,
+		String(L.customerFlow(m5)));
+	ok('5B.4 ...under a heading that is a language key, not a hand-written line',
+		txt.indexOf(PC.lpn_node_customers) >= 0);
+	// **IT IS THE DERIVED JUNCTION AND NOT THE PIPE'S FIRST NODE**, which is the same question the
+	// demand arithmetic asks. Move the service past the middle and the two boxes must swap.
+	{
+		const other = L.getDoc().nodes.filter(n => n.type === 'junction' && n.id !== nid)[0];
+		ok('5B.5 the other junction says nothing about it yet',
+			(L.renderNodeFields(other.id), popupText().indexOf(m5.id) < 0));
+		L.setCustomerStation(m5, 0.9);
+		L.customerEdited(m5);
+		ok('5B.6 the meter moved to the other junction', L.customerNodeId(m5) === other.id);
+		ok('5B.7 ...and it is the other junction that now names it',
+			(L.renderNodeFields(other.id), popupText().indexOf(m5.id) >= 0));
+		ok('5B.8 ...and the first one has stopped',
+			(L.renderNodeFields(nid), popupText().indexOf(m5.id) < 0));
+		L.setCustomerStation(m5, 0.2);
+		L.customerEdited(m5);
+	}
+	// A junction with no customers gets no section at all: nearly every junction in nearly every
+	// network has none, and a permanently empty table on all of them is clutter.
+	{
+		const bare = L.getDoc().nodes.filter(n => n.type === 'junction' && L.customersAtNode(n.id).length === 0)[0];
+		L.renderNodeFields(bare.id);
+		ok('5B.9 a junction with no customers is not given an empty table',
+			popupText().indexOf(PC.lpn_node_customers) < 0, bare.id);
+	}
 }
 
 // ---- 6. THE SYMBOL SIZE IS ONE max(), AND THE THRESHOLD FALLS OUT OF IT ----------------------

@@ -8080,6 +8080,12 @@ var EngCalcs = EngCalcs || {};
 		if (!doc.customers || !doc.customers.length || !EngCalcs.lpnCustomerRowsByNode) { return []; }
 		return EngCalcs.lpnCustomerRowsByNode(doc)[nodeId] || [];
 	}
+	// Every customer whose demand lands on this node, in document order. The junction is DERIVED
+	// (customerNodeId()), so this asks the same question the demand rows ask and cannot come to a
+	// different answer from the one the arithmetic uses.
+	function customersAtNode(nodeId) {
+		return (doc.customers || []).filter(function (c) { return customerNodeId(c) === nodeId; });
+	}
 	// Every customer attached to nothing. Its demand is in no junction's total and therefore in no
 	// answer, which is a fact the user has to be told rather than left to notice.
 	function detachedCustomers() {
@@ -36116,6 +36122,9 @@ var EngCalcs = EngCalcs || {};
 			// **AND WHO IS DRAWING IT** (Task 468). The demand above is row 0 of a LIST; these are
 			// the rest of it, and this is the only place a person adds, names or removes one.
 			demandCategoryFields(fields, n, nodeId);
+			// **AND WHAT THE METERS AROUND IT ADD** (Task 247; Tom, 2026-09-17). Between the rows
+			// the user typed and the total they add up to, which is the order the sum is made in.
+			nodeCustomerFields(fields, n);
 			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
 				resolvedDemand(n), pc.lpn_result_demand_tip);
 			// **THIS JUNCTION'S OWN REQUIRED FIRE FLOW** (Task 530), blank-capable because blank is
@@ -36326,6 +36335,70 @@ var EngCalcs = EngCalcs || {};
 		});
 		fields.appendChild(addBtn);
 		fields.appendChild(document.createElement('br'));
+	}
+	/**
+	 * **THE CUSTOMERS THIS JUNCTION IS CARRYING, IN ITS OWN PROPERTY BOX** (Tom, 2026-09-17: *"The
+	 * customer doesn't appear in the properties for its representative node. Fix/add that."*).
+	 *
+	 * **THE DEMAND WAS ALWAYS IN THE TOTAL AND THE REASON FOR IT WAS NOWHERE.** A junction drawing
+	 * 34 gpm with 10 gpm typed into its own demand table is the page contradicting itself as far as
+	 * the reader can see; the 24 came from four meters on the pipes around it, and nothing on this
+	 * screen said so. It sits between the junction's own rows and the resolved Demand under them,
+	 * which is the order the arithmetic runs in: what you typed, what the meters add, the answer.
+	 *
+	 * **READ-ONLY, AND THAT IS NOT LAZINESS.** A customer is not a property of this junction -- the
+	 * junction is DERIVED from where the service connects (customerNodeId()), so a demand edited
+	 * here would be an edit to an object that may belong to a different junction by the time the
+	 * pipe is bent. The id is a way back to the meter, exactly as a table row's id is, and that is
+	 * where it is edited.
+	 *
+	 * Absent, not empty, on a junction with no customers: nearly every junction in nearly every
+	 * network has none, and a permanently empty table on all of them is the clutter Task 553
+	 * removed from this same box.
+	 */
+	function nodeCustomerFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
+			head, table, thead, hrow, tbody;
+		if (!list.length) { return; }
+		head = document.createElement('p');
+		head.className = 'lpn-set-note';
+		setFieldLabel(head, pc.lpn_node_customers || 'Demand added here by meters',
+			pc.lpn_node_customers_tip);
+		fields.appendChild(head);
+		table = document.createElement('table');
+		table.className = 'lpn-demand-table';
+		thead = document.createElement('thead');
+		hrow = document.createElement('tr');
+		// The headings are the keys the meter's own box and the Customers table already use, so the
+		// three places a customer is read name its fields the same way in all 27 languages.
+		[pc.lpn_tool_add_meter || 'Meter',
+			pc.lpn_field_account || 'Account number',
+			(pc.lpn_field_meter_total || 'Total demand') + ' (' + unitLabel('lpn_u_flow') + ')'
+		].forEach(function (text) {
+			var th = document.createElement('th');
+			th.textContent = text;
+			hrow.appendChild(th);
+		});
+		thead.appendChild(hrow);
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		list.forEach(function (c) {
+			var tr = document.createElement('tr'),
+				idCell = document.createElement('td'), accCell = document.createElement('td'),
+				demCell = document.createElement('td'), btn = document.createElement('button'),
+				flow = customerFlow(c);
+			btn.type = 'button';
+			btn.className = 'lpn-pane-goto';
+			btn.textContent = c.id;
+			btn.addEventListener('click', function () { findGoTo('customer', c.id); });
+			idCell.appendChild(btn);
+			accCell.textContent = c.account || '';
+			demCell.textContent = (typeof flow === 'number' && isFinite(flow)) ? String(+flow.toFixed(6)) : '';
+			tr.appendChild(idCell); tr.appendChild(accCell); tr.appendChild(demCell);
+			tbody.appendChild(tr);
+		});
+		table.appendChild(tbody);
+		fields.appendChild(table);
 	}
 	// ONE ROW OF THE DEMAND TABLE, whichever kind it is. `acc` is six accessors and a remove; the
 	// caller supplies row 0's (which go through setProp and promote on delete) or a category row's
