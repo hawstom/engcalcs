@@ -3565,8 +3565,8 @@ $ec_lang['lpn_survey_err_no_points']='Not one row of that file could be read as 
 // A file whose first line names its own columns is read from those names and the chooser is left
 // alone. Nothing is ever worked out from the size of the numbers: that is right on the file it was
 // tried against and wrong on the next one.
-$ec_lang['lpn_survey_format_label']='File format (if not specified internally):';
-$ec_lang['lpn_survey_format_hint']='This says which of the two coordinate columns comes first, the northing or the easting. If the first line of your file names its columns, those names are used and this is left alone.';
+$ec_lang['lpn_survey_format_label']='File format:';
+$ec_lang['lpn_survey_format_internal']='{format} specified internally';
 $ec_lang['lpn_survey_create']='Create junctions';
 $ec_lang['lpn_survey_fmt_pnezd']='Point name, northing, easting, elevation, description (PNEZD)';
 $ec_lang['lpn_survey_fmt_penzd']='Point name, easting, northing, elevation, description (PENZD)';

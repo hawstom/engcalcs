@@ -22745,24 +22745,20 @@ var EngCalcs = EngCalcs || {};
 		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		openDialog(function (body) {
 			var wrap = document.createElement('div'), sel, note, preview;
-			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND DISABLED.** Hiding it would
-			// make the two cases look like two different features; showing it greyed, above a
-			// sentence saying the header won, is what teaches the rule Declan asked for -- a header
-			// beats the chooser -- in the one place anybody will meet it.
+			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
+			// SAID** (Tom, 2026-09-18, writing the box: *"File format: / PNEZD specified
+			// internally"*). It used to grey out beside a sentence of ours explaining that a header
+			// had won -- the fact in our prose, and the control standing empty above it holding a
+			// stale preference that had nothing to do with the file in front of the reader. **THE
+			// FACT LIVES IN THE CONTROL.** The order the file states is read back out of its own
+			// column map by lpnSurveyFormatLetters(), so the chooser's one row says PNEZD, and it
+			// is disabled because there is nothing left to choose.
 			note = document.createElement('p');
 			note.style.margin = '0 0 6px';
-			note.textContent = pc.lpn_survey_format_label ||
-				'File format (if not specified internally):';
+			note.textContent = pc.lpn_survey_format_label || 'File format:';
 			wrap.appendChild(note);
 			sel = document.createElement('select');
 			sel.id = 'lpn_survey_format';
-			(EngCalcs.lpnSurveyFormats || []).forEach(function (f) {
-				var o = document.createElement('option');
-				o.value = f;
-				o.textContent = EngCalcs.lpnSurveyFormatLabel(f);
-				if (f === format) { o.selected = true; }
-				sel.appendChild(o);
-			});
 			wrap.appendChild(sel);
 			// **AND NO PARAGRAPH UNDER IT** (Tom, 2026-09-18). A sentence explaining that the
 			// chooser says which coordinate comes first, and that a header beats it, was three lines
@@ -22772,9 +22768,33 @@ var EngCalcs = EngCalcs || {};
 			preview.style.marginTop = '10px';
 			wrap.appendChild(preview);
 			body.appendChild(wrap);
+			// **THE CHOOSER IS REBUILT WITH THE PREVIEW, not filled once above it.** Whether the
+			// file names its own columns is a fact about the READING, and the reading is redone on
+			// every change -- so a control filled before the first read is a control that can
+			// disagree with the sentence under it.
+			function fillChooser() {
+				var internal = parsed.ok && parsed.headerRead, o;
+				sel.innerHTML = '';
+				sel.disabled = !!internal;
+				if (internal) {
+					o = document.createElement('option');
+					o.value = '';
+					o.textContent = (pc.lpn_survey_format_internal || '{format} specified internally')
+						.replace('{format}', EngCalcs.lpnSurveyFormatLetters(parsed.mapping));
+					sel.appendChild(o);
+					return;
+				}
+				(EngCalcs.lpnSurveyFormats || []).forEach(function (f) {
+					var op = document.createElement('option');
+					op.value = f;
+					op.textContent = EngCalcs.lpnSurveyFormatLabel(f);
+					if (f === format) { op.selected = true; }
+					sel.appendChild(op);
+				});
+			}
 			function draw() {
 				preview.innerHTML = '';
-				sel.disabled = !!(parsed.ok && parsed.headerRead);
+				fillChooser();
 				var text2 = parsed.ok
 					? EngCalcs.lpnSurveyConfirmText(parsed)
 					: EngCalcs.lpnSurveyErrorText(parsed, axes);

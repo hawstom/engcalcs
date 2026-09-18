@@ -2677,6 +2677,7 @@ EngCalcs.pageConfig = {
 	lpn_survey_err_ambiguous_coord: <?=json_encode($ec_lang['lpn_survey_err_ambiguous_coord'])?>,
 	lpn_survey_err_no_points: <?=json_encode($ec_lang['lpn_survey_err_no_points'])?>,
 	lpn_survey_format_label: <?=json_encode($ec_lang['lpn_survey_format_label'])?>,
+	lpn_survey_format_internal: <?=json_encode($ec_lang['lpn_survey_format_internal'])?>,
 	lpn_survey_create: <?=json_encode($ec_lang['lpn_survey_create'])?>,
 	lpn_survey_note_header_unread: <?=json_encode($ec_lang['lpn_survey_note_header_unread'])?>,
 	lpn_survey_confirm: <?=json_encode($ec_lang['lpn_survey_confirm'])?>,

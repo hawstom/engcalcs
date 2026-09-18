@@ -148,6 +148,32 @@
 		return FORMATS.indexOf(f) >= 0 ? f : String(format || '');
 	};
 
+	/**
+	 * The acronym a COLUMN MAP spells, read back out of the indices.
+	 *
+	 * **THIS IS THE CHOOSER'S VALUE WHEN THE FILE ANSWERED FOR ITSELF** (Tom, 2026-09-18, writing
+	 * the box he wants: *"File format: / PNEZD specified internally"*). A file whose first row
+	 * names its own columns is not a file with no format -- it is a file that STATES one, and the
+	 * control is where a reader looks for it. The chooser used to grey out beside a sentence
+	 * explaining that a header had won, which put the fact in our prose and left the control empty.
+	 *
+	 * The letters are the roles in COLUMN ORDER, which is the same derivation
+	 * lpnSurveyFormatMapping() runs backwards, so a header naming easting before northing spells
+	 * PENZD and says so. A column the header does not name contributes no letter. The result need
+	 * not be one of FORMATS -- a header may name only two columns -- and that is correct: it
+	 * describes the file rather than offering an order to choose.
+	 */
+	EngCalcs.lpnSurveyFormatLetters = function (mapping) {
+		var roles = ['id', 'north', 'east', 'elev', 'desc'], out = [];
+		roles.forEach(function (r) {
+			if (mapping && typeof mapping[r] === 'number') { out.push({ i: mapping[r], r: r }); }
+		});
+		out.sort(function (a, b) { return a.i - b.i; });
+		return out.map(function (w) {
+			return { id: 'P', north: 'N', east: 'E', elev: 'Z', desc: 'D' }[w.r];
+		}).join('');
+	};
+
 	function norm(s) {
 		return String(s === undefined || s === null ? '' : s)
 			.toLowerCase().replace(/[^a-z0-9]/g, '');

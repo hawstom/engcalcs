@@ -748,6 +748,46 @@ ok('the junctions landed in the order the reader chose, not the one it opened on
 		L.node('A').y === -1000 && L.node('A').x === 2000,
 		L.node('A').x + ' / ' + L.node('A').y);
 }
+// ---- AND WHERE THE FILE STATES ITS OWN ORDER, THE CHOOSER SAYS SO ------------------------------
+//
+// **THE FACT LIVES IN THE CONTROL, NOT IN A SENTENCE BESIDE IT** (Tom, 2026-09-18, writing the box
+// he wants: *"File format: / PNEZD specified internally"*). A file whose first row names its own
+// columns used to grey the chooser out while it still displayed a stale preference read off the
+// LAST file this browser opened -- so the one control on screen was showing an order that had
+// nothing to do with the file in front of the reader, and a paragraph underneath explained it away.
+{
+	ok('a column map spells its own acronym back',
+		EC.lpnSurveyFormatLetters({ id: 0, north: 1, east: 2, elev: 3, desc: 4 }) === 'PNEZD',
+		EC.lpnSurveyFormatLetters({ id: 0, north: 1, east: 2, elev: 3, desc: 4 }));
+	// Derived from the INDICES, so a header naming the easting first says PENZ and is not tidied
+	// into the order somebody expected.
+	ok('...in the order the columns actually come, never the order we expected',
+		EC.lpnSurveyFormatLetters({ id: 0, east: 1, north: 2, elev: 3, desc: null }) === 'PENZ',
+		EC.lpnSurveyFormatLetters({ id: 0, east: 1, north: 2, elev: 3, desc: null }));
+	// A header naming only two columns spells two letters. It is not one of the eight orders and
+	// must not be forced into one: it describes the file rather than offering a choice.
+	ok('...and a header naming two columns spells two letters, not the nearest whole format',
+		EC.lpnSurveyFormatLetters({ id: null, north: 0, east: 1, elev: null, desc: null }) === 'NE');
+	L.reset(L.GEO);
+	alerts = []; clearBox();
+	L.land(CSV, 'survey-points.csv');
+	const sel = boxSelect();
+	const said = (PC.lpn_survey_format_internal || '').replace('{format}', 'PNEZ');
+	ok('a file that states its own order offers no choice at all, only what it states',
+		!!sel && sel.children.length === 1 && sel.disabled === true,
+		sel && (sel.children.length + ' options, disabled=' + sel.disabled));
+	ok('...and the control itself carries the order, read back out of the file\'s own header',
+		!!sel && sel.children[0].textContent === said,
+		sel && sel.children[0].textContent);
+	// The label is the same short one either way: the parenthetical it used to carry -- *(if not
+	// specified internally)* -- was the same explanation in the other half of the box.
+	ok('...under the same short label, which no longer explains the case it is in',
+		boxText().indexOf(PC.lpn_survey_format_label) >= 0 && boxParagraphs().length === 2,
+		boxParagraphs().join(' | '));
+	press(PC.lpn_cancel);
+	clearBox();
+}
+
 // The chooser is remembered for the next file, and it is BROWSER furniture: it says which way round
 // this person's data collector writes, not anything about this network.
 ok('the order chosen is remembered for the next file',
