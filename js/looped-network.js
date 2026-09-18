@@ -40180,6 +40180,7 @@ var EngCalcs = EngCalcs || {};
 		demLabel = document.createElement('label');
 		demInput = document.createElement('input');
 		demInput.type = 'number';
+		demInput.step = 'any';
 		demInput.value = (typeof c.demand === 'number' && isFinite(c.demand)) ? String(+c.demand.toFixed(6)) : '';
 		demInput.addEventListener('change', function () {
 			saveUndoSnapshot();
@@ -40238,6 +40239,7 @@ var EngCalcs = EngCalcs || {};
 			stLabel = document.createElement('label');
 			stInput = document.createElement('input');
 			stInput.type = 'number';
+			stInput.step = 'any';
 			stInput.min = '0';
 			stInput.max = '100';
 			stInput.value = String(+(customerT(c) * 100).toFixed(2));

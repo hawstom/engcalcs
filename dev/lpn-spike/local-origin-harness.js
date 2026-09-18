@@ -356,8 +356,8 @@ console.log('\n--- one home for the concept ---');
 	// two retired: nodeCoordAxis() and nodeLonLat() now ask effective(), which is the SAME
 	// consolidation the DEM lists made twice above -- one reader of "where is this node" rather than
 	// three.
-	ok('outwardX has one definition and twenty-seven call sites', count(/outwardX\(/g) === 28, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-seven call sites', count(/outwardY\(/g) === 28, count(/outwardY\(/g));
+	ok('outwardX has one definition and twenty-nine call sites', count(/outwardX\(/g) === 30, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-nine call sites', count(/outwardY\(/g) === 30, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -412,8 +412,8 @@ console.log('\n--- one home for the concept ---');
 	// there is no override they return the field untouched, so a Base drawing still pays nothing at
 	// all. writeNodeCoord() is the other: a typed box hands it the public number and it converts
 	// once, which is what keeps a typed 38.5 stored as 38.5.
-	ok('inwardX has one definition and twenty-seven call sites', count(/inwardX\(/g) === 28, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-eight call sites', count(/inwardY\(/g) === 29, count(/inwardY\(/g));
+	ok('inwardX has one definition and twenty-eight call sites', count(/inwardX\(/g) === 29, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-nine call sites', count(/inwardY\(/g) === 30, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

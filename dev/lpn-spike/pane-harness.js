@@ -349,10 +349,11 @@ console.log('\n--- six tabs, one renderer ---');
 	// -- the seven tables together, the drawings at the end -- and leaves Profile in the position he
 	// named. The count is asserted so that a tenth tab is a decision somebody makes rather than one
 	// that lands.
-	report(L.paneTabIds().length === 9, 'nine tabs in all', String(L.paneTabIds().length));
+	// **TEN SINCE TASK 247**: Customers joined, with the tables, before the two drawings.
+	report(L.paneTabIds().length === 10, 'ten tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
-	report(L.paneTabIds().indexOf('timeseries') === 7,
+	report(L.paneTabIds().indexOf('timeseries') === 8,
 		'Time series is the drawing BEFORE Profile (Task 599)', L.paneTabIds().join(','));
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.
