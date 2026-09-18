@@ -22731,7 +22731,10 @@ var EngCalcs = EngCalcs || {};
 	function rememberSurveyFormat(v) {
 		try { localStorage.setItem(LPN_SURVEY_FORMAT_KEY, v); } catch (e) { /* see above */ }
 	}
-	function landSurveyText(text, fileName) {
+	// No `fileName`: the report no longer names the file, so nothing downstream of the reading
+	// wants it. It is still what the file input hands over, and it is dropped here rather than
+	// carried unread.
+	function landSurveyText(text) {
 		var pc = EngCalcs.pageConfig || {}, axes = surveyAxes(), limits = surveyLimits(),
 			format = surveyFormatPref(), parsed;
 		function read() {
@@ -22817,7 +22820,7 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_survey_create || 'Create junctions', fn: function () {
 				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
-				showSurveyReport(parsed, createSurveyJunctions(parsed), fileName);
+				showSurveyReport(parsed, createSurveyJunctions(parsed));
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
 				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
@@ -22906,15 +22909,14 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		return { created: created, elevFromFile: elevFromFile, notes: notes };
 	}
-	function showSurveyReport(parsed, outcome, fileName) {
+	// **THE REPORT OPENS ON THE COUNT, AND ON NOTHING ELSE** (Tom, 2026-09-18, writing it out:
+	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It
+	// used to open with the file's name in bold. The reader chose that file a moment ago and is
+	// looking at the box they asked for; what they do not know is how many points came out of it.
+	function showSurveyReport(parsed, outcome) {
 		var pc = EngCalcs.pageConfig || {},
 			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes());
 		openDialog(function (body) {
-			var h = document.createElement('p');
-			h.style.margin = '0 0 8px';
-			h.style.fontWeight = 'bold';
-			h.textContent = (pc.lpn_survey_report_heading || 'Imported {file}').replace('{file}', fileName);
-			body.appendChild(h);
 			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
 			// should print the entire line with a much shorter message"*). The line is drawn in a
 			// fixed-width face and indented, because it is a QUOTATION of the file and not more of
@@ -22923,7 +22925,7 @@ var EngCalcs = EngCalcs || {};
 			// and keeps its own runs of spaces, which in a fixed-column file are the columns.
 			lines.forEach(function (entry) {
 				var p = document.createElement('p');
-				p.style.margin = entry.raw === null ? '0 0 6px' : '0';
+				p.style.margin = '0 0 6px';
 				p.textContent = entry.text;
 				body.appendChild(p);
 				if (entry.raw === null) { return; }

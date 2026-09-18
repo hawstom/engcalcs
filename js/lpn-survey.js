@@ -730,12 +730,14 @@
 	 */
 	EngCalcs.lpnSurveyReportLines = function (parsed, outcome, axes) {
 		var out = [], perLine = [], fileWide = [], seen = {};
-		out.push({ text: (PC.lpn_survey_report_counts || '{n} junction(s) created.')
-			.replace('{n}', (outcome && outcome.created) || 0), raw: null });
-		if (outcome && outcome.elevFromFile) {
-			out.push({ text: (PC.lpn_survey_report_elev || '{n} of them took an elevation from the file.')
-				.replace('{n}', outcome.elevFromFile), raw: null });
-		}
+		// **ONE COUNTS LINE, AND IT COUNTS BOTH THINGS** (Tom, 2026-09-18, writing the opening he
+		// wants: *"6 junction(s) imported, 5 with elevation."*). It was three lines -- the file's
+		// name, how many junctions, and how many of them took an elevation -- where the reader's
+		// question is one question. The elevation count is stated even when it is zero, because a
+		// number that appears only when it is interesting makes its absence mean two things.
+		out.push({ text: (PC.lpn_survey_report_counts || '{n} junction(s) imported, {m} with elevation.')
+			.replace('{n}', (outcome && outcome.created) || 0)
+			.replace('{m}', (outcome && outcome.elevFromFile) || 0), raw: null });
 		((parsed && parsed.notes) || []).concat((outcome && outcome.notes) || []).forEach(function (d) {
 			var said = EngCalcs.lpnSurveyNoteText(d, axes);
 			if (d && d.line) { perLine.push({ line: d.line, text: said.text, raw: said.raw }); return; }
@@ -753,7 +755,11 @@
 			out.push({ text: PC.lpn_survey_report_clean || 'Every point in the file came across, and nothing was changed on the way in.', raw: null });
 			return out;
 		}
-		out.push({ text: PC.lpn_survey_report_lead || 'Below is every line that could not be taken as it stands, and everything that was changed on the way in. Nothing was thrown away quietly.', raw: null });
+		// **A HEADING, NOT A LEAD-IN** (Tom, 2026-09-18: *"Import errors and notes:"*). What stood
+		// here was three sentences promising that nothing had been thrown away quietly -- a promise
+		// the list underneath it keeps by existing, and which nobody reads twice. Two words name
+		// what follows, which is the whole job of the line.
+		out.push({ text: PC.lpn_survey_report_notes || 'Import errors and notes:', raw: null });
 		return out.concat(perLine, fileWide);
 	};
 

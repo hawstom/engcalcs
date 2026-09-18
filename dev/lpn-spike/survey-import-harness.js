@@ -275,8 +275,22 @@ ok('...and says nothing else at all: no mapping, no axes, no unit, no note about
 ok('a clean file is told that it was clean, so silence never means two things',
 	texts(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 })
 		.indexOf(PC.lpn_survey_report_clean) >= 0);
-ok('a file with a bad line gets the lead-in that says nothing was thrown away',
-	texts(csv).indexOf(PC.lpn_survey_report_lead) >= 0);
+ok('a file with a bad line gets the heading that names what follows',
+	texts(csv).indexOf(PC.lpn_survey_report_notes) >= 0);
+// **THE REPORT OPENS ON ONE COUNTS LINE, and it is the FIRST line** (Tom, 2026-09-18: *"6
+// junction(s) imported, 5 with elevation."*). Three things are held here because each can come
+// back on its own: the file name is not above it, both numbers are in the one line, and the second
+// number is stated even when it is zero.
+{
+	const lines = texts(csv, { created: 6, elevFromFile: 5 });
+	ok('the report opens on the count, with nothing above it',
+		lines[0] === PC.lpn_survey_report_counts.replace('{n}', 6).replace('{m}', 5), lines[0]);
+	const none = texts(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 });
+	ok('...and says how many took an elevation even when none did',
+		none[0] === PC.lpn_survey_report_counts.replace('{n}', 1).replace('{m}', 0), none[0]);
+	ok('...and the heading comes straight after it, with no paragraph between',
+		lines[1] === PC.lpn_survey_report_notes, lines[1]);
+}
 
 // ---- THE SHAPE OF A LINE ERROR, which is the whole of this section ----------------------------
 //
