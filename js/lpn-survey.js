@@ -541,18 +541,38 @@
 			.replace(/\{line\}/g, line === null || line === undefined ? '' : line);
 	}
 
-	// ---- THE SHAPE OF A LINE ERROR (Tom, 2026-09-18) -------------------------------------------
+	// ---- THE SHAPE OF A LINE ERROR -------------------------------------------------------------
 	//
-	// *"Change format pattern to 'Line 6 (see below): DUPLICATE_NAME - Name already in project, new
-	// name assigned.'"* One shell, filled once, so every refusal in the report reads the same way
-	// down the left-hand edge and a reader scanning for their line number never has to parse a
-	// sentence to find it.
+	//     Line 6: warning: DUPLICATE_NAME: Name already in project, new name assigned.
+	//         PT-1,33.415300,-111.831400,1243.50
+	//
+	// One shell, filled once, so every refusal in the report reads the same way down the left-hand
+	// edge and a reader scanning for their line number never has to parse a sentence to find it.
+	// Tom asked for this shape on 2026-09-18 and then asked that it be checked against what real
+	// tools do. Three of its parts survived that check unchanged and are here for that reason: the
+	// number spelled out as `Line 6` (Python, PostgreSQL COPY, pandas, Oracle SQL*Loader, csvlint),
+	// the offending line echoed underneath (SQL*Loader, and the SARIF standard's `snippet`), and an
+	// uppercase symbolic code beside a plain sentence (Node's ENOENT, ShellCheck's SC2086, rustc's
+	// error[E0308]). Two did not survive it, and both are gone rather than argued for:
+	//
+	//   * THE DASH JOINING THE CODE TO ITS SENTENCE IS ATTESTED NOWHERE. Every tool found joins the
+	//     two with a colon or with brackets, so this is a colon.
+	//   * `(see below)` HAS NO PRECEDENT AND WAS REDUNDANT: the offending line is always printed
+	//     directly underneath, so the shell was carrying a layout instruction about itself.
+	//
+	// **THE SEVERITY WORD IS THE PART THAT WAS MISSING, and it is the one the reader most needs.**
+	// Every convention carries one, and without it DUPLICATE_NAME -- we fixed it, carried on, and a
+	// junction exists -- reads in exactly the same shape as BAD_COORDINATE, where no junction was
+	// made at all. That difference is the whole question a reader brings to this report. Lowercase,
+	// as in every tool cited.
 	//
 	// **THE CODE IS A JS LITERAL AND NOT A LANGUAGE KEY, in any of the 27 files.** It is a symbol
 	// rather than a word -- the thing somebody quotes into a mail or searches this page for -- and a
 	// symbol that reads differently in Turkish is no longer the same symbol. The SENTENCE beside it
 	// is the translated half, and it carries the whole meaning on its own: the code is a handle,
-	// never the only statement of what went wrong.
+	// never the only statement of what went wrong. **The severity word goes the other way** and is
+	// a language key, because it is a word and not a symbol: nothing is searched for by it, and a
+	// reader who cannot read `warning` has lost the one part of the line that was written for them.
 	//
 	// **AND THE VALUE IS NOT IN THE SENTENCE ANY MORE.** Every one of these used to quote the
 	// offending cell back -- `repeated name: PT-1` -- while the reader's own line was already being
@@ -568,9 +588,30 @@
 		'id-taken': 'DUPLICATE_NAME',
 		'id-invalid': 'INVALID_NAME'
 	};
+	// **THE SPLIT IS A FACT ABOUT THE CODE ABOVE, NOT A JUDGEMENT ABOUT SEVERITY.** `error` is every
+	// case where readCsvRow() returns before pushing a point, so the file's row produced nothing;
+	// `warning` is every case where the junction was made and something about it was adjusted or
+	// left out. Anything absent from this table is a note about the FILE rather than about a line,
+	// and carries no number, no severity and no code.
+	var NOTE_SEV = {
+		'row-short': 'error',
+		'coord-missing': 'error',
+		'bad-coord': 'error',
+		'coord-range': 'error',
+		'bad-elev': 'warning',
+		'id-duplicate': 'warning',
+		'id-taken': 'warning',
+		'id-invalid': 'warning'
+	};
+	function sevWord(code) {
+		return NOTE_SEV[code] === 'error'
+			? (PC.lpn_survey_sev_error || 'error')
+			: (PC.lpn_survey_sev_warning || 'warning');
+	}
 	function lineNote(code, sentence, axis, line) {
-		return (PC.lpn_survey_note_line || 'Line {line} (see below): {code} - {text}')
+		return (PC.lpn_survey_note_line || 'Line {line}: {sev}: {code}: {text}')
 			.replace('{line}', line === null || line === undefined ? '' : line)
+			.replace('{sev}', sevWord(code))
 			.replace('{code}', NOTE_CODE[code] || '')
 			.replace('{text}', fill(sentence, null, axis, line));
 	}
@@ -595,7 +636,7 @@
 		else if (code === 'coord-missing') { text = lineNote(code, PC.lpn_survey_note_coord_missing || 'The {axis} cell is empty.', ax, line); }
 		else if (code === 'bad-coord') { text = lineNote(code, PC.lpn_survey_note_bad_coord || 'The {axis} does not read as a number.', ax, line); }
 		else if (code === 'coord-range') { text = lineNote(code, PC.lpn_survey_note_coord_range || 'The {axis} is outside the range this project allows.', ax, line); }
-		else if (code === 'bad-elev') { text = lineNote(code, PC.lpn_survey_note_bad_elev || 'The elevation does not read as a number. Junction made without one.', ax, line); }
+		else if (code === 'bad-elev') { text = lineNote(code, PC.lpn_survey_note_bad_elev || 'Non-numeric elevation. Imported without elevation.', ax, line); }
 		else if (code === 'id-duplicate') { text = lineNote(code, PC.lpn_survey_note_id_duplicate || 'Name already used earlier in this file, new name assigned.', ax, line); }
 		else if (code === 'id-taken') { text = lineNote(code, PC.lpn_survey_note_id_taken || 'Name already in project, new name assigned.', ax, line); }
 		else if (code === 'id-invalid') { text = lineNote(code, PC.lpn_survey_note_id_invalid || 'Name cannot be used here, new name assigned.', ax, line); }

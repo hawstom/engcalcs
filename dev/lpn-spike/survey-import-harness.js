@@ -278,34 +278,72 @@ ok('a clean file is told that it was clean, so silence never means two things',
 ok('a file with a bad line gets the lead-in that says nothing was thrown away',
 	texts(csv).indexOf(PC.lpn_survey_report_lead) >= 0);
 
-// ---- THE SHAPE TOM ASKED FOR, which is the whole of this section ------------------------------
+// ---- THE SHAPE OF A LINE ERROR, which is the whole of this section ----------------------------
 //
-// *"Change format pattern to 'Line 6 (see below): DUPLICATE_NAME - Name already in project, new
-// name assigned.'"* (2026-09-18, replacing his 2026-09-17 instruction that the report list line
-// numbers and print the whole line). Four claims, and each is its own assertion because each can
-// break on its own: the shell is the shell, the CODE is in it, the reader's line is printed
-// underneath, and the sentence is SHORT.
+//     Line 6: warning: DUPLICATE_NAME: Name already in project, new name assigned.
+//         PT-1,33.415300,-111.831400,1243.50
+//
+// Tom asked for this shape on 2026-09-18 and then asked that it be checked against real tools. The
+// line number spelled out, the reader's own line echoed underneath and an uppercase symbolic code
+// are all attested; the dash that used to join the code to its sentence is attested nowhere, and
+// `(see below)` had no precedent and described the layout of the report inside a message about a
+// file. What the check found MISSING is the severity word, and it is the claim this section cares
+// about most: without it DUPLICATE_NAME, where a junction exists, reads in the same shape as
+// BAD_COORDINATE, where none was made.
+//
+// Every assertion here is built out of the shell key itself rather than out of English typed here,
+// so rewording the shell in lib/lang.ec.en.php stays free -- the freedom dev/english-key-rulings.json
+// is built on. `sentenceOf()` is the same derivation: it takes the shell apart at its placeholders
+// and reads the four pieces back out of a rendered line.
 {
 	const rep = EC.lpnSurveyReportLines(csv, { created: 6 }, AX);
 	const bad = rep.find(e => /33\.415910/.test(e.raw || ''));
-	// Built from the shell key itself rather than from English typed here, so rewording the shell
-	// in lib/lang.ec.en.php is free -- that freedom is what dev/english-key-rulings.json is built on.
-	const shellHead = PC.lpn_survey_note_line.split('{line}')[0];
-	const shellMid = PC.lpn_survey_note_line.split('{line}')[1].split('{code}')[0];
+	const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const parts = PC.lpn_survey_note_line.split(/\{(?:line|sev|code|text)\}/);
+	const shellRx = new RegExp('^' + esc(parts[0]) + '(\\d+)' + esc(parts[1]) + '(\\S+?)'
+		+ esc(parts[2]) + '([A-Z_]+)' + esc(parts[3]) + '([\\s\\S]*)' + esc(parts[4]) + '$');
+	const partsOf = t => shellRx.exec(t);
+	const sentenceOf = t => { const m = partsOf(t); return m ? m[4] : t; };
 	ok('a refusal is written in the shell, leading with its line number',
-		!!bad && bad.text.indexOf(shellHead + '11' + shellMid) === 0, bad && bad.text);
+		!!bad && bad.text.indexOf(parts[0] + '11' + parts[1]) === 0, bad && bad.text);
+	ok('...and every part of the shell is filled: line, severity, code, sentence',
+		!!bad && !!partsOf(bad.text), bad && bad.text);
 	ok('...and carries the machine-readable CODE, which is never translated',
 		!!bad && bad.text.indexOf('COORDINATE_OUT_OF_RANGE') >= 0, bad && bad.text);
 	ok('...and prints the reader\'s own line underneath, verbatim',
 		!!bad && bad.raw === 'PT-6,-111.830400,33.415910,1247.00', bad && bad.raw);
 	ok('...and the sentence after the code is SHORT -- one plain statement, not a paragraph',
-		!!bad && bad.text.split(' - ').slice(1).join(' - ').split(/\s+/).length <= 12,
-		bad && bad.text.split(' - ').slice(1).join(' - '));
+		!!bad && sentenceOf(bad.text).split(/\s+/).length <= 12, bad && sentenceOf(bad.text));
 	ok('...and no refusal anywhere in this report runs longer than that',
 		rep.filter(e => e.raw !== null)
-			.every(e => e.text.split(' - ').slice(1).join(' - ').split(/\s+/).length <= 12));
+			.every(e => sentenceOf(e.text).split(/\s+/).length <= 12));
 	ok('a note about the FILE rather than a line prints nothing underneath it',
 		rep.filter(e => e.raw === null).length >= 2);
+	// **THE SEVERITY WORD SPLITS THE ONE THING THE READER CAME TO FIND OUT: is there a junction on
+	// that line or not?** A row this page could not read at all produced nothing; a row it read and
+	// then adjusted produced a junction that is on the map right now under a name or an elevation
+	// the file did not state. The two used to be one shape.
+	const sevOf = t => { const m = partsOf(t); return m && m[2]; };
+	ok('a row that produced NO junction is an error',
+		sevOf(bad.text) === PC.lpn_survey_sev_error, bad && bad.text);
+	ok('...and a row that produced one, adjusted, is a warning',
+		(() => { const e = rep.find(x => x.text.indexOf('BAD_ELEVATION') >= 0);
+			return !!e && sevOf(e.text) === PC.lpn_survey_sev_warning; })(),
+		JSON.stringify(rep.map(e => e.text)));
+	ok('...and a name already taken is a warning, because the point is on the map',
+		(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,33.5,-111.8\nA,33.6,-111.9\n');
+			const e = EC.lpnSurveyReportLines(r, { created: 2 }, AX)
+				.find(x => x.text.indexOf('DUPLICATE_NAME') >= 0);
+			return !!e && sevOf(e.text) === PC.lpn_survey_sev_warning; })());
+	ok('...and every refusal in the report carries one of exactly the two words',
+		rep.filter(e => e.raw !== null).every(e =>
+			sevOf(e.text) === PC.lpn_survey_sev_error
+			|| sevOf(e.text) === PC.lpn_survey_sev_warning));
+	// **THE JOINT IS A COLON AND NOT A DASH.** The one part of Tom's own spelling that the research
+	// turned up no precedent for anywhere, in any tool; pinned here so it cannot drift back.
+	ok('the code is joined to its sentence the way every real tool joins it, never by a dash',
+		PC.lpn_survey_note_line.indexOf('{code} - {text}') < 0
+			&& PC.lpn_survey_note_line.indexOf('(') < 0, PC.lpn_survey_note_line);
 	// **THE VALUE IS NO LONGER QUOTED INTO THE SENTENCE** (Tom, 2026-09-18). It used to be, and the
 	// reader's own line was already being printed directly underneath holding that same text -- so
 	// the report said everything twice. The record still CARRIES the cell verbatim, which is what
