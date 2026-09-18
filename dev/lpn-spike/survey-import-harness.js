@@ -243,15 +243,14 @@ section('4b. what it says');
 // What this project calls its two axes -- the page's own axisNames(), handed in.
 const AX = { north: 'Latitude', east: 'Longitude' };
 const texts = (r, o) => EC.lpnSurveyReportLines(r, o || { created: 6 }, AX).map(e => e.text);
+// **THE BOX IS ONE SENTENCE NOW** (Tom, 2026-09-18). It used to name the mapping, the axes, the
+// unit and the fact that no pipes are drawn; all four are cut, so what is asserted is that the
+// count is there and that the paragraphs are NOT -- a cut nothing tests grows back.
 ok('the confirm names how many junctions it is about to make',
-	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf(PC.lpn_survey_confirm.replace('{n}', 6)) >= 0);
-ok('...and names the mapping, which is the whole column-mapping step',
-	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf('Elevation_ft') >= 0 &&
-	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf('Latitude') >= 0);
-ok('...in the words the PROJECT uses for its axes, not in the file\'s',
-	/Northing/.test(EC.lpnSurveyConfirmText(csv, 'ft', { north: 'Northing', east: 'Easting' })));
-ok('...and says that no pipes are drawn',
-	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf(PC.lpn_survey_confirm_pipes) >= 0);
+	EC.lpnSurveyConfirmText(csv) === PC.lpn_survey_confirm.replace('{n}', 6),
+	EC.lpnSurveyConfirmText(csv));
+ok('...and says nothing else at all: no mapping, no axes, no unit, no note about pipes',
+	EC.lpnSurveyConfirmText(csv).split('\n').length === 1);
 ok('a clean file is told that it was clean, so silence never means two things',
 	texts(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 })
 		.indexOf(PC.lpn_survey_report_clean) >= 0);
@@ -334,6 +333,17 @@ function boxText() {
 	const walk = (el) => (!el.children || !el.children.length)
 		? (el.textContent || '') : el.children.map(walk).join('\n');
 	return walk(byId.lpn_dialog_body);
+}
+// Every <p> the box draws, in order. The box is a label, a chooser and one sentence, so this is
+// how the cut is measured rather than by naming a paragraph that is supposed to be gone.
+function boxParagraphs() {
+	const out = [];
+	const walk = (el) => {
+		if (el.tagName === 'P') { out.push(el.textContent || ''); }
+		(el.children || []).forEach(walk);
+	};
+	walk(byId.lpn_dialog_body);
+	return out;
 }
 function boxButtons() { return byId.lpn_dialog_buttons.children || []; }
 function press(label) {
@@ -600,12 +610,11 @@ ok('a headerless file loses no line to a header that is not there',
 	ok('a file that names its own columns IGNORES the chosen order entirely',
 		r.headerRead === true && r.points[0].north === 1000 && r.points[0].east === 2000,
 		JSON.stringify([r.points[0].north, r.points[0].east]));
-	ok('...and says so, so the reader can see the header won rather than trusting that it did',
-		EC.lpnSurveyConfirmText(r, 'ft', AX).indexOf(PC.lpn_survey_from_header) >= 0);
+	// The BEHAVIOUR is what is held here, not a sentence about it: the box no longer explains
+	// which half answered, and `headerRead` is how the page greys the chooser instead.
 	const h = EC.lpnSurveyParse(PNEZD_TEXT, { format: 'PENZD' });
-	ok('...and a file with no names of its own names the order it was read in',
-		EC.lpnSurveyConfirmText(h, 'ft', AX)
-			.indexOf(EC.lpnSurveyFormatLabel('PENZD')) >= 0);
+	ok('...and a file with no names of its own records the order it was read in',
+		h.headerRead === false && h.format === 'PENZD');
 }
 // **NOT FROM THE SIZE OF THE NUMBERS.** A file whose eastings are far larger than its northings,
 // which is what a State Plane survey looks like, still reads in the order that was CHOSEN.
@@ -632,14 +641,17 @@ L.land(PNEZD_TEXT, 'points.txt');
 	ok('...each named by its trade acronym alone',
 		!!sel && sel.children[0].textContent === 'PNEZD',
 		sel && sel.children[0].textContent);
-	ok('...and the box asks the coordinate-order question in plain words',
-		boxText().indexOf(PC.lpn_survey_format_hint) >= 0);
-	// Turn it, and the box must re-read: what it SAYS has to be what pressing the button will DO.
-	const before = boxText();
+	// **THE WHOLE BOX IS THE LABEL, THE CHOOSER AND ONE SENTENCE.** Asserted by counting the lines
+	// rather than by naming what is absent: a cut nothing measures grows back one paragraph at a
+	// time, and the next paragraph would have no assertion written against it.
+	ok('...under the short label, with no paragraph explaining it',
+		boxText().indexOf(PC.lpn_survey_format_label) >= 0
+			&& boxParagraphs().length === 2,
+		boxParagraphs().join(' | '));
+	// Turn it, and the file must be re-read: what the box stands for has to be what pressing the
+	// button will DO. The box says only a count now, so the PLACEMENT below is the proof.
 	sel.value = 'PENZD';
 	(sel._listeners.change || []).forEach(f => f());
-	ok('turning the chooser re-reads the file, so the preview cannot disagree with the result',
-		boxText() !== before && boxText().indexOf(EC.lpnSurveyFormatLabel('PENZD')) >= 0);
 	press(PC.lpn_survey_create);
 }
 ok('the junctions landed in the order the reader chose, not the one it opened on',

@@ -22753,7 +22753,7 @@ var EngCalcs = EngCalcs || {};
 			note = document.createElement('p');
 			note.style.margin = '0 0 6px';
 			note.textContent = pc.lpn_survey_format_label ||
-				'Column order, for a file that does not name its own columns';
+				'File format (if not specified internally):';
 			wrap.appendChild(note);
 			sel = document.createElement('select');
 			sel.id = 'lpn_survey_format';
@@ -22765,22 +22765,19 @@ var EngCalcs = EngCalcs || {};
 				sel.appendChild(o);
 			});
 			wrap.appendChild(sel);
-			// **THE QUESTION IN PLAIN WORDS, under the control that asks it** -- Declan's own
-			// ranking: the one field that must be explicit is which coordinate comes first, and the
-			// label must not assume the reader knows which of PNEZD and PENZD that is.
-			var hint = document.createElement('p');
-			hint.style.margin = '6px 0 10px';
-			hint.textContent = pc.lpn_survey_format_hint ||
-				'This says which of the two coordinate columns comes first, the northing or the easting. If the first line of your file names its columns, those names are used and this is left alone.';
-			wrap.appendChild(hint);
+			// **AND NO PARAGRAPH UNDER IT** (Tom, 2026-09-18). A sentence explaining that the
+			// chooser says which coordinate comes first, and that a header beats it, was three lines
+			// of ours teaching a reader who already reads PNEZD. The label names the control, the
+			// control is greyed when the file answered for itself, and that is the whole lesson.
 			preview = document.createElement('div');
+			preview.style.marginTop = '10px';
 			wrap.appendChild(preview);
 			body.appendChild(wrap);
 			function draw() {
 				preview.innerHTML = '';
 				sel.disabled = !!(parsed.ok && parsed.headerRead);
 				var text2 = parsed.ok
-					? EngCalcs.lpnSurveyConfirmText(parsed, unitLabel('lpn_u_elevhead'), axes)
+					? EngCalcs.lpnSurveyConfirmText(parsed)
 					: EngCalcs.lpnSurveyErrorText(parsed, axes);
 				text2.split('\n\n').forEach(function (para) {
 					var p = document.createElement('p');

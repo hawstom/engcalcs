@@ -577,60 +577,28 @@
 	/**
 	 * What the import is about to do, for the box that stands in front of it.
 	 *
-	 * **IT NAMES THE MAPPING, IT DOES NOT MERELY COUNT THE POINTS.** The reader sees which of their
-	 * own columns became which coordinate, which the name and which the elevation BEFORE anything is
-	 * created, so a wrong reading of ours is answerable with Cancel rather than with an undo.
+	 * **ONE SENTENCE: HOW MANY, AND MAY WE** (Tom, 2026-09-18, reading the box this used to write and
+	 * calling it *"AI slop"*, then writing what he wants in its place):
 	 *
-	 * `unitText` is the label of the unit the project is showing for elevations, and `axes` is what
-	 * the project calls its two axes -- neither of which this file can know.
+	 *     File format (if not specified internally):
+	 *     PNEZD [etc]
+	 *     6 junction(s) found. Proceed?
+	 *
+	 * Gone with that: the sentence saying which coordinate column comes first, the sentence saying a
+	 * header was used instead, the sentence naming which of the reader's columns became which field,
+	 * the sentence about the elevation column's unit, and the sentence saying no pipes are drawn.
+	 * Every one of them was true and every one of them was a paragraph standing between a person and
+	 * a button. The reader has their own file open; what they cannot see without being told is how
+	 * many points came out of it.
+	 *
+	 * **THE HEADER STILL WINS AND THAT DID NOT CHANGE.** What was cut is the EXPLANATION, not the
+	 * mechanism: a file naming its own columns is still read by those names, and the chooser is still
+	 * disabled while that is so, which says the same thing without a sentence.
 	 */
-	EngCalcs.lpnSurveyConfirmText = function (parsed, unitText, axes) {
-		var lines = [], m = parsed.mapping, none = PC.lpn_survey_map_none || 'not used';
-		lines.push((PC.lpn_survey_confirm || 'Create {n} junction(s) from this surveyed point list?')
-			.replace('{n}', parsed.points.length));
-		// **WHERE THE READING CAME FROM, BEFORE WHAT IT SAYS.** Declan's third point is that a
-		// header must beat the chooser; saying WHICH of the two answered is what lets the reader
-		// see that it did, instead of taking it on trust.
-		lines.push(parsed.headerRead
-			? (PC.lpn_survey_from_header || 'The first line of your file names its own columns, so those names were used and the column order below was not needed.')
-			: (PC.lpn_survey_from_format || 'Your file does not name its own columns, so they were read in this order: {format}')
-				.replace('{format}', EngCalcs.lpnSurveyFormatLabel(parsed.format)));
-		if (m) {
-			lines.push((PC.lpn_survey_map_lines || '{first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.')
-				.replace('{first}', axisWord(axes, 'north'))
-				.replace('{second}', axisWord(axes, 'east'))
-				.replace('{a}', columnName(parsed, m.north))
-				.replace('{b}', columnName(parsed, m.east))
-				.replace('{id}', m.id === null ? none : columnName(parsed, m.id))
-				.replace('{elev}', m.elev === null ? none : columnName(parsed, m.elev)));
-		}
-		// **THE UNIT IS KNOWN ONLY WHEN THE COLUMN SAYS SO**, which is Tom's own question about this
-		// sentence (2026-09-17, on the old wording: *"Under what condition would we know the units
-		// of the file?"*). The answer is a header reading `Elevation_ft` or `elev (m)` and nothing
-		// else, so the sentence now says where the claim comes from instead of asserting it.
-		if (unitText && parsed.elevUnit) {
-			lines.push((PC.lpn_survey_elev_unit || 'The elevation column in your file is named for {file}, and this project is showing {project}.')
-				.replace('{file}', parsed.elevUnit === 'm' ? (PC.lpn_survey_unit_m || 'meters') : (PC.lpn_survey_unit_ft || 'feet'))
-				.replace('{project}', unitText));
-		} else if (unitText && m && m.elev !== null) {
-			lines.push((PC.lpn_survey_elev_assumed || 'The file does not say what unit its elevations are in, so they are read as {project}, which is the unit this project is showing.')
-				.replace('{project}', unitText));
-		}
-		lines.push(PC.lpn_survey_confirm_pipes || 'No pipes are drawn. A surveyed list says where the points are, not which of them are joined.');
-		return lines.join('\n\n');
+	EngCalcs.lpnSurveyConfirmText = function (parsed) {
+		return (PC.lpn_survey_confirm || '{n} junction(s) found. Proceed?')
+			.replace('{n}', parsed.points.length);
 	};
-
-	// The file's own word for a column where it states one, and the column's NUMBER where it does
-	// not -- a file read by position has no names to print, and "column 2" is still an answer a
-	// person can check against the file open beside them.
-	function columnName(parsed, index) {
-		if (index === null || index === undefined) { return ''; }
-		if (parsed.header && parsed.headerRead && parsed.header[index] !== undefined
-			&& String(parsed.header[index]).trim() !== '') {
-			return String(parsed.header[index]).trim();
-		}
-		return (PC.lpn_survey_column_n || 'column {n}').replace('{n}', index + 1);
-	}
 
 	/**
 	 * The import report, as a list of `{text, raw}`. The caller puts them on screen; `raw` is the

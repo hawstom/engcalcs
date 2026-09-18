@@ -3565,7 +3565,7 @@ $ec_lang['lpn_survey_err_no_points']='Not one row of that file could be read as 
 // A file whose first line names its own columns is read from those names and the chooser is left
 // alone. Nothing is ever worked out from the size of the numbers: that is right on the file it was
 // tried against and wrong on the next one.
-$ec_lang['lpn_survey_format_label']='Column order, for a file that does not name its own columns';
+$ec_lang['lpn_survey_format_label']='File format (if not specified internally):';
 $ec_lang['lpn_survey_format_hint']='This says which of the two coordinate columns comes first, the northing or the easting. If the first line of your file names its columns, those names are used and this is left alone.';
 $ec_lang['lpn_survey_create']='Create junctions';
 $ec_lang['lpn_survey_fmt_pnezd']='Point name, northing, easting, elevation, description (PNEZD)';
@@ -3581,7 +3581,7 @@ $ec_lang['lpn_survey_fmt_enz']='Easting, northing, elevation (ENZ, also written 
 $ec_lang['lpn_survey_from_header']='The first line of your file names its own columns, so those names were used and the column order below was not needed.';
 $ec_lang['lpn_survey_from_format']='Your file does not name its own columns, so they were read in this order: {format}';
 $ec_lang['lpn_survey_note_header_unread']='The first line of the file names columns this page does not know, so it was passed over and the column order you chose was used. It reads: {detail}';
-$ec_lang['lpn_survey_confirm']='Create {n} junction(s) from this surveyed point list?';
+$ec_lang['lpn_survey_confirm']='{n} junction(s) found. Proceed?';
 $ec_lang['lpn_survey_map_lines']='{first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.';
 $ec_lang['lpn_survey_map_gpx']='Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.';
 $ec_lang['lpn_survey_map_none']='not used';
