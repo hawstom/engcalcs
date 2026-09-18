@@ -333,8 +333,15 @@ console.log('\n--- one home for the concept ---');
 	// and a latitude. Reading the drawing, writing nothing. One crossing per axis and not two: the
 	// function holds `lon` and `lat` in locals rather than converting the same point twice, which
 	// is this census asking for the honest minimum exactly as inwardBox() was made to.
-	ok('outwardX has one definition and twenty-six call sites', count(/outwardX\(/g) === 27, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-six call sites', count(/outwardY\(/g) === 27, count(/outwardY\(/g));
+	// **AND ONE MORE ON EACH OF THE FOUR FOR A METER'S TYPED LOCATION** (Task 247; Tom, 2026-09-17:
+	// *"Pick location, pick pipe, repeat"*, and a table row per customer carrying both). A meter's
+	// position is read out for the two location columns and written back from them, so it is a
+	// boundary of exactly the kind this census counts: customerCoordAxis() crosses outward once per
+	// axis and setCustomerCoordAxis() crosses inward once per axis, and each is the ONLY reader of
+	// its own question -- the setter takes the axis it was given and leaves the other alone rather
+	// than converting a whole point twice.
+	ok('outwardX has one definition and twenty-seven call sites', count(/outwardX\(/g) === 28, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-seven call sites', count(/outwardY\(/g) === 28, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -376,8 +383,9 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH COMING BACK** (Task 668): georefWriteOffsets() maps the captured base and
 	// tip through the transform and differences them, and both halves come home through the one
 	// door, exactly as georefWrite() itself does for a position.
-	ok('inwardX has one definition and twenty-four call sites', count(/inwardX\(/g) === 25, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-five call sites', count(/inwardY\(/g) === 26, count(/inwardY\(/g));
+	// The other half of the meter-location pair above: one inward crossing per axis, in the setter.
+	ok('inwardX has one definition and twenty-five call sites', count(/inwardX\(/g) === 26, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-six call sites', count(/inwardY\(/g) === 27, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

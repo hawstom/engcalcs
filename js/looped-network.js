@@ -8299,6 +8299,103 @@ var EngCalcs = EngCalcs || {};
 		if (moved) { refreshCustomerHandle(); }
 		return moved;
 	}
+	/**
+	 * **WHICH ASSET SERVES THIS CUSTOMER, WRITTEN AS A VALUE** (Task 247; Tom, 2026-09-17, on the
+	 * tables: one row per customer with a location and a link). The map gesture states it by where
+	 * you press; this is the keyboard's way of stating the same thing, and both end here so there
+	 * is one idea of what re-serving a customer means.
+	 *
+	 * **IT IS NEVER GUESSED FOR THE USER.** The table OFFERS the nearest pipe as a suggestion and
+	 * writes nothing until somebody types one, because a wrong guess where four mains meet is the
+	 * invisible kind of wrong: the customer appears, every number calculates, and the demand is on
+	 * the wrong main. A suggestion the reader accepted is a decision; a guess the page made is not.
+	 *
+	 * The meter does not move: it keeps the point it is drawn at, and the station is re-derived as
+	 * the nearest point on the new pipe, which is the same arithmetic dragging it there would do.
+	 * Returns false and says why when the id names nothing.
+	 */
+	function setCustomerLink(c, linkId) {
+		var pc = EngCalcs.pageConfig || {}, id = String(linkId === null || linkId === undefined ? '' : linkId).trim(),
+			pt = customerPoint(c), l, hit, t, an, n;
+		if (c.link && customersByLink[c.link]) {
+			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
+		}
+		if (!id) {
+			// Detached, and drawn where it was: `x`/`y` stops being an offset the moment there is
+			// nothing to be an offset from, which is detachCustomersFromLink()'s own rule.
+			c.link = null; delete c.t;
+			c.x = pt.x; c.y = pt.y;
+			return true;
+		}
+		l = linkById(id);
+		if (!l || !nodeById(l.from) || !nodeById(l.to)) {
+			// **REFUSED OUT LOUD, and the meter is left exactly as it was.** A silent refusal is
+			// indistinguishable from a cell that does nothing, and a customer quietly detached by a
+			// typing slip takes its demand out of the answers with nothing on screen to say so.
+			if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
+			setNotice(String(pc.lpn_meter_pipe_unknown ||
+				'Nothing in this project is named {id}, so the meter was left where it was.')
+				.split('{id}').join(id));
+			return false;
+		}
+		c.link = l.id;
+		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
+		customersByLink[l.id].push(c.id);
+		hit = Geom.nearestFractionOnPolyline(linkPointList(l), pt.x, pt.y);
+		t = customerSnapT(l, hit.f);
+		an = Geom.pointAlongPolyline(linkPointList(l), t);
+		n = linkNormalAt(l, t);
+		setCustomerPerp(c, t, (pt.x - an.x) * n.x + (pt.y - an.y) * n.y);
+		return true;
+	}
+	// **THE PIPE THIS METER MOST LIKELY BELONGS TO, AS A SUGGESTION AND NOT AS A WRITE.** The
+	// nearest one to where the meter is drawn, measured to the pipe itself; null where the project
+	// has no pipes at all. Nothing calls this to assign anything -- see setCustomerLink().
+	function suggestCustomerLink(c) {
+		var pt = customerPoint(c), best = null, bestD = Infinity, i, l, d;
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
+			d = Geom.nearestFractionOnPolyline(linkPointList(l), pt.x, pt.y).dist;
+			if (d < bestD) { bestD = d; best = l; }
+		}
+		return best ? best.id : null;
+	}
+	// **WHICH DOCUMENT AXIS THE FIRST-READ COLUMN IS.** The pair is read north first wherever there
+	// is a north, so slot 1 is the document's y there and its x on a grid. (Task 674 defines a
+	// function of this name and this body for a node's typed coordinates; they are one idea and the
+	// merge of the two branches should keep one copy.)
+	function coordSlotIsY(slot) { return readsNorthFirst() ? (slot === 1) : (slot === 2); }
+	/**
+	 * **WHERE A METER IS, TYPED ONE AXIS AT A TIME** (Task 247; Tom, 2026-09-17: *"Pick location,
+	 * pick pipe, repeat"*, and one table row per customer carrying both). The map gesture and these
+	 * two columns are the same statement made with different hands, so they end in the same place.
+	 *
+	 * **THE STATION IS RE-DERIVED RATHER THAN KEPT**, which is what makes a typed location behave
+	 * like a dragged one: the service connects at the nearest point on its own pipe to wherever the
+	 * meter now is, and is therefore square to the main by construction (see linkNormalAt()).
+	 */
+	function setCustomerCoordAxis(c, slot, v) {
+		var isY = coordSlotIsY(slot), pt, x, y, l, hit, t, an, n;
+		if (typeof v !== 'number' || !isFinite(v)) { return false; }
+		pt = customerPoint(c);
+		x = isY ? pt.x : inwardX(v);
+		y = isY ? inwardY(v) : pt.y;
+		l = customerLink(c);
+		if (!l) { c.x = x; c.y = y; return true; }
+		hit = Geom.nearestFractionOnPolyline(linkPointList(l), x, y);
+		t = customerSnapT(l, hit.f);
+		an = Geom.pointAlongPolyline(linkPointList(l), t);
+		n = linkNormalAt(l, t);
+		return setCustomerPerp(c, t, (x - an.x) * n.x + (y - an.y) * n.y);
+	}
+	// What those two columns READ: the meter's drawn point, outward, so a typed value and a
+	// displayed one are the same number. One crossing per axis, which is what the census in
+	// dev/lpn-spike/local-origin-harness.js asks of every boundary.
+	function customerCoordAxis(c, slot) {
+		var pt = customerPoint(c);
+		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
+	}
 	// Writing a customer's own field: no setProp(), no effective(), no override marker -- see the
 	// section note on why a customer carries nothing overridable. One seam all the same, so the
 	// solve, the drawing, the table and the popup are always refreshed together.
@@ -16162,9 +16259,50 @@ var EngCalcs = EngCalcs || {};
 	 * The last two are read-only: which pipe serves a meter is identity (moving the meter is how it
 	 * changes) and the junction is DERIVED, so an input there would accept a number nothing reads.
 	 */
+	/**
+	 * **A METER'S LOCATION AS TWO COLUMNS** (Task 247), in whatever the project calls its axes, and
+	 * through the same setCustomerCoordAxis() seam the rest of this file writes a position with.
+	 *
+	 * **THE KEY IS A SLOT AND THE HEADING IS A FUNCTION**, because paneTables() is built once and
+	 * cached while the vocabulary follows the PROJECT: lat/lon, northing/easting or x/y. A heading
+	 * resolved at build time would be whichever kind of project happened to be open first and would
+	 * stay that way for the life of the tab. (Task 674 builds the same pair for a node; keep one
+	 * copy of the reasoning when the two branches meet.)
+	 */
+	function paneColCustomerCoord(slot) {
+		return {
+			key: 'axis' + slot, em: 5.5, reread: true,
+			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
+			get: function (c) { return customerCoordAxis(c, slot); },
+			set: function (c, v) { setCustomerCoordAxis(c, slot, v); customerEdited(c); }
+		};
+	}
 	function paneCustomerCols() {
+		var pc = EngCalcs.pageConfig || {};
 		return [
 			paneColId(),
+			// **THE LOCATION AND THE LINK, SIDE BY SIDE AND IN THAT ORDER** (Tom, 2026-09-17: *"Pick
+			// location, pick pipe, repeat"*, and one row per customer carrying both). It is the map
+			// gesture written as a table, and the two columns are adjacent because Enter walks DOWN
+			// a column here: forty locations, then forty pipes, which is how somebody types forty
+			// services without touching the mouse. A flat alternating list would cost a keystroke
+			// per field to stay in step and would put two unlike quantities in one column.
+			paneColCustomerCoord(1), paneColCustomerCoord(2),
+			// **THE LINK IS A TYPED VALUE WITH A SUGGESTION, NEVER AN ASSIGNMENT WE MADE.** The
+			// placeholder offers the nearest pipe and writes nothing; the cell stays empty until
+			// somebody states one. A guess would be the invisible kind of wrong at a corner where
+			// four mains meet: the customer appears, every number calculates, and the demand is on
+			// the wrong main. Re-read after every write, because the setter may refuse the id.
+			{ key: 'link', label: 'lpn_field_meter_pipe', str: true, em: 4, reread: true,
+				hint: function (c) { return customerLink(c) ? '' : (suggestCustomerLink(c) || ''); },
+				hintTip: function (c) {
+					var id = customerLink(c) ? '' : suggestCustomerLink(c);
+					return id ? String(pc.lpn_field_meter_pipe_suggest ||
+						'The nearest asset is {id}. Type it here to serve this customer from it.')
+						.split('{id}').join(id) : '';
+				},
+				get: function (c) { var l = customerLink(c); return l ? l.id : ''; },
+				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
 			{ key: 'account', label: 'lpn_field_account', str: true, em: 6,
 				get: function (c) { return c.account || ''; },
 				set: function (c, v) { c.account = v === undefined || v === null ? '' : String(v); customerEdited(c); } },
@@ -16187,10 +16325,8 @@ var EngCalcs = EngCalcs || {};
 				} },
 			{ key: 'total', label: 'lpn_field_meter_total', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
 				get: function (c) { return customerFlow(c); } },
-			// An EMPTY cell here is a detached meter, and it is the one reading in the table that
-			// says its demand is in no answer. The popup says so in words.
-			{ key: 'link', label: 'lpn_field_meter_pipe', em: 3,
-				get: function (c) { var l = customerLink(c); return l ? l.id : ''; } },
+			// An EMPTY link cell above is a detached meter, and it is the one reading in the table
+			// that says its demand is in no answer. The popup says so in words.
 			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
 				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
 		];
@@ -16693,6 +16829,17 @@ var EngCalcs = EngCalcs || {};
 	function paneApplyColWidth(input, c) {
 		if (c.em) { input.style.setProperty('--lpn-pane-col-w', c.em + 'em'); }
 	}
+	// The placeholder and its explanation for a column that offers a suggestion, and nothing at all
+	// for one that does not. The tip goes on `title` rather than beside the cell: a table of forty
+	// rows has no room for a sentence, and the placeholder itself is the short form.
+	function paneApplyHint(input, c, el) {
+		var text, tip;
+		if (!c.hint || !input || input.tagName !== 'INPUT') { return; }
+		text = c.hint(el) || '';
+		tip = c.hintTip ? (c.hintTip(el) || '') : '';
+		if (text) { input.setAttribute('placeholder', text); } else { input.removeAttribute('placeholder'); }
+		if (tip) { input.title = tip; } else if (input.title) { input.removeAttribute('title'); }
+	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
 			text = (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key),
@@ -16930,6 +17077,12 @@ var EngCalcs = EngCalcs || {};
 				// is the whole of Tom's "beautiful exploration tool": tighten a limit and the cells
 				// that break it light up, loosen it and they go out again.
 				if (c.cp) { customPropPaintFlag(input, c.cp, input.value); }
+				// **A COLUMN MAY SUGGEST WITHOUT WRITING** (Task 247). The placeholder is a
+				// suggestion and nothing else: it is not the cell's value, it is not saved, and
+				// paneCellText() never returns it -- so an empty cell stays empty in the document,
+				// in a paste, and in the printed sheet. It is the shape a guess has to take where
+				// guessing wrong is invisible; see the link column in paneCustomerCols().
+				paneApplyHint(input, c, el);
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
@@ -16955,6 +17108,10 @@ var EngCalcs = EngCalcs || {};
 				} else if (c.bool && target.type === 'checkbox') {
 					target.checked = !!c.get(el);
 				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
+					// The suggestion follows the drawing: move the meter and the pipe it would be
+					// served from changes, so a placeholder written once at build time would be
+					// stale advice. Refreshed here, in the one pass that refreshes everything else.
+					paneApplyHint(target, c, el);
 					// **ONLY A CELL BEING EDITED IS LEFT ALONE** (Task 186). It used to be any cell
 					// with the caret in it, which was the same thing when focus WAS editing; now a
 					// person can sit on a cell for a minute without typing, and a solve that
@@ -17230,6 +17387,12 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		c.set(el, p.v);
+		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
+		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
+		// location is snapped onto its own pipe. In both cases the document and the box would
+		// otherwise disagree until the next solve, with the box showing the version that was not
+		// kept -- which is the reading a person would act on.
+		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
 		completeEdit(c.prop ? { el: el, prop: c.prop } : null);
 		refreshPopupIfOpen();
 		paneLeaveEdit(input);
@@ -27374,13 +27537,19 @@ var EngCalcs = EngCalcs || {};
 					setPendingMeter(null);
 					var madeC = addCustomer(mx, my, { link: mLink.link.id, t: mLink.t });
 					setSelection('customer', madeC.id);
-					// **THE POPUP OPENS ON PLACEMENT, because a meter with no demand and no account
-					// number is not finished.** Every other add tool leaves an element that already
-					// means something; this one leaves two empty boxes, and the reader has to be
-					// told where to fill them in. The TOOL STAYS ARMED all the same -- a row of
-					// twelve houses along one main is the common case -- so the next press places
-					// the next meter.
-					openCustomerPopup(madeC.id, e.clientX, e.clientY);
+					// **PICK LOCATION, PICK PIPE, REPEAT** (Tom, 2026-09-17, in exactly those
+					// words). The property box used to open on placement, on the argument that a
+					// meter with no demand and no account number is not finished -- and it is not,
+					// but a box over the map after every second click is the end of the rhythm this
+					// tool exists for. A row of twelve houses along one main is the common case.
+					//
+					// **THE NUMBERS ARE TYPED IN THE CUSTOMERS TABLE, A COLUMN AT A TIME**, which is
+					// where a person entering forty of them wants to be anyway, and the notice says
+					// so rather than leaving the reader to find it. Selecting a meter still opens
+					// its own box for the one-off case.
+					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
+						'Meter {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.')
+						.split('{id}').join(madeC.id));
 					return;
 				}
 				// **A CLICK IN OPEN SPACE EITHER STARTS THE GESTURE OR CANCELS IT.** Starting is

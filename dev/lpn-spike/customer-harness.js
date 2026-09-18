@@ -75,6 +75,7 @@ const L = loadLoopedNetwork(
 	"\t\tcustomersAtNode: customersAtNode,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tpaneTables: paneTables, paneCols: paneCols,\n" +
+	"\t\tsuggestCustomerLink: suggestCustomerLink, setCustomerLink: setCustomerLink,\n" +
 	"\t\tpaneTableAllElements: paneTableAllElements,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -531,6 +532,68 @@ L.renderCustomerFields(m1.id);
 	const atNode = L.paneCols(spec).filter(c => c.key === 'atNode')[0];
 	ok('7.5 the junction column is read-only', !atNode.set);
 	ok('7.6 ...and reads the same answer the popup does', atNode.get(m1) === L.customerNodeId(m1));
+	// ---- ONE ROW PER CUSTOMER WITH A LOCATION AND A LINK (Tom, 2026-09-17) -------------------
+	//
+	// **A COLUMN, NOT AN ALTERNATING LIST**, because Enter walks DOWN a column in these tables:
+	// forty locations typed, then forty pipes. So the two live side by side and both are real
+	// columns with setters.
+	const cust = (L.getDoc().customers || [])[0];
+	const colOf = k => L.paneCols(spec).filter(c => c.key === k)[0];
+	ok('7.7 the location is two columns and both can be typed into',
+		!!colOf('axis1') && !!colOf('axis2') && !!colOf('axis1').set && !!colOf('axis2').set);
+	ok('7.8 the location and the link are next to each other, in that order',
+		cols.indexOf('axis1') < cols.indexOf('axis2') &&
+		cols.indexOf('axis2') + 1 === cols.indexOf('link'), cols.join(','));
+	ok('7.9 the link can be typed into', !!colOf('link').set);
+	// **A TYPED LOCATION MOVES THE METER AND THE SERVICE STAYS SQUARE**, because the station is
+	// re-derived rather than kept -- the same arithmetic dragging it there would do.
+	{
+		const was = colOf('axis1').get(cust);
+		colOf('axis1').set(cust, was + 7);
+		ok('7.10 typing a location moves the meter', Math.abs(colOf('axis1').get(cust) - (was + 7)) < 25,
+			was + ' -> ' + colOf('axis1').get(cust));
+		const an = L.customerAttachPoint(cust), pt = L.customerPoint(cust);
+		const n = L.linkNormalAt(L.customerLink(cust), cust.t);
+		const dx = pt.x - an.x, dy = pt.y - an.y, len = Math.hypot(dx, dy) || 1;
+		ok('7.11 ...and the service is still square to its main',
+			near(((dx / len) * -n.y) + ((dy / len) * n.x), 0, 1e-12));
+		colOf('axis1').set(cust, was);
+	}
+	// **THE LINK IS SUGGESTED AND NEVER ASSIGNED.** A detached meter's cell reads EMPTY while the
+	// suggestion is offered beside it, which is the whole of Declan's condition: a wrong guess at a
+	// corner where four mains meet is invisible, because the customer appears and every number
+	// calculates.
+	{
+		const loose = L.addCustomer(140, 140, null);
+		loose.demand = 1;
+		L.customerEdited(loose);
+		ok('7.12 a meter with no pipe reads as empty rather than as a guess',
+			colOf('link').get(loose) === '' && loose.link === null);
+		ok('7.13 ...while a suggestion is offered for it',
+			!!colOf('link').hint(loose) && !!L.linkById(colOf('link').hint(loose)),
+			colOf('link').hint(loose));
+		ok('7.14 ...and the suggestion is the nearest asset to where it is drawn',
+			colOf('link').hint(loose) === L.suggestCustomerLink(loose));
+		ok('7.15 nothing about it reached the document until somebody typed one',
+			loose.link === null && loose.t === undefined);
+		// Typed: the meter is served from that pipe, and its demand joins that junction.
+		colOf('link').set(loose, L.suggestCustomerLink(loose));
+		ok('7.16 typing the link serves the customer from it',
+			!!loose.link && L.customerNodeId(loose) !== null, String(loose.link));
+		ok('7.17 ...and a meter that has one is offered no suggestion', !colOf('link').hint(loose));
+		// **AN ID THAT NAMES NOTHING IS REFUSED AND THE METER LEFT ALONE**, because a customer
+		// quietly detached by a typing slip takes its demand out of the answers in silence.
+		const heldLink = loose.link, heldT = loose.t;
+		colOf('link').set(loose, 'NOT-A-PIPE');
+		ok('7.18 an id that names nothing is refused', loose.link === heldLink && loose.t === heldT,
+			String(loose.link));
+		ok('7.19 ...and the cell is re-read rather than left showing what was not kept',
+			colOf('link').reread === true);
+		// An empty cell detaches on purpose, which is a different act from a typing slip.
+		colOf('link').set(loose, '');
+		ok('7.20 clearing the cell detaches it deliberately', loose.link === null);
+		L.deleteElement('customer', loose.id);
+	}
 }
 
 // ---- 8. THE DOCUMENT ROUND TRIP --------------------------------------------------------------
