@@ -30572,6 +30572,15 @@ var EngCalcs = EngCalcs || {};
 	function visibleMapWidth() {
 		return mapBox().w / (state.s || 1);
 	}
+	// Round a positive number UP to `sig` significant figures. `Number.prototype.toPrecision()`
+	// rounds to NEAREST and there is no built-in that does this, so the exponent is taken off first
+	// and Math.ceil does the work on the mantissa. Used by the labeling threshold's capture button,
+	// where rounding down by one part in a thousand hides the drawing being captured.
+	function ceilToPrecision(v, sig) {
+		if (!(v > 0) || !isFinite(v)) { return v; }
+		var mag = Math.pow(10, sig - 1 - Math.floor(Math.log(v) / Math.LN10));
+		return Math.ceil(v * mag) / mag;
+	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
 	// it, it exists to be read, and zoomed out it is noise over the network. Each label's leader is
@@ -31547,9 +31556,16 @@ var EngCalcs = EngCalcs || {};
 			// zoomed in"), and writing 1283.4177 into the box would present an accident of the
 			// current pan as a decision worth preserving.
 			// MIN, matching the threshold it is capturing for -- see mapSpan().
+			//
+			// **ROUNDED UP, NEVER TO NEAREST, AND THAT IS NOT A NICETY.** `toPrecision(3)` rounds to
+			// nearest, so about half of all views round DOWN -- and a threshold one part in a
+			// thousand below the view it was captured from hides the very drawing the user was
+			// looking at when they pressed the button. Found by driving a real browser on
+			// 2026-09-18: a capture read 1110 off a 1114-unit view and the labels went out on the
+			// press. Rounding up is the only direction that keeps the promise the button makes.
 			var w = mapSpan('min');
 			if (!(w > 0)) { return; }
-			settings.labelMaxWidth = +w.toPrecision(3);
+			settings.labelMaxWidth = ceilToPrecision(w, 3);
 			lmwInput.value = settings.labelMaxWidth;
 			refreshLabelSuppression(); saveToStorage();
 		});

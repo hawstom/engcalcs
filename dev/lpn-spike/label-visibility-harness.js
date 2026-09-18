@@ -40,6 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tan = lb.anchorNode ? nodeById(lb.anchorNode) : null;\n" +
 	"\t\t\treturn textLabelBox(lb, le, an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y); },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
+	"\t\tceilToPrecision: ceilToPrecision,\n" +
 	"\t\tdelSetting: function (k) { delete settings[k]; },\n" +
 	// How wide the map is on screen, and the zoom that turns that into model length units. BOTH
 	// dimensions: mapSpan('min') is the house standard, so a harness that sets only the width leaves
@@ -161,6 +162,19 @@ console.log('\n--- a threshold of 500 map units ---');
 	L.applyLabelVisibility();
 	ok('far enough out the 3x title block goes too', hidden(L.labelEl(title.id).text),
 		L.visibleMapWidth() + ' units across');
+
+	// **THE CAPTURE BUTTON MAY NEVER HIDE THE VIEW IT CAPTURED**, which is the promise "Use current
+	// view" makes and the one it broke. It rounds to three significant figures because the number is
+	// a judgement rather than an accident of the pan -- and `toPrecision(3)` rounds to NEAREST, so
+	// about half of all views round DOWN and the drawing the user was looking at goes out on the
+	// press. Found by driving a real browser on 2026-09-18: 1114 units across captured as 1110.
+	// Asserted over a sweep, because the failure needs a view whose third digit rounds down and a
+	// single fixture would sit on one that does not.
+	[1114, 1115, 999.6, 1000.4, 0.0001234, 87654, 3.14159].forEach(function (v) {
+		var got = L.ceilToPrecision(v, 3);
+		ok('a capture of ' + v + ' rounds UP, to ' + got, got >= v);
+		ok('...and not by more than one part in a hundred', got <= v * 1.01);
+	});
 
 	// A threshold of zero or a negative is not a threshold, it is a blank box: otherwise a stray 0
 	// would blank the drawing with no way back that reads as one.
