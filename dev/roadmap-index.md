@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**100 open tasks.** Next (100): 12 · Soon (75): 27 · Someday (50): 32 · Maybe (25): 11 · Parked (5): 18
+**104 open tasks.** Next (100): 12 · Soon (75): 30 · Someday (50): 33 · Maybe (25): 11 · Parked (5): 18
 
 ## 100 — Next (12)
 
@@ -24,7 +24,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 686 — The progress bar finishes before the work does.
 
-## 75 — Soon (27)
+## 75 — Soon (30)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -53,8 +53,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 682 — Zoom on a PC with no wheel, and from the keyboard.
 - Task 685 — Name every unit dropdown for a screen reader.
 - Task 687 — The lock dialog's destructive button sits beside Cancel.
+- Task 688 — File, Convert units as: US to work in, SI to hand over.
+- Task 689 — Undo does not work inside a table, only on the map.
+- Task 691 — Banner messages are annoying, and one of them is a trap.
 
-## 50 — Someday (32)
+## 50 — Someday (33)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -88,6 +91,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 664 — A link's status colours correctly and its legend prints numbers.
 - Task 675 — A labelled grid, with the significant digits picked out.
 - Task 683 — The wheel zoom increment, snapping having been ruled out.
+- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 
 ## 25 — Maybe (11)
 
@@ -128,5 +132,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-92 of 100 titles are within 4–12 words. `!` marks the rest;
+96 of 104 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

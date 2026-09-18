@@ -266,6 +266,70 @@ the block.
     field's own existing label, already written and already translated 26 times. If a design turns
     out to need new words, stop -- that is a different decision and a different price.
 
+- 75|689| **Undo does not work inside a table, only on the map.**
+  Tom, 2026-09-17, testing `674-coordinate-entry`: *"Checking this on the Junctions Table, I can copy
+  and paste from two cells to two cells. But I can't Ctrl+Z within the table. I must move cursor to
+  the map for Ctrl+Z to work."*
+  - **THE UNDO EXISTS AND THE TABLE CANNOT REACH IT**, which is worse than having none: a person who
+    has learned that Ctrl+Z works here presses it after a bad paste and nothing happens. Find where
+    the keydown is bound and why the table pane is outside it; the map's own binding is one of only
+    two this page has outside a text field.
+  - Paste itself works, which is what makes this a sharp edge rather than a gap.
+
+- 50|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+  Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
+  project we should be working on in the roadmap if not on a branch."* He is right that it is not
+  tracked: Task 186 is the tables interface and Task 610 is paste that CREATES rows, and neither is
+  the general capability.
+  - **THIS IS AN UMBRELLA, NOT A TASK, and it should not be started as one.** What belongs under it:
+    undo inside the table (Task 689), paste that creates rows (610, gated on Declan's spec), column
+    hide (Declan's own named fix, with a design in his journal), fill-down, multi-cell selection, and
+    whatever `tables-interface` already holds.
+  - **`tables-interface` EXISTS AND IS NOT ON master ON HIS INSTRUCTION**, and copy and paste in the
+    tables is the defect inside that programme. Read it before opening anything new.
+  - At 50 because he named it as long-term, not next. Promoting it is his call.
+
+- 75|691| **Banner messages are annoying, and one of them is a trap.**
+  Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
+  'Something wrong here?' just because I wanted to dismiss a banner. The QGIS paradigm would be
+  nice. They show lots of error messages."*
+  - **THE ACCIDENT IS THE FINDING, not the annoyance.** A banner whose only obvious gesture is a
+    LINK that files a report means the cost of dismissing it is sending us something. He did exactly
+    that, at a meeting. **A dismiss must be reachable without passing through an action.**
+  - **THE QGIS PARADIGM HE NAMES IS A MESSAGE LOG**, not a banner: messages accumulate in a panel a
+    person opens when they want them, with the newest surfaced briefly and then filed rather than
+    held on screen awaiting a click. That also answers a second thing this page needs -- a refused
+    DEM, a skipped survey row and an import difference are all things worth KEEPING, and a banner
+    that clears itself keeps nothing.
+  - Read with `dev/ROADMAP.md` Task 616 (a prompt history in the banner area, parked at 5 by Tom)
+    and Task 622. **616 is the same idea arriving from the other direction** and should probably be
+    folded in here rather than left parked separately; that is his call, not ours.
+
+- 75|688| **File, Convert units as: US to work in, SI to hand over.**
+  Tom, 2026-09-17: *"We start the project in US units so that we can intuit the values. Before we
+  are done, we want to convert to SI for the community."* Put to him that this collides with a rule
+  he set himself; he read the reconciliation and answered *"File, Convert units as...: I agree."*
+  - **THE BAN IS NOT TOUCHED AND MUST NOT BE.** *"A bad design decision was made without my
+    knowledge to convert inputs when units are switched. Scrub and ban this."* That forbids a UNIT
+    SELECTOR silently rewriting typed numbers, and it stays absolute: changing a unit reinterprets
+    the number, 1 becomes 1 ft instead of 1 m, and EPANET behaves the same way so there is no
+    authority on the other side.
+  - **WHAT MAKES THIS DIFFERENT IS THE SAVE-AS SHAPE, WHICH IS HIS OWN DESIGN FROM TASK 667(f).**
+    There he ruled, of coordinates: *"let's not fool ourselves, conversion of all coordinates is
+    happening"*, and the rule the project actually holds is **never convert IN PLACE**. A Save-as
+    does not: the original project is untouched and a new one is produced. So this row joins the
+    **File, Save as...** family beside **File, Convert coordinates as...**, and the two should look
+    and behave alike -- a file picker, or a duplicate tab named for the original.
+  - **THE UNIT IS A DISPLAY FACT, WHICH IS WHY THIS IS CHEAPER THAN IT SOUNDS.** A calculator stores
+    what the user typed and converts at the solver; the `lpn_` page records its own unit selection in
+    the project because declarative storage makes a bare number meaningless without it. So a
+    conversion rewrites the stored numbers AND the recorded selection together, once, deliberately.
+  - **THE TRAP IS THE ONE TASK 390 ALREADY NAMES:** exact factors still fail in doubles --
+    `150 * 0.3048 * (1/0.3048) === 149.99999999999997` -- so a converted project must never claim to
+    be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
+  - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
+    original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
+
 - 100|686| **The progress bar finishes before the work does.**
   Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
   progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the
