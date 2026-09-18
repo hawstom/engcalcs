@@ -509,6 +509,43 @@ single guess in the build.
       [TGH: I did not test due to previous.]
 - [x] With the broker blocked (see §9), Save as… still works. A lock outage must not disable saving.
 
+> **THE "ASK" ROUND TRIP, MEASURED 2026-09-18 AFTER TOM FOUND IT DEAD.** He tested it with a
+> colleague: *"B asked, but A didn't see anything."* The mechanism was sound and three things around
+> it were not, each silent. (1) **A reloading destroyed the note**: a page unloading releases its
+> lock, so a note left in that one-second gap was wiped by the release and thrown away by the
+> re-acquire, while B had been told they would be heard. (2) **A standing warning stamped on it**:
+> the note is raised once and marked read in the same breath, so the reconnect banner overwriting it
+> lost it for good. (3) **There is no push**, so nothing happens for up to a minute and two people
+> watching one screen conclude it is broken. Fixed, except that the minute is real. Coming back to
+> the tab now checks straight away, which also closes the case of a holder whose tab is in the
+> background and whose timers the browser has slowed.
+>
+> `dev/lpn-spike/lock-ask-both-sides-harness.js` runs both users as two processes against the real
+> broker, which is what none of the earlier tests did -- each half was tested against a fake of the
+> other half, and the carriage between them is where it broke. It blocks, and every one of the four
+> fixes has been removed one at a time to watch it go red.
+>
+> **AND IT WAS FOUND BY DRIVING, NOT BY READING.** `dev/lpn-spike/lock-ask-browser-drive.js` runs
+> the two people as two isolated contexts of one real Chrome against a real server, clicking the
+> real menus. On the code as Tom tested it, it reproduces his sentence exactly: the note reaches
+> A's browser, is cleared from the record as delivered, and is painted over by the reconnect
+> banner, so nothing whatever appears. With the fixes it shows the bar at boot after a reload, and
+> with `SLOW=1` -- nobody touching A's tab -- it showed it after 48 seconds of real waiting.
+
+- [ ] **Two profiles.** A holds the file. B opens it, presses **Ask**, types initials.
+      B is told the note was sent. **A sees a yellow bar naming those initials within one minute**,
+      and once only. Waiting the full minute is part of the test.
+- [ ] **A reloads between the two.** Same result: A is told at boot, not a minute later, and the
+      note is not lost.
+- [ ] **A's tab is in the background when B asks.** Clicking back onto A's tab shows the bar at
+      once rather than after another minute.
+- [ ] **What it still cannot do, and this is by design:** B is never told whether A saw it, the note
+      reaches nobody whose page is shut (it waits on the record for when they next open the file),
+      and nothing takes the file away from A. Ask is a message, not a command. There is also room
+      for ONE note at a time: a second colleague asking before the holder's next check-in replaces
+      the first, so the holder is told who wants it most recently rather than given a queue. A
+      queue was declined because what the holder has to do about it is the same either way.
+
 ---
 
 ## 7. Read-only is opt-in, and it means read-only
