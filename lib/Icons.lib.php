@@ -240,12 +240,16 @@ $ec_icons = array(
 	// A run between two nodes — the thing you are actually about to place.
 	'pipe'       => '<path d="M5 12H19" stroke-linecap="butt"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
-	// A meter, which is a box on a service line off a main (ROADMAP Task 247). The short stroke on
-	// the left IS the service connector, so the icon draws the whole gesture -- pick the pipe, get a
-	// box connected to it -- rather than a box on its own, which reads as a node. The dial is what
-	// makes it a meter and not a vault: three concentric marks were tried and are a smudge at 14px,
-	// so it is one ring, off-centre in the box the way a register actually sits.
-	'meter'      => '<path d="M3 12h5"/><path d="M8 7.5h12.5v9H8z"/><circle cx="14" cy="12" r="2.6"/>',
+	// A METER BOX, DRAWN AS A DOUBLE-LINE RECTANGLE AND WITH NO CIRCLE IN IT (Tom, 2026-09-17:
+	// *"The toolbar icon is to be a house or a meter box (no circle, and double-line rectangle)."*).
+	// The lid inside the box is what says meter box rather than plain rectangle, and it is the thing
+	// a reader recognises from the parkway: a box in the ground with a lid in it.
+	//
+	// **THE FIRST DRAWING HAD A DIAL AND A SERVICE STUB AND BOTH ARE STRUCK.** The dial was read as
+	// a pump volute at 14 px, and the stub made the icon a picture of the GESTURE rather than of the
+	// thing. The map symbol is where the service connection is shown; it is a solid dot there,
+	// because at three to seven pixels a picture of anything is a smudge.
+	'meter'      => '<path d="M3.5 6.5h17v11h-17z"/><path d="M7 10h10v4H7z"/>',
 
 	// ---- Backdrop ----
 	'image'      => '<path d="M3 5h18v14H3z"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',

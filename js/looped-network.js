@@ -8042,7 +8042,7 @@ var EngCalcs = EngCalcs || {};
 	var custEls = {}, customersByLink = {};
 	function buildCustomerEls(c) {
 		var stub = el('line', { 'class': 'lpn-service' }, labelsLayer),
-			box = el('rect', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
+			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
 		custEls[c.id] = { stub: stub, box: box };
 		if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
 		updateCustomerGeometry(c.id);
@@ -8060,10 +8060,15 @@ var EngCalcs = EngCalcs || {};
 		an = customerAttachPoint(c);
 		half = meterHalfWorld(pt.x, pt.y);
 		sw = serviceStrokeWorld(pt.x, pt.y);
-		ce.box.setAttribute('x', pt.x - half);
-		ce.box.setAttribute('y', pt.y - half);
-		ce.box.setAttribute('width', half * 2);
-		ce.box.setAttribute('height', half * 2);
+		// **A SOLID DOT ON THE MAP, AND A PICTURE ONLY IN THE TOOLBAR** (Tom, 2026-09-17: *"The map
+		// symbol is to be a solid dot. The toolbar icon is to be a house or a meter box."*). The two
+		// are drawn at sizes two orders apart: the map symbol is three to seven pixels across, where
+		// no picture of anything reads and a hollow outline is a grey smudge, while the toolbar draws
+		// at 24 and can carry a meter box. So this is not one symbol used twice -- it is a dot where
+		// a dot is all that can be seen, and a drawing where a drawing can be.
+		ce.box.setAttribute('cx', pt.x);
+		ce.box.setAttribute('cy', pt.y);
+		ce.box.setAttribute('r', half);
 		ce.box.setAttribute('stroke-width', sw);
 		// **THE CONNECTOR IS NOT PICKABLE**, like a label's leader: a click on it picks the meter,
 		// which is what a reader means by clicking a service line. Hidden entirely when the meter is
@@ -11658,7 +11663,10 @@ var EngCalcs = EngCalcs || {};
 	// ---- THE TWO-CLICK METER GESTURE (ROADMAP Task 247) ----------------------------------------
 	//
 	// Tom's own gesture: *"you pick a point, it draws a meter rectangle, and then you pick a pipe
-	// and it connects perpendicularly from the meter to the pipe."*
+	// and it connects perpendicularly from the meter to the pipe."* **The RECTANGLE in that sentence
+	// is superseded and the PERPENDICULAR is not** (2026-09-17): the map symbol is a solid dot,
+	// because at the size it is drawn a rectangle is a smudge, and the picture of a meter box lives
+	// in the toolbar where there is room for one.
 	//
 	// **NOTHING IS WRITTEN TO THE DOCUMENT UNTIL THE PIPE IS PICKED**, exactly as a half-drawn pipe
 	// writes nothing until its second node arrives: the position is held in view state, so an
@@ -11669,7 +11677,7 @@ var EngCalcs = EngCalcs || {};
 	// main is the common case and it must not cost twenty-four clicks, so the one-click door places
 	// the meter a default offset out on the side the press was on.
 	var pendingMeter = null;        // {x, y} in world units, or null
-	var pendingMeterEl = null;      // the preview rectangle
+	var pendingMeterEl = null;      // the preview dot
 	var pendingMeterBand = null;    // the dashed line to the live pointer
 	function setPendingMeter(pt) {
 		pendingMeter = pt || null;
@@ -11683,7 +11691,7 @@ var EngCalcs = EngCalcs || {};
 			pendingMeterBand = el('line', { 'class': 'lpn-rubberband' }, world);
 		}
 		if (!pendingMeterEl) {
-			pendingMeterEl = el('rect', { 'class': 'lpn-meter lpn-meter-pending' }, world);
+			pendingMeterEl = el('circle', { 'class': 'lpn-meter lpn-meter-pending' }, world);
 		}
 		drawPendingMeter(pendingMeter.x, pendingMeter.y);
 		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
@@ -11694,11 +11702,12 @@ var EngCalcs = EngCalcs || {};
 	function drawPendingMeter(tx, ty) {
 		var half;
 		if (!pendingMeter || !pendingMeterEl) { return; }
+		// The preview is the same dot the placed meter will be, so what the reader sees before the
+		// pipe is picked is what they get after it.
 		half = meterHalfWorld(pendingMeter.x, pendingMeter.y);
-		pendingMeterEl.setAttribute('x', pendingMeter.x - half);
-		pendingMeterEl.setAttribute('y', pendingMeter.y - half);
-		pendingMeterEl.setAttribute('width', half * 2);
-		pendingMeterEl.setAttribute('height', half * 2);
+		pendingMeterEl.setAttribute('cx', pendingMeter.x);
+		pendingMeterEl.setAttribute('cy', pendingMeter.y);
+		pendingMeterEl.setAttribute('r', half);
 		pendingMeterEl.setAttribute('stroke-width', serviceStrokeWorld(pendingMeter.x, pendingMeter.y));
 		if (!pendingMeterBand) { return; }
 		pendingMeterBand.setAttribute('x1', pendingMeter.x);
