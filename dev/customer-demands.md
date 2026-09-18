@@ -215,6 +215,14 @@ The gesture:
 - The stub is drawn perpendicular from the meter to its attachment point. Dragging the meter moves the
   attachment; dragging past mid-pipe flips the assigned junction, which is why the readout in §2 is
   not optional.
+- **THE METER IS THE INPUT AND THE CONNECTION IS DERIVED, in every writer** (Tom, 2026-09-18: *"You
+  are putting the meter at the pipe point instead of at the meter point. Put the meter where user
+  clicks. Snap perpendicular to the selected link or snap to the selected node."*). The second press
+  names the pipe and states no station; the station is the nearest point on that pipe to where the
+  meter already is. Getting this backwards is what the gesture shipped with, and it slid the symbol
+  away from the hand by the distance between the two presses measured along the main.
+  **On a node the offset is kept whole rather than squared**, because a junction is where several
+  mains meet and there is no one of them to be perpendicular to.
 
 Hit-testing and drawing:
 

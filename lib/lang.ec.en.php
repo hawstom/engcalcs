@@ -821,7 +821,7 @@ $ec_lang['lpn_node_customers_tip']='Every meter whose service connects nearer th
 $ec_lang['lpn_customer_detached']='⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.';
 $ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
 $ec_lang['lpn_customer_detached_count']='{n} meters are no longer connected to a pipe. Their demand is not in the answers.';
-$ec_lang['lpn_meter_pick_pipe']='Now click the pipe that serves this meter. Press Escape to cancel.';
+$ec_lang['lpn_meter_pick_pipe']='Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.';
 $ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.';
 
 $ec_lang['lpn_area_hint_window_start']='Click one corner of the window.';

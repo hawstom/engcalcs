@@ -7953,6 +7953,13 @@ var EngCalcs = EngCalcs || {};
 	// attachment along the pipe while the meter STAYED WHERE IT WAS DRAWN, which is precisely how an
 	// arbitrary angle was made. It carries the meter with it now (setCustomerStation()).
 	//
+	// **THE ONE PLACE THE RULE DOES NOT REACH IS A CONNECTION ON A NODE** (Tom, 2026-09-18: *"Snap
+	// perpendicular to the selected link or snap to the selected node."* -- two behaviours). A
+	// junction is where two, three or four mains meet, so "perpendicular" there would mean square to
+	// whichever pipe the attachment happens to be stored against, which is an angle chosen by the
+	// order somebody drew their network in. A service on a node therefore keeps the offset it was
+	// given whole; see customerPoint() and setCustomerOffsetTo().
+	//
 	// The normal is the LEFT normal of the segment the station falls in, so ONE SIGNED DISTANCE
 	// carries both how far out the meter stands and which side of the main it stands on.
 	function linkNormalAt(l, t) {
@@ -8041,6 +8048,39 @@ var EngCalcs = EngCalcs || {};
 		c.x = n.x * dist; c.y = n.y * dist;
 		return true;
 	}
+	/**
+	 * **THE METER GOES WHERE IT WAS PUT, AND THE CONNECTION IS WHAT IS DERIVED** (Tom, 2026-09-18:
+	 * *"You are putting the meter at the pipe point instead of at the meter point. Put the meter
+	 * where user clicks. Snap perpendicular to the selected link or snap to the selected node."*).
+	 *
+	 * **WHICH OF THE TWO POINTS IS THE INPUT IS THE WHOLE OF THIS.** The placement gesture used to
+	 * take the station from the press that named the PIPE and then draw the meter square to the
+	 * main at that station -- so the symbol jumped away from the hand that placed it, by as much as
+	 * the two presses were apart along the pipe. Every other writer here already worked the right
+	 * way round (a drag, a typed coordinate, a typed pipe), and this is those three and the gesture
+	 * arriving at one function instead of four copies of the same five lines.
+	 *
+	 * Away from a node the offset is rebuilt from its perpendicular component, which is what keeps
+	 * the stub square to the main (linkNormalAt()); ON a node it is kept whole, because a junction
+	 * is where several mains meet and there is no one of them to be square to.
+	 */
+	function setCustomerOffsetTo(c, l, t, x, y) {
+		var an, n;
+		if (!l) { return false; }
+		c.t = Math.max(0, Math.min(1, (typeof t === 'number' && isFinite(t)) ? t : 0.5));
+		an = Geom.pointAlongPolyline(linkPointList(l), c.t);
+		if (c.t === 0 || c.t === 1) { c.x = x - an.x; c.y = y - an.y; return true; }
+		n = linkNormalAt(l, c.t);
+		return setCustomerPerp(c, c.t, (x - an.x) * n.x + (y - an.y) * n.y);
+	}
+	// The same thing with the station DERIVED as well: the nearest point on this pipe to where the
+	// meter is, snapped onto an end within reach of it (customerSnapT()). This is what a drag, a
+	// typed location, a typed pipe and the second press of the placement gesture all want.
+	function setCustomerAt(c, l, x, y) {
+		if (!l) { return false; }
+		return setCustomerOffsetTo(c, l,
+			customerSnapT(l, Geom.nearestFractionOnPolyline(linkPointList(l), x, y).f), x, y);
+	}
 	// Where the METER sits. `c.x`/`c.y` is an OFFSET from the attachment point while the
 	// customer is attached and an absolute position while it is not -- the same dual meaning a Text
 	// label's own x/y has, through the same single door, so a second kind of attachment could not be
@@ -8052,6 +8092,12 @@ var EngCalcs = EngCalcs || {};
 	function customerPoint(c) {
 		var an = customerAttachPoint(c), l, n, d;
 		if (!an) { return { x: c.x || 0, y: c.y || 0 }; }
+		// **ON A NODE THE OFFSET IS READ WHOLE** -- see setCustomerOffsetTo() for why a junction has
+		// no one main to be square to. Every perpendicular writer still produces a perpendicular
+		// offset there, so a service that arrived at a node by sliding along its pipe draws exactly
+		// where it always did; what this allows is the one Tom asked for, a meter left standing
+		// where the hand put it when the press named a node.
+		if (customerAtNodeEnd(c)) { return { x: an.x + (c.x || 0), y: an.y + (c.y || 0) }; }
 		l = customerLink(c);
 		n = linkNormalAt(l, customerT(c));
 		d = customerPerpDistance(c, l);
@@ -8226,28 +8272,37 @@ var EngCalcs = EngCalcs || {};
 	 * of thing, and no migration is needed the day somebody wants both.
 	 */
 	function addCustomer(x, y, attach) {
-		var id = mintId(LPN_ID_KEY.meter), c, an = null;
-		if (attach && linkById(attach.link)) {
-			an = Geom.pointAlongPolyline(linkPointList(linkById(attach.link)), attach.t);
+		var id = mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
+		// **`x`/`y` IS WHERE THE METER GOES, AND THE STATION IS DERIVED FROM IT WHEN THE CALLER
+		// DOES NOT STATE ONE.** That is the placement gesture's ordinary case: the second press
+		// names the PIPE, and where along the pipe the service lands is the nearest point on it to
+		// the meter, which is what makes the stub square and leaves the symbol under the hand that
+		// put it there. A caller that DOES state a station means it -- the node case states exactly
+		// 0 or 1, and a document being opened states what its file says.
+		if (l) {
+			t = (attach && typeof attach.t === 'number' && isFinite(attach.t)) ? attach.t
+				: customerSnapT(l, Geom.nearestFractionOnPolyline(linkPointList(l), x, y).f);
 		}
 		c = {
 			id: id,
 			account: '',
 			demand: undefined,
 			count: 1,
-			link: an ? attach.link : null,
-			t: an ? attach.t : undefined,
+			link: l ? l.id : null,
+			t: l ? t : undefined,
 			// Attached: an offset from the attachment point, so the meter follows its pipe. Loose:
-			// a position on the map. One field, two meanings, one reader (customerPoint()).
-			x: an ? x - an.x : x,
-			y: an ? y - an.y : y
+			// a position on the map. One field, two meanings, one reader (customerPoint()). The
+			// offset is written two lines down; these are the absolute numbers until it is.
+			x: x,
+			y: y
 		};
 		if (!doc.customers) { doc.customers = []; }
 		doc.customers.push(c);
-		// **STORED PERPENDICULAR, so the file says what the drawing shows.** customerPoint() would
-		// draw it perpendicular either way, and leaving the raw offset in the document would mean
-		// the two disagreed on disk about a position nobody had moved.
-		if (c.link) { setCustomerPerp(c, c.t, customerPerpDistance(c, customerLink(c))); }
+		// **STORED AS THE DRAWING READS IT, so the file says what the screen says.** Leaving a raw
+		// offset in the document where customerPoint() would draw a projected one means the two
+		// disagree on disk about a position nobody has moved. The meter itself does not shift: the
+		// caller states where it goes and this writes the offset that puts it there.
+		if (c.link) { setCustomerOffsetTo(c, l, c.t, x, y); }
 		if (c.link && !customersByLink[c.link]) { customersByLink[c.link] = []; }
 		buildCustomerEls(c);
 		// A customer changes what a junction draws, so this one DOES schedule a solve -- unlike a
@@ -8312,7 +8367,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function setCustomerLink(c, linkId) {
 		var pc = EngCalcs.pageConfig || {}, id = String(linkId === null || linkId === undefined ? '' : linkId).trim(),
-			pt = customerPoint(c), l, hit, t, an, n;
+			pt = customerPoint(c), l;
 		if (c.link && customersByLink[c.link]) {
 			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
 		}
@@ -8337,11 +8392,7 @@ var EngCalcs = EngCalcs || {};
 		c.link = l.id;
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
-		hit = Geom.nearestFractionOnPolyline(linkPointList(l), pt.x, pt.y);
-		t = customerSnapT(l, hit.f);
-		an = Geom.pointAlongPolyline(linkPointList(l), t);
-		n = linkNormalAt(l, t);
-		setCustomerPerp(c, t, (pt.x - an.x) * n.x + (pt.y - an.y) * n.y);
+		setCustomerAt(c, l, pt.x, pt.y);
 		return true;
 	}
 	// **THE PIPE THIS METER MOST LIKELY BELONGS TO, AS A SUGGESTION AND NOT AS A WRITE.** The
@@ -8372,18 +8423,14 @@ var EngCalcs = EngCalcs || {};
 	 * meter now is, and is therefore square to the main by construction (see linkNormalAt()).
 	 */
 	function setCustomerCoordAxis(c, slot, v) {
-		var isY = coordSlotIsY(slot), pt, x, y, l, hit, t, an, n;
+		var isY = coordSlotIsY(slot), pt, x, y, l;
 		if (typeof v !== 'number' || !isFinite(v)) { return false; }
 		pt = customerPoint(c);
 		x = isY ? pt.x : inwardX(v);
 		y = isY ? inwardY(v) : pt.y;
 		l = customerLink(c);
 		if (!l) { c.x = x; c.y = y; return true; }
-		hit = Geom.nearestFractionOnPolyline(linkPointList(l), x, y);
-		t = customerSnapT(l, hit.f);
-		an = Geom.pointAlongPolyline(linkPointList(l), t);
-		n = linkNormalAt(l, t);
-		return setCustomerPerp(c, t, (x - an.x) * n.x + (y - an.y) * n.y);
+		return setCustomerAt(c, l, x, y);
 	}
 	// What those two columns READ: the meter's drawn point, outward, so a typed value and a
 	// displayed one are the same number. One crossing per axis, which is what the census in
@@ -11868,7 +11915,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		drawPendingMeter(pendingMeter.x, pendingMeter.y);
 		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
-			'Now click the pipe that serves this meter. Press Escape to cancel.');
+			'Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.');
 	}
 	// The preview box, plus the band from it to wherever the pointer is now. `to` is omitted on the
 	// first press, when there is nowhere yet for the band to reach.
@@ -27504,12 +27551,20 @@ var EngCalcs = EngCalcs || {};
 				// falling back to the same finder every other tool uses.
 				if (!mLink) {
 					mLink = (t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle'))
-						? { link: linkById(t.dataset.link), t: Geom.nearestFractionOnPolyline(linkPointList(linkById(t.dataset.link)), w.x, w.y).f }
+						? { link: linkById(t.dataset.link) }
 						: nearestLinkNearScreen(e.clientX, e.clientY, reachPx(e));
-					// A press near the END of a pipe means the node there, on exactly the reading the
-					// branch above makes -- and this is the half that catches it where the node's own
-					// symbol was not what the press landed on.
-					if (mLink && mLink.link) { mLink.t = customerSnapT(mLink.link, mLink.t); }
+					// **THIS PRESS NAMES THE PIPE AND NOTHING ELSE** (Tom, 2026-09-18: *"You are
+					// putting the meter at the pipe point instead of at the meter point. Put the
+					// meter where user clicks."*). It states no station, so addCustomer() drops one
+					// from the METER -- square to the main, and leaving the symbol exactly where the
+					// first press put it however far up the pipe the second one was. Taking the
+					// station from this press instead is what used to move it, by the distance
+					// between the two presses measured along the main.
+					//
+					// A station that lands near the END of a pipe is the node there, which is the
+					// half of the node rule that catches a press the junction's own symbol missed,
+					// and it happens inside that same derivation (customerSnapT()).
+					if (mLink && mLink.link) { mLink = { link: mLink.link }; }
 				}
 				if (mLink && mLink.link) {
 					saveUndoSnapshot();
@@ -27865,7 +27920,7 @@ var EngCalcs = EngCalcs || {};
 			relayoutLabels();
 		} else if (drag.type === 'customer') {
 			snapshotDragOnce();
-			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos, hitm, nm, tm, am;
+			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos;
 			if (!cm) { return; }
 			lm = customerLink(cm);
 			pos = { x: wm.x + drag.offX, y: wm.y + drag.offY };
@@ -27878,14 +27933,9 @@ var EngCalcs = EngCalcs || {};
 				// the pipe, and out from it. The pointer's position is resolved into exactly those
 				// two -- a station, and a signed distance along the normal there -- so a drag can
 				// never produce an angle, whatever direction the hand moves in. See linkNormalAt().
-				hitm = Geom.nearestFractionOnPolyline(linkPointList(lm), pos.x, pos.y);
 				// **AND A NEAR MISS ON EITHER END OF THE PIPE IS A CONNECTION TO THAT NODE**, judged
 				// afresh on every move, so dragging away releases it (customerSnapT()).
-				tm = customerSnapT(lm, hitm.f);
-				am = Geom.pointAlongPolyline(linkPointList(lm), tm);
-				nm = linkNormalAt(lm, tm);
-				setCustomerPerp(cm, tm,
-					(pos.x - am.x) * nm.x + (pos.y - am.y) * nm.y);
+				setCustomerAt(cm, lm, pos.x, pos.y);
 			} else {
 				cm.x = pos.x; cm.y = pos.y;
 			}

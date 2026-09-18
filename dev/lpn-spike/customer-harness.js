@@ -54,6 +54,7 @@ const L = loadLoopedNetwork(
 	"\t\tcustomerAttachPoint: customerAttachPoint, customerFlow: customerFlow,\n" +
 	"\t\tsetCustomerStation: setCustomerStation, customerEdited: customerEdited,\n" +
 	"\t\tsetCustomerPerp: setCustomerPerp, customerPerpDistance: customerPerpDistance,\n" +
+	"\t\tsetCustomerAt: setCustomerAt, setCustomerOffsetTo: setCustomerOffsetTo,\n" +
 	"\t\tlinkNormalAt: linkNormalAt, customerLink: customerLink,\n" +
 	"\t\tcustomerSnapT: customerSnapT, customerAtNodeEnd: customerAtNodeEnd,\n" +
 	"\t\tcustomerAttachAtNode: customerAttachAtNode, linkPointList: linkPointList,\n" +
@@ -345,6 +346,89 @@ ok('3.4 and back again', L.customerNodeId(m1) === jA.id);
 	}
 	L.setCustomerPerp(m1, 0.2, 40);
 	L.customerEdited(m1);
+}
+
+// ---- 3C. THE METER GOES WHERE IT WAS PUT ------------------------------------------------------
+//
+// Tom, 2026-09-18: *"Clicking in space: I suspected from your talk that this would be wrong. You
+// are putting the meter at the pipe point instead of at the meter point. Put the meter where user
+// clicks. Snap perpendicular to the selected link or snap to the selected node."*
+//
+// **WHICH OF THE TWO POINTS IS THE INPUT IS THE DEFECT AND THE FIX.** The two presses of the
+// placement gesture are two different statements -- where the meter is, and what serves it -- and
+// the second one used to decide BOTH: the station came from the press that named the pipe, and the
+// meter was then drawn square to the main there. So the symbol slid away from the hand by the
+// distance between the two presses measured along the pipe, which on a long main is the whole
+// length of a street.
+//
+// **IT LOOKS LIKE A DRAWING CHOICE AND NOT LIKE A DEFECT**, which is why it needs a fixture: the
+// map is tidy afterwards, the stub is square, the arithmetic is right, and the only thing wrong is
+// that the meter is not where it was asked for. The assertion is therefore the REQUESTED POINT
+// ITSELF, to a billionth: the perpendicular rebuild costs a bit or two of double arithmetic, while
+// the behaviour this replaces was out by tens of units -- half the length of a street.
+{
+	const l = L.customerLink(m1);
+	const pts = L.linkPointList(l);
+	// Well off the main and nowhere near either end of it, so the station is a genuine
+	// perpendicular foot rather than a snap.
+	const want = { x: (pts[0].x + pts[1].x) / 2 + 37, y: (pts[0].y + pts[1].y) / 2 - 61 };
+	const placed = L.addCustomer(want.x, want.y, { link: l.id });
+	const got = L.customerPoint(placed);
+	ok('3C.1 a meter placed against a pipe stays on the point it was given',
+		near(got.x, want.x) && near(got.y, want.y),
+		got.x + ',' + got.y + ' wanted ' + want.x + ',' + want.y);
+	// **AND THE CONNECTION IS WHAT MOVED TO MEET IT.** The station is the nearest point on the pipe
+	// to the meter, which is the same thing as saying the stub is square to the main -- so this
+	// fixture is 3A's rule arriving from the placement end rather than from a drag.
+	{
+		const an = L.customerAttachPoint(placed);
+		const n = L.linkNormalAt(l, placed.t);
+		const dx = got.x - an.x, dy = got.y - an.y, len = Math.hypot(dx, dy) || 1;
+		ok('3C.2 ...and the service it derived is square to the main',
+			near(((dx / len) * -n.y) + ((dy / len) * n.x), 0, 1e-12));
+		ok('3C.3 ...at a station between the ends rather than snapped to one',
+			placed.t > 0 && placed.t < 1, String(placed.t));
+	}
+	// **AND THE STATION REALLY IS FOLLOWING THE METER**, which a fixed one would pass the test above
+	// by accident on a single point. A second meter much further along the same main must land on
+	// its own point AND connect somewhere else.
+	{
+		const far = { x: want.x + 260, y: want.y + 15 };
+		const c2 = L.addCustomer(far.x, far.y, { link: l.id });
+		ok('3C.4 a meter further along the main lands on its own point too',
+			near(L.customerPoint(c2).x, far.x) && near(L.customerPoint(c2).y, far.y),
+			L.customerPoint(c2).x + ',' + L.customerPoint(c2).y);
+		ok('3C.4b ...and connects at a different station from the first',
+			Math.abs(c2.t - placed.t) > 0.05, placed.t + ' vs ' + c2.t);
+		L.deleteElement('customer', c2.id);
+	}
+	// **ON A NODE, THE METER ALSO STAYS PUT**, which is the other half of Tom's sentence. A junction
+	// is where several mains meet, so there is no one of them for the service to be square to, and
+	// forcing the meter onto a perpendicular of whichever pipe the attachment is stored against
+	// would move it for a reason no reader could see.
+	{
+		const n = L.nodeById(l.from);
+		const at = L.customerAttachAtNode(n, want);
+		const onNode = L.addCustomer(want.x, want.y, { link: at.link.id, t: at.t });
+		const p = L.customerPoint(onNode);
+		ok('3C.5 a meter served from a node stays exactly on the point it was given',
+			p.x === want.x && p.y === want.y, p.x + ',' + p.y);   // exact: no projection at a node
+		ok('3C.6 ...and the connection really is on that node', L.customerAtNodeEnd(onNode) === true);
+		ok('3C.7 ...and its demand lumps there', L.customerNodeId(onNode) === n.id);
+		L.deleteElement('customer', onNode.id);
+	}
+	// **THE OTHER THREE WRITERS OF A POSITION ANSWER THE SAME WAY**, because they go through the
+	// same seam: a drag, a typed location and a typed pipe all state where the METER is and let the
+	// connection follow. Four copies of these five lines is how they came to disagree in the first
+	// place.
+	{
+		const moved = { x: want.x - 18, y: want.y + 24 };
+		L.setCustomerAt(placed, l, moved.x, moved.y);
+		const p = L.customerPoint(placed);
+		ok('3C.8 stating a new point for the meter puts it there',
+			near(p.x, moved.x) && near(p.y, moved.y), p.x + ',' + p.y);
+	}
+	L.deleteElement('customer', placed.id);
 }
 
 // RENAMING THE PIPE carries the meter with it. Left out, the service would name an id the document
