@@ -1096,6 +1096,70 @@ caps the largest a box and a leader can ever be; `reachFactor` decides how far o
 inside that cap. Both were needed and neither substitutes for the other.
 
 
+## 15. Tom's box strategies A and B, measured (2026-09-18)
+
+He asked for findings rather than a build, and the finding is that **strategy A as literally stated
+returns nothing on a real drawing, and strategy B is not a relaxation of it but the only version of
+it that exists.** `dev/lpn-spike/box-at-node-probe.js` takes every number below: Net3-World, 1400x900,
+solved, every label field on, at the fit zoom and two steps in.
+
+> **A:** *"a box-at-node model, where we (iteratively?) draw the open rectangle with the largest area
+> possible that touches a node ... (c) we don't have to store a box for every node. If the area is
+> too small to be usable, or none are found, we don't store."*
+
+> **B:** *"If we modify the strategy above to allow a box to be away from a node, it complicates our
+> search ... I am doing a concept where we allow the box to be two text heights away from a node."*
+
+| | fit zoom | 2x | 4x |
+|---|---|---|---|
+| nodes searched | 97 | 97 | 97 |
+| nodes yielding at least one usable box | **97** | **97** | **97** |
+| spots found | 388 | 388 | 388 |
+| **boxes that actually TOUCH their node** | **0** | **0** | **0** |
+| median gap, node to nearest box edge, in text rows | 0.98 | 1.02 | 0.51 |
+| 90th percentile gap, in text rows | 3.92 | 4.57 | 2.54 |
+| nodes reached within TWO text rows (strategy B) | 71 | 66 | 82 |
+| cost of one search per node | **538 ms** | **673 ms** | **488 ms** |
+| cost of ranking 582 boxes by unique area, on top | 21 ms | 2.5 ms | 44 ms |
+
+**Five findings.**
+
+1. **NOT ONE BOX TOUCHES ITS NODE, AT ANY ZOOM, AND THAT IS GEOMETRY RATHER THAN A BUG.** A node's
+   own symbol is an obstacle in the occupancy raster -- it has to be, or labels would be drawn over
+   junctions -- so the nearest empty rectangle abuts the SYMBOL and not the point. The symbol's
+   radius alone is 0.455 of a text row here, and the measured median gap is about one whole row.
+   A search for "the largest open rectangle that touches a node" therefore comes back empty on every
+   node of a real drawing. **Strategy A needs an offset to exist at all, which is strategy B.**
+2. **TWO TEXT ROWS IS THE RIGHT ORDER OF MAGNITUDE AND REACHES ABOUT THREE NODES IN FOUR** -- 66 to
+   82 of 97. The rest need more, out to four or five rows at the 90th percentile. His instinct about
+   the distance is good; the number is a floor rather than a bound.
+3. **THE PRUNING HE HOPED FOR PRUNES NOTHING: every node yields a usable box, 97 of 97, at all three
+   zooms.** *"We don't have to store a box for every node"* is true of a sparse drawing and false of
+   this one, so the storage saving is not where the affordability comes from.
+4. **"MOST UNIQUE AREA" IS CHEAP AND THE SEARCH IS NOT.** 582 kept boxes is 169,000 pairs and costs
+   tens of milliseconds; the per-node search costs 500 to 670. Between 5,300 and 33,600 of those
+   pairs OVERLAP, which is the same fact the shipped search already answers by collapsing a run of
+   maximal rectangles into one PLACE with three extreme boxes: without that collapse, forty
+   rectangles over one patch of open ground read as forty spots.
+5. **AT NET3 SCALE IT IS NOT AFFORDABLE PER VIEW, AND THAT IS THE ANSWER TO "IS SPOT-PRIME
+   WORKABLE".** One search per node is 500-670 ms against about 90 ms for the whole shipped gang
+   repair and 600-1,400 ms for the content-and-layout pass it sits inside -- so it would roughly
+   double the cost of drawing every frame of a zoom. **What makes the shipped search affordable is
+   not the algorithm, which is the same maximal-empty-rectangle scan: it is the SCHEDULE.** It runs
+   per gang, over that gang's own neighborhood, and only where a crossing survived the cheap routes
+   -- 7 to 11 gangs a view on this drawing rather than 97 nodes.
+
+**And his own precomputation does not rescue it**, for section 10c's reason restated: free space is
+a per-VIEW quantity. An index of the DRAWING cannot answer a question about the VIEW, because what
+is open depends on how big the lettering is in map units, which depends on the zoom. A precomputed
+per-node index would have to be rebuilt on every zoom step, which is the 500 ms above.
+
+**What the measurement suggests instead, if the box-at-node idea is wanted:** keep the per-gang
+schedule and change what a spot is ALLOWED to be, which is the one line section 14 already moved.
+The evidence there is that the search's problem is not that it looks in the wrong PLACE but that it
+is allowed to look too FAR.
+
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.
