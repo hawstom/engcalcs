@@ -449,10 +449,16 @@ console.log('\n--- each table lists exactly its own type ---');
 	report(pipeCells.from.textContent === j1.id && pipeCells.to.textContent === j2.id,
 		'...and they name the right nodes', pipeCells.from.textContent + ' → ' + pipeCells.to.textContent);
 	// A pump has no editable scalar at all: what it is, is its curve.
+	// **THE THREE EXEMPTIONS ARE NOT SCALARS, WHICH IS WHY THE CLAIM SURVIVES THEM.** Active is
+	// whether this pump is in the network; Description and Tag are the identity band Tom ruled onto
+	// every table on 2026-09-15 (Task 674) -- what the asset is CALLED, not a number the pump has.
+	// A pump still has no editable number of its own, which is the fact this asserts.
 	L.renderTable('pumps');
 	const pumpCells = L.tableCells('pumps')[pu1.id];
-	report(Object.keys(pumpCells).every((k) => k === 'active' || pumpCells[k]._tag === 'td'),
-		'every cell of the pump table but Active is read-only — a pump IS its curve, and a curve lives in the popup');
+	const PUMP_NOT_SCALAR = { active: 1, desc: 1, tag: 1 };
+	report(Object.keys(pumpCells).every((k) => PUMP_NOT_SCALAR[k] || pumpCells[k]._tag === 'td'),
+		'every cell of the pump table but Active and the identity band is read-only — a pump IS its curve, and a curve lives in the popup',
+		Object.keys(pumpCells).filter((k) => !PUMP_NOT_SCALAR[k] && pumpCells[k]._tag !== 'td').join(','));
 	report(pumpCells.active && pumpCells.active.type === 'checkbox',
 		'...and Active is a checkbox on every table (Tom, 2026-09-08)');
 	// The valve's SETTING heading carries no unit, because the quantity differs per row.
@@ -565,7 +571,10 @@ console.log('\n--- the write seam ---');
 	// ways -- a blur, an Enter, an arrow out, and a paste -- and four copies of it is four chances
 	// to forget the override mark. paneTableRow() calls that one function; this asserts the ending
 	// where it now lives.
-	report(/completeEdit\(c\.prop \? \{ el: el, prop: c\.prop \} : null\);/.test(fnBody('paneCommitCell')),
+	// **THE PROPERTY IS ASKED THROUGH paneColProp() SINCE TASK 674**, because the two coordinate
+	// columns cannot carry a literal one: which document axis the first-read column writes follows
+	// the KIND of project, while the column spec is built once and cached.
+	report(/completeEdit\(paneColProp\(c\) \? \{ el: el, prop: paneColProp\(c\) \} : null\);/.test(fnBody('paneCommitCell')),
 		'every table edit ends in completeEdit(), the popup’s own ending');
 	report(/paneCommitCell\(input\)/.test(fnBody('paneTableRow')),
 		'...and a cell reaches it through the one commit, never by repeating it');
@@ -661,10 +670,15 @@ console.log('\n--- heading and cells share one alignment ---');
 	const pipeThs = pipeTable.children.filter((c) => c._tag === 'thead')[0].children[0].children;
 	report(!pipeThs[0].classList.contains(NUM) && pipeThs[0].classList.contains('lpn-pane-col-id'),
 		'the ID heading is not a number column, and names itself');
-	// Index 6, not 5, since the Active column joined every table (2026-09-08).
-	report(pipeThs[6].classList.contains('lpn-pane-col-roughness'),
+	// **FOUND BY ITS OWN CLASS, NEVER BY AN INDEX.** This was `pipeThs[6]` and the comment beside it
+	// said "index 6, not 5, since the Active column joined every table" -- which is the tell: a
+	// magic index is a number that has to be re-counted every time a column is added, and it had
+	// already been re-counted once. Task 674's identity band moved it to 8 and reddened this line
+	// for nothing. The claim is that the column NAMES ITSELF, so the assertion looks the name up.
+	const roughTh = pipeThs.filter((th) => th.classList.contains('lpn-pane-col-roughness'))[0];
+	report(!!roughTh,
 		'...and every column names itself, which is what lets one column be narrowed',
-		pipeThs[6].className);
+		pipeThs.map((th) => th.className).join(' | '));
 	// **THE LIBRARIES CURVE SECTION IS A TWO-COLUMN GRID AGAIN** (Task 588, Tom: *"The line given is
 	// worse than EPANET"*). It was one text field of every number in order, borrowed from the
 	// Patterns section -- and that argument does not carry, because a pattern is ONE column and a

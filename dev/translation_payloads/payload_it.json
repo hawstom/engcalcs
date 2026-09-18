@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1871,
-        "delta_key_count": 4,
+        "expected_key_count": 1874,
+        "delta_key_count": 7,
         "exempt_key_count": 39,
         "exempt_keys": [
             "calc_units_us",
@@ -533,13 +533,19 @@
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_field_northing_abbr": "N",
-        "lpn_field_easting_abbr": "E"
+        "lpn_field_easting_abbr": "E",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone."
     },
     "keys": {
         "lpn_find_q_and": "AND",
         "lpn_find_q_or": "OR",
         "lpn_field_northing_abbr": "N",
-        "lpn_field_easting_abbr": "E"
+        "lpn_field_easting_abbr": "E",
+        "lpn_field_coord_tip": "Type a coordinate to place this node exactly. In a scenario this places the node in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone."
     },
     "key_context": {
         "lpn_find_q_and": {
@@ -603,6 +609,54 @@
                     "key": "lpn_field_text_size",
                     "value": "Moltiplicatore di dimensione",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_coord_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "Coordinata Est",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Moltiplicatore di dimensione",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_coord_off_world": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "Coordinata Est",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Moltiplicatore di dimensione",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_inp_export_flat_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_flat_types",
+                    "value": "{n} tubazioni qui fanno riferimento a {t} tipi di tubazione. Nel file ciascuna di quelle tubazioni porta la propria copia dei numeri, quindi le risposte sono le stesse. Ciò che il file non può contenere è il tipo di tubazione in sé, quindi modificare una definizione e vedere ogni tubazione seguirla è qualcosa che solo il tuo file di progetto registra.",
+                    "english": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_flat_fittings",
+                    "value": "Un file EPANET non può contenere l'elenco di gomiti, valvole e raccordi a T del tuo file di progetto. Il coefficiente di perdita minore di {n} tubazioni qui è ottenuto sommando un elenco di raccordi. Il totale entra nel file esattamente com'è, quindi nulla cambia nelle risposte.",
+                    "english": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes."
                 }
             }
         }
