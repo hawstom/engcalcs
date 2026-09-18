@@ -1124,9 +1124,12 @@ $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
-$ec_lang['lpn_file_import_geo']='Open xy file on map…';
+$ec_lang['lpn_file_import_geo']='Convert coordinates as…';
+// **HIS OWN NAME FOR THE COPY** (Tom, 2026-09-18): the command belongs to the Save as family,
+// so its result is a second version of this project and is named the way a second version is.
+$ec_lang['lpn_copy_of']='Copy of {name}';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_geo_tip']='Opens a project file or an EPANET file in a new project tab on this page, on the world map. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more precisely.';
+$ec_lang['lpn_file_import_geo_tip']='Copies this project to a new tab and starts an approximate coordinates conversion wizard. A wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, Custom georeference instead.';
 // **THE BUTTON, NOT A GUESS** (Tom, 2026-08-21, on importing Net3 and landing in North Darfur).
 // Offered in step 1 whenever every coordinate in the file would also be a valid longitude and
 // latitude -- which nearly every small drawing is -- so the sentence has to make the user the

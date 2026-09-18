@@ -22240,7 +22240,7 @@ var EngCalcs = EngCalcs || {};
 	// One of OUR documents, off a disk, landed as a new project. Split out of the reader above so
 	// that File > Import XY to lat/lon… reaches the identical landing (Task 447) -- a second copy of this
 	// would be a second place for "an uploaded project arrives SAVED" to drift.
-	function landProjectText(text, asGeo) {
+	function landProjectText(text, asGeo, name) {
 		var pc = EngCalcs.pageConfig || {};
 		var saved = acceptImportedText(text);
 		if (!saved) { return; }
@@ -22254,7 +22254,7 @@ var EngCalcs = EngCalcs || {};
 		// after the project rather than the file, and why Save cannot go back where this came from.
 		setNotice(pc.lpn_status_uploaded || 'Project file uploaded. No connection to it can be maintained, so the only way to save back to it is by using File, Save as.');
 		renderTabs();
-		if (asGeo && upId) { renameToNumbered(upId); georefStart(); }
+		if (asGeo && upId) { renameToNumbered(upId, name); georefStart(); }
 	}
 	// **A CONVERTED PROJECT IS A NEW PROJECT AND IS NAMED LIKE ONE** (Tom, 2026-09-13, specifying
 	// what File > Open to new coordinates does: *"Behavior = existing plus Project name =
@@ -22262,10 +22262,13 @@ var EngCalcs = EngCalcs || {};
 	// the coordinates it always held; what is on screen is a second document about to be placed
 	// somewhere else. Carrying the name over would give two different documents one name, and the
 	// one this page can save is the one that is not the original.
-	function renameToNumbered(id) {
+	// `name` is optional and is what File, Convert coordinates as calls its copy: the file route
+	// arrives holding somebody else's document and gets a number, while the copy route is a second
+	// version of the project you are looking at and says so by name.
+	function renameToNumbered(id, name) {
 		var entry = indexEntry(id);
 		if (!entry || !project) { return; }
-		project.name = nextProjectName();
+		project.name = name || nextProjectName();
 		entry.name = project.name;
 		saveIndex();
 		saveToStorage();
@@ -23185,6 +23188,53 @@ var EngCalcs = EngCalcs || {};
 	function pickGeoFile() {
 		var input = document.getElementById('lpn_geo_file');
 		if (input) { input.click(); }
+	}
+	/**
+	 * **File, Convert coordinates as: a Save as that converts.** Tom's design, 2026-09-18, in
+	 * his own three steps: *"(1) the row becomes File, Convert coordinates as...; (2) it offers a
+	 * file picker OR makes a duplicate tab named `Copy of {project_name}`; (3) the redesigned
+	 * conversion wizard runs."*).
+	 *
+	 * **WHAT SHIPPED BEFORE THIS WAS AN "OPEN AS", WHICH IS WHY NO NAME FOR IT EVER READ
+	 * CORRECTLY.** The row opened a FILE and placed it; he wants a row that converts THIS project.
+	 * Tom: *"let's not fool ourselves, conversion of all coordinates is happening"* -- and the rule
+	 * this repository actually holds is never to convert IN PLACE, which a Save as does not: the
+	 * project you were looking at is still open, still unconverted, and still on its own tab.
+	 *
+	 * **AND IT IS THE EXCEPTION PATH NOW, not the recommended one.** The default way to
+	 * georeference is Map, Custom georeference, which moves no coordinate at all;
+	 * dev/tom-coordinate-vocabulary-2026-09-16.md: *"We may offer (since we already programmed and
+	 * debugged the wizard) coordinate system conversion. But that is not our recommended work flow
+	 * in most situations. As always, we prefer the preserve-the-inputs path."*
+	 *
+	 * **THE "OR" IN HIS STEP 2 IS ANSWERED BY THE PROJECT ITSELF RATHER THAN BY A DIALOG.** An
+	 * empty tab has nothing to copy, so that is the case where the picker is the only thing the
+	 * command can mean; a tab with a network in it is the thing being converted. Asking which of
+	 * the two somebody meant, when the answer is already on the screen, is a modal for nothing.
+	 */
+	function convertCoordsAs() {
+		var pc = EngCalcs.pageConfig || {}, saved, name;
+		if (isGeoProject()) {
+			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
+			return;
+		}
+		// Nothing here to convert: the row can only mean the file route.
+		if (!doc.nodes.length) { pickGeoFile(); return; }
+		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
+		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
+		if (!saved || !saved.project) {
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
+		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId
+		// is what the lock broker and every live file handle key on, so two tabs sharing one would
+		// be two documents claiming to be the same file. And the world map attached to the original
+		// is a statement about coordinates that are about to be replaced, so it goes too.
+		delete saved.project.docId;
+		delete saved.project.georef;
+		saved.project.name = name;
+		landProjectText(JSON.stringify(saved), true, name);
 	}
 
 	// ---- Live file handles ----
@@ -26028,8 +26078,8 @@ var EngCalcs = EngCalcs || {};
 			// nothing about the project on screen makes this impossible, because the result is a new
 			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
 			// had to be greyed whenever that project was already on the map, is gone with it.
-			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
-			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Convert coordinates as…',
+			  tip: pc.lpn_file_import_geo_tip, fn: convertCoordsAs },
 			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
 			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
 			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was

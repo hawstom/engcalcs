@@ -2055,6 +2055,7 @@ EngCalcs.pageConfig = {
 	lpn_clean_map_off: <?=json_encode($ec_lang['lpn_clean_map_off'])?>,
 	lpn_clean_map_tip: <?=json_encode($ec_lang['lpn_clean_map_tip'])?>,
 	lpn_file_import_geo: <?=json_encode($ec_lang['lpn_file_import_geo'])?>,
+	lpn_copy_of: <?=json_encode($ec_lang['lpn_copy_of'])?>,
 	lpn_file_import_geo_tip: <?=json_encode($ec_lang['lpn_file_import_geo_tip'])?>,
 	lpn_georef_intro: <?=json_encode($ec_lang['lpn_georef_intro'])?>,
 	lpn_georef_step1: <?=json_encode($ec_lang['lpn_georef_step1'])?>,
