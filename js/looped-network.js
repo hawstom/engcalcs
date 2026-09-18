@@ -3704,7 +3704,7 @@ var EngCalcs = EngCalcs || {};
 			// accepting one would put the node at Infinity and take the whole drawing with it; and
 			// a silent refusal is indistinguishable from a control that does nothing.
 			setNotice(pc.lpn_coord_off_world ||
-				'That is off the map. A latitude runs from -85.05 to 85.05 and a longitude from -180 to 180.');
+				'That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.');
 			return false;
 		}
 		var isY = coordSlotIsY(slot);
@@ -22666,12 +22666,14 @@ var EngCalcs = EngCalcs || {};
 	// button that I found"*. This one reads a file the user chose, shows what it is about to make,
 	// and does nothing until they say so. The guard was never the menu it hid in.
 	//
-	// **A GEOGRAPHIC PROJECT ONLY, AND IT SAYS SO RATHER THAN PROJECTING SILENTLY.** A latitude has
-	// no meaning on an XY grid and this page has no forward projection for a projected plane
-	// (dev/geographic-projects.md section 8), so the refusal names both the reason and the way out.
-	// The control is still drawn, deliberately unlike the elevation-source row beside it: somebody
-	// with a survey in hand will look for this, and a row that is simply absent teaches them
-	// nothing about why.
+	// **ANY COORDINATE SYSTEM THE READER WORKS IN, AND NO REFUSAL AT ALL** (Tom, 2026-09-17: *"I
+	// disagree that a project must be 'on a map of the Earth' (and, by the way, the technical term
+	// is 'georeferenced', you know that, and we should use that). There is no good reason why the
+	// file can't be in any system the user wants."*). This used to refuse a project that was not
+	// georeferenced, on the argument that a latitude has no meaning on a grid -- which describes a
+	// LATITUDE and not a surveyed point list. The file holds two coordinates in whatever system the
+	// project is already in, and surveyLimits() is the whole of what the distinction still costs:
+	// a georeferenced project has a range to be outside of and no other kind does.
 	var LPN_SURVEY_ELEV_UNIT = { m: 'mh2o', ft: 'fth2o' };
 	function pickSurveyFile() {
 		var input = document.getElementById('lpn_survey_file');
