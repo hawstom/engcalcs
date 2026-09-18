@@ -3335,6 +3335,13 @@ $ec_lang['lpn_terrain_working']='Reading the land surface…';
 // {status} is a number the service sent back, such as 403.
 $ec_lang['lpn_terrain_denied']='The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.';
 $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.';
+// A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
+// gets its own sentence: the same request works in a minute.
+$ec_lang['lpn_terrain_rate_limited']='The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.';
+// Any other status the service sent back. {status} is that number.
+$ec_lang['lpn_terrain_http']='The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.';
+// Said when the nodes asked about have no position on the Earth at all, which is what a projected
+$ec_lang['lpn_terrain_no_place']='None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.';
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
 $ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';

@@ -13830,9 +13830,11 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Cheap: two rects and, only when it is too tall, one style write. It runs on each keystroke in
 	// the query line, which is the same budget the panel already spends re-rendering its results.
+	// The open test is panelIsOpen() and NOT `display === 'block'`: this box opens as a flex
+	// column, so the literal test had been false since the day it did. See panelIsOpen().
 	function refitFindPopup() {
 		var popup = document.getElementById('lpn_find_popup');
-		if (!popup || popup.style.display !== 'block') { return; }
+		if (!panelIsOpen(popup)) { return; }
 		capPanelToRoomBelow(popup, popup.getBoundingClientRect().top);
 	}
 	// ---- REPLACE: the same query, plus a write (ROADMAP Task 389) --------------------------------
@@ -34707,8 +34709,16 @@ var EngCalcs = EngCalcs || {};
 			said.textContent = (pc.lpn_elev_dem_said || 'Mapbox DEM says {v} {u}.')
 				.replace('{v}', String(shown)).replace('{u}', unitLabel('lpn_u_elevhead'));
 		} else if (terrainAsked[nodeId]) {
-			// Asked and got nothing. The map notice carries the reason; this says the press landed.
-			said.textContent = pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
+			// **THE REASON, HERE, NOT ONLY IN THE NOTICE AT THE OTHER SIDE OF THE SCREEN.** This
+			// line used to say "The DEM has no elevation for this node" whatever had happened,
+			// which is a claim about GHANA when the truth was a refused request or a lost network
+			// -- and it is the sentence somebody reads, because it is under the button they just
+			// pressed. js/lpn-terrain.js owns the wording for a failure and hands it over, so the
+			// two places cannot come to different opinions. Only when the service genuinely
+			// answered and had no height there is the original sentence the true one.
+			said.textContent = (EngCalcs.lpnTerrainLastFailureText
+				&& EngCalcs.lpnTerrainLastFailureText())
+				|| pc.lpn_elev_dem_none || 'The DEM has no elevation for this node.';
 		} else {
 			said.textContent = '';
 		}
@@ -37339,9 +37349,31 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		overrideMarker(fields, el, 'active');
 	}
+	/**
+	 * **A PANEL IS OPEN WHEN IT IS NOT HIDDEN, AND THAT IS THE ONLY TEST THAT SURVIVES A LAYOUT
+	 * CHANGE.** hidePanel() writes `display: none` and the markup ships with it, so "not none" is
+	 * decidable from one fact. Asking whether it equals a PARTICULAR display value asks a second
+	 * question -- what kind of box is this -- which the caller has no business knowing and whose
+	 * answer changes the day somebody makes the box a flex column.
+	 *
+	 * **WHICH IS EXACTLY WHAT HAPPENED, AND IT COST A DEMONSTRATION.** The properties popup and
+	 * the Find box were both opened with `display: block` when their guards were written; both
+	 * became `flex` so the body could scroll inside a dragged height (openPopupAt() and
+	 * openFindPopup() each say so in a comment), and both guards still asked for `block`. From
+	 * that moment refreshPopupIfOpen() returned on its first line for every one of its ~70
+	 * callers, and refitFindPopup() for all of its.
+	 *
+	 * The failure is silent and reads as the feature being broken: press Read DEM on a node, the
+	 * request goes out, Mapbox answers, the height is recorded -- and the popup in front of you
+	 * does not change, because redrawing it is the thing that never happened. Close the node and
+	 * open it again and the number is there. Measured on https://librewaternet.org/app/ with
+	 * dev/lpn-spike/browser-drive.js after Tom reported it to an Engineers Without Borders
+	 * chapter as "Read DEM didn't work ... There is no indication why not."
+	 */
+	function panelIsOpen(el) { return !!el && el.style.display !== 'none'; }
 	function refreshPopupIfOpen() {
 		var popup = document.getElementById('lpn_popup');
-		if (!currentPopup || popup.style.display !== 'block') { return; }
+		if (!currentPopup || !panelIsOpen(popup)) { return; }
 		if (currentPopup.kind === 'node') { renderNodeFields(currentPopup.id); }
 		else if (currentPopup.kind === 'link') { renderLinkFields(currentPopup.id); }
 		// The multi-properties box has no single id to re-render; it is rebuilt from the subject,
