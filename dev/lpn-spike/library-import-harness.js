@@ -445,6 +445,13 @@ head('9. the chooser: one wizard, a checkbox per library the file holds, with it
 	// EVERY BOX OPENS CHECKED. Somebody who pressed Import libraries has already said what they
 	// want; the boxes are there to take something out of that, which is the rarer half.
 	check(rows.every(r => r.input.checked === true), 'and every box opens checked');
+	// **THE ONE-LINE NOTE, AND IT IS THE WHOLE OF THE PROSE ON THIS SCREEN** (Tom, 2026-09-18:
+	// *"This is too wordy and confusing. Have mercy on the humans."*). A library is taken whole, so
+	// the only thing a person has to be told before pressing Import is that they undo an unwanted
+	// entry afterwards the way they undo any other one.
+	check(walk(document.getElementById('lpn_dialog_body')).filter(e => tag(e) === 'p')
+		.some(e => pat('lpn_library_import_note').test(String(e.textContent || ''))),
+		'the chooser carries the one-line note about taking a library whole');
 	// PER LIBRARY, NEVER PER ENTRY (Declan). Nothing here offers a definition one at a time.
 	check(rows.length === chooserRows().filter(r => !!r.kind).length,
 		'the boxes are libraries, not entries');

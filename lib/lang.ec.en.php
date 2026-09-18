@@ -3171,7 +3171,7 @@ $ec_lang['lpn_library_import_tip']='Choose another project file and copy whole l
 // beside each name is the only thing on that screen that says what the file actually has in it.
 $ec_lang['lpn_library_import_choose']='Choose what to copy from {file}';
 $ec_lang['lpn_library_import_count']='{name} ({count})';
-$ec_lang['lpn_library_import_note']='Each library you check is copied in whole. Anything whose name is already taken here is skipped and listed. Delete what you do not want afterwards, the way you delete any other row.';
+$ec_lang['lpn_library_import_note']='Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.';
 $ec_lang['lpn_library_import_go']='Import';
 $ec_lang['lpn_library_import_no_libraries']='That project file has no libraries to copy.';
 $ec_lang['lpn_library_import_heading']='Imported from {file}';
@@ -3187,7 +3187,11 @@ $ec_lang['lpn_library_import_needs_fittings']='These pipe types refer to a fitti
 // convert, because changing a unit on this page reinterprets a typed number rather than converting
 // it, and a number that came from a file is the user's. {name} is the quantity, {mine} and {theirs}
 // the two unit labels, each read off this project's own unit selector.
-$ec_lang['lpn_library_import_units']='The file does not show its numbers in the units this project shows. Nothing is converted. Every number is copied exactly as the file wrote it, so it will mean the unit this project shows.';
+// WORDED BY TOM, 2026-09-18, after using it: 'This is too wordy and confusing. Have mercy on the
+// humans.' It opens with the word Warning and says Not recommended because he wants the
+// discouragement explicit; the per-quantity lines below carry the whole of the detail. Do not
+// restore the longer explanation, and do not add a convert button it would read as offering.
+$ec_lang['lpn_library_import_units']='Warning: Units mismatch. Will be imported as is. Not recommended.';
 $ec_lang['lpn_library_import_units_line']='{name}: this project shows {mine}, the file shows {theirs}.';
 $ec_lang['lpn_fitting_qty']='Quantity';
 $ec_lang['lpn_fitting_name']='Fitting';

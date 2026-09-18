@@ -31429,7 +31429,9 @@ var EngCalcs = EngCalcs || {};
 	 * saying the file does not show its numbers in this project's units."*). It used to be said in
 	 * the RECEIPT, which is the wrong end of the act: by then the definitions are in the document
 	 * and the only remedy left is Undo. Said here it is what it has to be, a fact the user weighs
-	 * before pressing Import.
+	 * before pressing Import. **ITS WORDING IS TOM'S OWN** (2026-09-18: *"This is too wordy and
+	 * confusing. Have mercy on the humans."*) -- it leads with Warning, says Not recommended, and
+	 * leaves every particular to the one line per quantity below it. Shorter is the requirement.
 	 *
 	 * **IT IS A DISCLOSURE AND NEVER AN OFFER TO CONVERT.** Changing a unit on this page
 	 * reinterprets the typed number rather than converting it, and a number that came from a file is
@@ -31468,7 +31470,7 @@ var EngCalcs = EngCalcs || {};
 				if (!diffs.length) { return; }
 				var lead = document.createElement('p'), ul = document.createElement('ul');
 				lead.style.margin = '8px 0 2px';
-				lead.textContent = pc.lpn_library_import_units || 'The file does not show its numbers in the units this project shows. Nothing is converted. Every number is copied exactly as the file wrote it, so it will mean the unit this project shows.';
+				lead.textContent = pc.lpn_library_import_units || 'Warning: Units mismatch. Will be imported as is. Not recommended.';
 				unitBox.appendChild(lead);
 				ul.style.margin = '0';
 				ul.style.paddingLeft = '20px';
@@ -31502,7 +31504,7 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(unitBox);
 			syncUnits();
 			note.style.margin = '8px 0 0';
-			note.textContent = pc.lpn_library_import_note || 'Each library you check is copied in whole. Anything whose name is already taken here is skipped and listed. Delete what you do not want afterwards, the way you delete any other row.';
+			note.textContent = pc.lpn_library_import_note || 'Each library you check is copied in whole. Delete what you do not want afterwards, the way you delete any other entry.';
 			body.appendChild(note);
 		}, [
 			{ label: pc.lpn_library_import_go || 'Import', fn: function () {
