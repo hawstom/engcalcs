@@ -569,7 +569,7 @@
 
 	// ---- THE SHAPE OF A LINE ERROR -------------------------------------------------------------
 	//
-	//     Line 6: warning: DUPLICATE_NAME: Name already in project, new name assigned.
+	//     Line 6: warning: duplicate-name: Name already in project, new name assigned.
 	//         PT-1,33.415300,-111.831400,1243.50
 	//
 	// One shell, filled once, so every refusal in the report reads the same way down the left-hand
@@ -577,9 +577,9 @@
 	// Tom asked for this shape on 2026-09-18 and then asked that it be checked against what real
 	// tools do. Three of its parts survived that check unchanged and are here for that reason: the
 	// number spelled out as `Line 6` (Python, PostgreSQL COPY, pandas, Oracle SQL*Loader, csvlint),
-	// the offending line echoed underneath (SQL*Loader, and the SARIF standard's `snippet`), and an
-	// uppercase symbolic code beside a plain sentence (Node's ENOENT, ShellCheck's SC2086, rustc's
-	// error[E0308]). Two did not survive it, and both are gone rather than argued for:
+	// the offending line echoed underneath (SQL*Loader, and the SARIF standard's `snippet`), and a
+	// symbolic code beside a plain sentence. Two did not survive it, and both are gone rather than
+	// argued for:
 	//
 	//   * THE DASH JOINING THE CODE TO ITS SENTENCE IS ATTESTED NOWHERE. Every tool found joins the
 	//     two with a colon or with brackets, so this is a colon.
@@ -587,10 +587,19 @@
 	//     directly underneath, so the shell was carrying a layout instruction about itself.
 	//
 	// **THE SEVERITY WORD IS THE PART THAT WAS MISSING, and it is the one the reader most needs.**
-	// Every convention carries one, and without it DUPLICATE_NAME -- we fixed it, carried on, and a
-	// junction exists -- reads in exactly the same shape as BAD_COORDINATE, where no junction was
+	// Every convention carries one, and without it duplicate-name -- we fixed it, carried on, and a
+	// junction exists -- reads in exactly the same shape as bad-coordinate, where no junction was
 	// made at all. That difference is the whole question a reader brings to this report. Lowercase,
 	// as in every tool cited.
+	//
+	// **AND THE CODE IS LOWER CASE AND HYPHENATED, WHICH IS THE CSV WORLD'S SPELLING AND NOT THE
+	// OPERATING SYSTEM'S** (Tom, 2026-09-18, asked which of the two conventions to follow: *"survey
+	// error codes: Lower case hyphenated to match the csv world."*). These were `DUPLICATE_NAME`
+	// and the rest, borrowed from the ENOENT family -- correct for a system call and wrong for a
+	// report about a spreadsheet. The tools a surveyor's own file already passes through spell it
+	// this way: Frictionless says `duplicate-label` and `missing-cell`, csvlint says `blank_rows`.
+	// A reader who has seen one of those recognises the shape of ours. **The severity word and the
+	// colons are untouched**, being a different question that was settled separately.
 	//
 	// **THE CODE IS A JS LITERAL AND NOT A LANGUAGE KEY, in any of the 27 files.** It is a symbol
 	// rather than a word -- the thing somebody quotes into a mail or searches this page for -- and a
@@ -605,14 +614,14 @@
 	// printed directly underneath, holding that same text in its own columns. Saying it twice is
 	// what made these read as prose rather than as a report.
 	var NOTE_CODE = {
-		'row-short': 'TOO_FEW_COLUMNS',
-		'coord-missing': 'MISSING_COORDINATE',
-		'bad-coord': 'BAD_COORDINATE',
-		'coord-range': 'COORDINATE_OUT_OF_RANGE',
-		'bad-elev': 'BAD_ELEVATION',
-		'id-duplicate': 'DUPLICATE_NAME',
-		'id-taken': 'DUPLICATE_NAME',
-		'id-invalid': 'INVALID_NAME'
+		'row-short': 'too-few-columns',
+		'coord-missing': 'missing-coordinate',
+		'bad-coord': 'bad-coordinate',
+		'coord-range': 'coordinate-out-of-range',
+		'bad-elev': 'bad-elevation',
+		'id-duplicate': 'duplicate-name',
+		'id-taken': 'duplicate-name',
+		'id-invalid': 'invalid-name'
 	};
 	// **THE SPLIT IS A FACT ABOUT THE CODE ABOVE, NOT A JUDGEMENT ABOUT SEVERITY.** `error` is every
 	// case where readCsvRow() returns before pushing a point, so the file's row produced nothing;

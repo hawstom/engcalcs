@@ -294,16 +294,23 @@ ok('a file with a bad line gets the heading that names what follows',
 
 // ---- THE SHAPE OF A LINE ERROR, which is the whole of this section ----------------------------
 //
-//     Line 6: warning: DUPLICATE_NAME: Name already in project, new name assigned.
+//     Line 6: warning: duplicate-name: Name already in project, new name assigned.
 //         PT-1,33.415300,-111.831400,1243.50
 //
 // Tom asked for this shape on 2026-09-18 and then asked that it be checked against real tools. The
-// line number spelled out, the reader's own line echoed underneath and an uppercase symbolic code
-// are all attested; the dash that used to join the code to its sentence is attested nowhere, and
+// line number spelled out, the reader's own line echoed underneath and a symbolic code beside a
+// plain sentence are all attested; the dash that used to join code to sentence is attested nowhere, and
 // `(see below)` had no precedent and described the layout of the report inside a message about a
 // file. What the check found MISSING is the severity word, and it is the claim this section cares
-// about most: without it DUPLICATE_NAME, where a junction exists, reads in the same shape as
-// BAD_COORDINATE, where none was made.
+// about most: without it duplicate-name, where a junction exists, reads in the same shape as
+// bad-coordinate, where none was made.
+//
+// **AND THE CODE IS SPELLED THE CSV WORLD'S WAY** (Tom, 2026-09-18: *"survey error codes: Lower
+// case hyphenated to match the csv world."*). It was `DUPLICATE_NAME` -- the ENOENT family, which
+// belongs to an operating system and not to a report about a spreadsheet. Frictionless writes
+// `duplicate-label`, csvlint writes `blank_rows`; a surveyor's file has already been through one of
+// those. The shape is asserted below as a PATTERN over every code the report can emit, not as a
+// list of seven literals, so a code added later is held to it without anybody remembering to.
 //
 // Every assertion here is built out of the shell key itself rather than out of English typed here,
 // so rewording the shell in lib/lang.ec.en.php stays free -- the freedom dev/english-key-rulings.json
@@ -315,7 +322,7 @@ ok('a file with a bad line gets the heading that names what follows',
 	const esc = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	const parts = PC.lpn_survey_note_line.split(/\{(?:line|sev|code|text)\}/);
 	const shellRx = new RegExp('^' + esc(parts[0]) + '(\\d+)' + esc(parts[1]) + '(\\S+?)'
-		+ esc(parts[2]) + '([A-Z_]+)' + esc(parts[3]) + '([\\s\\S]*)' + esc(parts[4]) + '$');
+		+ esc(parts[2]) + '([a-z0-9-]+)' + esc(parts[3]) + '([\\s\\S]*)' + esc(parts[4]) + '$');
 	const partsOf = t => shellRx.exec(t);
 	const sentenceOf = t => { const m = partsOf(t); return m ? m[4] : t; };
 	ok('a refusal is written in the shell, leading with its line number',
@@ -323,7 +330,33 @@ ok('a file with a bad line gets the heading that names what follows',
 	ok('...and every part of the shell is filled: line, severity, code, sentence',
 		!!bad && !!partsOf(bad.text), bad && bad.text);
 	ok('...and carries the machine-readable CODE, which is never translated',
-		!!bad && bad.text.indexOf('COORDINATE_OUT_OF_RANGE') >= 0, bad && bad.text);
+		!!bad && bad.text.indexOf('coordinate-out-of-range') >= 0, bad && bad.text);
+	// **AND EVERY CODE IN THE REPORT IS LOWER CASE AND HYPHENATED.** A pattern rather than a list,
+	// so the rule holds a code nobody has written yet. The negative half is what kills a drift back
+	// to the old spelling: no underscore, and not one upper-case letter anywhere in a code.
+	{
+		const codeOf = t => { const m = partsOf(t); return m && m[3]; };
+		// EVERY internal note that carries a code, rendered one at a time. Two of them -- a name
+		// already in the project and a name this page cannot use -- are raised while the nodes are
+		// being made rather than while the file is being read, so a report built from a parse alone
+		// never sees them; going through lpnSurveyNoteText() puts all eight under the rule. The
+		// left-hand names are internal and are not English, so pinning them here costs nothing.
+		const all = ['row-short', 'coord-missing', 'bad-coord', 'coord-range', 'bad-elev',
+			'id-duplicate', 'id-taken', 'id-invalid']
+			.map(c => codeOf(EC.lpnSurveyNoteText({ code: c, line: 3, raw: 'x' }, AX).text));
+		ok('every code the report can emit is lower case and hyphenated, the csv world\'s spelling',
+			all.length === 8 && all.every(c => !!c && /^[a-z]+(-[a-z]+)*$/.test(c)),
+			JSON.stringify(all));
+		ok('...with no underscore and no capital in any of them, which is the shape it came from',
+			all.every(c => !!c && c.indexOf('_') < 0 && c === c.toLowerCase()),
+			JSON.stringify(all));
+		// ...and the ones actually on screen in this report obey it too, which is the leg that ties
+		// the table above to what a reader sees.
+		ok('...and so does every code in the report on screen',
+			rep.filter(e => e.raw !== null).map(e => codeOf(e.text))
+				.every(c => !!c && /^[a-z]+(-[a-z]+)*$/.test(c)),
+			JSON.stringify(rep.filter(e => e.raw !== null).map(e => codeOf(e.text))));
+	}
 	ok('...and prints the reader\'s own line underneath, verbatim',
 		!!bad && bad.raw === 'PT-6,-111.830400,33.415910,1247.00', bad && bad.raw);
 	ok('...and the sentence after the code is SHORT -- one plain statement, not a paragraph',
@@ -341,13 +374,13 @@ ok('a file with a bad line gets the heading that names what follows',
 	ok('a row that produced NO junction is an error',
 		sevOf(bad.text) === PC.lpn_survey_sev_error, bad && bad.text);
 	ok('...and a row that produced one, adjusted, is a warning',
-		(() => { const e = rep.find(x => x.text.indexOf('BAD_ELEVATION') >= 0);
+		(() => { const e = rep.find(x => x.text.indexOf('bad-elevation') >= 0);
 			return !!e && sevOf(e.text) === PC.lpn_survey_sev_warning; })(),
 		JSON.stringify(rep.map(e => e.text)));
 	ok('...and a name already taken is a warning, because the point is on the map',
 		(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,33.5,-111.8\nA,33.6,-111.9\n');
 			const e = EC.lpnSurveyReportLines(r, { created: 2 }, AX)
-				.find(x => x.text.indexOf('DUPLICATE_NAME') >= 0);
+				.find(x => x.text.indexOf('duplicate-name') >= 0);
 			return !!e && sevOf(e.text) === PC.lpn_survey_sev_warning; })());
 	ok('...and every refusal in the report carries one of exactly the two words',
 		rep.filter(e => e.raw !== null).every(e =>
