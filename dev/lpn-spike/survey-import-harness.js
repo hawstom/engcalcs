@@ -627,8 +627,10 @@ L.land(PNEZD_TEXT, 'points.txt');
 	ok('...offering exactly the orders the module declares, in that order',
 		!!sel && sel.children.map(o => o.value).join(' ') === EC.lpnSurveyFormats.join(' '),
 		sel && sel.children.map(o => o.value).join(' '));
-	ok('...each spelled out in words, with the trade name only identifying it',
-		!!sel && sel.children[0].textContent === PC.lpn_survey_fmt_pnezd,
+	// **THE SHORT NAME AND NOTHING ELSE** (Tom, 2026-09-18: *"use short version only: PNEZD etc.
+	// It's standard"*). No language key is read here on purpose: an acronym is a code, not English.
+	ok('...each named by its trade acronym alone',
+		!!sel && sel.children[0].textContent === 'PNEZD',
 		sel && sel.children[0].textContent);
 	ok('...and the box asks the coordinate-order question in plain words',
 		boxText().indexOf(PC.lpn_survey_format_hint) >= 0);

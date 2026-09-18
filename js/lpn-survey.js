@@ -127,31 +127,25 @@
 	};
 
 	/**
-	 * What the chooser's row for one order says, in plain words.
+	 * What the chooser's row for one order says: THE ACRONYM, AND NOTHING ELSE.
 	 *
-	 * **THE QUESTION IS ASKED IN WORDS AND THE ACRONYM ONLY IDENTIFIES THE ANSWER** -- Declan's
-	 * point, and Tom's: a clerk who has the file in front of them knows what is in each column and
-	 * may well not know which of PNEZD and PENZD puts the northing first. So the label spells the
-	 * columns out and carries the trade name in brackets for whoever does recognise it.
+	 * **THE ACRONYM IS THE STANDARD AND THE READER IS A SURVEYOR** (Tom, 2026-09-18: *"For format
+	 * selector, use short version only: PNEZD etc. It's standard; ask Mary. These are humans. Always
+	 * as short as the audience can handle."*). This REVERSES the previous design, which spelled every
+	 * order out -- *"Point name, northing, easting, elevation, description (PNEZD)"* -- on the
+	 * argument that a clerk may not know which of PNEZD and PENZD puts the northing first. That
+	 * argument assumes a reader who needs teaching; the person holding a point list already reads
+	 * these five letters, and eight spelled-out rows are eight sentences to compare where eight
+	 * acronyms are one glance.
+	 *
+	 * **SO THERE IS NO LANGUAGE KEY HERE AT ALL, in any of the 27 files.** PNEZD is a code and not
+	 * English -- it does not translate, and a key whose value is the same five letters everywhere is
+	 * 26 translations of nothing. The eight `lpn_survey_fmt_*` keys are left in lib/lang.ec.en.php
+	 * unread rather than deleted; whether an unread key is debt is a judgement for a person.
 	 */
-	//
-	// **EIGHT LITERAL READS AND NOT A COMPUTED KEY.** `PC['lpn_survey_fmt_' + name]` would be
-	// invisible to dev/scripts/pageconfig_check.php and to
-	// dev/scripts/js_fallback_string_check.php alike, which is exactly how js/lpn-search.js came to
-	// carry English nothing compares. Spelled out, each one is held against lib/lang.ec.en.php.
-	var FORMAT_LABEL = {
-		PNEZD: function () { return PC.lpn_survey_fmt_pnezd || 'Point name, northing, easting, elevation, description (PNEZD)'; },
-		PENZD: function () { return PC.lpn_survey_fmt_penzd || 'Point name, easting, northing, elevation, description (PENZD)'; },
-		PNEZ: function () { return PC.lpn_survey_fmt_pnez || 'Point name, northing, easting, elevation (PNEZ)'; },
-		PENZ: function () { return PC.lpn_survey_fmt_penz || 'Point name, easting, northing, elevation (PENZ)'; },
-		NEZD: function () { return PC.lpn_survey_fmt_nezd || 'Northing, easting, elevation, description (NEZD)'; },
-		ENZD: function () { return PC.lpn_survey_fmt_enzd || 'Easting, northing, elevation, description (ENZD)'; },
-		NEZ: function () { return PC.lpn_survey_fmt_nez || 'Northing, easting, elevation (NEZ)'; },
-		ENZ: function () { return PC.lpn_survey_fmt_enz || 'Easting, northing, elevation (ENZ, also written XYZ)'; }
-	};
 	EngCalcs.lpnSurveyFormatLabel = function (format) {
-		var f = FORMAT_LABEL[String(format || '').toUpperCase()];
-		return f ? f() : String(format || '');
+		var f = String(format || '').toUpperCase();
+		return FORMATS.indexOf(f) >= 0 ? f : String(format || '');
 	};
 
 	function norm(s) {
