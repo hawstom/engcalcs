@@ -47,7 +47,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**5 still to read**, of 120 new keys across 11 unmerged branch(es).
+**5 still to read**, of 120 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -57,8 +57,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### 674-coordinate-entry (`690a67c0`) — adds no English strings
 
 ### feat/customer-demands (`bd17fa89`) — 24 new, all ruled
 
