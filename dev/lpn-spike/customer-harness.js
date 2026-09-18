@@ -53,6 +53,8 @@ const L = loadLoopedNetwork(
 	"\t\tcustomerNodeId: customerNodeId, customerPoint: customerPoint,\n" +
 	"\t\tcustomerAttachPoint: customerAttachPoint, customerFlow: customerFlow,\n" +
 	"\t\tsetCustomerStation: setCustomerStation, customerEdited: customerEdited,\n" +
+	"\t\tsetCustomerPerp: setCustomerPerp, customerPerpDistance: customerPerpDistance,\n" +
+	"\t\tlinkNormalAt: linkNormalAt, customerLink: customerLink,\n" +
 	"\t\tmeterHalfWorld: meterHalfWorld, serviceStrokeWorld: serviceStrokeWorld,\n" +
 	"\t\tcustomerLabelText: customerLabelText, detachedCustomers: detachedCustomers,\n" +
 	"\t\tcustEls: function () { return custEls; },\n" +
@@ -156,15 +158,21 @@ L.customerEdited(m1);
 ok('3.1 past the middle it lumps at the other end', L.customerNodeId(m1) === jB.id);
 ok('3.2 the demand went with it', near(L.baseDemandTotal(jA), ownA) && near(L.baseDemandTotal(jB), ownB + 12),
 	L.baseDemandTotal(jA) + ' / ' + L.baseDemandTotal(jB));
-// **THE METER DID NOT MOVE ON THE MAP.** That is the whole of what the slide handle is for: the
-// service comes off the main somewhere other than the nearest point, and the box stays put.
+// **THE HANDLE SLIDES THE WHOLE SERVICE, METER AND ALL** (Tom, 2026-09-17). This assertion
+// REPLACES its opposite: the handle used to move the attachment and leave the meter where it was
+// drawn, which is exactly how a service came to point sideways down the street. What is preserved
+// now is the distance out and the side, not the drawn point.
 {
 	const was = L.customerPoint(m1);
+	const wasOut = L.customerPerpDistance(m1, L.customerLink(m1));
 	L.setCustomerStation(m1, 0.55);
 	const now = L.customerPoint(m1);
-	ok('3.3 sliding the attachment leaves the meter exactly where it is drawn',
-		near(was.x, now.x, 1e-9) && near(was.y, now.y, 1e-9),
+	ok('3.3 sliding the attachment carries the meter along the pipe with it',
+		!near(was.x, now.x, 1e-6) || !near(was.y, now.y, 1e-6),
 		was.x + ',' + was.y + ' -> ' + now.x + ',' + now.y);
+	ok('3.3b ...at the same distance out and on the same side',
+		near(L.customerPerpDistance(m1, L.customerLink(m1)), wasOut, 1e-9),
+		wasOut + ' -> ' + L.customerPerpDistance(m1, L.customerLink(m1)));
 }
 L.setCustomerStation(m1, 0.2);
 L.customerEdited(m1);
@@ -179,6 +187,81 @@ ok('3.4 and back again', L.customerNodeId(m1) === jA.id);
 	ok('3.6 a bend is re-derived rather than remembered, and the answer is still a real junction',
 		L.customerNodeId(m1) === jA.id || L.customerNodeId(m1) === jB.id,
 		before + ' -> ' + L.customerNodeId(m1));
+}
+
+// ---- 3A. THE SERVICE IS PERPENDICULAR, AND THERE IS NO OTHER ANGLE ON OFFER ------------------
+//
+// Tom, 2026-09-17: *"The initial default connection to pipe needs to be perpendicular... In fact,
+// I am not sure we should offer a non-perpendicular connection to link."* The placement was
+// already perpendicular; it was everything AFTERWARDS that was not, so these fixtures are about
+// the drag and the handle rather than about the default.
+//
+// **THE FAILURE IS SILENT AND LOOKS LIKE A DRAWING CHOICE.** An angled stub claims the service is
+// laid diagonally, and no number on the screen disagrees, because the lumping is measured along
+// the PIPE and never reads the stub at all. So the test is the angle itself: the vector from the
+// attachment point to the meter must be square to the pipe there, whatever was done to it.
+{
+	const l = L.customerLink(m1);
+	function squareness(c) {
+		// The dot product of the service vector with the pipe's own direction at the station,
+		// both as unit vectors: zero is a right angle. Comparing an ANGLE rather than comparing
+		// coordinates is what makes this independent of where the meter happens to be.
+		const an = L.customerAttachPoint(c), pt = L.customerPoint(c);
+		const n = L.linkNormalAt(L.customerLink(c), c.t);
+		const dx = pt.x - an.x, dy = pt.y - an.y, len = Math.hypot(dx, dy) || 1;
+		// The pipe direction is the normal turned back: (-n.y, n.x).
+		return ((dx / len) * -n.y) + ((dy / len) * n.x);
+	}
+	ok('3A.1 a meter is square to its main where it was placed', near(squareness(m1), 0, 1e-12),
+		String(squareness(m1)));
+	// **A HAND-EDITED FILE CANNOT SMUGGLE ONE IN EITHER**, because the position has one reader and
+	// it rebuilds the offset from its perpendicular component. This is the case that would
+	// otherwise arrive from a project written before the rule, or from a text editor.
+	{
+		const was = L.customerPerpDistance(m1, l);
+		m1.x = 30; m1.y = 30;                        // a 45-degree offset, typed straight in
+		ok('3A.2 an angled offset in the document still draws square',
+			near(squareness(m1), 0, 1e-12), String(squareness(m1)));
+		L.setCustomerPerp(m1, m1.t, was);            // put it back for what follows
+	}
+	// The drag: the pointer goes wherever the hand goes, and what is stored is a station and a
+	// distance. Dragging far past the end of the pipe is the case that used to produce the worst
+	// angle, because the nearest point stops moving and the offset keeps growing.
+	{
+		const pts = [{ x: 0, y: 0 }, { x: 100, y: 0 }];
+		void pts;
+		L.setCustomerPerp(m1, 1.4, 25);              // a station off the end, clamped
+		ok('3A.3 a station past the end is clamped rather than allowed off the pipe',
+			m1.t === 1, String(m1.t));
+		ok('3A.4 ...and it is still square there', near(squareness(m1), 0, 1e-12));
+		L.setCustomerPerp(m1, 0.2, -40);             // the other side of the main
+		ok('3A.5 the sign of the distance is which side of the main it is on',
+			L.customerPerpDistance(m1, L.customerLink(m1)) < 0,
+			String(L.customerPerpDistance(m1, L.customerLink(m1))));
+		ok('3A.6 ...and that side is square too', near(squareness(m1), 0, 1e-12));
+		L.setCustomerPerp(m1, 0.2, 40);
+		L.customerEdited(m1);
+	}
+	// **ACROSS A BEND IS THE CASE THAT SEPARATES THE TWO RULES**, and it is why this fixture is on
+	// a bent pipe. On a straight main, "keep the meter where it is drawn" and "keep it the same
+	// distance out" move it to the same place, so a straight fixture would pass under either rule
+	// and prove nothing. Where the pipe turns, the old rule leaves the service at whatever angle
+	// the turn makes of it.
+	{
+		const out0 = L.customerPerpDistance(m1, L.customerLink(m1));
+		const at0 = L.customerAttachPoint(m1);
+		L.setCustomerStation(m1, 0.8);               // the far side of the bend
+		const at1 = L.customerAttachPoint(m1);
+		ok('3A.7 the station really did cross the bend',
+			Math.hypot(at1.x - at0.x, at1.y - at0.y) > 1, at0.x + ',' + at0.y + ' -> ' + at1.x + ',' + at1.y);
+		ok('3A.8 the distance out is what is kept across it, exactly',
+			near(L.customerPerpDistance(m1, L.customerLink(m1)), out0, 1e-9),
+			out0 + ' -> ' + L.customerPerpDistance(m1, L.customerLink(m1)));
+		ok('3A.9 ...and the service is square on the new segment', near(squareness(m1), 0, 1e-12),
+			String(squareness(m1)));
+		L.setCustomerStation(m1, 0.2);
+		L.customerEdited(m1);
+	}
 }
 
 // RENAMING THE PIPE carries the meter with it. Left out, the service would name an id the document

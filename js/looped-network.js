@@ -7942,13 +7942,66 @@ var EngCalcs = EngCalcs || {};
 		p = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		return { x: p.x, y: p.y };
 	}
-	// Where the METER BOX sits. `c.x`/`c.y` is an OFFSET from the attachment point while the
+	// **THE SERVICE LEAVES ITS MAIN AT A RIGHT ANGLE, AND THERE IS NO OTHER ANGLE ON OFFER**
+	// (Tom, 2026-09-17: *"The initial default connection to pipe needs to be perpendicular. Only an
+	// intentional drag away from that should change it. In fact, I am not sure we should offer a
+	// non-perpendicular connection to link."*). We do not offer one, and the reason is that an angle
+	// here would be A CLAIM THE MODEL DOES NOT MAKE: the demand is lumped to whichever end of the
+	// pipe is nearer measured ALONG the pipe, and that arithmetic never reads the stub's direction.
+	// A stub drawn at forty degrees therefore says something about how the service is laid in the
+	// ground that nothing in the answers knows about, and a row of parallel stubs makes the one real
+	// exception -- a service that genuinely crosses the street -- visible rather than hiding it
+	// among forty accidents.
+	//
+	// **SUPERSEDED, AND RECORDED SO IT IS NOT REBUILT:** the slide handle used to move the
+	// attachment along the pipe while the meter STAYED WHERE IT WAS DRAWN, which is precisely how an
+	// arbitrary angle was made. It carries the meter with it now (setCustomerStation()).
+	//
+	// The normal is the LEFT normal of the segment the station falls in, so ONE SIGNED DISTANCE
+	// carries both how far out the meter stands and which side of the main it stands on.
+	function linkNormalAt(l, t) {
+		var pts = linkPointList(l), seg = Geom.segmentAtFraction(pts, t), i = seg.index, dx, dy, len;
+		if (!pts[i] || !pts[i + 1]) { return { x: 0, y: 1 }; }
+		dx = pts[i + 1].x - pts[i].x; dy = pts[i + 1].y - pts[i].y;
+		len = Math.hypot(dx, dy) || 1;
+		return { x: -dy / len, y: dx / len };
+	}
+	// How far out from its main this meter stands, and on which side. The stored `x`/`y` is read as
+	// a vector and PROJECTED onto the normal rather than measured, so a document written before this
+	// rule -- or hand-edited to an angle -- draws at its perpendicular reading instead of being
+	// refused, and nothing has to rewrite a number on open.
+	function customerPerpDistance(c, l) {
+		var n;
+		if (!l) { return 0; }
+		n = linkNormalAt(l, customerT(c));
+		return (c.x || 0) * n.x + (c.y || 0) * n.y;
+	}
+	// **THE ONE WRITE SEAM FOR WHERE A METER IS**, taking the two things a drag is now allowed to
+	// change: the station ALONG the pipe, and the distance TOWARD or AWAY from it. Every gesture and
+	// every typed box goes through it, so there is no path left that can write an angle.
+	function setCustomerPerp(c, t, dist) {
+		var l = customerLink(c), n;
+		if (!l) { return false; }
+		c.t = Math.max(0, Math.min(1, (typeof t === 'number' && isFinite(t)) ? t : 0.5));
+		n = linkNormalAt(l, c.t);
+		c.x = n.x * dist; c.y = n.y * dist;
+		return true;
+	}
+	// Where the METER sits. `c.x`/`c.y` is an OFFSET from the attachment point while the
 	// customer is attached and an absolute position while it is not -- the same dual meaning a Text
 	// label's own x/y has, through the same single door, so a second kind of attachment could not be
 	// half-implemented (see textLabelPoint()).
+	//
+	// **ATTACHED, THE OFFSET IS REBUILT FROM ITS PERPENDICULAR COMPONENT**, which is what makes the
+	// rule above structural rather than a discipline every write site has to remember: there is one
+	// reader of a meter's position, so there is one place an angle could get in, and it cannot.
 	function customerPoint(c) {
-		var an = customerAttachPoint(c);
-		return an ? { x: an.x + (c.x || 0), y: an.y + (c.y || 0) } : { x: c.x || 0, y: c.y || 0 };
+		var an = customerAttachPoint(c), l, n, d;
+		if (!an) { return { x: c.x || 0, y: c.y || 0 }; }
+		l = customerLink(c);
+		n = linkNormalAt(l, customerT(c));
+		d = customerPerpDistance(c, l);
+		return { x: an.x + n.x * d, y: an.y + n.y * d };
 	}
 	// **THE JUNCTION THIS CUSTOMER LUMPS AT, DERIVED AND NEVER STORED.** The rule is one function in
 	// js/lpn-inp.js, shared with the `.inp` writer; the precedent for deriving it is `lenAuto` on a
@@ -8127,6 +8180,10 @@ var EngCalcs = EngCalcs || {};
 		};
 		if (!doc.customers) { doc.customers = []; }
 		doc.customers.push(c);
+		// **STORED PERPENDICULAR, so the file says what the drawing shows.** customerPoint() would
+		// draw it perpendicular either way, and leaving the raw offset in the document would mean
+		// the two disagreed on disk about a position nobody had moved.
+		if (c.link) { setCustomerPerp(c, c.t, customerPerpDistance(c, customerLink(c))); }
 		if (c.link && !customersByLink[c.link]) { customersByLink[c.link] = []; }
 		buildCustomerEls(c);
 		// A customer changes what a junction draws, so this one DOES schedule a solve -- unlike a
@@ -8183,17 +8240,17 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		refreshPaneIfOpen();
 	}
-	// Move a meter's attachment to the nearest point on its own pipe to a world position, keeping
-	// the meter exactly where it is drawn. This is what the slide handle writes.
+	// Move a meter's attachment ALONG its own pipe, carrying the meter with it at the same distance
+	// out and on the same side. This is what the slide handle and the station box both write.
+	//
+	// **IT USED TO LEAVE THE METER WHERE IT WAS DRAWN, and that was the whole of how a service came
+	// to point sideways** -- see linkNormalAt() for why we no longer offer any angle but the right
+	// one. Sliding the attachment now slides the service, which is the gesture a reader means by
+	// dragging the circle: this house is served from further up the main.
 	function setCustomerStation(c, t) {
-		var l = customerLink(c), was, an;
+		var l = customerLink(c);
 		if (!l) { return false; }
-		was = customerPoint(c);
-		c.t = Math.max(0, Math.min(1, t));
-		an = customerAttachPoint(c);
-		if (!an) { return false; }
-		c.x = was.x - an.x; c.y = was.y - an.y;
-		return true;
+		return setCustomerPerp(c, t, customerPerpDistance(c, l));
 	}
 
 	function buildDom() {
@@ -27567,7 +27624,7 @@ var EngCalcs = EngCalcs || {};
 			relayoutLabels();
 		} else if (drag.type === 'customer') {
 			snapshotDragOnce();
-			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos, hitm;
+			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos, hitm, nm;
 			if (!cm) { return; }
 			lm = customerLink(cm);
 			pos = { x: wm.x + drag.offX, y: wm.y + drag.offY };
@@ -27575,9 +27632,15 @@ var EngCalcs = EngCalcs || {};
 				// **THE ATTACHMENT FOLLOWS THE METER TO THE NEAREST POINT ON ITS OWN PIPE.** Its own
 				// pipe, never a nearer one: re-serving a customer from a different main is a
 				// decision, and a decision is not something a drag should make on the way past.
+				//
+				// **AND THE DRAG HAS TWO DEGREES OF FREEDOM, NOT THREE** (Tom, 2026-09-17): along
+				// the pipe, and out from it. The pointer's position is resolved into exactly those
+				// two -- a station, and a signed distance along the normal there -- so a drag can
+				// never produce an angle, whatever direction the hand moves in. See linkNormalAt().
 				hitm = Geom.nearestFractionOnPolyline(linkPointList(lm), pos.x, pos.y);
-				cm.t = hitm.f;
-				cm.x = pos.x - hitm.x; cm.y = pos.y - hitm.y;
+				nm = linkNormalAt(lm, hitm.f);
+				setCustomerPerp(cm, hitm.f,
+					(pos.x - hitm.x) * nm.x + (pos.y - hitm.y) * nm.y);
 			} else {
 				cm.x = pos.x; cm.y = pos.y;
 			}
@@ -27592,9 +27655,10 @@ var EngCalcs = EngCalcs || {};
 			snapshotDragOnce();
 			var wa = screenToWorld(p.x, p.y), ca = customerById(drag.id), la = ca ? customerLink(ca) : null;
 			if (!ca || !la) { return; }
-			// **THE METER STAYS WHERE IT IS DRAWN and only the connection point moves**, which is
-			// the whole of what an attachment override is for: the service comes off the main
-			// somewhere other than the nearest point, and the user is the one who knows where.
+			// **THE HANDLE SLIDES THE WHOLE SERVICE ALONG THE MAIN** -- the connection point and the
+			// meter together, at the same distance out and on the same side. It used to leave the
+			// meter where it was drawn, which was the one gesture on this page that could make a
+			// service point sideways; linkNormalAt() carries why that is no longer offered.
 			setCustomerStation(ca, Geom.nearestFractionOnPolyline(linkPointList(la), wa.x, wa.y).f);
 			updateCustomerGeometry(drag.id);
 			refreshCustomerHandle();
