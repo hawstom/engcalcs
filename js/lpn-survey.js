@@ -217,6 +217,15 @@
 	function readNumber(cell) {
 		var tok = String(cell === undefined || cell === null ? '' : cell).trim(), v;
 		if (tok === '') { return { ok: false, blank: true, tok: '' }; }
+		// **WHAT COMES BACK ON FAILURE IS THE CELL'S OWN TEXT AND NOT A READING OF IT** (Tom,
+		// 2026-09-17, on the sentence that used to print it: *"This error seems wrong: 'The
+		// elevation here does not read as a number (about 1240).' "*). He is right about the
+		// sentence and the code was doing the right thing under it: `tok` is the characters the
+		// file holds, trimmed, and nothing here ever parsed them. The old wording put them in a
+		// bare parenthesis after "does not read as a number", where a parenthesis is how this page
+		// prints a VALUE everywhere else -- so it read as a claim that the elevation is about 1240,
+		// which is precisely what we cannot say. The fix is the sentence: the text is now
+		// introduced by a colon, as the quotation it is.
 		// **STRICTER THAN parseFloat, DELIBERATELY.** `parseFloat('38.5 N')` is 38.5, and a bearing
 		// or a hemisphere letter silently becoming a decimal degree is the kind of guess this
 		// module does not make. Degrees-minutes-seconds is not read either; it is reported, and the
@@ -428,7 +437,7 @@
 		else if (code === 'coord-missing') { text = fill(PC.lpn_survey_note_coord_missing || 'Line {line} empty {axis}. See entire line below.', d, ax, line); }
 		else if (code === 'bad-coord') { text = fill(PC.lpn_survey_note_bad_coord || 'Line {line} invalid {axis}: {detail} See entire line below.', d, ax, line); }
 		else if (code === 'coord-range') { text = fill(PC.lpn_survey_note_coord_range || 'Line {line} {axis} out of range: {detail} See entire line below.', d, ax, line); }
-		else if (code === 'bad-elev') { text = fill(PC.lpn_survey_note_bad_elev || 'Line {line} unreadable elevation: {detail} Junction made. See entire line below.', d, ax, line); }
+		else if (code === 'bad-elev') { text = fill(PC.lpn_survey_note_bad_elev || 'Line {line} non-numeric elevation: {detail} Junction made. See entire line below.', d, ax, line); }
 		else if (code === 'id-duplicate') { text = fill(PC.lpn_survey_note_id_duplicate || 'Line {line} repeated name: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
 		else if (code === 'id-taken') { text = fill(PC.lpn_survey_note_id_taken || 'Line {line} name already in this project: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }
 		else if (code === 'id-invalid') { text = fill(PC.lpn_survey_note_id_invalid || 'Line {line} name cannot be an ID here: {detail} Junction made, under a name of ours. See entire line below.', d, ax, line); }

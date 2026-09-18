@@ -278,6 +278,18 @@ ok('a file with a bad line gets the lead-in that says nothing was thrown away',
 		rep.filter(e => e.raw !== null).every(e => e.text.split(/\s+/).length <= 16));
 	ok('a note about the FILE rather than a line prints nothing underneath it',
 		rep.filter(e => e.raw === null).length >= 2);
+	// **THE ONE MESSAGE TOM CALLED WRONG RATHER THAN MERELY LONG** (2026-09-17: *"This error seems
+	// wrong: 'The elevation here does not read as a number (about 1240).' "*). If it does not read
+	// as a number we cannot then say it IS about 1240. The code was already right -- what comes
+	// back is the cell's own characters and nothing parsed them -- so this pins the two halves the
+	// sentence has to keep apart: the text is the FILE's, verbatim, and it is introduced as a
+	// quotation rather than dropped into a parenthesis where every other number on this page is a
+	// value.
+	ok('the elevation it could not read is quoted verbatim, never reported as a number',
+		(() => { const n = csv.notes.find(x => x.code === 'bad-elev');
+			return n.detail === 'about 1240' && typeof n.detail === 'string'; })());
+	ok('...and the line it is on still became a junction, which the sentence has to say',
+		csv.points.some(p => p.line === 12 && p.elev === null));
 	ok('the unreadable elevation is reported on its own line, with the cell it could not read',
 		!!rep.find(e => e.raw === 'PT-7,33.414700,-111.830400,about 1240' &&
 			e.text.indexOf('about 1240') >= 0), JSON.stringify(rep.map(e => e.text)));
