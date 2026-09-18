@@ -25508,9 +25508,10 @@ var EngCalcs = EngCalcs || {};
 			// existing is touched; and Find and replace with Elevation set to From Mapbox DEM, where
 			// the user has already chosen the set and Replace already owns the preview and the undo.
 			// **Do not restore a third door.** Keeping it is what made the feature a cool button
-			// nobody asked for. EngCalcs.lpnTerrainFill() itself stays in js/lpn-terrain.js -- it is
-			// still the code that decides a list and it is still exercised by its harness -- with no
-			// caller on the page.
+			// nobody asked for. The command behind it was deleted from js/lpn-terrain.js on
+			// 2026-09-17, having had no caller but a harness since the day this row went: the two
+			// sentences only it could say were being translated into 27 languages for a state no
+			// visitor could reach. See dev/geographic-projects.md for what went with it.
 		];
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
@@ -41168,19 +41169,25 @@ var EngCalcs = EngCalcs || {};
 	if (EngCalcs.lpnSearchInit) {
 		EngCalcs.lpnSearchInit({ locatable: projectLocatable, goTo: goToPoint, notice: setNotice });
 	}
-	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). Six functions: what a geographic project
-	// is, the token that decides whether the feature exists at all, which nodes have no elevation,
-	// WHICH already have one, how to write a batch of them under one undo (returning WHICH it
-	// wrote), and where to speak. The two "which" answers are lists of ids rather than counts
-	// because that file names the nodes in both directions; see terrainNodesWithElevation().
+	// **THE WHOLE SEAM TO js/lpn-terrain.js** (Task 497). FIVE functions now: whether this project
+	// can say where on the Earth a point of it is, the token that decides whether the feature
+	// exists at all, how to write a batch of elevations under one undo (returning WHICH it wrote),
+	// how to record a reading without writing anything, and where to speak.
+	//
+	// **THE THREE "WHICH NODES" ANSWERS WENT ON 2026-09-17 WITH THE ONLY THING THAT ASKED THEM.**
+	// EC.lpnTerrainFill() was the whole-drawing command behind the Map-menu row Task 542 deleted,
+	// and it was the only reader of nodesNeedingElevation, nodesWithElevation and
+	// nodesAtDefaultElevation. Every door that remains arrives holding its own list, so the seam
+	// no longer has to answer a question nobody asks. terrainNodesNeedingElevation() and its two
+	// siblings are still in this file and are now read only by the harnesses -- kept deliberately,
+	// because whether a whole-drawing fill ever comes back is a product decision and the
+	// at-default arithmetic in them is the part that would be expensive to write again.
+	//
 	// The tile scheme, the Terrain-RGB decode, the request budget, the consent gate and every
 	// string live in that file.
 	if (EngCalcs.lpnTerrainInit) {
 		EngCalcs.lpnTerrainInit({
 			locatable: projectLocatable, token: mapboxToken, notice: setNotice,
-			nodesNeedingElevation: terrainNodesNeedingElevation,
-			nodesWithElevation: terrainNodesWithElevation,
-			nodesAtDefaultElevation: terrainNodesAtDefaultElevation,
 			fill: terrainFillElevations,
 			// **RECORD, WHICH IS THE SEAM THAT WRITES NOTHING** (Task 542). lpnTerrainSample() hands
 			// its readings here instead of to `fill`, so the page can SHOW what the DEM says and let

@@ -647,6 +647,13 @@ It also reports keys whose only reader is itself unreachable — a reference fro
 is still a reference, which is why a reference count alone could not see the two terrain strings
 Task 542 stranded. That walk is advisory and lists CANDIDATES: reachability through a dynamic
 dispatch is undecidable, so it is deliberately conservative and prints what it turned away.
+**Since 2026-09-17 it also NAMES what only a harness reaches (finding 1c), which the walk itself
+can never list** -- a harness ROOTS a function, correctly, because a test seam is not a corpse, so
+`EC.lpnTerrainFill()` sat rooted by `terrain-harness.js` alone from the day Task 542 deleted its
+menu row, and two of its strings went on being translated into 27 languages for a state no visitor
+could reach. Tom found it by reading: *"When could that possibly display?"* A worklist and not a
+verdict -- 23 rows today and most of them are genuine seams; the question it puts to a person is
+whether the function SAYS anything a visitor could see.
 a key rendered by nothing is not automatically debt, so decide per key and never bulk-delete.
 **Keep sibling keys parallel in NAME and in VALUE across all 27 files.**
 

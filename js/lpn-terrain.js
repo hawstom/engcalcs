@@ -516,60 +516,37 @@
 	};
 
 	/**
-	 * The whole command, and the ONLY entry point js/looped-network.js knows about.
+	 * **EC.lpnTerrainFill() WAS DELETED HERE ON 2026-09-17, AND IT HAD BEEN DEAD SINCE TASK 542.**
 	 *
-	 * Order matters and is not arbitrary: what will be touched is counted BEFORE anything is asked,
-	 * so nobody consents to a request that turns out to have had nothing to do, and nobody is asked
-	 * to confirm a fill whose size they have not been told.
+	 * It was the Map-menu row's command: decide a list -- every blank elevation, or failing that
+	 * every node still on the starting number -- and hand it to lpnTerrainFillFor() below. Task
+	 * 542 deleted the row on Tom's own instruction (*"a cool new button that I found"*) and left
+	 * the function behind with no caller but its harness. **The cost of leaving it was not dead
+	 * code, it was dead PROSE**: the only two sentences it could emit -- "there are no nodes to
+	 * fill in yet" and "every node already has an elevation you have set" -- were maintained in 27
+	 * languages for a state no visitor could reach. Tom, finding the first: *"When could that
+	 * possibly display?"* Both keys were deleted with it; dev/geographic-projects.md names them.
+	 * (Named in prose rather than as `$ec_lang` tokens on purpose: delete_lang_key.php reads a
+	 * comment as a reader and refuses to remove a key this file so much as mentions.)
+	 *
+	 * **THREE DOORS REMAIN AND EVERY ONE OF THEM ARRIVES HOLDING A LIST**: a node born on a
+	 * geographic project, Find and replace with Elevation set to From DEM, and the node popup's
+	 * Read DEM / Use DEM. So lpnTerrainFillFor() and lpnTerrainSample() take the nodes as an
+	 * argument and nothing here decides one any more. Do not restore a fourth door that decides
+	 * its own -- that is Task 542's ruling, and it is the ruling this deletion finishes.
+	 *
+	 * `opts.confirm` and lpnTerrainPlanText() outlive it and no live door sets or calls them
+	 * today; they are the plan a whole-drawing fill would have to show, and whether they are debt
+	 * or a half-built control is Tom's call rather than a script's.
 	 */
-	EC.lpnTerrainFill = function () {
-		if (!seam || (seam.locatable && !seam.locatable())) { return; }
-		var token = seam.token && seam.token();
-		if (!token) { return; }   // the row is hidden without one; this is the belt to that brace
-		if (running) {
-			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
-			return;
-		}
-		var want = seam.nodesNeedingElevation();
-		var keep = seam.nodesWithElevation();
-		// **THE SECOND SET, AND WHY IT IS A SECOND QUESTION.** A node drawn on the map is born with
-		// the starting elevation (0), so a freshly drawn network has no BLANK elevations at all --
-		// only a number nobody typed. Offering to replace those is what makes this feature useful
-		// for the commonest case there is; offering it silently, mixed in with the blanks, would be
-		// the rule this whole file is built around breaking. So it is asked only when there is
-		// nothing blank left to do, and the number being replaced is named in the question.
-		var replacing;
-		if (!want.length) {
-			var atDefault = seam.nodesAtDefaultElevation ? seam.nodesAtDefaultElevation() : { points: [] };
-			if (atDefault.points.length) {
-				want = atDefault.points;
-				replacing = atDefault.value;
-				// `keep` is a list of ids now, not a count, so the nodes that just moved OUT of it
-				// and into `want` are removed by name rather than by subtracting a number.
-				var moving = {};
-				want.forEach(function (p) { moving[p.id] = true; });
-				keep = keep.filter(function (id) { return !moving[id]; });
-			}
-		}
-		if (!want.length) {
-			notice(keep.length > 0
-				? t('lpn_terrain_none_needed',
-					'Every node already has an elevation you have set. Nothing was changed, and ' +
-					'nothing was sent — we never overwrite an elevation that is already there.')
-				: t('lpn_terrain_no_nodes', 'There are no nodes to fill in yet.'));
-			return;
-		}
-		EC.lpnTerrainFillFor(want, { keep: keep, replacing: replacing, confirm: true });
-	};
 
 	/**
 	 * **FETCH AND WRITE A LIST SOMEBODY ELSE CHOSE** (ROADMAP Task 542). Everything from the consent
 	 * gate down, taking the nodes as an argument instead of deciding them.
 	 *
-	 * This is the split Task 542 needed. `lpnTerrainFill` above is one CALLER: it decides its own
-	 * list (blank elevations, then the ones still on the starting number) and passes it here. The
-	 * two Task 542 doors are the other two -- a node born on a geographic project, and Find and
-	 * replace with Elevation set to From DEM -- and neither of them decides a list the same way.
+	 * This is the split Task 542 needed. Its three callers -- a node born on a geographic project,
+	 * Find and replace with Elevation set to From DEM, and the node popup's own two buttons -- each
+	 * decide a list a different way and share everything that happens to it afterwards.
 	 * Splitting was the alternative to a third copy of the tile plan, the budget, the consent gate
 	 * and the eight messages, which is how three doors become three behaviours.
 	 *

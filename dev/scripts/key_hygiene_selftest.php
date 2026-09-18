@@ -102,6 +102,41 @@ foreach ($fixtures as [$want, $js, $php, $keys, $shape]) {
     printf("FAIL  expected [%s] got [%s]\n      %s\n\n", implode(',', $want), implode(',', $got), $shape);
 }
 
+// ---- FINDING 1c: REACHED ONLY FROM A HARNESS -------------------------------------------------
+//
+// **THE SHAPE THAT COST TWO KEYS IN 27 LANGUAGES.** EC.lpnTerrainFill() lost its caller when Task
+// 542 deleted the Map-menu row and was driven by nothing but dev/lpn-spike/terrain-harness.js from
+// that day. The walk ROOTED it -- correctly, since a seam is not a corpse -- so finding 1b reported
+// 0 while looking straight at it, and the two sentences only it could emit went on being
+// translated for a state no visitor could reach. Naming such a function is a weaker claim than
+// calling it dead, and it is the claim a person can act on.
+//
+// Both directions, because a list that names everything is the same as a list that names nothing:
+// a function some other shipped function calls must NOT appear, however many harnesses drive it.
+{
+    $shipped = [
+        'a.js' => "EC.seamOnly = function () { return t('k_seam', 'x'); };\n"
+            . "EC.realDoor = function () { return t('k_door', 'x'); };\n"
+            . "EC.pressed = function () { return EC.realDoor(); };\n",
+    ];
+    $harness = ['dev/lpn-spike/h.js' => "EC.seamOnly();\nEC.realDoor();\n"];
+    $r = ecReachabilityCandidates($shipped, ['p.php' => 'EC.pressed();'], ['k_seam', 'k_door'], [], $harness);
+    $only = $r['harnessOnly'];
+    if (!isset($only['seamOnly'])) {
+        $fail++; echo "FAIL  1c did not name a function only a harness reaches\n";
+    }
+    if (isset($only['realDoor'])) {
+        $fail++; echo "FAIL  1c named a function a shipped caller also reaches\n";
+    }
+    if (isset($only['pressed'])) {
+        $fail++; echo "FAIL  1c named a function a page reaches\n";
+    }
+    // And it still ROOTS: neither key may be reported as read only by unreachable code.
+    if (array_column($r['candidates'], 0)) {
+        $fail++; echo "FAIL  a harness-rooted function was also reported dead by 1b\n";
+    }
+}
+
 // The MASK is the part everything else rests on, so it is pinned directly rather than only through
 // its effects: a string body must vanish from the code view and survive in the key view.
 $src = "var a = 'lpn_hidden'; // comment_name\n";
@@ -119,6 +154,6 @@ if ($fail) {
     printf("\nkey_hygiene_selftest: %d failure(s).\n", $fail);
     exit(1);
 }
-printf("key_hygiene_selftest: %d fixtures pass — the walk still sees the dead reader, and still\n", count($fixtures));
-echo "turns away the six shapes that only look like one.\n";
+printf("key_hygiene_selftest: %d fixtures pass — the walk still sees the dead reader, still turns\n", count($fixtures));
+echo "away the six shapes that only look like one, and still names what only a harness reaches.\n";
 exit(0);

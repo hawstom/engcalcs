@@ -271,6 +271,9 @@ const L = loadLoopedNetwork(
 	// Task 542's two new doors, and the queue between the first one and the tiles.
 	"\t\tsetElevSource: function (v) { settings.defaults.nodeElevSource = v; },\n" +
 	"\t\tflushNewNodes: flushTerrainForNewNodes,\n" +
+	// The three lists EC.lpnTerrainFill() used to consult before it was deleted; see decideFill().
+	"\t\tneeding: terrainNodesNeedingElevation, withElev: terrainNodesWithElevation,\n" +
+	"\t\tatDefault: terrainNodesAtDefaultElevation,\n" +
 	"\t\tlastRead: function (id) { return terrainLastRead[id]; },\n" +
 	"\t\trenderNode: renderNodeFields,\n" +
 	// **THE POPUP IS OPENED THE WAY THE PAGE OPENS IT, AND THAT IS NOT A DETAIL.** This wrote
@@ -348,11 +351,39 @@ global.confirm = global.window.confirm = function (m) { confirmTexts.push(m); re
 function settle() {
 	return new Promise(function (r) { setImmediate(function () { setImmediate(r); }); });
 }
+// **THE LIST THE DELETED MENU ROW USED TO DECIDE, DECIDED HERE INSTEAD.**
+//
+// `EC.lpnTerrainFill()` was removed on 2026-09-17. Task 542 had already deleted the Map-menu row
+// that pressed it -- Tom's own "a cool new button that I found" -- and nothing on the page called
+// it afterwards, so the only two sentences it could emit were unreachable while being maintained
+// in 27 languages. Tom, reading one of them: *"When could that possibly display?"*
+//
+// What it did was pick a list and hand it to `lpnTerrainFillFor()`. **Everything below that pick
+// is what these sections are really about** -- the consent gate, the plan and its counts, the tile
+// budget, the write, the single undo -- and all of it is reached by the three live doors (a node
+// born on a geographic project, Find and replace with Elevation set to From DEM, and the node
+// popup's own two buttons). So the pick moves here, as a fixture, and every assertion below keeps
+// testing shipped code rather than being deleted with the entry point.
+function decideFill() {
+	var want = L.needing(), keep = L.withElev(), replacing;
+	if (!want.length) {
+		var atDefault = L.atDefault();
+		if (atDefault.points.length) {
+			want = atDefault.points;
+			replacing = atDefault.value;
+			var moving = {};
+			want.forEach(function (p) { moving[p.id] = true; });
+			keep = keep.filter(function (id) { return !moving[id]; });
+		}
+	}
+	return { want: want, keep: keep, replacing: replacing };
+}
 function runFill(answers) {
 	confirmAnswers = answers.slice();
 	confirmTexts = [];
 	tileRequests = 0;
-	EC.lpnTerrainFill();
+	var d = decideFill();
+	EC.lpnTerrainFillFor(d.want, { keep: d.keep, replacing: d.replacing, confirm: true });
 	return settle();
 }
 
@@ -527,14 +558,11 @@ function runFill(answers) {
 		L.elev('J2') + ', ' + L.elev('J3'));
 	ok('...and leaves the typed one where it was', L.elev('J1') === 123.45);
 
-	// ---- 5e. NOTHING LEFT TO DO SAYS SO, AND SENDS NOTHING --------------------------------------
-	buildSite();
-	SITE.forEach(function (s, i) { L.setElev(s.id, 100 + i); });
-	await runFill([true]);
-	ok('a network whose elevations are all set sends nothing',
-		tileRequests === 0, tileRequests + ' tile requests');
-	ok('...and none of them moved',
-		L.elev('J1') === 100 && L.elev('J2') === 101 && L.elev('J3') === 102);
+	// ---- 5e. **DELETED WITH EC.lpnTerrainFill() ON 2026-09-17** ----------------------------------
+	// It asserted lpn_terrain_none_needed, the sentence a whole-drawing fill said when every node
+	// already had an elevation somebody had set. No live door can reach that state: Find and
+	// replace hands over the set its own query found, and a node being born hands over itself. The
+	// key is gone from all 27 language files with the entry point that alone could show it.
 
 	// ---- 5f. THE STARTING ELEVATION IS A SEPARATE QUESTION ---------------------------------------
 	// A node drawn on the map is born at 0, so a freshly drawn network has no blanks at all -- only
@@ -572,6 +600,8 @@ function runFill(answers) {
 	await runFill([true, true]);
 	ok('a grid project asks nothing and sends nothing',
 		tileRequests === 0 && confirmTexts.length === 0, tileRequests + ' requests');
+	ok('...because it can offer no node a place on the Earth', L.needing().length === 0,
+		JSON.stringify(L.needing()));
 
 	// ---- 6. TASK 542: TWO ORDINARY CONTROLS, AND THE MENU ROW GONE ------------------------------
 	//
