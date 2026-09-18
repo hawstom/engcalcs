@@ -56,7 +56,10 @@ const L = loadLoopedNetwork(
 	"\t\tsetCustomerPerp: setCustomerPerp, customerPerpDistance: customerPerpDistance,\n" +
 	"\t\tlinkNormalAt: linkNormalAt, customerLink: customerLink,\n" +
 	"\t\tmeterHalfWorld: meterHalfWorld, serviceStrokeWorld: serviceStrokeWorld,\n" +
-	"\t\tcustomerLabelText: customerLabelText, detachedCustomers: detachedCustomers,\n" +
+	"\t\tdetachedCustomers: detachedCustomers,\n" +
+	"\t\tlabelsLayerTexts: function () {\n" +
+	"\t\t\treturn Array.prototype.slice.call(labelsLayer.children || [])\n" +
+	"\t\t\t\t.filter(function (e) { return (e.nodeName || '').toLowerCase() === 'text'; }); },\n" +
 	"\t\tcustEls: function () { return custEls; },\n" +
 	"\t\teffective: effective, setProp: setProp,\n" +
 	"\t\tbaseDemandTotal: baseDemandTotal, resolvedDemand: resolvedDemand,\n" +
@@ -366,15 +369,20 @@ L.renderCustomerFields(m1.id);
 		wide > tight * 100, tight + ' -> ' + wide);
 	ok('6.4 the connector follows the same hybrid rule', wideStroke > L.serviceStrokeWorld(0, 0));
 }
-// **THE ACCOUNT NUMBER AND THE COUNT ARE COMPOSED FROM A NUMBER, not from translated fragments**,
-// so there is nothing in the map label for a language to order differently.
+// **A METER CARRIES NO LABEL ON THE MAP** (Tom, 2026-09-17: *"I don't think we want labels on
+// customers. I didn't ask for them."*). Three fixtures asserting what the account number said
+// beside the symbol were DELETED with the label itself; what stands in their place is the
+// assertion that nothing draws one, because a label quietly re-added is the way this comes back.
 {
-	const solo = { id: 'M-T', account: 'A1', count: 1 };
-	const many = { id: 'M-T', account: 'A1', count: 42 };
-	const bare = { id: 'M-T', account: '', count: 7 };
-	ok('6.5 a count of one says nothing about the count', L.customerLabelText(solo) === 'A1');
-	ok('6.6 more than one says how many', L.customerLabelText(many).indexOf('42') > 0);
-	ok('6.7 a meter with no account still says how many', L.customerLabelText(bare).indexOf('7') >= 0);
+	const c = (L.getDoc().customers || [])[0];
+	const els = L.custEls()[c.id];
+	ok('6.5 a meter draws a symbol and a service line and nothing else',
+		!!els && !!els.box && !!els.stub && els.text === undefined, Object.keys(els).join(','));
+	ok('6.6 ...and no text element of any kind is drawn for one',
+		L.labelsLayerTexts().every(t => !t.getAttribute('data-cust')),
+		String(L.labelsLayerTexts().length));
+	ok('6.7 the account number is still IN the document, it is only not drawn',
+		typeof c.account === 'string');
 }
 
 // ---- 7. THE CUSTOMER TABLE -------------------------------------------------------------------

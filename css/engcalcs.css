@@ -1052,10 +1052,10 @@ html[lang="zh"] .ec-welcome {
 .lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
 /* The slide handle: on the pipe, only while its meter is selected, and grabbable. */
 .lpn-custhandle { fill: #fff; stroke: #d32f2f; cursor: grab; }
-/* The account number beside the meter is GENERATED ANNOTATION (annotationEl), so it hides with the
-   rest of it and the box and its connector -- which are authored content -- never do. It carries
-   `data-cust`, so a press on the words picks the meter, exactly as a press on a node's own data
-   label picks that node; it therefore needs no rule of its own here. */
+/* A METER CARRIES NO LABEL ON THE MAP (Tom, 2026-09-17: "I don't think we want labels on
+   customers. I didn't ask for them."). An account number used to be drawn beside every symbol as
+   generated annotation; it is gone, and so is the rule that was here for it. The account number
+   lives in the property box and in the Customers table, where it is read rather than glanced at. */
 /* A LABEL THE USER HAS JUST PLACED SAYS SO, AND THEN STOPS SAYING IT (Tom, 2026-08-15, after
    discovering he had dragged a label without meaning to: "put a timed box or highlight on dragged
    labels for about a minute, maybe fading, maybe dashed, maybe animated so it's obviously

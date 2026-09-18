@@ -8030,33 +8030,28 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- drawing a meter ------------------------------------------------------------------------
 	// A screen-anchored glyph at a world point, like every other symbol here, EXCEPT that its size
-	// follows meterHalfWorld()'s hybrid rule. Three elements: the service connector, the box, and
-	// the account text -- which is generated annotation and hides with the rest of it, while the box
-	// and its connector are authored content and never do.
+	// follows meterHalfWorld()'s hybrid rule. TWO elements: the service connector and the symbol,
+	// both authored content, so neither hides with the generated annotation.
+	//
+	// **A METER CARRIES NO LABEL ON THE MAP, AND THIS IS A DELETION RATHER THAN AN OMISSION** (Tom,
+	// 2026-09-17: *"I don't think we want labels on customers. I didn't ask for them."*). An account
+	// number was drawn beside every symbol; it is gone, with the function that composed it. What he
+	// said he might accept instead -- shown only very close in, aligned with the service line, on it
+	// or beyond the meter -- is a description of a thing he has not asked for, so it is NOT built
+	// here, and building it would be answering a condition as though it were a request.
 	var custEls = {}, customersByLink = {};
 	function buildCustomerEls(c) {
 		var stub = el('line', { 'class': 'lpn-service' }, labelsLayer),
-			box = el('rect', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer),
-			text = annotationEl('text', { 'class': 'lpn-lbl lpn-meter-lbl', 'data-cust': c.id }, labelsLayer);
-		custEls[c.id] = { stub: stub, box: box, text: text };
+			box = el('rect', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
+		custEls[c.id] = { stub: stub, box: box };
 		if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
 		updateCustomerGeometry(c.id);
 	}
 	function removeCustomerEls(id) {
 		var ce = custEls[id];
 		if (!ce) { return; }
-		ce.stub.remove(); ce.box.remove(); ce.text.remove();
+		ce.stub.remove(); ce.box.remove();
 		delete custEls[id];
-	}
-	// What a meter says on the map beside itself: its account number, and where one symbol stands
-	// for several services, how many. Composed from a number rather than from translated fragments,
-	// so there is nothing here for a language to order differently.
-	function customerLabelText(c) {
-		var n = (c && typeof c.count === 'number' && isFinite(c.count)) ? c.count : 1,
-			parts = [];
-		if (c && c.account) { parts.push(String(c.account)); }
-		if (n > 1) { parts.push('×' + n); }
-		return parts.join(' ');
 	}
 	function updateCustomerGeometry(id) {
 		var c = customerById(id), ce = custEls[id], pt, an, half, sw;
@@ -8085,10 +8080,6 @@ var EngCalcs = EngCalcs || {};
 		// support. The class is the same idiom .lpn-lbl-hidden already is.
 		ce.stub.classList[an ? 'remove' : 'add']('lpn-service-off');
 		ce.box.classList[an ? 'remove' : 'add']('lpn-meter-loose');
-		ce.text.setAttribute('x', pt.x + half * 1.5);
-		ce.text.setAttribute('y', pt.y - half);
-		ce.text.setAttribute('font-size', effectiveFontSize());
-		ce.text.textContent = customerLabelText(c);
 	}
 	// Every meter on this pipe, redrawn where the pipe's new shape puts it. Replayed from
 	// updateLinkGeometry(), which is the one pass every reshaping goes through -- so there is no
