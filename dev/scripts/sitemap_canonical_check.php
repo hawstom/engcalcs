@@ -24,6 +24,12 @@
  * whatever happens to be on this machine. Re-deriving the URL list from
  * generate_sitemap.php --stdout tests the thing that will be deployed next.
  *
+ * **IT HOLDS THE ORIGIN AS WELL AS THE PATH, since 2026-09-17.** The suite stopped having one
+ * origin the day the calculators went back to hawsedc.com and the map application stayed on
+ * librewaternet.org, so "is this URL on the suite's domain" is no longer a question with one
+ * answer. Scope is therefore decided on the PATH and the origin is then compared against
+ * ecCanonicalOrigin() -- the same declaration ec_canonical_url() reads.
+ *
  * **WHAT IT CANNOT SEE, stated rather than implied:** it does not fetch a page and read its real
  * <link rel="canonical">. That needs a web request, which is the account's own daily page check and
  * not this tree (ROADMAP Task 676). It compares the advertised URL against ecCanonicalPath() plus
@@ -51,15 +57,28 @@ if ($doc === false) {
     exit(1);
 }
 
-// The suite's own origin. Parent-site URLs (hawsedc.com/sewslope.php and friends) are DECLARED out
-// of scope: they are documents of another site that emit no canonical tag at all, so there is
-// nothing to compare them against. They are counted and printed, never silently skipped.
+// **SCOPE IS DECIDED ON THE PATH, NOT THE ORIGIN, and that changed on 2026-09-17.** The suite no
+// longer has one origin: ecCanonicalOrigins() declares Looped-Network.php on librewaternet.org and
+// everything else falls through to CANONICAL_ORIGIN_DEFAULT, which is hawsedc.com again -- the same
+// host the parent site's own pages are on. So an origin test can no longer tell a suite URL from a
+// parent-site one. A suite URL is one under EC_SW_BASE or at a declared pretty path; the parent
+// site's /sewslope.php and friends are DECLARED out of scope because they emit no canonical tag at
+// all and there is nothing to compare them against. They are counted and printed, never skipped in
+// silence.
 $_SERVER['SCRIPT_NAME'] = 'sitemap_canonical_check.php';
 require $root . '/lib/Language.Settings.php';
 require $root . '/lib/Canonical.lib.php';
 $languages = array_flip(array_keys($all_language_settings));
 
-$suiteOrigin = 'https://librewaternet.org';
+// The fallback origin, read out of lib/config.inc.php exactly as the generator reads it, so this
+// check and the thing it checks cannot hold two opinions about the default.
+$defaultOrigin = 'https://hawsedc.com';
+if (is_file($root . '/lib/config.inc.php')
+    && preg_match("/define\('CANONICAL_ORIGIN_DEFAULT',\s*'([^']*)'\)/",
+                  (string)file_get_contents($root . '/lib/config.inc.php'), $dm)) {
+    $defaultOrigin = $dm[1];
+}
+$prettyToPage = array_flip(ecCanonicalPaths());
 
 $checked = 0;
 $offSite = 0;
@@ -68,13 +87,17 @@ $findings = [];
 
 foreach ($doc->url as $u) {
     $loc = (string)$u->loc;
-    if (strpos($loc, $suiteOrigin) !== 0) { $offSite++; continue; }
-    $rest = substr($loc, strlen($suiteOrigin));
+    if (!preg_match('#^(https?://[^/]+)(/.*)?$#', $loc, $lm)) { $turnedAway++; continue; }
+    $origin = $lm[1];
+    $rest   = isset($lm[2]) && $lm[2] !== '' ? $lm[2] : '/';
 
     $q = '';
     $path = $rest;
     $qpos = strpos($rest, '?');
     if ($qpos !== false) { $path = substr($rest, 0, $qpos); $q = substr($rest, $qpos + 1); }
+
+    // Out of scope: not a suite address at all. The parent site's own documents land here.
+    if (strpos($path, '/engcalcs/') !== 0 && !isset($prettyToPage[$path])) { $offSite++; continue; }
 
     // A URL shaped like nothing this suite emits has no expectation to compare against. Counted.
     if ($q !== '' && strpos($q, 'lang=') !== 0) { $turnedAway++; continue; }
@@ -103,6 +126,18 @@ foreach ($doc->url as $u) {
     $lang = substr($q, strlen('lang='));
     if (!isset($languages[$lang])) {
         $findings[] = "$loc\n      ?lang=$lang names no lib/lang.ec.$lang.php, so the page renders and canonicalises as en";
+        continue;
+    }
+
+    // Leg 4: the ORIGIN must be the one the page nominates. **This is the leg of 2026-09-17.** For
+    // eleven days every calculator was advertised, and canonicalised, on librewaternet.org while
+    // hawsedc.com held the ranking -- 7,575 clicks a quarter against 68. A sitemap that names the
+    // other origin is the same disagreement as a wrong path and is just as invisible: the URL
+    // answers 200 either way, because both hosts serve this checkout.
+    $page = isset($prettyToPage[$path]) ? $prettyToPage[$path] : basename($path);
+    $wantOrigin = ecCanonicalOrigin($page, $defaultOrigin);
+    if ($origin !== $wantOrigin) {
+        $findings[] = "$loc\n      the page nominates the origin $wantOrigin, not $origin";
     }
 }
 

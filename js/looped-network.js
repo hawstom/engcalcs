@@ -19473,8 +19473,11 @@ var EngCalcs = EngCalcs || {};
 	// `app` is a URL rather than a product name: the product name is unsettled, and a URL stays
 	// useful to somebody who finds this file knowing nothing. Old readers ignore unknown keys.
 	var LPN_FILE_FORMAT = 'hawsedc-lpn';
-	// The CANONICAL address of this page: CANONICAL_ORIGIN_DEFAULT in lib/config.inc.php plus the
-	// pretty URL lib/Canonical.lib.php declares for it (no `www`). HARDCODED, not derived from
+	// The CANONICAL address of this page: EC_LWN_ORIGIN in lib/config.inc.php plus the pretty URL
+	// lib/Canonical.lib.php declares for it (no `www`). **EC_LWN_ORIGIN and NOT
+	// CANONICAL_ORIGIN_DEFAULT: the two stopped being the same string on 2026-09-17**, when the
+	// calculators went back to nominating hawsedc.com and this page alone stayed on
+	// librewaternet.org (ecCanonicalOrigins()). HARDCODED, not derived from
 	// location.origin: a file saved from a dev host would record the dev host forever, and this key
 	// says where the format lives, not where one save happened. It must be the INDEXED address for
 	// the same reason -- the marker outlives the request that wrote it and has no Host header of its

@@ -93,20 +93,39 @@ define('BASE_DIRECTORY', $basedirectory);
 // the server answers on all four of http/https x www/non-www with no redirect and each pair must
 // land on one origin. Add a domain here and nowhere else; ec_canonical_check.php reads this array.
 //
-// CONSOLIDATED ONTO LibreWaterNet 2026-09-06 (ROADMAP Tasks 479 and 479.01). Both hosts serve
-// every page -- librewaternet.org/engcalcs is a symlink onto this docroot -- so until this edit
-// each domain nominated ITSELF and the two copies divided one page's ranking signal between them.
-// Every host therefore now maps to the one origin: librewaternet.org is the address that gets
-// indexed, and hawsedc.com defers to it. That is the standard site-move play, and its cost is
-// real and already accepted: hawsedc.com's accumulated history transfers slowly and imperfectly
-// reversibly. The array stays an array precisely because it is the thing that would have to move
-// again; a single hard-coded string is how the suite got into a split in the first place.
+// **hawsedc.com IS THE SUITE'S ORIGIN AGAIN, AND THE MAP APPLICATION KEEPS LibreWaterNet'S**
+// (Tom, 2026-09-17: *"The terms of the divorce were not that LWN gets all the calculators. They
+// were only that LWN walks away free. hawsedc.com/engcalcs should stay canonical for what it
+// is."*). Both hosts serve every page -- librewaternet.org/engcalcs is a symlink onto this docroot
+// -- so one of them has to be nominated and the other has to defer; the question is only which.
+//
+// It was consolidated ONTO librewaternet.org on 2026-09-06 (Tasks 479 and 479.01) and that was
+// wrong, measured rather than argued. Search Console, three months to 2026-09-17: hawsedc.com
+// 7,575 clicks and 114,431 impressions, Manning Pipe Flow sitting at position 9.7; the whole of
+// librewaternet.org, 68 clicks in nine days at position 34.1. For eleven days every calculator
+// told Google its authoritative copy was the page-four one. **A canonical is a HINT and passes no
+// authority**, so nothing was transferred and nothing needs transferring back -- there were simply
+// two live copies with the weaker one nominated.
+//
+// **THIS ARRAY ANSWERS FOR THE SUITE; ecCanonicalOrigins() IN lib/Canonical.lib.php OVERRIDES IT
+// PER PAGE, and that is where Looped-Network.php's librewaternet.org is declared.** The origin is
+// now the same kind of fact as the pretty path -- a property of the PAGE, not of the host that
+// happened to answer -- so it lives beside it. The array stays an array because it is the thing
+// that would have to move again; a single hard-coded string is how the suite got into a split in
+// the first place.
 $ec_canonical_origins = Array(
-    'hawsedc.com'                    => 'https://librewaternet.org',
-    'librewaternet.org'              => 'https://librewaternet.org',
-    'constructionnotesmanager.com'   => 'https://librewaternet.org',
+    'hawsedc.com'                    => 'https://hawsedc.com',
+    'librewaternet.org'              => 'https://hawsedc.com',
+    'constructionnotesmanager.com'   => 'https://hawsedc.com',
 );
-define('CANONICAL_ORIGIN_DEFAULT', 'https://librewaternet.org');
+define('CANONICAL_ORIGIN_DEFAULT', 'https://hawsedc.com');
+
+// **WHERE LibreWaterNet LIVES.** A literal, because it is not the suite's own origin any more and
+// cannot be derived from one. It is the same string ecCanonicalOrigins() declares for
+// Looped-Network.php, and canonical_origin_check.php holds the two together so the pair cannot
+// drift -- config.inc.php cannot require Canonical.lib.php (it is loaded after this file), so a
+// check is what makes one fact out of two copies.
+define('EC_LWN_ORIGIN', 'https://librewaternet.org');
 
 // **WHERE THE SUITE SENDS SOMEBODY WANTING THE MAP** (ROADMAP Task 625, Tom 2026-09-10: *"Change
 // it to LibreWaterNet.org as label and link to it without a link back"*). A FULL URL and not a
@@ -117,11 +136,11 @@ define('CANONICAL_ORIGIN_DEFAULT', 'https://librewaternet.org');
 // **SAME TAB, NO `target="_blank"`.** The browser Back button is the path back and a new tab
 // destroys it. This suite reserves a new tab for genuine side-trips -- the licence, the screenshot
 // gallery, Not EPANET -- and the app is the destination, not a side-trip.
-define('EC_LWN_APP_URL', CANONICAL_ORIGIN_DEFAULT . '/app/');
+define('EC_LWN_APP_URL', EC_LWN_ORIGIN . '/app/');
 // The SITE, not the app: where the map's own home mark goes (Task 625). A reader standing in the
 // application who wants to know what this project is has nowhere to go without it -- Tom:
 // *"No way to get back to LibreWaterNet.org from the map."*
-define('EC_LWN_SITE_URL', CANONICAL_ORIGIN_DEFAULT . '/');
+define('EC_LWN_SITE_URL', EC_LWN_ORIGIN . '/');
 
 /**
  * Which code is actually running on this host: the deploy time and the commit.
