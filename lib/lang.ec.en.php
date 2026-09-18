@@ -2321,12 +2321,12 @@ $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on 
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Priority';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first and is also the rightmost (last in English) on the label.';
+$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The lowest number is dropped first and is also the rightmost (last in English) on the label.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first, and the ID is never dropped. When only the ID and one value are left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
+$ec_lang['lpn_labels_priority_node_tip']='The order in which values are dropped when two node labels would overlap. The lowest number is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';

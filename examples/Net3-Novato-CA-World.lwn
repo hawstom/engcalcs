@@ -2566,32 +2566,6 @@
 			"link": {}
 		},
 		"separator": ", ",
-		"priority": {
-			"node": {
-				"quality": 7,
-				"initQuality": 6,
-				"demandActual": 5,
-				"demand": 4,
-				"pressure": 3,
-				"elev": 2,
-				"head": 1
-			},
-			"link": {
-				"rate": 13,
-				"quality": 12,
-				"status": 11,
-				"flow": 9,
-				"velocity": 8,
-				"headloss": 7,
-				"gradient": 6,
-				"friction": 6,
-				"diameter": 5,
-				"length": 4,
-				"roughness": 3,
-				"km": 2,
-				"id": 1
-			}
-		},
 		"markExtrema": true
 	},
 	"backdrop": null,

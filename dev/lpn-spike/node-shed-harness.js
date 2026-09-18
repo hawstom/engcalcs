@@ -262,10 +262,13 @@ console.log('\n--- the property numbered 1 in the Drop column is the first one g
 		{ field: 'pressure' }, { field: 'elev' }];
 	const pr = ls.priority.node;
 	const order = L.shedOrder(lines).map(function (i) { return lines[i].field; });
-	report(order.join(',') === 'head,elev,pressure,demand',
-		'nodeShedOrder() ranks the four ranked fields lowest-number-first',
+	// Tom's own column, 2026-09-18: head 2, elev 4, demand 6, id 10, pressure 18. The ID is IN the
+	// order now, which is the change: a label showing a name and one number had nothing it was
+	// allowed to give up, so it could only hide.
+	report(order.join(',') === 'head,elev,demand,id,pressure',
+		'nodeShedOrder() ranks every ranked field lowest-number-first',
 		order.join(' -> ') + '   (column: ' + JSON.stringify(pr) + ')');
-	report(order.indexOf('id') < 0, '...and the ID is not in the order at all');
+	report(order.indexOf('id') === 3, '...and the ID takes its own place in it, at his rank of 10');
 
 	zoomTo(30000);
 	const before = shedders().map(function (n) {
@@ -304,16 +307,28 @@ console.log('\n--- the property numbered 1 in the Drop column is the first one g
 	zoomTo(30000);
 }
 
-// ---- 4. the ID is never shed, and the last ranked value is never shed ---------------------------
-console.log('\n--- a label sheds down to its name and one number, and then goes whole ---');
+// ---- 4. the ID goes in ITS OWN PLACE, and the last ranked value is never shed -------------------
+// **THIS SECTION SAID "THE ID IS NEVER SHED" UNTIL 2026-09-18**, and that was the defect rather
+// than the rule: a label showing a name and one number had exactly one ranked value, the cascade
+// may not drop the last one, and so the only move left was to hide the whole label. Tom, on three
+// screenshots of exactly that: *"if the Demand and ID can't both fit, we would drop one."* He then
+// put the ID in the Drop column himself, at 10. What is asserted now is that it obeys that number
+// like every other row -- no earlier, which would take a label's name while a value it outranks is
+// still on screen.
+console.log('\n--- a label sheds in the column order, ID included, and then goes whole ---');
 {
 	zoomTo(30000);
-	const lostId = shedders().filter(function (n) {
-		const ne = nodeEls[n.id];
-		return askedFields(ne).indexOf('id') >= 0 && shownFields(ne).indexOf('id') < 0;
+	const lsN = ls.priority.node;
+	const tooSoon = shedders().filter(function (n) {
+		const ne = nodeEls[n.id], asked = askedFields(ne), shown = shownFields(ne);
+		if (asked.indexOf('id') < 0 || shown.indexOf('id') >= 0) { return false; }
+		// The ID is gone. Everything it outranks must be gone too, or the column was not obeyed.
+		return shown.some(function (f) {
+			return typeof lsN[f] === 'number' && lsN[f] < lsN.id;
+		});
 	});
-	report(lostId.length === 0, 'no label ever gives up its ID',
-		lostId.map(function (n) { return n.id; }).join(', ') || 'none did');
+	report(tooSoon.length === 0, 'a label that gave up its ID had already given up everything below it',
+		tooSoon.map(function (n) { return n.id; }).join(', ') || 'none went early');
 	const stripped = shedders().filter(function (n) {
 		const ne = nodeEls[n.id];
 		return shownFields(ne).filter(function (f) {
@@ -581,8 +596,15 @@ console.log('\n--- a node label is stacked in the user\'s own drop order, highes
 	})[0];
 	report(!!n, 'there is a node carrying four or more label values to order');
 	if (n) {
+		// **THE ID IS EXCLUDED, AND THAT IS THE ONE DELIBERATE SPLIT BETWEEN THE TWO USES OF THE
+		// COLUMN** (2026-09-18). The ID gained a Drop rank that day, and nodeDisplayRank() still
+		// pins it to the top line: the rank says WHEN THE NAME IS GIVEN UP, and the label still
+		// leads with the name the other rows are about. So the descending test is about every OTHER
+		// ranked row, and the assertion below is what holds the ID's place.
 		const ranked = function () {
-			return askedFields(nodeEls[n.id]).filter(function (f) { return typeof lsN[f] === 'number'; });
+			return askedFields(nodeEls[n.id]).filter(function (f) {
+				return f !== 'id' && typeof lsN[f] === 'number';
+			});
 		};
 		const descends = function (fields) {
 			for (let i = 1; i < fields.length; i++) {
@@ -594,9 +616,10 @@ console.log('\n--- a node label is stacked in the user\'s own drop order, highes
 		const shipped = ranked();
 		report(descends(shipped), 'the shipped defaults come out highest rank first',
 			shipped.map(function (f) { return f + '=' + lsN[f]; }).join(' '));
-		// **THE ID LEADS AND IS NOT IN THE COLUMN.** nodeFieldRank() answers -Infinity for an
-		// unranked field, which is right for shedding and exactly backwards for display; a label
-		// whose own name migrated to the bottom would be unreadable.
+		// **THE ID LEADS WHATEVER ITS RANK IS.** nodeFieldRank() answers -Infinity for an unranked
+		// field, which is right for shedding and exactly backwards for display; and since the ID
+		// gained a rank of its own, nodeDisplayRank() pins it explicitly. A label whose own name
+		// migrated to the middle would read as a list of numbers with a name buried in it.
 		report(askedFields(nodeEls[n.id])[0] === 'id',
 			'...with the ID still the first line, because it is what the others are about',
 			askedFields(nodeEls[n.id]).join(' '));

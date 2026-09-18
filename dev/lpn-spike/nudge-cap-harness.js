@@ -92,7 +92,20 @@ L.refreshLabelText();
 ids.forEach(function (id) { L.setLabelPx(id, 60); });
 L.relayout();
 
-console.log('--- no label is carried further than the reach, at any zoom ---');
+// **THE SPOT SEARCH IS ALLOWED PAST THE FIRST-FIT REACH, AND SAYS SO** (Task 539 phase four).
+// `SPOT.reachFactor` in js/lpn-collide.js is 2: the whole point of searching for open ground is to
+// look where the candidate list does not, so a spot trial may stand at twice the gang's own reach
+// and the leader is what carries the association back. So the bound asserted here is the first-fit
+// reach TIMES that factor, and the three labels that cross 1.0 on this fixture (at 1.13 to 1.21) are
+// spot placements rather than clipped ones.
+//
+// **IT ONLY STARTED BINDING WHEN THE DROP COLUMN CHANGED** (2026-09-18): with the node ID ranked,
+// this fixture's labels shed from three rows to one, which changes where the crowd is and routes
+// three of them through the spot search for the first time. Nothing about the placement moved. If
+// this ever exceeds the factor, that IS a defect -- a label further out than the search is allowed
+// to look has been carried there by something that does not know the rule.
+const SPOT_REACH_FACTOR = 2;
+console.log('--- no label is carried further than the search is allowed to look, at any zoom ---');
 {
 	[8, 22, 60, 150].forEach(function (s) {
 		L.setZoom(s);
@@ -100,11 +113,12 @@ console.log('--- no label is carried further than the reach, at any zoom ---');
 		let over = 0, worstRatio = 0;
 		ids.forEach(function (id) {
 			const r = L.labelDistPx(id) / L.reachPx();
-			if (r > 1 + 1e-6) { over++; }
+			if (r > SPOT_REACH_FACTOR + 1e-6) { over++; }
 			worstRatio = Math.max(worstRatio, r);
 		});
-		ok('at scale ' + s + ', every label is within ITS OWN reach', over === 0,
-			'worst ' + (worstRatio * 100).toFixed(0) + '% of its reach');
+		ok('at scale ' + s + ', every label is within the searchable reach', over === 0,
+			'worst ' + (worstRatio * 100).toFixed(0) + '% of the first-fit reach, bound '
+				+ (SPOT_REACH_FACTOR * 100) + '%');
 	});
 	// THE REACH IS A SCREEN DISTANCE, and the proof is that it binds at the SAME NUMBER OF PIXELS at
 	// two different zooms -- which means a different world distance each time. Asserting a world
@@ -182,8 +196,13 @@ console.log('\n--- the limit is a property of the candidates, not a correction a
 	const moved = after.filter(function (v) { return v > 1e-6; });
 	ok('the pass really moved labels, so this section is not vacuous',
 		moved.length > 0, moved.length + ' of ' + ids.length + ' moved');
-	ok('...and not one is beyond its reach', after.every(function (v) { return v <= L.reachPx() * 1.0001; }),
-		Math.max.apply(null, after).toFixed(2) + 'px');
+	// The same bound as section 1, and for the same reason: a spot placement is allowed out to
+	// SPOT_REACH_FACTOR times the first-fit reach, and going further than the search may look is
+	// what would be a defect.
+	ok('...and not one is beyond the searchable reach',
+		after.every(function (v) { return v <= L.reachPx() * SPOT_REACH_FACTOR * 1.0001; }),
+		Math.max.apply(null, after).toFixed(2) + 'px of a bound of '
+			+ (L.reachPx() * SPOT_REACH_FACTOR).toFixed(2) + 'px');
 	// The source says it too: a limit that is applied afterwards leaves a function behind. Matched
 	// on the CALL, so the one mention left -- the comment recording why it went -- does not count as
 	// the thing coming back.

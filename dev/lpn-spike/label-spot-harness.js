@@ -39,7 +39,16 @@ const SHIPPED = 'all+shed';
 // the view, and pinning the exact count would go red on any placement change that did not make the
 // drawing worse. The number may FALL and may not RISE -- lower it when it falls.
 const SHED_CEILING_ALL = 38;
-const SHED_CEILING_HEADLINE = 16;      // 5 / 7 / 4 / 0 over Net3-World's four views
+// **THE HEADLINE CEILING WENT UP ON 2026-09-18, AND THE REASON IS A PREFERENCE, NOT A REGRESSION.**
+// It was 16 (5/7/4/0 over Net3-World's four views) and is 18 (6/7/5/0). Tom rewrote both Drop
+// columns that day, row by row, and his node order keeps the PRESSURE longest where the old one
+// kept it third from the end; a pressure reads `P=68.3` where a head reads `H=98`, so a label that
+// sheds down to its last value now ends on a wider one and fits in fewer places. **The all-views
+// figure did not move at all -- 38 against 38** -- because Net3 (XY) went the other way by as much
+// as Net3-World went this way, which is what says this is the drawing rearranging rather than the
+// placement getting worse. The ratchet rule stands for every change that is not a deliberate
+// restatement of what the user wants to see: lower it when it falls.
+const SHED_CEILING_HEADLINE = 18;      // 6 / 7 / 5 / 0 over Net3-World's four views
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {

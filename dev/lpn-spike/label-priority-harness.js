@@ -109,60 +109,55 @@ function dropOrderOf(map) {
 
 const def = L.defaultLabelSettings();
 
-// Tom, 2026-08-16, verbatim: "Link (drop last first): q flow, v velocity, H head loss, s gradient,
-// d diameter, C roughness, Km local losses" -- with `length` placed among the inputs before
-// roughness, and `id` LAST so it sheds first. The id rank reversed on 2026-08-16: it shipped as
-// never-shed on the Maplex key-number argument, and Tom overruled it because a link label lies along
-// its own pipe, so the drawing already says which pipe the numbers belong to.
+// **TOM WROTE BOTH COLUMNS OUT ROW BY ROW ON 2026-09-18 AND THIS IS HIS LINK LIST, VERBATIM**:
+// *"2 ID, 4 K, 6 C, 8 Length, 10 Diameter, 12 friction factor, 14 Flow, 16 gradient, 18 Head Loss,
+// 20 Status, 22 Average source share, 24 Reaction rate, 26 Velocity."* Thirteen numbers for the
+// thirteen rows that exist, so nothing had to be inferred or slotted.
 //
-// **THE PREFERENCE IS UNCHANGED BY TASK 445; ONLY THE NUMBERS ARE.** Tom's list still runs from the
-// value kept longest to the value shed first, so as a DROP order it reads backwards -- which is why
-// this literal is his list reversed rather than a new decision about which value matters.
-// **TASK 638 ADDED THREE ROWS AND REORDERED NONE OF HIS; TASK 652 ADDED A FOURTH THE SAME WAY.**
-// The friction factor goes with the results it is back-computed from, between the diameter and the
-// gradient; the status, the average quality and the REACTION RATE go ABOVE the whole of his list,
-// on the argument the node's quality row already won -- none of them is ever on unless somebody
-// switched the analysis on and asked for it by name, so none should give up its space to a value
-// that is on by default.
+// It supersedes the list that grew here a task at a time (his 2026-08-16 dictation, reversed, plus
+// Task 638's three rows and Task 652's fourth). **Two of his own earlier preferences moved and the
+// moves are his**: the FLOW is no longer the last of the hydraulic values standing -- the VELOCITY
+// is, at 26, above everything -- and the status, average quality and reaction rate no longer sit
+// above the whole list. Asserted as the order, not as the integers, so a renumbering is free.
 eq(dropOrderOf(def.priority.link),
-	['id', 'km', 'roughness', 'length', 'diameter', 'friction', 'gradient', 'headloss', 'velocity',
-		'flow', 'status', 'quality', 'rate'],
-	'link drop order is Tom\'s list reversed, with Task 638\'s three slotted in');
+	['id', 'km', 'roughness', 'length', 'diameter', 'friction', 'flow', 'gradient', 'headloss',
+		'status', 'quality', 'rate', 'velocity'],
+	'link drop order is Tom\'s own 2026-09-18 list, row for row');
 // Stated as meaning rather than as position, so it fails under the OLD sense instead of merely
 // sorting differently.
 ok(def.priority.link.id === Math.min.apply(null, Object.keys(def.priority.link).map(function (k) {
 	return def.priority.link[k];
 })), 'a link ID holds the LOWEST number, which is now what "shed first" means');
-// **HIS OWN LIST IS ASKED ABOUT ON ITS OWN**, so the claim he made -- the flow is the last of these
-// values standing -- is still tested rather than quietly widened by every field added after it.
-const TOM_LINK_FIELDS = ['id', 'km', 'roughness', 'length', 'diameter', 'gradient', 'headloss',
-	'velocity', 'flow'];
-ok(def.priority.link.flow === Math.max.apply(null, TOM_LINK_FIELDS.map(function (k) {
+// Stated as meaning rather than as position: the VELOCITY is the last link value standing, which is
+// the endpoint his 2026-09-18 list moved and the one a future reordering is most likely to undo by
+// habit -- the flow held this place from 2026-08-16 until then.
+ok(def.priority.link.velocity === Math.max.apply(null, Object.keys(def.priority.link).map(function (k) {
 	return def.priority.link[k];
-})), 'and of the values he named, the flow holds the highest: the last one standing');
-ok(['status', 'quality', 'rate'].every(function (k) {
-	return TOM_LINK_FIELDS.every(function (t) { return def.priority.link[k] > def.priority.link[t]; });
-}), 'a status, an average quality and a reaction rate outrank all of them, being on only because they were asked for');
+})), 'a link velocity holds the HIGHEST number: the last value standing');
 
-// Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on". Reversed here
-// for the same reason as the link list.
-// Demand joined the top of it on 2026-08-25, when Base demand and Demand became two fields: the
-// RESOLVED demand is the one worth the last space on a crowded drawing, and the base is recoverable
-// from it and the pattern.
-// Water quality joined the TOP of it on 2026-09-01. It is the one node field that is never on
-// unless somebody switched the analysis on and re-ran, so a field asked for by name is the last
-// to give up its space.
-// The starting concentration joined it under the quality row on 2026-09-13 (Task 638), on the same
-// argument: it is only ever on because the chemical analysis is.
+// **AND THIS IS HIS NODE LIST, VERBATIM**: *"2 Head, 4 Elevation, 6 Base Demand, 8 Initial quality,
+// 10 ID, 12 Source share, 14 Concentration, 16 Demand, 18 Pressure."* Nine names for eight rows --
+// "Source share" and "Concentration" are the SAME row, `quality`, whose name follows the quality
+// analysis and can only ever be one of them at once, so it takes the first number he gave it and 14
+// is unused. Everything else is his number.
 eq(dropOrderOf(def.priority.node),
-	['head', 'elev', 'pressure', 'demand', 'demandActual', 'initQuality', 'quality'],
-	'node drop order is head, elevation, pressure, base demand, demand, initial quality, water quality -- quality decides last and so wins');
+	['head', 'elev', 'demand', 'initQuality', 'id', 'quality', 'demandActual', 'pressure'],
+	'node drop order is Tom\'s own 2026-09-18 list, row for row');
 
 // The two columns are not the same axis and must not converge on one list.
 ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,
 	'node and link priority maps are separate lists');
-ok(def.priority.node.id === undefined,
-	'a node ID carries no rank: an ID is never the reason one label beats another');
+// **THE ID IS IN THE NODE COLUMN NOW, AND THIS ASSERTION IS THE REVERSE OF WHAT IT SAID.** It read
+// "a node ID carries no rank" until 2026-09-18, which is what made the value shed unreachable on a
+// label showing an ID and one number: the cascade may not drop the last ranked value, so with one
+// ranked value there was nothing to drop and the whole label had to go. Section 13 of
+// dev/label-placement-algorithms.md measures it.
+ok(typeof def.priority.node.id === 'number',
+	'a node ID carries a rank, so an ID and one value can shed rather than hide');
+// A rank is not a whole-label criterion. The drop RULE table is the separate statement, and the ID
+// is deliberately not in it: "this node's name is more interesting" is not a judgement to make.
+ok(L.dropRule().id === undefined,
+	'...but it is still not a criterion for which whole label wins a contested spot');
 
 
 // Every ranked field is a real field, and every numeric field is ranked. A rank on a field that

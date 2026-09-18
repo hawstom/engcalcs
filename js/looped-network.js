@@ -1133,18 +1133,24 @@ var EngCalcs = EngCalcs || {};
 	// A node field's shed rank, out of the user's own Drop column -- linkFieldRank()'s counterpart,
 	// and the SECOND consumer of labelSettings.priority.node, which until Task 469 had only one.
 	//
-	// **THE ID IS NOT IN THE COLUMN AND IS THEREFORE NEVER SHED.** labelSettings.priority.node holds
-	// demand, pressure, elev and head and nothing else, which is also exactly what
-	// LPN_NODE_DROP_RULE ranks: the four values a reader could weigh against each other. A node's ID
-	// is not one of them -- it is what the other four are ABOUT -- so a label sheds down to its ID
-	// plus one ranked value and then, if it still will not fit, goes whole.
+	// **THE ID IS IN THE COLUMN SINCE 2026-09-18 AND CAN THEREFORE BE SHED** (Task 539 item 5). It
+	// was not, and the label was the worse for it: a node label shed down to its ID plus one ranked
+	// value and then went whole, so the commonest setup of all -- an ID and one number -- had
+	// nothing to give and could only hide. See defaultLabelSettings() for the measurement.
+	//
+	// **IT IS STILL NOT A WHOLE-LABEL CRITERION.** nodeDropKey() ranks over LPN_NODE_DROP_RULE's
+	// keys, and the ID is not one of them: "this node's name is more interesting than that one's" is
+	// not a judgement anything here can make. A rank and no rule is the same pair `quality` carries,
+	// and it says exactly two things -- order this row inside the column, and do not make it a
+	// criterion for which whole label wins a contested spot.
 	function nodeFieldRank(field) {
 		var r = field && labelSettings.priority.node[field];
 		return typeof r === 'number' ? r : -Infinity;
 	}
 	// The shed order over the RANKED lines only, lowest rank first: the user's column is a drop order
-	// and 1 is the first value to go (Task 445). Unranked lines (the ID) are not in the order at all,
-	// so shedKeepSet() never reaches them.
+	// and the lowest number is the first value to go (Task 445). Unranked lines -- the empty
+	// placeholder, and any future non-numeric row -- are not in the order at all, so shedKeepSet()
+	// never reaches them.
 	function nodeShedOrder(lines) {
 		var order = [], i;
 		for (i = 0; i < lines.length; i++) {
@@ -1165,12 +1171,20 @@ var EngCalcs = EngCalcs || {};
 	// it is what makes the column legible: the top line is the one that survives longest and the
 	// bottom line is the one about to go, so a reader watches the label shed from the bottom up.
 	//
-	// **THE ID LEADS AND IS NOT IN THE COLUMN AT ALL.** nodeFieldRank() answers -Infinity for an
-	// unranked field, which is right for shedding (give it up first) and exactly backwards here, so
-	// the display rank is its own function rather than a reuse: the ID is what the other values are
-	// ABOUT, it is never shed, and a label whose name migrated to the bottom would be unreadable.
-	// The empty placeholder line has no field either and rides along with it, harmlessly.
+	// **THE ID LEADS, WHATEVER ITS DROP RANK IS, AND THAT SPLIT IS DELIBERATE** (2026-09-18). The
+	// ID joined the Drop column that day, and sorting the display strictly by rank would have put
+	// a node's own name fourth down its label, under the pressure and the demand. Tom asked for two
+	// things and they point opposite ways here: the column is a DROP order, and the column also
+	// orders the display. Both survive by saying what each number is FOR -- the ID's 10 says when it
+	// is given up, and the label still leads with the name the other rows are about. If he would
+	// rather see it sort by rank like everything else, delete the first line of this function.
+	//
+	// nodeFieldRank() answers -Infinity for an unranked field, which is right for shedding (give it
+	// up first) and exactly backwards here, so the display rank is its own function rather than a
+	// reuse. The empty placeholder line has no field and rides along at the top with the ID,
+	// harmlessly.
 	function nodeDisplayRank(field) {
+		if (field === 'id') { return Infinity; }
 		var r = field && labelSettings.priority.node[field];
 		return typeof r === 'number' ? r : Infinity;
 	}
@@ -5066,11 +5080,29 @@ var EngCalcs = EngCalcs || {};
 			// PARALLEL to decimals/prefix/suffix rather than nested into the boolean maps, for the
 			// reason the decimals comment gives.
 			//
-			// Link order puts the flow highest so it survives longest. **`id` IS RANK 1 AND SHEDS
-			// FIRST**, not the top rank never-shed: a link label lies ALONG its own pipe, so the
-			// drawing already says which pipe the numbers belong to and the ID is the one value whose
-			// job the label's own position is doing. That argument does NOT carry to node labels,
-			// which is why no node ID rank exists.
+			// **BOTH ORDERS ARE TOM'S OWN, WRITTEN OUT ROW BY ROW** (2026-09-18), and they replace
+			// the two tables that grew here a task at a time. His numbers are EVEN -- 2, 4, 6 and up
+			// -- which is his convention and leaves a gap between every pair for the next row that
+			// has to slot in; ranks are an order and nothing reads the arithmetic between them.
+			//
+			// **THE NODE ID IS IN THE COLUMN NOW, AT 10, AND THAT IS THE CHANGE THAT MATTERS.** It
+			// carried no rank at all until this, on the argument that an ID is what the other values
+			// are ABOUT rather than one of them -- so a node label shed down to its ID plus one
+			// value and then went whole. Measured, that made the cascade unreachable in the commonest
+			// setup there is: with the ID and one number switched on there was exactly one ranked
+			// value, nothing the shed was allowed to give up, and the only move left was to hide the
+			// whole label. Tom, 2026-09-18, on three screenshots of exactly that: *"if the Demand and
+			// ID can't both fit, we would drop one."* It could not. It can now. Section 13 of
+			// dev/label-placement-algorithms.md has the measurement.
+			//
+			// **HIS NODE LIST NAMES NINE ROWS AND THERE ARE EIGHT.** He ranked "Source share" 12 and
+			// "Concentration" 14; both are the SAME row -- `quality`, whose name follows the quality
+			// analysis (qualityLabel()) and can only ever be one of them at a time. It takes 12, the
+			// first number he gave it, and 14 is unused.
+			//
+			// A LINK label's `id` stays rank 2 and still sheds early, which is his order and also the
+			// old argument: a link label lies ALONG its own pipe, so the drawing already says which
+			// pipe the numbers belong to.
 			priority: {
 				// Demand outranks Base demand: on a crowded drawing the resolved number is the one
 				// worth the last space, and the base is recoverable from it and the pattern.
@@ -5081,7 +5113,8 @@ var EngCalcs = EngCalcs || {};
 				// and "do not make this a criterion for which whole label wins a contested spot".
 				// initQuality ranks just under quality for the same argument: it is only ever on
 				// because somebody switched the analysis on, so it outranks the six hydraulic rows.
-				node: { quality: 7, initQuality: 6, demandActual: 5, demand: 4, pressure: 3, elev: 2, head: 1 },
+				node: { head: 2, elev: 4, demand: 6, initQuality: 8, id: 10, quality: 12,
+					demandActual: 16, pressure: 18 },
 				// **RENUMBERED, NOT REORDERED** (Task 638): every row that existed keeps the
 				// neighbours it had, and the three new ones are slotted where they belong -- the
 				// friction factor beside the gradient it is derived from, the status and the
@@ -5089,8 +5122,8 @@ var EngCalcs = EngCalcs || {};
 				// **RENUMBERED AGAIN, NOT REORDERED** (Task 652), on the rule the line above states:
 				// the reaction rate goes on top beside the average quality, because like it the row
 				// is never on unless the chemical analysis was switched on and run.
-				link: { rate: 13, quality: 12, status: 11, flow: 10, velocity: 9, headloss: 8, gradient: 7,
-					friction: 6, diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
+				link: { id: 2, km: 4, roughness: 6, length: 8, diameter: 10, friction: 12, flow: 14,
+					gradient: 16, headloss: 18, status: 20, quality: 22, rate: 24, velocity: 26 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field. Here rather than in `settings` because a label mark is a property
@@ -7187,6 +7220,22 @@ var EngCalcs = EngCalcs || {};
 	 * Undefined for a pump (no length, and a rise rather than a loss), for a zero-length link and
 	 * wherever the water is not moving -- f is not defined at zero velocity, and a zero there would
 	 * read as a perfectly smooth pipe.
+	 */
+	/**
+	 * **CAN C AND f BE ON THE SAME LABEL AT THE SAME TIME? YES, AND THEY ARE DIFFERENT KINDS OF
+	 * THING** (Tom asked it inside his 2026-09-18 Drop-order list: *"should both C and f appear on
+	 * the list at the same time?"*).
+	 *
+	 * There is ONE roughness row and its SYMBOL follows the friction method -- `C` under
+	 * Hazen-Williams, `e` under Darcy-Weisbach, `n` under Manning (roughnessSymbol()). So C and e
+	 * can never be on screen together: they are the same row wearing the method's own letter, and
+	 * that is the collision the question was about.
+	 *
+	 * The friction factor below is a SEPARATE row and it is a RESULT, not an input. It is
+	 * back-computed from the head loss the solve actually produced -- f = 2 g D h_f / (L V^2) -- so
+	 * it exists under every friction method and is gated by nothing. Under Hazen-Williams a label
+	 * can therefore read `C=130` and `f=0.021` at once, and both are true: C is the number the user
+	 * typed, f is the Darcy friction factor the answer implies. Two rows, two ranks, no conflict.
 	 */
 	function linkFrictionFactor(l) {
 		var len, dia, hf, v;
@@ -29812,8 +29861,11 @@ var EngCalcs = EngCalcs || {};
 			};
 		}
 		// **THE SAME GATE AS decimalsFor(), AND THE SAME REASON: THE MAP IS THE LIST.** A field gets a
-		// priority spinner exactly when labelSettings.priority carries an entry for it, so a node's ID
-		// row is skipped without a second list of participants to keep in step with the first.
+		// priority spinner exactly when labelSettings.priority carries an entry for it, and nothing
+		// here names the participants a second time. That is also why the node ID row simply GAINED
+		// its Drop spinner on 2026-09-18: the map grew an `id` entry and the control followed. Tom
+		// reported the missing box as a bug, and it was one, but the box was never the defect -- the
+		// missing rank behind it was (see defaultLabelSettings()).
 		// The two tips differ because the two columns order different things -- rows inside one label
 		// on a link, whole labels against each other on a node.
 		// Bound 99: high enough that nobody meets it, low enough to stay one glance wide.
@@ -29823,7 +29875,7 @@ var EngCalcs = EngCalcs || {};
 			return {
 				value: map[key], max: 99,
 				title: (group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) ||
-					'The order in which values are dropped when a label does not fit. 1 is dropped first.',
+					'The order in which values are dropped when a label does not fit. The lowest number is dropped first.',
 				onChange: function (v) { map[key] = v; }
 			};
 		}

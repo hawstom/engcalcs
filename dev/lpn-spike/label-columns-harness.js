@@ -164,14 +164,20 @@ function describe(edges) {
 		ok('...and the text boxes carrying no alignment of their own',
 			!affix.style.textAlign, affix.style.textAlign || '(none)');
 	}
-	// The ID row is the one named in the task: it has affix boxes but NO spinners, so its last two
-	// columns are spacers. A spacer that carried the width and not the margin is how the columns
-	// came apart the first time, and it is checked above by the same equality -- this only makes
-	// sure such a row is actually in the list being checked.
+	// The ID row is the one named in the task: it is the row that does NOT have one of everything, so
+	// it is where a column comes apart first. A spacer that carried the width and not the margin is
+	// how they came apart the first time, and that is checked above by the same equality -- this
+	// only makes sure such a row is actually in the list being checked.
+	//
+	// **IT HAS ONE SPACER NOW AND NOT TWO** (2026-09-18). Both its numeric columns were spacers until
+	// the node ID joined the Drop column, which is Tom's own respecification of that column; a name
+	// is still not a number, so DECIMALS stays a spacer and the row remains the mixed case this
+	// check wants. Both maps gate their own spinner -- see priorityFor()/decimalsFor() -- so the row
+	// needed no code of its own in either direction.
 	if (group === 'node') {
 		const idRow = rows.filter((r) => /ID/.test(r.children[0].textContent || ''))[0];
-		ok('the node ID row is present and reserves its two numeric columns with spacers',
-			!!idRow && idRow.children[3].tagName === 'SPAN' && idRow.children[4].tagName === 'SPAN',
+		ok('the node ID row reserves its decimals column with a spacer and carries a Drop spinner',
+			!!idRow && idRow.children[3].tagName === 'SPAN' && idRow.children[4].tagName === 'INPUT',
 			idRow ? idRow.children.map((c) => c.tagName).join(',') : 'missing');
 	}
 });
