@@ -516,60 +516,37 @@
 	};
 
 	/**
-	 * The whole command, and the ONLY entry point js/looped-network.js knows about.
+	 * **EC.lpnTerrainFill() WAS DELETED HERE ON 2026-09-17, AND IT HAD BEEN DEAD SINCE TASK 542.**
 	 *
-	 * Order matters and is not arbitrary: what will be touched is counted BEFORE anything is asked,
-	 * so nobody consents to a request that turns out to have had nothing to do, and nobody is asked
-	 * to confirm a fill whose size they have not been told.
+	 * It was the Map-menu row's command: decide a list -- every blank elevation, or failing that
+	 * every node still on the starting number -- and hand it to lpnTerrainFillFor() below. Task
+	 * 542 deleted the row on Tom's own instruction (*"a cool new button that I found"*) and left
+	 * the function behind with no caller but its harness. **The cost of leaving it was not dead
+	 * code, it was dead PROSE**: the only two sentences it could emit -- "there are no nodes to
+	 * fill in yet" and "every node already has an elevation you have set" -- were maintained in 27
+	 * languages for a state no visitor could reach. Tom, finding the first: *"When could that
+	 * possibly display?"* Both keys were deleted with it; dev/geographic-projects.md names them.
+	 * (Named in prose rather than as `$ec_lang` tokens on purpose: delete_lang_key.php reads a
+	 * comment as a reader and refuses to remove a key this file so much as mentions.)
+	 *
+	 * **THREE DOORS REMAIN AND EVERY ONE OF THEM ARRIVES HOLDING A LIST**: a node born on a
+	 * geographic project, Find and replace with Elevation set to From DEM, and the node popup's
+	 * Read DEM / Use DEM. So lpnTerrainFillFor() and lpnTerrainSample() take the nodes as an
+	 * argument and nothing here decides one any more. Do not restore a fourth door that decides
+	 * its own -- that is Task 542's ruling, and it is the ruling this deletion finishes.
+	 *
+	 * `opts.confirm` and lpnTerrainPlanText() outlive it and no live door sets or calls them
+	 * today; they are the plan a whole-drawing fill would have to show, and whether they are debt
+	 * or a half-built control is Tom's call rather than a script's.
 	 */
-	EC.lpnTerrainFill = function () {
-		if (!seam || (seam.locatable && !seam.locatable())) { return; }
-		var token = seam.token && seam.token();
-		if (!token) { return; }   // the row is hidden without one; this is the belt to that brace
-		if (running) {
-			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
-			return;
-		}
-		var want = seam.nodesNeedingElevation();
-		var keep = seam.nodesWithElevation();
-		// **THE SECOND SET, AND WHY IT IS A SECOND QUESTION.** A node drawn on the map is born with
-		// the starting elevation (0), so a freshly drawn network has no BLANK elevations at all --
-		// only a number nobody typed. Offering to replace those is what makes this feature useful
-		// for the commonest case there is; offering it silently, mixed in with the blanks, would be
-		// the rule this whole file is built around breaking. So it is asked only when there is
-		// nothing blank left to do, and the number being replaced is named in the question.
-		var replacing;
-		if (!want.length) {
-			var atDefault = seam.nodesAtDefaultElevation ? seam.nodesAtDefaultElevation() : { points: [] };
-			if (atDefault.points.length) {
-				want = atDefault.points;
-				replacing = atDefault.value;
-				// `keep` is a list of ids now, not a count, so the nodes that just moved OUT of it
-				// and into `want` are removed by name rather than by subtracting a number.
-				var moving = {};
-				want.forEach(function (p) { moving[p.id] = true; });
-				keep = keep.filter(function (id) { return !moving[id]; });
-			}
-		}
-		if (!want.length) {
-			notice(keep.length > 0
-				? t('lpn_terrain_none_needed',
-					'Every node already has an elevation you have set. Nothing was changed, and ' +
-					'nothing was sent — we never overwrite an elevation that is already there.')
-				: t('lpn_terrain_no_nodes', 'There are no nodes to fill in yet.'));
-			return;
-		}
-		EC.lpnTerrainFillFor(want, { keep: keep, replacing: replacing, confirm: true });
-	};
 
 	/**
 	 * **FETCH AND WRITE A LIST SOMEBODY ELSE CHOSE** (ROADMAP Task 542). Everything from the consent
 	 * gate down, taking the nodes as an argument instead of deciding them.
 	 *
-	 * This is the split Task 542 needed. `lpnTerrainFill` above is one CALLER: it decides its own
-	 * list (blank elevations, then the ones still on the starting number) and passes it here. The
-	 * two Task 542 doors are the other two -- a node born on a geographic project, and Find and
-	 * replace with Elevation set to From DEM -- and neither of them decides a list the same way.
+	 * This is the split Task 542 needed. Its three callers -- a node born on a geographic project,
+	 * Find and replace with Elevation set to From DEM, and the node popup's own two buttons -- each
+	 * decide a list a different way and share everything that happens to it afterwards.
 	 * Splitting was the alternative to a third copy of the tile plan, the budget, the consent gate
 	 * and the eight messages, which is how three doors become three behaviours.
 	 *
@@ -609,21 +586,75 @@
 	 *
 	 * `fetchPixels` already throws `{kind:'http', status}`; nothing read it until now.
 	 */
-	function refusedStatus(err) {
-		if (!err || err.kind !== 'http') { return 0; }
-		return (err.status === 401 || err.status === 403) ? err.status : 0;
+	/**
+	 * **FOUR KINDS OF NO, AND ONLY ONE OF THEM IS ABOUT THE READER'S CONNECTION.** `denied` is a
+	 * 401 or a 403 -- the service answered at once and said no, which is a fact about the token
+	 * and the address, not about being offline. `busy` is a 429: the same request will work in a
+	 * moment, so the advice is to wait rather than to look at anything. `http` is any other
+	 * status, where the honest report is the number itself. Everything else -- a DNS failure, a
+	 * dropped connection, an abort on our own timeout -- is the one case where "you may be
+	 * offline" is true.
+	 *
+	 * Returns a small record rather than a number, because the caller has to pick a SENTENCE and
+	 * a bare status could not tell 0 apart from "we never got a status at all".
+	 */
+	function failureOf(err) {
+		if (!err || err.kind !== 'http') { return { kind: 'network', status: 0 }; }
+		if (err.status === 401 || err.status === 403) { return { kind: 'denied', status: err.status }; }
+		if (err.status === 429) { return { kind: 'busy', status: err.status }; }
+		return { kind: 'http', status: err.status };
 	}
-	function reportNoHeights(notice, denied) {
-		if (denied) {
-			notice(t('lpn_terrain_denied',
+	/**
+	 * **THE SENTENCE, SEPARATE FROM THE PLACE IT IS SAID.** The map notice is at the far side of
+	 * the screen from the node popup's own Read DEM button, and an unread notice is
+	 * indistinguishable from silence -- so js/looped-network.js asks for this text too and puts it
+	 * under the button that was pressed. One reason, one wording, two places.
+	 */
+	function failureText(f) {
+		if (!f) { return ''; }
+		if (f.kind === 'denied') {
+			return t('lpn_terrain_denied',
 				'The terrain service refused the request ({status}), so no elevation was changed. '
 				+ 'The Mapbox token this site uses may not allow the web address you are on.')
-				.replace('{status}', String(denied)));
-			return;
+				.replace('{status}', String(f.status));
 		}
-		notice(t('lpn_terrain_failed',
+		if (f.kind === 'busy') {
+			return t('lpn_terrain_rate_limited',
+				'The terrain service is asking us to slow down (429), so no elevation was changed. '
+				+ 'Try again in a minute.');
+		}
+		if (f.kind === 'http') {
+			return t('lpn_terrain_http',
+				'The terrain service answered with an error ({status}), so no elevation was '
+				+ 'changed. Nothing is wrong with your network.')
+				.replace('{status}', String(f.status));
+		}
+		return t('lpn_terrain_failed',
 			'We could not reach the terrain service, so no elevation was changed. You may ' +
-			'be offline. Everything else on this page works without it.'));
+			'be offline. Everything else on this page works without it.');
+	}
+	// **WHAT WENT WRONG LAST, FOR WHOEVER IS LOOKING SOMEWHERE ELSE.** Set on every run that
+	// produces no height and cleared on every run that starts, so it is always about the press the
+	// person just made. Not in the document and never serialized: it is a fact about the service.
+	var lastFailure = null;
+	EC.lpnTerrainLastFailureText = function () { return failureText(lastFailure); };
+	function reportNoHeights(notice, failure) {
+		lastFailure = failure || { kind: 'network', status: 0 };
+		notice(failureText(lastFailure));
+	}
+	// **A NODE WITH NO PLACE ON THE EARTH IS NOT AN EMPTY LIST, IT IS AN ANSWER.** Three of the
+	// four doors below hand over a list somebody else built, and js/looped-network.js builds it by
+	// asking each node where on the Earth it is -- which a projected project can only answer for a
+	// coordinate system this page has a transform for. When it cannot, the list comes back empty
+	// and the press did nothing at all. Two of the four guards said so and two returned in
+	// silence, which is this project's own rel="noopener" signature: one construct written four
+	// times with the discriminating detail on half of them.
+	function reportNothingToDo() {
+		lastFailure = null;
+		notice(t('lpn_terrain_no_place',
+			'None of those nodes has a position on the Earth, so nothing was sent and no elevation '
+			+ 'was changed. Reading the land surface needs a project in latitude and longitude, or '
+			+ 'one on a projection this page can place.'));
 	}
 
 	EC.lpnTerrainSample = function (want, done) {
@@ -634,7 +665,7 @@
 			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
 			return;
 		}
-		if (!want || !want.length) { return; }
+		if (!want || !want.length) { reportNothingToDo(); return; }
 		if (!mayWeSend(want.length)) { return; }
 		var plan = EC.lpnTerrainPlan(want);
 		if (!plan || !plan.tiles.length) {
@@ -647,18 +678,19 @@
 			return;
 		}
 		running = true;
-		var heights = [], failed = 0, denied = 0;
+		lastFailure = null;
+		var heights = [], failed = 0, why = null;
 		Promise.all(plan.tiles.map(function (tile) {
 			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
 				pixels.forEach(function (p) {
 					var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
 					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
 				});
-			}, function (err) { failed++; denied = denied || refusedStatus(err); });
+			}, function (err) { failed++; why = why || failureOf(err); });
 		})).then(function () {
 			running = false;
 			if (!heights.length) {
-				reportNoHeights(notice, denied);
+				reportNoHeights(notice, why);
 			} else if (seam.record) {
 				seam.record(heights);
 			}
@@ -675,7 +707,7 @@
 			notice(t('lpn_terrain_busy', 'Elevations are already being filled in. Wait for them.'));
 			return;
 		}
-		if (!want || !want.length) { return; }
+		if (!want || !want.length) { reportNothingToDo(); return; }
 		if (!mayWeSend(want.length)) { return; }
 		var plan = EC.lpnTerrainPlan(want);
 		if (!plan || !plan.tiles.length) {
@@ -711,7 +743,8 @@
 		// the success line, not the failures: a fill that could not reach the service, or that left
 		// nodes blank, is news whatever started it. Nothing is ever silent about what it did NOT do.
 		if (!quiet) { notice(t('lpn_terrain_working', 'Reading the land surface…')); }
-		var heights = [], failed = 0, denied = 0;
+		lastFailure = null;
+		var heights = [], failed = 0, why = null;
 		var jobs = plan.tiles.map(function (tile) {
 			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
 				pixels.forEach(function (p) {
@@ -721,12 +754,12 @@
 					// would then have to notice was wrong.
 					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
 				});
-			}, function (err) { failed++; denied = denied || refusedStatus(err); });
+			}, function (err) { failed++; why = why || failureOf(err); });
 		});
 		Promise.all(jobs).then(function () {
 			running = false;
 			if (!heights.length) {
-				reportNoHeights(notice, denied);
+				reportNoHeights(notice, why);
 				return;
 			}
 			// **ONE CALL, ONE UNDO SNAPSHOT, ONE EVENT.** The seam takes the whole list, not a node

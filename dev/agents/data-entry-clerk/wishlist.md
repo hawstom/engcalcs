@@ -346,3 +346,63 @@ EPANET/PNEZD "order of fundamentalism" argument actually applies) and move them 
 typed columns in the table (functionally Option 2, but past every OTHER input, not merely past
 Elevation) — not because Tom's instinct toward Option 1 is wrong, but because it is being asked to
 answer two questions that do not have the same answer.
+
+## 10. Customer bulk-entry (Task 247): typed LINK column, never a silent nearest-pipe guess — a condition on the build, not a new row
+
+Raised 2026-09-17, answering Tom's direct question about the "location, link, location, link" input
+shape (journal, eleventh invocation). Not a request for a new feature — Task 247's own design
+document already stores `link` + `t` and derives the node, so this is a condition on HOW customers
+get created in bulk, not a new mechanism.
+
+**The two-column-per-row shape (location cell, link cell, one row per customer) is fine and is what
+this page already does everywhere else** — no disagreement there, and Enter-down-column
+(`js/looped-network.js:17008`, master, checked 2026-09-17) makes it cheap to type. **The condition:
+LINK must be an explicit, typed/matched value on import, never a silent nearest-pipe geometric guess**
+— a plan set already states which main serves which service, which is exactly the information a
+geometric guess cannot recover reliably at a parallel-main or intersection case, and the failure is
+silent (the meter still draws, the demand still solves, it is on the wrong main). This is the same
+class of danger CLAUDE.md already names for elevation fill and for units: a value that changes the
+solved answer must never be quietly substituted for what the user actually has.
+
+**Ranking: below item 1/610 (row creation generally) since it depends on that shipping first for any
+element kind, and it is a condition on that build rather than a separate one — I am not asking for
+separate work, only that whoever builds Task 247's bulk-entry path reads this before writing the
+importer.**
+
+## 11. Library import: per-library checkboxes, not per-entry — do not build a 200-row picker
+
+Raised 2026-09-17, journal eleventh invocation, **SPECULATION** (did not read the importing branch's
+own code this session; the branch was not given to me). Someone importing a colleague's pipe-type
+library wants nearly all of it, which makes a checkbox-per-entry picker the wrong-shaped tool in the
+common case: default-checked costs a hunt-and-uncheck across 200 rows to find the few you don't want,
+default-unchecked costs ~195 clicks to get what "import the library" already meant for free.
+**Per-library selection, then ordinary multi-select-and-delete in the Tables pane to prune the few
+unwanted entries**, is cheaper in the common case and no worse in the rare one, and it reuses a
+mechanism (row selection/delete) this page already has rather than asking for a new one.
+
+**Ranking: low — this is a "don't build it this way" flag, not a feature I am asking for.** If a
+filter box above a checkbox list is wanted for a genuinely large library, I would want to see the
+library's real size before agreeing it earns the extra control; import-then-prune may still win.
+
+## 12. CSV/point-file import: a format chooser is the SAFE answer for northing/easting order, and should not be replaced by a magnitude guess
+
+Raised 2026-09-17, journal eleventh invocation. **CITED** (full citations in the journal): PNEZD and
+PENZD are both real, named Civil 3D/survey conventions and differ only in which of
+Northing/Easting comes first; a wider survey (CivilGEO's own documentation) names at least eight
+distinct orderings varying independently on point-ID presence, description presence, and
+coordinate order. **The coordinate-order axis is the one that matters** — a wrong point-ID or
+description guess is visibly wrong the moment you look at the import; a Northing/Easting swap is
+not, and can place a whole survey at a plausible-looking wrong position. This is the same shape of
+danger CLAUDE.md's own lon/lat-vs-lat/lon rule already exists to guard against, from a different
+door.
+
+**I would build: (1) a plain-language (not acronym) chooser for coordinate order as the one
+mandatory question; (2) simple ID/description presence toggles, lower priority since a wrong guess
+there is self-evident; (3) read a header row when present and trust it over any chooser default,
+falling back to the chooser only when there is none.** I would NOT try to auto-detect coordinate
+order from value magnitude — it is exactly the kind of guess that passes on the examples you tried
+and fails silently on the plan set you didn't.
+
+**Ranking: this is a correctness condition on the CSV-import branch, not a new priority of my own —
+I would not delay that branch to build it elaborately, but I would treat skipping the coordinate-
+order question as a defect, not a simplification, given how silent the failure is.**

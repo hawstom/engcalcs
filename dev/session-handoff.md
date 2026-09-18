@@ -1,20 +1,149 @@
-# Session handoff — written 2026-09-05, state refreshed 2026-09-17 (ninth session)
+# Session handoff — written 2026-09-05, state refreshed 2026-09-17 evening (tenth session)
 
-## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-17.
+## STOP. READ THIS BLOCK BEFORE YOU TOUCH ANYTHING. 2026-09-17 EVENING.
 
-**MASTER IS GREEN AT `30b27945` AND PUSHED. PRODUCTION IS AT `81792180` (2026-09-15) AND IS ABOUT
-TWENTY-FIVE COMMITS BEHIND.** Production is the SHA somebody last pulled; master can advance for
-days and ship nothing. Never say "it is live" because you pushed. **Tom has NOT pulled the
-2026-09-16 performance work and should not be pushed to before his EWB meeting** -- see the
-clearance below.
+**MASTER IS GREEN AT `535f9d3a` AND PUSHED. PRODUCTION IS AT `81792180` (2026-09-15).** Production is
+the SHA somebody last pulled; master can advance for days and ship nothing. Never say "it is live"
+because you pushed.
 
-**THE `.claude` EXPOSURE IS CLOSED.** Verified from outside the account 2026-09-16:
-`https://hawsedc.com/engcalcs/.claude/settings.json` and `dev/ROADMAP.md` both answer **403**, and
-the daily page check's new `blocked=6` line is that fix landing. **Delete this paragraph once you
-have read it** -- it is state, and it is now finished state.
+**THERE IS A RELEASE BRANCH NOW, AND IT IS THE ANSWER TO FREEZING.** `release/ewb` is cut from
+`81792180` -- exactly what Tom has deployed -- and pushed, on his own question: *"Where is the EWB
+release branch in case hot fixes are needed today?"* A hotfix branches off `release/ewb`, merges back,
+and he pulls THAT; the same fix goes to master separately and nothing on master has to stop. Preview
+port **8093**. The procedure is in `CLAUDE.md`'s Git Workflow.
+- **AND THE 2026-09-13 ADVICE THAT A CLEAN RELEASE COULD NOT BE EXTRACTED WAS WRONG, which is
+  written down in that same section and was owned to him on 2026-09-17.** The first `projection`
+  merge is `06a1deab`; every commit before it is projection-free. **Do not repeat that advice.**
 
-**TOM'S EWB MEETING IS 2026-09-17.** He was told to demo from PRODUCTION, normal browser window,
-staying inside one project. Nothing in this repository should be deployed on the morning of it.
+**THE FEATURE GATE WAS PROSE AND IS NOW A CHECK.** Until 2026-09-17 the six `feat/*` branches were
+held off master by a SENTENCE in this file and by nothing else -- `dev/branch-policy.json` named only
+five older branches. **Every live feature branch is in `protected` now**, and the refusal was tested
+live rather than assumed. **A feature branch goes in that list WHEN IT IS MADE.** A defect, tooling
+or documentation track does not, and must not.
+
+**THE FEATURE FREEZE IS OFF, LIFTED BY TOM ON 2026-09-17** (*"Lift it now"*), on the argument that
+`release/ewb` now does its job better: a freeze stops everybody, a release branch stops nobody.
+**LIFTING IT MERGED NOTHING.** The first lock is untouched -- every branch in `protected` still
+refuses until his all-clear is recorded in `dev/branch-all-clears.json`, pinned to the exact commit,
+and that was tested with the freeze off. Do not read an absent freeze as permission.
+
+**HIS READING LIST WAS BLIND TO 120 STRINGS AND NOW IS NOT** (2026-09-17, found by him: *"dev/new-
+english-keys.md is empty. Please check."*). It was empty and it was CORRECT -- the derivation
+compares English against the other 26 in the CHECKED-OUT tree, and master genuinely had none. The
+work was on seven unmerged branches. **Under branch work that is now the normal case**, so the file
+grew a second half listing every new string per branch with the commit it was read at. **That half is
+advisory and deliberately outside `--check`**: a branch tip moves whenever anybody commits on it, and
+failing master's build for somebody else's commit is a gate that gets switched off.
+
+**TWO FALSE ALARMS WERE RAISED AND RETRACTED THE SAME HOUR, BOTH TEST ERROR RATHER THAN DEFECT.** The
+merge gate was reported broken -- it was not; the test merge ran from a working branch, and
+`pre-merge-commit` guards merges INTO master only, so it correctly stood aside. Ida was reported to
+have committed onto master -- she had not; the check ran while HEAD was on her branch. **Both
+machines were right and both tests were wrong.** Verify which branch you are standing on before
+concluding a guard has failed.
+
+**AND ONE REAL SLIP WORTH THE SAME TREATMENT AS ANY CODE DEFECT:** a roadmap edit recording Tom's own
+zoom design was written with `if anchor in s:` instead of an assert, the anchor had already been
+replaced by an earlier edit in the same session, and **it silently did nothing and reported success**.
+That is the shape this tree builds checks against -- passing by finding nothing -- done by hand in a
+scratch script. **Assert every anchor in a scripted edit.**
+
+**EIGHT FEATURE BRANCHES AWAIT HIS BROWSER PASS. NONE MAY MERGE.** Descriptions in
+`~/webdev/worktrees/_panel/ports.conf`; the panel is at 127.0.0.1:8080.
+
+| Port | Branch | Task |
+|---|---|---|
+| 8087 | `674-coordinate-entry` | 674 |
+| 8088 | `feat/customer-demands` | 247 |
+| 8089 | `feat/time-series-graph` | 599 |
+| 8090 | `feat/label-gang-search` | 539 (demoted to 75; he has notes he has not written up) |
+| 8091 | `feat/survey-import` | 592 |
+| 8092 | `feat/library-import` | 611 |
+| 8093 | `release/ewb` | not a feature -- the release line |
+| 8094 | `feat/xy-world-map` | 646 |
+| 8095 | `feat/lock-initials-later` | 667(b) -- needs TWO browser profiles to test |
+
+**CHECK A PORT IS FREE BEFORE PUTTING IT IN `ports.conf`, AND THIS COST TOM HIS WHOLE PANEL.** On
+2026-09-17 port 8093 was assigned to `release/ewb` without looking; a `php -S` left running by the
+PREVIOUS session was already on it. His Apache reload then could not bind 8093 and **Apache shut down
+entirely rather than skipping that one port**, taking the panel and all nine other branches with it.
+Four stray dev servers from that session had been running ten hours (8093, 8100, 8101, 8102).
+- **Before adding a line:** `ss -ltn | grep :<port>` must be empty.
+- **Before ending a session:** kill every `php -S` it started. `ps aux | grep "[p]hp -S"`. This is
+  `wait_guard_selftest.php`'s leak in another construct, and no guard watches for it.
+- The reload itself: `sudo cp ~/webdev/worktrees/_panel/branch-preview.conf /etc/apache2/sites-available/ && sudo a2ensite branch-preview && sudo apache2ctl configtest && sudo systemctl reload apache2`
+
+**HIS LIST OF TASK RULINGS ON 2026-09-17 WAS PARTLY STALE AND THAT IS WORTH KNOWING.** He ruled on
+615, 618, 627, 628 and 638 -- **all five were already closed**, some four days earlier. Whatever he
+was reading was not the roadmap. He also could not find 680 and 681, which are both open at 75 and
+both in the index; the index was current and `roadmap_id_check.php` proves it. **If he cites a task
+state that disagrees with the file, check the file before agreeing with him.**
+
+**TWO NUMBERS IN THIS TREE WERE WRONG AND ARE CORRECTED.** Task 676 said *"the account is at 96%
+disk"*: that is the SHARED 7 TB volume at 95% with 372 GB free, and **this account uses 6.3 GB with
+no quota**, 2.3 GB of it cPanel's own stats cache. Clearing the 22,907 bounces frees 13 MB. The risk
+is real and is not ours. And 676's *"minimal pre-push for the two sibling repositories"* was **already
+built** in both.
+
+**GOOGLE SEARCH CONSOLE: THE PICTURE CHANGED ON 2026-09-17 AND THE STRATEGY QUESTION IS UNANSWERED.**
+He sent PERFORMANCE exports (not the Pages/indexing report, so the notification question is still
+unanswered). What they show: **hawsedc.com earns 7,575 clicks and 114,431 impressions a quarter with
+Manning Pipe Flow at position 9.7; librewaternet.org has 68 clicks in nine days at position 34.1.**
+- **`librewaternet.org` HAD NO robots.txt AT ALL -- it answered 404.** So nothing on that property
+  pointed Google at the sitemap. Written and pushed 2026-09-17; it reaches the site when he pulls it.
+- **THE UNPRICED DECISION, and it needs him:** every hawsedc.com page now canonicalises to
+  librewaternet.org. **A canonical is a HINT and passes no authority; a 301 is a MOVE and does.**
+  Google is currently ignoring ours and still ranking hawsedc, which is very likely the source of his
+  "new reasons" notifications -- *Duplicate, Google chose different canonical than user*. If it ever
+  honours us, a page-one ranking earning 7,575 clicks a quarter transfers to a domain at position 34.
+  **Traffic is declining 3-4% a week but was ALREADY doing so before librewaternet existed, so the
+  divorce cannot be blamed for it** -- the mechanism is real, the damage is not yet visible, and
+  nobody has decided it deliberately.
+- **Still wanted from him: the Pages CSV export.** Both properties are verified.
+
+**THE OLD SEARCH CONSOLE ITEM, now partly answered:** He asked whether his "new reasons prevent pages
+from being indexed" notifications can be ignored and the honest answer needed his export, which he
+has not sent. What was established here: 30 sampled sitemap URLs all answer 200, hreflang is fully
+reciprocal across 27 languages plus x-default, and **exactly 2 of 545 sitemap URLs advertised an
+address their own page disowned** -- `privacy.php` and `terms.php`, now fixed and held by
+`sitemap_canonical_check.php`. **The live suspicion, unproven: every `hawsedc.com/engcalcs/*` URL now
+canonicalises to librewaternet.org, so Google is reporting hundreds of historically-indexed URLs as
+excluded-by-canonical. That is the divorce working, and it is exactly what triggers that
+notification.** **Still needed from him: the Pages CSV export, and whether `librewaternet.org` is a
+VERIFIED property in the same Search Console account** -- the sitemap sits on hawsedc.com and lists
+542 librewaternet.org URLs, which is cross-submission and is honoured only between verified
+properties. If it is not verified those 542 URLs are being ignored outright, which would matter far
+more than the notifications.
+
+**THE USAGE REPORT PAGE SHIPPED AND IS DEAD UNTIL HE MAKES ONE FILE.** `/engcalcs/usage-report/`,
+HTTP Basic, and it answers 500 until `~/.htpasswd-engcalcs` exists -- deliberately, so there is no
+window where the numbers are public. Three commands in `dev/usage-report-page.md`. **Untestable from
+here**: whether this host permits password rules in a subfolder. It has its own directory precisely
+so that if the host refuses, it breaks that page and not the other twenty-eight.
+
+**TWO SEATS ANSWERED THE ZOOM QUESTION AND THEY AGREE WITH TOM: DO NOT SNAP.** Franco pinches to line
+the drawing up against the ground he is standing on, and a snap after he lifts his fingers jumps away
+from the spot he just placed it on. **The real gap is Task 682**: the zoom function has exactly two
+callers, the wheel and the pinch, and the only non-gesture control is Zoom to fit, which is a reset.
+**EPANET answers this with two ordinary Zoom In / Zoom Out buttons** -- copy our own reference
+application, do not invent an idiom. The wheel is 1.1 a notch against AutoCAD's 1.6 and QGIS's 2.0.
+**And Task 681(d) does NOT need snapping**: key a label cache on a rounded bucket of the continuous
+scale and let the view go on tracking the fingers exactly.
+
+**FRANCO'S DOUBLE-TAP HAZARD IS WITHDRAWN AND THE LESSON IS IN THE ROSTER.** Tom, 2026-09-17:
+*"No. He's wrong... He didn't try the latest version that has explicit vertex mode."* **An OBSERVED
+finding DECAYS.** He traced it on 2026-09-01, tagged it with a line number, and carried it into two
+later invocations without re-reading the code. A provenance tag records where a fact came from, never
+that it is still true, and OBSERVED is the tag most likely to rot because this tree changes daily.
+**Re-verify before ranking again, and carry the date you last CHECKED.** The cost was Tom's attention
+on a decision that no longer existed.
+
+**ONE THING FROM TASK 322 IS HIS DECISION, NOT A SCRIPT'S:** of 430 form controls, **272 have no
+accessible name and 226 of those are the unit selects** -- every one in the suite. A screen reader
+says "combo box, feet" with no idea which field. Nothing was decided two ways, so it is not the
+survey's pattern; closing it is a product decision and may cost wording in 27 languages.
+
+**DELETE A LINE IN THIS BLOCK ONCE YOU HAVE CHECKED IT AND IT IS NO LONGER NEWS.**
 
 ## WHAT THE 2026-09-16 SESSION LEFT YOU: A CLEARANCE TO PROCEED ON THE ROADMAP
 

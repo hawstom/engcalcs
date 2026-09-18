@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1871,
-        "delta_key_count": 1,
+        "expected_key_count": 1879,
+        "delta_key_count": 11,
         "exempt_key_count": 45,
         "exempt_keys": [
             "calc_units_us",
@@ -536,12 +536,96 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_field_tag": "Tag"
+        "lpn_crs_unplaceable_mark": "(no map)",
+        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_field_desc": "Description",
+        "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
+        "lpn_field_tag": "Tag",
+        "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
+        "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
+        "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
+        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "keys": {
-        "lpn_field_tag": "Tag"
+        "lpn_crs_unplaceable_mark": "(no map)",
+        "lpn_crs_unplaceable": "This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.",
+        "lpn_field_desc": "Description",
+        "lpn_field_desc_tip": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
+        "lpn_field_tag": "Tag",
+        "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
+        "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
+        "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
+        "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
+        "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
+        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
     },
     "key_context": {
+        "lpn_crs_unplaceable_mark": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_place_projected",
+                    "value": "Ein projiziertes Projekt öffnet sich auf seiner eigenen Ebene, nicht an dem gesuchten Ort. Um diese Ebene auf der Erde zu verorten, ist eine Koordinatentransformation nötig, die diese Seite noch nicht hat.",
+                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "Nicht georeferenziert",
+                    "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_crs_unplaceable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crs_place_projected",
+                    "value": "Ein projiziertes Projekt öffnet sich auf seiner eigenen Ebene, nicht an dem gesuchten Ort. Um diese Ebene auf der Erde zu verorten, ist eine Koordinatentransformation nötig, die diese Seite noch nicht hat.",
+                    "english": "A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet."
+                },
+                "next_translated": {
+                    "key": "lpn_crs_none",
+                    "value": "Nicht georeferenziert",
+                    "english": "Not georeferenced"
+                }
+            }
+        },
+        "lpn_field_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_source_tip",
+                    "value": "Die Kurve im Bibliotheken-Feld, die angibt, wie viel Druckhöhe diese Pumpe bei jedem Durchfluss hinzufügt. Mehrere Pumpen können dieselbe Kurve verwenden, und eine Änderung dort wirkt sich auf alle aus. Diese Pumpe enthält nur den Verweis; die Punkte selbst werden unter Bibliotheken, Kurven gelesen und bearbeitet.",
+                    "english": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them."
+                },
+                "next_translated": {
+                    "key": "lpn_field_tag_tip",
+                    "value": "Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.",
+                    "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_field_desc_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pump_curve_source_tip",
+                    "value": "Die Kurve im Bibliotheken-Feld, die angibt, wie viel Druckhöhe diese Pumpe bei jedem Durchfluss hinzufügt. Mehrere Pumpen können dieselbe Kurve verwenden, und eine Änderung dort wirkt sich auf alle aus. Diese Pumpe enthält nur den Verweis; die Punkte selbst werden unter Bibliotheken, Kurven gelesen und bearbeitet.",
+                    "english": "The curve in the Libraries box that says how much head this pump adds at each flow. Several pumps can use the same curve, and editing it there changes all of them."
+                },
+                "next_translated": {
+                    "key": "lpn_field_tag_tip",
+                    "value": "Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.",
+                    "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
         "lpn_field_tag": {
             "reason": "equal_to_english",
             "current_value": "Tag",
@@ -555,6 +639,102 @@
                     "key": "lpn_field_tag_tip",
                     "value": "Ein Tag kann jede Bedeutung haben, die Sie benötigen, etwa eine Druckzone oder einen Arbeitsauftrag. Keine Berechnung hier oder in EPANET liest ihn aus. Ein Tag ist ein einziges Wort: EPANET liest nur bis zum ersten Leerzeichen, daher wird ein Leerzeichen schon bei der Eingabe abgelehnt. Er wird in die EPANET-Datei übernommen und aus ihr gelesen.",
                     "english": "A one-word identifier with any meaning you require, such as a pressure zone or a work order."
+                }
+            }
+        },
+        "lpn_field_coord_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting_abbr",
+                    "value": "R",
+                    "english": "E"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Größenfaktor",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_coord_off_world": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting_abbr",
+                    "value": "R",
+                    "english": "E"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Größenfaktor",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_inp_export_flat_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_export_flat_types",
+                    "value": "{n} Rohre hier beziehen sich auf {t} Rohrtypen. In der Datei trägt jedes dieser Rohre eine eigene Kopie der Zahlen, sodass die Ergebnisse gleich bleiben. Was die Datei nicht enthalten kann, ist der Rohrtyp selbst, sodass nur Ihre eigene Projektdatei festhält, dass das Bearbeiten einer Definition jedem Rohr folgt.",
+                    "english": "{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_export_flat_fittings",
+                    "value": "Eine EPANET-Datei kann die Liste der Bögen, Ventile und T-Stücke aus Ihrer Projektdatei nicht enthalten. Der Einzelverlustkoeffizient von {n} Rohren hier wird aus einer Formstückliste aufaddiert. Die Summe wird unverändert in die Datei übernommen, sodass sich an den Ergebnissen nichts ändert.",
+                    "english": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes."
+                }
+            }
+        },
+        "lpn_terrain_rate_limited": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "Wir konnten den Geländedienst nicht erreichen, daher wurde keine Höhe geändert. Möglicherweise sind Sie offline. Alles andere auf dieser Seite funktioniert auch ohne ihn.",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_done",
+                    "value": "{n} Höhe(n) ausgefüllt.",
+                    "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_terrain_http": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "Wir konnten den Geländedienst nicht erreichen, daher wurde keine Höhe geändert. Möglicherweise sind Sie offline. Alles andere auf dieser Seite funktioniert auch ohne ihn.",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_done",
+                    "value": "{n} Höhe(n) ausgefüllt.",
+                    "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_terrain_no_place": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_failed",
+                    "value": "Wir konnten den Geländedienst nicht erreichen, daher wurde keine Höhe geändert. Möglicherweise sind Sie offline. Alles andere auf dieser Seite funktioniert auch ohne ihn.",
+                    "english": "We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it."
+                },
+                "next_translated": {
+                    "key": "lpn_terrain_done",
+                    "value": "{n} Höhe(n) ausgefüllt.",
+                    "english": "{n} elevation(s) filled in."
                 }
             }
         }

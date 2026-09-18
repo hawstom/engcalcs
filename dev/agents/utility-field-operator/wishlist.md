@@ -126,9 +126,22 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   because it is an enumeration, not a forecast; a derived time is not, and should not be added even
   as a later "improvement."
 
-### 5. Task 567 (vertices): fix the accidental double-tap edit FIRST — it is a live read-only hazard today, before any mode ships
+### 5. WITHDRAWN 2026-09-17 ON TOM'S OWN TESTING — the double-tap hazard is fixed and I had not retested
 
-- **Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**
+**Tom, 2026-09-17, asked whether to promote this: *"No. He's wrong. Tell him to remove it from his
+wish list. He didn't try the latest version that has explicit vertex mode. It's no longer a hazard,
+and this has been weeks so now."*** He is right and the item is withdrawn. An explicit vertex mode
+shipped; a reader in `select` mode no longer edits anything by double-tapping.
+
+**THE LESSON IS MINE AND IT IS THE ONE WORTH KEEPING: an OBSERVED finding decays.** I traced this
+on 2026-09-01, tagged it OBSERVED with `path:line`, and it was true that day. I then carried it
+forward as my top-ranked item into two later invocations WITHOUT RE-READING THE CODE, because a
+provenance tag felt like proof. **A tag records where a fact came from, never that it is still
+true.** Re-verify an OBSERVED finding against the current tree before ranking it again, and say the
+date you last checked — not only the date you found it. The text below is kept as the record of what
+the defect was, and is no longer a recommendation.
+
+- ~~**Rank: above my own #1-3, alongside #4, and I would build it before the vertices mode Tom sketched.**~~
   This is the one place my seat's standing worry — a reader silently changing somebody's model — is
   not speculative. It is already true of the shipped page.
 - **What I found, OBSERVED (full trace in the journal, 2026-09-01):** in ordinary `select` mode — the
@@ -293,6 +306,35 @@ building `lpn_` toward being a field tool it structurally is not, and I disagree
   and I think they are two different changes with very different costs to my task. The caching
   half is worth having; the snapping half is the one I would ask him to reconsider before it is
   built, on the finger-tracking argument above, not on taste.
+
+### 9. Customer service connections: constrain the DRAG, not only the default — and skip the house icon at these sizes
+
+- **What:** on `feat/customer-demands` (Task 247), lock a customer's service-line drag to station
+  (along the pipe) and standoff distance/side (perpendicular to it), rather than a free x/y drag
+  that can land the stub at any angle. Full reasoning and citation: journal, 2026-09-17. I agree
+  with Tom's instinct not to offer a non-perpendicular connection at all — I found no field-reading
+  task the angle serves that the meter's position does not already serve better, and a uniform
+  perpendicular pattern makes the one real exception (a lateral crossing the street) MORE visible,
+  not less, because it is the one dot sitting on the wrong side of an otherwise consistent row.
+- **Snap to the nearest node on close approach: yes, no reservation** — the page already snaps a
+  near-miss onto an existing node/meter elsewhere (`nearestNodeNearScreen()`,
+  `js/looped-network.js:27186-27196`, worktree), so this is the page's own standing idiom, not a
+  new one. The one thing I'd want confirmed, not a reason to decline: the catch is visually obvious
+  and a further drag releases it.
+- **Small solid dot: yes. House/building icon: no, at the sizes this page actually draws.**
+  **CITED**, Esri's own minimum-symbol-size guidance puts a simple symbol's screen floor near 10 px
+  and names 20×20 px as the size below which an iconic (detailed) shape needs different design work
+  entirely (Esri ArcGIS blog, "Guidelines for minimum size for text and symbols on maps," retrieved
+  2026-09-17). **OBSERVED**, this page's customer symbol draws at 3-7 px in the ordinary zoomed-out
+  case (`LPN_METER_MIN_PX = 1.5` half-width vs. the junction's fixed `symbolSize: 7`,
+  `js/looped-network.js:7873-7874`, `4650`, worktree) — under even the simple-shape floor, so a
+  house glyph will not read as a house there; it reads as a slightly different dot, at extra
+  rendering cost for no legibility gain I can find. Keep the size and position cues (smaller than a
+  junction, off the pipe on a stub) that already do the real identification work.
+- **Rank: low, and mostly already built.** The perpendicular default ships today
+  (`meterOffsetFor()`); the only gap is the unconstrained drag afterward, which is a small, cheap
+  fix layered on a feature already in flight — not a new want of mine. I answer it because Tom asked
+  the seats directly, not because it is where I would have pointed the team's attention unprompted.
 
 ## Parked
 

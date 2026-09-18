@@ -1653,6 +1653,12 @@ $ec_lang['lpn_crs_choose']='Select';
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} projections listed.';
 $ec_lang['lpn_crs_place_projected']='A projected project opens on its own plane, not at the place you searched for. Putting that plane on the Earth needs a coordinate transform, which this page does not have yet.';
+// Shown beside a projection in the chooser, and beside the chosen one in the New project box, when
+// this page has no transform for it. Short on purpose: it sits at the end of a register name that
+// can already run to 50 characters.
+$ec_lang['lpn_crs_unplaceable_mark']='(no map)';
+// The same fact in a sentence, under the chooser's list and again if such a project is created.
+$ec_lang['lpn_crs_unplaceable']='This page has no transform for that projection, so a project on it opens on its own plane: no map behind the drawing, no arrival at the place you searched for, and no elevations from the land surface. Your coordinates are unaffected. Another projection covering the same area will have all three.';
 // What the status strip says when a project has no projection at all. The local grid is a plane the
 // user declared the meaning of, and it sits nowhere on the Earth.
 $ec_lang['lpn_crs_none']='Not georeferenced';
@@ -2122,6 +2128,17 @@ $ec_lang['lpn_pump_curve_source_tip']='The curve in the Libraries box that says 
 //
 // {name} and {percent} are placeholders and not concatenation (Task 193): a language that puts the
 // curve name first, or wraps a percentage in its own punctuation, cannot express a prefix sandwich.
+// **THE ELEMENT'S DESCRIPTION** (Task 674). EPANET's own word, and EPANET's own Property Editor row:
+// the terminology rule decides it, and there is no vocabulary collision here of the kind Label and
+// Text have. EPANET carries it as the trailing comment on the element's own row in the file, which is
+// where this page now reads and writes it; until Task 674 it was read nowhere and every imported
+// description was discarded in silence.
+$ec_lang['lpn_field_desc']='Description';
+// THE THREE THINGS SOMEBODY HAS TO KNOW, and the third is the one nothing else on the page says: a
+// description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
+// be written as a trailing comment and is turned into a space. The tip says what the field is for
+// first, because that is what a reader of a blank box wants.
+$ec_lang['lpn_field_desc_tip']='For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part\'s own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2234,6 +2251,14 @@ $ec_lang['lpn_field_northing_abbr']='N';
 $ec_lang_syn['lpn_field_northing_abbr']='Northing | abbreviation of Northing, as short as the language has a short form for; the full word where it has none.';
 $ec_lang['lpn_field_easting_abbr']='E';
 $ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as short as the language has a short form for; the full word where it has none.';
+// Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
+// INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
+// states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
+// when the node is dragged.
+$ec_lang['lpn_field_coord_tip']='Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.';
+// Refused, and it says what the range is. Only a geographic project has one: Web Mercator has no
+// finite y at the poles, so a latitude past the cut-off would put the node nowhere at all.
+$ec_lang['lpn_coord_off_world']='That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
@@ -3214,6 +3239,7 @@ $ec_lang['lpn_fitting_other']='Other fitting';
 $ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
 $ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
 $ec_lang['lpn_inp_export_flat_types']='{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.';
+$ec_lang['lpn_inp_export_flat_coords']='An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.';
 $ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
@@ -3337,8 +3363,6 @@ $ec_lang['lpn_terrain_keep']='{k} node(s) already have an elevation and will not
 $ec_lang['lpn_terrain_undo']='One Undo (Ctrl-Z) puts every one of them back.';
 $ec_lang['lpn_terrain_requests']='{n} request(s) to api.mapbox.com.';
 $ec_lang['lpn_terrain_busy']='Elevations are already being filled in. Wait for them.';
-$ec_lang['lpn_terrain_none_needed']='Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.';
-$ec_lang['lpn_terrain_no_nodes']='There are no nodes to fill in yet.';
 $ec_lang['lpn_terrain_offmap']='These node positions are not on the terrain map, so nothing was sent.';
 $ec_lang['lpn_terrain_too_wide']='These nodes are spread over too much of the Earth to read in one go ({n} tile requests). Nothing was sent.';
 $ec_lang['lpn_terrain_cancelled']='Nothing was changed and nothing was sent.';
@@ -3347,6 +3371,14 @@ $ec_lang['lpn_terrain_working']='Reading the land surface…';
 // {status} is a number the service sent back, such as 403.
 $ec_lang['lpn_terrain_denied']='The terrain service refused the request ({status}), so no elevation was changed. The Mapbox token this site uses may not allow the web address you are on.';
 $ec_lang['lpn_terrain_failed']='We could not reach the terrain service, so no elevation was changed. You may be offline. Everything else on this page works without it.';
+// A 429 is the service asking us to slow down. It is not a refusal and not a lost network, so it
+// gets its own sentence: the same request works in a minute.
+$ec_lang['lpn_terrain_rate_limited']='The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.';
+// Any other status the service sent back. {status} is that number.
+$ec_lang['lpn_terrain_http']='The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.';
+// Said when the nodes asked about have no position on the Earth at all, which is what a projected
+// project reports when this page has no transform for its coordinate system.
+$ec_lang['lpn_terrain_no_place']='None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.';
 $ec_lang['lpn_terrain_done']='{n} elevation(s) filled in.';
 $ec_lang['lpn_terrain_missed']='{m} could not be read and are still blank.';
 $ec_lang['lpn_terrain_partial']='{f} terrain tile(s) did not answer.';

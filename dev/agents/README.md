@@ -40,6 +40,17 @@ promoting a row is Tom's call.
 quoted by a later invocation; the third must be re-derived. Untagged is a defect, and a
 SPECULATION is upgraded only by finding the source — never by still sounding right.
 
+**AND AN OBSERVED FINDING DECAYS, WHICH THE RULE ABOVE DID NOT SAY** (2026-09-17). Franco traced an
+accidental double-tap that edited a model in read-only browsing, tagged it OBSERVED with a line
+number, ranked it his most urgent item — and carried it into two later invocations without re-reading
+the code. An explicit vertex mode had shipped in the meantime and the hazard was gone. Tom, asked
+whether to promote it: *"No. He's wrong... He didn't try the latest version."* **A provenance tag
+records where a fact came from, never that it is still true**, and OBSERVED is the tag most likely to
+rot, because this tree changes daily while a CITED paper does not. **Re-verify an OBSERVED finding
+against the current tree before ranking it again, and carry the date you last CHECKED it, not only
+the date you found it.** The cost here was Tom's attention, spent on a decision that no longer
+existed — the scarcest thing this project has.
+
 ## Seats named but not filled
 
 Tom, 2026-08-24, listing who else may deserve a place: the **data entry clerk** (tab order,

@@ -302,11 +302,17 @@ head('6. THE POPUP: a property the type states renders DISABLED at its inherited
 		`and it SHOWS the inherited value rather than hiding it, so a hand check needs no click-through: ${JSON.stringify(disabled[0].value)}`);
 	check(inputs.some((e) => !e.disabled && e.value === '8'),
 		'while the diameter the definition does not state is still editable at the pipe\'s own 8 in');
-	// **THE SELECTOR STANDS IMMEDIATELY AFTER ID** (Tom's own placement), which here means it is the
-	// first control in the fields box -- the ID has its own row above it.
+	// **THE SELECTOR STANDS IMMEDIATELY AFTER THE IDENTITY BAND** (Tom's own placement for the
+	// selector, 2026-09-06; his band ruling of 2026-09-15 put Description and Tag in front of it).
+	// So it is the first control that is not one of those two -- which is what "immediately after
+	// ID" meant when the band was the ID alone, and is asserted that way rather than as slot 0,
+	// because a fixed slot is a number somebody has to re-count every time the band changes.
 	const controls = walk(pf).filter((e) => e._tag === 'select' || e._tag === 'input');
-	check(controls.length > 0 && controls[0]._tag === 'select',
-		`the pipe type selector is the first control on the popup: ${controls[0] && controls[0]._tag}`);
+	const afterBand = controls.slice(2);
+	check(controls.length > 2 && controls[0]._tag === 'input' && controls[1]._tag === 'input' &&
+		afterBand[0]._tag === 'select',
+		`the identity band's two text boxes come first and then the pipe type selector: ` +
+		controls.slice(0, 3).map((e) => e._tag).join(','));
 	// An untyped pipe is exactly the popup it always was: nothing disabled anywhere.
 	L.renderLinkFields('P3');
 	check(walk(pf).filter((e) => e._tag === 'input' && e.disabled === true).length === 0,

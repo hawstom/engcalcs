@@ -23,9 +23,21 @@
  *   3. Every value is an absolute https origin with no trailing slash and no path.
  *   4. CANONICAL_ORIGIN_DEFAULT is itself one of the whitelisted values -- an unknown host must
  *      land on an address we serve, not on a name that only appears in the fallback.
- *   5. dev/scripts/generate_sitemap.php's own $origin agrees with the default. The sitemap is
- *      generated outside a web request, so it has no host to look up and carries its own copy;
- *      the two drifting apart is the failure this pins down.
+ *   5. dev/scripts/generate_sitemap.php READS the default out of lib/config.inc.php rather than
+ *      carrying its own copy. It used to carry a literal with a comment asking the next editor to
+ *      keep the two in step, which is the arrangement that drifts; it now lifts the value, and this
+ *      leg fails if it goes back to a literal.
+ *
+ * AND THE PER-PAGE HALF, added 2026-09-17 when the suite stopped having one origin:
+ *   6. ecCanonicalOrigins() (lib/Canonical.lib.php) declares only real pages, each with a literal
+ *      https origin -- the same shape the whitelist values must have.
+ *   7. EC_LWN_ORIGIN in lib/config.inc.php is the SAME STRING ecCanonicalOrigins() declares for
+ *      Looped-Network.php. config.inc.php is loaded before Canonical.lib.php and cannot require it,
+ *      so librewaternet.org is written in two files; this leg is what makes it one fact.
+ *   8. The three readers actually go through the declaration: ec_canonical_url() (which feeds the
+ *      canonical, all 27 hreflang alternates and og:url), echoHTMLHead()'s og:image, and the
+ *      sitemap generator all call ecCanonicalOrigin(). Without this the declaration is decoration
+ *      and every page silently nominates whichever host answered -- the exact eleven-day defect.
  *
  * Blocking. A finding here is never cosmetic.
  */
@@ -81,14 +93,64 @@ if (!preg_match("/define\('CANONICAL_ORIGIN_DEFAULT',\s*'([^']*)'\)/", $config, 
     if (is_file($sitemapPath)) {
         $sitemap = file_get_contents($sitemapPath);
         if (preg_match("/\\\$origin\s*=\s*'([^']*)'/", $sitemap, $s)) {
-            if ($s[1] !== $default) {
-                bad("generate_sitemap.php \$origin is '{$s[1]}' but CANONICAL_ORIGIN_DEFAULT is\n"
-                  . "        '$default'. The sitemap runs outside a web request and carries its own copy;\n"
-                  . "        keep the two in step or the sitemap advertises URLs the pages disown.");
-            }
-        } else {
-            bad("generate_sitemap.php: no single-quoted \$origin found to compare.");
+            bad("generate_sitemap.php sets \$origin to the literal '{$s[1]}'. It must READ\n"
+              . "        CANONICAL_ORIGIN_DEFAULT out of lib/config.inc.php instead: a second copy with a\n"
+              . "        comment asking the next editor to keep it in step is the arrangement that drifts,\n"
+              . "        and a sitemap advertising an origin the pages disown is invisible from both ends.");
+        } elseif (strpos($sitemap, 'CANONICAL_ORIGIN_DEFAULT') === false) {
+            bad("generate_sitemap.php never mentions CANONICAL_ORIGIN_DEFAULT, so it is not reading\n"
+              . "        the default origin from lib/config.inc.php.");
         }
+    }
+}
+
+// ---- THE PER-PAGE ORIGIN DECLARATION -------------------------------------------------------
+require_once $root . '/lib/Canonical.lib.php';
+
+$pageFiles = array();
+foreach (glob($root . '/*.php') as $p) { $pageFiles[] = basename($p); }
+
+$declared = ecCanonicalOrigins();
+foreach ($declared as $page => $o) {
+    if (!in_array($page, $pageFiles, true)) {
+        bad("ecCanonicalOrigins() declares '$page', which is not a page in the repository root.\n"
+          . "        The key is the SCRIPT the page is served by, as a bare filename.");
+    }
+    if (strpos($o, 'https://') !== 0 || substr($o, -1) === '/' || substr_count($o, '/') !== 2) {
+        bad("ecCanonicalOrigins()['$page'] is '$o'. A canonical origin is https, has no path and\n"
+          . "        no trailing slash -- the same shape every whitelist value must have.");
+    }
+}
+
+// EC_LWN_ORIGIN and the declaration are two copies of one string, in two files that cannot see
+// each other. This is the whole guard against them drifting.
+if (preg_match("/define\('EC_LWN_ORIGIN',\s*'([^']*)'\)/", $config, $lwn)) {
+    if (!isset($declared['Looped-Network.php'])) {
+        bad("lib/config.inc.php defines EC_LWN_ORIGIN but ecCanonicalOrigins() declares no origin\n"
+          . "        for Looped-Network.php, so the map application would nominate hawsedc.com.");
+    } elseif ($declared['Looped-Network.php'] !== $lwn[1]) {
+        bad("EC_LWN_ORIGIN is '{$lwn[1]}' but ecCanonicalOrigins() puts Looped-Network.php on\n"
+          . "        '{$declared['Looped-Network.php']}'. One is where the suite SENDS somebody wanting\n"
+          . "        the map and the other is the address that page nominates; they must be one string.");
+    }
+} else {
+    bad("lib/config.inc.php does not define EC_LWN_ORIGIN as a literal. EC_LWN_APP_URL and\n"
+      . "        EC_LWN_SITE_URL are built from it and must not be built from CANONICAL_ORIGIN_DEFAULT,\n"
+      . "        which is the calculators' origin and no longer LibreWaterNet's.");
+}
+
+// The readers. A declaration nothing consults is decoration, and that is exactly how every page
+// came to nominate one host for eleven days.
+$readers = array(
+    'lib/Language.lib.php'        => 'ec_canonical_url(), which feeds the canonical, all 27 hreflang alternates and og:url',
+    'lib/HeadersFooters.lib.php'  => "echoHTMLHead()'s og:image",
+    'dev/scripts/generate_sitemap.php' => 'the sitemap generator',
+);
+foreach ($readers as $rel => $what) {
+    $src = is_file($root . '/' . $rel) ? (string)file_get_contents($root . '/' . $rel) : '';
+    if (strpos($src, 'ecCanonicalOrigin(') === false) {
+        bad("$rel does not call ecCanonicalOrigin(), so $what\n"
+          . "        ignores the per-page declaration and emits whichever origin the host resolved to.");
     }
 }
 
@@ -98,6 +160,8 @@ if ($fail) {
 }
 
 $hosts = count($values);
+$pp = count($declared);
 echo "PASS: canonical origin is a whitelist of $hosts host"
-   . ($hosts === 1 ? '' : 's') . ", every value a literal https origin.\n";
+   . ($hosts === 1 ? '' : 's') . ", every value a literal https origin, with $pp per-page override"
+   . ($pp === 1 ? '' : 's') . " declared and read by all three readers.\n";
 exit(0);

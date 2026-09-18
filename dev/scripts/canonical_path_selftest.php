@@ -154,9 +154,18 @@ $redirectCases = [
         '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', false, null],
     ['a page with no pretty URL is never redirected',
         '/engcalcs/Manning-Pipe-Flow.php', '/engcalcs/Manning-Pipe-Flow.php', true, null],
+    // **THE ORIGIN COMES FROM THE PAGE, NOT FROM THE HOST** (2026-09-17). hawsedc.com's whitelist
+    // entry now answers hawsedc.com, so a redirect built from the host argument would send the
+    // visitor to hawsedc.com/app/ -- an address that does not exist, /app/ being a rewrite only
+    // librewaternet.org carries. This fixture passes the calculators' origin and demands the app's.
+    ['the app moves to LIBREWATERNET even when the host resolves to hawsedc.com',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true,
+        'https://librewaternet.org/app/', 'https://hawsedc.com'],
 ];
-foreach ($redirectCases as [$name, $script, $req, $declared, $want]) {
-    $got = ecCanonicalRedirectTarget($script, $req, $declared, $O);
+foreach ($redirectCases as $case) {
+    [$name, $script, $req, $declared, $want] = $case;
+    $hostOrigin = isset($case[5]) ? $case[5] : $O;
+    $got = ecCanonicalRedirectTarget($script, $req, $declared, $hostOrigin);
     if ($got !== $want) {
         $fails++;
         echo "  FAIL $name\n        wanted " . var_export($want, true)

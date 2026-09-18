@@ -182,7 +182,47 @@ function ecLiveEnglish(string $root, string $key): ?string
             foreach ($m as $hit) { $lang[$hit[1]] = str_replace(array("\\'", '\\\\'), array("'", '\\'), $hit[2]); }
         }
     }
-    return isset($lang[$key]) ? $lang[$key] : null;
+    if (isset($lang[$key])) { return $lang[$key]; }
+
+    /* **A KEY CAN LIVE ON A BRANCH, AND SINCE 2026-09-17 THE LIST HE READS SHOWS THOSE TOO.**
+     *
+     * `dev/new-english-keys.md` grew a section listing every new string on every unmerged branch,
+     * because under branch work that is where new wording lives before it reaches master -- and his
+     * reading is the critical path. He then ruled on 120 of them and REWORDED 13.
+     *
+     * Reading only master's English file made every one of those 13 look like an edit that had
+     * never been applied, for ever: the key is not on master, so the lookup returned null, so the
+     * script kept telling whoever ran it to "apply it to lib/lang.ec.en.php by hand" -- a file that
+     * does not contain the key and must not. **Thirteen permanent false alarms is a check nobody
+     * reads, which is how a real one gets missed.**
+     *
+     * So the branches are the fallback, and his wording is applied on the branch that OWNS the key.
+     * Cached per process; a branch tip moving between two runs is not a case worth modelling here,
+     * because the answer is re-read on the next run anyway. */
+    static $branchLang = null;
+    if ($branchLang === null) {
+        $branchLang = array();
+        $branches = array();
+        exec('cd ' . escapeshellarg($root) . ' && git branch --no-merged master --format="%(refname:short)" 2>/dev/null', $branches);
+        foreach ($branches as $b) {
+            $b = trim($b);
+            if ($b === '' || $b === 'master') { continue; }
+            $out = array();
+            exec('cd ' . escapeshellarg($root) . ' && git show ' . escapeshellarg($b . ':lib/lang.ec.en.php') . ' 2>/dev/null', $out);
+            $src = implode("\n", $out);
+            if ($src === '') { continue; }
+            if (preg_match_all("/\\\$ec_lang\\['([a-z0-9_]+)'\\]='((?:[^'\\\\]|\\\\.)*)';/", $src, $m, PREG_SET_ORDER)) {
+                foreach ($m as $hit) {
+                    // FIRST branch wins: a key on two branches with two wordings is a merge
+                    // conflict waiting to happen and is not this script's to arbitrate.
+                    if (!isset($branchLang[$hit[1]])) {
+                        $branchLang[$hit[1]] = str_replace(array("\\'", '\\\\'), array("'", '\\'), $hit[2]);
+                    }
+                }
+            }
+        }
+    }
+    return isset($branchLang[$key]) ? $branchLang[$key] : null;
 }
 
 /**
@@ -222,7 +262,24 @@ foreach ($now as $id => $e) {
         }
     }
     if ($isGenerated($e['mark'])) { continue; }
-    if ($before !== null && $before['mark'] === $e['mark']) { continue; }  // already there when generated
+    /* **THIS TEST USED TO BE `$before['mark'] === $e['mark']` AND IT SILENTLY LOST 120 RULINGS.**
+     *
+     * CLAUDE.md instructs, in as many words: *"When he writes on that file, COMMIT HIS MARKS
+     * VERBATIM BEFORE ANYTHING ELSE TOUCHES IT"* -- because the file has eaten his work once
+     * already. Doing exactly that made `$committed` identical to the file on disk, so every one of
+     * his marks read as "already there when generated" and was skipped. **The documented procedure
+     * disabled the guard that protects it**, and the failure was silent: the script printed
+     * "nothing unharvested" and exited 0, which is indistinguishable from a clean run.
+     *
+     * Measured 2026-09-17: harvest after committing found 0 of 120; the same tree with the commit
+     * soft-reset found all 120.
+     *
+     * **THE DESTINATION IS THE ONLY HONEST TEST, which is what the comment below has always said
+     * and what this line contradicted.** `ecMarkIsStored()` asks whether a permanent home already
+     * holds this exact mark against this exact English -- true whether the file is committed or
+     * not, which makes the harvester genuinely idempotent and independent of git state. A
+     * GENERATED mark is already turned away by $isGenerated() above, which is the only thing this
+     * line was needed for. */
     /* **THE TEST IS "DOES A PERMANENT HOME ALREADY HOLD THIS MARK", NOT "HAS THE FILE CHANGED".**
      * The first version asked the second question, comparing disk against HEAD, and so went on
      * reporting fifty unharvested marks after harvesting all fifty -- which would have made

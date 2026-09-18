@@ -91,10 +91,10 @@ EngCalcs.pageConfig = {
 	rc_pond_ok_tip:  <?=json_encode($ec_lang['rc_pond_ok_tip'])?>,
 	rc_pond_warn:    <?=json_encode($ec_lang['rc_pond_warn'])?>,
 	rc_pond_warn_tip:<?=json_encode($ec_lang['rc_pond_warn_tip'])?>,
-	rc_sketch_filter:         '<?=$ec_lang['rc_sketch_filter']?>',
-	rc_sketch_top_crest_curve:'<?=$ec_lang['rc_sketch_top_crest_curve']?>',
-	rc_sketch_outlet_apron:   '<?=$ec_lang['rc_sketch_outlet_apron']?>',
-	rc_sketch_radius:         '<?=$ec_lang['rc_sketch_radius']?>'
+	rc_sketch_filter:         <?=json_encode($ec_lang['rc_sketch_filter'])?>,
+	rc_sketch_top_crest_curve:<?=json_encode($ec_lang['rc_sketch_top_crest_curve'])?>,
+	rc_sketch_outlet_apron:   <?=json_encode($ec_lang['rc_sketch_outlet_apron'])?>,
+	rc_sketch_radius:         <?=json_encode($ec_lang['rc_sketch_radius'])?>
 };
 </script>
 <script src="/engcalcs/js/rock-chute.js?v=<?=filemtime(__DIR__.'/js/rock-chute.js')?>"></script>

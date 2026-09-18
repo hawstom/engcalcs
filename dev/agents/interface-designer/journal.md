@@ -1628,3 +1628,242 @@ phone's lack of a wheel: OBSERVED, it does not, and could not without a collisio
 on the exact same element, not add one for free.
 
 No shipped file touched.
+
+---
+
+## 2026-09-17 — Two direct questions: the lock-dialog button order, and the shape of a zoom control
+
+Per the standing rule written today ("re-read the code before ranking anything from an earlier
+sitting"), everything below is read fresh from `feat/lock-initials-later`
+(`/home/haws/webdev/worktrees/feat-lock-initials-later/engcalcs`, checked 2026-09-17) and from
+`master`'s own `js/looped-network.js` / `Looped-Network.php` for the map-corner survey. Nothing
+here is carried forward unchecked from an earlier entry, though wishlist item 32 (zoom in/out
+gap) is the same finding, re-verified rather than assumed.
+
+### Question 1 — the four-button lock dialog
+
+OBSERVED (`js/looped-network.js:23072-23095` in the worktree, `presentOpenChoice()`): the shipped
+dialog is generic `openDialog()` machinery — every button is a plain `<button>`, identical style,
+`marginLeft: 6px` and nothing else (`:25861-25868`); there is no CSS class distinguishing one
+button from another anywhere in `css/engcalcs.css` (grepped for `lpn_dialog`/`lpn-dialog`, found
+only the backdrop/body/max-height rules at `:1326-1358`). **The only asymmetry the code already
+gives one button over the others is keyboard focus**: `openDialog()` calls `.focus()` on
+`bar.querySelector('button')` — literally the FIRST button in the array (`:25877-25878`). Whichever
+label is listed first is what a bare Enter-press, or a fast double-click before the eyes have
+read the text, activates.
+
+**A live sibling in this same file is worth reading before ranking anything, because it is this
+codebase's own answer to the identical genre of question.** OBSERVED (`:25822-25846`,
+`closeTab()`'s Save/Discard/Cancel dialog — Apple's own "Do you want to save changes?" shape):
+order is **Save (safe, default-focused) → Close without saving (destructive) → Cancel (safe)**.
+Two things to take from it: (1) this codebase already puts the safe, wanted-most-often action
+first and gives it the default focus, which both of Tom's two lock-dialog orders already do (Ask
+first in both); (2) it puts its ONE destructive option immediately next to Cancel, which is
+exactly the adjacency that every external guideline below warns against — a real, live
+counter-example inside this file, not a hypothetical. I did not touch it and am not asked to; it
+is a 3-button dialog with no second safe option to buffer with, so it had nowhere else to put
+Discard. The 4-button lock dialog does not have that excuse — it has TWO safe non-Ask options
+(Open read-only, Cancel), which is room the Close-tab dialog never had.
+
+**CITED** (Apple, Human Interface Guidelines, Alerts —
+developer.apple.com/design/human-interface-guidelines/alerts, and the buttons page under
+Menus and actions, fetched 2026-09-17): *"Don't assign the primary role to a button that performs
+a destructive action, even if that action is the most likely choice,"* and Apple's own worked
+example for "Do you want to save changes?" is **Don't Save / Cancel / Save** — the destructive
+option is neither the default (rightmost, blue) nor adjacent to nothing; Apple's guidance
+elsewhere on the same family of dialogs is to add visible SPACE around a destructive button so it
+cannot be reached by the same rote sequence of clicks or tabs that reaches the safe ones, and to
+mark it with the system's own destructive (red) styling so it reads as different in KIND, not
+just in position.
+
+**CITED** (Nielsen Norman Group, "Confirmation Dialogs Can Prevent User Errors,"
+nngroup.com/articles/confirmation-dialog, fetched 2026-09-17): confirmation dialogs work when they
+are rare and specific; used too often, or worded generically, they train a reader to click through
+without reading — "cry wolf too many times… the confirmation dialog will lose its power." Read
+studies cited there put the miss rate on unread confirmations above half. **This argues against a
+second, extra "are you sure you want to break the lock?" confirmation step layered on top of the
+dialog that is already open** — the three-age readout (`lockReadoutLines()`,
+`:23025-23057`) already states the consequence in specific, non-generic words before any button is
+reachable; a second modal on top of it adds friction without adding information, which is exactly
+the shape NN/g's own research says teaches a reader to stop reading rather than to read more
+carefully.
+
+**Is `.ec-consent-btn`'s "never restyle one to stand out" rule the same case? No, and the reason is
+what each dialog is FOR.** The consent banner styles Accept and Reject identically because the two
+answers are equally legitimate expressions of one visitor's own preference — restyling either
+would be steering someone toward the answer that serves this suite rather than them, which is the
+dark pattern the rule exists to forbid. **The lock dialog's four options are not four equally
+weighted answers to a preference question; they carry objectively different, stated risk** — three
+change nothing recoverable and one can force a colleague's file into an unmergeable state. Marking
+that difference is not persuasion toward an answer this suite wants; it is honest disclosure of a
+fact already written out in the paragraph above the buttons, the same job the suite's own verdict
+glyph already does elsewhere (CLAUDE.md's "Verdict / check-string convention": a leading `✓`/`⚠`
+glyph, decorative, RTL-safe, no translated marker word, used precisely so a reader can tell a safe
+result from a caution one before reading the sentence). Extending that existing, already-approved
+convention to one button label is a smaller and more consistent move than either leaving all four
+buttons identical (which every external source above treats as the mistake, not the neutral
+choice) or inventing a new red-button CSS component for one dialog.
+
+**The frightening option being sometimes correct is the argument for keeping it fully visible and
+legibly labelled, not for hiding or burying it** — nothing recommended here removes it from the
+row, shrinks it, or requires an extra click to reach. The only things changed are (a) which
+position it sits in relative to the two safe non-Ask options, (b) a small amount of extra spacing
+before it, and (c) a leading `⚠`. A reader who has decided their colleague has gone home for the
+weekend can still read all four labels in the same glance and press the one they mean; what the
+change defends against is a Tab-Tab-Enter or a startled double-click landing there BY ACCIDENT,
+which is a different harm than a deliberate, informed choice.
+
+**Recommendation — a third order, not either of Tom's two:**
+
+> **Ask · Open read-only · Cancel** [gap] **⚠ Break lock**
+
+Reasoning for each move: Ask stays first, unchanged from both of Tom's orders and matching the
+codebase's own standing default-focus convention (Save/Ask, whichever is safest, always leads).
+Open read-only moves next to Ask because both are "look, don't touch" answers and reads as a
+natural pair to someone scanning left to right. Cancel moves to third, ahead of Break lock, so a
+reader tabbing forward from the default focus meets only safe options before ever reaching the
+destructive one — this is the opposite of the Close-tab dialog's own adjacency and is possible
+here specifically because this dialog has two safe non-Ask buttons to spend on the buffer, which
+the 3-button sibling did not. Break lock sits last, set apart by a visible gap (CSS: extra
+`margin-left`, no other change) and its label carries a leading `⚠` reusing the suite's own
+existing glyph convention (`pc.lpn_lock_break` becomes `⚠ ' + (pc.lpn_lock_break || 'Break lock')`,
+or the glyph baked into the English string itself the way a verdict string already carries it) —
+zero new translated words, one glyph.
+
+**What I would NOT do:** repaint Break lock as a solid red/coloured button. This suite has no
+existing coloured-button component anywhere I found (`grep` for a `.lpn-*-danger`/`.btn-danger`-
+style class in `css/engcalcs.css` turned up nothing), and building one costs a new visual idiom for
+a single dialog rather than reusing the ✓/⚠ language the reader already meets in results tables
+and status readouts elsewhere on this exact page. A colour would also do the SAME job the glyph
+does, just with a bespoke component instead of a five-minute reuse — no reason to pay for both.
+
+No shipped file touched (I read the worktree; I did not edit it, per the brief).
+
+### Question 2 — the shape and home of an on-map zoom control
+
+**The map's corners are NOT free, and I was wrong to assume otherwise before checking — worth
+recording the correction rather than silently fixing it, since the same mistake is exactly the
+kind the 2026-09-17 "re-read before ranking" rule was written to catch.** OBSERVED
+(`Looped-Network.php:264-322`, `#lpn_map_overlay_tl`), checked 2026-09-17: top-left already carries
+a live, growing flex column — the mode hint (which itself wraps to two lines in several
+languages, by its own comment), the select-area instruction bubble, the solver's standing
+diagnostic with its own grievance button, and the EPANET engine-wait banner, PLUS a separate
+absolutely-positioned one-shot notice box (`#lpn_map_notice`, `:334`) that deliberately COVERS this
+same corner when a transient message fires. This is not a quiet corner; it is dynamic,
+multi-line, and already the seam this suite's own comments say a wrongly-placed second thing
+already pushed "an inch down the map" once (`:268-271`, the fix Tom ordered in 2026-08-27).
+Bottom-left (`#lpn_map_footer`, `:416-474`) is the busiest of the four by cell count — seven
+widgets today (satellite teaser, scenario button, status readout, coordinates, CRS name, scale
+bar, one-tap grievance link) and already wraps on a narrow window by its own comment. Bottom-right
+(`#lpn_basemap_credit`, `:498`) is the one corner that CANNOT move or share casually — required
+OSM/Mapbox attribution, non-dismissible — and is also the DEFAULT parking spot for the colour
+legend (`colorLegendPosition: … 'bottom-right'`, `:4924`), which already has to dodge the credit
+via `placeLegends()`/`overlayOccupants()` (`:29116-29135`). **Top-right is the calmest of the four**
+— OBSERVED, its only default occupant is the labels legend (`legendPosition: … 'top-right'`,
+`:4877`), a single box that is frequently set to Off by design (Tom, 2026-08-25: *"the legend is of
+less value now"*) and is not growing or multi-line the way the other three corners' content is.
+
+**CITED** (Mapbox, `Map#addControl` API reference, docs.mapbox.com/mapbox-gl-js/api/map, fetched
+2026-09-17): the default position for any control, including `NavigationControl` (the vendor's own
++/− zoom stack), when no position is given, is **`'top-right'`**. This is the one mapping vendor
+already integrated on this page (satellite tiles, terrain), so it is not an arbitrary citation —
+it is the convention of the library whose OWN tiles this page already draws. CITED (Leaflet's own
+`zoomControl` option defaults to `'topleft'`, per Leaflet's documented API) as the other half of a
+genuinely split convention in this space — OpenLayers and Leaflet both default top-left,
+Mapbox GL defaults top-right, and Google Maps' own consumer product stacks its zoom control
+directly above its attribution strip at bottom-right. **There is no single universal answer across
+the industry; the deciding fact here is which corner is actually free on THIS page, and that is
+top-right, which happens to also match the one vendor convention this suite already inherited.**
+
+**Recommendation: a small vertical two-button stack, `+` over `−`, fixed at top-right, styled as
+one more chip in the same visual language every other map-corner control already uses** — the
+`rgba(255,255,255,.85)` translucent background, thin border, the same font-size class as the
+legends and the footer readouts (`css/engcalcs.css`'s existing chip rules, not a new component).
+No third button (no on-stack "reset to fit" — that lives on the toolbar per Tom's own settled
+half of this task, and a third instrument for the same function on the same page would be the
+exact redundancy the four-bar brief exists to catch). Not draggable, not resizable — every zoom
+control I found in every cited product is fixed, and this page's own draggable/resizable
+convention (wishlist item 23) is reserved for STANDING PANELS a reader leaves open, not a
+two-button chip pressed and released. **Register it as a new occupant in the existing
+`overlayOccupants()` function** (`:29116-29131`) — a four-line addition matching the pattern
+already there for `#lpn_basemap_credit` — so a labels legend a user has moved to top-right dodges
+around the new chip exactly as legends already dodge the mode-hint column and the footer strip.
+This is not new infrastructure; it is one more line in a dodge system that already exists for
+this exact purpose.
+
+**Is this a fifth line of chrome, on top of the four Tom named?** No, and the distinction is the
+same one I drew on 2026-09-13 about panel drag handles: the four-bar diagnosis is about
+ALWAYS-VISIBLE, FIRST-GLANCE surfaces a reader's eye has to find before they have done anything —
+suite chrome, menus, toolbar, tab strip. A map-corner zoom chip is discovered by someone who has
+already opened the map and is already looking at it to navigate it, the same category as the
+scale bar, the coordinate readout and the two legends already living there without complaint —
+it adds one more chip to an existing population of roughly a dozen, not a new competitor for the
+first-glance budget the four bars already spend. The real cost is smaller and different: corner
+crowding, which the survey above says is genuine (every corner already has content) but
+manageable at top-right specifically, and mitigated by reusing the existing visual idiom rather
+than inventing a new one.
+
+**Phone: hide it below the existing 640px breakpoint, and the reason is a ruling Tom already
+made, not a new one.** Tom, 2026-08-22, cited in my own 2026-09-10 entry: *"on a phone, zoom in is
+the answer. You can't see through your finger… A finger is not a mouse!"* — pinch-to-zoom is
+already the phone's native, always-available answer to "how do I change scale," which is exactly
+why the whole justification for an on-map +/- chip (no wheel, no keyboard, no pinch surface) does
+not apply on a touchscreen. Hiding it at the breakpoint that already collapses the toolbar's
+non-transport groups (CLAUDE.md, `css/engcalcs.css` `max-width: 640px` block) also sidesteps the
+one real collision I found: `legendPosition` defaults to `'top-left'` on a small screen
+(`:4877`/`:4924`, `smallScreen()` branch), not top-right — so the corner this control would want on
+a phone is a different corner than on desktop, and the cheapest correct answer is to not need one
+there at all.
+
+**Is this worth building at all, given the toolbar half of Tom's own design (Zoom to Fit /
+Zoom Window double duty) is already settled?** Yes, and it is not redundant with it: the toolbar
+pair gives a RESET (fit) and a DRAG-A-RECTANGLE zoom-in (Window) — both still gestures, and neither
+gives a plain, one-click zoom OUT from wherever the reader already is. The on-map chip is the only
+one of the three instruments that answers "zoom out one step, right now, with one click, no drag."
+Rank it below the toolbar half (already decided) and roughly level with wishlist item 32's
+Map-menu Zoom In/Out rows — the menu rows are the more keyboard/screen-reader-reachable route
+(an ordinary focusable menu item, not a bespoke SVG button needing its own accessible markup)
+and cost nothing in map-corner space; the on-map chip is the more DISCOVERABLE route for the
+ordinary pointer user who will never open the Map menu looking for it. Building both is not
+double work — the menu rows and the on-map chip and the existing wheel/pinch handlers all call the
+same `zoomAbout()` function, so it is a third and fourth door onto a function that already has two.
+
+### The cheaper question: is the conventional keyboard binding worth adding, and what has to be
+true of the drawing surface
+
+**Yes, worth adding, and cheaply — but bind the BARE `+`/`-` keys, not `Ctrl`/`Cmd` + `+`/`-`.**
+OBSERVED (`js/looped-network.js:37430-37474`), checked 2026-09-17: this page's only two `keydown`
+listeners outside a text field are both on `document`, unscoped to any focused element — Ctrl/Cmd+Z
+for undo and a bare-digit-key tool picker (Task 595). **Both are guarded by the same function,
+`isTextEntry(e.target)`** (`:37469-37474`, checking `input`/`textarea`/`select`/
+`contentEditable`), which is the answer to "what has to be true of the drawing surface for a key
+press to reach it at all": nothing about focus — the listener is global and does not need the
+canvas to hold focus — but the handler MUST check that the reader is not currently typing into a
+field, or a bare `-` would zoom the map out every time somebody typed a negative elevation, and a
+bare `+` every time somebody typed into a field that happens to accept one. This guard already
+exists in this file for exactly this reason and a zoom binding should reuse it rather than write a
+second copy.
+
+**CITED** (Figma, "Adjust your zoom and view options," help.figma.com, fetched 2026-09-17): Figma
+binds `Cmd/Ctrl` + `+`/`-` to zoom, which means it deliberately overrides the browser's OWN
+reserved page-zoom shortcut inside its canvas. **That is a bigger claim on the keyboard than this
+page has made anywhere else** — Ctrl+Z and the digit keys are not shortcuts a browser reserves for
+itself, so intercepting `Ctrl`/`Cmd` + `+`/`-` would be a new kind of commitment (every browser
+binds that combination to its own text/page zoom, and a user who has learned that expectation
+gets a different, undocumented behaviour the moment focus is on this page). Recommend the bare
+keys instead — `+` (and `=`, since `+` is the shifted form of `=` on a US layout and QGIS-style
+tools bind both) and `-`, no modifier — which is closer to what a CAD-style tool (not a
+browser-embedded design tool like Figma) does, avoids the browser-reserved collision entirely, and
+matches the SHAPE of the existing digit-key binding (bare key, guarded by `isTextEntry`) rather
+than inventing a new pattern.
+
+### Where I did not look
+I did not render either dialog or the map corners in a real browser this session — every finding
+above is read from source (`js/looped-network.js`, `Looped-Network.php`, `css/engcalcs.css`), not
+measured on screen. I did not check whether `overlayOccupants()`'s four-line addition is
+mechanically trivial beyond reading the function once; I did not attempt the edit. I did not check
+Google Maps' or Bing Maps' own source for their zoom-control default position — both citations
+above rest on the public-facing product behaviour and Mapbox's own documented default, not on
+reading either company's source.
+
+No shipped file touched.

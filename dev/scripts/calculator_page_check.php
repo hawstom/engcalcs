@@ -222,7 +222,9 @@ function ecMenuRows(string $php): array
         if (!preg_match('/href="(?:<\?=[A-Za-z0-9_]+\?>)?([^"\/][^"]*\.php)"/', $el, $h)) { continue; }
         $descKey = null;
         $textKey = null;
-        if (preg_match('/title="<\?=\$ec_lang\[\'([A-Za-z0-9_]+)\'\]\?>"/', $el, $t)) {
+        // The value is escaped at the door (attr_escape_check.php, Task 322 row 68), so the
+        // wrapper is optional here and the KEY is what this check is reading.
+        if (preg_match('/title="<\?=(?:htmlspecialchars\()?\$ec_lang\[\'([A-Za-z0-9_]+)\'\]\)?\?>"/', $el, $t)) {
             $descKey = $t[1];
             $el = str_replace($t[0], '', $el);
         }
