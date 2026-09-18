@@ -23385,7 +23385,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			draw();
 		}, [
-			{ label: pc.lpn_survey_create || 'Create junctions', fn: function () {
+			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
 				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
 				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));

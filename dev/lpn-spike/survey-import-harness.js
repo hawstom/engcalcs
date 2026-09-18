@@ -847,6 +847,23 @@ L.land(CSV, 'survey-points.csv');
 		sels[0].children.map(o => o.textContent).join('|'));
 	ok('...opening on junction every time, never on what the last import chose',
 		sels[0].children.find(o => o.selected).value === 'junction');
+	// **AND THE BUTTON NAMES NO KIND AT ALL** (Tom, 2026-09-18: *"Create junctions should say
+	// 'Create nodes'."*). It said `Create junctions` while the chooser above it offered three, so
+	// the button was wrong two times in three -- and it is the LAST thing read before the
+	// irreversible press. A node is the one word true of all three. Asserted as a NEGATIVE against
+	// the toolbar's own three words rather than against the literal `Create nodes`, so rewording it
+	// again stays a one-line edit and the rule survives the wording.
+	ok('the button that does it names no kind, because it makes whichever kind is chosen',
+		[PC.lpn_tool_add_junction, PC.lpn_tool_add_reservoir, PC.lpn_tool_add_tank]
+			.every(w => PC.lpn_survey_create.toLowerCase().indexOf(w.toLowerCase()) < 0),
+		PC.lpn_survey_create);
+	// ...and the button carries the key VERBATIM, with nothing appended to it. That is the leg that
+	// matters, because the buttons are built once when the box opens while the kind chooser is
+	// turned afterwards -- so a label composed from the chosen kind would go stale in place rather
+	// than say the wrong thing loudly. Asserting equality rather than "it did not change" is what
+	// catches that: a label that varies by kind cannot also be the key on its own.
+	ok('...and carries that one key whole, never a kind noun composed onto it at render time',
+		boxButtons()[0].textContent === PC.lpn_survey_create, boxButtons()[0].textContent);
 	// **THE QUESTION NAMES THE KIND, AND IT IS A WHOLE SENTENCE PER KIND.** Never a noun dropped
 	// into a shared one: CLAUDE.md forbids composing a label from fragments at render time, and a
 	// translator who never sees the noun cannot inflect it, move it or agree its plural.

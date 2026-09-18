@@ -3641,7 +3641,7 @@ $ec_lang['lpn_survey_err_no_points']='Not one row of that file could be read as 
 // tried against and wrong on the next one.
 $ec_lang['lpn_survey_format_label']='File format:';
 $ec_lang['lpn_survey_format_internal']='{format} specified internally';
-$ec_lang['lpn_survey_create']='Create junctions';
+$ec_lang['lpn_survey_create']='Create nodes';
 $ec_lang['lpn_survey_fmt_pnezd']='Point name, northing, easting, elevation, description (PNEZD)';
 $ec_lang['lpn_survey_fmt_penzd']='Point name, easting, northing, elevation, description (PENZD)';
 $ec_lang['lpn_survey_fmt_pnez']='Point name, northing, easting, elevation (PNEZ)';
