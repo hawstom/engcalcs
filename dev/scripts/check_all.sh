@@ -483,6 +483,16 @@ run_check "nested repo boundary"      advisory php dev/scripts/nested_repo_bound
 # coverage. Which side is right when they differ is a judgement -- somebody may have fixed the host
 # copy at 4am -- so it refuses to recommend a direction and prints the diff command.
 run_check "host script parity"         advisory php dev/scripts/host_script_parity_check.php
+# The same question docroot_exposure_check.php asks of THIS tree, asked of the two sibling websites
+# -- and it exists because the answer was no. On 2026-09-18 librewaternet.org/tools/ answered 200
+# with a directory index and build-chrome.php answered 200 EXECUTED, while that repository's own
+# check.sh was green; Tom found it by noticing an untracked error_log in `git status`. The real
+# check now lives in each sibling (tools/exposure-check.sh, run by its own check.sh and so by its
+# pre-push hook), because the declaration is about THAT site's document root. This one only notices
+# a sibling that has gone unguarded -- script deleted, check.sh no longer calling it, copies drifted
+# -- which is the one failure a sibling's own green build cannot report. Advisory because it reads
+# repositories OUTSIDE this tree; it prints that it checked nothing rather than passing in silence.
+run_check "sibling docroot exposure"   advisory php dev/scripts/sibling_exposure_check.php
 # Task 322. This line used to pipe the report through `grep -q "^CHANGED"`, so the NOTE it printed
 # had NO TEXT UNDER IT -- nine role changes were sitting in a report nobody could see from here,
 # and an advisory whose findings never reach the reader is not an advisory. --brief prints the
