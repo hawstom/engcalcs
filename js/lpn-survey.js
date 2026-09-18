@@ -18,9 +18,19 @@
 // came from.
 //
 // **AND NOTHING HERE GUESSES WHICH COLUMN IS WHICH.** A header naming two columns that could both
-// be a latitude is reported as ambiguous rather than resolved by position; a file with eastings and
-// northings is refused by name, because a plane coordinate is not a latitude and treating one as a
-// latitude puts a network in the Gulf of Guinea with no symptom but the map being wrong.
+// be the northing is reported as ambiguous rather than resolved by position.
+//
+// **THE TWO COORDINATES ARE A NORTHING AND AN EASTING, WHICHEVER KIND OF PROJECT IS OPEN** (Tom,
+// 2026-09-17: *"I disagree that a project must be 'georeferenced'... There is no good reason why
+// the file can't be in any system the user wants."*). This module reads a pair of numbers and says
+// which is which; what those numbers MEAN is the page's business, and the page already has one
+// opinion about it -- a georeferenced project reads the pair as a latitude and a longitude, a
+// projected one as a northing and an easting, a plain grid as Y and X. So there is no latitude in
+// here at all, and a file of eastings and northings is an ordinary file rather than a refusal.
+//
+// **RANGE LIMITS COME FROM THE CALLER, for exactly that reason.** A latitude of 122 is not a
+// latitude; a northing of 122 is a perfectly good northing. `opts.limits` is how the page states
+// the bound its own kind of project has, and with none stated nothing is range-checked.
 //
 // **THE TOKEN IS KEPT BESIDE THE NUMBER, for the reason CLAUDE.md gives in terms: the numbers came
 // out of the user's file and they are the user's.** `parseFloat('38.50')` can only ever come back
@@ -52,21 +62,27 @@
 	// ---- the column vocabulary -----------------------------------------------------------------
 	//
 	// Normalised to lowercase letters and digits, so `Latitude (DD)`, `LAT_DD` and `lat dd` are one
-	// word. DELIBERATELY SHORT LISTS: a name nobody recognises is reported as "no latitude column"
-	// with the header printed back, which a person can act on in one edit of their own file. A long
-	// list of clever synonyms is where a wrong guess comes from.
-	var LAT_NAMES = { lat: 1, latitude: 1, latdd: 1, latdeg: 1, latitudedd: 1 };
-	var LON_NAMES = { lon: 1, long: 1, lng: 1, longitude: 1, londd: 1, londeg: 1, longitudedd: 1 };
-	var ID_NAMES = { id: 1, name: 1, point: 1, pointid: 1, pointname: 1, pt: 1, ptid: 1,
-		station: 1, node: 1, nodeid: 1, junction: 1 };
+	// word. DELIBERATELY SHORT LISTS: a name nobody recognises is reported with the header printed
+	// back, which a person can act on in one edit of their own file. A long list of clever synonyms
+	// is where a wrong guess comes from.
+	// **NORTH AND EAST, and every word for either goes in one of these two lists.** A georeferenced
+	// file writes `Latitude`, a State Plane file writes `Northing`, a grid file writes `Y`, and all
+	// three are the same column as far as this module is concerned: the one the page will read as
+	// its first axis. Keeping them in one list is what lets a survey in any system come in.
+	var NORTH_NAMES = { north: 1, northing: 1, n: 1, y: 1, ycoord: 1, northingm: 1, northingft: 1,
+		lat: 1, latitude: 1, latdd: 1, latdeg: 1, latitudedd: 1 };
+	var EAST_NAMES = { east: 1, easting: 1, e: 1, x: 1, xcoord: 1, eastingm: 1, eastingft: 1,
+		lon: 1, long: 1, lng: 1, longitude: 1, londd: 1, londeg: 1, longitudedd: 1 };
+	var ID_NAMES = { p: 1, id: 1, name: 1, point: 1, pointid: 1, pointname: 1, pointnumber: 1, pt: 1,
+		ptid: 1, station: 1, node: 1, nodeid: 1, junction: 1 };
 	var ELEV_NAMES = { elev: 1, elevation: 1, ele: 1, z: 1, alt: 1, altitude: 1, height: 1,
 		elevm: 1, elevft: 1, elevationm: 1, elevationft: 1, elem: 1, eleft: 1, zm: 1, zft: 1,
 		altm: 1, altft: 1, heightm: 1, heightft: 1 };
-	// **A PLANE COORDINATE IS NOT A LATITUDE, and this is the list that says so out loud.** A State
-	// Plane or UTM file is the commonest wrong file to bring to this control, its columns are
-	// numbers of exactly the right shape, and a metre read as a degree is silent.
-	var PLANE_NAMES = { easting: 1, northing: 1, east: 1, north: 1, e: 1, n: 1, x: 1, y: 1,
-		eastingm: 1, northingm: 1, eastingft: 1, northingft: 1 };
+	// The trailing D of PNEZD. Read and carried onto the junction as its description, which is a
+	// field this page already has -- the surveyor's own note about the point is the single most
+	// useful thing in a point list after the position itself.
+	var DESC_NAMES = { d: 1, desc: 1, descr: 1, description: 1, note: 1, notes: 1, remark: 1,
+		remarks: 1, comment: 1, comments: 1, code: 1 };
 
 	function norm(s) {
 		return String(s === undefined || s === null ? '' : s)
@@ -87,43 +103,48 @@
 	/**
 	 * Which column is which, read out of a header row.
 	 *
-	 * Returns `{mapping, notes, error, detail}`. `mapping` holds the column INDEX for each of
-	 * id/lat/lon/elev, with null where the header names none; `elevUnit` is what the elevation
-	 * column says about itself, or null.
+	 * Returns `{mapping, notes, elevUnit}`, or `{error, detail, axis}` where the header itself is
+	 * the problem. `mapping` holds the column INDEX for each of id/north/east/elev/desc, with null
+	 * where the header names none.
 	 *
-	 * Exported so the harness can assert the mapping without building a file around it, and so a
-	 * future mapping dialog can show what was detected before anything is created.
+	 * **THIS IS THE HALF THAT WINS OVER THE FORMAT CHOOSER.** A file that names its own columns
+	 * needs nobody to be asked, and Declan put that third on his own list for the reason a `.inp`
+	 * file's own UNITS line beats any default we would have picked: what the file says about itself
+	 * is evidence, and a chooser is a preference left over from the last file somebody opened.
 	 */
 	EngCalcs.lpnSurveyColumnMap = function (header) {
-		var mapping = { id: null, lat: null, lon: null, elev: null },
-			hits = { id: [], lat: [], lon: [], elev: [] },
-			plane = [], notes = [], i, n;
+		var mapping = { id: null, north: null, east: null, elev: null, desc: null },
+			hits = { id: [], north: [], east: [], elev: [], desc: [] },
+			notes = [], i, n;
 		for (i = 0; i < (header || []).length; i++) {
 			n = norm(header[i]);
 			if (!n) { continue; }
-			if (LAT_NAMES[n]) { hits.lat.push(i); }
-			else if (LON_NAMES[n]) { hits.lon.push(i); }
+			if (NORTH_NAMES[n]) { hits.north.push(i); }
+			else if (EAST_NAMES[n]) { hits.east.push(i); }
 			else if (ID_NAMES[n]) { hits.id.push(i); }
 			else if (ELEV_NAMES[n]) { hits.elev.push(i); }
-			else if (PLANE_NAMES[n]) { plane.push(header[i]); }
+			else if (DESC_NAMES[n]) { hits.desc.push(i); }
 		}
-		// **AMBIGUITY IS REPORTED, NEVER RESOLVED BY POSITION.** Two columns called `lat` and
-		// `latitude` are a file somebody has edited by hand, and picking the first one is a coin
+		// **AMBIGUITY IS REPORTED, NEVER RESOLVED BY POSITION.** Two columns called `north` and
+		// `northing` are a file somebody has edited by hand, and picking the first one is a coin
 		// toss whose wrong answer draws a plausible map in the wrong place.
-		['lat', 'lon', 'id', 'elev'].forEach(function (k) {
+		['north', 'east', 'id', 'elev', 'desc'].forEach(function (k) {
 			if (hits[k].length === 1) { mapping[k] = hits[k][0]; }
 		});
-		if (hits.lat.length > 1) {
-			return { error: 'ambiguous-lat', detail: hits.lat.map(function (j) { return header[j]; }).join(', ') };
+		if (hits.north.length > 1) {
+			return { error: 'ambiguous-coord', axis: 'north',
+				detail: hits.north.map(function (j) { return header[j]; }).join(', ') };
 		}
-		if (hits.lon.length > 1) {
-			return { error: 'ambiguous-lon', detail: hits.lon.map(function (j) { return header[j]; }).join(', ') };
+		if (hits.east.length > 1) {
+			return { error: 'ambiguous-coord', axis: 'east',
+				detail: hits.east.map(function (j) { return header[j]; }).join(', ') };
 		}
-		if (mapping.lat === null || mapping.lon === null) {
-			// A plane file gets its own answer, because "no latitude column" would send the reader
-			// hunting for a spelling mistake in a file that does not hold a latitude at all.
-			if (plane.length) { return { error: 'plane-columns', detail: plane.join(', ') }; }
-			return { error: 'no-latlon', detail: (header || []).join(', ') };
+		// **NOT AN ERROR ANY MORE.** A first row this module cannot read is a file with no header,
+		// or one whose header is written in words nobody listed -- and either way the FORMAT the
+		// reader chose says where the columns are. `matched` is how the caller tells the two apart.
+		if (mapping.north === null || mapping.east === null) {
+			return { matched: false, mapping: null, notes: [], elevUnit: null,
+				detail: (header || []).join(', ') };
 		}
 		if (hits.elev.length > 1) {
 			// Not fatal: the junctions are still points. The elevation column is left unread and
@@ -132,7 +153,8 @@
 				detail: hits.elev.map(function (j) { return header[j]; }).join(', ') });
 			mapping.elev = null;
 		}
-		return { mapping: mapping, notes: notes,
+		if (hits.desc.length > 1) { mapping.desc = null; }
+		return { matched: true, mapping: mapping, notes: notes,
 			elevUnit: mapping.elev === null ? null : headerUnit(header[mapping.elev]) };
 	};
 
@@ -244,10 +266,7 @@
 		var lines = src.split(/\r\n|\r|\n/), notes = [], points = [],
 			delim = null, header = null, mapping = null, elevUnit = null,
 			seen = {}, blank = 0, rows = 0, i, cells, lineNo, map;
-		// The header is the first line that is neither blank nor a comment. **A CSV WITH NO HEADER
-		// IS REFUSED RATHER THAN READ BY POSITION**: which column is a latitude cannot be told from
-		// numbers, both of a pair are plausible either way round, and a swapped pair draws a map
-		// that looks fine and is somewhere else entirely.
+		// The header is the first line that is neither blank nor a comment.
 		for (i = 0; i < lines.length; i++) {
 			if (lines[i].trim() === '' || isCommentLine(lines[i])) { continue; }
 			delim = sniffDelimiter(lines[i]);
@@ -260,9 +279,12 @@
 		// counted, so `blank` means what a person reading their own file would mean by it.
 		while (lines.length && lines[lines.length - 1] === '') { lines.pop(); }
 		if (header === null) { return { ok: false, error: 'empty' }; }
-		map = opts.mapping ? { mapping: opts.mapping, notes: [], elevUnit: opts.elevUnit || null }
+		map = opts.mapping ? { matched: true, mapping: opts.mapping, notes: [], elevUnit: opts.elevUnit || null }
 			: EngCalcs.lpnSurveyColumnMap(header);
-		if (map.error) { return { ok: false, error: map.error, detail: map.detail }; }
+		if (map.error) { return { ok: false, error: map.error, detail: map.detail, axis: map.axis }; }
+		if (!map.matched) {
+			return { ok: false, error: 'no-coords', detail: (header || []).join(', ') };
+		}
 		mapping = map.mapping;
 		elevUnit = (opts.elevUnit !== undefined && opts.elevUnit !== null) ? opts.elevUnit : map.elevUnit;
 		(map.notes || []).forEach(function (n) { notes.push(n); });
@@ -271,46 +293,56 @@
 			cells = splitRow(lines[i], delim);
 			if (isBlankRow(cells)) { blank++; continue; }
 			rows++;
-			readCsvRow(cells, i + 1, mapping, seen, points, notes);
+			readCsvRow(cells, i + 1, mapping, seen, points, notes, opts.limits);
 		}
 		if (blank) { notes.push({ code: 'blank-rows', ids: [], detail: String(blank) }); }
 		if (!points.length) { return { ok: false, error: 'no-points', detail: String(rows) }; }
-		return { ok: true, kind: 'csv', delimiter: delim, header: header, mapping: mapping,
-			elevUnit: elevUnit, points: points, notes: notes,
+		return { ok: true, kind: 'csv', delimiter: delim, header: header, headerRead: true,
+			mapping: mapping, elevUnit: elevUnit, points: points, notes: notes,
 			counts: { rows: rows, points: points.length, blank: blank } };
 	}
 
-	function readCsvRow(cells, lineNumber, mapping, seen, points, notes) {
+	/**
+	 * One row. `limits` is `{north, east}` where the CALLER's kind of project has a bound, and
+	 * absent where it has none -- see the note at the top of this file.
+	 */
+	function readCsvRow(cells, lineNumber, mapping, seen, points, notes, limits) {
 		var id = mapping.id === null ? '' : readId(cells[mapping.id]),
 			label = id || rowLabel(lineNumber),
-			lat, lon, ele;
+			north, east, ele, desc;
 		// A row too short to hold the coordinate columns at all. Reported as its own case rather
 		// than as an unreadable number, because the reader's fix is different: a ragged file is one
 		// a spreadsheet wrote badly, not one with a typo in it.
-		if (cells.length <= Math.max(mapping.lat, mapping.lon)) {
+		if (cells.length <= Math.max(mapping.north, mapping.east)) {
 			notes.push({ code: 'row-short', ids: [label], detail: String(cells.length) });
 			return;
 		}
-		lat = readNumber(cells[mapping.lat]);
-		lon = readNumber(cells[mapping.lon]);
-		if (!lat.ok) {
-			notes.push({ code: lat.blank ? 'lat-missing' : 'bad-lat', ids: [label], detail: lat.tok });
+		north = readNumber(cells[mapping.north]);
+		east = readNumber(cells[mapping.east]);
+		if (!north.ok) {
+			notes.push({ code: north.blank ? 'coord-missing' : 'bad-coord', axis: 'north',
+				ids: [label], detail: north.tok });
 			return;
 		}
-		if (!lon.ok) {
-			notes.push({ code: lon.blank ? 'lon-missing' : 'bad-lon', ids: [label], detail: lon.tok });
+		if (!east.ok) {
+			notes.push({ code: east.blank ? 'coord-missing' : 'bad-coord', axis: 'east',
+				ids: [label], detail: east.tok });
 			return;
 		}
 		// **THE RANGE TEST IS SUGGESTIVE AND IS USED ONLY TO REFUSE, NEVER TO SWAP.** A latitude of
 		// 122 is not a latitude; it is very probably a longitude in the latitude column, and
 		// putting the pair back the other way round would be exactly the guess this module does not
-		// make. So the row is reported with its own number printed, and the reader fixes their file.
-		if (Math.abs(lat.value) > 90) {
-			notes.push({ code: 'lat-range', ids: [label], detail: lat.tok || String(lat.value) });
+		// make. So the row is reported with its own number printed, and the reader fixes their file
+		// -- or presses the other way round in the format chooser, which is one gesture.
+		//
+		// **THERE IS NO BOUND AT ALL WITHOUT `limits`**, which is the whole of what dropping the
+		// georeferenced-only rule cost: a northing of 700,000 is an ordinary northing.
+		if (limits && isFinite(limits.north) && Math.abs(north.value) > limits.north) {
+			notes.push({ code: 'lat-range', ids: [label], detail: north.tok || String(north.value) });
 			return;
 		}
-		if (Math.abs(lon.value) > 180) {
-			notes.push({ code: 'lon-range', ids: [label], detail: lon.tok || String(lon.value) });
+		if (limits && isFinite(limits.east) && Math.abs(east.value) > limits.east) {
+			notes.push({ code: 'lon-range', ids: [label], detail: east.tok || String(east.value) });
 			return;
 		}
 		if (id !== '') {
@@ -326,8 +358,9 @@
 			// new-asset setting to answer, which is the same thing a blank column gets.
 			notes.push({ code: 'bad-elev', ids: [label], detail: ele.tok });
 		}
-		points.push({ row: lineNumber, id: id, lat: lat.value, lon: lon.value,
-			latTok: lat.tok, lonTok: lon.tok,
+		desc = (mapping.desc === null || mapping.desc >= cells.length) ? '' : readId(cells[mapping.desc]);
+		points.push({ row: lineNumber, id: id, north: north.value, east: east.value,
+			northTok: north.tok, eastTok: east.tok, desc: desc,
 			elev: ele.ok ? ele.value : null, elevTok: ele.ok ? ele.tok : null });
 	}
 
@@ -341,25 +374,38 @@
 	// NOTES ARE RECORDS AND NOT SENTENCES until they are printed, exactly as js/lpn-inp.js keeps
 	// them: the same fact is wanted in the report now and possibly on the element later, and a
 	// record can be re-read while a sentence can only be re-parsed.
-	function fill(text, detail) {
-		return String(text).replace('{detail}', detail === null || detail === undefined ? '' : detail);
+	//
+	// **A SENTENCE ABOUT A COORDINATE NAMES THE AXIS THE PROJECT CALLS IT, and the caller is the
+	// only one who knows what that is.** A georeferenced project reads the first column as a
+	// latitude, a projected one as a northing, a plain grid as Y -- and the page settled that once,
+	// in axisNames(). So every function here takes an `axes` pair and substitutes `{axis}`; nothing
+	// in this module decides what kind of project is open, and nothing keeps a second list of what
+	// an axis is called.
+	function axisWord(axes, which) {
+		if (axes && axes[which]) { return axes[which]; }
+		return which === 'east' ? (PC.lpn_survey_axis_east || 'Easting')
+			: (PC.lpn_survey_axis_north || 'Northing');
 	}
-	EngCalcs.lpnSurveyNoteText = function (note) {
-		var code = (note && note.code) || '', d = note && note.detail;
-		if (code === 'row-short') { return fill(PC.lpn_survey_note_row_short || 'This row does not have enough columns to hold a position, so no junction was made for it.', d); }
-		if (code === 'lat-missing') { return fill(PC.lpn_survey_note_lat_missing || 'The latitude column is empty on this row, so no junction was made for it.', d); }
-		if (code === 'lon-missing') { return fill(PC.lpn_survey_note_lon_missing || 'The longitude column is empty on this row, so no junction was made for it.', d); }
-		if (code === 'bad-lat') { return fill(PC.lpn_survey_note_bad_lat || 'The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.', d); }
-		if (code === 'bad-lon') { return fill(PC.lpn_survey_note_bad_lon || 'The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.', d); }
-		if (code === 'lat-range') { return fill(PC.lpn_survey_note_lat_range || 'This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, swap them in your own file: this page will not swap them for you, because it cannot tell a mistake from a place.', d); }
-		if (code === 'lon-range') { return fill(PC.lpn_survey_note_lon_range || 'This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.', d); }
-		if (code === 'bad-elev') { return fill(PC.lpn_survey_note_bad_elev || 'The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.', d); }
-		if (code === 'id-duplicate') { return fill(PC.lpn_survey_note_id_duplicate || 'This name is used more than once in the file, so this junction was given a name of ours instead.', d); }
-		if (code === 'id-taken') { return fill(PC.lpn_survey_note_id_taken || 'This name already belongs to something in the project, so this junction was given a name of ours instead.', d); }
-		if (code === 'id-invalid') { return fill(PC.lpn_survey_note_id_invalid || 'This name cannot be used as an ID here, so this junction was given a name of ours instead.', d); }
-		if (code === 'ambiguous-elev') { return fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d); }
-		if (code === 'blank-rows') { return fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d); }
-		if (code === 'elev-converted') { return fill(PC.lpn_survey_note_elev_converted || 'The elevations in the file are in {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d); }
+	function fill(text, detail, axis) {
+		return String(text)
+			.replace(/\{detail\}/g, detail === null || detail === undefined ? '' : detail)
+			.replace(/\{axis\}/g, axis === null || axis === undefined ? '' : axis);
+	}
+	EngCalcs.lpnSurveyNoteText = function (note, axes) {
+		var code = (note && note.code) || '', d = note && note.detail,
+			ax = axisWord(axes, (note && note.axis) || 'north');
+		if (code === 'row-short') { return fill(PC.lpn_survey_note_row_short || 'This row does not have enough columns to hold a position, so no junction was made for it.', d, ax); }
+		if (code === 'coord-missing') { return fill(PC.lpn_survey_note_coord_missing || 'The {axis} column is empty on this row, so no junction was made for it.', d, ax); }
+		if (code === 'bad-coord') { return fill(PC.lpn_survey_note_bad_coord || 'The {axis} on this row does not read as a plain decimal number ({detail}), so no junction was made for it. Degrees, minutes and seconds are not read; convert them to decimal degrees first.', d, ax); }
+		if (code === 'lat-range') { return fill(PC.lpn_survey_note_lat_range || 'This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, say so in the column order above: this page will not swap them for you, because it cannot tell a mistake from a place.', d, ax); }
+		if (code === 'lon-range') { return fill(PC.lpn_survey_note_lon_range || 'This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.', d, ax); }
+		if (code === 'bad-elev') { return fill(PC.lpn_survey_note_bad_elev || 'The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.', d, ax); }
+		if (code === 'id-duplicate') { return fill(PC.lpn_survey_note_id_duplicate || 'This name is used more than once in the file, so this junction was given a name of ours instead.', d, ax); }
+		if (code === 'id-taken') { return fill(PC.lpn_survey_note_id_taken || 'This name already belongs to something in the project, so this junction was given a name of ours instead.', d, ax); }
+		if (code === 'id-invalid') { return fill(PC.lpn_survey_note_id_invalid || 'This name cannot be used as an ID here, so this junction was given a name of ours instead.', d, ax); }
+		if (code === 'ambiguous-elev') { return fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.', d, ax); }
+		if (code === 'blank-rows') { return fill(PC.lpn_survey_note_blank_rows || 'Blank lines were passed over: {detail}.', d, ax); }
+		if (code === 'elev-converted') { return fill(PC.lpn_survey_note_elev_converted || 'The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.', d, ax); }
 		return code;
 	};
 
@@ -367,41 +413,45 @@
 	 * Why a whole file could not be read, as a sentence. One per `error` code, and each one names
 	 * what the reader has to change.
 	 */
-	EngCalcs.lpnSurveyErrorText = function (parsed) {
-		var code = (parsed && parsed.error) || '', d = (parsed && parsed.detail) || '';
-		if (code === 'empty') { return fill(PC.lpn_survey_err_empty || 'That file has nothing in it.', d); }
-		if (code === 'no-latlon') { return fill(PC.lpn_survey_err_no_latlon || 'This page could not find a latitude column and a longitude column in that file. Name two of the columns latitude and longitude, in the first row of the file, and try again. The first row reads: {detail}', d); }
-		if (code === 'ambiguous-lat') { return fill(PC.lpn_survey_err_ambiguous_lat || 'More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.', d); }
-		if (code === 'ambiguous-lon') { return fill(PC.lpn_survey_err_ambiguous_lon || 'More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.', d); }
-		if (code === 'plane-columns') { return fill(PC.lpn_survey_err_plane || 'That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.', d); }
-		if (code === 'no-points') { return fill(PC.lpn_survey_err_no_points || 'Not one row of that file could be read as a surveyed point. Rows read: {detail}', d); }
-		return fill(PC.lpn_survey_err_unreadable || 'That file could not be read as a surveyed point list.', d);
+	EngCalcs.lpnSurveyErrorText = function (parsed, axes) {
+		var code = (parsed && parsed.error) || '', d = (parsed && parsed.detail) || '',
+			ax = axisWord(axes, (parsed && parsed.axis) || 'north');
+		if (code === 'empty') { return fill(PC.lpn_survey_err_empty || 'That file has nothing in it.', d, ax); }
+		if (code === 'no-coords') { return fill(PC.lpn_survey_err_no_coords || 'This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}', d, ax); }
+		if (code === 'ambiguous-coord') { return fill(PC.lpn_survey_err_ambiguous_coord || 'More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.', d, ax); }
+		if (code === 'no-points') { return fill(PC.lpn_survey_err_no_points || 'Not one row of that file could be read as a surveyed point. Rows read: {detail}', d, ax); }
+		return fill(PC.lpn_survey_err_unreadable || 'That file could not be read as a surveyed point list.', d, ax);
 	};
 
 	/**
-	 * What the import is about to do, for the confirm that stands in front of it.
+	 * What the import is about to do, for the box that stands in front of it.
 	 *
-	 * **IT NAMES THE MAPPING, IT DOES NOT MERELY COUNT THE POINTS.** This is the whole of the
-	 * column-mapping step for a file whose header we recognised: the reader sees which of their own
-	 * columns became the latitude, the longitude, the name and the elevation BEFORE anything is
-	 * created, so a wrong guess of ours is answerable with Cancel rather than with an undo.
+	 * **IT NAMES THE MAPPING, IT DOES NOT MERELY COUNT THE POINTS.** The reader sees which of their
+	 * own columns became which coordinate, which the name and which the elevation BEFORE anything is
+	 * created, so a wrong reading of ours is answerable with Cancel rather than with an undo.
 	 *
-	 * `unitText` is the label of the unit the project is showing for elevations, which this file
-	 * cannot know.
+	 * `unitText` is the label of the unit the project is showing for elevations, and `axes` is what
+	 * the project calls its two axes -- neither of which this file can know.
 	 */
-	EngCalcs.lpnSurveyConfirmText = function (parsed, unitText) {
+	EngCalcs.lpnSurveyConfirmText = function (parsed, unitText, axes) {
 		var lines = [], m = parsed.mapping, none = PC.lpn_survey_map_none || 'not used';
 		lines.push((PC.lpn_survey_confirm || 'Create {n} junction(s) from this surveyed point list?')
 			.replace('{n}', parsed.points.length));
-		if (parsed.kind === 'csv' && m) {
-			lines.push((PC.lpn_survey_map_lines || 'Latitude comes from the column {lat}, longitude from {lon}, the name from {id}, and the elevation from {elev}.')
-				.replace('{lat}', parsed.header[m.lat])
-				.replace('{lon}', parsed.header[m.lon])
-				.replace('{id}', m.id === null ? none : parsed.header[m.id])
-				.replace('{elev}', m.elev === null ? none : parsed.header[m.elev]));
+		if (m) {
+			lines.push((PC.lpn_survey_map_lines || '{first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.')
+				.replace('{first}', axisWord(axes, 'north'))
+				.replace('{second}', axisWord(axes, 'east'))
+				.replace('{a}', columnName(parsed, m.north))
+				.replace('{b}', columnName(parsed, m.east))
+				.replace('{id}', m.id === null ? none : columnName(parsed, m.id))
+				.replace('{elev}', m.elev === null ? none : columnName(parsed, m.elev)));
 		}
+		// **THE UNIT IS KNOWN ONLY WHEN THE COLUMN SAYS SO**, which is Tom's own question about this
+		// sentence (2026-09-17, on the old wording: *"Under what condition would we know the units
+		// of the file?"*). The answer is a header reading `Elevation_ft` or `elev (m)` and nothing
+		// else, so the sentence now says where the claim comes from instead of asserting it.
 		if (unitText && parsed.elevUnit) {
-			lines.push((PC.lpn_survey_elev_unit || 'Elevations in the file are read as {file}, and this project is showing {project}.')
+			lines.push((PC.lpn_survey_elev_unit || 'The elevation column in your file is named for {file}, and this project is showing {project}.')
 				.replace('{file}', parsed.elevUnit === 'm' ? (PC.lpn_survey_unit_m || 'meters') : (PC.lpn_survey_unit_ft || 'feet'))
 				.replace('{project}', unitText));
 		} else if (unitText && m && m.elev !== null) {
@@ -412,13 +462,25 @@
 		return lines.join('\n\n');
 	};
 
+	// The file's own word for a column where it states one, and the column's NUMBER where it does
+	// not -- a file read by position has no names to print, and "column 2" is still an answer a
+	// person can check against the file open beside them.
+	function columnName(parsed, index) {
+		if (index === null || index === undefined) { return ''; }
+		if (parsed.header && parsed.headerRead && parsed.header[index] !== undefined
+			&& String(parsed.header[index]).trim() !== '') {
+			return String(parsed.header[index]).trim();
+		}
+		return (PC.lpn_survey_column_n || 'column {n}').replace('{n}', index + 1);
+	}
+
 	/**
 	 * The import report, as lines of text. The caller puts them on screen.
 	 *
 	 * **IT SPEAKS EVEN WHEN NOTHING WENT WRONG**, for the reason js/lpn-inp.js's report does: "what
 	 * came across" is the question, and an answer only on failure makes silence mean two things.
 	 */
-	EngCalcs.lpnSurveyReportLines = function (parsed, outcome) {
+	EngCalcs.lpnSurveyReportLines = function (parsed, outcome, axes) {
 		var out = [], byText = [], seen = {};
 		out.push((PC.lpn_survey_report_counts || '{n} junction(s) created.')
 			.replace('{n}', (outcome && outcome.created) || 0));
@@ -427,7 +489,7 @@
 				.replace('{n}', outcome.elevFromFile));
 		}
 		((parsed && parsed.notes) || []).concat((outcome && outcome.notes) || []).forEach(function (d) {
-			var text = EngCalcs.lpnSurveyNoteText(d), at = seen[text];
+			var text = EngCalcs.lpnSurveyNoteText(d, axes), at = seen[text];
 			if (at === undefined) { seen[text] = byText.length; byText.push({ text: text, ids: (d.ids || []).slice() }); }
 			else { byText[at].ids = byText[at].ids.concat(d.ids || []); }
 		});

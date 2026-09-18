@@ -3535,24 +3535,31 @@ $ec_lang['lpn_ff_err_unknown']='No answer. The code reported was {code}.';
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Import surveyed points…';
-$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.';
+$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 $ec_lang['lpn_survey_not_geo']='A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.';
 $ec_lang['lpn_survey_read_error']='That file could not be read from your disk.';
 $ec_lang['lpn_survey_cancelled']='Nothing was created and nothing was changed.';
 $ec_lang['lpn_survey_row']='row {n}';
+// What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
+// page's own axisNames() answers this for a project that is open; these two are the fallback for a
+// reading done before there is one, and they are the surveyor's own words rather than the map's.
+$ec_lang['lpn_survey_axis_north']='Northing';
+$ec_lang['lpn_survey_axis_east']='Easting';
+// A column in a file that states no names of its own. Counted from 1, the way a spreadsheet does.
+$ec_lang['lpn_survey_column_n']='column {n}';
 $ec_lang['lpn_survey_err_empty']='That file has nothing in it.';
 $ec_lang['lpn_survey_err_unreadable']='That file could not be read as a surveyed point list.';
-$ec_lang['lpn_survey_err_no_latlon']='This page could not find a latitude column and a longitude column in that file. Name two of the columns latitude and longitude, in the first row of the file, and try again. The first row reads: {detail}';
-$ec_lang['lpn_survey_err_ambiguous_lat']='More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.';
+$ec_lang['lpn_survey_err_no_coords']='This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}';
+$ec_lang['lpn_survey_err_ambiguous_coord']='More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.';
 $ec_lang['lpn_survey_err_ambiguous_lon']='More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.';
 $ec_lang['lpn_survey_err_plane']='That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.';
 $ec_lang['lpn_survey_err_gpx_no_wpt']='That GPX file holds no waypoints, so there is nothing to make junctions from.';
 $ec_lang['lpn_survey_err_no_points']='Not one row of that file could be read as a surveyed point. Rows read: {detail}';
 $ec_lang['lpn_survey_confirm']='Create {n} junction(s) from this surveyed point list?';
-$ec_lang['lpn_survey_map_lines']='Latitude comes from the column {lat}, longitude from {lon}, the name from {id}, and the elevation from {elev}.';
+$ec_lang['lpn_survey_map_lines']='{first} comes from the column {a}, {second} from {b}, the name from {id}, and the elevation from {elev}.';
 $ec_lang['lpn_survey_map_gpx']='Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.';
 $ec_lang['lpn_survey_map_none']='not used';
-$ec_lang['lpn_survey_elev_unit']='Elevations in the file are read as {file}, and this project is showing {project}.';
+$ec_lang['lpn_survey_elev_unit']='The elevation column in your file is named for {file}, and this project is showing {project}.';
 $ec_lang['lpn_survey_elev_assumed']='The file does not say what unit its elevations are in, so they are read as {project}, which is the unit this project is showing.';
 $ec_lang['lpn_survey_unit_m']='meters';
 $ec_lang['lpn_survey_unit_ft']='feet';
@@ -3563,11 +3570,11 @@ $ec_lang['lpn_survey_report_elev']='{n} of them took an elevation from the file.
 $ec_lang['lpn_survey_report_clean']='Every point in the file came across, and nothing was changed on the way in.';
 $ec_lang['lpn_survey_report_lead']='Nothing in your file was thrown away quietly. Below is every row that could not be taken as it stands, and everything that was changed on the way in:';
 $ec_lang['lpn_survey_note_row_short']='This row does not have enough columns to hold a position, so no junction was made for it.';
-$ec_lang['lpn_survey_note_lat_missing']='The latitude column is empty on this row, so no junction was made for it.';
+$ec_lang['lpn_survey_note_coord_missing']='The {axis} column is empty on this row, so no junction was made for it.';
 $ec_lang['lpn_survey_note_lon_missing']='The longitude column is empty on this row, so no junction was made for it.';
-$ec_lang['lpn_survey_note_bad_lat']='The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.';
+$ec_lang['lpn_survey_note_bad_coord']='The {axis} on this row does not read as a plain decimal number ({detail}), so no junction was made for it. Degrees, minutes and seconds are not read; convert them to decimal degrees first.';
 $ec_lang['lpn_survey_note_bad_lon']='The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.';
-$ec_lang['lpn_survey_note_lat_range']='This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, swap them in your own file: this page will not swap them for you, because it cannot tell a mistake from a place.';
+$ec_lang['lpn_survey_note_lat_range']='This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, say so in the column order above: this page will not swap them for you, because it cannot tell a mistake from a place.';
 $ec_lang['lpn_survey_note_lon_range']='This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.';
 $ec_lang['lpn_survey_note_bad_elev']='The elevation here does not read as a number ({detail}). The junction was still made, and its elevation follows the Elevation setting for new assets.';
 $ec_lang['lpn_survey_note_ambiguous_elev']='More than one column could be the elevation ({detail}), so none of them was read and every elevation follows the Elevation setting for new assets.';
@@ -3577,4 +3584,4 @@ $ec_lang['lpn_survey_note_id_taken']='This name already belongs to something in 
 $ec_lang['lpn_survey_note_id_invalid']='This name cannot be used as an ID here, so this junction was given a name of ours instead.';
 $ec_lang['lpn_survey_note_gpx_trkpt']='The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.';
 $ec_lang['lpn_survey_note_gpx_rtept']='The file also holds {detail} route point(s), which were not made into junctions.';
-$ec_lang['lpn_survey_note_elev_converted']='The elevations in the file are in {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.';
+$ec_lang['lpn_survey_note_elev_converted']='The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it.';

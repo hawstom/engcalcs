@@ -5,8 +5,11 @@
 // first was the terrain fill), and it is the first that puts POSITIONS there. Every way it can go
 // wrong is quiet:
 //
-//   1. **The pair is swapped.** A latitude read as a longitude draws a map that looks perfectly
-//      reasonable and is somewhere else on Earth. Nothing throws and every length still solves.
+//   1. **The pair is swapped.** A northing read as an easting draws a map that looks perfectly
+//      reasonable and is somewhere else. Nothing throws and every length still solves. Tom's own
+//      judgement on this one (2026-09-17) is that a swap IS visible on the map -- and it is, which
+//      is why the format chooser is for convenience and correctness rather than a catastrophe
+//      guard. It is still the thing most worth a test, because the code cannot see it at all.
 //   2. **The user's own numbers are rewritten.** A geographic document is DRAWN in Web Mercator and
 //      STORED in longitude and latitude, and `mercLat(mercY(lat))` is a different double for 69.8%
 //      of latitudes -- so an import that goes through the projection without carrying the file's own
@@ -49,6 +52,11 @@ const CSV = fs.readFileSync(FIX + 'survey-points.csv', 'utf8');
 
 function noteCodes(parsed) { return (parsed.notes || []).map(n => n.code); }
 
+// **THE BOUNDS A GEOREFERENCED PROJECT HAS, and the ONLY project kind that has any** (Tom,
+// 2026-09-17: *"There is no good reason why the file can't be in any system the user wants."*). The
+// reader is handed them by the page; with none, a northing of 700,000 is an ordinary northing.
+const GEO_LIMITS = { limits: { north: 85.0511287798066, east: 180 } };
+
 // The page's own source, for the one question that is about WHERE a command is rather than what it
 // does. Same idiom as dev/lpn-spike/recent-files-harness.js.
 const PAGE_SRC = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
@@ -81,38 +89,57 @@ ok('the whole page names the picker in exactly two places: the menu row and the 
 	String((PAGE_SRC.match(/pickSurveyFile/g) || []).length));
 
 // ================================================================================================
-// 1. WHICH COLUMN IS WHICH, and the two questions it refuses to answer
+// 1. WHICH COLUMN IS WHICH, and the one question it still refuses to answer
 // ================================================================================================
 section('1. the column mapping');
 {
 	const m = EC.lpnSurveyColumnMap(['Point', 'Latitude', 'Longitude', 'Elevation_ft']);
-	ok('the fixture header maps to id, latitude, longitude and elevation',
-		m.mapping.id === 0 && m.mapping.lat === 1 && m.mapping.lon === 2 && m.mapping.elev === 3,
+	ok('the fixture header maps to id, north, east and elevation',
+		m.matched && m.mapping.id === 0 && m.mapping.north === 1 && m.mapping.east === 2 && m.mapping.elev === 3,
 		JSON.stringify(m.mapping));
 	ok('...and the elevation column states its own unit', m.elevUnit === 'ft', String(m.elevUnit));
 }
+// **THE CHANGE TOM ASKED FOR, IN ONE ASSERTION.** A northing and an easting used to be refused BY
+// NAME, on the argument that a plane coordinate is not a latitude. He disagreed: the file is in
+// whatever system the user works in, and the page already knows which system this project is.
+{
+	const m = EC.lpnSurveyColumnMap(['Point', 'Northing', 'Easting', 'Elev']);
+	ok('a northing and an easting are an ORDINARY file now, not a refusal',
+		m.matched && m.mapping.north === 1 && m.mapping.east === 2, JSON.stringify(m.mapping));
+}
+ok('bare N and E are read as the two coordinates',
+	(() => { const m = EC.lpnSurveyColumnMap(['P', 'N', 'E', 'Z']);
+		return m.matched && m.mapping.north === 1 && m.mapping.east === 2 && m.mapping.elev === 3; })());
+ok('a plain grid file writes Y and X, and those are the same two columns',
+	(() => { const m = EC.lpnSurveyColumnMap(['name', 'Y', 'X']);
+		return m.matched && m.mapping.north === 1 && m.mapping.east === 2; })());
 ok('a header written in other words still maps',
 	(() => { const m = EC.lpnSurveyColumnMap(['name', 'LAT_DD', 'lon_dd', 'elev (m)']);
-		return m.mapping.id === 0 && m.mapping.lat === 1 && m.mapping.lon === 2 && m.elevUnit === 'm'; })());
+		return m.mapping.id === 0 && m.mapping.north === 1 && m.mapping.east === 2 && m.elevUnit === 'm'; })());
 ok('a header with no unit on its elevation says so, rather than assuming one',
 	EC.lpnSurveyColumnMap(['id', 'lat', 'lon', 'height']).elevUnit === null);
-// **THE TWO REFUSALS ARE THE POINT OF THIS SECTION.** Both are cases where an answer could be
-// produced and would be a guess.
-ok('two columns that could both be the latitude are refused, not chosen between',
-	EC.lpnSurveyColumnMap(['lat', 'latitude', 'lon']).error === 'ambiguous-lat');
-ok('eastings and northings are refused BY NAME -- a plane coordinate is not a latitude',
-	EC.lpnSurveyColumnMap(['point', 'Easting', 'Northing']).error === 'plane-columns');
-ok('...and the message names the columns it found, so the reader can act on it',
-	/Easting/.test(EC.lpnSurveyErrorText(EC.lpnSurveyColumnMap(['point', 'Easting', 'Northing']))));
-ok('a header naming neither is refused with the header printed back',
-	(() => { const e = EC.lpnSurveyColumnMap(['a', 'b', 'c']);
-		return e.error === 'no-latlon' && e.detail === 'a, b, c'; })());
+ok('the trailing D of PNEZD is read as the description',
+	EC.lpnSurveyColumnMap(['P', 'N', 'E', 'Z', 'Description']).mapping.desc === 4);
+// **THE REFUSAL THAT REMAINS IS THE ONE WHERE AN ANSWER WOULD BE A GUESS.**
+ok('two columns that could both be the northing are refused, not chosen between',
+	(() => { const e = EC.lpnSurveyColumnMap(['north', 'northing', 'east']);
+		return e.error === 'ambiguous-coord' && e.axis === 'north'; })());
+ok('...and the same on the other axis, reported as the other axis',
+	(() => { const e = EC.lpnSurveyColumnMap(['n', 'east', 'easting']);
+		return e.error === 'ambiguous-coord' && e.axis === 'east'; })());
+ok('...and the message names the columns it found AND what the project calls that axis',
+	(() => { const e = EC.lpnSurveyColumnMap(['north', 'northing', 'east']);
+		const t = EC.lpnSurveyErrorText(e, { north: 'Latitude', east: 'Longitude' });
+		return /northing/.test(t) && /Latitude/.test(t) && !/\{axis\}/.test(t); })());
+ok('a header naming no two coordinates is NOT an error -- it is a file to read by position',
+	(() => { const m = EC.lpnSurveyColumnMap(['a', 'b', 'c']);
+		return m.matched === false && !m.error && m.detail === 'a, b, c'; })());
 
 // ================================================================================================
 // 2. THE CSV, against the shipped fixture
 // ================================================================================================
 section('2. the CSV fixture');
-const csv = EC.lpnSurveyParse(CSV);
+const csv = EC.lpnSurveyParse(CSV, GEO_LIMITS);
 ok('the fixture reads', csv.ok === true, csv.error || '');
 ok('six of its seven rows became points', csv.points.length === 6, String(csv.points.length));
 ok('...and the comment lines above the header were not read as rows',
@@ -123,6 +150,12 @@ ok('...and its own number is printed in the note, not a paraphrase',
 	(csv.notes.find(n => n.code === 'lat-range') || {}).detail === '-111.830400');
 ok('...and the note names the row by the name the file gave it',
 	((csv.notes.find(n => n.code === 'lat-range') || {}).ids || [])[0] === 'PT-6');
+// **THE SAME FILE, READ WITH NO BOUNDS, KEEPS ALL SEVEN.** That is not a bug: on a projected or a
+// grid project -111.83 is a perfectly good northing, and refusing it would be the georeferenced-only
+// rule stated as a number instead of as a sentence.
+ok('...and with no bounds stated, that same row is an ordinary point',
+	EC.lpnSurveyParse(CSV).points.length === 7,
+	String(EC.lpnSurveyParse(CSV).points.length));
 ok('the unreadable elevation is reported and the junction is STILL made',
 	noteCodes(csv).indexOf('bad-elev') >= 0 && csv.points.some(p => p.id === 'PT-7'));
 ok('...with no elevation of its own, rather than a zero',
@@ -130,13 +163,13 @@ ok('...with no elevation of its own, rather than a zero',
 {
 	const p1 = csv.points.find(p => p.id === 'PT-1');
 	ok('a coordinate keeps its own TEXT where the plain number would not reproduce it',
-		p1.latTok === '33.415300' && p1.lonTok === '-111.831400', p1.latTok + ' / ' + p1.lonTok);
+		p1.northTok === '33.415300' && p1.eastTok === '-111.831400', p1.northTok + ' / ' + p1.eastTok);
 	ok('...and its VALUE is the number the file states',
-		p1.lat === 33.4153 && p1.lon === -111.8314);
+		p1.north === 33.4153 && p1.east === -111.8314);
 	ok('...and the elevation keeps its text too', p1.elevTok === '1243.50');
 }
 ok('a number whose plain rendering already matches keeps NO token, so an ordinary file costs nothing',
-	EC.lpnSurveyParse('lat,lon\n33.4153,-111.8314\n').points[0].latTok === null);
+	EC.lpnSurveyParse('lat,lon\n33.4153,-111.8314\n').points[0].northTok === null);
 
 // ================================================================================================
 // 3. EVERY OTHER SHAPE A CSV ARRIVES IN, and every row that cannot be honoured
@@ -147,7 +180,7 @@ ok('semicolons are read as the delimiter where that is what the file uses',
 		return r.ok && r.delimiter === ';' && r.points[0].id === 'A'; })());
 ok('tabs are read as the delimiter',
 	(() => { const r = EC.lpnSurveyParse('id\tlat\tlon\nA\t33.5\t-111.8\n');
-		return r.ok && r.delimiter === '\t' && r.points[0].lat === 33.5; })());
+		return r.ok && r.delimiter === '\t' && r.points[0].north === 33.5; })());
 ok('a quoted cell holding a comma does not elect the comma in a semicolon file',
 	(() => { const r = EC.lpnSurveyParse('name;lat;lon\n"Tank Farm, north";33.5;-111.8\n');
 		return r.ok && r.points[0].id === 'Tank Farm, north'; })());
@@ -157,15 +190,20 @@ ok('a byte order mark does not swallow the first column name',
 	EC.lpnSurveyParse('﻿lat,lon\n33.5,-111.8\n').ok === true);
 ok('degrees, minutes and seconds are REPORTED rather than half read',
 	(() => { const r = EC.lpnSurveyParse('lat,lon\n33 24 55.1 N,-111.8\n');
-		return r.error === 'no-points' || noteCodes(r).indexOf('bad-lat') >= 0; })());
-ok('a latitude with a hemisphere letter is not quietly taken as a decimal',
-	noteCodes(EC.lpnSurveyParse('lat,lon\n33.5N,-111.8\nx,y\n33.6,-111.9\n')).indexOf('bad-lat') >= 0);
+		return r.error === 'no-points' || noteCodes(r).indexOf('bad-coord') >= 0; })());
+ok('a coordinate with a hemisphere letter is not quietly taken as a decimal',
+	noteCodes(EC.lpnSurveyParse('lat,lon\n33.5N,-111.8\nx,y\n33.6,-111.9\n')).indexOf('bad-coord') >= 0);
+ok('...and the note says WHICH axis it was, in the project\'s own word for it',
+	(() => { const r = EC.lpnSurveyParse('lat,lon\n33.5N,-111.8\n33.6,-111.9\n');
+		const n = r.notes.find(x => x.code === 'bad-coord');
+		return n.axis === 'north' &&
+			/Northing/.test(EC.lpnSurveyNoteText(n, { north: 'Northing', east: 'Easting' })); })());
 ok('a short row is reported as a short row, which is a different fix',
 	noteCodes(EC.lpnSurveyParse('id,lat,lon\nA,33.5\nB,33.6,-111.9\n')).indexOf('row-short') >= 0);
 ok('an empty coordinate cell is reported as empty, not as unreadable',
-	noteCodes(EC.lpnSurveyParse('id,lat,lon\nA,,-111.8\nB,33.6,-111.9\n')).indexOf('lat-missing') >= 0);
-ok('a longitude past 180 is refused for the same reason a latitude past 90 is',
-	noteCodes(EC.lpnSurveyParse('lat,lon\n33.5,999\n33.6,-111.9\n')).indexOf('lon-range') >= 0);
+	noteCodes(EC.lpnSurveyParse('id,lat,lon\nA,,-111.8\nB,33.6,-111.9\n')).indexOf('coord-missing') >= 0);
+ok('an out-of-range east is refused for the same reason an out-of-range north is, WHEN there are bounds',
+	noteCodes(EC.lpnSurveyParse('lat,lon\n33.5,999\n33.6,-111.9\n', GEO_LIMITS)).indexOf('lon-range') >= 0);
 ok('a name used twice keeps one and reports the other',
 	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,33.5,-111.8\nA,33.6,-111.9\n');
 		return r.points.length === 2 && r.points[1].id === '' && noteCodes(r).indexOf('id-duplicate') >= 0; })());
@@ -174,46 +212,50 @@ ok('blank lines are counted and mentioned, never merely skipped',
 		return r.points.length === 2 && r.counts.blank === 2 && noteCodes(r).indexOf('blank-rows') >= 0; })());
 ok('...and the empty string a trailing newline leaves is not counted as one of them',
 	EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n').counts.blank === 0);
-ok('a file with no header is refused rather than read by column position',
-	EC.lpnSurveyParse('33.5,-111.8\n33.6,-111.9\n').error === 'no-latlon');
 ok('an empty file says so', EC.lpnSurveyParse('   \n').error === 'empty');
 ok('a file whose every row is unreadable says how many rows it tried',
 	(() => { const r = EC.lpnSurveyParse('lat,lon\nx,y\n');
 		return r.error === 'no-points' && r.detail === '1'; })());
-// A caller-supplied mapping, which is what a mapping control would hand back. Proven here so the
-// door exists before anybody builds the control, and so this file keeps no second opinion about
-// which column is which once a person has chosen.
+ok('a description column is carried onto the point',
+	(() => { const r = EC.lpnSurveyParse('P,N,E,Z,D\nA,33.5,-111.8,10,Fire hydrant\n');
+		return r.points[0].desc === 'Fire hydrant'; })());
+// A caller-supplied mapping, which is what the format chooser hands back. Proven here so this file
+// keeps no second opinion about which column is which once a person has chosen.
 ok('a mapping handed in overrides the detection',
 	(() => { const r = EC.lpnSurveyParse('a,b,c\nP1,33.5,-111.8\n',
-		{ mapping: { id: 0, lat: 1, lon: 2, elev: null } });
-		return r.ok && r.points[0].id === 'P1' && r.points[0].lat === 33.5; })());
+		{ mapping: { id: 0, north: 1, east: 2, elev: null, desc: null } });
+		return r.ok && r.points[0].id === 'P1' && r.points[0].north === 33.5; })());
 
 // ================================================================================================
 // 4b. THE SENTENCES, against the language file rather than against English typed here
 // ================================================================================================
 section('4b. what it says');
+// What this project calls its two axes -- the page's own axisNames(), handed in.
+const AX = { north: 'Latitude', east: 'Longitude' };
 ok('the confirm names how many junctions it is about to make',
-	EC.lpnSurveyConfirmText(csv, 'ft').indexOf(PC.lpn_survey_confirm.replace('{n}', 6)) >= 0);
+	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf(PC.lpn_survey_confirm.replace('{n}', 6)) >= 0);
 ok('...and names the mapping, which is the whole column-mapping step',
-	EC.lpnSurveyConfirmText(csv, 'ft').indexOf('Elevation_ft') >= 0 &&
-	EC.lpnSurveyConfirmText(csv, 'ft').indexOf('Latitude') >= 0);
+	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf('Elevation_ft') >= 0 &&
+	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf('Latitude') >= 0);
+ok('...in the words the PROJECT uses for its axes, not in the file\'s',
+	/Northing/.test(EC.lpnSurveyConfirmText(csv, 'ft', { north: 'Northing', east: 'Easting' })));
 ok('...and says that no pipes are drawn',
-	EC.lpnSurveyConfirmText(csv, 'ft').indexOf(PC.lpn_survey_confirm_pipes) >= 0);
+	EC.lpnSurveyConfirmText(csv, 'ft', AX).indexOf(PC.lpn_survey_confirm_pipes) >= 0);
 ok('a clean file is told that it was clean, so silence never means two things',
-	EC.lpnSurveyReportLines(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 })
+	EC.lpnSurveyReportLines(EC.lpnSurveyParse('lat,lon\n33.5,-111.8\n'), { created: 1 }, AX)
 		.indexOf(PC.lpn_survey_report_clean) >= 0);
 ok('a file with a bad row gets the lead-in that says nothing was thrown away',
-	EC.lpnSurveyReportLines(csv, { created: 6 }).indexOf(PC.lpn_survey_report_lead) >= 0);
+	EC.lpnSurveyReportLines(csv, { created: 6 }, AX).indexOf(PC.lpn_survey_report_lead) >= 0);
 ok('...and every note is printed, each with the rows it is about',
-	EC.lpnSurveyReportLines(csv, { created: 6 }).some(t => /PT-6/.test(t)));
+	EC.lpnSurveyReportLines(csv, { created: 6 }, AX).some(t => /PT-6/.test(t)));
 // Two rows that failed the same way in the same WORDS are one line naming both; two that each
 // print their own number are two lines, because the number is the useful half.
 ok('two rows failing identically are ONE line naming both',
 	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,,-111.8\nB,,-111.9\nC,33.5,-111.7\n');
-		return EC.lpnSurveyReportLines(r, { created: 1 }).filter(t => /A, B/.test(t)).length === 1; })());
+		return EC.lpnSurveyReportLines(r, { created: 1 }, AX).filter(t => /A, B/.test(t)).length === 1; })());
 ok('...but two that print their own numbers stay two lines',
-	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,999,-111.8\nB,998,-111.9\nC,33.5,-111.7\n');
-		const lines = EC.lpnSurveyReportLines(r, { created: 1 });
+	(() => { const r = EC.lpnSurveyParse('id,lat,lon\nA,999,-111.8\nB,998,-111.9\nC,33.5,-111.7\n', GEO_LIMITS);
+		const lines = EC.lpnSurveyReportLines(r, { created: 1 }, AX);
 		return lines.some(t => /\(A\)/.test(t)) && lines.some(t => /\(B\)/.test(t)); })());
 
 // ================================================================================================
@@ -269,6 +311,17 @@ ok('a point is at the longitude the file states, read back out of the drawing fr
 	L.lonOf('PT-1') === -111.8314, String(L.lonOf('PT-1')));
 ok('...and at its latitude, within the projection round trip',
 	Math.abs(L.latOf('PT-1') - 33.4153) < 1e-9, String(L.latOf('PT-1')));
+// The surveyor's own note about the point, which is the D of PNEZD and the thing a clerk most wants
+// to keep. Written as a description, which is a field this page already has.
+{
+	alerts = []; confirms = [];
+	L.reset(L.GEO);
+	L.land('P,N,E,Z,D\nA,33.5,-111.8,10,Fire hydrant at Elm and 1st\n', 'd.csv');
+	ok('a description column lands on the junction as its description',
+		L.node('A').desc === 'Fire hydrant at Elm and 1st', String(L.node('A').desc));
+	L.reset(L.GEO);
+	importCsv();
+}
 ok('the elevation came from the file, in the unit the project is showing',
 	L.node('PT-1').elev === 1243.5, String(L.node('PT-1').elev));
 ok('...and the row whose elevation could not be read has none',
@@ -315,13 +368,19 @@ importCsv();
 ok('answering no to the confirm creates nothing at all', L.getDoc().nodes.length === 0);
 confirmAnswer = true;
 
-// **AN XY PROJECT IS REFUSED IN WORDS.** A latitude has no meaning on a grid, and projecting one
-// silently is the defect this refusal exists for.
+// **AN XY PROJECT NOW TAKES THE FILE, and this is the assertion Tom's second instruction is** (he
+// disagreed with the old refusal in terms: *"There is no good reason why the file can't be in any
+// system the user wants."*). All SEVEN rows land, because a grid has no range to be outside of --
+// the row the fixture calls deliberately wrong is only wrong on a georeferenced project.
 L.reset();
 importCsv();
-ok('an XY project refuses the file and says why',
-	L.getDoc().nodes.length === 0 && alerts.length === 1 && alerts[0] === PC.lpn_survey_not_geo,
-	alerts[0]);
+ok('an XY project takes the file rather than refusing it',
+	L.getDoc().nodes.length === 7 && alerts.length === 0, String(L.getDoc().nodes.length));
+ok('...and the columns land on the document axes the right way round: north is y, east is x',
+	L.node('PT-1').x === -111.8314 && L.node('PT-1').y === -33.4153,
+	L.node('PT-1').x + ' / ' + L.node('PT-1').y);
+ok('...and nothing geographic was written to a grid document',
+	L.serialize().nodes.every(n => n._xsrc === undefined && n._ysrc === undefined));
 
 // A name the document already holds cannot be honoured, and is reported rather than repaired by
 // adding a digit to somebody's field-book name.

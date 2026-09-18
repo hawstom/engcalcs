@@ -22674,13 +22674,30 @@ var EngCalcs = EngCalcs || {};
 	// nothing about why.
 	var LPN_SURVEY_ELEV_UNIT = { m: 'mh2o', ft: 'fth2o' };
 	function pickSurveyFile() {
-		var pc = EngCalcs.pageConfig || {};
-		if (!isGeoProject()) {
-			alert(pc.lpn_survey_not_geo || 'A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.');
-			return;
-		}
 		var input = document.getElementById('lpn_survey_file');
 		if (input) { input.click(); }
+	}
+	/**
+	 * **WHAT THE PROJECT CALLS ITS TWO AXES, handed to the reader** -- js/lpn-survey.js reads a pair
+	 * of numbers and has no opinion about what they mean. axisNames() is the page's one opinion
+	 * (Task 674), so this is a hand-over and not a second list.
+	 */
+	function surveyAxes() {
+		var a = axisNames();
+		return { north: a.first, east: a.second };
+	}
+	/**
+	 * **THE BOUND THIS KIND OF PROJECT HAS, or nothing.** Only a georeferenced project has one, and
+	 * it is the Mercator cut-off rather than 90 degrees, because a latitude past it has no finite y
+	 * at all -- the same limit coordValueOk() holds for a typed coordinate, read from the same
+	 * constant so the typed door and the file door cannot come to two answers.
+	 *
+	 * **A PROJECTED OR GRID PROJECT GETS NONE, and that is the whole of what Tom's ruling cost**
+	 * (2026-09-17: *"There is no good reason why the file can't be in any system the user wants."*).
+	 * A northing of 700,000 is an ordinary northing; refusing it was the old rule stated as a number.
+	 */
+	function surveyLimits() {
+		return isGeoProject() ? { north: LPN_MERC_MAX_LAT, east: 180 } : null;
 	}
 	function importSurveyFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
@@ -22693,19 +22710,14 @@ var EngCalcs = EngCalcs || {};
 		reader.readAsText(file);
 	}
 	function landSurveyText(text, fileName) {
-		var pc = EngCalcs.pageConfig || {}, parsed, outcome;
-		// Asked AGAIN here, not only at the picker: reading a file is not instant, and the project
-		// that comes back from the reader is whatever tab is open by then.
-		if (!isGeoProject()) {
-			alert(pc.lpn_survey_not_geo || 'A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.');
-			return;
-		}
-		parsed = EngCalcs.lpnSurveyParse ? EngCalcs.lpnSurveyParse(text) : { ok: false };
-		if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed)); return; }
+		var pc = EngCalcs.pageConfig || {}, axes = surveyAxes(), parsed, outcome;
+		parsed = EngCalcs.lpnSurveyParse
+			? EngCalcs.lpnSurveyParse(text, { limits: surveyLimits() }) : { ok: false };
+		if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		// The confirm NAMES THE MAPPING, which is the whole column-mapping step: the reader sees
-		// which of their own columns became the latitude before a single junction exists, so a
-		// wrong guess of ours costs a Cancel rather than an undo.
-		if (!window.confirm(EngCalcs.lpnSurveyConfirmText(parsed, unitLabel('lpn_u_elevhead')))) {
+		// which of their own columns became which coordinate before a single junction exists, so a
+		// wrong reading of ours costs a Cancel rather than an undo.
+		if (!window.confirm(EngCalcs.lpnSurveyConfirmText(parsed, unitLabel('lpn_u_elevhead'), axes))) {
 			setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
 			return;
 		}
@@ -22732,13 +22744,28 @@ var EngCalcs = EngCalcs || {};
 			// REPORTED rather than done quietly -- and the converted number keeps no token, because
 			// the text no longer says the number.
 			elevSame = !fileUnit || unitKey('lpn_u_elevhead') === fileUnit;
+		var geo = isGeoProject();
 		saveUndoSnapshot();
 		parsed.points.forEach(function (p) {
-			var n = addNode('junction', inwardX(p.lon), inwardY(p.lat)), want = p.id, v;
-			n[LPN_GEO_XSRC] = p.lon;
-			n[LPN_GEO_YSRC] = p.lat;
-			if (p.lonTok) { (n.tok || (n.tok = {})).x = p.lonTok; }
-			if (p.latTok) { (n.tok || (n.tok = {})).y = p.latTok; }
+			// **THE EAST COLUMN IS THE DOCUMENT'S x AND THE NORTH COLUMN IS ITS y, in every kind of
+			// project** -- a longitude on a georeferenced one, an easting on a projected one, a
+			// plain X on a grid. inwardX/inwardY is the one door either number comes through, and it
+			// is the door that knows whether this project projects.
+			var n = addNode('junction', inwardX(p.east), inwardY(p.north)), want = p.id;
+			// **THE SOURCE RECORD IS GEOGRAPHIC ONLY, for the reason setNodeCoordAxis() states**:
+			// these two keys are stripped from the snapshot by unprojectStoredGeo(), which no other
+			// kind of project runs -- so writing one here would put it in the saved file. A grid
+			// document needs none anyway: inwardX/inwardY is a shift by an origin that is zero.
+			if (geo) {
+				n[LPN_GEO_XSRC] = p.east;
+				n[LPN_GEO_YSRC] = p.north;
+			}
+			if (p.eastTok) { (n.tok || (n.tok = {})).x = p.eastTok; }
+			if (p.northTok) { (n.tok || (n.tok = {})).y = p.northTok; }
+			// The surveyor's own note about the point, where the file states one. A description is
+			// identity rather than an overridable property, so it is written to the element -- the
+			// same base-write descField() makes.
+			if (p.desc) { n.desc = p.desc; }   // base-write: a description is identity -- see descField()
 			if (typeof p.elev === 'number') {
 				if (elevSame) {
 					n.elev = p.elev;
@@ -22785,7 +22812,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function showSurveyReport(parsed, outcome, fileName) {
 		var pc = EngCalcs.pageConfig || {},
-			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome);
+			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes());
 		openDialog(function (body) {
 			var h = document.createElement('p');
 			h.style.margin = '0 0 8px';

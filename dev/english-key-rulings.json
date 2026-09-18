@@ -2697,7 +2697,7 @@
             "ruled": "2026-09-17",
             "answer": "Under what condition would we know the units of the file?"
         },
-        "lpn_survey_err_ambiguous_lat": {
+        "lpn_survey_err_ambiguous_coord": {
             "on": "More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
@@ -2717,7 +2717,7 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_err_no_latlon": {
+        "lpn_survey_err_no_coords": {
             "on": "This page could not find a latitude column and a longitude column in that file. Name two of the columns latitude and longitude, in the first row of the file, and try again. The first row reads: {detail}",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
@@ -2767,7 +2767,7 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_note_bad_lat": {
+        "lpn_survey_note_bad_coord": {
             "on": "The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
@@ -2812,7 +2812,7 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_note_lat_missing": {
+        "lpn_survey_note_coord_missing": {
             "on": "The latitude column is empty on this row, so no junction was made for it.",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
