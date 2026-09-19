@@ -95,6 +95,18 @@ of them does the thing the standing ruling says we never do.
 
 ## RULINGS -- permanent
 
+- **THE MAPBOX TOKEN IS URL-RESTRICTED, AND THAT IS WHY SATELLITE NEVER WORKED LOCALLY** (measured
+  2026-09-19, and Tom fixed it the same night by adding the local origins to the token's allowed URL
+  list: *"URL list fixed it."*). **The lesson outlives the fix: a token being PRESENT is not a token
+  being ACCEPTED.** Two rounds were spent saying "the token is present, so that is ruled out" while
+  checking only that the string existed. The measurement that settled it was fetching a real tile
+  with the real token and varying nothing but the `Referer`: `https://hawsedc.com/` 200,
+  `https://librewaternet.org/` 200, and **403 from `hawsedc.local`, `localhost:8094` and
+  `localhost:8096` alike** -- satellite AND Terrain-RGB. Street map is unaffected because
+  OpenStreetMap tiles need no token, which is exactly why the symptom read as "map but not
+  satellite". **A NEW PREVIEW PORT NEEDS A NEW ENTRY IN THAT LIST**, or satellite is dead on it and
+  the page gives no clue why.
+
 - **"Production is not master. Say it again and again."** (2026-09-12)
 - **A branch names its capability, in the singular.** (2026-09-12)
 - **Tom's all-clear is required to merge a `protected` branch. Green is not done.** (2026-09-13)

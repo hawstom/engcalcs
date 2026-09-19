@@ -983,11 +983,13 @@ the block.
     response-time doctrine is explicit that past ten seconds a wait needs one or the reader leaves,
     and this is a DELIBERATE CLICK rather than a page load, which is the more forgiving case
     provided the wait is legible. Buildable now, needing nobody.
-  - **THE THIRD OPTION THE FRAMING MISSED: a connection-aware idle prefetch, on this page only.**
-    `navigator.connection.effectiveType` and `.saveData` let the page ask the visitor's own browser
-    which cost is smaller, and prefetch after idle unless they are on 2G or have data-saver on.
-    **Chromium-only**, so Safari and Firefox get no signal and must fall back to today's behaviour
-    rather than to an unconditional prefetch.
+  - **THE CONNECTION-AWARE IDLE PREFETCH IS DEAD. TOM RULED IT OUT 2026-09-19: *"Connection-aware
+    not needed."*** It was the third option the original framing missed -- `navigator.connection
+    .effectiveType` and `.saveData` letting the page ask the visitor's own browser which cost is
+    smaller, and prefetching after idle unless they are on 2G or have data-saver on. **Recorded so
+    it is not re-proposed**, with the argument that was put to him and that he declined: it is
+    Chromium-only, so it would help exactly the visitors it might also cost the most and only on
+    some browsers. Do not build it.
   - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
     optimisation.
   - **HE ANSWERED 2026-09-08** (numbering it 600, which is the plots task; the words are this one's):
@@ -995,7 +997,15 @@ the block.
     delayed momentarily. Continue working.'"* So the percent-done bullet above is authorized, and
     the sentence he wrote is the sentence to use. **"Continue working" is the load-bearing half** --
     it says the page is not frozen, which is the thing a wait most needs to say and the thing a bare
-    spinner cannot. The `[H]` stands on the connection-aware prefetch, which he has not ruled on.
+    spinner cannot. **HE HAS NOW RULED ON EVERY OPEN QUESTION HERE (2026-09-19), so nothing in this
+    task waits on him**: the banner *"Worked great. Banner can show always"* -- which also settles
+    that it appears on a fast connection, where the fetch used to be silent -- and the prefetch
+    declined above. **What he added is the PROGRESS BAR: *"We must include the unknown in the
+    progress bar. The progress bar can stall at the end if necessary. But it can't disappear
+    prematurely."*** Two unknowns have to ride in it: the unmeasured tail after the last byte (the
+    `import()` and the WASM instantiation, which report nothing), and an unknown TOTAL on a gzipped
+    or length-less reply. **The bar reaching its end must mean the solver is READY, never that the
+    bytes arrived**, and he has authorized a stall at the end as the price of that.
 
 - 75|617| **More map view options, the opacity one having shipped.**
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
