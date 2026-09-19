@@ -10622,10 +10622,20 @@ var EngCalcs = EngCalcs || {};
 		// were appended earlier, so they sit UNDER the new ones and are covered tile by tile as
 		// each arrives. This is what every map does, and it costs one extra generation of
 		// elements -- bounded, because only ONE generation is ever carried.
-		var carried = {};
+		// **NEVER ACROSS A CHANGE OF SOURCE, and that is a licence rule rather than a nicety.**
+		// The credit swaps with the style, so an OpenStreetMap tile left under the Mapbox credit
+		// while the satellite photographs load would be crediting the wrong provider -- the exact
+		// failure the key's own style prefix was introduced to stop. A source change therefore
+		// blanks, as it always did; only a zoom or a pan carries. Caught by
+		// dev/lpn-spike/basemap-credit-harness.js the first time this shipped without the test.
+		var style = basemapStyle(), carried = {};
 		for (k in basemapEls) {
 			if (basemapEls.hasOwnProperty(k) && !want[k]) {
-				carried[k] = basemapEls[k];
+				if (k.slice(0, style.length + 1) === style + '/') {
+					carried[k] = basemapEls[k];
+				} else if (basemapEls[k].remove) {
+					basemapEls[k].remove();
+				}
 				delete basemapEls[k];
 			}
 		}
