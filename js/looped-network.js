@@ -43108,6 +43108,45 @@ var EngCalcs = EngCalcs || {};
 	// Waiting for the debounced solve to trigger the load is not enough: the gap between choosing a
 	// valve type and the solve firing is exactly where a phone drops its connection.
 	var epanetWarmState = 'cold';   // cold | warming | ready | unavailable
+	// **HOW FAR THE 664 KB HAS GOT** (Task 608, the percent-done half; Tom, 2026-09-08: *"I am also
+	// open to putting up a banner 'Loading solver. Results delayed momentarily. Continue working.'"*).
+	// Nielsen's response-time doctrine is that past ten seconds a wait needs a progress indicator or
+	// the reader leaves, and this file floors at roughly 7 s on 3G and 21 s on 2G before handshake.
+	//
+	// `epanetWarmTotal` is 0 when the transfer did not state a size, and the banner then says how
+	// many kilobytes have arrived instead of inventing a fraction of a number nobody has. See
+	// watchFetch() in js/lpn-epanet.js for why a total can be missing.
+	//
+	// `epanetWarmPct` is the last WHOLE percent put on screen, and it exists only so that a hundred
+	// chunks do not each repaint the banner. -1 means nothing has been drawn for this fetch yet.
+	var epanetWarmLoaded = 0, epanetWarmTotal = 0, epanetWarmPct = -1;
+	function onEpanetProgress(p) {
+		var pct;
+		epanetWarmLoaded = (p && p.loaded) || 0;
+		epanetWarmTotal = (p && p.total) || 0;
+		// Clamped, because a wrongly stated length must not print 140%. A total that cannot be
+		// trusted is still better read as "nearly there" than as arithmetic nobody believes.
+		pct = epanetWarmTotal > 0 ? Math.min(100, Math.floor(epanetWarmLoaded * 100 / epanetWarmTotal)) : -1;
+		if (epanetWarmTotal > 0 && pct === epanetWarmPct) { return; }
+		epanetWarmPct = pct;
+		refreshEpanetBanner();
+	}
+	// The one sentence the banner adds to say HOW FAR ALONG the wait is, or '' when there is nothing
+	// honest to say yet. Two whole sentences, never a fragment assembled at render time: a language
+	// that puts the number elsewhere in the clause can do so.
+	function epanetProgressText() {
+		var pc = EngCalcs.pageConfig || {};
+		if (epanetWarmState !== 'warming') { return ''; }
+		if (epanetWarmTotal > 0) {
+			return (pc.lpn_engine_wait_pct || 'Solver {percent}% loaded.')
+				.replace('{percent}', String(Math.max(0, epanetWarmPct)));
+		}
+		if (epanetWarmLoaded > 0) {
+			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.')
+				.replace('{kb}', String(Math.round(epanetWarmLoaded / 1024)));
+		}
+		return '';
+	}
 	// `why` is 'valve', 'engine' or 'background'. THE SAME FETCH HAS THREE REASONS and one message
 	// cannot be true of all of them: Tom turned the solver on and was told about valves he had not
 	// created (2026-08-14).
@@ -43129,9 +43168,12 @@ var EngCalcs = EngCalcs || {};
 		// see maybeWarmEpanetInBackground(), which refuses to start from any state but 'cold'.
 		if (epanetWarmState === 'warming' || epanetWarmState === 'ready') { return; }
 		epanetWarmState = 'warming';
+		epanetWarmLoaded = 0;
+		epanetWarmTotal = 0;
+		epanetWarmPct = -1;
 		if (!quiet) { setNotice(pc['lpn_engine_fetching' + suffix] || 'Getting the EPANET solver.'); }
 		refreshEpanetBanner();
-		EngCalcs.lpnEpanetLoad().then(function () {
+		EngCalcs.lpnEpanetLoad(null, onEpanetProgress).then(function () {
 			epanetWarmState = 'ready';
 			if (!quiet) { setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.'); }
 			refreshEpanetBanner();
@@ -43200,6 +43242,22 @@ var EngCalcs = EngCalcs || {};
 			pc = EngCalcs.pageConfig || {},
 			text = '';
 		if (!el) { return; }
+		// **THE ORDINARY NETWORK'S WAIT IS A WAIT TOO, AND IT IS THE ONE TOM WROTE THE SENTENCE
+		// FOR** (Task 608). Task 605 made EPANET the page default, so a first-time visitor drawing
+		// plain pipes and junctions now waits for 664 KB at their first solve. The test is not
+		// "did a fetch start" -- section 2 of dev/lpn-spike/engine-prefetch-harness.js is right
+		// that a background fetch nobody is waiting on says nothing -- it is **whether results are
+		// actually delayed**, which is true exactly when the engine the network will be solved BY
+		// is the one still arriving. With the built-in solver chosen, answers are already on
+		// screen and there is nothing to report.
+		//
+		// "Continue working" is the load-bearing half of his sentence: it says the page is not
+		// frozen, which is the thing a bare spinner cannot say. Keeping that true is the whole
+		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
+		// anything modal.
+		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
+			text = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
+		}
 		if (networkNeedsEpanet()) {
 			if (epanetWarmState === 'warming') {
 				text = pc.lpn_engine_needed_loading || 'Loading EPANET solver while you build. Results will be available when completely loaded.';
@@ -43209,6 +43267,10 @@ var EngCalcs = EngCalcs || {};
 				// no reason given.
 				text = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 			}
+		}
+		if (text && epanetWarmState === 'warming') {
+			var prog = epanetProgressText();
+			if (prog) { text += ' ' + prog; }
 		}
 		el.textContent = text;
 		el.style.display = text ? 'block' : 'none';

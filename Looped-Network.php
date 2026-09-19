@@ -1991,6 +1991,9 @@ EngCalcs.pageConfig = {
         // fetch is entitled to report, because without the engine this network has no answers. ?>
 	lpn_engine_needed_loading: <?=json_encode($ec_lang['lpn_engine_needed_loading'])?>,
 	lpn_engine_needed_failed: <?=json_encode($ec_lang['lpn_engine_needed_failed'])?>,
+	lpn_engine_wait: <?=json_encode($ec_lang['lpn_engine_wait'])?>,
+	lpn_engine_wait_pct: <?=json_encode($ec_lang['lpn_engine_wait_pct'])?>,
+	lpn_engine_wait_bytes: <?=json_encode($ec_lang['lpn_engine_wait_bytes'])?>,
 	lpn_diag_valve_needs_epanet: <?=json_encode($ec_lang['lpn_diag_valve_needs_epanet'])?>,
 	lpn_diag_valve_on_fixed_head: <?=json_encode($ec_lang['lpn_diag_valve_on_fixed_head'])?>,
 	lpn_settings_default_is: <?=json_encode($ec_lang['lpn_settings_default_is'])?>,

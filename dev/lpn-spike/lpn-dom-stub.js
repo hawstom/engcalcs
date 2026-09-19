@@ -999,7 +999,9 @@ require(ROOT + 'js/lpn-inp.js');
 const NODE_ENGINE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 {
 	const browserLoad = global.EngCalcs.lpnEpanetLoad;
-	global.EngCalcs.lpnEpanetLoad = function (url) { return browserLoad(url || NODE_ENGINE_URL); };
+	// The second argument is the Task 608 progress callback and is forwarded rather than dropped:
+	// a wrapper that swallowed it would make the percent-done indicator untestable through the page.
+	global.EngCalcs.lpnEpanetLoad = function (url, onProgress) { return browserLoad(url || NODE_ENGINE_URL, onProgress); };
 }
 // A COUNTER AND A SETTLE POINT, because the engine is asynchronous and the page is not.
 // runSolveEpanet() hands the result back through a promise the caller cannot see, so a harness

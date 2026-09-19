@@ -872,9 +872,63 @@
 	// would, so caching its failure would be a permanent penalty for being briefly offline.
 	var enginePromise = null;
 
-	EngCalcs.lpnEpanetLoad = function (url) {
+	/**
+	 * **WATCHING THE 664 KB ARRIVE, SO THE WAIT CAN BE SAID OUT LOUD** (ROADMAP Task 608).
+	 *
+	 * A dynamic `import()` reports nothing on its way: it either resolves or it does not, and at
+	 * 7 s on 3G and 21 s on 2G that is the wait Nielsen's doctrine says a reader abandons. So when
+	 * a caller hands in a progress callback, the same URL is FETCHED first and read a chunk at a
+	 * time for the count, and the `import()` that follows is then served from the browser's own
+	 * HTTP cache rather than off the wire again.
+	 *
+	 * **THAT CACHE IS THE ASSUMPTION, AND IT IS STATED RATHER THAN HIDDEN.** js/vendor/epanet-js.js
+	 * is an ordinary static file with a Last-Modified far in the past and no `Cache-Control`, so
+	 * heuristic freshness covers the microseconds between the two, and the worst realistic outcome
+	 * is a 304 rather than a second download. A response served `no-store` would be fetched twice,
+	 * which is why the progress pass is OPT-IN per call and not the default.
+	 *
+	 * **A BLOB URL WAS THE OBVIOUS FIX AND IS IMPOSSIBLE HERE**: the vendored module opens with a
+	 * static `import ... from "./slim/index.js"`, and a relative specifier has no base to resolve
+	 * against inside a `blob:` module.
+	 *
+	 * The progress pass NEVER REJECTS. Whatever goes wrong in it -- no `fetch`, no streaming body,
+	 * a refused request -- it resolves quietly and lets `import()` be the one that decides whether
+	 * the engine can be had, exactly as it did before this existed.
+	 *
+	 * `onProgress({loaded, total})` is called with `total` 0 when the transfer does not state one.
+	 * **Do not invent a percentage from a guess at the size**: a bar that reaches 90% and stops is
+	 * worse than a byte count that keeps moving. The caller is the one that decides what to say.
+	 */
+	function watchFetch(href, onProgress) {
+		if (typeof onProgress !== 'function' || typeof fetch !== 'function') { return Promise.resolve(); }
+		return fetch(href, { credentials: 'same-origin' }).then(function (res) {
+			if (!res.ok || !res.body || typeof res.body.getReader !== 'function') { return null; }
+			// **A GZIPPED RESPONSE COUNTS TWO DIFFERENT THINGS.** Content-Length is then the
+			// ENCODED length while the reader hands back DECODED bytes, so the ratio runs well
+			// past 100%. This host does not compress .js today; a host that did would otherwise
+			// produce a confidently wrong number, so an encoded response reports no total at all.
+			var enc = res.headers.get('content-encoding'),
+				total = enc ? 0 : (Number(res.headers.get('content-length')) || 0),
+				reader = res.body.getReader(),
+				got = 0;
+			onProgress({ loaded: 0, total: total });
+			return (function pump() {
+				return reader.read().then(function (r) {
+					if (r.done) { return null; }
+					got += (r.value && r.value.length) || 0;
+					onProgress({ loaded: got, total: total });
+					return pump();
+				});
+			})();
+		}).catch(function () { return null; });
+	}
+
+	EngCalcs.lpnEpanetLoad = function (url, onProgress) {
 		if (enginePromise === null) {
-			enginePromise = import(url || '/engcalcs/js/vendor/epanet-js.js').catch(function (err) {
+			var href = url || '/engcalcs/js/vendor/epanet-js.js';
+			enginePromise = watchFetch(href, onProgress).then(function () {
+				return import(href);
+			}).catch(function (err) {
 				enginePromise = null;   // let the next caller try again
 				throw err;
 			});
