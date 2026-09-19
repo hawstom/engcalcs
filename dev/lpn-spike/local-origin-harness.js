@@ -345,7 +345,7 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR viewLonLat()** (Task 692), which is where on the Earth the middle of
 	// the camera is. It is nodeLonLat() asked of the view rather than of an element, and it crosses
 	// the boundary the same way: outwardX/outwardY on the view centre, then the projection's own
-	// inverse. It exists because the audit of every isGeoProject() reader turned up one -- the New
+	// inverse. It exists because the audit of every isLatLonProject() reader turned up one -- the New
 	// project box's place pre-fill -- that asked "are these numbers a longitude and a latitude"
 	// where it meant "can this project say where on the Earth it is". Both call sites are inside
 	// the one function, which is the point: the question is asked once. **NET ONE EACH, NOT TWO**:
@@ -389,7 +389,7 @@ console.log('\n--- one home for the concept ---');
 	// point and then bringing it into the local frame like any other outside number. Widening
 	// that door is what put Map > Go to and Map > Search place name back on a projected project
 	// (Tom, 2026-09-14: *"I don't think it's necessary or intentional"* -- it was not; the rows
-	// were written `isGeoProject()` before there was a transform).
+	// were written `isLatLonProject()` before there was a transform).
 	// **AND ONE MORE EACH COMING BACK** (Task 668): georefWriteOffsets() maps the captured base and
 	// tip through the transform and differences them, and both halves come home through the one
 	// door, exactly as georefWrite() itself does for a position.

@@ -3199,17 +3199,28 @@ var EngCalcs = EngCalcs || {};
 	 * and nowhere else), for how a coordinate is written and bounded, and for the `_xsrc`/`_ysrc`
 	 * round-trip record. It is the WRONG question for anything that reaches outside the drawing.
 	 *
+	 * **THE NAME SAYS LAT/LON OUT LOUD BECAUSE ITS OLD ONE DID NOT** (Tom, 2026-09-18:
+	 * *"isGeoProject reads like 'is this on the map': Rename it."*). It was `isGeoProject()`, which
+	 * reads as "is this project on the map", and five separate people reached for it meaning
+	 * exactly that. `isLatLonProject` keeps the shape of its neighbour isProjectedProject() -- the
+	 * two are read side by side and one is written in terms of the other -- while naming the
+	 * answer it actually gives. Do not rename it back to anything that answers a question in
+	 * general: the value of this name is that it is too specific to borrow.
+	 *
 	 * **"CAN THIS PROJECT SAY WHERE ON THE EARTH A POINT OF IT IS" IS projectLocatable(), AND
-	 * PICKING THE WRONG ONE HAS NOW COST THREE DEFECTS IN THE SAME FAMILY.** The elevation
+	 * PICKING THE WRONG ONE HAS NOW COST FIVE DEFECTS IN THE SAME FAMILY** -- Read DEM dead on a
+	 * projected project, the satellite row hidden, the street-map row hidden, "Go to a latitude and
+	 * longitude" offered and dead, and the New-project coordinate-system chooser opening on the
+	 * whole world's list when the project already knew the town. The elevation
 	 * controls asked this one and were widened on 2026-09-14; the satellite and street-map rows,
 	 * the corner teaser and goToLatLon() were left behind and were found by Tom on 2026-09-18
 	 * (*"Satellite view is only available for lat/lon CRS."*) -- a row offered and dead, which is
 	 * exactly what the elevation buttons had been four days earlier. A projected project with a
-	 * transform knows perfectly well where it is. **So before writing isGeoProject() in a new
+	 * transform knows perfectly well where it is. **So before writing isLatLonProject() in a new
 	 * gate, ask which of the two you mean**; dev/lpn-spike/projected-basemap-harness.js section
 	 * 13 holds the outward-facing ones.
 	 */
-	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
+	function isLatLonProject() { return !!project && project.coords === LPN_COORDS_GEO; }
 
 	// ---- A PROJECT'S DECLARED COORDINATE REFERENCE SYSTEM (ROADMAP Task 641) ---------------------
 	//
@@ -3238,7 +3249,7 @@ var EngCalcs = EngCalcs || {};
 	// than deleted because it was read as the rule for a month after it lapsed, and each outward
 	// feature was then widened separately: the basemap painter, then the elevation controls, then
 	// (2026-09-18, Task 692) the satellite row, the street-map row, the corner teaser and Go to.
-	// **The question every one of them asks is projectLocatable(), not isGeoProject()** -- see the
+	// **The question every one of them asks is projectLocatable(), not isLatLonProject()** -- see the
 	// note on that predicate. **Nothing here claims anything about the accuracy of a length**; that
 	// claim waits on Task 643, and so does the point scale factor of ruling P7.
 	//
@@ -3253,7 +3264,7 @@ var EngCalcs = EngCalcs || {};
 
 	// **EPSG:3857 IS THE GEOGRAPHIC ANSWER AND IS NEVER STORED AS `project.crs`.** It names the
 	// drawing frame of a lon/lat document, and a document that stated it as a projected plane would
-	// be claiming its numbers are metres. isGeoProject() is the one thing that answers "is this
+	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
 	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
 	var LPN_CRS_WEBMERC = 'EPSG:3857';
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
@@ -3523,13 +3534,13 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function projectCrsCode() { return (project && project.crs) ? String(project.crs) : ''; }
-	function isProjectedProject() { return !isGeoProject() && !!projectCrsCode(); }
+	function isProjectedProject() { return !isLatLonProject() && !!projectCrsCode(); }
 	// THE ONLY WRITER. Refuses a project that already declares one, refuses a lat/lon project (which
 	// IS its own coordinate system), and refuses one with anything drawn in it -- because at that
 	// point there are numbers on the page whose meaning the answer would change.
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
-		if (isGeoProject()) { return false; }
+		if (isLatLonProject()) { return false; }
 		// **EPSG:3857 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
 		// lon/lat project, and newProject() takes that branch; if it ever reached here it would
 		// write a document claiming its longitudes were metres.
@@ -3555,7 +3566,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
-		if (isGeoProject()) {
+		if (isLatLonProject()) {
 			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
 		}
 		code = projectCrsCode();
@@ -3568,7 +3579,7 @@ var EngCalcs = EngCalcs || {};
 	// is not one -- on the unprojected grid x really is first, and there is nothing to reverse.
 	function axisNames() {
 		var pc = EngCalcs.pageConfig || {};
-		if (isGeoProject()) {
+		if (isLatLonProject()) {
 			return { first: pc.lpn_field_lat || 'Latitude', second: pc.lpn_field_lon || 'Longitude' };
 		}
 		if (isProjectedProject()) {
@@ -3591,7 +3602,7 @@ var EngCalcs = EngCalcs || {};
 		// cannot come to spell the same axis two ways.
 		return { first: pc.lpn_field_x || 'X', second: pc.lpn_field_y || 'Y' };
 	}
-	function readsNorthFirst() { return isGeoProject() || isProjectedProject(); }
+	function readsNorthFirst() { return isLatLonProject() || isProjectedProject(); }
 	// **WHICH DOCUMENT AXIS THE FIRST-READ FIELD IS.** The pair is read north first wherever there
 	// is a north (readsNorthFirst()), so slot 1 is the document's y there and its x on a grid --
 	// the same fork coordReadoutAt() makes, asked once so an entry site and a display site cannot
@@ -3692,7 +3703,7 @@ var EngCalcs = EngCalcs || {};
 	// for one.
 	function coordValueOk(isY, v) {
 		if (typeof v !== 'number' || !isFinite(v)) { return false; }
-		if (!isGeoProject()) { return true; }
+		if (!isLatLonProject()) { return true; }
 		return isY ? Math.abs(v) <= LPN_MERC_MAX_LAT : Math.abs(v) <= 180;
 	}
 	/**
@@ -3746,7 +3757,7 @@ var EngCalcs = EngCalcs || {};
 		// (Task 674). The override IS the typed characters, so it needs no source of its own; and
 		// Base's coordinate has not moved, so Base's `_xsrc`/`_ysrc` is still true. Writing one here
 		// from inside a scenario would file a source record for a number the element does not hold.
-		if (isGeoProject() && inBaseScenario()) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
+		if (isLatLonProject() && inBaseScenario()) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
 		updateNode(n.id);
 		// Every other label on the map is an obstacle to this node's, and the node has just moved --
 		// the same call every node drag ends in.
@@ -3765,7 +3776,7 @@ var EngCalcs = EngCalcs || {};
 	function coordReadoutBlank() { return coordReadout('--', '--'); }
 	// The readout is rewritten when the KIND changes, and two UTM zones are two kinds: a northing
 	// read under the wrong zone is the silent error this whole feature exists to stop.
-	function coordKind() { return isGeoProject() ? 'geo' : (projectCrsCode() || 'xy'); }
+	function coordKind() { return isLatLonProject() ? 'geo' : (projectCrsCode() || 'xy'); }
 	// x is a LONGITUDE and y is a LATITUDE, in that order -- this page's own x/y order, and the
 	// opposite of the "lat, long" a person says out loud.
 	//
@@ -3800,7 +3811,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
-	function coordText(v) { return isGeoProject() ? v.toFixed(6) : v.toFixed(2); }
+	function coordText(v) { return isLatLonProject() ? v.toFixed(6) : v.toFixed(2); }
 	function baseScenario() {
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].isBase) { return scenarios[i]; } }
 		return scenarios[0];
@@ -5337,11 +5348,11 @@ var EngCalcs = EngCalcs || {};
 	function outwardX(x) { return x + docOrigin().x; }
 	function outwardY(y) {
 		var c = cartesianY(y) + docOrigin().y;
-		return isGeoProject() ? Geom.mercLat(c) : c;
+		return isLatLonProject() ? Geom.mercLat(c) : c;
 	}
 	function inwardX(x) { return x - docOrigin().x; }
 	function inwardY(y) {
-		return cartesianY((isGeoProject() ? Geom.mercY(y) : y) - docOrigin().y);
+		return cartesianY((isLatLonProject() ? Geom.mercY(y) : y) - docOrigin().y);
 	}
 	// ---- THE PROJECTION SEAM (ROADMAP Task 145) -------------------------------------------------
 	//
@@ -5471,7 +5482,7 @@ var EngCalcs = EngCalcs || {};
 	function scaleBarUnitsPerPx() {
 		var probe = 100, a, b, metres;
 		if (!svg || !state.s || !isFinite(state.s) || state.s <= 0) { return null; }
-		if (!isGeoProject()) {
+		if (!isLatLonProject()) {
 			// A grid project's world unit IS the display length unit, so there is nothing to ask.
 			return 1 / state.s;
 		}
@@ -6207,7 +6218,7 @@ var EngCalcs = EngCalcs || {};
 
 	function linkGeomLength(l) {
 		var pts = linkPointList(l);
-		if (!isGeoProject()) { return Geom.polylineLength(pts); }
+		if (!isLatLonProject()) { return Geom.polylineLength(pts); }
 		return Geom.geodesicPolylineMeters(pts.map(function (p) {
 			return { x: outwardX(p.x), y: outwardY(p.y) };
 		})) * unitFactor('lpn_u_length');
@@ -8915,7 +8926,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **THIS IS A FRAME MISMATCH, NOT A CORRUPT NUMBER.** `defaultViewForCoords()` answers
 	// `{cx: w/2, cy: h/2, s: 1}` in PIXELS, which is right for an XY grid and meaningless in
-	// degrees; it takes that branch whenever `isGeoProject()` is false, and `project` still
+	// degrees; it takes that branch whenever `isLatLonProject()` is false, and `project` still
 	// describes the OUTGOING project while a geographic one is arriving. Tom's Net3-Novato came
 	// back from storage centred on (958, 4999) -- exactly half his canvas in each axis -- with the
 	// scale clamped up to minScale(), the whole-world floor. 677 symbols drew at 1 x 0 px, 26,000
@@ -8937,7 +8948,7 @@ var EngCalcs = EngCalcs || {};
 	// (cx = w/2 and cy = h/2 from the same line), so longitude sees every case of it. Tom's was
 	// 835 degrees east.
 	function viewIsReachable(v, sc, w, h) {
-		if (!isGeoProject() || !isFinite(sc) || sc <= 0) { return true; }
+		if (!isLatLonProject() || !isFinite(sc) || sc <= 0) { return true; }
 		return Math.abs(outwardX(v.cx)) - 180 <= (w / 2) / sc;
 	}
 	// **A STORED VIEW IS CHECKED AGAINST THE MODEL IT HAS TO SHOW, ON THE WAY IN** (ROADMAP Task
@@ -9001,7 +9012,7 @@ var EngCalcs = EngCalcs || {};
 	function viewShowsModel(v) {
 		var ext, sc, w, h, halfW, halfH;
 		if (!validView(v)) { return false; }
-		if (isGeoProject() && (Math.abs(outwardX(v.cx)) > 180 ||
+		if (isLatLonProject() && (Math.abs(outwardX(v.cx)) > 180 ||
 			Math.abs(outwardY(v.cy)) > LPN_MERC_MAX_LAT)) { return false; }
 		ext = modelExtent();
 		// Nothing to show, so nothing this can be wrong about. An empty document's view is its
@@ -9064,7 +9075,7 @@ var EngCalcs = EngCalcs || {};
 	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
 	// index and never reaches a file, so no stored document learns a field.
 	var tabViews = {}, pendingView = null, pendingViewFor = null;
-	function viewFrame() { return isGeoProject() ? 'geo' : 'grid'; }
+	function viewFrame() { return isLatLonProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
 		if (v && library.openId) { v.frame = viewFrame(); tabViews[library.openId] = v; }
@@ -9127,7 +9138,7 @@ var EngCalcs = EngCalcs || {};
 	// drawn immediately re-frames it anyway, because `zoomExtent()` takes over as soon as there is
 	// content.
 	function defaultViewForCoords() {
-		if (isGeoProject()) { return geoHomeView(); }
+		if (isLatLonProject()) { return geoHomeView(); }
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		if (!w || !h) { return null; }
@@ -9376,13 +9387,13 @@ var EngCalcs = EngCalcs || {};
 	 * elevations. A geographic project always could -- its coordinates ARE the answer. A projected
 	 * one can since Task 641 phase 5, for the 98% of the register with a transform.
 	 *
-	 * **IT IS ONE PREDICATE BECAUSE IT WAS FOUR COPIES OF `isGeoProject() && mapboxToken()` AND
+	 * **IT IS ONE PREDICATE BECAUSE IT WAS FOUR COPIES OF `isLatLonProject() && mapboxToken()` AND
 	 * THEY DID NOT MOVE TOGETHER.** The basemap was widened on 2026-09-14 and the elevation
 	 * buttons were not, so a new projected project drew the world map and then refused to read
 	 * heights off it -- Tom, the same day: *"A new project with a projection doesn't offer the DEM
 	 * elevation buttons."* Both are the same question and now they ask it once.
 	 */
-	function projectLocatable() { return isGeoProject() || projectedBasemapOk(); }
+	function projectLocatable() { return isLatLonProject() || projectedBasemapOk(); }
 	function basemapOn() { return projectLocatable() && project.basemap !== 'off'; }
 	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
 	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
@@ -10177,7 +10188,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function minScale() {
 		var w = (svg && svg.clientWidth) || 1000;
-		if (isGeoProject()) { return Math.max(MIN_SCALE_GRID, w / 360); }
+		if (isLatLonProject()) { return Math.max(MIN_SCALE_GRID, w / 360); }
 		if (isProjectedProject()) {
 			var per = planeUnitsPerMetre();
 			if (per > 0) { return Math.min(MIN_SCALE_GRID, w / (LPN_PLANE_SPAN_M * per)); }
@@ -10186,7 +10197,7 @@ var EngCalcs = EngCalcs || {};
 		if (span > 0) { return Math.min(MIN_SCALE_GRID, LPN_VIEW_MIN_MODEL_PX / span); }
 		return MIN_SCALE_GRID;
 	}
-	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
+	function maxScale() { return isLatLonProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
 	var drag = null;
 	// **THE ONE PLACE THE PANNING CLASS IS WRITTEN** (Task 569). It exists so a moving-state cursor
@@ -10971,7 +10982,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		// **THE GATE IS THE MENU ROW'S OWN.** The row is hidden on a project that cannot say where
 		// on the Earth it is, and this asks the same question rather than a narrower one: it read
-		// isGeoProject() while the row read projectLocatable(), so on a projected project the row
+		// isLatLonProject() while the row read projectLocatable(), so on a projected project the row
 		// was offered and the press did nothing at all. goToPoint() below travels through the
 		// transform, so there is nothing here a projected project cannot do.
 		if (!projectLocatable()) { return; }
@@ -11142,7 +11153,7 @@ var EngCalcs = EngCalcs || {};
 		// The position the SCENARIO shows, so a node moved in a scenario samples the ground it is
 		// standing on there rather than the ground Base left it on (Task 674).
 		var x = effective(n, 'x'), y = effective(n, 'y');
-		if (isGeoProject()) { return { lon: x, lat: y }; }
+		if (isLatLonProject()) { return { lon: x, lat: y }; }
 		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
 		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
 	}
@@ -11160,7 +11171,7 @@ var EngCalcs = EngCalcs || {};
 	function viewLonLat(v) {
 		var ll;
 		if (!v || !projectLocatable()) { return null; }
-		if (isGeoProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+		if (isLatLonProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
 		if (!EngCalcs.lpnCrsInverse) { return null; }
 		ll = EngCalcs.lpnCrsInverse(projectCrsCode(), { x: outwardX(v.cx), y: outwardY(v.cy) });
 		return ll ? { lat: ll.lat, lon: ll.lon, extent: null } : null;
@@ -11484,7 +11495,7 @@ var EngCalcs = EngCalcs || {};
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
-		if (isGeoProject()) {
+		if (isLatLonProject()) {
 			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
 			return;
 		}
@@ -20264,7 +20275,7 @@ var EngCalcs = EngCalcs || {};
 	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
 	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
 	function rebaseLiveGeoDoc() {
-		if (!isGeoProject()) { return null; }
+		if (!isLatLonProject()) { return null; }
 		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
 		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
 		// boundary between the drawing frame and the world, and local-origin-harness.js counts
@@ -20535,7 +20546,7 @@ var EngCalcs = EngCalcs || {};
 			// which is what keeps "an untouched coordinate leaves as the bytes it arrived as" true
 			// rather than nearly true. The file then states origin {0, 0}, which is what a
 			// geographic file has always stated.
-			if (!isGeoProject()) { return snap; }
+			if (!isLatLonProject()) { return snap; }
 			// The origin comes off INSIDE unprojectStoredGeo(), per coordinate, because whether a
 			// number can be handed back verbatim is decided against the shifted value. A separate
 			// add-back pass before it would destroy every source's equality test.
@@ -21321,7 +21332,7 @@ var EngCalcs = EngCalcs || {};
 		// double the memory and create a second thing to keep in step.
 		// Longitude/latitude in, Web Mercator out (Task 145's projection seam). BEFORE the flip,
 		// because the projection is defined on the file's Cartesian frame, and read off `saved`
-		// rather than isGeoProject() because `project` is not assigned until a few lines below.
+		// rather than isLatLonProject() because `project` is not assigned until a few lines below.
 		if (saved.v >= LPN_CARTESIAN_VERSION &&
 			saved.project && saved.project.coords === LPN_COORDS_GEO) {
 			projectStoredGeo(saved);
@@ -21394,7 +21405,7 @@ var EngCalcs = EngCalcs || {};
 		// **AND A VIEW THAT CANNOT SHOW THIS MODEL IS DECLINED HERE** (Task 628, see
 		// viewShowsModel()), which hands the document the same fit. This is the whole document's
 		// one door, and by this line everything the test needs is installed and in the drawing
-		// frame: doc.nodes, doc.links, doc.origin, and `project`, so isGeoProject() answers for the
+		// frame: doc.nodes, doc.links, doc.origin, and `project`, so isLatLonProject() answers for the
 		// document ARRIVING rather than the one leaving. `saved.view` is in that frame too -- the
 		// projection, the rebase and the flip above all carry it.
 		pendingView = viewShowsModel(saved.view) ? saved.view : null;
@@ -23257,7 +23268,7 @@ var EngCalcs = EngCalcs || {};
 	 * A northing of 700,000 is an ordinary northing; refusing it was the old rule stated as a number.
 	 */
 	function surveyLimits() {
-		return isGeoProject() ? { north: LPN_MERC_MAX_LAT, east: 180 } : null;
+		return isLatLonProject() ? { north: LPN_MERC_MAX_LAT, east: 180 } : null;
 	}
 	function importSurveyFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
@@ -23464,7 +23475,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function createSurveyNodes(parsed, assetType) {
 		var notes = [], created = 0, elevFromFile = 0;
-		var geo = isGeoProject();
+		var geo = isLatLonProject();
 		var type = LPN_SURVEY_TYPES.indexOf(assetType) >= 0 ? assetType : 'junction';
 		saveUndoSnapshot();
 		parsed.points.forEach(function (p) {
@@ -26340,7 +26351,7 @@ var EngCalcs = EngCalcs || {};
 		//
 		// **THIS USED TO SAY A PROJECTED PROJECT'S VIEW COULD NOT BE READ, "the transform this
 		// page does not have"** -- true when it was written and false since Task 641 phase 5 gave
-		// the page js/lpn-crs.js. It was the last reader of isGeoProject() that meant
+		// the page js/lpn-crs.js. It was the last reader of isLatLonProject() that meant
 		// projectLocatable(), found by auditing all of them on 2026-09-18 (Task 692) after the
 		// same word had been the defect three times. It costs no dead control, only a New project
 		// box that opened on the whole register while the project behind it knew the town.
@@ -26897,7 +26908,7 @@ var EngCalcs = EngCalcs || {};
 			// x/y are canvas units with no place on the Earth, so travelling to a latitude means
 			// nothing there. **A PROJECTED PROJECT IS NOT IN THAT CASE ANY MORE** (Tom,
 			// 2026-09-14: *"A projected project ... removes Map, Go to, and removes Map, Search
-			// place name. Is this intentional?"* -- it was not; it was `isGeoProject()` written
+			// place name. Is this intentional?"* -- it was not; it was `isLatLonProject()` written
 			// before there was a transform, and the answer to a typed latitude is now one forward
 			// projection away). The label states what the row will DO, because this menu has no
 			// checkmark column.
@@ -39574,7 +39585,7 @@ var EngCalcs = EngCalcs || {};
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
-		// ask isGeoProject(), and minScale()/maxScale() do too, so a document restored under the
+		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.
 		var coordsChanged = snap.coords !== project.coords;
 		project.coords = snap.coords;

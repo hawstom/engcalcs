@@ -37,7 +37,7 @@ const L = loadLoopedNetwork(
 	"\t\tstyle: basemapStyle, setStyle: setBasemapStyle, satAvailable: satelliteAvailable,\n" +
 	// Task 452's corner teaser: the same two predicates and the same seam as the View row.
 	"\t\trefreshTeaser: refreshBasemapTeaser, wireTeaser: wireBasemapTeaser,\n" +
-	"\t\tisGeo: isGeoProject,\n" +
+	"\t\tisGeo: isLatLonProject,\n" +
 	"\t\ttileUrl: function () { return tileSource().url(); },\n" +
 	"\t\tbasemapOn: basemapOn, setBasemapOn: setBasemapOn,\n" +
 	"\t\trefresh: refreshBasemap, layer: function () { return basemapLayer; },\n" +
@@ -354,7 +354,7 @@ ok('turning it back on says so on the project', L.getProject().basemap === 'osm'
 // little 'satellite' teaser tile/button in the corner of the map like at Google Maps?"*
 //
 // There WAS a way -- Map > Show satellite images -- and reading openMapMenu() says exactly why he
-// could not find it: the row carries `hidden: !isGeoProject() || !satelliteAvailable()`, so on a
+// could not find it: the row carries `hidden: !isLatLonProject() || !satelliteAvailable()`, so on a
 // grid project it is not in the menu at all. The teaser must therefore appear on EXACTLY that
 // condition and no other, or the corner and the menu come to disagree about whether this network
 // can have photographs behind it. That is what this section checks, by driving the real function.

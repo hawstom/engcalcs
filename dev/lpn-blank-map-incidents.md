@@ -211,9 +211,9 @@ coords geo    origin {0,0}    nodes x -122.6076..-122.5111  y 38.0645..38.1287
 
 A real local coordinate here is about 0.05 degrees. These are pixels.
 
-**THE LINE IS `defaultViewForCoords()`** (`js/looped-network.js:7239`): `if (isGeoProject()) {
+**THE LINE IS `defaultViewForCoords()`** (`js/looped-network.js:7239`): `if (isLatLonProject()) {
 return geoHomeView(); }` and otherwise `{cx: w/2, cy: h/2, s: 1}`, which is correct for an XY grid
-and nonsense for degrees. `isGeoProject()` reads `project.coords`, and `project` is still the
+and nonsense for degrees. `isLatLonProject()` reads `project.coords`, and `project` is still the
 PREVIOUS project's while a geographic one arrives, so the geographic document takes the grid
 branch. `s: 1` is then raised by `applyView()`'s clamp to `minScale()`, which is exactly the stored
 number. Reached from `if (!doc.nodes.length) { applyView(defaultViewForCoords()); return; }`.
