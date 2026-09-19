@@ -243,7 +243,7 @@ global.window.fetch = function () { realFetches++; return Promise.reject(new Err
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
-	"\t\taddNode: addNode, undo: undo, isGeo: isGeoProject,\n" +
+	"\t\taddNode: addNode, undo: undo, isGeo: isLatLonProject,\n" +
 	"\t\tsetDefaultElev: function (v) { settings.defaults.nodeElev = v; },\n" +
 	"\t\tplace: function (id, lon, lat) { var n = nodeById(id); n.x = inwardX(lon); n.y = inwardY(lat); },\n" +
 	"\t\tsetElev: function (id, v) { var n = nodeById(id); if (v === undefined) { delete n.elev; } else { n.elev = v; } },\n" +

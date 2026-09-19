@@ -3126,8 +3126,12 @@ var EngCalcs = EngCalcs || {};
 	// The document. nodes: Junction/Reservoir/Tank (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node (`anchorNode`), or to a station along a link (`anchorLink` + `anchorT`,
-	// Task 502), OR a free-floating text with neither.
-	var doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
+	// Task 502), OR a free-floating text with neither. customers: metered demands (Task 247) --
+	// a meter symbol attached to a pipe at a station along it (`link` + `t`), carrying an account
+	// number, a per-service demand and a count. **A CUSTOMER IS NOT A NODE**: its demand is summed
+	// into the junction its pipe reaches it through, which is arithmetic on a junction the network
+	// already had. See customerNodeId() for that rule and why the junction is derived, not stored.
+	var doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 
 	// The structural ID letters: LOOKUP KEYS into nextId and settings.idPrefixes, not the text an ID
 	// starts with -- that is settings.idPrefixes[key], which the user can change.
@@ -3135,8 +3139,9 @@ var EngCalcs = EngCalcs || {};
 	// text elements keep their T3 ids and mintId() refuses to reissue a taken id, so the worst case
 	// is a first tank numbered T4, never a collision.
 	// V is the valve -- EPANET's own default letter, so an imported V1 keeps its name.
-	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X' };
-	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 }; }
+	// M is the meter, and a Customer is what it stands for (Task 247).
+	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X', meter: 'M' };
+	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1, M: 1 }; }
 	var nextId = newNextId();
 	// Re-derive the counters from the ids actually present, matching against the CURRENT
 	// settings.idPrefixes, not a hardcoded single-letter regex -- a customized prefix can be any
@@ -3144,7 +3149,7 @@ var EngCalcs = EngCalcs || {};
 	// is not matched after a rename, so a counter can under-count. mintId() is the real guarantee.
 	function recountNextId() {
 		nextId = newNextId();
-		doc.nodes.concat(doc.links, doc.labels).forEach(function (x) {
+		doc.nodes.concat(doc.links, doc.labels, doc.customers || []).forEach(function (x) {
 			Object.keys(settings.idPrefixes).forEach(function (key) {
 				var p = settings.idPrefixes[key] || key, rest = String(x.id).indexOf(p) === 0 ? String(x.id).slice(p.length) : null;
 				if (rest !== null && /^\d+$/.test(rest) && nextId[key] !== undefined) { nextId[key] = Math.max(nextId[key], +rest + 1); }
@@ -3199,17 +3204,28 @@ var EngCalcs = EngCalcs || {};
 	 * and nowhere else), for how a coordinate is written and bounded, and for the `_xsrc`/`_ysrc`
 	 * round-trip record. It is the WRONG question for anything that reaches outside the drawing.
 	 *
+	 * **THE NAME SAYS LAT/LON OUT LOUD BECAUSE ITS OLD ONE DID NOT** (Tom, 2026-09-18:
+	 * *"isGeoProject reads like 'is this on the map': Rename it."*). It was `isGeoProject()`, which
+	 * reads as "is this project on the map", and five separate people reached for it meaning
+	 * exactly that. `isLatLonProject` keeps the shape of its neighbour isProjectedProject() -- the
+	 * two are read side by side and one is written in terms of the other -- while naming the
+	 * answer it actually gives. Do not rename it back to anything that answers a question in
+	 * general: the value of this name is that it is too specific to borrow.
+	 *
 	 * **"CAN THIS PROJECT SAY WHERE ON THE EARTH A POINT OF IT IS" IS projectLocatable(), AND
-	 * PICKING THE WRONG ONE HAS NOW COST THREE DEFECTS IN THE SAME FAMILY.** The elevation
+	 * PICKING THE WRONG ONE HAS NOW COST FIVE DEFECTS IN THE SAME FAMILY** -- Read DEM dead on a
+	 * projected project, the satellite row hidden, the street-map row hidden, "Go to a latitude and
+	 * longitude" offered and dead, and the New-project coordinate-system chooser opening on the
+	 * whole world's list when the project already knew the town. The elevation
 	 * controls asked this one and were widened on 2026-09-14; the satellite and street-map rows,
 	 * the corner teaser and goToLatLon() were left behind and were found by Tom on 2026-09-18
 	 * (*"Satellite view is only available for lat/lon CRS."*) -- a row offered and dead, which is
 	 * exactly what the elevation buttons had been four days earlier. A projected project with a
-	 * transform knows perfectly well where it is. **So before writing isGeoProject() in a new
+	 * transform knows perfectly well where it is. **So before writing isLatLonProject() in a new
 	 * gate, ask which of the two you mean**; dev/lpn-spike/projected-basemap-harness.js section
 	 * 13 holds the outward-facing ones.
 	 */
-	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
+	function isLatLonProject() { return !!project && project.coords === LPN_COORDS_GEO; }
 
 	// ---- A PROJECT'S DECLARED COORDINATE REFERENCE SYSTEM (ROADMAP Task 641) ---------------------
 	//
@@ -3238,7 +3254,7 @@ var EngCalcs = EngCalcs || {};
 	// than deleted because it was read as the rule for a month after it lapsed, and each outward
 	// feature was then widened separately: the basemap painter, then the elevation controls, then
 	// (2026-09-18, Task 692) the satellite row, the street-map row, the corner teaser and Go to.
-	// **The question every one of them asks is projectLocatable(), not isGeoProject()** -- see the
+	// **The question every one of them asks is projectLocatable(), not isLatLonProject()** -- see the
 	// note on that predicate. **Nothing here claims anything about the accuracy of a length**; that
 	// claim waits on Task 643, and so does the point scale factor of ruling P7.
 	//
@@ -3253,7 +3269,7 @@ var EngCalcs = EngCalcs || {};
 
 	// **EPSG:3857 IS THE GEOGRAPHIC ANSWER AND IS NEVER STORED AS `project.crs`.** It names the
 	// drawing frame of a lon/lat document, and a document that stated it as a projected plane would
-	// be claiming its numbers are metres. isGeoProject() is the one thing that answers "is this
+	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
 	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
 	var LPN_CRS_WEBMERC = 'EPSG:3857';
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
@@ -3523,13 +3539,13 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function projectCrsCode() { return (project && project.crs) ? String(project.crs) : ''; }
-	function isProjectedProject() { return !isGeoProject() && !!projectCrsCode(); }
+	function isProjectedProject() { return !isLatLonProject() && !!projectCrsCode(); }
 	// THE ONLY WRITER. Refuses a project that already declares one, refuses a lat/lon project (which
 	// IS its own coordinate system), and refuses one with anything drawn in it -- because at that
 	// point there are numbers on the page whose meaning the answer would change.
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
-		if (isGeoProject()) { return false; }
+		if (isLatLonProject()) { return false; }
 		// **EPSG:3857 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
 		// lon/lat project, and newProject() takes that branch; if it ever reached here it would
 		// write a document claiming its longitudes were metres.
@@ -3555,7 +3571,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
-		if (isGeoProject()) {
+		if (isLatLonProject()) {
 			return crsOptionText({ code: LPN_CRS_WEBMERC, name: crsLabel(LPN_CRS_WEBMERC) });
 		}
 		code = projectCrsCode();
@@ -3568,7 +3584,7 @@ var EngCalcs = EngCalcs || {};
 	// is not one -- on the unprojected grid x really is first, and there is nothing to reverse.
 	function axisNames() {
 		var pc = EngCalcs.pageConfig || {};
-		if (isGeoProject()) {
+		if (isLatLonProject()) {
 			return { first: pc.lpn_field_lat || 'Latitude', second: pc.lpn_field_lon || 'Longitude' };
 		}
 		if (isProjectedProject()) {
@@ -3591,7 +3607,7 @@ var EngCalcs = EngCalcs || {};
 		// cannot come to spell the same axis two ways.
 		return { first: pc.lpn_field_x || 'X', second: pc.lpn_field_y || 'Y' };
 	}
-	function readsNorthFirst() { return isGeoProject() || isProjectedProject(); }
+	function readsNorthFirst() { return isLatLonProject() || isProjectedProject(); }
 	// **WHICH DOCUMENT AXIS THE FIRST-READ FIELD IS.** The pair is read north first wherever there
 	// is a north (readsNorthFirst()), so slot 1 is the document's y there and its x on a grid --
 	// the same fork coordReadoutAt() makes, asked once so an entry site and a display site cannot
@@ -3692,7 +3708,7 @@ var EngCalcs = EngCalcs || {};
 	// for one.
 	function coordValueOk(isY, v) {
 		if (typeof v !== 'number' || !isFinite(v)) { return false; }
-		if (!isGeoProject()) { return true; }
+		if (!isLatLonProject()) { return true; }
 		return isY ? Math.abs(v) <= LPN_MERC_MAX_LAT : Math.abs(v) <= 180;
 	}
 	/**
@@ -3746,7 +3762,7 @@ var EngCalcs = EngCalcs || {};
 		// (Task 674). The override IS the typed characters, so it needs no source of its own; and
 		// Base's coordinate has not moved, so Base's `_xsrc`/`_ysrc` is still true. Writing one here
 		// from inside a scenario would file a source record for a number the element does not hold.
-		if (isGeoProject() && inBaseScenario()) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
+		if (isLatLonProject() && inBaseScenario()) { n[isY ? LPN_GEO_YSRC : LPN_GEO_XSRC] = v; }
 		updateNode(n.id);
 		// Every other label on the map is an obstacle to this node's, and the node has just moved --
 		// the same call every node drag ends in.
@@ -3765,7 +3781,7 @@ var EngCalcs = EngCalcs || {};
 	function coordReadoutBlank() { return coordReadout('--', '--'); }
 	// The readout is rewritten when the KIND changes, and two UTM zones are two kinds: a northing
 	// read under the wrong zone is the silent error this whole feature exists to stop.
-	function coordKind() { return isGeoProject() ? 'geo' : (projectCrsCode() || 'xy'); }
+	function coordKind() { return isLatLonProject() ? 'geo' : (projectCrsCode() || 'xy'); }
 	// x is a LONGITUDE and y is a LATITUDE, in that order -- this page's own x/y order, and the
 	// opposite of the "lat, long" a person says out loud.
 	//
@@ -3800,7 +3816,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
 	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
-	function coordText(v) { return isGeoProject() ? v.toFixed(6) : v.toFixed(2); }
+	function coordText(v) { return isLatLonProject() ? v.toFixed(6) : v.toFixed(2); }
 	function baseScenario() {
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].isBase) { return scenarios[i]; } }
 		return scenarios[0];
@@ -4962,7 +4978,7 @@ var EngCalcs = EngCalcs || {};
 			// Keyed by the same structural letters nextId already uses (LPN_ID_KEY) -- changing a
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X' },
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X', M: 'M' },
 			// **THE CUSTOM PROPERTY DESIGNS** (Task 636). MODELLING data by CLAUDE.md's
 			// project-versus-browser rule, not window furniture: a document whose assets carry a
 			// value under a key means nothing without the design of that key, so the list rides in
@@ -5337,11 +5353,11 @@ var EngCalcs = EngCalcs || {};
 	function outwardX(x) { return x + docOrigin().x; }
 	function outwardY(y) {
 		var c = cartesianY(y) + docOrigin().y;
-		return isGeoProject() ? Geom.mercLat(c) : c;
+		return isLatLonProject() ? Geom.mercLat(c) : c;
 	}
 	function inwardX(x) { return x - docOrigin().x; }
 	function inwardY(y) {
-		return cartesianY((isGeoProject() ? Geom.mercY(y) : y) - docOrigin().y);
+		return cartesianY((isLatLonProject() ? Geom.mercY(y) : y) - docOrigin().y);
 	}
 	// ---- THE PROJECTION SEAM (ROADMAP Task 145) -------------------------------------------------
 	//
@@ -5471,7 +5487,7 @@ var EngCalcs = EngCalcs || {};
 	function scaleBarUnitsPerPx() {
 		var probe = 100, a, b, metres;
 		if (!svg || !state.s || !isFinite(state.s) || state.s <= 0) { return null; }
-		if (!isGeoProject()) {
+		if (!isLatLonProject()) {
 			// A grid project's world unit IS the display length unit, so there is nothing to ask.
 			return 1 / state.s;
 		}
@@ -6207,7 +6223,7 @@ var EngCalcs = EngCalcs || {};
 
 	function linkGeomLength(l) {
 		var pts = linkPointList(l);
-		if (!isGeoProject()) { return Geom.polylineLength(pts); }
+		if (!isLatLonProject()) { return Geom.polylineLength(pts); }
 		return Geom.geodesicPolylineMeters(pts.map(function (p) {
 			return { x: outwardX(p.x), y: outwardY(p.y) };
 		})) * unitFactor('lpn_u_length');
@@ -6520,6 +6536,11 @@ var EngCalcs = EngCalcs || {};
 			if (ne && ne.hit) { syncNodeHit(n); }
 			positionNodeSymbol(n.id);
 		});
+		// **A METER'S SIZE IS PART SCREEN AND PART WORLD** (Task 247, meterHalfWorld()), so the
+		// screen half of it has to be re-derived whenever the scale moves -- exactly the reason
+		// the node radii above are.
+		refreshCustomerSizes();
+		refreshCustomerHandle();
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			le.handles.forEach(function (h) { h.setAttribute('r', VERTEX_HANDLE_R * k); });
@@ -8298,6 +8319,808 @@ var EngCalcs = EngCalcs || {};
 		return textLabelPoint(lb).x;
 	}
 
+	// ---- CUSTOMERS: METERED DEMANDS, LUMPED AT THE NEAREST NODE (ROADMAP Task 247) -------------
+	//
+	// Tom, 2026-08-24: *"expand/envision as a Customer management model where we are adding Customer
+	// account numbers, and these are meters on the system... And of course I assume that we lump the
+	// Customer demands additively at their nearest (by length) node. Graphically, I think you pick a
+	// point, it draws a meter rectangle, and then you pick a pipe and it connects perpendicularly
+	// from the meter to the pipe."*
+	//
+	// **A CUSTOMER IS A DRAWN OBJECT THAT CARRIES A DEMAND, AND IS NOT A NODE.** His own lumping
+	// sentence is what settles that: a thing whose demand is summed into its nearest node is not
+	// itself a node. So the network never sees a customer as anything but arithmetic on a junction
+	// it already had, and a 20-node design network with 200 services stays a 20-node model.
+	// Full design, the rejected alternatives and his rulings: dev/customer-demands.md.
+	//
+	// **IT IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED, AND NOT A SECOND STRUCTURE.** demandRowsOf()
+	// appends the rows EngCalcs.lpnCustomerRowsByNode() builds, so the map labels, the colour ramp,
+	// the Tables pane, the popup's resolved Demand, the solver and the `.inp` writer all pick
+	// customers up through the one door they already read a junction's demands through. There is no
+	// second flattening path and no second opinion about what a junction draws.
+	//
+	// **NOTHING HERE IS SCENARIO-OVERRIDABLE, and that is a decision rather than an omission.**
+	// Task 468 settled that a demand ROW cannot be overridden -- an override is keyed by an element
+	// and a property NAME, a row has only a position, and a position moves when a row above it is
+	// deleted -- and a customer's row inherits the ruling verbatim (dev/customer-demands.md sec 3).
+	// A customer has an id of its own, so a fourth ovKey kind WOULD be representable; what has not
+	// changed is that the scenario question being asked ("what if this zone draws more") is a
+	// question about the junction, which it asks of `demand` through setProp() exactly as it always
+	// has, and a scenario's demand multiplier already multiplies a customer's flow along with
+	// everything else. So a customer's fields are stored WITHOUT a leading underscore, they never
+	// meet setProp(), effective() or ovKey(), and elGroup() is therefore never asked about one.
+	//
+	// **THE ACCOUNT NUMBER IS A LABEL ON A DEMAND, NEVER A KEY INTO ANYTHING.** No registry, no
+	// validation, no uniqueness, no lookup. It is the first personal-adjacent data in this suite, it
+	// stays inside the user's own project, and it must never reach a log row or a usage statistic --
+	// nothing here writes one, which is the structural half of that rule rather than a discipline.
+
+	// A meter's real-world half-size and its floor on the screen (Tom, 2026-08-24, as figures to
+	// measure against: *"meter a 2-4 px dot, service connector a 0.5-1 px stroke... about 2 m
+	// across for the dot and 0.2 m for the connector, and meter and connector (service line) can
+	// keep size instead of scaling when map extent gets bigger than 1000 m."*)
+	//
+	// **THAT HYBRID RULE IS ONE max(), AND THE THRESHOLD FALLS OUT OF IT RATHER THAN BEING TYPED.**
+	// A symbol drawn to scale has a constant size in WORLD units; one held at a screen size has a
+	// world size of pixels / scale, which grows as you zoom out. Taking the larger of the two draws
+	// the meter to scale while that is the bigger of them -- a site plan, where a survey drawing
+	// would show a meter box at its real size -- and holds it at a legible dot beyond, which is what
+	// a system map does. The crossover is where 2 m equals 3 px, about 670 m across a 1000 px
+	// canvas, which is Tom's own figure arrived at from the other side.
+	//
+	// It is a different rule from every other symbol on this map, all of which are screen-space
+	// always, and it is right here for the same reason: nothing else drawn here has a real size a
+	// reader would recognise.
+	var LPN_METER_REAL_M = 1;          // half-width, so 2 m across
+	var LPN_METER_MIN_PX = 1.5;        // half-width, so a 3 px dot at the floor
+	var LPN_SERVICE_REAL_M = 0.2;      // the service connector's stroke, full width
+	var LPN_SERVICE_MIN_PX = 0.75;
+
+	// How many metres one world unit is, HERE. In a grid project a world unit IS the display length
+	// unit, so this is one conversion. In a geographic project a world unit is a DEGREE, and how
+	// long a degree is depends on where you are -- so it is MEASURED with the same geodesicMeters()
+	// that fills every `lenAuto` length on this map, rather than against a metres-per-degree
+	// constant that would be a second opinion about ground distance.
+	//
+	// Web Mercator is conformal, so one degree of longitude and one unit of Mercator y are the same
+	// ground distance at a given latitude -- which is what lets a meter be drawn as a SQUARE in
+	// world units and still be square on the screen.
+	function metresPerWorldUnit(x, y) {
+		var f, d = 0.001, m, lon, lat;
+		if (!isLatLonProject()) {
+			f = unitFactor('lpn_u_length');
+			return (f && isFinite(f)) ? 1 / f : 1;
+		}
+		if (!Geom || !Geom.geodesicMeters) { return 1; }
+		// **ONE CROSSING PER AXIS, and the local variables are the reason rather than tidiness**:
+		// dev/lpn-spike/local-origin-harness.js censuses every outwardX/outwardY call site, and a
+		// second conversion of the same point would be a second reader of one question -- the shape
+		// that census has already taken three readers down to one twice.
+		lon = outwardX(x); lat = outwardY(y);
+		m = Geom.geodesicMeters(lon, lat, lon + d, lat);
+		return (isFinite(m) && m > 0) ? m / d : 1;
+	}
+	// The two hybrid sizes, in world units, at a given point. See LPN_METER_REAL_M above for the
+	// rule; this is that one max() written twice.
+	function meterHalfWorld(x, y) {
+		var s = state.s || 1, mpu = metresPerWorldUnit(x, y);
+		return Math.max(LPN_METER_REAL_M / mpu, LPN_METER_MIN_PX / s);
+	}
+	function serviceStrokeWorld(x, y) {
+		var s = state.s || 1, mpu = metresPerWorldUnit(x, y);
+		return Math.max(LPN_SERVICE_REAL_M / mpu, LPN_SERVICE_MIN_PX / s);
+	}
+
+	function customerById(id) {
+		var list = doc.customers || [], i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	// The pipe a customer is attached to, or null -- including when its `link` names something no
+	// longer in the drawing, which every caller then treats as DETACHED rather than throwing.
+	function customerLink(c) {
+		var l;
+		if (!c || !c.link) { return null; }
+		l = linkById(c.link);
+		if (!l || !nodeById(l.from) || !nodeById(l.to)) { return null; }
+		return l;
+	}
+	// `t` clamped and defaulted, so a hand-edited file cannot put a service off the end of its pipe.
+	function customerT(c) {
+		var t = c && c.t;
+		return (typeof t === 'number' && isFinite(t)) ? Math.max(0, Math.min(1, t)) : 0.5;
+	}
+	// **WHERE THE SERVICE MEETS THE PIPE**: the point that fraction of the arc length names, which on
+	// a bent pipe may be a vertex rather than the foot of a perpendicular to any one segment. Say
+	// "the nearest point on the pipe" rather than "the perpendicular foot" anywhere that can bite.
+	function customerAttachPoint(c) {
+		var l = customerLink(c), p;
+		if (!l) { return null; }
+		p = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
+		return { x: p.x, y: p.y };
+	}
+	// **THE SERVICE LEAVES ITS MAIN AT A RIGHT ANGLE, AND THERE IS NO OTHER ANGLE ON OFFER**
+	// (Tom, 2026-09-17: *"The initial default connection to pipe needs to be perpendicular. Only an
+	// intentional drag away from that should change it. In fact, I am not sure we should offer a
+	// non-perpendicular connection to link."*). We do not offer one, and the reason is that an angle
+	// here would be A CLAIM THE MODEL DOES NOT MAKE: the demand is lumped to whichever end of the
+	// pipe is nearer measured ALONG the pipe, and that arithmetic never reads the stub's direction.
+	// A stub drawn at forty degrees therefore says something about how the service is laid in the
+	// ground that nothing in the answers knows about, and a row of parallel stubs makes the one real
+	// exception -- a service that genuinely crosses the street -- visible rather than hiding it
+	// among forty accidents.
+	//
+	// **SUPERSEDED, AND RECORDED SO IT IS NOT REBUILT:** the slide handle used to move the
+	// attachment along the pipe while the meter STAYED WHERE IT WAS DRAWN, which is precisely how an
+	// arbitrary angle was made. It carries the meter with it now (setCustomerStation()).
+	//
+	// **THE ONE PLACE THE RULE DOES NOT REACH IS A CONNECTION ON A NODE** (Tom, 2026-09-18: *"Snap
+	// perpendicular to the selected link or snap to the selected node."* -- two behaviours). A
+	// junction is where two, three or four mains meet, so "perpendicular" there would mean square to
+	// whichever pipe the attachment happens to be stored against, which is an angle chosen by the
+	// order somebody drew their network in. A service on a node therefore keeps the offset it was
+	// given whole; see customerPoint() and setCustomerOffsetTo().
+	//
+	// The normal is the LEFT normal of the segment the station falls in, so ONE SIGNED DISTANCE
+	// carries both how far out the meter stands and which side of the main it stands on.
+	function linkNormalAt(l, t) {
+		var pts = linkPointList(l), seg = Geom.segmentAtFraction(pts, t), i = seg.index, dx, dy, len;
+		if (!pts[i] || !pts[i + 1]) { return { x: 0, y: 1 }; }
+		dx = pts[i + 1].x - pts[i].x; dy = pts[i + 1].y - pts[i].y;
+		len = Math.hypot(dx, dy) || 1;
+		return { x: -dy / len, y: dx / len };
+	}
+	// How far out from its main this meter stands, and on which side. The stored `x`/`y` is read as
+	// a vector and PROJECTED onto the normal rather than measured, so a document written before this
+	// rule -- or hand-edited to an angle -- draws at its perpendicular reading instead of being
+	// refused, and nothing has to rewrite a number on open.
+	function customerPerpDistance(c, l) {
+		var n;
+		if (!l) { return 0; }
+		n = linkNormalAt(l, customerT(c));
+		return (c.x || 0) * n.x + (c.y || 0) * n.y;
+	}
+	/**
+	 * **A SERVICE THAT COMES OFF THE MAIN RIGHT AT A NODE SNAPS TO THE NODE** (Tom, 2026-09-17:
+	 * *"I don't see a way to connect directly to a node. I think that a very close connection
+	 * should snap to the nearest node."*).
+	 *
+	 * **IT IS THE SAME SNAP-ON-CREATE THIS PAGE ALREADY MAKES**, in the same one knob: a press
+	 * within reach of an existing junction reuses that junction rather than dropping a second one
+	 * on top of it, and a station within reach of a pipe's end is the same sentence about the same
+	 * tolerance (see TOUCH_REACH_PX's note on there being exactly two reach numbers on this page,
+	 * one per hand). No third constant is invented here.
+	 *
+	 * **WHAT IT ACTUALLY BUYS IS AN EXACT STATION, NOT A NEW KIND OF ATTACHMENT.** A customer is
+	 * always attached to a PIPE; `t` of 0 or 1 puts the connection exactly on that pipe's end node,
+	 * and the lumping rule then names that node with no near-miss arithmetic left in it. So there
+	 * is no new field, nothing to migrate, and an `.inp` export is unchanged.
+	 *
+	 * **AND IT IS RELEASED BY DRAGGING AWAY**, because it is judged on the CURRENT position every
+	 * time rather than remembered: leave the reach and the station is whatever the pointer says.
+	 */
+	function customerSnapT(l, t) {
+		var pts, p, sc = state.s || 1, a, b;
+		if (!l) { return t; }
+		pts = linkPointList(l);
+		if (!pts.length) { return t; }
+		p = Geom.pointAlongPolyline(pts, Math.max(0, Math.min(1, t)));
+		a = pts[0]; b = pts[pts.length - 1];
+		if (Math.hypot(p.x - a.x, p.y - a.y) * sc <= POINTER_REACH_PX) { return 0; }
+		if (Math.hypot(p.x - b.x, p.y - b.y) * sc <= POINTER_REACH_PX) { return 1; }
+		return t;
+	}
+	// **WHICH PIPE A SERVICE CONNECTED TO A NODE HANGS OFF, and the station that IS that node.**
+	// The node itself cannot hold the attachment -- a customer attaches to a pipe and lumps at a
+	// node, which is the whole model (dev/customer-demands.md) -- so connecting "to a node" means
+	// picking one of the pipes it is on and landing on its end.
+	//
+	// The pipe picked is the one running nearest the meter's own position, which is the one the
+	// service physically runs along; a node with no pipes on it at all answers null rather than
+	// inventing one, and the caller then treats the press as it treated it before.
+	function customerAttachAtNode(n, pt) {
+		var ids = (n && incidentLinks[n.id]) || [], best = null, bestD = Infinity, i, l, d;
+		for (i = 0; i < ids.length; i++) {
+			l = linkById(ids[i]);
+			if (!l || !nodeById(l.from) || !nodeById(l.to)) { continue; }
+			d = Geom.nearestFractionOnPolyline(linkPointList(l), pt.x, pt.y).dist;
+			if (d < bestD) { bestD = d; best = l; }
+		}
+		if (!best) { return null; }
+		return { link: best, t: best.from === n.id ? 0 : 1 };
+	}
+	/**
+	 * **THE ONE PLACE A SCREEN POINT BECOMES A CONNECTION** (Task 247; Tom, 2026-09-18: *"the
+	 * rubber band after customer placement step 1 should be constrained to link perpendiculars and
+	 * nodes"*, and *"all always either perp to link or snapped to node"*).
+	 *
+	 * Given where the pointer is and where the METER is, it answers the only two connections this
+	 * page offers: the foot of a perpendicular dropped from the meter onto a pipe, or a node. It
+	 * returns `{link, t, point}` or null, and null genuinely means *there is no legal connection
+	 * here* rather than *ask again differently*.
+	 *
+	 * **THE PREVIEW AND THE COMMIT READ THE SAME ANSWER, WHICH IS THE WHOLE POINT.** A band drawn
+	 * to the raw pointer promised a connection at an angle we do not offer, at a station the press
+	 * would not use -- so the line a person aimed with was not the line they got. Both now call
+	 * this, so the preview cannot be wrong about the press.
+	 *
+	 * **THE STATION COMES FROM THE METER, NEVER FROM THE POINTER.** That is the correction Tom
+	 * already made once (*"Put the meter where user clicks"*): the pointer names WHICH pipe, and
+	 * the meter's own position names where along it, which is what makes the stub square.
+	 *
+	 * A node wins a tie, on the finger-fallback's own argument: every pipe ends at a node, so near
+	 * a junction both are in reach and the node is the more specific thing the user can have meant.
+	 */
+	function customerConnectionAt(clientX, clientY, pt, pxTolerance, target) {
+		var n = nearestNodeNearScreen(clientX, clientY, pxTolerance),
+			a = n ? customerAttachAtNode(n, pt) : null, l, p;
+		if (!a) {
+			// The pipe under the press by the browser's own hit test on its wide stroke, falling
+			// back to the same finder every other tool on this page uses.
+			l = (target && target.dataset && target.dataset.link !== undefined &&
+					!(target.classList && target.classList.contains('lpn-vhandle')))
+				? { link: linkById(target.dataset.link) }
+				: nearestLinkNearScreen(clientX, clientY, pxTolerance);
+			if (!l || !l.link) { return null; }
+			a = { link: l.link, t: customerSnapT(l.link,
+				Geom.nearestFractionOnPolyline(linkPointList(l.link), pt.x, pt.y).f) };
+		}
+		if (!a.link || !nodeById(a.link.from) || !nodeById(a.link.to)) { return null; }
+		p = Geom.pointAlongPolyline(linkPointList(a.link), a.t);
+		return { link: a.link, t: a.t, point: { x: p.x, y: p.y } };
+	}
+	// Whether this meter's service lands exactly on a node, which is what the drawing says out loud
+	// (see updateCustomerGeometry). A station of exactly 0 or 1 IS the pipe's end node, and only the
+	// snap above and a typed 0 or 100 can produce one.
+	function customerAtNodeEnd(c) {
+		var t;
+		if (!customerLink(c)) { return false; }
+		t = customerT(c);
+		return t === 0 || t === 1;
+	}
+	/**
+	 * **THE ONE WRITE SEAM FOR WHAT SERVES A METER**, as setCustomerPerp() below is the one for
+	 * where the meter is. It moves the connection to another pipe -- or to another station on the
+	 * same one -- and leaves the house standing exactly where it stands, which is the half of Tom's
+	 * two-grip design that separates the gestures (2026-09-18).
+	 *
+	 * The index has to move with it: customersByLink is what makes a meter follow its pipe when the
+	 * pipe is reshaped, so a re-connection that forgot it would leave the service hanging off the
+	 * old main's geometry with nothing on screen to explain it.
+	 *
+	 * **THE OFFSET IS REWRITTEN, NOT THE POSITION.** `c.x`/`c.y` is an offset from the attachment
+	 * point, so a new attachment means a new offset for the SAME drawn point -- which is why the
+	 * meter's current position is read before anything is written and handed to the one offset
+	 * writer afterwards.
+	 */
+	function setCustomerConnection(c, l, t) {
+		var pt;
+		if (!c || !l || !nodeById(l.from) || !nodeById(l.to)) { return false; }
+		pt = customerPoint(c);
+		if (c.link && customersByLink[c.link]) {
+			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
+		}
+		c.link = l.id;
+		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
+		customersByLink[l.id].push(c.id);
+		return setCustomerOffsetTo(c, l, t, pt.x, pt.y);
+	}
+	// **THE ONE WRITE SEAM FOR WHERE A METER IS**, taking the two things a drag is now allowed to
+	// change: the station ALONG the pipe, and the distance TOWARD or AWAY from it. Every gesture and
+	// every typed box goes through it, so there is no path left that can write an angle.
+	function setCustomerPerp(c, t, dist) {
+		var l = customerLink(c), n;
+		if (!l) { return false; }
+		c.t = Math.max(0, Math.min(1, (typeof t === 'number' && isFinite(t)) ? t : 0.5));
+		n = linkNormalAt(l, c.t);
+		c.x = n.x * dist; c.y = n.y * dist;
+		return true;
+	}
+	/**
+	 * **THE METER GOES WHERE IT WAS PUT, AND THE CONNECTION IS WHAT IS DERIVED** (Tom, 2026-09-18:
+	 * *"You are putting the meter at the pipe point instead of at the meter point. Put the meter
+	 * where user clicks. Snap perpendicular to the selected link or snap to the selected node."*).
+	 *
+	 * **WHICH OF THE TWO POINTS IS THE INPUT IS THE WHOLE OF THIS.** The placement gesture used to
+	 * take the station from the press that named the PIPE and then draw the meter square to the
+	 * main at that station -- so the symbol jumped away from the hand that placed it, by as much as
+	 * the two presses were apart along the pipe. Every other writer here already worked the right
+	 * way round (a drag, a typed coordinate, a typed pipe), and this is those three and the gesture
+	 * arriving at one function instead of four copies of the same five lines.
+	 *
+	 * Away from a node the offset is rebuilt from its perpendicular component, which is what keeps
+	 * the stub square to the main (linkNormalAt()); ON a node it is kept whole, because a junction
+	 * is where several mains meet and there is no one of them to be square to.
+	 */
+	function setCustomerOffsetTo(c, l, t, x, y) {
+		var an, n;
+		if (!l) { return false; }
+		c.t = Math.max(0, Math.min(1, (typeof t === 'number' && isFinite(t)) ? t : 0.5));
+		an = Geom.pointAlongPolyline(linkPointList(l), c.t);
+		if (c.t === 0 || c.t === 1) { c.x = x - an.x; c.y = y - an.y; return true; }
+		n = linkNormalAt(l, c.t);
+		return setCustomerPerp(c, c.t, (x - an.x) * n.x + (y - an.y) * n.y);
+	}
+	// The same thing with the station DERIVED as well: the nearest point on this pipe to where the
+	// meter is, snapped onto an end within reach of it (customerSnapT()). This is what a drag, a
+	// typed location, a typed pipe and the second press of the placement gesture all want.
+	function setCustomerAt(c, l, x, y) {
+		if (!l) { return false; }
+		return setCustomerOffsetTo(c, l,
+			customerSnapT(l, Geom.nearestFractionOnPolyline(linkPointList(l), x, y).f), x, y);
+	}
+	// Where the METER sits. `c.x`/`c.y` is an OFFSET from the attachment point while the
+	// customer is attached and an absolute position while it is not -- the same dual meaning a Text
+	// label's own x/y has, through the same single door, so a second kind of attachment could not be
+	// half-implemented (see textLabelPoint()).
+	//
+	// **ATTACHED, THE OFFSET IS REBUILT FROM ITS PERPENDICULAR COMPONENT**, which is what makes the
+	// rule above structural rather than a discipline every write site has to remember: there is one
+	// reader of a meter's position, so there is one place an angle could get in, and it cannot.
+	function customerPoint(c) {
+		var an = customerAttachPoint(c), l, n, d;
+		if (!an) { return { x: c.x || 0, y: c.y || 0 }; }
+		// **ON A NODE THE OFFSET IS READ WHOLE** -- see setCustomerOffsetTo() for why a junction has
+		// no one main to be square to. Every perpendicular writer still produces a perpendicular
+		// offset there, so a service that arrived at a node by sliding along its pipe draws exactly
+		// where it always did; what this allows is the one Tom asked for, a meter left standing
+		// where the hand put it when the press named a node.
+		if (customerAtNodeEnd(c)) { return { x: an.x + (c.x || 0), y: an.y + (c.y || 0) }; }
+		l = customerLink(c);
+		n = linkNormalAt(l, customerT(c));
+		d = customerPerpDistance(c, l);
+		return { x: an.x + n.x * d, y: an.y + n.y * d };
+	}
+	// **THE JUNCTION THIS CUSTOMER LUMPS AT, DERIVED AND NEVER STORED.** The rule is one function in
+	// js/lpn-inp.js, shared with the `.inp` writer; the precedent for deriving it is `lenAuto` on a
+	// pipe length, and the reason is that a consequence which is recomputed cannot go stale when the
+	// pipe is re-routed, bent, or has its ends renamed.
+	function customerNodeId(c) {
+		return EngCalcs.lpnCustomerNode(c, customerLink(c));
+	}
+	function customerFlow(c) { return EngCalcs.lpnCustomerFlow(c); }
+	// The customer demand rows for one junction, in the shape demandRowsOf() concatenates.
+	//
+	// **NOT CACHED, DELIBERATELY.** The early return makes the no-customer case -- every document
+	// written before this existed -- free, and with customers the cost is one walk of the list per
+	// junction asked. A cache would have to be invalidated by a change to `t`, to `link`, to the
+	// list, or to a pipe's own ends, and a stale entry there is a wrong demand in the answers: the
+	// wrong side of that trade for a walk of a list that is hundreds long at most.
+	function customerRowsOf(nodeId) {
+		if (!doc.customers || !doc.customers.length || !EngCalcs.lpnCustomerRowsByNode) { return []; }
+		return EngCalcs.lpnCustomerRowsByNode(doc)[nodeId] || [];
+	}
+	// Every customer whose demand lands on this node, in document order. The junction is DERIVED
+	// (customerNodeId()), so this asks the same question the demand rows ask and cannot come to a
+	// different answer from the one the arithmetic uses.
+	function customersAtNode(nodeId) {
+		return (doc.customers || []).filter(function (c) { return customerNodeId(c) === nodeId; });
+	}
+	// Every customer attached to nothing. Its demand is in no junction's total and therefore in no
+	// answer, which is a fact the user has to be told rather than left to notice.
+	function detachedCustomers() {
+		return (doc.customers || []).filter(function (c) { return !customerLink(c); });
+	}
+
+	// ---- drawing a meter ------------------------------------------------------------------------
+	// A screen-anchored glyph at a world point, like every other symbol here, EXCEPT that its size
+	// follows meterHalfWorld()'s hybrid rule. TWO elements: the service connector and the symbol,
+	// both authored content, so neither hides with the generated annotation.
+	//
+	// **A METER CARRIES NO LABEL ON THE MAP, AND THIS IS A DELETION RATHER THAN AN OMISSION** (Tom,
+	// 2026-09-17: *"I don't think we want labels on customers. I didn't ask for them."*). An account
+	// number was drawn beside every symbol; it is gone, with the function that composed it. What he
+	// said he might accept instead -- shown only very close in, aligned with the service line, on it
+	// or beyond the meter -- is a description of a thing he has not asked for, so it is NOT built
+	// here, and building it would be answering a condition as though it were a request.
+	var custEls = {}, customersByLink = {};
+	function buildCustomerEls(c) {
+		// The connector names its customer too, though it is not pickable: an element that says
+		// whose it is can be found and read -- by a probe driving a real browser, and by anybody
+		// reading the drawing in the inspector -- and "which service is this" has no other answer.
+		var stub = el('line', { 'class': 'lpn-service', 'data-cust': c.id }, labelsLayer),
+			box = el('circle', { 'class': 'lpn-meter', 'data-cust': c.id }, labelsLayer);
+		custEls[c.id] = { stub: stub, box: box };
+		if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
+		updateCustomerGeometry(c.id);
+	}
+	function removeCustomerEls(id) {
+		var ce = custEls[id];
+		if (!ce) { return; }
+		ce.stub.remove(); ce.box.remove();
+		delete custEls[id];
+	}
+	function updateCustomerGeometry(id) {
+		var c = customerById(id), ce = custEls[id], pt, an, half, sw;
+		if (!c || !ce) { return; }
+		pt = customerPoint(c);
+		an = customerAttachPoint(c);
+		half = meterHalfWorld(pt.x, pt.y);
+		sw = serviceStrokeWorld(pt.x, pt.y);
+		// **A SOLID DOT ON THE MAP, AND A PICTURE ONLY IN THE TOOLBAR** (Tom, 2026-09-17: *"The map
+		// symbol is to be a solid dot. The toolbar icon is to be a house or a meter box."*). The two
+		// are drawn at sizes two orders apart: the map symbol is three to seven pixels across, where
+		// no picture of anything reads and a hollow outline is a grey smudge, while the toolbar draws
+		// at 24 and can carry a meter box. So this is not one symbol used twice -- it is a dot where
+		// a dot is all that can be seen, and a drawing where a drawing can be.
+		ce.box.setAttribute('cx', pt.x);
+		ce.box.setAttribute('cy', pt.y);
+		ce.box.setAttribute('r', half);
+		ce.box.setAttribute('stroke-width', sw);
+		// **THE CONNECTOR IS NOT PICKABLE**, like a label's leader: a click on it picks the meter,
+		// which is what a reader means by clicking a service line. Hidden entirely when the meter is
+		// attached to nothing, because a stub to nowhere is a claim the drawing cannot support.
+		if (an) {
+			ce.stub.setAttribute('x1', an.x); ce.stub.setAttribute('y1', an.y);
+			ce.stub.setAttribute('x2', pt.x); ce.stub.setAttribute('y2', pt.y);
+			ce.stub.setAttribute('stroke-width', sw);
+		}
+		// **A CLASS, NEVER AN INLINE `style.display`.** dev/lpn-spike/panel-touch-harness.js holds
+		// the rule that nothing on this page hides anything except through its own one door, and it
+		// is right about this one too: an inline display is invisible to every class-driven pass
+		// over the drawing, and a connector to nowhere left showing is a claim the drawing cannot
+		// support. The class is the same idiom .lpn-lbl-hidden already is.
+		ce.stub.classList[an ? 'remove' : 'add']('lpn-service-off');
+		ce.box.classList[an ? 'remove' : 'add']('lpn-meter-loose');
+		// **A SNAP THAT CAUGHT SAYS SO WHILE IT IS CAUGHT** (Task 247; Tom, 2026-09-17). A service
+		// landing exactly on a node is the one attachment a reader cannot verify by eye -- a
+		// connection one pixel short of the junction draws identically and lumps by the near-miss
+		// rule instead -- so the connector is marked while it is on the node and unmarked the moment
+		// a drag takes it off. Painted here, in the one pass every move goes through, rather than at
+		// each gesture: a mark applied by a drag and cleared by nobody is the defect this avoids.
+		ce.stub.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-service-snapped');
+		ce.box.classList[customerAtNodeEnd(c) ? 'add' : 'remove']('lpn-meter-snapped');
+	}
+	// Every meter on this pipe, redrawn where the pipe's new shape puts it. Replayed from
+	// updateLinkGeometry(), which is the one pass every reshaping goes through -- so there is no
+	// second listener, exactly as with a Text on a link (updateTextOnLink()).
+	function updateCustomersOnLink(id) {
+		var following = customersByLink[id] || [], i;
+		for (i = 0; i < following.length; i++) {
+			if (custEls[following[i]]) { updateCustomerGeometry(following[i]); }
+		}
+	}
+	function refreshCustomerSizes() {
+		(doc.customers || []).forEach(function (c) { updateCustomerGeometry(c.id); });
+	}
+	// The selection handle Tom asked for (2026-08-24: *"if they click on a meter it can create a
+	// temporary draggable circle that slides along the pipe"*). It exists only while exactly one
+	// meter is selected, it is constrained to that meter's own pipe, and it writes `t` -- which the
+	// document already stores, so this is a gesture on data we were keeping anyway rather than a new
+	// field. It is the same `{link, t}` handle Task 502 needs, which is the second reason those two
+	// tasks must not build it twice.
+	var custHandleEl = null;
+	/**
+	 * **WHERE THE GRIP IS BEING HELD, WHILE A HAND IS HOLDING IT** (Tom, 2026-09-18: *"I asked for
+	 * the connection circle to be draggable even though the service line cannot follow along until
+	 * it snaps to something new. Note that the circle's drag path cannot be constrained, because we
+	 * may want to jump to another pipe entirely."*).
+	 *
+	 * **THE GRIP IS THE THING IN THE HAND AND THE SERVICE IS WHAT WAITS**, and until this existed
+	 * only the second half was true: the circle was painted at the ATTACHMENT, so it sat still on
+	 * the old main for the whole gesture and the drag had nothing visible in it at all. What moved
+	 * was the pointer, which the map already draws.
+	 *
+	 * **AND THE PATH IS NOT CONSTRAINED, WHICH IS THE POINT RATHER THAN A SIMPLIFICATION.** Holding
+	 * it to perpendiculars of the current pipe -- the constraint the CONNECTION obeys, and the
+	 * obvious one to reach for -- would make the one gesture he named impossible, carrying the
+	 * connection to a main on the other side of the drawing. So this is the raw pointer in world
+	 * units and nothing is done to it.
+	 *
+	 * It is view state and never the document: null except between a press on the grip and the
+	 * release, and the release puts the circle back on whatever the connection ended up being.
+	 */
+	var custHandleAt = null;
+	function customerHandleFor() {
+		var sel = selection;
+		if (!sel || sel.kind !== 'customer') { return null; }
+		return customerById(sel.id);
+	}
+	function refreshCustomerHandle() {
+		var c = customerHandleFor(), an = c ? customerAttachPoint(c) : null, half;
+		// **A HELD GRIP IS DRAWN WHERE THE HAND IS, NOT WHERE THE CONNECTION IS** -- see
+		// custHandleAt. It still belongs to the selected customer, so an unselected one has no grip
+		// whatever a stale held point might say, which is why this is read after `c` and not before.
+		if (c && custHandleAt) { an = custHandleAt; }
+		if (!an) {
+			if (custHandleEl) { custHandleEl.remove(); custHandleEl = null; }
+			return;
+		}
+		if (!custHandleEl) {
+			custHandleEl = el('circle', { 'class': 'lpn-custhandle', 'data-custhandle': c.id }, labelsLayer);
+		}
+		custHandleEl.setAttribute('data-custhandle', c.id);
+		half = meterHalfWorld(an.x, an.y);
+		custHandleEl.setAttribute('cx', an.x);
+		custHandleEl.setAttribute('cy', an.y);
+		// Drawn at a grabbable SCREEN size rather than at the meter's hybrid one: it is a control
+		// the user asked to see, not a symbol standing for a thing in the ground.
+		custHandleEl.setAttribute('r', Math.max(half, 6 / (state.s || 1)));
+		custHandleEl.setAttribute('stroke-width', serviceStrokeWorld(an.x, an.y));
+	}
+	// The meter a press meant, when the browser's own hit test found bare map. Measured to the box's
+	// centre, in screen pixels, like every other finder here.
+	// **THE REACH IS THE CALLER'S GESTURE'S OWN**, `reachPx(e)` for a press and TOUCH_REACH_PX for
+	// the finger fallback. A meter-specific constant was written here and taken out again: there are
+	// exactly two reach numbers on this page, one per hand, and dev/lpn-spike/touch-radius-harness.js
+	// holds that -- a third would be a knob nobody could find to turn.
+	function nearestCustomerNearScreen(clientX, clientY, pxTolerance) {
+		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance,
+			list = doc.customers || [], i, pt, dPx;
+		for (i = 0; i < list.length; i++) {
+			pt = customerPoint(list[i]);
+			dPx = Math.hypot(pt.x - w.x, pt.y - w.y) * state.s;
+			if (dPx <= bestPx) { best = list[i]; bestPx = dPx; }
+		}
+		return best;
+	}
+
+	// ---- adding, attaching and removing --------------------------------------------------------
+	/**
+	 * A new meter. `attach` is `{link, t}` or null for one placed on open ground.
+	 *
+	 * **ITS DEMAND IS BORN BLANK, NOT ZERO OR A COPY OF ANYTHING.** A new row is a question to the
+	 * user, and seeding it with the junction's own number, or with a default nobody typed, is the
+	 * same mistake as filling in a blank reservoir head.
+	 *
+	 * **AND THE COUNT IS BORN AT 1** (Tom, 2026-08-24, on making a meter a Type and a Count):
+	 * a customer with an account number is then the count-of-one case rather than a different kind
+	 * of thing, and no migration is needed the day somebody wants both.
+	 */
+	function addCustomer(x, y, attach) {
+		var id = mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
+		// **`x`/`y` IS WHERE THE METER GOES, AND THE STATION IS DERIVED FROM IT WHEN THE CALLER
+		// DOES NOT STATE ONE.** That is the placement gesture's ordinary case: the second press
+		// names the PIPE, and where along the pipe the service lands is the nearest point on it to
+		// the meter, which is what makes the stub square and leaves the symbol under the hand that
+		// put it there. A caller that DOES state a station means it -- the node case states exactly
+		// 0 or 1, and a document being opened states what its file says.
+		if (l) {
+			t = (attach && typeof attach.t === 'number' && isFinite(attach.t)) ? attach.t
+				: customerSnapT(l, Geom.nearestFractionOnPolyline(linkPointList(l), x, y).f);
+		}
+		c = {
+			id: id,
+			account: '',
+			demand: undefined,
+			count: 1,
+			link: l ? l.id : null,
+			t: l ? t : undefined,
+			// Attached: an offset from the attachment point, so the meter follows its pipe. Loose:
+			// a position on the map. One field, two meanings, one reader (customerPoint()). The
+			// offset is written two lines down; these are the absolute numbers until it is.
+			x: x,
+			y: y
+		};
+		if (!doc.customers) { doc.customers = []; }
+		doc.customers.push(c);
+		// **STORED AS THE DRAWING READS IT, so the file says what the screen says.** Leaving a raw
+		// offset in the document where customerPoint() would draw a projected one means the two
+		// disagree on disk about a position nobody has moved. The meter itself does not shift: the
+		// caller states where it goes and this writes the offset that puts it there.
+		if (c.link) { setCustomerOffsetTo(c, l, c.t, x, y); }
+		if (c.link && !customersByLink[c.link]) { customersByLink[c.link] = []; }
+		buildCustomerEls(c);
+		// A customer changes what a junction draws, so this one DOES schedule a solve -- unlike a
+		// Text, which is why addText() has to save and refresh the pane by hand.
+		scheduleSolve();
+		refreshPaneIfOpen();
+		return c;
+	}
+	function deleteCustomerById(id) {
+		if (isSelected('customer', id)) { deselectOne('customer', id); }
+		removeCustomerEls(id);
+		Object.keys(customersByLink).forEach(function (lid) {
+			customersByLink[lid] = customersByLink[lid].filter(function (x) { return x !== id; });
+		});
+		doc.customers = (doc.customers || []).filter(function (c) { return c.id !== id; });
+		if (currentPopup && currentPopup.kind === 'customer' && currentPopup.id === id) { closePopup(); }
+		refreshCustomerHandle();
+		scheduleSolve();
+		refreshPaneIfOpen();
+	}
+	/**
+	 * **A PIPE'S METERS ARE DETACHED, NOT DELETED.** A Text label is deleted with its pipe because
+	 * it is an annotation OF that pipe; a customer is a service that exists whether or not anybody
+	 * has drawn a main to it yet. It keeps its account number, its demand and its drawn position,
+	 * and it is drawn with no connector.
+	 *
+	 * Silently dropping the demand would change the answers without saying so, which is why this
+	 * returns the count and its caller says it out loud.
+	 */
+	function detachCustomersFromLink(linkId) {
+		var moved = 0;
+		(doc.customers || []).forEach(function (c) {
+			var pt;
+			if (c.link !== linkId) { return; }
+			// The absolute position it is drawn at NOW becomes its own, because `x`/`y` stops being
+			// an offset the moment there is nothing to be an offset from.
+			pt = customerPoint(c);
+			c.x = pt.x; c.y = pt.y;
+			c.link = null;
+			delete c.t;
+			moved++;
+			if (custEls[c.id]) { updateCustomerGeometry(c.id); }
+		});
+		delete customersByLink[linkId];
+		if (moved) { refreshCustomerHandle(); }
+		return moved;
+	}
+	/**
+	 * **WHICH ASSET SERVES THIS CUSTOMER, WRITTEN AS A VALUE** (Task 247; Tom, 2026-09-17, on the
+	 * tables: one row per customer with a location and a link). The map gesture states it by where
+	 * you press; this is the keyboard's way of stating the same thing, and both end here so there
+	 * is one idea of what re-serving a customer means.
+	 *
+	 * **IT IS NEVER GUESSED FOR THE USER.** The table OFFERS the nearest pipe as a suggestion and
+	 * writes nothing until somebody types one, because a wrong guess where four mains meet is the
+	 * invisible kind of wrong: the customer appears, every number calculates, and the demand is on
+	 * the wrong main. A suggestion the reader accepted is a decision; a guess the page made is not.
+	 *
+	 * The meter does not move: it keeps the point it is drawn at, and the station is re-derived as
+	 * the nearest point on the new pipe, which is the same arithmetic dragging it there would do.
+	 * Returns false and says why when the id names nothing.
+	 */
+	function setCustomerLink(c, linkId) {
+		var pc = EngCalcs.pageConfig || {}, id = String(linkId === null || linkId === undefined ? '' : linkId).trim(),
+			pt = customerPoint(c), l;
+		if (c.link && customersByLink[c.link]) {
+			customersByLink[c.link] = customersByLink[c.link].filter(function (x) { return x !== c.id; });
+		}
+		if (!id) {
+			// Detached, and drawn where it was: `x`/`y` stops being an offset the moment there is
+			// nothing to be an offset from, which is detachCustomersFromLink()'s own rule.
+			c.link = null; delete c.t;
+			c.x = pt.x; c.y = pt.y;
+			return true;
+		}
+		l = linkById(id);
+		if (!l || !nodeById(l.from) || !nodeById(l.to)) {
+			// **REFUSED OUT LOUD, and the meter is left exactly as it was.** A silent refusal is
+			// indistinguishable from a cell that does nothing, and a customer quietly detached by a
+			// typing slip takes its demand out of the answers with nothing on screen to say so.
+			if (c.link && customersByLink[c.link]) { customersByLink[c.link].push(c.id); }
+			setNotice(String(pc.lpn_meter_pipe_unknown ||
+				'Nothing in this project is named {id}, so the customer was left where it was.')
+				.split('{id}').join(id));
+			return false;
+		}
+		c.link = l.id;
+		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
+		customersByLink[l.id].push(c.id);
+		setCustomerAt(c, l, pt.x, pt.y);
+		return true;
+	}
+	// **THE PIPE THIS METER MOST LIKELY BELONGS TO, AS A SUGGESTION AND NOT AS A WRITE.** The
+	// nearest one to where the meter is drawn, measured to the pipe itself; null where the project
+	// has no pipes at all. Nothing calls this to assign anything -- see setCustomerLink().
+	function suggestCustomerLink(c) {
+		var pt = customerPoint(c), best = null, bestD = Infinity, i, l, d;
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!nodeById(l.from) || !nodeById(l.to)) { continue; }
+			d = Geom.nearestFractionOnPolyline(linkPointList(l), pt.x, pt.y).dist;
+			if (d < bestD) { bestD = d; best = l; }
+		}
+		return best ? best.id : null;
+	}
+	// **WHICH DOCUMENT AXIS THE FIRST-READ COLUMN IS.** The pair is read north first wherever there
+	// is a north, so slot 1 is the document's y there and its x on a grid. (Task 674 defines a
+	// function of this name and this body for a node's typed coordinates; they are one idea and the
+	// merge of the two branches should keep one copy.)
+	function coordSlotIsY(slot) { return readsNorthFirst() ? (slot === 1) : (slot === 2); }
+	/**
+	 * **WHERE A METER IS, TYPED ONE AXIS AT A TIME** (Task 247; Tom, 2026-09-17: *"Pick location,
+	 * pick pipe, repeat"*, and one table row per customer carrying both). The map gesture and these
+	 * two columns are the same statement made with different hands, so they end in the same place.
+	 *
+	 * **THE STATION IS RE-DERIVED RATHER THAN KEPT**, which is what makes a typed location behave
+	 * like a dragged one: the service connects at the nearest point on its own pipe to wherever the
+	 * meter now is, and is therefore square to the main by construction (see linkNormalAt()).
+	 */
+	function setCustomerCoordAxis(c, slot, v) {
+		var isY = coordSlotIsY(slot), pt, x, y, l;
+		if (typeof v !== 'number' || !isFinite(v)) { return false; }
+		pt = customerPoint(c);
+		x = isY ? pt.x : inwardX(v);
+		y = isY ? inwardY(v) : pt.y;
+		l = customerLink(c);
+		if (!l) { c.x = x; c.y = y; return true; }
+		return setCustomerAt(c, l, x, y);
+	}
+	// What those two columns READ: the meter's drawn point, outward, so a typed value and a
+	// displayed one are the same number. One crossing per axis, which is what the census in
+	// dev/lpn-spike/local-origin-harness.js asks of every boundary.
+	function customerCoordAxis(c, slot) {
+		var pt = customerPoint(c);
+		return coordSlotIsY(slot) ? outwardY(pt.y) : outwardX(pt.x);
+	}
+	// Writing a customer's own field: no setProp(), no effective(), no override marker -- see the
+	// section note on why a customer carries nothing overridable. One seam all the same, so the
+	// solve, the drawing, the table and the popup are always refreshed together.
+	function customerEdited(c) {
+		if (c && custEls[c.id]) { updateCustomerGeometry(c.id); }
+		refreshCustomerHandle();
+		scheduleSolve();
+		refreshPaneIfOpen();
+	}
+	// Move a meter's attachment ALONG its own pipe, carrying the meter with it at the same distance
+	// out and on the same side. This is what the slide handle and the station box both write.
+	//
+	// **IT USED TO LEAVE THE METER WHERE IT WAS DRAWN, and that was the whole of how a service came
+	// to point sideways** -- see linkNormalAt() for why we no longer offer any angle but the right
+	// one. Sliding the attachment now slides the service, which is the gesture a reader means by
+	// dragging the circle: this house is served from further up the main.
+	function setCustomerStation(c, t) {
+		var l = customerLink(c);
+		if (!l) { return false; }
+		return setCustomerPerp(c, t, customerPerpDistance(c, l));
+	}
+
+	// ---- STATION AND OFFSET: the pair a position is read from ------------------------------------
+	//
+	// **STATION SAYS HOW FAR ALONG, OFFSET SAYS HOW FAR OFF, AND ONLY THE SECOND IS A LENGTH**
+	// (Tom, 2026-09-18: *"I told you to add Offset in properties and tables."*). The station stays a
+	// percentage for the reason its own field states: `t` is a fraction of ARC length, and a pipe's
+	// stated length is the user's own number, routinely nothing like the distance between two
+	// symbols on a schematic. An offset has no such problem. It is a distance across the ground and
+	// nothing else, so it is stated in the length unit, and it is what makes the station readable as
+	// a survey position rather than as a fraction.
+	//
+	// **POSITIVE IS TO THE RIGHT OF THE PIPE, LOOKING FROM ITS FIRST NODE TOWARD ITS SECOND.** That
+	// is the surveyor's own convention, and it is also what linkNormalAt() already returns: the
+	// document stores y downward, so its (-dy, dx) normal points to the right of travel. ONE SIGNED
+	// NUMBER therefore carries both how far out the meter stands and which side it stands on, and
+	// there is no second control that could contradict it.
+	//
+	// **THE OFFSET WAS ALWAYS THERE. WHAT WAS MISSING WAS A WAY TO READ AND TYPE IT** -- a drag
+	// wrote it through setCustomerPerp() from the first day, which is why nothing below is a new
+	// way of storing anything.
+	function customerOffsetDrawn(c) {
+		var l = customerLink(c), n;
+		if (!l) { return 0; }
+		// **ON A NODE THE WHOLE DISTANCE IS THE ANSWER, NOT ITS SQUARE COMPONENT.** A service that
+		// lands on a junction keeps the offset it was given whole (customerPoint()), because a
+		// junction is where several mains meet and there is no one of them to be square to. Reading
+		// the projection there would print a number shorter than the stub in front of the reader.
+		if (customerAtNodeEnd(c)) {
+			n = linkNormalAt(l, customerT(c));
+			return ((c.x || 0) * n.x + (c.y || 0) * n.y) < 0 ?
+				-Math.hypot(c.x || 0, c.y || 0) : Math.hypot(c.x || 0, c.y || 0);
+		}
+		return customerPerpDistance(c, l);
+	}
+	// A probe one ten-thousandth of a degree long: short enough that the ground under it is flat,
+	// long enough that the geodesic is not measuring double precision.
+	var OFFSET_PROBE = 1e-4;
+	// How many LENGTH units one drawing unit is worth where this meter stands. In a grid project a
+	// drawing unit IS the length unit, which is the same reading linkGeomLength() takes of a pipe. A
+	// geographic project draws in degrees, where a degree is worth a different distance at every
+	// latitude and on each axis, so the scale is MEASURED on the very direction the offset runs,
+	// with the same geodesic a pipe's Auto length is measured with.
+	function customerOffsetUnitsPerDrawn(c) {
+		var l = customerLink(c), an, n;
+		if (!l || !isLatLonProject()) { return 1; }
+		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
+		n = linkNormalAt(l, customerT(c));
+		return Geom.geodesicPolylineMeters([
+			{ x: outwardX(an.x), y: outwardY(an.y) },
+			{ x: outwardX(an.x + n.x * OFFSET_PROBE), y: outwardY(an.y + n.y * OFFSET_PROBE) }
+		]) * unitFactor('lpn_u_length') / OFFSET_PROBE;
+	}
+	// What the Offset box and the Offset column READ: the signed distance out, in the length unit.
+	function customerOffset(c) {
+		return customerOffsetDrawn(c) * customerOffsetUnitsPerDrawn(c);
+	}
+	// ...and what they WRITE, through setCustomerPerp() -- the one seam for where a meter is, so a
+	// typed offset and a dragged one cannot come to disagree about what an offset means. Typing one
+	// squares the service to its main, which is the only angle this page offers at all.
+	function setCustomerOffset(c, v) {
+		var per = customerOffsetUnitsPerDrawn(c);
+		if (!customerLink(c) || typeof v !== 'number' || !isFinite(v) || !(per > 0)) { return false; }
+		return setCustomerPerp(c, customerT(c), v / per);
+	}
+
 	// **A REBUILD DOES NOT HAVE TO LAY THE LABELS OUT WHERE IT STANDS.** On a project switch the
 	// view is restored AFTER the rebuild, so a pass run here is computed at the OUTGOING project's
 	// zoom and superseded moments later -- and a label's footprint is a pixel size divided by the
@@ -8343,6 +9166,9 @@ var EngCalcs = EngCalcs || {};
 		// 1,414 ms switch -- 9.7 ms per pipe.** The drawing is the same either way: a hold changes
 		// WHEN the answer is read, not what it is, and both are pure functions of a drawing that is
 		// not moving while this runs.
+		// The meters go with them (Task 247): their elements live in labelsLayer, which this
+		// function has just emptied, so every holder pointing into it is now an orphan.
+		custEls = {}; customersByLink = {}; custHandleEl = null;
 		beginMapBoxHold();
 		beginLinkGeomHold();
 		try {
@@ -8358,6 +9184,7 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < doc.links.length; i++) {
 				incidentLinks[doc.links[i].from].push(doc.links[i].id);
 				incidentLinks[doc.links[i].to].push(doc.links[i].id);
+				customersByLink[doc.links[i].id] = [];
 				buildLinkEls(doc.links[i]);
 			}
 		});
@@ -8366,6 +9193,12 @@ var EngCalcs = EngCalcs || {};
 				buildLabelEls(doc.labels[i]);
 				updateLabelGeometry(doc.labels[i].id);
 			}
+		});
+		// **THE METERS COME AFTER THE LINKS**, because customersByLink is seeded in the link loop
+		// above and buildCustomerEls() pushes into it -- built first, every meter would be missing
+		// from the index that makes it follow its pipe (Task 247).
+		perfDebugTime('  customers', function () {
+			for (i = 0; i < (doc.customers || []).length; i++) { buildCustomerEls(doc.customers[i]); }
 		});
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
 		perfDebugTime('  labelPass', function () {
@@ -8402,6 +9235,10 @@ var EngCalcs = EngCalcs || {};
 		// links), a vertex dragged (updateVertex), a rebuild -- so there is no second listener and
 		// nothing to forget to call.
 		updateTextOnLink(id);
+		// **AND EVERY METER ON THIS PIPE FOLLOWS HERE, AND ONLY HERE** (Task 247), on exactly the
+		// argument the line above it makes: this is the one pass every reshaping goes through.
+		updateCustomersOnLink(id);
+		refreshCustomerHandle();
 		// **AN AUTO LENGTH IS WRITTEN ONLY WHILE BASE IS SHOWING** (Task 674). This line runs on
 		// every geometry update, and buildDom() runs it for every link on a scenario switch -- so
 		// without the guard, merely LOOKING at a scenario that moves a node would write that
@@ -8915,7 +9752,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **THIS IS A FRAME MISMATCH, NOT A CORRUPT NUMBER.** `defaultViewForCoords()` answers
 	// `{cx: w/2, cy: h/2, s: 1}` in PIXELS, which is right for an XY grid and meaningless in
-	// degrees; it takes that branch whenever `isGeoProject()` is false, and `project` still
+	// degrees; it takes that branch whenever `isLatLonProject()` is false, and `project` still
 	// describes the OUTGOING project while a geographic one is arriving. Tom's Net3-Novato came
 	// back from storage centred on (958, 4999) -- exactly half his canvas in each axis -- with the
 	// scale clamped up to minScale(), the whole-world floor. 677 symbols drew at 1 x 0 px, 26,000
@@ -8937,7 +9774,7 @@ var EngCalcs = EngCalcs || {};
 	// (cx = w/2 and cy = h/2 from the same line), so longitude sees every case of it. Tom's was
 	// 835 degrees east.
 	function viewIsReachable(v, sc, w, h) {
-		if (!isGeoProject() || !isFinite(sc) || sc <= 0) { return true; }
+		if (!isLatLonProject() || !isFinite(sc) || sc <= 0) { return true; }
 		return Math.abs(outwardX(v.cx)) - 180 <= (w / 2) / sc;
 	}
 	// **A STORED VIEW IS CHECKED AGAINST THE MODEL IT HAS TO SHOW, ON THE WAY IN** (ROADMAP Task
@@ -9001,7 +9838,7 @@ var EngCalcs = EngCalcs || {};
 	function viewShowsModel(v) {
 		var ext, sc, w, h, halfW, halfH;
 		if (!validView(v)) { return false; }
-		if (isGeoProject() && (Math.abs(outwardX(v.cx)) > 180 ||
+		if (isLatLonProject() && (Math.abs(outwardX(v.cx)) > 180 ||
 			Math.abs(outwardY(v.cy)) > LPN_MERC_MAX_LAT)) { return false; }
 		ext = modelExtent();
 		// Nothing to show, so nothing this can be wrong about. An empty document's view is its
@@ -9064,7 +9901,7 @@ var EngCalcs = EngCalcs || {};
 	// `frame` rides on the in-memory copy only -- tabViews is deliberately not in the library
 	// index and never reaches a file, so no stored document learns a field.
 	var tabViews = {}, pendingView = null, pendingViewFor = null;
-	function viewFrame() { return isGeoProject() ? 'geo' : 'grid'; }
+	function viewFrame() { return isLatLonProject() ? 'geo' : 'grid'; }
 	function rememberCurrentView() {
 		var v = currentView();
 		if (v && library.openId) { v.frame = viewFrame(); tabViews[library.openId] = v; }
@@ -9127,7 +9964,7 @@ var EngCalcs = EngCalcs || {};
 	// drawn immediately re-frames it anyway, because `zoomExtent()` takes over as soon as there is
 	// content.
 	function defaultViewForCoords() {
-		if (isGeoProject()) { return geoHomeView(); }
+		if (isLatLonProject()) { return geoHomeView(); }
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		if (!w || !h) { return null; }
@@ -9376,13 +10213,13 @@ var EngCalcs = EngCalcs || {};
 	 * elevations. A geographic project always could -- its coordinates ARE the answer. A projected
 	 * one can since Task 641 phase 5, for the 98% of the register with a transform.
 	 *
-	 * **IT IS ONE PREDICATE BECAUSE IT WAS FOUR COPIES OF `isGeoProject() && mapboxToken()` AND
+	 * **IT IS ONE PREDICATE BECAUSE IT WAS FOUR COPIES OF `isLatLonProject() && mapboxToken()` AND
 	 * THEY DID NOT MOVE TOGETHER.** The basemap was widened on 2026-09-14 and the elevation
 	 * buttons were not, so a new projected project drew the world map and then refused to read
 	 * heights off it -- Tom, the same day: *"A new project with a projection doesn't offer the DEM
 	 * elevation buttons."* Both are the same question and now they ask it once.
 	 */
-	function projectLocatable() { return isGeoProject() || projectedBasemapOk(); }
+	function projectLocatable() { return isLatLonProject() || projectedBasemapOk(); }
 	function basemapOn() { return projectLocatable() && project.basemap !== 'off'; }
 	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
 	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
@@ -10177,7 +11014,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function minScale() {
 		var w = (svg && svg.clientWidth) || 1000;
-		if (isGeoProject()) { return Math.max(MIN_SCALE_GRID, w / 360); }
+		if (isLatLonProject()) { return Math.max(MIN_SCALE_GRID, w / 360); }
 		if (isProjectedProject()) {
 			var per = planeUnitsPerMetre();
 			if (per > 0) { return Math.min(MIN_SCALE_GRID, w / (LPN_PLANE_SPAN_M * per)); }
@@ -10186,7 +11023,7 @@ var EngCalcs = EngCalcs || {};
 		if (span > 0) { return Math.min(MIN_SCALE_GRID, LPN_VIEW_MIN_MODEL_PX / span); }
 		return MIN_SCALE_GRID;
 	}
-	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
+	function maxScale() { return isLatLonProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
 	var drag = null;
 	// **THE ONE PLACE THE PANNING CLASS IS WRITTEN** (Task 569). It exists so a moving-state cursor
@@ -10971,7 +11808,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		// **THE GATE IS THE MENU ROW'S OWN.** The row is hidden on a project that cannot say where
 		// on the Earth it is, and this asks the same question rather than a narrower one: it read
-		// isGeoProject() while the row read projectLocatable(), so on a projected project the row
+		// isLatLonProject() while the row read projectLocatable(), so on a projected project the row
 		// was offered and the press did nothing at all. goToPoint() below travels through the
 		// transform, so there is nothing here a projected project cannot do.
 		if (!projectLocatable()) { return; }
@@ -11142,7 +11979,7 @@ var EngCalcs = EngCalcs || {};
 		// The position the SCENARIO shows, so a node moved in a scenario samples the ground it is
 		// standing on there rather than the ground Base left it on (Task 674).
 		var x = effective(n, 'x'), y = effective(n, 'y');
-		if (isGeoProject()) { return { lon: x, lat: y }; }
+		if (isLatLonProject()) { return { lon: x, lat: y }; }
 		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
 		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
 	}
@@ -11160,7 +11997,7 @@ var EngCalcs = EngCalcs || {};
 	function viewLonLat(v) {
 		var ll;
 		if (!v || !projectLocatable()) { return null; }
-		if (isGeoProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+		if (isLatLonProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
 		if (!EngCalcs.lpnCrsInverse) { return null; }
 		ll = EngCalcs.lpnCrsInverse(projectCrsCode(), { x: outwardX(v.cx), y: outwardY(v.cy) });
 		return ll ? { lat: ll.lat, lon: ll.lon, extent: null } : null;
@@ -11484,7 +12321,7 @@ var EngCalcs = EngCalcs || {};
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
-		if (isGeoProject()) {
+		if (isLatLonProject()) {
 			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
 			return;
 		}
@@ -11904,6 +12741,108 @@ var EngCalcs = EngCalcs || {};
 		return null;
 	}
 
+	// ---- THE TWO-CLICK METER GESTURE (ROADMAP Task 247) ----------------------------------------
+	//
+	// Tom's own gesture: *"you pick a point, it draws a meter rectangle, and then you pick a pipe
+	// and it connects perpendicularly from the meter to the pipe."* **The RECTANGLE in that sentence
+	// is superseded and the PERPENDICULAR is not** (2026-09-17): the map symbol is a solid dot,
+	// because at the size it is drawn a rectangle is a smudge, and the picture of a meter box lives
+	// in the toolbar where there is room for one.
+	//
+	// **NOTHING IS WRITTEN TO THE DOCUMENT UNTIL THE PIPE IS PICKED**, exactly as a half-drawn pipe
+	// writes nothing until its second node arrives: the position is held in view state, so an
+	// abandoned placement leaves no element and owes no undo snapshot. Escape and a click on
+	// nothing both cancel, which is what keeps a half-made object off the drawing.
+	//
+	// **AND THERE IS NO ONE-CLICK DOOR. IT WAS BUILT, IT SHIPPED, AND TOM HAD IT TAKEN OUT**
+	// (2026-09-18: *"I did not ask for it, it could be difficult to manage... Let's remove it. It's
+	// of questionable value."*). A press straight onto a pipe used to make a meter then and there,
+	// one default offset out on the side the press was on -- which bought a row of twelve houses
+	// twelve clicks instead of twenty-four and cost two things nobody could see: the offset was a
+	// constant with no control anywhere, and which side of the main the meter landed on was decided
+	// by a fraction of a pixel. **Do not rebuild it.** He liked it for a day, listed what was wrong
+	// with it, and then answered his own question in the other direction; the later word wins.
+	//
+	// So the tool is two presses, always, and they are two different statements: where the meter
+	// is, and what serves it.
+	var pendingMeter = null;        // {x, y} in world units, or null
+	var pendingMeterEl = null;      // the preview dot
+	var pendingMeterBand = null;    // the dashed line to the live pointer
+	function setPendingMeter(pt) {
+		pendingMeter = pt || null;
+		if (!pendingMeter) {
+			if (pendingMeterEl) { pendingMeterEl.remove(); pendingMeterEl = null; }
+			if (pendingMeterBand) { pendingMeterBand.remove(); pendingMeterBand = null; }
+			setNotice('');
+			return;
+		}
+		if (!pendingMeterBand) {
+			// **ITS OWN CLASS BESIDE THE SHARED ONE.** The half-drawn PIPE uses lpn-rubberband too,
+			// and one selector that finds either is how a probe ends up reading the wrong line's
+			// attributes -- measured in the browser probe, which found the pipe's band first.
+			pendingMeterBand = el('line', { 'class': 'lpn-rubberband lpn-meter-band' }, world);
+		}
+		if (!pendingMeterEl) {
+			pendingMeterEl = el('circle', { 'class': 'lpn-meter lpn-meter-pending' }, world);
+		}
+		drawPendingMeter(null);
+		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
+			'Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
+	}
+	/**
+	 * The preview dot, plus the band from it to the connection the next press would make. `to` is
+	 * null before the pointer has found one, and on the first press, when there is nothing yet for
+	 * the band to reach.
+	 *
+	 * **THE BAND ONLY EVER DRAWS A CONNECTION THAT COULD BE MADE** (Tom, 2026-09-18: *"the rubber
+	 * band after customer placement step 1 should be constrained to link perpendiculars and
+	 * nodes"*). It used to follow the raw pointer, which drew a line at whatever angle the hand
+	 * was at, from the meter to a point in open space -- a picture of two things this page does
+	 * not offer: a service at an angle, and a service to nowhere. Over bare map there is now no
+	 * band at all, which is the honest drawing of "this press would cancel".
+	 */
+	function drawPendingMeter(to) {
+		var half;
+		if (!pendingMeter || !pendingMeterEl) { return; }
+		// The preview is the same dot the placed meter will be, so what the reader sees before the
+		// pipe is picked is what they get after it.
+		half = meterHalfWorld(pendingMeter.x, pendingMeter.y);
+		pendingMeterEl.setAttribute('cx', pendingMeter.x);
+		pendingMeterEl.setAttribute('cy', pendingMeter.y);
+		pendingMeterEl.setAttribute('r', half);
+		pendingMeterEl.setAttribute('stroke-width', serviceStrokeWorld(pendingMeter.x, pendingMeter.y));
+		if (!pendingMeterBand) { return; }
+		// Hidden rather than collapsed to a zero-length line: a line from the dot to itself is a
+		// dot-sized smudge on top of the preview, which reads as a mark rather than as nothing.
+		if (!to || !isFinite(to.x) || !isFinite(to.y)) {
+			pendingMeterBand.setAttribute('visibility', 'hidden');
+			return;
+		}
+		pendingMeterBand.setAttribute('visibility', 'visible');
+		pendingMeterBand.setAttribute('x1', pendingMeter.x);
+		pendingMeterBand.setAttribute('y1', pendingMeter.y);
+		pendingMeterBand.setAttribute('x2', to.x);
+		pendingMeterBand.setAttribute('y2', to.y);
+	}
+	// Where the next press would connect this half-placed meter, or null over bare map. The one
+	// reader of customerConnectionAt() for the preview; the press itself calls it again rather than
+	// trusting a remembered answer, because the drawing may have moved between the two.
+	function pendingMeterConnection(e, target) {
+		if (!pendingMeter) { return null; }
+		// **THE PREVIEW'S REACH IS THE PRESS'S REACH**, one number per hand, so the band cannot
+		// promise a pipe a finger's press would miss or refuse one it would catch.
+		return customerConnectionAt(e.clientX, e.clientY, pendingMeter, reachPx(e), target);
+	}
+	// **ESCAPE ABANDONS A HALF-PLACED METER, on the same capture-phase argument the link below it
+	// makes** -- it is the newest thing on screen, and the key is consumed only when there is
+	// something to abandon.
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
+		if (!pendingMeter) { return; }
+		setPendingMeter(null);
+		e.stopPropagation();
+	}, true);
+
 	// **ESCAPE ABANDONS A HALF-DRAWN LINK** (Task 567). Once a click in open space is a BEND rather
 	// than an abandonment, the gesture that used to cancel a drawing is gone, so the drawing needs a
 	// way out of its own. Capture phase and the same "innermost first" argument the profile
@@ -11940,12 +12879,13 @@ var EngCalcs = EngCalcs || {};
 	// already reads -- the property popup, the profile's starting node, the fire-flow sweep's
 	// subject. Keeping both means a one-element selection behaves exactly as it always did, and a
 	// caller that has no multi-element meaning does not have to invent one.
-	var selections = [];    // [{kind:'node'|'link'|'label', id}, ...] -- the whole subject
+	var selections = [];    // [{kind:'node'|'link'|'label'|'customer', id}, ...] -- the whole subject
 	var selection = null;   // the last of them, or null. Every pre-266 reader wants this.
 	function selectionExists(sel) {
 		if (!sel) { return false; }
 		if (sel.kind === 'node') { return !!nodeById(sel.id); }
 		if (sel.kind === 'link') { return !!linkById(sel.id); }
+		if (sel.kind === 'customer') { return !!customerById(sel.id); }
 		return !!labelById(sel.id);
 	}
 	// The ONE element each kind wears the mark on. A link wears it on its HALO -- the wider line
@@ -11956,6 +12896,9 @@ var EngCalcs = EngCalcs || {};
 		if (!sel) { return null; }
 		if (sel.kind === 'node') { return nodeEls[sel.id] && nodeEls[sel.id].circle; }
 		if (sel.kind === 'link') { return linkEls[sel.id] && (linkEls[sel.id].halo || linkEls[sel.id].line); }
+		// A meter wears the mark on its BOX, which is the whole symbol -- there is no halo under it
+		// and the connector is not pickable, so the box is what a reader sees and grabs.
+		if (sel.kind === 'customer') { return custEls[sel.id] && custEls[sel.id].box; }
 		return labelEls[sel.id] && labelEls[sel.id].text;
 	}
 	function paintSelection(sel, on) {
@@ -11988,6 +12931,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		selection = selections.length ? selections[selections.length - 1] : null;
 		selections.forEach(function (s) { paintSelection(s, true); });
+		// **THE METER'S SLIDE HANDLE IS A FACT ABOUT THE SELECTION** (Task 247, Tom's own
+		// *"temporary draggable circle that slides along the pipe"*), so it is drawn and removed in
+		// the one place the subject is written. Anywhere else and there would be a path by which a
+		// handle is left on a pipe whose meter is no longer selected.
+		refreshCustomerHandle();
 	}
 	function setSelection(kind, id) {
 		setSelectionList((kind && id) ? [{ kind: kind, id: id }] : []);
@@ -12026,6 +12974,10 @@ var EngCalcs = EngCalcs || {};
 		else if (d.linklbl !== undefined) { setSelection('link', d.linklbl); }
 		else if (d.link !== undefined) { setSelection('link', d.link); }
 		else if (d.lbl !== undefined) { setSelection('label', d.lbl); }
+		// A meter and its account text are both the customer (Task 247), on exactly the reading this
+		// function already makes of a node's own data label.
+		else if (d.cust !== undefined) { setSelection('customer', d.cust); }
+		else if (d.custhandle !== undefined) { setSelection('customer', d.custhandle); }
 		else { clearSelection(); }
 	}
 	// The same reading of a hit, ADDED to the subject rather than replacing it. It is deliberately
@@ -12036,7 +12988,8 @@ var EngCalcs = EngCalcs || {};
 	function hitIsElement(t) {
 		var d = (t && t.dataset) || {};
 		return !!(d.node || d.nodelbl !== undefined || d.linklbl !== undefined ||
-			d.link !== undefined || d.lbl !== undefined);
+			d.link !== undefined || d.lbl !== undefined || d.cust !== undefined ||
+			d.custhandle !== undefined);
 	}
 	function toggleFromHit(t) {
 		var d = (t && t.dataset) || {};
@@ -12045,6 +12998,8 @@ var EngCalcs = EngCalcs || {};
 		else if (d.linklbl !== undefined) { toggleInSelection('link', d.linklbl); }
 		else if (d.link !== undefined) { toggleInSelection('link', d.link); }
 		else if (d.lbl !== undefined) { toggleInSelection('label', d.lbl); }
+		else if (d.cust !== undefined) { toggleInSelection('customer', d.cust); }
+		else if (d.custhandle !== undefined) { toggleInSelection('customer', d.custhandle); }
 		// Shift on bare canvas keeps what is there: clearing would make an accidental miss cost
 		// the whole selection, which is the one thing a modifier click exists to protect.
 	}
@@ -12328,6 +13283,12 @@ var EngCalcs = EngCalcs || {};
 		(doc.labels || []).forEach(function (lb) {
 			var pt = textLabelPoint(lb);
 			if (pt && inArea(ring, pt.x, pt.y)) { out.push({ kind: 'label', id: lb.id }); }
+		});
+		// A meter is caught by the point it is drawn at, which is the Text rule above it -- the
+		// service connector is not consulted, exactly as a label's leader is not (Task 247).
+		(doc.customers || []).forEach(function (c) {
+			var pt = customerPoint(c);
+			if (pt && inArea(ring, pt.x, pt.y)) { out.push({ kind: 'customer', id: c.id }); }
 		});
 		return out;
 	}
@@ -13287,6 +14248,7 @@ var EngCalcs = EngCalcs || {};
 			if (!a || !b) { return null; }
 			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
 		}
+		if (cand.group === 'customer') { return customerPoint(cand.el); }
 		return textLabelPoint(cand.el);
 	}
 	// **HOW MUCH OF THE DRAWING A RESULT NEEDS AROUND IT** (Tom, 2026-08-18: *"something like twice
@@ -13344,7 +14306,9 @@ var EngCalcs = EngCalcs || {};
 	// edits, an undo, and a project switch; a stored element object outlives all three and would
 	// pan the map to a node that no longer exists.
 	function findGoTo(group, id) {
-		var el = group === 'node' ? nodeById(id) : (group === 'link' ? linkById(id) : labelById(id)), p, v;
+		var el = group === 'node' ? nodeById(id)
+			: (group === 'link' ? linkById(id)
+			: (group === 'customer' ? customerById(id) : labelById(id))), p, v;
 		if (!el) { return; }
 		setSelection(group, id);
 		p = findPointOf({ group: group, el: el });
@@ -16356,6 +17320,116 @@ var EngCalcs = EngCalcs || {};
 		return pc.lpn_field_text_attached_tip ||
 			'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
 	}
+	/**
+	 * **THE CUSTOMER TABLE'S COLUMNS** (Task 247). The popup's own rows, re-keyed: the account
+	 * number, what one service draws, how many services, the total, the pipe and the junction it
+	 * lumps at. The multi-properties box takes its property list from here, so editing the count
+	 * across forty selected meters at once costs no code of its own.
+	 *
+	 * **NOTHING HERE GOES THROUGH setProp() AND NOTHING CARRIES `prop`**, which is the table's half
+	 * of the popup's own rule: a customer has no overridable property, so a row with an override
+	 * marker would be a mark that can never appear and a promise a scenario cannot keep.
+	 *
+	 * The last two are read-only: which pipe serves a meter is identity (moving the meter is how it
+	 * changes) and the junction is DERIVED, so an input there would accept a number nothing reads.
+	 */
+	/**
+	 * **A METER'S LOCATION AS TWO COLUMNS** (Task 247), in whatever the project calls its axes, and
+	 * through the same setCustomerCoordAxis() seam the rest of this file writes a position with.
+	 *
+	 * **THE KEY IS A SLOT AND THE HEADING IS A FUNCTION**, because paneTables() is built once and
+	 * cached while the vocabulary follows the PROJECT: lat/lon, northing/easting or x/y. A heading
+	 * resolved at build time would be whichever kind of project happened to be open first and would
+	 * stay that way for the life of the tab. (Task 674 builds the same pair for a node; keep one
+	 * copy of the reasoning when the two branches meet.)
+	 */
+	function paneColCustomerCoord(slot) {
+		return {
+			key: 'axis' + slot, em: 5.5, reread: true,
+			label: function () { return slot === 1 ? axisNames().first : axisNames().second; },
+			get: function (c) { return customerCoordAxis(c, slot); },
+			set: function (c, v) { setCustomerCoordAxis(c, slot, v); customerEdited(c); }
+		};
+	}
+	function paneCustomerCols() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			paneColId(),
+			// **THE LOCATION AND THE LINK, SIDE BY SIDE AND IN THAT ORDER** (Tom, 2026-09-17: *"Pick
+			// location, pick pipe, repeat"*, and one row per customer carrying both). It is the map
+			// gesture written as a table, and the two columns are adjacent because Enter walks DOWN
+			// a column here: forty locations, then forty pipes, which is how somebody types forty
+			// services without touching the mouse. A flat alternating list would cost a keystroke
+			// per field to stay in step and would put two unlike quantities in one column.
+			paneColCustomerCoord(1), paneColCustomerCoord(2),
+			// **THE LINK IS A TYPED VALUE WITH A SUGGESTION, NEVER AN ASSIGNMENT WE MADE.** The
+			// placeholder offers the nearest pipe and writes nothing; the cell stays empty until
+			// somebody states one. A guess would be the invisible kind of wrong at a corner where
+			// four mains meet: the customer appears, every number calculates, and the demand is on
+			// the wrong main. Re-read after every write, because the setter may refuse the id.
+			{ key: 'link', label: 'lpn_field_meter_pipe', str: true, em: 4, reread: true,
+				hint: function (c) { return customerLink(c) ? '' : (suggestCustomerLink(c) || ''); },
+				hintTip: function (c) {
+					var id = customerLink(c) ? '' : suggestCustomerLink(c);
+					return id ? String(pc.lpn_field_meter_pipe_suggest ||
+						'The nearest asset is {id}. Type it here to serve this customer from it.')
+						.split('{id}').join(id) : '';
+				},
+				get: function (c) { var l = customerLink(c); return l ? l.id : ''; },
+				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
+			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
+			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
+			// through the same two seams: setCustomerStation() slides the connection ALONG the main
+			// and carries the house with it, setCustomerOffset() moves the house ACROSS. A meter
+			// attached to nothing has no pipe to be along or off, so both cells read empty there and
+			// both setters refuse rather than inventing a position.
+			{ key: 'station', label: 'lpn_field_meter_station', em: 3.5,
+				get: function (c) {
+					return customerLink(c) ? +(customerT(c) * 100).toFixed(2) : '';
+				},
+				set: function (c, v) {
+					if (!customerLink(c) || !isFinite(v)) { return; }
+					setCustomerStation(c, Math.max(0, Math.min(100, v)) / 100);
+					customerEdited(c);
+				} },
+			{ key: 'offset', label: 'lpn_field_meter_offset', em: 3.5,
+				unit: function () { return 'lpn_u_length'; },
+				get: function (c) {
+					return customerLink(c) ? +customerOffset(c).toFixed(3) : '';
+				},
+				set: function (c, v) {
+					if (!isFinite(v)) { return; }
+					setCustomerOffset(c, v);
+					customerEdited(c);
+				} },
+			{ key: 'account', label: 'lpn_field_account', str: true, em: 6,
+				get: function (c) { return c.account || ''; },
+				set: function (c, v) { c.account = v === undefined || v === null ? '' : String(v); customerEdited(c); } },
+			{ key: 'demand', label: 'lpn_field_meter_demand', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
+				get: function (c) { return c.demand; },
+				// Blank stays blank: a meter nobody has given a demand to yet and a meter that draws
+				// nothing are two different statements, and `+'' === 0` would merge them.
+				set: function (c, v) {
+					if (v === undefined || v === null || v === '' || !isFinite(v)) { delete c.demand; }
+					else { c.demand = v; }
+					customerEdited(c);
+				} },
+			{ key: 'count', label: 'lpn_field_meter_count', em: 2.5,
+				get: function (c) { return (typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1; },
+				set: function (c, v) {
+					var n = Math.round(v);
+					if (!isFinite(n) || n < 1) { return; }
+					c.count = n;
+					customerEdited(c);
+				} },
+			{ key: 'total', label: 'lpn_field_meter_total', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
+				get: function (c) { return customerFlow(c); } },
+			// An EMPTY link cell above is a detached meter, and it is the one reading in the table
+			// that says its demand is in no answer. The popup says so in words.
+			{ key: 'atNode', label: 'lpn_field_meter_lumped', em: 3,
+				get: function (c) { var n = customerNodeId(c); return (n === null || n === undefined) ? '' : n; } }
+		];
+	}
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -16610,6 +17684,20 @@ var EngCalcs = EngCalcs || {};
 				id: 'text', panel: 'lpn_pane_text', label: 'lpn_tool_add_text',
 				group: 'label', type: 'text',
 				cols: paneTextCols()
+			},
+			// **THE CUSTOMER TABLE** (Task 247; Tom, 2026-08-24: *"First slice is good thinking.
+			// Customers on a shoestring! And we can add a Customer table! Yes!"*). The pane already
+			// generates one tab per row of this list, so a Customer table is a row here rather than
+			// a new mechanism -- which is the whole reason it costs so little.
+			//
+			// **NO Active COLUMN**, unlike every asset table above: `active` is an overridable
+			// property and a customer carries none (see the Task 247 section note). A column of
+			// permanently ticked boxes would be a control that says a scenario can do something it
+			// cannot.
+			{
+				id: 'customers', panel: 'lpn_pane_customers', label: 'lpn_pane_tab_customers',
+				group: 'customer', type: 'customer',
+				cols: paneCustomerCols()
 			}
 		].map(function (spec) {
 			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
@@ -16681,6 +17769,12 @@ var EngCalcs = EngCalcs || {};
 	function paneFilterKeys(spec) {
 		var q = paneFilterQuery(spec), r, keys = {};
 		if (!q) { return null; }
+		// **A CUSTOMER IS NOT IN Find YET, so a filter has nothing to ask** (Task 247; searching
+		// one by account number is the roadmap's own later slice). Admitting every row is the
+		// answer this function already gives a line that cannot be resolved, and for the same
+		// reason: hiding every row is the one answer a reader cannot tell from a network that has
+		// none.
+		if (spec.group === 'customer') { return null; }
 		r = findSelectByQuery(q);
 		if (!r.ok) { return null; }
 		r.list.forEach(function (c) { keys[c.group + ':' + c.el.id] = true; });
@@ -16690,8 +17784,9 @@ var EngCalcs = EngCalcs || {};
 	function paneTableAllElements(spec) {
 		var pool = spec.group === 'link' ? doc.links : doc.nodes;
 		// A Text object has no `type` of its own: every label is a Text, so the Text table is all
-		// of them (Tom, 2026-09-08).
+		// of them (Tom, 2026-09-08). A customer is the same shape (Task 247).
 		if (spec.group === 'label') { return (doc.labels || []).slice(); }
+		if (spec.group === 'customer') { return (doc.customers || []).slice(); }
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
 	function paneTableElements(spec) {
@@ -16856,6 +17951,17 @@ var EngCalcs = EngCalcs || {};
 	// A column that declares no `em` says nothing at all, and CSS's own fallback is the old 7em.
 	function paneApplyColWidth(input, c) {
 		if (c.em) { input.style.setProperty('--lpn-pane-col-w', c.em + 'em'); }
+	}
+	// The placeholder and its explanation for a column that offers a suggestion, and nothing at all
+	// for one that does not. The tip goes on `title` rather than beside the cell: a table of forty
+	// rows has no room for a sentence, and the placeholder itself is the short form.
+	function paneApplyHint(input, c, el) {
+		var text, tip;
+		if (!c.hint || !input || input.tagName !== 'INPUT') { return; }
+		text = c.hint(el) || '';
+		tip = c.hintTip ? (c.hintTip(el) || '') : '';
+		if (text) { input.setAttribute('placeholder', text); } else { input.removeAttribute('placeholder'); }
+		if (tip) { input.title = tip; } else if (input.title) { input.removeAttribute('title'); }
 	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
@@ -17094,6 +18200,12 @@ var EngCalcs = EngCalcs || {};
 				// is the whole of Tom's "beautiful exploration tool": tighten a limit and the cells
 				// that break it light up, loosen it and they go out again.
 				if (c.cp) { customPropPaintFlag(input, c.cp, input.value); }
+				// **A COLUMN MAY SUGGEST WITHOUT WRITING** (Task 247). The placeholder is a
+				// suggestion and nothing else: it is not the cell's value, it is not saved, and
+				// paneCellText() never returns it -- so an empty cell stays empty in the document,
+				// in a paste, and in the printed sheet. It is the shape a guess has to take where
+				// guessing wrong is invisible; see the link column in paneCustomerCols().
+				paneApplyHint(input, c, el);
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
@@ -17119,6 +18231,10 @@ var EngCalcs = EngCalcs || {};
 				} else if (c.bool && target.type === 'checkbox') {
 					target.checked = !!c.get(el);
 				} else if (!(target === activeElementSafe() && paneInEdit(target))) {
+					// The suggestion follows the drawing: move the meter and the pipe it would be
+					// served from changes, so a placeholder written once at build time would be
+					// stale advice. Refreshed here, in the one pass that refreshes everything else.
+					paneApplyHint(target, c, el);
 					// **ONLY A CELL BEING EDITED IS LEFT ALONE** (Task 186). It used to be any cell
 					// with the caret in it, which was the same thing when focus WAS editing; now a
 					// person can sit on a cell for a minute without typing, and a solve that
@@ -17394,6 +18510,12 @@ var EngCalcs = EngCalcs || {};
 			return false;
 		}
 		c.set(el, p.v);
+		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
+		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
+		// location is snapped onto its own pipe. In both cases the document and the box would
+		// otherwise disagree until the next solve, with the box showing the version that was not
+		// kept -- which is the reading a person would act on.
+		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
 		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
 		refreshPopupIfOpen();
 		paneLeaveEdit(input);
@@ -19468,7 +20590,8 @@ var EngCalcs = EngCalcs || {};
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
-		'add-valve': 'lpn_mode_add_valve', 'add-text': 'lpn_mode_add_text',
+		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
+		'add-text': 'lpn_mode_add_text',
 		'vertices': 'lpn_mode_vertices'
 	};
 	function updateModeHint() {
@@ -19511,6 +20634,10 @@ var EngCalcs = EngCalcs || {};
 		// is built over several clicks, so leaving the tool mid-ring is a real gesture -- and a ring
 		// left on the map by a tool that is no longer running is a shape nothing can finish.
 		if (mode === 'select-area' && newMode !== 'select-area') { areaCancel(); }
+		// A half-placed meter dies with the tool, exactly as a half-drawn link does one line down:
+		// a preview left on the map by a tool that is no longer running is a shape nothing can
+		// finish (Task 247).
+		if (mode === 'add-meter' && newMode !== 'add-meter') { setPendingMeter(null); }
 		mode = newMode; setPendingLinkFrom(null);
 		// **THE GRIPS ARE A CSS STATE, NOT A REDRAW** (Task 567). Every vertex handle already exists
 		// in the drawing -- buildLinkEls() makes one per bend -- so turning the mode on is one class
@@ -19750,7 +20877,20 @@ var EngCalcs = EngCalcs || {};
 
 	function deleteElement(kind, id) {
 		var pc = EngCalcs.pageConfig || {},
-			el = kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : linkById(id);
+			el = kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id)
+				: kind === 'customer' ? customerById(id) : linkById(id);
+		// **A METER IS DELETED OUTRIGHT IN EVERY SCENARIO, and that is not an oversight.** Nothing a
+		// customer carries is overridable (see the Task 247 section note), so it has no scenario
+		// values to lose, no `active` to switch and no override count to confirm -- the whole of the
+		// branching below is about elements that have those, and none of it can say anything true
+		// about this one. Deleting a meter inside a scenario therefore deletes it, which is the same
+		// answer as in Base, and Undo is the way back.
+		if (kind === 'customer') {
+			if (!el) { return; }
+			saveUndoSnapshot();
+			deleteCustomerById(id);
+			return;
+		}
 		// One guard for both branches. A delete gesture can name an element that is already gone --
 		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
 		// would otherwise walk an incidentLinks entry that no longer exists.
@@ -20030,6 +21170,16 @@ var EngCalcs = EngCalcs || {};
 		// no longer there. One rule for both anchors; undo brings the note back with its link.
 		(labelsByLinkAnchor[id] || []).slice().forEach(function (lid) { deleteLabelById(lid); });
 		delete labelsByLinkAnchor[id];
+		// **A METER ON A DELETED PIPE IS DETACHED, NOT DELETED**, and that is deliberately the
+		// OPPOSITE of the Text rule above it (Task 247). A Text is an annotation of that pipe; a
+		// customer is a service that exists whether or not anybody has drawn a main to it yet. Said
+		// out loud, because its demand has just left every answer on the screen.
+		var loose = detachCustomersFromLink(id);
+		if (loose) {
+			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
+				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				.replace('{n}', String(loose)));
+		}
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
@@ -20107,6 +21257,9 @@ var EngCalcs = EngCalcs || {};
 			if (typeof l.ly === 'number') { l.ly = -l.ly; }
 		});
 		(o.labels || []).forEach(function (lb) { if (typeof lb.y === 'number') { lb.y = -lb.y; } });
+		// A meter's y, on exactly the label rule above it: flipped whether it is an OFFSET from an
+		// attachment or an absolute position, because y-down to y-up applies to both.
+		(o.customers || []).forEach(function (c) { if (typeof c.y === 'number') { c.y = -c.y; } });
 		if (o.backdrop && typeof o.backdrop.ty === 'number') { o.backdrop.ty = -o.backdrop.ty; }
 		// The saved VIEW is a world REGION -- a centre point and an extent in drawing units -- so its
 		// centre's y belongs here like every other y. The extent is a size, and sizes do not flip.
@@ -20140,6 +21293,10 @@ var EngCalcs = EngCalcs || {};
 		(o.nodes || []).forEach(function (n) { visit(n); });
 		(o.links || []).forEach(function (l) { (l.verts || []).forEach(function (v) { visit(v); }); });
 		(o.labels || []).forEach(function (lb) { if (!lb.anchorNode && !lb.anchorLink) { visit(lb); } });
+		// A DETACHED meter's x/y is a position on the map; an attached one's is an offset from its
+		// attachment point, and an offset does not move when the frame's origin does. Same rule,
+		// same reason and same shape as the Text above it (Task 247).
+		(o.customers || []).forEach(function (c) { if (!c.link) { visit(c); } });
 		if (o.backdrop && typeof o.backdrop.tx === 'number') {
 			visit({}, function () { return { x: o.backdrop.tx, y: o.backdrop.ty }; },
 				function (x, y) { o.backdrop.tx = x; o.backdrop.ty = y; });
@@ -20273,7 +21430,7 @@ var EngCalcs = EngCalcs || {};
 	// Returns the delta so a caller holding a view of its OWN in the old frame can move it. Null
 	// means nothing happened, so `if (rebaseLiveGeoDoc())` reads correctly.
 	function rebaseLiveGeoDoc() {
-		if (!isGeoProject()) { return null; }
+		if (!isLatLonProject()) { return null; }
 		var cur = docOrigin(), minX = Infinity, minY = Infinity, org, dx, dy, tv;
 		// **THROUGH outwardX/outwardY, NOT cartesianY().** Those four functions are the whole
 		// boundary between the drawing frame and the world, and local-origin-harness.js counts
@@ -20492,6 +21649,11 @@ var EngCalcs = EngCalcs || {};
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
+			// **THE CUSTOMERS** (Task 247). Modelling data, and therefore the project's, on exactly
+			// the argument the curve and pipe-type libraries below are: a junction's demand means
+			// nothing without the meters lumped into it. A document that has none writes an empty
+			// list, so nothing about an existing file's other sections moves and no version is owed.
+			customers: doc.customers || [],
 			// The frame every coordinate above is measured from (Task 354). Written unconditionally,
 			// including the {0, 0} an ordinary drawing has, because a file that omits it is a file
 			// whose reader has to guess -- and the guess is only right until somebody hand-edits one.
@@ -20544,7 +21706,7 @@ var EngCalcs = EngCalcs || {};
 			// which is what keeps "an untouched coordinate leaves as the bytes it arrived as" true
 			// rather than nearly true. The file then states origin {0, 0}, which is what a
 			// geographic file has always stated.
-			if (!isGeoProject()) { return snap; }
+			if (!isLatLonProject()) { return snap; }
 			// The origin comes off INSIDE unprojectStoredGeo(), per coordinate, because whether a
 			// number can be handed back verbatim is decided against the shifted value. A separate
 			// add-back pass before it would destroy every source's equality test.
@@ -20575,7 +21737,8 @@ var EngCalcs = EngCalcs || {};
 	// since that is always current; a background tab is read from its own saved JSON.
 	function projectIsEmpty(id) {
 		var saved = id === library.openId ? doc : readJSON(projectKey(id));
-		return !!saved && !(saved.nodes && saved.nodes.length) && !(saved.links && saved.links.length) && !(saved.labels && saved.labels.length);
+		return !!saved && !(saved.nodes && saved.nodes.length) && !(saved.links && saved.links.length) &&
+			!(saved.labels && saved.labels.length) && !(saved.customers && saved.customers.length);
 	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
 	// ---- "differs from the file", the only thing the asterisk may mean ----
@@ -21306,11 +22469,11 @@ var EngCalcs = EngCalcs || {};
 			alert(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
 			return null;
 		}
-		// The three collections are the one part applySaved() takes on trust (`saved.nodes || []`),
+		// The four collections are the one part applySaved() takes on trust (`saved.nodes || []`),
 		// so a file whose `nodes` is a string or a number would install and then break the renderer
 		// rather than being refused here. Absent is fine -- that is an empty project; present and
 		// not an array is not a project document.
-		var lists = ['nodes', 'links', 'labels'], i;
+		var lists = ['nodes', 'links', 'labels', 'customers'], i;
 		for (i = 0; i < lists.length; i++) {
 			if (saved[lists[i]] !== undefined && !Array.isArray(saved[lists[i]])) { return null; }
 		}
@@ -21330,7 +22493,7 @@ var EngCalcs = EngCalcs || {};
 		// double the memory and create a second thing to keep in step.
 		// Longitude/latitude in, Web Mercator out (Task 145's projection seam). BEFORE the flip,
 		// because the projection is defined on the file's Cartesian frame, and read off `saved`
-		// rather than isGeoProject() because `project` is not assigned until a few lines below.
+		// rather than isLatLonProject() because `project` is not assigned until a few lines below.
 		if (saved.v >= LPN_CARTESIAN_VERSION &&
 			saved.project && saved.project.coords === LPN_COORDS_GEO) {
 			projectStoredGeo(saved);
@@ -21359,6 +22522,11 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		// The customers (Task 247). A file written before they existed has none, and every
+		// junction in it draws exactly what it always did -- there is no migration step and no
+		// version bump, because nothing MOVED: this adds demand rows beside the junction's own
+		// rather than taking anything out of them.
+		doc.customers = saved.customers || [];
 		// The clock (Task 423). A file written before this existed has none and behaves exactly as
 		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
 		doc.patterns = saved.patterns || [];
@@ -21403,7 +22571,7 @@ var EngCalcs = EngCalcs || {};
 		// **AND A VIEW THAT CANNOT SHOW THIS MODEL IS DECLINED HERE** (Task 628, see
 		// viewShowsModel()), which hands the document the same fit. This is the whole document's
 		// one door, and by this line everything the test needs is installed and in the drawing
-		// frame: doc.nodes, doc.links, doc.origin, and `project`, so isGeoProject() answers for the
+		// frame: doc.nodes, doc.links, doc.origin, and `project`, so isLatLonProject() answers for the
 		// document ARRIVING rather than the one leaving. `saved.view` is in that frame too -- the
 		// projection, the rebase and the flip above all carry it.
 		pendingView = viewShowsModel(saved.view) ? saved.view : null;
@@ -21961,7 +23129,7 @@ var EngCalcs = EngCalcs || {};
 		var id = newProjectId();
 		// Computed BEFORE the push below, or the project would be counted against itself.
 		var name = nextProjectName();
-		doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
+		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
 		scenarios = defaultScenarios();
 		project = { name: name, activeScenario: 'base' };
@@ -22181,16 +23349,25 @@ var EngCalcs = EngCalcs || {};
 	 * the status line and are deliberately not raised to a dialog here.
 	 */
 	function showInpExportFlattening(differences, fileName) {
-		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, coords = null, said = [];
+		var pc = EngCalcs.pageConfig || {}, types = null, fittings = null, custs = null, coords = null, said = [];
 		(differences || []).forEach(function (d) {
 			if (d.code === 'pipe-type-flattened') { types = d; }
 			if (d.code === 'fittings-flattened') { fittings = d; }
 			if (d.code === 'node-coords-scenario') { coords = d; }
+			// **AND THE CUSTOMERS** (Task 247), which is a THIRD sentence rather than a widening of
+			// either above it, on this function's own rule: a pipe type loses its indirection, a
+			// fittings list loses its itemisation, and a customer loses its PLACE. One sentence
+			// covering all three would say something untrue of each.
+			if (d.code === 'customer-geometry') { custs = d; }
 		});
-		if (!types && !fittings && !coords) { return; }
+		if (!types && !fittings && !coords && !custs) { return; }
 		if (types) {
 			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so editing one definition and having every pipe follow is something only your own project file records.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
+		}
+		if (custs) {
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
+				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
 			said.push((pc.lpn_inp_export_flat_coords || 'An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.')
@@ -23266,7 +24443,7 @@ var EngCalcs = EngCalcs || {};
 	 * A northing of 700,000 is an ordinary northing; refusing it was the old rule stated as a number.
 	 */
 	function surveyLimits() {
-		return isGeoProject() ? { north: LPN_MERC_MAX_LAT, east: 180 } : null;
+		return isLatLonProject() ? { north: LPN_MERC_MAX_LAT, east: 180 } : null;
 	}
 	function importSurveyFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
@@ -23473,7 +24650,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function createSurveyNodes(parsed, assetType) {
 		var notes = [], created = 0, elevFromFile = 0;
-		var geo = isGeoProject();
+		var geo = isLatLonProject();
 		var type = LPN_SURVEY_TYPES.indexOf(assetType) >= 0 ? assetType : 'junction';
 		saveUndoSnapshot();
 		parsed.points.forEach(function (p) {
@@ -26349,7 +27526,7 @@ var EngCalcs = EngCalcs || {};
 		//
 		// **THIS USED TO SAY A PROJECTED PROJECT'S VIEW COULD NOT BE READ, "the transform this
 		// page does not have"** -- true when it was written and false since Task 641 phase 5 gave
-		// the page js/lpn-crs.js. It was the last reader of isGeoProject() that meant
+		// the page js/lpn-crs.js. It was the last reader of isLatLonProject() that meant
 		// projectLocatable(), found by auditing all of them on 2026-09-18 (Task 692) after the
 		// same word had been the defect three times. It costs no dead control, only a New project
 		// box that opened on the whole register while the project behind it knew the town.
@@ -26650,6 +27827,11 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
 			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', fn: function () { setMode('add-valve'); } },
+			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
+			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
+			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
+			// Text stays last, being the only tool that adds nothing hydraulic.
+			{ icon: 'customer', label: pc.lpn_tool_add_meter || 'Customer', fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
@@ -26906,7 +28088,7 @@ var EngCalcs = EngCalcs || {};
 			// x/y are canvas units with no place on the Earth, so travelling to a latitude means
 			// nothing there. **A PROJECTED PROJECT IS NOT IN THAT CASE ANY MORE** (Tom,
 			// 2026-09-14: *"A projected project ... removes Map, Go to, and removes Map, Search
-			// place name. Is this intentional?"* -- it was not; it was `isGeoProject()` written
+			// place name. Is this intentional?"* -- it was not; it was `isLatLonProject()` written
 			// before there was a transform, and the answer to a typed latitude is now one forward
 			// projection away). The label states what the row will DO, because this menu has no
 			// checkmark column.
@@ -27544,7 +28726,7 @@ var EngCalcs = EngCalcs || {};
 	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
-		doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
+		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
 		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
 		// since their overrides key element IDs that no longer exist. Preferences survive.
@@ -28076,7 +29258,7 @@ var EngCalcs = EngCalcs || {};
 
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
-		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
+		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu and
 		// the ID-prefix rows. See insertAssetRows() for why that order.
 		[
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
@@ -28085,6 +29267,7 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
+			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
@@ -28299,6 +29482,15 @@ var EngCalcs = EngCalcs || {};
 			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
 			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
 		});
+		// The half-placed meter's band (Task 247), its own listener for the same reason the ring
+		// below it has one: the shapes both track the pointer between clicks and neither should
+		// depend on the other being wired.
+		svg.addEventListener('pointermove', function (e) {
+			var hit;
+			if (!pendingMeter) { return; }
+			hit = pendingMeterConnection(e, e.target);
+			drawPendingMeter(hit ? hit.point : null);
+		});
 		// The select-area ring, which follows the pointer with NO BUTTON DOWN (Task 266). Its own
 		// listener beside the rubber band's, and for the same reason: the two shapes both track the
 		// pointer between clicks and neither should depend on the other being wired.
@@ -28451,6 +29643,22 @@ var EngCalcs = EngCalcs || {};
 					w2 = screenToWorld(e.clientX, e.clientY);
 				drag = { type: 'label', id: t.dataset.lbl, offX: lbPt.x - w2.x, offY: lbPt.y - w2.y };
 				Object.assign(drag, common);
+			} else if (t.dataset.custhandle !== undefined) {
+				// **THE CONNECTION GRIP MOVES THE CONNECTION AND NOTHING ELSE** (Task 247; Tom,
+				// 2026-09-18, naming the second of the two grips: *"you can drag the connection
+				// point to a different asset"*). Read before the box below it because it is the
+				// more specific thing to have grabbed.
+				drag = { type: 'custanchor', id: t.dataset.custhandle, touch: e.pointerType === 'touch' };
+				Object.assign(drag, common);
+			} else if (t.dataset.cust !== undefined) {
+				// Dragging the METER moves the meter, and its attachment follows to the nearest
+				// point on the same pipe -- which is what makes dragging one past the middle of a
+				// main move its demand to the other junction, visibly, as the readout says.
+				var cDrag = customerById(t.dataset.cust),
+					cPt = cDrag ? customerPoint(cDrag) : { x: 0, y: 0 },
+					w6 = screenToWorld(e.clientX, e.clientY);
+				drag = { type: 'customer', id: t.dataset.cust, offX: cPt.x - w6.x, offY: cPt.y - w6.y };
+				Object.assign(drag, common);
 			} else if (t.dataset.nodelbl !== undefined) {
 				// Task 146.01: dragging a node's OWN data label (id/elev/demand/... beside the
 				// symbol), distinct from dragging the node itself (data-node, above) -- offset is
@@ -28525,6 +29733,14 @@ var EngCalcs = EngCalcs || {};
 			// junction whose new position is the only evidence it moved.
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
+			}
+			// **THE GRIP GOES BACK ONTO THE CONNECTION WHEN THE HAND LETS GO** -- see custHandleAt,
+			// which is view state for the length of one gesture and nothing else. Cleared on a
+			// CANCEL as well as on a release, because a held point that outlived its own drag would
+			// leave the ring stranded in the street with nothing left on the page to move it.
+			if (drag && drag.pointerId === e.pointerId && drag.type === 'custanchor') {
+				custHandleAt = null;
+				refreshCustomerHandle();
 			}
 			// **THE HAND OPENS ON EVERY RELEASE, GUARDED BY NOTHING** (Tom, 2026-09-08). It used to
 			// be cleared only where a drag was being ended, so any path that dropped `drag` during
@@ -28651,6 +29867,15 @@ var EngCalcs = EngCalcs || {};
 			if (e.pointerType === 'touch' && mode === 'select') {
 				if (t === svg) { t = touchAssetNear(e.clientX, e.clientY) || t; }
 				t = touchNodeOver(e.clientX, e.clientY, t);
+				// **AND A METER GETS THE SAME REACH A NODE DOES, for the same reason** (Task 247):
+				// it is deliberately a 3 px dot at system zoom, which makes it the one symbol on
+				// this map smaller than a junction. Only where the hit test found BARE MAP -- it
+				// fills in, it never overrules, so nothing else on the drawing becomes harder to
+				// tap. Touch only, so no pointer gesture changes at all.
+				if (t === svg) {
+					var nearMeter = nearestCustomerNearScreen(e.clientX, e.clientY, TOUCH_REACH_PX);
+					if (nearMeter && custEls[nearMeter.id]) { t = custEls[nearMeter.id].box; }
+				}
 			}
 			// No zoomExtent() after placing an element: rescaling the whole view on every click while
 			// building a network is disorienting. Zoom Extent stays user-requested only.
@@ -28700,6 +29925,69 @@ var EngCalcs = EngCalcs || {};
 					logLpnFirstAction('element');
 					addNode(mode.slice('add-'.length), w.x, w.y);
 				}
+			}
+			else if (mode === 'add-meter') {
+				// **A TAP ON A METER THAT IS ALREADY THERE OPENS IT**, which is the fat-finger rule
+				// the node and Text tools above already follow: refusing to place a second meter on
+				// top of one and then doing nothing at all is worse, because the user cannot tell a
+				// suppressed duplicate from a press the page missed.
+				var onMeter = pendingMeter ? null : nearestCustomerNearScreen(e.clientX, e.clientY, reachPx(e));
+				if (onMeter) {
+					setMode('select');
+					setSelection('customer', onMeter.id);
+					openCustomerPopup(onMeter.id, e.clientX, e.clientY);
+					return;
+				}
+				// **THE FIRST PRESS IS WHERE THE METER IS, AND IT IS NOTHING ELSE.** A pipe under it
+				// is not a target here: a meter often sits right over a main on the drawing, and the
+				// press that used to attach one there is the door Tom had removed (see
+				// setPendingMeter above). Nothing is written to the document yet.
+				if (!pendingMeter) { setPendingMeter({ x: w.x, y: w.y }); return; }
+				// **A PRESS ON A NODE CONNECTS THE SERVICE TO THAT NODE** (Tom, 2026-09-17: *"I
+				// don't see a way to connect directly to a node."*). There was genuinely no way:
+				// this tool asked for a PIPE and a node is not one, so pressing a junction did
+				// nothing at all and the reader could not tell that from a press the page missed.
+				//
+				// It is still an attachment to a pipe -- a customer has no other kind -- at the
+				// station that IS that node: `t` of 0 or 1 on one of the pipes the node is on. The
+				// pipe chosen is the one that passes nearest the meter's own position, so a corner
+				// where four mains meet takes the one the service actually runs along rather than
+				// whichever was drawn first; a genuine tie takes the first, deterministically, and
+				// the Customers table shows which pipe it landed on so a wrong guess is visible and
+				// typeable rather than silent.
+				//
+				// **THAT READING, AND THE PERPENDICULAR ONTO A PIPE BESIDE IT, ARE NOT WRITTEN HERE
+				// ANY MORE**: both are customerConnectionAt(), which is also what the band the user
+				// aimed with was drawn from. A press can no longer land anywhere the preview did
+				// not show. Its station comes from the METER and not from this press, which is Tom's
+				// own correction of 2026-09-18 (*"Put the meter where user clicks"*) now stated once
+				// rather than twice.
+				var mLink = customerConnectionAt(e.clientX, e.clientY, pendingMeter, reachPx(e), t);
+				if (mLink && mLink.link) {
+					saveUndoSnapshot();
+					logLpnFirstAction('element');
+					var mx = pendingMeter.x, my = pendingMeter.y;
+					setPendingMeter(null);
+					var madeC = addCustomer(mx, my, { link: mLink.link.id, t: mLink.t });
+					setSelection('customer', madeC.id);
+					// **PICK LOCATION, PICK PIPE, REPEAT** (Tom, 2026-09-17, in exactly those
+					// words). The property box used to open on placement, on the argument that a
+					// meter with no demand and no account number is not finished -- and it is not,
+					// but a box over the map after every second click is the end of the rhythm this
+					// tool exists for. A row of twelve houses along one main is the common case.
+					//
+					// **THE NUMBERS ARE TYPED IN THE CUSTOMERS TABLE, A COLUMN AT A TIME**, which is
+					// where a person entering forty of them wants to be anyway, and the notice says
+					// so rather than leaving the reader to find it. Selecting a meter still opens
+					// its own box for the one-off case.
+					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
+						'Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.')
+						.split('{id}').join(madeC.id));
+					return;
+				}
+				// **A SECOND PRESS THAT NAMES NOTHING CANCELS.** It is what keeps a half-made
+				// object off the drawing, and nothing has been written, so there is nothing to undo.
+				setPendingMeter(null);
 			}
 			else if (mode === 'add-text') {
 				// **THE OTHER HALF OF THE FAT-FINGER RULE.** Without a guard here, a tap on the Text
@@ -28818,6 +30106,7 @@ var EngCalcs = EngCalcs || {};
 				// No saveUndoSnapshot() here any more -- removeVertex() takes its own, so this would
 			// push a second identical snapshot and cost the user a dead press of Undo.
 			else if (t.classList.contains('lpn-vhandle')) { removeVertex(t.dataset.link, +t.dataset.vidx); }
+				else if (t.dataset.cust !== undefined) { deleteElement('customer', t.dataset.cust); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
 			} else if (mode === 'select' && profileEditActive()) {
@@ -28855,6 +30144,14 @@ var EngCalcs = EngCalcs || {};
 				// the add-junction door two hundred lines above all get the right answer without
 				// anyone setting a flag. See ghostClickShield().
 				openPopup(t.dataset.node, e.clientX, e.clientY);
+			} else if (mode === 'select' && (t.dataset.cust !== undefined || t.dataset.custhandle !== undefined)) {
+				// **SYNCHRONOUS, LIKE A NODE'S AND UNLIKE A LABEL'S** (Task 247). The 300 ms debounce
+				// on the three label cases below exists so a double-click can cancel the popup and
+				// mean something else instead; a double-click on a meter means nothing, so there is
+				// nothing for a delay to disambiguate and a press that opens its box after a
+				// third of a second reads as a page that missed.
+				openCustomerPopup(t.dataset.cust !== undefined ? t.dataset.cust : t.dataset.custhandle,
+					e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
 				// Delayed, not immediate: gives the native dblclick listener above a chance to
 				// cancel this if a second tap arrives (add-a-vertex), matching the browser's own
@@ -29023,6 +30320,92 @@ var EngCalcs = EngCalcs || {};
 			linkById(drag.id).verts[drag.vidx] = { x: w2.x + drag.offX, y: w2.y + drag.offY };
 			updateVertex(drag.id, drag.vidx);
 			relayoutLabels();
+		} else if (drag.type === 'customer') {
+			snapshotDragOnce();
+			var wm = screenToWorld(p.x, p.y), cm = customerById(drag.id), lm, pos;
+			if (!cm) { return; }
+			lm = customerLink(cm);
+			pos = { x: wm.x + drag.offX, y: wm.y + drag.offY };
+			if (lm) {
+				// **THE ATTACHMENT FOLLOWS THE METER TO THE NEAREST POINT ON ITS OWN PIPE.** Its own
+				// pipe, never a nearer one: re-serving a customer from a different main is a
+				// decision, and a decision is not something a drag should make on the way past.
+				//
+				// **AND THE DRAG HAS TWO DEGREES OF FREEDOM, NOT THREE** (Tom, 2026-09-17): along
+				// the pipe, and out from it. The pointer's position is resolved into exactly those
+				// two -- a station, and a signed distance along the normal there -- so a drag can
+				// never produce an angle, whatever direction the hand moves in. See linkNormalAt().
+				// **AND A NEAR MISS ON EITHER END OF THE PIPE IS A CONNECTION TO THAT NODE**, judged
+				// afresh on every move, so dragging away releases it (customerSnapT()).
+				setCustomerAt(cm, lm, pos.x, pos.y);
+			} else {
+				cm.x = pos.x; cm.y = pos.y;
+			}
+			updateCustomerGeometry(drag.id);
+			refreshCustomerHandle();
+			// Debounced, so the answers follow the drag rather than being recomputed per frame --
+			// and they have to follow it at all, because crossing the middle of a pipe moves this
+			// demand from one junction to the other.
+			scheduleSolve();
+			refreshPopupIfOpen();
+		} else if (drag.type === 'custanchor') {
+			/**
+			 * **THE SERVICE IS RE-CONNECTED TO ANOTHER ASSET, AND THE LINE STAYS PUT UNTIL IT GETS
+			 * THERE** (Task 247; Tom, 2026-09-18, in his own words: *"while you drag, only the
+			 * connection point drags. The line stays where it is until you arrive at another asset,
+			 * and at that point the service line snaps to the new asset, repeating this until you
+			 * drop the connection point on a new asset, all always either perp to link or snapped
+			 * to node."*).
+			 *
+			 * **THE GRIP FOLLOWS THE HAND AND THE SERVICE DOES NOT** (Tom, 2026-09-18, correcting
+			 * what was built here: *"I asked for the connection circle to be draggable even though
+			 * the service line cannot follow along until it snaps to something new."*). The circle
+			 * is the thing in the hand; the line is what waits. Until the same day the circle was
+			 * painted at the ATTACHMENT, so over open ground nothing on the screen moved at all and
+			 * the gesture read as a drag that had failed to start.
+			 *
+			 * **AND ITS PATH IS NOT CONSTRAINED, DELIBERATELY** (*"the circle's drag path cannot be
+			 * constrained, because we may want to jump to another pipe entirely"*). The obvious
+			 * constraint -- hold it to the perpendiculars of the pipe it is on, which is what the
+			 * CONNECTION obeys -- is exactly the one that would make his own gesture impossible.
+			 * So the grip is the raw pointer and nothing here touches it: custHandleAt.
+			 *
+			 * **WHAT STAYS PUT IS THE SERVICE, AND THAT IS STILL THE DESIGN RATHER THAN A GUARD.** A
+			 * LINE that tracked the pointer would draw a service to a point in the street, at an
+			 * angle, for as long as the hand was between two mains -- the same false promise the
+			 * placement band was carrying, in the other gesture. So the drawing only ever shows
+			 * connections that exist, and a drag that ends in the middle of nowhere leaves the
+			 * customer exactly as it was.
+			 *
+			 * **THE METER DOES NOT MOVE.** That is grip one's job (`drag.type === 'customer'`), and
+			 * keeping them apart is the whole of what Tom asked for: one gesture moves the house,
+			 * the other moves what serves it. The station on the new pipe is therefore DERIVED --
+			 * the foot of the perpendicular from where the house already stands -- and never taken
+			 * from the pointer.
+			 *
+			 * **AND IT REPEATS.** Every move re-asks, so passing over three mains shows the service
+			 * on each in turn and the drop merely stops asking. There is no separate commit.
+			 */
+			var ca = customerById(drag.id), hit;
+			if (!ca) { return; }
+			// The grip first, and unconditionally: it moves on every frame whether or not the
+			// pointer has reached anything, which is the whole of what separates it from the line.
+			custHandleAt = screenToWorld(p.x, p.y);
+			refreshCustomerHandle();
+			hit = customerConnectionAt(p.x, p.y, customerPoint(ca),
+				drag.touch ? TOUCH_REACH_PX : POINTER_REACH_PX);
+			if (!hit) { return; }
+			// The same connection again is not a change: re-writing it every frame would put a
+			// snapshot on the undo stack for a drag that moved nothing.
+			if (ca.link === hit.link.id && customerT(ca) === hit.t) { return; }
+			snapshotDragOnce();
+			setCustomerConnection(ca, hit.link, hit.t);
+			updateCustomerGeometry(drag.id);
+			refreshCustomerHandle();
+			// The junction this demand lumps at can change with the asset, so the answers have to
+			// follow exactly as they do when the meter itself is dragged past the middle of a main.
+			scheduleSolve();
+			refreshPopupIfOpen();
 		} else if (drag.type === 'label') {
 			snapshotDragOnce();
 			// **DRAGGING THE WORDS MOVES THE OFFSET, NEVER THE ATTACHMENT.** For a link anchor that
@@ -36348,6 +37731,7 @@ var EngCalcs = EngCalcs || {};
 		if (c.kind === 'node') { openPopup(c.id); }
 		else if (c.kind === 'link') { openLinkPopup(c.id); }
 		else if (c.kind === 'label') { openLabelPopup(c.id); }
+		else if (c.kind === 'customer') { openCustomerPopup(c.id); }
 	}
 	// ---- field labels, with an optional definitional tip (Task 193) ----
 	// CLAUDE.md's tip-only convention: .ec-help carries the title and wraps the label WORDS plus a
@@ -37438,7 +38822,12 @@ var EngCalcs = EngCalcs || {};
 	function allIds() {
 		return doc.nodes.map(function (x) { return x.id; })
 			.concat(doc.links.map(function (x) { return x.id; }))
-			.concat(doc.labels.map(function (x) { return x.id; }));
+			.concat(doc.labels.map(function (x) { return x.id; }))
+			// A meter joins the one id pool the rest of the drawing shares (Task 247). This page
+			// has always pooled nodes, links and Texts -- EPANET namespaces nodes and links
+			// separately and we do not -- so a meter is pooled on the same terms, and mintId()
+			// cannot hand a new meter an id a junction already answers to.
+			.concat((doc.customers || []).map(function (x) { return x.id; }));
 	}
 	function validateNewId(newId, oldId) {
 		var pc = EngCalcs.pageConfig || {};
@@ -37568,7 +38957,12 @@ var EngCalcs = EngCalcs || {};
 		linkEls[newId] = linkEls[oldId]; delete linkEls[oldId];
 		labelsByLinkAnchor[newId] = labelsByLinkAnchor[oldId] || []; delete labelsByLinkAnchor[oldId];
 		doc.labels.forEach(function (lb) { if (lb.anchorLink === oldId) { lb.anchorLink = newId; } });
-		linkEls[newId].line.setAttribute('data-link', newId);
+		// **AND EVERY METER SERVED BY IT** (Task 247). A customer names its pipe, and the junction it
+		// lumps at is derived from that pipe's own ends -- so a rename that skipped this would leave
+		// a service attached to an id this document does not have, which reads as detached and
+		// silently takes its demand out of the answers.
+		customersByLink[newId] = customersByLink[oldId] || []; delete customersByLink[oldId];
+		(doc.customers || []).forEach(function (c) { if (c.link === oldId) { c.link = newId; } });
 		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
 		// **THE DEFECT TASK 533 WAS OPENED FOR.** `incidentLinks` is keyed by NODE and holds LINK
 		// ids, so a link rename does not rekey it -- it has to rewrite the ids inside two of its
@@ -37937,6 +39331,9 @@ var EngCalcs = EngCalcs || {};
 			// **AND WHO IS DRAWING IT** (Task 468). The demand above is row 0 of a LIST; these are
 			// the rest of it, and this is the only place a person adds, names or removes one.
 			demandCategoryFields(fields, n, nodeId);
+			// **AND WHAT THE METERS AROUND IT ADD** (Task 247; Tom, 2026-09-17). Between the rows
+			// the user typed and the total they add up to, which is the order the sum is made in.
+			nodeCustomerFields(fields, n);
 			readonlyField(fields, (pc.bpn_demand || 'Demand') + ' (' + unitLabel('lpn_u_flow') + ')',
 				resolvedDemand(n), pc.lpn_result_demand_tip);
 			// **THIS JUNCTION'S OWN REQUIRED FIRE FLOW** (Task 530), blank-capable because blank is
@@ -38145,6 +39542,113 @@ var EngCalcs = EngCalcs || {};
 		});
 		fields.appendChild(addBtn);
 		fields.appendChild(document.createElement('br'));
+	}
+	/**
+	 * **THE CUSTOMERS THIS JUNCTION IS CARRYING, IN ITS OWN PROPERTY BOX** (Tom, 2026-09-17: *"The
+	 * customer doesn't appear in the properties for its representative node. Fix/add that."*).
+	 *
+	 * **THE DEMAND WAS ALWAYS IN THE TOTAL AND THE REASON FOR IT WAS NOWHERE.** A junction drawing
+	 * 34 gpm with 10 gpm typed into its own demand table is the page contradicting itself as far as
+	 * the reader can see; the 24 came from four meters on the pipes around it, and nothing on this
+	 * screen said so. It sits between the junction's own rows and the resolved Demand under them,
+	 * which is the order the arithmetic runs in: what you typed, what the meters add, the answer.
+	 *
+	 * **READ-ONLY, AND THAT IS NOT LAZINESS.** A customer is not a property of this junction -- the
+	 * junction is DERIVED from where the service connects (customerNodeId()), so a demand edited
+	 * here would be an edit to an object that may belong to a different junction by the time the
+	 * pipe is bent. The id is a way back to the meter, exactly as a table row's id is, and that is
+	 * where it is edited.
+	 *
+	 * Absent, not empty, on a junction with no customers: nearly every junction in nearly every
+	 * network has none, and a permanently empty table on all of them is the clutter Task 553
+	 * removed from this same box.
+	 *
+	 * **AND LUMPED BEHIND ONE LINE SINCE 2026-09-18** (Tom: *"We need to lump the meters with an
+	 * expansion to see the connected customers and their demands."*). It listed every meter, which
+	 * is fine at two and pushes the elevation, the demand rows and the answer off the bottom of the
+	 * box at forty. The shut line says how many and how much; opening it is the reader's.
+	 */
+	// **WHICH JUNCTION'S METER LIST IS EXPANDED, FOR THE LIFE OF THIS PAGE AND NO LONGER.** The
+	// property box is rebuilt on every commit, so without this the list a reader had just opened
+	// would shut itself the moment they typed anything. It is FURNITURE by CLAUDE.md's
+	// project-versus-browser rule -- which box somebody has open is a fact about the screen they
+	// are sitting at -- so it is NOT in serializeProject() and NOT in localStorage; it is the same
+	// answer, for the same reason, that cpOpenKeys gives for a custom property.
+	var nodeCustomersOpen = {};
+	function nodeCustomerFields(fields, n) {
+		var pc = EngCalcs.pageConfig || {}, list = n ? customersAtNode(n.id) : [],
+			box, sum, count, total = 0, table, thead, hrow, tbody;
+		if (!list.length) { return; }
+		list.forEach(function (c) {
+			var f = customerFlow(c);
+			if (typeof f === 'number' && isFinite(f)) { total += f; }
+		});
+		// **`<details>` RATHER THAN A BUTTON AND A HIDDEN DIV**, which is the idiom this page
+		// already uses twice (multiSection() and the custom-property rows): the disclosure pattern
+		// for free, and every row built eagerly, so a shut list is still found by the browser's own
+		// Find and still read by a screen reader that opens it.
+		box = document.createElement('details');
+		box.className = 'lpn-node-customers';
+		sum = document.createElement('summary');
+		sum.className = 'lpn-node-customers-sum';
+		setFieldLabel(sum, pc.lpn_node_customers || 'Customer demands',
+			pc.lpn_node_customers_tip);
+		// **THE COUNT AND THE TOTAL ARE THE LINE, AND THE METERS ARE BEHIND IT** (Tom, 2026-09-18:
+		// *"We need to lump the meters with an expansion to see the connected customers and their
+		// demands."*). A junction on a residential main carries tens of services and each one was a
+		// row here, so the rows the reader came for -- the elevation, the junction's own demand,
+		// the resolved answer -- were pushed off the bottom of the box by a list they had not asked
+		// to read. What the shut line has to say is exactly what the junction's arithmetic borrows
+		// from the meters: how many, and how much.
+		count = document.createElement('span');
+		count.className = 'lpn-node-customers-count';
+		count.textContent = (pc.lpn_node_customers_sum || '{total} {unit} from {n} Customers')
+			.split('{n}').join(String(list.length))
+			.split('{total}').join(String(+total.toFixed(6)))
+			.split('{unit}').join(unitLabel('lpn_u_flow'));
+		sum.appendChild(count);
+		box.appendChild(sum);
+		// **SHUT UNLESS THIS READER OPENED IT**, which is the opposite default from multiSection()
+		// and deliberately so: a mixed selection is something you asked for and every group in it
+		// is the answer, while a junction's services are context beside the fields you came to
+		// edit.
+		if (nodeCustomersOpen[n.id]) { box.open = true; }
+		box.addEventListener('toggle', function () { nodeCustomersOpen[n.id] = !!box.open; });
+		fields.appendChild(box);
+		table = document.createElement('table');
+		table.className = 'lpn-demand-table';
+		thead = document.createElement('thead');
+		hrow = document.createElement('tr');
+		// The headings are the keys the meter's own box and the Customers table already use, so the
+		// three places a customer is read name its fields the same way in all 27 languages.
+		[pc.lpn_tool_add_meter || 'Customer',
+			pc.lpn_field_account || 'Account number',
+			(pc.lpn_field_meter_total || 'Total demand') + ' (' + unitLabel('lpn_u_flow') + ')'
+		].forEach(function (text) {
+			var th = document.createElement('th');
+			th.textContent = text;
+			hrow.appendChild(th);
+		});
+		thead.appendChild(hrow);
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		list.forEach(function (c) {
+			var tr = document.createElement('tr'),
+				idCell = document.createElement('td'), accCell = document.createElement('td'),
+				demCell = document.createElement('td'), btn = document.createElement('button'),
+				flow = customerFlow(c);
+			btn.type = 'button';
+			btn.className = 'lpn-pane-goto';
+			btn.textContent = c.id;
+			btn.addEventListener('click', function () { findGoTo('customer', c.id); });
+			idCell.appendChild(btn);
+			accCell.textContent = c.account || '';
+			demCell.textContent = (typeof flow === 'number' && isFinite(flow)) ? String(+flow.toFixed(6)) : '';
+			tr.appendChild(idCell); tr.appendChild(accCell); tr.appendChild(demCell);
+			tbody.appendChild(tr);
+		});
+		table.appendChild(tbody);
+		box.appendChild(table);
 	}
 	// ONE ROW OF THE DEMAND TABLE, whichever kind it is. `acc` is six accessors and a remove; the
 	// caller supplies row 0's (which go through setProp and promote on delete) or a category row's
@@ -38942,10 +40446,15 @@ var EngCalcs = EngCalcs || {};
 	function multiGroups() {
 		var byType = {}, out = [];
 		selectedRefs().forEach(function (s) {
-			var el = s.kind === 'node' ? nodeById(s.id) : (s.kind === 'link' ? linkById(s.id) : labelById(s.id)),
+			var el = s.kind === 'node' ? nodeById(s.id)
+					: (s.kind === 'link' ? linkById(s.id)
+					: (s.kind === 'customer' ? customerById(s.id) : labelById(s.id))),
 				// A Text object carries no `type`; its table is keyed 'text'. Never undefined --
 				// that was Tom's *"9 undefined assets selected"* (2026-09-08).
-				ty = s.kind === 'label' ? 'text' : (el && el.type) || s.kind;
+				// A Text and a meter both carry no `type`; their tables are keyed 'text' and
+				// 'customer'. Never undefined -- that was Tom's *"9 undefined assets selected"*.
+				ty = s.kind === 'label' ? 'text' : s.kind === 'customer' ? 'customer'
+					: (el && el.type) || s.kind;
 			if (!el) { return; }
 			if (!byType[ty]) { byType[ty] = []; }
 			byType[ty].push(el);
@@ -39124,6 +40633,8 @@ var EngCalcs = EngCalcs || {};
 				if (!l) { return; }
 				take(nodeById(l.from)); take(nodeById(l.to));
 				(l.verts || []).forEach(take);
+			} else if (s.kind === 'customer') {
+				if (customerById(s.id)) { take(customerPoint(customerById(s.id))); }
 			} else if (labelById(s.id)) { take(textLabelPoint(labelById(s.id))); }
 		});
 		return box;
@@ -39334,6 +40845,192 @@ var EngCalcs = EngCalcs || {};
 		importNotesField(fields, lb);
 		tipsIn(fields);
 	}
+	// ---- THE CUSTOMER'S OWN PROPERTY BOX (ROADMAP Task 247) ------------------------------------
+	//
+	// **NO idField() AND NO RENAME**, like a Text's popup and for a related reason: a meter's id is
+	// minted, is shown here and in the Customers table so a reader can tell two apart, and is not
+	// something anybody has a note on their desk about. The ACCOUNT NUMBER is what a person knows
+	// this service by, and that is the first field.
+	//
+	// **NO OVERRIDE MARKER ON ANY ROW, and no setProp() anywhere in it.** Nothing a customer carries
+	// is scenario-overridable -- see the Task 247 section note for the reasoning, which is Task
+	// 468's ruling about a demand ROW applied unchanged.
+	//
+	// **THE DERIVED JUNCTION IS SHOWN, AND IT IS NOT OPTIONAL.** Dragging a meter past the middle of
+	// its pipe silently moves flow from one junction to the other, and a reader who cannot see which
+	// junction it lumps at has no way to know that happened.
+	function renderCustomerFields(custId) {
+		var c = customerById(custId), fields = document.getElementById('lpn_popup_fields'),
+			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
+			l = c ? customerLink(c) : null, nid = c ? customerNodeId(c) : null,
+			nd = nid ? nodeById(nid) : null,
+			accLabel, accInput, demLabel, demInput, cntLabel, cntInput, stLabel, stInput,
+			offLabel, offInput, warn;
+		if (!c) { return; }
+		title.textContent = String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id);
+		clearFields(fields);
+
+		// **THE ACCOUNT NUMBER IS A LABEL ON A DEMAND, NEVER A KEY INTO ANYTHING.** A text box and
+		// nothing else: no registry, no validation, no uniqueness check and no lookup. It is stored
+		// as the bytes the user typed, it rides in their own project file, and nothing in this page
+		// writes it to a log row or a usage statistic.
+		accLabel = document.createElement('label');
+		accInput = document.createElement('input');
+		accInput.type = 'text';
+		accInput.value = c.account === undefined || c.account === null ? '' : String(c.account);
+		accInput.addEventListener('change', function () {
+			if (accInput.value === (c.account || '')) { return; }
+			saveUndoSnapshot();
+			c.account = accInput.value;
+			customerEdited(c);
+		});
+		setFieldLabel(accLabel, pc.lpn_field_account || 'Account number', pc.lpn_field_account_tip);
+		accLabel.appendChild(accInput);
+		fields.appendChild(accLabel);
+		fields.appendChild(document.createElement('br'));
+
+		// **WHAT ONE SERVICE DRAWS, AND BLANK IS THE HONEST BORN STATE.** `+'' === 0`, so a blank box
+		// and a typed zero would be the same number -- and they are two different statements: a
+		// meter nobody has given a demand to yet, and a meter that draws nothing.
+		demLabel = document.createElement('label');
+		demInput = document.createElement('input');
+		demInput.type = 'number';
+		demInput.step = 'any';
+		demInput.value = (typeof c.demand === 'number' && isFinite(c.demand)) ? String(+c.demand.toFixed(6)) : '';
+		demInput.addEventListener('change', function () {
+			saveUndoSnapshot();
+			if (demInput.value === '') { delete c.demand; }
+			else { c.demand = +demInput.value; }
+			customerEdited(c);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(demLabel, (pc.lpn_field_meter_demand || 'Demand per service') +
+			' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_field_meter_demand_tip);
+		demLabel.appendChild(demInput);
+		fields.appendChild(demLabel);
+		fields.appendChild(document.createElement('br'));
+
+		// **THE COUNT: one symbol, many identical services** (Tom, 2026-08-24). Forty-two
+		// single-family residential is one line, one symbol and one place on the pipe, which is how
+		// a designer actually works and is also the cheap answer to the label density a meter per
+		// service would put on the map. Refused below 1: a meter standing for no services is not a
+		// meter, and zero typed here would silently take a real demand out of the answers.
+		cntLabel = document.createElement('label');
+		cntInput = document.createElement('input');
+		cntInput.type = 'number';
+		cntInput.min = '1';
+		cntInput.step = '1';
+		cntInput.value = String((typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1);
+		cntInput.addEventListener('change', function () {
+			var v = Math.round(+cntInput.value);
+			if (!isFinite(v) || v < 1) { v = 1; }
+			saveUndoSnapshot();
+			c.count = v;
+			cntInput.value = String(v);
+			customerEdited(c);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Services at this customer', pc.lpn_field_meter_count_tip);
+		cntLabel.appendChild(cntInput);
+		fields.appendChild(cntLabel);
+		fields.appendChild(document.createElement('br'));
+
+		// The product, read-only, directly under the two numbers that make it -- the same shape and
+		// the same argument as a junction's resolved Demand row under its base: two equal numbers
+		// under two headings is an ANSWER to the question the heading raises, and at a count of one
+		// this row saying the same thing twice is exactly what tells the reader the count is 1.
+		readonlyField(fields, (pc.lpn_field_meter_total || 'Total demand') +
+			' (' + unitLabel('lpn_u_flow') + ')', customerFlow(c), pc.lpn_field_meter_total_tip);
+
+		if (l) {
+			readonlyField(fields, pc.lpn_field_meter_pipe || 'Connected asset', l.id,
+				pc.lpn_field_meter_pipe_tip);
+			// **THE STATION, AS A PERCENTAGE OF THE WAY ALONG THE PIPE.** A percentage rather than a
+			// length because `t` is a fraction of ARC LENGTH and a pipe's stated length is the
+			// user's own number, routinely nothing like the distance between two symbols on a
+			// schematic: printing one as the other would be a claim the drawing cannot support.
+			// Editable, because the handle on the map is a pointer gesture and this is the keyboard
+			// one -- the same value, written through the same function.
+			stLabel = document.createElement('label');
+			stInput = document.createElement('input');
+			stInput.type = 'number';
+			stInput.step = 'any';
+			stInput.min = '0';
+			stInput.max = '100';
+			stInput.value = String(+(customerT(c) * 100).toFixed(2));
+			stInput.addEventListener('change', function () {
+				var v = +stInput.value;
+				if (!isFinite(v)) { return; }
+				saveUndoSnapshot();
+				setCustomerStation(c, Math.max(0, Math.min(100, v)) / 100);
+				customerEdited(c);
+				refreshPopupIfOpen();
+			});
+			setFieldLabel(stLabel, pc.lpn_field_meter_station || 'Station along the pipe (%)',
+				pc.lpn_field_meter_station_tip);
+			stLabel.appendChild(stInput);
+			fields.appendChild(stLabel);
+			fields.appendChild(document.createElement('br'));
+			// **AND THE OFFSET BESIDE IT, WHICH IS THE OTHER HALF OF A SURVEYED POSITION** (Tom,
+			// 2026-09-18). Station says how far along; offset says how far off, and its sign says
+			// which side. It is a real length rather than a percentage, so it carries the length
+			// unit in its heading, and it writes through setCustomerOffset() -- setCustomerPerp()'s
+			// one seam again, which is why a typed offset and a dragged one cannot disagree.
+			offLabel = document.createElement('label');
+			offInput = document.createElement('input');
+			offInput.type = 'number';
+			offInput.step = 'any';
+			offInput.value = String(+customerOffset(c).toFixed(3));
+			offInput.addEventListener('change', function () {
+				var v = +offInput.value;
+				if (!isFinite(v)) { return; }
+				saveUndoSnapshot();
+				setCustomerOffset(c, v);
+				customerEdited(c);
+				refreshPopupIfOpen();
+			});
+			setFieldLabel(offLabel, (pc.lpn_field_meter_offset || 'Offset from the pipe') +
+				' (' + unitLabel('lpn_u_length') + ')', pc.lpn_field_meter_offset_tip);
+			offLabel.appendChild(offInput);
+			fields.appendChild(offLabel);
+			fields.appendChild(document.createElement('br'));
+			readonlyField(fields, pc.lpn_field_meter_lumped || 'Added to node',
+				nid === null || nid === undefined ? '' : nid, pc.lpn_field_meter_lumped_tip);
+			// **A DEMAND ON A FIXED HEAD CHANGES NOTHING, AND IT IS REPORTED RATHER THAN REROUTED.**
+			// A reservoir's and a tank's water surface is the level the document states, so the
+			// solve is identical with or without this meter's demand. Quietly lumping it at the
+			// second-nearest junction instead would be inventing a rule the user cannot see.
+			if (nd && isFixedHeadNode(nd)) {
+				warn = document.createElement('p');
+				warn.className = 'lpn-set-note';
+				warn.textContent = pc.lpn_customer_fixed_head ||
+					'⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
+				fields.appendChild(warn);
+			}
+		} else {
+			// **DETACHED IS A REAL STATE AND IT IS SAID OUT LOUD.** Its demand is in no junction's
+			// total and therefore in no answer on the screen, which is not something a reader can
+			// be left to notice.
+			warn = document.createElement('p');
+			warn.className = 'lpn-set-note';
+			warn.textContent = pc.lpn_customer_detached ||
+				'⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
+			fields.appendChild(warn);
+		}
+		tipsIn(fields);
+	}
+	function openCustomerPopup(custId, sx, sy) {
+		var c = customerById(custId), pt, at;
+		currentPopup = { kind: 'customer', id: custId };
+		renderCustomerFields(custId);
+		pt = c ? customerPoint(c) : null;
+		// Cleared of the meter by one meter-width, on the same measure the link popup borrows a
+		// junction diameter: a meter has no radius of its own that a reader would recognise, and its
+		// own hybrid size would put the box on top of the symbol at system zoom.
+		at = popupAnchorFor(c ? {} : null, pt,
+			pt ? meterHalfWorld(pt.x, pt.y) * 2 : 0, sx, sy);
+		openPopupAt(at.x, at.y);
+	}
 	function openLabelPopup(labelId, sx, sy) {
 		currentPopup = { kind: 'label', id: labelId };
 		renderLabelFields(labelId);
@@ -39511,6 +41208,7 @@ var EngCalcs = EngCalcs || {};
 		// The multi-properties box has no single id to re-render; it is rebuilt from the subject,
 		// and closes if the subject has gone.
 		else if (currentPopup.kind === 'multi') { if (selectionCount()) { openMultiProperties(); } else { closePopup(); } }
+		else if (currentPopup.kind === 'customer') { renderCustomerFields(currentPopup.id); }
 		else { renderLabelFields(currentPopup.id); }
 	}
 
@@ -39583,7 +41281,7 @@ var EngCalcs = EngCalcs || {};
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
-		// ask isGeoProject(), and minScale()/maxScale() do too, so a document restored under the
+		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.
 		var coordsChanged = snap.coords !== project.coords;
 		project.coords = snap.coords;
@@ -39722,7 +41420,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	var LPN_TOOL_KEYS = {
 		'1': 'select', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
-		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '9': 'add-text'
+		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text'
 	};
 	document.addEventListener('keydown', function (e) {
 		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
@@ -39814,9 +41512,17 @@ var EngCalcs = EngCalcs || {};
 	function hasDemandBreakdown(n) {
 		return !!(n && n.extraDemands && n.extraDemands.length);
 	}
+	// **AND THE CUSTOMERS LUMPED AT THIS JUNCTION ARE ROWS OF THE SAME LIST** (Task 247). Appended
+	// rather than merged: the total is ADDITIVE (Tom, 2026-08-24, *"468 is a sum of all the 247
+	// plus any additionals at the node"*), so a junction's own rows are untouched and nothing a
+	// meter does ever rewrites a number the user typed here. One door, so the map label, the colour
+	// ramp, the Tables column, the popup's resolved Demand and the solver all pick a meter up
+	// without knowing what one is.
 	function demandRowsOf(n, base) {
-		if (EngCalcs.lpnDemandRows) { return EngCalcs.lpnDemandRows(n, base); }
-		return [{ base: base, pattern: n.demandPattern || null, category: n.demandCategory || null }];
+		var own = EngCalcs.lpnDemandRows
+			? EngCalcs.lpnDemandRows(n, base)
+			: [{ base: base, pattern: n.demandPattern || null, category: n.demandCategory || null }];
+		return own.concat(customerRowsOf(n.id));
 	}
 	// **WHAT THE USER TYPED, ADDED UP** -- every category's base, unmultiplied. For the 99% of
 	// junctions with one demand this IS `effective(n, 'demand')` and the same double, so no label,
@@ -43112,8 +44818,17 @@ var EngCalcs = EngCalcs || {};
 			shownEngineNotes[code] = true;
 			return true;
 		}
-		var manningNote = noteOnce('manning-constant-differs'),
-			minorNote = noteOnce('minor-loss-gravity-differs');
+		var manningNote = noteOnce('manning-constant-differs');
+		// **THE MINOR-LOSS GRAVITY NOTE IS NOT SHOWN, AND THAT IS TOM'S OWN CALL** (2026-09-18:
+		// *"We can't keep showing the gravity message forever. It's just noise. If anything, put
+		// it in settings in the tip for the choice of whether to use the built-in solver when
+		// possible."*). The difference it reported is real and is still REPORTED BY THE ENGINE --
+		// `minor-loss-gravity-differs` is still raised in js/lpn-epanet.js and two harnesses still
+		// assert it -- but a sentence about a rounding in the last digits of a minor loss, on
+		// screen after every solve that has one k value in it, buys the reader nothing and costs
+		// them the attention the notes that DO matter need. Its substance moved to
+		// `lpn_settings_engine_native_tip`, beside the choice it is actually about, where somebody
+		// wondering why two engines disagree will go looking for it.
 		// LEADS the status bar, ahead of every other note, because everything after it is a remark
 		// about numbers this sentence says not to trust. Logged under the same diagnostic code the
 		// discard path uses: to a user it is the same dead end, reached with something on screen.
@@ -43167,8 +44882,7 @@ var EngCalcs = EngCalcs || {};
 		// noteOnce() has already decided that -- so a later solve neither restarts a running clock
 		// nor wipes a note the user has not finished reading.
 		var engineNotes = [
-			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.') : '',
-			minorNote ? (pc.lpn_engine_minor_loss_note || 'Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.') : ''
+			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.') : ''
 		].filter(function (t) { return !!t; }).join(' ');
 		if (engineNotes) { setEngineNotes(engineNotes); }
 		refreshLabelText();

@@ -278,6 +278,85 @@
 	};
 
 	/**
+	 * ---- CUSTOMERS: METERED DEMANDS, LUMPED AT THE NEAREST NODE (ROADMAP Task 247) -------------
+	 *
+	 * **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED, AND NOT A SECOND STRUCTURE.** It
+	 * carries an account number, a count of identical services, a place on the map and an
+	 * attachment to a pipe; everything else about it is a demand row. Which is why these three
+	 * functions live HERE, beside EngCalcs.lpnDemandRows(): the editor's own totals and the `.inp`
+	 * writer both have to answer "how much does this junction draw" the same way, and two
+	 * implementations of that is how a demand goes missing on export.
+	 *
+	 * **THE DOCUMENT STORES THE ATTACHMENT AND DERIVES THE JUNCTION.** A customer says *this
+	 * service comes off that pipe, at this station along it*; which end it lumps at is a
+	 * consequence, and a consequence that is recomputed cannot go stale when the pipe is re-routed,
+	 * bent, or has an end node dragged past the other.
+	 *
+	 * **ADDITIVE, AND NOTHING IS DEDUCTED** (Tom, 2026-08-24: *"468 is a sum of all the 247 plus
+	 * any additionals at the node (additive)"*, and *"we don't do any fancy footwork like deducting
+	 * flows at the node as meters are placed"*). Placing a meter never edits a number the user
+	 * typed on the junction -- which is the suite's standing rule about the user's own numbers,
+	 * arriving here from a different door.
+	 */
+	// The flow a meter represents: what one service draws, times how many of them this symbol
+	// stands for. **THE COUNT IS WHY A ROW OF FORTY-TWO HOUSES IS ONE SYMBOL** (Tom, 2026-08-24:
+	// *"should we make meter only a Type and Count object?"*), and it defaults to 1 so a customer
+	// with an account number is the count-of-one case rather than a different kind of thing.
+	EngCalcs.lpnCustomerFlow = function (c) {
+		var d = (c && typeof c.demand === 'number' && isFinite(c.demand)) ? c.demand : 0,
+			n = (c && typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1;
+		return d * n;
+	};
+	// **THE LUMPING RULE, IN ONE PLACE.** The end of the attached pipe that is nearer MEASURED
+	// ALONG THE PIPE -- not in a straight line to the two node symbols, which on a bent pipe is a
+	// different end. Arc length is the one that means something: it is the pipe the water actually
+	// reaches the meter through. Returns null for a customer attached to nothing, which is a real
+	// state (see the detach rule in js/looped-network.js) and not an error.
+	//
+	// `link` is passed in rather than looked up, because this file holds no document.
+	EngCalcs.lpnCustomerNode = function (c, link) {
+		if (!c || !link || !c.link || c.link !== link.id) { return null; }
+		if (!EngCalcs.lpnGeom || !EngCalcs.lpnGeom.arcEndNearer) { return null; }
+		return EngCalcs.lpnGeom.arcEndNearer(c.t) === 'from' ? link.from : link.to;
+	};
+	/**
+	 * Every junction's customer demand rows, keyed by node id: `{nodeId: [row, ...]}`.
+	 *
+	 * A row is shaped exactly like one of EngCalcs.lpnDemandRows()' -- `base`, `pattern`,
+	 * `category`, `rec`, `key` -- so every reader downstream treats it as the demand row it is, and
+	 * it carries `customer` as well for the one caller that needs to know which meter it came from.
+	 *
+	 * **`rec` IS null, WHICH IS THE HONEST ANSWER ABOUT ITS TEXT.** `base` is count times demand --
+	 * a number of OURS, computed from two the user typed -- so there is no file token to hand back
+	 * and EngCalcs.lpnNumText() composes it. A customer never came out of an `.inp` in the first
+	 * place; no `.inp` has customers.
+	 *
+	 * **THE CATEGORY IS THE ACCOUNT NUMBER, and that is the only slot EPANET has for a name.** Task
+	 * 468 occupies the category with *who* the demand is, and an account number is exactly that
+	 * kind of name -- so a customer's row says its account in the one field of a `[DEMANDS]` row
+	 * that can hold a name, and the export report says what the file could not hold beside it.
+	 * Blank where the meter has no account number, which leaves a nameless row rather than a
+	 * fabricated name.
+	 */
+	EngCalcs.lpnCustomerRowsByNode = function (docLike) {
+		var out = {}, byId = {}, list = (docLike && docLike.customers) || [];
+		(((docLike && docLike.links) || [])).forEach(function (l) { if (l && l.id !== undefined) { byId[l.id] = l; } });
+		list.forEach(function (c) {
+			var link = c && c.link ? byId[c.link] : null,
+				nid = EngCalcs.lpnCustomerNode(c, link);
+			if (nid === null || nid === undefined) { return; }
+			if (!out[nid]) { out[nid] = []; }
+			out[nid].push({
+				base: EngCalcs.lpnCustomerFlow(c),
+				pattern: c.pattern || null,
+				category: c.account ? String(c.account) : null,
+				rec: null, key: 'base', customer: c
+			});
+		});
+		return out;
+	};
+
+	/**
 	 * Read an EPANET `.inp` into an SI model plus a report of everything it could not keep.
 	 *
 	 * Returns null-free: `ok` false with `error` set means the text was not an `.inp` at all.
@@ -2298,6 +2377,11 @@
 			return a === undefined || a === null || a === true;
 		}
 		var differences = [], failure = null;
+		// **THE CUSTOMER ROWS, WORKED OUT ONCE** (Task 247), through the same function the editor's
+		// own totals go through -- so the file and the screen cannot disagree about what a junction
+		// draws. Empty for every document that has no customers, which is every document written
+		// before they existed.
+		var custByNode = EngCalcs.lpnCustomerRowsByNode(doc);
 		function diff(code, ids, detail) {
 			differences.push({ code: code, ids: ids || [], detail: detail === undefined ? null : detail });
 		}
@@ -2486,8 +2570,19 @@
 				// layout, and the only unambiguous one, since [DEMANDS] REPLACES this column. Any
 				// lumping for readability is a decision the property popup and the Tables pane get
 				// to make; the file states the rows.
-				var drows = EngCalcs.lpnDemandRows(nd, eff(nd, 'demand') || 0);
-				if (EngCalcs.lpnDemandItemized(nd)) {
+				// **A CUSTOMER'S DEMAND RIDES OUT AS A [DEMANDS] ROW ON THE JUNCTION IT LUMPS AT**
+				// (Task 247). EPANET has no customer object, so the numbers go out and the
+				// geometry cannot -- reported per meter below, never dropped in silence. Appended
+				// after the junction's own rows because the total is ADDITIVE (Tom, 2026-08-24):
+				// what the junction says plus what its customers say, in one direction, with
+				// nothing the user typed rewritten by a symbol placed somewhere else.
+				var crows = custByNode[nd.id] || [];
+				var drows = EngCalcs.lpnDemandRows(nd, eff(nd, 'demand') || 0).concat(crows);
+				// **A JUNCTION WITH CUSTOMERS IS ITEMIZED WHETHER OR NOT IT WAS BEFORE**, because
+				// the [JUNCTIONS] demand column can hold exactly one number and there are now at
+				// least two. A junction with NO customers is untouched by this, which is what
+				// keeps every Net1/2/3 token identical (dev/lpn-spike/inp-export-harness.js).
+				if (EngCalcs.lpnDemandItemized(nd) || crows.length) {
 					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]) + descOf(nd));
 					for (j = 0; j < drows.length; j++) {
 						// The CATEGORY is a trailing comment, not a column -- see the reader's note
@@ -3120,6 +3215,19 @@
 			diff('pipe-type-flattened', typedPipes, String(Object.keys(typesUsed).length));
 		}
 		if (fittedPipes.length) { diff('fittings-flattened', fittedPipes, null); }
+		// **WHAT AN .inp CANNOT HOLD ABOUT A CUSTOMER** (Task 247). Its demand went out, on the
+		// junction it lumps at; its account number went out too, in the one field of a [DEMANDS]
+		// row that can hold a name. What has nowhere to go is the METER: where it sits, which pipe
+		// serves it, where along that pipe the service connects, and how many identical services
+		// one symbol stands for. `detail` is the number of meters, so the sentence can say it.
+		//
+		// **REPORTED RATHER THAN FAKED, and the rejected alternative is named in the design doc:**
+		// fabricating a service node and a lateral per customer would round trip beautifully and
+		// would be a lie about the network, with a length and a diameter we invented.
+		if ((doc.customers || []).length) {
+			diff('customer-geometry', (doc.customers || []).map(function (c) { return c.id; }),
+				String((doc.customers || []).length));
+		}
 		return { ok: true, inp: inp, differences: differences };
 	};
 

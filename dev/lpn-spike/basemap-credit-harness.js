@@ -47,7 +47,7 @@ const L = loadLoopedNetwork(
 	"\t\tlayer: function () { return basemapLayer; },\n" +
 	"\t\tsetStyle: setBasemapStyle, setBasemapOn: setBasemapOn,\n" +
 	"\t\tteaserPress: toggleBasemapTeaser,\n" +
-	"\t\tstyle: basemapStyle, basemapOn: basemapOn, isGeo: isGeoProject,\n" +
+	"\t\tstyle: basemapStyle, basemapOn: basemapOn, isGeo: isLatLonProject,\n" +
 	"\t\tsatAvailable: satelliteAvailable,\n" +
 	"\t\trefreshAll: refreshAllFromDocument,\n" +
 	"\t\tgetProject: function () { return project; }, serialize: serializeProject "

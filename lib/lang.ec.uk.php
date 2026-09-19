@@ -1115,7 +1115,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Цей клапан посилається �
 $ec_lang['lpn_select_first']='Нічого не вибрано. Спочатку клацніть елемент на карті, потім натисніть Delete.';
 $ec_lang['lpn_field_lon']='Довгота';
 $ec_lang['lpn_field_lat']='Широта';
-$ec_lang['lpn_engine_minor_loss_note']='Примітка: у розв\'язувачі EPANET місцеві втрати виходять трохи нижчими, ніж у вбудованому розв\'язувачі, бо EPANET округлює значення, яке використовує для прискорення вільного падіння.';
 $ec_lang['template_share_manual']='Скопіюйте це посилання:';
 $ec_lang['lpn_time_menu']='Час';
 $ec_lang['lpn_time_duration']='Загальний час роботи';

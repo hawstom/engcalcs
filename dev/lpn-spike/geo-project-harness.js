@@ -25,7 +25,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
-	"\t\tnewProject: newProject, isGeo: isGeoProject,\n" +
+	"\t\tnewProject: newProject, isGeo: isLatLonProject,\n" +
 	"\t\tgeoHome: geoHomeView, GEO_HOME: LPN_GEO_HOME,\n" +
 	"\t\tsetView: function (v) { applyView(v); }, view: currentView,\n" +
 	"\t\tgetProject: function () { return project; },\n" +

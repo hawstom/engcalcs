@@ -1179,7 +1179,6 @@ $ec_lang['lpn_field_northing']='Северная координата';
 $ec_lang['lpn_field_easting']='Восточная координата';
 $ec_lang['lpn_field_northing_abbr']='С';
 $ec_lang['lpn_field_easting_abbr']='В';
-$ec_lang['lpn_engine_minor_loss_note']='Примечание: с расчётным ядром EPANET местные потери получаются чуть ниже, чем со встроенным решателем, потому что EPANET округляет используемое значение ускорения свободного падения.';
 $ec_lang['template_share_manual']='Скопируйте эту ссылку:';
 $ec_lang['lpn_time_menu']='Время';
 $ec_lang['lpn_time_duration']='Общая продолжительность работы';

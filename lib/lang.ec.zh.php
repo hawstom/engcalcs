@@ -989,7 +989,6 @@ $ec_lang['lpn_georef_on_map']='此项目已经处于经纬度状态。';
 $ec_lang['lpn_georef_unavailable']='放置工具未能加载。请重新加载页面后再试一次。';
 $ec_lang['lpn_field_lon']='经度';
 $ec_lang['lpn_field_lat']='纬度';
-$ec_lang['lpn_engine_minor_loss_note']='注意：使用 EPANET 求解器时，局部水头损失会比内置求解器算出的略低，因为 EPANET 对其重力所用数值进行了取整。';
 $ec_lang['lpn_goto_menu']='前往某一经纬度…';
 $ec_lang['lpn_goto_tip']='将地图移动到您已知坐标的位置。先纬度、后经度，与地图标注顺序一致，两者之间以空格分隔：38 -122';
 $ec_lang['lpn_goto_prompt']='纬度和经度，按此顺序';
