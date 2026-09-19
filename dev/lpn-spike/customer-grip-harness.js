@@ -200,6 +200,19 @@ console.log('\n--- 2. the connection grip re-serves a customer from another asse
 		L.customerLink(c).id + ' at ' + JSON.stringify(L.customerAttachPoint(c)));
 	ok('2.5 ...and neither has the customer', near(L.customerPoint(c).x, 350, 1e-6) &&
 		near(L.customerPoint(c).y, 260, 1e-6), JSON.stringify(L.customerPoint(c)));
+	// **BUT THE GRIP HAS, AND IT IS THE ONLY THING THAT HAS** (Tom, 2026-09-18, correcting the
+	// first build of this gesture: *"I asked for the connection circle to be draggable even though
+	// the service line cannot follow along until it snaps to something new."*). The circle sat on
+	// the old attachment for the whole drag, so over open ground the screen showed nothing moving
+	// at all. 2.4 and this one are the two halves of his sentence and neither is worth anything
+	// without the other.
+	function gripAt() {
+		const g = L.custHandle();
+		return g ? { x: +g.getAttribute('cx'), y: +g.getAttribute('cy') } : null;
+	}
+	ok('2.5b the grip itself IS following the pointer, out in the middle of nowhere',
+		!!gripAt() && near(gripAt().x, 350, 1e-6) && near(gripAt().y, 500, 1e-6),
+		JSON.stringify(gripAt()));
 
 	// **ARRIVING AT ANOTHER PIPE SNAPS THE SERVICE TO IT, SQUARE.**
 	const onOther = L.worldToScreen(500, 800);
@@ -219,6 +232,14 @@ console.log('\n--- 2. the connection grip re-serves a customer from another asse
 	ok('2.8 ...and the customer is still exactly where it stood',
 		near(L.customerPoint(c).x, 350, 1e-6) && near(L.customerPoint(c).y, 260, 1e-6),
 		JSON.stringify(L.customerPoint(c)));
+	// **AND THE PATH IS NOT CONSTRAINED, WHICH IS THE CLAUSE HE SPELLED OUT** (*"the circle's drag
+	// path cannot be constrained, because we may want to jump to another pipe entirely"*). The
+	// pointer is 150 units along the second main from the foot of the perpendicular the SERVICE
+	// took; a grip held to that perpendicular would be at x = 350, and the whole gesture of
+	// carrying a connection across the drawing would be impossible.
+	ok('2.8b the grip is at the pointer, not on the perpendicular the service snapped to',
+		!!gripAt() && near(gripAt().x, 500, 1e-6) && near(gripAt().y, 800, 1e-6),
+		JSON.stringify(gripAt()));
 
 	// **AND IT REPEATS.** Back over the first main, and the service goes back -- the drop is not a
 	// separate commit, it merely stops the asking.
@@ -249,6 +270,9 @@ console.log('\n--- 2. the connection grip re-serves a customer from another asse
 	// The grip follows its own connection, or the next drag starts from a ring drawn on the pipe
 	// the service has left.
 	const after = L.custHandle();
+	// **AND THE RELEASE PUTS IT BACK ON THE CONNECTION.** The held point is view state for the
+	// length of one gesture; a grip left where the hand let go would be a ring in the street that
+	// nothing on the page could explain, and the next press on the connection would miss it.
 	ok('2.14 the grip is redrawn on the new connection point',
 		!!after && near(+after.getAttribute('cx'), 600, 1e-6) && near(+after.getAttribute('cy'), 200, 1e-6),
 		after ? after.getAttribute('cx') + ',' + after.getAttribute('cy') : 'none');

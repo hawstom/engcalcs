@@ -283,6 +283,36 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
 	ok('over open ground between the two mains the service has not moved',
 		!!mid && JSON.stringify(mid) === JSON.stringify(before),
 		JSON.stringify(before) + ' -> ' + JSON.stringify(mid));
+	// **AND THE CIRCLE IS THE THING THAT DID MOVE** (Tom, 2026-09-18: *"I asked for the connection
+	// circle to be draggable even though the service line cannot follow along until it snaps to
+	// something new."*). Read as a rectangle on the SCREEN rather than as a world coordinate,
+	// because that is the fact being checked -- the ring is painted under the hand -- and it is the
+	// half of this gesture the headless harness has to take on trust: it has no layout.
+	// Two pixels of tolerance, for the rounding a half-pixel-wide ring goes through.
+	async function gripScreen() {
+		return await evaluate(`(function () {
+			var g = document.querySelector('.lpn-custhandle');
+			if (!g) { return null; }
+			var q = g.getBoundingClientRect();
+			return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; })()`);
+	}
+	const held = await gripScreen();
+	ok('...but the grip itself is under the hand, out in the open ground',
+		!!held && Math.abs(held.x - HOUSE.x) <= 2 && Math.abs(held.y - EMPTY.y) <= 2,
+		JSON.stringify(held) + ' pointer ' + HOUSE.x + ',' + EMPTY.y);
+	// **AND ITS PATH IS NOT CONSTRAINED** (*"the circle's drag path cannot be constrained, because
+	// we may want to jump to another pipe entirely"*). This point is 250 px along the first main
+	// from the perpendicular the SERVICE is still holding, so a grip kept square to that main would
+	// be at the house x and the drag across the drawing would be impossible.
+	// **LEFT OF THE HOUSE, NOT RIGHT OF IT, AND THAT IS NOT ARBITRARY**: selecting the customer
+	// opened its property box, which sits to the RIGHT of the symbol, and a synthetic mouseMoved
+	// over the box never reaches the canvas at all -- so the first version of this line moved the
+	// pointer onto a panel and reported a grip that had not budged.
+	await moveTo(HOUSE.x - 250, EMPTY.y, 1);
+	const far = await gripScreen();
+	ok('...and it goes wherever the hand goes, off the perpendicular entirely',
+		!!far && Math.abs(far.x - (HOUSE.x - 250)) <= 2, JSON.stringify(far));
+	await moveTo(HOUSE.x, EMPTY.y, 1);
 
 	await moveTo(HOUSE.x, BOTY, 1);
 	const onNew = await ends();
@@ -300,6 +330,11 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
 	const dropped = await ends();
 	ok('the drop leaves it on the main it arrived at',
 		!!dropped && JSON.stringify(dropped) === JSON.stringify(onNew), JSON.stringify(dropped));
+	// The ring is a control, so it has to be back on the thing it controls: left where the hand let
+	// go, the next press on the connection would miss it entirely.
+	const rest = await gripScreen();
+	ok('...and the grip is back on the connection rather than left where the hand let go',
+		!!rest && !!onNew && Math.abs(rest.y - BOTY) <= 3, JSON.stringify(rest) + ' main at y ' + BOTY);
 
 	logs.filter(l => /EXCEPTION/.test(l)).forEach(l => { console.log('  ' + l); fails++; });
 	console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nAll browser customer-grip checks passed.');

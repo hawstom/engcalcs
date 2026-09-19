@@ -8760,6 +8760,27 @@ var EngCalcs = EngCalcs || {};
 	// field. It is the same `{link, t}` handle Task 502 needs, which is the second reason those two
 	// tasks must not build it twice.
 	var custHandleEl = null;
+	/**
+	 * **WHERE THE GRIP IS BEING HELD, WHILE A HAND IS HOLDING IT** (Tom, 2026-09-18: *"I asked for
+	 * the connection circle to be draggable even though the service line cannot follow along until
+	 * it snaps to something new. Note that the circle's drag path cannot be constrained, because we
+	 * may want to jump to another pipe entirely."*).
+	 *
+	 * **THE GRIP IS THE THING IN THE HAND AND THE SERVICE IS WHAT WAITS**, and until this existed
+	 * only the second half was true: the circle was painted at the ATTACHMENT, so it sat still on
+	 * the old main for the whole gesture and the drag had nothing visible in it at all. What moved
+	 * was the pointer, which the map already draws.
+	 *
+	 * **AND THE PATH IS NOT CONSTRAINED, WHICH IS THE POINT RATHER THAN A SIMPLIFICATION.** Holding
+	 * it to perpendiculars of the current pipe -- the constraint the CONNECTION obeys, and the
+	 * obvious one to reach for -- would make the one gesture he named impossible, carrying the
+	 * connection to a main on the other side of the drawing. So this is the raw pointer in world
+	 * units and nothing is done to it.
+	 *
+	 * It is view state and never the document: null except between a press on the grip and the
+	 * release, and the release puts the circle back on whatever the connection ended up being.
+	 */
+	var custHandleAt = null;
 	function customerHandleFor() {
 		var sel = selection;
 		if (!sel || sel.kind !== 'customer') { return null; }
@@ -8767,6 +8788,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshCustomerHandle() {
 		var c = customerHandleFor(), an = c ? customerAttachPoint(c) : null, half;
+		// **A HELD GRIP IS DRAWN WHERE THE HAND IS, NOT WHERE THE CONNECTION IS** -- see
+		// custHandleAt. It still belongs to the selected customer, so an unselected one has no grip
+		// whatever a stale held point might say, which is why this is read after `c` and not before.
+		if (c && custHandleAt) { an = custHandleAt; }
 		if (!an) {
 			if (custHandleEl) { custHandleEl.remove(); custHandleEl = null; }
 			return;
@@ -29159,6 +29184,14 @@ var EngCalcs = EngCalcs || {};
 			if (drag && drag.pointerId === e.pointerId && drag.type === 'node' && drag.snapped) {
 				markNodeMoved(drag.id);
 			}
+			// **THE GRIP GOES BACK ONTO THE CONNECTION WHEN THE HAND LETS GO** -- see custHandleAt,
+			// which is view state for the length of one gesture and nothing else. Cleared on a
+			// CANCEL as well as on a release, because a held point that outlived its own drag would
+			// leave the ring stranded in the street with nothing left on the page to move it.
+			if (drag && drag.pointerId === e.pointerId && drag.type === 'custanchor') {
+				custHandleAt = null;
+				refreshCustomerHandle();
+			}
 			// **THE HAND OPENS ON EVERY RELEASE, GUARDED BY NOTHING** (Tom, 2026-09-08). It used to
 			// be cleared only where a drag was being ended, so any path that dropped `drag` during
 			// the gesture left the class on, and with it the rule that took the cursor away from
@@ -29774,9 +29807,22 @@ var EngCalcs = EngCalcs || {};
 			 * drop the connection point on a new asset, all always either perp to link or snapped
 			 * to node."*).
 			 *
-			 * **NOTHING HAPPENS OVER BARE MAP, AND THAT IS THE DESIGN RATHER THAN A GUARD.** A grip
-			 * that tracked the pointer would draw a service to a point in the street, at an angle,
-			 * for as long as the hand was between two mains -- which is the same false promise the
+			 * **THE GRIP FOLLOWS THE HAND AND THE SERVICE DOES NOT** (Tom, 2026-09-18, correcting
+			 * what was built here: *"I asked for the connection circle to be draggable even though
+			 * the service line cannot follow along until it snaps to something new."*). The circle
+			 * is the thing in the hand; the line is what waits. Until the same day the circle was
+			 * painted at the ATTACHMENT, so over open ground nothing on the screen moved at all and
+			 * the gesture read as a drag that had failed to start.
+			 *
+			 * **AND ITS PATH IS NOT CONSTRAINED, DELIBERATELY** (*"the circle's drag path cannot be
+			 * constrained, because we may want to jump to another pipe entirely"*). The obvious
+			 * constraint -- hold it to the perpendiculars of the pipe it is on, which is what the
+			 * CONNECTION obeys -- is exactly the one that would make his own gesture impossible.
+			 * So the grip is the raw pointer and nothing here touches it: custHandleAt.
+			 *
+			 * **WHAT STAYS PUT IS THE SERVICE, AND THAT IS STILL THE DESIGN RATHER THAN A GUARD.** A
+			 * LINE that tracked the pointer would draw a service to a point in the street, at an
+			 * angle, for as long as the hand was between two mains -- the same false promise the
 			 * placement band was carrying, in the other gesture. So the drawing only ever shows
 			 * connections that exist, and a drag that ends in the middle of nowhere leaves the
 			 * customer exactly as it was.
@@ -29792,6 +29838,10 @@ var EngCalcs = EngCalcs || {};
 			 */
 			var ca = customerById(drag.id), hit;
 			if (!ca) { return; }
+			// The grip first, and unconditionally: it moves on every frame whether or not the
+			// pointer has reached anything, which is the whole of what separates it from the line.
+			custHandleAt = screenToWorld(p.x, p.y);
+			refreshCustomerHandle();
 			hit = customerConnectionAt(p.x, p.y, customerPoint(ca),
 				drag.touch ? TOUCH_REACH_PX : POINTER_REACH_PX);
 			if (!hit) { return; }
