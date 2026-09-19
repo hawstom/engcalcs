@@ -531,14 +531,21 @@ L.renderCustomerFields(m1.id);
 	L.renderCustomerFields(m2.id);
 	ok('5.8 ...and it is reported as changing nothing',
 		popupText().indexOf(PC.lpn_customer_fixed_head) >= 0);
-	// **NO CAUTION GLYPH ON THIS ONE, WHICH IS A CHANGE AND NOT AN OVERSIGHT.** Tom gave the exact
-	// wording on 2026-09-19 -- *"The near end of that pipe holds a fixed water surface, so this
-	// demand does not affect the simulation."* -- and it carries no marker. The DETACHED note beside
-	// it still does, which is the one to keep an eye on: that state loses a demand from the answers,
-	// where this one is a statement about what a fixed head means.
-	ok('5.9 ...in his own words, with no marker glyph in front of them',
-		PC.lpn_customer_fixed_head.charAt(0) !== '⚠' &&
-		PC.lpn_customer_fixed_head.charAt(0) !== '✓',
+	// **THE CAUTION GLYPH LEADS IT, ON TOM'S OWN RULING OF 2026-09-19.** A previous pass took the
+	// glyph off with the old sentence when he gave the new wording -- *"The near end of that pipe
+	// holds a fixed water surface, so this demand does not affect the simulation."* -- and he
+	// reversed that: *"Put it back."* So the value is the glyph and then his words, unchanged.
+	//
+	// **IT BELONGS IN THE VALUE HERE AND WOULD SHIP TWO ANYWHERE ELSE.** This note is written
+	// straight onto a `<p class="lpn-set-note">` with `textContent`; nothing prepends a glyph to it,
+	// which is exactly how its neighbour `lpn_customer_detached` carries its own. A verdict built
+	// through `EngCalcs.writeCheckHTML()` is the opposite case and must NOT carry one.
+	// verdict_string_check.php's third leg holds the half that matters in the five right-to-left
+	// languages: a value containing a glyph must LEAD with it.
+	ok('5.9 ...led by the caution glyph, then his words unchanged',
+		PC.lpn_customer_fixed_head.charAt(0) === '⚠' &&
+		PC.lpn_customer_fixed_head.slice(2) ===
+			'The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.',
 		PC.lpn_customer_fixed_head);
 	L.deleteElement('customer', m2.id);
 	L.deleteElement('link', feeder.id);

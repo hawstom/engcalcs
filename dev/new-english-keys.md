@@ -43,7 +43,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > {n} customers are no longer connected to a pipe. Their demand is not in the answers.
   @@ NEEDS RULING
 - **`lpn_customer_fixed_head`**
-  > The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.
+  > ⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.
   @@ NEEDS RULING
 - **`lpn_customer_heading`**
   > Customer {id}
@@ -455,7 +455,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**87 still to read**, of 112 new keys across 9 unmerged branch(es).
+**81 still to read**, of 106 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -466,7 +466,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-2 (`fa446c35`) — 7 new, 5 to read @@ NEEDS RULING
+### chore/review-round-2 (`9e7f4afb`) — 6 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_field_account`**
   > Account number
@@ -474,9 +474,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_field_account_tip`**
   > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
   _Ruled OK 2026-09-17._
-- **`lpn_manual_results_cleared`**
-  > The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.
-  @@ NEEDS RULING
 - **`lpn_settings_link_symbology`**
   > Link symbology
   @@ NEEDS RULING
@@ -490,23 +487,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Visualization
   @@ NEEDS RULING
 
-### feat/customer-find-labels (`4f15643b`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_settings_customer_symbology`**
-  > Customer symbology
-  @@ NEEDS RULING
-- **`lpn_settings_link_symbology`**
-  > Link symbology
-  @@ NEEDS RULING
-- **`lpn_settings_node_link`**
-  > Node and link
-  @@ NEEDS RULING
-- **`lpn_settings_node_symbology`**
-  > Node symbology
-  @@ NEEDS RULING
-- **`lpn_settings_sec_visualization`**
-  > Visualization
-  @@ NEEDS RULING
+### feat/customer-find-labels (`19a04cd9`) — adds no English strings
 
 ### feat/engine-fetch-wait (`3df1129e`) — 10 new, 8 to read @@ NEEDS RULING
 
@@ -667,7 +648,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Visualization
   @@ NEEDS RULING
 
-### feat/xy-world-map (`4505b5db`) — 38 new, 33 to read @@ NEEDS RULING
+### feat/xy-world-map (`448533f6`) — 38 new, 33 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
