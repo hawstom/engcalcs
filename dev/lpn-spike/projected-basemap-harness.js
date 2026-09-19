@@ -4,7 +4,7 @@
 //
 // Tom, 2026-09-14: *"the world map is not in the background. It appears that the math to put the
 // world map tiles on the projected map is not implemented or is wrong."* It was not wrong; it was
-// absent. `basemapOn()` had read `isGeoProject() && ...` since 2026-08-18, so a projected project
+// absent. `basemapOn()` had read `isLatLonProject() && ...` since 2026-08-18, so a projected project
 // had never drawn a tile -- there was nowhere to put one, because the page could not turn a
 // longitude into an easting.
 //
@@ -60,7 +60,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetMapSized: function () { mapSized = true; },\n" +
 	"\t\tapplyView: applyView, currentView: currentView,\n" +
 	"\t\tassignCrs: assignProjectCrs, crsCode: projectCrsCode,\n" +
-	"\t\tisGeo: isGeoProject, isProjected: isProjectedProject,\n" +
+	"\t\tisGeo: isLatLonProject, isProjected: isProjectedProject,\n" +
 	"\t\tbasemapOn: basemapOn, setBasemapStyle: setBasemapStyle,\n" +
 	"\t\trefreshBasemap: refreshBasemap,\n" +
 	"\t\ttiles: function () { return Array.prototype.slice.call(basemapLayer.children || []); },\n" +
@@ -75,7 +75,7 @@ const L = loadLoopedNetwork(
 	"\t\tcreateProjectFrom: createProjectFrom,\n" +
 	// The chooser and the wizard line that now warn BEFORE a projection is committed to.
 	// Task 692: the outward-facing MENU ROWS, the corner teaser and the Go to command, which are
-	// the gates that were left on isGeoProject() when the basemap painter and the DEM controls
+	// the gates that were left on isLatLonProject() when the basemap painter and the DEM controls
 	// were widened.
 	"\t\tmapRows: mapMenuRows, refreshTeaser: refreshBasemapTeaser,\n" +
 	"\t\tgoToLatLon: goToLatLon, satAvailable: satelliteAvailable,\n" +
@@ -269,7 +269,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 	head('10. The DEM elevation controls are offered too');
 	// Tom, 2026-09-14: *"A new project with a projection doesn't offer the DEM elevation
 	// buttons."* The basemap gate was widened and this one was not -- four copies of
-	// `isGeoProject() && mapboxToken()` that did not move together -- so a projected project drew
+	// `isLatLonProject() && mapboxToken()` that did not move together -- so a projected project drew
 	// the world map and then refused to read heights off the very same tiles. One predicate now.
 	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.test';
 	global.EngCalcs.lpnTerrainFillFor = global.EngCalcs.lpnTerrainFillFor || function () {};
@@ -626,7 +626,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 	}
 
 	head('14. The last reader the audit turned up -- where the New project box opens');
-	// Every isGeoProject() reader was read on 2026-09-18 after the third defect from the same word.
+	// Every isLatLonProject() reader was read on 2026-09-18 after the third defect from the same word.
 	// All but one genuinely mean "are these numbers a longitude and a latitude" -- the Mercator
 	// boundary, the coordinate bounds, the decimal places, the `_xsrc` record. The exception was
 	// the New project box's place pre-fill, whose own comment still said turning an easting into a

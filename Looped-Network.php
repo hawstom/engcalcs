@@ -439,7 +439,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<?php // THE SATELLITE TEASER (ROADMAP Task 452). Tom, 2026-08-22: *"It's live, but the
 			      // interface has no way to activate it. Should there be a little 'satellite' teaser
 			      // tile/button in the corner of the map like at Google Maps?"* There WAS a way --
-			      // View > Show satellite images -- but the row carries `hidden: !isGeoProject() ||
+			      // View > Show satellite images -- but the row carries `hidden: !isLatLonProject() ||
 			      // !satelliteAvailable()`, so on a grid project it does not exist at all, and on a
 			      // geographic one it is four rows down a menu.
 			      //

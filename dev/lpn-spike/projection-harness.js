@@ -30,7 +30,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\taddNode: addNode, buildDom: buildDom,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
-	"\t\tnewProject: newProject, isGeo: isGeoProject, isProjected: isProjectedProject,\n" +
+	"\t\tnewProject: newProject, isGeo: isLatLonProject, isProjected: isProjectedProject,\n" +
 	"\t\tgetProject: function () { return project; },\n" +
 	"\t\tserialize: serializeProject, applySaved: applySaved,\n" +
 	"\t\tdeleteNetwork: deleteNetwork, georefStart: georefStart,\n" +

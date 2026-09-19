@@ -49,7 +49,7 @@ canvas.getBoundingClientRect = function () {
 
 const L = stub.loadLoopedNetwork(
 	"\t\tapplySaved: applySaved, applyView: applyView, currentView: currentView,\n" +
-	"\t\tisGeoProject: isGeoProject, docOrigin: docOrigin, noteMapSized: noteMapSized,\n" +
+	"\t\tisLatLonProject: isLatLonProject, docOrigin: docOrigin, noteMapSized: noteMapSized,\n" +
 	"\t\tscaleBarRound: scaleBarRound, scaleBarUnitsPerPx: scaleBarUnitsPerPx,\n" +
 	"\t\trefreshScaleBar: refreshScaleBar, setTransform: setTransform,\n" +
 	"\t\tgetState: function () { return state; },\n" +
@@ -97,7 +97,7 @@ const LAT = 38.1, LON = -122.56;
 		],
 		links: [], view: null
 	});
-	check(L.isGeoProject(), 'the fixture installed as geographic');
+	check(L.isLatLonProject(), 'the fixture installed as geographic');
 
 	const org = L.docOrigin();
 	// A scale that puts about a tenth of a degree across the window: a plausible working zoom.
@@ -112,7 +112,7 @@ const LAT = 38.1, LON = -122.56;
 	// THE INDEPENDENT NUMBER: the ground length of one pixel's worth of longitude at the bar's
 	// own latitude, taken straight from the function that fills every pipe length. Computed here
 	// from the definition rather than read back from the page, or this would test nothing.
-	const bottomLat = L.isGeoProject()
+	const bottomLat = L.isLatLonProject()
 		? Geom.mercLat(-((H / 2 - L.getState().ty) / s * -1 + 0) )   // placeholder, replaced below
 		: LAT;
 	void bottomLat;

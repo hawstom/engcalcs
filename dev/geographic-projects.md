@@ -317,7 +317,7 @@ holds the user's own eastings and northings and converts nothing. `newBoxAnswers
 those two part, and it is one comparison.
 
 **EPSG:3857 is never stored as `project.crs`.** `assignProjectCrs()` refuses it by name: a document
-stating it as a projected plane would be claiming its longitudes are metres. `isGeoProject()` remains
+stating it as a projected plane would be claiming its longitudes are metres. `isLatLonProject()` remains
 the one thing that answers "is this document lon/lat".
 
 ### The Geographic projection box, and why a spatial filter needed no library

@@ -40,9 +40,9 @@ The whole boundary between file and drawing is four functions in `js/looped-netw
 ```js
 function outwardX(x) { return x + docOrigin().x; }
 function outwardY(y) { var c = cartesianY(y) + docOrigin().y;
-                       return isGeoProject() ? Geom.mercLat(c) : c; }
+                       return isLatLonProject() ? Geom.mercLat(c) : c; }
 function inwardX(x)  { return x - docOrigin().x; }
-function inwardY(y)  { return cartesianY((isGeoProject() ? Geom.mercY(y) : y) - docOrigin().y); }
+function inwardY(y)  { return cartesianY((isLatLonProject() ? Geom.mercY(y) : y) - docOrigin().y); }
 ```
 
 `dev/lpn-spike/local-origin-harness.js` **counts the call sites** (20/20/17/18 today) so a fifth

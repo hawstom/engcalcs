@@ -12,7 +12,7 @@
 //   cx local     958.000000       ==  w/2   -- half the canvas width, IN PIXELS
 //   cy local    4999.000000       ==  h/2   for a 9998 px tall unsized SVG, IN PIXELS
 //
-// `defaultViewForCoords()` answers `{cx: w/2, cy: h/2, s: 1}` whenever `isGeoProject()` is false.
+// `defaultViewForCoords()` answers `{cx: w/2, cy: h/2, s: 1}` whenever `isLatLonProject()` is false.
 // That is right for an XY grid and meaningless in degrees, and `project` still describes the
 // OUTGOING project while a geographic one arrives -- so a lat/lon document took the grid branch.
 // applyView()'s clamp then raised s:1 to minScale(). The comment above the call site fixes the
@@ -63,7 +63,7 @@ canvas.getBoundingClientRect = function () {
 const L = stub.loadLoopedNetwork(
 	"\t\tapplySaved: applySaved, refreshAllFromDocument: refreshAllFromDocument,\n" +
 	"\t\tserializeProject: serializeProject, applyView: applyView,\n" +
-	"\t\tcurrentView: currentView, isGeoProject: isGeoProject,\n" +
+	"\t\tcurrentView: currentView, isLatLonProject: isLatLonProject,\n" +
 	"\t\tdocOrigin: docOrigin, minScale: minScale, noteMapSized: noteMapSized,\n" +
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\tgetState: function () { return state; },\n" +
@@ -93,7 +93,7 @@ console.log('--- 1. Tom\'s saved file still carries the camera that blanked his 
 console.log('--- 2. applyView() refuses a camera with no part of the Earth on screen ---');
 L.applySaved(JSON.parse(JSON.stringify(BAD)));
 {
-	check(L.isGeoProject(), 'the document installed as geographic');
+	check(L.isLatLonProject(), 'the document installed as geographic');
 	const org = L.docOrigin();
 	// The file's view is ABSOLUTE; applyView() takes the LOCAL frame, which is what the page hands
 	// it. Reproduce that conversion here rather than trusting a number typed into this file.

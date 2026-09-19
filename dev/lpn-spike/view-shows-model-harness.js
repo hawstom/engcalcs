@@ -57,7 +57,7 @@ canvas.getBoundingClientRect = function () {
 const L = stub.loadLoopedNetwork(
 	"\t\tapplySaved: applySaved, refreshAllFromDocument: refreshAllFromDocument,\n" +
 	"\t\tserializeProject: serializeProject, applyView: applyView,\n" +
-	"\t\tcurrentView: currentView, isGeoProject: isGeoProject,\n" +
+	"\t\tcurrentView: currentView, isLatLonProject: isLatLonProject,\n" +
 	"\t\tviewShowsModel: viewShowsModel, modelExtent: modelExtent,\n" +
 	"\t\tdocOrigin: docOrigin, minScale: minScale, maxScale: maxScale,\n" +
 	"\t\tnoteMapSized: noteMapSized,\n" +
@@ -97,7 +97,7 @@ console.log('--- 1. Tom\'s measured camera, against the network it had to show -
 		lonSpan.toFixed(6));
 
 	L.applySaved(clone(BAD));
-	check(L.isGeoProject(), 'it installs as a geographic project');
+	check(L.isLatLonProject(), 'it installs as a geographic project');
 	const ext = L.modelExtent();
 	check(Math.abs(ext.h - 0.082) < 0.001,
 		'...and 0.082 in the drawing frame north to south, which is Mercator y', ext.h.toFixed(6));
@@ -200,7 +200,7 @@ console.log('--- 4. an XY grid project ---');
 		};
 	}
 	L.applySaved(gridDoc(100, { cx: 50, cy: 50, s: 5 }));
-	check(!L.isGeoProject(), 'the project installed as a grid');
+	check(!L.isLatLonProject(), 'the project installed as a grid');
 	check(!!L.getPendingView(), 'a sane grid camera is accepted', '100 units at 5 px per unit');
 
 	L.applySaved(gridDoc(100, { cx: 50, cy: 50, s: 0.02 }));
