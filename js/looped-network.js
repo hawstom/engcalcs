@@ -9046,6 +9046,70 @@ var EngCalcs = EngCalcs || {};
 		return setCustomerPerp(c, t, customerPerpDistance(c, l));
 	}
 
+	// ---- STATION AND OFFSET: the pair a position is read from ------------------------------------
+	//
+	// **STATION SAYS HOW FAR ALONG, OFFSET SAYS HOW FAR OFF, AND ONLY THE SECOND IS A LENGTH**
+	// (Tom, 2026-09-18: *"I told you to add Offset in properties and tables."*). The station stays a
+	// percentage for the reason its own field states: `t` is a fraction of ARC length, and a pipe's
+	// stated length is the user's own number, routinely nothing like the distance between two
+	// symbols on a schematic. An offset has no such problem. It is a distance across the ground and
+	// nothing else, so it is stated in the length unit, and it is what makes the station readable as
+	// a survey position rather than as a fraction.
+	//
+	// **POSITIVE IS TO THE RIGHT OF THE PIPE, LOOKING FROM ITS FIRST NODE TOWARD ITS SECOND.** That
+	// is the surveyor's own convention, and it is also what linkNormalAt() already returns: the
+	// document stores y downward, so its (-dy, dx) normal points to the right of travel. ONE SIGNED
+	// NUMBER therefore carries both how far out the meter stands and which side it stands on, and
+	// there is no second control that could contradict it.
+	//
+	// **THE OFFSET WAS ALWAYS THERE. WHAT WAS MISSING WAS A WAY TO READ AND TYPE IT** -- a drag
+	// wrote it through setCustomerPerp() from the first day, which is why nothing below is a new
+	// way of storing anything.
+	function customerOffsetDrawn(c) {
+		var l = customerLink(c), n;
+		if (!l) { return 0; }
+		// **ON A NODE THE WHOLE DISTANCE IS THE ANSWER, NOT ITS SQUARE COMPONENT.** A service that
+		// lands on a junction keeps the offset it was given whole (customerPoint()), because a
+		// junction is where several mains meet and there is no one of them to be square to. Reading
+		// the projection there would print a number shorter than the stub in front of the reader.
+		if (customerAtNodeEnd(c)) {
+			n = linkNormalAt(l, customerT(c));
+			return ((c.x || 0) * n.x + (c.y || 0) * n.y) < 0 ?
+				-Math.hypot(c.x || 0, c.y || 0) : Math.hypot(c.x || 0, c.y || 0);
+		}
+		return customerPerpDistance(c, l);
+	}
+	// A probe one ten-thousandth of a degree long: short enough that the ground under it is flat,
+	// long enough that the geodesic is not measuring double precision.
+	var OFFSET_PROBE = 1e-4;
+	// How many LENGTH units one drawing unit is worth where this meter stands. In a grid project a
+	// drawing unit IS the length unit, which is the same reading linkGeomLength() takes of a pipe. A
+	// geographic project draws in degrees, where a degree is worth a different distance at every
+	// latitude and on each axis, so the scale is MEASURED on the very direction the offset runs,
+	// with the same geodesic a pipe's Auto length is measured with.
+	function customerOffsetUnitsPerDrawn(c) {
+		var l = customerLink(c), an, n;
+		if (!l || !isGeoProject()) { return 1; }
+		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
+		n = linkNormalAt(l, customerT(c));
+		return Geom.geodesicPolylineMeters([
+			{ x: outwardX(an.x), y: outwardY(an.y) },
+			{ x: outwardX(an.x + n.x * OFFSET_PROBE), y: outwardY(an.y + n.y * OFFSET_PROBE) }
+		]) * unitFactor('lpn_u_length') / OFFSET_PROBE;
+	}
+	// What the Offset box and the Offset column READ: the signed distance out, in the length unit.
+	function customerOffset(c) {
+		return customerOffsetDrawn(c) * customerOffsetUnitsPerDrawn(c);
+	}
+	// ...and what they WRITE, through setCustomerPerp() -- the one seam for where a meter is, so a
+	// typed offset and a dragged one cannot come to disagree about what an offset means. Typing one
+	// squares the service to its main, which is the only angle this page offers at all.
+	function setCustomerOffset(c, v) {
+		var per = customerOffsetUnitsPerDrawn(c);
+		if (!customerLink(c) || typeof v !== 'number' || !isFinite(v) || !(per > 0)) { return false; }
+		return setCustomerPerp(c, customerT(c), v / per);
+	}
+
 	// **A REBUILD DOES NOT HAVE TO LAY THE LABELS OUT WHERE IT STANDS.** On a project switch the
 	// view is restored AFTER the rebuild, so a pass run here is computed at the OUTGOING project's
 	// zoom and superseded moments later -- and a label's footprint is a pixel size divided by the
@@ -17286,6 +17350,31 @@ var EngCalcs = EngCalcs || {};
 				},
 				get: function (c) { var l = customerLink(c); return l ? l.id : ''; },
 				set: function (c, v) { setCustomerLink(c, v); customerEdited(c); } },
+			// **STATION AND OFFSET, THE PAIR, AND THE TABLE GETS BOTH** (Tom, 2026-09-18: *"I told
+			// you to add Offset in properties and tables."*). The popup's own two rows re-keyed,
+			// through the same two seams: setCustomerStation() slides the connection ALONG the main
+			// and carries the house with it, setCustomerOffset() moves the house ACROSS. A meter
+			// attached to nothing has no pipe to be along or off, so both cells read empty there and
+			// both setters refuse rather than inventing a position.
+			{ key: 'station', label: 'lpn_field_meter_station', em: 3.5,
+				get: function (c) {
+					return customerLink(c) ? +(customerT(c) * 100).toFixed(2) : '';
+				},
+				set: function (c, v) {
+					if (!customerLink(c) || !isFinite(v)) { return; }
+					setCustomerStation(c, Math.max(0, Math.min(100, v)) / 100);
+					customerEdited(c);
+				} },
+			{ key: 'offset', label: 'lpn_field_meter_offset', em: 3.5,
+				unit: function () { return 'lpn_u_length'; },
+				get: function (c) {
+					return customerLink(c) ? +customerOffset(c).toFixed(3) : '';
+				},
+				set: function (c, v) {
+					if (!isFinite(v)) { return; }
+					setCustomerOffset(c, v);
+					customerEdited(c);
+				} },
 			{ key: 'account', label: 'lpn_field_account', str: true, em: 6,
 				get: function (c) { return c.account || ''; },
 				set: function (c, v) { c.account = v === undefined || v === null ? '' : String(v); customerEdited(c); } },
@@ -40755,7 +40844,8 @@ var EngCalcs = EngCalcs || {};
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			l = c ? customerLink(c) : null, nid = c ? customerNodeId(c) : null,
 			nd = nid ? nodeById(nid) : null,
-			accLabel, accInput, demLabel, demInput, cntLabel, cntInput, stLabel, stInput, warn;
+			accLabel, accInput, demLabel, demInput, cntLabel, cntInput, stLabel, stInput,
+			offLabel, offInput, warn;
 		if (!c) { return; }
 		title.textContent = String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id);
 		clearFields(fields);
@@ -40860,6 +40950,29 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_field_meter_station_tip);
 			stLabel.appendChild(stInput);
 			fields.appendChild(stLabel);
+			fields.appendChild(document.createElement('br'));
+			// **AND THE OFFSET BESIDE IT, WHICH IS THE OTHER HALF OF A SURVEYED POSITION** (Tom,
+			// 2026-09-18). Station says how far along; offset says how far off, and its sign says
+			// which side. It is a real length rather than a percentage, so it carries the length
+			// unit in its heading, and it writes through setCustomerOffset() -- setCustomerPerp()'s
+			// one seam again, which is why a typed offset and a dragged one cannot disagree.
+			offLabel = document.createElement('label');
+			offInput = document.createElement('input');
+			offInput.type = 'number';
+			offInput.step = 'any';
+			offInput.value = String(+customerOffset(c).toFixed(3));
+			offInput.addEventListener('change', function () {
+				var v = +offInput.value;
+				if (!isFinite(v)) { return; }
+				saveUndoSnapshot();
+				setCustomerOffset(c, v);
+				customerEdited(c);
+				refreshPopupIfOpen();
+			});
+			setFieldLabel(offLabel, (pc.lpn_field_meter_offset || 'Offset from the pipe') +
+				' (' + unitLabel('lpn_u_length') + ')', pc.lpn_field_meter_offset_tip);
+			offLabel.appendChild(offInput);
+			fields.appendChild(offLabel);
 			fields.appendChild(document.createElement('br'));
 			readonlyField(fields, pc.lpn_field_meter_lumped || 'Added to node',
 				nid === null || nid === undefined ? '' : nid, pc.lpn_field_meter_lumped_tip);

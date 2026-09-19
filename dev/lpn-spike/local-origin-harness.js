@@ -364,12 +364,17 @@ console.log('\n--- one home for the concept ---');
 	// where it meant "can this project say where on the Earth it is". Both call sites are inside
 	// the one function, which is the point: the question is asked once. **NET ONE EACH, NOT TWO**:
 	// the pre-fill's own inline pair was the site that moved into it.
-	// **AND TWO MORE EACH FOR A CUSTOMER'S STATION AND OFFSET** (Task 247). A customer is placed by
-	// how far ALONG its pipe it sits and how far OFF, so the popup and the customers table both
-	// state a position the document stores as a drawn point: the leader's foot and the symbol come
-	// back out through this door rather than reading the stored pair straight.
-	ok('outwardX has one definition and thirty call sites', count(/outwardX\(/g) === 31, count(/outwardX\(/g));
-	ok('outwardY has one definition and thirty call sites', count(/outwardY\(/g) === 31, count(/outwardY\(/g));
+	// **AND TWO MORE EACH FOR A CUSTOMER'S OFFSET** (Task 247, Tom 2026-09-18: *"add Offset in
+	// properties and tables"*). An offset is a DISTANCE ACROSS THE GROUND in the length unit, and
+	// the drawing frame of a geographic project is degrees, where a degree is worth a different
+	// distance at every latitude and on each axis. So customerOffsetUnitsPerDrawn() measures the
+	// scale on the very direction the offset runs, which is two points crossing outward per axis --
+	// the same door, and the same geodesic, linkGeomLength() takes a pipe's Auto length through.
+	// **THE INWARD PAIR GAINS NOTHING**, and that asymmetry is the design rather than an oversight:
+	// a typed offset is converted to drawing units by DIVIDING by that same measured scale, so it
+	// never states a longitude or a latitude of its own for anything to convert.
+	ok('outwardX has one definition and thirty-two call sites', count(/outwardX\(/g) === 33, count(/outwardX\(/g));
+	ok('outwardY has one definition and thirty-two call sites', count(/outwardY\(/g) === 33, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -428,9 +433,6 @@ console.log('\n--- one home for the concept ---');
 	// surveyed file arrives as a pair of numbers out of somebody's file, which is the definition of
 	// an outside number: it comes through this door once, in createSurveyJunctions(), and the file's
 	// own value rides beside the drawn one so the save hands it back unchanged.
-	// **AND ONE MORE EACH FOR A TYPED STATION OR OFFSET** (Task 247). A station and an offset are
-	// typed in the LENGTH unit and are measured along and across a pipe, so the point they resolve
-	// to is an outside number and crosses here once, in writeCustomerStationOffset().
 	ok('inwardX has one definition and twenty-nine call sites', count(/inwardX\(/g) === 30, count(/inwardX\(/g));
 	ok('inwardY has one definition and thirty call sites', count(/inwardY\(/g) === 31, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly

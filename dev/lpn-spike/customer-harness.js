@@ -54,6 +54,8 @@ const L = loadLoopedNetwork(
 	"\t\tcustomerAttachPoint: customerAttachPoint, customerFlow: customerFlow,\n" +
 	"\t\tsetCustomerStation: setCustomerStation, customerEdited: customerEdited,\n" +
 	"\t\tsetCustomerPerp: setCustomerPerp, customerPerpDistance: customerPerpDistance,\n" +
+	"\t\tcustomerOffset: customerOffset, setCustomerOffset: setCustomerOffset,\n" +
+	"\t\tcustomerT: customerT,\n" +
 	"\t\tsetCustomerAt: setCustomerAt, setCustomerOffsetTo: setCustomerOffsetTo,\n" +
 	"\t\tlinkNormalAt: linkNormalAt, customerLink: customerLink,\n" +
 	"\t\tcustomerSnapT: customerSnapT, customerAtNodeEnd: customerAtNodeEnd,\n" +
@@ -499,6 +501,22 @@ L.renderCustomerFields(m1.id);
 	ok('5.4 ...and the pipe that serves it', txt.indexOf(main2.id) >= 0);
 	ok('5.5 ...and its total demand', txt.indexOf('12') >= 0);
 	ok('5.6 no fixed-head caution on a junction', txt.indexOf(PC.lpn_customer_fixed_head) < 0);
+	// **STATION AND OFFSET ARE BOTH IN THE BOX** (Tom, 2026-09-18). An attached meter states how far
+	// ALONG its main it sits and how far OFF it, and the second row was the one missing. The offset
+	// row names the LENGTH unit, which is what says out loud that it is a distance and the station
+	// is not.
+	ok('5.6a the box states the station', txt.indexOf(PC.lpn_field_meter_station) >= 0);
+	ok('5.6b ...and the offset beside it', txt.indexOf(PC.lpn_field_meter_offset) >= 0);
+	ok('5.6c ...in the length unit',
+		txt.indexOf(PC.lpn_field_meter_offset + ' (' + L.unitLabel('lpn_u_length') + ')') >= 0);
+	// Typed into, it moves the meter across its main, through the same seam a drag writes.
+	{
+		const was = L.customerOffset(m1);
+		L.setCustomerOffset(m1, was + 15);
+		ok('5.6d a typed offset moves the meter across its main',
+			near(L.customerOffset(m1), was + 15, 1e-3), L.customerOffset(m1));
+		L.setCustomerOffset(m1, was);
+	}
 }
 // A DEMAND ON A FIXED HEAD CHANGES NOTHING, and it is reported rather than rerouted to the
 // second-nearest junction, which would be a rule the reader cannot see.
@@ -780,6 +798,70 @@ L.renderCustomerFields(m1.id);
 		colOf('link').set(loose, '');
 		ok('7.20 clearing the cell detaches it deliberately', loose.link === null);
 		L.deleteElement('customer', loose.id);
+	}
+	// ---- STATION AND OFFSET, THE PAIR, IN THE TABLE (Tom, 2026-09-18) ------------------------
+	//
+	// **"I told you to add Offset in properties and tables."** Station says how far ALONG the main,
+	// offset says how far OFF it and which side. A station on its own is half a position, which is
+	// why the two columns are asserted together and sit beside each other.
+	{
+		const cust2 = (L.getDoc().customers || [])[0];
+		// Put it back where the rest of the file found it: section 9 asserts which junction this
+		// meter's demand is written to, and a station on the far side of the middle moves it.
+		const heldT = cust2.t, heldX = cust2.x, heldY = cust2.y;
+		ok('7.21 the table carries both halves of a position',
+			!!colOf('station') && !!colOf('offset'), cols.join(','));
+		ok('7.22 ...beside each other, station first',
+			L.paneCols(spec).map(c => c.key).indexOf('station') + 1 ===
+			L.paneCols(spec).map(c => c.key).indexOf('offset'));
+		ok('7.23 both can be typed into', !!colOf('station').set && !!colOf('offset').set);
+		// **THE OFFSET IS A LENGTH AND THE STATION IS NOT**, which is the whole reason they are two
+		// columns rather than a coordinate pair: `t` is a fraction of arc length, and a pipe's
+		// stated length is the user's own number.
+		ok('7.24 the offset column states the length unit and the station states none',
+			colOf('offset').unit() === 'lpn_u_length' && !colOf('station').unit);
+		ok('7.25 neither claims an overridable property',
+			colOf('station').prop === undefined && colOf('offset').prop === undefined);
+		// A round trip through the cell: what is typed is what is read back.
+		L.setCustomerStation(cust2, 0.4);
+		L.setCustomerOffset(cust2, 30);
+		ok('7.26 the station cell reads the station as a percentage',
+			near(colOf('station').get(cust2), 40, 1e-6), colOf('station').get(cust2));
+		ok('7.27 the offset cell reads what was written to it',
+			near(colOf('offset').get(cust2), 30, 1e-3), colOf('offset').get(cust2));
+		colOf('offset').set(cust2, -18);
+		ok('7.28 typing an offset moves the meter to the other side',
+			near(colOf('offset').get(cust2), -18, 1e-3), colOf('offset').get(cust2));
+		ok('7.29 ...and the sign is which side of the main it stands on', (function () {
+			const an = L.customerAttachPoint(cust2), pt = L.customerPoint(cust2);
+			const n = L.linkNormalAt(L.customerLink(cust2), L.customerT(cust2));
+			return ((pt.x - an.x) * n.x + (pt.y - an.y) * n.y) < 0;
+		})());
+		// **THE STATION DOES NOT MOVE WHEN THE OFFSET DOES**, which is what makes them two
+		// independent readings of one position rather than two views of the same number.
+		const stationWas = colOf('station').get(cust2);
+		colOf('offset').set(cust2, 22);
+		ok('7.30 moving the meter across its main leaves its station alone',
+			near(colOf('station').get(cust2), stationWas, 1e-9), colOf('station').get(cust2));
+		// ...and the other way round: sliding ALONG carries the house at the same distance out.
+		const offsetWas = colOf('offset').get(cust2);
+		colOf('station').set(cust2, 70);
+		ok('7.31 sliding along the main carries the meter at the same offset',
+			near(colOf('offset').get(cust2), offsetWas, 1e-3), colOf('offset').get(cust2));
+		ok('7.32 ...and the station really did move', near(colOf('station').get(cust2), 70, 1e-6));
+		// A meter attached to nothing has no main to be along or off, so both cells read empty
+		// rather than printing a number measured from something that is not there.
+		{
+			const bare = L.addCustomer(400, 400, null);
+			ok('7.33 a detached meter has neither a station nor an offset to show',
+				colOf('station').get(bare) === '' && colOf('offset').get(bare) === '');
+			colOf('offset').set(bare, 12);
+			ok('7.34 ...and typing one is refused rather than inventing a position',
+				colOf('offset').get(bare) === '');
+			L.deleteElement('customer', bare.id);
+		}
+		cust2.t = heldT; cust2.x = heldX; cust2.y = heldY;
+		L.customerEdited(cust2);
 	}
 }
 
