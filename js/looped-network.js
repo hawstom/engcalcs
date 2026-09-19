@@ -8387,7 +8387,7 @@ var EngCalcs = EngCalcs || {};
 	// world units and still be square on the screen.
 	function metresPerWorldUnit(x, y) {
 		var f, d = 0.001, m, lon, lat;
-		if (!isGeoProject()) {
+		if (!isLatLonProject()) {
 			f = unitFactor('lpn_u_length');
 			return (f && isFinite(f)) ? 1 / f : 1;
 		}
@@ -9100,7 +9100,7 @@ var EngCalcs = EngCalcs || {};
 	// with the same geodesic a pipe's Auto length is measured with.
 	function customerOffsetUnitsPerDrawn(c) {
 		var l = customerLink(c), an, n;
-		if (!l || !isGeoProject()) { return 1; }
+		if (!l || !isLatLonProject()) { return 1; }
 		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		n = linkNormalAt(l, customerT(c));
 		return Geom.geodesicPolylineMeters([
