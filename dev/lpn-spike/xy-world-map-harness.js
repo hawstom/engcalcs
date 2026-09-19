@@ -172,6 +172,99 @@ ok('...about the point under the pointer, which does not move',
 	Math.abs(mid.lat - LAT) < 1e-9 && Math.abs(mid.lon - LON) < 1e-9);
 ok('STEP 1 STILL CHANGES NOT ONE STORED BYTE', snapshot() === before);
 
+// ---- STEP 1 PANS, AND IT IS DRIVEN THROUGH THE PAGE'S OWN PRESS -------------------------------
+//
+// Tom, 2026-09-18: *"On step 1 of 2, pan and zoom must be enabled. I only have zoom. I need pan."*
+//
+// **EVERYTHING ABOVE AND BELOW THIS BLOCK HANDS mapgeoApplyDrag() A DRAG RECORD THIS FILE BUILT**,
+// which tests the arithmetic of a gesture and says nothing at all about whether a press ever
+// reaches it. The whole of step 1's pan is that path: there is no rectangle at step 1, so the press
+// lands on bare canvas and the only thing that can turn it into a map move is
+// mapgeoPointerDown()'s fallback. Nothing in this repository had ever driven it. So this block
+// fires the page's own pointerdown, pointermove and pointerup, and pumps the frame loop that
+// applies them -- the same three things a hand does -- and asserts the ground moved.
+//
+// **THE FRAME LOOP IS PART OF THE PATH AND IS WHY IT IS PUMPED HERE.** looped-network.js records a
+// press, sets `dragDirty`, and does the work in a requestAnimationFrame chain; panning is the one
+// gesture that depends on that loop and on nothing else, which is why "I can edit and zoom but I
+// cannot pan" is the exact signature of the loop having stopped (ROADMAP Task 650). Asserting
+// through the loop is what makes this block able to see that.
+{
+	const { setHitTarget } = require('./lpn-dom-stub.js');
+	const canvas = byId.lpn_canvas;
+	canvas._listeners = {};
+	L.wirePointerEvents();
+	const fire = (type, ev) => (canvas._listeners[type] || []).forEach(f => f(ev));
+	// A press on BARE CANVAS -- null is the stub's way of saying the pointer is over nothing.
+	const pan = (dx, dy, id) => {
+		const a = L.screenOf(midX, midY), b = { x: a.x + dx, y: a.y + dy };
+		setHitTarget(null);
+		fire('pointerdown', { pointerId: id, clientX: a.x, clientY: a.y, pointerType: 'mouse', button: 0 });
+		const armed = L.getDrag();
+		fire('pointermove', { pointerId: id, clientX: b.x, clientY: b.y, pointerType: 'mouse', buttons: 1 });
+		const applied = L.pumpDrag();
+		fire('pointerup', { pointerId: id, clientX: b.x, clientY: b.y, pointerType: 'mouse' });
+		return { armed: armed, applied: applied };
+	};
+	let was = G.lpnGeorefToLonLat(L.xyGeoref(), midX, midY);
+	let r = pan(120, 0, 41);
+	ok('a press on bare canvas at step 1 arms a map drag, not a camera pan',
+		!!r.armed && r.armed.type === 'mapgeo' && r.armed.kind === 'move',
+		JSON.stringify(r.armed && { type: r.armed.type, kind: r.armed.kind }));
+	ok('...and the frame loop applies it', r.applied === true);
+	let now = G.lpnGeorefToLonLat(L.xyGeoref(), midX, midY);
+	// Dragging RIGHT must carry the ground right, which on a map means the drawing ends up further
+	// WEST on it. The sign is the assertion: a pan that moved the map the wrong way would still
+	// change the number.
+	ok('dragging right slides the map right, so the drawing sits further west on it',
+		now.lon < was.lon && Math.abs(now.lat - was.lat) < 1e-9,
+		was.lon.toFixed(4) + ' -> ' + now.lon.toFixed(4));
+	was = now;
+	r = pan(0, 130, 42);
+	now = G.lpnGeorefToLonLat(L.xyGeoref(), midX, midY);
+	ok('...and dragging down slides it down, so the drawing sits further north on it',
+		now.lat > was.lat && Math.abs(now.lon - was.lon) < 1e-9,
+		was.lat.toFixed(4) + ' -> ' + now.lat.toFixed(4));
+	// A second and a third press must work too: the drag record is rebuilt from the transform of
+	// the moment, so a pan that only ever worked once would be a stale `t0`.
+	was = now;
+	pan(-90, 0, 43); pan(0, -70, 44);
+	now = G.lpnGeorefToLonLat(L.xyGeoref(), midX, midY);
+	ok('...and it keeps working press after press, never only the first time',
+		now.lon !== was.lon && now.lat !== was.lat);
+	// The press that did not travel slides nothing -- the slop every other gesture on this page
+	// obeys.
+	was = now;
+	pan(1, 1, 45);
+	now = G.lpnGeorefToLonLat(L.xyGeoref(), midX, midY);
+	ok('...while a press that barely moved slides nothing',
+		now.lon === was.lon && now.lat === was.lat);
+	// **AND IT IS NOT A TAP ON THE DRAWING EITHER, which it was.** The tap listener beside the drag
+	// one exempted the OTHER placement wizard by name and said nothing about this one, so a nudge
+	// too small to pan went on to the ordinary select machinery and opened the popup of whatever
+	// was under the pointer -- on a canvas where the drawing fills the screen. The map not moving
+	// AND something else happening is what "I have no pan" looks like from the outside.
+	{
+		const node = { dataset: { node: L.getDoc().nodes[1].id } };
+		setHitTarget(node);
+		fire('pointerdown', { pointerId: 46, clientX: 400, clientY: 300, pointerType: 'mouse', button: 0 });
+		fire('pointerup', { pointerId: 46, clientX: 401, clientY: 300, pointerType: 'mouse' });
+		// Asserted as NOT SHOWN rather than as "not block": this popup is laid out with `flex`, and
+		// a test written against the wrong keyword is a test that passes on the defect. It did.
+		const popup = byId.lpn_popup;
+		const shown = !!popup && !!popup.style.display && popup.style.display !== 'none';
+		ok('...and a press too small to pan opens nothing, because the wizard owns every press',
+			!shown, popup && JSON.stringify(popup.style.display));
+		setHitTarget(null);
+	}
+	// THE WHEEL, through the one door the page sends every zoom request to.
+	const mpuWas = L.xyGeoref().metersPerUnit;
+	L.wheelZoom(L.screenOf(midX, midY).x, L.screenOf(midX, midY).y, 2);
+	ok('and the wheel still zooms the map at step 1, which is the half he already had',
+		Math.abs(L.xyGeoref().metersPerUnit - mpuWas / 2) < 1e-9 * mpuWas);
+	ok('STEP 1 PANNED AND ZOOMED AND CHANGED NOT ONE STORED BYTE', snapshot() === before);
+}
+
 // ---- STEP 2: the rectangle that controls the map -----------------------------------------------
 L.mapgeoPlace();
 ok('Place approximately moves to step 2', L.mapgeoStep() === 2);

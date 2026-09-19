@@ -28820,8 +28820,20 @@ var EngCalcs = EngCalcs || {};
 		// depends on is false -- so picking a node as the target of a Move also opens that node's
 		// popup, or with the Delete tool active DELETES it. Gating the tap's START, not its end, is
 		// what makes this hold: the pointerdown happens while regMode is unambiguously still on.
+		// **AND THE CUSTOM GEOREFERENCE WIZARD IS EXEMPT TOO, which it was not** (Tom, 2026-09-18:
+		// *"On step 1 of 2, pan and zoom must be enabled. I only have zoom. I need pan."*). This
+		// pair named `georefActive()` -- the OTHER placement wizard -- and said nothing about
+		// mapgeoActive(), so while the world map was being placed every press was still being
+		// recorded as a possible tap. A press that travelled less than the tap slop therefore went
+		// on to the ordinary select machinery: a nudge of the map opened the popup of whatever
+		// happened to be under the pointer, on a canvas where the drawing fills the screen, and the
+		// nudge itself did nothing because it was below the drag slop. That reads exactly as "I
+		// have no pan" -- the map does not move and something else happens instead. The drag path
+		// was never broken; this is what was sitting on top of it. The signature is the one this
+		// file records again and again: a construct written twice, with the discriminating test on
+		// one of them and absent from the other.
 		svg.addEventListener('pointerdown', function (e) {
-			if (regMode || georefActive()) { downPt = null; return; }
+			if (regMode || georefActive() || mapgeoActive()) { downPt = null; return; }
 			// The TIME and the POINTER TYPE come along, because a press is not only a place any
 			// more: the profile's chooser reads a short touch, a long one and a double one as three
 			// different gestures (Task 506), and both facts are only available here.
@@ -28829,7 +28841,7 @@ var EngCalcs = EngCalcs || {};
 			areaLastPointer = e.pointerType || 'mouse';   // so the select-area bubble knows a finger from a mouse before its own first press
 		});
 		svg.addEventListener('pointerup', function (e) {
-			if (regMode || georefActive()) { downPt = null; return; } // a pending registration sequence, or a placement in progress
+			if (regMode || georefActive() || mapgeoActive()) { downPt = null; return; } // a pending registration sequence, or either placement wizard
 			// **A DRAG IS NEVER ALSO A TAP.** `gestureMoved` is the fact -- this press armed a drag
 			// and moved the document -- and the distance test is what covers the modes that set no
 			// `drag` at all (add-*, delete), where nothing arms anything but a travelling press is
