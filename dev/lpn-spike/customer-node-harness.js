@@ -68,6 +68,9 @@ const L = loadLoopedNetwork(
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tcustomerLabelLines: customerLabelLines,\n" +
 	"\t\tcustLblEls: function () { return custLblEls; },\n" +
+	"\t\tlabelSeparator: labelSeparator, effectiveFontSize: effectiveFontSize,\n" +
+	"\t\tcustomerFieldDefs: customerFieldDefs, applySaved: applySaved,\n" +
+	"\t\tprepareDocument: prepareDocument, serializeProject: serializeProject,\n" +
 	"\t\tlayoutCustomerLabels: layoutCustomerLabels,\n" +
 	"\t\tcustomerLabelsAttempted: customerLabelsAttempted,\n" +
 	"\t\tvisibleMapMetres: visibleMapMetres,\n" +
@@ -123,8 +126,8 @@ const pipe = L.addLink('pipe', nA.id, nB.id);
 const c1 = L.addCustomer(120, 60, { link: pipe.id, t: 0.2 });
 const c2 = L.addCustomer(280, 60, { link: pipe.id, t: 0.8 });
 const cLoose = L.addCustomer(600, 400, null);
-c1.account = '4417'; c1.demand = 2; c1.count = 42;
-c2.account = 'ELM-9'; c2.demand = 5;
+c1.tag = '4417'; c1.demand = 2; c1.count = 42;
+c2.tag = 'ELM-9'; c2.demand = 5;
 L.customerEdited(c1);
 L.customerEdited(c2);
 
@@ -144,26 +147,30 @@ L.customerEdited(c2);
 	});
 
 	// The honesty rule of findPropDefs() is that a property which silently matches nothing does not
-	// go in the menu. The rule beside it is that a property nobody asks a question about is
-	// clutter, which is why STATION and OFFSET are asserted ABSENT: they are positions on the
-	// drawing, and offering one here would put a bulk Replace that slides four hundred meters along
-	// their mains one control away.
+	// go in the menu.
+	//
+	// **STATION AND OFFSET ARE ASSERTED PRESENT, AND THEY USED TO BE ASSERTED ABSENT** (Tom,
+	// 2026-09-19, of the argument that they are positions on the drawing rather than facts about
+	// the service: *"Bad decision. Put them in. Very handy for offset or station 0."*).
+	//
+	// **AND THERE IS NO ACCOUNT NUMBER** (same message). A customer carries the DESCRIPTION and the
+	// TAG every node and link carries, which is what those two assertions now say.
 	L.findState().scope = 'customer';
 	const keys = propKeys(L.findPropDefs());
-	['id', 'account', 'link', 'demand', 'count', 'total', 'atNode'].forEach(function (k) {
+	['id', 'desc', 'tag', 'link', 'demand', 'count', 'total', 'atNode', 'station', 'offset'].forEach(function (k) {
 		ok('1.5 ' + k + ' is searchable on a customer', keys.indexOf(k) >= 0, keys.join(','));
 	});
-	ok('1.6 the station is deliberately NOT offered', keys.indexOf('station') < 0);
-	ok('1.7 ...nor the offset', keys.indexOf('offset') < 0);
-	ok('1.8 ...nor a tag or a description, which a customer does not carry',
-		keys.indexOf('tag') < 0 && keys.indexOf('desc') < 0);
+	ok('1.6 the account number is gone from the menu, not renamed inside it',
+		keys.indexOf('account') < 0);
 	ok('1.9 ...nor connectivity, which is a question about the network',
 		keys.indexOf('connection') < 0);
-	ok('1.10 the account number is named by its own whole label, reused not re-keyed',
-		L.findPropDefs().filter(d => d[0] === 'account')[0][1] === PC.lpn_field_account);
+	ok('1.10 the tag is named by its own whole label, reused not re-keyed',
+		L.findPropDefs().filter(d => d[0] === 'tag')[0][1] === PC.lpn_field_tag);
+	ok('1.10b ...and so is the description',
+		L.findPropDefs().filter(d => d[0] === 'desc')[0][1] === PC.lpn_field_desc);
 
 	const cand = { group: 'customer', el: c1 };
-	ok('1.11 the account number reads', L.findValueOf(cand, 'account') === '4417');
+	ok('1.11 the tag reads', L.findValueOf(cand, 'tag') === '4417');
 	ok('1.12 the connected asset reads as the pipe', L.findValueOf(cand, 'link') === pipe.id);
 	ok('1.13 the junction it lumps at is DERIVED, not stored',
 		L.findValueOf(cand, 'atNode') === L.customerNodeId(c1));
@@ -173,25 +180,37 @@ L.customerEdited(c2);
 		L.findValueOf({ group: 'customer', el: c2 }, 'count') === 1);
 	// An absent value is undefined and never an invented zero, so `contains` with an empty box
 	// lists exactly the customers that CARRY one.
-	ok('1.17 a customer with no account number answers undefined, not an empty string',
-		L.findValueOf({ group: 'customer', el: cLoose }, 'account') === undefined);
+	ok('1.17 a customer with no tag answers undefined, not an empty string',
+		L.findValueOf({ group: 'customer', el: cLoose }, 'tag') === undefined);
 	ok('1.18 a detached customer states no connected asset and no junction',
 		L.findValueOf({ group: 'customer', el: cLoose }, 'link') === undefined &&
 		L.findValueOf({ group: 'customer', el: cLoose }, 'atNode') === undefined);
-	ok('1.19 a customer answers no tag and no description',
-		L.findValueOf(cand, 'tag') === undefined && L.findValueOf(cand, 'desc') === undefined);
+	// **THE STATION AND THE OFFSET ANSWER, AND A DETACHED CUSTOMER ANSWERS NEITHER** -- undefined
+	// rather than a zero, which would make `offset equal to 0` match every loose service in the
+	// drawing. The station is the percentage the popup and the table both show, so all three doors
+	// report one number.
+	ok('1.19 the station reads as the percentage the popup shows',
+		near(L.findValueOf(cand, 'station'), 20));
+	ok('1.19b the offset reads as a number', typeof L.findValueOf(cand, 'offset') === 'number');
+	ok('1.19c a detached customer is along nothing and off nothing',
+		L.findValueOf({ group: 'customer', el: cLoose }, 'station') === undefined &&
+		L.findValueOf({ group: 'customer', el: cLoose }, 'offset') === undefined);
 
 	const st = L.findState();
-	st.scope = 'customer'; st.prop = 'account'; st.op = 'contains'; st.value = '441';
+	st.scope = 'customer'; st.prop = 'tag'; st.op = 'contains'; st.value = '441';
 	let hits = L.findMatches();
-	ok('1.20 a search by account number finds the one service',
+	ok('1.20 a search by tag finds the one service',
 		hits.length === 1 && hits[0].el.id === c1.id && hits[0].group === 'customer');
 	st.prop = 'count'; st.op = 'gt'; st.value = '10';
 	ok('1.21 a numeric condition works on the count',
 		L.findMatches().length === 1);
-	st.prop = 'account'; st.op = 'contains'; st.value = '';
-	ok('1.22 an empty "contains" lists exactly the customers that HAVE an account number',
+	st.prop = 'tag'; st.op = 'contains'; st.value = '';
+	ok('1.22 an empty "contains" lists exactly the customers that HAVE a tag',
 		L.findMatches().length === 2);
+	// The case he named: every service that never got moved off its main.
+	st.prop = 'offset'; st.op = 'eq'; st.value = '0';
+	ok('1.22b "offset equal to 0" is answerable, which is the case he asked for',
+		L.findMatches().length === 0 || L.findMatches().every(h => h.group === 'customer'));
 	// "Everything" has to reach them: a customer has an id a reader can see, on its own symbol and
 	// in its own table, so an ID search that skipped it would answer a question about the drawing
 	// with part of the drawing left out.
@@ -210,7 +229,7 @@ L.customerEdited(c2);
 	ok('1.25 unfiltered, it holds every customer', L.paneTableElements(spec).length === 3);
 	const label = L.findScopeDefs().filter(d => d.key === 'customer')[0].label;
 	L.findState().scope = 'customer';
-	const prop = L.findPropDefs().filter(d => d[0] === 'account')[0][1];
+	const prop = L.findPropDefs().filter(d => d[0] === 'tag')[0][1];
 	L.paneSetFilter('customers', label + '.' + prop + ' ' + PC.lpn_find_op_contains + ' "ELM"');
 	ok('1.26 a filter written in the panel\'s own words reaches the table',
 		L.paneTableElements(spec).length === 1 && L.paneTableElements(spec)[0].id === c2.id,
@@ -222,9 +241,9 @@ L.customerEdited(c2);
 // ---- 1c. REPLACE, AND THE LABEL-NOT-A-KEY RULING ----------------------------------------------
 {
 	const st = L.findState(), rs = L.replaceState();
-	st.scope = 'customer'; st.prop = 'account'; st.op = 'contains'; st.value = '';
+	st.scope = 'customer'; st.prop = 'tag'; st.op = 'contains'; st.value = '';
 	const fields = L.replaceSpecs().map(s => s.field);
-	['account', 'demand', 'count', 'pattern'].forEach(function (f) {
+	['desc', 'tag', 'demand', 'count', 'pattern', 'station', 'offset'].forEach(function (f) {
 		ok('1.28 ' + f + ' is writable on a customer', fields.indexOf(f) >= 0, fields.join(','));
 	});
 	ok('1.29 the TOTAL is not: it is the product of two numbers above it',
@@ -237,26 +256,29 @@ L.customerEdited(c2);
 	ok('1.33 a pipe\'s diameter is not offered against a set of customers',
 		fields.indexOf('diameter') < 0 && fields.indexOf('elev') < 0);
 
-	// **THE ASSERTIONS HERE ARE ABOUT WHAT DOES NOT HAPPEN.** The standing ruling is that the
-	// account number is a name on a demand and nothing looks anything up by it. A bulk write is
-	// exactly where a page would be tempted to start treating it as a key -- a uniqueness test, a
-	// format check, a renumbering -- so this writes ONE account onto TWO customers and asserts both
-	// keep it. Refusing, renumbering or skipping the second would all look like helpfulness.
-	rs.prop = 'account'; rs.value = 'ROUTE-12';
+	// **THE ASSERTIONS HERE ARE ABOUT WHAT DOES NOT HAPPEN.** A tag is a name on an asset and
+	// nothing looks anything up by it. A bulk write is exactly where a page would be tempted to
+	// start treating it as a key -- a uniqueness test, a format check, a renumbering -- so this
+	// writes ONE tag onto TWO customers and asserts both keep it. Refusing, renumbering or skipping
+	// the second would all look like helpfulness.
+	rs.prop = 'tag'; rs.value = 'ROUTE-12';
 	L.runReplacePreview();
 	ok('1.34 the preview counts both services', L.replaceTargets().length === 2);
 	L.applyReplace();
-	ok('1.35 both carry the account number now',
-		c1.account === 'ROUTE-12' && c2.account === 'ROUTE-12');
+	ok('1.35 both carry the tag now',
+		c1.tag === 'ROUTE-12' && c2.tag === 'ROUTE-12');
 	ok('1.36 ...and nothing enforced uniqueness, because it is a label and not a key',
-		c1.account === c2.account);
-	ok('1.37 the customer that matched nothing is untouched', !cLoose.account);
+		c1.tag === c2.tag);
+	ok('1.37 the customer that matched nothing is untouched', !cLoose.tag);
 	ok('1.38 writing a name changed no demand', near(L.customerFlow(c1), 2 * 42));
-	// An account number is whatever your own records call the service, so the one-word rule a tag
-	// obeys must not eat one.
-	rs.value = '123 Elm St';
+	// A DESCRIPTION is a sentence and survives whole, where a TAG keeps EPANET's one word. Both
+	// rules live in lpnDescText()/lpnTagText() and are applied here through them, not restated.
+	rs.prop = 'desc'; rs.value = '123 Elm St';
 	L.runReplacePreview(); L.applyReplace();
-	ok('1.39 an account number with spaces in it survives whole', c1.account === '123 Elm St');
+	ok('1.39 a description with spaces in it survives whole', c1.desc === '123 Elm St');
+	rs.prop = 'tag'; rs.value = 'MAIN 1962 south';
+	L.runReplacePreview(); L.applyReplace();
+	ok('1.39b a tag keeps the one word EPANET reads', c1.tag === 'MAIN');
 
 	st.prop = 'demand'; st.op = 'gt'; st.value = '0';
 	rs.prop = 'count'; rs.value = '3.6';
@@ -362,44 +384,76 @@ L.customerEdited(c2);
 }
 
 // ================================================================================================
-// 3. THE LABEL IS A NODE LABEL
+// 3. THE LABEL HAS ITS OWN SYMBOLOGY
 // ================================================================================================
 //
 // **WHAT CUSTOMER LABELLING WAS BEFORE THIS: NOTHING.** A meter carried no label of any kind. What
 // HAS always been true is that its demand is in its JUNCTION's label, because a customer is one of
 // Task 468's demand rows -- which is assertion 3.1, and is why customers can look labelled without
 // anybody ever having decided to label them.
+//
+// **AND THE NODE CHECKBOXES NO LONGER GOVERN, WHICH REVERSES WHAT THIS SECTION USED TO ASSERT**
+// (Tom, 2026-09-19: *"I think we need a third separate Customer symbology area in settings so that
+// we can control Customer labels differently than other labels, since we may want only demand or
+// only demand and description."*). It asserted that there is NO customer side of labelSettings and
+// that there must not be one -- his own earlier instruction, now overruled by him. What has NOT
+// changed, and is asserted harder here because he called the alternative a bug, is that there is no
+// separate TEXT SIZE: *"I **don't** think we need a separate text size. That's a bug."*
 {
 	const ls = L.labelSettings();
 	ok('3.1 a customer\'s demand has always been in its junction\'s own total',
 		near(L.baseDemandTotal(nA), (nA._demand || 0) + L.customerFlow(c1)),
 		String(L.baseDemandTotal(nA)));
 
-	ok('3.2 there is NO customer side of labelSettings, and there must not be',
-		ls.customer === undefined);
-	ok('3.3 ...nor a customer decimals map', (ls.decimals || {}).customer === undefined);
+	ok('3.2 there IS a customer side of labelSettings now', !!ls.customer);
+	ok('3.3 ...and a customer decimals map of its own',
+		typeof (ls.decimals.customer || {}).demand === 'number');
+	// **NO TEXT SIZE ANYWHERE IN IT.** He called a separate one a bug, so this is the assertion
+	// that would go red if somebody added one back.
+	ok('3.3b ...and NO text size of its own, which he called a bug',
+		ls.customer.textSize === undefined && ls.customer.size === undefined &&
+		ls.customerTextSize === undefined);
 	// The ONE customer-shaped setting there is, and it is about how close you have to be rather
 	// than about what the label says -- see section 3c.
 	ok('3.4 ...and the one customer setting is a view width, not a content switch',
 		typeof ls.customerMaxWidth === 'number');
 
-	// **THE NODE CHECKBOXES GOVERN**, which is the whole of "its labels would follow Node styles".
-	ls.node.id = true; ls.node.demand = true; ls.node.demandActual = false;
+	// **THE CUSTOMER CHECKBOXES GOVERN, AND THE NODE ONES DO NOT REACH A METER.**
+	ls.customer.id = true; ls.customer.demand = true; ls.customer.demandActual = false;
+	ls.customer.desc = false; ls.customer.tag = false; ls.customer.count = false;
 	let lines = L.customerLabelLines(c1);
-	ok('3.5 the node ID and Base demand rows reach a customer',
+	ok('3.5 the customer ID and Base demand rows reach a customer',
 		lines.map(l => l.field).join(',') === 'id,demand', lines.map(l => l.field).join(','));
-	ls.node.demandActual = true;
+	ls.customer.demandActual = true;
 	lines = L.customerLabelLines(c1);
 	ok('3.6 Demand sits above Base demand, as it does on a junction',
 		lines.map(l => l.field).join(',') === 'id,demandActual,demand');
+	// **THE TWO IDENTITY STRINGS, WHICH ARE THE ROWS HE ASKED FOR** -- *"we may want only demand or
+	// only demand and description"*. An absent value prints nothing rather than an empty slot.
+	ls.customer.id = false; ls.customer.demandActual = false; ls.customer.desc = true;
+	c1.desc = 'Corner of Elm and Main';
+	ok('3.6b demand and description alone is expressible, which is the case he named',
+		L.customerLabelLines(c1).map(l => l.field).join(',') === 'demand,desc');
+	c1.desc = '';
+	ok('3.6c ...and a customer with no description prints no empty slot for it',
+		L.customerLabelLines(c1).map(l => l.field).join(',') === 'demand');
+	c1.desc = 'Corner of Elm and Main';
+	ls.customer.desc = false;
+	// **THE NODE SIDE IS NOW INERT HERE**, which is the assertion that the two really are separate.
+	ls.node.id = true; ls.node.demandActual = true;
+	ok('3.6d turning every node row on adds nothing to a customer label',
+		L.customerLabelLines(c1).map(l => l.field).join(',') === 'demand',
+		L.customerLabelLines(c1).map(l => l.field).join(','));
+	ls.customer.id = true; ls.customer.demandActual = true;
+	lines = L.customerLabelLines(c1);
 	// **Q IS A DEMAND, AND IT IS THE METER'S OWN TOTAL** -- count included, which is the number
 	// this customer adds to its junction.
 	const dem = lines.filter(l => l.field === 'demand')[0];
 	ok('3.7 the Base demand row prints this meter\'s own total, count included',
 		dem.text.indexOf(String(Math.round(L.customerFlow(c1)))) >= 0, dem.text);
 
-	// Three node rows a customer does not have, and they pass over it rather than printing a blank
-	// or borrowing a junction's number.
+	// Four rows a customer does not have, and the customer list simply does not offer them -- so a
+	// meter never prints a blank or borrows a junction's number.
 	ls.node.elev = true; ls.node.head = true; ls.node.pressure = true; ls.node.quality = true;
 	lines = L.customerLabelLines(c1);
 	ok('3.8 elevation, head, pressure and quality are not offered on a meter',
@@ -407,12 +461,11 @@ L.customerEdited(c2);
 		lines.map(l => l.field).join(','));
 	ls.node.elev = true; ls.node.head = false; ls.node.pressure = true; ls.node.quality = false;
 
-	// **TURNING THE NODE ROWS OFF EMPTIES A METER'S LABEL**, with no customer switch anywhere --
-	// which is the test that there is not a second settings path.
-	ls.node.id = false; ls.node.demand = false; ls.node.demandActual = false;
-	ok('3.9 with the node rows off a meter has nothing to say',
+	// **TURNING THE CUSTOMER ROWS OFF EMPTIES A METER'S LABEL.**
+	ls.customer.id = false; ls.customer.demand = false; ls.customer.demandActual = false;
+	ok('3.9 with the customer rows off a meter has nothing to say',
 		L.customerLabelLines(c1).length === 0);
-	ls.node.id = true; ls.node.demand = true;
+	ls.customer.id = true; ls.customer.demand = true;
 
 	L.refreshLabelText();
 	const els = L.custLblEls();
@@ -430,6 +483,21 @@ L.customerEdited(c2);
 		String(els[c1.id].text.textContent));
 	ok('3.16 a detached meter still gets an element: it is a customer either way',
 		!!els[cLoose.id]);
+	// **ONE LINE, LIKE A LINK LABEL** (Tom, 2026-09-19: *"Can we make labels one-line concats like
+	// link labels?"*). Two values ticked and the drawn label is still ONE row, with the blanket
+	// separator between them -- which is also the whole of the answer to *"Labels are bigger than
+	// node and pipe labels"*: same font size, one row instead of three.
+	ls.customer.id = true; ls.customer.demand = true; ls.customer.demandActual = true;
+	L.refreshLabelText();
+	const oneLine = L.custLblEls()[c1.id];
+	ok('3.17a three values make ONE row, the way a link label concatenates',
+		oneLine.lineCount === 1, String(oneLine.lineCount));
+	ok('3.17b ...with the blanket separator between the values',
+		String(oneLine.text.textContent).split(L.labelSeparator()).length >= 3,
+		String(oneLine.text.textContent));
+	ok('3.17c ...at the shared text size, with none of its own',
+		String(oneLine.text.style.fontSize) === String(L.effectiveFontSize()) + 'px',
+		String(oneLine.text.style.fontSize) + ' vs ' + L.effectiveFontSize() + 'px');
 	ok('3.17 the label is measured, so the placement pass has a box to reason about',
 		(els[c1.id].twPx || els[c1.id].tw) > 0,
 		String(els[c1.id].twPx || els[c1.id].tw));
@@ -631,7 +699,7 @@ L.customerEdited(c2);
 	ok('4.15 it is writable in Replace',
 		L.replaceSpecs().map(s => s.field).indexOf('custom_route') >= 0,
 		L.replaceSpecs().map(s => s.field).join(','));
-	st.prop = 'account'; st.op = 'contains'; st.value = '';
+	st.prop = 'tag'; st.op = 'contains'; st.value = '';
 	rs.prop = 'custom_route'; rs.value = 'South loop';
 	L.runReplacePreview();
 	L.applyReplace();
@@ -641,6 +709,49 @@ L.customerEdited(c2);
 		c1._custom_route === undefined && c2._custom_route === undefined);
 
 	settings.customProps = [];
+}
+
+// ================================================================================================
+// 5. AN ACCOUNT NUMBER A DOCUMENT ALREADY HOLDS IS CARRIED, NEVER DROPPED
+// ================================================================================================
+//
+// **THIS IS THE SUITE'S STANDING RULE ABOUT THE USER'S OWN NUMBERS, arriving through a field being
+// RETIRED rather than through an import** (Tom, 2026-09-19: *"Didn't I say to trash Account
+// number...?"*). Projects saved between 2026-09-15 and today hold `account` on every customer, and
+// a removal that simply stopped reading the field would delete four hundred people's records in
+// silence, on open, with nothing on the screen to notice.
+//
+// It goes to the TAG, because that is what an account number is: what somebody else's records call
+// this service. A customer that somehow already carries a tag keeps it and the account joins the
+// DESCRIPTION instead, so no document loses the text either way.
+{
+	const doc0 = L.serializeProject();
+	const legacy = JSON.parse(JSON.stringify(doc0));
+	legacy.customers = [
+		{ id: 'M90', account: '4417-A', demand: 1, count: 1, x: 10, y: 10 },
+		{ id: 'M91', account: '123 Elm St', demand: 1, count: 1, x: 20, y: 10 },
+		{ id: 'M92', account: 'KEEP-ME', tag: 'ALREADY', demand: 1, count: 1, x: 30, y: 10 },
+		{ id: 'M93', account: '', demand: 1, count: 1, x: 40, y: 10 }
+	];
+	L.applySaved(L.prepareDocument(legacy));
+	const byId = {};
+	(L.getDoc().customers || []).forEach(c => { byId[c.id] = c; });
+	ok('5.1 every legacy customer opened', Object.keys(byId).length === 4);
+	ok('5.2 an account number became the tag, byte for byte', byId.M90.tag === '4417-A');
+	ok('5.3 ...including one with spaces in it, untrimmed and untruncated',
+		byId.M91.tag === '123 Elm St', JSON.stringify(byId.M91.tag));
+	ok('5.4 a customer that already had a tag keeps it...', byId.M92.tag === 'ALREADY');
+	ok('5.5 ...and its account joins the description rather than being lost',
+		String(byId.M92.desc || '').indexOf('KEEP-ME') >= 0, JSON.stringify(byId.M92.desc));
+	ok('5.6 an empty account number leaves nothing behind',
+		byId.M93.tag === undefined && byId.M93.desc === undefined);
+	['M90', 'M91', 'M92', 'M93'].forEach(function (id) {
+		ok('5.7 ' + id + ' carries no account field any more', byId[id].account === undefined);
+	});
+	// And the saved file has none either, which is what makes this a one-way move rather than a
+	// field that comes back on the next open.
+	ok('5.8 the document written back states no account on any customer',
+		(L.serializeProject().customers || []).every(c => c.account === undefined));
 }
 
 console.log(fails ? '\nFAILED ' + fails : '\nAll customer pseudo-node checks passed.');

@@ -11,7 +11,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ## 100 — Next (10)
 
-- Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
+- Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 608 — Fetch the engine before somebody's first solve needs it.

@@ -832,13 +832,13 @@ the block.
   to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
   is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 
-- 100|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
+- 100|247| **Customers: metered demands, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
   EPANET does not. **Design, his rulings, and what is built against what is not:
   `dev/customer-demands.md`. Priority left at 100 for Tom to move: Slices 1-3 are in and what is
   left is his call.**
   - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
-    connector, the two-click gesture and its one-click door, the account number, the **Count** (so
+    connector, the two-click gesture and its one-click door, the **Count** (so
     forty-two residential services are one symbol), the draggable attachment, the derived junction,
     the detached state, a Customers tab, and the `.inp` answer.
     `dev/lpn-spike/customer-harness.js`, 66 assertions.
@@ -849,28 +849,41 @@ the block.
     meter does rewrites a number the user typed on a junction.**
   - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
     row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
-  - **THE ACCOUNT NUMBER IS A LABEL, NEVER A KEY**, and it reaches no log row and no usage statistic.
-    **Tom now says we should not OWN it** (2026-09-18): a user's own custom property could be it
-    instead. That is a removal of shipped code, so it is costed rather than done --
-    `dev/symbology-property-audit.md` §5, whose one open question is whether the account should
-    still ride out in the `[DEMANDS]` category once it is a custom property.
+  - **THE ACCOUNT NUMBER IS GONE, AND A CUSTOMER CARRIES DESCRIPTION AND TAG INSTEAD** (2026-09-19,
+    his own two sentences): *"Didn't I say to trash Account number since they can just make a Custom
+    property for that or anything else?"* and *"Since Customer is a pseudo-node, what if we provide
+    existing properties like Description and Tag instead of Account number? Then we aren't inventing
+    something, and we incur no language debt."* The field, its two language keys and its column are
+    deleted; the popup, the Customers table, Find and Replace all use the two identity properties
+    every node and link already has. **A saved project's account number is CARRIED into the tag**
+    (into the description where a tag is already there), because a number that came out of a file is
+    the user's -- `customer-node-harness.js` §5 asserts all four cases. The `[DEMANDS]` CATEGORY
+    slot now carries the TAG, which is a better map than the old one: it is EPANET's own join key.
   - **`feat/customer-find-labels` (2026-09-18) adds four things**, all from his message of that
     day: custom properties respected in a customer's Properties box and Customers table; a Customer
     scope in Find and replace; a demand PATTERN on a customer, reaching both solvers and the `.inp`;
-    and customer LABELS, which he has not decided he wants. The labels follow NODE styles and node
-    checkboxes, and their placement is his own two fixed locations along the service line with a
-    drop if both are taken -- *"This much simpler than general node label placement."* Settings >
-    Customer labels carries one control, the widest view that attempts them; 0 there is never.
+    and customer LABELS. Their placement is his own two fixed locations along the service line with
+    a drop if both are taken -- *"This much simpler than general node label placement."*
+  - **HIS BROWSER PASS OF 2026-09-19 REWROTE THE LABEL HALF OF THAT.** A customer label no longer
+    follows the node checkboxes: **Settings > Customer symbology** is a third section of its own
+    (*"since we may want only demand or only demand and description"*), the values are laid out on
+    ONE LINE the way a link label's are (*"Can we make labels one-line concats like link labels?"*),
+    and there is deliberately **no separate text size** -- he called one a bug, and what made his
+    look bigger was the stacking. The **symbol is 0.25 of a junction and follows Symbol scale**,
+    replacing a hybrid real-world rule that made it the one symbol ignoring that setting. Station
+    and Offset are in Find and in Replace (*"Bad decision. Put them in."*), the Insert menu's tool
+    rows carry the toolbar's tips and their shortcut digits, and the widest-view box has a **Use
+    current view** capture button matching `feat/label-gang-search`'s.
   - **The symbology audit he asked for is `dev/symbology-property-audit.md`** (2026-09-18): every
     property missing from Settings Node symbology, Settings Link symbology and the two "Color ... by"
     selectors, ranked. The two cheapest are a pipe's LENGTH and its MINOR LOSS k, both already
     labelled and neither colourable; the largest is that a custom property can be searched,
     replaced and typed and cannot be printed on the map or coloured by.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
-    account number in the CATEGORY comment (the one field of that row that holds a name), and a
+    customer's TAG in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.
   - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
-    label density rule, a customer in Find, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
+    label density rule, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
     so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
     here is a pointer gesture no harness can hold.
 

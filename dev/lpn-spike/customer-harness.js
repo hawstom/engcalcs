@@ -62,6 +62,7 @@ const L = loadLoopedNetwork(
 	"\t\tcustomerAttachAtNode: customerAttachAtNode, linkPointList: linkPointList,\n" +
 	"\t\tnodeById: nodeById, linkById: linkById,\n" +
 	"\t\tmeterHalfWorld: meterHalfWorld, serviceStrokeWorld: serviceStrokeWorld,\n" +
+	"\t\tgetSettings: function () { return settings; }, nodeRadius: nodeRadius,\n" +
 	"\t\tdetachedCustomers: detachedCustomers,\n" +
 	"\t\tlabelsLayerTexts: function () {\n" +
 	"\t\t\treturn Array.prototype.slice.call(labelsLayer.children || [])\n" +
@@ -143,7 +144,7 @@ const ownA = jA._demand, ownB = jB._demand;
 
 // A meter at 20% along the main: nearer jA by arc length, so it lumps there.
 const m1 = L.addCustomer(150, 40, { link: main.id, t: 0.2 });
-m1.account = '4417-A';
+m1.tag = '4417-A';
 m1.demand = 3;
 m1.count = 4;
 L.customerEdited(m1);
@@ -160,7 +161,7 @@ ok('2.8 the resolved demand carries it too', near(L.resolvedDemand(jA), ownA + 1
 	String(L.resolvedDemand(jA)));
 ok('2.9 it arrives as a DEMAND ROW and not a fourth thing',
 	L.demandRowsOf(jA, L.effective(jA, 'demand')).length === 2);
-ok('2.10 the row is named with the account number',
+ok('2.10 the row is named with the customer\'s tag',
 	L.demandRowsOf(jA, L.effective(jA, 'demand'))[1].category === '4417-A');
 
 // ---- 3. MOVING IT MOVES THE DEMAND -----------------------------------------------------------
@@ -443,8 +444,8 @@ ok('3.7 a pipe rename carries its meters', m1.link === 'MAIN-1' && L.customerNod
 	const totalWas = L.baseDemandTotal(jA);
 	L.deleteElement('link', main.id);
 	ok('4.1 deleting the pipe does NOT delete the meter', (L.getDoc().customers || []).length === 1);
-	ok('4.2 it keeps its account number and its demand',
-		m1.account === '4417-A' && near(L.customerFlow(m1), 12));
+	ok('4.2 it keeps its tag and its demand',
+		m1.tag === '4417-A' && near(L.customerFlow(m1), 12));
 	ok('4.3 it is attached to nothing', m1.link === null && L.customerNodeId(m1) === null);
 	ok('4.4 its demand has left the answers, and the junction says so',
 		near(L.baseDemandTotal(jA), ownA), totalWas + ' -> ' + L.baseDemandTotal(jA));
@@ -530,8 +531,15 @@ L.renderCustomerFields(m1.id);
 	L.renderCustomerFields(m2.id);
 	ok('5.8 ...and it is reported as changing nothing',
 		popupText().indexOf(PC.lpn_customer_fixed_head) >= 0);
-	ok('5.9 ...leading with the caution glyph',
-		PC.lpn_customer_fixed_head.charAt(0) === '⚠');
+	// **NO CAUTION GLYPH ON THIS ONE, WHICH IS A CHANGE AND NOT AN OVERSIGHT.** Tom gave the exact
+	// wording on 2026-09-19 -- *"The near end of that pipe holds a fixed water surface, so this
+	// demand does not affect the simulation."* -- and it carries no marker. The DETACHED note beside
+	// it still does, which is the one to keep an eye on: that state loses a demand from the answers,
+	// where this one is a statement about what a fixed head means.
+	ok('5.9 ...in his own words, with no marker glyph in front of them',
+		PC.lpn_customer_fixed_head.charAt(0) !== '⚠' &&
+		PC.lpn_customer_fixed_head.charAt(0) !== '✓',
+		PC.lpn_customer_fixed_head);
 	L.deleteElement('customer', m2.id);
 	L.deleteElement('link', feeder.id);
 }
@@ -552,8 +560,8 @@ L.renderCustomerFields(m1.id);
 	L.renderNodeFields(nid);
 	const txt = popupText();
 	ok('5B.1 the junction names the meter that is adding to it', txt.indexOf(m5.id) >= 0);
-	ok('5B.2 ...and the account number it is filed under', txt.indexOf(m5.account) >= 0,
-		JSON.stringify(m5.account));
+	ok('5B.2 ...and its description, which is the column the account number used to hold',
+		txt.indexOf(PC.lpn_field_desc) >= 0, txt.slice(0, 120));
 	ok('5B.3 ...and what that meter adds', txt.indexOf(String(L.customerFlow(m5))) >= 0,
 		String(L.customerFlow(m5)));
 	ok('5B.4 ...under a heading that is a language key, not a hand-written line',
@@ -677,30 +685,37 @@ L.renderCustomerFields(m1.id);
 // held at a legible dot beyond. A symbol drawn to scale is constant in WORLD units; one held at a
 // screen size is pixels / scale, which grows as you zoom out. So it is the larger of the two, and
 // the crossover is where 2 m equals 3 px rather than a number anybody typed.
+// **THE SYMBOL IS A QUARTER OF A JUNCTION AND FOLLOWS SYMBOL SCALE** (Tom, 2026-09-19: *"Customer
+// symbols should scale using the Symbol scale setting, but they should just be a lot smaller than a
+// node, like 0.2 to 0.3 as big, maybe 0.25."*).
+//
+// **THIS REPLACED A HYBRID REAL-WORLD RULE, and the three fixtures that asserted that rule are
+// gone with it.** The meter used to be drawn `max(1 m, 1.5 px)` in world units, which made it the
+// one symbol on this map that did not answer to Symbol scale at all -- so a reader who turned every
+// symbol up got every symbol but the services. The assertion that matters most is 6.2: turning the
+// setting up MUST move this number.
 {
 	const st = L.getState();
-	const was = st.s;
-	st.s = 1000;                       // deep zoom: one drawing unit is a thousand pixels
-	const tight = L.meterHalfWorld(0, 0);
-	st.s = 2000;                       // deeper still
-	const tighter = L.meterHalfWorld(0, 0);
-	st.s = 0.0001;                     // system zoom: the whole site is a few pixels across
+	const was = st.s, sizeWas = L.getSettings().symbolSize;
+	st.s = 1000;
+	const small = L.meterHalfWorld(0, 0);
+	const node = L.nodeRadius({ type: 'junction' });
+	ok('6.1 a customer is a quarter the size of a junction', near(small / node, 0.25, 1e-9),
+		String(small / node));
+	L.getSettings().symbolSize = sizeWas * 2;
+	const bigger = L.meterHalfWorld(0, 0);
+	ok('6.2 turning Symbol scale up makes the customer bigger, in step with the nodes',
+		near(bigger, small * 2, 1e-9), small + ' -> ' + bigger);
+	ok('6.3 ...and it is still a quarter of a junction at the new setting',
+		near(bigger / L.nodeRadius({ type: 'junction' }), 0.25, 1e-9));
+	L.getSettings().symbolSize = sizeWas;
+	// Like every other symbol here it is a SCREEN size divided by the scale, so zooming out makes
+	// its world size grow and the dot on screen stays legible.
+	st.s = 0.0001;
 	const wide = L.meterHalfWorld(0, 0);
-	const wideStroke = L.serviceStrokeWorld(0, 0);
+	ok('6.4 zoomed out its world size grows, so the dot on screen keeps its size',
+		wide > small * 100, small + ' -> ' + wide);
 	st.s = was;
-	// Zoomed in, the symbol is a CONSTANT SIZE IN THE GROUND: two zooms, one world size, so the
-	// drawn box grows on the screen exactly as the pipework around it does.
-	ok('6.1 zoomed in it is drawn to scale, so its world size does not move with the zoom',
-		near(tight, tighter, 1e-12), tight + ' vs ' + tighter);
-	// ...and it is comfortably above the pixel floor there, which is what says the real size and
-	// not the floor is the number in force.
-	ok('6.2 ...and the pixel floor is not what is in force there', tight * 1000 > 1.5,
-		String(tight * 1000) + ' px');
-	// Zoomed out, the floor takes over: to scale the box would be far under a pixel and invisible,
-	// so it is held at a legible dot, which in WORLD units is very much bigger.
-	ok('6.3 zoomed out the pixel floor wins, and the world size is larger for it',
-		wide > tight * 100, tight + ' -> ' + wide);
-	ok('6.4 the connector follows the same hybrid rule', wideStroke > L.serviceStrokeWorld(0, 0));
 }
 // **A METER CARRIES NO LABEL ON THE MAP** (Tom, 2026-09-17: *"I don't think we want labels on
 // customers. I didn't ask for them."*). Three fixtures asserting what the account number said
@@ -714,8 +729,8 @@ L.renderCustomerFields(m1.id);
 	ok('6.6 ...and no text element of any kind is drawn for one',
 		L.labelsLayerTexts().every(t => !t.getAttribute('data-cust')),
 		String(L.labelsLayerTexts().length));
-	ok('6.7 the account number is still IN the document, it is only not drawn',
-		typeof c.account === 'string');
+	ok('6.7 no account number survives anywhere in the document',
+		c.account === undefined, JSON.stringify(c));
 }
 
 // ---- 7. THE CUSTOMER TABLE -------------------------------------------------------------------
@@ -725,9 +740,11 @@ L.renderCustomerFields(m1.id);
 	ok('7.2 it lists the customers and nothing else',
 		L.paneTableAllElements(spec).length === (L.getDoc().customers || []).length);
 	const cols = L.paneCols(spec).map(c => c.key);
-	ok('7.3 its columns cover the account, the count and the junction',
-		cols.indexOf('account') >= 0 && cols.indexOf('count') >= 0 && cols.indexOf('atNode') >= 0,
+	ok('7.3 its columns cover the description, the tag, the count and the junction',
+		cols.indexOf('desc') >= 0 && cols.indexOf('tag') >= 0 &&
+		cols.indexOf('count') >= 0 && cols.indexOf('atNode') >= 0,
 		cols.join(','));
+	ok('7.3b ...and no account number column survives', cols.indexOf('account') < 0, cols.join(','));
 	// **NO COLUMN CARRIES `prop`**, which is the table's half of the popup's rule: a customer has no
 	// overridable property, so an override marker there would be a promise a scenario cannot keep.
 	ok('7.4 no column claims an overridable property',
@@ -879,8 +896,8 @@ L.renderCustomerFields(m1.id);
 	L.applySaved(back);
 	const now = L.getDoc().customers;
 	ok('8.3 every customer came back', now.length === out.customers.length);
-	ok('8.4 ...with its account number, its demand and its count',
-		now[0].account === '4417-A' && near(now[0].demand, 3) && now[0].count === 4,
+	ok('8.4 ...with its tag, its demand and its count',
+		now[0].tag === '4417-A' && near(now[0].demand, 3) && now[0].count === 4,
 		JSON.stringify(now[0]));
 	ok('8.5 the reopened document serializes to the same bytes',
 		JSON.stringify(L.serializeProject().customers) === JSON.stringify(out.customers));
@@ -919,7 +936,7 @@ L.renderCustomerFields(m1.id);
 	const ours = section.filter(l => l.indexOf('4417-A') >= 0);
 	ok('9.2 the customer is written as a demand row on its own junction',
 		ours.length === 1 && ours[0].indexOf(jA.id) === 1, ours.join(' | '));
-	ok('9.3 the account number rides out as the row name, in a trailing comment',
+	ok('9.3 the tag rides out as the row name, in a trailing comment',
 		/;\s*4417-A\s*$/.test(ours[0]), ours[0]);
 	ok('9.4 the total, not the per-service demand, is what the file states',
 		/(^|\s)12(\s|\t)/.test(ours[0].split(';')[0]), ours[0].split(';')[0]);

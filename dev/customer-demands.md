@@ -1,5 +1,25 @@
 # Customers and metered demands (`lpn_`) — design, not a build plan
 
+> **THE ACCOUNT NUMBER WAS REMOVED ON 2026-09-19 AND THIS DOCUMENT STILL ARGUES ABOUT IT
+> THROUGHOUT.** Read every "account number" below as history. Tom, that day: *"Didn't I say to trash
+> Account number since they can just make a Custom property for that or anything else?"* and *"Since
+> Customer is a pseudo-node, what if we provide existing properties like Description and Tag instead
+> of Account number? Then we aren't inventing something, and we incur no language debt."*
+>
+> **A customer now carries `desc` and `tag`** — the same two identity properties every node and link
+> carries, with the same writers, the same conditions in Find, the same one-word rule on the tag and
+> the same no-newline rule on the description. `lpn_field_account` and `lpn_field_account_tip` are
+> deleted. A saved project's `account` is CARRIED into the tag on open (into the description where a
+> tag is already present), because a number that came out of a file is the user's.
+>
+> **The `[DEMANDS]` CATEGORY slot now carries the TAG**, which answers §3's open question from the
+> other side: a tag is EPANET's own join key for a node or a link, so it is a better match for that
+> slot than a field we invented. The DESCRIPTION is deliberately not written there — the slot is one
+> token read back as a name, and a sentence would round-trip as its first word.
+>
+> What is unchanged is §5's ruling, which is why it survives its own subject: **it is a LABEL, never
+> a key**. Nothing is unique, nothing is looked up, nothing reaches a log row.
+
 Scope for ROADMAP Task 247. **Slices 1, 2 and 3 shipped 2026-09-15 together** -- the drawn meter,
 the account number, the count, the derived junction, the draggable attachment, the Customer table and
 the `.inp` answer. Tom asked for something to test, and the field work and the drawing surface touch
@@ -21,7 +41,7 @@ His steer, verbatim:
 
 ## 1. What a Customer is in the document model
 
-**A Customer is a drawn object that carries a demand and an account number, is attached to a PIPE at
+**A Customer is a drawn object that carries a demand, a description and a tag, is attached to a PIPE at
 a position along it, and is NOT a node in the hydraulic model.** It lives in its own document
 collection (`doc.customers`), sits beside `doc.labels` in every respect that matters, and its demand
 is summed into a junction at solve time.
@@ -78,7 +98,7 @@ State it precisely, because the meter attaches to a pipe and not to a node:
 3. A tie is broken deterministically toward `from`. Never randomly, and never by splitting the demand
    between both ends.
 
-**Store the attachment, derive the node.** As built: `customer = {id, account, demand, count, link,
+**Store the attachment, derive the node.** As built: `customer = {id, desc, tag, demand, count, link,
 t, x, y}` — where the assigned junction is computed, not stored, and `x`/`y` is an OFFSET from the
 attachment point while the customer is attached and an absolute position while it is not, which is
 the dual meaning a Text label's own x/y already has (`customerPoint()` is the one door, as

@@ -849,7 +849,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // is Tom's own ruling; what this section answers is the one question
 						      // those rows cannot, namely how close the view has to be before a
 						      // service is worth lettering. rebuildLabelsFields() fills it. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_customer_labels']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_customer_symbology']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_customer_fields"></div>
 						</div>
@@ -1387,8 +1387,6 @@ EngCalcs.pageConfig = {
 	lpn_mode_add_meter: <?=json_encode($ec_lang['lpn_mode_add_meter'])?>,
 	lpn_pane_tab_customers: <?=json_encode($ec_lang['lpn_pane_tab_customers'])?>,
 	lpn_customer_heading: <?=json_encode($ec_lang['lpn_customer_heading'])?>,
-	lpn_field_account: <?=json_encode($ec_lang['lpn_field_account'])?>,
-	lpn_field_account_tip: <?=json_encode($ec_lang['lpn_field_account_tip'])?>,
 	lpn_field_meter_demand: <?=json_encode($ec_lang['lpn_field_meter_demand'])?>,
 	lpn_field_meter_demand_tip: <?=json_encode($ec_lang['lpn_field_meter_demand_tip'])?>,
 	lpn_field_meter_count: <?=json_encode($ec_lang['lpn_field_meter_count'])?>,
@@ -1906,6 +1904,7 @@ EngCalcs.pageConfig = {
 	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
 	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
 	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
+	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
 	lpn_labels_mark_extrema: <?=json_encode($ec_lang['lpn_labels_mark_extrema'])?>,
 	lpn_labels_mark_extrema_tip: <?=json_encode($ec_lang['lpn_labels_mark_extrema_tip'])?>,

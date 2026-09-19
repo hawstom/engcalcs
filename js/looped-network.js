@@ -187,6 +187,16 @@ var EngCalcs = EngCalcs || {};
 	// AND IT IS NOT THE SCREEN -- it is the map area, narrower than the window and much shorter, so
 	// any wording shown to a user says map, not screen.
 
+	// Rounded UP to `sig` significant figures. **UP, never to nearest**: this rounds a captured view
+	// width into a threshold that is compared against that same view, and `toPrecision()` rounds
+	// half of all views DOWN -- which hides the very labels the reader was looking at when they
+	// pressed the button that captured it. Measured in a real browser on 2026-09-18, where a capture
+	// read 1110 off a 1114-unit view and the labels went out on the press.
+	function ceilToPrecision(v, sig) {
+		if (!(v > 0) || !isFinite(v)) { return v; }
+		var mag = Math.pow(10, sig - 1 - Math.floor(Math.log(v) / Math.LN10));
+		return Math.ceil(v * mag) / mag;
+	}
 	function mapSpan(which) {
 		var w = visibleMapWidth(), h = visibleMapHeight();
 		if (which === 'w') { return w; }
@@ -3133,8 +3143,8 @@ var EngCalcs = EngCalcs || {};
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node (`anchorNode`), or to a station along a link (`anchorLink` + `anchorT`,
 	// Task 502), OR a free-floating text with neither. customers: metered demands (Task 247) --
-	// a meter symbol attached to a pipe at a station along it (`link` + `t`), carrying an account
-	// number, a per-service demand and a count. **A CUSTOMER IS NOT A NODE**: its demand is summed
+	// a meter symbol attached to a pipe at a station along it (`link` + `t`), carrying the same
+	// description and tag every other element carries, a per-service demand and a count. **A CUSTOMER IS NOT A NODE**: its demand is summed
 	// into the junction its pipe reaches it through, which is arithmetic on a junction the network
 	// already had. See customerNodeId() for that rule and why the junction is derived, not stored.
 	var doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
@@ -4906,6 +4916,29 @@ var EngCalcs = EngCalcs || {};
 			//     (gradePercent and plain rise/run). 2 decimals is useless as a ratio, where a typical
 			//     pipe gradient is 0.0043; 4 covers both.
 
+			/**
+			 * **CUSTOMER SYMBOLOGY: WHICH VALUES A CUSTOMER LABEL SHOWS, AND ITS OWN ANSWER**
+			 * (Tom, 2026-09-19: *"I think we need a third separate Customer symbology area in
+			 * settings so that we can control Customer labels differently than other labels, since
+			 * we may want only demand or only demand and description."*).
+			 *
+			 * **THIS REPLACES "A CUSTOMER LABEL FOLLOWS THE NODE CHECKBOXES", which was his own
+			 * earlier instruction and which he has now overruled** -- and the reason he gives is the
+			 * one that could not have been guessed: a node label and a service label are read for
+			 * different things. A junction's label answers *what is the pressure here*; a service's
+			 * answers *whose is this and how much does it draw*, and the second list is not a subset
+			 * of the first.
+			 *
+			 * **AND THERE IS STILL NO SEPARATE TEXT SIZE** (same message: *"I **don't** think we
+			 * need a separate text size. That's a bug."*). Every label on this map is drawn at
+			 * `effectiveFontSize()` and a customer's is no exception; what made his look bigger was
+			 * that it STACKED its values where a link label concatenates them, which is fixed in
+			 * customerLabelLines()'s caller rather than by a size of its own.
+			 *
+			 * **BASE DEMAND ON, EVERYTHING ELSE OFF**, which is the one value a service is drawn to
+			 * be read for and is the same starting answer the node group makes.
+			 */
+			customer: { id: false, demandActual: false, demand: true, desc: false, tag: false, count: false },
 			decimals: {
 				// quality 1 -- a water age in hours reads as a whole number and a first decimal
 				// ("14.3 hr"); two would be a minute and a half of false precision on a quantity
@@ -4914,6 +4947,11 @@ var EngCalcs = EngCalcs || {};
 				//   initQuality 2 -- a typed residual is written to a tenth or a hundredth
 				//     (0.8 mg/L, 1.25 mg/L), and it is the user's own number rather than a solved one.
 				node: { demand: 2, demandActual: 2, head: 2, pressure: 2, elev: 2, quality: 1, initQuality: 2 },
+				// The customer group's own two numbers, its own entries: this map is what decides
+				// which rows get a decimals spinner, so borrowing the node's would have tied a
+				// service's demand to a junction's for no reason anybody could re-derive. A COUNT
+				// is a whole number of services and has no entry, exactly as an ID has none.
+				customer: { demand: 2, demandActual: 2 },
 				// friction 4 -- a Darcy f runs 0.015 to 0.04, so 2 places is two significant figures
 				//   at best and reads as "0.02" for most of a network.
 				// **STATUS HAS NO ENTRY AND THAT IS THE POINT**: this map is the one place naming
@@ -4935,8 +4973,8 @@ var EngCalcs = EngCalcs || {};
 			// The separator is blanket and goes BETWEEN VALUES on a one-line label ('Q=120 V=3.1').
 			// A prefix's own punctuation is part of the prefix string, so the defaults carry '='.
 
-			prefix: { node: {}, link: {} },
-			suffix: { node: {}, link: {} },
+			prefix: { node: {}, link: {}, customer: {} },
+			suffix: { node: {}, link: {}, customer: {} },
 			separator: ' ',
 			// **LABEL PRIORITY -- WHICH IS NOT A WEIGHT** (Task 397; dev/label-placement-goals.md
 			// §2.2, §3.1). ESRI Maplex keeps three numbers apart: LABEL PRIORITY is the order labels
@@ -8418,24 +8456,21 @@ var EngCalcs = EngCalcs || {};
 	// stays inside the user's own project, and it must never reach a log row or a usage statistic --
 	// nothing here writes one, which is the structural half of that rule rather than a discipline.
 
-	// A meter's real-world half-size and its floor on the screen (Tom, 2026-08-24, as figures to
-	// measure against: *"meter a 2-4 px dot, service connector a 0.5-1 px stroke... about 2 m
-	// across for the dot and 0.2 m for the connector, and meter and connector (service line) can
-	// keep size instead of scaling when map extent gets bigger than 1000 m."*)
+	// **A CUSTOMER IS A QUARTER OF A JUNCTION AND FOLLOWS THE SYMBOL SCALE SETTING** (Tom,
+	// 2026-09-19: *"Customer symbols should scale using the Symbol scale setting, but they should
+	// just be a lot smaller than a node, like 0.2 to 0.3 as big, maybe 0.25."*). 0.25, his own
+	// middle figure.
 	//
-	// **THAT HYBRID RULE IS ONE max(), AND THE THRESHOLD FALLS OUT OF IT RATHER THAN BEING TYPED.**
-	// A symbol drawn to scale has a constant size in WORLD units; one held at a screen size has a
-	// world size of pixels / scale, which grows as you zoom out. Taking the larger of the two draws
-	// the meter to scale while that is the bigger of them -- a site plan, where a survey drawing
-	// would show a meter box at its real size -- and holds it at a legible dot beyond, which is what
-	// a system map does. The crossover is where 2 m equals 3 px, about 670 m across a 1000 px
-	// canvas, which is Tom's own figure arrived at from the other side.
+	// **THIS REPLACES A HYBRID REAL-WORLD RULE, and that rule is gone rather than qualified.** The
+	// meter used to be drawn `max(1 m, 1.5 px)` in world units -- to scale on a site plan, held at a
+	// three-pixel dot beyond -- which made it the one symbol on this map that did not answer to
+	// Symbol scale, so turning every symbol up left the services alone. A reader who makes the
+	// junctions bigger means the whole drawing, and a service is part of it.
 	//
-	// It is a different rule from every other symbol on this map, all of which are screen-space
-	// always, and it is right here for the same reason: nothing else drawn here has a real size a
-	// reader would recognise.
-	var LPN_METER_REAL_M = 1;          // half-width, so 2 m across
-	var LPN_METER_MIN_PX = 1.5;        // half-width, so a 3 px dot at the floor
+	// The SERVICE CONNECTOR keeps its own hybrid stroke: it is a line weight rather than a symbol,
+	// it is not what he was looking at, and nothing in Symbol scale governs a stroke width
+	// (settings.linkWidth is the page's other line weight and is its own control).
+	var LPN_METER_NODE_FRAC = 0.25;    // of a junction's own radius -- his figure
 	var LPN_SERVICE_REAL_M = 0.2;      // the service connector's stroke, full width
 	var LPN_SERVICE_MIN_PX = 0.75;
 
@@ -8463,11 +8498,13 @@ var EngCalcs = EngCalcs || {};
 		m = Geom.geodesicMeters(lon, lat, lon + d, lat);
 		return (isFinite(m) && m > 0) ? m / d : 1;
 	}
-	// The two hybrid sizes, in world units, at a given point. See LPN_METER_REAL_M above for the
-	// rule; this is that one max() written twice.
-	function meterHalfWorld(x, y) {
-		var s = state.s || 1, mpu = metresPerWorldUnit(x, y);
-		return Math.max(LPN_METER_REAL_M / mpu, LPN_METER_MIN_PX / s);
+	// The meter's radius in world units. A fraction of the JUNCTION's radius, through the same
+	// symbolFactor() every other symbol on this map reads, so Symbol scale moves all of them
+	// together. `x`/`y` are still taken -- every call site names the point, and the service
+	// connector beside it genuinely needs them -- but the size no longer depends on WHERE the
+	// meter is, which is the whole of what changed.
+	function meterHalfWorld() {
+		return LPN_METER_NODE_FRAC * JUNCTION_R * symbolFactor();
 	}
 	function serviceStrokeWorld(x, y) {
 		var s = state.s || 1, mpu = metresPerWorldUnit(x, y);
@@ -8846,14 +8883,26 @@ var EngCalcs = EngCalcs || {};
 		return b * patternMultiplier(c.pattern || doc.defaultPattern, modelTimeSeconds()) *
 			docDemandMultiplier();
 	}
+	// **READ OUT OF THE CUSTOMER GROUP, NOT THE NODE GROUP** (Tom, 2026-09-19 -- see
+	// defaultLabelSettings().customer for why that changed). The ORDER is the order of
+	// customerFieldDefs(), which is the order the checkboxes are drawn in, so what a reader ticks
+	// top to bottom is what they get left to right.
 	function customerLabelLines(c) {
-		var ls = labelSettings, nd = ls.decimals.node, lines = [];
-		if (ls.node.id) { lines.push(affix('node', 'id', { text: c.id })); }
+		var ls = labelSettings, cd = ls.decimals.customer, lines = [];
+		if (ls.customer.id) { lines.push(affix('customer', 'id', { text: c.id })); }
 		// Demand over Base demand, which is refreshLabelTextPass()'s own order for a junction.
 		// rawLine() for both: a customer's numbers are already in the displayed flow unit, because
 		// this page stores what the user typed and never crossed them into SI.
-		if (ls.node.demandActual) { lines.push(affix('node', 'demandActual', rawLine(customerResolvedFlow(c), null, nd.demandActual))); }
-		if (ls.node.demand) { lines.push(affix('node', 'demand', rawLine(customerFlow(c), null, nd.demand))); }
+		if (ls.customer.demandActual) { lines.push(affix('customer', 'demandActual', rawLine(customerResolvedFlow(c), null, cd.demandActual))); }
+		if (ls.customer.demand) { lines.push(affix('customer', 'demand', rawLine(customerFlow(c), null, cd.demand))); }
+		// The two identity strings, printed as the words they are. An absent one prints NOTHING
+		// rather than an empty slot: a blank where a description would be is a separator with no
+		// value beside it, which reads as a defect on every unlabelled service in the drawing.
+		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: String(c.desc) })); }
+		if (ls.customer.tag && c.tag) { lines.push(affix('customer', 'tag', { text: String(c.tag) })); }
+		if (ls.customer.count) {
+			lines.push(affix('customer', 'count', { text: String((typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1) }));
+		}
 		return lines;
 	}
 	function buildCustomerLabelEls(c) {
@@ -9096,8 +9145,17 @@ var EngCalcs = EngCalcs || {};
 	 * same mistake as filling in a blank reservoir head.
 	 *
 	 * **AND THE COUNT IS BORN AT 1** (Tom, 2026-08-24, on making a meter a Type and a Count):
-	 * a customer with an account number is then the count-of-one case rather than a different kind
-	 * of thing, and no migration is needed the day somebody wants both.
+	 * a single service is then the count-of-one case rather than a different kind of thing, and no
+	 * migration is needed the day somebody wants both.
+	 *
+	 * **IT CARRIES NO ACCOUNT NUMBER, AND THAT FIELD IS GONE RATHER THAN HIDDEN** (Tom, 2026-09-19:
+	 * *"Didn't I say to trash Account number since they can just make a Custom property for that or
+	 * anything else?"* and *"Since Customer is a pseudo-node, what if we provide existing properties
+	 * like Description and Tag instead of Account number? Then we aren't inventing something, and we
+	 * incur no language debt."*). A customer now carries the DESCRIPTION and the TAG every node and
+	 * link already carries -- same keys, same writers, same conditions in Find -- and a utility that
+	 * wants a field of its own name makes a custom property. Nothing here is born holding either:
+	 * an absent description and an absent tag are what every other element is born with.
 	 */
 	function addCustomer(x, y, attach) {
 		var id = mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
@@ -9113,7 +9171,6 @@ var EngCalcs = EngCalcs || {};
 		}
 		c = {
 			id: id,
-			account: '',
 			demand: undefined,
 			count: 1,
 			link: l ? l.id : null,
@@ -9154,8 +9211,8 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * **A PIPE'S METERS ARE DETACHED, NOT DELETED.** A Text label is deleted with its pipe because
 	 * it is an annotation OF that pipe; a customer is a service that exists whether or not anybody
-	 * has drawn a main to it yet. It keeps its account number, its demand and its drawn position,
-	 * and it is drawn with no connector.
+	 * has drawn a main to it yet. It keeps its description, its tag, its demand and its drawn
+	 * position, and it is drawn with no connector.
 	 *
 	 * Silently dropping the demand would change the answers without saying so, which is why this
 	 * returns the count and its caller says it out loud.
@@ -13213,7 +13270,7 @@ var EngCalcs = EngCalcs || {};
 		else if (d.linklbl !== undefined) { setSelection('link', d.linklbl); }
 		else if (d.link !== undefined) { setSelection('link', d.link); }
 		else if (d.lbl !== undefined) { setSelection('label', d.lbl); }
-		// A meter and its account text are both the customer (Task 247), on exactly the reading this
+		// A meter and its label are both the customer (Task 247), on exactly the reading this
 		// function already makes of a node's own data label.
 		else if (d.cust !== undefined) { setSelection('customer', d.cust); }
 		else if (d.custhandle !== undefined) { setSelection('customer', d.custhandle); }
@@ -13776,26 +13833,35 @@ var EngCalcs = EngCalcs || {};
 		 * **WHAT IS OFFERED AND WHAT IS NOT, because the honesty rule of this function is that a
 		 * property that silently matches nothing does not go in the menu, and the rule beside it
 		 * is that a property nobody would ask a question about is clutter:**
-		 *   * ID and ACCOUNT NUMBER are identity, and the account is the one a person actually
-		 *     comes here with -- *which service is 4417* has no other answer on this page.
+		 *   * DESCRIPTION and TAG are identity, and they are the same two properties every node and
+		 *     link carries -- **there is no account number any more** (Tom, 2026-09-19: *"Since
+		 *     Customer is a pseudo-node, what if we provide existing properties like Description and
+		 *     Tag instead of Account number?"*). *Which service is 4417* is asked of the tag, which
+		 *     is where an account number already went.
 		 *   * CONNECTED ASSET and ADDED TO NODE are the two ways of asking *whose customers are
 		 *     these*. Both are text, both are read-only below, and the second is DERIVED -- it is
 		 *     the nearest end measured along the pipe, so it is in band 3 with the results.
-		 *   * DEMAND PER SERVICE and SERVICES AT THIS CUSTOMER are what you typed. TOTAL DEMAND is
+		 *   * DEMAND PER SERVICE and NUMBER OF SERVICES are what you typed. TOTAL DEMAND is
 		 *     the product, so it is a result.
-		 *   * STATION and OFFSET are LEFT OUT. They are positions on the drawing rather than facts
-		 *     about the service, nobody looks for a customer by a percentage along a pipe, and
-		 *     putting them here would put them one control away from a bulk Replace that slides
-		 *     four hundred meters along their mains at once.
-		 *   * There is no TAG and no DESCRIPTION: a customer carries neither.
+		 *   * **STATION AND OFFSET ARE IN, AND THEY WERE WRONGLY LEFT OUT** (Tom, 2026-09-19, of the
+		 *     argument that they are positions on the drawing rather than facts about the service:
+		 *     *"Bad decision. Put them in. Very handy for offset or station 0."*). He is right and
+		 *     the case he names is the proof: *offset 0* is every service that never got moved off
+		 *     its main, and *station 0* every one sitting on a junction, and neither question has
+		 *     another answer on this page. They are positions, so they are in band 4 with the
+		 *     drawing questions -- and they are writable in Replace beside the rest, because a
+		 *     column of four hundred offsets set back to 0 is exactly the repair he is describing.
 		 */
 		if (d.group === 'customer') {
-			out.push(['account', pc.lpn_field_account || 'Account number', 'Account number']);
+			out.push(['desc', pc.lpn_field_desc || 'Description', 'Description']);
+			out.push(['tag', pc.lpn_field_tag || 'Tag', 'Tag']);
 			out.push(['link', pc.lpn_field_meter_pipe || 'Connected asset', 'Connected asset']);
 			out.push(['demand', pc.lpn_field_meter_demand || 'Demand per service', 'Demand per service']);
-			out.push(['count', pc.lpn_field_meter_count || 'Services at this customer', 'Services at this customer']);
+			out.push(['count', pc.lpn_field_meter_count || 'Number of services', 'Number of services']);
 			out.push(['total', pc.lpn_field_meter_total || 'Total demand', 'Total demand']);
 			out.push(['atNode', pc.lpn_field_meter_lumped || 'Added to node', 'Added to node']);
+			out.push(['station', pc.lpn_field_meter_station || 'Station along the pipe (%)', 'Station along the pipe (%)']);
+			out.push(['offset', pc.lpn_field_meter_offset || 'Offset from the pipe', 'Offset from the pipe']);
 			findOfferCustom(out, d);
 			return out;
 		}
@@ -14096,13 +14162,13 @@ var EngCalcs = EngCalcs || {};
 		// values, so an empty column still gets the conditions its author intended.
 		var d = customPropDefs().length ? customPropDefByKey(prop) : null;
 		if (d) { return !customPropIsNumeric(d); }
-		// A customer's three text properties (Task 247): the account number, the asset it is
-		// connected to and the junction it lumps at. All three are NAMES -- the account by Tom's
-		// own standing ruling, the other two because they are ids -- so they take the text
-		// conditions and sort in the reader's own alphabet, exactly as an id does.
+		// A customer's two text properties of its own (Task 247): the asset it is connected to and
+		// the junction it lumps at. Both are ids, so they take the text conditions and sort in the
+		// reader's own alphabet exactly as an id does. Its description and its tag are already on
+		// this list, being the same two properties a node and a link carry.
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
 			prop === 'tag' || prop === 'desc' ||
-			prop === 'account' || prop === 'link' || prop === 'atNode';
+			prop === 'link' || prop === 'atNode';
 	}
 	// ---- DICTIONARY ORDER, IN THE READER'S OWN LANGUAGE (ROADMAP Task 598) ----------------------
 	//
@@ -14319,10 +14385,10 @@ var EngCalcs = EngCalcs || {};
 		// An empty or absent tag reads as undefined, like a fire flow nobody stated: that is what
 		// makes `contains` with an empty box list exactly the elements that CARRY a tag rather than
 		// every element in the drawing, which is how "what have we tagged so far" gets asked.
-		// **A CUSTOMER ANSWERS ITS OWN QUESTIONS AND NOBODY ELSE'S** (Task 247). Above the tag and
-		// description branches deliberately: a customer carries neither, and reading `c.tag` off
-		// one would answer `undefined` by accident rather than by decision -- which is the shape
-		// of thing that starts working the day somebody adds a tag field to a meter.
+		// **A CUSTOMER ANSWERS ITS OWN QUESTIONS, AND SINCE 2026-09-19 TWO OF THEM ARE EVERYBODY'S**
+		// (Task 247). It stays above the tag and description branches because it has its own
+		// properties to answer first; the two it now shares are answered HERE rather than by
+		// falling through, so this branch remains the one place a customer's value is read.
 		if (cand.group === 'customer') {
 			var cu = cand.el, cuDef = customPropDefs().length ? customPropDefByKey(prop) : null;
 			// **A DESIGN THE USER INVENTED, READ PLAIN** (Task 247): a customer's custom property
@@ -14338,7 +14404,11 @@ var EngCalcs = EngCalcs || {};
 				}
 				return String(cuV);
 			}
-			if (prop === 'account') { return cu.account || undefined; }
+			// The same two identity properties every node and link carries, read the same way they
+			// are read below: base-owned, so straight off the object, and blank reads as undefined
+			// so `contains` with an empty box lists exactly the services that HAVE one.
+			if (prop === 'desc') { return cu.desc || undefined; }
+			if (prop === 'tag') { return cu.tag || undefined; }
 			if (prop === 'link') { var cl = customerLink(cu); return cl ? cl.id : undefined; }
 			if (prop === 'atNode') { return customerNodeId(cu) || undefined; }
 			// Blank stays blank: a meter nobody has given a demand to and a meter that draws
@@ -14346,6 +14416,12 @@ var EngCalcs = EngCalcs || {};
 			if (prop === 'demand') { return typeof cu.demand === 'number' ? cu.demand : undefined; }
 			if (prop === 'count') { return (typeof cu.count === 'number' && isFinite(cu.count) && cu.count > 0) ? cu.count : 1; }
 			if (prop === 'total') { return customerFlow(cu); }
+			// **THE TWO POSITIONS** (Tom, 2026-09-19). A station is the percentage the popup and the
+			// table both show, and an offset the signed length beside it, so all three doors report
+			// one number. A customer attached to nothing is along nothing and off nothing, and both
+			// read undefined there rather than as a zero that would match `offset equal to 0`.
+			if (prop === 'station') { return customerLink(cu) ? customerT(cu) * 100 : undefined; }
+			if (prop === 'offset') { return customerLink(cu) ? customerOffset(cu) : undefined; }
 			return undefined;
 		}
 		if (prop === 'tag') {
@@ -15642,32 +15718,43 @@ var EngCalcs = EngCalcs || {};
 	 * is scenario-overridable (see the Task 247 section note), which is also why every setter here
 	 * writes the object directly and none has a `prop`.
 	 *
-	 * **THE ACCOUNT NUMBER IS WRITABLE, AND IT IS WRITABLE BECAUSE IT IS A LABEL** (the standing
-	 * ruling: *the account number is a LABEL on a demand, never a key*). Nothing references one,
-	 * nothing has to be unique, and no other object changes when one is written -- which is exactly
-	 * the argument that made the tag the one piece of text this panel writes. The ruling also says
-	 * what this must NOT grow: no uniqueness test, no format check, no registry, no lookup. Any of
-	 * those would be the page treating the number as a key, and a bulk write is where that would
-	 * first be reached for. `str`, not `text`: an account number is whatever your own records call
-	 * this service -- "123 Elm St" is a legal one -- so the one-word rule a tag obeys would eat it.
-	 * An empty box stays a refusal (replaceValueOf()), because erasing four hundred account numbers
-	 * must not be spelled the same way as leaving a box alone.
+	 * **THE DESCRIPTION AND THE TAG ARE WRITABLE HERE, AND THE ACCOUNT NUMBER IS GONE** (Tom,
+	 * 2026-09-19). They are the same two properties `replaceExtraSpecs()` writes on a node and a
+	 * link, on exactly the same terms -- `str` for the description so a sentence survives a bulk
+	 * write, `text` for the tag so EPANET's one-word rule is applied in the one place it lives --
+	 * and they are repeated here rather than widened there because `replaceSpecGroupOk()` reads
+	 * `any` as "a node or a link" and a customer is neither.
 	 *
 	 * **TOTAL DEMAND IS NOT HERE, AND NEITHER IS THE CONNECTION.** The total is the product of the
-	 * two numbers below it, so writing it would be writing a result; the connected asset and the
-	 * station are a gesture on the drawing, and one value box cannot say which pipe four hundred
-	 * services should move to. The id is out for the reason every id is.
+	 * two numbers below it, so writing it would be writing a result; the connected asset is a
+	 * gesture on the drawing, and one value box cannot say which pipe four hundred services should
+	 * move to. The id is out for the reason every id is.
+	 *
+	 * **THE STATION AND THE OFFSET ARE IN** (Tom, 2026-09-19: *"Bad decision. Put them in. Very
+	 * handy for offset or station 0."*). They were left out on the argument that a bulk write would
+	 * slide four hundred meters along their mains at once; he overruled it, and the case he names is
+	 * the reason -- setting a column of offsets back to 0 is the repair, not the accident. Both
+	 * write through the same two seams the popup and the table use, so no door can disagree about
+	 * what a station means, and both refuse a customer attached to nothing rather than inventing a
+	 * position for it.
 	 */
 	function customerReplaceSpecs() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ key: 'custAccount', group: 'customer', field: 'account', str: true,
-				label: pc.lpn_field_account || 'Account number',
+			{ key: 'custDesc', group: 'customer', field: 'desc', str: true,
+				label: pc.lpn_field_desc || 'Description',
 				applies: function () { return true; },
-				get: function (c) { return c.account || ''; },
+				get: function (c) { return c.desc || ''; },
 				set: function (c, v) {
-					var t = String(v === undefined || v === null ? '' : v);
-					if (t) { c.account = t; } else { delete c.account; }   // base-write: a customer carries nothing overridable -- see the Task 247 section note
+					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
+					if (t) { c.desc = t; } else { delete c.desc; }   // base-write: a customer carries nothing overridable -- see the Task 247 section note
+				} },
+			{ key: 'custTag', group: 'customer', field: 'tag', text: true,
+				label: pc.lpn_field_tag || 'Tag',
+				applies: function () { return true; },
+				get: function (c) { return c.tag || ''; },
+				set: function (c, v) {
+					if (v) { c.tag = v; } else { delete c.tag; }   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 				} },
 			{ key: 'custDemand', group: 'customer', field: 'demand',
 				label: pc.lpn_field_meter_demand || 'Demand per service',
@@ -15692,13 +15779,34 @@ var EngCalcs = EngCalcs || {};
 					c.pattern = id;   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 				} },
 			{ key: 'custCount', group: 'customer', field: 'count',
-				label: pc.lpn_field_meter_count || 'Services at this customer',
+				label: pc.lpn_field_meter_count || 'Number of services',
 				applies: function () { return true; },
 				get: function (c) { return (typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1; },
 				set: function (c, v) {
 					var n = Math.round(v);
 					if (!isFinite(n) || n < 1) { return; }
 					c.count = n;   // base-write: a customer carries nothing overridable -- see the Task 247 section note
+				} },
+			// **THE TWO POSITIONS, WRITTEN THROUGH THEIR OWN SEAMS** (Tom, 2026-09-19). A station is
+			// a percentage here because it is a percentage in the popup and in the table, and one
+			// quantity shown three ways in two units is how two doors come to disagree. Clamped to
+			// the pipe, like the typed one; refused on a customer attached to nothing, because
+			// there is no pipe to be along or off.
+			{ key: 'custStation', group: 'customer', field: 'station',
+				label: pc.lpn_field_meter_station || 'Station along the pipe (%)',
+				applies: function (c) { return !!customerLink(c); },
+				get: function (c) { return customerLink(c) ? customerT(c) * 100 : undefined; },
+				set: function (c, v) {
+					if (!isFinite(v) || !customerLink(c)) { return; }
+					setCustomerStation(c, Math.max(0, Math.min(100, v)) / 100);   // base-write: a customer carries nothing overridable -- see the Task 247 section note
+				} },
+			{ key: 'custOffset', group: 'customer', field: 'offset',
+				label: pc.lpn_field_meter_offset || 'Offset from the pipe',
+				applies: function (c) { return !!customerLink(c); },
+				get: function (c) { return customerLink(c) ? customerOffset(c) : undefined; },
+				set: function (c, v) {
+					if (!isFinite(v) || !customerLink(c)) { return; }
+					setCustomerOffset(c, v);   // base-write: a customer carries nothing overridable -- see the Task 247 section note
 				} }
 		].concat(customerCustomSpecs());
 	}
@@ -17724,9 +17832,9 @@ var EngCalcs = EngCalcs || {};
 			'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.';
 	}
 	/**
-	 * **THE CUSTOMER TABLE'S COLUMNS** (Task 247). The popup's own rows, re-keyed: the account
-	 * number, what one service draws, how many services, the total, the pipe and the junction it
-	 * lumps at. The multi-properties box takes its property list from here, so editing the count
+	 * **THE CUSTOMER TABLE'S COLUMNS** (Task 247). The popup's own rows, re-keyed: the description
+	 * and the tag, what one service draws, how many services, the total, the pipe and the junction
+	 * it lumps at. The multi-properties box takes its property list from here, so editing the count
 	 * across forty selected meters at once costs no code of its own.
 	 *
 	 * **NOTHING HERE GOES THROUGH setProp() AND NOTHING CARRIES `prop`**, which is the table's half
@@ -17805,9 +17913,27 @@ var EngCalcs = EngCalcs || {};
 					setCustomerOffset(c, v);
 					customerEdited(c);
 				} },
-			{ key: 'account', label: 'lpn_field_account', str: true, em: 6,
-				get: function (c) { return c.account || ''; },
-				set: function (c, v) { c.account = v === undefined || v === null ? '' : String(v); customerEdited(c); } },
+			// **THE DESCRIPTION AND THE TAG, IN PLACE OF THE ACCOUNT NUMBER** (Tom, 2026-09-19). The
+			// same two cells `paneColDesc()` and `paneColTag()` build for a node and a link, through
+			// the same two one-place rules -- `lpnDescText()` refuses the line break a trailing
+			// comment cannot hold, `lpnTagText()` keeps the one word EPANET's reader stops at.
+			// Written out here rather than borrowed because a customer's every write goes through
+			// `customerEdited()`, which redraws the symbol and re-solves, and neither borrowed cell
+			// knows that.
+			{ key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+				get: function (c) { return c.desc || ''; },
+				set: function (c, v) {
+					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
+					if (t) { c.desc = t; } else { delete c.desc; }
+					customerEdited(c);
+				} },
+			{ key: 'tag', label: 'lpn_field_tag', str: true, em: 5,
+				get: function (c) { return c.tag || ''; },
+				set: function (c, v) {
+					var t = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(v) : String(v || '').trim().split(/\s+/)[0];
+					if (t) { c.tag = t; } else { delete c.tag; }
+					customerEdited(c);
+				} },
 			// **THE PATTERN, BESIDE THE DEMAND IT MULTIPLIES** (Task 247). A typed id with the same
 			// refusal the Connected asset cell already makes: a name nothing answers to is reported
 			// and the cell put back, because a silent refusal is indistinguishable from a cell that
@@ -22895,6 +23021,17 @@ var EngCalcs = EngCalcs || {};
 	// Split out of readDocument() for Task 195: an IMPORTED file has to go through exactly the same
 	// gate a stored document does, and the only difference between the two is where the JSON came
 	// from. Anything that runs here runs for both, by construction.
+	function migrateCustomerAccounts(list) {
+		(list || []).forEach(function (c) {
+			var a;
+			if (!c || typeof c !== 'object' || c.account === undefined || c.account === null) { return; }
+			a = String(c.account);
+			delete c.account;
+			if (a === '') { return; }
+			if (!c.tag) { c.tag = a; return; }
+			c.desc = c.desc ? (c.desc + ' ' + a) : a;
+		});
+	}
 	function prepareDocument(saved) {
 		if (!saved || typeof saved !== 'object' || typeof saved.v !== 'number') { return null; }
 		if (saved.v > LPN_STORAGE_VERSION) {
@@ -22972,6 +23109,25 @@ var EngCalcs = EngCalcs || {};
 		// construction: a document already holding its curves in the library has nothing left on any
 		// element for it to find.
 		mintCurveLibrary(saved);
+		// **AN ACCOUNT NUMBER A DOCUMENT ALREADY HOLDS BECOMES ITS CUSTOMER'S TAG** (Task 247; Tom,
+		// 2026-09-19, retiring the owned field: *"Since Customer is a pseudo-node, what if we
+		// provide existing properties like Description and Tag instead of Account number? Then we
+		// aren't inventing something, and we incur no language debt."*).
+		//
+		// **THE NUMBER IS THE USER'S AND IT IS CARRIED, NEVER DROPPED** -- the suite's standing rule
+		// about a value that came out of a file, arriving here through a field being retired rather
+		// than through an import. A TAG is where it goes because that is what an account number IS:
+		// what somebody ELSE'S records call this service, the join key into the utility's own
+		// inventory, which is the tag's own job on every node and link already. The bytes are copied
+		// EXACTLY, with no one-word trim -- EPANET truncates a tag at the first space only when it
+		// writes a [TAGS] row, and a customer is never in one.
+		//
+		// A customer somehow already carrying a tag keeps it and its account joins the DESCRIPTION
+		// instead, so no document can lose the text either way. Here in applySaved() rather than in
+		// the migration chain because this is the single install seam -- an `.inp` import, the boot
+		// path and every harness that builds its own document all arrive through it -- and it is
+		// idempotent by construction: once moved there is no `account` left to find.
+		migrateCustomerAccounts(saved.customers);
 		doc.curves = saved.curves || [];
 		// The pipe type library (Task 465). A file written before this existed has none, and every
 		// pipe in it states its own numbers exactly as it always did -- there is no migration step
@@ -23034,16 +23190,22 @@ var EngCalcs = EngCalcs || {};
 		var savedLS = saved.labelSettings || {}, savedDec = savedLS.decimals || {};
 		Object.assign(labelSettings.node, savedLS.node || {});
 		Object.assign(labelSettings.link, savedLS.link || {});
+		// The customer group, merged exactly like its two siblings. A document saved before it
+		// existed has none and opens on the shipped answer, which is the merge doing its job.
+		Object.assign(labelSettings.customer, savedLS.customer || {});
 		Object.assign(labelSettings.decimals.node, savedDec.node || {});
 		Object.assign(labelSettings.decimals.link, savedDec.link || {});
+		Object.assign(labelSettings.decimals.customer, savedDec.customer || {});
 		// Task 333's affixes merge the same way, one level deeper. They ship EMPTY, so this is
 		// really just a copy -- but written as a merge for the same reason as its siblings: the day
 		// a field gains a stored default here, a document saved before it must still pick it up.
 		var savedPre = savedLS.prefix || {}, savedSuf = savedLS.suffix || {};
 		Object.assign(labelSettings.prefix.node, savedPre.node || {});
 		Object.assign(labelSettings.prefix.link, savedPre.link || {});
+		Object.assign(labelSettings.prefix.customer, savedPre.customer || {});
 		Object.assign(labelSettings.suffix.node, savedSuf.node || {});
 		Object.assign(labelSettings.suffix.link, savedSuf.link || {});
+		Object.assign(labelSettings.suffix.customer, savedSuf.customer || {});
 		// Task 397's priorities, merged one level deeper for the reason the block above gives. This
 		// one carries real shipped defaults, so a document saved before a field existed must come
 		// back at that field's default RANK: undefined in a sort comparator is a non-total order.
@@ -23804,7 +23966,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with the customer’s tag. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.')
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
@@ -28256,21 +28418,64 @@ var EngCalcs = EngCalcs || {};
 	//
 	// THE SAME ORDER APPEARS IN THREE PLACES and they must agree: this list, the toolbar, and the
 	// ID-prefix rows in Settings.
+	/**
+	 * **WHICH KEY SWITCHES A TOOL ON, ASKED OF THE ONE TABLE THAT KNOWS** (Task 595). Lifted out of
+	 * modeButton() on 2026-09-19 so the INSERT MENU can say the same thing the toolbar says: Tom,
+	 * of the Customer tool, *"The Customer menu/toolbar tip should indicate Shortcut: 8. And that
+	 * should be the truth. 8 to start Add Customer."* The digit WAS already wired and already on
+	 * the toolbar button's tip; the menu row carried no tip at all, so the half of his sentence
+	 * that was untrue was the menu's.
+	 *
+	 * **THE MAPPING STILL HAS ONE HOME (LPN_TOOL_KEYS) and the sentence still has one** -- appended
+	 * here rather than written into eight strings, so no translator has to keep a digit in step
+	 * with a table in a JavaScript file.
+	 */
+	function toolKeyFor(mode) {
+		var k = null, kk;
+		for (kk in LPN_TOOL_KEYS) {
+			if (Object.prototype.hasOwnProperty.call(LPN_TOOL_KEYS, kk) && LPN_TOOL_KEYS[kk] === mode) { k = kk; }
+		}
+		return k;
+	}
+	// **A NAMED KEY BESIDE THE DIGIT** (Tom, 2026-09-12). Two tools answer to a key that is not one
+	// of the nine digits, and both facts were once told in prose instead. **NEITHER KEY SWITCHES
+	// THE TOOL ON, and that is not the claim**: Delete removes what is selected and Esc returns to
+	// Select, so the tip says what to press to do the thing the button is named for.
+	var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
+	function toolTipWithKey(mode, tip) {
+		var pc = EngCalcs.pageConfig || {}, key = toolKeyFor(mode), alt = LPN_TOOL_ALT_KEYS[mode] || null;
+		if (key && alt) {
+			return (tip ? tip + ' ' : '')
+				+ (pc.lpn_tool_key_hint_two || 'Shortcut: press {key} or {key2}.')
+					.replace('{key}', key).replace('{key2}', alt);
+		}
+		if (key || alt) {
+			return (tip ? tip + ' ' : '')
+				+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.').replace('{key}', key || alt);
+		}
+		return tip;
+	}
 	function insertAssetRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
-			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
-			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', fn: function () { setMode('add-tank'); } },
-			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
-			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
-			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', fn: function () { setMode('add-valve'); } },
+			// **EVERY ROW CARRIES THE TOOLBAR BUTTON'S OWN TIP, SHORTCUT AND ALL** (Tom, 2026-09-19:
+			// *"The Customer menu/toolbar tip should indicate Shortcut: 8. And that should be the
+			// truth. 8 to start Add Customer."*). The strings already existed and were reaching one
+			// of the two doors: a reader who opens the menu rather than hovering the strip was told
+			// nothing at all, about any of the eight tools. No new key, and the digit still comes
+			// from LPN_TOOL_KEYS rather than from a translator.
+			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), fn: function () { setMode('add-junction'); } },
+			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
-			{ icon: 'customer', label: pc.lpn_tool_add_meter || 'Customer', fn: function () { setMode('add-meter'); } },
-			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
+			{ icon: 'customer', label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), fn: function () { setMode('add-meter'); } },
+			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -29533,10 +29738,7 @@ var EngCalcs = EngCalcs || {};
 			// is. Appended rather than written into each of the eight strings, so the mapping has
 			// ONE home (LPN_TOOL_KEYS) and no translator has to keep a digit in step with it.
 			// Nothing is appended for a button with no key, and nothing changes for a mouse user.
-			var keyForMode = null, kk;
-			for (kk in LPN_TOOL_KEYS) {
-				if (Object.prototype.hasOwnProperty.call(LPN_TOOL_KEYS, kk) && LPN_TOOL_KEYS[kk] === t.mode) { keyForMode = kk; }
-			}
+
 			// **A NAMED KEY BESIDE THE DIGIT** (Tom, 2026-09-12: *"Delete tip: '.... Shortcut:
 			// press Delete.'"* and *"Select tip: Should we use our standard 'Shortcut: ' wording
 			// for the Esc explanations?"*). Two tools answer to a key that is not one of the eight
@@ -29549,18 +29751,7 @@ var EngCalcs = EngCalcs || {};
 			// is selected and Esc returns to Select; the tip says what to press to do the thing
 			// the button is named for, which is what a reader is asking. The sentence Esc's SECOND
 			// press earns is in lpn_tip_select, because a shortcut line cannot hold it.
-			var LPN_TOOL_ALT_KEYS = { 'select': 'Esc', 'delete': 'Delete' };
-			var altForMode = LPN_TOOL_ALT_KEYS[t.mode] || null;
-			var tipText = t.tip;
-			if (keyForMode && altForMode) {
-				tipText = (tipText ? tipText + ' ' : '')
-					+ (pc.lpn_tool_key_hint_two || 'Shortcut: press {key} or {key2}.')
-						.replace('{key}', keyForMode).replace('{key2}', altForMode);
-			} else if (keyForMode || altForMode) {
-				tipText = (tipText ? tipText + ' ' : '')
-					+ (pc.lpn_tool_key_hint || 'Shortcut: press {key}.')
-						.replace('{key}', keyForMode || altForMode);
-			}
+			var tipText = toolTipWithKey(t.mode, t.tip);
 			setIconLabel(btn, t.icon, pc[t.key] || t.mode, tipText);
 			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
 			btn.addEventListener('click', function () {
@@ -30410,7 +30601,7 @@ var EngCalcs = EngCalcs || {};
 					setSelection('customer', madeC.id);
 					// **PICK LOCATION, PICK PIPE, REPEAT** (Tom, 2026-09-17, in exactly those
 					// words). The property box used to open on placement, on the argument that a
-					// meter with no demand and no account number is not finished -- and it is not,
+					// meter with no demand and no description is not finished -- and it is not,
 					// but a box over the map after every second click is the end of the rhythm this
 					// tool exists for. A row of twelve houses along one main is the common case.
 					//
@@ -30419,7 +30610,7 @@ var EngCalcs = EngCalcs || {};
 					// so rather than leaving the reader to find it. Selecting a meter still opens
 					// its own box for the one-off case.
 					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
-						'Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.')
+						'Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.')
 						.split('{id}').join(madeC.id));
 					return;
 				}
@@ -31871,21 +32062,65 @@ var EngCalcs = EngCalcs || {};
 		];
 	}
 	/**
-	 * **THE ONE CUSTOMER LABEL CONTROL, AND THE REASON IT IS THE ONLY ONE** (Task 247). A customer
-	 * label's CONTENT is chosen in the Node symbology rows above -- Tom's *"Customer labels would
-	 * follow Node styles"* -- so this section carries no checkboxes of its own and must never grow
-	 * any. What it carries is the one question the node rows cannot answer: how close you have to
-	 * be before a service is worth lettering.
+	 * **THE VALUES A CUSTOMER LABEL SHOWS, AND THEY ARE THIS SECTION'S OWN** (Tom, 2026-09-19:
+	 * *"I think we need a third separate Customer symbology area in settings so that we can control
+	 * Customer labels differently than other labels, since we may want only demand or only demand
+	 * and description."*).
+	 *
+	 * **THERE IS NO TEXT SIZE ROW AND THERE MUST NOT BE ONE** (same message: *"I **don't** think we
+	 * need a separate text size. That's a bug."*). Text size is one setting for the whole map, in
+	 * Map appearance, and a customer label is drawn at it like every other label.
+	 *
+	 * **AND NO DROP COLUMN.** The link list's Drop number orders the rows a label SHEDS when it
+	 * will not fit; a customer label has two candidate spots and a drop, so there is nothing to
+	 * shed and a spinner there would order a queue that does not exist.
 	 */
+	function customerFieldDefs(pc) {
+		return [
+			['id', pc.lpn_field_id || 'ID'],
+			// The junction's own two demand rows, same order and same two headings: the typed base
+			// and what it resolves to at the moment on the clock.
+			['demandActual', pc.bpn_demand || 'Demand'],
+			['demand', pc.lpn_field_base_demand || 'Base demand'],
+			// The two identity strings a customer now carries, in place of the account number that
+			// was removed on the same day (Tom: *"provide existing properties like Description and
+			// Tag instead of Account number"*). The description is the one he named for a label.
+			['desc', pc.lpn_field_desc || 'Description'],
+			['tag', pc.lpn_field_tag || 'Tag'],
+			['count', pc.lpn_field_meter_count || 'Number of services']
+		];
+	}
 	function buildCustomerLabelSection(host) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'),
 			name = document.createElement('span'), input = document.createElement('input'),
 			unit = document.createElement('span'), note = document.createElement('div'),
+			wrap = document.createElement('span'), useBtn = document.createElement('button'),
 			cur = labelSettings.customerMaxWidth;
 		host.innerHTML = '';
+		customerFieldDefs(pc).forEach(function (f) {
+			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
+				function (v) { labelSettings.customer[f[0]] = v; },
+				(typeof labelSettings.decimals.customer[f[0]] === 'number') ? {
+					value: labelSettings.decimals.customer[f[0]], max: 32,
+					title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
+					onChange: function (v) { labelSettings.decimals.customer[f[0]] = v; }
+				} : null,
+				{
+					prefix: {
+						value: labelPrefixFor('customer', f[0]),
+						title: pc.lpn_labels_prefix_tip || 'Text added before this property on map labels',
+						onChange: function (v) { setLabelAffix('prefix', 'customer', f[0], v); }
+					},
+					suffix: {
+						value: labelSuffixFor('customer', f[0]),
+						title: pc.lpn_labels_suffix_tip || 'Text added after this property on map labels',
+						onChange: function (v) { setLabelAffix('suffix', 'customer', f[0], v); }
+					}
+				}, null);
+		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
-			'Customer labels show the node values chosen above, at the customer.';
+			'A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
 		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
 		name.className = 'lpn-set-name ec-help';
@@ -31909,9 +32144,33 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 			refreshLabelText();
 		});
+		// **A CAPTURE BUTTON BESIDE THE NUMBER** (Tom, 2026-09-19: *"Widest view: Add a 'Use current
+		// view' button like the other one we restored in a different branch."*). It is that button,
+		// matched rather than re-invented: same words, same `mapSpan('min')`, same rounding UP to
+		// three significant figures.
+		//
+		// **ROUNDED UP, NEVER TO NEAREST, AND THAT IS NOT A NICETY.** `toPrecision(3)` rounds to
+		// nearest, so about half of all views round DOWN -- and a threshold one part in a thousand
+		// below the view it was captured from hides the very labels the user was looking at when
+		// they pressed the button.
+		//
+		// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps the pair
+		// inside the row's control column instead of pushing the whole group left.
+		useBtn.type = 'button';
+		useBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
+		useBtn.addEventListener('click', function () {
+			var w = mapSpan('min');
+			if (!(w > 0)) { return; }
+			labelSettings.customerMaxWidth = ceilToPrecision(w, 3);
+			input.value = String(labelSettings.customerMaxWidth);
+			saveToStorage();
+			refreshLabelText();
+		});
+		wrap.className = 'lpn-set-ctlgroup';
+		wrap.appendChild(input); wrap.appendChild(useBtn);
 		unit.className = 'lpn-set-note';
 		unit.textContent = unitLabel('lpn_u_length');
-		row.appendChild(name); row.appendChild(input); row.appendChild(unit);
+		row.appendChild(name); row.appendChild(wrap); row.appendChild(unit);
 		host.appendChild(row);
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
@@ -40115,7 +40374,7 @@ var EngCalcs = EngCalcs || {};
 		// The headings are the keys the meter's own box and the Customers table already use, so the
 		// three places a customer is read name its fields the same way in all 27 languages.
 		[pc.lpn_tool_add_meter || 'Customer',
-			pc.lpn_field_account || 'Account number',
+			pc.lpn_field_desc || 'Description',
 			(pc.lpn_field_meter_total || 'Total demand') + ' (' + unitLabel('lpn_u_flow') + ')'
 		].forEach(function (text) {
 			var th = document.createElement('th');
@@ -40127,7 +40386,7 @@ var EngCalcs = EngCalcs || {};
 		tbody = document.createElement('tbody');
 		list.forEach(function (c) {
 			var tr = document.createElement('tr'),
-				idCell = document.createElement('td'), accCell = document.createElement('td'),
+				idCell = document.createElement('td'), descCell = document.createElement('td'),
 				demCell = document.createElement('td'), btn = document.createElement('button'),
 				flow = customerFlow(c);
 			btn.type = 'button';
@@ -40135,9 +40394,12 @@ var EngCalcs = EngCalcs || {};
 			btn.textContent = c.id;
 			btn.addEventListener('click', function () { findGoTo('customer', c.id); });
 			idCell.appendChild(btn);
-			accCell.textContent = c.account || '';
+			// The DESCRIPTION, in the column the account number used to hold (Tom, 2026-09-19). It
+			// is the wider of the two identity fields a customer now carries and the one a sentence
+			// goes in, so it is what tells two services on one junction apart at a glance.
+			descCell.textContent = c.desc || '';
 			demCell.textContent = (typeof flow === 'number' && isFinite(flow)) ? String(+flow.toFixed(6)) : '';
-			tr.appendChild(idCell); tr.appendChild(accCell); tr.appendChild(demCell);
+			tr.appendChild(idCell); tr.appendChild(descCell); tr.appendChild(demCell);
 			tbody.appendChild(tr);
 		});
 		table.appendChild(tbody);
@@ -40506,7 +40768,10 @@ var EngCalcs = EngCalcs || {};
 	 * `lpnTagText()` does for the space, and it is applied on `input` so the rule is visible at the
 	 * moment somebody pastes a paragraph in rather than after they have looked away.
 	 */
-	function descField(fields, el) {
+	// `after` is the one thing a CUSTOMER needs that a node and a link do not: every write to a
+	// customer goes through customerEdited(), which redraws its symbol and its label and re-solves.
+	// Optional, so the two dozen existing callers are untouched.
+	function descField(fields, el, after) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
 			input = document.createElement('input');
@@ -40518,6 +40783,7 @@ var EngCalcs = EngCalcs || {};
 			if (t === (el.desc || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is identity, not an overridable property -- see this function's own note
+			if (after) { after(); }
 		}
 		input.addEventListener('input', commit);
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
@@ -40543,7 +40809,7 @@ var EngCalcs = EngCalcs || {};
 	 * here shows them the rule at the moment they break it. `lpnTagText()` is the one place it is
 	 * stated, shared with the exporter.
 	 */
-	function tagField(fields, el) {
+	function tagField(fields, el, after) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
 			input = document.createElement('input');
@@ -40566,6 +40832,7 @@ var EngCalcs = EngCalcs || {};
 			if (t === (el.tag || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { el.tag = t; } else { delete el.tag; }   // base-write: a tag is an identity, not an overridable property -- see this function's own note
+			if (after) { after(); }
 		}
 		input.addEventListener('input', commit);
 		// `change` as well, because a field can lose focus without ever firing `input` -- a value
@@ -41342,8 +41609,16 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **NO idField() AND NO RENAME**, like a Text's popup and for a related reason: a meter's id is
 	// minted, is shown here and in the Customers table so a reader can tell two apart, and is not
-	// something anybody has a note on their desk about. The ACCOUNT NUMBER is what a person knows
-	// this service by, and that is the first field.
+	// something anybody has a note on their desk about. The DESCRIPTION and the TAG are what a
+	// person knows this service by, and they are the first two fields.
+	//
+	// **THERE IS NO ACCOUNT NUMBER, AND THAT FIELD WAS REMOVED RATHER THAN RENAMED** (Tom,
+	// 2026-09-19: *"Didn't I say to trash Account number since they can just make a Custom property
+	// for that or anything else?"* and *"Since Customer is a pseudo-node, what if we provide
+	// existing properties like Description and Tag instead of Account number? Then we aren't
+	// inventing something, and we incur no language debt."*). Both halves of that are the reason:
+	// a utility that wants a field of its own name has custom properties, and a description and a
+	// tag are already written, already checked and already on their way into 27 languages.
 	//
 	// **NO OVERRIDE MARKER ON ANY ROW, and no setProp() anywhere in it.** Nothing a customer carries
 	// is scenario-overridable -- see the Task 247 section note for the reasoning, which is Task
@@ -41357,30 +41632,19 @@ var EngCalcs = EngCalcs || {};
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
 			l = c ? customerLink(c) : null, nid = c ? customerNodeId(c) : null,
 			nd = nid ? nodeById(nid) : null,
-			accLabel, accInput, demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
+			demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
 			stLabel, stInput, offLabel, offInput, warn;
 		if (!c) { return; }
 		title.textContent = String(pc.lpn_customer_heading || 'Customer {id}').replace('{id}', c.id);
 		clearFields(fields);
 
-		// **THE ACCOUNT NUMBER IS A LABEL ON A DEMAND, NEVER A KEY INTO ANYTHING.** A text box and
-		// nothing else: no registry, no validation, no uniqueness check and no lookup. It is stored
-		// as the bytes the user typed, it rides in their own project file, and nothing in this page
-		// writes it to a log row or a usage statistic.
-		accLabel = document.createElement('label');
-		accInput = document.createElement('input');
-		accInput.type = 'text';
-		accInput.value = c.account === undefined || c.account === null ? '' : String(c.account);
-		accInput.addEventListener('change', function () {
-			if (accInput.value === (c.account || '')) { return; }
-			saveUndoSnapshot();
-			c.account = accInput.value;
-			customerEdited(c);
-		});
-		setFieldLabel(accLabel, pc.lpn_field_account || 'Account number', pc.lpn_field_account_tip);
-		accLabel.appendChild(accInput);
-		fields.appendChild(accLabel);
-		fields.appendChild(document.createElement('br'));
+		// **THE SAME TWO IDENTITY FIELDS EVERY NODE AND LINK CARRIES**, built by the same two
+		// functions, so a customer's description obeys the one rule about a line break and its tag
+		// the one rule about a space -- in the places those rules already live rather than in a
+		// third copy here. `customerEdited` is the callback the other callers have no need of:
+		// a customer's label is drawn from these values and its row is in the Customers table.
+		descField(fields, c, function () { customerEdited(c); });
+		tagField(fields, c, function () { customerEdited(c); });
 
 		// **WHAT ONE SERVICE DRAWS, AND BLANK IS THE HONEST BORN STATE.** `+'' === 0`, so a blank box
 		// and a typed zero would be the same number -- and they are two different statements: a
@@ -41455,7 +41719,7 @@ var EngCalcs = EngCalcs || {};
 			customerEdited(c);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Services at this customer', pc.lpn_field_meter_count_tip);
+		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Number of services', pc.lpn_field_meter_count_tip);
 		cntLabel.appendChild(cntInput);
 		fields.appendChild(cntLabel);
 		fields.appendChild(document.createElement('br'));
@@ -41529,7 +41793,7 @@ var EngCalcs = EngCalcs || {};
 				warn = document.createElement('p');
 				warn.className = 'lpn-set-note';
 				warn.textContent = pc.lpn_customer_fixed_head ||
-					'⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
+					'The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
 				fields.appendChild(warn);
 			}
 		} else {
@@ -42907,7 +43171,12 @@ var EngCalcs = EngCalcs || {};
 		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=',
 		// **AND A REACTION RATE GETS NONE** (Task 652), on the average quality's own argument: it
 		// is the reacting half of that same pair and has no symbol a reader would recognise.
-			friction: 'f=', status: '', quality: '', rate: '' }
+			friction: 'f=', status: '', quality: '', rate: '' },
+		// The node group's own symbols for the two quantities a customer shares with a junction, so
+		// a Q on a service reads as the Q on the junction it lumps at. A description and a tag are
+		// words rather than quantities and get none, exactly as an ID does; a count gets none
+		// because there is no symbol for it a reader of any of these 27 languages would know.
+		customer: { id: '', demand: 'Qb=', demandActual: 'Q=', desc: '', tag: '', count: '' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
 	// follows the method selector rather than being frozen at the moment defaults were built.
@@ -43352,9 +43621,16 @@ var EngCalcs = EngCalcs || {};
 			writeLabelGlyphs(le, l, lines, fsNow);
 			linkWork.push({ l: l, le: le, all: lines });
 		});
-		// **THE METERS, COMPOSED THROUGH THE SAME DOORS** (Task 247). A customer is a pseudo-node,
-		// so its lines come out of `labelSettings.node` and its glyphs are stacked exactly as a
-		// junction's are -- see customerLabelLines(). Written now and measured with the batch
+		// **THE METERS, COMPOSED THROUGH THE SAME DOORS** (Task 247). Its lines come out of
+		// `labelSettings.customer` -- see customerLabelLines() -- and its glyphs are laid out ON
+		// ONE LINE, the way a LINK label's are.
+		//
+		// **ONE LINE, NOT A STACK** (Tom, 2026-09-19: *"Can we make labels one-line concats like
+		// link labels?"*). It is the same `composeRows()` call the link pass makes two blocks up,
+		// with the same blanket separator between values, and it is the second half of the answer
+		// to *"Labels are bigger than node and pipe labels"*: a stacked three-value label is three
+		// text heights tall beside a junction's one, at the identical font size. A customer label
+		// already lies ALONG its service line, so one line is also the shape the drawing wants. Written now and measured with the batch
 		// below, which is the write/read seam every label on this page obeys: a measurement taken
 		// between two DOM writes forces a synchronous layout of the whole drawing, and one main
 		// may carry forty meters.
@@ -43364,7 +43640,7 @@ var EngCalcs = EngCalcs || {};
 			var cLines = customerLabelLines(c);
 			ce.empty = cLines.length === 0;
 			if (!cLines.length) { cLines = [{ text: '' }]; }
-			var cRows = composeRows(cLines, true);
+			var cRows = composeRows(cLines, false);
 			setMultilineText(ce.text, customerPoint(c).x, cRows);
 			ce.text.style.fontSize = fsNow;
 			ce.lineCount = cRows.length;

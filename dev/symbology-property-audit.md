@@ -146,7 +146,25 @@ the reason is structural rather than fiddly:
 
 ---
 
-## 5. The account number: Tom now says we should NOT own it
+## 5. The account number: REMOVED 2026-09-19
+
+> **DONE, AND THE ANSWER TO THIS SECTION'S OWN OPEN QUESTION CAME FROM HIM.** Tom, 2026-09-19:
+> *"Didn't I say to trash Account number since they can just make a Custom property for that or
+> anything else?"* and, in the next breath, the thing this section did not think of -- *"Since
+> Customer is a pseudo-node, what if we provide existing properties like Description and Tag instead
+> of Account number? Then we aren't inventing something, and we incur no language debt."*
+>
+> So removal was neither a deletion nor a redesign: a customer took the DESCRIPTION and the TAG
+> every node and link already carries. **The `.inp` question 5d says to ask him is answered by the
+> same sentence** -- the `[DEMANDS]` CATEGORY slot carries the TAG, and a tag is EPANET's own join
+> key, so the slot is better matched than it was before. 5b's custom-property route was not needed
+> and is left below as the rejected alternative.
+>
+> 5d's second recommendation was followed: **a read-once migration, not a silent orphan.** An
+> `account` on a saved customer becomes its tag on open (its description where a tag is present),
+> asserted four ways in `dev/lpn-spike/customer-node-harness.js` §5.
+>
+> Everything below this line is the costing as it stood before the decision.
 
 **THIS IS A REVERSAL OF SHIPPED CODE AND IT IS WRITTEN UP RATHER THAN DONE.** His words,
 2026-09-18: *"A property (of Customer) is Account number. I don't think that we want to own this
