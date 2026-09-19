@@ -1300,14 +1300,15 @@ on a leader.** That is the cascade of section 16b in miniature, on a drawing sma
 **In open ground the invariant already holds, and now holds under two independent assertions.** No
 code change would make it hold any harder.
 
-**Where labels touch, width cannot be made immaterial, and that is a matter of logic rather than of
-effort.** A wider label genuinely does not fit in a gap a narrower one fits in; a placer that ignored
-the width would place text on top of text. What is left over -- a label moving because some OTHER
-label fell through and took its ground -- is the greedy cascade, and section 16c measured three
-contained attempts to damp it. All three cost drawn labels, including the one whose reasoning said it
-could not. **Nothing was shipped on this branch for that reason, which is why Tom saw no change when
-he tested it.** Removing the cascade means global assignment over the conflict graph (section 6),
-which is a different placement paradigm and his call to make, not a tuning change.
+**A label moves only when something really lies in the direction its text grew, and that is
+FOURTEEN labels on Net3-World -- the same fourteen at the fit zoom and at 2x.** Everything else that
+moves, 44 labels at the fit zoom and 20 at 2x, moved because a NEIGHBOUR moved first; its own extra
+width hit nothing whatsoever. Section 16h is the per-label evidence, and it is what corrects the
+sentence this section used to carry. Section 16c measured three contained attempts to damp that
+amplification and all three cost drawn labels, including the one whose reasoning said it could not.
+**Nothing was shipped on this branch for that reason, which is why Tom saw no change when he tested
+it.** Removing the amplification means global assignment over the conflict graph (section 6), which
+is a different placement paradigm and his call to make, not a tuning change.
 
 **Two more contained ideas were put and both are already answered by the code, which is worth
 recording so they are not proposed a fourth time.** *Order the candidates by something that does not
@@ -1318,6 +1319,60 @@ width changes is which candidate is CLEAR.** And *test the candidate ANCHOR rath
 when nothing is nearby* -- where nothing is nearby the whole box is clear anyway, so that changes
 nothing in the open case it was aimed at, and where something IS nearby it is the proposal to ignore
 the collision, which is text on text.
+
+### 16h. WHAT EACH MOVED LABEL HIT, named one label at a time -- and the sentence this retracts
+
+**Tom contradicted section 16g's conclusion, for the second time on this question, and he was right.**
+2026-09-18: *"width and height are independent dimensions in an area of unlimited width. No amount of
+additions to the string should affect placements. If you can't see that the following sentence is
+nonsense in the context of unlimited width, maybe I need to turn up the effort level."* The sentence
+he quoted was this record's own: *"when labels are close enough to touch, a wider one genuinely does
+not fit in a gap a narrower one fits in, and there's no way around that without printing text on top
+of text."*
+
+**IT IS WITHDRAWN, on two counts.** It conflates a two-dimensional gap with a one-dimensional one: a
+box that grows only in width can be blocked only by something lying in the direction it grew, so "it
+does not fit in the gap" is a claim about a BOUNDED gap and nothing here had shown the gaps were
+bounded. And it is a restatement dressed as an explanation -- "a wider box did not fit" says nothing
+a person could check. **The standing rule that a question asked twice makes the CONCLUSION the
+suspect is what should have caught it the first time.**
+
+**So the placer was made to say, for every label that moved, which object its wider box hit that its
+narrower box did not.** `dev/lpn-spike/label-width-cause-harness.js` replays the first-fit offline
+from its own captured inputs, in its own committing order, **with a full scan instead of the
+broad-phase grid** -- so the grid is excluded by construction -- and re-tests each mover's narrow
+choice against the obstacle list exactly as it stood when that label was placed. The replay
+reproduces the real pass **97 of 97** at both widths, which is what makes it evidence rather than a
+second opinion.
+
+| view | labels that move | grew into a real object, in the direction it grew | following a neighbour | unclassified |
+|---|---|---|---|---|
+| synthetic crowded | 9 of 13 | 9 | 0 | **0** |
+| Net3-World fit | 58 of 97 | **14** | 44 | **0** |
+| Net3-World 2x | 34 of 97 | **14** | 20 | **0** |
+
+**THE FOURTEEN DO NOT CHANGE WITH THE ZOOM, AND THAT IS THE FINDING.** Only fourteen labels anywhere
+ever grow into anything. Every one of them was checked for DIRECTION, not merely for contact -- the
+harness fails a blocker that is not on the side the box grew towards -- and every one is a node
+symbol lying past the growing edge, between 0.07 and 1.11 label-heights deep. **The other 44 and 20
+never rejected anything at all with their own extra width**: 63 of those 64 were blocked only by a
+label box that had itself moved, and the remaining one found its own first choice freed up by a
+neighbour leaving.
+
+**So the earlier answer named the minority mechanism as though it were the whole of it.** Three
+quarters of what Tom is looking at is not width at all. It is that the pass places one label at a
+time in importance order, so a label pushed off its first choice sits where a later label was going
+to stand, and that label is pushed off in turn. Fourteen genuine collisions move fifty-eight labels.
+
+**AND EVERY NAMED SUSPECT MEASURED ZERO**, which is the other half of the answer he is owed. There is
+no rejection against a viewport or drawing bound anywhere in it (unlimited width is exactly the case
+he names). The broad-phase grid contributes nothing: the full-scan replay reproduces the real pass to
+the choice. The candidate set is identical at both widths on all 97 labels, so where a label may be
+OFFERED a place does not read its text. No label's height changed. `dataLabelOrigin()` chooses its
+side on `end.x >= anchor.x` and reads no width. `cardinalSides()` prunes on the open-arc table and the
+resting offset, never on the box. Nothing reads box area. **The harness asserts all of these, and its
+selftest kills a candidate reach keyed on the box width while leaving a constant shift of every
+candidate uncaught.**
 
 ## 17. The labeling threshold's own default, measured (Task 669, 2026-09-18)
 

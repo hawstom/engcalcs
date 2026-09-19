@@ -684,11 +684,20 @@ differently... Placement in the open area should be identical for ID regardless 
 or suffix."* **In the open area it already is**, and that is asserted twice now:
 `dev/lpn-spike/label-width-stability-harness.js` part 1 holds it at the placer and part 3 holds it
 through the whole page -- a real document, the real refresh, five affix settings, **13 of 13 labels
-drawn and 0 of 13 moving**. Its crowded control moves 9 of 13 and hides 2, so the zero is a
-measurement that can still see. **Where labels TOUCH, width cannot be made immaterial without putting
-text on text**, and the leftover movement is the greedy cascade: §16c measured three contained ways
-to damp it and all three cost drawn labels. Removing it means global assignment over the conflict
-graph, which is **his call** and not a tuning change. §16f and §16g.
+drawn and 0 of 13 moving**.
+
+**HE THEN CONTRADICTED THE CROWDED HALF OF THAT ANSWER AND WAS RIGHT** -- *"width and height are
+independent dimensions in an area of unlimited width"* -- against the sentence *"a wider one genuinely
+does not fit in a gap a narrower one fits in"*, which conflates a two-dimensional gap with a
+one-dimensional one and is a restatement rather than an explanation. **It is withdrawn.**
+`dev/lpn-spike/label-width-cause-harness.js` now names, for every label that moves, the object its
+wider box hit that its narrower one did not -- replayed offline with a FULL SCAN, reproducing the
+real pass 97 of 97. On Net3-World: **14 labels grow into a real object in the direction they grew,
+the same 14 at both zooms**, each a node symbol past the growing edge; **44 more (20 at 2x) never
+rejected anything with their own width at all** and moved only because a neighbour moved first.
+**Every named suspect measured zero** -- no viewport bound, no broad-phase grid effect, no candidate
+set or reach or side rule reading the text. So three quarters of what he sees is sequential
+placement, not width. §16h, and the ROADMAP line.
 
 ### Task 322 half B: the counting method found four rounded constants
 

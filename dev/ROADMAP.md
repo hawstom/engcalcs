@@ -946,10 +946,14 @@ the block.
   - **HIS WIDTH QUESTION IS ANSWERED AND NOTHING SHIPPED, WHICH IS WHY HE SAW NO CHANGE.** In open
     ground the placement is already identical at every prefix and suffix -- asserted twice now, at
     the placer and through the whole page, with a crowded control beside it
-    (`dev/lpn-spike/label-width-stability-harness.js`, §16f). Where labels TOUCH, width cannot be
-    made immaterial without putting text on text; the leftover movement is the greedy cascade, and
-    all three contained damping attempts cost drawn labels (§16c). Removing it is a different
-    placement paradigm and is **his call**, §16g.
+    (`dev/lpn-spike/label-width-stability-harness.js`, §16f). **And the crowded case is now named one
+    label at a time** (`label-width-cause-harness.js`, §16h): on Net3-World only **14** labels ever
+    grow into anything, the same 14 at both zooms, each a node symbol genuinely past the growing
+    edge; the other 44 moved because a NEIGHBOUR moved first and their own extra width hit nothing.
+    Every named suspect measured zero -- no viewport bound, no grid effect, no reach or side rule
+    reading the width. **The earlier answer to him was wrong and is retracted in §16h.** Damping the
+    amplification was tried three ways and all three cost drawn labels (§16c); removing it is a
+    different placement paradigm and is **his call**, §16g.
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
   file, then import anything that is not a name conflict, that probably would be all that's needed."*
