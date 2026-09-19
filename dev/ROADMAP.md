@@ -963,6 +963,17 @@ the block.
     clear is a fact rather than a judgement"* -- it is a fact about 28 points, not about the plane
     (§16k). **Remove the bounds BEFORE damping the churn**; the damping option is judged a
     papering-over in §16l, and cannot draw one extra label.
+  - **THE STRATEGY SEAM IS BUILT, on his structural instruction** (*"split things into strategies
+    that can be turned off and on"*, §18). `cardinalSides()` takes `opts.strategies` --
+    `corners`, `sector`, `ring` -- the page states the shipped set once as `labelSideStrategies`,
+    and `?debug=labels` grows one checkbox per strategy DERIVED from `Collide.SIDE_STRATEGIES`.
+    **The default is byte-identical, so no label moved.** Measured (`label-strategy-harness.js`,
+    §18b): replacing the sector with a full ring **halves the hidden labels, 22 to 11 over the five
+    examples, and loses none** -- 16 to 9 on Net3-World alone. **Adopting it is HIS call**: it moves
+    131 labels, and `ring only` matches it on count, so what the corners buy is the resting look and
+    not labels. §18c answers his zoom-independence point: the stable model is ANGULAR, already built
+    and already cached in `nodeContext`, and all but one number of it is thrown away by
+    `widestArc()`; occupancy and the candidate radii are per-view and cannot be precomputed.
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
   file, then import anything that is not a name conflict, that probably would be all that's needed."*

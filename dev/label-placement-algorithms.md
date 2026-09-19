@@ -1301,7 +1301,8 @@ on a leader.** That is the cascade of section 16b in miniature, on a drawing sma
 code change would make it hold any harder.
 
 **A label moves only when something really lies in the direction its text grew, and that is
-FOURTEEN labels on Net3-World -- the same fourteen at the fit zoom and at 2x.** Everything else that
+FOURTEEN labels on Net3-World, at the fit zoom and fourteen again at 2x -- though NOT the same
+fourteen; see section 16i for the names.** Everything else that
 moves, 44 labels at the fit zoom and 20 at 2x, moved because a NEIGHBOUR moved first; its own extra
 width hit nothing whatsoever. Section 16h is the per-label evidence, and it is what corrects the
 sentence this section used to carry. Section 16c measured three contained attempts to damp that
@@ -1528,6 +1529,129 @@ cached answer survived a project switch and `switch-keep-harness.js` found 119 o
 out from the previous document's threshold. A stale threshold is invisible, because the number it
 produces is always plausible. The work is bounded instead: at most 512 pipes at an even stride,
 exact below that and a good estimate of the median above it.
+
+## 18. STRATEGIES THAT TURN OFF AND ON, and the sector model measured against a ring (2026-09-19)
+
+Tom, having read section 16j: *"it seems to me like we have been adding things onto an early model
+instead of trying new models from scratch. While probably complete abandonment of all early work is
+not right, it might be helpful to split things into strategies that can be turned off and on. Clearly
+the 'most open sector' strategy is not synergistic with the spot-prime box strategy. Great detective
+work. While I agree with letting labels look further, (a) I am not sure that the sector model needs
+to live alongside the spot-prime box model and (b) it's important that they know beforehand the good
+places to hunt based on a stable model of the network that doesn't have to be rebuilt at every
+zoom."*
+
+Three instructions, in his order, and the structural one came first.
+
+### 18a. The seam
+
+`cardinalSides()` took `opts.raster` and did one thing. It now takes **`opts.strategies`**, the same
+vocabulary `repairCrossingGangs()` already used for its own routes, naming which generators may
+propose a place for a node label:
+
+| strategy | what it proposes |
+|---|---|
+| `corners` | the four cardinal corners of the symbol, pruned by the open-arc table (Task 411) |
+| `sector` | a polar raster inside `widestArc(arcs)` -- the SINGLE widest gap between the node's own pipes. **The bound section 16j measured.** |
+| `ring` | the same circles and the same angle steps over the WHOLE circle. The alternative to `sector`. |
+
+`js/looped-network.js` states the shipped set once, as `labelSideStrategies = ['corners', 'sector']`,
+and `?debug=labels` grows **one checkbox per strategy, derived from `Collide.SIDE_STRATEGIES` rather
+than typed**, so a strategy added to the geometry file cannot be one the bench has no switch for.
+**The default is byte-identical to the old behaviour** -- introducing the seam moved no label, and
+the 219 existing harnesses are the check on that.
+
+**`ring` needed one deliberate adjustment or the comparison would have been rigged.**
+`polarCandidates()` fills the inner circle first and stops at `max` (24). On one sector that leaves
+room for all three circles; on the whole circle it would spend the entire budget on the nearest one,
+so `ring` would have been tested as *"look all round but never far"* -- a different strategy from the
+one being asked about. The cap is scaled by the number of circles instead, so the only difference
+between `sector` and `ring` is the angular window.
+
+### 18b. His suspicion, measured: the sector model costs labels on every crowded example
+
+Node ID alone, four views of each example, drawn and hidden summed over the four.
+`dev/lpn-spike/label-strategy-harness.js`.
+
+| example | corners+sector (ships) | corners+ring | corners only | ring only |
+|---|---|---|---|---|
+| Net3-Novato-CA-World | 372 drawn / **16 hidden** | 379 / **9** | 325 / 63 | 381 / 7 |
+| Net3 | 382 / 6 | 386 / 2 | 354 / 34 | 385 / 3 |
+| Net2 | 144 / 0 | 144 / 0 | 142 / 2 | 144 / 0 |
+| Net1 | 44 / 0 | 44 / 0 | 40 / 4 | 44 / 0 |
+| Elm-Street-Center | 72 / 0 | 72 / 0 | 72 / 0 | 72 / 0 |
+| **all examples** | **1,014 / 22** | **1,025 / 11** | 933 / 103 | 1,026 / 10 |
+
+**He is right, and the margin is not marginal: replacing the sector with a full ring HALVES the
+hidden labels and loses none.** It is a strict improvement on every example -- no example draws fewer
+-- and on his own drawing it recovers 7 of the 16 labels the sector model was hiding.
+
+Three further readings, each of which matters more than the headline:
+
+- **`ring only` is as good as `corners+ring`** (1,026 against 1,025). Once the search can look all
+  round, **the corner strategy is contributing essentially nothing to the COUNT** -- but it moves 940
+  labels against the shipped set, so what it is contributing is the resting look of the drawing, not
+  labels. That is a taste decision and it is Tom's; the corners are Imhof's ascender argument and
+  right-first convention, and they should not be dropped on a count.
+- **`corners only` is the control that proves the raster is load-bearing** at all: 103 hidden against
+  22. Nobody proposed removing it; it is here so the table cannot be read as "the raster does nothing".
+- **Elm-Street-Center separates nothing**, because no label there is ever crowded off its first
+  corner. The harness says so rather than passing in silence -- a fixture with no work to do must not
+  read as a strategy having no effect.
+
+**What this does NOT show, and the honesty matters:** it is measured with the node ID alone, which is
+Tom's own test and the case where a drop is a drop rather than a shed. With every field on, a label
+that cannot be placed sheds values before it is hidden, so the same change would be worth less. And
+`moved` is large for every non-shipped set, so adopting `ring` IS a visible change to every drawing,
+not a free win.
+
+### 18c. What can be precomputed zoom-independently, and what honestly cannot
+
+His (b): *"it's important that they know beforehand the good places to hunt based on a stable model
+of the network that doesn't have to be rebuilt at every zoom."*
+
+**THE STABLE HALF ALREADY EXISTS AND IS ALREADY CACHED -- and then all but one number of it is thrown
+away at the point of use.** `nodeContext` (section 3.3) is built in `refreshLabelText()` and
+invalidated by a model edit or a solve and **not** by a zoom, a pan or a drag frame -- a zoom calls
+`relayoutLabels()`, which does not rebuild it. It carries, per node, the incident `bearings` and the
+whole `arcs` table: **every gap between that node's pipes, not just the biggest.** The placer then
+calls `widestArc(arcs)` and uses one.
+
+So the answer to "can the good places to hunt be known beforehand" is **yes for the angular
+structure, and it is already computed**. Publishing the gaps as a RANKED list and rastering the best
+few rather than the single best is a change at the point of consumption, not a new model.
+
+**WHAT CANNOT BE PRECOMPUTED, stated plainly, because half a truth here would send the next session
+down a long road:**
+
+1. **Whether a place is FREE is a per-view question and always will be.** A label's box is a fixed
+   number of screen pixels, so in world units it grows as the drawing is zoomed out; and which link
+   labels exist at all changes with the zoom, since they shed values and vanish. Section 10c found
+   this for `spot_prime` and it is the same finding: an index of the DRAWING cannot answer a question
+   about the VIEW.
+2. **The candidate RADII are screen-fixed too.** `defaultLabelOffset()` scales with `symbolFactor()`
+   and the reach floor with `effectiveFontSize()`, both of which divide by `state.s`. So a
+   precomputed model can hold the DIRECTIONS a label should hunt in and the ORDER to try them; the
+   distances are view quantities.
+
+**That split is the design, and it is a good one:** the stable model is angular and per node -- a
+ranked list of directions with their widths -- and the per-view work reduces to testing occupancy
+along those directions. It is also where Tom's (a) and (b) meet: `spot_prime` searches for open
+ground per view because it must, and the sector model claims to know where the ground is per network
+but only ever offers one wedge. **Those two are not the same kind of thing, which is why he felt they
+were not synergistic.**
+
+### 18d. What was NOT done, and why
+
+- **No placement change ships from this round.** The seam's default is the old behaviour. Adopting
+  `ring` is a visible change to every drawing and is his call, and the table above is what it is for.
+- **The settled-label damping (his "Recommended" option) is still not built**, and section 16l's
+  verdict stands: it cannot draw one extra label, and building it before the bounds are fixed would
+  tune the symptom and hide the measurement.
+- **"Letting labels look further" -- widening the RADIUS bound -- is deliberately not built either.**
+  It is his third priority and the seam had to come first. Note that the table above is the ANGULAR
+  bound alone: `ring` reaches exactly as far as `sector` does. The 10 labels on Net3-World's fit view
+  that had room only past their reach (section 16j) are untouched by any of these numbers.
 
 ## Sources
 

@@ -863,7 +863,8 @@ var EngCalcs = EngCalcs || {};
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
 			sides = Collide.cardinalSides(nodeAt(n), d,
-				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
+				(ctx && ctx.arcs) || Collide.openArcs([]),
+				{ raster: true, outer: reach, strategies: labelSideStrategies });
 		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
@@ -2289,6 +2290,29 @@ var EngCalcs = EngCalcs || {};
 			+ 'was before Task 539 phase four. Watch the "hid (crossing)" count below: the route '
 			+ 'earns its keep by hiding fewer labels, not by lowering the crossing count, which is '
 			+ 'already zero. Add ?debug=spots to the URL to see where it looked.');
+		// **ONE CHECKBOX PER CANDIDATE STRATEGY**, derived from the list rather than typed, so a
+		// strategy added to js/lpn-collide.js cannot be one the bench has no switch for. English
+		// literals like every other row here: the bench exists only under ?debug=labels, never
+		// reaches a visitor and is not translated.
+		var HINTS = {
+			corners: 'The four cardinal corners of the node symbol, with the ones a pipe arrives '
+				+ 'through skipped. Tried first and in a fixed order.',
+			sector: 'A fan of positions inside the SINGLE widest gap between this node\u2019s own '
+				+ 'pipes. Open ground in any other direction is never offered, which is what drops '
+				+ 'labels that have room. Turn off and turn "ring" on to compare.',
+			ring: 'The same circles and the same angles as "sector", but all the way round the node '
+				+ 'instead of inside one gap. The alternative to the sector model.'
+		};
+		Collide.SIDE_STRATEGIES.forEach(function (name) {
+			checkRow('candidates: ' + name,
+				function () { return labelSideStrategies.indexOf(name) >= 0; },
+				function (v) {
+					var at = labelSideStrategies.indexOf(name);
+					if (v && at < 0) { labelSideStrategies.push(name); }
+					if (!v && at >= 0) { labelSideStrategies.splice(at, 1); }
+				},
+				HINTS[name]);
+		});
 		var g = document.createElement('div');
 		g.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
 		g.textContent = 'rank weights';
@@ -2414,6 +2438,13 @@ var EngCalcs = EngCalcs || {};
 	// ON, which is what ships. The bench checkbox is the only thing that ever sets it false, and the
 	// bench exists only under ?debug=labels.
 	var labelSpotRoute = true;
+	// **WHICH CANDIDATE STRATEGIES PROPOSE A PLACE FOR A NODE LABEL** (Tom, 2026-09-19: *"split
+	// things into strategies that can be turned off and on"*). The shipped set is what the page has
+	// always done -- the four cardinal corners plus a polar raster inside the widest gap between the
+	// node's own pipes -- stated here as a LIST so it can be switched rather than inferred from the
+	// call. `ring` replaces `sector`'s one wedge with the whole circle;
+	// dev/lpn-spike/label-strategy-harness.js is what measures one against the other.
+	var labelSideStrategies = ['corners', 'sector'];
 	function spotDebugOn() { return debugOn('spots'); }
 	function drawSpotDebug() {
 		if (!spotDebugLayer) { return; }

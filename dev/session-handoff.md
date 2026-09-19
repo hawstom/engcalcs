@@ -712,6 +712,18 @@ remembered "amazing stack of node labels" was that rule, and this commit is what
 **Do NOT build the settled-label damping first** -- it cannot draw one extra label and it hides the
 measurement (§16l).
 
+**AND THE STRATEGY SEAM HE ASKED FOR IS BUILT (§18).** `cardinalSides()` now takes
+`opts.strategies` (`corners`, `sector`, `ring`), the page states the shipped set once as
+`labelSideStrategies`, and `?debug=labels` grows one checkbox per strategy derived from
+`Collide.SIDE_STRATEGIES`. **The shipped default is byte-identical -- no label moved.** His suspicion
+that the sector model is not pulling its weight is CONFIRMED: swapping it for a full ring **halves
+the hidden labels over the five examples, 22 to 11, and loses none** (16 to 9 on Net3-World).
+**Adopting it is his call and is NOT done** -- it moves 131 labels, so it changes every drawing.
+On his zoom-independence point: **the stable model is ANGULAR and already exists** -- `nodeContext`
+holds every gap between a node's pipes, survives a zoom, and `widestArc()` throws all but one away.
+Occupancy and the candidate radii are screen-fixed and cannot be precomputed. **The RADIUS bound is
+still untouched**; §18b is the angular bound alone.
+
 ### Task 322 half B: the counting method found four rounded constants
 
 **`unit_factor_check.php` re-derives every `$ec_units` factor and had never read a line of

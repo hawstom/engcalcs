@@ -512,25 +512,67 @@ EngCalcs.lpnCollide = (function () {
 	 * further out -- so the four come back in their fixed order as the last resort. Rejection is an
 	 * ordering and skipping device; it is not a veto on labelling a node.
 	 */
+	// ---- WHERE A NODE LABEL MAY BE OFFERED A PLACE: NAMED STRATEGIES, SWITCHABLE ONE AT A TIME ---
+	//
+	// **Tom, 2026-09-19, and this is a structural instruction rather than a placement one:** *"it
+	// seems to me like we have been adding things onto an early model instead of trying new models
+	// from scratch... it might be helpful to split things into strategies that can be turned off and
+	// on. Clearly the 'most open sector' strategy is not synergistic with the spot-prime box
+	// strategy."*
+	//
+	// Until this existed the candidate set was one function with one behaviour, accreted over four
+	// tasks, and **no strategy in it could be run without the others or measured alone** -- so
+	// whether the sector helps or hurts was an argument rather than a number. `opts.strategies` is
+	// the same vocabulary repairCrossingGangs() already uses for its own routes; the switch belongs
+	// here because this is where the accretion is.
+	//
+	//   corners   the four cardinal corners, pruned by the open-arc table (Task 411)
+	//   sector    a polar raster inside widestArc(arcs) -- the SINGLE widest gap between the node's
+	//             own pipes. **This is the bound section 16j measured**: open ground in any other
+	//             direction generates no candidate at all, and 9 of 32 dropped labels on
+	//             Net3-World's fit view had room it never looked toward.
+	//   ring      the same rings and the same angle steps over the WHOLE circle. The alternative to
+	//             `sector`, and the thing Tom asked to have measured against it.
+	//
+	// **THE DEFAULT IS EXACTLY WHAT IT WAS**, so introducing the seam moves no label: `corners`
+	// always, plus `sector` when the caller asked for a raster. Every existing harness is the check
+	// on that, and none of them moved.
+	var SIDE_STRATEGIES = ['corners', 'sector', 'ring'];
 	function cardinalSides(anchor, offset, arcs, opts) {
 		opts = opts || {};
 		var dx = Math.abs((offset && offset.x) || 0), dy = Math.abs((offset && offset.y) || 0),
 			tol = opts.tol >= 0 ? opts.tol : ANGLE_TUNING.cornerTolerance,
 			open = openCorners(arcs, tol), out = [], i,
-			home = Math.hypot(dx, dy), outer = opts.outer > 0 ? opts.outer : home * 3;
+			home = Math.hypot(dx, dy), outer = opts.outer > 0 ? opts.outer : home * 3,
+			use = opts.strategies || (opts.raster ? ['corners', 'sector'] : ['corners']);
 		function endpointOf(k) {
 			var c = CORNERS[k];
 			return { x: anchor.x + c.sx * dx, y: anchor.y + c.sy * dy, corner: k, deg: null };
 		}
-		if (!open.length) {
-			for (i = 0; i < CORNERS.length; i++) { out.push(endpointOf(i)); }
-		} else {
-			for (i = 0; i < open.length; i++) { out.push(endpointOf(open[i])); }
+		if (use.indexOf('corners') >= 0) {
+			if (!open.length) {
+				for (i = 0; i < CORNERS.length; i++) { out.push(endpointOf(i)); }
+			} else {
+				for (i = 0; i < open.length; i++) { out.push(endpointOf(open[i])); }
+			}
 		}
-		if (opts.raster) {
+		if (use.indexOf('sector') >= 0) {
 			polarCandidates(anchor, widestArc(arcs), home, outer, opts).forEach(function (p) {
 				out.push(p);
 			});
+		}
+		if (use.indexOf('ring') >= 0) {
+			// **THE CAP HAS TO BE RAISED OR THE COMPARISON IS NOT A COMPARISON.** polarCandidates()
+			// fills the inner ring first and stops at `max` (24), which on one sector leaves room
+			// for all three rings and on the whole circle would spend the entire budget on the
+			// nearest one -- so `ring` would be tested as "look all round but never far", which is
+			// not the strategy being asked about. Scaled by the number of rings instead, so each
+			// ring is reached and the only difference from `sector` is the angular window.
+			var ringOpts = {}, k;
+			for (k in opts) { if (Object.prototype.hasOwnProperty.call(opts, k)) { ringOpts[k] = opts[k]; } }
+			ringOpts.max = (opts.max > 0 ? opts.max : 24) * (opts.rings > 0 ? opts.rings : 3);
+			polarCandidates(anchor, { start: 0, end: 360 }, home, outer, ringOpts)
+				.forEach(function (p) { out.push(p); });
 		}
 		return out;
 	}
@@ -2409,6 +2451,7 @@ EngCalcs.lpnCollide = (function () {
 		widestArc: widestArc,
 		polarCandidates: polarCandidates,
 		cardinalSides: cardinalSides,
+		SIDE_STRATEGIES: SIDE_STRATEGIES,
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,
 		boxesClearOf: boxesClearOf,
