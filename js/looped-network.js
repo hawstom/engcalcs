@@ -12035,6 +12035,108 @@ var EngCalcs = EngCalcs || {};
 		refreshMapStatus();
 		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
 	}
+	// **THE FIVE WORLD-MAP COMMANDS, in the shape Background image already uses** (Tom, 2026-09-18).
+	// Built fresh on every open so `disabled` is read from the state of the moment, and every row
+	// but Attach is dead while there is no map attached -- greyed and not hidden, because a row that
+	// comes and goes teaches nobody what the feature can do.
+	//
+	// **MOVE AND Scale by picking ARE THE SAME RECTANGLE, ENTERED WITH DIFFERENT INTENT, and that
+	// is deliberate rather than lazy.** Step 2 of the wizard already slides on its body, resizes on
+	// a corner and turns on the round handle; writing a second gesture for each would be a second
+	// opinion about what moving a map means. What the two rows buy is that a reader looking for
+	// "move it a bit" and a reader looking for "it is the wrong size" each find a row with their own
+	// word on it, and the hint that comes up names the handle they want.
+	function mapgeoRows() {
+		var pc = EngCalcs.pageConfig || {}, has = xyGeorefOk();
+		return [
+			{ icon: 'globe', label: pc.lpn_map_attach_add || 'Attach',
+				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
+			{ icon: 'position', label: pc.lpn_map_attach_move || 'Move',
+				tip: pc.lpn_map_attach_move_tip,
+				fn: function () { mapgeoAdjust('move'); }, disabled: !has },
+			{ icon: 'scale', label: pc.lpn_map_attach_scale || 'Scale by picking',
+				tip: pc.lpn_map_attach_scale_tip,
+				fn: function () { mapgeoAdjust('scale'); }, disabled: !has },
+			{ icon: 'scale', label: pc.lpn_map_attach_scale_from || 'Scale from the current size…',
+				fn: mapgeoScaleFromCurrent, disabled: !has },
+			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Detach',
+				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach, disabled: !has }
+		];
+	}
+	/**
+	 * Move and Scale by picking: the wizard's step 2, opened on the placement already on file.
+	 *
+	 * **IT KEEPS THE TRANSFORM AND OPENS AT STEP 2, which is what makes it a correction rather than
+	 * a fresh placement.** mapgeoStart() throws the map out to the whole world at 0 N 0 E, because
+	 * that is the honest place for a drawing nobody has placed yet; a reader who came to nudge an
+	 * existing map would lose the placement they were correcting. Everything else is shared with the
+	 * wizard, Cancel included, so there is one way back and it puts the old transform back exactly.
+	 */
+	function mapgeoAdjust(kind) {
+		var pc = EngCalcs.pageConfig || {};
+		if (mapgeo || georefActive()) { return; }
+		if (!xyMapAttachable() || !xyGeorefOk()) {
+			setNotice(pc.lpn_map_attach_none ||
+				'There is no world map attached to this project yet. Use Map, World map, Attach first.');
+			return;
+		}
+		if (!EngCalcs.lpnGeorefToLonLat || !EngCalcs.lpnGeorefFromLonLat) {
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		mapgeo = {
+			step: MAPGEO_STEP_FINE,
+			openId: library ? library.openId : null,
+			rect: null,
+			prev: {
+				georef: project.georef ? JSON.parse(JSON.stringify(project.georef)) : null,
+				basemap: project.basemap, view: currentView()
+			}
+		};
+		if (!project.basemap || project.basemap === 'off') { project.basemap = 'osm'; }
+		setMode('select');
+		mapgeoCaptureRect();
+		mapgeoSet(project.georef);
+		refreshMapStatus();
+		setNotice(kind === 'scale'
+			? (pc.lpn_mapgeo_hint_scale || 'Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.')
+			: (pc.lpn_mapgeo_hint_move || 'Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.'));
+	}
+	/**
+	 * Scale from the current size: a typed factor, applied at once, with no wizard at all.
+	 *
+	 * **THE PIVOT IS THE MIDDLE OF THE DRAWING AND IS NOT PICKED.** The background image's own
+	 * version asks for a point first, because a picture can be pinned by a feature somebody
+	 * recognises in it; the ground behind a drawing has no such point, and the middle of the drawing
+	 * is the one place a reader can predict will not move. It writes through mapgeoScaled(), which
+	 * keeps that pivot fixed by construction, and touches not one document number -- the same
+	 * `project.georef` declaration the wizard writes, and nothing else.
+	 */
+	function mapgeoScaleFromCurrent() {
+		var pc = EngCalcs.pageConfig || {}, t = mapgeoT(), ext, answer, f;
+		if (mapgeo || georefActive()) { return; }
+		if (!xyMapAttachable() || !xyGeorefOk() || !t) {
+			setNotice(pc.lpn_map_attach_none ||
+				'There is no world map attached to this project yet. Use Map, World map, Attach first.');
+			return;
+		}
+		answer = window.prompt(pc.lpn_map_attach_scale_from_prompt ||
+			'Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
+		if (answer === null) { return; }
+		f = parseFloat(String(answer).replace(',', '.'));
+		if (!(f > 0) || !isFinite(f)) {
+			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type one number greater than zero.');
+			return;
+		}
+		ext = mapgeoExtent();
+		project.georef = mapgeoScaled(t, f, { x: ext.cx, y: ext.cy });
+		markEdited();
+		saveToStorage();
+		refreshBasemap();
+		refreshMapStatus();
+		setNotice(pc.lpn_map_attach_scale_from_done ||
+			'The map is resized, and your drawing and every coordinate in it are exactly as they were.');
+	}
 	// **STEP 2 NAILS A RECTANGLE TO THE GROUND.** It is stated in latitude and longitude, so it
 	// belongs to the Earth and not to the drawing: when the map moves, the rectangle moves with it,
 	// which is what makes dragging it read as dragging the map. It starts as the drawing's own
@@ -12189,13 +12291,13 @@ var EngCalcs = EngCalcs || {};
 		mapgeoClearLayer();
 		// **THE FIRST AND ONLY WRITE.** markEdited() so the declaration is saved with the project;
 		// no undo snapshot, because the stack holds the DOCUMENT and not one thing in it moved --
-		// the way back is Map, Remove the world map.
+		// the way back is Map, World map, Detach.
 		markEdited();
 		saveToStorage();
 		refreshBasemap();
 		refreshMapStatus();
 		mapgeoRefreshBar();
-		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, Remove the world map to take it away again.');
+		setNotice(pc.lpn_map_attach_done || 'The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.');
 	}
 	function mapgeoCancel() {
 		var pc = EngCalcs.pageConfig || {}, prev = mapgeo ? mapgeo.prev : null;
@@ -23716,7 +23818,7 @@ var EngCalcs = EngCalcs || {};
 	 * project you were looking at is still open, still unconverted, and still on its own tab.
 	 *
 	 * **AND IT IS THE EXCEPTION PATH NOW, not the recommended one.** The default way to
-	 * georeference is Map, Custom georeference, which moves no coordinate at all;
+	 * georeference is Map, World map, Attach, which moves no coordinate at all;
 	 * dev/tom-coordinate-vocabulary-2026-09-16.md: *"We may offer (since we already programmed and
 	 * debugged the wizard) coordinate system conversion. But that is not our recommended work flow
 	 * in most situations. As always, we prefer the preserve-the-inputs path."*
@@ -27001,21 +27103,23 @@ var EngCalcs = EngCalcs || {};
 			// submenu, so six commands about one picture cost one row.
 			{ icon: 'image', label: pc.lpn_backdrop_menu || 'Background image…',
 				submenu: function () { return backdropRows(false); } },
-			// **AND THE WORLD MAP BEHIND A GRID DRAWING** (Task 646, and Tom's own menu name,
-			// 2026-09-18: *"Map, Custom georeference"*). Beside the background image because it is
-			// the same kind of thing said in his words -- something placed BEHIND the drawing that
+			// **AND THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Beside the background image
+			// because it is the same kind of thing -- something placed BEHIND the drawing that
 			// changes nothing in it.
 			//
-			// **TWO TOP-LEVEL ROWS RATHER THAN A SUBMENU, and the second one hides itself.** Setting
-			// the map up is a wizard and taking it away is one press; burying either under a parent
-			// row costs a click on the only two commands this feature has. Remove appears only when
-			// there is something to remove, so the menu is never a list of things that do nothing.
+			// **ONE ROW WITH A SUBMENU, SHAPED LIKE THE ROW ABOVE IT** (Tom, 2026-09-18: *"Change
+			// Map, Custom georeference to Map, World map... (to be parallel with Background image).
+			// And can it have a submenu with Attach (at top), Move, Scale by picking, Scale from
+			// the current size..., Detach, similar to the Background map submenu."*). It was two
+			// top-level rows -- the wizard, and the undoing of the wizard -- on the argument that a
+			// feature with two commands should not cost a click. **PARALLELISM BEAT THAT ARGUMENT,
+			// and the reason is that a reader does not meet these rows one feature at a time**: a
+			// picture behind the drawing and a map behind the drawing are the same kind of thing,
+			// so a reader who has learnt one submenu has learnt the other.
 			{ icon: 'globe', hidden: !xyMapAttachable(),
-				label: pc.lpn_map_attach_menu || 'Custom georeference…',
-				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
-			{ icon: 'del', hidden: !xyMapAttachable() || !xyGeorefOk(),
-				label: pc.lpn_map_attach_remove || 'Remove the world map',
-				tip: pc.lpn_map_attach_remove_tip, fn: removeMapAttach },
+				label: pc.lpn_map_attach_menu || 'World map…',
+				tip: pc.lpn_map_attach_tip,
+				submenu: function () { return mapgeoRows(); } },
 			{ separator: true },
 			// **NO LABELS ROW AND NO PROFILE ROW** (Tom, 2026-08-21). Labels is a SECTION of the
 			// Settings box, reachable from the box's own index and from a click on the colour

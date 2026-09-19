@@ -52,6 +52,18 @@ const L = loadLoopedNetwork(
 	"\t\tmapgeoApplyDrag: mapgeoApplyDrag, mapgeoRectSrc: mapgeoRectSrc,\n" +
 	"\t\tmapgeoStep: function () { return mapgeo && mapgeo.step; },\n" +
 	"\t\tsetDrag: function (d) { drag = d; },\n" +
+	// The REAL gesture path, so the pan Tom asked about is driven the way a hand drives it rather
+	// than by handing mapgeoApplyDrag() a drag record this file built. Every assertion about the
+	// rectangle below goes past mapgeoPointerDown(); nothing did until step 1's pan needed it.
+	"\t\tgetDrag: function () { return drag; },\n" +
+	"\t\twirePointerEvents: wirePointerEvents,\n" +
+	"\t\twheelZoom: wheelZoom,\n" +
+	"\t\tmapgeoAdjust: mapgeoAdjust, mapgeoScaleFrom: mapgeoScaleFromCurrent,\n" +
+	"\t\tmapgeoRows: mapgeoRows, backdropRows: backdropRows,\n" +
+	// One frame of the drag loop. tick() is a requestAnimationFrame chain in the page; here the
+	// frame is asked for explicitly so a harness assertion is about the gesture and not about
+	// whether an animation frame happened to land.
+	"\t\tpumpDrag: function () { if (drag && dragDirty) { applyDrag(); dragDirty = false; return true; } return false; },\n" +
 	// Screen point of a point in the drawing's own OUTWARD coordinates, which is the inverse of
 	// screenToWorld() at the stub's canvas origin. A gesture is aimed in ground terms here, so the
 	// assertions can say where the pointer went rather than which pixel it was.
@@ -234,18 +246,126 @@ ok('REMOVING LEAVES THE PROJECT EXACTLY AS IT WAS', snapshot() === before,
 ok('...and the map status goes back to saying it is not georeferenced',
 	L.crsDisplayName() === PC0.lpn_crs_none, L.crsDisplayName());
 
-// ---- the menu says what Tom asked it to say ----------------------------------------------------
-const rows = L.mapMenuRows().filter(function (r) { return !r.hidden && r.fn; });
-ok('the Map menu carries the custom georeference row',
-	rows.some(function (r) { return /georeference/i.test(String(r.label)); }),
-	rows.map(function (r) { return r.label; }).join(' | '));
-// Read off pageConfig rather than typed here: harness_wording_check.php is right that a pinned
-// literal taxes rewording, and the stub fills pageConfig from the real language file.
-const REMOVE = (global.EngCalcs.pageConfig || {}).lpn_map_attach_remove;
-ok('and the Remove row hides itself when there is nothing to remove',
-	L.mapMenuRows().every(function (r) {
-		return String(r.label) !== REMOVE || r.hidden === true;
-	}));
+// ---- THE MENU, AND IT IS THE BACKGROUND IMAGE SUBMENU'S SHAPE ---------------------------------
+//
+// Tom, 2026-09-18: *"Change Map, Custom georeference to Map, World map... (to be parallel with
+// Background image). And can it have a submenu with Attach (at top), Move, Scale by picking, Scale
+// from the current size..., Detach, similar to the Background map submenu."* PARALLELISM is the
+// instruction, so the assertion is a comparison against the row it is meant to be parallel with --
+// not a list of five literals, which would pass while the two submenus drifted apart.
+{
+	const top = L.mapMenuRows().filter(function (r) { return !r.hidden; });
+	const world = top.find(function (r) { return r.label === PC0.lpn_map_attach_menu; });
+	ok('the Map menu carries ONE world map row, and it opens a submenu',
+		!!world && typeof world.submenu === 'function' && !world.fn,
+		top.map(function (r) { return r.label; }).join(' | '));
+	const image = top.find(function (r) { return r.label === PC0.lpn_backdrop_menu; });
+	ok('...sitting beside the background image row, which is the row it is parallel with',
+		!!image && Math.abs(top.indexOf(world) - top.indexOf(image)) === 1,
+		top.map(function (r) { return r.label; }).join(' | '));
+	ok('...and no top-level row is left over from the two it replaced',
+		!top.some(function (r) { return r.label === PC0.lpn_map_attach_remove; }));
+	const rows = world.submenu();
+	ok('the submenu reads Attach, Move, Scale by picking, Scale from the current size, Detach',
+		rows.map(function (r) { return r.label; }).join(' | ') ===
+			[PC0.lpn_map_attach_add, PC0.lpn_map_attach_move, PC0.lpn_map_attach_scale,
+				PC0.lpn_map_attach_scale_from, PC0.lpn_map_attach_remove].join(' | '),
+		rows.map(function (r) { return r.label; }).join(' | '));
+	// Every row but Attach is dead while nothing is attached -- GREYED, not gone, which is the
+	// backdrop submenu's own rule: a row that comes and goes teaches nobody what the feature can do.
+	ok('with nothing attached, Attach is live and every other row is greyed',
+		rows[0].disabled !== true && rows.slice(1).every(function (r) { return r.disabled === true; }),
+		rows.map(function (r) { return r.label + '=' + !!r.disabled; }).join(' | '));
+	// **THE RULE IS WHAT IS PARALLEL, NOT THE ROW COUNT.** The background image submenu carries six
+	// rows because a picture can be scaled from a world file as well as by picking, and a world map
+	// has no such file; Tom named five and five is what this has. What both must share is the shape
+	// a reader learns: the row that makes the thing is first and always live, and every row that
+	// acts on the thing is greyed until there is one.
+	const img = L.backdropRows();
+	ok('...under the same rule the background image submenu follows, which is the parallel asked for',
+		img[0].disabled !== true && img.slice(1).every(function (r) { return r.disabled === true; })
+			&& rows[rows.length - 1].label === PC0.lpn_map_attach_remove
+			&& img[img.length - 1].label === PC0.lpn_backdrop_remove,
+		img.map(function (r) { return r.label + '=' + !!r.disabled; }).join(' | '));
+}
+
+// ---- AND THE FOUR NEW ROWS CHANGE NOT ONE STORED BYTE EITHER -----------------------------------
+//
+// The byte-identity criterion at the top of this file is the whole acceptance test for this
+// feature, and the submenu added four more doors into the transform. Each is driven here, and the
+// saved project is compared after every one.
+L.mapgeoStart();
+L.mapgeoGoTo({ lat: 44.0, lon: 7.0 });
+L.mapgeoPlace();
+L.mapgeoFinish();
+const attached = JSON.stringify(L.xyGeoref());
+ok('a map is attached again, so the fine adjustments have something to adjust',
+	L.xyGeorefOk() === true);
+ok('ATTACHING AGAIN CHANGED NOT ONE STORED BYTE', snapshot() === before);
+{
+	// MOVE: step 2 on the placement already on file, never a fresh one. The old transform has to
+	// still be there -- a Move that threw the map back to 0 N 0 E would be a new placement wearing
+	// the word Move.
+	L.mapgeoAdjust('move');
+	ok('Move opens the wizard at step 2', L.mapgeoActive() === true && L.mapgeoStep() === 2);
+	ok('...on the placement that was already on file, not a fresh one',
+		JSON.stringify(L.xyGeoref()) === attached, L.xyGeoref() && JSON.stringify(L.xyGeoref()));
+	ok('...with the rectangle already round the drawing', !!L.mapgeoRectSrc());
+	L.mapgeoCancel();
+	ok('...and Cancel puts it back exactly', JSON.stringify(L.xyGeoref()) === attached);
+	L.mapgeoAdjust('scale');
+	ok('Scale by picking opens the same step 2, which is the same rectangle',
+		L.mapgeoStep() === 2 && JSON.stringify(L.xyGeoref()) === attached);
+	L.mapgeoCancel();
+	ok('MOVE AND SCALE BY PICKING CHANGED NOT ONE STORED BYTE', snapshot() === before);
+}
+{
+	// SCALE FROM THE CURRENT SIZE: a typed factor, applied at once, about the middle of the drawing.
+	// No wizard, so no Cancel -- the way back is the same number the other way, or Detach.
+	const t0 = L.xyGeoref(), mpu0 = t0.metersPerUnit;
+	const mid0 = G.lpnGeorefToLonLat(t0, midX, midY);
+	global.prompt = global.window.prompt = function () { return '2'; };
+	L.mapgeoScaleFrom();
+	let t2 = L.xyGeoref();
+	ok('Scale from the current size halves the ground under one drawing unit at a factor of two',
+		Math.abs(t2.metersPerUnit - mpu0 / 2) < 1e-9 * mpu0, t2.metersPerUnit);
+	const mid2 = G.lpnGeorefToLonLat(t2, midX, midY);
+	ok('...about the middle of the drawing, which does not move',
+		Math.abs(mid2.lat - mid0.lat) < 1e-9 && Math.abs(mid2.lon - mid0.lon) < 1e-9,
+		mid2.lat + ', ' + mid2.lon);
+	ok('...and it opens no wizard at all', L.mapgeoActive() === false);
+	ok('SCALE FROM THE CURRENT SIZE CHANGED NOT ONE STORED BYTE', snapshot() === before);
+	// A refusal is a refusal: nothing typed, nothing zero, nothing negative reaches the transform.
+	const kept = JSON.stringify(L.xyGeoref());
+	const notice = () => (byId.lpn_map_notice || {}).textContent;
+	let refused = 0;
+	['0', '-1', 'abc', ''].forEach(function (bad) {
+		global.prompt = global.window.prompt = function () { return bad; };
+		byId.lpn_map_notice.textContent = '';
+		L.mapgeoScaleFrom();
+		if (notice() === PC0.lpn_map_attach_scale_from_bad) { refused++; }
+	});
+	global.prompt = global.window.prompt = function () { return null; };
+	byId.lpn_map_notice.textContent = '';
+	L.mapgeoScaleFrom();
+	ok('...and a number it cannot use moves nothing, cancelling included',
+		JSON.stringify(L.xyGeoref()) === kept);
+	// **AND IT SAYS SO.** Asserting only that nothing moved would pass on a build that accepted the
+	// number and let mapgeoScaled() quietly hand the old transform back -- the reader would have
+	// typed an answer, watched nothing happen and been told nothing. Four bad answers, four
+	// refusals; and cancelling is not one of them, because nothing was asked.
+	ok('...each bad answer is refused out loud, and cancelling is not an error',
+		refused === 4 && notice() !== PC0.lpn_map_attach_scale_from_bad,
+		refused + ' refused, after cancel: ' + JSON.stringify(notice()));
+	global.prompt = global.window.prompt = function () { return '0.5'; };
+	L.mapgeoScaleFrom();
+	ok('...while the same factor the other way puts the size back',
+		Math.abs(L.xyGeoref().metersPerUnit - mpu0) < 1e-9 * mpu0);
+}
+// DETACH is the old Remove row under Tom's word, so the reversibility claim above still holds.
+L.removeMapAttach();
+ok('Detach takes the world map away', L.xyGeorefOk() === false);
+ok('DETACHING CHANGED NOT ONE STORED BYTE', snapshot() === before);
 
 if (MUTATE) {
 	console.log('');

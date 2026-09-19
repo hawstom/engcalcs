@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**29 still to read on master**, of 62 untranslated keys, of 1931 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**41 still to read on master**, of 71 untranslated keys, of 1940 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (62, 29 to read @@ NEEDS RULING)
+## lpn_  (71, 41 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -99,17 +99,26 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_library_import_units_line`**
   > {name}: this project shows {mine}, the file shows {theirs}.
   @@ NEEDS RULING
+- **`lpn_map_attach_add`**
+  > Attach
+  @@ NEEDS RULING
 - **`lpn_map_attach_done`**
-  > The world map is behind your drawing now, and your project is unchanged. Use Map, Remove the world map to take it away again.
+  > The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.
   @@ NEEDS RULING
 - **`lpn_map_attach_menu`**
-  > Custom georeference…
+  > World map…
   @@ NEEDS RULING
-- **`lpn_map_attach_place`**
-  > Attach the world map…
-  _Ruled OK 2026-09-17._
+- **`lpn_map_attach_move`**
+  > Move
+  @@ NEEDS RULING
+- **`lpn_map_attach_move_tip`**
+  > Slide the map under the drawing. Nothing in the drawing moves.
+  @@ NEEDS RULING
+- **`lpn_map_attach_none`**
+  > There is no world map attached to this project yet. Use Map, World map, Attach first.
+  @@ NEEDS RULING
 - **`lpn_map_attach_remove`**
-  > Remove the world map
+  > Detach
   @@ NEEDS RULING
 - **`lpn_map_attach_remove_tip`**
   > Take the world map away. The drawing and its coordinates are untouched either way.
@@ -117,14 +126,26 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_map_attach_removed`**
   > The world map is gone, and the drawing is exactly as it was.
   _Ruled OK 2026-09-17._
+- **`lpn_map_attach_scale`**
+  > Scale by picking
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from`**
+  > Scale from the current size…
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from_bad`**
+  > Type one number greater than zero.
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from_done`**
+  > The map is resized, and your drawing and every coordinate in it are exactly as they were.
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_from_prompt`**
+  > Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.
+  @@ NEEDS RULING
+- **`lpn_map_attach_scale_tip`**
+  > Drag a corner of the blue rectangle to resize the map, or the round handle to turn it.
+  @@ NEEDS RULING
 - **`lpn_map_attach_tip`**
   > Attach the world map to this project without changing it any other way.
-  _Ruled OK 2026-09-17._
-- **`lpn_map_attach_turn`**
-  > Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map
-  _Ruled 2026-09-17: Edited. Changed meaning. Please review carefully._
-- **`lpn_map_attach_where`**
-  > Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space
   _Ruled OK 2026-09-17._
 - **`lpn_mapgeo_cancelled`**
   > The world map is back where it was, and your drawing never moved.
@@ -137,6 +158,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_mapgeo_hint2`**
   > Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint_move`**
+  > Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint_scale`**
+  > Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
   @@ NEEDS RULING
 - **`lpn_mapgeo_intro`**
   > Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
@@ -218,7 +245,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**59 still to read**, of 112 new keys across 6 unmerged branch(es).
+**69 still to read**, of 117 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -229,14 +256,14 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-demands (`51c7cfec`) — 32 new, 12 to read @@ NEEDS RULING
+### feat/customer-demands (`a57ef624`) — 30 new, 18 to read @@ NEEDS RULING
 
 - **`lpn_customer_detached`**
-  > ⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.
-  _Ruled OK 2026-09-17._
+  > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
+  @@ NEEDS RULING
 - **`lpn_customer_detached_count`**
-  > {n} meters are no longer connected to a pipe. Their demand is not in the answers.
-  _Ruled OK 2026-09-17._
+  > {n} customers are no longer connected to a pipe. Their demand is not in the answers.
+  @@ NEEDS RULING
 - **`lpn_customer_fixed_head`**
   > ⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.
   _Ruled 2026-09-17: Can you clarify the case? Like a reservoir?_
@@ -250,23 +277,23 @@ build for that would be a gate nobody keeps. Refresh it with
   > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
   _Ruled OK 2026-09-17._
 - **`lpn_field_meter_count`**
-  > Services at this meter
-  _Ruled OK 2026-09-17._
+  > Services at this customer
+  @@ NEEDS RULING
 - **`lpn_field_meter_count_tip`**
-  > How many identical services this one meter stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.
-  _Ruled OK 2026-09-17._
+  > How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.
+  @@ NEEDS RULING
 - **`lpn_field_meter_demand`**
   > Demand per service
   _Ruled OK 2026-09-17._
 - **`lpn_field_meter_demand_tip`**
-  > What one service at this meter draws. With the count below at 1, this is the whole of it. An empty box is a meter you have not given a demand to yet, which is not the same as a meter that draws nothing.
-  _Ruled OK 2026-09-17._
+  > What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.
+  @@ NEEDS RULING
 - **`lpn_field_meter_lumped`**
   > Added to node
   _Ruled OK 2026-09-17._
 - **`lpn_field_meter_lumped_tip`**
-  > The node that this meter's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.
-  _Ruled 2026-09-17: Edited. This is strictly for accounting, not necessarily physical._
+  > The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.
+  @@ NEEDS RULING
 - **`lpn_field_meter_pipe`**
   > Connected asset
   _Ruled 2026-09-17: Edited. We want to allow connecting directly to a node._
@@ -274,7 +301,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The nearest asset is {id}. Type it here to serve this customer from it.
   @@ NEEDS RULING
 - **`lpn_field_meter_pipe_tip`**
-  > The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the circle on the pipe to move where along it the service connects.
+  > The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.
   @@ NEEDS RULING
 - **`lpn_field_meter_station`**
   > Station along the pipe (%)
@@ -289,46 +316,53 @@ build for that would be a gate nobody keeps. Refresh it with
   > The demand per service times the number of services. This is the number added to the junction named below.
   _Ruled OK 2026-09-17._
 - **`lpn_inp_export_flat_customers`**
-  > An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.
-  _Ruled OK 2026-09-17._
+  > An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.
+  @@ NEEDS RULING
 - **`lpn_meter_pick_pipe`**
-  > Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.
+  > Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.
   @@ NEEDS RULING
 - **`lpn_meter_pipe_unknown`**
-  > Nothing in this project is named {id}, so the meter was left where it was.
+  > Nothing in this project is named {id}, so the customer was left where it was.
   @@ NEEDS RULING
 - **`lpn_meter_placed`**
-  > Meter {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.
+  > Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.
   @@ NEEDS RULING
 - **`lpn_mode_add_meter`**
-  > Meter: click where the meter is, then click the pipe or the node that serves it. Escape leaves the tool.
+  > Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.
   @@ NEEDS RULING
 - **`lpn_node_customers`**
-  > Demand added here by meters
+  > Customer demands
   @@ NEEDS RULING
 - **`lpn_node_customers_sum`**
-  > Meters: {n}, demand: {total} {unit}
+  > {total} {unit} from {n} Customers
   @@ NEEDS RULING
 - **`lpn_node_customers_tip`**
-  > Every meter whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A meter is edited where it sits on the map or in the Customers table.
+  > Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.
   @@ NEEDS RULING
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
-- **`lpn_terrain_no_nodes`**
-  > There are no nodes to fill in yet.
-  @@ NEEDS RULING
-- **`lpn_terrain_none_needed`**
-  > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
-  @@ NEEDS RULING
 - **`lpn_tool_add_meter`**
-  > Meter
-  _Ruled OK 2026-09-17._
+  > Customer
+  @@ NEEDS RULING
 - **`lpn_tool_add_meter_tip`**
-  > Click where the meter is, then click the pipe or the node that serves it. The demand you give the meter is added to the junction at the near end of that pipe.
+  > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`84a527a1`) — adds no English strings
+### feat/label-gang-search (`104eb38d`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_settings_label_always`**
+  > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width`**
+  > Widest view that shows labels (map units)
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width_tip`**
+  > Labels are shown only while the view is narrower than this. Leave the box blank to always show them. A text object you added shows until the view is this much wider than its own size multiplier.
+  @@ NEEDS RULING
+- **`lpn_settings_label_use_view`**
+  > Use current view
+  @@ NEEDS RULING
 
 ### feat/lock-initials-later (`37f05c7e`) — 15 new, 3 to read @@ NEEDS RULING
 
@@ -378,7 +412,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/survey-import (`4bed8672`) — 63 new, 42 to read @@ NEEDS RULING
+### feat/survey-import (`f4ef6cde`) — 63 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_file_import_survey`**
   > Import surveyed points…
@@ -411,7 +445,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {n} tank(s) found. Proceed?
   @@ NEEDS RULING
 - **`lpn_survey_create`**
-  > Create junctions
+  > Create nodes
   @@ NEEDS RULING
 - **`lpn_survey_err_ambiguous_coord`**
   > More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.
@@ -462,7 +496,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Point name, northing, easting, elevation, description (PNEZD)
   @@ NEEDS RULING
 - **`lpn_survey_format_internal`**
-  > {format} specified internally
+  > specified internally
   @@ NEEDS RULING
 - **`lpn_survey_format_label`**
   > File format:
@@ -570,7 +604,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > meters
   _Ruled OK 2026-09-17._
 
-### feat/xy-world-map (`4be05921`) — adds no English strings
+### feat/xy-world-map (`68d112b9`) — 3 new, all ruled
+
+- **`lpn_map_attach_place`**
+  > Attach the world map…
+  _Ruled OK 2026-09-17._
+- **`lpn_map_attach_turn`**
+  > Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map
+  _Ruled 2026-09-17: Edited. Changed meaning. Please review carefully._
+- **`lpn_map_attach_where`**
+  > Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space
+  _Ruled OK 2026-09-17._
+
+### ida/esc-and-lock-identity (`b3c6bbd7`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 2 new, 2 to read @@ NEEDS RULING
 

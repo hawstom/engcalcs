@@ -2391,14 +2391,27 @@ $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
 // **THE WORLD MAP BEHIND A GRID DRAWING** (Task 646). Tom's own sentence is the tip, because the
 // point of these rows is that the project's own numbers are untouched, which is the whole of what
 // separates this from the placement wizard that converts a project.
-$ec_lang['lpn_map_attach_menu']='Custom georeference…';
+// **ONE ROW WITH A SUBMENU, BUILT TO MATCH Background image** (Tom, 2026-09-18: *"Change Map,
+// Custom georeference to Map, World map... (to be parallel with Background image). And can it have
+// a submenu with Attach (at top), Move, Scale by picking, Scale from the current size..., Detach,
+// similar to the Background map submenu."*). The two rows this replaces named the WIZARD and named
+// the UNDOING of it, which is a pair of commands rather than a thing; a picture behind the drawing
+// and a map behind the drawing are the same kind of thing to a reader, so they read the same way.
+$ec_lang['lpn_map_attach_menu']='World map…';
 $ec_lang['lpn_map_attach_tip']='Attach the world map to this project without changing it any other way.';
-$ec_lang['lpn_map_attach_place']='Attach the world map…';
-$ec_lang['lpn_map_attach_remove']='Remove the world map';
+$ec_lang['lpn_map_attach_add']='Attach';
+$ec_lang['lpn_map_attach_move']='Move';
+$ec_lang['lpn_map_attach_move_tip']='Slide the map under the drawing. Nothing in the drawing moves.';
+$ec_lang['lpn_map_attach_scale']='Scale by picking';
+$ec_lang['lpn_map_attach_scale_tip']='Drag a corner of the blue rectangle to resize the map, or the round handle to turn it.';
+$ec_lang['lpn_map_attach_scale_from']='Scale from the current size…';
+$ec_lang['lpn_map_attach_scale_from_prompt']='Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.';
+$ec_lang['lpn_map_attach_scale_from_bad']='Type one number greater than zero.';
+$ec_lang['lpn_map_attach_scale_from_done']='The map is resized, and your drawing and every coordinate in it are exactly as they were.';
+$ec_lang['lpn_map_attach_none']='There is no world map attached to this project yet. Use Map, World map, Attach first.';
+$ec_lang['lpn_map_attach_remove']='Detach';
 $ec_lang['lpn_map_attach_remove_tip']='Take the world map away. The drawing and its coordinates are untouched either way.';
-$ec_lang['lpn_map_attach_where']='Latitude and longitude of the middle of your drawing, in that order, separated by a comma or a space';
-$ec_lang['lpn_map_attach_turn']='Map rotation in degrees, counterclockwise, where 0 puts north toward the top of the map';
-$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and your project is unchanged. Use Map, Remove the world map to take it away again.';
+$ec_lang['lpn_map_attach_done']='The world map is behind your drawing now, and your project is unchanged. Use Map, World map, Detach to take it away again.';
 $ec_lang['lpn_map_attach_removed']='The world map is gone, and the drawing is exactly as it was.';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
@@ -2410,6 +2423,8 @@ $ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
 $ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';
 $ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.';
 $ec_lang['lpn_mapgeo_hint2']='Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_hint_move']='Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_hint_scale']='Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
 $ec_lang['lpn_mapgeo_place']='Place approximately';
 $ec_lang['lpn_mapgeo_finish']='Georeference here';
 $ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';
