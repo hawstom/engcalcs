@@ -214,12 +214,19 @@ anything else → false.
 
 ### Specialist agents (`.claude/agents/`, journals in `dev/agents/`)
 
-Persistent agents with a library, a journal and a research programme. **Four seats are filled:**
+Persistent agents with a library, a journal and a research programme. **Six seats are filled:**
 `utility-planning-engineer` (2026-08-24, the design-and-planning engineer inside a water utility --
 Tom: *"Scale is my big and first blind spot... I have designed many Elm Street Center projects, but
 no Novatos."*), `utility-field-operator` (2026-08-25, the map read on a phone in the street),
 `market-researcher` and `data-entry-clerk` (both 2026-09-04 -- the world outside this repository,
-and entry at volume by keyboard). **An agent must carry something this repo does not
+and entry at volume by keyboard), `interface-designer` (2026-09-09, Ida -- visual hierarchy and the
+frame around the content), and **`pre-reviewer` (2026-09-19, on Tom's own ask: *"I just want
+independent review, not self-review, of all work before I see it"*). It runs on every branch after
+the build agent reports and BEFORE Tom is told the branch is ready, and it REPORTS rather than
+fixes** -- a reviewer who repairs the work becomes its author and stops being independent. The two
+failures it was made from are in its journal, both from the day it was hired, and both the same
+shape: an agent verifying that it had done what it set out to do rather than that the result was
+what was asked for. **An agent must carry something this repo does not
 already have** -- external evidence, or a vantage point nobody occupies; an agent briefed from our
 own prose is an echo chamber in a second voice. Roster, the provenance rules, and the seats named
 but not filled: `dev/agents/README.md`. **Each agent keeps its own ranked wish list** — its
