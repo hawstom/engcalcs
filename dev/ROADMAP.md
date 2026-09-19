@@ -276,7 +276,8 @@ the block.
     two this page has outside a text field.
   - Paste itself works, which is what makes this a sharp edge rather than a gap.
 
-- 50|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+- 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+  **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
   project we should be working on in the roadmap if not on a branch."* He is right that it is not
   tracked: Task 186 is the tables interface and Task 610 is paste that CREATES rows, and neither is
@@ -439,6 +440,35 @@ the block.
     file before drafting a word of it, and expect the completeness question (never a completeness
     claim against EPANET) to be the first one asked.
   - At 50 because he framed it as A/B testing rather than as next. Promoting it is his call.
+
+- 100|698| **Ask for initials once per browser, keep them, and name the holder.**
+  Tom, 2026-09-18, **correcting a decision this repository had recorded wrong**: *"I guess there was
+  a misunderstanding. What was always undesirable was (1) being asked to provide your initials the
+  first time you save, because that could be confused for a registration request and (2) being asked
+  to provide your initials every time because that's rude. It was never desirable to avoid saving
+  the initials or to keep prompting. In other words, you interpreted and recorded the decision wrong
+  when you wrote 'sent, never stored -- that is the whole point.' That doesn't avoid a login feeling.
+  Removing the prompt avoids it. So I say yes to storing User B initials and using them when they
+  take the role of User A."*
+  - **THE OBJECTION WAS ALWAYS TO THE PROMPT, NEVER TO THE STORAGE**, and the two were conflated in
+    `js/looped-network.js` as a rule. **Not storing them meant prompting every time, which is the
+    second thing he called undesirable** -- so the misrecording did not merely mis-describe the
+    decision, it built the opposite of it.
+  - **SO: ask once per browser, keep the answer, and use it when this browser HOLDS a file** -- the
+    colleague who finds a file locked is told who has it rather than "somebody". That recovers, in
+    his words, *"some (just a little) of our old functionality where we can say A has this file
+    open."*
+  - **THE WRONG-NAME ANSWER IS HIS OWN and it must ship with the storage, not after it:** *"When we
+    stop a user B from opening a file, and when we ask a user A to close a file, we can say, 'We have
+    you listed as ABC. If that's wrong, you can change it.'"* A confidently wrong name on a
+    break-the-lock dialog is worse than an honest "somebody", and Ida noted the live site already has
+    this problem -- it asks once, ever, and reuses the answer with no re-check.
+  - **NO NEW CONSENT QUESTION AND NO BANNER REWRITE** (Ida, 2026-09-18, with the reasoning rather
+    than the assertion): this is user-input storage for a feature the person is actively using, which
+    is the same exemption the suite already applies to a name plus an anonymous token. Read
+    `dev/cookie-storage-inventory.md` before adding a key, and add it there.
+  - Belongs on `feat/lock-initials-later`, whose one-paragraph panel and button order Tom has
+    already approved and which must not change.
 
 - 100|686| **The progress bar finishes before the work does.**
   Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
@@ -883,7 +913,7 @@ the block.
     29 keys reaching the tip helpers' `title=""` were unbound by rule B.
   - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 
-- 75|539| **Gang the neighbour labels so their leaders stop crossing.**
+- 100|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
   `feat/label-gang-search`, port 8090, and **he has notes on it he has not yet been able to
   write up** -- so the branch waits on his reading, not on more building.
@@ -981,11 +1011,11 @@ the block.
   the box is rebuilt under an open dropdown, so the control reads as broken rather than as slow --
   `refreshLabelText()` has 40 call sites and coalescing it into a frame is the shape of the fix.
 
-- 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
+- 50|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
 
-- 75|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
+- 50|498| **A public roadmap, with epanet-js's Canny board as the worked example.**
   Tom, 2026-08-23: epanet-js runs one at `roadmap.epanetjs.com`, powered by Canny. Noted as an
   example to weigh, not a decision. The thing to weigh is that `dev/ROADMAP.md` is written for us and
   says things a public board should not (measured costs, what Tom is not proud of, who to ask), so a
@@ -1001,7 +1031,10 @@ the block.
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
 
-- 75|608| **[H] The engine's 664 KB is no longer opt-in, and somebody pays for it.**
+- 100|608| **Fetch the engine before somebody's first solve needs it.**
+  **RAISED TO 100 AND THE [H] TAG REMOVED BY TOM, 2026-09-18: *"I see no human tasks pending.
+  Reframe this and raise to 100."*** He is right -- the decision this was waiting on is already
+  made in the block below, and what remains is building.
   Task 605 made EPANET the default, so a first-time visitor now fetches `js/vendor/epanet-js.js`
   on their FIRST SOLVE rather than on opting in. **A blanket precache is the wrong answer and that
   half is settled**: it moves the cost to service-worker install, paid by every visitor to all
@@ -1029,13 +1062,11 @@ the block.
     it says the page is not frozen, which is the thing a wait most needs to say and the thing a bare
     spinner cannot. The `[H]` stands on the connection-aware prefetch, which he has not ruled on.
 
-- 75|612| **[H] Screenshot 0082 is the centerpiece of any lpn display.**
-  Tom, 2026-09-08, having replaced it: *"I consider my replacement to be the quintessential
-  expression of the state of this project. I would consider it the current centerpiece of any
-  display about lpn."* The file is not in `dev/screenshots/` yet (the folder ends at 0081); once it
-  lands, it leads `dev/screenshots/INDEX.md`, the landing page's screenshots, and the social card.
-
-- 75|617| **A basemap the reader can tone down, and a menu of tile styles.**
+- 75|617| **More map view options, the opacity one having shipped.**
+  **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
+  tone down'. That is already provided by Settings background opacity. Focus the task on other map
+  view options."*** Half of what this asked for exists; what is left is the menu of tile styles and
+  whatever else belongs beside it.
   Tom, 2026-09-09: *"Let's make a task to play with some additional selectors for the user including
   some that are understated such as you suggest. FWIW, we are non-commercial."* Full costing of every
   route, with named services and their terms: `dev/basemap-styling-options.md`.
@@ -1058,7 +1089,13 @@ the block.
     `vendor_integrity_check.php`, and a second canvas with its own projection state fighting the one
     opinion about Mercator that `js/looped-network.js` owns.
 
-- 75|623| **[H] File loss judged only by people whose files are throwaway.**
+- 75|623| **File loss judged only by people whose files are throwaway.**
+  **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
+  right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING
+  BIAS with no next step written down.** The one actionable thing in it, stated plainly: **nobody
+  who has tested this page has had anything to lose.** So the ask is a test by somebody with a real
+  file -- his own EWB work is the nearest candidate -- and until that happens there is nothing to
+  build. If that reads as not worth keeping, remove it; it is a reminder, not a task.
   Tom, 2026-09-10, after a reload appeared to break the project he had open: *"I am merely testing
   examples. But I also am trying to take file loss seriously in a way that I had not sufficiently
   done previously ... I have been oblivious to file loss because everything is throwaway."*
@@ -1091,34 +1128,13 @@ the block.
     read-only console paste that answers the scenario list in one go -- run it on the next
     specimen BEFORE closing the tab.
 
-- 75|624| **[H] The scale fallbacks turn any missed publish into a flooded canvas.**
-  Tom, 2026-09-10, with a screenshot: an all-blue map after opening the geographic Net3 example
-  beside an existing project. **NOT REPRODUCIBLE by either of us**, and a repro seeded with his own
-  exported `localStorage` (both projects, `openId` on the 35 KB Net3) came back GREEN on HEAD --
-  2.8% map ink against the ~44% the failure paints, every scale property published. So there is no
-  bad commit to bisect to; the window `88b750a0` narrowed on 2026-09-09 is still open, narrower.
-  - **THE MECHANISM IS KNOWN AND WRITTEN DOWN** (`dev/browser-pass/specs/mapscale.js`): every stroke
-    is screen pixels divided by `state.s` and handed to CSS as a custom property in WORLD units.
-    Miss the publish and CSS falls back to `var(--lpn-lw, 0.7)` and `var(--lpn-sym, 1)`, **which are
-    world units too** -- 4,535 px of pipe and a 77,745 px grab band at the Net3's 6,479 px per
-    degree. `--lpn-map-ink` is `#1a6faf`, and that is the blue in his screenshot: the flood is the
-    PIPES.
-  - **THE AMPLIFIER IS GONE, 2026-09-10, on Tom's approval.** All five scale fallbacks in
-    `css/engcalcs.css` now read 0 -- `--lpn-sym` (19 sites), `--lpn-lw` (5), `--lpn-hit`,
-    `--lpn-hit-coarse`, `--lpn-hair` -- joining `--lpn-nhit`, `--lpn-symhit` and
-    `--lpn-symhit-coarse`, which already did and are why the principle was not new. A missed publish
-    now draws a pipe too thin to see instead of a page that looks destroyed. **There is no value that
-    is both visible at 1 px per unit and harmless at 6,479, so do not restore a number**; the reason
-    is written at the site. Invisible on the happy path: pipe still 6.000 px, ink 3.6%, 101/101
-    across `mapscale`, `geo` and `color`. **The RACE is untouched and still unreproduced.**
-  - **A RACE NEEDS A RACE TEST.** Rebuild the repro as a spec that throttles the CPU (CDP
-    `Emulation.setCPUThrottlingRate`) so first paint can beat `publishScaleSizes()`; without one,
-    this stays unreproducible and the guard only ever measures the happy path.
-  - **A 2026-09-10 BLANK MAP WAS FILED HERE AND WAS NOT THIS** -- 677 symbols drawn, healthy
-    strokes, a corrupted `view` (Task 628). The misfile was natural, since this task PREDICTED a
-    blank map as its own face. **A missed publish cannot move a camera:** check `view` first.
-
-- 75|625| **[H] BUILT: the app page divorced from EngCalcs chrome. Remainder below.**
+- 50|625| **The app page divorce: what is left is one unanswered question.**
+  **TOM, 2026-09-18: *"I don't see anything actionable."* Correct -- the build shipped on 2026-09-11
+  and this row has been carrying its own history rather than a next step.** Dropped to 50 and the
+  [H] struck. **The only thing genuinely open is whether the app page should carry any link back to
+  the suite's other calculators**, which nobody has asked him and which costs nothing to leave as it
+  is. Everything else here is the record of a finished job and belongs in the closed ledger the day
+  he says so.
   **SHIPPED AND DEPLOYED 2026-09-11.** `echoHeader("EngCalcsApp", ...)` suppresses the suite navbar
   and the H1/welcome block, keeping the CSS and JS. **NO H1 at all**, on Tom's ruling
   (*"app.epanetjs.com has no h1 ... this is not a storefront page"*, verified). Install and the
@@ -1141,7 +1157,10 @@ the block.
   - Measurements behind all of it: `dev/chrome-audit.md`,
     `dev/app-chrome-postdivorce-recommendations.md`, `dev/help-menu-mastermind.md`.
 
-- 75|626| **A refused beacon is retried like an offline one, 20 times.**
+- 100|626| **A refused beacon is retried like an offline one, 20 times.**
+  **TOM, 2026-09-18: *"This is all CC. Do something about it or remove it."*** Raised to 100 and it
+  is a defect with a one-line fix, not a question: a 4xx means the server READ the payload and
+  refused it, so re-sending the same bytes 20 times cannot succeed and only the retry count ends it.
   `EngCalcs._sendOrQueue()` (`js/Calculators.lib.js`) queues on `!resp.ok` as well as on a thrown
   fetch. A 4xx is not a connectivity failure -- the server read the payload and refused it -- and
   the flush re-sends `record.params` VERBATIM, so the retry is byte-identical and so is the
@@ -1162,36 +1181,6 @@ the block.
     `echoCookieScript()` nor `echoPageNameScript()` still sends an empty name. **That set is
     enumerable and nothing enumerates it** -- a check is the right shape.
 
-- 75|630| **[H] The map shows lat/lon as xy, and that is the problem.**
-  Tom, 2026-09-11, testing at high latitude: *"We don't treat them as xy for length calculations.
-  But we show them as xy. And that's a problem."* Meridians are drawn parallel where on the ground
-  they converge, so a screen rectangle is not a ground rectangle and a true ground square draws as
-  a donut segment. **`sec φ - 1` is 19.8% at Phoenix and 100% at 60N** -- about 150x the
-  ellipsoidal effect the mathematics report found, which is a different phenomenon and must not be
-  offered as an answer to this one.
-  - **THE DECISION RECORD IS `dev/map-projection-decision.md`**, including his own architecture --
-    store easting/northing in a stated CRS, let the drawing frame BE that plane, and need the
-    projection only when talking to tiles and the geocoder -- and the one question that sizes the
-    work: proj4js or UTM alone. Measurements: `dev/map-coordinate-review.md` and
-    `dev/map-coordinate-mathematics.md`.
-  - **A SCALE BAR IS A MITIGATION, NOT THE FIX**, and he corrected me when I said otherwise: it
-    makes one number honest at one latitude while the scale varies down the view. Rank it below
-    projections.
-  - Corrections the mathematics found, each with its own line in that report: the Sterbenz comment
-    (wrong twice over), `maxScale()` unclamped by extent (28 px of float32 drift at scope),
-    `geo-precision-harness`'s exactness claim (true in Novato, false in Nairobi), and `lenAuto`
-    being a PLAN length that does not say so (1.12% at 15% grade).
-
-- 75|634| **Re-shoot the everything-at-once frame; it is the front page's lead.**
-  `dev/screenshots/0082.PNG` is published as the LibreWaterNet lead image and as Plate 1 of
-  screenshots.html, on Tom's instruction 2026-09-12: *"This quintessence of what we've built is
-  still not implemented after multiple reminders from me. Do it. Feature it prominently."* It is
-  the right picture and it is older than the software in two visible ways, both fixed by one
-  capture: it carries the **EngCalcs navbar the divorce deleted** (Task 625), which is the one
-  thing this site is not supposed to advertise, and its **Libraries box has no Fittings section**,
-  which Tom spotted himself. Drop the new frame in as `0082` and nothing else changes: the file
-  name, the dimensions, the alt text and both captions already fit.
-
 - 75|635| **A Zoom to button on the Properties box.**
   Tom, 2026-09-12. Zooms the map to this element. **Use the My Location / Use Location icon**
   (a circle with quadrant ticks pointing mostly inward) -- which `lib/Icons.lib.php` does not have:
@@ -1205,21 +1194,6 @@ the block.
   values CSV, spreadsheet ODS. It may carry a time-range selector. Shape and the two unknowns
   (PDF and ODS are formats this suite has never written): `dev/graphs-scope.md`. Task 640 is the
   menu this belongs to and Task 599 is the plot itself.
-
-- 75|642| **Retire the Windows WSL2 IP script and its scheduled task.**
-  Tom, 2026-09-13, after the branch previews came up: *"If this works for a while, I delete the
-  Windows Task Scheduler and script."* `C:\TGHFiles\Update-WSL2-IP.ps1` runs elevated at logon to
-  rewrite a hosts line and point a netsh port proxy at whatever address WSL currently has. **Browsing
-  from inside WSL needs none of it** -- Apache is on the same host as the browser, so there is no
-  proxy to keep pointed and no address that moves.
-  - **GATED ON LIVING WITH IT, not on a date.** It is his machine's only route to `hawsedc.local` and
-    `librewaternet.local` from a WINDOWS browser, and those are still how he checks appearance --
-    WSLg renders with Linux font stacks and his users are on Windows. Deleting it early costs him the
-    truer view of his own site.
-  - What goes when it goes: the Task Scheduler entry, the script, and the `$hostnames` list it
-    maintains. What must be checked FIRST: whether anything else on that machine reaches WSL by those
-    names. `dev/local-preview.md` does not exist yet and the arrangement is recorded only in this
-    session and in `~/webdev/worktrees/_panel/`; write it down before deleting the thing it replaces.
 
 - 75|643| **The camel behind grid-to-ground: slope distance and a length adjustment.**
   Tom, 2026-09-13, answering the projection brief's question about grid versus ground length:

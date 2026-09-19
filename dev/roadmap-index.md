@@ -7,40 +7,34 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**107 open tasks.** Next (100): 10 · Soon (75): 31 · Someday (50): 37 · Maybe (25): 11 · Parked (5): 18
+**103 open tasks.** Next (100): 15 · Soon (75): 20 · Someday (50): 39 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (10)
+## 100 — Next (15)
 
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
+- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 592 — [AI] · Read a surveyed point list: junctions from a CSV or GPX file.
+- Task 608 — Fetch the engine before somebody's first solve needs it.
 - Task 611 — Import a library (pipe types, fittings, curves) from another project file.
+- Task 626 — A refused beacon is retried like an offline one, 20 times.
 - Task 646 — Attach the world map to an XY project without changing the project.
 - Task 669 — Show labels at this zoom or closer.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 686 — The progress bar finishes before the work does.
+- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - ! Task 692 — Satellite view is refused on a projected project, and it is the DEM bug again.
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
+- Task 698 — Ask for initials once per browser, keep them, and name the holder.
 
-## 75 — Soon (31)
+## 75 — Soon (20)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
-- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
-- Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
-- Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
-- ! Task 608 — [H] · The engine's 664 KB is no longer opt-in, and somebody pays for it.
-- Task 612 — [H] · Screenshot 0082 is the centerpiece of any lpn display.
-- ! Task 617 — A basemap the reader can tone down, and a menu of tile styles.
-- Task 623 — [H] · File loss judged only by people whose files are throwaway.
-- Task 624 — [H] · The scale fallbacks turn any missed publish into a flooded canvas.
-- Task 625 — [H] · BUILT: the app page divorced from EngCalcs chrome. Remainder below.
-- Task 626 — A refused beacon is retried like an offline one, 20 times.
-- Task 630 — [H] · The map shows lat/lon as xy, and that is the problem.
-- Task 634 — Re-shoot the everything-at-once frame; it is the front page's lead.
+- Task 617 — More map view options, the opacity one having shipped.
+- Task 623 — File loss judged only by people whose files are throwaway.
 - Task 635 — A Zoom to button on the Properties box.
 - Task 637 — A Graph button on the Properties box.
-- Task 642 — Retire the Windows WSL2 IP script and its scheduled task.
 - Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
@@ -56,7 +50,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 691 — Banner messages are annoying, and one of them is a trap.
 - Task 693 — "Length and map coordinates" is a lie on an EPSG project.
 
-## 50 — Someday (37)
+## 50 — Someday (39)
 
 - ! Task 146.09 — A key map: the whole project as a thumbnail, with a box round where you are.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -68,6 +62,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 283 — Map label legibility: what remains is the AUTO-HIDE rule.
 - Task 285 — We do not know what devices anybody uses this on.
+- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
+- Task 498 — A public roadmap, with epanet-js's Canny board as the worked example.
 - Task 544 — [H] · epanet-js is implicitly claiming to be EPANET, and we have now decided.
 - Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
 - Task 601 — Calibration files: measured field data, against the model that predicts it.
@@ -76,6 +72,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 614 — The sewer-slope cluster is the largest demand we do not convert.
 - Task 620 — [H] · A changed icon never reaches a returning visitor.
 - Task 622 — [H] · A refused terrain lookup is reported as an unreachable one.
+- Task 625 — The app page divorce: what is left is one unanswered question.
 - Task 629 — [H] · GUARDED: a geographic project opening on the XY default view, in pixels.
 - Task 631 — Four things Tom hit while testing, none of them urgent.
 - Task 632 — Animation speed control for the transport.
@@ -91,7 +88,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
 - Task 675 — A labelled grid, with the significant digits picked out.
 - Task 683 — The wheel zoom increment, snapping having been ruled out.
-- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - Task 694 — Export a map animation as an animated picture.
 - Task 695 — The daily status mail has columns with no headings.
 - Task 697 — EPANET++ as a competing front door, on its own two domains.
@@ -135,5 +131,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-98 of 107 titles are within 4–12 words. `!` marks the rest;
+96 of 103 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
