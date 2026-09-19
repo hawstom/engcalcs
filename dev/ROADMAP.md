@@ -935,28 +935,6 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|592| **[AI] Read a surveyed point list: junctions from a CSV or GPX file.**
-  **Promoted from the market researcher's wish list, 2026-09-06, ranked first there** (its journal
-  and `dev/agents/market-researcher/wishlist.md` §1 hold the citation and the honest size).
-  **RAISED TO 75 by Tom the same day**: *"I am excited about this contribution of Market
-  Researcher."* The line that said nobody had asked for it is superseded -- he has. It is also the
-  row the `data-entry-clerk` moved ABOVE its own item 2 against its earlier ranking, reached from a
-  different direction: a mapped file import removes the per-row round trip entirely rather than
-  shortening it, which is what "400 pipes from a marked-up plan set" actually needs.
-  - **The evidence is a paper trail rather than an inference.** A field survey -- the actual input
-    method for the EWB chapters and Peace Corps volunteers this suite most resembles -- produces a
-    flat list of id, latitude and longitude, never an `.inp`. EPANET has no path for it either, and
-    the researcher found independent Open Water Analytics and Eng-Tips threads asking how, each
-    answered with an ad hoc workaround.
-  - **The hard parts are built.** Geographic projects already store longitude and latitude and
-    already derive their own frame (`dev/geographic-projects.md`); what is missing is one column
-    mapping step and one batch of junctions created at their surveyed coordinates. It belongs
-    behind the `Settings > New assets` door Task 542 already opened rather than a new one, and the
-    coordinate order rule applies on both sides: the FILE is read as whatever its header says, the
-    person reads lat,lon.
-  - **The one design question is the same one the `.inp` importer already answered:** a row that
-    cannot be honoured is reported, never dropped and never guessed at.
-
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
   file, then import anything that is not a name conflict, that probably would be all that's needed."*
