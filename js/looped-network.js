@@ -195,6 +195,66 @@ var EngCalcs = EngCalcs || {};
 		if (which === 'diag') { return Math.hypot(w, h); }
 		return Math.max(w, h);   // 'max' -- available, named, and no longer the house style
 	}
+	// **THE LABELING THRESHOLD HAS A DEFAULT, AND IT IS SCALE-FREE** (Task 669, Tom 2026-09-18:
+	// *"Widest view: Good. Now we need a default. How about when text height is larger than twice
+	// the median link length? That's conservatively large, I think, but it gives us an upper
+	// limit."*). His own proposal, implemented as he stated it.
+	//
+	// It has to be derived rather than typed because no number is meaningful across a 300 m site and
+	// a 300 km system, which is why the control shipped with no default at all and only a capture
+	// button. The median link length is the one quantity that says how big this network is in its
+	// own units, it is cheap, and it barely moves when a pipe is added.
+	//
+	// **THE ARITHMETIC, because the two sides are in different units.** Lettering is drawn in SCREEN
+	// pixels, so its height in MAP units is `textSize / s` and grows as the view widens. The
+	// threshold is compared against `mapSpan('min')`, which is `minPx / s`. Setting
+	// `textSize / s = 2 x medianLink` and eliminating `s`:
+	//
+	//     labelMaxWidth = 2 x medianLink x minPx / textSize
+	//
+	// so the answer is a map width in model units, exactly what the box holds, and the scale cancels
+	// out -- reading it at one zoom gives the same number as reading it at another.
+	//
+	// **IT IS AN UPPER LIMIT AND NOT A WORKING SETTING, which is what he said it was.** Measured
+	// 2026-09-18 on Net3-World at 1400x900: the label box is 0.61 of the median link length at the
+	// fit zoom, so this does not trip until about 3.3x further out than the view that frames the
+	// whole network. Somebody who wants labels to thin out sooner still presses Use current view.
+	// **SAMPLED, NOT CACHED, AND THE CACHE IS WHAT WENT WRONG FIRST.** This is read on every zoom
+	// step, so measuring every pipe each time is a real cost on a large network -- but a cached
+	// answer keyed on anything cheap is a STALE one the first time the key misses a change, and it
+	// did: keyed on the link COUNT it survived a project switch and a rebuild, and
+	// `switch-keep-harness.js` found 119 of 216 labels laid out from the previous document's
+	// threshold. A stale threshold is invisible, because the number it produces is always plausible.
+	//
+	// So the work is bounded instead of remembered: at most SAMPLE pipes, taken at an even stride
+	// through the list, which is exact for every network smaller than that and a very good estimate
+	// of the median above it. This is an upper limit against a drawing that is nothing but
+	// lettering, not a working setting, so an estimate is the honest shape for it.
+	var LPN_LABEL_AUTO_SAMPLE = 512;
+	function defaultLabelMaxWidth() {
+		var minPx = Math.min(svg && svg.clientWidth ? svg.clientWidth : 0,
+				svg && svg.clientHeight ? svg.clientHeight : 0),
+			fs = +settings.textSize, n = doc && doc.links ? doc.links.length : 0,
+			step = n > LPN_LABEL_AUTO_SAMPLE ? Math.ceil(n / LPN_LABEL_AUTO_SAMPLE) : 1,
+			lens = [], i, p;
+		if (!(minPx > 0) || !(fs > 0) || !n) { return 0; }
+		for (i = 0; i < n; i += step) {
+			p = Geom.polylineLength(linkPointList(doc.links[i]));   // DRAWN length, the threshold's own units
+			if (p > 0 && isFinite(p)) { lens.push(p); }
+		}
+		if (!lens.length) { return 0; }
+		lens.sort(function (a, b) { return a - b; });
+		return 2 * lens[Math.floor(lens.length / 2)] * minPx / fs;
+	}
+	// The threshold in force: the stored number when the project states one, the derived default
+	// when it has never been asked. **A STORED ZERO IS AN ANSWER AND NOT AN ABSENCE** -- it is what
+	// an empty box writes, and it means always show labels, which is why the two cannot be the same
+	// value. Anything at or below zero is that answer.
+	function labelMaxWidthInForce() {
+		var lim = settings.labelMaxWidth;
+		if (typeof lim === 'number' && isFinite(lim)) { return lim > 0 ? lim : 0; }
+		return defaultLabelMaxWidth();
+	}
 	function labelRepeatSpacing() {
 		// MIN, the house standard: a wide, short window repeats labels a little more often, measured
 		// against the dimension that runs out first.
@@ -5269,11 +5329,15 @@ var EngCalcs = EngCalcs || {};
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
 			// **THE LABELING THRESHOLD** (Task 669, restored 2026-09-18). Generated labels are drawn
-			// only while the visible map is at most this many LENGTH UNITS across. null = always
-			// draw, which is the right default because no single number is meaningful across
-			// networks 400 ft and 40 miles wide -- the Settings row captures it from the current
-			// view rather than asking anyone to guess one. See applyLabelVisibility() for why it
-			// came back after being removed.
+			// only while the visible map is at most this many LENGTH UNITS across.
+			//
+			// **null MEANS NEVER ASKED, AND IT IS NOT THE SAME AS 0.** No single number is
+			// meaningful across networks 400 ft and 40 miles wide, so the number cannot be typed
+			// here -- it is DERIVED from the drawing by defaultLabelMaxWidth(), the view at which
+			// the lettering grows taller than twice the median pipe length (Tom's own proposal,
+			// 2026-09-18). A stored 0 is the user's own answer "always show labels", which is what
+			// clearing the box writes. labelMaxWidthInForce() is the one place the two are told
+			// apart. See applyLabelVisibility() for why the threshold came back after being removed.
 			labelMaxWidth: null,
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -9003,12 +9067,12 @@ var EngCalcs = EngCalcs || {};
 	// for the scale being TESTED, or the fit reserves room for labels that will not be there.
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
-			lim = settings.labelMaxWidth,
+			lim = labelMaxWidthInForce(),
 			// The same MIN question the threshold itself asks (see mapSpan()), but asked about the
 			// scale being considered rather than the one in force.
 			mapW = Math.min(svg && svg.clientWidth ? svg.clientWidth : 0,
 				svg && svg.clientHeight ? svg.clientHeight : 0) / (atScale || 1),
-			ignoreDataLabels = !!modelOnly || (typeof lim === 'number' && lim > 0 && mapW > lim);
+			ignoreDataLabels = !!modelOnly || (lim > 0 && mapW > lim);
 		function boxFor(x, y, bx, by, bw, bh) {
 			fitItem(out, x, y, (x - bx) * sc, (bx + bw - x) * sc, (y - by) * sc, (by + bh - y) * sc);
 		}
@@ -31027,8 +31091,8 @@ var EngCalcs = EngCalcs || {};
 	function applyLabelVisibility() {
 		// MIN: "how much can I see" is answered by the dimension that runs out first, and the
 		// control's own wording matches it. See mapSpan().
-		var lim = settings.labelMaxWidth,
-			limOn = typeof lim === 'number' && lim > 0,
+		var lim = labelMaxWidthInForce(),
+			limOn = lim > 0,
 			vw = limOn ? mapSpan('min') : 0;
 		// Recorded, not just applied. The zoom path needs to KNOW whether generated annotation is on
 		// screen rather than merely being styled by it, so it can skip the whole label pipeline when
@@ -31929,16 +31993,32 @@ var EngCalcs = EngCalcs || {};
 		var lmwInput = document.createElement('input');
 		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
 		// THE ONE BOX IN THE BOX THAT IS WIDER THAN THE NUMBER IT HOLDS, and its PLACEHOLDER is the
-		// reason: blank means "always show labels", and that sentence is the only place the rule is
-		// written on screen. It still starts at the control column's left edge like every other
-		// control, so the column is unbroken -- see --lpn-set-num in css/engcalcs.css.
+		// reason: an empty box has to say what it means, and that sentence is the only place the
+		// rule is written on screen. It still starts at the control column's left edge like every
+		// other control, so the column is unbroken -- see --lpn-set-num in css/engcalcs.css.
+		//
+		// **EMPTY MEANS TWO DIFFERENT THINGS AND THE PLACEHOLDER IS WHICH ONE** (Task 669,
+		// 2026-09-18). A project that has never been asked takes the automatic threshold
+		// (defaultLabelMaxWidth()), and the placeholder prints the number so it is not a secret; a
+		// project whose box the user has CLEARED shows labels at every zoom, and stores 0 to say so.
+		// Both render as an empty box, because both are "no number of mine here" -- what separates
+		// them is an answer given, and Restore defaults is the way back to the automatic one.
 		lmwInput.style.width = '7em';
-		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
-		lmwInput.value = settings.labelMaxWidth === null || settings.labelMaxWidth === undefined ? '' : settings.labelMaxWidth;
+		function lmwSyncPlaceholder() {
+			var stated = typeof settings.labelMaxWidth === 'number' && isFinite(settings.labelMaxWidth);
+			lmwInput.placeholder = stated
+				? (pc.lpn_settings_label_always || 'Always show labels')
+				: (pc.lpn_settings_label_auto || 'Automatic: {width}')
+					.replace('{width}', String(ceilToPrecision(defaultLabelMaxWidth(), 3)));
+		}
+		lmwInput.value = typeof settings.labelMaxWidth === 'number' && settings.labelMaxWidth > 0
+			? settings.labelMaxWidth : '';
+		lmwSyncPlaceholder();
 		lmwInput.addEventListener('change', function () {
 			var v = lmwInput.value.trim();
-			settings.labelMaxWidth = (v === '' || !(+v > 0)) ? null : +v;
-			if (settings.labelMaxWidth === null) { lmwInput.value = ''; }
+			settings.labelMaxWidth = (v === '' || !(+v > 0)) ? 0 : +v;
+			if (!settings.labelMaxWidth) { lmwInput.value = ''; }
+			lmwSyncPlaceholder();
 			refreshLabelSuppression(); saveToStorage();
 		});
 		var lmwBtn = document.createElement('button');
@@ -31960,6 +32040,7 @@ var EngCalcs = EngCalcs || {};
 			if (!(w > 0)) { return; }
 			settings.labelMaxWidth = ceilToPrecision(w, 3);
 			lmwInput.value = settings.labelMaxWidth;
+			lmwSyncPlaceholder();
 			refreshLabelSuppression(); saveToStorage();
 		});
 		lmwWrap.appendChild(lmwInput);

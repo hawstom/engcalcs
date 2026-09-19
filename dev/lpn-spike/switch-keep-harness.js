@@ -53,6 +53,13 @@ const L = loadLoopedNetwork(
 	"\t\trestores: function () { return switchRestoreCount; },\n" +
 	"\t\tmiss: function () { return keptLayoutMiss; },\n" +
 	"\t\tsetKeepLayout: function (v) { keepLayoutEnabled = v; },\n" +
+	// **THIS DRAWING ALWAYS SHOWS ITS LABELS, said out loud** (Task 669, 2026-09-18). The labeling
+	// threshold gained an automatic default -- the view at which the lettering is twice the median
+	// pipe length -- and this harness views a drawing a few units across in a 700-unit window,
+	// because it never zooms and does not need to: what it is testing is whether a layout survives a
+	// project switch. Left alone, every label here is suppressed and the layout it compares is empty.
+	// 0 is the setting's own "always show", which is what an empty box writes.
+	"\t\talwaysLabel: function () { settings.labelMaxWidth = 0; },\n" +
 	"\t\tsegIndexBuilds: function () { return linkSegIndexBuilds; }"
 );
 
@@ -152,6 +159,12 @@ console.log('\n--- a restored layout equals a computed one, label by label ---')
 	// A real drawing, because the interesting decisions (shedding, crowding, leaders) need a crowd.
 	L.applySaved(JSON.parse(fs2.readFileSync(
 		path.join(__dirname, '../water-network-examples/Net3.lwn'), 'utf8')));
+	// **SAID AFTER THE LOAD, BECAUSE A PROJECT CARRIES ITS OWN SETTINGS.** Net3's pipes are about
+	// 1.5 units long and this harness never zooms -- it is testing whether a layout survives a
+	// project switch, not what a view shows -- so the automatic labeling threshold suppresses every
+	// label here and the layout it compares would be empty. Stored with the project below, so the
+	// switch away and back keeps it.
+	L.alwaysLabel();
 	L.refreshAll();
 	const ls = L.labelSettings();
 	Object.keys(ls.node).forEach(function (k) { ls.node[k] = true; });

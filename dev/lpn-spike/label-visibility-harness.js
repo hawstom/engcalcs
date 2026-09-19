@@ -40,6 +40,8 @@ const L = loadLoopedNetwork(
 	"\t\t\tan = lb.anchorNode ? nodeById(lb.anchorNode) : null;\n" +
 	"\t\t\treturn textLabelBox(lb, le, an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y); },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
+	"\t\tgetSetting: function (k) { return settings[k]; },\n" +
+	"\t\tdefaultLabelMaxWidth: defaultLabelMaxWidth,\n" +
 	"\t\tceilToPrecision: ceilToPrecision,\n" +
 	"\t\tdelSetting: function (k) { delete settings[k]; },\n" +
 	// How wide the map is on screen, and the zoom that turns that into model length units. BOTH
@@ -124,10 +126,13 @@ console.log('--- generated annotation carries the class, authored content does n
 // The second half is the rule in his own words: *"There must be a zoom outside of which the map is
 // not labeled."* Generated annotation goes at the threshold; a Text object goes at the threshold
 // times its OWN size multiplier, so a title block set at 3x outlives the notes around it.
-console.log('\n--- blank box: nothing hides because of how far out you are ---');
+console.log('\n--- a stored zero: nothing hides because of how far out you are ---');
 {
 	L.setCanvas(1000, 1000);   // square, so the smaller dimension is unambiguous
-	L.delSetting('labelMaxWidth');
+	// **ZERO IS THE ANSWER "ALWAYS SHOW", AND IT IS WHAT AN EMPTY BOX WRITES.** It used to be
+	// spelled by DELETING the setting, and since 2026-09-18 an absent setting means something else
+	// -- the automatic threshold below -- so the two had to stop being the same value.
+	L.setSetting('labelMaxWidth', 0);
 	[1, 0.8, 0.2, 0.001, 50].forEach(function (z) {
 		L.setZoom(z);
 		L.applyLabelVisibility();
@@ -136,6 +141,49 @@ console.log('\n--- blank box: nothing hides because of how far out you are ---')
 		ok('...and so is a 1x Text label', !hidden(L.labelEl(note.id).text));
 		ok('...and so is a 3x title block', !hidden(L.labelEl(title.id).text));
 	});
+}
+
+// ---- 2b. THE AUTOMATIC THRESHOLD, for a project that has never set one ------------------------
+// Tom, 2026-09-18: *"Now we need a default. How about when text height is larger than twice the
+// median link length? That's conservatively large, I think, but it gives us an upper limit."* His
+// own proposal, and the two things worth asserting about it are the ARITHMETIC and the fact that it
+// is an upper limit rather than a working setting.
+//
+// The arithmetic is asserted against the definition rather than against a number typed here: the
+// lettering is a SCREEN size, so its height in map units is textSize/s and the threshold has to be
+// 2 x medianLink x minPx / textSize for the scale to cancel. One pipe, so the median is its length.
+console.log('\n--- never asked: the automatic threshold, from the drawing itself ---');
+{
+	L.setCanvas(1000, 1000);
+	L.delSetting('labelMaxWidth');
+	const want = 2 * 100 * 1000 / L.getSetting('textSize');
+	const got = L.defaultLabelMaxWidth();
+	ok('the automatic width is 2 x median link x screen pixels / text size',
+		Math.abs(got - want) < 1e-9, got + ' against ' + want);
+	// Inside it, everything is drawn -- including at the fit-ish zooms the sweep above used, which
+	// is what "conservatively large" has to mean if it is not to take labels off a working view.
+	[50, 1, 0.8, 0.2].forEach(function (z) {
+		L.setZoom(z);
+		L.applyLabelVisibility();
+		ok('at zoom ' + z + ' (' + L.visibleMapWidth() + ' units across, inside ' + got + ') labels are drawn',
+			!L.svgHas('lpn-labels-hidden'));
+	});
+	// And far enough out it does what it is for: a drawing that would be nothing but lettering is
+	// not labeled at all.
+	L.setZoom(1000 / (got * 2));
+	L.applyLabelVisibility();
+	ok('twice the automatic width, the generated annotation is gone',
+		L.svgHas('lpn-labels-hidden'), L.visibleMapWidth() + ' units across');
+	ok('...and so is the 1x note', hidden(L.labelEl(note.id).text));
+	ok('...and the 3x title block is still drawn: its own width is three times this one',
+		!hidden(L.labelEl(title.id).text));
+	L.setZoom(1000 / (got * 4));
+	L.applyLabelVisibility();
+	ok('four times out, the 3x title block goes too', hidden(L.labelEl(title.id).text),
+		L.visibleMapWidth() + ' units across');
+	L.setSetting('labelMaxWidth', 0);
+	L.setZoom(1);
+	L.applyLabelVisibility();
 }
 
 console.log('\n--- a threshold of 500 map units ---');
@@ -180,8 +228,7 @@ console.log('\n--- a threshold of 500 map units ---');
 	// would blank the drawing with no way back that reads as one.
 	L.setSetting('labelMaxWidth', 0);
 	L.applyLabelVisibility();
-	ok('a zero threshold reads as blank, not as "hide everything"', !L.svgHas('lpn-labels-hidden'));
-	L.delSetting('labelMaxWidth');
+	ok('a zero threshold reads as "always show", not as "hide everything"', !L.svgHas('lpn-labels-hidden'));
 	L.setZoom(1);
 	L.applyLabelVisibility();
 }

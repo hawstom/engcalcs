@@ -2636,6 +2636,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_label_max_width_tip: <?=json_encode($ec_lang['lpn_settings_label_max_width_tip'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_settings_label_always: <?=json_encode($ec_lang['lpn_settings_label_always'])?>,
+	lpn_settings_label_auto: <?=json_encode($ec_lang['lpn_settings_label_auto'])?>,
 	lpn_settings_leader_snap: <?=json_encode($ec_lang['lpn_settings_leader_snap'])?>,
 	lpn_settings_leader_snap_tip: <?=json_encode($ec_lang['lpn_settings_leader_snap_tip'])?>,
 	lpn_settings_symbol_opacity: <?=json_encode($ec_lang['lpn_settings_symbol_opacity'])?>,

@@ -1244,6 +1244,52 @@ would take zooming out about 3.3x further than the fit view to reach it. His own
 absurdity, not a remedy for the crowded-view lottery above.
 
 
+## 17. The labeling threshold's own default, measured (Task 669, 2026-09-18)
+
+Tom, 2026-09-18: *"Widest view: Good. Now we need a default. How about when text height is larger
+than twice the median link length? That's conservatively large, I think, but it gives us an upper
+limit."* Built as he stated it, in `defaultLabelMaxWidth()`.
+
+**The arithmetic, because the two sides are in different units.** Lettering is drawn in SCREEN
+pixels, so its height in MAP units is `textSize / s`, and the number the box holds is a map width,
+`minPx / s`. Setting `textSize / s = 2 x medianLink` and eliminating the scale:
+
+    labelMaxWidth = 2 x medianLink x minPx / textSize
+
+The scale cancels, which is the property that makes it usable: reading it at one zoom gives the same
+answer as reading it at another, and it carries no number that assumes a size of network.
+
+**What it actually produces**, measured through the page's own code at 1400x900 on the six shipped
+examples. `fit` is the view `Zoom to fit` gives; `ratio` is how much further out you must go before
+generated annotation stops being drawn:
+
+| example | automatic threshold | fit view | ratio |
+|---|---|---|---|
+| Net3 | 332 | 64.9 | 5.1x |
+| Net3-Novato-CA-World | 0.634 | 0.175 | 3.6x |
+| Net2 | 1,312 | 173 | 7.6x |
+| Elm Street Center | 12,611 | 1,008 | 12.5x |
+| Net1 | 3,273 | 176 | 18.6x |
+| Basic example (US) | 108,167 | 1,491 | 72.5x |
+
+**His own reading is right and is if anything an understatement.** On the big examples it takes
+three to eight times the fit view to trip; on the small ones, twelve to seventy. It is a guard
+against a drawing that is nothing but lettering, not a working setting -- somebody who wants labels
+to thin out sooner presses **Use current view**, which is what that button is for. The ratio varies
+because `textSize` is a per-project setting and the examples do not agree on one.
+
+**A STORED ZERO IS AN ANSWER AND NOT AN ABSENCE.** Clearing the box writes 0, meaning always show
+labels; never having been asked is `null`, and takes the automatic number. Both render as an empty
+box, so the placeholder says which one is in force and prints the automatic number rather than
+keeping it a secret. `labelMaxWidthInForce()` is the one place the two are told apart, and
+`Restore defaults` is the way back from a stored zero to the automatic width.
+
+**It is sampled, not cached, and the cache is what went wrong first.** Keyed on the link count, a
+cached answer survived a project switch and `switch-keep-harness.js` found 119 of 216 labels laid
+out from the previous document's threshold. A stale threshold is invisible, because the number it
+produces is always plausible. The work is bounded instead: at most 512 pipes at an even stride,
+exact below that and a good estimate of the median above it.
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.
