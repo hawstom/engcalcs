@@ -21,7 +21,17 @@
 // tool, for as long as that box sat in the corner. That is worse than what he reported, and nothing
 // on screen would say why.
 //
-// THE MUTATION AT THE END is the point of the file. A harness asserting that a box stayed open can
+// **AND FOCUS ALONE WAS NOT ENOUGH.** Tom, reading the repair the same day: *"What about mouse
+// away and I don't click away, then I press Esc? I want to be very severe against accidental Esc
+// closures of the boxes."* He clicks into the box, so focus IS inside it; he moves the pointer
+// away without clicking, which changes no focus at all; and the Escape he then presses is about
+// whatever he is now looking at. So the guard asks the pointer as well -- focus inside AND the
+// pointer over the box -- and where the two disagree the box stays open. The pointer is believed
+// only once it has been used on this page at all, so a reader who never touches a mouse keeps the
+// one-key exit; that case is asserted below too, because a severity that strands somebody is a
+// different defect rather than a stricter version of this one.
+//
+// THE MUTATIONS AT THE END are the point of the file. A harness asserting that a box stayed open can
 // pass because the box never opened, because the key never arrived, or because the handler is not
 // wired -- so the guard is removed from the source and the first assertion is REQUIRED to fail.
 
@@ -36,10 +46,14 @@ const INJECT =
 
 // The guard, as it stands in the shipped source. loadLoopedNetwork() throws when a mutation matches
 // nothing, so rewording the guard cannot quietly turn the mutation below into a no-op.
-const GUARD = "\t\tif (escapeFocusIsInside('lpn_popup')) { closePopup(); }\n" +
-	"\t\tif (escapeFocusIsInside('lpn_settings_box')) { closeSettingsBox(); }\n" +
-	"\t\tif (escapeFocusIsInside('lpn_library_box')) { closeLibraryBox(); }\n";
+const GUARD = "\t\tif (escapeOwnsBox('lpn_popup')) { closePopup(); }\n" +
+	"\t\tif (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }\n" +
+	"\t\tif (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }\n";
 const PAGE_WIDE = "\t\tclosePopup();\n\t\tcloseSettingsBox();\n\t\tcloseLibraryBox();\n";
+// The POINTER half of the guard, on its own, so it can be removed without removing the focus half
+// -- which is exactly the state the page shipped in earlier the same day and which Tom rejected.
+const POINTER_LEG = "\t\treturn escapeFocusIsInside(id) && escapePointerIsOver(id);\n";
+const FOCUS_ONLY = "\t\treturn escapeFocusIsInside(id);\n";
 
 let fails = 0;
 function ok(name, cond, extra) {
@@ -58,10 +72,36 @@ function pressEscape() {
 
 // The three boxes, shown the way the page shows them. Display strings matter: setboxIsOpen() and
 // libBoxIsOpen() test for 'flex' exactly, and the popup for anything that is not 'none'.
+//
+// **AND THEY ARE GIVEN A REAL CORNER AND A REAL SIZE**, because the pointer half of the guard
+// measures one: the stub's getBoundingClientRect() reads the inline left/top/width/height a box
+// was placed with, which is how the page itself places these boxes.
+const BOX_AT = {
+	lpn_popup: { left: 40, top: 40, width: 260, height: 180 },
+	lpn_settings_box: { left: 400, top: 120, width: 320, height: 240 },
+	lpn_library_box: { left: 760, top: 300, width: 300, height: 200 }
+};
+function placeBox(id) {
+	const st = ensure(id).style, at = BOX_AT[id];
+	st.left = at.left + 'px'; st.top = at.top + 'px';
+	st.width = at.width + 'px'; st.height = at.height + 'px';
+}
+function centreOf(id) {
+	const at = BOX_AT[id];
+	return { x: at.left + at.width / 2, y: at.top + at.height / 2 };
+}
 function showBoxes() {
 	ensure('lpn_popup').style.display = 'block';
 	ensure('lpn_settings_box').style.display = 'flex';
 	ensure('lpn_library_box').style.display = 'flex';
+	Object.keys(BOX_AT).forEach(placeBox);
+}
+// The pointer, as the page receives it. Until this is called even once the page has never seen a
+// pointer at all, which is the keyboard-only state every assertion before section 4b runs in.
+function movePointer(x, y) {
+	(global.document._listeners.mousemove || []).slice().forEach(function (fn) {
+		fn({ type: 'mousemove', clientX: x, clientY: y });
+	});
 }
 function boxStates() {
 	return {
@@ -178,7 +218,80 @@ ok('Escape still leaves the armed tool, even though a box is open elsewhere',
 	L.getMode() === 'select', L.getMode());
 ok('...and that same press still did not touch the boxes', allOpen(boxStates()), JSON.stringify(boxStates()));
 
-// ---- 5. THE LIVE MUTATION ---------------------------------------------------------------------
+// ---- 4b. THE POINTER, WHICH FOCUS ALONE CANNOT SEE --------------------------------------------
+//
+// Tom's case, and it is the one that matters in this file: focus is genuinely inside the box
+// because he clicked into it, and the mouse has since walked off without clicking anything.
+// EVERY ASSERTION FROM HERE ON RUNS WITH THE POINTER IN PLAY -- before this line the page has
+// never seen one, which is the keyboard-only state asserted just below.
+console.log('\n-- the pointer has been used, and it is not over the box --');
+
+// First, on the record: while no pointer has ever been used, Escape still works from inside. This
+// is the keyboard-only reader, and it is asserted BEFORE the first movePointer() call for exactly
+// that reason -- afterwards the page can no longer be in that state.
+showBoxes();
+global.document.activeElement = fieldInside('lpn_settings_box');
+pressEscape();
+ok('a reader who has never touched a mouse still leaves Settings on Escape',
+	boxStates().settings === 'none', boxStates().settings);
+
+showBoxes();
+global.document.activeElement = fieldInside('lpn_settings_box');
+movePointer(1200, 700);
+pressEscape();
+s = boxStates();
+ok('focus inside Settings but the pointer away: SETTINGS STAYS OPEN', s.settings === 'flex', s.settings);
+ok('...and so does Properties', s.popup !== 'none', s.popup);
+ok('...and so does Libraries', s.library === 'flex', s.library);
+
+// ...and the tool is still cleared by that same press, which is section 4's point restated for the
+// pointer: a box that this press is no longer going to cost must not swallow it.
+showBoxes();
+L.setMode('pipe');
+global.document.activeElement = fieldInside('lpn_settings_box');
+movePointer(1200, 700);
+pressEscape();
+ok('...and that press still clears the armed tool rather than being swallowed',
+	L.getMode() === 'select', L.getMode());
+
+// The pointer over ANOTHER box is not the pointer over this one.
+showBoxes();
+global.document.activeElement = fieldInside('lpn_settings_box');
+let at = centreOf('lpn_library_box');
+movePointer(at.x, at.y);
+pressEscape();
+ok('the pointer sitting over Libraries does not let Escape close Settings',
+	boxStates().settings === 'flex', boxStates().settings);
+
+// Both agreeing is the one case that closes, and it must still close or the guard has taken the
+// key away altogether.
+console.log('\n-- focus inside AND the pointer over it, which is the one case that closes --');
+showBoxes();
+global.document.activeElement = fieldInside('lpn_settings_box');
+at = centreOf('lpn_settings_box');
+movePointer(at.x, at.y);
+pressEscape();
+s = boxStates();
+ok('Escape closes Settings when focus and pointer agree', s.settings === 'none', s.settings);
+ok('...and still leaves the other two alone', s.popup !== 'none' && s.library === 'flex', JSON.stringify(s));
+
+showBoxes();
+global.document.activeElement = fieldInside('lpn_popup');
+at = centreOf('lpn_popup');
+movePointer(at.x, at.y);
+pressEscape();
+ok('...and the same for Properties', boxStates().popup === 'none', boxStates().popup);
+
+// The pointer over the box but focus somewhere else is still no. Both halves, both directions.
+showBoxes();
+global.document.activeElement = global.document.body;
+at = centreOf('lpn_settings_box');
+movePointer(at.x, at.y);
+pressEscape();
+ok('the pointer over Settings with focus on the drawing is still not enough',
+	boxStates().settings === 'flex', boxStates().settings);
+
+// ---- 5. THE LIVE MUTATIONS --------------------------------------------------------------------
 console.log('\n-- live mutation: the guard removed, which is master as Tom found it --');
 build(function (src) {
 	if (src.indexOf(GUARD) < 0) { throw new Error('the guard lines have moved; update GUARD in this harness'); }
@@ -190,6 +303,22 @@ pressEscape();
 s = boxStates();
 ok('without the guard, Escape from outside DOES close all three -- so the checks above test the repair',
 	s.popup === 'none' && s.settings === 'none' && s.library === 'none', JSON.stringify(s));
+
+// ...and the pointer half on its own, because removing it leaves a page that passes every focus
+// assertion above and still does the thing Tom reported. This mutation IS the page as it shipped
+// earlier on 2026-09-19.
+console.log('\n-- live mutation: the pointer half removed, which is the page he rejected --');
+const focusOnly = build(function (src) {
+	if (src.indexOf(POINTER_LEG) < 0) { throw new Error('the pointer leg has moved; update POINTER_LEG in this harness'); }
+	return src.replace(POINTER_LEG, FOCUS_ONLY);
+});
+showBoxes();
+global.document.activeElement = fieldInside('lpn_settings_box');
+movePointer(1200, 700);
+pressEscape();
+ok('without the pointer half, focus-inside-pointer-away DOES close the box -- the defect he named',
+	boxStates().settings === 'none', boxStates().settings);
+void focusOnly;
 
 console.log('\n' + (fails === 0 ? 'ALL OK' : fails + ' FAILED'));
 process.exit(fails === 0 ? 0 : 1);

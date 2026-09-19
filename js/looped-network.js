@@ -22953,8 +22953,8 @@ var EngCalcs = EngCalcs || {};
 		// still dropped, which is the one thing scheduleSolve() does besides the arithmetic: its
 		// rings describe the network they were run on, and this is a different project.
 		perfDebugTime('scheduleSolve', function () {
-			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. Opening
-			// a project must give the user their answers whatever "Recalculate automatically" says.
+			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
+			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
 			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleArrivalSolve(); }
 		});
 		perfDebugTime('tabs', function () { renderTabs(); });
@@ -26866,8 +26866,63 @@ var EngCalcs = EngCalcs || {};
 		if (!el || el === document.body || el === document.documentElement) { return false; }
 		return el === box || (typeof box.contains === 'function' && box.contains(el));
 	}
+	/**
+	 * **FOCUS IS NOT ENOUGH, BECAUSE THE MOUSE CAN WALK AWAY WITHOUT TAKING FOCUS WITH IT** (Tom,
+	 * 2026-09-19: *"What about mouse away and I don't click away, then I press Esc? I want to be
+	 * very severe against accidental Esc closures of the boxes."*).
+	 *
+	 * The case he names: he clicks into the box, so focus is genuinely inside it; he then moves
+	 * the POINTER off somewhere else without clicking, which changes no focus at all; and the
+	 * Escape he presses there is about whatever he is now looking at. The focus test says "inside"
+	 * and his attention says "elsewhere", and the focus test is the one that was wrong.
+	 *
+	 * **SO BOTH HAVE TO AGREE, AND WHERE THEY DISAGREE THE BOX STAYS OPEN.** That is the severity
+	 * he asked for stated as a rule: Escape closes a standing box only when focus is inside it AND
+	 * the pointer is over it.
+	 *
+	 * **THE RULE CHOSEN, AND WHY IT IS THIS ONE RATHER THAN "HAS THE POINTER MOVED SINCE THE BOX
+	 * OPENED".** The pointer position is believed only once the pointer has been used on this page
+	 * at all; until then there is no position to believe and the test passes. Two things follow,
+	 * and both are wanted:
+	 *
+	 *   - **A KEYBOARD-ONLY READER IS NEVER STRANDED.** Somebody who tabbed into the box and has
+	 *     not touched a mouse leaves on Escape exactly as before. (All three boxes also carry a
+	 *     real focusable close button, so the keyboard exit never rested on this key alone.)
+	 *   - **A MOUSE READER MUST HAVE THE POINTER ON THE BOX.** Opening the box by clicking a
+	 *     toolbar button or a pipe leaves focus outside it anyway, so nothing changes there; the
+	 *     only way focus gets inside is a click into the box or a Tab, and after a click the
+	 *     pointer IS on the box until it is moved off -- which is Tom's case, and it now stays
+	 *     open.
+	 *
+	 * Measuring since-the-box-opened instead would need every open path to stamp a mark, and a box
+	 * shown by any route that missed the stamp would answer wrongly. This asks one question of the
+	 * live pointer and needs no bookkeeping anywhere else.
+	 *
+	 * Every uncertainty resolves TOWARDS LEAVING THE BOX OPEN: no element, no measurable rectangle
+	 * or a zero-sized one all read as "not over it".
+	 */
+	var escapePointerAt = null;
+	function escapeNotePointer(e) {
+		if (!e || typeof e.clientX !== 'number') { return; }
+		escapePointerAt = { x: e.clientX, y: e.clientY };
+	}
+	['mousemove', 'mousedown', 'pointermove', 'pointerdown'].forEach(function (type) {
+		document.addEventListener(type, escapeNotePointer, true);
+	});
+	function escapePointerIsOver(id) {
+		var box = document.getElementById(id), r;
+		if (!escapePointerAt) { return true; }
+		if (!box || typeof box.getBoundingClientRect !== 'function') { return false; }
+		r = box.getBoundingClientRect();
+		if (!r || (!r.width && !r.height)) { return false; }
+		return escapePointerAt.x >= r.left && escapePointerAt.x <= r.right &&
+			escapePointerAt.y >= r.top && escapePointerAt.y <= r.bottom;
+	}
+	function escapeOwnsBox(id) {
+		return escapeFocusIsInside(id) && escapePointerIsOver(id);
+	}
 	function escapeOwnsScopedBox() {
-		return ESCAPE_SCOPED_BOXES.some(escapeFocusIsInside);
+		return ESCAPE_SCOPED_BOXES.some(escapeOwnsBox);
 	}
 	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
 	// below run, because afterwards nothing is open and the question is unanswerable. Exactly the
@@ -26909,13 +26964,13 @@ var EngCalcs = EngCalcs || {};
 		// Settings' filter field takes Escape first while it holds text (see wireSettingsBox), so a
 		// typo costs the search rather than the box.
 		//
-		// **ALL THREE ONLY WHEN FOCUS IS INSIDE THE BOX ITSELF** -- see escapeFocusIsInside() above
+		// **ALL THREE ONLY WHEN FOCUS IS INSIDE THE BOX AND THE POINTER IS ON IT** -- see escapeOwnsBox()
 		// for Tom's words and the reasoning. Each is asked separately rather than as one group, so
 		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
 		// press, one thing, which is the rule the rest of this handler already keeps.
-		if (escapeFocusIsInside('lpn_popup')) { closePopup(); }
-		if (escapeFocusIsInside('lpn_settings_box')) { closeSettingsBox(); }
-		if (escapeFocusIsInside('lpn_library_box')) { closeLibraryBox(); }
+		if (escapeOwnsBox('lpn_popup')) { closePopup(); }
+		if (escapeOwnsBox('lpn_settings_box')) { closeSettingsBox(); }
+		if (escapeOwnsBox('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
 		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
@@ -44887,7 +44942,7 @@ var EngCalcs = EngCalcs || {};
 				'These rules could not be read, so they were ignored in this run: {ids}'),
 			// (A note about the later times being out of date used to be composed here. It is gone:
 			// off means off now, so there is no state in which SOME of a run is up to date --
-			// see EC.lpnTimeDropRun() in js/lpn-time.js.)
+			// see EC.lpnTimeStandDown() in js/lpn-time.js.)
 			'']
 			.filter(function (t) { return !!t; }).join(' '));
 		// The engine notes go to their OWN span, so their two-minute clock runs independently of
@@ -45073,37 +45128,62 @@ var EngCalcs = EngCalcs || {};
 		solveTimer = setTimeout(runSolve, 300);
 	}
 	/**
-	 * **ARRIVING IS NOT AN EDIT**, which refreshAllFromDocument() already says in its own words: a
-	 * file that states a 24-hour run is asking to see the 24 hours, and EC.lpnTimeArrived() has
-	 * already marked the run as wanted by the time this is reached. So an arrival solves whatever
-	 * the switch says, exactly as it did before the gate above existed. The switch decides what an
-	 * EDIT costs, and opening a project is the user asking for answers rather than changing them.
+	 * **OFF MEANS OFF ON THE WAY IN TOO** (Tom, 2026-09-19: *"Calculate on open: No. Off means
+	 * off; you say it, but do you believe it? Consent, people! And the industry is used to
+	 * that."*).
+	 *
+	 * **THIS REVERSES WHAT SHIPPED EARLIER THE SAME DAY.** Arriving used to solve whatever the
+	 * switch said, on the argument that opening a file is the user asking for answers rather than
+	 * changing them. He rejected that argument: a switch with an exception in it is not a switch,
+	 * and EPANET and its peers open a model without solving it, which is what he means by the
+	 * industry being used to it. So a project opened with the box unticked draws, and holds
+	 * whatever answers came with it, until he presses Calculate.
+	 *
+	 * The fire-flow run still goes, because that is not arithmetic being withheld -- its rings
+	 * describe the network they were run on, and this is a different project.
+	 *
+	 * EC.lpnTimeArrived() has already flagged a period run as wanted by the time this is reached,
+	 * so the off branch has to stand that flag down as well: leaving it set would fire a full
+	 * 24-hour run the next time anything at all called through, which is the defect wearing a
+	 * different hat.
 	 */
 	function scheduleArrivalSolve() {
 		clearFireFlowRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
+		solveTimer = null;
+		if (settings.autoRun === false) {
+			if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
+			return;
+		}
 		solveTimer = setTimeout(runSolve, 300);
 	}
 	/**
-	 * Everything an edit still owes the page when no solve is going to happen. Two things, and the
-	 * first is the reason this is not simply `return`.
+	 * Everything an edit still owes the page when no solve is going to happen. **Exactly two
+	 * things, and taking the old answers away is not one of them.**
 	 *
 	 *   1. **THE EDIT STILL HAS TO PERSIST.** Autosave piggybacked on the solve debounce -- see
 	 *      runSolve()'s own saveToStorage() -- so cutting the solve out without this would lose
 	 *      every edit made with the switch off at the next reload. Same 300 ms, so one burst of
 	 *      typing is still one save.
-	 *   2. **THE NUMBERS ON SCREEN DESCRIBE A NETWORK THAT NO LONGER EXISTS.** Dropping them rather
-	 *      than marking them stale is this page's existing answer in two other places
-	 *      (clearFireFlowRun() above, dropFrames() in js/lpn-time.js) and it is EPANET's. A label
-	 *      reading a pressure for a pipe whose diameter has since changed is worse than a blank
-	 *      one, because it is believable.
+	 *   2. **NOTHING MAY BE LEFT QUEUED.** An idle period run scheduled before the switch went off
+	 *      would fire in a second and make a liar of it.
+	 *
+	 * **THE STALE NUMBERS STAY EXACTLY WHERE THEY ARE, AND THIS REVERSES WHAT SHIPPED EARLIER THE
+	 * SAME DAY** (Tom, 2026-09-19: *"Recalc off Old values: Leave in place stale. Don't clear.
+	 * Trust the user."*). The first repair cleared `lastSolveResult`, repainted the labels and
+	 * said so in the status bar, on the argument that a pressure shown for a pipe whose diameter
+	 * has since changed is believable and therefore worse than a blank. He rejected it: with the
+	 * switch off he is the one who decides when the answers are worked out, so he is also the one
+	 * who decides how long the last set is worth looking at. There is no grey-out and no sentence
+	 * either -- he said *leave in place*, not *mark it*. **Do not reinstate any of the three
+	 * without his word**; this is the "a calculator stores what the user typed, and we do not
+	 * decide for him" rule reaching the results half of the screen.
 	 *
 	 * The drawing itself is not touched here at all: whoever called us has already redrawn what
 	 * they changed, which is why an edit with the switch off still SHOWS.
 	 *
-	 * **THE SECOND AND EVERY LATER EDIT OF A BURST COST NOTHING**, which is what makes this
-	 * lightning fast rather than merely cheaper: once the results are gone there is nothing left
-	 * to drop, so a following edit is one comparison and a timer reset.
+	 * **SO EVERY EDIT OF A BURST COSTS THE SAME NOTHING**: a comparison, a timer reset and one
+	 * debounced write. There is no repaint at all on this path now.
 	 */
 	function afterManualEdit() {
 		if (manualSaveTimer) { clearTimeout(manualSaveTimer); }
@@ -45111,15 +45191,7 @@ var EngCalcs = EngCalcs || {};
 			manualSaveTimer = null;
 			saveToStorage();
 		}, 300);
-		if (EngCalcs.lpnTimeDropRun) { EngCalcs.lpnTimeDropRun(); }
-		if (!lastSolveResult) { return; }
-		lastSolveResult = null;
-		setStatus((EngCalcs.pageConfig || {}).lpn_manual_results_cleared ||
-			'The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.',
-			'manual-cleared');
-		refreshLabelText();
-		refreshValueColors();
-		refreshPaneIfOpen();
+		if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
 	}
 
 	// calcAndSave() calls this unconditionally, from the units strip's own selects and from

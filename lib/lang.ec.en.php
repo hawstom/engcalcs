@@ -1389,11 +1389,13 @@ $ec_lang['lpn_run_menu_tip']='Recalculate this network now. The Calculate button
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_auto_run_tip']='Hides the Calculate button and recalculates after any edit. Turn off if recalculation is too slow.';
-// **WHAT AN EDIT SAYS WHEN THE SWITCH IS OFF** (2026-09-19). Off means off: nothing is solved, so
-// the numbers that were on screen describe a network that no longer exists and are taken away
-// rather than left to be believed. Says the same three things the fire flow sentence says, in the
-// same order -- what happened, why, and what to press -- because it is the same event.
-$ec_lang['lpn_manual_results_cleared']='The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.';
+// **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
+// values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
+// stood here for part of one day and is DELETED, English-only, never translated: it announced a
+// clearing that no longer happens. With the box unticked an edit leaves the last answers exactly
+// where they are and says nothing about them, because whether they are still worth reading is
+// the user's judgement and not this page's. Do not write a replacement -- a grey-out or a
+// "stale" marker is the same decision in quieter clothes.
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
@@ -2873,7 +2875,7 @@ $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
 // but the later time steps, and Tom read it as the defect it was: *"when Recalculate is off, the
 // first time step is still calculated. This is bad. Off means off."* Off now means off -- an edit
 // with the box unticked solves nothing at all -- so there is no such state left to describe, and
-// the reader is told the results were CLEARED instead (`lpn_manual_results_cleared`, below).
+// nothing replaced it: the last answers simply stay on screen until the reader presses Calculate.
 // The measurement and the new gate: scheduleSolve() in js/looped-network.js.
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
