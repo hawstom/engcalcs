@@ -983,19 +983,26 @@ the block.
     response-time doctrine is explicit that past ten seconds a wait needs one or the reader leaves,
     and this is a DELIBERATE CLICK rather than a page load, which is the more forgiving case
     provided the wait is legible. Buildable now, needing nobody.
-  - **THE THIRD OPTION THE FRAMING MISSED: a connection-aware idle prefetch, on this page only.**
-    `navigator.connection.effectiveType` and `.saveData` let the page ask the visitor's own browser
-    which cost is smaller, and prefetch after idle unless they are on 2G or have data-saver on.
-    **Chromium-only**, so Safari and Firefox get no signal and must fall back to today's behaviour
-    rather than to an unconditional prefetch.
-  - `[H]` because the trade is Tom's: it is a claim about who this suite is for, not an
-    optimisation.
+  - **A CONNECTION-AWARE IDLE PREFETCH IS DECLINED. Tom, 2026-09-19: *"Connection-aware not
+    needed."*** The proposal was to read `navigator.connection.effectiveType` and `.saveData` and
+    prefetch after idle unless the visitor is on 2G or has data-saver on. It is not to be built and
+    not to be re-proposed. The `[H]` it carried is gone with it, and Task 608 has no open question
+    left for him.
   - **HE ANSWERED 2026-09-08** (numbering it 600, which is the plots task; the words are this one's):
     *"I am open to your ideas. I am also open to putting up a banner 'Loading solver. Results
     delayed momentarily. Continue working.'"* So the percent-done bullet above is authorized, and
     the sentence he wrote is the sentence to use. **"Continue working" is the load-bearing half** --
     it says the page is not frozen, which is the thing a wait most needs to say and the thing a bare
-    spinner cannot. The `[H]` stands on the connection-aware prefetch, which he has not ruled on.
+    spinner cannot.
+  - **BUILT AND TESTED 2026-09-19 on `feat/engine-fetch-wait`, and he ruled on all three halves.**
+    The banner: *"'Continue working': Worked great. Banner can show always."* The bar: *"We must
+    include the unknown in the progress bar. The progress bar can stall at the end if necessary.
+    But it can't disappear prematurely."* So the transfer is given the first 90% of the bar and
+    the last tenth belongs to the unmeasured tail after the bytes land -- the import, the WASM
+    instantiation, the first project open, none of which report anything. **The bar's end means the
+    solver is USABLE, never that the download finished**, and a stall at the end is the authorized
+    cost of that guarantee. Where the transfer states no size at all, the bar runs indeterminate
+    beside a kilobyte count rather than going missing or inventing a denominator.
 
 - 75|617| **More map view options, the opacity one having shipped.**
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can

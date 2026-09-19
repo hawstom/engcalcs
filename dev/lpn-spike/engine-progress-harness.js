@@ -53,6 +53,20 @@ function pct(n) { return PC.lpn_engine_wait_pct.replace('{percent}', String(n));
 function kb(n) { return PC.lpn_engine_wait_bytes.replace('{kb}', String(n)); }
 function settle() { return new Promise(function (r) { setTimeout(r, 0); }); }
 
+// THE BAR, READ THE WAY THE PAGE LEAVES IT. width is the percent the fill is drawn at, or -1 for
+// the indeterminate state, which draws no width of its own.
+const barEl = doc$.getElementById('lpn_engine_bar');
+const fillEl = doc$.getElementById('lpn_engine_bar_fill');
+function barShown() { return !!barEl && barEl.style.display === 'block'; }
+function barUnknown() {
+	return !!barEl && String(barEl.className || '').indexOf('lpn-engine-bar-unknown') !== -1;
+}
+function barWidth() {
+	if (barUnknown()) { return -1; }
+	const w = (fillEl && fillEl.style.width) || '';
+	return w ? parseFloat(w) : 0;
+}
+
 // ---------------------------------------------------------------------------------------------
 // THE LOADER HALF. global.fetch is replaced with something whose headers and chunking this test
 // chooses, because what is being asserted is how a REPLY is read, and no real reply can be asked
@@ -208,11 +222,16 @@ console.log('\n--- the ordinary network whose answer is the one still arriving -
 	ok('...and zero percent is shown, not hidden',
 		banner() === PC.lpn_engine_wait + ' ' + pct(0), JSON.stringify(banner()));
 	prog({ loaded: 339347, total: 678695 });
+	// 45, not 49: the sentence reports the BAR's number, and the bar gives the transfer nine
+	// tenths of its length. Halfway through the download is 45% of the wait as drawn.
 	ok('...half way through it says so',
-		banner() === PC.lpn_engine_wait + ' ' + pct(49), JSON.stringify(banner()));
+		banner() === PC.lpn_engine_wait + ' ' + pct(45), JSON.stringify(banner()));
+	// **AND THE LAST BYTE READS NINETY, NOT A HUNDRED** (Tom, 2026-09-19). The download is over
+	// and the wait is not: the import and the WASM instantiation are still to come, and they
+	// report nothing. A hundred here would be the page saying it was ready when it was not.
 	prog({ loaded: 678695, total: 678695 });
-	ok('...and the last chunk reads a hundred',
-		banner() === PC.lpn_engine_wait + ' ' + pct(100), JSON.stringify(banner()));
+	ok('...and the last byte of the download still is not the end',
+		banner() === PC.lpn_engine_wait + ' ' + pct(90), JSON.stringify(banner()));
 
 	// **THE PAGE IS NOT FROZEN, WHICH IS WHAT "Continue working" PROMISES.** The banner is a live
 	// region rather than anything modal, the document still takes edits, and the load is still
@@ -264,7 +283,7 @@ console.log('\n--- a network only EPANET can solve keeps its own stronger senten
 		JSON.stringify(banner()));
 	prog({ loaded: 250000, total: 1000000 });
 	ok('...and it carries the same percentage',
-		banner() === PC.lpn_engine_needed_loading + ' ' + pct(25), JSON.stringify(banner()));
+		banner() === PC.lpn_engine_needed_loading + ' ' + pct(23), JSON.stringify(banner()));
 	gate.rej(new Error('offline'));
 	await settle();
 	ok('a failure replaces the whole thing, percentage included',
@@ -287,8 +306,103 @@ console.log('\n--- and when the size was never stated ---');
 	// A TOTAL THAT IS WRONG MUST NOT PRINT 140%. Clamped, because "nearly there" is at least a
 	// reading a person can act on, where arithmetic nobody believes is not.
 	prog({ loaded: 900, total: 500 });
-	ok('an understated total is clamped rather than printed',
-		banner() === PC.lpn_engine_wait + ' ' + pct(100), JSON.stringify(banner()));
+	ok('an understated total is clamped, and clamped to the reserved end rather than to a hundred',
+		banner() === PC.lpn_engine_wait + ' ' + pct(90), JSON.stringify(banner()));
+}
+
+// ---------------------------------------------------------------------------------------------
+// **THE RULING THE BAR EXISTS FOR** (Tom, 2026-09-19): *"We must include the unknown in the
+// progress bar. The progress bar can stall at the end if necessary. But it can't disappear
+// prematurely."*
+//
+// The bar reaching its end must mean the SOLVER IS READY, never that the bytes arrived. The tail
+// after the last byte -- the import, the WASM instantiation, the first project open -- reports
+// nothing, so a bar driven by the transfer alone completes and vanishes while the page still
+// cannot solve. That is right on a fast local link and wrong on Slow 3G, which is why it is
+// asserted over the WHOLE input space below rather than sampled at one convenient moment.
+// ---------------------------------------------------------------------------------------------
+console.log('\n--- the bar cannot finish before the engine can solve ---');
+{
+	fakeLoader();
+	const L = fresh();
+	L.settings().engine = 'epanet';
+	line(L);
+	L.runSolve();
+	ok('the bar is on screen for the wait', barShown(), barEl && barEl.style.display);
+
+	// EVERY POSSIBLE TRANSFER STATE, including a byte count that overshoots its own stated total.
+	// Not one of them may draw a full bar, because not one of them means the engine is usable.
+	const TOTAL = 678695;
+	let worst = 0, everFull = false;
+	for (let i = 0; i <= 40; i++) {
+		prog({ loaded: Math.round(TOTAL * i / 40), total: TOTAL });
+		worst = Math.max(worst, barWidth());
+		if (barWidth() >= 100) { everFull = true; }
+	}
+	prog({ loaded: TOTAL * 2, total: TOTAL });       // an understated total
+	if (barWidth() >= 100) { everFull = true; }
+	ok('no transfer state whatever draws a full bar', everFull === false, worst + '% at worst');
+	ok('...and the tail that is reserved is the last tenth', Math.round(worst) === 90, worst);
+
+	// **A COMPLETED TRANSFER THAT IS STILL NOT USABLE.** The bytes are all in; the engine is not
+	// ready. Real time passes -- several turns of the event loop -- and the bar must neither
+	// complete nor go away. This is the Slow 3G case where the tail is visible.
+	prog({ loaded: TOTAL, total: TOTAL });
+	let stalledFull = false, stalledGone = false;
+	for (let t = 0; t < 10; t++) {
+		await settle();
+		if (barWidth() >= 100) { stalledFull = true; }
+		if (!barShown()) { stalledGone = true; }
+	}
+	ok('a finished download does not finish the bar', stalledFull === false, barWidth() + '%');
+	ok('...and does not take it off screen either', stalledGone === false, barEl.style.display);
+	ok('...and the sentence agrees with the bar rather than saying 100%',
+		banner() === PC.lpn_engine_wait + ' ' + pct(90), JSON.stringify(banner()));
+	ok('...and a screen reader is told the same number',
+		barEl.getAttribute('aria-valuenow') === '90', barEl.getAttribute('aria-valuenow'));
+
+	// AND ONLY BECOMING USABLE CLOSES IT.
+	gate.res({});
+	await settle();
+	ok('the engine landing is what takes the bar away', !barShown(), barEl.style.display);
+	ok('...and the banner with it', banner() === '', JSON.stringify(banner()));
+}
+
+console.log('\n--- the unknown is IN the bar, not a missing bar ---');
+{
+	fakeLoader();
+	const L = fresh();
+	L.settings().engine = 'epanet';
+	line(L);
+	L.runSolve();
+	prog({ loaded: 0, total: 0 });
+	ok('a transfer that states no size still shows a bar', barShown(), barEl.style.display);
+	ok('...running indeterminate rather than at a made-up position', barUnknown() && barWidth() === -1,
+		barEl.className);
+	ok('...and claiming no position to a screen reader',
+		barEl.getAttribute('aria-valuenow') == null, barEl.getAttribute('aria-valuenow'));
+	prog({ loaded: 204800, total: 0 });
+	ok('...with the kilobytes said in words beside it',
+		banner() === PC.lpn_engine_wait + ' ' + kb(200), JSON.stringify(banner()));
+	ok('...and it is STILL indeterminate, because no denominator was fabricated', barUnknown());
+	gate.res({});
+	await settle();
+	ok('and it goes when the engine is usable, not before', !barShown() && banner() === '',
+		barEl.style.display);
+}
+
+console.log('\n--- no bar where there is no download to report ---');
+{
+	fakeLoader();
+	const L = fresh();
+	L.settings().engine = 'native';
+	withPrv(L);
+	L.runSolve();
+	ok('the needs-the-engine wait has a bar', barShown(), barEl.style.display);
+	gate.rej(new Error('offline'));
+	await settle();
+	ok('a failure leaves the message and takes the bar', !barShown() && banner() === PC.lpn_engine_needed_failed,
+		barEl.style.display);
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

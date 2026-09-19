@@ -372,6 +372,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // from this list, refreshEpanetBanner() returns at its first line and the whole of Part 2 --
   // the sentence Tom wrote and the failure that replaces it -- is invisible to every harness.
   'lpn_engine_banner',
+  // The progress bar under it and the fill inside it (Task 608, Tom's 2026-09-19 ruling that the
+  // bar may stall but may not vanish early). Absent from this list, refreshEpanetBar() returns at
+  // its first line and the one thing he asked to be guaranteed is invisible to every harness.
+  'lpn_engine_bar', 'lpn_engine_bar_fill',
   // The tile attribution (ROADMAP Task 145). It was NOT here, so refreshBasemapCredit() returned at
   // its first line in every harness and the licence credit was the one piece of map chrome no test
   // could see -- which is how it shipped invisible on the boot path (Task 486).

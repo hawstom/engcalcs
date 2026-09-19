@@ -146,6 +146,9 @@ console.log('\n--- a panel that opens comes to the front ---');
 		[/^sepRow @/, 'a row inside a box that is already open'],
 		[/^div @/, 'a row inside a box that is already open'],
 		[/^banner @/, 'the one-line status banner across the top of the map'],
+		[/^bar @/, 'the engine-wait progress bar (Task 608): a 6px track under that same banner, '
+			+ 'holding no control, with no drag, no resize, no stored geometry and nothing '
+			+ 'focusable -- the same reasoning as the banner it hangs from'],
 		[/^back @/, 'the modal dialog backdrop -- an empty scrim, holding no control'],
 		[/^dlg @/, 'the modal dialog itself, centred by CSS and outranking everything'],
 		[/^panel @/, 'openPanelAtAnchor(): the menus, their fly-outs and the panels that hang off a '
@@ -189,6 +192,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/pop\.style\.display = 'none';/, 'a colour-ramp list, hidden as it is BUILT'],
 		[/msg\.style\.display = 'none';/, 'a one-line status message'],
 		[/banner\.style\.display = 'none'/, 'the model-locked banner'],
+		[/bar\.style\.display = 'none';\n\t\t\treturn;/, 'the engine-wait progress bar (Task 608), declared with its reason beside NOT_A_PANEL_SHOW above'],
 		[/back\.style\.display = 'none'/, 'the modal backdrop -- an empty scrim, holds no control'],
 		[/b\.el\.style\.display = 'none'; return;/, 'a legend badge on the map'],
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],

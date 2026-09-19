@@ -43120,6 +43120,23 @@ var EngCalcs = EngCalcs || {};
 	// `epanetWarmPct` is the last WHOLE percent put on screen, and it exists only so that a hundred
 	// chunks do not each repaint the banner. -1 means nothing has been drawn for this fetch yet.
 	var epanetWarmLoaded = 0, epanetWarmTotal = 0, epanetWarmPct = -1;
+	// **THE SHARE OF THE BAR THE TRANSFER MAY HAVE, AND WHY IT IS NOT ALL OF IT** (Tom, 2026-09-19:
+	// *"We must include the unknown in the progress bar. The progress bar can stall at the end if
+	// necessary. But it can't disappear prematurely."*).
+	//
+	// The bytes are not the whole wait. After the last one there is still the dynamic import, the
+	// WASM instantiation and the first open of a project, and NONE of that reports progress -- so a
+	// bar driven by the transfer alone reaches its end while the page still cannot solve, which is
+	// the one outcome he ruled out. The last tenth is therefore reserved for that tail, and the bar
+	// is closed by the engine becoming USABLE rather than by the download finishing.
+	//
+	// **WHY A TENTH.** The two costs are measured and they are wildly different in ratio depending
+	// on the connection: 664 KB floors at about 7 s on 3G against ~33 ms to import and instantiate,
+	// so on the slow connection this feature exists for the transfer really is ~99% of the wait and
+	// a tenth is generous. On a fast link the tail dominates instead, and there the bar is on screen
+	// for so little time that where it stalls does not matter. A tenth is small enough to keep the
+	// number honest on the connection that counts and large enough to be visibly unfinished.
+	var EPANET_BAR_TRANSFER_SHARE = 0.9;
 	function onEpanetProgress(p) {
 		var pct;
 		epanetWarmLoaded = (p && p.loaded) || 0;
@@ -43138,14 +43155,59 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (epanetWarmState !== 'warming') { return ''; }
 		if (epanetWarmTotal > 0) {
+			// THE SAME NUMBER THE BAR IS DRAWING, never the raw transfer percent. A sentence
+			// reading 100% beside a bar held short of its end is two instruments disagreeing, and
+			// the one that would be believed is the one that is wrong.
 			return (pc.lpn_engine_wait_pct || 'Solver {percent}% loaded.')
-				.replace('{percent}', String(Math.max(0, epanetWarmPct)));
+				.replace('{percent}', String(Math.round(epanetBarFraction() * 100)));
 		}
 		if (epanetWarmLoaded > 0) {
 			return (pc.lpn_engine_wait_bytes || 'Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.')
 				.replace('{kb}', String(Math.round(epanetWarmLoaded / 1024)));
 		}
 		return '';
+	}
+	/**
+	 * **HOW FULL THE BAR IS, 0 TO 1, AND IT CANNOT REACH 1 WHILE ANYBODY IS STILL WAITING.**
+	 *
+	 * Capped at EPANET_BAR_TRANSFER_SHARE for as long as the state is 'warming', WHATEVER the
+	 * transfer says -- a download that has delivered its last byte is at 0.9 here, and the only
+	 * thing that moves it past that is the engine becoming usable, at which point the bar is being
+	 * taken off screen anyway. That is Tom's ruling expressed as arithmetic rather than as care:
+	 * there is no path through this function that returns 1 during a wait.
+	 *
+	 * Returns -1 when the size is unknown, which is the INDETERMINATE bar rather than a hidden one.
+	 */
+	function epanetBarFraction() {
+		if (epanetWarmState !== 'warming') { return 1; }
+		if (!(epanetWarmTotal > 0)) { return -1; }
+		return Math.min(1, Math.max(0, epanetWarmLoaded / epanetWarmTotal)) * EPANET_BAR_TRANSFER_SHARE;
+	}
+	// The bar itself. Shown exactly when the banner is showing a WAIT, because a bar under a failure
+	// message would be a download that is not happening.
+	function refreshEpanetBar(showing) {
+		var bar = document.getElementById('lpn_engine_bar'),
+			fill = document.getElementById('lpn_engine_bar_fill'),
+			frac;
+		if (!bar || !fill) { return; }
+		if (!showing || epanetWarmState !== 'warming') {
+			bar.style.display = 'none';
+			return;
+		}
+		frac = epanetBarFraction();
+		bar.style.display = 'block';
+		if (frac < 0) {
+			// UNKNOWN SIZE. The bar stays, and it moves; what it does not do is claim a position.
+			// aria-valuenow is REMOVED rather than set to something, which is how a progressbar
+			// says indeterminate to a screen reader.
+			bar.classList.add('lpn-engine-bar-unknown');
+			bar.removeAttribute('aria-valuenow');
+			fill.style.width = '';
+		} else {
+			bar.classList.remove('lpn-engine-bar-unknown');
+			bar.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
+			fill.style.width = (frac * 100) + '%';
+		}
 	}
 	// `why` is 'valve', 'engine' or 'background'. THE SAME FETCH HAS THREE REASONS and one message
 	// cannot be true of all of them: Tom turned the solver on and was told about valves he had not
@@ -43274,6 +43336,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		el.textContent = text;
 		el.style.display = text ? 'block' : 'none';
+		refreshEpanetBar(!!text);
 	}
 	// **THE BACKGROUND FETCH, AND WHAT DEBOUNCES IT** (Task 608 part 1). Two gates, and neither is a
 	// timer of its own:

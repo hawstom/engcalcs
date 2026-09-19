@@ -332,6 +332,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // d-print-none, unlike the diagnostic beside it: a printed sheet should say why a
 			      // drawing has no answers, and "still loading" will not be true of the paper. ?>
 			<p id="lpn_engine_banner" class="d-print-none" role="status" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:rgba(255,255,255,.9);border:1px solid #05a"></p>
+			<?php // **THE BAR, AND WHY ITS END IS NOT THE END OF THE TRANSFER** (Task 608, Tom
+			      // 2026-09-19: *"We must include the unknown in the progress bar. The progress bar can
+			      // stall at the end if necessary. But it can't disappear prematurely."*). The bytes are
+			      // only part of the wait: after the last one there is still the import, the WASM
+			      // instantiation and the first open of a project, none of which report anything. So the
+			      // transfer is given the FIRST 90% of this track and the last tenth belongs to that
+			      // unmeasured tail, which is why the bar can sit still at the end. It is filled and
+			      // hidden by refreshEpanetBanner() in looped-network.js, its one writer.
+			      //
+			      // aria-valuenow is written only where there is a real fraction. Where the transfer
+			      // states no size the bar runs INDETERMINATE -- it still exists and still moves, because
+			      // his ruling is that the unknown belongs in the bar rather than out of it. ?>
+			<div id="lpn_engine_bar" class="lpn-engine-bar d-print-none" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="<?=htmlspecialchars($ec_lang['lpn_engine_bar_label'])?>" style="display:none"><div id="lpn_engine_bar_fill" class="lpn-engine-bar-fill"></div></div>
 		</div>
 		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 		      // saving a project put a line of text above the canvas and "moves the map down past the

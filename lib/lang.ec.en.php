@@ -2109,6 +2109,8 @@ $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Re
 // The other two are the progress readout, which is a whole sentence of its own so a language can
 // put the number where it belongs. There is no invented percentage: where the transfer does not
 // state a total, the kilobytes are reported instead and the reader is told why.
+// The bar under that sentence is named for a screen reader, which cannot see it fill.
+$ec_lang['lpn_engine_bar_label']='Solver loading progress';
 $ec_lang['lpn_engine_wait']='Loading solver. Results delayed momentarily. Continue working.';
 $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.';
