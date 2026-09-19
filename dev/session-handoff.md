@@ -106,8 +106,11 @@ of them does the thing the standing ruling says we never do.
   `https://librewaternet.org/` 200, and **403 from `hawsedc.local`, `localhost:8094` and
   `localhost:8096` alike** -- satellite AND Terrain-RGB. Street map is unaffected because
   OpenStreetMap tiles need no token, which is exactly why the symptom read as "map but not
-  satellite". **A NEW PREVIEW PORT NEEDS A NEW ENTRY IN THAT LIST**, or satellite is dead on it and
-  the page gives no clue why.
+  satellite". **CORRECTED BY TOM, 2026-09-19: A NEW PREVIEW PORT NEEDS NOTHING.** He was told each new
+  port needs its own entry; his answer: *"No. The list simply contains localhost and
+  hawsedc.local."* An allowed-URL entry is a HOST, and every preview port lives on one of those two
+  hosts already. **A new HOSTNAME would need an entry; a new port never does.** The 403s measured
+  above were from before he fixed the list, not evidence about ports.
 
 - **"Production is not master. Say it again and again."** (2026-09-12)
 - **A branch names its capability, in the singular.** (2026-09-12)
