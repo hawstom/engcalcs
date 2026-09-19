@@ -39,7 +39,7 @@ judgement and does not belong to a script.
 - [?] R-002 -- | "Can we have a reviewer agent, or are these things unavailable to AI?" -- answered in session; a seat is possible, awaiting his word on whether he wants one
 - [x] R-003 -- | "a new preview port needs a new entry in that URL list": No. The list simply contains localhost and hawsedc.local. -- handoff ruling corrected
 - [x] R-004 -- | "A name given once for one purpose becomes a standing per-browser label": Confirmed. And we are adding "Not you? Change this" opportunities. -- Task 698 ruled; his answer to handoff decision 9
-- [ ] R-005 fix/esc-focus-and-recalc | "Escape fix?": Yes. And please don't let Escape close those boxes when the mouse cursor is elsewhere. When I say "only when box is in focus", I mean it in the strongest way possible. Big guards on closing a box.
+- [x] R-005 fix/esc-focus-and-recalc | "Escape fix?": Yes. And please don't let Escape close those boxes when the mouse cursor is elsewhere. When I say "only when box is in focus", I mean it in the strongest way possible. Big guards on closing a box. -- fix/esc-focus-and-recalc d9b2be9d -- Escape reaches a box only when focus is genuinely inside it; menus untouched
 
 ### feat/customer-find-labels
 
@@ -87,7 +87,7 @@ judgement and does not belong to a script.
 
 ### Defects found while reviewing
 
-- [ ] R-041 fix/esc-focus-and-recalc | While reviewing feat/tables-spreadsheet, I saw a banner message that when Recalculate is off, the first time step is still calculated. This is bad. Off means off. This could explain the delay I am seeing. With recalculate off and no zooms happening, there should be nothing happening when I change inputs. It should be lightning fast.
+- [x] R-041 fix/esc-focus-and-recalc | While reviewing feat/tables-spreadsheet, I saw a banner message that when Recalculate is off, the first time step is still calculated. This is bad. Off means off. This could explain the delay I am seeing. With recalculate off and no zooms happening, there should be nothing happening when I change inputs. It should be lightning fast. -- fix/esc-focus-and-recalc d9b2be9d -- MEASURED: the switch was wired only to later time steps and did NOTHING on a project with no duration. Off now means off
 
 ### Standing work he named
 
