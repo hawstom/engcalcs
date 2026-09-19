@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1972,
-        "delta_key_count": 104,
+        "expected_key_count": 2004,
+        "delta_key_count": 136,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -515,6 +515,38 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_add_meter": "Customer",
+        "lpn_tool_add_meter_tip": "Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.",
+        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
+        "lpn_pane_tab_customers": "Customers",
+        "lpn_customer_heading": "Customer {id}",
+        "lpn_field_account": "Account number",
+        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
+        "lpn_field_meter_demand": "Demand per service",
+        "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
+        "lpn_field_meter_count": "Services at this customer",
+        "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
+        "lpn_field_meter_total": "Total demand",
+        "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
+        "lpn_field_meter_pipe": "Connected asset",
+        "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
+        "lpn_meter_placed": "Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
+        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
+        "lpn_field_meter_station": "Station along the pipe (%)",
+        "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
+        "lpn_field_meter_offset": "Offset from the pipe",
+        "lpn_field_meter_offset_tip": "How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.",
+        "lpn_field_meter_lumped": "Added to node",
+        "lpn_field_meter_lumped_tip": "The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+        "lpn_node_customers": "Customer demands",
+        "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
+        "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
+        "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
+        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+        "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
+        "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
+        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -621,6 +653,38 @@
         "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
     "keys": {
+        "lpn_tool_add_meter": "Customer",
+        "lpn_tool_add_meter_tip": "Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.",
+        "lpn_mode_add_meter": "Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.",
+        "lpn_pane_tab_customers": "Customers",
+        "lpn_customer_heading": "Customer {id}",
+        "lpn_field_account": "Account number",
+        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
+        "lpn_field_meter_demand": "Demand per service",
+        "lpn_field_meter_demand_tip": "What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.",
+        "lpn_field_meter_count": "Services at this customer",
+        "lpn_field_meter_count_tip": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
+        "lpn_field_meter_total": "Total demand",
+        "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
+        "lpn_field_meter_pipe": "Connected asset",
+        "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
+        "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the customer was left where it was.",
+        "lpn_meter_placed": "Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
+        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.",
+        "lpn_field_meter_station": "Station along the pipe (%)",
+        "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
+        "lpn_field_meter_offset": "Offset from the pipe",
+        "lpn_field_meter_offset_tip": "How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.",
+        "lpn_field_meter_lumped": "Added to node",
+        "lpn_field_meter_lumped_tip": "The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
+        "lpn_node_customers": "Customer demands",
+        "lpn_node_customers_tip": "Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.",
+        "lpn_node_customers_sum": "{total} {unit} from {n} Customers",
+        "lpn_customer_detached": "⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.",
+        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
+        "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
+        "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
+        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -727,6 +791,518 @@
         "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
     "key_context": {
+        "lpn_tool_add_meter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_tool_add_meter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_mode_add_meter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_pane_tab_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_account": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_account_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_demand_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_count_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_total": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_total_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pipe_suggest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_pipe_unknown": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_placed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_pipe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_station": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_station_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_offset": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_offset_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_lumped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_field_meter_lumped_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_node_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_node_customers_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_node_customers_sum": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_detached": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_fixed_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_customer_detached_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_meter_pick_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_inp_export_flat_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершины",
+                    "english": "Vertices"
+                },
+                "next_translated": {
+                    "key": "lpn_area_hint_window_start",
+                    "value": "Щёлкните по одному углу окна выбора.",
+                    "english": "Click one corner of the window."
+                }
+            }
+        },
         "lpn_ts_menu": {
             "reason": "missing",
             "current_value": null,
