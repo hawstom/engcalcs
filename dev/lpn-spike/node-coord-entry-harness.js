@@ -313,7 +313,10 @@ function project(kind, crs, origin) {
 	ok('...and every one of them carries both coordinate columns',
 		withCoords.length === 3, withCoords.map(s => s.id).join(', '));
 
-	const linkSpecs = L.paneTables().filter(s => s.group !== 'node');
+	// **'link', NOT 'not node'** (Task 247): a customer table joined the strip and it DOES carry a
+	// location pair of its own, so the old spelling read the new table as a link and failed on a
+	// column that is correct. The claim here was always about links.
+	const linkSpecs = L.paneTables().filter(s => s.group === 'link');
 	ok('a link has no coordinates of its own and is given none',
 		linkSpecs.every(s => !L.paneCols(s).some(c => c.key === 'axis1' || c.key === 'axis2')));
 

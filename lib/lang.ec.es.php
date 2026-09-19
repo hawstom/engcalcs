@@ -1070,7 +1070,6 @@ $ec_lang['lpn_settings_engine_native_tip']='Ejecuta el solucionador EPANET de la
 $ec_lang['lpn_engine_loading']='Cargando el solucionador de EPANET…';
 $ec_lang['lpn_engine_failed']='No se pudo cargar el solucionador de EPANET. Se muestra el solucionador incorporado en su lugar.';
 $ec_lang['lpn_engine_manning_note']='Nota: con rugosidad de Manning, EPANET calcula una pérdida de carga aproximadamente 0,6% menor que el solucionador incorporado.';
-$ec_lang['lpn_engine_minor_loss_note']='Nota: con el solucionador EPANET, las pérdidas localizadas resultan levemente menores que con el solucionador incorporado, porque EPANET redondea el valor que usa para la gravedad.';
 $ec_lang['lpn_settings_text_size']='Tamaño del texto (píxeles)';
 $ec_lang['lpn_settings_symbol_size']='Tamaño del símbolo (píxeles)';
 $ec_lang['lpn_settings_link_width']='Grosor de la línea de tubería (píxeles)';

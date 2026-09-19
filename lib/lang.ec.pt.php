@@ -1009,7 +1009,6 @@ $ec_lang['lpn_settings_engine_native_tip']='Executa o solucionador EPANET da EPA
 $ec_lang['lpn_engine_loading']='Carregando o solucionador do EPANET…';
 $ec_lang['lpn_engine_failed']='Não foi possível carregar o solucionador do EPANET. Mostrando o solucionador integrado em vez disso.';
 $ec_lang['lpn_engine_manning_note']='Nota: com rugosidade de Manning, o EPANET calcula a perda de carga cerca de 0,6% menor que o solucionador integrado.';
-$ec_lang['lpn_engine_minor_loss_note']='Nota: com o solucionador EPANET, as perdas localizadas saem ligeiramente menores do que com o solucionador integrado, porque o EPANET arredonda o valor que usa para a gravidade.';
 $ec_lang['lpn_engine_fetching']='Obtendo o solucionador do EPANET. Ele é baixado uma vez e depois mantido neste dispositivo, então funciona offline depois disso.';
 $ec_lang['lpn_engine_ready']='O solucionador do EPANET já está neste dispositivo, e funciona offline.';
 $ec_lang['lpn_engine_fetching_valve']='Obtendo o solucionador do EPANET, para que esta válvula possa ser resolvida agora e offline depois.';

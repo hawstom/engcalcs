@@ -58,7 +58,7 @@ const EngCalcs = { pageConfig: {} };
 // returning its argument would remove the shift, which is the one thing section 6 below is about.
 let doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 // Task 145's projection seam: inwardY()/outwardY() now ask whether the project is geographic, and
-// isGeoProject() is EXTRACTED rather than stubbed for the same reason the four converters are --
+// isLatLonProject() is EXTRACTED rather than stubbed for the same reason the four converters are --
 // a stub returning false would hold constant exactly the quantity the seam varies. `project` here
 // is a grid one, which is what a world file is about; Geom carries the Mercator pair.
 const Geom = require('../../js/lpn-geom.js').lpnGeom;
@@ -67,7 +67,7 @@ let project = { name: 'backdrop test' };
 
 eval([
 	'backdropPixelSize', 'setBackdropPixelSize', 'formatPixelSize', 'scaleBackdropAbout',
-	'docOrigin', 'isGeoProject', 'outwardX', 'outwardY', 'inwardX', 'inwardY',
+	'docOrigin', 'isLatLonProject', 'outwardX', 'outwardY', 'inwardX', 'inwardY',
 	'parseWorldFile', 'worldFileRepresentable', 'applyWorldFile', 'applyScaleEntry'
 ].map(extract).join('\n'));
 

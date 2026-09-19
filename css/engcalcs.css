@@ -1030,6 +1030,79 @@ html[lang="zh"] .ec-welcome {
    looking at them (2026-08-15). A leader that cannot be seen is worse than none: the label it
    belongs to then reads as floating free of the network. */
 .lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0); pointer-events: none; }
+/* ---- CUSTOMERS: the meter and its service connector (ROADMAP Task 247) ----------------------
+   THE STROKE WIDTH IS SET PER ELEMENT, NOT HERE, and that is the one thing about these two that
+   is unlike every other symbol on this map. A meter is drawn to its real size (about 2 m across)
+   while that is bigger than a legible dot and held at the dot beyond -- meterHalfWorld() in
+   js/looped-network.js carries the rule and Tom's own figures -- so both its box and its
+   connector carry a computed `stroke-width` attribute. A width declared here in --lpn-sym terms
+   would be a second opinion about a size the script is already deciding.
+
+   THE CONNECTOR IS NOT PICKABLE, exactly like a label's leader above it: a press on a service
+   line means the meter, which is what a reader intends by pressing one. */
+.lpn-service { stroke: #000; pointer-events: none; fill: none; }
+.lpn-service-off { display: none; }
+/* A SOLID DOT (Tom, 2026-09-17: "The map symbol is to be a solid dot."). It is drawn three to
+   seven pixels across at the zooms this map is read at, where an outlined box is a grey smudge
+   and a picture of a meter is nothing at all. The toolbar icon is the drawing; this is the mark. */
+/* **AND IT SAYS `pointer`, BECAUSE IT IS AN OBJECT ON THE MAP** (Tom, 2026-09-18: *"Cursor does
+   not change over customer editables."*). A customer wore no cursor rule at all, so the canvas's
+   own `default` reached it and the one thing that separates an object from the map on this page --
+   the glyph, since Task 659 -- was missing on the newest object here. `.lpn-node` and `.lpn-link`
+   have said `pointer` since that task; this is the same sentence about the same kind of thing, and
+   there is no third convention. The service connector needs none: it is `pointer-events: none`
+   above, so the cursor over it is whatever is behind it. */
+.lpn-meter { fill: #000; stroke: #000; cursor: pointer; }
+/* A METER ATTACHED TO NOTHING LOOKS LIKE IT. Its demand is in no junction's total and therefore
+   in no answer on the screen, so it is drawn hollow and dashed rather than merely drawn without a
+   connector: an absent line is a thing you have to notice, an empty ring is a thing you can see. */
+.lpn-meter-loose { fill: #fff; stroke-dasharray: 1.5 1.2; }
+/* The preview dot of a half-placed meter, which is view state and not an element yet. The same
+   red the rubber band it hangs off is, so the two read as one gesture in progress. */
+.lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
+/* A SERVICE CONNECTED EXACTLY TO A NODE SAYS SO WHILE IT IS (Task 247; Tom, 2026-09-17: "a very
+   close connection should snap to the nearest node"). A snap that catches and looks identical to
+   one that missed by a pixel is a snap nobody can trust, so the connector and the dot take the same
+   red the other temporary marks on this map use, and both lose it the moment a drag pulls away. */
+.lpn-service-snapped { stroke: #d32f2f; }
+.lpn-meter-snapped { fill: #d32f2f; stroke: #d32f2f; }
+/* **A SELECTED CUSTOMER IS A HIGHLIGHTED DOT** (Tom, 2026-09-18: dragging one works "except that
+   it's highlighted wrong (red circle instead of highlighted dot)"). It wore no mark of its own at
+   all: the class was applied, and nothing here answered it, so the only thing that changed on
+   screen when a customer was selected was the red ring appearing on its pipe -- which is what the
+   ring was being read as. The selection blue every other selected thing on this map takes
+   (.lpn-node.lpn-selected above), on the symbol itself.
+
+   Two classes, so it outranks the snap red and the loose white above it while a customer is
+   selected, and they come back the moment it is not. Neither signal is lost meanwhile: a service
+   connected at a node keeps the snap red on its LINE (.lpn-service-snapped), and a customer
+   connected to nothing keeps its dashes, which is the half of each signal a reader is looking
+   at anyway. */
+.lpn-meter.lpn-selected { fill: #1976d2; stroke: #1976d2; }
+/* THE CONNECTION GRIP: on the pipe, only while its customer is selected, and grabbable.
+
+   **IT WAS RED, AND RED IS WHAT MADE IT UNREADABLE** (Tom, 2026-09-18: "The red circle at the pipe
+   is confusing to me. It's not selectable."). Every other red mark on this map is a temporary
+   state -- a gesture in progress, a service snapped to a node -- so a permanent red ring beside a
+   selected customer read as a warning about the drawing rather than as a control. It is a GRIP,
+   and it takes the selection blue for the same reason the selected dot does: it exists because
+   something is selected and it disappears with the selection.
+
+   Hollow where the selected customer is solid, which is how the two grips tell themselves apart at
+   a glance: the filled dot is the house and drags the house, the ring is the connection and drags
+   the connection. */
+/* **AND IT SAYS `pointer`, NOT `grab`** (Tom, 2026-09-18: *"drag is the wrong cursor for the
+   connection point. That should be pointer to be true to the app paradigm."*). The open hand is
+   this map's PANNING glyph and nothing else -- Task 569 took it off the bare canvas and Task 659
+   gave `pointer` to every object -- so a hand on a control said "the map moves here", which is the
+   one thing this grip does not do. Every other draggable thing on this page (a node, a vertex
+   handle, a label) says `pointer` while it is draggable, so this is not a new rule; it is the grip
+   rejoining the one that was already there. */
+.lpn-custhandle { fill: #fff; stroke: #1976d2; cursor: pointer; }
+/* A METER CARRIES NO LABEL ON THE MAP (Tom, 2026-09-17: "I don't think we want labels on
+   customers. I didn't ask for them."). An account number used to be drawn beside every symbol as
+   generated annotation; it is gone, and so is the rule that was here for it. The account number
+   lives in the property box and in the Customers table, where it is read rather than glanced at. */
 /* A LABEL THE USER HAS JUST PLACED SAYS SO, AND THEN STOPS SAYING IT (Tom, 2026-08-15, after
    discovering he had dragged a label without meaning to: "put a timed box or highlight on dragged
    labels for about a minute, maybe fading, maybe dashed, maybe animated so it's obviously
@@ -1220,6 +1293,12 @@ html[lang="zh"] .ec-welcome {
 .lpn-demand-table input[type="number"] { width: 5em; }
 .lpn-demand-table input[type="text"] { width: 7em; }
 .lpn-demand-table select { max-width: 7em; }
+/* THE METERS A JUNCTION CARRIES, LUMPED BEHIND ONE LINE (Tom, 2026-09-18). The summary is the
+   count and the total, so it must read as one line of the box and not as a heading over an empty
+   space; the table under it keeps the demand-table treatment it already had. */
+.lpn-node-customers { margin: 2px 0; }
+.lpn-node-customers-sum { cursor: pointer; }
+.lpn-node-customers-count { font-weight: normal; }
 /* A glyph, not a button: the same treatment the toolbar's icons get, so a row of data does not
    carry a row of push-button relief. It lights up under the pointer, which is where the "this is a
    control" signal belongs. */

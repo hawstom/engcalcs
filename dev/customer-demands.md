@@ -1,8 +1,15 @@
 # Customers and metered demands (`lpn_`) — design, not a build plan
 
-Scope for ROADMAP Task 247. **Nothing here is built.** Tom raised the customer-management framing on
-2026-08-24 and said in the same breath that he is not sure where it is headed, so this document's job
-is to fix the shape and the rejected alternatives, not to commit to an implementation.
+Scope for ROADMAP Task 247. **Slices 1, 2 and 3 shipped 2026-09-15 together** -- the drawn meter,
+the account number, the count, the derived junction, the draggable attachment, the Customer table and
+the `.inp` answer. Tom asked for something to test, and the field work and the drawing surface touch
+no common seam, so they were built in one pass rather than in the recommended order; §6 says which
+parts of each slice are in and which are not. Everything above §6 describes the shape as built unless
+a line says otherwise.
+
+Tom raised the customer-management framing on 2026-08-24 and said in the same breath that he is not
+sure where it is headed, so this document's original job was to fix the shape and the rejected
+alternatives rather than to commit to an implementation; that is still what it is for.
 
 His steer, verbatim:
 
@@ -71,12 +78,21 @@ State it precisely, because the meter attaches to a pipe and not to a node:
 3. A tie is broken deterministically toward `from`. Never randomly, and never by splitting the demand
    between both ends.
 
-**Store the attachment, derive the node.** `customer = {id, account, demand, pattern, link, t, mx, my}`
-— where the assigned junction is computed, not stored. The user's statement is *this service comes
+**Store the attachment, derive the node.** As built: `customer = {id, account, demand, count, link,
+t, x, y}` — where the assigned junction is computed, not stored, and `x`/`y` is an OFFSET from the
+attachment point while the customer is attached and an absolute position while it is not, which is
+the dual meaning a Text label's own x/y already has (`customerPoint()` is the one door, as
+`textLabelPoint()` is). `pattern` is read if a document states one and no control writes one yet. The user's statement is *this service comes
 off that pipe, here*; which end it lumps at is a consequence, and a consequence that is recomputed is
 a consequence that cannot go stale. The precedent already in the code is `lenAuto` on a pipe length:
-derived until the user types one. Same shape here — an optional explicit `atNode` pin, set from the
-popup, which then wins and is shown as pinned.
+derived until the user types one.
+
+**NOT BUILT: the optional explicit `atNode` pin.** It was proposed here as the `lenAuto` shape's
+second half, and Tom's own 2026-08-24 ruling supersedes the need for it: the attachment point is
+user-draggable along its pipe (§7), so a reader who disagrees with the derived junction moves the
+service to where it really connects, which states the same thing about the network and states it
+where a reader can see it. A pin would be a second way to say it and the only one invisible on the
+drawing. Build it only if a real case turns up that dragging cannot express.
 
 Because the assignment is derived, the popup and the status bar must **show which junction this
 customer currently lumps at**. Dragging a meter past the midpoint of a pipe silently moves flow from
@@ -120,10 +136,15 @@ against the vendored engine in `dev/lpn-spike/demand-category-harness.js`.
 Recommended answer, in three parts:
 
 1. **The numbers ride out, one `[DEMANDS]` row per customer** — which is the writer Task 468 already
-   ships, one row per demand, so this is a field on a row and not a new section. Note that the
-   Category position is now genuinely occupied by the category (who), so an account number wants its
-   own convention rather than the same slot. A file we write then re-imports with the same total, and the breakdown survives
-   as far as the format allows.
+   ships, one row per demand, so this is a field on a row and not a new section. **AS BUILT, THE
+   ACCOUNT NUMBER TAKES THE CATEGORY SLOT rather than a convention of its own**, and the reasoning
+   reverses the sentence that stood here: the category is the one field of a `[DEMANDS]` row that can
+   hold a NAME, Task 468's own ruling is that a category names *who* the demand is, and an account
+   number is exactly that kind of name. A private key convention inside the comment would be a
+   format only we can read, in the one file whose whole purpose is that everybody can. The row
+   re-imports as a demand category named by the account number, which is the honest sentence below
+   ("the `.inp` file keeps their totals and their names") arriving at the field level. The count is
+   not in the file: the row states `count x demand`, the total, which is what the model means.
 2. **The geometry does not.** The meter position, the pipe attachment and the perpendicular service
    have nowhere to go in an `.inp`. Say so, per customer, in the export report. Task 483 shipped the
    symmetric mechanism on the import side — a `{code, detail}` note filed on the element and composed
@@ -184,12 +205,34 @@ The gesture:
   *pick the pipe that serves it.* Hovering a pipe highlights it and previews the perpendicular stub
   and the junction it would lump at. Click attaches. Escape or a click on nothing cancels and removes
   the meter — never leave a half-made object on the drawing.
-- **Click directly on a pipe → one click is enough:** attach there and place the meter one default
-  offset out on the open side. A row of twelve houses along one main is the common case, and it should
-  not cost twenty-four clicks.
+- **REMOVED 2026-09-18: the one-click door.** A press straight onto a pipe used to attach a meter
+  there and place it one default offset out on the side of the press. Tom had it taken out --
+  *"I did not ask for it, it could be difficult to manage... Let's remove it. It's of questionable
+  value."* It is recorded here so it is not rebuilt: he liked it for a day (2026-09-17), listed the
+  two things wrong with it -- the offset would have to become a Settings row, and left-versus-right
+  was decided by a fraction of a pixel with nothing on screen to say so -- and then answered his own
+  question in the other direction. **The later word wins.** The tool is two presses, always.
 - The stub is drawn perpendicular from the meter to its attachment point. Dragging the meter moves the
   attachment; dragging past mid-pipe flips the assigned junction, which is why the readout in §2 is
   not optional.
+- **THE METER IS THE INPUT AND THE CONNECTION IS DERIVED, in every writer** (Tom, 2026-09-18: *"You
+  are putting the meter at the pipe point instead of at the meter point. Put the meter where user
+  clicks. Snap perpendicular to the selected link or snap to the selected node."*). The second press
+  names the pipe and states no station; the station is the nearest point on that pipe to where the
+  meter already is. Getting this backwards is what the gesture shipped with, and it slid the symbol
+  away from the hand by the distance between the two presses measured along the main.
+  **On a node the offset is kept whole rather than squared**, because a junction is where several
+  mains meet and there is no one of them to be perpendicular to.
+
+**THE JUNCTION'S OWN BOX LUMPS THEM** (Tom, 2026-09-18: *"We need to lump the meters with an
+expansion to see the connected customers and their demands."*). The property box listed every meter
+serving the junction, which is fine at two and pushes the elevation, the demand rows and the resolved
+answer off the bottom at forty -- the density problem below, arriving in the property box rather than
+on the map. One shut line now states the count and the total, which are the two numbers the list was
+being read for, and the meters are behind an expander. **Which junction's list is open is BROWSER
+furniture** by CLAUDE.md's project-versus-browser rule: it is remembered for the life of the page so
+a rebuild does not shut it under the reader's hand, and it reaches neither `serializeProject()` nor
+`localStorage`.
 
 Hit-testing and drawing:
 
@@ -226,28 +269,48 @@ the project document** — the same argument that gave this page project units i
 **One privacy note that is easy to miss.** An account number plus a map position is
 personal-adjacent data in a way nothing else in this suite is. It stays in the user's own project like
 everything else and we never transmit it — but it must never appear in a log row, a usage statistic or
-an error report, and a shared project file now carries it. Anyone building this owes
-`dev/cookie-storage-inventory.md` a paragraph.
+an error report, and a shared project file now carries it.
+
+**As built:** nothing writes an account number anywhere but into the project document.
+`log_bucket_check.php` lists six appending log writers in shipped PHP and this feature added none;
+the one logging call the placement gesture makes is `logLpnFirstAction('element')`, which records a
+literal and names no element and no field. `dev/cookie-storage-inventory.md` carries the paragraph.
 
 ## 6. Staged plan
 
 - **Slice 0 — Task 468 (prerequisite). SHIPPED 2026-08-26** — demand rows on a junction: base
   demand, pattern, category, itemized both ways through `.inp`. See the structure note in §3.
-- **Slice 1 — the smallest useful customer.** An account-number column on those rows, plus a
-  per-junction total. No geometry, no meter, no gesture. It ships the vocabulary and the export story
-  (§3) and is testable before a single pixel is drawn — and it is the version that works on a phone.
-- **Slice 2 — the drawn meter.** `linkAnchor {link, t}` shared with Task 502; the meter object, the
-  two-click gesture, the derived-node rule, the detached state and the status readout.
-- **Slice 3 — round trips.** Per-customer `[DEMANDS]` rows, the export loss report, and a harness
-  asserting that an untouched imported junction is still byte-identical.
+- **Slice 1 — the smallest useful customer. SHIPPED 2026-09-15**, though not in the shape proposed
+  here: the account number is a field on the CUSTOMER rather than a column on a junction's own demand
+  rows, because a customer turned out to be cheap enough to build whole. A junction's total picks
+  every meter up through `demandRowsOf()`, which is the one door the map labels, the colour ramp, the
+  Tables column, the popup's resolved Demand and both solvers already read a demand through.
+- **Slice 2 — the drawn meter. SHIPPED 2026-09-15.** The meter object, the two-click gesture (its
+  one-click door was removed 2026-09-18, §4), the derived-node rule, the count, the detached state, the slide handle on the pipe
+  and a Customers tab in the bottom pane. **`linkAnchor {link, t}` was NOT extracted into a shared
+  function** -- a Text already stores `anchorLink`/`anchorT` and a customer stores `link`/`t`, so the
+  seam Task 502 is meant to build is still two spellings of one idea and is still that task's to
+  unify. **NOT BUILT: the zoom-dependent label density rule** (§4's last bullet). The account number
+  is generated annotation, so it hides with the rest of it at the one threshold this page already
+  has; nobody has yet drawn forty meters on one main and measured what that looks like.
+- **Slice 3 — round trips. SHIPPED 2026-09-15.** Per-customer `[DEMANDS]` rows, the export
+  difference report, and `dev/lpn-spike/customer-harness.js` asserting that a junction which never
+  had a customer writes the same row either way.
 - **Slice 4 — only if asked.** Finding a customer by account number (Task 353's element search is the
   host), totals by pressure zone, bulk entry.
 - **Never, without a new decision from Tom:** billing, consumption history, meter reads, or a customer
   store that lives outside a project.
 
-**Recommended first slice: Slice 1**, on top of Task 468. It delivers the part of the vision that is
-unambiguously design work, it settles the `.inp` answer while it is still cheap to change, and it does
-not spend the drawing-surface budget before we know where this is headed.
+**Recommended first slice was Slice 1**, on top of Task 468, because it settles the `.inp` answer
+while it is still cheap to change and spends none of the drawing-surface budget. What changed is that
+Tom wanted something to test; the reasoning was right and the recommendation was overtaken.
+
+**What is NOT built, in one list:** the `atNode` pin (§2, and the ruling that supersedes it); the
+zoom-dependent density rule (§4); finding a customer by account number, totals by pressure zone and
+bulk entry (Slice 4, "only if asked"); a Meter row in Settings' ID-prefix list, which is absent for
+the reason Text's is -- `applyIdPrefixToAll()` knows only nodes and links, and a meter's id is not
+renameable from any screen; and a customer in Find, which is why the Customers table declines to
+answer a filter rather than hiding every row.
 
 ---
 

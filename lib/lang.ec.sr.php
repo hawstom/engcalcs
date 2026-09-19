@@ -1110,7 +1110,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Овај вентил упућује на к
 $ec_lang['lpn_select_first']='Ништа није изабрано. Прво кликните на елемент на мапи, а затим притисните тастер Delete.';
 $ec_lang['lpn_field_lon']='Географска дужина';
 $ec_lang['lpn_field_lat']='Географска ширина';
-$ec_lang['lpn_engine_minor_loss_note']='Напомена: са EPANET решавачем, локални губици испадају незнатно нижи него са уграђеним решавачем, јер EPANET заокружује вредност коју користи за гравитацију.';
 $ec_lang['template_share_manual']='Копирајте овај линк:';
 $ec_lang['lpn_time_menu']='Време';
 $ec_lang['lpn_time_duration']='Укупно време рада';

@@ -1116,7 +1116,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='यह वाल्व एक ऐसे ह�
 $ec_lang['lpn_select_first']='कुछ भी चुना नहीं गया है। पहले मानचित्र पर किसी तत्व पर क्लिक करें, फिर Delete दबाएँ।';
 $ec_lang['lpn_field_lon']='देशांतर';
 $ec_lang['lpn_field_lat']='अक्षांश';
-$ec_lang['lpn_engine_minor_loss_note']='नोट: EPANET सॉल्वर के साथ, स्थानीय (लघु) हानियाँ बिल्ट-इन सॉल्वर की तुलना में थोड़ी कम आती हैं, क्योंकि EPANET गुरुत्वाकर्षण के लिए जिस मान का उपयोग करता है उसे पूर्णांकित करता है।';
 $ec_lang['template_share_manual']='यह लिंक कॉपी करें:';
 $ec_lang['lpn_time_menu']='समय';
 

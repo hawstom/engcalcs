@@ -265,5 +265,5 @@ free of every one of those obligations; proj4js afterwards, on its own merits, a
 **A bigger catalogue does not make a projected project more useful; it makes it CORRECTLY NAMED.**
 Worth saying out loud before anybody reads the row count as progress: a user who picks their State
 Plane zone still gets no basemap, no place-name search, no terrain elevations and no initial view on
-their site, because all four are gated on `isGeoProject()` and none of them can be had without a
+their site, because all four are gated on `isLatLonProject()` and none of them can be had without a
 transform. The catalogue is necessary for the release and is not sufficient for the feature.

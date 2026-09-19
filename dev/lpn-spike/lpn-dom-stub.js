@@ -384,6 +384,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves', 'lpn_pane_text',
+  'lpn_pane_customers',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
   // The time-series tab and its three boxes (ROADMAP Task 599), the profile's twin. Absent from
   // this list, rebuildTsForm() and renderTimeSeries() return at their first line and the chart

@@ -4,7 +4,7 @@
 //
 // Tom, 2026-09-14: *"the world map is not in the background. It appears that the math to put the
 // world map tiles on the projected map is not implemented or is wrong."* It was not wrong; it was
-// absent. `basemapOn()` had read `isGeoProject() && ...` since 2026-08-18, so a projected project
+// absent. `basemapOn()` had read `isLatLonProject() && ...` since 2026-08-18, so a projected project
 // had never drawn a tile -- there was nowhere to put one, because the page could not turn a
 // longitude into an easting.
 //
@@ -60,7 +60,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetMapSized: function () { mapSized = true; },\n" +
 	"\t\tapplyView: applyView, currentView: currentView,\n" +
 	"\t\tassignCrs: assignProjectCrs, crsCode: projectCrsCode,\n" +
-	"\t\tisGeo: isGeoProject, isProjected: isProjectedProject,\n" +
+	"\t\tisGeo: isLatLonProject, isProjected: isProjectedProject,\n" +
 	"\t\tbasemapOn: basemapOn, setBasemapStyle: setBasemapStyle,\n" +
 	"\t\trefreshBasemap: refreshBasemap,\n" +
 	"\t\ttiles: function () { return Array.prototype.slice.call(basemapLayer.children || []); },\n" +
@@ -74,6 +74,13 @@ const L = loadLoopedNetwork(
 	"\t\t\t&& !!EngCalcs.lpnTerrainFillFor; },\n" +
 	"\t\tcreateProjectFrom: createProjectFrom,\n" +
 	// The chooser and the wizard line that now warn BEFORE a projection is committed to.
+	// Task 692: the outward-facing MENU ROWS, the corner teaser and the Go to command, which are
+	// the gates that were left on isLatLonProject() when the basemap painter and the DEM controls
+	// were widened.
+	"\t\tmapRows: mapMenuRows, refreshTeaser: refreshBasemapTeaser,\n" +
+	"\t\tgoToLatLon: goToLatLon, satAvailable: satelliteAvailable,\n" +
+	// Task 692's audit: the last gate that asked the narrow question and meant the wide one.
+	"\t\tviewLonLat: viewLonLat,\n" +
 	"\t\tcrsRegisterLoad: crsRegisterLoad, renderCrsBoxList: renderCrsBoxList,\n" +
 	"\t\tcrsBoxState: function () { return crsBox; },\n" +
 	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced,\n" +
@@ -262,7 +269,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 	head('10. The DEM elevation controls are offered too');
 	// Tom, 2026-09-14: *"A new project with a projection doesn't offer the DEM elevation
 	// buttons."* The basemap gate was widened and this one was not -- four copies of
-	// `isGeoProject() && mapboxToken()` that did not move together -- so a projected project drew
+	// `isLatLonProject() && mapboxToken()` that did not move together -- so a projected project drew
 	// the world map and then refused to read heights off the very same tiles. One predicate now.
 	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.test';
 	global.EngCalcs.lpnTerrainFillFor = global.EngCalcs.lpnTerrainFillFor || function () {};
@@ -534,6 +541,129 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		ok('creating one anyway states the projection\'s own limit',
 			byId.lpn_map_notice.textContent === PC.lpn_crs_unplaceable,
 			byId.lpn_map_notice.textContent);
+	}
+
+	head('13. The rows that OFFER all this are widened too -- Task 692');
+	// Tom, 2026-09-18, after building projects in Mesa AZ and in Fotobi, Ghana: *"Satellite view is
+	// only available for lat/lon CRS."* The painter above had been widened on 2026-09-14 and the
+	// CONTROLS over it had not, so a projected project drew a street map it could not turn off and
+	// was refused the satellite it could perfectly well have drawn. **This is the third time the
+	// same word has been the defect** -- the DEM controls were section 10 -- so the gates are
+	// asserted here rather than left to be found on the page.
+	{
+		const PC = global.EngCalcs.pageConfig;
+		PC.lpn_mapbox_token = 'pk.test';
+		const rowsFor = () => L.mapRows().filter((r) => r && !r.separator && !r.hidden);
+		const labels = () => rowsFor().map((r) => String(r.label || ''));
+		const has = (key) => labels().some((t) => t.indexOf(PC[key]) >= 0);
+
+		// A lat/lon project is the reference: everything below must be true of it too, or the
+		// widening has moved a row rather than added one.
+		L.newProject('geo', '');
+		L.setCanvas(W, H); L.setMapSized();
+		ok('a lat/lon project offers the street map row', has('lpn_basemap_hide') || has('lpn_basemap_show'));
+		ok('...the satellite row', has('lpn_basemap_satellite_show') || has('lpn_basemap_satellite_hide'));
+		ok('...and Go to', has('lpn_goto_menu'));
+
+		L.newProject(null, ZONE12N);
+		L.setCanvas(W, H); L.setMapSized();
+		ok('a projected project can be located at all', L.locatable());
+		ok('**the satellite row is offered on a projected project**',
+			has('lpn_basemap_satellite_show') || has('lpn_basemap_satellite_hide'), labels().join(' | '));
+		ok('...and so is the street map row',
+			has('lpn_basemap_hide') || has('lpn_basemap_show'), labels().join(' | '));
+		ok('...and the corner teaser is not hidden', (function () {
+			byId.lpn_basemap_teaser.style.display = 'none';
+			L.refreshTeaser();
+			return byId.lpn_basemap_teaser.style.display !== 'none';
+		}()), byId.lpn_basemap_teaser.style.display);
+		// The row has to WORK, not merely appear -- section 10b's lesson, where a widened gate met
+		// a second copy of the old question inside the command.
+		ok('...and pressing it actually paints satellite tiles', (function () {
+			const row = L.mapRows().filter((r) => r && !r.hidden && r.label
+				&& String(r.label).indexOf(PC.lpn_basemap_satellite_show) >= 0)[0];
+			if (!row) { return false; }
+			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
+			row.fn();
+			return L.tiles().length > 0
+				&& L.tiles().every((t) => /mapbox/.test(String(t.href)));
+		}()), L.tiles().length + ' tiles');
+
+		// **GO TO IS THE ONE FOUND BY LOOKING RATHER THAN BY BEING TOLD.** Its menu row already
+		// read projectLocatable() -- widened on 2026-09-14 with the search row beside it -- while
+		// the command behind it still returned on the first line for anything but lat/lon. So it
+		// was a row that opened no prompt at all.
+		L.newProject(null, ZONE12N);
+		L.setCanvas(W, H); L.setMapSized();
+		let asked = 0;
+		global.window.prompt = function () { asked++; return String(PHOENIX.lat) + ',' + String(PHOENIX.lon); };
+		global.prompt = global.window.prompt;
+		L.goToLatLon();
+		ok('Go to asks for a coordinate on a projected project', asked === 1, 'asked=' + asked);
+		{
+			const v = L.currentView(), want = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			ok('...and travels to it, through the transform',
+				!!v && Math.abs(v.cx - L.inwardX(want.x)) < 1 && Math.abs(v.cy - L.inwardY(want.y)) < 1,
+				v ? v.cx.toFixed(1) + ', ' + v.cy.toFixed(1) : 'no view');
+		}
+
+		// **AND A PROJECT THAT CANNOT BE LOCATED KEEPS EVERY ONE OF THEM SHUT.** A widening that
+		// also offers a dead row on a grid project has traded one defect for the same defect.
+		L.newProject(null, '');
+		L.setCanvas(W, H); L.setMapSized();
+		ok('a grid project is not locatable', L.locatable() === false);
+		ok('...so it is offered no satellite row',
+			!has('lpn_basemap_satellite_show') && !has('lpn_basemap_satellite_hide'), labels().join(' | '));
+		ok('...no street map row', !has('lpn_basemap_show') && !has('lpn_basemap_hide'));
+		ok('...no Go to row', !has('lpn_goto_menu'));
+		byId.lpn_basemap_teaser.style.display = '';
+		L.refreshTeaser();
+		ok('...and no corner teaser', byId.lpn_basemap_teaser.style.display === 'none');
+		asked = 0;
+		L.goToLatLon();
+		ok('...and Go to, called anyway, still refuses', asked === 0);
+	}
+
+	head('14. The last reader the audit turned up -- where the New project box opens');
+	// Every isLatLonProject() reader was read on 2026-09-18 after the third defect from the same word.
+	// All but one genuinely mean "are these numbers a longitude and a latitude" -- the Mercator
+	// boundary, the coordinate bounds, the decimal places, the `_xsrc` record. The exception was
+	// the New project box's place pre-fill, whose own comment still said turning an easting into a
+	// longitude was "the transform this page does not have" -- true when written, false since the
+	// page gained js/lpn-crs.js. It costs no dead control, only a chooser that opens on the whole
+	// register while the project behind it knows the town.
+	{
+		L.newProject('geo', '');
+		L.setCanvas(W, H); L.setMapSized();
+		L.applyView({ cx: L.inwardX(PHOENIX.lon), cy: L.inwardY(PHOENIX.lat), s: 200 });
+		{
+			const ll = L.viewLonLat(L.currentView());
+			ok('a lat/lon project reads its own view as a place', !!ll
+				&& Math.abs(ll.lat - PHOENIX.lat) < 0.01 && Math.abs(ll.lon - PHOENIX.lon) < 0.01,
+				ll ? ll.lat.toFixed(4) + ', ' + ll.lon.toFixed(4) : 'null');
+		}
+
+		L.newProject(null, ZONE12N);
+		L.setCanvas(W, H); L.setMapSized();
+		{
+			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
+			const ll = L.viewLonLat(L.currentView());
+			ok('**and so does a projected one, through the transform**', !!ll
+				&& Math.abs(ll.lat - PHOENIX.lat) < 0.01 && Math.abs(ll.lon - PHOENIX.lon) < 0.01,
+				ll ? ll.lat.toFixed(4) + ', ' + ll.lon.toFixed(4) : 'null');
+			ok('...and states no extent, because a camera is not the size of a place',
+				!!ll && ll.extent === null);
+		}
+
+		// A grid project's view is canvas units and there is nothing on the Earth to report. Null
+		// is the honest answer and the caller falls back to the place-name search.
+		L.newProject(null, '');
+		L.setCanvas(W, H); L.setMapSized();
+		L.applyView({ cx: 400, cy: 300, s: 1 });
+		ok('a grid project reports no place at all', L.viewLonLat(L.currentView()) === null);
+		ok('...and neither does a missing view', L.viewLonLat(null) === null);
 	}
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall projected-basemap checks passed');

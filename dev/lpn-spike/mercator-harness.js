@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tmigrateSaved: migrateSaved, serializeProject: serializeProject, applySaved: applySaved,\n" +
 	"\t\tstorageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
 	"\t\toutwardX: outwardX, outwardY: outwardY, inwardX: inwardX, inwardY: inwardY,\n" +
-	"\t\tisGeo: isGeoProject, docOrigin: docOrigin, docFromInp: docFromInp,\n" +
+	"\t\tisGeo: isLatLonProject, docOrigin: docOrigin, docFromInp: docFromInp,\n" +
 	"\t\tdocSignature: docSignature,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +

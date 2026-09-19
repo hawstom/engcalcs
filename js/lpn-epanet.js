@@ -1585,6 +1585,33 @@
 	EngCalcs.LPN_EPANET_SLICE_MS = 100;
 
 	/**
+	 * **THE SHARE OF THE PROGRESS BAR THE OUTPUT-FILE READ OWNS** (ROADMAP Task 686).
+	 *
+	 * **THE DEFECT WAS THE BAR, NOT THE MILLISECONDS.** Reading the reaction rate out of EPANET's
+	 * binary output costs a measured 234 ms on Net3 over 24 hours at a 5 minute step -- and it ran
+	 * AFTER the bar had already reached 100%, on the main thread. A bar at 100% that then freezes
+	 * does not read as a run still working; it reads as the page hanging. It scales with links
+	 * times periods, so a utility-scale network at a fine step pays seconds of exactly that.
+	 *
+	 * **SO THE READ GETS A SHARE OF THE BAR AND THE BAR DOES NOT FINISH UNTIL THE OUTPUT IS IN
+	 * HAND** (Tom, 2026-09-18, rejecting both a worker and a narrower reader: *"Add some arbitrary
+	 * amount to the progress bar (just guess a percent like 10% based on what you've seen so far)
+	 * and don't finish the progress bar until all the output is available."*). 10% is his own
+	 * guess and is deliberately a guess: the read's cost against the run's is a property of the
+	 * network, not a constant, and no honest number exists to put here. What the share buys is not
+	 * accuracy -- it is that the freeze happens at 90% with a bar still saying "running" instead of
+	 * at 100% with a bar saying "done".
+	 *
+	 * **AND THE RUN YIELDS BEFORE THE READ**, which is the half a reserved share alone would not
+	 * give: without one macrotask between them the browser never paints the 90%, and the reader
+	 * would see the bar jump from wherever it was straight to 100% after the freeze.
+	 *
+	 * Zero where there is nothing to read -- no chemical quality analysis means no output file and
+	 * no read, and a bar that stopped at 90% for ever would be a defect of its own.
+	 */
+	EngCalcs.LPN_EPANET_READ_SPAN = 0.10;
+
+	/**
 	 * `options.onProgress` is called with `{t, duration, fraction, frames}` at the end of every
 	 * slice, plus once at the start and once at the end. **THE FRACTION IS SIMULATED TIME**, which
 	 * is real progress rather than a guess: EPANET's clock only ever moves forward, so t/duration is
@@ -1670,7 +1697,14 @@
 					// The two passes share one progress bar, so each owns half of it. Both are the
 					// same walk over the same duration, which is the only reason a flat half-and-half
 					// split is honest rather than a guess.
-					phase0 = 0, phaseSpan = qualOn ? 0.5 : 1;
+					// **THE BAR HAS THREE PHASES WHEN THERE IS AN OUTPUT FILE TO READ** (Task
+					// 686): the hydraulic walk, the quality walk, and the read. The first two
+					// share what the read does not take, still half and half -- they are the same
+					// walk over the same duration, which is the only reason a flat split is honest
+					// rather than a guess. See LPN_EPANET_READ_SPAN for why the third exists.
+					readSpan = rateOn ? EngCalcs.LPN_EPANET_READ_SPAN : 0,
+					runSpan = 1 - readSpan,
+					phase0 = 0, phaseSpan = qualOn ? runSpan / 2 : runSpan;
 
 				// ALWAYS closed, on every path out. A Project is a WASM allocation inside a
 				// Workspace that outlives it, so a run that threw would otherwise leak the whole
@@ -1828,9 +1862,28 @@
 							}
 						}
 					}
+					/**
+					 * **THE BAR FINISHES WHEN THE OUTPUT IS IN HAND, NOT WHEN THE CLOCK STOPS**
+					 * (Task 686). Where there is a binary output file to read, the run holds the
+					 * bar at `runSpan` and YIELDS before reading it: one macrotask is what lets
+					 * the browser paint that 90% before 234 ms -- or, on a big network at a fine
+					 * step, seconds -- of synchronous reading. Without the yield the reserved
+					 * share would exist and nobody would ever see it.
+					 *
+					 * Where there is nothing to read this is the old path exactly, single task
+					 * and all: `readSpan` is 0, so `runSpan` is 1 and the last tick of the walk
+					 * already said 100%.
+					 */
 					function done() {
-						var report = shutdown();
-						fillReactionRates();
+						if (!rateOn) { finish(shutdown()); return; }
+						tell(runSpan);
+						setTimeout(function () {
+							var report = shutdown();
+							fillReactionRates();
+							finish(report);
+						}, 0);
+					}
+					function finish(report) {
 						seen = 1;
 						tell(1);
 						resolve({
@@ -1922,7 +1975,7 @@
 							// EPANET'S OWN number in place of one of ours.
 							p.initQ(rateOn ? EN_SAVE : EN_NOSAVE);
 						} catch (e) { failed(e); return; }
-						phase0 = 0.5; phaseSpan = 0.5; t = 0; guard = 0;
+						phase0 = runSpan / 2; phaseSpan = runSpan / 2; t = 0; guard = 0;
 						qslice();
 					}
 					function slice() {

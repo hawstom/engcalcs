@@ -513,6 +513,46 @@ ok('GEOREFERENCE HERE CHANGES NOT ONE STORED BYTE', snapshot() === before,
 ok('the placement it keeps is the one on the screen',
 	JSON.stringify(L.xyGeoref()) === JSON.stringify(placed));
 
+// ---- AND IT IS OFFERED SATELLITE, WHICH IS TASK 692's QUESTION ASKED A FOURTH TIME ------------
+//
+// Tom, 2026-09-18: *"Satellite unreliable: I am specifically not getting satellite view on local
+// testing of feat/xy-world-map."* Task 692 renamed the narrow predicate isLatLonProject() because
+// four capabilities were gated on "are these coordinates a latitude and a longitude" when what they
+// meant was "can this project be put on the Earth at all". **A georeferenced XY project is the case
+// that could not exist when that audit ran** -- emphatically not lat/lon, and locatable all the
+// same -- so its own basemap rows were gated on the narrow question and the satellite row was
+// simply absent. basemapChoosable() is the wide question, and the STREET and SATELLITE rows and the
+// corner teaser are the three readers of it.
+//
+// **Go to, the place-name search and the DEM elevations are deliberately NOT here**, and that is the
+// other half of the same ruling: each of those needs more than a transform, and a row that is
+// offered and does nothing is the defect 692 closed. Asserted in both directions, so widening the
+// wrong three fails here rather than reaching Tom.
+{
+	// **A TOKEN IS SUPPLIED HERE, because the question under test is the PREDICATE and not the
+	// account.** satelliteAvailable() reads `pc.lpn_mapbox_token`, which lib/config.inc.php fills on
+	// the served page and which no harness has; without it the satellite row is correctly absent for
+	// a reason that has nothing to do with this branch, and the assertion would pass or fail by
+	// accident. Put back afterwards, so nothing below inherits it.
+	const PCS = global.EngCalcs.pageConfig || {};
+	const tokenWas = PCS.lpn_mapbox_token;
+	PCS.lpn_mapbox_token = 'pk.harness';
+	const rows = L.mapMenuRows().filter(function (r) { return !r.hidden; })
+		.map(function (r) { return r.label; });
+	ok('a georeferenced XY project can say where on the Earth it is', L.basemapChoosable() === true);
+	ok('...so the STREET MAP row is offered', rows.indexOf(PCS.lpn_basemap_show) >= 0 ||
+		rows.indexOf(PCS.lpn_basemap_hide) >= 0, rows.join(' | '));
+	ok('...AND THE SATELLITE ROW IS OFFERED', rows.indexOf(PCS.lpn_basemap_satellite_show) >= 0 ||
+		rows.indexOf(PCS.lpn_basemap_satellite_hide) >= 0, rows.join(' | '));
+	ok('...while Go to stays on the narrow question, being more than a transform',
+		rows.indexOf(PCS.lpn_goto_menu) < 0, rows.join(' | '));
+	if (tokenWas === undefined) { delete PCS.lpn_mapbox_token; } else { PCS.lpn_mapbox_token = tokenWas; }
+	ok('...and with no account there is no satellite row to offer, which is the other half',
+		L.mapMenuRows().filter(function (r) { return !r.hidden; })
+			.every(function (r) { return r.label !== PCS.lpn_basemap_satellite_show &&
+				r.label !== PCS.lpn_basemap_satellite_hide; }));
+}
+
 // **(3) THE STATUS BAR SAYS `unnamed`** -- Tom's own third step, and the middle of three values.
 const PC0 = global.EngCalcs.pageConfig || {};
 ok('the map status reads unnamed once the world map is attached',

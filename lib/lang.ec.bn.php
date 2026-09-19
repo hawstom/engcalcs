@@ -1114,7 +1114,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='এই ভালভ এমন একটি �
 $ec_lang['lpn_select_first']='কিছুই নির্বাচিত নেই। প্রথমে মানচিত্রে একটি উপাদানে ক্লিক করুন, তারপর Delete চাপুন।';
 $ec_lang['lpn_field_lon']='দ্রাঘিমাংশ';
 $ec_lang['lpn_field_lat']='অক্ষাংশ';
-$ec_lang['lpn_engine_minor_loss_note']='লক্ষ্য করুন: EPANET সমাধানকারী দিয়ে স্থানীয় ক্ষতি বিল্ট-ইন সমাধানকারীর চেয়ে সামান্য কম আসে, কারণ EPANET মহাকর্ষের জন্য যে মান ব্যবহার করে তা রাউন্ড করে।';
 $ec_lang['template_share_manual']='এই লিংকটি কপি করুন:';
 $ec_lang['lpn_time_menu']='সময়';
 

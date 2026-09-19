@@ -1122,7 +1122,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='یہ والو ایک ایسے ہیڈ لاس 
 $ec_lang['lpn_select_first']='کچھ منتخب نہیں ہے۔ پہلے نقشے پر کسی عنصر پر کلک کریں، پھر حذف کریں دبائیں۔';
 $ec_lang['lpn_field_lon']='طول بلد';
 $ec_lang['lpn_field_lat']='عرض بلد';
-$ec_lang['lpn_engine_minor_loss_note']='نوٹ: EPANET حل کار کے ساتھ، مقامی نقصان بلٹ ان حل کار کے مقابلے میں معمولی سا کم آتا ہے، کیونکہ EPANET کشش ثقل کے لیے جو قدر استعمال کرتا ہے اسے قریب ترین عدد پر گول کرتا ہے۔';
 $ec_lang['template_share_manual']='یہ لنک کاپی کریں:';
 $ec_lang['lpn_time_menu']='وقت';
 $ec_lang['lpn_time_duration']='کل چلنے کا وقت';

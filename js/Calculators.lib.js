@@ -233,6 +233,36 @@ EngCalcs._QUEUE_DB = 'engcalcs-offline-queue';
 EngCalcs._QUEUE_STORE = 'queue';
 EngCalcs._QUEUE_MAX_ATTEMPTS = 20;
 
+/**
+ * IS THIS ANSWER WORTH SENDING AGAIN? (ROADMAP Task 626.)
+ *
+ * **A REFUSAL IS FINAL AND ONLY A CONNECTIVITY FAILURE IS WORTH RETRYING.** The queue was written
+ * for the field worker who walks out of signal, and it queued on `!resp.ok` as well as on a thrown
+ * fetch -- so a 400 went in beside a dropped connection. The flush re-sends `record.params`
+ * VERBATIM, so the retry is byte-identical and so is the refusal: one malformed beacon became 20
+ * rejections, because the flush runs on every `online` event and on every later page load. The
+ * server had already met this from the other side, and log-calc-event.php still carries the
+ * workaround in a comment: an opted-out visitor is answered 204 rather than a refusal, so that the
+ * beacon would not come back.
+ *
+ * The three that are NOT final, and each is a request that never got a hearing:
+ *
+ *   * **408 Request Timeout** -- the server gave up waiting for the body.
+ *   * **429 Too Many Requests** -- it is asking for later, in those words.
+ *   * **5xx** -- the server broke, which says nothing about the payload.
+ *
+ * Everything else a shipped endpoint answers is a verdict on what was sent. These four log
+ * endpoints answer 204 or 400 and nothing between, so in practice this is "a 400 is dropped"; it
+ * is written as a rule rather than as that one number because the next endpoint may answer 413 or
+ * 422 and those are just as final.
+ */
+EngCalcs._retryWorthwhile = function (status) {
+	'use strict';
+	var s = Number(status);
+	if (!isFinite(s) || s <= 0) { return true; }   // no status at all is a thrown fetch's shape
+	return s === 408 || s === 429 || s >= 500;
+};
+
 EngCalcs._openQueueDB = function () {
 	'use strict';
 	return new Promise(function (resolve, reject) {
@@ -290,7 +320,9 @@ EngCalcs._sendOrQueue = function (url, params) {
 	}
 	fetch(url, { method: 'POST', body: body, keepalive: true, credentials: 'same-origin' })
 		.then(function (resp) {
-			if (!resp.ok) EngCalcs._queueBeacon(url, params);
+			// The server READ this and said no, so sending the same bytes again can only get the
+			// same no. Only an answer that says "not now" is queued -- see _retryWorthwhile().
+			if (!resp.ok && EngCalcs._retryWorthwhile(resp.status)) EngCalcs._queueBeacon(url, params);
 		})
 		.catch(function () {
 			EngCalcs._queueBeacon(url, params);
@@ -357,7 +389,13 @@ EngCalcs.flushQueue = function () {
 					body: new URLSearchParams(params),
 					credentials: 'same-origin'
 				}).then(function (resp) {
-					if (resp.ok || record.attempts + 1 >= EngCalcs._QUEUE_MAX_ATTEMPTS) {
+					// **A REFUSAL DROPS THE RECORD HERE TOO, RATHER THAN SPENDING 19 MORE
+					// ATTEMPTS ON IT** (Task 626). The attempts counter is a bound on a queue that
+					// cannot drain; it is not a reason to keep re-sending bytes the server has
+					// already judged. A record queued before this rule existed meets it on its
+					// next flush and leaves then.
+					if (resp.ok || !EngCalcs._retryWorthwhile(resp.status)
+							|| record.attempts + 1 >= EngCalcs._QUEUE_MAX_ATTEMPTS) {
 						self._deleteQueueRecord(db, record.id);
 					} else {
 						self._updateQueueRecord(db, Object.assign({}, record, { attempts: record.attempts + 1 }));

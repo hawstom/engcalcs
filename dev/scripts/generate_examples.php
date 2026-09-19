@@ -281,7 +281,7 @@ foreach ($files as $name) {
 	 * stored system could disagree with the file it describes. */
 	$system = in_array($flow, array('gpm', 'mgd', 'cfs', 'gpd'), true) ? 'us' : 'si';
 	/* An XY grid is the absence of a declaration, not a value: `project.coords` is 'geo' or it is
-	 * not there at all, which is what js/looped-network.js's isGeoProject() reads. Derived the same
+	 * not there at all, which is what js/looped-network.js's isLatLonProject() reads. Derived the same
 	 * way here so the tag cannot disagree with how the page will actually open the file. */
 	$coords = (($doc['project']['coords'] ?? '') === 'geo') ? 'geo' : 'xy';
 	$work = exampleWork($name);

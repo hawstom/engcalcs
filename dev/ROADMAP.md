@@ -331,21 +331,6 @@ the block.
   - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
     original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
 
-- 100|692| **Satellite view is refused on a projected project, and it is the DEM bug again.**
-  Tom, 2026-09-18, after making projects in Mesa AZ and Fotobi, Ghana: *"Satellite view is only
-  available for lat/lon CRS."*
-  - **IT IS THE SAME SINGLE WORD THAT BROKE Read DEM, IN THE CONTROL NEXT DOOR.** The satellite row
-    is gated on `isGeoProject()` (`js/looped-network.js:9378` and `:25968`), which means lat/lon and
-    nothing else. The elevation controls asked the same question until 2026-09-14, when `cc894f98`
-    replaced it with **"can this project say where on the Earth a point of it is"** --
-    `projectLocatable()` -- precisely because the row appeared on a projected project and then did
-    nothing. **That fix was applied to its own three entry points and not to its neighbour.**
-  - A project on an EPSG plane knows exactly where it is on the Earth; that is what the plane is for.
-    There is no reason a satellite tile cannot be drawn behind it.
-  - **SO THE REAL TASK IS WIDER THAN THE SYMPTOM: find every OTHER reader of `isGeoProject()` and
-    ask, of each, whether it means "lat/lon" or means "locatable".** Two have now been wrong for the
-    same reason, which is the signature this project keeps finding.
-
 - 75|693| **"Length and map coordinates" is a lie on an EPSG project.**
   Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
   Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
@@ -470,19 +455,6 @@ the block.
   - Belongs on `feat/lock-initials-later`, whose one-paragraph panel and button order Tom has
     already approved and which must not change.
 
-- 100|686| **The progress bar finishes before the work does.**
-  Extracted from Task 663 on Tom's own reframing, 2026-09-17: *"Add some arbitrary amount to the
-  progress bar (just guess a percent like 10% based on what you've seen so far) and don't finish the
-  progress bar until all the output is available."*
-  - **THE DEFECT IS THE BAR, NOT THE MILLISECONDS.** Reading the reaction rate out of the engine's
-    binary output costs 234 ms on Net3 over 24 hours -- but it runs on the main thread AFTER the run's
-    own progress bar has already reached the end, so it reads as the page hanging rather than as the
-    run still working. **He was offered "accept it" and "hide the rate on big networks" and rejected
-    both**, which was right: neither addresses a bar that lies, and both get worse as networks grow.
-  - Reserve a share of the bar for the read -- his guess is 10% and a guess is explicitly fine -- and
-    do not complete it until the output is in hand. Then the cost stops mattering at any size.
-
-
 - 75|679| **Narrower strokes on the About mark, and more pixels used.**
   Tom, 2026-09-15: *"The icon is golden, but I might like to see Help, About a little more
   photo-realistic since there are many more pixels. First item of business, narrower strokes on
@@ -502,7 +474,6 @@ the block.
     "more surfaces" means here:** *"possibly more realistic leg thicknesses and catwalk rendering,
     where a catwalk consists of a robust deck plus a handrail above it."* A catwalk is therefore TWO
     elements, not a line -- that is the drawing note, and it is his, not ours.
-
 
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
@@ -863,38 +834,29 @@ the block.
 
 - 100|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
-  EPANET does not. **Full design, with the costs priced: `dev/customer-demands.md`.**
-  - **Tom's expansion, in his words:** *"expand/envision as a Customer management model where we are
-    adding Customer account numbers, and these are meters on the system. Not sure where this is
-    headed, but let's at least think that way. And of course I assume that we lump the Customer
-    demands additively at their nearest (by length) node. Graphically, I think you pick a point, it
-    draws a meter rectangle, and then you pick a pipe and it connects perpendicularly from the meter
-    to the pipe."*
-  - **Task 468 is a PREREQUISITE, not a sibling** — a Customer is one of its demand rows extended,
-    and 247 must not invent a second breakdown structure. Shares the attach-to-a-link-at-a-fraction
-    seam with Task 502.
-  - **Recommended first slice: an account number on a 468 demand row, no geometry** — it settles the
-    `.inp` answer while that is still cheap to change, and spends none of the drawing-surface budget.
-  - **The account number is a label on a demand, never a key into anything**, and it is the first
-    personal-adjacent data in the suite: it must never reach a log row or a usage statistic.
-  - **AND IT IS NOT A CUSTOM PROPERTY, so 636 DOES NOT BLOCK THIS** (Tom, 2026-09-12: *"epanetjs.com
-    doesn't really have 'account number'. They just have the asset id, like any node, so it's not
-    absolutely necessary to have a custom property to get Customer working."*). This corrects a
-    recommendation made the same day that Task 636 land first so an account number could BE a custom
-    property. It can, later, and the gain would be real; what is wrong is treating it as the way in.
-    An asset id already identifies a meter, exactly as it identifies every other element.
-  - **CONCURRENCY: everything here except the shared field seams can run beside 636.** The three
-    places they collide are `pushSpecList()` (one source of truth for writable properties, 8
-    callers), the Properties popup's `BAND_NODE`/`RESULT_NODE`, and the Tables pane's columns. The
-    geometry -- the meter symbol, the perpendicular leader, the `linkAnchor {link, t}` handle, the
-    nearest-node lumping -- touches none of them. **Sequence only the field work; let the drawing
-    surface proceed.** Also shares the coordinate frame with Task 641, so the lumping arithmetic
-    waits on whatever 641 decides about the drawing plane.
-  - **Tom ruled the open questions 2026-08-24 — `dev/customer-demands.md` §7 has all of them.** The
-    two that change the build: a meter carries a **Count** (so *forty-two residential services* is
-    one symbol), and the attachment point is **user-draggable along its pipe** — a handle on the
-    `linkAnchor {link, t}` Task 502 needs anyway, on data we already store. He also asked for a
-    **Customer table**, which the pane's generated tab list makes a row rather than a mechanism.
+  EPANET does not. **Design, his rulings, and what is built against what is not:
+  `dev/customer-demands.md`. Priority left at 100 for Tom to move: Slices 1-3 are in and what is
+  left is his call.**
+  - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
+    connector, the two-click gesture and its one-click door, the account number, the **Count** (so
+    forty-two residential services are one symbol), the draggable attachment, the derived junction,
+    the detached state, a Customers tab, and the `.inp` answer.
+    `dev/lpn-spike/customer-harness.js`, 66 assertions.
+  - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
+    labels, the ramp, the Tables column, the popup's resolved Demand and both solvers pick a meter up
+    without knowing what one is. **The junction is DERIVED** -- the nearest end measured ALONG the
+    pipe, a different end from the nearest in a straight line on a bent one. **Additive: nothing a
+    meter does rewrites a number the user typed on a junction.**
+  - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
+    row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
+  - **THE ACCOUNT NUMBER IS A LABEL, NEVER A KEY**, and it reaches no log row and no usage statistic.
+  - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
+    account number in the CATEGORY comment (the one field of that row that holds a name), and a
+    `customer-geometry` difference. A junction that never had one writes the same row either way.
+  - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
+    label density rule, a customer in Find, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
+    so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture
+    here is a pointer gesture no harness can hold.
 
 - 100|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
   Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
@@ -935,11 +897,6 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
-  Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
-  file, then import anything that is not a name conflict, that probably would be all that's needed."*
-  No export function: a project file already is the export. A name conflict is reported and skipped,
-  never renamed silently.
 
 - 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
@@ -1134,30 +1091,6 @@ the block.
     BUILT, hidden below 640 px on his instruction, and unvalidated by eye.
   - Measurements behind all of it: `dev/chrome-audit.md`,
     `dev/app-chrome-postdivorce-recommendations.md`, `dev/help-menu-mastermind.md`.
-
-- 100|626| **A refused beacon is retried like an offline one, 20 times.**
-  **TOM, 2026-09-18: *"This is all CC. Do something about it or remove it."*** Raised to 100 and it
-  is a defect with a one-line fix, not a question: a 4xx means the server READ the payload and
-  refused it, so re-sending the same bytes 20 times cannot succeed and only the retry count ends it.
-  `EngCalcs._sendOrQueue()` (`js/Calculators.lib.js`) queues on `!resp.ok` as well as on a thrown
-  fetch. A 4xx is not a connectivity failure -- the server read the payload and refused it -- and
-  the flush re-sends `record.params` VERBATIM, so the retry is byte-identical and so is the
-  refusal. One malformed beacon becomes 20 rejections: `flushQueue()` runs on every `online` AND
-  every `DOMContentLoaded`, so it is one per page load until `_QUEUE_MAX_ATTEMPTS` drops it.
-  Original design, shipped with Task 119 (`ce5533df`), never revisited.
-  - **THE SYMPTOM IS A CONSOLE ERROR ON A PAGE THAT DID NOTHING WRONG, DAYS LATER**, which costs
-    out of all proportion to the lost analytics row. Found 2026-09-10 in the console of a
-    work-loss specimen, where the only suite error was a `log-human-view.php` 400 and it took a
-    live fetch of both mounts to prove the page in front of us could not have sent it
-    (`dev/lpn-blank-map-incidents.md`). **A fossil in the log is worse than a silence:** it is the
-    first thing an investigator reaches for.
-  - **The fix is one condition; the judgement is where to cut it.** Retry a throw, a 5xx and a
-    429; drop a 4xx. That loses one event, which is the right price.
-  - Still unanswered: which page ever queued an EMPTY `page`. 400 fires on `$page === ''` alone,
-    and the app page emits `cookieName='Looped-Network'` on both mounts. Task 206 fixed this class
-    once for `contact.php`; any page loading `js/Calculators.lib.js` that calls neither
-    `echoCookieScript()` nor `echoPageNameScript()` still sends an empty name. **That set is
-    enumerable and nothing enumerates it** -- a check is the right shape.
 
 - 75|635| **A Zoom to button on the Properties box.**
   Tom, 2026-09-12. Zooms the map to this element. **Use the My Location / Use Location icon**
@@ -1645,7 +1578,7 @@ the block.
     `dev/lpn-spike/projection-harness.js`, 40 assertions.
   - **NO TRANSFORM EXISTS ON THE PROJECTED PATH, BY CONSTRUCTION.** proj4js was not vendored, so
     basemap, place-name search and terrain elevations are absent rather than newly gated -- all
-    three already gate on `isGeoProject()`, which a projected project is not. The eastings and
+    three already gate on `isLatLonProject()`, which a projected project is not. The eastings and
     northings in the file are the ones the user typed and the round trip is byte-identical.
     Everything needing the inverse transform is therefore still open: State Plane and the full
     register, point scale factor, ground length, per-tile reprojection, `;CRS` in the `.inp`, and
@@ -1670,7 +1603,7 @@ the block.
     for. We know the lat/lon and zoom level they searched for."* (b) *"The world map is not in the
     background. It appears that the math to put the world map tiles on the projected map is not
     implemented or is wrong."* **It is not wrong; it is absent** -- `basemapOn()` is
-    `isGeoProject() && ...`, so a projected project has never drawn a tile.
+    `isLatLonProject() && ...`, so a projected project has never drawn a tile.
     - **THEY ARE ONE MISSING PIECE, WHICH IS THE THING TO SEE.** Both need a forward and inverse
       transform between lon/lat and the plane: (a) is one point, (b) is four corners per TILE.
       Everything else phase 4 shipped is data and needed none. Nothing cheaper works for (a)

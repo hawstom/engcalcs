@@ -1113,7 +1113,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='این شیر به منحنی افت هدی 
 $ec_lang['lpn_select_first']='چیزی انتخاب نشده. نخست یک المان را روی نقشه کلیک کنید، سپس Delete را بزنید.';
 $ec_lang['lpn_field_lon']='طول جغرافیایی';
 $ec_lang['lpn_field_lat']='عرض جغرافیایی';
-$ec_lang['lpn_engine_minor_loss_note']='نکته: با حل‌کنندهٔ EPANET، افت‌های موضعی اندکی کمتر از حل‌کنندهٔ درون‌ساخت به دست می‌آیند، چون EPANET مقداری را که برای شتاب گرانش به کار می‌برد، گرد می‌کند.';
 $ec_lang['template_share_manual']='این پیوند را کپی کنید:';
 $ec_lang['lpn_time_menu']='زمان';
 $ec_lang['lpn_time_duration']='کل مدت اجرا';
