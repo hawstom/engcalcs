@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**102 open tasks.** Next (100): 14 · Soon (75): 20 · Someday (50): 39 · Maybe (25): 11 · Parked (5): 18
+**101 open tasks.** Next (100): 14 · Soon (75): 19 · Someday (50): 39 · Maybe (25): 11 · Parked (5): 18
 
 ## 100 — Next (14)
 
@@ -26,7 +26,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
 - Task 698 — Ask for initials once per browser, keep them, and name the holder.
 
-## 75 — Soon (20)
+## 75 — Soon (19)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -45,7 +45,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 685 — Name every unit dropdown for a screen reader.
 - Task 687 — The lock dialog's destructive button sits beside Cancel.
 - Task 688 — File, Convert units as: US to work in, SI to hand over.
-- Task 689 — Undo does not work inside a table, only on the map.
 - Task 691 — Banner messages are annoying, and one of them is a trap.
 - Task 693 — "Length and map coordinates" is a lie on an EPSG project.
 
@@ -130,5 +129,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-95 of 102 titles are within 4–12 words. `!` marks the rest;
+94 of 101 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

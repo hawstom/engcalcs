@@ -266,16 +266,6 @@ the block.
     field's own existing label, already written and already translated 26 times. If a design turns
     out to need new words, stop -- that is a different decision and a different price.
 
-- 75|689| **Undo does not work inside a table, only on the map.**
-  Tom, 2026-09-17, testing `674-coordinate-entry`: *"Checking this on the Junctions Table, I can copy
-  and paste from two cells to two cells. But I can't Ctrl+Z within the table. I must move cursor to
-  the map for Ctrl+Z to work."*
-  - **THE UNDO EXISTS AND THE TABLE CANNOT REACH IT**, which is worse than having none: a person who
-    has learned that Ctrl+Z works here presses it after a bad paste and nothing happens. Find where
-    the keydown is bound and why the table pane is outside it; the map's own binding is one of only
-    two this page has outside a text field.
-  - Paste itself works, which is what makes this a sharp edge rather than a gap.
-
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
@@ -288,7 +278,15 @@ the block.
     whatever `tables-interface` already holds.
   - **`tables-interface` EXISTS AND IS NOT ON master ON HIS INSTRUCTION**, and copy and paste in the
     tables is the defect inside that programme. Read it before opening anything new.
-  - At 50 because he named it as long-term, not next. Promoting it is his call.
+  - **TWO PIECES ARE BUILT ON `feat/tables-spreadsheet`.** Undo inside the table (689, closed), and
+    `table_column_parity_check.php`, which derives both surfaces from the source and **names 28
+    popup properties with no column in their own table** -- the quality source on every node, a
+    link's Closed, pipe type and fittings, the head-loss gradient, the tank's mixing, the
+    reservoir's head pattern, the junction's emitter, and the whole of the pump. Advisory until
+    that count is zero; run it for the list.
+  - **WHETHER THE PUMP ROWS SHOULD BE COLUMNS AT ALL IS HIS CALL, NOT A DEFECT.** That table says
+    in its own comment that a pump has no editable scalar and is a reading rather than an editor;
+    a speed and an energy price are scalars, and nothing mechanical can settle which is right.
 
 - 75|691| **Banner messages are annoying, and one of them is a trap.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked

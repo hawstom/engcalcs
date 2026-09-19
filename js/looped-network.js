@@ -14966,6 +14966,22 @@ var EngCalcs = EngCalcs || {};
 	// declaration, so there is no per-type tab code that could disagree with the per-type columns.
 	// A rebuild on entry, because the tab may have been away for a whole editing session; a refill
 	// afterwards, because renderPaneTable() decides that for itself.
+	// **BUILT ONCE, ON DEMAND, AND THE DECLARATION HAS TO SIT ABOVE paneTabs** -- the column getters
+	// name functions declared further down the file, so the list cannot be a plain initializer; but
+	// `var paneTablesCache = null;` written down THERE re-ran at load AFTER the paneTabs block below
+	// had already filled it, which is the ordinary `var` hoisting rule and looks like nothing at
+	// all. The page then held TWO sets of six specs: the tab strip rendered, sorted and selected on
+	// the first set, while everything reaching a table by id -- the filter, the multi-properties
+	// box, and activePaneTableSpec(), which is what the Print button reads -- got the second, whose
+	// `sort` was permanently the default and whose `cells` and `sel` were permanently null. So the
+	// paper came out in id order however the reader had sorted the screen, which is the one
+	// user-visible half of it. Found while making undo reach the tables (Task 689); the harness
+	// asserts the two doors return the same object, because nothing on screen can say they do not.
+	var paneTablesCache = null;
+	function paneTables() {
+		if (!paneTablesCache) { paneTablesCache = buildPaneTables(); }
+		return paneTablesCache;
+	}
 	var paneTabs = [];
 	paneTables().forEach(function (spec) {
 		paneTabs.push({
@@ -16396,13 +16412,6 @@ var EngCalcs = EngCalcs || {};
 					textLabelRelayout(lb.id);
 				} }
 		];
-	}
-	// Built once, on demand, because paneTabs is assembled at load time and these column getters
-	// name functions declared further down the file.
-	var paneTablesCache = null;
-	function paneTables() {
-		if (!paneTablesCache) { paneTablesCache = buildPaneTables(); }
-		return paneTablesCache;
 	}
 	function buildPaneTables() {
 		return [
@@ -39628,6 +39637,15 @@ var EngCalcs = EngCalcs || {};
 		// first line when the box is not in the page, so a project undone with the box closed costs
 		// nothing. It is buildDom()'s opposite number for the three lists the drawing never shows.
 		rebuildLibraryBox();
+		// **AND THE TABLE UNDER THE MAP, FOR THE SAME REASON** (ROADMAP Task 689). A table edit is
+		// now undoable from inside the table, so the pane is a place a person watches an undo
+		// happen rather than a place they happen to have open. renderPaneTable() refills in place
+		// when the row set has not moved, so an undone cell goes back to what the document holds;
+		// refreshPaneIfOpen() returns at its first line when no pane is open, exactly as
+		// rebuildLibraryBox() does. The solve that scheduleSolve() below ends in calls this too,
+		// but a debounced solve is not a guarantee about the next paint, and an undo the user
+		// cannot see is indistinguishable from an undo that did nothing.
+		refreshPaneIfOpen();
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
 		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
@@ -39647,8 +39665,30 @@ var EngCalcs = EngCalcs || {};
 		var tag = (el.tagName || '').toLowerCase();
 		return tag === 'input' || tag === 'textarea' || tag === 'select';
 	}
+	// **A TABLE CELL IS THE ONE TEXT ENTRY THAT STILL GETS THE MAP'S UNDO** (ROADMAP Task 689; Tom,
+	// 2026-09-17: *"Checking this on the Junctions Table, I can copy and paste from two cells to two
+	// cells. But I can't Ctrl+Z within the table. I must move cursor to the map for Ctrl+Z to
+	// work."*). The guard above was right about its own case and wrong about this one: a pane cell
+	// is an `<input>`, so isTextEntry() turned it away, and an undo that exists and cannot be
+	// reached from where the edit was made is worse than no undo at all -- a person who has learned
+	// Ctrl+Z presses it after a bad paste and nothing happens.
+	//
+	// **THE RULE, AND IT IS THE ONE THE TABLE ALREADY MODELS: native undo while a cell editor is
+	// OPEN, project undo when it is not.** paneInEdit() is that state and is not a second opinion
+	// about it -- a pane cell is `readOnly` in NAVIGATION mode and writable only once F2, a
+	// double-click or a printable character has opened the editor. So Ctrl+Z on a cell somebody is
+	// typing in is still the browser's text undo, which is Tom's own 2026-08-20 point about the
+	// Library fields; Ctrl+Z on a cell nobody is typing in is the map's undo, which is the only
+	// thing it could sensibly mean. A checkbox cell and a select cell are never "being typed in"
+	// and therefore always take the project undo.
+	//
+	// Nothing else moves: the tool-key handler below keeps the plain isTextEntry() guard, because a
+	// bare digit on a navigating cell OVERWRITES it (Task 186) and must not also pick a tool.
+	function paneCellNavigating(el) {
+		return !!(el && el._lpnCell && !paneInEdit(el));
+	}
 	document.addEventListener('keydown', function (e) {
-		if (isTextEntry(e.target)) { return; }
+		if (isTextEntry(e.target) && !paneCellNavigating(e.target)) { return; }
 		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
 	});
 
