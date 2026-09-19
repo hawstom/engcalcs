@@ -2230,3 +2230,150 @@ branch's Ask dialog has its own separate close-on-Escape wiring beyond the share
 above; the "Escaping 101" citation is general convention, not a reading of that dialog's code.
 
 No shipped file touched.
+
+## 2026-09-19 — Sort-heading affordance: blue links, and the ID column's stray highlight
+
+Tom's question, reviewing `feat/tables-spreadsheet`: *"Ask Ida how most apps do clicking on
+headings to change sorting; we have blue text links."* Checked worktree
+`feat-tables-spreadsheet` at `f688970a` (checked 2026-09-19).
+
+### The convention, with sources
+
+**A sortable heading is a real, focusable control — most commonly a `<button>` wrapping the
+label text — carrying `aria-sort` on the `<th>` itself, never styled as a hyperlink.** CITED
+(WAI-ARIA Authoring Practices Guide, "Table Pattern," w3.org, fetched 2026-09-19): "the header
+text of sortable columns is wrapped in a button element," and `aria-sort` (`ascending` /
+`descending`) is set on the currently-sorted header only — removed entirely from an unsorted one,
+never left at a default `none`. CITED (MDN, "aria-sort," developer.mozilla.org, fetched
+2026-09-19): same reading, one `aria-sort` live at a time. CITED (Adrian Roselli, "Sortable Table
+Columns," adrianroselli.com, 2021, fetched 2026-09-19): his worked example uses native `<button>`s
+throughout; the direction indicator is a small chevron placed to the right of the label, drawn
+**always** (not hover-only), and the sorted state is shown by a SHAPE change (hollow chevron →
+filled) rather than by color, explicitly to avoid relying on color alone (WCAG 1.4.1, "Use of
+Color").
+
+**Desktop precedent agrees on the shape even where I could not pin a single citable source for
+each product's own style guide.** SPECULATION, from ordinary use and general knowledge rather
+than a spec I can cite: Excel's own column headers (not the AutoFilter dropdown, which is a
+separate, later-added control) and Google Sheets' plain grid headers are neutral gray/black text
+with no underline and no color change; macOS Finder's List View and Windows Explorer's Details
+view both put a small triangle at the trailing edge of the ACTIVE sort column only, in the
+header's own ink color, with every other heading left as plain unmarked label text. None of these
+color the heading text itself, and none underline it. The pattern is consistent enough across
+every example I could find, cited or not, that I am confident in it as the convention: **a
+sortable heading looks like a heading that also happens to be clickable — bold or plain text plus
+a small directional glyph on the active column — never like a hyperlink to another page.**
+
+**Why "never a link" is more than a style preference: the semantics are wrong.** A `<a href>`
+promises navigation — leaving the current view for a different resource, with the back button as
+the undo. Clicking a sort heading does the opposite: it stays on the same view and reorders what
+is already there in place. Blue-and-underlined is the one visual vocabulary the web has spent
+thirty years training every reader to read as "this leaves." Borrowing it for an action that does
+not leave is a false promise, independent of whether it also happens to look nice.
+
+### Our own table, read before recommending
+
+OBSERVED `js/looped-network.js:18538-18576` (checked 2026-09-19): **the sort control is already
+the right ELEMENT** — a real `<button type="button" class="lpn-pane-sort">` wrapping the heading
+text, with `aria-sort` set correctly on the `<th>` only for the sorted column (`:18575`), and the
+direction glyph (`▲`/`▼`) appended to the button's own text content on the active column only
+(`:18548-18549`) — trailing edge, always visible when sorted, exactly the convention above. This
+part needs no design correction; it is worth telling Tom so nothing here gets un-fixed by accident
+while the real problem is chased.
+
+**The "blue text links" he is seeing is styling laid on top of that correct element, not the
+element itself.** OBSERVED `css/engcalcs.css:2371-2377` (checked 2026-09-19):
+
+```
+.lpn-pane-sort, .lpn-pane-goto {
+	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
+	text-align: inherit;
+}
+.lpn-pane-sort { font-weight: bold; }
+.lpn-pane-goto { text-decoration: underline; }
+.lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
+```
+
+At REST the sort button is `color: inherit` (correctly neutral) and bold — fine, matches
+convention. But **on hover it turns `#0645ad`**, which is not an arbitrary blue: it is the
+long-standing browser default color for a *visited* hyperlink, the single most recognized "this is
+a link" signal on the web after the default unvisited blue. And `.lpn-pane-goto` — the button in
+the ID cell, `:18617-18626`, which selects the part on the map and pans to it — is underlined **at
+rest, permanently**, and shares the identical hover blue. Underline-at-rest plus link-blue-on-hover
+is not a heading that happens to be clickable; it is, pixel for pixel, an ordinary inline hyperlink.
+That is almost certainly what Tom is naming, even though no `<a>` tag is anywhere in this code —
+the classic case of markup being correct and paint being wrong, which this suite's own automated
+checks (`link_title_check.php` et al.) cannot see, because there is no `<a>` to inspect.
+
+**What that costs at a row of ten headings, which is the question only this seat can answer.** A
+reader scans a heading row once, fast, to answer "what can I do here and what am I looking at."
+Blue-and-underlined text is a category the eye has a single, automatic reading for, learned from
+every other page on the web: *leaving*. A row of ten such headings does not read as "ten sortable
+columns" — it reads as ten hyperlinks sitting where a table normally has none, which is a
+genuinely startling first impression on a page whose whole point is that you stay and work in
+place. Worse, it COMPETES with the one control in this same table that legitimately IS a
+navigation-flavored action: `.lpn-pane-goto` really does move the reader's attention to a different
+place (the map), the nearest thing this table has to "leaving." Giving the sort headings the exact
+same visual language as that button erases the one distinction a reader could have used to tell
+"this reorders what I'm already looking at" from "this takes me somewhere else" — the two
+controls currently look alike because they share a stylesheet rule, not because they mean the same
+thing.
+
+**Recommendation, ranked:**
+1. **Drop `.lpn-pane-sort:hover { color: #0645ad }` and give it a neutral hover treatment instead**
+   — a background tint or a slightly heavier weight, not a color already carrying a specific,
+   different meaning elsewhere on this exact page (see below). Cheapest fix, one line, zero new
+   strings, zero translation cost.
+2. **Drop the permanent underline on `.lpn-pane-goto`.** If the ID cell should still read as
+   "special," a hover-only background tint or a small icon (a pin/crosshair reading "go to this on
+   the map") does the job without borrowing hyperlink vocabulary for an in-page action. This one
+   costs slightly more (an icon decision), so it is second.
+3. **Reserve `#0645ad` for exactly one meaning in this table, and it already has one:** OBSERVED
+   `css/engcalcs.css:2229-2246` (checked 2026-09-19) — that same blue is the "current cell" outline
+   and its autofill-dot, freshly designed and named by Tom himself on 2026-09-19 in the same
+   session ("a blue border highlight... should indicate the current cell"). Two unrelated meanings
+   sharing one color in one table is a hierarchy collision on its own, independent of the
+   link-reading problem above — a reader who has learned "blue means current cell" then sees the
+   identical blue flash under their pointer while merely hovering a heading, for a reason that has
+   nothing to do with the cursor's position.
+
+### A second, separate finding: the "strange highlighting around the ID" is likely this same seam
+
+Tom's other, separate report — *"at column A there is a strange highlighting around the ID"* — is
+very likely produced by the collision named in point 3 above, not a new bug needing new code.
+OBSERVED `css/engcalcs.css:2229-2233` (checked 2026-09-19):
+
+```
+.lpn-pane-table tbody td.lpn-pane-cur,
+.lpn-pane-table tbody td:focus, .lpn-pane-table tbody td:focus-within {
+	outline: 2px solid #0645ad; outline-offset: -2px;
+}
+```
+
+`:focus-within` fires on the `<td>` the moment its child `.lpn-pane-goto` button receives focus —
+which happens on every ordinary click, since a `<button>` takes focus on click in most browsers.
+Nothing in `paneTableRow()` needs to mark that cell "current" for this rule to paint the identical
+2px inset blue box `js/looped-network.js` was just given as the deliberate, meaningful signal for
+"this is the current cell in Entry/Navigate mode" (`:18617-18626` builds the button; the outline
+rule is generic to any focused `<td>`, not gated on the spreadsheet-mode logic that owns
+`.lpn-pane-cur`). So clicking an ID to jump to the map leaves that cell wearing the SAME visual
+mark the new spreadsheet-mode design just invented for a different, specific idea — and it will
+sit there, focus rarely being cleared automatically, until something else steals focus. **This
+reads as the same root cause as the "blue text links" question: one color pressed into two jobs.**
+Whoever fixes the sort-heading colors should check this outline rule at the same time — either
+exclude `.lpn-pane-goto`'s own focus from painting the cell (`:focus-within:not(:has(.lpn-pane-goto:focus))`,
+or simpler, give the goto button its own `:focus` ring instead of relying on the generic
+`td:focus-within` rule) — rather than treating it as a second, unrelated defect.
+
+### Where I did not look
+
+I did not render the table in a real browser this session (no `dev/browser-pass` screenshot) —
+everything above is read from source, not measured on screen. I could not find a single citable
+style-guide document for Excel's or Google Sheets' or Finder's or Explorer's own header
+conventions (all four are proprietary, undocumented visual conventions); that part of the finding
+is SPECULATION from ordinary use, flagged as such above, not a citation I can point at. I did not
+check whether `#0645ad` appears anywhere else on this page outside the bottom pane (e.g., the
+map's own selection highlight) — if it does, the collision named above is wider than this one
+table.
+
+No shipped file touched.
