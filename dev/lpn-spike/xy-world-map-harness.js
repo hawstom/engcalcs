@@ -49,7 +49,7 @@ const L = loadLoopedNetwork(
 	"\t\tmapgeoStart: mapgeoStart, mapgeoPlace: mapgeoPlaceApproximately,\n" +
 	"\t\tmapgeoFinish: mapgeoFinish, mapgeoCancel: mapgeoCancel,\n" +
 	"\t\tmapgeoActive: mapgeoActive, mapgeoGoTo: mapgeoGoTo, mapgeoZoom: mapgeoZoomAbout,\n" +
-	"\t\tmapgeoApplyDrag: mapgeoApplyDrag, mapgeoRectSrc: mapgeoRectSrc,\n" +
+	"\t\tmapgeoApplyDrag: mapgeoApplyDrag,\n" +
 	"\t\tmapgeoStep: function () { return mapgeo && mapgeo.step; },\n" +
 	"\t\tsetDrag: function (d) { drag = d; },\n" +
 	// The REAL gesture path, so the pan Tom asked about is driven the way a hand drives it rather
@@ -76,6 +76,10 @@ const L = loadLoopedNetwork(
 	"\t\trefreshBasemap: refreshBasemap, setMapSized: function (on) { mapSized = on !== false; },\n" +
 	"\t\ttileEls: function () { return basemapEls; },\n" +
 	"\t\tdialFactor: mapgeoDialFactor, dialTurn: mapgeoDialSetTurn,\n" +
+	"\t\tdialPosFor: mapgeoDialPosFor, dialDrop: mapgeoDialDrop,\n" +
+	// The camera, so "the wheel moved the camera and not the transform" can be said as a
+	// number rather than inferred from a screen position the stub may hold constant.
+	"\t\tcamera: function () { return { s: state.s, tx: state.tx, ty: state.ty }; },\n" +
 	"\t\tdialPos: mapgeoDialSetPos, dialState: function () { return mapgeo && mapgeo.dial; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -273,46 +277,34 @@ ok('STEP 1 STILL CHANGES NOT ONE STORED BYTE', snapshot() === before);
 	ok('STEP 1 PANNED AND ZOOMED AND CHANGED NOT ONE STORED BYTE', snapshot() === before);
 }
 
-// ---- STEP 2: the rectangle that controls the map -----------------------------------------------
+// ---- STEP 2: A DRAG SLIDES THE MAP, AND THE RECTANGLE IS GONE --------------------------------
+//
+// Tom, 2026-09-19, after using the first build: *"(b) Pan (normal gestures) works on the map only...
+// (e) The rectangle control is gone."* So what step 2 offers is one gesture and two sliders, and
+// what is asserted here is the gesture; the sliders have their own block below.
+//
+// **THE CORNER AND TURN-HANDLE ASSERTIONS THAT STOOD HERE WENT WITH THE CONTROL THEY GRADED.** They
+// were correct and they passed; what they graded was a rectangle whose handles a hand could not
+// reach at a fitted zoom, measured in a real browser (dev/lpn-spike/mapgeo-browser-drive.js, where
+// elementFromPoint at the rotate handle returned `lpn_toolbar`). Scaling and turning are now the two
+// sliders, graded below against the same two properties: the ground moves, the drawing does not.
 L.mapgeoPlace();
 ok('Place approximately moves to step 2', L.mapgeoStep() === 2);
-let rect = L.mapgeoRectSrc();
-ok('and the rectangle starts on the drawing itself',
-	rect && Math.abs(rect[0].x - bMinX) < 1e-6 && Math.abs(rect[2].y - bMaxY) < 1e-6);
 
-// A CORNER DRAG scales the map about the opposite corner. Grab the north-east corner (index 2) and
-// pull it to twice its distance from the south-west one (index 0).
+// A DRAG ANYWHERE slides the map, and the ground the pointer grabbed follows the pointer.
 t = L.xyGeoref();
-const pivot = rect[0], grab = rect[2];
-const far = { x: pivot.x + (grab.x - pivot.x) * 2, y: pivot.y + (grab.y - pivot.y) * 2 };
-const pivotGround = G.lpnGeorefToLonLat(t, pivot.x, pivot.y);
-const mpuBeforeDrag = t.metersPerUnit;
-L.setDrag({ type: 'mapgeo', kind: 'scale', corner: 2, t0: t, rect: rect,
-	start: { x: grab.x, y: grab.y } });
-L.mapgeoApplyDrag(L.screenOf(far.x, far.y));
+const slideFrom = { x: midX, y: midY }, slideBy = 300;
+const grabbedGround = G.lpnGeorefToLonLat(t, slideFrom.x, slideFrom.y);
+const mpuBeforeSlide = t.metersPerUnit, rotBeforeSlide = t.rotDeg;
+L.setDrag({ type: 'mapgeo', kind: 'move', t0: t, start: { x: slideFrom.x, y: slideFrom.y } });
+L.mapgeoApplyDrag(L.screenOf(slideFrom.x + slideBy, slideFrom.y));
 t = L.xyGeoref();
-ok('a corner drag of two halves the ground under one drawing unit',
-	Math.abs(t.metersPerUnit - mpuBeforeDrag / 2) < 1e-9 * mpuBeforeDrag, t.metersPerUnit);
-let back = G.lpnGeorefFromLonLat(t, pivotGround.lon, pivotGround.lat);
-ok('...and the opposite corner of the ground stays exactly where it was',
-	Math.abs(back.x - pivot.x) < 1e-6 && Math.abs(back.y - pivot.y) < 1e-6,
+let back = G.lpnGeorefFromLonLat(t, grabbedGround.lon, grabbedGround.lat);
+ok('a drag slides the map, and the ground under the pointer goes with it',
+	Math.abs(back.x - (slideFrom.x + slideBy)) < 1e-6 && Math.abs(back.y - slideFrom.y) < 1e-6,
 	back.x.toFixed(6) + ', ' + back.y.toFixed(6));
-
-// THE TURN HANDLE. A quarter turn counterclockwise about the middle of the rectangle.
-rect = L.mapgeoRectSrc();
-t = L.xyGeoref();
-const centre = { x: (rect[0].x + rect[2].x) / 2, y: (rect[0].y + rect[2].y) / 2 };
-const centreGround = G.lpnGeorefToLonLat(t, centre.x, centre.y);
-const rotBefore = t.rotDeg, armLen = 500;
-L.setDrag({ type: 'mapgeo', kind: 'rotate', corner: -1, t0: t, rect: rect,
-	start: { x: centre.x + armLen, y: centre.y } });
-L.mapgeoApplyDrag(L.screenOf(centre.x, centre.y + armLen));
-t = L.xyGeoref();
-ok('turning the handle a quarter turn turns the map a quarter turn',
-	Math.abs(t.rotDeg - (rotBefore - 90)) < 1e-6, t.rotDeg);
-back = G.lpnGeorefFromLonLat(t, centreGround.lon, centreGround.lat);
-ok('...about the middle of the rectangle, which does not move',
-	Math.abs(back.x - centre.x) < 1e-6 && Math.abs(back.y - centre.y) < 1e-6);
+ok('...and it changes neither the size of the map nor its bearing, which the sliders own',
+	t.metersPerUnit === mpuBeforeSlide && t.rotDeg === rotBeforeSlide);
 ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 
 // ---- AND THE GROUND IS THE THING THAT MOVES ----------------------------------------------------
@@ -365,14 +357,14 @@ ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 	// onto the screen, so the two tile sets share no key and "every shared tile moved" is vacuously
 	// true. A few degrees is the gesture somebody actually makes at the end of a fit, and it leaves
 	// most of the ground on screen to be compared.
-	const t2 = L.xyGeoref();
-	const rect2 = L.mapgeoRectSrc();
-	const c2 = { x: (rect2[0].x + rect2[2].x) / 2, y: (rect2[0].y + rect2[2].y) / 2 };
-	const armR = 500, turn = 5 * Math.PI / 180;
-	L.setDrag({ type: 'mapgeo', kind: 'rotate', corner: -1, t0: t2, rect: rect2,
-		start: { x: c2.x + armR, y: c2.y } });
-	L.mapgeoApplyDrag(L.screenOf(c2.x + armR * Math.cos(turn), c2.y + armR * Math.sin(turn)));
+	// Through the TURN SLIDER, which is the only way to turn the map since the rectangle went.
+	L.dialTurn(5);
 	L.refreshBasemap();
+	// **AND THE BASELINE IS DROPPED AFTERWARDS, which is what the page itself does the moment any
+	// other gesture writes.** Left standing, the record made here is still the base the NEXT block's
+	// slider reads from, so its `tWas` and its base are five degrees apart and every assertion in it
+	// is off by five -- measured, not guessed: that is how this line came to be written.
+	L.dialDrop();
 
 	const tilesAfter = placedNow();
 	const pinAfter = L.screenOf(midX, midY);
@@ -439,10 +431,26 @@ ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 	ok('BACK TO THE MIDDLE IS THE SIZE IT STARTED AT, exactly', JSON.stringify(L.xyGeoref()) === tWas);
 
 	// The knob. Same pivot as the bar, which is what lets the two be applied in one expression.
-	L.dialTurn(30);
+	// **HIS BAND IS TEN DEGREES EITHER WAY** (2026-09-19: *"up is counter-clockwise with a limit of
+	// about 10 degrees (since most convergence angles are less than 1 degree)"*), so the knob's old
+	// 30 is now off the end of the travel and the assertion is the CLAMP as well as the sign.
+	L.dialTurn(6);
 	const tTurn = L.xyGeoref();
-	ok('the knob turns the map counterclockwise by the degrees it reads',
-		Math.abs(tTurn.rotDeg - (JSON.parse(tWas).rotDeg + 30)) < 1e-9, tTurn.rotDeg);
+	ok('the turn slider turns the map counterclockwise by the degrees it reads',
+		Math.abs(tTurn.rotDeg - (JSON.parse(tWas).rotDeg + 6)) < 1e-9, tTurn.rotDeg);
+	L.dialTurn(30);
+	ok('...and it stops at ten degrees rather than carrying on round, which a knob did',
+		Math.abs(L.xyGeoref().rotDeg - (JSON.parse(tWas).rotDeg + 10)) < 1e-9, L.xyGeoref().rotDeg);
+	L.dialTurn(-30);
+	ok('...at both ends', Math.abs(L.xyGeoref().rotDeg - (JSON.parse(tWas).rotDeg - 10)) < 1e-9);
+	// **THE NUMBER BOXES ARE THE SAME TWO SEAMS REACHED BY TYPING** (his point 5). A typed factor
+	// lands where the slider would put it, which is what makes the two halves of each pair one
+	// control rather than two.
+	ok('a typed factor of 1 is the middle of the size bar', L.dialPosFor(1) === 0, L.dialPosFor(1));
+	ok('...1.5 is the top end', Math.abs(L.dialPosFor(1.5) - 1) < 1e-12, L.dialPosFor(1.5));
+	ok('...0.75 is the bottom end', Math.abs(L.dialPosFor(0.75) + 1) < 1e-12, L.dialPosFor(0.75));
+	ok('...and a typed factor round-trips through the travel it names',
+		Math.abs(L.dialFactor(L.dialPosFor(1.2)) - 1.2) < 1e-12, L.dialFactor(L.dialPosFor(1.2)));
 	const pinTurn = L.screenOf(midX, midY);
 	ok('...and the drawing has still not moved on screen',
 		pinWas.x === pinTurn.x && pinWas.y === pinTurn.y);
@@ -460,47 +468,50 @@ ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 	ok('THE DIAL CHANGES NOT ONE STORED BYTE', snapshot() === before);
 }
 
-// ---- AND IN STEP 2 NOTHING BUT THE RECTANGLE MOVES THE MAP -------------------------------------
+// ---- AND IN STEP 2 THE TWO GESTURES HAVE TWO DIFFERENT SUBJECTS ------------------------------
 //
-// Tom, 2026-09-18: *"The map zooms during step 2. It should not zoom or pan at that point."* Step 2
-// is a fit somebody is holding by hand across several drags; a wheel notch or a stray press that
-// also moved the map could undo all of it, and neither is a decision anybody made.
+// Tom, 2026-09-19: *"(a) Zoom (normal gestures) works on everything (both) together, and we state
+// this in the wizard. (b) Pan (normal gestures) works on the map only, and we state this in the
+// wizard."*
+//
+// **THIS REVERSES HIS 2026-09-18 RULING THAT THE WHEEL DOES NOTHING AT STEP 2**, and the reversal is
+// his own after using it. What he was refusing then was the map moving UNDER a still drawing on a
+// gesture nobody aimed; a camera zoom moves the two TOGETHER, which is what judging a fit needs.
+// The assertion below is the one that tells those two apart: a camera zoom leaves `project.georef`
+// byte-identical, because the camera is not the transform.
 {
 	const { setHitTarget } = require('./lpn-dom-stub.js');
 	const canvas = byId.lpn_canvas;
 	const fire = (type, ev) => (canvas._listeners[type] || []).forEach(f => f(ev));
 	const frozen = JSON.stringify(L.xyGeoref());
+	const camWas = L.camera().s;
 	L.wheelZoom(L.screenOf(midX, midY).x, L.screenOf(midX, midY).y, 2);
-	ok('the wheel does nothing at all at step 2', JSON.stringify(L.xyGeoref()) === frozen,
-		JSON.stringify(L.xyGeoref()));
-	// The pinch arrives at the same door, so one guard covers both; asserted through that door
-	// rather than through a second pretend gesture.
-	L.wheelZoom(L.screenOf(midX, midY).x, L.screenOf(midX, midY).y, 1 / 1.1);
-	ok('...and so does a pinch, which comes through the same door',
-		JSON.stringify(L.xyGeoref()) === frozen);
-	// A press on BARE CANVAS at step 2. At step 1 this is the pan; here it must arm nothing.
+	ok('THE WHEEL AT STEP 2 MOVES THE CAMERA, so it changes the placement not at all',
+		JSON.stringify(L.xyGeoref()) === frozen, JSON.stringify(L.xyGeoref()));
+	// ...and it really did zoom, or the line above is satisfied by a wheel that does NOTHING --
+	// which is exactly what it did until today, so this is the leg that tells the fix from the
+	// defect. Read off the camera rather than off a screen position: the drawing and the tiles are
+	// in one world group, so one scale is what moves them together.
+	ok('...and it really zoomed, which the old "do nothing" branch also passed the line above',
+		L.camera().s !== camWas, camWas + ' -> ' + L.camera().s);
+	L.wheelZoom(L.screenOf(midX, midY).x, L.screenOf(midX, midY).y, 0.5);
+
+	// A press on BARE CANVAS at step 2 now slides the MAP. There is no rectangle to press instead.
 	setHitTarget(null);
 	const a = L.screenOf(midX, midY);
+	const beforeDrag = JSON.stringify(L.xyGeoref());
+	const pinBeforeDrag = L.screenOf(midX, midY);
 	fire('pointerdown', { pointerId: 51, clientX: a.x, clientY: a.y, pointerType: 'mouse', button: 0 });
-	ok('a press on bare canvas at step 2 arms no drag at all', !L.getDrag(),
-		JSON.stringify(L.getDrag()));
-	fire('pointermove', { pointerId: 51, clientX: a.x + 150, clientY: a.y + 90, pointerType: 'mouse', buttons: 1 });
-	L.pumpDrag();
-	fire('pointerup', { pointerId: 51, clientX: a.x + 150, clientY: a.y + 90, pointerType: 'mouse' });
-	ok('...so dragging the bare canvas slides nothing', JSON.stringify(L.xyGeoref()) === frozen,
-		JSON.stringify(L.xyGeoref()));
-	// ...and the rectangle itself still works, which is the half that must NOT be lost. The body of
-	// it carries data-mapgeo="move", and that is what the guard tests for.
-	setHitTarget({ dataset: { mapgeo: 'move' } });
-	fire('pointerdown', { pointerId: 52, clientX: a.x, clientY: a.y, pointerType: 'mouse', button: 0 });
 	const armed = L.getDrag();
-	fire('pointermove', { pointerId: 52, clientX: a.x + 150, clientY: a.y, pointerType: 'mouse', buttons: 1 });
+	ok('a press on bare canvas at step 2 arms the map drag', !!armed && armed.kind === 'move',
+		JSON.stringify(armed));
+	fire('pointermove', { pointerId: 51, clientX: a.x + 150, clientY: a.y, pointerType: 'mouse', buttons: 1 });
 	L.pumpDrag();
-	fire('pointerup', { pointerId: 52, clientX: a.x + 150, clientY: a.y, pointerType: 'mouse' });
-	ok('while the rectangle itself still slides the map, which is the half not to lose',
-		!!armed && armed.kind === 'move' && JSON.stringify(L.xyGeoref()) !== frozen,
-		JSON.stringify(L.xyGeoref()));
-	ok('STEP 2 REFUSING THE WHEEL CHANGED NOT ONE STORED BYTE', snapshot() === before);
+	fire('pointerup', { pointerId: 51, clientX: a.x + 150, clientY: a.y, pointerType: 'mouse' });
+	ok('...and dragging it slides the MAP', JSON.stringify(L.xyGeoref()) !== beforeDrag);
+	ok('...while the drawing does not move on screen, which is the whole ruling',
+		L.screenOf(midX, midY).x === pinBeforeDrag.x && L.screenOf(midX, midY).y === pinBeforeDrag.y);
+	ok('STEP 2 ZOOMING AND PANNING CHANGED NOT ONE STORED BYTE', snapshot() === before);
 }
 
 // ---- Georeference here -------------------------------------------------------------------------
@@ -639,11 +650,10 @@ ok('ATTACHING AGAIN CHANGED NOT ONE STORED BYTE', snapshot() === before);
 	ok('Move opens the wizard at step 2', L.mapgeoActive() === true && L.mapgeoStep() === 2);
 	ok('...on the placement that was already on file, not a fresh one',
 		JSON.stringify(L.xyGeoref()) === attached, L.xyGeoref() && JSON.stringify(L.xyGeoref()));
-	ok('...with the rectangle already round the drawing', !!L.mapgeoRectSrc());
 	L.mapgeoCancel();
 	ok('...and Cancel puts it back exactly', JSON.stringify(L.xyGeoref()) === attached);
 	L.mapgeoAdjust('scale');
-	ok('Scale by picking opens the same step 2, which is the same rectangle',
+	ok('Scale by picking opens the same step 2, which is the same two sliders',
 		L.mapgeoStep() === 2 && JSON.stringify(L.xyGeoref()) === attached);
 	L.mapgeoCancel();
 	ok('MOVE AND SCALE BY PICKING CHANGED NOT ONE STORED BYTE', snapshot() === before);

@@ -446,8 +446,13 @@ console.log('\n--- one home for the concept ---');
 	// surveyed file arrives as a pair of numbers out of somebody's file, which is the definition of
 	// an outside number: it comes through this door once, in createSurveyJunctions(), and the file's
 	// own value rides beside the drawn one so the save hands it back unchanged.
-	ok('inwardX has one definition and 31 call sites', count(/inwardX\(/g) === 32, count(/inwardX\(/g));
-	ok('inwardY has one definition and 32 call sites', count(/inwardY\(/g) === 33, count(/inwardY\(/g));
+	// **AND ONE SITE EACH CAME OFF WHEN THE WORLD-MAP WIZARD'S RECTANGLE WAS DELETED** (2026-09-19,
+	// Tom: *"The rectangle control is gone."*). mapgeoInward() was its own one-line crossing, used
+	// only to draw that overlay; the two sliders that replace it edit the transform and draw
+	// nothing in the drawing frame at all, so the boundary got SMALLER. Worth saying out loud
+	// because every other movement of these numbers in this file has been upward.
+	ok('inwardX has one definition and 30 call sites', count(/inwardX\(/g) === 31, count(/inwardX\(/g));
+	ok('inwardY has one definition and 31 call sites', count(/inwardY\(/g) === 32, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

@@ -2464,9 +2464,8 @@ $ec_lang['lpn_mapgeo_intro']='Your drawing is on a map of the whole world, in th
 $ec_lang['lpn_mapgeo_step1']='Step 1 of 2: find your place in the world';
 $ec_lang['lpn_mapgeo_step2']='Step 2 of 2: fit the map behind your drawing';
 $ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.';
-$ec_lang['lpn_mapgeo_hint2']='Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
-$ec_lang['lpn_mapgeo_hint_move']='Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
-$ec_lang['lpn_mapgeo_hint_scale']='Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_hint2']='Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+$ec_lang['lpn_mapgeo_gestures']='Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.';
 // ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
 //
 // **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
@@ -2484,7 +2483,7 @@ $ec_lang['lpn_mapgeo_dial_turn']='Turn the map';
 $ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
 $ec_lang['lpn_mapgeo_dial_size']='Map size';
 $ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
-$ec_lang['lpn_mapgeo_dial_help']='Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.';
+$ec_lang['lpn_mapgeo_dial_help']='Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.';
 $ec_lang['lpn_mapgeo_place']='Place approximately';
 $ec_lang['lpn_mapgeo_finish']='Georeference here';
 $ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';

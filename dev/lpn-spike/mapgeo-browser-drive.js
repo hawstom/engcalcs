@@ -118,9 +118,12 @@ module.exports = async ({ send, evaluate, logs, sleep }) => {
 					cr = c && c.getBoundingClientRect();
 					return cr ? { t: cr.top, b: cr.bottom, h: cr.height } : (pr ? { t: pr.top, b: pr.bottom, h: pr.height } : null); })(),
 				knob: (function () { var k = document.getElementById('lpn_mapgeo_turn'), kr = k && k.getBoundingClientRect();
-					return kr ? hit(kr.left + kr.width / 2, kr.top + kr.height / 2) : 'no knob'; })(),
+					return kr ? hit(kr.left + kr.width / 2, kr.top + kr.height / 2) + '|' + Math.round(kr.height) : 'no turn bar'; })(),
 				bar: (function () { var b = document.getElementById('lpn_mapgeo_size'), br = b && b.getBoundingClientRect();
-					return br ? hit(br.left + br.width / 2, br.top + br.height / 2) + '|' + Math.round(br.height) : 'no bar'; })()
+					return br ? hit(br.left + br.width / 2, br.top + br.height / 2) + '|' + Math.round(br.height) : 'no bar'; })(),
+				canvasH: (function () { var c = document.getElementById('lpn_canvas'); return c ? Math.round(c.getBoundingClientRect().height) : 0; })(),
+				frames: document.querySelectorAll('.lpn-georef').length,
+				gestures: (document.getElementById('lpn_mapgeo_hint_gestures') || {}).textContent || ''
 			}); })()`));
 
 		ok(name + ': the dial is drawn', !m.missing && m.display === 'block' && m.rect.w > 0 && m.rect.h > 0,
@@ -134,11 +137,31 @@ module.exports = async ({ send, evaluate, logs, sleep }) => {
 			' box ' + Math.round(m.box.t) + '..' + Math.round(m.box.b));
 		// And that a hand can reach both halves of it. The knob is the half that went behind the
 		// toolbar, so it is named rather than folded into a loop.
-		ok(name + ': ...the TURN KNOB is the topmost thing at its own middle', m.knob === 'lpn_mapgeo_dial' ||
-			m.knob === 'lpn_mapgeo_turn' || m.knob === 'lpn_mapgeo_turn_needle' || m.knob === 'lpn_mapgeo_turn_label', m.knob);
+		ok(name + ': ...the TURN SLIDER is the topmost thing at its own middle',
+			String(m.knob).split('|')[0] === 'lpn_mapgeo_turn', m.knob);
+		// **THE RECTANGLE IS GONE** (Tom, 2026-09-19). Asserted rather than assumed, because the
+		// layer it drew is created by mapgeoSet() on every frame and a leftover caller would put it
+		// back silently.
+		ok(name + ': ...and no blue rectangle is drawn at all', m.frames === 0, m.frames);
+		// **ALMOST AS TALL AS THE MAP** -- his instruction, and it is asserted as "nothing is being
+		// wasted" rather than as one ratio. Two thirds of the canvas is what a roomy window gives;
+		// on a short one the labels, the number box and the readout are a fixed cost that a
+		// proportion cannot know about, so the PANEL filling the canvas is the same claim stated
+		// where it is still decidable. The control was a flat 150 px before this, which is 20% of a
+		// 768 px window and 14% of a 1080 one.
+		ok(name + ': ...and the sliders are almost as tall as the map',
+			+String(m.bar).split('|')[1] >= m.canvasH * 0.66 || m.rect.h >= m.canvasH - 24,
+			String(m.bar).split('|')[1] + ' of ' + m.canvasH + ', panel ' + Math.round(m.rect.h));
 		// Each control hit-tested at ITS OWN middle, never at the dial's: the dial shrinks, so its
 		// geometric centre wanders between the knob, the readout and the bar and would make the
 		// assertion a statement about layout arithmetic rather than about reachability.
+		// **THE GESTURE SPLIT IS STATED, not left to be discovered** (Tom, 2026-09-19: *"and we state
+		// this in the wizard"*, twice). Asserted against the pageConfig value rather than against
+		// English wording, so rewording the sentence never reddens this.
+		const said = await evaluate(`(function () { var pc = EngCalcs.pageConfig || {};
+			return (document.getElementById('lpn_mapgeo_hint_gestures') || {}).textContent === pc.lpn_mapgeo_gestures; })()`);
+		ok(name + ': ...and the wizard STATES which gesture moves what', said === true, m.gestures.slice(0, 60));
+
 		if (L.cramped) {
 			// Reported rather than asserted: the canvas is shorter than the control, so the bar is
 			// below the fold of the dial's own scroll. The assertions that still bind are the two
@@ -164,8 +187,13 @@ module.exports = async ({ send, evaluate, logs, sleep }) => {
 			}); })()`);
 		const before = JSON.parse(await snap());
 		ok('the basemap draws tiles at all, or nothing below means anything', before.tiles.length > 0, before.tiles.length);
+		// **THE SLIDER IS DRIVEN THROUGH ITS OWN `input` EVENT, which is the seam the page listens
+		// on.** A synthetic KeyboardEvent was used here while the control was a div with
+		// role="slider"; on a real `<input type=range>` an untrusted key event has NO default
+		// action, so the value never moved, the map never turned, and "the drawing did not move"
+		// passed for the wrong reason. Measured: 6 tiles compared, 0 of them moved.
 		await evaluate(`(function(){ var k = document.getElementById('lpn_mapgeo_turn');
-			for (var i = 0; i < 20; i++) { k.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true })); } })()`);
+			k.value = '50'; k.dispatchEvent(new Event('input', { bubbles: true })); })()`);
 		await sleep(1200);
 		const after = JSON.parse(await snap());
 		ok('TURNING THE MAP DOES NOT MOVE THE DRAWING ONE PIXEL',
@@ -176,21 +204,49 @@ module.exports = async ({ send, evaluate, logs, sleep }) => {
 			!before.tiles.some(function (t, i) { return t === after.tiles[i]; }),
 			before.tiles.length + ' tiles compared');
 
-		// ---- the rectangle's own rotate handle, reached the way a hand reaches it
-		const handle = JSON.parse(await evaluate(`(function(){
-			var c = document.querySelector('.lpn-georef circle[data-mapgeo=rotate]');
-			if (!c) { return JSON.stringify({ missing: true }); }
-			var r = c.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-			var e = document.elementFromPoint(x, y);
-			return JSON.stringify({ x: x, y: y, under: e ? (e.id || e.getAttribute('data-mapgeo') || e.tagName) : 'none' }); })()`));
-		// **REPORTED, NOT FAILED, and that is a decision.** The handle stands off the NORTH edge of a
-		// drawing just fitted to the window, so at a fitted zoom it lands above the canvas and under
-		// the toolbar -- measured here, `elementFromPoint` returns `formInput`. It is why the dial
-		// exists. Failing on it would fail the build over a control Tom may yet decide to delete.
-		console.log('NOTE  the rectangle rotate handle at ' +
-			(handle.missing ? 'MISSING' : Math.round(handle.x) + ',' + Math.round(handle.y) +
-			' has ' + handle.under + ' on top of it' +
-			(handle.under === 'rotate' ? ' (reachable)' : ' (NOT REACHABLE -- the dial is the way in)')));
+		// ---- his two gestures, and they have two different subjects -------------------------------
+		const camOf = () => evaluate(`(function () { var w = document.querySelector('#lpn_canvas > g');
+			return w ? (w.getAttribute('transform') || '') : ''; })()`);
+		const georefOf = () => evaluate(`(function () { try { var ix = JSON.parse(localStorage.getItem('lpn_index'));
+			var d = JSON.parse(localStorage.getItem('lpn_project_' + ix.openId));
+			return JSON.stringify((d && d.project && d.project.georef) || null); } catch (e) { return 'unreadable'; } })()`);
+		const mid = { x: 400, y: 300 };
+
+		// ZOOM MOVES BOTH TOGETHER. One camera, one world group: the tiles and the pipes are in it,
+		// so a camera change is the only thing that can move them without moving either relative to
+		// the other. What it must NOT do is touch the placement.
+		const camBefore = await camOf();
+		const before2 = JSON.parse(await snap());
+		await evaluate(`(function () { var c = document.getElementById('lpn_canvas');
+			c.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, clientX: 400, clientY: 300, bubbles: true, cancelable: true })); })()`);
+		await sleep(600);
+		const camAfter = await camOf();
+		const after2 = JSON.parse(await snap());
+		ok('A WHEEL AT STEP 2 ZOOMS, which it did not do at all before today',
+			camBefore !== camAfter, camBefore + ' -> ' + camAfter);
+		ok('...and it moves the drawing on screen, which is "both together"',
+			JSON.stringify(before2.nodes) !== JSON.stringify(after2.nodes));
+
+		// PAN MOVES THE MAP ONLY, from bare canvas, where there is no longer a rectangle to press.
+		const pinPre = JSON.parse(await snap()).nodes;
+		const geoPre = await georefOf();
+		await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: mid.x, y: mid.y, button: 'left', buttons: 1, clickCount: 1, pointerType: 'mouse' });
+		for (let i = 1; i <= 6; i++) {
+			await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: mid.x + i * 20, y: mid.y, button: 'left', buttons: 1, pointerType: 'mouse' });
+			await sleep(60);
+		}
+		await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: mid.x + 120, y: mid.y, button: 'left', buttons: 0, clickCount: 1, pointerType: 'mouse' });
+		await sleep(800);
+		const pinPost = JSON.parse(await snap()).nodes;
+		ok('A DRAG ON BARE CANVAS MOVES THE MAP AND NOT THE DRAWING',
+			JSON.stringify(pinPre) === JSON.stringify(pinPost),
+			pinPre.slice(0, 1) + ' -> ' + pinPost.slice(0, 1));
+		console.log('NOTE  the placement while the wizard is open is not yet saved, so the stored ' +
+			'georef is unchanged by design: ' + (geoPre === await georefOf() ? 'unchanged' : 'CHANGED'));
+
+		// ---- the rectangle is gone, so there is no handle to reach ---------------------------------
+		ok('and no rectangle handle is left anywhere on the canvas',
+			(await evaluate(`document.querySelectorAll('[data-mapgeo]').length`)) === 0);
 	}
 
 	const ex = logs.filter(function (l) { return /^EXCEPTION/.test(l); });

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**108 still to read on master**, of 171 untranslated keys, of 2039 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**107 still to read on master**, of 170 untranslated keys, of 2038 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (171, 108 to read @@ NEEDS RULING)
+## lpn_  (170, 107 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -223,7 +223,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > The world map is back where it was, and your drawing never moved.
   @@ NEEDS RULING
 - **`lpn_mapgeo_dial_help`**
-  > Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.
+  > Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.
   @@ NEEDS RULING
 - **`lpn_mapgeo_dial_size`**
   > Map size
@@ -240,17 +240,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_mapgeo_finish`**
   > Georeference here
   @@ NEEDS RULING
+- **`lpn_mapgeo_gestures`**
+  > Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.
+  @@ NEEDS RULING
 - **`lpn_mapgeo_hint1`**
   > Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.
   @@ NEEDS RULING
 - **`lpn_mapgeo_hint2`**
-  > Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_hint_move`**
-  > Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_hint_scale`**
-  > Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  > Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
   @@ NEEDS RULING
 - **`lpn_mapgeo_intro`**
   > Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
@@ -545,7 +542,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**19 still to read**, of 31 new keys across 6 unmerged branch(es).
+**22 still to read**, of 34 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -556,13 +553,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-2026-09-18 (`b2571821`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/engine-fetch-wait (`1a783fa3`) — 3 new, 3 to read @@ NEEDS RULING
 
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+- **`lpn_engine_wait`**
+  > Loading solver. Results delayed momentarily. Continue working.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_bytes`**
+  > Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_pct`**
+  > Solver {percent}% loaded.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`41cc0833`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/label-gang-search (`c5c450d5`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -643,10 +646,15 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/xy-world-map (`b7663a36`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`a29ef2d9`) — adds no English strings
 
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+### feat/xy-world-map (`41e715c6`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_mapgeo_hint_move`**
+  > Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_hint_scale`**
+  > Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
   @@ NEEDS RULING
 
 ### ida/esc-and-lock-identity (`b3c6bbd7`) — 1 new, 1 to read @@ NEEDS RULING
