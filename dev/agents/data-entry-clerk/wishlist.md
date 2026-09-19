@@ -406,3 +406,26 @@ and fails silently on the plan set you didn't.
 **Ranking: this is a correctness condition on the CSV-import branch, not a new priority of my own —
 I would not delay that branch to build it elaborately, but I would treat skipping the coordinate-
 order question as a defect, not a simplification, given how silent the failure is.**
+
+## UPDATE 2026-09-19 to item 1: Task 186 is CLOSED (2026-09-08), the create-rows gap now has its own number, Task 610, and I re-verified it carries exactly the gap this row named
+
+**Re-checked against the current tree, not just trusted from memory, per the rule that an
+OBSERVED finding decays.** Task 186 (the tables interface generally) closed 2026-09-08 with the
+two unbuilt halves — paste that CREATES rows, and this item's own original complaint — split into
+Task 610, still open at priority 50, its text naming the gap this row raised word-for-word: an ID
+that can create, and From/To/X/Y becoming typeable. **This item's original ask is therefore no
+longer an unrecognized gap in a closed task; it is Task 610's actual scope, on the roadmap, in
+Tom's own words, with him "sympathetic."** Nothing further for me to flag here — I would delete
+this pointer as satisfied except that the roster's own provenance rule wants the correction on
+record with a date CHECKED, not just a date found: **checked 2026-09-19.**
+
+One condition of Task 610 (§2.1 of `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md`,
+the Junction table's own X/Y/lat/lon columns) has separately shipped under Task 674 — confirmed
+this session by reading `paneColCoord()`, `js/looped-network.js:17097`. What remains open in 610
+is the vertex-cell format itself (delivered, journal twelfth invocation adds a sourced ranking of
+five candidates against Tom's own list) and the paste-that-creates mechanism (still unbuilt,
+confirmed this session — no `paneColVerts` anywhere, `panePasteAt()`'s own comment still says it
+cannot grow the table).
+
+**Ranking unchanged**: still the top of this list by my own arithmetic (a per-row round trip
+removed 400 times), still behind nothing else here.

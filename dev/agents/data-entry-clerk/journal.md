@@ -1413,3 +1413,60 @@ code should re-verify against what actually shipped before repeating these as fi
 recommendations.
 
 — Declan
+
+## Twelfth invocation, 2026-09-19 — re-verifying and completing the Task 610 vertex-cell spec
+
+Tom's orchestrator relayed that Task 610 is blocked "on it and nothing else," as if the spec did
+not exist. **OBSERVED**: it does — `dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md` was
+delivered in full on 2026-09-09 (wishlist item 1's update of that date), with the format
+(single-`/`-separated flat list, lat/lon or x/y per project kind, whole-cell refuse-or-commit,
+empty means no bends), the round-trip mechanism (`mergeTok()`), and my read on Tom's other two
+conditions. Rather than re-derive it from nothing, I re-verified it against the current tree and
+added what it was missing against this invocation's more specific brief — an explicit sourced
+ranking of five named candidates (in-cell list / WKT / WKB-hex / separate vertex table / no paste
+at all), which the 2026-09-09 version argued for its own pick without naming or sourcing the
+others as alternatives.
+
+**What changed on re-verification, and why it matters:**
+
+- **Section 2.1's claim ("Junction table still has no X/Y/lat/lon columns") is now FALSE and I
+  corrected it in place rather than leaving it to mislead a future reader.** **OBSERVED**
+  `js/looped-network.js:17097`, `paneColCoord(slot)` — this shipped under Task 674 (closed),
+  independently of Task 610, and my own wishlist items 7 and 9 already tracked its build and
+  placement without me connecting it back to this spec until now. Condition 2.1 of Tom's three is
+  done; I marked it done in the spec file rather than trusting my own six-day-old claim.
+- **Line numbers throughout §1–3 have drifted** (the file grew substantially between 2026-09-09
+  and now) but every function named — `libPasteCells()`, `panePasteAt()`, `paneWriteCellText()`,
+  `paneParseCellText()`, `mergeTok()` — still exists with the same signature and behaviour. I
+  re-grepped each one rather than trusting the old citations; the design in §1 is unaffected.
+- **New §4, added this session**, ranks the five candidates the orchestrator named explicitly:
+  1. in-cell delimited list (unchanged recommendation); 2. a separate vertex table keyed on pipe
+  ID — **CITED, this is literally EPANET's own `[VERTICES]` section shape**, already implemented
+  in `js/lpn-inp.js:1263` (import) and `:3209` (export) — real, and the right shape for a FILE,
+  wrong for a per-pipe PASTE cell (would need a seventh tab and a repeated ID per bend); 3. WKT —
+  rejected, with a new piece of evidence found this session: **CITED**, QGIS's own attribute table
+  cannot set geometry from a typed/pasted WKT string without a third-party plugin
+  (plugins.qgis.org, "Plain Geometry Editor," "Geom From Attribute"), which is corroborating
+  evidence that WKT-in-a-cell is not an established spreadsheet-paste convention anywhere, not
+  only a bad fit for this page's own parser; 4. WKB/hex — rejected outright, no source treats it
+  as a human entry format; 5. leave vertices out of paste entirely — named honestly as the safe,
+  smaller first slice (every straight pipe already works under §1's empty-cell rule with no
+  vertex column at all), not a recommendation to stop there.
+- **The four "row 300" questions the orchestrator asked me to answer explicitly are now all
+  answered with citations in §4**: malformed pair (refuse whole cell, unchanged), blank (no
+  vertices, unchanged), the Excel character ceiling (**CITED**, Microsoft's own "Excel
+  specifications and limits" page: 32,767-character storage limit, 1,024 displayed in-cell — at
+  this format's ~9–12 chars/coordinate that is roughly 40–50 vertices before the CELL DISPLAY
+  truncates visually, no data loss, no pipe plausibly needs that many bends), coordinate units/CS
+  (table's displayed unit and the project's own coordinate order, re-affirmed against
+  `paneColCoord()`'s now-shipped per-project labeling), and the round-trip rule (`mergeTok()`,
+  confirmed still present and unchanged, still unapplied because there is no vertex column yet to
+  apply it to).
+
+**What I did NOT do:** I did not build anything, and I did not change my own recommendation — the
+research this session strengthened the case for the in-cell list (the separate-table alternative
+turned out to already exist as EPANET's own format, which made it worth taking seriously rather
+than dismissing by assumption, and it still lost on paste ergonomics once actually compared) rather
+than changing it.
+
+— Declan
