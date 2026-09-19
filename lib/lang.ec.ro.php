@@ -1111,7 +1111,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Această vană indică o curbă de pierdere 
 $ec_lang['lpn_select_first']='Nimic nu este selectat. Faceți mai întâi clic pe un element de pe hartă, apoi apăsați Delete.';
 $ec_lang['lpn_field_lon']='Longitudine';
 $ec_lang['lpn_field_lat']='Latitudine';
-$ec_lang['lpn_engine_minor_loss_note']='Notă: cu rezolvitorul EPANET, pierderile locale (minore) ies puțin mai mici decât cu rezolvitorul intern, deoarece EPANET rotunjește valoarea pe care o folosește pentru gravitație.';
 $ec_lang['template_share_manual']='Copiați acest link:';
 $ec_lang['lpn_time_menu']='Timp';
 $ec_lang['lpn_time_duration']='Durata totală de rulare';

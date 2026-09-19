@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 104 untranslated keys, of 1973 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**56 still to read on master**, of 104 untranslated keys, of 1972 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -344,7 +344,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**54 still to read**, of 81 new keys across 6 unmerged branch(es).
+**70 still to read**, of 97 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -355,7 +355,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-demands (`d145512d`) — 30 new, 18 to read @@ NEEDS RULING
+### chore/handoff-2026-09-18 (`b2571821`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
+
+### feat/customer-demands (`d145512d`) — 31 new, 19 to read @@ NEEDS RULING
 
 - **`lpn_customer_detached`**
   > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
@@ -369,6 +375,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
 - **`lpn_field_account`**
   > Account number
   _Ruled OK 2026-09-17._
@@ -448,23 +457,41 @@ build for that would be a gate nobody keeps. Refresh it with
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`1c6f394e`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/label-gang-search (`41cc0833`) — 9 new, 9 to read @@ NEEDS RULING
 
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  @@ NEEDS RULING
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
 - **`lpn_settings_label_always`**
   > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_auto`**
+  > Automatic: {width}
   @@ NEEDS RULING
 - **`lpn_settings_label_max_width`**
   > Widest view that shows labels (map units)
   @@ NEEDS RULING
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are shown only while the view is narrower than this. Leave the box blank to always show them. A text object you added shows until the view is this much wider than its own size multiplier.
+  > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
   @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
   @@ NEEDS RULING
 
-### feat/lock-initials-later (`37f05c7e`) — 15 new, 3 to read @@ NEEDS RULING
+### feat/lock-initials-later (`37f05c7e`) — 16 new, 4 to read @@ NEEDS RULING
 
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
 - **`lpn_lock_age_edited`**
   > It was last edited {x} ago.
   _Ruled OK 2026-09-17._
@@ -511,13 +538,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/xy-world-map (`b6433f21`) — 30 new, 27 to read @@ NEEDS RULING
+### feat/xy-world-map (`b7663a36`) — 36 new, 33 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
   @@ NEEDS RULING
 - **`lpn_crs_unnamed`**
   > unnamed
+  @@ NEEDS RULING
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
 - **`lpn_map_attach_add`**
   > Attach
@@ -570,6 +600,21 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_cancelled`**
   > The world map is back where it was, and your drawing never moved.
   @@ NEEDS RULING
+- **`lpn_mapgeo_dial_help`**
+  > Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size`**
+  > Map size
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size_read`**
+  > {f} times
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn`**
+  > Turn the map
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn_read`**
+  > {d} degrees
+  @@ NEEDS RULING
 - **`lpn_mapgeo_finish`**
   > Georeference here
   @@ NEEDS RULING
@@ -604,10 +649,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
 
-### ida/esc-and-lock-identity (`b3c6bbd7`) — adds no English strings
+### ida/esc-and-lock-identity (`b3c6bbd7`) — 1 new, 1 to read @@ NEEDS RULING
 
-### tables-interface (`e34970bc`) — 2 new, 2 to read @@ NEEDS RULING
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
 
+### tables-interface (`e34970bc`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_engine_minor_loss_note`**
+  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
 - **`lpn_terrain_no_nodes`**
   > There are no nodes to fill in yet.
   @@ NEEDS RULING

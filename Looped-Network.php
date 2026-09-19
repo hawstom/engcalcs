@@ -2621,7 +2621,6 @@ EngCalcs.pageConfig = {
 	lpn_control_unreadable_note: <?=json_encode($ec_lang['lpn_control_unreadable_note'])?>,
 	lpn_rule_dangling_note: <?=json_encode($ec_lang['lpn_rule_dangling_note'])?>,
 	lpn_rule_unreadable_note: <?=json_encode($ec_lang['lpn_rule_unreadable_note'])?>,
-	lpn_engine_minor_loss_note: <?=json_encode($ec_lang['lpn_engine_minor_loss_note'])?>,
 	lpn_unit_unknown: <?=json_encode($ec_lang['lpn_unit_unknown'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
 	lpn_settings_symbol_size: <?=json_encode($ec_lang['lpn_settings_symbol_size'])?>,

@@ -1118,7 +1118,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Bu vana, dosyada bulunmayan bir yük kaybı 
 $ec_lang['lpn_select_first']='Hiçbir şey seçili değil. Önce haritada bir öğeye tıklayın, sonra Sil\'e basın.';
 $ec_lang['lpn_field_lon']='Boylam';
 $ec_lang['lpn_field_lat']='Enlem';
-$ec_lang['lpn_engine_minor_loss_note']='Not: EPANET çözücüsüyle, küçük (yerel) kayıplar yerleşik çözücüye göre çok az daha düşük çıkar, çünkü EPANET yer çekimi için kullandığı değeri yuvarlar.';
 $ec_lang['template_share_manual']='Bu bağlantıyı kopyalayın:';
 $ec_lang['lpn_time_menu']='Zaman';
 $ec_lang['lpn_time_duration']='Toplam çalışma süresi';

@@ -1111,7 +1111,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='ይህ ቫልቭ በፋይሉ ውስጥ የ�
 $ec_lang['lpn_select_first']='ምንም ነገር አልተመረጠም። መጀመሪያ በካርታው ላይ አካል ይጫኑ፣ ከዚያም ሰርዝ ይጫኑ።';
 $ec_lang['lpn_field_lon']='ኬንትሮስ';
 $ec_lang['lpn_field_lat']='ኬክሮስ';
-$ec_lang['lpn_engine_minor_loss_note']='ማስታወሻ፦ የEPANET ፈታችን ሲጠቀሙ፣ ጥቃቅን (አካባቢያዊ) ኪሳራዎች ከአብሮ ከተሰራው ፈታች ትንሽ ያነሱ ይወጣሉ፣ ምክንያቱም EPANET ለስበት ኃይል የሚጠቀመውን ዋጋ ስለሚያጠጋጋ ነው።';
 $ec_lang['template_share_manual']='ይህን አገናኝ ቅዳ፦';
 $ec_lang['lpn_time_menu']='ጊዜ';
 $ec_lang['lpn_time_duration']='ጠቅላላ የመሮጫ ጊዜ';

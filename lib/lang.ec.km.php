@@ -1113,7 +1113,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='វ៉ាល់នេះសំដៅទៅ�
 $ec_lang['lpn_select_first']='គ្មានអ្វីត្រូវបានជ្រើសរើសទេ។ ចុចលើធាតុមួយនៅលើផែនទីជាមុនសិន រួចចុច លុប។';
 $ec_lang['lpn_field_lon']='បណ្ដោយ';
 $ec_lang['lpn_field_lat']='ទទឹង';
-$ec_lang['lpn_engine_minor_loss_note']='ចំណាំ៖ ជាមួយឧបករណ៍ដោះស្រាយ EPANET ការបាត់បង់មូលដ្ឋានចេញមកទាបជាងបន្តិចបំផុត បើប្រៀបធៀបនឹងឧបករណ៍ដោះស្រាយខាងក្នុង ព្រោះ EPANET បង្គត់តម្លៃទំនាញផែនដីដែលវាប្រើ។';
 $ec_lang['template_share_manual']='ចម្លងតំណនេះ៖';
 $ec_lang['lpn_time_menu']='ពេលវេលា';
 $ec_lang['lpn_time_duration']='រយៈពេលដំណើរការសរុប';

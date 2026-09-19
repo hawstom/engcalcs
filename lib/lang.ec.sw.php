@@ -1119,7 +1119,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Vali hii inarejelea mkondo wa upotevu wa kim
 $ec_lang['lpn_select_first']='Hakuna kilichochaguliwa. Bofya kipengele kwenye ramani kwanza, kisha bonyeza Futa.';
 $ec_lang['lpn_field_lon']='Longitudo';
 $ec_lang['lpn_field_lat']='Latitudo';
-$ec_lang['lpn_engine_minor_loss_note']='Kumbuka: kwa kitatuzi cha EPANET, upotevu wa ndani hutokea chini kidogo sana kuliko kwa kitatuzi kilichojengwa ndani, kwa sababu EPANET hurunda thamani inayoitumia kwa mvuto wa dunia.';
 $ec_lang['template_share_manual']='Nakili kiungo hiki:';
 $ec_lang['lpn_time_menu']='Muda';
 $ec_lang['lpn_time_duration']='Muda wote wa kuendesha';

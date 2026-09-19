@@ -1112,7 +1112,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Katup ini merujuk pada kurva kehilangan ting
 $ec_lang['lpn_select_first']='Tidak ada yang dipilih. Klik sebuah elemen di peta terlebih dahulu, lalu tekan Hapus.';
 $ec_lang['lpn_field_lon']='Bujur';
 $ec_lang['lpn_field_lat']='Lintang';
-$ec_lang['lpn_engine_minor_loss_note']='Catatan: dengan penyelesai EPANET, kehilangan lokal (minor) muncul sedikit lebih rendah daripada dengan penyelesai bawaan, karena EPANET membulatkan nilai gravitasi yang digunakannya.';
 $ec_lang['template_share_manual']='Salin tautan ini:';
 $ec_lang['lpn_time_menu']='Waktu';
 $ec_lang['lpn_time_duration']='Total waktu berjalan';

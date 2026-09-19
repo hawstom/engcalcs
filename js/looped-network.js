@@ -43072,8 +43072,17 @@ var EngCalcs = EngCalcs || {};
 			shownEngineNotes[code] = true;
 			return true;
 		}
-		var manningNote = noteOnce('manning-constant-differs'),
-			minorNote = noteOnce('minor-loss-gravity-differs');
+		var manningNote = noteOnce('manning-constant-differs');
+		// **THE MINOR-LOSS GRAVITY NOTE IS NOT SHOWN, AND THAT IS TOM'S OWN CALL** (2026-09-18:
+		// *"We can't keep showing the gravity message forever. It's just noise. If anything, put
+		// it in settings in the tip for the choice of whether to use the built-in solver when
+		// possible."*). The difference it reported is real and is still REPORTED BY THE ENGINE --
+		// `minor-loss-gravity-differs` is still raised in js/lpn-epanet.js and two harnesses still
+		// assert it -- but a sentence about a rounding in the last digits of a minor loss, on
+		// screen after every solve that has one k value in it, buys the reader nothing and costs
+		// them the attention the notes that DO matter need. Its substance moved to
+		// `lpn_settings_engine_native_tip`, beside the choice it is actually about, where somebody
+		// wondering why two engines disagree will go looking for it.
 		// LEADS the status bar, ahead of every other note, because everything after it is a remark
 		// about numbers this sentence says not to trust. Logged under the same diagnostic code the
 		// discard path uses: to a user it is the same dead end, reached with something on screen.
@@ -43127,8 +43136,7 @@ var EngCalcs = EngCalcs || {};
 		// noteOnce() has already decided that -- so a later solve neither restarts a running clock
 		// nor wipes a note the user has not finished reading.
 		var engineNotes = [
-			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.') : '',
-			minorNote ? (pc.lpn_engine_minor_loss_note || 'Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.') : ''
+			manningNote ? (pc.lpn_engine_manning_note || 'Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss comes out about 0.6% lower than the exact form.') : ''
 		].filter(function (t) { return !!t; }).join(' ');
 		if (engineNotes) { setEngineNotes(engineNotes); }
 		refreshLabelText();

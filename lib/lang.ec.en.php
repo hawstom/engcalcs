@@ -2654,7 +2654,7 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device.';
+$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe carries a minor (local) loss, the two solvers disagree in the last digits: EPANET rounds the value it uses for gravity, so its minor losses come out very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
@@ -2685,7 +2685,6 @@ $ec_lang['lpn_control_dangling_note']='These controls refer to an element that i
 $ec_lang['lpn_control_unreadable_note']='These controls could not be read, so they were left out: {ids}';
 $ec_lang['lpn_rule_dangling_note']='These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='These rules could not be read, so they were ignored in this run: {ids}';
-$ec_lang['lpn_engine_minor_loss_note']='Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
