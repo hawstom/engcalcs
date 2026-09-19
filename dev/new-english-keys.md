@@ -440,7 +440,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 66 new keys across 6 unmerged branch(es).
+**51 still to read**, of 66 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -457,7 +457,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`41cc0833`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/label-gang-search (`1b5ed5fc`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -537,6 +537,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_terrain_none_needed`**
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
+
+### feat/tables-spreadsheet (`c057985a`) — adds no English strings
 
 ### feat/xy-world-map (`b7663a36`) — 36 new, 33 to read @@ NEEDS RULING
 
