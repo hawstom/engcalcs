@@ -7,22 +7,18 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**102 open tasks.** Next (100): 14 · Soon (75): 20 · Someday (50): 39 · Maybe (25): 11 · Parked (5): 18
+**98 open tasks.** Next (100): 10 · Soon (75): 20 · Someday (50): 39 · Maybe (25): 11 · Parked (5): 18
 
-## 100 — Next (14)
+## 100 — Next (10)
 
 - Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 608 — Fetch the engine before somebody's first solve needs it.
-- Task 611 — Import a library (pipe types, fittings, curves) from another project file.
-- Task 626 — A refused beacon is retried like an offline one, 20 times.
 - Task 646 — Attach the world map to an XY project without changing the project.
 - Task 669 — Show labels at this zoom or closer.
 - Task 676 — Watch the sites, and send a derived weekly report.
-- Task 686 — The progress bar finishes before the work does.
 - Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
-- ! Task 692 — Satellite view is refused on a projected project, and it is the DEM bug again.
 - Task 696 — File, Convert coordinates as: a working menu item, as a new project.
 - Task 698 — Ask for initials once per browser, keep them, and name the holder.
 
@@ -130,5 +126,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-95 of 102 titles are within 4–12 words. `!` marks the rest;
+92 of 98 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
