@@ -1134,7 +1134,6 @@ $ec_lang['lpn_time_tank']='Vasca';
 $ec_lang['lpn_time_level']='Livello dell\'acqua';
 $ec_lang['lpn_time_run']='Calcola';
 $ec_lang['lpn_time_run_tip']='Calcola questa rete a ogni passo temporale idraulico, dall\'inizio alla fine del periodo.';
-$ec_lang['lpn_time_run_note']='Stai vedendo la rete al primo istante di riferimento. L\'impostazione Calcola automaticamente è disattivata, quindi i risultati per gli istanti successivi non vengono aggiornati mentre lavori. Premi il pulsante Calcola per aggiornarli.';
 $ec_lang['lpn_time_speed']='Velocità';
 $ec_lang['lpn_time_speed_tip']='Con quale velocità viene riprodotta la simulazione.';
 $ec_lang['lpn_settings_search']='Cerca nelle impostazioni';

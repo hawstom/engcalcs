@@ -1133,7 +1133,6 @@ $ec_lang['lpn_time_tank']='Nádrž';
 $ec_lang['lpn_time_level']='Hladina vody';
 $ec_lang['lpn_time_run']='Vypočítat';
 $ec_lang['lpn_time_run_tip']='Vypočítá tuto síť v každém hydraulickém časovém kroku, od začátku běhu do jeho konce.';
-$ec_lang['lpn_time_run_note']='Vidíte síť v prvním vykazovaném čase. Nastavení Přepočítávat automaticky je vypnuté, takže se výsledky pro pozdější časy během práce neaktualizují. Stiskněte tlačítko Vypočítat, aby se aktualizovaly.';
 $ec_lang['lpn_time_speed']='Rychlost přehrávání';
 $ec_lang['lpn_time_speed_tip']='Jak rychle se běh přehrává.';
 $ec_lang['lpn_settings_search']='Hledat v nastavení';

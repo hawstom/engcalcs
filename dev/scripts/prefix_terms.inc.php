@@ -101,7 +101,7 @@ function prefixToTermNames(): array
             // Added 2026-08-19 (Task 438 Wave 0, second pass over the resync set). 'drop (a label)'
             // guards a three-character column heading whose word is also a drop in head; 'run (a
             // simulation)' guards a one-word button whose word is also a run of pipe, and it is
-            // quoted by name inside lpn_time_run_note; 'work out (compute)' is the suite's plain
+            // quoted by name inside lpn_run_menu_tip; 'work out (compute)' is the suite's plain
             // verb for solving, opaque word by word to anyone parsing the two words separately.
             'drop (a label)', 'run (a simulation)', 'work out (compute)', 'decimal separator',
             // Added 2026-09-02 (Task 573 Wave 0). 'open (link status)' is EPANET's OPEN/CLOSED and

@@ -2051,6 +2051,12 @@ the block.
   Tom, 2026-09-19, reviewing the spreadsheet tables: *"Doesn't copy across columns. Maybe this is
   what we want. Don't 'fix' for now. Maybe it can be a project Setting (Allow table copy across
   columns). Make this a Priority 50 question."*
+  - **AND THE PREMISE MAY BE WRONG, WHICH HE SHOULD RE-TEST FIRST.** Driven in a real browser
+    2026-09-19: Ctrl+C on a two-column range put `5077<tab>80 / 5080<tab>190` on the clipboard, and
+    a two-by-two block pasted into two different columns wrote all four values. **Copying across
+    columns already works in both directions.** What he saw was most likely the single-cell Ctrl+C
+    that did nothing at all until the same day (his R-039), which looks like "copy did not work"
+    from either end. So the first move is his re-test, not a build.
   - **IT IS A QUESTION AND NOT A BUILD, and it stays one until he answers it.** Copying a value
     sideways across columns means copying it between DIFFERENT QUANTITIES -- a diameter into a
     roughness -- which a spreadsheet allows because a spreadsheet does not know what its columns

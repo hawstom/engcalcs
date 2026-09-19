@@ -1645,7 +1645,7 @@ EngCalcs.pageConfig = {
 	lpn_time_level: <?=json_encode($ec_lang['lpn_time_level'])?>,
 	lpn_time_run: <?=json_encode($ec_lang['lpn_time_run'])?>,
 	lpn_time_run_tip: <?=json_encode($ec_lang['lpn_time_run_tip'])?>,
-	lpn_time_run_note: <?=json_encode($ec_lang['lpn_time_run_note'])?>,
+	lpn_manual_results_cleared: <?=json_encode($ec_lang['lpn_manual_results_cleared'])?>,
 <?php   // The run box (Task 450). Three new strings; `lpn_time_running` above says what it says
         // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,

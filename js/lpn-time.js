@@ -430,7 +430,6 @@
 			// this literal is the button's name and not a synonym for it.
 			run: pageConfig.lpn_time_run || 'Calculate',
 			runTip: pageConfig.lpn_time_run_tip || 'Solve this network at every hydraulic time step.',
-			runNote: pageConfig.lpn_time_run_note || 'You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.',
 			// ---- the run box (Task 450) ----
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
 			// already the sentence the status bar uses for exactly this moment.
@@ -902,18 +901,33 @@
 	};
 
 	/**
-	 * What the status bar has to say while the later times are NOT being kept up to date. Empty
-	 * whenever they are -- including while an automatic run is a second away, because a warning
-	 * that appears and disappears on every edit is noise rather than information.
+	 * **OFF MEANS OFF** (Tom, 2026-09-19). The host's edit path when "Recalculate automatically" is
+	 * off: nothing is run, nothing is queued, and the frames go, because they describe a network
+	 * that no longer exists. Same disposal as the edit branch of lpnTimeRun() -- minus the
+	 * scheduleIdleRun(), which is the whole difference -- reached without assembling a model,
+	 * because assembling one is arithmetic and the point is that there is to be none.
 	 *
-	 * js/looped-network.js's applySolveResult() composes it beside valveRouteNote, which is the
-	 * same kind of thing: a fact about this network that the user has to know to read the numbers.
+	 * `state.wanted` is cleared too: a run the user asked for and then edited away from is a run
+	 * they no longer asked for, and leaving the flag standing would fire a full period run the
+	 * next time anything at all called through.
 	 */
-	EC.lpnTimeStatusNote = function () {
-		if (!host || state.run || !EC.lpnEpanetRun) { return ''; }
-		if (!EC.lpnTimeIsExtended(docTimes()) || autoRunAllowed()) { return ''; }
-		return strings().runNote;
+	EC.lpnTimeDropRun = function () {
+		cancelIdleRun();
+		state.wanted = false;
+		state.wantedByUser = false;
+		state.lastRunMs = null;
+		dropFrames();
 	};
+
+	/**
+	 * **GONE, WITH THE STATE IT DESCRIBED** (2026-09-19). This returned `lpn_time_run_note`: "you
+	 * are seeing the first reporting time, and the LATER times are not being kept up to date". It
+	 * was true while `autoRun` suppressed nothing but the later time steps, and Tom named that as
+	 * the defect rather than the wording -- *"off means off"*. An edit with the switch off now
+	 * solves nothing, so there is no half-fresh state to warn about: the results are cleared and
+	 * js/looped-network.js says so (`lpn_manual_results_cleared`). Do not reinstate either half
+	 * without reinstating the behaviour first.
+	 */
 
 	/**
 	 * What the run is doing, for a test that has to know. NOT read by anything on the page: the

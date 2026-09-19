@@ -2,7 +2,7 @@
     "meta": {
         "language": "fa",
         "expected_key_count": 2004,
-        "delta_key_count": 138,
+        "delta_key_count": 139,
         "exempt_key_count": 27,
         "exempt_keys": [
             "u_imgd",
@@ -434,14 +434,14 @@
             {
                 "term": "run (a simulation)",
                 "symbol": "",
-                "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip, lpn_time_run_note and lpn_time_duration.",
-                "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and lpn_time_run_note quotes the button label inside a sentence -- so the word chosen for the button must be the word that appears in that sentence, or the instruction points at a button that is not there.",
+                "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip and lpn_time_duration.",
+                "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and several shipped sentences quote the button label inside themselves -- so the word chosen for the button must be the word that appears in those sentences, or the instruction points at a button that is not there. (lpn_time_run_note was one of them and was deleted 2026-09-19; lpn_run_menu_tip and lpn_manual_results_cleared still do it.)",
                 "preferred_translation": ""
             },
             {
                 "term": "work out (compute)",
                 "symbol": "",
-                "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_run_note, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
+                "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
                 "translation_notes": "[2026-08-19, sprint 438 Wave 0] Raised because the phrasal verb is opaque word by word: a reader who parses \"work\" plus \"out\" gets exercise, not arithmetic. One rendering should serve all four strings.",
                 "preferred_translation": ""
             },
@@ -550,6 +550,7 @@
         "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_manual_results_cleared": "The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -690,6 +691,7 @@
         "lpn_customer_detached_count": "{n} customers are no longer connected to a pipe. Their demand is not in the answers.",
         "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.",
         "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.",
+        "lpn_manual_results_cleared": "The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -1307,6 +1309,22 @@
                     "key": "lpn_area_hint_window_start",
                     "value": "روی یکی از گوشه‌های پنجره کلیک کنید.",
                     "english": "Click one corner of the window."
+                }
+            }
+        },
+        "lpn_manual_results_cleared": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_auto_run_tip",
+                    "value": "وقتی روشن باشد، این پروژه اندکی پس از هر تغییری که می‌دهید دوباره محاسبه می‌شود، و دکمهٔ محاسبه از نوار ابزار برداشته می‌شود چون کاری برایش باقی نمی‌ماند. در شبکه‌ای بزرگ که انتظار برای محاسبهٔ هر تغییر مانع تایپ می‌شود، آن را خاموش کنید؛ آنگاه دکمهٔ محاسبه بازمی‌گردد تا خودتان زمان اجرا را انتخاب کنید.",
+                    "english": "Hides the Calculate button and recalculates after any edit. Turn off if recalculation is too slow."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_slow",
+                    "value": "محاسبهٔ این شبکه {secs} ثانیه طول کشید، و طوری تنظیم شده که پس از هر تغییری دوباره محاسبه شود. برای متوقف کردن این کار و بازگرداندن دکمهٔ محاسبه، «محاسبهٔ خودکار» را در تنظیمات، زیر محاسبه، هیدرولیک، خاموش کنید.",
+                    "english": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics."
                 }
             }
         },

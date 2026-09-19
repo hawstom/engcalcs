@@ -1142,7 +1142,6 @@ $ec_lang['lpn_time_tank']='Depo';
 $ec_lang['lpn_time_level']='Su seviyesi';
 $ec_lang['lpn_time_run']='Hesapla';
 $ec_lang['lpn_time_run_tip']='Bu şebekeyi, çalışmanın başından sonuna kadar her hidrolik zaman adımında çözer.';
-$ec_lang['lpn_time_run_note']='Şebekeyi ilk raporlama zamanında görüyorsunuz. Otomatik olarak yeniden hesapla ayarı kapalı, bu yüzden siz çalışırken sonraki zamanların sonuçları güncel tutulmuyor. Bunları güncellemek için Hesapla düğmesine basın.';
 $ec_lang['lpn_time_speed']='Hız';
 $ec_lang['lpn_time_speed_tip']='Çalışmanın ne kadar hızlı oynatılacağı.';
 $ec_lang['lpn_settings_search']='Ayarlarda ara';

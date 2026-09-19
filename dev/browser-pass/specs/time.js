@@ -436,12 +436,12 @@ exports.run = async function ({ browser, report }) {
 			runs: window.__runs,
 			frames: window.EngCalcs.lpnTimeRunState().frames,
 			ms: Math.round(window.EngCalcs.lpnTimeRunState().lastRunMs),
-			note: window.EngCalcs.lpnTimeStatusNote()
+			noteGone: !window.EngCalcs.lpnTimeStatusNote
 		}));
 		report.eq(settled.runs, 1, 'ONE run once the editing stops', String(settled.runs));
 		report.ok(settled.frames > 0, 'the period is worked out again without anybody asking',
 			settled.frames + ' frames, last run ' + settled.ms + ' ms');
-		report.eq(settled.note, '', 'and the page says nothing, because there is nothing out of date');
+		report.ok(settled.noteGone, 'and the half-fresh banner no longer exists to be shown');
 
 		// **THE MEASUREMENT IS ADVICE, NOT A VETO — AND THE USER OWNS THE SWITCH** (Task 467, Tom
 		// 2026-08-20). Until Task 511 this section dropped `LPN_TIME_AUTO.budgetMs` to zero and
@@ -460,13 +460,12 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(2500);
 		const noVeto = await a.page.evaluate(() => ({
 			runs: window.__runs,
-			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
-			note: window.EngCalcs.lpnTimeStatusNote()
+			frame: !!window.EngCalcs.lpnTimeCurrentFrame()
 		}));
 		report.eq(noVeto.runs, 1,
 			'a network over the old cost budget STILL runs itself — automatic means automatic');
 		report.ok(noVeto.frame, '...and the frames are there, unasked');
-		report.eq(noVeto.note, '', '...with nothing to warn about, because nothing is out of date');
+
 
 		// **TURNING THE CHECKBOX OFF IS THE MANUAL PATH.** Found by its own label rather than by a
 		// selector: it is a row of the Settings box under Calculation, and the box's rows are built
@@ -494,7 +493,6 @@ exports.run = async function ({ browser, report }) {
 		const manual = await a.page.evaluate(() => ({
 			runs: window.__runs,
 			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
-			note: window.EngCalcs.lpnTimeStatusNote(),
 			status: (document.getElementById('lpn_status') || {}).textContent || '',
 			btn: (function () {
 				const b = [...document.querySelectorAll('#lpn_toolbar button')]
@@ -504,13 +502,17 @@ exports.run = async function ({ browser, report }) {
 		}));
 		report.eq(manual.runs, 0, 'with it OFF, an edit does not re-run the period at all');
 		report.ok(!manual.frame, 'and still never leaves a stale frame behind');
-		report.ok(manual.note.length > 0 && manual.status.indexOf(manual.note) >= 0,
-			'the status bar SAYS the later times are not being kept up to date', manual.status);
+		// **OFF MEANS OFF, 2026-09-19.** This asserted the half-fresh banner: "you are seeing the
+		// first reporting time, the later times are not up to date". Tom named that state as the
+		// defect rather than the wording, so it is gone -- an edit with the box off solves nothing,
+		// and what the bar says is that the results were CLEARED.
+		report.ok(/cleared/i.test(manual.status),
+			'the status bar says the results were CLEARED, because nothing was recalculated', manual.status);
 		report.ok(manual.btn, '...and the Calculate button is back on the strip to answer it');
 
 		// ...and the button is what brings them back. It is on the toolbar, in the transport's own
 		// group. **NAMED "Calculate", NOT "Run"**: `lpn_time_run` reads Calculate, and every string
-		// that pointed at it followed (lpn_time_run_note now says "Press Calculate"). Task 511 found
+		// that pointed at it followed. Task 511 found
 		// this spec still clicking "Run", which THREW out of Session.toolbarClick() and took the
 		// seven specs listed after `time` in run.js down with it — they were neither passing nor
 		// failing, they were unrun.
@@ -518,12 +520,10 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(2500);
 		const ran = await a.page.evaluate(() => ({
 			runs: window.__runs,
-			frames: window.EngCalcs.lpnTimeRunState().frames,
-			note: window.EngCalcs.lpnTimeStatusNote()
+			frames: window.EngCalcs.lpnTimeRunState().frames
 		}));
 		report.eq(ran.runs, 1, 'Calculate works the whole period out');
 		report.ok(ran.frames > 0, 'the frames are back', String(ran.frames));
-		report.eq(ran.note, '', 'and the page stops warning about them');
 
 		// ---- 6. AND THE RUN BOX SAYS SO WHILE IT HAPPENS (Task 450) ----
 		//
