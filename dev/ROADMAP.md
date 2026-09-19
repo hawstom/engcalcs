@@ -868,8 +868,12 @@ the block.
     follows the node checkboxes: **Settings > Customer symbology** is a third section of its own
     (*"since we may want only demand or only demand and description"*), the values are laid out on
     ONE LINE the way a link label's are (*"Can we make labels one-line concats like link labels?"*),
-    and there is deliberately **no separate text size** -- he called one a bug, and what made his
-    look bigger was the stacking. The **symbol is 0.25 of a junction and follows Symbol scale**,
+    and there is deliberately **no separate text size**. **THE SIZE WAS STILL WRONG AND THE
+    "it was only the stacking" ANSWER IS WITHDRAWN** (his screenshot, 2026-09-19): the zoom path
+    rewrote node, link and Text label sizes and not customers, so a customer label carried the size
+    of whatever scale it was last composed at -- 11 px beside a node label's 2.75 px at 4x.
+    Measured and guarded in `dev/lpn-spike/customer-label-size-harness.js`. The **symbol is 0.25 of
+    a junction and follows Symbol scale**,
     replacing a hybrid real-world rule that made it the one symbol ignoring that setting. Station
     and Offset are in Find and in Replace (*"Bad decision. Put them in."*), the Insert menu's tool
     rows carry the toolbar's tips and their shortcut digits, and the widest-view box has a **Use
@@ -882,6 +886,13 @@ the block.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
     customer's TAG in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.
+  - **THE LABEL PLACEMENT MYSTERY IS MEASURED AND ANSWERED** (2026-09-19,
+    `dev/lpn-spike/customer-label-cause-harness.js`). He asked why a few labels go beyond the
+    customer and guessed a LINK label was the conflict. It is not: in three views the rejector was
+    always the PREVIOUS CUSTOMER'S OWN label, named by `customerSpotBlocker()`. His proposal -- one
+    standard location for all -- is already what happens where there is room, and forcing it would
+    DROP the few that were pushed rather than tidy them. Settings > Symbology, and the two
+    placement changes he asked for, are in `dev/customer-demands.md` §6a.
   - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
     label density rule, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
     so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture

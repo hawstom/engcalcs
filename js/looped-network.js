@@ -8870,7 +8870,22 @@ var EngCalcs = EngCalcs || {};
 	// Air between the service line and the letters, and along it at each end, as fractions of the
 	// font size -- the same currency LPN_ALIGNED_PAD_FRAC is stated in, so the numbers can be read
 	// against each other.
-	var LPN_CUST_LABEL_GAP_FRAC = 0.30;
+	//
+	// **0.48 AND NOT 0.30, BECAUSE AT 0.30 THE LETTERING SAT ON THE SERVICE LINE** (Tom,
+	// 2026-09-19: *"The labels are hiding the service line. They need to be moved away about 1px
+	// or 2px or their halo needs to be that much smaller."*). He offered two fixes and this is the
+	// first of them; the halo was left alone deliberately. The halo is 0.2em of white stroke under
+	// the glyphs and its whole job is legibility over a basemap, which is the ground a service
+	// label is read against more than any other label on this page -- and `.lpn-lbl` is ONE class,
+	// so shrinking it would thin the halo on every node and link label as well, to fix a
+	// collision only these have.
+	//
+	// The old number was not a near miss, it was exactly zero clearance, which is why it reads as
+	// deliberate on screen: the gap is measured to the BASELINE, and below the baseline sit a
+	// descender (the Q of `Qb=` is one, ~0.21 of a font size) and then the halo's outer half
+	// (0.10). 0.21 + 0.10 = 0.31 against a gap of 0.30. The number is stated as that sum plus his
+	// air, so a future reader can see what each part of it is paying for.
+	var LPN_CUST_LABEL_GAP_FRAC = 0.21 + 0.10 + 0.17;   // descender + halo + ~2px of air at 11px   // descender + halo + ~2px of air at 11px
 	var LPN_CUST_LABEL_LINKPAD_FRAC = 0.40;
 	var LPN_CUST_LABEL_DOTPAD_FRAC = 0.40;
 	// **THE DEMAND THIS METER IS DRAWING AT THE MOMENT ON THE CLOCK**, which is resolvedDemand()'s
@@ -8954,6 +8969,27 @@ var EngCalcs = EngCalcs || {};
 	 * order decides who gets the ground, which keeps the pass stable, since that order does not
 	 * depend on anything a reader can change by clicking.
 	 */
+	// **WHAT REJECTED A CUSTOMER LABEL'S FIRST CHOICE, BY NAME** (Tom, 2026-09-19: *"Like most of
+	// the label placement, I see a mystery. I see a row of labels along the service lines with a few
+	// beyond the meter."*). `boxIsClear()` answers yes or no, and "it did not fit" is the kind of
+	// non-answer this project has already withdrawn twice -- so the rejecting obstacle is named and
+	// hung on the element, which is what makes the question measurable instead of arguable.
+	//
+	// Paid for ONLY on a rejection: a label that takes its first choice never enters this. The scan
+	// is linear over the obstacle list rather than through the broad-phase index, because the index
+	// answers whether ANY box overlaps and this needs to know WHICH.
+	// dev/lpn-spike/customer-label-cause-harness.js is the reader.
+	function customerSpotBlocker(b, obs, pad) {
+		var grown = Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a), i, o;
+		for (i = 0; i < obs.boxes.length; i++) {
+			o = obs.boxes[i];
+			if (Collide.boxOverlapDepth(grown, o) > 0) {
+				return { kind: o.kind || 'unknown', linkOwner: o.linkOwner || null,
+					custOwner: o.custOwner || null };
+			}
+		}
+		return null;
+	}
 	function layoutCustomerLabels(obs) {
 		var list = doc.customers || [], fs, pad, gap;
 		if (!customerLabelsAttempted()) {
@@ -8980,8 +9016,15 @@ var EngCalcs = EngCalcs || {};
 				dotPad: meterHalfWorld(pt.x, pt.y) + fs * LPN_CUST_LABEL_DOTPAD_FRAC,
 				bias: labelReadabilityBias()
 			});
+			ce.trials = [];
 			for (k = 0; k < spots.length; k++) {
-				if (boxIsClear(spots[k].box, obs, pad)) { chosen = spots[k]; break; }
+				if (boxIsClear(spots[k].box, obs, pad)) {
+					ce.trials.push({ atLink: spots[k].atLink, taken: true, by: null });
+					chosen = spots[k];
+					break;
+				}
+				ce.trials.push({ atLink: spots[k].atLink, taken: false,
+					by: customerSpotBlocker(spots[k].box, obs, pad) });
 			}
 			if (!chosen) { setLabelAssemblyHidden(ce, true); return; }
 			setLabelAssemblyHidden(ce, false);
@@ -8990,6 +9033,12 @@ var EngCalcs = EngCalcs || {};
 				chosen.ax + ' ' + chosen.ay + ')');
 			repositionMultilineText(ce.text, chosen.ax, chosen.ay);
 			ce.spot = chosen;
+			// **TAGGED, SO THE NEXT METER ON THIS MAIN CAN SAY WHOSE LABEL TOOK THE GROUND.** The
+			// obstacle list is flat and a box carries its own provenance; without this a customer
+			// blocked by the customer before it reports `unknown`, which is the answer that reads
+			// as an explanation and is not one.
+			chosen.box.kind = chosen.box.kind || 'custlabel';
+			chosen.box.custOwner = c.id;
 			obs.boxes.push(chosen.box);
 		});
 	}
@@ -32879,6 +32928,17 @@ var EngCalcs = EngCalcs || {};
 					linkEls[id].text.style.fontSize = fs;
 					(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
 				});
+				// **AND THE CUSTOMERS, WHICH WERE MISSING FROM HERE AND IS THE WHOLE OF THE
+				// "customer labels are a vastly different size" DEFECT** (Tom, 2026-09-19; the
+				// three measured sizes are in dev/lpn-spike/customer-label-size-harness.js). A
+				// customer label has no text size of its own -- it is the same effectiveFontSize()
+				// as every other label -- but a font size is a PIXEL size divided by the scale, so
+				// it is the one geometry here that a zoom invalidates. refreshLabelTextPass() wrote
+				// all three; this, the ZOOM path, wrote two, and a customer label therefore kept
+				// the size of whatever scale it was last composed at until the next content pass.
+				// At 4x that is four times the junction label beside it, with nothing on screen to
+				// say so.
+				Object.keys(custLblEls).forEach(function (id) { custLblEls[id].text.style.fontSize = fs; });
 			} else { labelWorkSkipped = true; }
 			// **THE USER'S OWN TEXT IS NOT SUPPRESSED** (Task 428) and is sized here whatever is
 			// hidden: it is authored content with its own per-label rule, not annotation we made.

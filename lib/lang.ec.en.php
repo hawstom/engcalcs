@@ -2930,16 +2930,16 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // colour a value is drawn in and the label printed beside it.
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
-$ec_lang['lpn_settings_sec_visualization']='Visualization';
+$ec_lang['lpn_settings_sec_symbology']='Symbology';
 $ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
-$ec_lang['lpn_settings_node_symbology']='Node symbology';
-$ec_lang['lpn_settings_link_symbology']='Link symbology';
+$ec_lang['lpn_settings_sym_node']='Node';
+$ec_lang['lpn_settings_sym_link']='Link';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
 // view has to be before a service is worth lettering.
-$ec_lang['lpn_settings_customer_symbology']='Customer symbology';
+$ec_lang['lpn_settings_sym_customer']='Customer';
 $ec_lang['lpn_labels_customer_note']='A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.';
 $ec_lang['lpn_labels_customer_width']='Widest view that attempts to display customer labels';
 $ec_lang['lpn_labels_customer_width_tip']='How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
@@ -3150,7 +3150,7 @@ $ec_lang['lpn_labels_col_drop']='Drop';
 // A third sub-heading over the two controls that are about a node label and a link label alike.
 // "Node and link" rather than "Both": it names the two things, which survives translation into a
 // language with no single word for the pair.
-$ec_lang['lpn_settings_node_link']='Node and link';
+$ec_lang['lpn_settings_sym_all']='All';
 // THE RANGE ALLOCATION MODES, which decide where one colour stops and the next begins. Named for
 // what they DO to the numbers, in the vocabulary QGIS, ArcGIS and every GIS textbook already use --
 // a translator should reach for their own discipline's standard term rather than a literal

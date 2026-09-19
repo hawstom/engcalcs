@@ -351,14 +351,59 @@ Tom wanted something to test; the reasoning was right and the recommendation was
    deleted on 2026-09-17, and what makes customers LOOK labelled is the other half -- a meter's
    demand is a demand row, so its junction's own node label has always included it. Nobody ever
    decided to label a customer.
-   **CONTENT AND STYLE ARE THE NODE'S** (*"Customer labels would follow Node styles. Q is a demand,
-   Base demand or Demand"*): `labelSettings.node.id`, `.demand` and `.demandActual`, and there is no
-   customer side of labelSettings. **PLACEMENT IS HIS OWN AND IS NOT THE NODE PASS**: two fixed
+   **CONTENT IS ITS OWN, SINCE 2026-09-19** -- `labelSettings.customer` is a third section in
+   Settings, which OVERRULES his earlier *"Customer labels would follow Node styles"*: a junction's
+   label answers *what is the pressure here* and a service's answers *whose is this and how much
+   does it draw*. **STYLE IS STILL SHARED AND THERE IS NO SEPARATE TEXT SIZE.**
+   **PLACEMENT IS HIS OWN AND IS NOT THE NODE PASS**: two fixed
    locations along the service line, one justified against the link and one beyond the dot, and a
    DROP if both fail the conflict check -- *"This much simpler than general node label placement."*
    No leader, no relaxation, no shed. `Geom.serviceLabelSpots()` is the whole geometry.
    **`labelSettings.customerMaxWidth` is the widest view that attempts them, and 0 is NEVER**, which
    keeps his own fallback one number away.
+
+### 6a. His browser pass of 2026-09-19, and the answer to the mystery
+
+**THE SIZE WAS A REAL DEFECT AND A PREVIOUS PASS CLOSED IT BY REASONING.** He was told there was no
+separate text size and that the STACKING made them look taller; both halves of that were true and
+the conclusion was wrong. Measured, in the harness he can be shown
+(`dev/lpn-spike/customer-label-size-harness.js`): at a 4x zoom a node label and a link label were
+each **2.75 px** and a customer label **11 px**. The cause is one missing line rather than a size of
+its own -- a font size on this page is a pixel size divided by the scale, so every zoom invalidates
+every one of them, and `refreshFontSizes()` (the zoom path) rewrote node, link and Text labels and
+not customers. From the first zoom until the next content pass a customer label carried the size of
+the scale it was last composed at. All three now measure equal at every scale.
+
+**AND IT MADE THE DRAWING LOOK MORE CROWDED THAN THE PLACER THOUGHT IT WAS.** The placement reserved
+a box the size of a CORRECT label -- the measured width is banked in pixels and rescaled on read --
+while the ink drawn into it was several times bigger. So some of the overlap in his screenshot was
+the size defect and not the placement at all.
+
+**THE MYSTERY, MEASURED** (`dev/lpn-spike/customer-label-cause-harness.js`, his own picture: a
+reservoir, one horizontal main, eight services). Every customer tries the spot beside its service
+line first and takes the one beyond the customer only when something is already standing there; the
+rejecting obstacle is now recorded on the element by name (`customerSpotBlocker()`), so this is
+evidence rather than a second opinion. **His reading was that the conflict is with a LINK label. It
+is not.** In three views, including one deliberately putting every service on the side the pipe's
+own label lies, every named blocker was **the previous customer's own label**, in document order.
+A pipe carries one label near its middle; a row of services is eight boxes in a line.
+
+**SO HIS PROPOSAL -- one standard location for all, chosen once to accommodate a link label -- is
+already what happens, and forcing it would cost labels.** With room, all eight take the identical
+standard position; the ones that differ are exactly the ones that could not have it. Removing the
+fallback would not tidy those four, it would DROP them, because the ground they were pushed off is
+occupied by a neighbour that has no reason to move either. Nothing here argues against a better
+answer -- spacing a row of services' labels jointly is a real design, and it is the same global
+question `dev/session-handoff.md` records for node labels -- but it is a different proposal from the
+one he made, and it is not a small thing.
+
+**Two placement changes shipped from the same pass**, both his own words. The label beyond the
+customer is **centred on the service line's axis** rather than sitting above it (*"middle justified
+with the meter instead of bottom"*); and the label beside the line is **moved off it** rather than
+the halo being thinned, because `.lpn-lbl` is one class and thinning it would thin the halo on every
+node and link label to fix a collision only these have. The gap was 0.30 of a font size and is now
+0.48, stated in the source as the sum it is: a descender (0.21), the halo's outer half (0.10) and
+his one to two pixels of air.
 
 **What is NOT built, in one list:** the `atNode` pin (§2, and the ruling that supersedes it); the
 zoom-dependent density rule (§4); finding a customer by account number, totals by pressure zone and

@@ -198,11 +198,11 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_pane_tab_customers`**
   > Customers
   _Ruled OK 2026-09-17._
-- **`lpn_settings_customer_symbology`**
-  > Customer symbology
-  @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
+  @@ NEEDS RULING
+- **`lpn_settings_sym_customer`**
+  > Customer
   @@ NEEDS RULING
 - **`lpn_survey_axis_east`**
   > Easting
@@ -455,7 +455,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 78 new keys across 9 unmerged branch(es).
+**87 still to read**, of 112 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -466,7 +466,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-1 (`9eb1b163`) — 2 new, all ruled
+### chore/review-round-2 (`fa446c35`) — 7 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_field_account`**
   > Account number
@@ -474,20 +474,41 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_field_account_tip`**
   > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
   _Ruled OK 2026-09-17._
-
-### feat/customer-find-labels (`18ef2788`) — 3 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_field_account`**
-  > Account number
-  _Ruled OK 2026-09-17._
-- **`lpn_field_account_tip`**
-  > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
-  _Ruled OK 2026-09-17._
-- **`lpn_settings_customer_labels`**
-  > Customer labels
+- **`lpn_manual_results_cleared`**
+  > The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.
+  @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
   @@ NEEDS RULING
 
-### feat/engine-fetch-wait (`3df1129e`) — 6 new, 4 to read @@ NEEDS RULING
+### feat/customer-find-labels (`4f15643b`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_settings_customer_symbology`**
+  > Customer symbology
+  @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
+
+### feat/engine-fetch-wait (`3df1129e`) — 10 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_engine_bar_label`**
   > Solver loading progress
@@ -507,8 +528,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_field_account_tip`**
   > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
   _Ruled OK 2026-09-17._
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
 
-### feat/label-gang-search (`4d763c56`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/label-gang-search (`4d763c56`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -534,8 +567,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_max_width_tip`**
   > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
   @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
 
-### feat/lock-initials-later (`37f05c7e`) — 16 new, 4 to read @@ NEEDS RULING
+### feat/lock-initials-later (`37f05c7e`) — 20 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
@@ -579,6 +624,18 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_lock_requested`**
   > {name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.
   _Ruled OK 2026-09-17._
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
 - **`lpn_terrain_no_nodes`**
   > There are no nodes to fill in yet.
   @@ NEEDS RULING
@@ -586,7 +643,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`f688970a`) — 3 new, 1 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`f688970a`) — 7 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_field_account`**
   > Account number
@@ -597,8 +654,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
 
-### feat/xy-world-map (`18d4febd`) — 34 new, 29 to read @@ NEEDS RULING
+### feat/xy-world-map (`4505b5db`) — 38 new, 33 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
@@ -702,8 +771,20 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_step2`**
   > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
+  @@ NEEDS RULING
 
-### fix/esc-focus-and-recalc (`d9b2be9d`) — 3 new, 1 to read @@ NEEDS RULING
+### fix/recalc-trust-user (`313a8656`) — 6 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_field_account`**
   > Account number
@@ -711,14 +792,35 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_field_account_tip`**
   > Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.
   _Ruled OK 2026-09-17._
-- **`lpn_manual_results_cleared`**
-  > The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
   @@ NEEDS RULING
 
-### tables-interface (`e34970bc`) — 3 new, 3 to read @@ NEEDS RULING
+### tables-interface (`e34970bc`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+  @@ NEEDS RULING
+- **`lpn_settings_link_symbology`**
+  > Link symbology
+  @@ NEEDS RULING
+- **`lpn_settings_node_link`**
+  > Node and link
+  @@ NEEDS RULING
+- **`lpn_settings_node_symbology`**
+  > Node symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sec_visualization`**
+  > Visualization
   @@ NEEDS RULING
 - **`lpn_terrain_no_nodes`**
   > There are no nodes to fill in yet.

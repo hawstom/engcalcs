@@ -1141,12 +1141,12 @@ $ec_lang['lpn_settings_search_tip']='Napište slovo a zobrazí se jen nastavení
 $ec_lang['lpn_settings_no_match']='Žádné nastavení toto slovo neobsahuje.';
 $ec_lang['lpn_rpane_empty']='Zatím zde nic není ukotveno. Vše, co patří celému projektu, najdete v Nastavení.';
 $ec_lang['lpn_time_settings_open']='Nastavení času';
-$ec_lang['lpn_settings_sec_visualization']='Vizualizace';
+$ec_lang['lpn_settings_sec_symbology']='Vizualizace';
 $ec_lang['lpn_settings_sec_map']='Mapa a stránka';
 $ec_lang['lpn_settings_sec_assets']='Výchozí hodnoty pro nové prvky';
 $ec_lang['lpn_settings_sec_calculation']='Výpočet';
-$ec_lang['lpn_settings_node_symbology']='Symbolika uzlů';
-$ec_lang['lpn_settings_link_symbology']='Symbolika spojů';
+$ec_lang['lpn_settings_sym_node']='Symbolika uzlů';
+$ec_lang['lpn_settings_sym_link']='Symbolika spojů';
 $ec_lang['lpn_settings_page']='Stránka';
 $ec_lang['lpn_settings_page_note']='Uloženo v této kalkulačce, ne v projektu.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulika';
@@ -1154,7 +1154,7 @@ $ec_lang['lpn_labels_col_decimals_example']='0,000';
 $ec_lang['lpn_labels_col_rank']='Pořadí';
 $ec_lang['lpn_labels_col_drop']='Vynechat';
 
-$ec_lang['lpn_settings_node_link']='Uzel a spoj';
+$ec_lang['lpn_settings_sym_all']='Uzel a spoj';
 
 $ec_lang['lpn_color_mode_equal']='Stejné intervaly';
 $ec_lang['lpn_color_mode_quantile']='Kvantily (stejný počet)';

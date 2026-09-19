@@ -368,13 +368,30 @@ EngCalcs.lpnGeom = (function () {
 			gap = opts.gap || 0, linkPad = opts.linkPad || 0, dotPad = opts.dotPad || 0,
 			bias = (typeof opts.bias === 'number' && isFinite(opts.bias)) ? opts.bias : 90,
 			dx = px - ax, dy = py - ay, len = Math.hypot(dx, dy),
-			out = [], fracs, i, a, hAlign;
+			out = [], fracs, gaps, i, a, hAlign;
 		if (!(len > 0) || !isFinite(len)) { return out; }
 		// **ORDER IS PART OF THE SPECIFICATION**: the link end is tried first.
 		fracs = [linkPad / len, (len + dotPad) / len];
+		// **AND THE TWO SPOTS SIT ACROSS THE LINE DIFFERENTLY, WHICH IS TOM'S OWN RULING**
+		// (2026-09-19: *"When a label is beyond the meter, make it middle justified with the meter
+		// instead of bottom."*).
+		//
+		//   * The spot BETWEEN the main and the customer lies alongside a service line that is
+		//     really there, so it is offset clear of it -- `gap` above the line, exactly as an
+		//     aligned pipe label is.
+		//   * The spot BEYOND the customer has no service line under it to avoid: the line stops
+		//     at the dot. So it is centred ON the service line's own axis, which puts the lettering
+		//     level with the customer symbol instead of perched above the axis it is extending.
+		//
+		// The centred offset is derived rather than chosen. `alignedLabelAnchor` returns a
+		// BASELINE, and a one-line box reaches 0.85 x fontSize above it and `h` tall in all; so
+		// the block's middle lands on the axis when the baseline sits `h / 2 - 0.85 x fontSize`
+		// above it -- a NEGATIVE offset for an ordinary line height, i.e. the baseline drops below
+		// the axis, which is what centring means.
+		gaps = [gap, h / 2 - fs * 0.85 - (Math.max(1, opts.nLines || 1) - 1) * fs];
 		for (i = 0; i < 2; i++) {
 			a = alignedLabelAnchor(ax, ay, px, py,
-				{ frac: fracs[i], gap: gap, fontSize: fs, nLines: opts.nLines || 1, side: 1, bias: bias });
+				{ frac: fracs[i], gap: gaps[i], fontSize: fs, nLines: opts.nLines || 1, side: 1, bias: bias });
 			hAlign = a.flipped ? 'end' : 'start';
 			out.push({
 				ax: a.x, ay: a.y, angle: a.angle, hAlign: hAlign, flipped: a.flipped,

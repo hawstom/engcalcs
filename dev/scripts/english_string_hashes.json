@@ -727,10 +727,10 @@
                 "lpn_select_first",
                 "lpn_settings_color_classes",
                 "lpn_settings_hydraulics",
-                "lpn_settings_link_symbology",
+                "lpn_settings_sym_link",
                 "lpn_settings_no_match",
-                "lpn_settings_node_link",
-                "lpn_settings_node_symbology",
+                "lpn_settings_sym_all",
+                "lpn_settings_sym_node",
                 "lpn_settings_page",
                 "lpn_settings_page_note",
                 "lpn_settings_search",
@@ -804,7 +804,7 @@
                 "lpn_notes_color_def",
                 "lpn_notes_color_term",
                 "lpn_settings_readability_bias_tip",
-                "lpn_settings_sec_visualization",
+                "lpn_settings_sec_symbology",
                 "lpn_time_no_period",
                 "lpn_time_run",
                 "lpn_time_run_note",
@@ -3136,13 +3136,13 @@
         "lpn_settings_legend_position": "8a7a163396239afaf5ce1518846ded3a69a992ae",
         "lpn_settings_legend_top_left": "04b38cf935ddb566539a9d8e1cdb43936bd668bb",
         "lpn_settings_legend_top_right": "c1cc898f9464ac2b95be31217a4bf923f156129e",
-        "lpn_settings_link_symbology": "890f2ff6ed8ab35922b0257e4511f547d16e9138",
+        "lpn_settings_sym_link": "890f2ff6ed8ab35922b0257e4511f547d16e9138",
         "lpn_settings_link_width": "3bc2bdae2e870971298fbd0f0485edc1967526c9",
         "lpn_settings_map_display": "986ff567ff2c4fc5523453c2180dd843d731c11a",
         "lpn_settings_mask_labels": "801615742e22b285a1838d6184c72544ec28a96b",
         "lpn_settings_no_match": "f323e88618d328cf97d644f8e7e27c817528dd4d",
-        "lpn_settings_node_link": "1d9001337c8660d173b9d7081a44d11a88b6237a",
-        "lpn_settings_node_symbology": "ebb5a7f654357f1637ce907072a9645a896cf42d",
+        "lpn_settings_sym_all": "1d9001337c8660d173b9d7081a44d11a88b6237a",
+        "lpn_settings_sym_node": "ebb5a7f654357f1637ce907072a9645a896cf42d",
         "lpn_settings_option_unset": "c092c44522aa2bd88c0787297ca60e385c3db155",
         "lpn_settings_page": "fb06270f7c212baabc8749ffc36e49dc8f321548",
         "lpn_settings_page_note": "ecb671010d8f9b8085e93c9cb220790442f768c9",
@@ -3163,7 +3163,7 @@
         "lpn_settings_sec_assets": "72707ec5629a9f5b8a0c80ef18f5fcd96372b11a",
         "lpn_settings_sec_calculation": "dc6751bd6532a841494c31d2cb271a6c23434bcc",
         "lpn_settings_sec_map": "de1c309b44683a001edb720820f80e41779d3f21",
-        "lpn_settings_sec_visualization": "d175985b87dd9f620aa960059c730b4a35e3bcb5",
+        "lpn_settings_sec_symbology": "d175985b87dd9f620aa960059c730b4a35e3bcb5",
         "lpn_settings_show_arrows": "506ea0310015efdaaa98a97baa00628f80c7560c",
         "lpn_settings_show_arrows_tip": "966d391f12da4e541ebbc0eead62ab9df4fe0ca2",
         "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
@@ -8922,7 +8922,7 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_settings_link_symbology": {
+        "lpn_settings_sym_link": {
             "words": 2,
             "ends_sentence": false
         },
@@ -8942,11 +8942,11 @@
             "words": 5,
             "ends_sentence": true
         },
-        "lpn_settings_node_link": {
+        "lpn_settings_sym_all": {
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_settings_node_symbology": {
+        "lpn_settings_sym_node": {
             "words": 2,
             "ends_sentence": false
         },
@@ -9030,7 +9030,7 @@
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_settings_sec_visualization": {
+        "lpn_settings_sec_symbology": {
             "words": 1,
             "ends_sentence": false
         },

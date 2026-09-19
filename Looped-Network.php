@@ -805,19 +805,21 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // A host carrying `lpn-set-part` is TRANSPARENT TO THE SEARCH: the filter recurses
 				      // into it and hides row by row, so two builders can share one sub-heading without a
 				      // search for "opacity" turning up everything either of them wrote. ?>
-				<?php // ---- Section: VISUALIZATION ----
-				      // Tom, 2026-08-19: "Group the three Node and Link headings under a new Visualization
-				      // main heading -- the first main heading ... to be honest, I really like Visualization.
-				      // Leave the sub-heading Node and link as is." He named and rejected his own
-				      // alternatives (Analysis View, Labels and colors, Seeing numbers), and Visualization is
-				      // also the word GIS uses for exactly this -- what is drawn and what is printed beside
-				      // it -- so no better term was found to offer against it.
+				<?php // ---- Section: SYMBOLOGY ----
+				      // Tom, 2026-09-19: "Let's try changing main heading Visualization to Symbology and
+				      // its subheadings to Node, Link, Customer, and All." That SUPERSEDES his own
+				      // 2026-08-19 wording ("I really like Visualization ... leave the sub-heading Node and
+				      // link as is"), and the change is the whole of it: each sub-heading used to repeat
+				      // the main heading's word back at the reader -- Node symbology, Link symbology,
+				      // Customer symbology -- which is four words to say what one says once the heading
+				      // above them is Symbology. "All" replaces "Node and link" because the two controls
+				      // under it are now true of a customer as well.
 				      //
 				      // FIRST, which is a claim about what this page is for: you draw a network and you look
 				      // at it, and the index now opens on the controls that decide what you see. Map and page
 				      // keeps what is true of the whole SHEET rather than of one kind of element. ?>
 				<section id="lpn_set_sec_visual" class="lpn-set-sec" data-set-sec="visual">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_visualization']?></h3>
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_symbology']?></h3>
 					<div class="lpn-set-secbody">
 						<?php // Node symbology, then link symbology: how each kind of element is DRAWN and
 						      // what is PRINTED beside it, which is one question and was two panels. Tom:
@@ -829,12 +831,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // now one complete answer to "how is this kind of element drawn", scheme
 						      // included -- which is why the ramp is stored per group; see
 						      // defaultSettings() in js/looped-network.js. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_node_symbology']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_sym_node']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_node_fields"></div>
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_link_symbology']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_sym_link']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_link_fields"></div>
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
@@ -844,16 +846,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // link label alike, so they belong to neither group and were being read as
 						      // part of whichever one they were filed under. rebuildLabelsFields() fills
 						      // this host. ?>
-						<?php // **CUSTOMER LABELS, ONE CONTROL AND NO CHECKBOXES** (ROADMAP Task 247).
-						      // What a customer label SAYS is chosen in Node symbology above, which
-						      // is Tom's own ruling; what this section answers is the one question
-						      // those rows cannot, namely how close the view has to be before a
-						      // service is worth lettering. rebuildLabelsFields() fills it. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_customer_symbology']?></div>
+						<?php // **CUSTOMER SYMBOLOGY, A SECTION OF ITS OWN** (ROADMAP Task 247, Tom
+						      // 2026-09-19). What a customer label says is chosen HERE and not in
+						      // Node above -- he overruled his earlier ruling, because a junction's
+						      // label answers "what is the pressure here" and a service's answers
+						      // "whose is this and how much does it draw". It also carries the one
+						      // question those rows cannot, namely how close the view has to be
+						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_customer_fields"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_node_link']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
 							<?php // Thematic map (Tom, 2026-08-19: "Move Thematic map to the Node and link

@@ -542,6 +542,53 @@ L.customerEdited(c2);
 	// would be the third candidate the rule says there is not.
 	ok('3.28 a zero-length service yields no candidate at all',
 		Geom.serviceLabelSpots(5, 5, 5, 5, { w: 30, h: 12, fontSize: 10 }).length === 0);
+
+	// **BEYOND THE CUSTOMER THE LABEL IS CENTRED ON THE SERVICE LINE'S AXIS** (Tom, 2026-09-19:
+	// *"When a label is beyond the meter, make it middle justified with the meter instead of
+	// bottom."*). The two spots are deliberately NOT alike across the line: the one between the
+	// main and the customer has a real service line under it to keep off, and the one past the
+	// customer does not, because the line stops at the dot. The service here runs straight up from
+	// (0,0) to (0,-100), so the axis is x = 0 and "centred on it" is a number rather than an
+	// impression -- the label box's own centre lies on that line.
+	const two = Geom.serviceLabelSpots(0, 0, 0, -100,
+		{ w: 30, h: 12, fontSize: 10, gap: 3, linkPad: 4, dotPad: 6 });
+	ok('3.28a the spot beyond the customer is centred on the service line axis',
+		near(two[1].box.cx, 0, 1e-9), two[1].box.cx.toFixed(6));
+	ok('3.28b ...while the one alongside the line is still held clear of it',
+		Math.abs(two[0].box.cx) > 0.5, two[0].box.cx.toFixed(3));
+	// And it is a CENTRING rather than a nudge: halve the box height and the centre stays put.
+	const tall = Geom.serviceLabelSpots(0, 0, 0, -100,
+		{ w: 30, h: 40, fontSize: 10, gap: 3, linkPad: 4, dotPad: 6 });
+	ok('3.28c ...at any box height, which is what centred means',
+		near(tall[1].box.cx, 0, 1e-9), tall[1].box.cx.toFixed(6));
+}
+
+// ---- 3b3. THE LETTERING DOES NOT LIE ON THE SERVICE LINE -------------------------------------
+//
+// Tom, 2026-09-19: *"The labels are hiding the service line. They need to be moved away about 1px
+// or 2px or their halo needs to be that much smaller."* He offered two fixes; the label moved and
+// the halo was left alone, because `.lpn-lbl` is one class and thinning it would thin the halo on
+// every node and link label to fix a collision only these have.
+//
+// **THE GAP IS MEASURED TO THE BASELINE, WHICH IS WHY 0.30 OF A FONT SIZE LOOKED LIKE PLENTY AND
+// WAS NOTHING.** Below the baseline sit a descender -- the Q of `Qb=` is one -- and then the
+// halo's outer half. So the clearance asserted here is from the SERVICE LINE to the bottom edge
+// of the label's own box, and it must still leave room for that halo.
+{
+	const fs = L.effectiveFontSize();
+	const a = L.addNode('junction', 0, 400), b = L.addNode('junction', 300, 400);
+	const main = L.addLink('pipe', a.id, b.id);
+	const c = L.addCustomer(150, 460, { link: main.id });
+	L.refreshLabelText();
+	L.relayoutLabels();
+	const ce = L.custLblEls()[c.id], an = L.customerAttachPoint(c), pt = L.customerPoint(c);
+	const ux = pt.x - an.x, uy = pt.y - an.y, len = Math.hypot(ux, uy);
+	// Perpendicular distance from the service line to the label box's centre, then in to its edge.
+	const perp = Math.abs((ce.spot.box.cx - an.x) * uy - (ce.spot.box.cy - an.y) * ux) / len;
+	const clear = perp - ce.spot.box.h / 2;
+	ok('3.28d the label alongside a service takes the spot beside the line', ce.spot.atLink === true);
+	ok('3.28e ...and its box clears that line by more than the halo\'s outer half',
+		clear > fs * 0.10, clear.toFixed(3) + ' against a halo of ' + (fs * 0.10).toFixed(3));
 }
 
 // ---- 3c. THE SETTING: THE WIDEST VIEW THAT ATTEMPTS IT ----------------------------------------
