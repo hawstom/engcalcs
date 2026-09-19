@@ -69,7 +69,7 @@ function docFire(type, ev) {
 	((global.document._listeners && global.document._listeners[type]) || []).slice().forEach((f) => f(ev || {}));
 }
 // The grip and the heading button, as the browser hands them over.
-function gripOf(key) { return thFor(key).children.filter((c) => c.className === 'lpn-pane-grip')[0]; }
+function gripOf(key) { return thFor(key).children.filter((c) => c.className === 'lpn-pane-colgrip')[0]; }
 function sortBtnOf(key) { return thFor(key).children.filter((c) => String(c.className || '').indexOf('lpn-pane-sort') === 0)[0]; }
 
 console.log('\n--- the heading carries both handles ---');

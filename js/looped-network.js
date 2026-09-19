@@ -18078,8 +18078,19 @@ var EngCalcs = EngCalcs || {};
 	// else the stylesheet's own 7em fallback. In `em`, like every declared width, so it still
 	// follows the reader's text size.
 	function paneColWidthEm(specId, c) {
+		var w = paneColUserWidth(specId, c);
+		return w || (c.em || 0);
+	}
+	// **HAS THE READER DRAGGED THIS COLUMN?** -- which is a different question from how wide it is,
+	// and the one that decides whether the heading is allowed to break mid-word (Task 690, Tom
+	// 2026-09-19). A column nobody has touched keeps the layout he has already approved: the
+	// heading holds the column open at its longest word, exactly as it always did. A column he has
+	// dragged is HIS width, and the heading wraps to the character to fit inside it, which is what
+	// *"Let selectors and inputs be truncated and headings be wrapped to the character level"*
+	// asks for -- relaxed for the gesture, not for everybody's first look at the table.
+	function paneColUserWidth(specId, c) {
 		var w = paneColPrefs[specId] && paneColPrefs[specId].w && paneColPrefs[specId].w[c.key];
-		return (typeof w === 'number' && isFinite(w) && w > 0) ? w : (c.em || 0);
+		return (typeof w === 'number' && isFinite(w) && w > 0) ? w : 0;
 	}
 	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
 	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
@@ -18289,11 +18300,15 @@ var EngCalcs = EngCalcs || {};
 	// A live resize writes the <col> and every input in that column, so the drag is seen as it
 	// happens; the preference is stored once, on release, rather than on every mouse move.
 	function paneDrawColWidth(spec, key, em) {
-		var i = paneColIndex(spec, key), id;
+		var i = paneColIndex(spec, key), id, th;
 		if (i < 0) { return; }
 		if (spec.colGroup && spec.colGroup.children && spec.colGroup.children[i]) {
 			spec.colGroup.children[i].style.width = em + 'em';
 		}
+		// The heading starts breaking at the character the moment the drag begins, not on the next
+		// rebuild -- otherwise the first drag narrower than the longest word appears to do nothing.
+		th = spec.headCells && spec.headCells[key];
+		if (th && th.classList) { th.classList.add('lpn-pane-tight'); }
 		for (id in spec.cells || {}) {
 			if (!Object.prototype.hasOwnProperty.call(spec.cells, id)) { continue; }
 			if (spec.cells[id][key] && spec.cells[id][key].style) {
@@ -18475,11 +18490,14 @@ var EngCalcs = EngCalcs || {};
 		spec.colGroup = cg;
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
+		spec.headCells = {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th'), b = document.createElement('button'),
 				grip = document.createElement('span');
-			th.className = paneCellClass(c, i);
+			th.className = paneCellClass(c, i) +
+				(paneColUserWidth(spec.id, c) ? ' lpn-pane-tight' : '');
 			th._lpnColKey = c.key;
+			spec.headCells[c.key] = th;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
@@ -18499,7 +18517,13 @@ var EngCalcs = EngCalcs || {};
 			// of the heading, which is where a spreadsheet user already aims; it is `aria-hidden`
 			// and carries no text, because resizing a column is a pointer gesture with a keyboard
 			// equivalent nobody has asked for and no word that would help a screen reader.
-			grip.className = 'lpn-pane-grip';
+			// **ITS OWN CLASS, AND THE COLLISION IT ESCAPES IS WORTH KEEPING.** `lpn-pane-grip`
+			// is the BOTTOM PANE's row-resize handle, declared 35 lines earlier in
+			// css/engcalcs.css, and this grip wore it for a week: it inherited that handle's gray
+			// background, its bottom rule and a 3rem-wide `::after` bar, in a box 7px wide. Tom
+			// found all three by eye on 2026-09-19 without being able to name them -- blips on
+			// every separator and a gray line running past the last column.
+			grip.className = 'lpn-pane-colgrip';
 			grip.setAttribute('aria-hidden', 'true');
 			grip.addEventListener('mousedown', function (ev) { paneStartColResize(spec, c.key, ev); });
 			th.appendChild(grip);
@@ -18774,27 +18798,49 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function paneSelPaint(spec, rows, cols) {
 		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {},
-			was = spec.painted || {}, now = {}, r, i, el, key, td;
+			was = spec.painted || {}, now = {}, r, i, el, key, td, one, curKey;
 		if (box) {
+			// **ONE CELL IS NEVER WASHED, AND A WASH ALWAYS MEANS A RANGE** (Tom, 2026-09-19:
+			// *"In Navigate mode, there should be no blue shading, since that's reserved for Select
+			// mode."*). So the picture reads off the SIZE of the box and nothing else: a box of one
+			// cell is somebody moving about, and it wears a border; a box of more than one is
+			// somebody who has selected something, and it wears a wash with the border on top.
+			one = box.r0 === box.r1 && box.c0 === box.c1;
+			// **AND THE BORDER SITS ON THE STARTING CELL, NOT THE ENDING ONE** (Tom, 2026-09-19:
+			// *"In select mode, the current cell should be the starting cell, not the ending cell.
+			// So if I select A1 and B1, then arrow down once, I should be at A2."*). The anchor is
+			// where the selection began; the focus is where it has been dragged to. Painting the
+			// anchor is the visible half of that ruling -- paneHandleKey() moves from it, which is
+			// the half he can act on.
+			curKey = (rows[box.ar] && cols[box.ac])
+				? rows[box.ar].id + '\u0000' + cols[box.ac].key : null;
 			for (r = box.r0; r <= box.r1; r++) {
 				el = rows[r];
 				if (!el) { continue; }
 				for (i = box.c0; i <= box.c1; i++) {
 					if (!cols[i]) { continue; }
-					now[el.id + '\u0000' + cols[i].key] = true;
+					key = el.id + '\u0000' + cols[i].key;
+					now[key] = (one || key === curKey) ? (one ? 'cur' : 'selcur') : 'sel';
 				}
 			}
 		}
+		// **THE MEMORY REMEMBERS WHICH PICTURE, NOT MERELY THAT THERE WAS ONE.** A cell that was
+		// the current one and is now merely inside the range has not left the box, so a membership
+		// test alone would leave its border behind -- which is the stale highlight this whole
+		// function exists to avoid, one class further in.
 		for (key in was) {
-			if (!Object.prototype.hasOwnProperty.call(was, key) || now[key]) { continue; }
+			if (!Object.prototype.hasOwnProperty.call(was, key) || now[key] === was[key]) { continue; }
 			td = paneTdByPaintKey(tds, key);
-			if (td) { td.classList.remove('lpn-pane-sel'); }
+			if (!td) { continue; }
+			td.classList.remove('lpn-pane-sel');
+			td.classList.remove('lpn-pane-cur');
 		}
 		for (key in now) {
-			if (!Object.prototype.hasOwnProperty.call(now, key) || was[key]) { continue; }
+			if (!Object.prototype.hasOwnProperty.call(now, key) || was[key] === now[key]) { continue; }
 			td = paneTdByPaintKey(tds, key);
-			// One class, and the box is a rectangle, so a cell either is in it or is not.
-			if (td) { td.classList.add('lpn-pane-sel'); }
+			if (!td) { continue; }
+			if (now[key] !== 'cur') { td.classList.add('lpn-pane-sel'); }
+			if (now[key] !== 'sel') { td.classList.add('lpn-pane-cur'); }
 		}
 		spec.painted = now;
 	}
@@ -18839,10 +18885,14 @@ var EngCalcs = EngCalcs || {};
 			target = paneCellFocusable(spec.tds && spec.tds[id] && spec.tds[id][key]);
 			if (!target) { return false; }
 			target.focus();
-			// A cell arrived at by keyboard has its contents SELECTED, which is also what makes
-			// Left and Right behave: the first press collapses the selection the way a text field
-			// should, and only the second one leaves the cell.
-			if (target.select && target.tagName === 'INPUT') { target.select(); }
+			// **ARRIVING AT A CELL SELECTS NO CHARACTERS** (Tom, 2026-09-19: *"the appearance is as
+			// Edit mode in that the contents of each cell are selected as I pass through/over/on
+			// it. Instead, a blue border highlight (double-wide inward) should indicate the current
+			// cell."*). It used to call select() here, and the reason given -- that a first Left or
+			// Right should collapse the text selection before leaving the cell -- died with the
+			// rule it served: an arrow key in SELECT and ENTRY moves a cell and never a caret, so
+			// there is nothing for a collapse to do. What was left was a cell that looked like it
+			// was being edited every time the caret merely passed over it.
 			return true;
 		} finally { spec._selMoving = false; }
 	}
@@ -18852,7 +18902,16 @@ var EngCalcs = EngCalcs || {};
 	// a spreadsheet does on a sparse column -- a second notion of "meaningfully blank" is a
 	// distinction a spreadsheet-literate user has no way to discover.
 	function paneCellBlankAt(rows, cols, r, c) {
-		return paneCellText(cols[c], rows[r]) === '';
+		var col = cols[c];
+		// **A CONTROL THAT HOLDS A STATE IS NEVER BLANK** (Tom, 2026-09-19: *"Ctrl+arrows works,
+		// but stops at selectors. Make it stop only at blanks/ends. Is an empty checkbox a blank?
+		// Let's say no since it's a zero in concept."*). His answer about the checkbox is the rule
+		// for both: an unticked box is a NO, which is a value, and a pull-down showing nothing is
+		// showing the one option that means none -- neither is the empty run of cells Ctrl+Down is
+		// looking for. A yes/no already read as 1 or 0 and was safe; a pull-down read back as its
+		// own empty option and stopped the jump on every row of it, which is what he hit.
+		if (col.bool || col.choices) { return false; }
+		return paneCellText(col, rows[r]) === '';
 	}
 	/**
 	 * Excel's Ctrl+Arrow, which is one rule read from both sides of a gap: from a cell whose
@@ -18874,11 +18933,13 @@ var EngCalcs = EngCalcs || {};
 		if (n >= lim) { n = lim - 1; }
 		return horiz ? { r: r, c: n } : { r: n, c: c };
 	}
-	// **THE FIRST DATA COLUMN IS INDEX 1, NOT THE ID.** Home is a spreadsheet user's most common
-	// keystroke, and the ID cell is a button that pans the map -- putting Home on it would take the
-	// reader somewhere else entirely the first time they tried to type over it. There is no row
-	// header in these tables for it to mean instead.
-	function paneHomeCol(cols) { return Math.min(1, cols.length - 1); }
+	// **HOME IS COLUMN A, WHICH IS THE ID** (Tom, 2026-09-19: *"Home and Ctrl+Home take me to
+	// column B, not to the ID column A. Fix this."*). It used to answer 1, on the argument that the
+	// ID cell is a button that pans the map and nobody wants Home to take them somewhere else. That
+	// argument confused ARRIVING at a cell with PRESSING it: Home focuses the button, exactly as
+	// End focuses a read-only result, and a focused button does nothing until it is pressed. A
+	// spreadsheet's Home is column A and there is no second candidate for what it could mean.
+	function paneHomeCol(cols) { return 0; }
 	// (paneCaretEdge() lived here and is DELETED, not left unused. It answered "is the caret against
 	// an edge", which was the old rule for letting Left or Right leave a cell being edited; Tom
 	// struck that rule on 2026-09-18 -- an arrow cannot leave EDIT mode at all now -- so the
@@ -19011,7 +19072,7 @@ var EngCalcs = EngCalcs || {};
 	// what the document holds rather than writing NaN into a field of the user's, which nothing
 	// downstream could tell from a value they meant.
 	function paneCommitCell(input) {
-		var ctx = input && input._lpnCell, c, el, p;
+		var ctx = input && input._lpnCell, c, el, p, was;
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
 		// A checkbox cell carries its answer in `checked`; every other cell in its text.
@@ -19021,6 +19082,25 @@ var EngCalcs = EngCalcs || {};
 			paneLeaveEdit(input);
 			return false;
 		}
+		/**
+		 * **A TYPED CELL IS AN EDIT LIKE ANY OTHER, AND UNTIL NOW IT TOOK NO SNAPSHOT** (Tom,
+		 * 2026-09-19: *"Ctrl+Z works for mouse copy, but doesn't undo and the undo button doesn't
+		 * undo."*). He is describing one defect from both ends: a PASTE called saveUndoSnapshot()
+		 * and a typed value did not, so Ctrl+Z after a paste worked and Ctrl+Z after typing put
+		 * back whatever the stack happened to be holding from before -- which from the outside is
+		 * indistinguishable from an undo that does nothing, and is worse, because the Undo button
+		 * on the toolbar reads the same empty stack.
+		 *
+		 * **ONLY A REAL CHANGE SNAPSHOTS, and that is not tidiness -- it is what makes ONE press of
+		 * Ctrl+Z enough.** paneCommitCell() runs TWICE for one edit: the key handler commits before
+		 * it moves, and then the move blurs the box, which fires `change`. A second snapshot taken
+		 * after the value had already landed would record the NEW state, so the first Ctrl+Z would
+		 * restore what was already on screen and the user would have to press it again. Compared as
+		 * PARSED values rather than as text, so "42.0" typed over a stored 42 is the no-change it
+		 * looks like.
+		 */
+		was = paneParseCellText(c, paneCellText(c, el));
+		if (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
 		// (Task 247). A link id that names nothing is refused and the meter left alone; a typed
@@ -19150,7 +19230,32 @@ var EngCalcs = EngCalcs || {};
 			box = paneSelBox(spec, rows, cols);
 			if (!box) { return false; }
 		}
-		r = box.fr; c = box.fc;
+		// **THE MOVE STARTS FROM THE ANCHOR, WHICH IS WHERE THE SELECTION BEGAN** (Tom,
+		// 2026-09-19: *"In select mode, the current cell should be the starting cell, not the
+		// ending cell. So if I select A1 and B1, then arrow down once, I should be at A2."*). His
+		// whole copy-down sequence depends on it: select A1 to B1, copy, press Down, paste. Moving
+		// from the FOCUS landed him at B2 and pasted a column across.
+		// A SHIFT-EXTEND STILL MOVES THE FOCUS, because that end is the one being dragged; and for
+		// a single cell the two are the same cell, so nothing else changes.
+		r = ext ? box.fr : box.ar;
+		c = ext ? box.fc : box.ac;
+		// **Ctrl+C IS OURS, AND IT HAS TO BE** (Tom, 2026-09-19: *"Works (and persists) for mouse
+		// select. Doesn't work for keyboard select or Navigate (copy current cell)."*). The `copy`
+		// listener on the table can only answer a copy the BROWSER raises, and a browser raises one
+		// off its own text selection -- which a mouse drag inside one box leaves behind and a
+		// Shift+Arrow never makes at all. Since a cell arrived at by keyboard no longer selects its
+		// characters either (paneFocusCell), there is now no native selection anywhere in this
+		// table and the event would never fire. So the keystroke is read here and the clipboard is
+		// written through libCopyOut(), the same door the Curves library already writes points
+		// with.
+		// **AND ONE CELL IS A COPY.** The listener declines a single cell on the argument that the
+		// browser's own copy of the caret's selection is better; with no selection to copy that
+		// argument is empty, and "copy the cell I am on" is what he asked for by name.
+		// A cell being TYPED IN keeps its own Ctrl+C: the characters under the caret are the user's.
+		if (jump && !editing && (key === 'c' || key === 'C' || key === 'Insert')) {
+			libCopyOut(paneCopyTsv(spec, rows, cols, box));
+			return true;
+		}
 		if (jump && (key === 'a' || key === 'A')) {
 			// The whole table, which is the gesture that earns the headings on the clipboard.
 			spec.sel = { aId: rows[0].id, aKey: cols[0].key,
@@ -19213,6 +19318,11 @@ var EngCalcs = EngCalcs || {};
 		table.addEventListener('focusin', function (e) {
 			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
 			if (!td || spec._selMoving) { return; }
+			// **A RIGHT PRESS INSIDE THE SELECTION HAS ALREADY SAID "LEAVE IT ALONE"** -- see the
+			// mousedown below. A right-click focuses the box under the pointer exactly as a left
+			// one does, so without this the selection would be collapsed here, a tick before the
+			// menu the user opened it for appears over it.
+			if (spec._keepSel) { spec._keepSel = false; return; }
 			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
 			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
 			if (r < 0 || c < 0) { return; }
@@ -19220,8 +19330,32 @@ var EngCalcs = EngCalcs || {};
 			paneSelPaint(spec, rows, cols);
 		});
 		table.addEventListener('mousedown', function (e) {
-			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c;
+			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c, box;
 			if (!td) { return; }
+			/**
+			 * **A RIGHT-CLICK INSIDE THE SELECTION LEAVES IT ALONE** (Tom, 2026-09-19:
+			 * *"Right-clicking anywhere in a selection should not perturb the selection. But I see
+			 * it changing the selection to the right-clicked cell."*). It is the press before the
+			 * context menu that carries "copy" -- collapsing the rectangle first means the menu
+			 * offers to copy one cell of the forty he had.
+			 *
+			 * **INSIDE ONLY, and that is the spreadsheet's own rule rather than a shortcut.** A
+			 * right press OUTSIDE the selection moves it, exactly as a left one does; only a press
+			 * on something already selected means "act on this", and a rule that never moved would
+			 * strand somebody whose only pointing device says menu.
+			 *
+			 * Neither is it a drag: a non-left button never starts one, which is the second half of
+			 * what he saw -- the button-state test in mouseover only asks about button 1, so a
+			 * right press that set `dragging` would extend the selection on the next mouse move.
+			 */
+			if (typeof e.button === 'number' && e.button !== 0) {
+				rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+				box = paneSelBox(spec, rows, cols);
+				r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
+				spec._keepSel = !!(box && r >= box.r0 && r <= box.r1 && c >= box.c0 && c <= box.c1);
+				return;
+			}
+			spec._keepSel = false;
 			dragging = true;
 			if (!e.shiftKey) { return; }   // a plain press is the focusin above; Shift extends
 			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
@@ -19247,7 +19381,10 @@ var EngCalcs = EngCalcs || {};
 			paneSelPaint(spec, rows, cols);
 			e.preventDefault();
 		});
-		table.addEventListener('mouseup', function () { dragging = false; });
+		// The flag is a one-shot for the focusin that follows the press. Cleared here as well,
+		// because a right press on a browser that does NOT focus the box would otherwise leave it
+		// standing and swallow the NEXT click's selection.
+		table.addEventListener('mouseup', function () { dragging = false; spec._keepSel = false; });
 		// **A PASTE IS THE USER TYPING**, so it goes through the same c.set() a keystroke does and
 		// obeys every rule about the user's own numbers. Intercepted only when the clipboard holds
 		// a GRID: one cell is ordinary typing and the browser does it better than we would --
@@ -19269,9 +19406,14 @@ var EngCalcs = EngCalcs || {};
 			var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 				box = paneSelBox(spec, rows, cols), tsv;
 			if (!box) { return; }
-			// ONE CELL IS NOT A RANGE: it is ordinary typing, and the browser's own copy of what
-			// the caret has selected inside the box is better than anything we would write.
-			if (box.r0 === box.r1 && box.c0 === box.c1) { return; }
+			// **ONE CELL IS A RANGE OF ONE, AND IT IS COPIED.** This used to hand a single cell
+			// back to the browser, on the argument that its own copy of the characters the caret
+			// had selected was better than ours. Since a cell arrived at by keyboard selects no
+			// characters at all (paneFocusCell, Tom 2026-09-19), that copy is now empty -- so the
+			// polite deferral became "Ctrl+C on one cell does nothing", which is what he reported.
+			// A cell being TYPED IN is a different matter and is still the browser's: paneInEdit()
+			// below holds that line.
+			if (paneInEdit(activeElementSafe())) { return; }
 			tsv = paneCopyTsv(spec, rows, cols, box);
 			try {
 				e.clipboardData.setData('text/plain', tsv);

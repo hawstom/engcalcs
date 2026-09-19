@@ -1268,11 +1268,15 @@ html[lang="zh"] .ec-welcome {
    he saw was the table's own blue frame outside the first row's blue rule -- two lines, 1px apart,
    round a compact input grid inside a floating popup.
    Written once for the two popup grids, whose own comments already claimed they "must not inherit
-   those borders" and did. **`.lpn-pane-table` is deliberately NOT in this list**: it has the same
-   unreset frame, but its blue row rules are the separators of a data grid a person reads every
-   day, and nobody has said they are wrong. Removing them is a look, not a defect fix. */
+   those borders" and did. **`.lpn-pane-table` JOINED THE LIST ON 2026-09-19 and the note that kept
+   it out is struck.** That note said nobody had called the blue wrong; Tom then did, in the same
+   browser pass as the grip collision above: *"The blue border at the top is unbalanced by anything.
+   Everything else is gray or black."* It was never a chosen colour -- it is the suite-wide default
+   arriving at a grid whose own cells had been given #ddd, so one frame was blue and everything
+   inside it was gray. */
 .lpn-curve-table, .lpn-curve-table tr,
-.lpn-demand-table, .lpn-demand-table tr { border: 0; }
+.lpn-demand-table, .lpn-demand-table tr,
+.lpn-pane-table, .lpn-pane-table tr { border: 0; }
 .lpn-curve-table { border-collapse: collapse; width: auto; margin: 2px 0; }
 .lpn-curve-table th, .lpn-curve-table td { padding: 1px 4px 1px 0; text-align: left; font-weight: normal; border: 0; }
 .lpn-curve-table thead th { font-weight: bold; }
@@ -2161,7 +2165,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-panel.lpn-pane-scroll { padding-top: 0; }
 /* The tabular editors. Column width is king: headings stay narrow and cells stay tight. The
    heading row STICKS, because a table you scroll is a table whose headings you lose. */
-.lpn-pane-table { border-collapse: collapse; font-size: .9em; }
+/* **THE TABLE IS ITS OWN WIDTH, NOT THE PANEL'S** (2026-09-19, with the width relaxation further
+   down). Letting a heading break at any character makes a column's MINIMUM one character wide,
+   which is exactly what a drag needs -- and it also lets the browser squeeze every column toward
+   that minimum the moment the table is wider than the pane, so seventeen columns arrived wrapped
+   to two and three lines with room to spare. `max-content` says: lay each column out at the width
+   it wants, and let the panel scroll, which is what it did before the relaxation. The floor is
+   then the drag's business and nothing else's. */
+.lpn-pane-table { border-collapse: collapse; font-size: .9em; width: max-content; }
 /* **A FILTERED TABLE SAYS SO ABOVE ITS ROWS** (Task 597). Hidden rows with no visible cause is the
    one way a filter can mislead, so this line is not decoration and never scrolls away with the
    rows: it sits outside the table, in the panel, above the scrollport. The query is printed in the
@@ -2205,16 +2216,35 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-table tbody td input {
 	border: 0; background: transparent; padding: 1px 4px; margin: 0; border-radius: 0;
 }
-/* The focused cell is outlined and not shaded, which is where a spreadsheet puts the eye. The
-   outline is INSET so it does not push the row apart, and it is on the cell rather than on the
+/* **THE CURRENT CELL IS A BORDER AND THE SELECTED RANGE IS A WASH, AND THE TWO NEVER MEAN THE
+   SAME THING** (Tom, 2026-09-19, correcting his own mode spec: *"in Select mode they should be
+   shaded blue and in Entry mode the single current cell should be merely border highlighted"*;
+   *"a blue border highlight (double-wide inward) should indicate the current cell"*; and
+   *"In Navigate mode, there should be no blue shading, since that's reserved for Select mode."*).
+   So one cell is never washed -- moving the caret from cell to cell paints a border and nothing
+   else -- and a wash on screen always means a RANGE somebody selected. js/looped-network.js
+   decides which of the two a cell is wearing; this file only says what each looks like.
+   The border is INSET so it does not push the row apart, and it is on the cell rather than on the
    control so a read-only cell can wear it too. */
+.lpn-pane-table tbody td.lpn-pane-cur,
 .lpn-pane-table tbody td:focus, .lpn-pane-table tbody td:focus-within {
 	outline: 2px solid #0645ad; outline-offset: -2px;
 }
 .lpn-pane-table tbody td input:focus { outline: 0; }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
-   block; the focused cell keeps its outline on top of it. */
+   block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
+/* **THE AUTOFILL DOT, AND IT DOES NOTHING YET.** Tom named it as modern spreadsheet practice
+   beside the border highlight (2026-09-19): *"a dot at lower right of current cell or range/block
+   for Autofill."* It is drawn here as a mark on the current cell and is INERT -- there is no
+   handler on it, no cursor of its own, and dragging it does nothing, because fill-down is still an
+   open task under ROADMAP 690. Pure CSS on a pseudo-element, so there is no element to catch a
+   pointer and nothing to unhook. When fill-down is built this is the mark it attaches to. */
+.lpn-pane-table tbody td.lpn-pane-cur { position: relative; }
+.lpn-pane-table tbody td.lpn-pane-cur::after {
+	content: ""; position: absolute; inset-inline-end: 0; bottom: 0;
+	width: 5px; height: 5px; background: #0645ad; pointer-events: none;
+}
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
@@ -2222,9 +2252,20 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    a row would beat it; padding-top, because the panel's own is gone; and the rule under the
    headings is an INSET SHADOW rather than a border -- under `border-collapse: collapse` the border
    belongs to the table, not to the cell, so it scrolls away from the heading that owns it. */
+/* **THE HEADING SEPARATORS ARE THE BODY'S, IN THE BODY'S COLOUR AND WIDTH** (Tom, 2026-09-19:
+   *"The heading separators are offset (misaligned) from the column separators about 2px"* and
+   *"The headings vertical and horizontal borders are gray and wider than expected, while the table
+   body borders are as expected."*). What he was seeing was the grip collision above -- a 7px gray
+   band sitting 3px past the heading's trailing edge, which is neither the body's colour nor its
+   width nor its position. With the grip drawing nothing again the headings had no separators at
+   all, so they are drawn here instead: one line on the trailing inside edge of each heading, #ddd,
+   1px, which is exactly what `tbody td` carries.
+   AN INSET SHADOW AND NOT A BORDER, for the reason the bottom rule below is already one: under
+   `border-collapse: collapse` the border belongs to the TABLE, not to the cell, so it scrolls out
+   from under a sticky heading that owns it. */
 .lpn-pane-table thead th {
 	position: sticky; top: 0; z-index: 2; background: #fff;
-	padding-top: 6px; box-shadow: inset 0 -1px 0 #ccc;
+	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ccc;
 }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
@@ -2254,6 +2295,41 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    stylesheet there is -- including the 360px widths below, which Tom has already approved and
    which this must not move. */
 .lpn-pane-table input { width: var(--lpn-pane-col-w, 7em); text-align: inherit; }
+/* **A COLUMN MAY BE DRAGGED NARROWER THAN THE THINGS IN IT** (Tom, 2026-09-19: *"They are
+   constrained from causing any word breaks or selector truncations, and this may be unwelcome by
+   users. Let's relax that constraint and see how it plays for the public. Let selectors and inputs
+   be truncated and headings be wrapped to the character level."*). The constraint was never a rule
+   anybody wrote -- it is the browser's: a table column cannot be laid out narrower than the widest
+   MIN-CONTENT in it, and for a heading that is its longest word, for a <select> the widest option
+   it offers. Three declarations answer all three:
+     * the heading and its sort button break ANYWHERE, so a heading's min-content is one character;
+     * a <select> takes the column's own width like an <input> does, which it never did -- nothing
+       gave it one, so it sized itself to its widest option and held the column open;
+     * `min-width: 0` on both, so the declared width is the floor rather than the content.
+   Truncation is then the browser's own: an over-long option or value is clipped by its control.
+   THIS IS A TRIAL AND HE SAID SO. If it reads badly in public, the thing to change is these three
+   lines, not the drag. */
+.lpn-pane-table thead th.lpn-pane-tight,
+.lpn-pane-table thead th.lpn-pane-tight .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
+.lpn-pane-table tbody td select {
+	/* NO 7em FALLBACK HERE, and that is deliberate: an unset custom property with no fallback
+	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the
+	   width it has always been. Only a column that names an em -- or that the reader has
+	   dragged -- pulls its pull-down in with it. */
+	width: var(--lpn-pane-col-w); max-width: 100%; min-width: 0;
+	border: 0; background: transparent; padding: 1px 2px; margin: 0; font: inherit;
+	text-align: inherit;
+}
+.lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
+.lpn-pane-table tbody td { overflow: hidden; }
+/* **A SELECTION HIGHLIGHTS CELLS, NOT CHARACTERS** (Tom, 2026-09-19: *"A selection should
+   highlight cells, not characters. But I see characters highlighting as in Entry mode."*). Every
+   editable cell here is an <input>, and dragging across one leaves the browser's own text
+   selection inside it -- blue characters, under our own blue wash, saying something we did not
+   mean. A cell that is not being typed in is `readOnly`, which is exactly the set of cells whose
+   text must never look selected. A cell in ENTRY or EDIT is writable and keeps its caret and its
+   native selection, which is what makes Ctrl+Z and the mouse work inside a value. */
+.lpn-pane-table tbody td input[readonly] { user-select: none; }
 /* A heading that sorts and an ID that goes to the map are both flat text buttons: they are the
    cell, not a control sitting in it. */
 .lpn-pane-sort, .lpn-pane-goto {
@@ -2276,12 +2352,29 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    pass declared `.lpn-pane-table thead th { position: relative; }` for a containing block and broke
    the sticky heading row, which is the same rule at the same specificity further down the file --
    caught by pane-harness.js, which asserts that heading still sticks. `position: sticky` already
-   establishes a containing block, so the grip has one for free. */
-.lpn-pane-grip {
-	position: absolute; top: 0; inset-inline-end: -3px; width: 7px; height: 100%;
+   establishes a containing block, so the grip has one for free.
+
+   **IT IS `lpn-pane-colgrip` AND NOT `lpn-pane-grip`, AND THE RENAME IS THE WHOLE OF THREE OF
+   TOM'S FINDINGS** (2026-09-19, browser pass: a blip on every column separator 2px below the top
+   line, a gray line running 15px past the last column, heading separators offset 2px from the
+   column ones, and heading borders gray and wider than the body's). `.lpn-pane-grip` was ALREADY
+   TAKEN -- it is the bottom pane's own row-resize handle at the top of the panel, 35 lines up this
+   file -- so every column grip inherited that handle's `background: #f2f2f2`, its
+   `border-bottom: 1px solid #e0e0e0` and, worst, its `::after`: a 3rem x 2px #bbb bar centred 3px
+   below the top. Seven pixels of grip cannot hold 48 pixels of bar, so it overflowed each side of
+   every separator (the blips) and ran clear off the end of the last column (the line past the
+   table). A name collision, drawing furniture nobody asked for, with no rule of its own to read. */
+.lpn-pane-colgrip {
+	/* **IT SITS INSIDE ITS OWN HEADING, NOT ASTRIDE THE BOUNDARY.** Straddling reads better on
+	   paper and half of it was dead: every heading is `position: sticky; z-index: 2`, so each one
+	   is its own stacking context and the NEXT heading -- later in the markup, same z-index --
+	   paints over whatever spills past the edge. The outer three pixels of this grip were behind
+	   the neighbouring heading and answered no pointer at all. Seven pixels on the near side of
+	   the line, all of them live. */
+	position: absolute; top: 0; inset-inline-end: 0; width: 7px; height: 100%;
 	cursor: col-resize; user-select: none;
 }
-.lpn-pane-grip:hover { background: linear-gradient(to right, transparent 3px, #8ab 3px, #8ab 4px, transparent 4px); }
+.lpn-pane-colgrip:hover { background: linear-gradient(to right, transparent 5px, #8ab 5px, #8ab 6px, transparent 6px); }
 /* A heading is draggable left and right (his point (e)), so it says so under the pointer. `grab`
    rather than `move`: the column is not going anywhere until it is picked up. */
 .lpn-pane-sort { cursor: grab; }
