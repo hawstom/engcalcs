@@ -10685,12 +10685,33 @@ var EngCalcs = EngCalcs || {};
 				// exactly; what the affine absorbs is the tile RASTER being linear in Mercator y
 				// while this frame is linear in latitude, which over one tile is far under the
 				// width of the line a pipe is drawn with.
-				var g = function (lon, lat) {
-					var p = EngCalcs.lpnGeorefFromLonLat(xg, lon, lat);
-					return { x: inwardX(p.x), y: inwardY(p.y) };
-				};
-				var gtl = g(t.lonW, t.latN), gtr = g(t.lonE, t.latN), gbl = g(t.lonW, t.latS);
-				if (!isFinite(gtl.x) || !isFinite(gtl.y)) { return; }
+				// **THE TWO EDGES ARE MEASURED AS DIFFERENCES, AND THAT IS WHAT KEEPS THE TILE'S
+				// CORNERS ON ONE BRANCH OF LONGITUDE (R-066).** Inverting all three corners as
+				// ABSOLUTE lon/lat asks lpn-georef.js's wrapLon() which way round each one is
+				// nearer, independently -- so the tile holding the ANTIPODE of the transform's
+				// origin got its east edge wrapped a whole world away from its west edge. At the
+				// wizard's step 1 the origin starts at 0, 0, so that antipode IS the date line and
+				// the world-zoom view always contains it: measured, the offending tile's placement
+				// width came out **-1,750 where it should be +250**, and a negative width draws
+				// the raster BACKWARDS, stretched across the whole screen over every other tile.
+				// Tom saw it as reversed, upside-down place names.
+				//
+				// A tile's own lon and lat spans are plain differences -- 360 / 2^z and whatever
+				// the two latitude cuts are -- and there is no branch to choose in a difference,
+				// so lpnGeorefDeltaFromLonLat() never wraps. The transform is a similarity, so
+				// corner-plus-edge is exactly the corner the old expression meant, everywhere the
+				// old expression was right. dev/lpn-spike/basemap-dateline-harness.js is the guard.
+				var ptl = EngCalcs.lpnGeorefFromLonLat(xg, t.lonW, t.latN);
+				if (!isFinite(ptl.x) || !isFinite(ptl.y)) { return; }
+				var dEast = EngCalcs.lpnGeorefDeltaFromLonLat(xg, t.lonE - t.lonW, 0),
+					dSouth = EngCalcs.lpnGeorefDeltaFromLonLat(xg, 0, t.latS - t.latN);
+				// ONE CROSSING PER AXIS, which is what dev/lpn-spike/local-origin-harness.js's
+				// census asks of every site here: three corners go through the same door rather
+				// than each spelling the boundary out again.
+				var inw = function (x, y) { return { x: inwardX(x), y: inwardY(y) }; };
+				var gtl = inw(ptl.x, ptl.y),
+					gtr = inw(ptl.x + dEast.x, ptl.y + dEast.y),
+					gbl = inw(ptl.x + dSouth.x, ptl.y + dSouth.y);
 				place = {
 					x: 0, y: 0, width: 1, height: 1,
 					transform: 'matrix(' + [

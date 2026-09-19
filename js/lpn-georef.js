@@ -94,18 +94,43 @@
 		};
 	}
 
-	// The exact algebraic inverse of toLonLat(): a rotation matrix's inverse is its transpose, and
-	// the radii are constants, so there is nothing to iterate.
-	function fromLonLat(t, lon, lat) {
+	// **A LON/LAT DIFFERENCE TO A DOC-SPACE VECTOR, AND IT DELIBERATELY DOES NOT WRAP.** This is
+	// the whole of the inverse arithmetic -- a rotation matrix's inverse is its transpose, and the
+	// radii are constants, so there is nothing to iterate -- with the ONE step that needs a
+	// decision lifted out of it: turning an ABSOLUTE longitude into a difference from the origin,
+	// which is the only place wrapLon() belongs.
+	//
+	// **THE SEPARATION IS NOT TIDINESS; IT IS THE FIX FOR A MIRRORED TILE (R-066).** wrapLon()
+	// answers "which way round is nearer", and it is right for one point and wrong for the EDGE of
+	// a shape, because the two ends of an edge can land on opposite branches. The basemap placed
+	// each tile by inverting its four corners one at a time, so the tile containing the ANTIPODE of
+	// the transform's origin had its east edge wrapped a whole world away from its west edge: at
+	// the wizard's step 1 -- where the origin starts at 0, 0, so the antipode IS the date line --
+	// the offending tile's placement width computed as **-1,750 where it should be +250**, and a
+	// negative width is a raster drawn BACKWARDS, stretched across the entire screen over
+	// everything else. Tom saw it as reversed, upside-down place names.
+	//
+	// A caller that knows it holds a DIFFERENCE -- a tile's own width, the span of an edge -- hands
+	// it here and no branch is ever chosen. dev/lpn-spike/basemap-dateline-harness.js is the guard.
+	function deltaToDoc(t, dLon, dLat) {
 		var mpd = metersPerDegree(t.origin.lat),
-			east = wrapLon(lon - t.origin.lon) * mpd.lon,
-			north = (lat - t.origin.lat) * mpd.lat,
+			east = dLon * mpd.lon,
+			north = dLat * mpd.lat,
 			rad = t.rotDeg * DEG, cos = Math.cos(rad), sin = Math.sin(rad),
 			s = t.metersPerUnit;
 		return {
-			x: t.anchor.x + (east * cos + north * sin) / s,
-			y: t.anchor.y + (-east * sin + north * cos) / s
+			x: (east * cos + north * sin) / s,
+			y: (-east * sin + north * cos) / s
 		};
+	}
+
+	// The exact algebraic inverse of toLonLat(), for one ABSOLUTE point: the nearest branch of
+	// longitude is the right answer here, which is what wrapLon() picks. Two points either side of
+	// the 180th meridian are neighbours, and without this a network straddling the antimeridian
+	// inverts to doc coordinates most of the way round the world.
+	function fromLonLat(t, lon, lat) {
+		var d = deltaToDoc(t, wrapLon(lon - t.origin.lon), lat - t.origin.lat);
+		return { x: t.anchor.x + d.x, y: t.anchor.y + d.y };
 	}
 
 	function points(t, pts) {
@@ -242,6 +267,7 @@
 
 	EngCalcs.lpnGeorefToLonLat = toLonLat;
 	EngCalcs.lpnGeorefFromLonLat = fromLonLat;
+	EngCalcs.lpnGeorefDeltaFromLonLat = deltaToDoc;
 	EngCalcs.lpnGeorefPoints = points;
 	EngCalcs.lpnGeorefFromTwoPoints = fromTwoPoints;
 	EngCalcs.lpnGeorefFitToBounds = fitToBounds;
