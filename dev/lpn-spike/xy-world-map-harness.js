@@ -307,6 +307,49 @@ ok('...about the middle of the rectangle, which does not move',
 	Math.abs(back.x - centre.x) < 1e-6 && Math.abs(back.y - centre.y) < 1e-6);
 ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 
+// ---- AND IN STEP 2 NOTHING BUT THE RECTANGLE MOVES THE MAP -------------------------------------
+//
+// Tom, 2026-09-18: *"The map zooms during step 2. It should not zoom or pan at that point."* Step 2
+// is a fit somebody is holding by hand across several drags; a wheel notch or a stray press that
+// also moved the map could undo all of it, and neither is a decision anybody made.
+{
+	const { setHitTarget } = require('./lpn-dom-stub.js');
+	const canvas = byId.lpn_canvas;
+	const fire = (type, ev) => (canvas._listeners[type] || []).forEach(f => f(ev));
+	const frozen = JSON.stringify(L.xyGeoref());
+	L.wheelZoom(L.screenOf(midX, midY).x, L.screenOf(midX, midY).y, 2);
+	ok('the wheel does nothing at all at step 2', JSON.stringify(L.xyGeoref()) === frozen,
+		JSON.stringify(L.xyGeoref()));
+	// The pinch arrives at the same door, so one guard covers both; asserted through that door
+	// rather than through a second pretend gesture.
+	L.wheelZoom(L.screenOf(midX, midY).x, L.screenOf(midX, midY).y, 1 / 1.1);
+	ok('...and so does a pinch, which comes through the same door',
+		JSON.stringify(L.xyGeoref()) === frozen);
+	// A press on BARE CANVAS at step 2. At step 1 this is the pan; here it must arm nothing.
+	setHitTarget(null);
+	const a = L.screenOf(midX, midY);
+	fire('pointerdown', { pointerId: 51, clientX: a.x, clientY: a.y, pointerType: 'mouse', button: 0 });
+	ok('a press on bare canvas at step 2 arms no drag at all', !L.getDrag(),
+		JSON.stringify(L.getDrag()));
+	fire('pointermove', { pointerId: 51, clientX: a.x + 150, clientY: a.y + 90, pointerType: 'mouse', buttons: 1 });
+	L.pumpDrag();
+	fire('pointerup', { pointerId: 51, clientX: a.x + 150, clientY: a.y + 90, pointerType: 'mouse' });
+	ok('...so dragging the bare canvas slides nothing', JSON.stringify(L.xyGeoref()) === frozen,
+		JSON.stringify(L.xyGeoref()));
+	// ...and the rectangle itself still works, which is the half that must NOT be lost. The body of
+	// it carries data-mapgeo="move", and that is what the guard tests for.
+	setHitTarget({ dataset: { mapgeo: 'move' } });
+	fire('pointerdown', { pointerId: 52, clientX: a.x, clientY: a.y, pointerType: 'mouse', button: 0 });
+	const armed = L.getDrag();
+	fire('pointermove', { pointerId: 52, clientX: a.x + 150, clientY: a.y, pointerType: 'mouse', buttons: 1 });
+	L.pumpDrag();
+	fire('pointerup', { pointerId: 52, clientX: a.x + 150, clientY: a.y, pointerType: 'mouse' });
+	ok('while the rectangle itself still slides the map, which is the half not to lose',
+		!!armed && armed.kind === 'move' && JSON.stringify(L.xyGeoref()) !== frozen,
+		JSON.stringify(L.xyGeoref()));
+	ok('STEP 2 REFUSING THE WHEEL CHANGED NOT ONE STORED BYTE', snapshot() === before);
+}
+
 // ---- Georeference here -------------------------------------------------------------------------
 const placed = JSON.parse(JSON.stringify(L.xyGeoref()));
 L.mapgeoFinish();

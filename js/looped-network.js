@@ -10287,7 +10287,17 @@ var EngCalcs = EngCalcs || {};
 	// drawing still, so the same gesture magnifies the map behind it instead. Both the wheel and the
 	// pinch come through here, so the two cannot come to different ideas about which is happening.
 	function wheelZoom(sx, sy, factor) {
-		if (mapgeoActive()) { mapgeoZoomAbout(sx, sy, factor); return; }
+		// **AND IN STEP 2 THE WHEEL DOES NOTHING AT ALL** (Tom, 2026-09-18: *"The map zooms during
+		// step 2. It should not zoom or pan at that point."*). Step 2 is a fit somebody is holding
+		// by hand: the rectangle's corners set the size and its body sets the position, so a wheel
+		// that also resized the map could undo a fit that took three drags to get right, and a
+		// notch of an over-sensitive wheel is not a decision anybody made. **The same guard covers
+		// the pinch**, which arrives here rather than at the wheel listener -- one door, so the two
+		// cannot come to different answers.
+		if (mapgeoActive()) {
+			if (mapgeo.step === MAPGEO_STEP_FINE) { return; }
+			mapgeoZoomAbout(sx, sy, factor); return;
+		}
 		zoomAbout(sx, sy, factor);
 	}
 	function zoomAbout(sx, sy, factor) {
@@ -12221,6 +12231,13 @@ var EngCalcs = EngCalcs || {};
 		if (!mapgeo || !t) { return false; }
 		target = document.elementFromPoint(e.clientX, e.clientY);
 		kind = target && target.dataset ? target.dataset.mapgeo : null;
+		// **IN STEP 2 ONLY THE RECTANGLE MOVES ANYTHING** (Tom, 2026-09-18: *"It should not zoom or
+		// pan at that point."*). Bare canvas fell through to the same translate the rectangle's body
+		// does, so a press anywhere on screen slid the map -- and the one thing a reader is doing in
+		// step 2 is holding a fit still while they adjust one edge of it. The press is dropped
+		// rather than passed on: `drag` is cleared, because the caller has already returned by the
+		// time this decides, and a stale drag record is a gesture nobody started.
+		if (mapgeo.step === MAPGEO_STEP_FINE && !kind) { drag = null; return false; }
 		drag = {
 			type: 'mapgeo', kind: kind || 'move', pointerId: e.pointerId,
 			startX: e.clientX, startY: e.clientY, t0: t,
