@@ -342,8 +342,16 @@ console.log('\n--- one home for the concept ---');
 	// two retired: nodeCoordAxis() and nodeLonLat() now ask effective(), which is the SAME
 	// consolidation the DEM lists made twice above -- one reader of "where is this node" rather than
 	// three.
-	ok('outwardX has one definition and twenty-seven call sites', count(/outwardX\(/g) === 28, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-seven call sites', count(/outwardY\(/g) === 28, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR viewLonLat()** (Task 692), which is where on the Earth the middle of
+	// the camera is. It is nodeLonLat() asked of the view rather than of an element, and it crosses
+	// the boundary the same way: outwardX/outwardY on the view centre, then the projection's own
+	// inverse. It exists because the audit of every isGeoProject() reader turned up one -- the New
+	// project box's place pre-fill -- that asked "are these numbers a longitude and a latitude"
+	// where it meant "can this project say where on the Earth it is". Both call sites are inside
+	// the one function, which is the point: the question is asked once. **NET ONE EACH, NOT TWO**:
+	// the pre-fill's own inline pair was the site that moved into it.
+	ok('outwardX has one definition and twenty-eight call sites', count(/outwardX\(/g) === 29, count(/outwardX\(/g));
+	ok('outwardY has one definition and twenty-eight call sites', count(/outwardY\(/g) === 29, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

@@ -79,7 +79,9 @@ const L = loadLoopedNetwork(
 	// were widened.
 	"\t\tmapRows: mapMenuRows, refreshTeaser: refreshBasemapTeaser,\n" +
 	"\t\tgoToLatLon: goToLatLon, satAvailable: satelliteAvailable,\n" +
-		"\t\tcrsRegisterLoad: crsRegisterLoad, renderCrsBoxList: renderCrsBoxList,\n" +
+	// Task 692's audit: the last gate that asked the narrow question and meant the wide one.
+	"\t\tviewLonLat: viewLonLat,\n" +
+	"\t\tcrsRegisterLoad: crsRegisterLoad, renderCrsBoxList: renderCrsBoxList,\n" +
 	"\t\tcrsBoxState: function () { return crsBox; },\n" +
 	"\t\tcrsOptionText: crsOptionText, crsCannotBePlaced: crsCannotBePlaced,\n" +
 	"\t\tnewBoxGeo: function () { return newBoxGeo; },\n" +
@@ -621,6 +623,47 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		asked = 0;
 		L.goToLatLon();
 		ok('...and Go to, called anyway, still refuses', asked === 0);
+	}
+
+	head('14. The last reader the audit turned up -- where the New project box opens');
+	// Every isGeoProject() reader was read on 2026-09-18 after the third defect from the same word.
+	// All but one genuinely mean "are these numbers a longitude and a latitude" -- the Mercator
+	// boundary, the coordinate bounds, the decimal places, the `_xsrc` record. The exception was
+	// the New project box's place pre-fill, whose own comment still said turning an easting into a
+	// longitude was "the transform this page does not have" -- true when written, false since the
+	// page gained js/lpn-crs.js. It costs no dead control, only a chooser that opens on the whole
+	// register while the project behind it knows the town.
+	{
+		L.newProject('geo', '');
+		L.setCanvas(W, H); L.setMapSized();
+		L.applyView({ cx: L.inwardX(PHOENIX.lon), cy: L.inwardY(PHOENIX.lat), s: 200 });
+		{
+			const ll = L.viewLonLat(L.currentView());
+			ok('a lat/lon project reads its own view as a place', !!ll
+				&& Math.abs(ll.lat - PHOENIX.lat) < 0.01 && Math.abs(ll.lon - PHOENIX.lon) < 0.01,
+				ll ? ll.lat.toFixed(4) + ', ' + ll.lon.toFixed(4) : 'null');
+		}
+
+		L.newProject(null, ZONE12N);
+		L.setCanvas(W, H); L.setMapSized();
+		{
+			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
+			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
+			const ll = L.viewLonLat(L.currentView());
+			ok('**and so does a projected one, through the transform**', !!ll
+				&& Math.abs(ll.lat - PHOENIX.lat) < 0.01 && Math.abs(ll.lon - PHOENIX.lon) < 0.01,
+				ll ? ll.lat.toFixed(4) + ', ' + ll.lon.toFixed(4) : 'null');
+			ok('...and states no extent, because a camera is not the size of a place',
+				!!ll && ll.extent === null);
+		}
+
+		// A grid project's view is canvas units and there is nothing on the Earth to report. Null
+		// is the honest answer and the caller falls back to the place-name search.
+		L.newProject(null, '');
+		L.setCanvas(W, H); L.setMapSized();
+		L.applyView({ cx: 400, cy: 300, s: 1 });
+		ok('a grid project reports no place at all', L.viewLonLat(L.currentView()) === null);
+		ok('...and neither does a missing view', L.viewLonLat(null) === null);
 	}
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall projected-basemap checks passed');

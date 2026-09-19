@@ -11146,6 +11146,25 @@ var EngCalcs = EngCalcs || {};
 		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
 		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
 	}
+	/**
+	 * **WHERE ON THE EARTH THE MIDDLE OF THIS VIEW IS, or null if the project cannot say** (Task
+	 * 692). It is nodeLonLat()'s question asked of the camera rather than of an element, and it
+	 * asks projectLocatable() for the same reason: a projected project with a transform knows
+	 * perfectly well what town it is looking at. Null on a grid project, which is not a failure --
+	 * it is the honest answer, and the one caller falls back to the place-name search.
+	 *
+	 * The shape is the crsBox's, so `extent` is stated null: a view has a size, but the place this
+	 * reports is a POINT, and inventing an extent from a camera would filter the projection list
+	 * by how far somebody happened to be zoomed out.
+	 */
+	function viewLonLat(v) {
+		var ll;
+		if (!v || !projectLocatable()) { return null; }
+		if (isGeoProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+		if (!EngCalcs.lpnCrsInverse) { return null; }
+		ll = EngCalcs.lpnCrsInverse(projectCrsCode(), { x: outwardX(v.cx), y: outwardY(v.cy) });
+		return ll ? { lat: ll.lat, lon: ll.lon, extent: null } : null;
+	}
 	function terrainPointsForIds(ids) {
 		if (!projectLocatable()) { return []; }
 		var out = [];
@@ -26315,15 +26334,20 @@ var EngCalcs = EngCalcs || {};
 		wireCrsBox();
 		crsBox.code = code || LPN_CRS_WEBMERC;
 		crsBox.onPick = onPick || null;
-		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** Only a geographic project has a view that is
-		// a place on the Earth; a projected or local one has eastings or canvas units, and turning
-		// those into a longitude is the transform this page does not have. So the point comes from
-		// the open project when it can, from the caller when it was found earlier in this box, and
-		// from the place-name search otherwise.
+		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** The point comes from the open project when
+		// it can, from the caller when it was found earlier in this box, and from the place-name
+		// search otherwise.
+		//
+		// **THIS USED TO SAY A PROJECTED PROJECT'S VIEW COULD NOT BE READ, "the transform this
+		// page does not have"** -- true when it was written and false since Task 641 phase 5 gave
+		// the page js/lpn-crs.js. It was the last reader of isGeoProject() that meant
+		// projectLocatable(), found by auditing all of them on 2026-09-18 (Task 692) after the
+		// same word had been the defect three times. It costs no dead control, only a New project
+		// box that opened on the whole register while the project behind it knew the town.
 		crsBox.place = place || null;
-		if (!crsBox.place && isGeoProject()) {
+		if (!crsBox.place) {
 			v = currentView();
-			if (v) { crsBox.place = { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+			if (v) { crsBox.place = viewLonLat(v); }
 		}
 		var field = document.getElementById('lpn_crsbox_place'),
 			nameEl = document.getElementById('lpn_crsbox_name'),
