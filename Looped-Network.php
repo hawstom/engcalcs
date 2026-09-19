@@ -400,11 +400,28 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // cannot work out by trying, because both look like the whole picture moving. ?>
 			<div id="lpn_mapgeo_hint_gestures" style="margin-bottom:4px"></div>
 			<div id="lpn_mapgeo_hint_dial" style="margin-bottom:4px"></div>
-			<button type="button" id="lpn_mapgeo_search"><?=$ec_lang['lpn_crs_place']?></button>
-			<button type="button" id="lpn_mapgeo_goto"><?=$ec_lang['lpn_georef_goto']?></button>
-			<button type="button" id="lpn_mapgeo_place"><?=$ec_lang['lpn_mapgeo_place']?></button>
-			<button type="button" id="lpn_mapgeo_finish" style="display:none"><?=$ec_lang['lpn_mapgeo_finish']?></button>
-			<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+			<?php // **THE TWO BUTTONS THAT LEAVE THE STEP SIT AT THE RIGHT** (Tom, 2026-09-19:
+			      // *"'Place approximately', for a new user, this and 'Cancel' need to be at the
+			      // right side of the box."*). They were in one run with Search and Go to, so the
+			      // button that ENDS the step sat in the middle of a row of buttons that do not,
+			      // and a reader meeting the wizard for the first time had no way to tell them
+			      // apart. Left: the two that help you find your place, and both are step 1 only.
+			      // Right: Place approximately (step 1) or Georeference here (step 2), and Cancel.
+			      //
+			      // `margin-left:auto` and not two fixed columns, so that when the left group is
+			      // hidden in step 2 the right group is still at the right; and `flex-wrap`, so a
+			      // narrow window stacks them rather than pushing the box off the screen. ?>
+			<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+				<span style="display:flex;flex-wrap:wrap;gap:6px">
+					<button type="button" id="lpn_mapgeo_search"><?=$ec_lang['lpn_crs_place']?></button>
+					<button type="button" id="lpn_mapgeo_goto"><?=$ec_lang['lpn_georef_goto']?></button>
+				</span>
+				<span style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto">
+					<button type="button" id="lpn_mapgeo_place"><?=$ec_lang['lpn_mapgeo_place']?></button>
+					<button type="button" id="lpn_mapgeo_finish" style="display:none"><?=$ec_lang['lpn_mapgeo_finish']?></button>
+					<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+				</span>
+			</div>
 		</div>
 		<?php // ---- THE TWO SLIDERS, step 2 only (Tom, 2026-09-19) ----------------------------
 		      //
@@ -2542,10 +2559,8 @@ EngCalcs.pageConfig = {
 	lpn_map_attach_menu: <?=json_encode($ec_lang['lpn_map_attach_menu'])?>,
 	lpn_map_attach_tip: <?=json_encode($ec_lang['lpn_map_attach_tip'])?>,
 	lpn_map_attach_add: <?=json_encode($ec_lang['lpn_map_attach_add'])?>,
-	lpn_map_attach_move: <?=json_encode($ec_lang['lpn_map_attach_move'])?>,
-	lpn_map_attach_move_tip: <?=json_encode($ec_lang['lpn_map_attach_move_tip'])?>,
-	lpn_map_attach_scale: <?=json_encode($ec_lang['lpn_map_attach_scale'])?>,
-	lpn_map_attach_scale_tip: <?=json_encode($ec_lang['lpn_map_attach_scale_tip'])?>,
+	lpn_map_attach_readjust: <?=json_encode($ec_lang['lpn_map_attach_readjust'])?>,
+	lpn_map_attach_readjust_tip: <?=json_encode($ec_lang['lpn_map_attach_readjust_tip'])?>,
 	lpn_map_attach_scale_from: <?=json_encode($ec_lang['lpn_map_attach_scale_from'])?>,
 	lpn_map_attach_scale_from_prompt: <?=json_encode($ec_lang['lpn_map_attach_scale_from_prompt'])?>,
 	lpn_map_attach_scale_from_bad: <?=json_encode($ec_lang['lpn_map_attach_scale_from_bad'])?>,

@@ -10114,6 +10114,26 @@ var EngCalcs = EngCalcs || {};
 	// round and nailing the map to the screen looks like the obvious thing to do, which is how this
 	// got written.
 	var basemapPlacedSig = '';
+	// **THE PREVIOUS VIEW'S TILES, KEPT UNDER THE NEW ONES WHILE THOSE LOAD.** See the note at the
+	// carry in paintBasemapTiles(): exactly one generation is ever held, so this cannot grow with a
+	// long pan, and it is emptied the moment every wanted tile has settled.
+	var basemapCarried = {};
+	function basemapDropCarried() {
+		var k;
+		for (k in basemapCarried) {
+			if (basemapCarried.hasOwnProperty(k) && basemapCarried[k].remove) { basemapCarried[k].remove(); }
+		}
+		basemapCarried = {};
+	}
+	// How many tiles the CURRENT view is still waiting on. Only the wanted set counts -- a carried
+	// tile that never arrives must not keep the generation before it alive.
+	function basemapPendingCount() {
+		var k, n = 0;
+		for (k in basemapEls) {
+			if (basemapEls.hasOwnProperty(k) && !basemapEls[k]._lpnSettled) { n++; }
+		}
+		return n;
+	}
 	// **TWO SOURCES, AND THEY ARE NOT EQUIVALENT** (ROADMAP Task 452). Tom, 2026-08-19: "epanetjs
 	// uses OpenStreet with MapBox and serves satellite imagery. Add that."
 	//
@@ -10224,6 +10244,26 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		}
+		// **THE MIDDLE OF THE SCREEN IS ASKED FOR FIRST, AND THIS IS HALF OF Tom's R-019 FIX.**
+		// The loops above walk x outer and y inner, so the list came out column by column from the
+		// WEST edge -- and a browser fetches images in the order the elements are appended.
+		// MEASURED in dev/lpn-spike/basemap-tile-load-probe.js against real Mapbox tiles in real
+		// headless Chrome, twice: arrival time tracked the element's position in the layer
+		// EXACTLY, 0 through 71 and 0 through 35, and had no relation at all to where the tile sat
+		// on the screen. So the patch of ground the reader is actually looking at was served
+		// halfway down a queue of up to 192 photographs, every time -- and because a repaint
+		// discarded whatever had not arrived, a second wheel notch threw that queue away and
+		// started again at the west edge. Tom, 2026-09-19: *"it's the area I care about most that
+		// disappears when I zoom in, while peripheral tiles keep showing."* That is this, exactly.
+		//
+		// Sorting by distance from the middle of the tile window costs one sort of at most 192
+		// items and changes nothing else: the same tiles, the same keys, the same places. Tiles do
+		// not overlap, so their paint order is not a visual fact.
+		var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+		out.sort(function (a, b) {
+			return ((a.x - cx) * (a.x - cx) + (a.y - cy) * (a.y - cy)) -
+				((b.x - cx) * (b.x - cx) + (b.y - cy) * (b.y - cy));
+		});
 		return { z: z, tiles: out };
 	}
 	// Stored on the PROJECT, beside `coords`, because both are declarations about what this document
@@ -10411,6 +10451,7 @@ var EngCalcs = EngCalcs || {};
 		if (!basemapOn() || !svg || !mapSized) {
 			basemapLayer.innerHTML = '';
 			basemapEls = {};
+			basemapCarried = {};
 			return;
 		}
 		r = svg.getBoundingClientRect();
@@ -10441,7 +10482,7 @@ var EngCalcs = EngCalcs || {};
 			};
 			if (!isFinite(xbnds.west) || !isFinite(xbnds.south) ||
 					!isFinite(xbnds.east) || !isFinite(xbnds.north)) {
-				basemapLayer.innerHTML = ''; basemapEls = {}; return;
+				basemapLayer.innerHTML = ''; basemapEls = {}; basemapCarried = {}; return;
 			}
 		}
 		// **THE GROUND MOVED, SO EVERY CACHED TILE IS A PICTURE OF SOMEWHERE ELSE.** The affine each
@@ -10456,6 +10497,7 @@ var EngCalcs = EngCalcs || {};
 		if (placeSig !== basemapPlacedSig) {
 			basemapLayer.innerHTML = '';
 			basemapEls = {};
+			basemapCarried = {};
 			basemapPlacedSig = placeSig;
 		}
 		var proj = projectedBasemapOk(), bnds = null;
@@ -10466,7 +10508,7 @@ var EngCalcs = EngCalcs || {};
 			// undone.
 			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(),
 				outwardX(tl.x), outwardY(tl.y), outwardX(br.x), outwardY(br.y));
-			if (!bnds) { basemapLayer.innerHTML = ''; basemapEls = {}; return; }
+			if (!bnds) { basemapLayer.innerHTML = ''; basemapEls = {}; basemapCarried = {}; return; }
 		}
 		// **THE ZOOM ARGUMENT IS A SCALE IN THE FRAME'S OWN UNITS AND THEY ARE NOT THE SAME UNITS.**
 		// `state.s` is pixels per world unit: per DEGREE in a geographic project, per metre or per
@@ -10546,16 +10588,55 @@ var EngCalcs = EngCalcs || {};
 			// rather than letting the renderer letterbox on a sub-pixel rounding difference at a
 			// tile seam -- and in the projected case it is doing real work, because the matrix
 			// deliberately makes the box a parallelogram.
-			basemapEls[t.key] = el('image', Object.assign({
+			var img = el('image', Object.assign({
 				href: t.url, preserveAspectRatio: 'none', crossorigin: 'anonymous',
 				'class': 'lpn-basemap-tile'
 			}, place), basemapLayer);
+			// **WHETHER THIS TILE HAS FINISHED ONE WAY OR THE OTHER**, which is what tells the
+			// carried-over tiles below when they may go. `error` counts as finished: a 404 over
+			// the provider's ceiling never arrives, and waiting on it forever would pin the old
+			// picture in place. A stub with no addEventListener is settled on the spot, so no
+			// harness waits for an event it can never fire.
+			img._lpnSettled = false;
+			if (img.addEventListener) {
+				var settle = function () {
+					img._lpnSettled = true;
+					if (!basemapPendingCount()) { basemapDropCarried(); }
+				};
+				img.addEventListener('load', settle);
+				img.addEventListener('error', settle);
+			} else {
+				img._lpnSettled = true;
+			}
+			basemapEls[t.key] = img;
 		});
+		// **THE OLD TILES STAY ON SCREEN UNTIL THE NEW ONES HAVE ARRIVED**, which is the other
+		// half of Tom's R-019 (2026-09-19: *"it's the area I care about most that disappears when
+		// I zoom in"*). Until now a repaint deleted every tile the new view did not want, in the
+		// same turn that it asked for the replacements -- so the map went BLANK the instant the
+		// wheel settled and stayed blank for as long as the photographs took to come down the
+		// wire. Removing an <image> also CANCELS its fetch, so a second nudge threw away
+		// everything in flight and started over.
+		//
+		// The old tiles are ground-referenced exactly as the new ones are, so they line up; they
+		// were appended earlier, so they sit UNDER the new ones and are covered tile by tile as
+		// each arrives. This is what every map does, and it costs one extra generation of
+		// elements -- bounded, because only ONE generation is ever carried.
+		var carried = {};
 		for (k in basemapEls) {
 			if (basemapEls.hasOwnProperty(k) && !want[k]) {
-				if (basemapEls[k].remove) { basemapEls[k].remove(); }
+				carried[k] = basemapEls[k];
 				delete basemapEls[k];
 			}
+		}
+		if (basemapPendingCount()) {
+			basemapDropCarried();
+			basemapCarried = carried;
+		} else {
+			// Nothing is waiting, so there is nothing to cover up: the honest thing is the old
+			// behaviour, an immediate removal, and no second generation left lying about.
+			basemapCarried = carried;
+			basemapDropCarried();
 		}
 	}
 
@@ -13012,11 +13093,22 @@ var EngCalcs = EngCalcs || {};
 		var d = mapgeo && mapgeo.dial, t;
 		if (!d) { return; }
 		t = mapgeoScaled(d.base, mapgeoDialFactor(d.pos), d.pivot);
-		// **NEGATED, AND THE SIGN IS THE WHOLE CONTRACT OF THE CONTROL.** mapgeoTurned() takes its
-		// angle in the DRAWING's frame, where y runs down, so a positive angle there is a CLOCKWISE
-		// sweep on screen. The knob reads the way the needle points and the way the pointer went,
-		// which is counterclockwise-positive, exactly as `rotDeg` itself is.
-		t = mapgeoTurned(t, -d.turn * Math.PI / 180, d.pivot);
+		// **THE SIGN IS THE WHOLE CONTRACT OF THE CONTROL, AND IT WAS THE WRONG WAY ROUND UNTIL
+		// 2026-09-19.** Tom: *"The rotation slider needs up to be counterclockwise."* It was
+		// negated here, on a comment reasoning about which way the DRAWING would sweep -- and the
+		// drawing never moves. The thing that turns is the MAP, which is the standing ruling in
+		// this file stated as an arithmetic sign: we align the streets with the project.
+		//
+		// MEASURED rather than reasoned, because reasoning about it is what got it wrong: a point
+		// of GROUND due east of the pivot, put through mapgeoTurned() and back out to the screen
+		// frame where y runs DOWN, went from 0 to +5 degrees on a slider pushed UP -- clockwise.
+		// It now goes to -5, which is the counterclockwise he asked for.
+		// dev/lpn-spike/mapgeo-turn-direction-harness.js holds it.
+		//
+		// **NOTHING STORED CHANGED MEANING.** `rotDeg` is what it always was and mapgeoTurned()
+		// was not touched; what flipped is which way the reader must push the bar, which is the
+		// only thing he asked about.
+		t = mapgeoTurned(t, d.turn * Math.PI / 180, d.pivot);
 		mapgeoDialWriting = true;
 		try { mapgeoSet(t); } finally { mapgeoDialWriting = false; }
 		mapgeoDialRefresh();
@@ -13227,12 +13319,18 @@ var EngCalcs = EngCalcs || {};
 		return [
 			{ icon: 'globe', label: pc.lpn_map_attach_add || 'Attach',
 				tip: pc.lpn_map_attach_tip, fn: mapgeoStart },
-			{ icon: 'position', label: pc.lpn_map_attach_move || 'Move',
-				tip: pc.lpn_map_attach_move_tip,
-				fn: function () { mapgeoAdjust('move'); }, disabled: !has },
-			{ icon: 'scale', label: pc.lpn_map_attach_scale || 'Scale by picking',
-				tip: pc.lpn_map_attach_scale_tip,
-				fn: function () { mapgeoAdjust('scale'); }, disabled: !has },
+			// **ONE ROW, BECAUSE THE TWO OPENED THE IDENTICAL THING** (Tom, 2026-09-19: *"Map
+			// submenus a lie: Yes. I see. Let's replace rows two and three (I like their
+			// behavior; good call) with 'Re-adjust'"*). Move and Scale by picking named two
+			// HANDLES of the blue rectangle; the rectangle was deleted, so from that day both
+			// rows ran the same code and showed the same sentence. Two names for one command is a
+			// menu telling the reader something untrue about itself. The label and the tip are
+			// his own words, verbatim. KEYS DELETED WITH THE ROWS: lpn_map_attach_move,
+			// lpn_map_attach_move_tip, lpn_map_attach_scale, lpn_map_attach_scale_tip -- none of
+			// them had ever been translated.
+			{ icon: 'position', label: pc.lpn_map_attach_readjust || 'Re-adjust',
+				tip: pc.lpn_map_attach_readjust_tip,
+				fn: mapgeoAdjust, disabled: !has },
 			{ icon: 'scale', label: pc.lpn_map_attach_scale_from || 'Scale from the current size…',
 				fn: mapgeoScaleFromCurrent, disabled: !has },
 			{ icon: 'del', label: pc.lpn_map_attach_remove || 'Detach',
@@ -13240,7 +13338,7 @@ var EngCalcs = EngCalcs || {};
 		];
 	}
 	/**
-	 * Move and Scale by picking: the wizard's step 2, opened on the placement already on file.
+	 * Re-adjust: the wizard's step 2, opened on the placement already on file.
 	 *
 	 * **IT KEEPS THE TRANSFORM AND OPENS AT STEP 2, which is what makes it a correction rather than
 	 * a fresh placement.** mapgeoStart() throws the map out to the whole world at 0 N 0 E, because
@@ -13248,7 +13346,7 @@ var EngCalcs = EngCalcs || {};
 	 * existing map would lose the placement they were correcting. Everything else is shared with the
 	 * wizard, Cancel included, so there is one way back and it puts the old transform back exactly.
 	 */
-	function mapgeoAdjust(kind) {
+	function mapgeoAdjust() {
 		var pc = EngCalcs.pageConfig || {};
 		if (mapgeo || georefActive()) { return; }
 		if (!xyMapAttachable() || !xyGeorefOk()) {
@@ -13272,14 +13370,11 @@ var EngCalcs = EngCalcs || {};
 		setMode('select');
 		mapgeoSet(project.georef);
 		refreshMapStatus();
-		// **ONE SENTENCE FOR BOTH ROWS NOW, and that is a consequence of deleting the rectangle
-		// rather than a shortcut.** Move and Scale by picking used to name different HANDLES of the
-		// same rectangle, so each could tell the reader which one they wanted; with the rectangle
-		// gone the two rows open the identical step 2, where the drag slides the map and the two
-		// bars size and turn it. Two strings saying that in different words would be two chances to
-		// drift. `kind` is kept because the rows are Tom's and the argument still says which one was
-		// pressed. **The row LABELS are now the loose end** -- "Scale by picking" names a gesture
-		// that no longer exists -- and renaming a row he specified is his call, not this file's.
+		// **ONE SENTENCE, BECAUSE THERE IS ONE ROW.** Move and Scale by picking used to name two
+		// HANDLES of the blue rectangle; deleting the rectangle left both rows opening the
+		// identical step 2, and Tom closed the loose end on 2026-09-19 by replacing them with a
+		// single Re-adjust. The `kind` argument went with them -- it distinguished two things that
+		// had stopped being two things.
 		setNotice(pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
 	}
 	/**

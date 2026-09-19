@@ -434,15 +434,22 @@ ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 	// **HIS BAND IS TEN DEGREES EITHER WAY** (2026-09-19: *"up is counter-clockwise with a limit of
 	// about 10 degrees (since most convergence angles are less than 1 degree)"*), so the knob's old
 	// 30 is now off the end of the travel and the assertion is the CLAMP as well as the sign.
+	// **THE SIGN FLIPPED ON 2026-09-19 AND THESE THREE LINES ARE WHERE IT WAS PINNED THE OLD WAY**
+	// (Tom: *"The rotation slider needs up to be counterclockwise."*). They read `+ 6` and called
+	// it counterclockwise, which is what a harness pinning arithmetic rather than a direction
+	// buys: `rotDeg` turns the MODEL counterclockwise against the ground, so on a screen where the
+	// model is nailed down it turns the MAP the other way. Which way the reader sees the streets
+	// go is asserted in dev/lpn-spike/mapgeo-turn-direction-harness.js, on a piece of ground and a
+	// named frame; what is left here is the magnitude and the clamp.
 	L.dialTurn(6);
 	const tTurn = L.xyGeoref();
-	ok('the turn slider turns the map counterclockwise by the degrees it reads',
-		Math.abs(tTurn.rotDeg - (JSON.parse(tWas).rotDeg + 6)) < 1e-9, tTurn.rotDeg);
+	ok('the turn slider turns the map by the degrees it reads',
+		Math.abs(tTurn.rotDeg - (JSON.parse(tWas).rotDeg - 6)) < 1e-9, tTurn.rotDeg);
 	L.dialTurn(30);
 	ok('...and it stops at ten degrees rather than carrying on round, which a knob did',
-		Math.abs(L.xyGeoref().rotDeg - (JSON.parse(tWas).rotDeg + 10)) < 1e-9, L.xyGeoref().rotDeg);
+		Math.abs(L.xyGeoref().rotDeg - (JSON.parse(tWas).rotDeg - 10)) < 1e-9, L.xyGeoref().rotDeg);
 	L.dialTurn(-30);
-	ok('...at both ends', Math.abs(L.xyGeoref().rotDeg - (JSON.parse(tWas).rotDeg - 10)) < 1e-9);
+	ok('...at both ends', Math.abs(L.xyGeoref().rotDeg - (JSON.parse(tWas).rotDeg + 10)) < 1e-9);
 	// **THE NUMBER BOXES ARE THE SAME TWO SEAMS REACHED BY TYPING** (his point 5). A typed factor
 	// lands where the slider would put it, which is what makes the two halves of each pair one
 	// control rather than two.
@@ -606,11 +613,18 @@ ok('...and the map status goes back to saying it is not georeferenced',
 	ok('...and no top-level row is left over from the two it replaced',
 		!top.some(function (r) { return r.label === PC0.lpn_map_attach_remove; }));
 	const rows = world.submenu();
-	ok('the submenu reads Attach, Move, Scale by picking, Scale from the current size, Detach',
+	// **FOUR ROWS, NOT FIVE, SINCE 2026-09-19.** Move and Scale by picking named two handles of a
+	// blue rectangle that no longer exists, so both ran the identical code and showed the identical
+	// sentence; Tom replaced the pair with one Re-adjust. A menu offering two names for one command
+	// is a menu saying something untrue about itself, which is how he put it: *"Map submenus a
+	// lie."*
+	ok('the submenu reads Attach, Re-adjust, Scale from the current size, Detach',
 		rows.map(function (r) { return r.label; }).join(' | ') ===
-			[PC0.lpn_map_attach_add, PC0.lpn_map_attach_move, PC0.lpn_map_attach_scale,
+			[PC0.lpn_map_attach_add, PC0.lpn_map_attach_readjust,
 				PC0.lpn_map_attach_scale_from, PC0.lpn_map_attach_remove].join(' | '),
 		rows.map(function (r) { return r.label; }).join(' | '));
+	ok('...and the two rows it replaced are gone from it',
+		!rows.some(function (r) { return r.label === 'Move' || r.label === 'Scale by picking'; }));
 	// Every row but Attach is dead while nothing is attached -- GREYED, not gone, which is the
 	// backdrop submenu's own rule: a row that comes and goes teaches nobody what the feature can do.
 	ok('with nothing attached, Attach is live and every other row is greyed',
@@ -643,20 +657,20 @@ ok('a map is attached again, so the fine adjustments have something to adjust',
 	L.xyGeorefOk() === true);
 ok('ATTACHING AGAIN CHANGED NOT ONE STORED BYTE', snapshot() === before);
 {
-	// MOVE: step 2 on the placement already on file, never a fresh one. The old transform has to
-	// still be there -- a Move that threw the map back to 0 N 0 E would be a new placement wearing
-	// the word Move.
-	L.mapgeoAdjust('move');
-	ok('Move opens the wizard at step 2', L.mapgeoActive() === true && L.mapgeoStep() === 2);
+	// RE-ADJUST: step 2 on the placement already on file, never a fresh one. The old transform has
+	// to still be there -- a Re-adjust that threw the map back to 0 N 0 E would be a new placement
+	// wearing the word, and the reader would lose what they came to correct.
+	L.mapgeoAdjust();
+	ok('Re-adjust opens the wizard at step 2', L.mapgeoActive() === true && L.mapgeoStep() === 2);
 	ok('...on the placement that was already on file, not a fresh one',
 		JSON.stringify(L.xyGeoref()) === attached, L.xyGeoref() && JSON.stringify(L.xyGeoref()));
 	L.mapgeoCancel();
 	ok('...and Cancel puts it back exactly', JSON.stringify(L.xyGeoref()) === attached);
-	L.mapgeoAdjust('scale');
-	ok('Scale by picking opens the same step 2, which is the same two sliders',
+	L.mapgeoAdjust();
+	ok('...and a second Re-adjust opens the same step 2, which is the same two sliders',
 		L.mapgeoStep() === 2 && JSON.stringify(L.xyGeoref()) === attached);
 	L.mapgeoCancel();
-	ok('MOVE AND SCALE BY PICKING CHANGED NOT ONE STORED BYTE', snapshot() === before);
+	ok('RE-ADJUST CHANGED NOT ONE STORED BYTE', snapshot() === before);
 }
 {
 	// SCALE FROM THE CURRENT SIZE: a typed factor, applied at once, about the middle of the drawing.

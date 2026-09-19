@@ -98,6 +98,58 @@ module.exports = async ({ send, evaluate, logs, sleep }) => {
 		return a === 'ok' && b === 'ok';
 	}
 
+	// ---- R-018: THE STEP'S OWN TWO BUTTONS ARE AT THE RIGHT OF THE BOX ------------------------
+	// Tom, 2026-09-19: *"'Place approximately', for a new user, this and 'Cancel' need to be at
+	// the right side of the box."* Asserted on RECTS and not on markup, because the grouping is
+	// done with `margin-left:auto` inside a flex row -- a rule that reads correctly and can still
+	// be defeated by a wrapping row, which is exactly what the narrow layouts here produce.
+	await send('Emulation.setDeviceMetricsOverride',
+		{ width: 1366, height: 768, deviceScaleFactor: 1, mobile: false });
+	{
+		await nav();
+		await evaluate(`(function(){ try { localStorage.clear();
+			localStorage.setItem('lpn_project_p1', ${JSON.stringify(PROJ)});
+			localStorage.setItem('lpn_index', JSON.stringify({v:1, openId:'p1', projects:[{id:'p1', name:'Probe'}]}));
+		} catch (e) {} return 1; })()`);
+		await nav();
+		await sleep(2500);
+		const menuClick2 = (re) => evaluate(`(function(){
+			var bs = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row, #lpn_menu_list2 button.lpn-menu-row'));
+			var m = bs.filter(function(b){ return new RegExp(${JSON.stringify(re)},'i').test(b.textContent||''); });
+			if (!m.length) { return 'no'; } m[m.length-1].click(); return 'ok'; })()`);
+		await evaluate(`document.getElementById('lpn_menu_map').click()`);
+		await sleep(400);
+		await menuClick2('World map');
+		await sleep(400);
+		await menuClick2('^Attach');
+		await sleep(1500);
+		const g = JSON.parse(await evaluate(`(function(){
+			var box = document.getElementById('lpn_mapgeo_bar');
+			var r = function (id) { var e = document.getElementById(id);
+				if (!e || getComputedStyle(e).display === 'none') { return null; }
+				var b = e.getBoundingClientRect(); return { l: b.left, r: b.right, t: b.top }; };
+			var bb = box.getBoundingClientRect();
+			return JSON.stringify({ box: { l: bb.left, r: bb.right },
+				search: r('lpn_mapgeo_search'), goto: r('lpn_mapgeo_goto'),
+				place: r('lpn_mapgeo_place'), cancel: r('lpn_mapgeo_cancel') }); })()`));
+		ok('step 1: the wizard shows Place approximately and Cancel', !!g.place && !!g.cancel,
+			JSON.stringify(g));
+		if (g.place && g.cancel) {
+			// Cancel is the last thing in the box, so its right edge is the box's own, give or
+			// take the padding.
+			ok('...and Cancel is hard against the RIGHT edge of the box',
+				g.box.r - g.cancel.r <= 14, Math.round(g.box.r - g.cancel.r) + ' px of padding');
+			ok('...with Place approximately immediately to its left, on the same line',
+				g.place.r <= g.cancel.l + 1 && Math.abs(g.place.t - g.cancel.t) < 2,
+				Math.round(g.cancel.l - g.place.r) + ' px apart');
+			// And the two that merely help you look around are on the LEFT of both of them, which
+			// is the half that makes the right-hand pair mean something.
+			ok('...and Search and Go to are to the LEFT of both',
+				!!g.search && !!g.goto && g.search.r < g.place.l && g.goto.r < g.place.l,
+				g.search && g.goto ? Math.round(g.place.l - g.goto.r) + ' px of gap' : 'missing');
+		}
+	}
+
 	for (const L of LAYOUTS) {
 		await send('Emulation.setDeviceMetricsOverride',
 			{ width: L.w, height: L.h, deviceScaleFactor: 1, mobile: false });
