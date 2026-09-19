@@ -678,6 +678,18 @@ measurable: the GANG route alone is the whole of that gain at the fit zoom -- 7-
   feature (automatic text sizing) that should be judged on its own. Full record:
   `dev/label-placement-algorithms.md` §10.
 
+**AND HIS WIDTH QUESTION IS NOW ANSWERED, WITH NOTHING SHIPPED -- which is exactly why he tested the
+branch and saw no change.** *"There is no good reason for a single label of any type to place
+differently... Placement in the open area should be identical for ID regardless of length of prefix
+or suffix."* **In the open area it already is**, and that is asserted twice now:
+`dev/lpn-spike/label-width-stability-harness.js` part 1 holds it at the placer and part 3 holds it
+through the whole page -- a real document, the real refresh, five affix settings, **13 of 13 labels
+drawn and 0 of 13 moving**. Its crowded control moves 9 of 13 and hides 2, so the zero is a
+measurement that can still see. **Where labels TOUCH, width cannot be made immaterial without putting
+text on text**, and the leftover movement is the greedy cascade: §16c measured three contained ways
+to damp it and all three cost drawn labels. Removing it means global assignment over the conflict
+graph, which is **his call** and not a tuning change. §16f and §16g.
+
 ### Task 322 half B: the counting method found four rounded constants
 
 **`unit_factor_check.php` re-derives every `$ec_units` factor and had never read a line of

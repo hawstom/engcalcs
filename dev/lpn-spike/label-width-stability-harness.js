@@ -25,13 +25,18 @@
 // label at once and the first such fall happens somewhere else, and the rest of the drawing follows
 // it. So the sensitivity tracks how over-subscribed the view is, which is what part 2 records.
 //
+// **PART 3 ASSERTS THE SAME PROPERTY THROUGH THE WHOLE PAGE**, because part 1 proves it about the
+// placer and his sentence is about the product: a real document, the real refresh, the real shed and
+// repair, with a crowded control beside it so the open-ground zero cannot be a measurement that has
+// gone blind. Section 16f.
+//
 // **PART 1 IS THE PROPERTY ITSELF, ON A DRAWING WHERE IT MUST HOLD.** Nodes spaced far apart
 // relative to their labels: nothing touches at any width, so every label must choose the same
 // candidate at every width. That is the assertion Tom can state in one sentence, and it should have
 // existed already. Part 2 is his own drawing, where labels do touch, and is a RATCHET -- the counts
 // may FALL and may not RISE.
 //
-// dev/label-placement-algorithms.md section 13 is the record, including the three candidate fixes
+// dev/label-placement-algorithms.md section 16 is the record, including the three candidate fixes
 // that were built and measured and all cost drawn labels.
 
 'use strict';
@@ -185,6 +190,170 @@ function partTwo() {
 	});
 }
 
+// ---- part 3: the same property, through the WHOLE PAGE ----------------------------------------
+//
+// **PART 1 PROVES IT ABOUT THE PLACER; THIS PROVES IT ABOUT THE PRODUCT, and they are not the same
+// claim.** Part 1 calls placeLabelsFirstFit() directly with hand-built specs, so everything between
+// the drawing and the placement is missing: nodeFirstFitSpec()'s candidate set, the value shed,
+// the gang repair, the crossing shed, and dataLabelOrigin()'s choice of which side of the endpoint
+// the text hangs on. Tom does not drive placeLabelsFirstFit(); he types into the Before box on a
+// drawing. So the invariant has to be asserted where he states it.
+//
+// **THE FIXTURE IS OPEN GROUND AND NO MORE THAN OPEN**, for the reason part 1 gives: nodes are
+// spaced about three of the widest label's widths apart, so nothing touches at any affix and a
+// placer whose claim grew with its text would run out of room at the widest. The positive control
+// below is the same drawing at a quarter of the spacing, where labels genuinely collide -- if that
+// does NOT move, the measurement has stopped being able to see movement and the open-ground result
+// means nothing.
+//
+// **BOTH AFFIXES, because his sentence names both**: *"Placement in the open area should be
+// identical for ID regardless of length of prefix or suffix."*
+// The scale both fixtures are read at: it frames the 400-unit grid with room round it.
+const OPEN_SCALE = 700 / (400 * 4);
+const AFFIXES = [
+	{ tag: 'none', prefix: '', suffix: '' },
+	{ tag: 'prefix 1=', prefix: '1=', suffix: '' },
+	{ tag: 'prefix 1234=', prefix: '1234=', suffix: '' },
+	{ tag: 'suffix =1234', prefix: '', suffix: '=1234' },
+	{ tag: 'both', prefix: '1234=', suffix: '=1234' }
+];
+
+// A plain XY project: a 4 x 3 grid of junctions chained into one run, plus a reservoir feeding it.
+// No solve is needed and none is run -- only the node ID is switched on, so the label is one row of
+// text and its width is the only thing the affixes move.
+function sparseDoc(spacing) {
+	const nodes = [], links = [];
+	for (let i = 0; i < 12; i++) {
+		nodes.push({ id: 'J' + (i + 1), type: 'junction',
+			x: (i % 4) * spacing, y: Math.floor(i / 4) * spacing, elev: 100, _demand: 5 });
+	}
+	nodes.push({ id: 'R1', type: 'reservoir', x: -spacing, y: 0, head: 200 });
+	for (let i = 0; i + 1 < 12; i++) {
+		links.push({ id: 'P' + (i + 1), type: 'pipe', from: nodes[i].id, to: nodes[i + 1].id,
+			diam: 200, rough: 130, verts: [] });
+	}
+	links.push({ id: 'P0', type: 'pipe', from: 'R1', to: 'J1', diam: 300, rough: 130, verts: [] });
+	return { format: 'hawsedc-lpn', v: 6,
+		project: { name: 'open-ground', activeScenario: 'base' },
+		scenarios: [{ id: 'base', name: 'Base', isBase: true, overrides: {} }],
+		nodes: nodes, links: links, labels: [] };
+}
+
+// Where each node's label ended up, AS AN OFFSET FROM ITS OWN NODE -- which is the quantity Tom's
+// sentence is about. An absolute position would move with the node and say nothing.
+function offsetsAt(L, spacing) {
+	const doc = L.getDoc(), nodeEls = L.nodeEls(), out = {};
+	doc.nodes.forEach(function (n) {
+		const ne = nodeEls[n.id];
+		if (!ne) { out[n.id] = 'missing'; return; }
+		if (ne.hiddenDropped || ne.hiddenCrossed) { out[n.id] = 'hidden'; return; }
+		const at = L.nodeAt(n), end = L.nodeLabelPos(n);
+		// Rounded to a thousandth of the node spacing: the assertion is "the same spot", not "the
+		// same float", and a spacing-relative tolerance keeps the two fixtures comparable.
+		const q = function (v) { return Math.round(v / spacing * 1000) / 1000; };
+		out[n.id] = ne.side + ':' + q(end.x - at.x) + ',' + q(end.y - at.y);
+	});
+	return out;
+}
+
+function runDocument(spacing) {
+	const fsmod = require('fs');
+	const stub = require('./lpn-dom-stub.js');
+	const { loadLoopedNetwork, setUnitSet } = stub;
+	setUnitSet('us');
+	const L = loadLoopedNetwork(
+		"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
+		"\t\t\tworld = el('g', {}, svg);\n" +
+		"\t\t\tbasemapLayer = el('g', {}, world); basemapEls = {};\n" +
+		"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
+		"\t\t\tmodelLayer = el('g', {}, world);\n" +
+		"\t\t\tlinksLayer = el('g', {}, modelLayer); nodesLayer = el('g', {}, modelLayer);\n" +
+		"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+		"\t\t\trubberBandEl = el('line', {}, world); },\n" +
+		"\t\tapplySaved: applySaved, buildDom: buildDom, noteMapSized: noteMapSized,\n" +
+		"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
+		"\t\tsetView: function (v) { return applyView(v); },\n" +
+		"\t\tgetDoc: function () { return doc; },\n" +
+		"\t\trefreshLabelText: refreshLabelText,\n" +
+		"\t\tlabelSettings: function () { return labelSettings; },\n" +
+		"\t\tsettings: function () { return settings; },\n" +
+		"\t\tnodeEls: function () { return nodeEls; },\n" +
+		"\t\tnodeAt: nodeAt, nodeLabelPos: nodeLabelPos"
+	);
+	L.buildLayers();
+	L.setCanvas(1400, 900);
+	L.applySaved(sparseDoc(spacing));
+	L.buildDom();
+	L.noteMapSized();
+	const ls = L.labelSettings();
+	// THE NODE ID ALONE, which is Tom's own test case. Every other field off, so the label is one
+	// row and the affix is the only thing that can change its width.
+	Object.keys(ls.node).forEach(function (k) { ls.node[k] = (k === 'id'); });
+	Object.keys(ls.link).forEach(function (k) { ls.link[k] = false; });
+	// **THE SCALE IS FIXED AND THE SPACING VARIES, which is the only way the two fixtures differ at
+	// all.** Deriving the scale from the spacing was tried first and is the trap: a label is sized
+	// in SCREEN units, so scaling the view with the drawing reproduces the identical picture and the
+	// crowded control was byte-for-byte the open one -- a control that varies nothing.
+	if (!L.setView({ cx: spacing * 1.5, cy: spacing, s: OPEN_SCALE })) {
+		throw new Error('view refused at spacing ' + spacing);
+	}
+	const seen = [];
+	AFFIXES.forEach(function (a) {
+		ls.prefix.node.id = a.prefix;
+		ls.suffix.node.id = a.suffix;
+		L.refreshLabelText();
+		seen.push({ tag: a.tag, off: offsetsAt(L, spacing) });
+	});
+	return seen;
+}
+
+function documentChild(spacing) {
+	const r = spawnSync(process.execPath, [__filename, '--document', String(spacing)],
+		{ cwd: __dirname, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 300000 });
+	const m = /@@JSON@@(.*)/.exec(r.stdout || '');
+	if (!m) { return { error: (r.stderr || r.stdout || 'no output').split('\n').slice(-8).join(' ') }; }
+	return JSON.parse(m[1]);
+}
+
+// How many node labels sit somewhere else than they did with no affix at all.
+function movedAgainstBase(seen) {
+	const base = seen[0].off;
+	return seen.slice(1).map(function (s) {
+		let n = 0;
+		Object.keys(base).forEach(function (k) { if (s.off[k] !== base[k]) { n++; } });
+		return { tag: s.tag, moved: n };
+	});
+}
+
+function partThree() {
+	// **ONE DOCUMENT PER PROCESS** -- lpn-dom-stub's own rule, and the reason both fixtures are
+	// spawned rather than run here: a second document loaded into a page that already holds one
+	// inherits its elements' measured widths.
+	const open = documentChild(400);
+	if (open.error) { report(false, 'open ground, through the page', open.error); return; }
+	const rows = movedAgainstBase(open);
+	const total = Object.keys(open[0].off).length;
+	const hidden = Object.keys(open[0].off).filter(function (k) {
+		return open[0].off[k] === 'hidden' || open[0].off[k] === 'missing';
+	}).length;
+	const worst = rows.reduce(function (m, r) { return Math.max(m, r.moved); }, 0);
+	report(!hidden, 'open ground: every node label is drawn before anything is asserted',
+		total - hidden + ' of ' + total + ' drawn');
+	report(worst === 0, 'open ground, through the page: the affix does not move a label',
+		rows.map(function (r) { return r.tag + ' ' + r.moved; }).join(', ') + ' of ' + total);
+
+	// **THE POSITIVE CONTROL, and it is the whole defence of the result above.** The same drawing at
+	// a quarter of the spacing, where the labels genuinely reach each other. If this does NOT move,
+	// the measurement has gone blind and the open-ground zero means nothing.
+	const tight = documentChild(100);
+	if (tight.error) { report(false, 'control: the crowded drawing', tight.error); return; }
+	const trows = movedAgainstBase(tight);
+	const tworst = trows.reduce(function (m, r) { return Math.max(m, r.moved); }, 0);
+	report(tworst > 0, 'control: the same drawing crowded, where the affix DOES move labels',
+		trows.map(function (r) { return r.tag + ' ' + r.moved; }).join(', ')
+			+ ' of ' + Object.keys(tight[0].off).length);
+}
+
 // ---- the selftest: a check that passes by finding nothing is a check that can die -------------
 //
 // Part 1 passes today, so it is a GUARD and not a repair -- which is exactly the shape that stops
@@ -242,6 +411,11 @@ function selftest() {
 }
 
 async function main() {
+	if (process.argv[2] === '--document') {
+		const seen = runDocument(Number(process.argv[3]));
+		process.stdout.write('@@JSON@@' + JSON.stringify(seen) + '\n', function () { process.exit(0); });
+		return;
+	}
 	if (process.argv[2] === '--measure') {
 		const views = await measure(process.argv[3]);
 		process.stdout.write('@@JSON@@' + JSON.stringify(views) + '\n', function () { process.exit(0); });
@@ -253,7 +427,7 @@ async function main() {
 	console.log('--- only the label width changes; the placement must not ---');
 	partOne(require(ROOTJS).lpnCollide);
 	selftest();
-	if (process.argv[2] !== '--selftest') { partTwo(); }
+	if (process.argv[2] !== '--selftest') { partThree(); partTwo(); }
 	console.log(`\n${checks - failures}/${checks} checks passed.`);
 	process.exit(failures ? 1 : 0);
 }

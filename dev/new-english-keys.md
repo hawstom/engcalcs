@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 104 untranslated keys, of 1973 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**64 still to read on master**, of 112 untranslated keys, of 1981 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,8 +25,11 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (104, 56 to read @@ NEEDS RULING)
+## lpn_  (112, 64 to read @@ NEEDS RULING)
 
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
   _Ruled OK 2026-09-17._
@@ -54,6 +57,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_inp_export_flat_coords`**
   > An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.
   _Ruled 2026-09-17: This is unclear. Please proofread and reword._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  @@ NEEDS RULING
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
 - **`lpn_library_import`**
   > Import libraries…
   @@ NEEDS RULING
@@ -98,6 +107,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_library_import_units_line`**
   > {name}: this project shows {mine}, the file shows {theirs}.
+  @@ NEEDS RULING
+- **`lpn_settings_label_always`**
+  > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_auto`**
+  > Automatic: {width}
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width`**
+  > Widest view that shows labels (map units)
+  @@ NEEDS RULING
+- **`lpn_settings_label_max_width_tip`**
+  > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
+  @@ NEEDS RULING
+- **`lpn_settings_label_use_view`**
+  > Use current view
   @@ NEEDS RULING
 - **`lpn_survey_axis_east`**
   > Easting
@@ -344,7 +368,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**54 still to read**, of 81 new keys across 6 unmerged branch(es).
+**57 still to read**, of 84 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -355,7 +379,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-demands (`d145512d`) — 30 new, 18 to read @@ NEEDS RULING
+### chore/handoff-2026-09-18 (`b2571821`) — adds no English strings
+
+### feat/customer-demands (`0476f882`) — 32 new, 20 to read @@ NEEDS RULING
 
 - **`lpn_customer_detached`**
   > ⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.
@@ -392,6 +418,12 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-17._
 - **`lpn_field_meter_lumped_tip`**
   > The node that this customer's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.
+  @@ NEEDS RULING
+- **`lpn_field_meter_offset`**
+  > Offset from the pipe
+  @@ NEEDS RULING
+- **`lpn_field_meter_offset_tip`**
+  > How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.
   @@ NEEDS RULING
 - **`lpn_field_meter_pipe`**
   > Connected asset
@@ -448,20 +480,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`1c6f394e`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_settings_label_always`**
-  > Always show labels
-  @@ NEEDS RULING
-- **`lpn_settings_label_max_width`**
-  > Widest view that shows labels (map units)
-  @@ NEEDS RULING
-- **`lpn_settings_label_max_width_tip`**
-  > Labels are shown only while the view is narrower than this. Leave the box blank to always show them. A text object you added shows until the view is this much wider than its own size multiplier.
-  @@ NEEDS RULING
-- **`lpn_settings_label_use_view`**
-  > Use current view
-  @@ NEEDS RULING
+### feat/label-gang-search (`41cc0833`) — adds no English strings
 
 ### feat/lock-initials-later (`37f05c7e`) — 15 new, 3 to read @@ NEEDS RULING
 
@@ -511,7 +530,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/xy-world-map (`b6433f21`) — 30 new, 27 to read @@ NEEDS RULING
+### feat/xy-world-map (`b7663a36`) — 35 new, 32 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
@@ -569,6 +588,21 @@ build for that would be a gate nobody keeps. Refresh it with
   _Ruled OK 2026-09-17._
 - **`lpn_mapgeo_cancelled`**
   > The world map is back where it was, and your drawing never moved.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_help`**
+  > Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size`**
+  > Map size
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size_read`**
+  > {f} times
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn`**
+  > Turn the map
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn_read`**
+  > {d} degrees
   @@ NEEDS RULING
 - **`lpn_mapgeo_finish`**
   > Georeference here

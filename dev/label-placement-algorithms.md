@@ -1272,6 +1272,53 @@ no constraint on width"* is true of open ground, where part 1 of
 widths; it is not true of the fit view of this drawing, where at `123=` the labels are wider apart
 than they are spaced.
 
+### 16f. Asserted a second time THROUGH THE WHOLE PAGE, and the control that makes it mean something
+
+Section 16e settles what moves a label in a crowded view. It does not settle Tom's sentence, because
+his sentence is about the OPEN area and part 1 of the harness proved the open-area case about
+`placeLabelsFirstFit()` alone -- hand-built specs, straight into the placer. Everything he actually
+drives sits between him and that call: `nodeFirstFitSpec()`'s candidate set, the value shed, the gang
+repair, the crossing shed, and `dataLabelOrigin()`'s choice of which side of the endpoint the text
+hangs on. Any of those could have carried a width dependence the placer does not have.
+
+**Part 3 asserts it where he states it.** A 12-junction grid and a reservoir, node ID alone, five
+affix settings -- none, `1=`, `1234=`, `=1234`, and both at once -- read through `applySaved()`,
+`buildDom()` and `refreshLabelText()`, with each label's offset FROM ITS OWN NODE compared across the
+five. **All 13 labels drawn, and 0 of 13 move at any affix.** The reservoir sits on its left side at
+every width because a pipe leaves it eastward and the open-arc table prunes the top-right corner --
+the same answer five times, which is the point.
+
+**The control is the whole defence of that zero**, and getting it wrong was instructive: the first
+version derived the view scale from the node spacing, which reproduces the identical picture, so the
+"crowded" fixture was byte-for-byte the open one and the control varied nothing. With the scale held
+fixed and only the spacing quartered, the same drawing moves **4 labels at `1=`, 9 at `1234=`, and at
+both affixes together 2 labels are hidden outright and two commit more than four node spacings away
+on a leader.** That is the cascade of section 16b in miniature, on a drawing small enough to read.
+
+### 16g. The conclusion, and why no fix was shipped
+
+**In open ground the invariant already holds, and now holds under two independent assertions.** No
+code change would make it hold any harder.
+
+**Where labels touch, width cannot be made immaterial, and that is a matter of logic rather than of
+effort.** A wider label genuinely does not fit in a gap a narrower one fits in; a placer that ignored
+the width would place text on top of text. What is left over -- a label moving because some OTHER
+label fell through and took its ground -- is the greedy cascade, and section 16c measured three
+contained attempts to damp it. All three cost drawn labels, including the one whose reasoning said it
+could not. **Nothing was shipped on this branch for that reason, which is why Tom saw no change when
+he tested it.** Removing the cascade means global assignment over the conflict graph (section 6),
+which is a different placement paradigm and his call to make, not a tuning change.
+
+**Two more contained ideas were put and both are already answered by the code, which is worth
+recording so they are not proposed a fourth time.** *Order the candidates by something that does not
+depend on the box size* -- they already are: the four corners come in a fixed order pruned by the
+open-arc table, and the polar raster behind them is generated from `defaultLabelOffset()` and the
+reach floor, neither of which reads the text. **The candidate ORDER is already width-invariant; what
+width changes is which candidate is CLEAR.** And *test the candidate ANCHOR rather than the whole box
+when nothing is nearby* -- where nothing is nearby the whole box is clear anyway, so that changes
+nothing in the open case it was aimed at, and where something IS nearby it is the proposal to ignore
+the collision, which is text on text.
+
 ## 17. The labeling threshold's own default, measured (Task 669, 2026-09-18)
 
 Tom, 2026-09-18: *"Widest view: Good. Now we need a default. How about when text height is larger

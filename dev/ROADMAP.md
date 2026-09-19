@@ -943,6 +943,13 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
+  - **HIS WIDTH QUESTION IS ANSWERED AND NOTHING SHIPPED, WHICH IS WHY HE SAW NO CHANGE.** In open
+    ground the placement is already identical at every prefix and suffix -- asserted twice now, at
+    the placer and through the whole page, with a crowded control beside it
+    (`dev/lpn-spike/label-width-stability-harness.js`, §16f). Where labels TOUCH, width cannot be
+    made immaterial without putting text on text; the leftover movement is the greedy cascade, and
+    all three contained damping attempts cost drawn labels (§16c). Removing it is a different
+    placement paradigm and is **his call**, §16g.
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
   file, then import anything that is not a name conflict, that probably would be all that's needed."*
