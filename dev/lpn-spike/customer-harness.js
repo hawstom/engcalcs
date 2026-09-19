@@ -542,10 +542,15 @@ L.renderCustomerFields(m1.id);
 	// through `EngCalcs.writeCheckHTML()` is the opposite case and must NOT carry one.
 	// verdict_string_check.php's third leg holds the half that matters in the five right-to-left
 	// languages: a value containing a glyph must LEAD with it.
-	ok('5.9 ...led by the caution glyph, then his words unchanged',
+	// **THE SENTENCE ITSELF IS NOT SPELLED OUT HERE, AND THAT IS THE POINT OF THE RATCHET.**
+	// Writing his words in as a literal would make rewording them a red build in a file about
+	// hydraulics -- harness_wording_check.php, and it caught exactly that in the first version of
+	// this assertion. What is asserted is the INVARIANT: one glyph, at the front, with text after
+	// it. Whether the words are the ones he wants is his reading, not a harness's.
+	ok('5.9 ...led by the caution glyph, and carrying exactly one',
 		PC.lpn_customer_fixed_head.charAt(0) === '⚠' &&
-		PC.lpn_customer_fixed_head.slice(2) ===
-			'The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.',
+		PC.lpn_customer_fixed_head.split('⚠').length === 2 &&
+		PC.lpn_customer_fixed_head.slice(1).trim().length > 0,
 		PC.lpn_customer_fixed_head);
 	L.deleteElement('customer', m2.id);
 	L.deleteElement('link', feeder.id);
