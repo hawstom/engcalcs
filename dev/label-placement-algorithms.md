@@ -1244,6 +1244,34 @@ would take zooming out about 3.3x further than the fit view to reach it. His own
 absurdity, not a remedy for the crowded-view lottery above.
 
 
+### 16e. Confirmed independently: nothing distant votes, and every blocker is a touch
+
+Section 16b's claim is the one Tom's sentence stands or falls on, so it was re-measured from the
+other side, on a second pass that knew nothing about the first. For the FIT view of Net3-World with
+the node ID alone, the first-fit's inputs were captured and replayed in its own committing order,
+and for every label that chose a different spot at `123=` than at `1=` the sides it gave up were
+re-tested against the obstacle set as it stood when that label was placed.
+
+Widening the prefix grows the label box **67%** (0.00349 to 0.00582 degrees wide, 0.00235 tall).
+33 of 97 node labels then choose a different spot. Of those 33:
+
+| | |
+|---|---|
+| moved with a genuinely blocked side they had used before | **32 of 33** |
+| the one that did not | `n:River`, moved by the repair pass, not by the first fit |
+| depth of the shallowest overlap that blocked one, in label heights | min 0.01, **median 0.22**, max 1.25 |
+| distance from the anchor to that blocker, in label widths | min 0.20, **median 0.61**, max 2.22 |
+| overlaps shallower than 1% of a label height | 1 |
+| blockers further than three label widths away | **0** |
+
+**So there is no epsilon and no distant obstacle anywhere in it.** The typical blocking overlap is a
+fifth of a text row deep against a label whose anchor is closer than one label width -- two labels
+touching, which is what a placement pass is for. *"Width in this case is immaterial because there is
+no constraint on width"* is true of open ground, where part 1 of
+`dev/lpn-spike/label-width-stability-harness.js` now asserts the placement is identical at four
+widths; it is not true of the fit view of this drawing, where at `123=` the labels are wider apart
+than they are spaced.
+
 ## 17. The labeling threshold's own default, measured (Task 669, 2026-09-18)
 
 Tom, 2026-09-18: *"Widest view: Good. Now we need a default. How about when text height is larger
