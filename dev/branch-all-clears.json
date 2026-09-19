@@ -35,6 +35,13 @@
             "words": "feat/library-import: Done. Merge and delete.",
             "context": "Cleared after his second round of testing. His three findings from the first round were all built before he cleared it: undo did not work (the document WAS being restored; the Libraries box was never rebuilt by undo, so it still listed rows that had gone), the wizard was not under File, and nothing said the incoming file's numbers were in different units. His own wording for the units warning was used verbatim, opening with 'Warning' and 'Not recommended', and the per-section buttons were removed so the File menu row is the only door -- which reversed an earlier instruction of his asking for both."
         },
+        "feat/customer-demands": {
+            "head": "0476f882",
+            "date": "2026-09-18",
+            "words": "feat/customer-demands: Nice. Let's call it done, merge it, and delete it.",
+            "context": "Cleared in the same message as two other branch reports, after he had tested the branch on its preview port. THE COMMIT HE CLEARED IS THE OFFSET ONE and that is the point of the pin: Offset beside Station, in the properties box and in the customers table, was the thing he had asked for TWICE and had twice not been given -- 'I told you to add Offset in properties and tables. Do it.' He cleared the branch in the round after it finally landed. Nothing else was added between his test and this record.",
+            "pin_note": "PINNED TO THE SHORT SHA AS HE CLEARED IT. The branch was 8 commits BEHIND master when he cleared it, and master was deliberately NOT merged into the branch afterwards -- doing so would have moved the head and lapsed his approval for no gain, since the merge into master resolves the same divergence and is the tree the suite actually runs on."
+        },
         "feat/survey-import": {
             "head": "f4ef6cdea957cd5353f6b285bd04a78b44e0e1f3",
             "date": "2026-09-18",
