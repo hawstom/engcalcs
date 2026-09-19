@@ -443,7 +443,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**64 still to read**, of 79 new keys across 9 unmerged branch(es).
+**63 still to read**, of 78 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -454,11 +454,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-1 (`9eb1b163`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_time_run_note`**
-  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
-  @@ NEEDS RULING
+### chore/review-round-1 (`01cee19f`) — adds no English strings
 
 ### feat/customer-find-labels (`18ef2788`) — 7 new, 7 to read @@ NEEDS RULING
 
@@ -598,7 +594,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/xy-world-map (`48ac9490`) — 33 new, 30 to read @@ NEEDS RULING
+### feat/xy-world-map (`4505b5db`) — 33 new, 30 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
@@ -700,7 +696,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### fix/esc-focus-and-recalc (`bdf0b552`) — adds no English strings
+### fix/esc-focus-and-recalc (`d9b2be9d`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 
