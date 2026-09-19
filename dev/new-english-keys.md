@@ -440,7 +440,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**65 still to read**, of 80 new keys across 8 unmerged branch(es).
+**68 still to read**, of 83 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -451,13 +451,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-2 (`fa446c35`) — 1 new, 1 to read @@ NEEDS RULING
+### chore/review-round-2 (`960fe30a`) — adds no English strings
 
-- **`lpn_manual_results_cleared`**
-  > The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.
-  @@ NEEDS RULING
-
-### feat/customer-find-labels (`4f15643b`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/customer-find-labels (`ffd11548`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
@@ -474,11 +470,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_meter_pattern_unknown`**
   > No pattern in this project is named {id}, so the customer was left as it was.
   @@ NEEDS RULING
-- **`lpn_settings_customer_symbology`**
-  > Customer symbology
-  @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
+  @@ NEEDS RULING
+- **`lpn_settings_sec_symbology`**
+  > Symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sym_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_settings_sym_customer`**
+  > Customer
+  @@ NEEDS RULING
+- **`lpn_settings_sym_link`**
+  > Link
+  @@ NEEDS RULING
+- **`lpn_settings_sym_node`**
+  > Node
   @@ NEEDS RULING
 - **`lpn_time_run_note`**
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
@@ -699,6 +707,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_run_note`**
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
+
+### fix/recalc-trust-user (`313a8656`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 

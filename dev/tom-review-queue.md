@@ -107,9 +107,9 @@ CONSENT, and both of those choices were this repository deciding for him what he
 
 ### On master -- the recalculate-off fix overreached
 
-- [ ] R-046 fix/recalc-trust-user | Recalc off Old values: Leave in place stale. Don't clear. Trust the user.
-- [ ] R-047 fix/recalc-trust-user | Calculate on open: No. **Off means off**; you say it, but do you believe it? Consent, people! And the industry is used to that.
-- [ ] R-049 fix/recalc-trust-user | Escape: What about mouse away and I don't click away, then I press Esc? I want to be very severe against accidental Esc closures of the boxes.
+- [x] R-046 fix/recalc-trust-user | Recalc off Old values: Leave in place stale. Don't clear. Trust the user. -- fix/recalc-trust-user 313a8656 -- stale numbers stay exactly where they are, and the page says nothing about them. Key `lpn_manual_results_cleared` DELETED
+- [x] R-047 fix/recalc-trust-user | Calculate on open: No. **Off means off**; you say it, but do you believe it? Consent, people! And the industry is used to that. -- fix/recalc-trust-user 313a8656 -- MEASURED: opening Net3 with the box unticked now produces ZERO solves; ticked, it still calculates, which is what makes the zero mean something
+- [x] R-049 fix/recalc-trust-user | Escape: What about mouse away and I don't click away, then I press Esc? I want to be very severe against accidental Esc closures of the boxes. -- fix/recalc-trust-user 313a8656 -- Escape reaches a box only when focus is inside it AND the pointer is on it. The pointer is believed only once a mouse has been used on the page, so a keyboard-only reader is never stranded
 
 ### Process
 
@@ -117,11 +117,11 @@ CONSENT, and both of those choices were this repository deciding for him what he
 
 ### feat/customer-find-labels
 
-- [ ] R-050 feat/customer-find-labels | Settings: Let's try changing main heading Visualization to Symbology and its subheadings to Node, Link, Customer, and All.
-- [ ] R-051 feat/customer-find-labels | The labels are hiding the service line. They need to be moved away about 1px or 2px or their halo needs to be that much smaller.
-- [ ] R-052 feat/customer-find-labels | When a label is beyond the meter, make it middle justified with the meter instead of bottom.
-- [ ] R-053 feat/customer-find-labels | Like most of the label placement, I see a mystery. I see a row of labels along the service lines with a few beyond the meter. I see that these would conflict with a link label, but if so, maybe we should calculate the standard location for all to accomodate a link label.
-- [ ] R-054 feat/customer-find-labels | As you can see in the image, Customer labels are still a vastly different size than other labels. Fix that.
+- [x] R-050 feat/customer-find-labels | Settings: Let's try changing main heading Visualization to Symbology and its subheadings to Node, Link, Customer, and All. -- feat/customer-find-labels ffd11548 -- Symbology, with Node, Link, Customer, All. CONFIRMED by the pre-reviewer: five keys renamed across all 27 files, zero references to an old name left anywhere
+- [x] R-051 feat/customer-find-labels | The labels are hiding the service line. They need to be moved away about 1px or 2px or their halo needs to be that much smaller. -- feat/customer-find-labels ffd11548 -- the LABEL moved, not the halo, because the halo style is shared by every label on the page. Clearance was EXACTLY ZERO and is now about 1.4 px. CONFIRMED by the pre-reviewer, mutation-tested independently
+- [x] R-052 feat/customer-find-labels | When a label is beyond the meter, make it middle justified with the meter instead of bottom. -- feat/customer-find-labels ffd11548 -- CONFIRMED by the pre-reviewer, including that it is genuine centring rather than a fixed nudge
+- [ ] R-053 feat/customer-find-labels | Like most of the label placement, I see a mystery. I see a row of labels along the service lines with a few beyond the meter. I see that these would conflict with a link label, but if so, maybe we should calculate the standard location for all to accomodate a link label. -- **YOU WERE RIGHT AND THE BRANCH SAID YOU WERE WRONG.** A first answer concluded the blocker is never a link label; the pre-reviewer found its test drawing put customers at round numbers while a long pipe REPEATS its label at two other points, so the case was never tested. One customer placed at a repeat point: `DROPPED -- first blocked by label of L1`. **A link label does block, and when it does the customer label disappears entirely rather than moving.** Back with the build agent
+- [x] R-054 feat/customer-find-labels | As you can see in the image, Customer labels are still a vastly different size than other labels. Fix that. -- feat/customer-find-labels ffd11548 -- MEASURED: 11 px against 2.75 px for node and link at 4x zoom. The routine that re-sizes labels ON ZOOM had never been told about customers, so a customer label kept the size it had at the zoom it was last composed at. CONFIRMED and re-derived independently by the pre-reviewer, which also traced every zoom door
 
 ### feat/xy-world-map
 

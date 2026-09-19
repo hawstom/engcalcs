@@ -878,7 +878,6 @@
         "lpn_run_menu_tip": "Recalculate this network now. The Calculate button is hidden when the \"Recalculate automatically\" setting is on; turn that setting off in Settings, Calculation, Hydraulics to bring the button back.",
         "lpn_settings_auto_run": "Recalculate automatically",
         "lpn_settings_auto_run_tip": "Hides the Calculate button and recalculates after any edit. Turn off if recalculation is too slow.",
-        "lpn_manual_results_cleared": "The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.",
         "lpn_time_run_slow": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.",
         "lpn_time_no_report": "There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.",
         "lpn_menu_settings": "Settings",
@@ -2006,7 +2005,7 @@
         "lpn_survey_note_gpx_rtept": "The file also holds {detail} route point(s), which were not made into junctions.",
         "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
-    "count": 2004,
+    "count": 2003,
     "active_prefixes": [
         "about",
         "bpn",
