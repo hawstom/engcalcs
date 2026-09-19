@@ -951,9 +951,18 @@ the block.
     grow into anything, the same 14 at both zooms, each a node symbol genuinely past the growing
     edge; the other 44 moved because a NEIGHBOUR moved first and their own extra width hit nothing.
     Every named suspect measured zero -- no viewport bound, no grid effect, no reach or side rule
-    reading the width. **The earlier answer to him was wrong and is retracted in §16h.** Damping the
-    amplification was tried three ways and all three cost drawn labels (§16c); removing it is a
-    different placement paradigm and is **his call**, §16g.
+    reading the width. **The earlier answer to him was wrong and is retracted in §16h**; the fourteen
+    are named in §16i.
+  - **THE ROOT DEFECT IS THE DROP, AND IT IS HIS FINDING** (*"there is infinite space available.
+    Moving is fine, but dropping is not"*, §16j). A node label's whole search is at most **28 points,
+    inside ONE wedge between its own pipes, within three resting offsets** -- and it is DROPPED the
+    moment those come up empty. Re-searched against the pass's own obstacle list, **not one dropped
+    label anywhere was actually enclosed**: 32 of 97 vanish from the fit view of Net3-World and all
+    32 had room. **The bad thinking is one sentence in `99de871e` (Task 398, 2026-08-16)** which
+    reversed the standing *"THERE IS NO FAILURE CONDITION"* rule on the ground that *"neither side is
+    clear is a fact rather than a judgement"* -- it is a fact about 28 points, not about the plane
+    (§16k). **Remove the bounds BEFORE damping the churn**; the damping option is judged a
+    papering-over in §16l, and cannot draw one extra label.
 - 100|611| **Import a library (pipe types, fittings, curves) from another project file.**
   Tom, 2026-09-08: *"If the Libraries have Import buttons that ask for selecting another project
   file, then import anything that is not a name conflict, that probably would be all that's needed."*

@@ -58,10 +58,14 @@ const ROOTJS = path.join(ROOT, 'js/lpn-collide.js');
 // Two views of Tom's own drawing plus one synthetic drawing packed tight enough that a label really
 // does have a node symbol one label-width away -- the BOUNDED case, kept so the classifier can be
 // seen separating it from the unbounded ones rather than only asserted about them.
+// **`roomCeiling` IS A RATCHET ON THE DEFECT ITSELF: labels dropped while they still had room.**
+// Measured 2026-09-19, narrow and wide. Not one drop anywhere was genuinely enclosed, so these are
+// entirely the three bounds coming up empty on ground that was there. **The numbers may FALL and may
+// not RISE** -- lower them when a fix lands. An honest fix takes them to zero.
 const FIXTURES = [
-	{ tag: 'synthetic crowded', kind: 'synthetic', arg: 100 },
-	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000 },
-	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000 }
+	{ tag: 'synthetic crowded', kind: 'synthetic', arg: 100, roomCeiling: { narrow: 0, wide: 0 } },
+	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 12, wide: 32 } },
+	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 1, wide: 5 } }
 ];
 // His own test: the same field, with and without four characters of Before text.
 const NARROW = '', WIDE = '1234=';
@@ -245,6 +249,86 @@ function blockersOf(Collide, boxes, obs, pad, ownerId) {
 	return out;
 }
 
+// ---- WHY IS ANY LABEL EVER DROPPED, WHEN THERE IS SPACE? (Tom, 2026-09-18) ---------------------
+//
+// **His words: *"But there is infinite space available. Moving is fine, but dropping is not."*** So
+// the question is not how far a label travelled, it is why the pass ever answered "nowhere" on a
+// plane that has somewhere. The answer is that the candidate set is bounded THREE ways, and a label
+// is dropped the moment those bounds come up empty -- not when the drawing is full:
+//
+//   RADIUS   nodeFirstFitSpec() passes `outer` = max(3 x the resting offset, 1.5 text heights), and
+//            polarCandidates() puts its three rings between the resting offset and that. So nothing
+//            beyond three resting offsets from the node is ever proposed, however empty it is.
+//   ARC      cardinalSides() rasters inside widestArc(arcs) -- the SINGLE widest gap between the
+//            node's own pipes. Every other direction, however open, generates no candidate at all.
+//   COUNT    polarCandidates() stops at `max` (24), filling the inner ring first.
+//
+// This function asks the drawing which of those three bounds actually did it, by re-searching the
+// SAME obstacle list the pass had, in three widening regimes. It is a diagnosis, not a proposal:
+// nothing here changes a placement.
+function firstClearRadius(Collide, lbl, snap, pad, opts) {
+	const inner = Math.hypot(lbl.home.x - lbl.anchor.x, lbl.home.y - lbl.anchor.y)
+		|| Math.hypot(lbl.w, lbl.h) || 1;
+	const maxR = opts.maxOffsets * inner, arc = opts.arc;
+	for (let r = inner; r <= maxR + 1e-12; r += inner * 0.25) {
+		for (let d = 0; d < 360; d += 10) {
+			if (arc) {
+				// The same window cardinalSides() rasters in, in the same y-down bearings.
+				const a = ((d - arc.start) % 360 + 360) % 360;
+				if (a > (arc.end - arc.start)) { continue; }
+			}
+			const rad = d * Math.PI / 180;
+			const c = { x: lbl.anchor.x + r * Math.cos(rad), y: lbl.anchor.y + r * Math.sin(rad) };
+			if (Collide.boxesClearOf(Collide.labelLineBoxes(lbl, c), snap, pad, lbl.id) === 'clear') {
+				return r / inner;
+			}
+		}
+	}
+	return null;
+}
+// The angular window the raster actually used, recovered from the candidates themselves rather than
+// recomputed -- the widest gap between this node's own pipes, as widestArc() chose it. Found as the
+// complement of the largest circular gap in the bearings that were generated.
+function arcOfCandidates(sides) {
+	const degs = sides.filter(function (s) { return typeof s.deg === 'number'; })
+		.map(function (s) { return ((s.deg % 360) + 360) % 360; }).sort(function (a, b) { return a - b; });
+	if (degs.length < 2) { return null; }
+	let gap = -1, at = 0;
+	for (let i = 0; i < degs.length; i++) {
+		const g = (i === degs.length - 1) ? (degs[0] + 360 - degs[i]) : (degs[i + 1] - degs[i]);
+		if (g > gap) { gap = g; at = i; }
+	}
+	const start = degs[(at + 1) % degs.length];
+	return { start: start, end: start + (360 - gap) };
+}
+// How far, in resting offsets, the real candidate set reached.
+function reachOfCandidates(lbl) {
+	const inner = Math.hypot(lbl.home.x - lbl.anchor.x, lbl.home.y - lbl.anchor.y)
+		|| Math.hypot(lbl.w, lbl.h) || 1;
+	let far = 0;
+	(lbl.sides || []).forEach(function (s) {
+		far = Math.max(far, Math.hypot(s.x - lbl.anchor.x, s.y - lbl.anchor.y));
+	});
+	return far / inner;
+}
+// **ONE DROPPED LABEL, DIAGNOSED AGAINST THE THREE BOUNDS, WIDENING ONE AT A TIME.** The order is
+// the point: each regime relaxes exactly one thing, so whichever regime first finds room is the
+// bound that did it.
+function diagnoseDrop(Collide, lbl, snap, pad) {
+	const arc = arcOfCandidates(lbl.sides || []), reach = reachOfCandidates(lbl);
+	// 1. Its own window and its own reach, sampled DENSELY. The pass had 24 points here; if a dense
+	//    sweep of the same ground finds room, the raster simply did not look closely enough.
+	const dense = firstClearRadius(Collide, lbl, snap, pad, { maxOffsets: reach, arc: arc });
+	if (dense !== null) { return { why: 'the raster RESOLUTION: room inside its own window', at: dense }; }
+	// 2. Same reach, every bearing. Room here means the arc window hid open ground.
+	const allAng = firstClearRadius(Collide, lbl, snap, pad, { maxOffsets: reach, arc: null });
+	if (allAng !== null) { return { why: 'the ARC window: open ground it never looked toward', at: allAng }; }
+	// 3. Every bearing, twenty resting offsets out. Room here means only the reach stopped it.
+	const far = firstClearRadius(Collide, lbl, snap, pad, { maxOffsets: 20, arc: null });
+	if (far !== null) { return { why: 'the RADIUS bound: open ground just beyond its reach', at: far }; }
+	return { why: 'genuinely enclosed out to 20 resting offsets', at: null };
+}
+
 function classify(Collide, runs) {
 	const N = replay(Collide, runs.narrow), W = replay(Collide, runs.wide);
 	function agrees(cap, r) {
@@ -272,7 +356,7 @@ function classify(Collide, runs) {
 	});
 	const movers = Object.keys(N.chosen).filter(function (id) { return W.chosen[id] !== N.chosen[id]; });
 	const tally = { physics: 0, upstream: 0, unclassified: 0 };
-	const rows = [];
+	const rows = [], named = [];
 	movers.forEach(function (id) {
 		const lw = labW[id], ln = labN[id], iN = N.chosen[id];
 		const sides = lw && lw.sides && lw.sides.length ? lw.sides : (lw ? [lw.home] : null);
@@ -324,6 +408,15 @@ function classify(Collide, runs) {
 				return;
 			}
 			tally.physics++;
+			let depth = 0;
+			wideBoxes.forEach(function (b) {
+				const grown = W.pad > 0 ? Collide.box(b.cx, b.cy, b.w + 2 * W.pad, b.h + 2 * W.pad, b.a) : b;
+				depth = Math.max(depth, Collide.boxOverlapDepth(grown, h.o));
+			});
+			// **NAMED, because Tom asked for names**: which node, what it hit, which side, how deep.
+			named.push({ id: id, hit: h.kind + (h.owner ? ' ' + h.owner : ''),
+				side: dirRight ? 'right' : 'left',
+				past: Number((side / lw.h).toFixed(2)), deep: Number((depth / lw.h).toFixed(3)) });
 			rows.push([id, 'grew into a real object, in the direction it grew',
 				h.kind + (h.owner ? ' ' + h.owner : '')
 					+ ' ' + (dirRight ? 'right' : 'left') + ' of the endpoint by '
@@ -343,9 +436,23 @@ function classify(Collide, runs) {
 		tally.unclassified++;
 		rows.push([id, 'blocked by an unchanged object that also touched the narrow box', '']);
 	});
+	// **THE DROPS, AT BOTH WIDTHS.** A drop is the outcome Tom rules out -- *"Moving is fine, but
+	// dropping is not"* -- so each one is asked which of the three bounds produced it.
+	const drops = {};
+	[['narrow', N, labN], ['wide', W, labW]].forEach(function (pair) {
+		const r = pair[1], labs = pair[2], list = [];
+		Object.keys(r.chosen).forEach(function (id) {
+			if (r.chosen[id] >= 0) { return; }
+			const lbl = labs[id];
+			if (!lbl) { return; }
+			const d = diagnoseDrop(Collide, lbl, r.snapshots[id], r.pad);
+			list.push({ id: id, why: d.why, at: d.at === null ? null : Number(d.at.toFixed(2)) });
+		});
+		drops[pair[0]] = list;
+	});
 	return { agreeN: agrees(runs.narrow, N), agreeW: agrees(runs.wide, W),
 		setDiff: setDiff, hDiff: hDiff, total: Object.keys(N.chosen).length,
-		movers: movers.length, tally: tally, rows: rows };
+		movers: movers.length, tally: tally, rows: rows, named: named, drops: drops };
 }
 
 // ---- the parent -------------------------------------------------------------------------------
@@ -375,6 +482,32 @@ function assertFixture(f, res, verbose) {
 			+ ' grew into a real object in the direction they grew, '
 			+ res.tally.upstream + ' followed a neighbour, '
 			+ res.tally.unclassified + ' unclassified');
+	// **THE FOURTEEN, BY NAME.** Tom, 2026-09-18: *"Name names. Tell me which nodes had their labels
+	// run into something real."*
+	if (res.named.length) {
+		console.log('        node        ran into                    side    past the edge   overlap');
+		res.named.sort(function (a, b) { return a.id < b.id ? -1 : 1; }).forEach(function (n) {
+			console.log('        ' + n.id.padEnd(12) + n.hit.padEnd(28) + n.side.padEnd(8)
+				+ (n.past + ' h').padEnd(16) + n.deep + ' h');
+		});
+	}
+	// **A DROP IS THE OUTCOME HE RULES OUT** -- *"Moving is fine, but dropping is not"* -- so it is
+	// asserted, and always printed, never only under a flag.
+	['narrow', 'wide'].forEach(function (w) {
+		const d = res.drops[w];
+		const by = {};
+		d.forEach(function (e) { by[e.why] = (by[e.why] || 0) + 1; });
+		const withRoom = d.filter(function (e) { return e.at !== null; }).length;
+		const enclosed = d.length - withRoom;
+		report(withRoom <= f.roomCeiling[w],
+			f.tag + ' (' + w + '): labels dropped while they still had room',
+			withRoom + ' of ' + res.total + ' dropped with room, ceiling ' + f.roomCeiling[w]
+				+ '; ' + enclosed + ' genuinely enclosed'
+				+ (d.length ? '  -- ' + Object.keys(by).map(function (k) { return by[k] + ' x ' + k; }).join(', ') : ''));
+		if (verbose) { d.forEach(function (e) {
+			console.log('          ' + e.id.padEnd(14) + e.why + (e.at === null ? '' : '  (room at ' + e.at + ' resting offsets)'));
+		}); }
+	});
 	if (verbose) { res.rows.forEach(function (r) {
 		console.log('        ' + r[0].padEnd(14) + r[1] + (r[2] ? '   ' + r[2] : ''));
 	}); }

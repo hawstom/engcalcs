@@ -1351,8 +1351,10 @@ second opinion.
 | Net3-World fit | 58 of 97 | **14** | 44 | **0** |
 | Net3-World 2x | 34 of 97 | **14** | 20 | **0** |
 
-**THE FOURTEEN DO NOT CHANGE WITH THE ZOOM, AND THAT IS THE FINDING.** Only fourteen labels anywhere
-ever grow into anything. Every one of them was checked for DIRECTION, not merely for contact -- the
+**FOURTEEN AT BOTH ZOOMS -- BUT NOT THE SAME FOURTEEN, and that overclaim is corrected here.** It
+was written as *"the same fourteen at both zooms"* before anybody had printed the names; asked for
+them (*"Name names"*), the lists share only `n:183` and `n:241`. The COUNT is stable and the
+membership is not. Only fourteen labels in any one view ever grow into anything. Every one of them was checked for DIRECTION, not merely for contact -- the
 harness fails a blocker that is not on the side the box grew towards -- and every one is a node
 symbol lying past the growing edge, between 0.07 and 1.11 label-heights deep. **The other 44 and 20
 never rejected anything at all with their own extra width**: 63 of those 64 were blocked only by a
@@ -1373,6 +1375,113 @@ side on `end.x >= anchor.x` and reads no width. `cardinalSides()` prunes on the 
 resting offset, never on the box. Nothing reads box area. **The harness asserts all of these, and its
 selftest kills a candidate reach keyed on the box width while leaving a constant shift of every
 candidate uncaught.**
+
+### 16i. THE FOURTEEN, BY NAME
+
+Tom, 2026-09-18: *"Name names. Tell me which nodes had their labels run into something real."* Node
+ID alone, `1234=` against no prefix, distances in label-heights. "Past the edge" is how far the
+blocker's far side lies beyond the growing edge of the box; "overlap" is how deep the wider box sits
+in it. Every one is a node symbol, and every one is on the side the box grew towards -- the harness
+fails any blocker that is not.
+
+| Net3-World, fit zoom | side | past the edge | overlap |   | Net3-World, 2x | side | past the edge | overlap |
+|---|---|---|---|---|---|---|---|---|
+| n:105 | right | 4.61 | 0.666 | | n:107 | right | 5.16 | 0.119 |
+| n:115 | right | 2.95 | 1.109 | | n:169 | left  | 4.54 | 0.738 |
+| n:117 | right | 4.30 | 0.268 | | n:179 | left  | 4.46 | 0.820 |
+| n:121 | right | 5.93 | 0.340 | | n:181 | left  | 4.05 | 0.757 |
+| n:127 | right | 4.29 | 0.947 | | n:183 | right | 3.16 | 1.141 |
+| n:147 | right | 4.97 | 0.066 | | n:193 | left  | 4.04 | 0.834 |
+| n:149 | left  | 4.24 | 0.807 | | n:199 | right | 3.55 | 0.804 |
+| n:183 | right | 3.89 | 0.141 | | n:201 | left  | 2.90 | 0.517 |
+| n:209 | right | 4.75 | 0.530 | | n:205 | right | 3.76 | 0.023 |
+| n:213 | right | 4.16 | 0.208 | | n:207 | right | 3.08 | 0.153 |
+| n:215 | right | 4.39 | 0.273 | | n:217 | left  | 4.69 | 0.022 |
+| n:241 | right | 4.55 | 0.097 | | n:237 | left  | 5.21 | 0.067 |
+| n:251 | right | 3.10 | 0.855 | | n:241 | right | 5.08 | 0.194 |
+| n:271 | right | 2.83 | 0.131 | | n:255 | right | 4.33 | 0.952 |
+
+`node dev/lpn-spike/label-width-cause-harness.js` prints this table on every run.
+
+## 16j. THE ROOT DEFECT: A LABEL IS DROPPED WHILE IT STILL HAS ROOM (2026-09-19)
+
+Tom, on being told fourteen collisions move fifty-eight labels: *"But there is infinite space
+available. Moving is fine, but dropping is not."* **He is right, and this is the finding the whole
+task was missing.**
+
+**THE CANDIDATE SET IS BOUNDED THREE WAYS, AND A LABEL IS DROPPED THE MOMENT THOSE BOUNDS COME UP
+EMPTY -- not when the drawing is full.**
+
+| bound | where | what it says |
+|---|---|---|
+| RADIUS | `nodeFirstFitSpec()` passes `outer = max(3 x the resting offset, 1.5 text heights)` | nothing further than three resting offsets from the node is ever proposed |
+| ARC | `cardinalSides()` rasters inside `widestArc(arcs)` | only the SINGLE widest gap between the node's own pipes; every other direction generates no candidate at all |
+| COUNT | `polarCandidates()` stops at `max` (24), inner ring first | at most 24 raster points, plus the four corners |
+
+So the whole search is at most 28 points, in one wedge, inside a small disc. `placeLabelsFirstFit()`
+then writes `dropped: true` and the label is never drawn.
+
+**MEASURED: NOT ONE DROPPED LABEL ANYWHERE WAS ACTUALLY ENCLOSED.** Each drop was re-searched against
+the same obstacle list the pass itself had, relaxing one bound at a time so that whichever regime
+first finds room is the bound that did it:
+
+| view | text | dropped | room inside its own window (resolution) | room it never looked toward (arc) | room just past its reach (radius) | **genuinely enclosed** |
+|---|---|---|---|---|---|---|
+| Net3-World fit | none | 12 of 97 | 6 | 4 | 2 | **0** |
+| Net3-World fit | `1234=` | **32 of 97** | 13 | 9 | 10 | **0** |
+| Net3-World 2x | none | 1 of 97 | 1 | 0 | 0 | **0** |
+| Net3-World 2x | `1234=` | 5 of 97 | 5 | 0 | 0 | **0** |
+
+**Every single one had somewhere to go.** Thirty-two labels vanish from the fit view of his drawing
+and the plane they were standing on was not full.
+
+### 16k. WHERE THE BAD THINKING ENTERED, and it is one commit and one sentence
+
+Tom, 2026-09-18: *"the stack of node labels visible with short ID only is quite amazing. I think we
+should understand how that was accomplished and then understand what destroyed it... clearly it's
+just some bad thinking."* **The history supports him exactly.**
+
+Before `99de871e` (2026-08-16, Task 398, *"Node labels take the first-fit: two sides, then drop, and
+links yield"*) **there was no drop at all.** The rule was stated at the top of `js/lpn-collide.js`:
+
+> **THERE IS NO FAILURE CONDITION.** The best candidate wins; nothing declares defeat. Hiding and
+> dropping lines are separate decisions, not a threshold in here.
+
+Every node label was placed somewhere, because the ring scorer always returns its best candidate --
+`placeLabels()` still does, and writes `dropped: false` unconditionally to this day. **That is the
+amazing stack he remembers, and it was not a happy accident: it was a stated design rule.**
+
+**THE SENTENCE THAT REVERSED IT IS STILL IN THE SOURCE, and it is the bad thinking:**
+
+> A first-fit has no score to threshold: a position is clear or it is not, and **"neither side is
+> clear" is a fact rather than a judgement.** That is what makes dropping expressible here and not
+> there.
+
+**It is not a fact.** It is a fact about a list of at most 28 points inside one wedge within three
+resting offsets of the node. The argument silently promoted *"no room in the places I looked"* to
+*"no room"*, and there was nothing in the reasoning or in any check to notice the difference -- the
+table above is the first time anybody asked the drawing. The reversal was sound about SCORES (a
+ladder with a finite top really cannot express defeat) and wrong about the plane.
+
+**And the cost has been paid twice**, because every later measurement in this file is denominated in
+drawn labels: section 16c's three damping attempts were rejected at 1,742 / 1,729 / 1,751 against
+1,762, differences of 1-2%. Those numbers are counting which labels got the bounded search's scraps.
+
+### 16l. VERDICT ON THE DAMPING PROPOSAL (option b), which Tom marked Recommended
+
+*A settled label keeps its place when that place is still free.* It is aimed at the 44 followers, and
+it would reduce visible churn. **But it is the papering-over he warned against, and it should not be
+built first**, for three reasons:
+
+1. **It cannot draw a single extra label.** A dropped label never had a place to keep.
+2. **It is the third cousin of an attempt already measured.** Section 16c's *"a resting claim reserved
+   for every unplaced label"* cost 11 drawn labels and did not reduce the movement at all.
+3. **It leaves the cause standing.** The churn is largely DOWNSTREAM of the bounds: a label that
+   falls through the bounded raster commits somewhere poor and displaces the next one. Widen the
+   search so it lands somewhere good and much of the cascade has nothing to propagate.
+
+**The order is: remove the bounds first, then re-measure the churn, then decide whether damping is
+still wanted.** Doing it the other way round tunes the symptom and hides the measurement.
 
 ## 17. The labeling threshold's own default, measured (Task 669, 2026-09-18)
 

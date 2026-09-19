@@ -697,7 +697,20 @@ the same 14 at both zooms**, each a node symbol past the growing edge; **44 more
 rejected anything with their own width at all** and moved only because a neighbour moved first.
 **Every named suspect measured zero** -- no viewport bound, no broad-phase grid effect, no candidate
 set or reach or side rule reading the text. So three quarters of what he sees is sequential
-placement, not width. §16h, and the ROADMAP line.
+placement, not width. §16h; the fourteen are named in §16i.
+
+**AND THEN HE FOUND THE ROOT DEFECT IN ONE SENTENCE: *"there is infinite space available. Moving is
+fine, but dropping is not."*** A node label's entire search is **28 points, in ONE wedge between its
+own pipes, within three resting offsets of it**, and it is DROPPED when those come up empty. Every
+drop was re-searched against the pass's own obstacle list and **not one was actually enclosed** -- 32
+of 97 vanish from the fit view of Net3-World and all 32 had somewhere to go (§16j, ratcheted in
+`label-width-cause-harness.js`). **The bad thinking is datable**: `99de871e` (Task 398, 2026-08-16)
+reversed the standing *"THERE IS NO FAILURE CONDITION -- the best candidate wins; nothing declares
+defeat"* rule, arguing that *"neither side is clear is a fact rather than a judgement"*. It is a fact
+about 28 points, not about the plane, and nothing checked the difference until now (§16k). **His
+remembered "amazing stack of node labels" was that rule, and this commit is what destroyed it.**
+**Do NOT build the settled-label damping first** -- it cannot draw one extra label and it hides the
+measurement (§16l).
 
 ### Task 322 half B: the counting method found four rounded constants
 
