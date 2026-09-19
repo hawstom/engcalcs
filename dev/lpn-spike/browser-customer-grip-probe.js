@@ -222,6 +222,38 @@ module.exports = async function ({ send, evaluate, logs, sleep }) {
 		return d ? getComputedStyle(d).fill : null; })()`);
 	ok('...and the customer itself is a highlighted dot',
 		/25, 118, 210/.test(String(dotFill)), String(dotFill));
+	// ---- THE CURSOR, WHICH IS A HIT TEST AND A CASCADE AND SO IS BROWSER-ONLY --------------
+	//
+	// Tom, 2026-09-18: *"Cursor does not change over customer editables. And drag is the wrong
+	// cursor for the connection point. That should be pointer to be true to the app paradigm."*
+	// Two faults, and neither can be read off the stylesheet: what a hand sees is whatever
+	// element ANSWERS the point, resolved through the whole cascade. A rule can be perfectly
+	// written and reached by nothing. So both are asked the way a hand asks -- elementFromPoint,
+	// then the computed cursor on whatever came back.
+	//
+	// `grab` is this map's PANNING glyph and is asserted against by name, because that is the
+	// value that was there: a wrong cursor is not a missing one, and a check that only demanded
+	// "something other than default" would have passed on it.
+	async function cursorAt(x, y) {
+		return await evaluate(`(function () {
+			var e = document.elementFromPoint(${Math.round(x)}, ${Math.round(y)});
+			return e ? { css: getComputedStyle(e).cursor, cls: e.getAttribute('class') } : null; })()`);
+	}
+	const dotBox = await evaluate(`(function () {
+		var d = document.querySelector('.lpn-meter[data-cust="' + ${JSON.stringify(grip.id)} + '"]');
+		if (!d) { return null; }
+		var q = d.getBoundingClientRect();
+		return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; })()`);
+	ok('the customer symbol is on the screen to point at', !!dotBox, JSON.stringify(dotBox));
+	const dotCur = dotBox ? await cursorAt(dotBox.x, dotBox.y) : null;
+	ok('the cursor over the customer says it is an object, as a node and a pipe do',
+		!!dotCur && dotCur.css === 'pointer', JSON.stringify(dotCur));
+	const gripCur = await cursorAt(grip.x, grip.y);
+	ok('the cursor over the connection grip is the pointer, not the panning hand',
+		!!gripCur && gripCur.css === 'pointer', JSON.stringify(gripCur));
+	ok('...and specifically not `grab`, which is what it used to say',
+		!!gripCur && gripCur.css !== 'grab', JSON.stringify(gripCur));
+
 	// The grip wins a press over the pipe it is drawn on top of. This is the one thing only a
 	// browser can answer, and it is what makes the whole gesture reachable at all.
 	const stack = await evaluate(`(function () {

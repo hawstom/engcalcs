@@ -1045,7 +1045,14 @@ html[lang="zh"] .ec-welcome {
 /* A SOLID DOT (Tom, 2026-09-17: "The map symbol is to be a solid dot."). It is drawn three to
    seven pixels across at the zooms this map is read at, where an outlined box is a grey smudge
    and a picture of a meter is nothing at all. The toolbar icon is the drawing; this is the mark. */
-.lpn-meter { fill: #000; stroke: #000; }
+/* **AND IT SAYS `pointer`, BECAUSE IT IS AN OBJECT ON THE MAP** (Tom, 2026-09-18: *"Cursor does
+   not change over customer editables."*). A customer wore no cursor rule at all, so the canvas's
+   own `default` reached it and the one thing that separates an object from the map on this page --
+   the glyph, since Task 659 -- was missing on the newest object here. `.lpn-node` and `.lpn-link`
+   have said `pointer` since that task; this is the same sentence about the same kind of thing, and
+   there is no third convention. The service connector needs none: it is `pointer-events: none`
+   above, so the cursor over it is whatever is behind it. */
+.lpn-meter { fill: #000; stroke: #000; cursor: pointer; }
 /* A METER ATTACHED TO NOTHING LOOKS LIKE IT. Its demand is in no junction's total and therefore
    in no answer on the screen, so it is drawn hollow and dashed rather than merely drawn without a
    connector: an absent line is a thing you have to notice, an empty ring is a thing you can see. */
@@ -1084,7 +1091,14 @@ html[lang="zh"] .ec-welcome {
    Hollow where the selected customer is solid, which is how the two grips tell themselves apart at
    a glance: the filled dot is the house and drags the house, the ring is the connection and drags
    the connection. */
-.lpn-custhandle { fill: #fff; stroke: #1976d2; cursor: grab; }
+/* **AND IT SAYS `pointer`, NOT `grab`** (Tom, 2026-09-18: *"drag is the wrong cursor for the
+   connection point. That should be pointer to be true to the app paradigm."*). The open hand is
+   this map's PANNING glyph and nothing else -- Task 569 took it off the bare canvas and Task 659
+   gave `pointer` to every object -- so a hand on a control said "the map moves here", which is the
+   one thing this grip does not do. Every other draggable thing on this page (a node, a vertex
+   handle, a label) says `pointer` while it is draggable, so this is not a new rule; it is the grip
+   rejoining the one that was already there. */
+.lpn-custhandle { fill: #fff; stroke: #1976d2; cursor: pointer; }
 /* A METER CARRIES NO LABEL ON THE MAP (Tom, 2026-09-17: "I don't think we want labels on
    customers. I didn't ask for them."). An account number used to be drawn beside every symbol as
    generated annotation; it is gone, and so is the rule that was here for it. The account number
