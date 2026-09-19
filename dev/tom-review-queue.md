@@ -138,8 +138,8 @@ CONSENT, and both of those choices were this repository deciding for him what he
 
 ### feat/tables-spreadsheet
 
-- [ ] R-060 feat/tables-spreadsheet | At column A there is a strange highlighting around the ID. And the ID is not editable, though it's editable in properties. Can you fix that?
-- [ ] R-061 feat/tables-spreadsheet | Ask Ida how most apps do clicking on headings to change sorting; we have blue text links.
+- [?] R-060 feat/tables-spreadsheet | At column A there is a strange highlighting around the ID. And the ID is not editable, though it's editable in properties. Can you fix that? -- IDA LIKELY FOUND THE SAME ROOT CAUSE: `#0645ad` is painted on any focused cell through a `:focus-within` rule, and clicking the ID button focuses its cell -- so a plain click to jump to the map leaves that cell wearing the exact current-cell mark the new spreadsheet modes invented for a different purpose the same day. Give the ID button its own focus ring instead of inheriting the generic rule. **The other half -- the ID not being editable in the table though it is in Properties -- is separate and still open**
+- [?] R-061 feat/tables-spreadsheet | Ask Ida how most apps do clicking on headings to change sorting; we have blue text links. -- IDA ANSWERED, fix not yet built. **A sortable heading is a real focusable button, never a hyperlink, anywhere in current practice** -- the ARIA authoring practices wrap the header text in a `<button>` and put `aria-sort` on the sorted column only; Excel, Sheets, Finder and Explorer all agree on the look: plain or bold text with a small triangle at the trailing edge, on the sorted column alone, **never underlined and never blue**. The reason is a promise: a hyperlink promises LEAVING, and a sort reorders what is already on screen. **Our markup is already right** -- real buttons, correct `aria-sort`, arrow on the active column. **The CSS is what is wrong**: the sort button turns `#0645ad`, which is the browser default VISITED-LINK blue, on hover, and the ID cell button is permanently underlined in the same colour. Three one-line fixes, cheapest first, in her journal
 - [ ] R-063 feat/tables-spreadsheet | Modes. There is another mode, and it is Select. So there are four modes. Call them what you want: Ready, Enter, Edit, Select.
 - [ ] R-064 feat/tables-spreadsheet | Copy across columns does **not** work.
 - [ ] R-065 feat/tables-spreadsheet | There is still an unbelievable delay when speed-entering a column. It's not huge. It's small. But it's unbelievable because nothing else should be happening. There's no recalculation, no reformatting, etc. And this worries me very deeply because it is a sign of pervasive bad coding.
@@ -154,7 +154,7 @@ CONSENT, and both of those choices were this repository deciding for him what he
 
 ### feat/customer-find-labels
 
-- [ ] R-067 feat/customer-find-labels | R-011's caution glyph: "Put it back."
+- [x] R-067 feat/customer-find-labels | R-011's caution glyph: "Put it back." -- feat/customer-find-labels a9422467 -- glyph leading, his sentence byte for byte after it
 - [x] R-068 feat/customer-find-labels | Account numbers went to Tag: "It doesn't matter, since this has not been released." -- settled, no action
 
 ### feat/engine-fetch-wait
