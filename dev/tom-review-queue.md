@@ -13,7 +13,7 @@ answered by a session that then dropped the rest. **This file is where they live
 ## Format
 
 ```
-- [ ] R-042 branch/name | his words, verbatim or near
+- [x] R-042 branch/name | his words, verbatim or near -- Task 699 added at priority 75
 ```
 
 - `[ ]` OPEN -- nobody has acted on it.
@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-045.
+**An ID is permanent and never reused.** Next free: R-046.
 
 ---
 
@@ -44,25 +44,25 @@ judgement and does not belong to a script.
 ### feat/customer-find-labels
 
 - [x] R-006 feat/customer-find-labels | "What makes them look labelled is something else": No. They didn't "look labelled". -- his correction of a session's answer; recorded, nothing to build
-- [ ] R-007 feat/customer-find-labels | "[Customer] Station and offset were deliberately left out [of Find]": Bad decision. Put them in. Very handy for offset or station 0.
-- [ ] R-008 feat/customer-find-labels | Didn't I say to trash Account number since they can just make a Custom property for that or anything else?
-- [ ] R-009 feat/customer-find-labels | Since Customer is a pseudo-node, what if we provide existing properties like Description and Tag instead of Account number? Then we aren't inventing something, and we incur no language debt.
-- [ ] R-010 feat/customer-find-labels | The Customer menu/toolbar tip should indicate Shortcut: 8. And that should be the truth. 8 to start Add Customer.
-- [ ] R-011 feat/customer-find-labels | Reword this alert: "The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation."
-- [ ] R-012 feat/customer-find-labels | Reword this property label: "Services at this customer" to "Number of services" (_syn "Number or count of services at this customer point").
-- [ ] R-013 feat/customer-find-labels | Widest view: Add a "Use current view" button like the other one we restored in a different branch.
-- [ ] R-014 feat/customer-find-labels | Labels are bigger than node and pipe labels, bad. I don't know where this came from.
-- [ ] R-015 feat/customer-find-labels | Can we make labels one-line concats like link labels?
-- [ ] R-016 feat/customer-find-labels | I think we need a third separate Customer symbology area in settings so that we can control Customer labels differently than other labels, since we may want only demand or only demand and description. "Customer symbology". I **don't** think we need a separate text size. That's a bug.
-- [ ] R-017 feat/customer-find-labels | Customer symbols should scale using the Symbol scale setting, but they should just be a lot smaller than a node, like 0.2 to 0.3 as big, maybe 0.25.
+- [x] R-007 feat/customer-find-labels | "[Customer] Station and offset were deliberately left out [of Find]": Bad decision. Put them in. Very handy for offset or station 0. -- feat/customer-find-labels 4f15643b -- in Find AND writable in Replace
+- [x] R-008 feat/customer-find-labels | Didn't I say to trash Account number since they can just make a Custom property for that or anything else? -- feat/customer-find-labels 4f15643b -- the owned Account number field is gone
+- [x] R-009 feat/customer-find-labels | Since Customer is a pseudo-node, what if we provide existing properties like Description and Tag instead of Account number? Then we aren't inventing something, and we incur no language debt. -- feat/customer-find-labels 4f15643b -- a customer now carries Description and Tag; an old project's account number is copied into the TAG on open, character for character. HIS CALL: Tag or Description?
+- [x] R-010 feat/customer-find-labels | The Customer menu/toolbar tip should indicate Shortcut: 8. And that should be the truth. 8 to start Add Customer. -- feat/customer-find-labels 4f15643b -- 8 already worked and the toolbar tip already said so; the INSERT MENU carried no tip at all, for any of the eight tools. All eight now do
+- [x] R-011 feat/customer-find-labels | Reword this alert: "The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation." -- feat/customer-find-labels 4f15643b -- HIS EXACT WORDS, which carry no glyph, so the caution mark came off with the old sentence. One edit to restore it if he wants it
+- [x] R-012 feat/customer-find-labels | Reword this property label: "Services at this customer" to "Number of services" (_syn "Number or count of services at this customer point"). -- feat/customer-find-labels 4f15643b -- label and synonym both exactly as he gave them
+- [x] R-013 feat/customer-find-labels | Widest view: Add a "Use current view" button like the other one we restored in a different branch. -- feat/customer-find-labels 4f15643b -- same words, same key, same behaviour as the one on feat/label-gang-search, rounding the width UP
+- [x] R-014 feat/customer-find-labels | Labels are bigger than node and pipe labels, bad. I don't know where this came from. -- feat/customer-find-labels 4f15643b -- there never was a separate text size; the STACKING is what made them look big. A check now fails the build if anyone adds one
+- [x] R-015 feat/customer-find-labels | Can we make labels one-line concats like link labels? -- feat/customer-find-labels 4f15643b -- one line, through the same function link labels use
+- [x] R-016 feat/customer-find-labels | I think we need a third separate Customer symbology area in settings so that we can control Customer labels differently than other labels, since we may want only demand or only demand and description. "Customer symbology". I **don't** think we need a separate text size. That's a bug. -- feat/customer-find-labels 4f15643b -- third section, named exactly Customer symbology, no separate text size
+- [x] R-017 feat/customer-find-labels | Customer symbols should scale using the Symbol scale setting, but they should just be a lot smaller than a node, like 0.2 to 0.3 as big, maybe 0.25. -- feat/customer-find-labels 4f15643b -- 0.25 of a junction, and it follows Symbol scale, which it had never done
 
 ### feat/xy-world-map
 
-- [ ] R-018 feat/xy-world-map | "Place approximately", for a new user, this and "Cancel" need to be at the right side of the box.
-- [ ] R-019 feat/xy-world-map | Mapbox satellite is connected and working, a little. I am getting huge hesitance to load tiles I need. I see tiles around the edges of my map. Zooming in and out coaxes the tiles slowly to load, but it's a slow and uncertain slog. Frustratingly, it's the area I care about most that disappears when I zoom in, while peripheral tiles keep showing. Can you please debug this? How can we get what we need from Mapbox?
+- [x] R-018 feat/xy-world-map | "Place approximately", for a new user, this and "Cancel" need to be at the right side of the box. -- feat/xy-world-map 4505b5db -- both at the right edge, search buttons left where they were
+- [x] R-019 feat/xy-world-map | Mapbox satellite is connected and working, a little. I am getting huge hesitance to load tiles I need. I see tiles around the edges of my map. Zooming in and out coaxes the tiles slowly to load, but it's a slow and uncertain slog. Frustratingly, it's the area I care about most that disappears when I zoom in, while peripheral tiles keep showing. Can you please debug this? How can we get what we need from Mapbox? -- feat/xy-world-map 4505b5db -- MEASURED: tiles were requested from the WEST EDGE across, so the middle of the screen sat about 35th in a queue of up to 192; and every wheel nudge deleted the whole picture and restarted the queue from that same corner. Centre-out now, and the old picture stays up underneath
 - [x] R-020 feat/xy-world-map | The interface is super nice now, and we are really close. Amazing work! -- praise, no action
-- [ ] R-021 feat/xy-world-map | The rotation slider needs up to be counterclockwise.
-- [ ] R-022 feat/xy-world-map | Map submenus a lie: Yes. I see. Let's replace rows two and three (I like their behavior; good call) with "Re-adjust" tip "Return to Step 2 of the map attachment process."
+- [x] R-021 feat/xy-world-map | The rotation slider needs up to be counterclockwise. -- feat/xy-world-map 4505b5db -- up is counterclockwise now. A test had pinned the wrong direction and called it counterclockwise, so nothing caught it
+- [x] R-022 feat/xy-world-map | Map submenus a lie: Yes. I see. Let's replace rows two and three (I like their behavior; good call) with "Re-adjust" tip "Return to Step 2 of the map attachment process." -- feat/xy-world-map 4505b5db -- one row, Re-adjust, with his exact tip
 
 ### feat/tables-spreadsheet
 
@@ -91,6 +91,10 @@ judgement and does not belong to a script.
 
 ### Standing work he named
 
-- [ ] R-042 -- | Can you make sure we have a Roadmap task to audit language for lazy duplications where maybe a slight redesign can simplify or eliminate keys?
+- [x] R-042 -- | Can you make sure we have a Roadmap task to audit language for lazy duplications where maybe a slight redesign can simplify or eliminate keys?
 - [ ] R-043 -- | I still need to test (and admire) label placement, solver bar, etc.
 - [x] R-044 -- | The label work is a debugging job he has forbidden papering over, and "let labels look further" is ranked third, behind the switchboard and the sector question. -- carried from the previous session; the three handoff decisions remain his
+
+### Raised by the work, and his to decide
+
+- [?] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build
