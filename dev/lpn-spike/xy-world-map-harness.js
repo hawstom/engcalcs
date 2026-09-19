@@ -70,8 +70,14 @@ const L = loadLoopedNetwork(
 	"\t\tscreenOf: function (ox, oy) {\n" +
 	"\t\t\treturn { x: inwardX(ox) * state.s + state.tx, y: inwardY(oy) * state.s + state.ty }; },\n" +
 	"\t\toutwardX: outwardX, outwardY: outwardY,\n" +
+	// The tiles, so the one thing a reader actually looks at during step 2 can be asserted about.
+	// `mapSized` is the page's "the canvas has a height now" latch and nothing here can raise it by
+	// laying anything out, so it is set directly; paintBasemapTiles() draws nothing without it.
+	"\t\trefreshBasemap: refreshBasemap, setMapSized: function (on) { mapSized = on !== false; },\n" +
+	"\t\ttileEls: function () { return basemapEls; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
+	"\t\t\tbasemapLayer = el('g', {}, world);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tmodelLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, modelLayer); nodesLayer = el('g', {}, modelLayer);\n" +
@@ -306,6 +312,80 @@ back = G.lpnGeorefFromLonLat(t, centreGround.lon, centreGround.lat);
 ok('...about the middle of the rectangle, which does not move',
 	Math.abs(back.x - centre.x) < 1e-6 && Math.abs(back.y - centre.y) < 1e-6);
 ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
+
+// ---- AND THE GROUND IS THE THING THAT MOVES ----------------------------------------------------
+//
+// **THE DEFECT TOM PHOTOGRAPHED, STATED AS A PROPERTY** (2026-09-18: *"Ida is wrong. See images.
+// The project is moved and rotated, not the map."*). In his two frames the STREETS held the same
+// screen positions while his network appeared to swing, which is the exact opposite of what step 2
+// promises. The arithmetic above was right the whole time -- a turn of the handle does turn the
+// transform and leaves the drawing alone -- and the picture was still wrong, because
+// paintBasemapTiles() keeps a tile element by key and never touches it again. That cache is correct
+// for a pan or a zoom, where the CAMERA moves and the whole drawing frame goes with it; it is wrong
+// the moment the GROUND moves under a still drawing, which is the only thing this wizard does. So
+// every visible tile went on showing where that patch of ground used to be.
+//
+// **WHY THE PROJECT IS THE ONE THAT HOLDS STILL**, which is the part that keeps this from being
+// rewritten (Tom, on the phrase "eyes-on alignment against the streets"): *"We are not interested
+// in aligning the project with the streets. We want to align the streets with the project."* The
+// project is the survey and the thing of value; the map is decoration being fitted to it.
+//
+// Measured in a real headless Chrome as well, through dev/lpn-spike/browser-drive.js: before the
+// repair a node sat at (423.8, 1013.2) and tile 4/4/0 at (896.3, 288.5), and after a 30 degree turn
+// of the handle the node was at (423.8, 1013.2) and the tile was STILL at (896.3, 288.5) -- 112 of
+// 112 shared tiles unmoved. After it, the node is at (423.8, 1013.2) still and the tile has moved to
+// (1140.3, 156.8), with all 112 moved.
+{
+	// `mapSized` is put back as well, and that is not tidiness: currentView() answers null until the
+	// canvas has a height, so raising the latch adds a `view` to the saved bytes and the identity
+	// check below would fail on a field this block invented.
+	L.setMapSized(true);
+	const project = L.getProject();
+	// `basemap` is part of the saved bytes, so it is put back before the identity check below runs.
+	const basemapWas = project.basemap;
+	project.basemap = 'osm';
+	L.refreshBasemap();
+	// Where each tile is DRAWN, which is what a reader sees: the affine each image carries. Nothing
+	// here re-derives it -- it is read back off the elements the page made.
+	const placedNow = () => {
+		const out = {}, els = L.tileEls();
+		Object.keys(els).forEach(function (k) { out[k] = els[k].getAttribute('transform') || ''; });
+		return out;
+	};
+	const tilesBefore = placedNow();
+	ok('the basemap draws tiles at all, or nothing below means anything',
+		Object.keys(tilesBefore).length > 0, Object.keys(tilesBefore).length);
+	// The drawing's own fixed point, in the frame the camera maps to the screen. The camera is not
+	// touched by any of this, so an unchanged drawing coordinate IS an unchanged screen position.
+	const pinBefore = L.screenOf(midX, midY);
+
+	// A SMALL turn, and that is not timidity: a quarter turn swings a different patch of the Earth
+	// onto the screen, so the two tile sets share no key and "every shared tile moved" is vacuously
+	// true. A few degrees is the gesture somebody actually makes at the end of a fit, and it leaves
+	// most of the ground on screen to be compared.
+	const t2 = L.xyGeoref();
+	const rect2 = L.mapgeoRectSrc();
+	const c2 = { x: (rect2[0].x + rect2[2].x) / 2, y: (rect2[0].y + rect2[2].y) / 2 };
+	const armR = 500, turn = 5 * Math.PI / 180;
+	L.setDrag({ type: 'mapgeo', kind: 'rotate', corner: -1, t0: t2, rect: rect2,
+		start: { x: c2.x + armR, y: c2.y } });
+	L.mapgeoApplyDrag(L.screenOf(c2.x + armR * Math.cos(turn), c2.y + armR * Math.sin(turn)));
+	L.refreshBasemap();
+
+	const tilesAfter = placedNow();
+	const pinAfter = L.screenOf(midX, midY);
+	ok('THE DRAWING DOES NOT MOVE ON SCREEN when the map is turned',
+		pinBefore.x === pinAfter.x && pinBefore.y === pinAfter.y,
+		pinBefore.x + ',' + pinBefore.y + ' -> ' + pinAfter.x + ',' + pinAfter.y);
+	const shared = Object.keys(tilesBefore).filter(function (k) { return tilesAfter[k] !== undefined; });
+	const stale = shared.filter(function (k) { return tilesAfter[k] === tilesBefore[k]; });
+	ok('...AND EVERY TILE OF GROUND STILL ON SCREEN HAS MOVED',
+		shared.length > 0 && stale.length === 0,
+		shared.length + ' shared, ' + stale.length + ' left where they were');
+	project.basemap = basemapWas;
+	L.setMapSized(false);
+	ok('turning the map still changes not one stored byte', snapshot() === before);
+}
 
 // ---- AND IN STEP 2 NOTHING BUT THE RECTANGLE MOVES THE MAP -------------------------------------
 //

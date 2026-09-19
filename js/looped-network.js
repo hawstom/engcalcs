@@ -9238,6 +9238,26 @@ var EngCalcs = EngCalcs || {};
 	// 45 is 0.03 px at zoom 12 and falls as h^2 -- below a pixel at every zoom a network is drawn
 	// at, so the map and the pipes register.
 	var basemapLayer = null, basemapEls = {}, basemapTimer = null;
+	// **THE PLACEMENT A CACHED TILE WAS DRAWN WITH, so the map can be told the ground has moved.**
+	//
+	// A tile element is kept by key and never touched again (`if (basemapEls[t.key]) { return; }`),
+	// which is right for a pan or a zoom -- the CAMERA moves, the whole `world` group moves with it,
+	// and a tile sitting in drawing coordinates is carried along correct. It is WRONG the moment the
+	// GROUND moves under a still drawing, which is the one thing Map, World map does: every tile's
+	// affine is computed from `project.georef`, so a changed transform makes every cached tile a
+	// picture of where that patch of ground USED TO BE. Nothing repainted it, so the streets stayed
+	// nailed to the screen while the blue rectangle swung across them -- which reads exactly like the
+	// project rotating, and is what Tom photographed on 2026-09-18: *"Ida is wrong. See images. The
+	// project is moved and rotated, not the map."* He was right, and the arithmetic in mapgeoTurned()
+	// was right the whole time; what was wrong was that nobody redrew the ground.
+	//
+	// **AND THE REASON IT HAS TO BE THE PROJECT THAT HOLDS STILL, not the streets** (Tom, on the
+	// phrase "eyes-on alignment against the streets"): *"We are not interested in aligning the
+	// project with the streets. We want to align the streets with the project."* The project is the
+	// survey and the thing of value; the map is decoration being fitted to it. Read it the other way
+	// round and nailing the map to the screen looks like the obvious thing to do, which is how this
+	// got written.
+	var basemapPlacedSig = '';
 	// **TWO SOURCES, AND THEY ARE NOT EQUIVALENT** (ROADMAP Task 452). Tom, 2026-08-19: "epanetjs
 	// uses OpenStreet with MapBox and serves satellite imagery. Add that."
 	//
@@ -9557,6 +9577,20 @@ var EngCalcs = EngCalcs || {};
 					!isFinite(xbnds.east) || !isFinite(xbnds.north)) {
 				basemapLayer.innerHTML = ''; basemapEls = {}; return;
 			}
+		}
+		// **THE GROUND MOVED, SO EVERY CACHED TILE IS A PICTURE OF SOMEWHERE ELSE.** The affine each
+		// tile carries was computed from the transform standing when it was made; change the
+		// transform and the only honest thing to do is throw them away and place them again. Cheap:
+		// a wizard frame repaints one screenful, and a pan or a zoom -- where the camera moves and
+		// the tiles are still correct -- leaves the signature untouched and costs one comparison.
+		var placeSig = xg
+			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
+				'|' + xg.metersPerUnit + '|' + xg.rotDeg
+			: '';
+		if (placeSig !== basemapPlacedSig) {
+			basemapLayer.innerHTML = '';
+			basemapEls = {};
+			basemapPlacedSig = placeSig;
 		}
 		var proj = projectedBasemapOk(), bnds = null;
 		if (proj) {
