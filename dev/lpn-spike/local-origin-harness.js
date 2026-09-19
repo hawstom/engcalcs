@@ -397,8 +397,12 @@ console.log('\n--- one home for the concept ---');
 	// there is no override they return the field untouched, so a Base drawing still pays nothing at
 	// all. writeNodeCoord() is the other: a typed box hands it the public number and it converts
 	// once, which is what keeps a typed 38.5 stored as 38.5.
-	ok('inwardX has one definition and twenty-seven call sites', count(/inwardX\(/g) === 28, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-eight call sites', count(/inwardY\(/g) === 29, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR A SURVEYED POINT LIST** (Task 592). Every junction made from a
+	// surveyed file arrives as a pair of numbers out of somebody's file, which is the definition of
+	// an outside number: it comes through this door once, in createSurveyJunctions(), and the file's
+	// own value rides beside the drawn one so the save hands it back unchanged.
+	ok('inwardX has one definition and twenty-eight call sites', count(/inwardX\(/g) === 29, count(/inwardX\(/g));
+	ok('inwardY has one definition and twenty-nine call sites', count(/inwardY\(/g) === 30, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,
