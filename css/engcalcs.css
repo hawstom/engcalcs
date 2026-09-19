@@ -2263,6 +2263,29 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-sort { font-weight: bold; }
 .lpn-pane-goto { text-decoration: underline; }
 .lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
+/* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
+   (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
+   heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
+   announces itself by the pointer changing, with no affordance drawn on a strip that is already
+   busy. `position: relative` on the th is what it is positioned against; the heading keeps its own
+   padding, so the grip overlaps nothing the reader is trying to read. A thin line appears under the
+   pointer rather than always, for the same reason: six of these drawn permanently across a narrow
+   pane read as a border nobody chose.
+
+   **IT IS POSITIONED AGAINST THE STICKY HEADING AND NOTHING IS ADDED TO MAKE THAT TRUE.** A first
+   pass declared `.lpn-pane-table thead th { position: relative; }` for a containing block and broke
+   the sticky heading row, which is the same rule at the same specificity further down the file --
+   caught by pane-harness.js, which asserts that heading still sticks. `position: sticky` already
+   establishes a containing block, so the grip has one for free. */
+.lpn-pane-grip {
+	position: absolute; top: 0; inset-inline-end: -3px; width: 7px; height: 100%;
+	cursor: col-resize; user-select: none;
+}
+.lpn-pane-grip:hover { background: linear-gradient(to right, transparent 3px, #8ab 3px, #8ab 4px, transparent 4px); }
+/* A heading is draggable left and right (his point (e)), so it says so under the pointer. `grab`
+   rather than `move`: the column is not going anywhere until it is picked up. */
+.lpn-pane-sort { cursor: grab; }
+.lpn-pane-sort:active { cursor: grabbing; }
 /* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
    "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
    an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the

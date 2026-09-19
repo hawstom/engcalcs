@@ -1332,6 +1332,7 @@ $ec_lang['lpn_pane_none']='This network has none of these yet.';
 // cell carries lpn_field_text_attached_tip, which is the property popup's own sentence for the same
 // rule.
 $ec_lang['lpn_pane_text_attached']='Attached';
+$ec_lang['lpn_pane_not_used']='Not used';
 $ec_lang['lpn_pane_paste_note']='This table is meant for entering values by pasting from a spreadsheet into rows that already exist. If it does not meet your needs, use Help to tell us.';
 // What a filtered table says above its rows, so hidden rows always have a visible cause. {q} is the
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.

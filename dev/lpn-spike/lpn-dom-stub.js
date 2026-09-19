@@ -102,7 +102,19 @@ function mkEl(tag, svgNS) {
     getAttribute(k) { return k === 'style' ? this._styleAttr : this[k]; },
     removeAttribute(k) { delete this[k]; if (k.indexOf('data-') === 0) { delete this.dataset[dataKey(k)]; } },
     addEventListener(t, f) { (this._listeners[t] = this._listeners[t] || []).push(f); },
-    removeEventListener() {},
+    // **REMOVAL IS REAL, AND IT WAS A NO-OP UNTIL 2026-09-19.** A handler that hangs itself on
+    // mousedown and takes itself down on mouseup -- which is how every drag on this page works,
+    // and how the column resize and column move of Task 690's points (d) and (e) work -- then
+    // accumulated one live copy per drag. The SECOND drag ran the first one's ending as well, so a
+    // press that should have changed nothing moved a column, and the harness failed for a reason
+    // that does not exist in a browser. That is the stub removing a coupling rather than modelling
+    // one, which dev/testing-notes.md names as the first thing to suspect.
+    removeEventListener(t, f) {
+      const a = this._listeners[t];
+      if (!a) { return; }
+      const i = a.indexOf(f);
+      if (i >= 0) { a.splice(i, 1); }
+    },
     querySelectorAll() { return []; },
     // **ONE SELECTOR SHAPE, A BARE TAG NAME**, and nothing more -- enough for the New-project box's
     // `copy.querySelector('select')` (Task 477) and honest about the rest. A stub that answered
@@ -683,7 +695,14 @@ global.document = {
   // line. Recording a listener changes nothing on its own; only a test that dispatches sees them.
   _listeners: {},
   addEventListener(t, f) { (global.document._listeners[t] = global.document._listeners[t] || []).push(f); },
-  removeEventListener() {},
+  // Real removal, for the reason the element's own removeEventListener() above states: a drag that
+  // hangs a document-level move/up pair and takes it down again is the commonest shape on this page.
+  removeEventListener(t, f) {
+    const a = global.document._listeners[t];
+    if (!a) { return; }
+    const i = a.indexOf(f);
+    if (i >= 0) { a.splice(i, 1); }
+  },
   dispatchEvent(e) {
     (global.document._listeners[e && e.type] || []).slice().forEach(function (f) { f(e); });
     return true;

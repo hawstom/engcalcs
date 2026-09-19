@@ -293,10 +293,11 @@ run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_
 # last one by opening the table looking for it (*"Initial quality is in no Table and no
 # multi-properties. Embarrassing"*). BOTH SIDES ARE DERIVED: the row builders are the functions
 # taking `fields` first and a `labelText` parameter, and the columns are buildPaneTables() with its
-# paneCol* helpers resolved. ADVISORY while the gap count is above zero; the selftest is blocking,
-# because every way this check can quietly stop working makes its count SMALLER, which reads as
-# progress on the very task it serves.
-run_check "popup/table parity"           advisory php dev/scripts/table_column_parity_check.php
+# paneCol* helpers resolved. A RATCHET AT ZERO since 2026-09-19: it shipped advisory at 28 gaps, Tom
+# said "Fix all that was found", all 28 were closed and the flag turned over. The selftest is
+# blocking too, because every way this check can quietly stop working makes its count SMALLER, which
+# reads as progress on the very task it serves.
+run_check "popup/table parity"           blocking php dev/scripts/table_column_parity_check.php
 run_check "popup/table parity selftest"  blocking php dev/scripts/table_column_parity_selftest.php
 # Unit conversion factors, re-derived from the exact international definitions. The suite once held
 # FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm

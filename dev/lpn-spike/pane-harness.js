@@ -475,17 +475,28 @@ console.log('\n--- each table lists exactly its own type ---');
 		'a pipe’s From and To are read-only — re-drawing the pipe is how they change');
 	report(pipeCells.from.textContent === j1.id && pipeCells.to.textContent === j2.id,
 		'...and they name the right nodes', pipeCells.from.textContent + ' → ' + pipeCells.to.textContent);
-	// A pump has no editable scalar at all: what it is, is its curve.
-	// **THE THREE EXEMPTIONS ARE NOT SCALARS, WHICH IS WHY THE CLAIM SURVIVES THEM.** Active is
-	// whether this pump is in the network; Description and Tag are the identity band Tom ruled onto
-	// every table on 2026-09-15 (Task 674) -- what the asset is CALLED, not a number the pump has.
-	// A pump still has no editable number of its own, which is the fact this asserts.
+	// **THE PUMP TABLE MATCHES THE PUMP PROPERTIES, and this assertion used to say the opposite.**
+	// It read "a pump has no editable scalar at all: what it is, is its curve" and required every
+	// cell but Active, Description and Tag to be read-only. Tom struck that on 2026-09-18: *"Make
+	// the pump table match the pump properties; I see nothing special there, and I don't know why
+	// you asked."* The old claim was half right and the half it got wrong is the half that matters
+	// -- a curve genuinely is a document object edited in the Library, which is why the two curve
+	// columns are REFERENCES and carry no points; but a relative speed, a speed pattern, a price of
+	// power and its pattern are ordinary numbers and names, and a person entering forty pumps wants
+	// them in rows. Asserted from the POPUP's side rather than by listing columns here, so the two
+	// surfaces are held together rather than this file holding a third opinion.
 	L.renderTable('pumps');
 	const pumpCells = L.tableCells('pumps')[pu1.id];
-	const PUMP_NOT_SCALAR = { active: 1, desc: 1, tag: 1 };
-	report(Object.keys(pumpCells).every((k) => PUMP_NOT_SCALAR[k] || pumpCells[k]._tag === 'td'),
-		'every cell of the pump table but Active and the identity band is read-only — a pump IS its curve, and a curve lives in the popup',
-		Object.keys(pumpCells).filter((k) => !PUMP_NOT_SCALAR[k] && pumpCells[k]._tag !== 'td').join(','));
+	['speed', 'speedPattern', 'energyPrice', 'energyPattern', 'curveId', 'efficCurveId', 'closed']
+		.forEach(function (k) {
+			report(!!pumpCells[k], `the pump table has a ${k} cell, as the pump popup has that row`);
+		});
+	report(pumpCells.speed && pumpCells.speed._tag === 'input',
+		'...and the relative speed is editable, which is what "match the properties" means',
+		pumpCells.speed && pumpCells.speed._tag);
+	report(pumpCells.curveId && pumpCells.curveId._tag === 'select',
+		'...while the head curve is a REFERENCE chooser and never a table of points (Task 586)',
+		pumpCells.curveId && pumpCells.curveId._tag);
 	report(pumpCells.active && pumpCells.active.type === 'checkbox',
 		'...and Active is a checkbox on every table (Tom, 2026-09-08)');
 	// The valve's SETTING heading carries no unit, because the quantity differs per row.
@@ -664,9 +675,28 @@ console.log('\n--- heading and cells share one alignment ---');
 		const tds = tbody.children[0].children;
 		report(ths.length === cols.length && tds.length === cols.length,
 			spec.id + ': one heading and one cell per column', ths.length + ' / ' + tds.length);
-		const disagree = cols.filter((c, i) => ths[i].className !== tds[i].className);
-		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ classes',
+		// **THE ALIGNMENT CLASSES, NOT EVERY CLASS**, and the difference is real rather than a
+		// loosening. A cell that STATES A RULE instead of showing a value carries `lpn-pane-stated`
+		// and `ec-help` of its own -- the tank's mixing fraction where the model is not
+		// two-compartment, the valve's minor loss on a TCV -- and a heading never does, because the
+		// heading is not the thing that is inapplicable. Comparing whole class strings was only
+		// ever true because no fixture row had been a stated one; it is the ALIGNMENT that has to
+		// agree between a heading and its column, which is what this section is about.
+		const align = (el) => [NUM, FIRST].filter((k) => el.classList.contains(k)).join(' ');
+		const disagree = cols.filter((c, i) => align(ths[i]) !== align(tds[i]));
+		report(disagree.length === 0, spec.id + ': every heading carries its own cells’ alignment',
 			disagree.map((c) => c.key).join(','));
+		// And nothing else may differ except that one documented pair.
+		const STATED = ['lpn-pane-stated', 'ec-help'];
+		const extra = cols.filter((c, i) => {
+			const h = String(ths[i].className || '').split(/\s+/).filter(Boolean);
+			const d = String(tds[i].className || '').split(/\s+/).filter(Boolean);
+			return d.some((k) => h.indexOf(k) < 0 && STATED.indexOf(k) < 0) ||
+				h.some((k) => d.indexOf(k) < 0);
+		});
+		report(extra.length === 0,
+			spec.id + ': and a cell adds nothing to its heading’s classes but the stated-rule pair',
+			extra.map((c) => c.key).join(','));
 		// And the class is the one the alignment hangs on: a number is a number whether it was typed
 		// or computed, which is the rule the printed sheet has always used.
 		const wrong = cols.filter((c, i) =>

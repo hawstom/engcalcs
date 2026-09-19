@@ -17290,6 +17290,216 @@ var EngCalcs = EngCalcs || {};
 			get: function (el) { return effective(el, 'active') !== false; },
 			set: function (el, v) { setProp(el, 'active', !!v); } };
 	}
+	function paneUnitGradient() { return 'lpn_u_gradient'; }
+	// **THE WORD A CELL SHOWS WHERE THE ROW CANNOT USE THE COLUMN** (Tom, 2026-09-08, about the Text
+	// table's alignments: *"center and middle uneditable look like a bug"*). A tank that mixes
+	// completely has no mixing fraction and a throttle valve has no minor-loss coefficient -- the
+	// property popup simply does not draw those rows, but a table has a cell for every column on
+	// every row, and a stored default sitting in a box nobody can change reads as a control that
+	// has stopped working. So the cell states the RULE, and carries the popup's own sentence as its
+	// tip, exactly as paneTextAttachedWord() does.
+	function paneNotUsedWord() {
+		var pc = EngCalcs.pageConfig || {};
+		return pc.lpn_pane_not_used || 'Not used';
+	}
+	// ---- THE COLUMNS THAT CLOSE THE POPUP/TABLE GAP (ROADMAP Task 690) -------------------------
+	//
+	// Tom, 2026-09-18: *"Fix all that was found."* `dev/scripts/table_column_parity_check.php`
+	// derived 28 properties a person could edit in the property popup and could not see in the
+	// table -- and therefore could not see in the multi-properties box either, because
+	// multiGroups() builds its sections from these same specs. Every one of them is below.
+	//
+	// **EACH IS THE POPUP ROW'S TWIN AND IS BUILT FROM THE SAME THREE PARTS ON PURPOSE**: the same
+	// gate, the same effective() read and the same setProp() write. Two editors of one property
+	// must not have two ideas of what editing it means; `scenario_seam_check.php` holds the write
+	// half of that, and a plain write here where the popup writes plainly is deliberate rather than
+	// an oversight (a mixing model and a pump's speed are not overridable, and setProp() would
+	// write a `_mixingModel` nothing reads).
+	function paneChoicesPatterns() {
+		var pc = EngCalcs.pageConfig || {},
+			out = [['', pc.lpn_library_pattern_none || 'No pattern']];
+		libPatternsRead().forEach(function (p) { out.push([p.id, p.id]); });
+		return out;
+	}
+	// A pattern REFERENCE as a column. The value is the pattern's id, which is what the document
+	// stores and what a pasted spreadsheet would carry; the list is the project's own.
+	function paneColPattern(key, labelKey, get, set, overridable) {
+		var c = { key: key, label: labelKey, em: 5, choices: paneChoicesPatterns,
+			get: get, set: set };
+		if (overridable) { c.prop = key; }
+		return c;
+	}
+	// **WHERE A CHEMICAL ENTERS THE NETWORK** (Task 566): on every kind of node, and only while one
+	// is being tracked, which is the popup's own gate asked rather than stored.
+	function paneColSourceType() {
+		return { key: 'sourceType', label: 'lpn_source_type', em: 5,
+			when: function () { return qualityMode() === 'chemical'; },
+			prop: 'sourceType',
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return [['CONCEN', pc.lpn_source_type_concen || 'Concentration'],
+					['MASS', pc.lpn_source_type_mass || 'Mass booster'],
+					['SETPOINT', pc.lpn_source_type_setpoint || 'Setpoint booster'],
+					['FLOWPACED', pc.lpn_source_type_flowpaced || 'Flow-paced booster']];
+			},
+			get: function (n) { return effective(n, 'sourceType') || 'CONCEN'; },
+			set: function (n, v) { setProp(n, 'sourceType', v); } };
+	}
+	function paneColSourceQuality() {
+		return { key: 'sourceQuality', label: 'lpn_source_quality', unitText: concentrationUnitText,
+			em: 3.5, blank: true,
+			when: function () { return qualityMode() === 'chemical'; },
+			prop: 'sourceQuality',
+			get: function (n) { return effective(n, 'sourceQuality'); },
+			set: function (n, v) { setProp(n, 'sourceQuality', v); } };
+	}
+	function paneColSourcePattern() {
+		var c = paneColPattern('sourcePattern', 'lpn_source_pattern',
+			function (n) { return effective(n, 'sourcePattern'); },
+			function (n, v) { setProp(n, 'sourcePattern', v || null); }, true);
+		c.when = function () { return qualityMode() === 'chemical'; };
+		return c;
+	}
+	// **THE EMITTER COEFFICIENT, WHICH IS A JUNCTION'S AND NOT THE NETWORK'S.** It is the one field
+	// on this page whose unit is two units -- flow per pressure^gamma -- so it cannot follow the
+	// store-what-was-typed rule and goes through the same emitterToDisplay()/emitterToStore() pair
+	// the popup uses. The heading therefore builds its own unit text rather than naming a family.
+	function paneColEmitter() {
+		return { key: 'emitter', label: 'lpn_field_emitter', em: 4, blank: true, prop: 'emitter',
+			unitText: function () { return unitLabel('lpn_u_flow') + '/' + unitLabel('lpn_u_pressure'); },
+			get: function (n) { return emitterToDisplay(effective(n, 'emitter')); },
+			set: function (n, v) { setProp(n, 'emitter', emitterToStore(v)); } };
+	}
+	// A reservoir's head pattern: EPANET multiplies the stated head by it. A PLAIN write, as in the
+	// popup -- which pattern a source follows is a statement about the system, not a design
+	// variable a scenario asks "what if" about.
+	function paneColHeadPattern() {
+		return paneColPattern('headPattern', 'lpn_field_head_pattern',
+			function (n) { return n.headPattern; },
+			function (n, v) { n.headPattern = v || null; updateNode(n.id); }, false);
+	}
+	function paneColMixingModel() {
+		return { key: 'mixingModel', label: 'lpn_mixing_model', em: 6,
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return [['MIXED', pc.lpn_mixing_mixed || 'Complete mixing'],
+					['2COMP', pc.lpn_mixing_2comp || 'Two-compartment mixing'],
+					['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
+					['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']];
+			},
+			get: function (n) { return n.mixingModel || 'MIXED'; },
+			set: function (n, v) { n.mixingModel = v; updateNode(n.id); } };
+	}
+	// **ONLY TWO-COMPARTMENT MIXING HAS A FRACTION**, which is why the popup draws this row only for
+	// that model. The cell exists on every row because a column does; on the others it states the
+	// rule instead of showing a number nothing reads.
+	function paneColMixingFraction() {
+		return { key: 'mixingFraction', label: 'lpn_mixing_fraction', em: 3.5, blank: true,
+			get: function (n) { return n.mixingFraction; },
+			plainFor: function (n) { return (n.mixingModel || 'MIXED') !== '2COMP'; },
+			plainWord: paneNotUsedWord,
+			plainTip: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return pc.lpn_mixing_fraction_tip;
+			},
+			set: function (n, v) { n.mixingFraction = v; updateNode(n.id); } };
+	}
+	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
+	// whether the scenario contains the link at all, Shut is whether water can pass through the one
+	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
+	function paneColClosed() {
+		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
+			get: function (l) { return effective(l, 'status') === 'closed'; },
+			set: function (l, v) { setProp(l, 'status', v ? 'closed' : 'open'); } };
+	}
+	// The library references. A pipe type states diameter, roughness and more; choosing one goes
+	// through setPipeType(), the same door the popup's chooser uses, because that is what knows how
+	// an element stops holding its own copy of a property the type states.
+	function paneColPipeType() {
+		return { key: 'typeId', label: 'lpn_field_pipetype', em: 6, prop: 'typeId',
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {},
+					out = [['', pc.lpn_pipetype_none || 'No pipe type selected']];
+				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + t.note) : t.id]); });
+				return out;
+			},
+			get: function (l) { return effective(l, 'typeId') || ''; },
+			set: function (l, v) { setPipeType(l, v || null); } };
+	}
+	function paneColFittings() {
+		return { key: 'fittingsId', label: 'lpn_field_fittings', em: 6, prop: 'fittingsId',
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {},
+					out = [['', pc.lpn_fittings_none || 'No fittings list selected']];
+				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + f.note) : f.id]); });
+				return out;
+			},
+			get: function (l) { return effective(l, 'fittingsId') || ''; },
+			plainFor: function (l) { return pipeTypeOwns(l, 'fittingsId'); },
+			set: function (l, v) { setProp(l, 'fittingsId', v || null); } };
+	}
+	// A CURVE REFERENCE, never its points (Task 586): a curve is a document object and an element
+	// states one by id. The list is filtered to the kind the element can use, exactly as the
+	// popup's chooser is, so a pump cannot be pointed at a volume curve.
+	function paneColCurveRef(key, kind, labelKey) {
+		return { key: key, label: labelKey, em: 6, prop: key,
+			choices: function () {
+				var pc = EngCalcs.pageConfig || {},
+					out = [['', pc.lpn_curve_none || 'No curve selected']];
+				libCurvesRead().forEach(function (c) { if (c.kind === kind) { out.push([c.id, c.id]); } });
+				return out;
+			},
+			get: function (l) { return effective(l, key) || ''; },
+			set: function (l, v) { setProp(l, key, v || null); } };
+	}
+	// **A PUMP DOES HAVE EDITABLE SCALARS AFTER ALL** (Tom, 2026-09-18: *"Make the pump table match
+	// the pump properties; I see nothing special there, and I don't know why you asked."*). The
+	// pumps tab was written as a reading rather than an editor, on the argument that what a pump IS
+	// is its curve; his answer is that a relative speed and a price of power are ordinary numbers
+	// and belong in the table with everything else.
+	//
+	// A BLANK, A ZERO AND A NEGATIVE ALL READ AS 1 here exactly as they do in the popup -- a pump at
+	// speed 0 is a pump that is off, and switching one off because a cell was cleared is the
+	// failure to avoid. Turning a pump off has its own column, Shut.
+	function paneColPumpSpeed() {
+		return { key: 'speed', label: 'lpn_field_pump_speed', em: 3,
+			get: function (l) { return (typeof l.speed === 'number' && isFinite(l.speed)) ? l.speed : 1; },
+			set: function (l, v) { l.speed = (isFinite(v) && v > 0) ? v : 1; } };
+	}
+	function paneColSpeedPattern() {
+		return paneColPattern('speedPattern', 'lpn_field_speed_pattern',
+			function (l) { return l.speedPattern; },
+			function (l, v) { l.speedPattern = v || null; }, false);
+	}
+	function paneColEnergyPrice() {
+		return { key: 'energyPrice', label: 'lpn_energy_price', em: 3.5, blank: true, prop: 'energyPrice',
+			unitText: function () {
+				var pc = EngCalcs.pageConfig || {}, money = currencyLabel();
+				return (money ? money + '/' : '') + (pc.lpn_energy_kwh || 'kWh');
+			},
+			get: function (l) { return effective(l, 'energyPrice'); },
+			set: function (l, v) { setProp(l, 'energyPrice', v); } };
+	}
+	function paneColEnergyPattern() {
+		return paneColPattern('energyPattern', 'lpn_energy_price_pattern',
+			function (l) { return effective(l, 'energyPattern'); },
+			function (l, v) { setProp(l, 'energyPattern', v || null); }, true);
+	}
+	// **A THROTTLE VALVE'S LOSS IS ITS SETTING ALONE**, which is EPANET's own simplification and
+	// ours: it ignores the [VALVES] minor-loss column for a TCV, so a number typed here would be one
+	// neither engine reads. The popup answers that by not drawing the row; a table answers it by
+	// stating the rule in the cell.
+	function paneColValveK() {
+		return { key: 'km', label: 'lpn_field_km_short', em: 3, prop: 'k',
+			get: function (l) { return effective(l, 'k') || 0; },
+			plainFor: function (l) { return (l.valveType || 'TCV').toUpperCase() === 'TCV'; },
+			plainWord: paneNotUsedWord,
+			plainTip: function () {
+				var pc = EngCalcs.pageConfig || {};
+				return pc.lpn_field_valve_km_tip;
+			},
+			set: function (l, v) { setProp(l, 'k', v); } };
+	}
 	// What a Text object's own popup redraws after any of size, bold, angle or alignment moves:
 	// the element's anchors, its style, then its content, measured width, geometry and visibility
 	// through refreshLabelContent(). One function, so the table, the multi-properties box and the
@@ -17522,9 +17732,11 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'fireFlow', label: 'lpn_ff_required', unit: function () { return 'lpn_u_flow'; }, em: 3.5,
 						prop: 'fireFlow', get: function (n) { return fireFlowOwn(n); },
 						set: function (n, v) { setProp(n, 'fireFlow', fireFlowStore(v)); } },
+					paneColEmitter(),
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					paneColNodeInitQuality(),
+					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
 				]
 			},
@@ -17548,11 +17760,13 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead, em: 3.5,
 						prop: 'head', get: function (n) { return effective(n, 'head'); },
 						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id); } },
+					paneColHeadPattern(),
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
 					// ground is unknown -- an imported reservoir states a head and no elevation, and
 					// a 0 there would assert what the file never said (Task 390).
 					paneColNodeResult('pressure', 'lpn_result_pressure', paneUnitPressure),
 					paneColNodeInitQuality(),
+					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
 				]
 			},
@@ -17589,18 +17803,21 @@ var EngCalcs = EngCalcs || {};
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
 					paneColReaction('tankCoeff', 'lpn_reaction_tank_short', paneReactionPerDay),
+					paneColMixingModel(), paneColMixingFraction(),
 					// The WATER SURFACE, derived and read-only: it is the number the solve uses, so
 					// it must be visible, but a second editable field would be two numbers that have
 					// to agree.
 					paneColNodeResult('head', 'lpn_result_head', paneUnitHead),
 					paneColNodeInitQuality(),
+					paneColSourceType(), paneColSourceQuality(), paneColSourcePattern(),
 					paneColNodeQuality()
 				]
 			},
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
+					paneColPipeType(),
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
 					// -- and lenAuto is Base-owned geometry, so it is only cleared in Base.
@@ -17632,23 +17849,34 @@ var EngCalcs = EngCalcs || {};
 						plainFor: function (l) { return pipeKIsDerived(l); },
 						set: function (l, v) { setProp(l, 'k', v); } },
 					// With the inputs and after them, which is the order this list already follows.
+					paneColFittings(),
 					paneColReaction('bulkCoeff', 'lpn_reaction_bulk_short', paneReactionPerDay),
 					paneColReaction('wallCoeff', 'lpn_reaction_wall_short', paneReactionWallUnit),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient)
 				])
 			},
 			{
 				id: 'pumps', panel: 'lpn_pane_pumps', label: 'lpn_pane_tab_pumps',
 				group: 'link', type: 'pump',
-				// A PUMP HAS NO EDITABLE SCALAR: what it is, is its curve, and a curve is a table of
-				// its own that belongs in the popup. So this tab is a reading of the pumps -- where
-				// they are and what they are doing -- and every cell in it is honest about that.
+				// **THIS TAB USED TO SAY "a pump has no editable scalar" AND TOM STRUCK THAT**
+				// (2026-09-18): *"Make the pump table match the pump properties; I see nothing
+				// special there, and I don't know why you asked."* The old argument was that what a
+				// pump IS, is its curve, and a curve is a document object edited in the Library --
+				// which remains true and is why the two curve columns here are REFERENCES and not
+				// points. It did not follow that the rest was unfit for a table: a relative speed, a
+				// speed pattern, a price of power and its pattern are ordinary numbers and names,
+				// and a person entering forty pumps wants them in rows like everything else.
 				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
 				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
 				// cell and the label beside the symbol cannot disagree.
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
+					paneColCurveRef('curveId', 'head', 'lpn_pump_curve_source'),
+					paneColPumpSpeed(), paneColSpeedPattern(),
+					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
+					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
 				])
@@ -17656,7 +17884,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				id: 'valves', panel: 'lpn_pane_valves', label: 'lpn_pane_tab_valves',
 				group: 'link', type: 'valve',
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
 					{ key: 'valveType', label: 'lpn_field_valve_type', get: paneValveTypeText },
 					// **THE SETTING HEADING CARRIES NO UNIT, AND THAT IS THE HONEST ANSWER.** A
 					// valve's setting is a different physical quantity per type -- a pressure, a
@@ -17669,9 +17897,15 @@ var EngCalcs = EngCalcs || {};
 						get: function (l) { return effective(l, 'setting'); },
 						set: function (l, v) { setProp(l, 'setting', v); } },
 					paneColDiameter(),
+					paneColValveK(),
+					// A GPV states its head loss as a curve; every other valve type states a number,
+					// so the reference is blank on those rows and the chooser offers the same
+					// headloss curves the popup's does.
+					paneColCurveRef('curveId', 'headloss', 'lpn_gpv_curve_source'),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
 					paneColLinkResult('velocity', 'lpn_result_velocity', paneUnitVelocity),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead)
+					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkResult('gradient', 'lpn_result_gradient', paneUnitGradient)
 				])
 			},
 			// **THE TEXT TABLE** (Tom, 2026-09-08, after nine of them turned up in the multi-properties
@@ -17709,6 +17943,9 @@ var EngCalcs = EngCalcs || {};
 			// On the SPEC, because switching tabs is switching data sets: a shared one would
 			// resolve against another table's rows.
 			spec.sel = null;
+			// Which cells currently carry the selection class, by (element id, column key). See
+			// paneSelPaint(): repainting the whole table was 13.3 ms of every arrow key.
+			spec.painted = null;
 			spec.sig = '';
 			spec.orderIds = null;
 			return spec;
@@ -17801,8 +18038,84 @@ var EngCalcs = EngCalcs || {};
 	// table built per mode. paneTableSignature() reads this list too, so the table rebuilds itself
 	// the moment the set changes, and a sort left pointing at a column that has gone falls back to
 	// the id ordering paneTableSorted() already uses for a value nothing carries.
+	// ---- COLUMN WIDTHS AND COLUMN ORDER, WHICH ARE THE READER'S AND NOT THE DOCUMENT'S ----------
+	//
+	// Tom's spreadsheet specification, 2026-09-18, points (d) and (e): *"Each column's width can be
+	// adjusted by clicking on the divider line between column headings"* and *"Columns can be
+	// dragged left and right using their headings."*
+	//
+	// **BOTH ARE WINDOW FURNITURE AND NEITHER GOES IN THE FILE** (CLAUDE.md's Task 584 rule). How
+	// wide a column is, is a fact about the screen somebody is sitting at; which order they like to
+	// read the columns in is a fact about the job they are doing this afternoon. A colleague opening
+	// the project on a laptop must inherit neither, exactly as they must not inherit a 32-inch pane
+	// height. So this is a `localStorage` sibling key that serializeProject() never learns about,
+	// and `lpn_furniture_check.php` holds that.
+	//
+	// **ONE KEY FOR ALL SEVEN TABLES**, shaped `{ <tableId>: { w: {<colKey>: em}, order: [colKey] } }`.
+	// Seven keys would be seven things to declare, seven to migrate and seven to forget.
+	//
+	// **A REMEMBERED ORDER DOES NOT FREEZE THE COLUMN LIST.** Columns appear and disappear with the
+	// document -- a quality column only while a chemical is tracked, one per custom property -- so a
+	// column nobody has dragged is placed AFTER the remembered ones rather than dropped or forced to
+	// the front. A new column therefore shows up, which is the failure that matters; where it shows
+	// up is then one drag away.
+	var LPN_PANECOLS_KEY = 'lpn_panecols';
+	var paneColPrefs = (function () {
+		var raw = null, v;
+		try { raw = localStorage.getItem(LPN_PANECOLS_KEY); } catch (e) { return {}; }
+		if (!raw) { return {}; }
+		try { v = JSON.parse(raw); } catch (e) { return {}; }
+		return (v && typeof v === 'object') ? v : {};
+	}());
+	function paneColPrefFor(specId) {
+		if (!paneColPrefs[specId]) { paneColPrefs[specId] = {}; }
+		return paneColPrefs[specId];
+	}
+	function savePaneColPrefs() {
+		try { localStorage.setItem(LPN_PANECOLS_KEY, JSON.stringify(paneColPrefs)); } catch (e) {}
+	}
+	// The width a column is drawn at: what the reader dragged it to, else what the spec declares,
+	// else the stylesheet's own 7em fallback. In `em`, like every declared width, so it still
+	// follows the reader's text size.
+	function paneColWidthEm(specId, c) {
+		var w = paneColPrefs[specId] && paneColPrefs[specId].w && paneColPrefs[specId].w[c.key];
+		return (typeof w === 'number' && isFinite(w) && w > 0) ? w : (c.em || 0);
+	}
+	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
+	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
+	// to nothing would be a column the reader cannot find again; a column dragged very wide is their
+	// business.
+	function paneSetColWidth(spec, key, em) {
+		var pref = paneColPrefFor(spec.id);
+		if (!pref.w) { pref.w = {}; }
+		pref.w[key] = Math.max(1, Math.round(em * 100) / 100);
+		savePaneColPrefs();
+		return pref.w[key];
+	}
+	function paneMoveCol(spec, key, toIndex) {
+		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
+			from = order.indexOf(key), pref;
+		if (from < 0 || toIndex < 0 || toIndex >= order.length || toIndex === from) { return false; }
+		order.splice(from, 1);
+		order.splice(toIndex, 0, key);
+		pref = paneColPrefFor(spec.id);
+		pref.order = order;
+		savePaneColPrefs();
+		paneTableReset(spec);   // the heading order is part of the signature, so this forces a rebuild
+		return true;
+	}
+	function paneApplyColOrder(spec, cols) {
+		var pref = paneColPrefs[spec.id] && paneColPrefs[spec.id].order, pos = {}, tail;
+		if (!pref || !pref.length) { return cols; }
+		pref.forEach(function (k, i) { pos[k] = i; });
+		tail = pref.length;
+		return cols.map(function (c, i) {
+			return { c: c, at: (pos[c.key] === undefined) ? (tail + i) : pos[c.key] };
+		}).sort(function (a, b) { return a.at - b.at; }).map(function (x) { return x.c; });
+	}
 	function paneCols(spec) {
-		return spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec));
+		return paneApplyColOrder(spec,
+			spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec)));
 	}
 	/**
 	 * **THE CUSTOM PROPERTY COLUMNS** (Task 636), appended rather than baked into buildPaneTables():
@@ -17949,8 +18262,102 @@ var EngCalcs = EngCalcs || {};
 	// inline `style.width` on purpose: an inline width beats every stylesheet, and the phone widths
 	// in css/engcalcs.css -- which Tom has approved and this must not move -- are a stylesheet.
 	// A column that declares no `em` says nothing at all, and CSS's own fallback is the old 7em.
-	function paneApplyColWidth(input, c) {
-		if (c.em) { input.style.setProperty('--lpn-pane-col-w', c.em + 'em'); }
+	// ---- THE TWO HEADING GESTURES -------------------------------------------------------------
+	//
+	// **ONE PAIR OF DOCUMENT LISTENERS PER DRAG, HUNG AND UNHUNG.** A pointer that leaves the table
+	// mid-drag -- which is exactly what happens when somebody drags a column narrow and overshoots
+	// -- never reaches a listener on the table, so the move and the release have to be watched on
+	// the document. They are added when a drag begins and removed when it ends, so there is nothing
+	// standing between drags and nothing to unhook when the table is rebuilt underneath them.
+	//
+	// **THE EM IS COMPUTED FROM THE FONT, NOT ASSUMED TO BE 16 px.** The whole width system on this
+	// page is in `em` so it follows the reader's own text size; measuring a drag in pixels and
+	// dividing by a guess would quietly rescale every column for anybody who has changed it.
+	function paneEmPx(table) {
+		var px = 16, cs;
+		try {
+			cs = window.getComputedStyle && window.getComputedStyle(table || document.body);
+			if (cs && cs.fontSize) { px = parseFloat(cs.fontSize) || 16; }
+		} catch (e) { px = 16; }
+		return px > 0 ? px : 16;
+	}
+	function paneColIndex(spec, key) {
+		var cols = paneCols(spec), i;
+		for (i = 0; i < cols.length; i++) { if (cols[i].key === key) { return i; } }
+		return -1;
+	}
+	// A live resize writes the <col> and every input in that column, so the drag is seen as it
+	// happens; the preference is stored once, on release, rather than on every mouse move.
+	function paneDrawColWidth(spec, key, em) {
+		var i = paneColIndex(spec, key), id;
+		if (i < 0) { return; }
+		if (spec.colGroup && spec.colGroup.children && spec.colGroup.children[i]) {
+			spec.colGroup.children[i].style.width = em + 'em';
+		}
+		for (id in spec.cells || {}) {
+			if (!Object.prototype.hasOwnProperty.call(spec.cells, id)) { continue; }
+			if (spec.cells[id][key] && spec.cells[id][key].style) {
+				spec.cells[id][key].style.setProperty('--lpn-pane-col-w', em + 'em');
+			}
+		}
+	}
+	function paneStartColResize(spec, key, ev) {
+		var cols = paneCols(spec), i = paneColIndex(spec, key), table, unit,
+			startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startEm;
+		if (i < 0) { return; }
+		// A grip is not a sort and not a column move: it is only ever a resize.
+		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+		if (ev && ev.preventDefault) { ev.preventDefault(); }
+		table = spec.colGroup && spec.colGroup.parentNode;
+		unit = paneEmPx(table);
+		startEm = paneColWidthEm(spec.id, cols[i]) || 7;
+		function move(e2) {
+			var dx = ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX;
+			paneDrawColWidth(spec, key, Math.max(1, startEm + dx / unit));
+		}
+		function up(e2) {
+			move(e2);
+			paneSetColWidth(spec, key, Math.max(1, startEm +
+				(((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX) / unit));
+			document.removeEventListener('mousemove', move);
+			document.removeEventListener('mouseup', up);
+		}
+		document.addEventListener('mousemove', move);
+		document.addEventListener('mouseup', up);
+		return { move: move, up: up };
+	}
+	// **THE MOVE COMMITS ONLY WHEN THE POINTER IS OVER A DIFFERENT HEADING**, which is what keeps a
+	// heading click a sort. A press-and-release on one heading changes nothing here and the sort
+	// button's own click handler does its job; a press, a travel and a release somewhere else is a
+	// column move and the click that follows is suppressed once.
+	function paneStartColDrag(spec, key, ev) {
+		var over = null;
+		if (ev && ev.button) { return; }
+		function move(e2) {
+			var th = paneThOfEvent(e2 && e2.target);
+			if (th && th._lpnColKey && th._lpnColKey !== key) { over = th._lpnColKey; }
+		}
+		function up() {
+			document.removeEventListener('mousemove', move);
+			document.removeEventListener('mouseup', up);
+			if (over === null) { return; }
+			if (paneMoveCol(spec, key, paneColIndex(spec, over))) { renderPaneTable(spec); }
+		}
+		document.addEventListener('mousemove', move);
+		document.addEventListener('mouseup', up);
+		return { move: move, up: up };
+	}
+	function paneThOfEvent(node) {
+		var n = node, guard = 0;
+		while (n && guard++ < 6) {
+			if (n._lpnColKey) { return n; }
+			n = n.parentNode;
+		}
+		return null;
+	}
+	function paneApplyColWidth(input, c, spec) {
+		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
+		if (em) { input.style.setProperty('--lpn-pane-col-w', em + 'em'); }
 	}
 	// The placeholder and its explanation for a column that offers a suggestion, and nothing at all
 	// for one that does not. The tip goes on `title` rather than beside the cell: a table of forty
@@ -18017,12 +18424,13 @@ var EngCalcs = EngCalcs || {};
 	function renderPaneTable(spec) {
 		var host = document.getElementById(spec.panel), pc = EngCalcs.pageConfig || {},
 				rows = paneTableRowsInOrder(spec), sig = paneTableSignature(spec, rows),
-			table, thead, tr, tbody, note, filterNote;
+			table, thead, tr, tbody, note, filterNote, cg;
 		if (!host) { return; }
 		if (sig === spec.sig && spec.cells) { refillPaneTable(spec, rows); return; }
 		spec.sig = sig;
 		spec.cells = {};
 		spec.tds = {};
+		spec.painted = null;   // fresh <td>s carry no class: see paneSelPaint()
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
 		// rows with no visible cause is the one way this feature can mislead somebody.
@@ -18053,11 +18461,25 @@ var EngCalcs = EngCalcs || {};
 		}
 		table = document.createElement('table');
 		table.className = 'lpn-pane-table';
+		// **A <colgroup> IS HOW A TABLE COLUMN IS GIVEN A WIDTH**, rather than a width on each cell:
+		// one element per column, so a drag rewrites one style instead of four hundred, and the
+		// heading and its cells cannot end up at two different widths. The inputs keep their own
+		// `--lpn-pane-col-w` because that is what sizes the BOX inside the cell.
+		cg = document.createElement('colgroup');
+		paneCols(spec).forEach(function (c) {
+			var col = document.createElement('col'), em = paneColWidthEm(spec.id, c);
+			if (em) { col.style.width = em + 'em'; }
+			cg.appendChild(col);
+		});
+		table.appendChild(cg);
+		spec.colGroup = cg;
 		thead = document.createElement('thead');
 		tr = document.createElement('tr');
 		paneCols(spec).forEach(function (c, i) {
-			var th = document.createElement('th'), b = document.createElement('button');
+			var th = document.createElement('th'), b = document.createElement('button'),
+				grip = document.createElement('span');
 			th.className = paneCellClass(c, i);
+			th._lpnColKey = c.key;
 			b.type = 'button';
 			b.className = 'lpn-pane-sort';
 			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
@@ -18066,7 +18488,21 @@ var EngCalcs = EngCalcs || {};
 				(spec.sort.col === c.key ? (spec.sort.dir > 0 ? ' ▲' : ' ▼') : '');
 			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
 			b.addEventListener('click', function () { sortPaneTable(spec, c.key); });
+			// **DRAGGING THE HEADING MOVES THE COLUMN** (Tom's point (e)). It is a mousedown on the
+			// heading rather than a drag handle of its own: the heading IS the handle, which is what
+			// he asked for and what every spreadsheet does. A click that never moves is still a
+			// sort, because the reorder only commits once the pointer has crossed into another
+			// heading -- so the two gestures cannot be confused by a hand that is not quite still.
+			b.addEventListener('mousedown', function (ev) { paneStartColDrag(spec, c.key, ev); });
 			th.appendChild(b);
+			// **THE DIVIDER IS ITS OWN TARGET** (Tom's point (d)). A grip sitting on the right edge
+			// of the heading, which is where a spreadsheet user already aims; it is `aria-hidden`
+			// and carries no text, because resizing a column is a pointer gesture with a keyboard
+			// equivalent nobody has asked for and no word that would help a screen reader.
+			grip.className = 'lpn-pane-grip';
+			grip.setAttribute('aria-hidden', 'true');
+			grip.addEventListener('mousedown', function (ev) { paneStartColResize(spec, c.key, ev); });
+			th.appendChild(grip);
 			if (spec.sort.col === c.key) { th.setAttribute('aria-sort', spec.sort.dir > 0 ? 'ascending' : 'descending'); }
 			tr.appendChild(th);
 		});
@@ -18154,7 +18590,7 @@ var EngCalcs = EngCalcs || {};
 					});
 					input.value = paneCellText(c, el);
 				}
-				paneApplyColWidth(input, c);
+				paneApplyColWidth(input, c, spec);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input._lpnCell = { spec: spec, c: c, el: el };
 				input.addEventListener('change', function () { paneCommitCell(input); });
@@ -18186,7 +18622,7 @@ var EngCalcs = EngCalcs || {};
 				// the text, whatever the key handler does or forgets to do. Modelling the mode in
 				// a flag alone would leave the browser still moving a caret underneath it.
 				input.readOnly = true;
-				paneApplyColWidth(input, c);
+				paneApplyColWidth(input, c, spec);
 				input.value = paneCellText(c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
 				input._lpnCell = { spec: spec, c: c, el: el };
@@ -18313,17 +18749,58 @@ var EngCalcs = EngCalcs || {};
 			spec.sel.fKey = cols[c].key;
 		}
 	}
+	/**
+	 * **IT TOUCHES THE CELLS THAT CHANGED AND NOTHING ELSE, AND THAT IS WHY THE TABLE IS NOT SLOW.**
+	 *
+	 * Tom, 2026-09-18: *"Editing is very sluggish, even when I turn off auto recalculate."* He had
+	 * already ruled out the solve, which was the obvious answer and the wrong one. MEASURED with
+	 * `dev/lpn-spike/pane-typing-bench.js` on 400 junctions x 13 columns, before any change: an
+	 * ArrowDown cost **17.9 ms**, of which **13.3 ms was this function** -- it wrote a class onto
+	 * every one of the 5,200 `<td>`s to move a highlight of one cell, on every press, and it is
+	 * called from the keydown, the focusin, the mousedown, the mouseover during a drag and the end
+	 * of every render. In a real browser each of those 5,200 writes is a style invalidation, so his
+	 * machine pays more than that bench does, not less.
+	 *
+	 * **THE SET OF PAINTED CELLS IS REMEMBERED BY (element id, column key), never by index.** A
+	 * sort click, a filter edit or a new part re-orders or rebuilds the rows underneath, so an
+	 * index recorded on the last paint would address a different cell on this one -- the same
+	 * reasoning the selection model itself is built on. Clearing what is no longer in the box and
+	 * setting what has newly entered it is then two loops over the SELECTION rather than one loop
+	 * over the table.
+	 *
+	 * A rebuild makes fresh `<td>`s with no class on them, so renderPaneTable() drops the memory
+	 * with the old cells; a stale memory would leave the first paint after a rebuild believing
+	 * cells were already lit.
+	 */
 	function paneSelPaint(spec, rows, cols) {
-		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {};
-		rows.forEach(function (el, r) {
-			cols.forEach(function (c, i) {
-				var td = tds[el.id] && tds[el.id][c.key], on;
-				if (!td) { return; }
-				on = !!box && r >= box.r0 && r <= box.r1 && i >= box.c0 && i <= box.c1;
-				// One class, and the box is a rectangle, so a cell either is in it or is not.
-				if (on) { td.classList.add('lpn-pane-sel'); } else { td.classList.remove('lpn-pane-sel'); }
-			});
-		});
+		var box = paneSelBox(spec, rows, cols), tds = spec.tds || {},
+			was = spec.painted || {}, now = {}, r, i, el, key, td;
+		if (box) {
+			for (r = box.r0; r <= box.r1; r++) {
+				el = rows[r];
+				if (!el) { continue; }
+				for (i = box.c0; i <= box.c1; i++) {
+					if (!cols[i]) { continue; }
+					now[el.id + '\u0000' + cols[i].key] = true;
+				}
+			}
+		}
+		for (key in was) {
+			if (!Object.prototype.hasOwnProperty.call(was, key) || now[key]) { continue; }
+			td = paneTdByPaintKey(tds, key);
+			if (td) { td.classList.remove('lpn-pane-sel'); }
+		}
+		for (key in now) {
+			if (!Object.prototype.hasOwnProperty.call(now, key) || was[key]) { continue; }
+			td = paneTdByPaintKey(tds, key);
+			// One class, and the box is a rectangle, so a cell either is in it or is not.
+			if (td) { td.classList.add('lpn-pane-sel'); }
+		}
+		spec.painted = now;
+	}
+	function paneTdByPaintKey(tds, key) {
+		var cut = key.indexOf('\u0000'), id = key.slice(0, cut), col = key.slice(cut + 1);
+		return (tds[id] && tds[id][col]) || null;
 	}
 	// The control standing in a cell, or the cell itself where there is none. A result cell and an
 	// identity carry no control at all and are given tabIndex -1 so the caret can still land on
@@ -18402,18 +18879,10 @@ var EngCalcs = EngCalcs || {};
 	// reader somewhere else entirely the first time they tried to type over it. There is no row
 	// header in these tables for it to mean instead.
 	function paneHomeCol(cols) { return Math.min(1, cols.length - 1); }
-	// **THE CARET HAS TO BE AT THE EDGE BEFORE LEFT OR RIGHT LEAVES THE CELL**, or nobody can put
-	// the caret inside `1000` to make it `1500`. A field that refuses to answer is treated as an
-	// edge, which at least still moves. Same rule and same reason as the Curves grid.
-	function paneCaretEdge(input, atEnd) {
-		var st, en, len;
-		if (!input || input.tagName !== 'INPUT') { return true; }
-		len = String(input.value === undefined ? '' : input.value).length;
-		try { st = input.selectionStart; en = input.selectionEnd; } catch (e) { return true; }
-		if (st === null || st === undefined) { return true; }
-		if (st !== en) { return false; }
-		return atEnd ? st >= len : st <= 0;
-	}
+	// (paneCaretEdge() lived here and is DELETED, not left unused. It answered "is the caret against
+	// an edge", which was the old rule for letting Left or Right leave a cell being edited; Tom
+	// struck that rule on 2026-09-18 -- an arrow cannot leave EDIT mode at all now -- so the
+	// question no longer has a caller. Reinstating it would be reinstating the behaviour.)
 	/**
 	 * **THE HEADERS COME WITH A WHOLE-TABLE COPY AND WITH NOTHING ELSE.** Selecting B5:D40 in a
 	 * spreadsheet does not silently prepend a heading nobody selected; selecting the whole table
@@ -18442,39 +18911,82 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out.join('\n');
 	}
-	// ---- EDIT MODE, AND THE PASTE (ROADMAP Task 186, Tom 2026-09-07) ---------------------------
+	// ---- THREE MODES, AND THE PASTE (ROADMAP Task 186; the three-mode spec is Tom's own, 2026-09-18)
 	//
-	// *"Now that they are a spreadsheet, we will have spreadsheet expectations... Reason says that
-	// we are over the tipping point and we should go all the way."* So the model is the
-	// spreadsheet's own, and the two states are real states rather than a manner of speaking:
+	// He wrote the specification out after testing, because *"if we want these tables to act like a
+	// spreadsheet, maybe I should make a prioritize spec list of how spreadsheets act"* -- and the
+	// answer was that this page had TWO states where a spreadsheet has THREE. The middle one is the
+	// whole of the difference, and it is what made his Ctrl+Z feel *"unpredictable"*.
 	//
-	//   NAVIGATION  the cell is `readOnly`. It has no caret, so an arrow cannot be swallowed by the
-	//               text under any circumstances. Typing a character OVERWRITES; F2 or a
-	//               double-click EDITS; Delete empties.
-	//   EDIT        the cell is writable and behaves as a text box. Left and Right are the caret
-	//               until it reaches an edge; Up, Down, Enter and Tab commit and move; Escape
-	//               abandons what was typed and puts back what the document holds.
+	//   SELECT   the cell is `readOnly`. Arrows, the mouse, Tab and Enter all move from cell to
+	//            cell and NEVER open an editor. F2 or a double-click opens EDIT. Typing a
+	//            printable character opens ENTRY. Delete empties the cell.
 	//
-	// **`readOnly` IS THE MECHANISM AND NOT A DECORATION.** Modelling the mode in a flag alone
-	// would leave the browser moving a caret underneath it, and every arrow key would be a race
-	// between our handler and the caret. A read-only input has no caret to move.
-	function paneInEdit(input) {
-		return !!(input && input.tagName === 'INPUT' && input._lpnCell && input.readOnly === false);
+	//   ENTRY    you are typing INTO the cell but you are not editing it. The first character
+	//            REPLACES what was there and the rest append. **ARROW KEYS MOVE TO THE NEIGHBOURING
+	//            CELL, not within the text you just typed** -- Tom singles out the right arrow, and
+	//            it is the one that matters, because a person typing 400 numbers uses Right to move
+	//            on and a caret that swallowed it would be the defect that ruins the whole table.
+	//            F2 promotes ENTRY to EDIT, which is the spreadsheet's own escape hatch when you
+	//            decide mid-entry that you want to fix a character.
+	//
+	//   EDIT     entered only by F2 or a double-click. Arrows move the CARET and **cannot leave the
+	//            mode at all**; the only ways out are Tab, Enter, Escape, or the mouse landing on
+	//            another cell. That is stricter than what shipped -- Left and Right used to leave
+	//            the cell once the caret reached an edge -- and he asked for the stricter rule by
+	//            name, because an edit that jumps out from under you is unrecoverable typing.
+	//
+	// **`readOnly` IS THE MECHANISM FOR SELECT AND NOT A DECORATION.** Modelling that mode in a
+	// flag alone would leave the browser moving a caret underneath it, and every arrow key would be
+	// a race between our handler and the caret. A read-only input has no caret to move. ENTRY and
+	// EDIT are both writable, so THOSE two are told apart by a flag -- there is nothing in the DOM
+	// that distinguishes them, because the difference is entirely in what our own handler does with
+	// an arrow key.
+	//
+	// **WHAT Ctrl+Z MEANS FOLLOWS FROM THE MODES RATHER THAN BEING A RULE BESIDE THEM** (Task 689):
+	// the project undo in SELECT, where there is no caret and nothing is being typed, and the
+	// browser's own text undo in ENTRY and EDIT, where there is a caret and the characters under it
+	// are the user's. One line, and a person can see which they are in.
+	function paneCellMode(input) {
+		if (!input || input.tagName !== 'INPUT' || !input._lpnCell) { return null; }
+		if (input.readOnly !== false) { return 'select'; }
+		return input._lpnEntry ? 'entry' : 'edit';
 	}
+	// Kept as the name the rest of the page already uses for "an editor is open", which is exactly
+	// the question every one of its callers is asking: a refill must not overwrite a cell being
+	// typed in, a paste must not intercept, and Ctrl+Z must leave the keystroke to the browser.
+	// ENTRY and EDIT answer it the same way and only the arrow keys tell them apart.
+	function paneInEdit(input) {
+		var m = paneCellMode(input);
+		return m === 'entry' || m === 'edit';
+	}
+	// `wipe` IS the mode: a wiped cell is ENTRY (a character replaced the contents), a kept one is
+	// EDIT (F2 or a double-click). One argument rather than two, because there has never been a
+	// fourth combination and a second parameter would invite one.
 	function paneEnterEdit(input, wipe) {
 		if (!input || !input._lpnCell || input.type !== 'text') { return false; }
 		input.readOnly = false;
+		input._lpnEntry = !!wipe;
 		// **WHAT THE CELL HELD WHEN EDITING BEGAN**, so Escape has something to put back. Read
 		// here rather than from the document, because the document is where a commit has ALREADY
 		// landed and Escape must undo the typing, not the last commit.
-		input._lpnWas = input.value;
+		if (input._lpnWas === undefined) { input._lpnWas = input.value; }
 		if (wipe) { input.value = ''; }
 		else if (input.select) { input.select(); }
+		return true;
+	}
+	// **F2 IN ENTRY MODE PROMOTES TO EDIT AND KEEPS WHAT HAS BEEN TYPED.** It is not a fresh
+	// paneEnterEdit(): that would re-read `_lpnWas` and select the text, and what the person wants
+	// is the caret where it is with the arrows suddenly meaning the caret.
+	function panePromoteToEdit(input) {
+		if (paneCellMode(input) !== 'entry') { return false; }
+		input._lpnEntry = false;
 		return true;
 	}
 	function paneLeaveEdit(input) {
 		if (!input || !input._lpnCell) { return; }
 		input.readOnly = true;
+		delete input._lpnEntry;
 		delete input._lpnWas;
 	}
 	// Escape. **IT PUTS BACK WHAT WAS THERE AND FIRES NOTHING** -- restoring the text before the
@@ -18599,15 +19111,21 @@ var EngCalcs = EngCalcs || {};
 			box = paneSelBox(spec, rows, cols), key = e && e.key,
 			ext = !!(e && e.shiftKey), jump = !!(e && (e.ctrlKey || e.metaKey)),
 			active = activeElementSafe(), r, c, at;
-		var editing = paneInEdit(active);
+		var mode = paneCellMode(active), editing = (mode === 'entry' || mode === 'edit');
 		if (!key || !rows.length || !cols.length) { return false; }
 		if (e.altKey) { return false; }
 		// **ESCAPE ABANDONS THE EDIT** (Tom's point 3), and it is the first thing asked, because
 		// it must work whatever else the key handler would have made of the moment.
 		if (key === 'Escape' || key === 'Esc') { return paneCancelEdit(active); }
-		// **F2 IS THE KEYBOARD'S DOOR INTO EDIT MODE**, the double-click's twin. It keeps the
-		// value; typing over a cell wipes it, which is Tom's (a) against his (b).
-		if (key === 'F2' && !editing) { return paneEnterEdit(active, false); }
+		// **F2 IS THE KEYBOARD'S DOOR INTO EDIT MODE**, the double-click's twin, from either of the
+		// other two: from SELECT it opens the editor keeping the value, and from ENTRY it promotes
+		// what is already being typed, which is how a person who started overwriting decides they
+		// only wanted to change a character.
+		if (key === 'F2') {
+			if (mode === 'entry') { return panePromoteToEdit(active); }
+			if (mode === 'select') { return paneEnterEdit(active, false); }
+			return false;
+		}
 		// **A PRINTABLE CHARACTER OVERWRITES**, which is the spreadsheet's own most-used gesture:
 		// land on a cell, type, move on. The mode is switched here and the keystroke is then left
 		// to the browser, so the character the user pressed is inserted by the same machinery that
@@ -18640,17 +19158,26 @@ var EngCalcs = EngCalcs || {};
 			paneSelPaint(spec, rows, cols);
 			return true;
 		}
+		// **AN ARROW KEY IN EDIT MODE IS THE CARET AND NOTHING ELSE** (Tom, 2026-09-18: *"You cannot
+		// exit edit mode with the arrow keys. You can only exit with Tab, Enter, or the mouse"*).
+		// It used to leave the cell once the caret reached an edge, which is what the Curves grid
+		// does and what this page copied; he asked for the stricter rule, and he is right that an
+		// edit which jumps out from under you is typing nobody can get back. Home and End are the
+		// caret's too, for the same reason.
+		//
+		// **ENTRY MODE IS THE OPPOSITE AND THAT IS THE WHOLE POINT OF IT**: the arrows commit and
+		// move, so the person typing four hundred numbers types a value, presses Right, and is on
+		// the next cell -- never inside the characters they just typed.
+		if (mode === 'edit' && !jump &&
+			(key.indexOf('Arrow') === 0 || key === 'Up' || key === 'Down' ||
+				key === 'Left' || key === 'Right' || key === 'Home' || key === 'End')) {
+			return false;
+		}
 		if (key === 'ArrowUp' || key === 'Up') { at = jump ? paneJumpEdge(rows, cols, r, c, -1, 0) : { r: r - 1, c: c }; }
 		else if (key === 'ArrowDown' || key === 'Down') { at = jump ? paneJumpEdge(rows, cols, r, c, 1, 0) : { r: r + 1, c: c }; }
 		else if (key === 'ArrowLeft' || key === 'Left') {
-			// **THE CARET RULE APPLIES IN EDIT MODE AND ONLY THERE** (Tom's point 2). While editing,
-			// Left is ordinary text editing until the caret is against the edge, or nobody could
-			// put the caret inside `1000` to make it `1500`. In navigation mode there IS no caret
-			// -- the cell is read-only -- so the arrow simply moves, every time.
-			if (editing && !jump && !ext && !paneCaretEdge(active, false)) { return false; }
 			at = jump ? paneJumpEdge(rows, cols, r, c, 0, -1) : { r: r, c: c - 1 };
 		} else if (key === 'ArrowRight' || key === 'Right') {
-			if (editing && !jump && !ext && !paneCaretEdge(active, true)) { return false; }
 			at = jump ? paneJumpEdge(rows, cols, r, c, 0, 1) : { r: r, c: c + 1 };
 		} else if (key === 'Home') { at = jump ? { r: 0, c: paneHomeCol(cols) } : { r: r, c: paneHomeCol(cols) }; }
 		else if (key === 'End') { at = jump ? { r: rows.length - 1, c: cols.length - 1 } : { r: r, c: cols.length - 1 }; }
@@ -41371,19 +41898,30 @@ var EngCalcs = EngCalcs || {};
 	// reached from where the edit was made is worse than no undo at all -- a person who has learned
 	// Ctrl+Z presses it after a bad paste and nothing happens.
 	//
-	// **THE RULE, AND IT IS THE ONE THE TABLE ALREADY MODELS: native undo while a cell editor is
-	// OPEN, project undo when it is not.** paneInEdit() is that state and is not a second opinion
-	// about it -- a pane cell is `readOnly` in NAVIGATION mode and writable only once F2, a
-	// double-click or a printable character has opened the editor. So Ctrl+Z on a cell somebody is
-	// typing in is still the browser's text undo, which is Tom's own 2026-08-20 point about the
-	// Library fields; Ctrl+Z on a cell nobody is typing in is the map's undo, which is the only
-	// thing it could sensibly mean. A checkbox cell and a select cell are never "being typed in"
-	// and therefore always take the project undo.
+	// **THE RULE FOLLOWS FROM THE THREE MODES RATHER THAN SITTING BESIDE THEM**, and that is the
+	// correction Tom's *"Ctrl+Z doesn't work or is unpredictable. I can't tell"* earned (2026-09-18).
+	// It was first written on a TWO-state model -- editor open against editor closed -- and a
+	// two-state rule cannot be predicted by somebody living in three states: typing a character put
+	// him in ENTRY, which still looks like SELECT because he had not asked to edit anything, and
+	// Ctrl+Z there quietly meant something else.
+	//
+	//   SELECT  the project undo. There is no caret and nothing is being typed.
+	//   ENTRY   the browser's own text undo. There IS a caret and the characters under it are his.
+	//   EDIT    the browser's own text undo, for the same reason.
+	//
+	// The boundary is now visible without being announced, because it is the same boundary the
+	// arrow keys are on: where Right moves to the next cell, Ctrl+Z undoes the project; where Right
+	// moves the caret, Ctrl+Z undoes the typing. Escape returns a cell to SELECT, and so does every
+	// commit, so the project undo is one keystroke away at all times. That is also Tom's own
+	// 2026-08-20 point about the Library fields, kept: an ordinary input anywhere else on the page
+	// still has its native undo, because it has no cell context at all.
+	//
+	// A checkbox cell and a select cell have no editor to open, so they are permanently in SELECT.
 	//
 	// Nothing else moves: the tool-key handler below keeps the plain isTextEntry() guard, because a
-	// bare digit on a navigating cell OVERWRITES it (Task 186) and must not also pick a tool.
+	// bare digit on a selected cell OVERWRITES it (Task 186) and must not also pick a tool.
 	function paneCellNavigating(el) {
-		return !!(el && el._lpnCell && !paneInEdit(el));
+		return paneCellMode(el) === 'select';
 	}
 	document.addEventListener('keydown', function (e) {
 		if (isTextEntry(e.target) && !paneCellNavigating(e.target)) { return; }

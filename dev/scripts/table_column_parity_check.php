@@ -65,18 +65,20 @@
  *   - The reverse direction. A column with no popup row is not a finding: the tables carry results
  *     the popup shows only after a solve, and Tom has asked for columns the popup does not have.
  *
- * ADVISORY, and deliberately so while the gap count is above zero: it reports, it does not block.
- * The moment the count reaches zero this becomes a ratchet -- change EC_TABLE_PARITY_ADVISORY to
- * false and it fails the build on the first popup row that ships without a column.
+ * **A RATCHET AT ZERO SINCE 2026-09-19**, which is what it was built to become. It shipped advisory
+ * at 28 gaps the day before; Tom read the list and said *"Fix all that was found"*, so all 28 were
+ * closed and the flag turned over. It now FAILS THE BUILD on the first popup row that ships without
+ * a column of its own -- which is the only state in which it is doing the job, because a number
+ * printed beside a green build is a number nobody has to act on.
  */
 
-// **ADVISORY UNTIL THE GAP COUNT IS ZERO.** See the closing note of the docblock above.
-const EC_TABLE_PARITY_ADVISORY = true;
+// **A RATCHET AT ZERO.** See the closing note of the docblock above.
+const EC_TABLE_PARITY_ADVISORY = false;
 
 /**
  * Popup rows that are NOT findings, keyed `<type>/<label identity>`, with the reason each.
  *
- * FOUR KINDS, and only the first is "this is deliberately not in the table":
+ * FIVE KINDS, and only the first is "this is deliberately not in the table":
  *   a. NOT A PROPERTY. The scenario override marker is a checkbox ABOUT a row, not a row.
  *   b. ALREADY A COLUMN UNDER A DIFFERENT LABEL. A table heading has to fit a column and a popup
  *      row does not, so several pairs are one property wearing a long name and a short one. The
@@ -84,6 +86,8 @@ const EC_TABLE_PARITY_ADVISORY = true;
  *      not evidence of one property, which is the whole reason the key is what is compared.
  *   c. A COLUMN BUILT AT RUN TIME. A custom property is a column, made in paneCols() from the
  *      document's own list, so there is no static label for the scan to find.
+ *   e. NOT THIS ELEMENT'S PROPERTY AT ALL. A roll-up of other elements that have a table of their
+ *      own -- the meters attached to a junction.
  *   d. A LABEL THE SCAN CANNOT RESOLVE. One popup row builder is wrapped in a helper declared
  *      INSIDE its render function, so the label arrives as that helper's parameter and this walk
  *      (which only substitutes across top-level functions) sees the parameter name.
@@ -113,6 +117,7 @@ const EC_TABLE_PARITY_EXEMPT = [
     'pipe/fn:pipeTypePropLabel' => 'b. the reaction pair a pipe type owns; the columns are '
         . 'lpn_reaction_bulk_short and lpn_reaction_wall_short',
     'pipe/lpn_field_km' => 'b. the column is lpn_field_km_short',
+    'valve/lpn_field_km' => 'b. the column is lpn_field_km_short, which states the rule on a TCV row',
     'tank/lpn_reaction_tank' => 'b. the column is lpn_reaction_tank_short',
     'valve/lpn_field_valve_setting_drop' => 'b. the column is lpn_field_valve_setting, which carries '
         . 'no unit on purpose: a valve setting is a different quantity per type',
@@ -121,6 +126,10 @@ const EC_TABLE_PARITY_EXEMPT = [
     'valve/lpn_field_valve_setting_pressure' => 'b. see lpn_field_valve_setting_drop',
     'text/lpn_field_text_attached' => 'b. an attached Text takes its alignment from its leader; the '
         . 'align and valign columns state that rule in the cell through plainWord/plainTip',
+    // (e) not this element's property at all. A junction's Customers line is a ROLL-UP of other
+    // elements -- the meters attached to it -- and those have a table of their own, with a row per
+    // customer. A column here would be a count in a cell that nothing can edit.
+    'junction/lpn_node_customers' => 'e. a roll-up of the Customers table\'s own rows, not a junction property',
     // (d) a label that arrives as a nested helper's parameter.
     'text/fn:labelText' => 'd. alignRow() is declared inside renderLabelFields(); the two rows it '
         . 'builds are the lpn_field_text_align and lpn_field_text_valign columns',

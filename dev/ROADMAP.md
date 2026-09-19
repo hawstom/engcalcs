@@ -267,31 +267,35 @@ the block.
     out to need new words, stop -- that is a different decision and a different price.
 
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
-  **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
-  Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
-  project we should be working on in the roadmap if not on a branch."* He is right that it is not
-  tracked: Task 186 is the tables interface and Task 610 is paste that CREATES rows, and neither is
-  the general capability.
-  - **THIS IS AN UMBRELLA, NOT A TASK, and it should not be started as one.** What belongs under it:
-    undo inside the table (Task 689), paste that creates rows (610, gated on Declan's spec), column
-    hide (Declan's own named fix, with a design in his journal), fill-down, multi-cell selection, and
-    whatever `tables-interface` already holds.
+  **HIS OWN THREE-MODE SPECIFICATION IS THE CENTRE OF IT** (2026-09-18, after testing
+  `feat/tables-spreadsheet`): (a) Select, (b) Entry, (c) Edit, plus (d) column widths dragged from
+  the divider and (e) columns dragged by their headings. All five are BUILT and await his browser
+  pass; what cannot be judged from here is the picture, not the behaviour.
+  - **THE MIDDLE MODE IS THE WHOLE FINDING.** This page had two states where a spreadsheet has
+    three, and ENTRY is the one it lacked: typing a character replaces the cell, and the arrows
+    still move from CELL to cell rather than into the characters just typed. He singled out the
+    right arrow, which is the keystroke a person entering four hundred numbers presses after every
+    value. **It also explains his *"Ctrl+Z doesn't work or is unpredictable"***: the undo rule was
+    written on the two-state model, so typing put him in a state he had not asked for where Ctrl+Z
+    quietly meant something else. It now reads off the arrow keys -- where Right moves a cell, the
+    project undoes; where Right moves the caret, the typing undoes.
+  - **AND AN ARROW CANNOT LEAVE EDIT MODE AT ALL**, which is stricter than what shipped and is his
+    ruling: *"You can only exit with Tab, Enter, or the mouse."*
+  - **"EDITING IS VERY SLUGGISH" WAS ONE FUNCTION AND IT WAS MEASURED, NOT GUESSED.** He had already
+    ruled out the solve. `dev/lpn-spike/pane-typing-bench.js` on 400 junctions x 13 columns: an
+    ArrowDown cost **17.9 ms, of which 13.3 ms was `paneSelPaint()`** writing a class onto all 5,200
+    cells to move a highlight of one. It now touches only the cells that changed: **0.42 ms**, 42x.
+  - **THE PARITY CHECK IS A RATCHET AT ZERO.** All 28 gaps closed on his *"Fix all that was
+    found"*, the pumps table included -- *"I see nothing special there, and I don't know why you
+    asked"* -- so its own comment claiming a pump has no editable scalar is struck.
   - **`tables-interface` IS MERGED INTO `feat/tables-spreadsheet` ON HIS WORD** (*"Can you try to
-    merge it?"*, 2026-09-19). It held no code: one ROADMAP block and its `branch-policy.json` entry,
-    and the block took ID 666, which a gallery task had closed under the same number the same day.
-    Its content is folded here rather than re-numbered -- copy and paste is the defect inside the
-    programme, user-resizable columns and headings that do not wrap are the programme, and the
-    bottom pane's tab strip is a SEAM shared with `custom-property` and `graph`, which also add
-    columns. The branch-policy entry is kept, so the name stays protected.
-  - **TWO PIECES ARE BUILT ON `feat/tables-spreadsheet`.** Undo inside the table (689, closed), and
-    `table_column_parity_check.php`, which derives both surfaces from the source and **names 28
-    popup properties with no column in their own table** -- the quality source on every node, a
-    link's Closed, pipe type and fittings, the head-loss gradient, the tank's mixing, the
-    reservoir's head pattern, the junction's emitter, and the whole of the pump. Advisory until
-    that count is zero; run it for the list.
-  - **WHETHER THE PUMP ROWS SHOULD BE COLUMNS AT ALL IS HIS CALL, NOT A DEFECT.** That table says
-    in its own comment that a pump has no editable scalar and is a reading rather than an editor;
-    a speed and an energy price are scalars, and nothing mechanical can settle which is right.
+    merge it?"*). It held no code: one ROADMAP block and a `branch-policy.json` entry, and the block
+    took ID 666, which a gallery task had closed under the same number the same day. Its content is
+    folded here rather than re-numbered -- copy and paste was the defect inside the programme,
+    resizable columns and headings that do not wrap were the programme, and the bottom pane's tab
+    strip is a SEAM shared with `custom-property` and `graph`, which also add columns.
+  - Still open under the umbrella: paste that CREATES rows (610, gated on Declan's spec), column
+    hide, fill-down.
 
 - 75|691| **Banner messages are annoying, and one of them is a trap.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked

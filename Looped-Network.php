@@ -1613,6 +1613,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_tab_tip: <?=json_encode($ec_lang['lpn_pane_tab_tip'])?>,
 	lpn_pane_none: <?=json_encode($ec_lang['lpn_pane_none'])?>,
 	lpn_pane_text_attached: <?=json_encode($ec_lang['lpn_pane_text_attached'])?>,
+	lpn_pane_not_used: <?=json_encode($ec_lang['lpn_pane_not_used'])?>,
 	lpn_pane_paste_note: <?=json_encode($ec_lang['lpn_pane_paste_note'])?>,
 	lpn_pane_filter_note: <?=json_encode($ec_lang['lpn_pane_filter_note'])?>,
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
