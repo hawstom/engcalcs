@@ -48,6 +48,8 @@
         "feat/survey-import",
         "feat/library-import",
         "feat/xy-world-map",
+        "feat/tables-spreadsheet",
+        "feat/customer-find-labels",
         "feat/lock-initials-later"
     ],
     "feature_freeze": {
