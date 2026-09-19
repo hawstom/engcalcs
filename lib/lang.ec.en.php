@@ -1389,6 +1389,11 @@ $ec_lang['lpn_run_menu_tip']='Recalculate this network now. The Calculate button
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_auto_run_tip']='Hides the Calculate button and recalculates after any edit. Turn off if recalculation is too slow.';
+// **WHAT AN EDIT SAYS WHEN THE SWITCH IS OFF** (2026-09-19). Off means off: nothing is solved, so
+// the numbers that were on screen describe a network that no longer exists and are taken away
+// rather than left to be believed. Says the same three things the fire flow sentence says, in the
+// same order -- what happened, why, and what to press -- because it is the same event.
+$ec_lang['lpn_manual_results_cleared']='The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.';
 // Says what it MEASURED and where the switch is, in that order. The number first, because a person
 // who has just waited a second already knows something is slow and wants it confirmed, not
 // explained. {secs} is one decimal.
@@ -2862,20 +2867,14 @@ $ec_lang['lpn_time_run']='Calculate';
 $ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
-// **IT STATED A CAUSE IT NEVER MEASURED, AND TOM HAD TO SAY SO TWICE** (2026-09-05: *"Message is
-// wrong, I think. Automatic recalculation is turned off by the user. When else would this shown?
-// This is the second time I mentioned this."*). It read "This network takes so long to calculate
-// over its whole time period that ..." -- but `EC.lpnTimeStatusNote()` consults no timing at all.
-// Its whole gate is `!autoRunAllowed()`, which asks ONE question: did the user turn the checkbox
-// off. So a small fast network whose owner unchecked that box was told its network was slow.
-//
-// The page does measure speed elsewhere and says so honestly: `adviseIfSlow()` writes
-// `lpn_time_run_slow` when a completed run passes `LPN_TIME_SLOW_MS`. That is ADVICE about a
-// measurement. This note is a statement about a SETTING, and it now says which setting, because
-// that is both the true cause and the one the reader can act on.
-// Full record, including why the row could not be closed as a wording question:
-// `dev/eps-terminology-audit.md` section 5.
-$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.';
+// **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
+// `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
+// LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
+// but the later time steps, and Tom read it as the defect it was: *"when Recalculate is off, the
+// first time step is still calculated. This is bad. Off means off."* Off now means off -- an edit
+// with the box unticked solves nothing at all -- so there is no such state left to describe, and
+// the reader is told the results were CLEARED instead (`lpn_manual_results_cleared`, below).
+// The measurement and the new gate: scheduleSolve() in js/looped-network.js.
 // ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
 // Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are

@@ -125,6 +125,18 @@ owns.
   one instant. The Calculate button returns to the toolbar the moment the box is unchecked
   (`js/lpn-time.js:1363`), and the Project menu's Run row is present either way by design.
 
+**SUPERSEDED 2026-09-19: THE BEHAVIOUR WAS NOT SOUND EITHER, AND THE SENTENCE IS DELETED.** This
+section concluded that unchecking the box was working correctly and only the wording was wrong.
+Tom read the shipped sentence and drew the opposite conclusion from the same words: *"when
+Recalculate is off, the first time step is still calculated. This is bad. Off means off."* He was
+right. `settings.autoRun` reached the arithmetic only through `scheduleIdleRun()`, so the steady
+solve at the first reporting time ran on every edit, and on a document with no duration the switch
+suppressed nothing at all -- measured on Net3 at one full EPANET solve per edit. The gate is now at
+`scheduleSolve()`, `lpn_time_run_note` and `EC.lpnTimeStatusNote()` are gone from all 27 language
+files and from the page, and an edit with the box off clears the results and says so
+(`lpn_manual_results_cleared`). `dev/lpn-spike/manual-recalc-harness.js` holds it. **Everything
+below this line is the record of the wording question and is kept only for that.**
+
 **So the behaviour is sound. The SENTENCE is not.**
 
 `EC.lpnTimeStatusNote()` returns this note whenever the project is extended and auto-run is off. It

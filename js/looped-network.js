@@ -22953,7 +22953,9 @@ var EngCalcs = EngCalcs || {};
 		// still dropped, which is the one thing scheduleSolve() does besides the arithmetic: its
 		// rings describe the network they were run on, and this is a different project.
 		perfDebugTime('scheduleSolve', function () {
-			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleSolve(); }
+			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. Opening
+			// a project must give the user their answers whatever "Recalculate automatically" says.
+			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleArrivalSolve(); }
 		});
 		perfDebugTime('tabs', function () { renderTabs(); });
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
@@ -26829,13 +26831,61 @@ var EngCalcs = EngCalcs || {};
 	// below run, because afterwards nothing is open and the question is unanswerable. Exactly the
 	// things this handler closes and nothing else: the Find box, for instance, is not on Escape at
 	// all, so an open Find must not stand between the reader and their tool.
+	/**
+	 * **BIG GUARDS ON CLOSING A BOX: ESCAPE REACHES A BOX ONLY WHEN FOCUS IS INSIDE IT** (Tom,
+	 * 2026-09-19: *"please don't let Escape close those boxes when the mouse cursor is elsewhere.
+	 * When I say 'only when box is in focus', I mean it in the strongest way possible. Big guards
+	 * on closing a box."*).
+	 *
+	 * The handler below used to be page-wide for every one of its closers, so an Escape meant for
+	 * something else -- leaving a tool, clearing a selection, dismissing a menu -- also swept away
+	 * a Properties, Settings or Libraries box standing quietly in a corner that the reader had not
+	 * touched. That is a FOCUS defect and not a question about whether Escape may close a box at
+	 * all: the old handler asked `document.activeElement` nothing.
+	 *
+	 * **THE THREE STANDING BOXES ARE SCOPED AND THE MENUS ARE NOT**, which is the line Ida drew
+	 * (`dev/agents/interface-designer/journal.md`, 2026-09-18) out of Higley's "Escaping 101": a
+	 * pull-down and a view popover never take focus, so there is no focus to ask about and
+	 * page-wide dismissal is the whole convention -- and Tom's own 2026-08-13 ruling already says
+	 * *"these are menus, not boxes"*. A standing box DOES take focus, and Escape is legitimate
+	 * there exactly while it holds the interaction.
+	 *
+	 * **AND THIS TAKES NO KEYBOARD EXIT AWAY.** All three boxes carry a real `<button>` close
+	 * control in the tab order, so a reader who never focused the box was never using Escape to
+	 * leave it, and one who DID focus it still gets the one-key exit that guard is protecting.
+	 *
+	 * It is deliberately blunt about what counts: `body` and the document element are not "inside"
+	 * anything, so the ordinary state -- a reader who has clicked the drawing, or clicked nothing
+	 * at all -- reaches no box. That bluntness is the guard.
+	 */
+	var ESCAPE_SCOPED_BOXES = ['lpn_popup', 'lpn_settings_box', 'lpn_library_box'];
+	function escapeFocusIsInside(id) {
+		var box = document.getElementById(id), el;
+		if (!box) { return false; }
+		try { el = document.activeElement; } catch (err) { return false; }
+		if (!el || el === document.body || el === document.documentElement) { return false; }
+		return el === box || (typeof box.contains === 'function' && box.contains(el));
+	}
+	function escapeOwnsScopedBox() {
+		return ESCAPE_SCOPED_BOXES.some(escapeFocusIsInside);
+	}
+	// **WHAT ESCAPE CAN COST BEFORE IT COSTS THE TOOL** (Tom, 2026-09-05). Asked BEFORE the closers
+	// below run, because afterwards nothing is open and the question is unanswerable. Exactly the
+	// things this handler closes and nothing else: the Find box, for instance, is not on Escape at
+	// all, so an open Find must not stand between the reader and their tool.
+	//
+	// **AND IT ASKS THE SAME FOCUS QUESTION THE CLOSERS DO**, which is the half that is easy to
+	// miss: a box that is open but unfocused is no longer something this press is going to cost,
+	// so counting it here would make Escape cost NOTHING at all -- neither the box nor the tool --
+	// for as long as that box sat there. Scoping the closers without scoping this would trade
+	// Tom's complaint for a dead Escape key.
 	function escapeClosableOpen() {
-		var open = ['lpn_menu_popup', 'lpn_popup'].concat(VIEW_POPOVERS).some(function (id) {
+		var open = ['lpn_menu_popup'].concat(VIEW_POPOVERS).some(function (id) {
 			var p = document.getElementById(id);
 			return !!p && !!p.style.display && p.style.display !== 'none';
 		});
 		var hint = document.getElementById('lpn_empty_hint');
-		return open || setboxIsOpen() || libBoxIsOpen() ||
+		return open || escapeOwnsScopedBox() ||
 			!!(hint && hint.style.display === 'block');
 	}
 	// Escape dismisses whatever pull-down is showing -- the other half of "these are menus, not
@@ -26853,15 +26903,19 @@ var EngCalcs = EngCalcs || {};
 		// not reach, and it is the box people open most. Field values are already committed on
 		// `change`, which fires on blur before this handler runs, so dismissing cannot lose a typed
 		// number -- the same contract every other box here has.
-		closePopup();
-		// ...and the Settings box, which is a standing box like the property popup and is closed
-		// the same three ways: its X, the button that opened it, and Escape. Its filter field takes
-		// Escape first while it holds text (see wireSettingsBox), so a typo costs the search rather
-		// than the box.
-		closeSettingsBox();
-		// ...and the Libraries box, which is the same kind of standing box and is closed the same
-		// three ways. It carries no filter field, so nothing here takes the key first.
-		closeLibraryBox();
+		//
+		// ...and the Settings box and the Libraries box, which are standing boxes of the same kind
+		// and are closed the same three ways: their X, the button that opened them, and Escape.
+		// Settings' filter field takes Escape first while it holds text (see wireSettingsBox), so a
+		// typo costs the search rather than the box.
+		//
+		// **ALL THREE ONLY WHEN FOCUS IS INSIDE THE BOX ITSELF** -- see escapeFocusIsInside() above
+		// for Tom's words and the reasoning. Each is asked separately rather than as one group, so
+		// an Escape inside Settings costs Settings and leaves an open Properties box alone: one
+		// press, one thing, which is the rule the rest of this handler already keeps.
+		if (escapeFocusIsInside('lpn_popup')) { closePopup(); }
+		if (escapeFocusIsInside('lpn_settings_box')) { closeSettingsBox(); }
+		if (escapeFocusIsInside('lpn_library_box')) { closeLibraryBox(); }
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
 		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
@@ -44831,11 +44885,10 @@ var EngCalcs = EngCalcs || {};
 				'These rules name an element that is no longer in this project, so they were ignored in this run: {ids}'),
 			droppedNote('rule-unreadable', 'lpn_rule_unreadable_note',
 				'These rules could not be read, so they were ignored in this run: {ids}'),
-			// The same kind of thing as valveRouteNote: a fact about THIS network that has to be
-			// known to read the numbers on screen. Here, that only the first reporting time is
-			// being kept up to date, because working the whole period out costs more than this
-			// page is willing to spend while you are still typing (js/lpn-time.js, LPN_TIME_AUTO).
-			EngCalcs.lpnTimeStatusNote ? EngCalcs.lpnTimeStatusNote() : '']
+			// (A note about the later times being out of date used to be composed here. It is gone:
+			// off means off now, so there is no state in which SOME of a run is up to date --
+			// see EC.lpnTimeDropRun() in js/lpn-time.js.)
+			'']
 			.filter(function (t) { return !!t; }).join(' '));
 		// The engine notes go to their OWN span, so their two-minute clock runs independently of
 		// this diagnostic. Written only when one of them was actually raised THIS solve --
@@ -44993,6 +45046,7 @@ var EngCalcs = EngCalcs || {};
 	// architecture ported from the spike) -- solving on every one of those would both be wasted
 	// work and would fight the drag for the main thread.
 	var solveTimer = null;
+	var manualSaveTimer = null;
 	function scheduleSolve() {
 		// **A FIRE FLOW RUN DESCRIBES THE NETWORK IT WAS RUN ON** (Task 530). This is the one thing
 		// every edit on this page goes through, so it is the one place the stale result set can be
@@ -45000,7 +45054,72 @@ var EngCalcs = EngCalcs || {};
 		// is quietly wrong, which is worse than no picture.
 		clearFireFlowRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
+		solveTimer = null;
+		// **OFF MEANS OFF** (Tom, 2026-09-19: *"With recalculate off and no zooms happening, there
+		// should be nothing happening when I change inputs. It should be lightning fast."*).
+		//
+		// **AND UNTIL NOW IT DID NOT MEAN OFF AT ALL.** `settings.autoRun` was read in exactly one
+		// place that could stop arithmetic -- js/lpn-time.js's scheduleIdleRun() -- so all the
+		// switch ever suppressed was the LATER time steps of an extended-period run. The steady
+		// solve at the first reporting time still ran on every edit, and on a document with no
+		// duration at all the switch suppressed nothing whatsoever. Measured on the shipped Net3
+		// example with the box unticked: one pipe roughness edit still produced one full EPANET
+		// solve, 26 ms of main-thread work before the engine was even called
+		// (dev/lpn-spike/manual-recalc-harness.js).
+		//
+		// So the gate belongs HERE, at the one door every edit goes through, rather than one layer
+		// further in where only half the edits could ever reach it.
+		if (settings.autoRun === false) { afterManualEdit(); return; }
 		solveTimer = setTimeout(runSolve, 300);
+	}
+	/**
+	 * **ARRIVING IS NOT AN EDIT**, which refreshAllFromDocument() already says in its own words: a
+	 * file that states a 24-hour run is asking to see the 24 hours, and EC.lpnTimeArrived() has
+	 * already marked the run as wanted by the time this is reached. So an arrival solves whatever
+	 * the switch says, exactly as it did before the gate above existed. The switch decides what an
+	 * EDIT costs, and opening a project is the user asking for answers rather than changing them.
+	 */
+	function scheduleArrivalSolve() {
+		clearFireFlowRun(false);
+		if (solveTimer) { clearTimeout(solveTimer); }
+		solveTimer = setTimeout(runSolve, 300);
+	}
+	/**
+	 * Everything an edit still owes the page when no solve is going to happen. Two things, and the
+	 * first is the reason this is not simply `return`.
+	 *
+	 *   1. **THE EDIT STILL HAS TO PERSIST.** Autosave piggybacked on the solve debounce -- see
+	 *      runSolve()'s own saveToStorage() -- so cutting the solve out without this would lose
+	 *      every edit made with the switch off at the next reload. Same 300 ms, so one burst of
+	 *      typing is still one save.
+	 *   2. **THE NUMBERS ON SCREEN DESCRIBE A NETWORK THAT NO LONGER EXISTS.** Dropping them rather
+	 *      than marking them stale is this page's existing answer in two other places
+	 *      (clearFireFlowRun() above, dropFrames() in js/lpn-time.js) and it is EPANET's. A label
+	 *      reading a pressure for a pipe whose diameter has since changed is worse than a blank
+	 *      one, because it is believable.
+	 *
+	 * The drawing itself is not touched here at all: whoever called us has already redrawn what
+	 * they changed, which is why an edit with the switch off still SHOWS.
+	 *
+	 * **THE SECOND AND EVERY LATER EDIT OF A BURST COST NOTHING**, which is what makes this
+	 * lightning fast rather than merely cheaper: once the results are gone there is nothing left
+	 * to drop, so a following edit is one comparison and a timer reset.
+	 */
+	function afterManualEdit() {
+		if (manualSaveTimer) { clearTimeout(manualSaveTimer); }
+		manualSaveTimer = setTimeout(function () {
+			manualSaveTimer = null;
+			saveToStorage();
+		}, 300);
+		if (EngCalcs.lpnTimeDropRun) { EngCalcs.lpnTimeDropRun(); }
+		if (!lastSolveResult) { return; }
+		lastSolveResult = null;
+		setStatus((EngCalcs.pageConfig || {}).lpn_manual_results_cleared ||
+			'The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.',
+			'manual-cleared');
+		refreshLabelText();
+		refreshValueColors();
+		refreshPaneIfOpen();
 	}
 
 	// calcAndSave() calls this unconditionally, from the units strip's own selects and from
