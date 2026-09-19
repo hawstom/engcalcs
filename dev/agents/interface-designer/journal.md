@@ -2093,3 +2093,140 @@ used for the frame (`:12200` etc.) — recommendation 2 above assumes it might a
 before building, not asserted as already true.
 
 No shipped file touched; the worktree was read only, per the brief.
+## 2026-09-18 — Escape and non-modal boxes; and a second opinion on remembered initials
+
+Checked master at `fb9bdc24` and branch `feat/lock-initials-later` at `37f05c7e`, both 2026-09-18.
+
+### Question 1 — Escape closing Properties/Settings when they are not in focus
+
+**What is actually shipped, and why Tom's complaint is correct as stated.** OBSERVED
+`js/looped-network.js:25258-25305` (checked 2026-09-18): one `document`-level `keydown` listener,
+not scoped to focus at all, runs `closeMenu(); closeViewPopovers(); closePopup(); closeSettingsBox();
+closeLibraryBox();` on every Escape press anywhere on the page, THEN falls through to "leave the
+armed tool" and "clear the selection" if nothing was open. So today a Properties or Settings box
+open in the corner of the screen, that the reader has not touched in the current gesture, is closed
+by an Escape meant for something else entirely — exactly the shape of his complaint. This is a
+FOCUS bug, not a "should Escape ever close these" bug: the handler doesn't ask `document.activeElement`
+anything.
+
+**The real close routes are ordinary buttons, not Escape-only.** OBSERVED `Looped-Network.php:664`
+(`#lpn_popup`, the Properties box), `:682` (`<button type="button" id="lpn_popup_close" ... aria-label="Close">×</button>`),
+`:743` (`#lpn_setbox_close`, same shape for Settings), `:997` (`#lpn_libbox_close`, Libraries). All
+three are real `<button>` elements with `aria-label`/`title` = "Close" (`lpn_close`), so they are
+in the normal Tab order and fire on Enter or Space like any button. **A keyboard-only visitor with
+no pointer at all is NOT stranded if Escape stops closing these boxes** — Tab to the × and press
+Enter still works, it is just more keystrokes than one Escape. That directly answers the brief's
+accessibility question: Escape is not the only keyboard route here, unlike the zoom control I found
+had no keyboard route at all (Task 682, journal 2026-09-17) — this is a different, milder case.
+
+**Convention.** CITED (Sarah Higley, "Escaping 101," sarahmhigley.com, fetched 2026-09-18): real
+platforms disagree on Escape's exact scope and the article's own conclusion is that there is no
+universal rule — but the piece's organizing distinction is FOCUS: "combobox menus and tooltips
+never take focus, so no active focus handling needs to occur when they are dismissed," while a
+component that DOES take focus (a dialog, a slide-pane, certain menus) should hand focus back to
+whoever opened it when Escape closes it. That is a convention that Escape is legitimate wherever
+the thing being dismissed currently HOLDS the interaction — never that it reaches into a panel
+sitting unfocused in the background. CITED (WAI-ARIA Authoring Practices Guide, w3.org, general
+knowledge of the disclosure/dialog patterns, cross-checked via search 2026-09-18): Escape is
+documented per-widget, on the widget that has focus, not as a page-wide "close everything open" key.
+SPECULATION, from ordinary use of desktop tools rather than a citation I can point at: docked
+panels in image/CAD editors (a Photoshop-style Layers palette, an Illustrator-style Properties
+panel) are not closed by Escape at all — Escape in those tools cancels the current operation or
+deselects, and a panel is closed by its own control. That is the same shape Tom is naming with
+"non-hog boxes," and it lines up with his Vision 1 rather than contradicting it. I could not verify
+this against a written spec in the time budgeted; treat it as informed guesswork, not a citation.
+
+**Which rule I would ship.** Not his blunt version and not a no-op — a **focus-scoped** version:
+Escape closes Properties/Settings/Libraries only when the keypress lands while focus is *inside*
+that box (`document.activeElement` under `#lpn_popup` / `#lpn_setbox` / `#lpn_libbox`); an Escape
+pressed anywhere else on the page — the canvas, the toolbar, a field, empty space — leaves an
+unfocused box exactly where it was and falls through to the tool/selection behavior it already has.
+This is the smaller change the brief asked me to weigh against the blunt one, and I think it is
+also the *better* one on the merits, not merely the cheaper one: it keeps a genuine keyboard exit
+for the one visitor who tabbed INTO the box and wants out without walking back to the × — a real
+person, not a hypothetical, since the box's own fields are all reachable by Tab and a reader
+already inside a Settings box that wants to leave it is the case Higley's rule protects. Tom's
+blunter Vision 1 (Escape can NEVER close these, click only) is defensible and is not an
+accessibility regression either, given the real × buttons — but it throws away a working keyboard
+exit for no reader-visible benefit over the focus-scoped fix, which already stops the exact
+complaint he filed (a box he was not touching disappearing). I would ship focus-scoped first,
+and treat "never" as the fallback if testing shows even the scoped version still feels wrong in
+practice — that is a testable difference, not a hunch either way needs to resolve on paper.
+
+One implementation note for whoever builds this, not a design opinion: `closeMenu()` and
+`closeViewPopovers()` (menu pull-downs and view popovers) are a DIFFERENT class of thing from
+these two boxes — a pull-down is the disclosure-menu pattern Tom's own 2026-08-13 ruling already
+names ("these are menus, not boxes") and Higley's non-focus-taking case applies to it cleanly.
+Nothing above touches that part of the handler; only the `closePopup()` / `closeSettingsBox()` /
+`closeLibraryBox()` three lines want the focus guard.
+
+### Question 2 — remembering initials across roles: is it good thinking, mostly, with one flag
+
+**This proposal collides with a decision made on `feat/lock-initials-later`, not yet on master,
+and the code comment calls it "the whole point."** OBSERVED `feat/lock-initials-later`
+`js/looped-network.js:23261-23291` (checked 2026-09-18, branch head `37f05c7e`): identity is now
+minted SILENTLY with an empty name (`identity = { holder: randomToken(24), name: '', trained: false };`)
+— nobody is asked anything to acquire a lock — and the name a colleague types into the new "Ask"
+dialog is, in the comment's own words, **"SENT, never stored — that is the whole point of Task
+667(b)."** That is the design ROADMAP Task 667(b) (`dev/ROADMAP.md:569-588`) already shipped on
+this branch, and it is a closer read of what Tom rejected than "asking is startling": he rejected
+asking AND he rejected the software remembering a name outside the one moment it is volunteered
+for one purpose (telling the current holder who wants in). Tom's new proposal is a second, explicit
+reversal of the "never stored" half, on the same day the branch that just built it is sitting
+unmerged.
+
+**Is it good thinking anyway? Mostly yes, on the part that matters, but say so as a reversal, not
+a refinement.** The two halves are not equally strong:
+- **"Ask once per browser"** is close to free and does not reopen the registration worry: it is
+  the SAME event (pressing Ask) that already gets a name today, just remembered so the SAME person
+  is not asked a second time in a later session. Nothing about the trigger changes — nobody is
+  solicited for a name at Save, ever, on this design. I see no real cost here.
+- **"Use it to name the holder in role A"** is the part that reopens the reversed decision. It
+  means: once a browser has ever answered an Ask, every lock THAT browser holds from then on is
+  labeled with that name automatically, with no fresh prompt — so a name given once for one purpose
+  (telling a specific colleague who wants a specific file) becomes a standing label the software
+  attaches to that browser everywhere, indefinitely. That is a small, real account, acquired by
+  accident of having once pressed Ask rather than by anyone choosing to register one. It is milder
+  than what Tom rejected (nobody is asked up front, ever), but it is the same shape at a smaller
+  scale, and it is worth him hearing that framing before it ships, given how recently and how
+  deliberately the "never stored" line was drawn.
+
+**Storage: I read this as passing the existing exemption test, by the same reasoning already
+applied to the identity token, not by a new argument.** OBSERVED `CLAUDE.md`, "What may be stored
+on a visitor's device": the test is "strictly necessary for a service the visitor explicitly
+requested." The per-browser identity holder token is already stored today, unconsented, on master
+AND on the branch (`LPN_IDENTITY_KEY`/`lpn_identity` in `localStorage`, both versions) — that
+storage already shipped under the user-input-storage exemption Tom's own file names: he typed it
+into a box to use a feature (locking on master; Ask on the branch). Remembering the NAME half
+alongside the token it is already stored beside is the same category of thing, not a new one — I
+would not gate it behind a new consent question, and I think doing so would be over-cautious given
+the precedent already standing in this file. I did not find a rule in `dev/cookie-storage-inventory.md`
+that treats a name differently from an opaque token for this purpose; if Tom or a later reader
+disagrees with that reading, that is the file to correct it in, not a new banner.
+
+**What happens when the name is wrong — real, but not a NEW risk, an existing one this proposal
+widens.** A stale or borrowed name on a shared machine is already possible today: master's own
+shipped identity (`js/looped-network.js:24222-24227`, OBSERVED, checked 2026-09-18) asks ONE person
+for initials at first save and reuses them forever after for every lock that browser takes, with no
+per-session re-check — so "confidently wrong on a data-loss-adjacent dialog" is a live property of
+the CURRENT shipped design, not something this proposal introduces. What it does is widen the
+window: today the name is set at the first deliberate save (a moment the person is paying
+attention), Tom's proposal sets it via Ask, which can be answered quickly and less carefully by
+someone reaching for a dialog that showed up unexpectedly, on someone else's project. I would not
+block the idea on this, but I would want an easy, visible way to correct a wrong stored name — a
+"not you?" affordance beside wherever the initials are used to label a lock — since the cost of a
+confidently wrong name on a break-lock decision is exactly the shape CLAUDE.md worries about
+elsewhere (a share card reading "undefined" is a defect only strangers see; a wrong name on a
+lock is a defect only the person NOT holding the lock ever notices).
+
+### Where I did not look
+I did not render either box in a real browser this session — everything above is read from
+`js/looped-network.js` and `Looped-Network.php` source, not measured on screen or in a headless
+harness. I did not check `dev/lpn-spike/` or `dev/browser-pass/` for an existing Escape or identity
+test that a focus-scoped fix would need to keep passing. I did not read `lpn-lock.php` (the
+server side of the lock broker) at all — everything about "name" above is the client's own storage
+and transmission of it, not how the server persists or exposes it. I did not check whether the
+branch's Ask dialog has its own separate close-on-Escape wiring beyond the shared handler discussed
+above; the "Escaping 101" citation is general convention, not a reading of that dialog's code.
+
+No shipped file touched.
