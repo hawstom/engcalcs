@@ -42,6 +42,7 @@
         "projection",
         "custom-property",
         "674-coordinate-entry",
+        "tables-interface",
         "feat/customer-demands",
         "feat/time-series-graph",
         "feat/label-gang-search",

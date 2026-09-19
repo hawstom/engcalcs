@@ -276,8 +276,13 @@ the block.
     undo inside the table (Task 689), paste that creates rows (610, gated on Declan's spec), column
     hide (Declan's own named fix, with a design in his journal), fill-down, multi-cell selection, and
     whatever `tables-interface` already holds.
-  - **`tables-interface` EXISTS AND IS NOT ON master ON HIS INSTRUCTION**, and copy and paste in the
-    tables is the defect inside that programme. Read it before opening anything new.
+  - **`tables-interface` IS MERGED INTO `feat/tables-spreadsheet` ON HIS WORD** (*"Can you try to
+    merge it?"*, 2026-09-19). It held no code: one ROADMAP block and its `branch-policy.json` entry,
+    and the block took ID 666, which a gallery task had closed under the same number the same day.
+    Its content is folded here rather than re-numbered -- copy and paste is the defect inside the
+    programme, user-resizable columns and headings that do not wrap are the programme, and the
+    bottom pane's tab strip is a SEAM shared with `custom-property` and `graph`, which also add
+    columns. The branch-policy entry is kept, so the name stays protected.
   - **TWO PIECES ARE BUILT ON `feat/tables-spreadsheet`.** Undo inside the table (689, closed), and
     `table_column_parity_check.php`, which derives both surfaces from the source and **names 28
     popup properties with no column in their own table** -- the quality source on every node, a
