@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**76 still to read on master**, of 136 untranslated keys, of 2004 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**77 still to read on master**, of 137 untranslated keys, of 2004 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (136, 76 to read @@ NEEDS RULING)
+## lpn_  (137, 77 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -164,6 +164,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_library_import_units_line`**
   > {name}: this project shows {mine}, the file shows {theirs}.
+  @@ NEEDS RULING
+- **`lpn_manual_results_cleared`**
+  > The drawing changed, so the results were cleared. Recalculate automatically is off, so press the Calculate button when you want new answers.
   @@ NEEDS RULING
 - **`lpn_meter_pick_pipe`**
   > Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.
@@ -440,7 +443,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**51 still to read**, of 66 new keys across 6 unmerged branch(es).
+**64 still to read**, of 79 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -451,13 +454,55 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-2026-09-18 (`b2571821`) — 1 new, 1 to read @@ NEEDS RULING
+### chore/review-round-1 (`9eb1b163`) — 1 new, 1 to read @@ NEEDS RULING
 
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`41cc0833`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/customer-find-labels (`18ef2788`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_field_meter_pattern_tip`**
+  > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
+  @@ NEEDS RULING
+- **`lpn_labels_customer_note`**
+  > Customer labels show the node values chosen above, at the customer.
+  @@ NEEDS RULING
+- **`lpn_labels_customer_width`**
+  > Widest view that attempts to display customer labels
+  @@ NEEDS RULING
+- **`lpn_labels_customer_width_tip`**
+  > How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.
+  @@ NEEDS RULING
+- **`lpn_meter_pattern_unknown`**
+  > No pattern in this project is named {id}, so the customer was left as it was.
+  @@ NEEDS RULING
+- **`lpn_settings_customer_labels`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
+
+### feat/engine-fetch-wait (`3df1129e`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_engine_bar_label`**
+  > Solver loading progress
+  @@ NEEDS RULING
+- **`lpn_engine_wait`**
+  > Loading solver. Results delayed momentarily. Continue working.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_bytes`**
+  > Solver {kb} KB loaded so far. The total was not stated, so there is no percentage.
+  @@ NEEDS RULING
+- **`lpn_engine_wait_pct`**
+  > Solver {percent}% loaded.
+  @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`4d763c56`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -486,8 +531,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_label_use_view`**
   > Use current view
   @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
 
-### feat/lock-initials-later (`37f05c7e`) — 16 new, 4 to read @@ NEEDS RULING
+### feat/lock-initials-later (`37f05c7e`) — 17 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
@@ -537,17 +585,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_terrain_none_needed`**
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
 
-### feat/xy-world-map (`b7663a36`) — 36 new, 33 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`f688970a`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_pane_not_used`**
+  > Not used
+  @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
+  @@ NEEDS RULING
+
+### feat/xy-world-map (`48ac9490`) — 33 new, 30 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
   @@ NEEDS RULING
 - **`lpn_crs_unnamed`**
   > unnamed
-  @@ NEEDS RULING
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
 - **`lpn_map_attach_add`**
   > Attach
@@ -558,14 +615,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_map_attach_menu`**
   > World map…
   @@ NEEDS RULING
-- **`lpn_map_attach_move`**
-  > Move
-  @@ NEEDS RULING
-- **`lpn_map_attach_move_tip`**
-  > Slide the map under the drawing. Nothing in the drawing moves.
-  @@ NEEDS RULING
 - **`lpn_map_attach_none`**
   > There is no world map attached to this project yet. Use Map, World map, Attach first.
+  @@ NEEDS RULING
+- **`lpn_map_attach_readjust`**
+  > Re-adjust
+  @@ NEEDS RULING
+- **`lpn_map_attach_readjust_tip`**
+  > Return to Step 2 of the map attachment process.
   @@ NEEDS RULING
 - **`lpn_map_attach_remove`**
   > Detach
@@ -576,9 +633,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_map_attach_removed`**
   > The world map is gone, and the drawing is exactly as it was.
   _Ruled OK 2026-09-17._
-- **`lpn_map_attach_scale`**
-  > Scale by picking
-  @@ NEEDS RULING
 - **`lpn_map_attach_scale_from`**
   > Scale from the current size…
   @@ NEEDS RULING
@@ -591,9 +645,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_map_attach_scale_from_prompt`**
   > Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.
   @@ NEEDS RULING
-- **`lpn_map_attach_scale_tip`**
-  > Drag a corner of the blue rectangle to resize the map, or the round handle to turn it.
-  @@ NEEDS RULING
 - **`lpn_map_attach_tip`**
   > Attach the world map to this project without changing it any other way.
   _Ruled OK 2026-09-17._
@@ -601,7 +652,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The world map is back where it was, and your drawing never moved.
   @@ NEEDS RULING
 - **`lpn_mapgeo_dial_help`**
-  > Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.
+  > Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to turn it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.
   @@ NEEDS RULING
 - **`lpn_mapgeo_dial_size`**
   > Map size
@@ -618,17 +669,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_finish`**
   > Georeference here
   @@ NEEDS RULING
+- **`lpn_mapgeo_gestures`**
+  > Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.
+  @@ NEEDS RULING
 - **`lpn_mapgeo_hint1`**
   > Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.
   @@ NEEDS RULING
 - **`lpn_mapgeo_hint2`**
-  > Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_hint_move`**
-  > Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
-  @@ NEEDS RULING
-- **`lpn_mapgeo_hint_scale`**
-  > Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
+  > Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.
   @@ NEEDS RULING
 - **`lpn_mapgeo_intro`**
   > Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.
@@ -648,14 +696,13 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_mapgeo_step2`**
   > Step 2 of 2: fit the map behind your drawing
   @@ NEEDS RULING
-
-### ida/esc-and-lock-identity (`b3c6bbd7`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### tables-interface (`e34970bc`) — 3 new, 3 to read @@ NEEDS RULING
+### fix/esc-focus-and-recalc (`bdf0b552`) — adds no English strings
+
+### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_engine_minor_loss_note`**
   > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
@@ -665,4 +712,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_terrain_none_needed`**
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
+  @@ NEEDS RULING
+- **`lpn_time_run_note`**
+  > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING

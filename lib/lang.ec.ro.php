@@ -1135,7 +1135,6 @@ $ec_lang['lpn_time_tank']='Bazin';
 $ec_lang['lpn_time_level']='Nivelul apei';
 $ec_lang['lpn_time_run']='Calculează';
 $ec_lang['lpn_time_run_tip']='Rezolvă această rețea la fiecare pas de timp hidraulic, de la începutul rulării până la sfârșitul ei.';
-$ec_lang['lpn_time_run_note']='Vedeți rețeaua la primul moment de raportare. Setarea Recalculează automat este dezactivată, deci rezultatele pentru momentele ulterioare nu sunt actualizate cât timp lucrați. Apăsați butonul Calculează pentru a le aduce la zi.';
 $ec_lang['lpn_time_speed']='Viteză';
 $ec_lang['lpn_time_speed_tip']='Cât de repede rulează redarea.';
 $ec_lang['lpn_settings_search']='Căutare setări';

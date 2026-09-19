@@ -640,8 +640,14 @@ console.log('\n--- Escape ---');
 	// What this line is about is whether the box opened, so it asks that.
 	report(L.popupDisplay() !== 'none' && L.popupDisplay() !== '', 'the multi box is open',
 		L.popupDisplay());
+	// **FROM INSIDE THE BOX** (2026-09-19). Escape reaches a standing box only when focus is in it
+	// -- Tom: *"Big guards on closing a box."* Without this line the press lands on the drawing,
+	// which is the case that must now leave the box alone; that half is held in
+	// dev/lpn-spike/escape-focus-harness.js and in entry-mode-exit-harness.js.
+	document.activeElement = document.getElementById('lpn_popup');
 	pressEscape();
-	report(L.popupDisplay() === 'none', 'Escape closes the box');
+	document.activeElement = document.body;
+	report(L.popupDisplay() === 'none', 'Escape from inside the box closes it');
 	report(L.selectionCount() === 2, '...and leaves the selection alone, one thing per press', String(L.selectionCount()));
 	pressEscape();
 	report(L.selectionCount() === 0, 'the next Escape clears it');

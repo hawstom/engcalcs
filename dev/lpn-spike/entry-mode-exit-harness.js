@@ -292,20 +292,46 @@ ADD_MODES.concat(['delete', 'vertices']).forEach(function (m) {
 }
 
 // ---------------------------------------------------------------------------
-// 5. AND ESCAPE STILL CLOSES A BOX -- the box, and not the box AND the tool.
+// 5. AND ESCAPE STILL CLOSES A FOCUSED BOX -- the box, and not the box AND the tool.
+//
+// **SCOPED TO FOCUS SINCE 2026-09-19** (Tom: *"don't let Escape close those boxes when the mouse
+// cursor is elsewhere ... Big guards on closing a box."*). This section used to open a box, press
+// Escape from nowhere in particular, and require the box to close -- the page-wide behaviour he
+// reported as a defect. Both halves are held now, because both can regress:
+//
+//   * focus INSIDE the box: the box takes the press and the tool survives it, which is the
+//     one-press-one-thing rule this whole file is about;
+//   * focus OUTSIDE it: the box is untouched AND the tool still goes away. That second clause is
+//     the one a careless scoping would break, leaving Escape doing nothing at all while an
+//     unfocused box sat in a corner.
 // ---------------------------------------------------------------------------
-console.log('\n--- an open box takes the Escape first ---');
+console.log('\n--- a FOCUSED box takes the Escape first ---');
 [['lpn_settings_box', 'flex'], ['lpn_library_box', 'flex'], ['lpn_popup', 'block']].forEach(function (pair) {
 	const id = pair[0];
 	build();
 	L.setMode('add-junction');
 	const box = byId[id];
 	box.style.display = pair[1];
+	document.activeElement = box;
 	esc();
-	ok(id + ' closes on Escape', box.style.display === 'none', box.style.display);
+	ok(id + ' closes on Escape when focus is inside it', box.style.display === 'none', box.style.display);
 	ok('...and the tool survives that press', L.getMode() === 'add-junction', L.getMode());
+	document.activeElement = document.body;
 	esc();
 	ok('...the next Escape puts the tool away', L.getMode() === 'select', L.getMode());
+});
+console.log('\n--- ...and an UNFOCUSED box takes nothing, and blocks nothing ---');
+[['lpn_settings_box', 'flex'], ['lpn_library_box', 'flex'], ['lpn_popup', 'block']].forEach(function (pair) {
+	const id = pair[0];
+	build();
+	L.setMode('add-junction');
+	const box = byId[id];
+	box.style.display = pair[1];
+	document.activeElement = document.body;
+	esc();
+	ok(id + ' is left open when the press lands elsewhere', box.style.display === pair[1], box.style.display);
+	ok('...and that same press still put the tool away', L.getMode() === 'select', L.getMode());
+	box.style.display = 'none';
 });
 {
 	// A box that Escape does NOT close must not stand between the reader and their tool. Find is
