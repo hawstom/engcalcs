@@ -34,6 +34,12 @@
             "date": "2026-09-18",
             "words": "feat/library-import: Done. Merge and delete.",
             "context": "Cleared after his second round of testing. His three findings from the first round were all built before he cleared it: undo did not work (the document WAS being restored; the Libraries box was never rebuilt by undo, so it still listed rows that had gone), the wizard was not under File, and nothing said the incoming file's numbers were in different units. His own wording for the units warning was used verbatim, opening with 'Warning' and 'Not recommended', and the per-section buttons were removed so the File menu row is the only door -- which reversed an earlier instruction of his asking for both."
+        },
+        "feat/survey-import": {
+            "head": "f4ef6cdea957cd5353f6b285bd04a78b44e0e1f3",
+            "date": "2026-09-18",
+            "words": "The task is complete. Merge, delete, and close.",
+            "context": "Cleared after three rounds of his testing. His own wording throughout: the short PNEZD-only chooser, the cut format box, 'Create nodes' rather than 'Create junctions', 'specified internally' as text beside a disabled selector rather than inside the option, the asset-type selector first because a node's kind cannot be changed after import, and lower-case hyphenated error codes to match the CSV-validator world rather than the operating-system one. Units detection from a column name was REMOVED on his instruction -- a PNEZD file often has no header at all -- and GPX with it, since no seat had asked for it."
         }
     }
 }

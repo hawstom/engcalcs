@@ -43,3 +43,15 @@ https://hawsedc.com/engcalcs/.github/copilot-instructions.md
 # The git directory. Blocked by a RedirectMatch in the suite's root .htaccess since 2026-07-28,
 # when it was found serving a browsable index and handing out intact packfiles.
 https://hawsedc.com/engcalcs/.git/config
+# **THE FOUR EXPOSURES FOUND ON 2026-09-18, asserted UNREACHABLE so the fix is watched.**
+# Tom noticed an untracked `tools/error_log` in a git status and that one file led to all of these.
+# Measured live before they were closed: /tools/ served a full directory index; build-chrome.php and
+# build-features.php were EXECUTED over HTTP (the second fatalled, which is what wrote that log);
+# build_claims.py was downloadable source; /docs/ served an index; and
+# /docs/apache/librewaternet-ssl.conf handed out the site's own Apache virtual-host configuration.
+# All four were on librewaternet.org. not-epanet.org was NOT exposed -- it 301s every path to
+# librewaternet.org, and an earlier report of two holes there was a redirect chain misread.
+https://librewaternet.org/tools/
+https://librewaternet.org/tools/build-chrome.php
+https://librewaternet.org/docs/
+https://librewaternet.org/docs/apache/librewaternet-ssl.conf

@@ -136,6 +136,13 @@ const EC_LPN_FURNITURE = [
     // they have read a hundred times is a fact about that reader, and carried in the file it would
     // take the instruction away from a colleague who has never used the tool.
     'lpn_areahint'    => 'whether the area-selection help bubble is shown',
+    // **WHICH WAY ROUND THE LAST SURVEY FILE WAS WRITTEN IS A FACT ABOUT THAT PERSON'S DATA
+    // COLLECTOR, not about this network** (Task 592). It is the remembered answer to the import
+    // chooser's one question -- northing first or easting first -- and a file read from it has
+    // already had its columns turned into coordinates, so nothing of it survives into the document.
+    // A colleague opening the project must not inherit it: their own files come out of their own
+    // instrument, in their own order.
+    'lpn_survey_format' => 'the column order last chosen when importing a surveyed point list',
 ];
 
 if (defined('LPN_FURNITURE_LIB_ONLY')) {

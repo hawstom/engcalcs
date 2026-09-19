@@ -28,9 +28,22 @@
 # an access gate doing its job) and none of that says the wiki is unwell.
 ^https://[^/]+/thomas/(rest|thumb|thumb_handler|img_auth)\.php$
 
-# A command-line build script that happens to live under a docroot. It is not a
-# page and has no browser behaviour; it fatals on a GET because it expects argv.
-^https://[^/]+/tools/build-features\.php$
+# **THE WHOLE tools/ DIRECTORY IS DENIED NOW, AND THE 403 IS THE POINT.** Until 2026-09-18 this
+# directory was reachable and its .php files were EXECUTED over HTTP: /tools/ served a full
+# directory index, build-chrome.php ran, build-features.php ran and fatalled (writing the
+# tools/error_log Tom noticed, which is how the whole thing was found), and build_claims.py was
+# downloadable source. That is remote execution of a site's own build scripts, and it is closed by
+# `Require all denied` in tools/.htaccess.
+#
+# So a 403 here is this check watching the fix hold, not a failure -- but the walk finds these files
+# on disk and expects a page, so it reports one. Excluding the DIRECTORY rather than each file means
+# a build script added later is covered the day it lands, instead of mailing Tom a failure until
+# somebody adds a line.
+#
+# **IF THIS EVER STOPS BEING 403, THAT IS A REAL FAILURE AND THIS LINE HIDES IT.** That is what
+# ~/check.mustblock is for: tools/ belongs there, asserted UNREACHABLE, rather than merely being
+# excused here. Both, deliberately.
+^https://[^/]+/tools/
 
 # Working copies kept beside the live page. Not linked, not public, not pages.
 \.dev\.php$

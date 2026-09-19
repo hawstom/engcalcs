@@ -2662,12 +2662,12 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_survey_btn": {
+        "lpn_file_import_survey": {
             "on": "Import surveyed points",
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_btn_tip": {
+        "lpn_file_import_survey_tip": {
             "on": "Read a list of surveyed points from a CSV or GPX file and make one junction at each point, using the new-asset values above. No pipes are drawn, and no row is ever dropped without being named. The project has to be on a map of the Earth.",
             "ruled": "2026-09-17",
             "answer": "I disagree with \"has to be\". See my prompt comments."
@@ -2697,7 +2697,7 @@
             "ruled": "2026-09-17",
             "answer": "Under what condition would we know the units of the file?"
         },
-        "lpn_survey_err_ambiguous_lat": {
+        "lpn_survey_err_ambiguous_coord": {
             "on": "More than one column in that file could be the latitude ({detail}), and this page will not choose between them. Leave one of them named as the latitude and try again.",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
@@ -2717,7 +2717,7 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_err_no_latlon": {
+        "lpn_survey_err_no_coords": {
             "on": "This page could not find a latitude column and a longitude column in that file. Name two of the columns latitude and longitude, in the first row of the file, and try again. The first row reads: {detail}",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
@@ -2767,7 +2767,7 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_note_bad_lat": {
+        "lpn_survey_note_bad_coord": {
             "on": "The latitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
@@ -2812,12 +2812,12 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_survey_note_lat_missing": {
+        "lpn_survey_note_coord_missing": {
             "on": "The latitude column is empty on this row, so no junction was made for it.",
             "ruled": "2026-09-17",
             "answer": "Needs discussion and design concept planning."
         },
-        "lpn_survey_note_lat_range": {
+        "lpn_survey_note_coord_range": {
             "on": "This latitude is outside the range a latitude can have ({detail}), so no junction was made for this row. If your latitude and longitude columns are the other way round, swap them in your own file: this page will not swap them for you, because it cannot tell a mistake from a place.",
             "ruled": "2026-09-17",
             "answer": "OK."

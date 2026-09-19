@@ -216,7 +216,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // a chosen file goes to is decided from its first character -- a project file is JSON --
 	      // never from its name, so the accept list only tidies the picker. ?>
 	<input type="file" id="lpn_geo_file" accept=".lwn,.json,.inp,.net,application/json,text/plain" style="display:none">
-	<?php // Library import (Task 611). A FOURTH picker, and it takes the same two extensions
+	<?php // File > Import surveyed points (Task 592). A FOURTH picker, and its own for the reason the
+	      // three above are their own: this one lands points in the OPEN project instead of making a
+	      // new tab, so an input shared with them would have to guess which act was meant. A text
+	      // point list; the accept list only tidies the picker, as it does for the three above. ?>
+	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
+	<?php // Library import (Task 611). A picker of its own, and it takes the same two extensions
 	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
 	      // else entirely: it copies one library (pipe types, fittings or curves) into the project
 	      // already open, rather than opening the file as a project of its own. One input per
@@ -2767,7 +2772,48 @@ EngCalcs.pageConfig = {
 	lpn_terrain_keep_ids: <?=json_encode($ec_lang['lpn_terrain_keep_ids'])?>,
 	lpn_terrain_filled_ids: <?=json_encode($ec_lang['lpn_terrain_filled_ids'])?>,
 	lpn_terrain_blank_ids: <?=json_encode($ec_lang['lpn_terrain_blank_ids'])?>,
-	lpn_terrain_ids_more: <?=json_encode($ec_lang['lpn_terrain_ids_more'])?>
+	lpn_terrain_ids_more: <?=json_encode($ec_lang['lpn_terrain_ids_more'])?>,
+<?php   // Reading a surveyed point list (Task 592). js/lpn-survey.js reads these through a pageConfig
+        // ALIAS, so dev/scripts/pageconfig_check.php sees every one of them and
+        // dev/scripts/js_fallback_string_check.php holds each English literal in that file against
+        // lib/lang.ec.en.php -- which is why this block is not the bracket-lookup arrangement the
+        // search and terrain blocks above it are. ?>
+	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
+	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
+	lpn_survey_read_error: <?=json_encode($ec_lang['lpn_survey_read_error'])?>,
+	lpn_survey_cancelled: <?=json_encode($ec_lang['lpn_survey_cancelled'])?>,
+	lpn_survey_axis_north: <?=json_encode($ec_lang['lpn_survey_axis_north'])?>,
+	lpn_survey_axis_east: <?=json_encode($ec_lang['lpn_survey_axis_east'])?>,
+	lpn_survey_err_empty: <?=json_encode($ec_lang['lpn_survey_err_empty'])?>,
+	lpn_survey_err_unreadable: <?=json_encode($ec_lang['lpn_survey_err_unreadable'])?>,
+	lpn_survey_err_ambiguous_coord: <?=json_encode($ec_lang['lpn_survey_err_ambiguous_coord'])?>,
+	lpn_survey_err_no_points: <?=json_encode($ec_lang['lpn_survey_err_no_points'])?>,
+	lpn_survey_format_label: <?=json_encode($ec_lang['lpn_survey_format_label'])?>,
+	lpn_survey_format_internal: <?=json_encode($ec_lang['lpn_survey_format_internal'])?>,
+	lpn_survey_create: <?=json_encode($ec_lang['lpn_survey_create'])?>,
+	lpn_survey_note_header_unread: <?=json_encode($ec_lang['lpn_survey_note_header_unread'])?>,
+	lpn_survey_type_label: <?=json_encode($ec_lang['lpn_survey_type_label'])?>,
+	lpn_survey_confirm_junction: <?=json_encode($ec_lang['lpn_survey_confirm_junction'])?>,
+	lpn_survey_confirm_reservoir: <?=json_encode($ec_lang['lpn_survey_confirm_reservoir'])?>,
+	lpn_survey_confirm_tank: <?=json_encode($ec_lang['lpn_survey_confirm_tank'])?>,
+	lpn_survey_report_junction: <?=json_encode($ec_lang['lpn_survey_report_junction'])?>,
+	lpn_survey_report_reservoir: <?=json_encode($ec_lang['lpn_survey_report_reservoir'])?>,
+	lpn_survey_report_tank: <?=json_encode($ec_lang['lpn_survey_report_tank'])?>,
+	lpn_survey_report_clean: <?=json_encode($ec_lang['lpn_survey_report_clean'])?>,
+	lpn_survey_report_notes: <?=json_encode($ec_lang['lpn_survey_report_notes'])?>,
+	lpn_survey_sev_error: <?=json_encode($ec_lang['lpn_survey_sev_error'])?>,
+	lpn_survey_sev_warning: <?=json_encode($ec_lang['lpn_survey_sev_warning'])?>,
+	lpn_survey_note_line: <?=json_encode($ec_lang['lpn_survey_note_line'])?>,
+	lpn_survey_note_row_short: <?=json_encode($ec_lang['lpn_survey_note_row_short'])?>,
+	lpn_survey_note_coord_missing: <?=json_encode($ec_lang['lpn_survey_note_coord_missing'])?>,
+	lpn_survey_note_bad_coord: <?=json_encode($ec_lang['lpn_survey_note_bad_coord'])?>,
+	lpn_survey_note_coord_range: <?=json_encode($ec_lang['lpn_survey_note_coord_range'])?>,
+	lpn_survey_note_bad_elev: <?=json_encode($ec_lang['lpn_survey_note_bad_elev'])?>,
+	lpn_survey_note_ambiguous_elev: <?=json_encode($ec_lang['lpn_survey_note_ambiguous_elev'])?>,
+	lpn_survey_note_blank_rows: <?=json_encode($ec_lang['lpn_survey_note_blank_rows'])?>,
+	lpn_survey_note_id_duplicate: <?=json_encode($ec_lang['lpn_survey_note_id_duplicate'])?>,
+	lpn_survey_note_id_taken: <?=json_encode($ec_lang['lpn_survey_note_id_taken'])?>,
+	lpn_survey_note_id_invalid: <?=json_encode($ec_lang['lpn_survey_note_id_invalid'])?>,
 };
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
@@ -2826,6 +2872,11 @@ EngCalcs.pageConfig = {
       // tag, and BEFORE looped-network.js, which reads EngCalcs.lpnFireFlowDefaults when the box
       // is opened. ?>
 <script src="/engcalcs/js/lpn-fireflow.js?v=<?=filemtime(__DIR__.'/js/lpn-fireflow.js')?>"></script>
+<?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column
+      // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
+      // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the
+      // file could not be read, which is a lie about the file. ?>
+<script src="/engcalcs/js/lpn-survey.js?v=<?=filemtime(__DIR__.'/js/lpn-survey.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
