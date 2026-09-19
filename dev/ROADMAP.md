@@ -1587,7 +1587,7 @@ the block.
     `dev/lpn-spike/projection-harness.js`, 40 assertions.
   - **NO TRANSFORM EXISTS ON THE PROJECTED PATH, BY CONSTRUCTION.** proj4js was not vendored, so
     basemap, place-name search and terrain elevations are absent rather than newly gated -- all
-    three already gate on `isGeoProject()`, which a projected project is not. The eastings and
+    three already gate on `isLatLonProject()`, which a projected project is not. The eastings and
     northings in the file are the ones the user typed and the round trip is byte-identical.
     Everything needing the inverse transform is therefore still open: State Plane and the full
     register, point scale factor, ground length, per-tile reprojection, `;CRS` in the `.inp`, and
@@ -1612,7 +1612,7 @@ the block.
     for. We know the lat/lon and zoom level they searched for."* (b) *"The world map is not in the
     background. It appears that the math to put the world map tiles on the projected map is not
     implemented or is wrong."* **It is not wrong; it is absent** -- `basemapOn()` is
-    `isGeoProject() && ...`, so a projected project has never drawn a tile.
+    `isLatLonProject() && ...`, so a projected project has never drawn a tile.
     - **THEY ARE ONE MISSING PIECE, WHICH IS THE THING TO SEE.** Both need a forward and inverse
       transform between lon/lat and the plane: (a) is one point, (b) is four corners per TILE.
       Everything else phase 4 shipped is data and needed none. Nothing cheaper works for (a)
