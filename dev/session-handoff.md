@@ -10,64 +10,65 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
 - **`feature_freeze.active` in `dev/branch-policy.json` is the second lock.** Tom's all-clear in
   `dev/branch-all-clears.json` (pin field is **`head`**, not `commit`) does not merge a `protected`
   branch while the freeze stands. Only Tom lifts it. It is currently OFF.
-- **`master` is `5a9c7fae`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
+- **`master` is `0d2256fd`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
 - **Production is whatever Tom last pulled, and it is not master.** Never say "it is live."
 - **`feat/tables-spreadsheet` is built, green on the merge result, and AWAITING HIS TEST** on port
   8096. Nothing else is waiting on an all-clear. See STATE.
 
+
 ---
 
-## THE OPEN QUESTION HE HAS NOW ASKED THREE TIMES: LABEL PLACEMENT AND STRING LENGTH
+## THE LABEL QUESTION IS ANSWERED. FOURTEEN COLLISIONS MOVE FIFTY-EIGHT LABELS
 
-**HE IS RIGHT AND TWO SESSIONS RUNNING HAVE ANSWERED HIM WRONG.** His claim, 2026-09-18:
+**TOM WAS RIGHT TWICE AND TWO SESSIONS RUNNING ANSWERED HIM WRONG.** The answer he was given --
+*"when labels are close enough to touch, a wider one genuinely does not fit in a gap a narrower one
+fits in"* -- **is withdrawn**. It treats a one-dimensional growth as though it faced a
+two-dimensional gap, and it is a restatement wearing an explanation's clothes: "it did not fit" is
+not checkable. His own refutation, 2026-09-18: *"Width and height are independent dimensions in an
+area of unlimited width. No amount of additions to the string should affect placements."*
 
-> *"Width and height are independent dimensions in an area of unlimited width. No amount of
-> additions to the string should affect placements."*
+**THE MEASUREMENT HE ASKED FOR, AND IT IS EVIDENCE RATHER THAN A SECOND OPINION.**
+`dev/lpn-spike/label-width-cause-harness.js` replays the first-fit offline from its own captured
+inputs, in the real committing order, **with a full scan instead of the broad-phase grid**, and
+re-tests each mover's narrow choice against the obstacle list as it stood when that label was
+placed. **It reproduces the real pass 97 of 97 at both widths.** Every blocker is checked for
+DIRECTION, not merely contact: a blocker that is not on the side the box grew towards is failed as
+unclassified.
 
-and, of the sentence he was handed back:
+| view | moved | grew into a real object, in the direction it grew | following a neighbour | unclassified |
+|---|---|---|---|---|
+| synthetic crowded | 9 of 13 | 9 | 0 | **0** |
+| Net3-World, fit | 58 of 97 | **14** | 44 | **0** |
+| Net3-World, 2x | 34 of 97 | **14** | 20 | **0** |
 
-> *"If you can't see that the following sentence is nonsense in the context of unlimited width,
-> maybe I need to turn up the effort level. 'When labels are close enough to touch, a wider one
-> genuinely does not fit in a gap a narrower one fits in, and there's no way around that without
-> printing text on top of text.'"*
+**ONLY 14 LABELS ANYWHERE EVER GROW INTO ANYTHING, AND IT IS THE SAME 14 AT BOTH ZOOMS** -- each a
+node symbol past the growing edge, 0.07 to 1.11 label-heights deep. The other 44 (and 20) **never
+rejected anything with their own extra width at all**; 63 of those 64 were blocked only by a label
+box that had itself moved. **So the earlier answer named the MINORITY mechanism as though it were
+the whole of it. Three quarters of what he is looking at is not width, it is queue position.**
 
-**THAT SENTENCE IS NONSENSE AND HE IS RIGHT ABOUT WHY.** It conflates a two-dimensional gap with a
-one-dimensional one. A box that grows ONLY IN WIDTH can be blocked only by something lying in the
-direction it grew. "It does not fit in the gap" smuggles in a BOUNDED gap that was never
-demonstrated to exist. It is the symptom restated, wearing an explanation's clothes.
+**EVERY SUSPECT HIS ARGUMENT PREDICTED MEASURED ZERO**, and each now has its own assertion, so a
+regression into any of them turns the build red: no rejection against a viewport or drawing bound
+anywhere (his "unlimited width" case); the broad-phase grid contributes nothing; **candidate sets
+are identical at both widths on all 97 labels**, so where a label may be OFFERED a place does not
+read its text; no height changed; `dataLabelOrigin()` chooses its side on `end.x >= anchor.x` and
+reads no width; `cardinalSides()` prunes on the open-arc table and the resting offset, never on the
+box; nothing reads box area. The harness's own selftest kills a candidate reach keyed on box width.
 
-**WHAT IS MEASURED AND NOT IN DISPUTE:**
+**Open ground was already invariant and that result stands**: 12 junctions and a reservoir, prefix
+`1=`, prefix `1234=`, suffix `=1234`, and both at once -- **0 of 13 moved, four times over**, all 13
+drawn (`label-width-stability-harness.js` part 3, driven through the WHOLE PAGE; part 1 drove the
+placement function directly and so never answered the claim he actually makes).
 
-- **Open ground: his invariant already holds.** 12 junctions and a reservoir, real document, real
-  refresh, node ID alone: prefix `1=`, prefix `1234=`, suffix `=1234`, and both at once -- **0 of 13
-  labels moved, four times over**, all 13 drawn. `dev/lpn-spike/label-width-stability-harness.js`
-  part 3 asserts it through the WHOLE PAGE, which part 1 did not: part 1 drove the placement
-  function directly with hand-built specs, so it never answered the claim Tom actually makes, which
-  is about typing into the Before box on a drawing.
-- **The crowded control moves, so the measurement can still see movement**: the same drawing at a
-  quarter of the spacing moves 4 labels at `1=`, 9 at `1234=`, 9 at `=1234`, and at both affixes 2
-  are hidden outright.
-- Node labels are placed by an **unscored greedy first-fit** (`placeLabelsFirstFit()`). `GOAL_WEIGHT`
-  in `js/lpn-collide.js` belongs to the ring scorer and decides nothing here -- an earlier session
-  blamed it wrongly. Candidate endpoints come from `defaultLabelOffset()` and a reach floor and
-  **neither reads the text**, so candidate ORDER is already width-invariant.
-
-**THE MEASUREMENT THAT IS OWED, AND WHICH WAS RUNNING WHEN THIS WAS WRITTEN:** for every label that
-moved in the crowded fixture, **name the specific thing its WIDER box overlapped that its NARROWER
-box did not**, then classify each. A real object sitting where the extra characters landed is
-physics, and his principle is satisfied by it. **Anything else is a defect and is what he has been
-pointing at**: a rejection against a viewport edge or drawing bound (unlimited width is exactly his
-case), a quantised raster or grid cell a wider box straddles one more of, a reach or leader rule
-keyed on box SIZE rather than on distance, a shed or score reading box AREA or width as a proxy for
-cost, a text-side chooser flipping on a width threshold, a candidate pruned by the open-arc table
-using the box rather than the direction. **Report it as a count: of the movers, how many hit
-something real in the direction of growth, and how many did not.** A non-zero second number is a
-CONTAINED fix, and would also make the standing "it is a paradigm change, your call" answer wrong.
-
-**Three contained damping attempts were built and measured previously and all three cost drawn
-labels** -- 1,742 / 1,729 / 1,751 against the shipped 1,762 across 28 views of 7 examples. That is
-evidence about THOSE THREE attempts, not about the class. Do not cite it as though it settled his
-question.
+**THE CHOICE NOW IN FRONT OF TOM, AND IT IS WIDER THAN HE WAS TOLD.** Global assignment over a
+conflict graph -- placing the whole drawing at once instead of one label at a time -- is still the
+thorough answer and is a real rebuild. **But the measurement suggests a cheaper one nobody has
+tried: 44 of the 58 movers had their own first choice sitting FREE, so a label that can still have
+the place it had could simply keep it.** That damps the cascade without re-deciding anything, and it
+is NOT what the three failed damping attempts did -- those changed how a label CHOOSES. Measure it
+before claiming it works. The three attempts cost drawn labels (1,742 / 1,729 / 1,751 against the
+shipped 1,762 across 28 views of 7 examples); that is evidence about those three, not about the
+class, and must not be cited as though it settled the question.
 
 **AND THE REASON HE SAW NO CHANGE WHEN HE TESTED THE BRANCH: NOTHING WAS EVER SHIPPED ON IT.** All
 three candidates lost labels, so they were abandoned -- and nobody said so. He spent a browser pass
@@ -75,6 +76,22 @@ on a branch with nothing in it and was then told his test was not the problem. *
 shipped" out loud the moment it is true.**
 
 ---
+
+## THE TWO STEP TWOS: A QUESTION OUTSTANDING WITH TOM
+
+**He reported "step 2 controls still move the project" and it is NOT reproducible in the new
+wizard.** Driven in real headless Chrome on his own port: a 20 degree turn leaves `R1` at screen
+`18.9999,681.9706` **identical to four decimals**, while all six basemap tile affines change.
+`d4bb8a01`'s tile repaint works.
+
+**THERE ARE TWO CONTROLS CALLED "STEP 2" AND THE CODE SAYS HE IS PROBABLY IN THE OLDER ONE.**
+`georefStart()` / `GEOREF_STEP_ATTACHED`, reached from **File > Import XY to lat/lon...**, has the
+same drag/scale/rotate rectangle, the same "step 2" wording, **no dial at all**, and its
+`georefApplyDrag()` -> `georefSetTransform()` -> `georefWrite(t)` **genuinely rewrites every
+coordinate, by design, because it is a CONVERSION rather than a placement**. That single cause
+explains both of his reports exactly. **ASK HIM WHICH MENU ROW HE PRESSED.** If it was the File row,
+the defect is not the arithmetic -- it is that two different operations wear the same words, and one
+of them does the thing the standing ruling says we never do.
 
 ## RULINGS -- permanent
 
@@ -178,9 +195,10 @@ shipped" out loud the moment it is true.**
 | Branch | Port | State |
 |---|---|---|
 | `feat/tables-spreadsheet` | 8096 | **BUILT, green on the merge result, AWAITING HIS TEST** |
-| `feat/xy-world-map` | 8094 | agent running: three of his defects; **47 behind master** |
-| `feat/label-gang-search` | 8090 | agent running: the classification measurement above |
-| `feat/customer-find-labels` | new | agent running: his two new customer items |
+| `feat/xy-world-map` | 8094 | **caught up with master; the dial clamp and the satellite ruling built.** See the two-step-twos block |
+| `feat/label-gang-search` | 8090 | **the classification measurement is built and committed.** No placement change; the choice is his |
+| `feat/customer-find-labels` | new | agent running: his customer items, spec REVISED twice -- see below |
+| `feat/engine-fetch-wait` | new | agent running: Task 608, the authorized half only |
 | `feat/lock-initials-later` | 8095 | needs Task 698; **170 behind master**, and it is what dev.hawsedc.com was sitting on |
 | `ida/esc-and-lock-identity` | -- | 1 ahead, untouched this session |
 | `tables-interface` | -- | stale, nobody has claimed it |
@@ -206,7 +224,23 @@ MADE, not when somebody remembers.
 - **Task 247 is NOT closed, deliberately.** He cleared the BRANCH, not the task. Its block says
   slices 1-3 are in and *"what is left is his call"*: the label density rule, a customer in Find,
   Slice 4.
-- **His three reports on `feat/xy-world-map`**, all open: no slider/dial, step 2 still rotates the
+- **`feat/xy-world-map` -- the dial defect is FIXED and it was real.** The dial is a 306 px control
+  centred on the canvas, and **with the bottom pane open the canvas is not tall enough**: at
+  1366x768 with a 300 px pane it slid under the form; at 1280x700 with a 340 px pane the TURN KNOB
+  sat behind the toolbar and could not be pressed. **That is the same defect the rectangle's rotate
+  handle already had -- the defect the dial was built to escape.** `mapgeoPlaceDial()` now fits
+  itself to the canvas rect and shrinks the bar to a 56 px floor rather than sliding out, re-placed
+  from `applyMapHeight()`. `dev/lpn-spike/mapgeo-browser-drive.js` drives real Chrome across five
+  layouts and fails before the fix.
+  - **THE SATELLITE RULING, recorded in the source:** a georeferenced XY project IS locatable **for
+    the basemap rows only** (street, satellite, corner teaser, via `basemapChoosable()`); **Go to,
+    place-name search and Read DEM stay on the narrow `isLatLonProject()` question**, because each
+    needs more than a transform and a row that does nothing is the defect Task 692 closed.
+  - **Two judgements, neither acted on:** the dial lands on the right edge overlapping the labels
+    legend and is the only wizard control not in the step bar where the reader's eyes already are;
+    and **the rectangle's rotate handle is UNREACHABLE at a fitted zoom** (measured twice --
+    `elementFromPoint` returns the step bar), so a dead handle is probably worse than none.
+- **His three original reports on `feat/xy-world-map`**, for the record: no slider/dial, step 2 still rotates the
   project, satellite refused. **The satellite one is traced**: that branch is 47 commits behind
   master and contains NEITHER half of the Task 692 fix (`ca25f1da`, `19ab3155`). The Mapbox token is
   present, 89 chars, so an absent token is ruled out. **And the branch creates a FOURTH case of Task
