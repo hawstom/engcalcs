@@ -1005,7 +1005,6 @@ $ec_lang['lpn_engine_loading']='Chargement du solveur EPANET…';
 $ec_lang['lpn_engine_failed']='Le solveur EPANET n\'a pas pu être chargé. Le solveur intégré est utilisé à la place.';
 $ec_lang['lpn_unit_unknown']='Ce dessin indique une unité que cette page ne propose pas : {unit}. Tout est conservé et affiché exactement comme reçu, et rien n\'a été modifié. Aucun résultat ne peut être donné tant que cette page ne connaît pas cette unité, car elle ne sait pas quelle est la grandeur de cette unité.';
 $ec_lang['lpn_engine_manning_note']='Remarque : avec la rugosité de Manning, EPANET calcule une perte de charge environ 0,6 % plus faible que le solveur intégré.';
-$ec_lang['lpn_engine_minor_loss_note']='Remarque : avec le solveur EPANET, les pertes de charge singulières (locales) ressortent très légèrement plus faibles qu\'avec le solveur intégré, car EPANET arrondit la valeur qu\'il utilise pour la gravité.';
 $ec_lang['lpn_settings_text_size']='Taille du texte (pixels)';
 $ec_lang['lpn_settings_symbol_size']='Taille des symboles (pixels)';
 $ec_lang['lpn_settings_link_width']='Épaisseur des conduites (pixels)';

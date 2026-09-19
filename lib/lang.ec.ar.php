@@ -1116,7 +1116,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='يشير هذا الصمام إلى منحن
 $ec_lang['lpn_select_first']='لا شيء محدد. انقر عنصراً على الخريطة أولاً، ثم اضغط حذف.';
 $ec_lang['lpn_field_lon']='خط الطول';
 $ec_lang['lpn_field_lat']='خط العرض';
-$ec_lang['lpn_engine_minor_loss_note']='ملاحظة: مع حلّال EPANET، تخرج الفواقد الموضعية أقل بشكل طفيف جداً مما هي عليه مع الحلّال المدمج، لأن EPANET يقرّب القيمة التي يستخدمها للجاذبية.';
 $ec_lang['template_share_manual']='انسخ هذا الرابط:';
 
 $ec_lang['lpn_time_menu']='الوقت';

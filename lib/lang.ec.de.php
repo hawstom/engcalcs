@@ -1111,7 +1111,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='Dieses Ventil verweist auf eine Druckverlust
 $ec_lang['lpn_select_first']='Nichts ist ausgewählt. Klicken Sie zuerst ein Element auf der Karte an, und drücken Sie dann Löschen.';
 $ec_lang['lpn_field_lon']='Länge';
 $ec_lang['lpn_field_lat']='Breite';
-$ec_lang['lpn_engine_minor_loss_note']='Hinweis: Mit dem EPANET-Löser fallen Einzel-(örtliche) Verluste etwas geringer aus als mit dem eingebauten Löser, da EPANET den Wert für die Erdbeschleunigung rundet.';
 $ec_lang['template_share_manual']='Diesen Link kopieren:';
 $ec_lang['lpn_time_menu']='Zeit';
 $ec_lang['lpn_time_duration']='Gesamtlaufzeit';

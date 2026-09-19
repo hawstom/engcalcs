@@ -1111,7 +1111,6 @@ $ec_lang['lpn_inp_drop_gpv_curve']='دا والو یوې داسې د سر ضیا
 $ec_lang['lpn_select_first']='هیڅ شی نه دی ټاکل شوی. لومړی نقشه کې یو عنصر کلیک کړئ، بیا ړنګول کېکاږئ.';
 $ec_lang['lpn_field_lon']='طول البلد';
 $ec_lang['lpn_field_lat']='عرض البلد';
-$ec_lang['lpn_engine_minor_loss_note']='یادونه: د EPANET حل کوونکي سره، ځایی (لوکل) ضیاع د جوړ شوي حل کوونکي په پرتله لږ ټیټه راځي، ځکه چې EPANET د جاذبې لپاره کارول شوی ارزښت مقرري کوي.';
 $ec_lang['template_share_manual']='دا لینک کاپي کړئ:';
 $ec_lang['lpn_time_menu']='وخت';
 $ec_lang['lpn_time_duration']='ټول د چلولو موده';
