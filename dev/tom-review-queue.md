@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-046.
+**An ID is permanent and never reused.** Next free: R-060.
 
 ---
 
@@ -98,3 +98,38 @@ judgement and does not belong to a script.
 ### Raised by the work, and his to decide
 
 - [?] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build
+
+## Round of 2026-09-19, later -- his third pass
+
+**TWO OF THESE REVERSE WHAT MERGED TO MASTER THE SAME DAY.** R-046 and R-047 undo choices made
+inside the recalculate-off fix. He is right and the reasoning is his: OFF MEANS OFF is a rule about
+CONSENT, and both of those choices were this repository deciding for him what he must have wanted.
+
+### On master -- the recalculate-off fix overreached
+
+- [ ] R-046 fix/recalc-trust-user | Recalc off Old values: Leave in place stale. Don't clear. Trust the user.
+- [ ] R-047 fix/recalc-trust-user | Calculate on open: No. **Off means off**; you say it, but do you believe it? Consent, people! And the industry is used to that.
+- [ ] R-049 fix/recalc-trust-user | Escape: What about mouse away and I don't click away, then I press Esc? I want to be very severe against accidental Esc closures of the boxes.
+
+### Process
+
+- [?] R-048 -- | Reviewer: I didn't have in mind a review assistant. I had in mind a pre-reviewer, but I guess you already do the best you can with that. I just want independent review, not self-review, of all work before I see it. This could save me review time. But if you have a vision for a review assistant, that could be helpful too.
+
+### feat/customer-find-labels
+
+- [ ] R-050 feat/customer-find-labels | Settings: Let's try changing main heading Visualization to Symbology and its subheadings to Node, Link, Customer, and All.
+- [ ] R-051 feat/customer-find-labels | The labels are hiding the service line. They need to be moved away about 1px or 2px or their halo needs to be that much smaller.
+- [ ] R-052 feat/customer-find-labels | When a label is beyond the meter, make it middle justified with the meter instead of bottom.
+- [ ] R-053 feat/customer-find-labels | Like most of the label placement, I see a mystery. I see a row of labels along the service lines with a few beyond the meter. I see that these would conflict with a link label, but if so, maybe we should calculate the standard location for all to accomodate a link label.
+- [ ] R-054 feat/customer-find-labels | As you can see in the image, Customer labels are still a vastly different size than other labels. Fix that.
+
+### feat/xy-world-map
+
+- [ ] R-055 feat/xy-world-map | Why do we throw away satellite tiles? We should have a good-sized cache where we throw away only the oldest, right?
+- [ ] R-056 feat/xy-world-map | There are still a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw these tiles.
+
+### feat/tables-spreadsheet
+
+- [ ] R-057 feat/tables-spreadsheet | Top border is missing.
+- [ ] R-058 feat/tables-spreadsheet | Strange missing heading border between Tanks Mixing model and Mixing fraction.
+- [ ] R-059 feat/tables-spreadsheet | Some of the columns are now sized too narrow by default. I believe that Description was a single character long. Please fix this in a reasonable way. I thought of making a rule not to divide any word into more than three parts, but that's just an idea.
