@@ -192,6 +192,19 @@ async function measure(file, mode, opts) {
 		Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
 	}
 
+	// **opts.prefix IS THE SAME KIND OF INPUT AS opts.fields, and it exists for the one question
+	// nothing here could ask** (2026-09-18): Tom changed ONLY the node ID's "Before" text, from
+	// `1=` to `12=` to `123=`, and the labels moved around the drawing. Width is the only thing
+	// that changes, so width has to be settable. `{ node: { id: '123=' } }` writes straight into
+	// labelSettings.prefix, which is where labelPrefixFor() reads it.
+	if (opts.prefix) {
+		ls.prefix = ls.prefix || {};
+		Object.keys(opts.prefix).forEach(function (g) {
+			ls.prefix[g] = ls.prefix[g] || {};
+			Object.keys(opts.prefix[g]).forEach(function (k) { ls.prefix[g][k] = opts.prefix[g][k]; });
+		});
+	}
+
 	// **SOLVED NUMBERS, THROUGH THE REAL ENGINE.** A node label carries head and pressure only once
 	// a solve has produced them, and a label with two fewer rows is a smaller box: measuring the
 	// unsolved drawing would count crossings on labels no visitor sees.

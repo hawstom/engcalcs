@@ -1159,6 +1159,90 @@ schedule and change what a spot is ALLOWED to be, which is the one line section 
 The evidence there is that the search's problem is not that it looks in the wrong PLACE but that it
 is allowed to look too FAR.
 
+## 16. Only the label width changes, and the labels move (Tom's prefix test, 2026-09-18)
+
+Tom's test case, and it is the crispest one this task has had: one drawing, one field (the node ID),
+change ONLY that field's **Before** text -- `1=`, then `12=`, then `123=`. Nothing about the drawing,
+the zoom or the field set moves; the labels merely get wider, and the placements rearrange.
+
+> *"I say that there is no good reason for a single label of any type to place differently than any
+> other type in these images. Width in this case is immaterial because there is no constraint on
+> width. I know that the bug is related to width."*
+
+**The labels do move, and here is the number.** Net3-World, node ID alone, every repair route and the
+shed on, node labels choosing a different candidate than they did at `1=`:
+
+| prefix | fit zoom | 2x | 4x | 8x |
+|---|---|---|---|---|
+| `12=`   | 27 | 20 | 2 | 0 |
+| `123=`  | 44 | 25 | 4 | 2 |
+| `1234=` | 49 | 28 | 8 | 2 |
+
+of 97 node labels. `dev/lpn-spike/label-width-stability-harness.js` holds those as a ratchet.
+
+### 16a. It is NOT the goal ladder, and that was the first answer offered
+
+The diagnosis proposed before anything was measured was `GOAL_WEIGHT`: `distance` is ranked last at
+1/64 of `labelLabel`, so proximity could never outrank sub-threshold near-misses with distant
+obstacles, and a width change would reshuffle the winner through those. **That ladder decides nothing
+here.** Three measurements, each sufficient on its own:
+
+1. **Node labels never reach a score.** They are placed by `placeLabelsFirstFit()`, where a side is
+   clear or it is not; `rawScore()`, `effectiveScores()` and `GOAL_WEIGHT` are the ring scorer's, and
+   the ring scorer places free link labels and dragged labels.
+2. **The divergence is complete with every repair route OFF.** Measured in `off` mode, before
+   anything that scores has run: 14 of 97 move at `12=` and 23 at `123=`. Turning the routes on adds
+   a few more; it does not create them.
+3. **The broad phase is exact.** Replacing `grid().near()` with a full scan of every obstacle
+   reproduces the layout to the bit, so nothing is being missed or found by a cell boundary.
+
+### 16b. What it is: a greedy first-fit, and the cascade
+
+The pass was replayed offline from its own captured inputs and reproduces the real layout **97 of 97
+labels**, which makes it possible to name a blocker for every change. **Every one is a real box
+overlap with a neighbour's label, nearer than one label width.** There is no epsilon noise in it,
+and nothing 2 km away votes on anything.
+
+The propagation is the cascade. A label that cannot use any of its four corners falls through to the
+polar raster, commits there, and becomes an obstacle for everyone placed after it -- on ground a
+later label was going to use from its own doorstep. That label then falls through too. Widen every
+label at once and the first such fall happens somewhere else, and the drawing downstream of it
+follows.
+
+So the sensitivity tracks how **over-subscribed** the view is, which the table above shows directly:
+at the fit zoom 24 of 97 node labels are already dropped and 41 are on raster candidates, and half
+the drawing moves; at 8x nothing is dropped, two are on raster candidates, and two labels move.
+
+### 16c. Three fixes were built and measured, and all three cost drawn labels
+
+Against the 28 views of the 7 shipped examples, every field on -- the same measurement the 2x-to-1.25
+reach change was made on. Drawn labels, higher is better:
+
+| | drawn | hidden | worst leader |
+|---|---|---|---|
+| **as it ships** | **1,762** | 774 | 204.0 |
+| corners for everyone, then the raster | 1,742 | 794 | 204.0 |
+| nearest ring for everyone, then the rest | 1,729 | 807 | 204.0 |
+| a resting claim reserved for every unplaced label | 1,751 | 785 | 204.0 |
+
+The first two halve the movement at the fit zoom (17 against 39 at `1234=` in the pure first-fit) and
+cost 20 and 33 labels. **The third cost 11 labels and did not reduce the movement at all** -- the
+reasoning that it could not drop anybody is wrong: a label that takes a different clear side occupies
+different ground, so the outcome is not monotone in anyone's options.
+
+**Nothing cheap is available here.** The width sensitivity is a property of a greedy sequential
+first-fit over a view that asks for more ground than it has, and it appears only where labels
+genuinely touch. Removing it means a different placement paradigm -- a global assignment over the
+conflict graph, section 6's exact methods -- which is Tom's call and not a tuning change.
+
+### 16d. What his threshold default would and would not do for it
+
+At the fit zoom of Net3-World the label box height is **0.61 of the median link length**, so a
+threshold at TWICE the median link length does not trip there, nor at any zoom this task measures. It
+would take zooming out about 3.3x further than the fit view to reach it. His own reading of it --
+*"that's conservatively large"* -- is confirmed by the arithmetic: it is an upper limit against
+absurdity, not a remedy for the crowded-view lottery above.
+
 
 ## Sources
 
