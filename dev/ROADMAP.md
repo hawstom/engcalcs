@@ -850,6 +850,22 @@ the block.
   - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
     row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
   - **THE ACCOUNT NUMBER IS A LABEL, NEVER A KEY**, and it reaches no log row and no usage statistic.
+    **Tom now says we should not OWN it** (2026-09-18): a user's own custom property could be it
+    instead. That is a removal of shipped code, so it is costed rather than done --
+    `dev/symbology-property-audit.md` §5, whose one open question is whether the account should
+    still ride out in the `[DEMANDS]` category once it is a custom property.
+  - **`feat/customer-find-labels` (2026-09-18) adds four things**, all from his message of that
+    day: custom properties respected in a customer's Properties box and Customers table; a Customer
+    scope in Find and replace; a demand PATTERN on a customer, reaching both solvers and the `.inp`;
+    and customer LABELS, which he has not decided he wants. The labels follow NODE styles and node
+    checkboxes, and their placement is his own two fixed locations along the service line with a
+    drop if both are taken -- *"This much simpler than general node label placement."* Settings >
+    Customer labels carries one control, the widest view that attempts them; 0 there is never.
+  - **The symbology audit he asked for is `dev/symbology-property-audit.md`** (2026-09-18): every
+    property missing from Settings Node symbology, Settings Link symbology and the two "Color ... by"
+    selectors, ranked. The two cheapest are a pipe's LENGTH and its MINOR LOSS k, both already
+    labelled and neither colourable; the largest is that a custom property can be searched,
+    replaced and typed and cannot be printed on the map or coloured by.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
     account number in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.

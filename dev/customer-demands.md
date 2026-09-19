@@ -305,6 +305,41 @@ literal and names no element and no field. `dev/cookie-storage-inventory.md` car
 while it is still cheap to change and spends none of the drawing-surface budget. What changed is that
 Tom wanted something to test; the reasoning was right and the recommendation was overtaken.
 
+### Added 2026-09-18 on `feat/customer-find-labels`, from Tom's own list
+
+1. **CUSTOM PROPERTIES ARE RESPECTED**, in the Properties box and in the Customers table, plus Find
+   and Replace. A design whose "Applies to" carries **M** reaches a customer. `customPropTypeKey()`
+   takes an explicit GROUP for this and for nothing else, because `elGroup()` is deliberately never
+   asked about a customer -- a group answer would invite exactly the `setProp()`/`effective()` path
+   §1 rules out. So the read and the write are PLAIN (`customerCustomValue()`,
+   `setCustomerCustomProp()`), there is no override marker, and `prop` is left off the table column
+   that would otherwise carry one.
+2. **CUSTOMER IN FIND.** Its own scope beside the seven, offering id, account number, connected
+   asset, demand per service, count, total and the junction it lumps at. Station and offset are
+   deliberately NOT offered: they are positions on the drawing, and a bulk Replace on one would
+   slide four hundred meters along their mains. Account, demand, count, pattern and the custom
+   properties are replaceable. **The account number replaces with NOTHING enforced**, which is the
+   label-not-a-key ruling arriving where a page would most be tempted to break it. The Customers
+   table's filter, which used to decline, now goes through the one evaluator.
+3. **A CUSTOMER DEMAND FOLLOWS A PATTERN.** The field was already READ -- `pattern` has always been
+   on the customer's demand row -- so this is the control and nothing else: a chooser in the popup,
+   a typed column in the table that refuses a name nothing answers to, and `libRepointPattern()`
+   grown a sixth attachment point so a rename or a delete cannot strand one.
+4. **CUSTOMER LABELS, WHICH HE HAS NOT DECIDED HE WANTS.** *"I wasn't expecting that Customers are
+   labeled, and it could be a huge commitment. I am not sure that we want that."* **The state before
+   this was NO LABEL AT ALL**: the account number drawn beside every symbol on 2026-09-15 was
+   deleted on 2026-09-17, and what makes customers LOOK labelled is the other half -- a meter's
+   demand is a demand row, so its junction's own node label has always included it. Nobody ever
+   decided to label a customer.
+   **CONTENT AND STYLE ARE THE NODE'S** (*"Customer labels would follow Node styles. Q is a demand,
+   Base demand or Demand"*): `labelSettings.node.id`, `.demand` and `.demandActual`, and there is no
+   customer side of labelSettings. **PLACEMENT IS HIS OWN AND IS NOT THE NODE PASS**: two fixed
+   locations along the service line, one justified against the link and one beyond the dot, and a
+   DROP if both fail the conflict check -- *"This much simpler than general node label placement."*
+   No leader, no relaxation, no shed. `Geom.serviceLabelSpots()` is the whole geometry.
+   **`labelSettings.customerMaxWidth` is the widest view that attempts them, and 0 is NEVER**, which
+   keeps his own fallback one number away.
+
 **What is NOT built, in one list:** the `atNode` pin (§2, and the ruling that supersedes it); the
 zoom-dependent density rule (§4); finding a customer by account number, totals by pressure zone and
 bulk entry (Slice 4, "only if asked"); a Meter row in Settings' ID-prefix list, which is absent for

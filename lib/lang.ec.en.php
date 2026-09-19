@@ -813,6 +813,11 @@ $ec_lang['lpn_field_meter_total_tip']='The demand per service times the number o
 $ec_lang['lpn_field_meter_pipe']='Connected asset';
 $ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
 $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
+// ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
+// heading is the junction's own whole label reused and only the tip is new: what it says that the
+// junction's does not is that the number the pattern multiplies is the TOTAL, count included.
+$ec_lang['lpn_field_meter_pattern_tip']='How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.';
+$ec_lang['lpn_meter_pattern_unknown']='No pattern in this project is named {id}, so the customer was left as it was.';
 $ec_lang['lpn_meter_placed']='Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.';
 $ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.';
 $ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
@@ -2922,6 +2927,13 @@ $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
 $ec_lang['lpn_settings_node_symbology']='Node symbology';
 $ec_lang['lpn_settings_link_symbology']='Link symbology';
+// ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
+// would follow Node styles"), so this section has one control and no checkboxes: how close the
+// view has to be before a service is worth lettering.
+$ec_lang['lpn_settings_customer_labels']='Customer labels';
+$ec_lang['lpn_labels_customer_note']='Customer labels show the node values chosen above, at the customer.';
+$ec_lang['lpn_labels_customer_width']='Widest view that attempts to display customer labels';
+$ec_lang['lpn_labels_customer_width_tip']='How wide the drawing on screen may be before customer labels stop being drawn, measured across the window. Zoom out past this and no customer label is placed. Type 0 to leave customers unlabelled.';
 $ec_lang['lpn_settings_page']='Page';
 $ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';

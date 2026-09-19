@@ -844,6 +844,15 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // link label alike, so they belong to neither group and were being read as
 						      // part of whichever one they were filed under. rebuildLabelsFields() fills
 						      // this host. ?>
+						<?php // **CUSTOMER LABELS, ONE CONTROL AND NO CHECKBOXES** (ROADMAP Task 247).
+						      // What a customer label SAYS is chosen in Node symbology above, which
+						      // is Tom's own ruling; what this section answers is the one question
+						      // those rows cannot, namely how close the view has to be before a
+						      // service is worth lettering. rebuildLabelsFields() fills it. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_customer_labels']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_labels_customer_fields"></div>
+						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_node_link']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
@@ -1390,6 +1399,8 @@ EngCalcs.pageConfig = {
 	lpn_field_meter_pipe_tip: <?=json_encode($ec_lang['lpn_field_meter_pipe_tip'])?>,
 	lpn_field_meter_pipe_suggest: <?=json_encode($ec_lang['lpn_field_meter_pipe_suggest'])?>,
 	lpn_meter_pipe_unknown: <?=json_encode($ec_lang['lpn_meter_pipe_unknown'])?>,
+	lpn_field_meter_pattern_tip: <?=json_encode($ec_lang['lpn_field_meter_pattern_tip'])?>,
+	lpn_meter_pattern_unknown: <?=json_encode($ec_lang['lpn_meter_pattern_unknown'])?>,
 	lpn_meter_placed: <?=json_encode($ec_lang['lpn_meter_placed'])?>,
 	lpn_field_meter_station: <?=json_encode($ec_lang['lpn_field_meter_station'])?>,
 	lpn_field_meter_station_tip: <?=json_encode($ec_lang['lpn_field_meter_station_tip'])?>,
@@ -1892,6 +1903,9 @@ EngCalcs.pageConfig = {
 	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
+	lpn_labels_customer_note: <?=json_encode($ec_lang['lpn_labels_customer_note'])?>,
+	lpn_labels_customer_width: <?=json_encode($ec_lang['lpn_labels_customer_width'])?>,
+	lpn_labels_customer_width_tip: <?=json_encode($ec_lang['lpn_labels_customer_width_tip'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
 	lpn_labels_mark_extrema: <?=json_encode($ec_lang['lpn_labels_mark_extrema'])?>,
 	lpn_labels_mark_extrema_tip: <?=json_encode($ec_lang['lpn_labels_mark_extrema_tip'])?>,
