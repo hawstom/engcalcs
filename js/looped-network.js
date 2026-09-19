@@ -8885,7 +8885,7 @@ var EngCalcs = EngCalcs || {};
 	// descender (the Q of `Qb=` is one, ~0.21 of a font size) and then the halo's outer half
 	// (0.10). 0.21 + 0.10 = 0.31 against a gap of 0.30. The number is stated as that sum plus his
 	// air, so a future reader can see what each part of it is paying for.
-	var LPN_CUST_LABEL_GAP_FRAC = 0.21 + 0.10 + 0.17;   // descender + halo + ~2px of air at 11px   // descender + halo + ~2px of air at 11px
+	var LPN_CUST_LABEL_GAP_FRAC = 0.21 + 0.10 + 0.17;   // descender + halo + ~2px of air at 11px
 	var LPN_CUST_LABEL_LINKPAD_FRAC = 0.40;
 	var LPN_CUST_LABEL_DOTPAD_FRAC = 0.40;
 	// **THE DEMAND THIS METER IS DRAWING AT THE MOMENT ON THE CLOCK**, which is resolvedDemand()'s

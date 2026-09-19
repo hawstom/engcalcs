@@ -886,13 +886,15 @@ the block.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
     customer's TAG in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.
-  - **THE LABEL PLACEMENT MYSTERY IS MEASURED AND ANSWERED** (2026-09-19,
-    `dev/lpn-spike/customer-label-cause-harness.js`). He asked why a few labels go beyond the
-    customer and guessed a LINK label was the conflict. It is not: in three views the rejector was
-    always the PREVIOUS CUSTOMER'S OWN label, named by `customerSpotBlocker()`. His proposal -- one
-    standard location for all -- is already what happens where there is room, and forcing it would
-    DROP the few that were pushed rather than tidy them. Settings > Symbology, and the two
-    placement changes he asked for, are in `dev/customer-demands.md` §6a.
+  - **THE LABEL PLACEMENT MYSTERY IS MEASURED, AND TOM WAS RIGHT** (2026-09-19,
+    `dev/lpn-spike/customer-label-cause-harness.js`). He guessed a LINK label was the conflict, was
+    first told it is not, and **that answer is withdrawn**: the fixture stood its customers at round
+    numbers on a main whose label repeats somewhere else, so the case was never on the drawing. A
+    neighbouring customer's label is the commonest blocker and that outcome is a shuffle; a link
+    label blocks too, and **that outcome is a SILENT DROP -- 2.4% of services on the pipe label's
+    own side, 1.2% on the far side**, measured on a random street.
+    **AWAITING HIS CALL:** a third position, letting a customer displace a link label, or making
+    the drop visible -- each spends something he chose. `dev/customer-demands.md` §6a.
   - **STILL OPEN:** the `atNode` pin (superseded by the draggable attachment), the zoom-dependent
     label density rule, and Slice 4. **`linkAnchor {link, t}` was NOT extracted**,
     so that seam is still Task 502's to unify. **NOT VERIFIED: no browser pass**, and every gesture

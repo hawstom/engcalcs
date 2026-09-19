@@ -383,19 +383,46 @@ the size defect and not the placement at all.
 reservoir, one horizontal main, eight services). Every customer tries the spot beside its service
 line first and takes the one beyond the customer only when something is already standing there; the
 rejecting obstacle is now recorded on the element by name (`customerSpotBlocker()`), so this is
-evidence rather than a second opinion. **His reading was that the conflict is with a LINK label. It
-is not.** In three views, including one deliberately putting every service on the side the pipe's
-own label lies, every named blocker was **the previous customer's own label**, in document order.
-A pipe carries one label near its middle; a row of services is eight boxes in a line.
+evidence rather than a second opinion.
 
-**SO HIS PROPOSAL -- one standard location for all, chosen once to accommodate a link label -- is
-already what happens, and forcing it would cost labels.** With room, all eight take the identical
-standard position; the ones that differ are exactly the ones that could not have it. Removing the
-fallback would not tidy those four, it would DROP them, because the ground they were pushed off is
-occupied by a neighbour that has no reason to move either. Nothing here argues against a better
-answer -- spacing a row of services' labels jointly is a real design, and it is the same global
-question `dev/session-handoff.md` records for node labels -- but it is a different proposal from the
-one he made, and it is not a small thing.
+**TOM'S READING WAS RIGHT: A LINK LABEL DOES BLOCK A CUSTOMER LABEL. THE FIRST ANSWER GIVEN HERE
+SAID IT DOES NOT, AND THAT ANSWER IS WITHDRAWN.** It was not a judgement that went the wrong way --
+**the case was never on the drawing.** A long pipe does not label itself once at its midpoint; it
+REPEATS its label along its length (`linkLabelStations()`), and on the 900-unit main in that first
+harness the repeats fall at x = 225 and x = 675 while the eight customers stood at 100, 200 ... 800.
+Not one of them was ever near a link label, and the harness then reported that a link label never
+blocks anything. **A harness that concludes "X never happens" from a drawing that cannot produce X
+is worse than no harness**, because it reads as evidence. The fixture now derives those positions
+from the page and stands a customer on each, and the assertion is permanent.
+
+**WHAT THE FOUR VIEWS SHOW TOGETHER**, which is not what any one of them shows:
+
+| the blocker | when | what happens to the label |
+|---|---|---|
+| the NEIGHBOURING customer's label | wherever services are close together | it steps past the customer and stays readable |
+| the pipe's OWN label | where a service lands near one of the label's repeat positions | **both positions can go at once and the label LEAVES THE DRAWING** |
+
+**THE SILENT DROP IS THE REAL DEFECT AND IT IS TOM'S OWN SPECIFIED BEHAVIOUR**, which is why it
+needs him rather than a fix chosen here: *"If both of those fail a conflict check, the label is
+dropped. This much simpler than general node label placement."* Nobody has ever been told how often
+that happens. Measured on an ordinary street -- a 3,000-unit main, twenty-five services at random
+stations, ten runs each way round: **6 of 250 disappeared (2.4%) on the side the pipe's label lies,
+3 of 250 (1.2%) on the far side.** Roughly one service in sixty, with nothing on screen to say a
+number is missing.
+
+**THE THREE WAYS OUT, none of them taken, because each spends something he chose.** (a) A THIRD
+position -- the other side of the service line -- is a few lines and would clear most of these; it
+is also exactly the simplification he asked for by name. (b) Letting a customer label DISPLACE a
+link label uses machinery that already exists for node labels (`yields`,
+`yieldStationedLabels()`), but the customer pass deliberately runs LAST, on ground everything else
+has left, so this reopens the ordering. (c) Accept the drop and make it VISIBLE. **His call.**
+
+**AND HIS PROPOSAL -- one standard location for all, chosen once to accommodate a link label.**
+Where there is room it is already what happens: all eight take the identical standard position. The
+labels that differ are exactly the ones whose first choice was REFUSED, named one by one in the
+trial record -- so a rule offering only that one position would not have tidied those four, it
+would have dropped them on top of the drops above. That much is measured. What is NOT measured is
+whether some OTHER single standard position would do better, and no claim is made about it.
 
 **Two placement changes shipped from the same pass**, both his own words. The label beyond the
 customer is **centred on the service line's axis** rather than sitting above it (*"middle justified
