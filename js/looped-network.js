@@ -10118,12 +10118,123 @@ var EngCalcs = EngCalcs || {};
 	// carry in paintBasemapTiles(): exactly one generation is ever held, so this cannot grow with a
 	// long pan, and it is emptied the moment every wanted tile has settled.
 	var basemapCarried = {};
+	// **A TILE ALREADY FETCHED IS KEPT, IN MEMORY, FOR THE LIFE OF THE PAGE** (Tom's R-055,
+	// 2026-09-19: *"Why do we throw away satellite tiles? We should have a good-sized cache where we
+	// throw away only the oldest, right?"*). He is right: until now a tile that left the view was
+	// DESTROYED, so zooming out one notch and back in, or panning away and back, re-fetched every
+	// photograph the reader had already waited for.
+	//
+	// **IT IS THE ELEMENT ITSELF THAT IS KEPT, not a copy of the bytes.** A detached <image> holds
+	// its decoded picture, so re-attaching it draws instantly and asks the network for nothing --
+	// which is also why there is no second opinion here about what a tile's URL is.
+	//
+	// **MEMORY ONLY, AND THAT IS A RULE RATHER THAN AN IMPLEMENTATION DETAIL** (CLAUDE.md, and
+	// dev/geographic-projects.md section 4). Nothing here reaches localStorage, IndexedDB, the Cache
+	// API or the service worker: a tile stored on the visitor's DEVICE is a tile-policy problem and
+	// a storage-consent problem at once, and would make a sentence in `consent_body` false. This
+	// cache dies with the tab, like any other variable.
+	//
+	// **THE SIZE IS MEASURED, not round.** A real satellite tile at zoom 19 over Novato is 18,385
+	// bytes (`curl` against the v4 raster endpoint, 2026-09-19) and a screenful is 72 to 105 tiles
+	// on a 2560 x 1400 window. The bound is TWICE THE PAGE'S OWN PER-REFRESH CEILING, LPN_TILE_BUDGET
+	// -- so the largest view this page is ever allowed to ask for fits whole, twice over, which is
+	// what makes a zoom out and back, or a pan away and back, cost nothing. In bytes that is about
+	// 7 MB of compressed picture; the decoded bitmaps are the browser's to keep or discard, and it
+	// discards them for a detached element under pressure, which is the behaviour being relied on.
+	var LPN_TILE_CACHE = 384;
+	var basemapCache = {}, basemapCacheOrder = [];
+	function basemapCacheTouch(key) {
+		var i = basemapCacheOrder.indexOf(key);
+		if (i >= 0) { basemapCacheOrder.splice(i, 1); }
+		basemapCacheOrder.push(key);
+	}
+	// **OLDEST FIRST, WHICH IS HIS OWN WORDING AND IS ALSO THE ONLY DEFENSIBLE ORDER HERE.** A tile
+	// is touched when it is put in and when it is taken out, so what falls off the front is the tile
+	// the reader has been furthest from for longest.
+	function basemapCacheTrim() {
+		var k;
+		while (basemapCacheOrder.length > LPN_TILE_CACHE) {
+			k = basemapCacheOrder.shift();
+			if (basemapCache[k]) {
+				if (basemapCache[k].remove) { basemapCache[k].remove(); }
+				delete basemapCache[k];
+			}
+		}
+	}
+	function basemapCacheClear() {
+		var k;
+		for (k in basemapCache) {
+			if (basemapCache.hasOwnProperty(k) && basemapCache[k].remove) { basemapCache[k].remove(); }
+		}
+		basemapCache = {};
+		basemapCacheOrder = [];
+	}
+	// Take a tile off the screen and keep it, IF it is a picture. **A TILE THAT NEVER ARRIVED MUST
+	// NEVER ENTER THE CACHE** -- caching a blank would serve that blank back for the life of the
+	// page, which is R-056 rebuilt on purpose.
+	function basemapRetire(key, img) {
+		if (!img) { return; }
+		if (img.remove) { img.remove(); }
+		if (!img._lpnOk) { return; }
+		basemapCache[key] = img;
+		basemapCacheTouch(key);
+		basemapCacheTrim();
+	}
 	function basemapDropCarried() {
 		var k;
 		for (k in basemapCarried) {
-			if (basemapCarried.hasOwnProperty(k) && basemapCarried[k].remove) { basemapCarried[k].remove(); }
+			if (basemapCarried.hasOwnProperty(k)) { basemapRetire(k, basemapCarried[k]); }
 		}
 		basemapCarried = {};
+	}
+	// **EMPTY THE LAYER.** `keep` retires every picture into the cache first, which is right when
+	// the basemap is merely switched off or the window is not sized yet. The callers that pass
+	// false are the ones where the PLACEMENT has changed -- a cached tile is then a picture of
+	// somewhere else, and the honest thing is to throw the lot away.
+	function basemapEmpty(keep) {
+		var k;
+		basemapDropCarried();
+		for (k in basemapEls) {
+			if (!basemapEls.hasOwnProperty(k)) { continue; }
+			if (keep) { basemapRetire(k, basemapEls[k]); }
+			else if (basemapEls[k].remove) { basemapEls[k].remove(); }
+		}
+		basemapEls = {};
+		basemapCarried = {};
+		if (basemapLayer) { basemapLayer.innerHTML = ''; }
+		if (!keep) { basemapCacheClear(); basemapFails = {}; }
+	}
+	// **A TILE WHOSE REQUEST FAILED IS ASKED FOR AGAIN** (Tom's R-056, 2026-09-19: *"There are still
+	// a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw
+	// these tiles."*). We did decide not to draw them, and this is where.
+	//
+	// **MEASURED, in real headless Chrome against the real tile servers**
+	// (dev/lpn-spike/basemap-blank-tile-probe.js, 2026-09-19): with 33 of 105 tile requests failed
+	// and then a perfect network restored and the view left alone, all 33 were still blank after 5,
+	// 15 and 30 seconds, each still showing exactly ONE request. 18.8% of the canvas stayed white.
+	// The only thing that ever repaired it was a gesture that produced DIFFERENT tile keys. The
+	// mechanism is `if (basemapEls[t.key]) { return; }` reading "we made an element for this key" as
+	// "this tile is handled", while the `error` listener marked it settled and moved on.
+	//
+	// Three attempts with a widening gap, and then it stops: a tile over the provider's own ceiling
+	// 404s every time, and a retry that never gives up is the bulk-download the tile policy
+	// forbids. Jitter spreads a failed screenful instead of sending it all back out in one volley,
+	// and the repaint is the DEBOUNCED one, so a hundred retries collapse into a single repaint.
+	var LPN_TILE_RETRIES = 3;
+	var basemapFails = {};
+	function basemapScheduleRetry(key, img) {
+		var n = (basemapFails[key] || 0) + 1, wait;
+		basemapFails[key] = n;
+		if (n > LPN_TILE_RETRIES) { return; }
+		wait = 800 * Math.pow(3, n - 1);        // 0.8 s, 2.4 s, 7.2 s
+		setTimeout(function () {
+			// The view may have moved on, or this element may already have been replaced. Only the
+			// tile that is still the current one for its key is ours to repair.
+			if (basemapEls[key] !== img) { return; }
+			if (img.remove) { img.remove(); }
+			delete basemapEls[key];
+			scheduleBasemapRefresh();
+		}, wait + Math.random() * wait * 0.5);
 	}
 	// How many tiles the CURRENT view is still waiting on. Only the wanted set counts -- a carried
 	// tile that never arrives must not keep the generation before it alive.
@@ -10449,9 +10560,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!basemapOn() || !svg || !mapSized) {
-			basemapLayer.innerHTML = '';
-			basemapEls = {};
-			basemapCarried = {};
+			// The pictures are kept: turning the basemap off and on again, or a window that has not
+			// been measured yet, does not move the ground under a single tile.
+			basemapEmpty(true);
 			return;
 		}
 		r = svg.getBoundingClientRect();
@@ -10482,7 +10593,7 @@ var EngCalcs = EngCalcs || {};
 			};
 			if (!isFinite(xbnds.west) || !isFinite(xbnds.south) ||
 					!isFinite(xbnds.east) || !isFinite(xbnds.north)) {
-				basemapLayer.innerHTML = ''; basemapEls = {}; basemapCarried = {}; return;
+				basemapEmpty(false); return;
 			}
 		}
 		// **THE GROUND MOVED, SO EVERY CACHED TILE IS A PICTURE OF SOMEWHERE ELSE.** The affine each
@@ -10490,17 +10601,21 @@ var EngCalcs = EngCalcs || {};
 		// transform and the only honest thing to do is throw them away and place them again. Cheap:
 		// a wizard frame repaints one screenful, and a pan or a zoom -- where the camera moves and
 		// the tiles are still correct -- leaves the signature untouched and costs one comparison.
-		var placeSig = xg
+		// **AND THE CACHE MAKES THIS SIGNATURE CARRY MORE THAN IT DID.** A tile kept from an earlier
+		// view is only re-usable while the map from a lon/lat box to a place in the drawing is
+		// unchanged, so the signature now names the FRAME as well as the attachment: the coordinate
+		// kind and, for a projected project, the CRS code. Changing either used to be safe because
+		// nothing survived the repaint; now something does.
+		var proj = projectedBasemapOk();
+		var placeSig = (project.coords || '') + '|' + (proj ? projectCrsCode() : '') + '|' + (xg
 			? 'xy|' + xg.anchor.x + ',' + xg.anchor.y + '|' + xg.origin.lon + ',' + xg.origin.lat +
 				'|' + xg.metersPerUnit + '|' + xg.rotDeg
-			: '';
+			: '');
 		if (placeSig !== basemapPlacedSig) {
-			basemapLayer.innerHTML = '';
-			basemapEls = {};
-			basemapCarried = {};
+			basemapEmpty(false);
 			basemapPlacedSig = placeSig;
 		}
-		var proj = projectedBasemapOk(), bnds = null;
+		var bnds = null;
 		if (proj) {
 			// outwardX/outwardY, exactly as the geographic branch below uses them: they are the
 			// one boundary out of the drawing frame, and in a projected project they hand back
@@ -10508,7 +10623,7 @@ var EngCalcs = EngCalcs || {};
 			// undone.
 			bnds = EngCalcs.lpnCrsBounds(projectCrsCode(),
 				outwardX(tl.x), outwardY(tl.y), outwardX(br.x), outwardY(br.y));
-			if (!bnds) { basemapLayer.innerHTML = ''; basemapEls = {}; basemapCarried = {}; return; }
+			if (!bnds) { basemapEmpty(false); return; }
 		}
 		// **THE ZOOM ARGUMENT IS A SCALE IN THE FRAME'S OWN UNITS AND THEY ARE NOT THE SAME UNITS.**
 		// `state.s` is pixels per world unit: per DEGREE in a geographic project, per metre or per
@@ -10530,6 +10645,17 @@ var EngCalcs = EngCalcs || {};
 		list.tiles.forEach(function (t) {
 			want[t.key] = true;
 			if (basemapEls[t.key]) { return; }
+			// **ALREADY FETCHED IN THIS PAGE'S LIFE.** The element is re-attached with the picture
+			// still in it: no request, no wait, nothing new to draw. The key carries the source, so
+			// a street tile can never be handed back while the satellite credit is showing.
+			if (basemapCache[t.key]) {
+				var hit = basemapCache[t.key], oi = basemapCacheOrder.indexOf(t.key);
+				delete basemapCache[t.key];
+				if (oi >= 0) { basemapCacheOrder.splice(oi, 1); }
+				basemapLayer.appendChild(hit);
+				basemapEls[t.key] = hit;
+				return;
+			}
 			// **WHERE the tile goes is the branch; MAKING it is not.** Two `el('image')` calls
 			// would be two places to remember crossorigin, the class and the aspect rule, and
 			// dev/lpn-spike/basemap-harness.js counts the creation sites for exactly that reason.
@@ -10598,15 +10724,26 @@ var EngCalcs = EngCalcs || {};
 			// picture in place. A stub with no addEventListener is settled on the spot, so no
 			// harness waits for an event it can never fire.
 			img._lpnSettled = false;
+			img._lpnOk = false;
 			if (img.addEventListener) {
-				var settle = function () {
+				// **`_lpnOk` IS THE NEW HALF AND IT SEPARATES TWO THINGS THAT WERE ONE.** Settled
+				// means "stop waiting for it"; ok means "there is a picture in it". A failure is
+				// still settled -- otherwise a 404 would pin the previous view on screen forever --
+				// but it is no longer treated as a delivered tile: it is not cached, and it is
+				// asked for again.
+				var settle = function (ok) {
 					img._lpnSettled = true;
+					img._lpnOk = ok;
+					if (ok) { delete basemapFails[t.key]; } else { basemapScheduleRetry(t.key, img); }
 					if (!basemapPendingCount()) { basemapDropCarried(); }
 				};
-				img.addEventListener('load', settle);
-				img.addEventListener('error', settle);
+				img.addEventListener('load', function () { settle(true); });
+				img.addEventListener('error', function () { settle(false); });
 			} else {
+				// A stub with no addEventListener has no network either, so there is nothing to
+				// wait for and nothing that can have failed.
 				img._lpnSettled = true;
+				img._lpnOk = true;
 			}
 			basemapEls[t.key] = img;
 		});
@@ -10633,8 +10770,12 @@ var EngCalcs = EngCalcs || {};
 			if (basemapEls.hasOwnProperty(k) && !want[k]) {
 				if (k.slice(0, style.length + 1) === style + '/') {
 					carried[k] = basemapEls[k];
-				} else if (basemapEls[k].remove) {
-					basemapEls[k].remove();
+				} else {
+					// **THE OTHER SOURCE'S TILES LEAVE THE SCREEN AT ONCE, and are KEPT.**
+					// basemapRetire() detaches before it stores, so the licence rule is untouched --
+					// nothing of OpenStreetMap's is ever on screen under the Mapbox credit -- and
+					// switching back to the map you were just looking at now costs nothing.
+					basemapRetire(k, basemapEls[k]);
 				}
 				delete basemapEls[k];
 			}
