@@ -3445,6 +3445,22 @@ var EngCalcs = EngCalcs || {};
 	// Stored as an additive key on the project, ABSENT meaning grid. Old readers ignore it and every
 	// document ever saved is a grid project, so nothing migrates and no version is owed.
 	var LPN_COORDS_GEO = 'geo';
+	/**
+	 * **THIS ASKS ONE NARROW QUESTION: ARE THIS DOCUMENT'S NUMBERS A LONGITUDE AND A LATITUDE?**
+	 * It is the right question for the drawing frame (outwardY/inwardY run through Mercator here
+	 * and nowhere else), for how a coordinate is written and bounded, and for the `_xsrc`/`_ysrc`
+	 * round-trip record. It is the WRONG question for anything that reaches outside the drawing.
+	 *
+	 * **"CAN THIS PROJECT SAY WHERE ON THE EARTH A POINT OF IT IS" IS projectLocatable(), AND
+	 * PICKING THE WRONG ONE HAS NOW COST THREE DEFECTS IN THE SAME FAMILY.** The elevation
+	 * controls asked this one and were widened on 2026-09-14; the satellite and street-map rows,
+	 * the corner teaser and goToLatLon() were left behind and were found by Tom on 2026-09-18
+	 * (*"Satellite view is only available for lat/lon CRS."*) -- a row offered and dead, which is
+	 * exactly what the elevation buttons had been four days earlier. A projected project with a
+	 * transform knows perfectly well where it is. **So before writing isGeoProject() in a new
+	 * gate, ask which of the two you mean**; dev/lpn-spike/projected-basemap-harness.js section
+	 * 13 holds the outward-facing ones.
+	 */
 	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
 
 	// ---- A PROJECT'S DECLARED COORDINATE REFERENCE SYSTEM (ROADMAP Task 641) ---------------------
@@ -3468,12 +3484,15 @@ var EngCalcs = EngCalcs || {};
 	// file conversion onto a COPY, which is not built; until it is, the honest answer is that there
 	// is no door, and assignProjectCrs() below is the only writer and refuses every second call.
 	//
-	// **WHAT IS DELIBERATELY NOT BUILT HERE**, so nothing is read into it that it does not do: there
-	// is no transform, so a projected project offers no basemap, no place-name search and no terrain
-	// elevations. Every one of those is already gated on isGeoProject(), which a projected project is
-	// not, so they are absent by construction rather than by a new gate. They wait on proj4js
-	// (ruling P3), and so does the point scale factor of ruling P7. **Nothing here claims anything
-	// about the accuracy of a length**; that claim waits on Task 643.
+	// **THIS PARAGRAPH USED TO SAY A PROJECTED PROJECT GETS NO BASEMAP, NO PLACE-NAME SEARCH AND NO
+	// TERRAIN ELEVATIONS, and that stopped being true at Task 641 phase 5** (2026-09-14), when
+	// js/lpn-crs.js gave the page a transform for 98% of the register. It is left named here rather
+	// than deleted because it was read as the rule for a month after it lapsed, and each outward
+	// feature was then widened separately: the basemap painter, then the elevation controls, then
+	// (2026-09-18, Task 692) the satellite row, the street-map row, the corner teaser and Go to.
+	// **The question every one of them asks is projectLocatable(), not isGeoProject()** -- see the
+	// note on that predicate. **Nothing here claims anything about the accuracy of a length**; that
+	// claim waits on Task 643, and so does the point scale factor of ruling P7.
 	//
 	// **PHASE 2 COLLAPSED THE QUESTION FROM THREE ANSWERS TO TWO** (Tom's interface specification,
 	// 2026-09-13). lat/lon is not a third kind beside "projected"; it IS a projection, and the
@@ -9702,7 +9721,7 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!isGeoProject() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		if (!projectLocatable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -11253,7 +11272,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	function goToLatLon() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!isGeoProject()) { return; }
+		// **THE GATE IS THE MENU ROW'S OWN.** The row is hidden on a project that cannot say where
+		// on the Earth it is, and this asks the same question rather than a narrower one: it read
+		// isGeoProject() while the row read projectLocatable(), so on a projected project the row
+		// was offered and the press did nothing at all. goToPoint() below travels through the
+		// transform, so there is nothing here a projected project cannot do.
+		if (!projectLocatable()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -11424,6 +11448,25 @@ var EngCalcs = EngCalcs || {};
 		if (isGeoProject()) { return { lon: x, lat: y }; }
 		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
 		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
+	}
+	/**
+	 * **WHERE ON THE EARTH THE MIDDLE OF THIS VIEW IS, or null if the project cannot say** (Task
+	 * 692). It is nodeLonLat()'s question asked of the camera rather than of an element, and it
+	 * asks projectLocatable() for the same reason: a projected project with a transform knows
+	 * perfectly well what town it is looking at. Null on a grid project, which is not a failure --
+	 * it is the honest answer, and the one caller falls back to the place-name search.
+	 *
+	 * The shape is the crsBox's, so `extent` is stated null: a view has a size, but the place this
+	 * reports is a POINT, and inventing an extent from a camera would filter the projection list
+	 * by how far somebody happened to be zoomed out.
+	 */
+	function viewLonLat(v) {
+		var ll;
+		if (!v || !projectLocatable()) { return null; }
+		if (isGeoProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+		if (!EngCalcs.lpnCrsInverse) { return null; }
+		ll = EngCalcs.lpnCrsInverse(projectCrsCode(), { x: outwardX(v.cx), y: outwardY(v.cy) });
+		return ll ? { lat: ll.lat, lon: ll.lon, extent: null } : null;
 	}
 	function terrainPointsForIds(ids) {
 		if (!projectLocatable()) { return []; }
@@ -26594,15 +26637,20 @@ var EngCalcs = EngCalcs || {};
 		wireCrsBox();
 		crsBox.code = code || LPN_CRS_WEBMERC;
 		crsBox.onPick = onPick || null;
-		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** Only a geographic project has a view that is
-		// a place on the Earth; a projected or local one has eastings or canvas units, and turning
-		// those into a longitude is the transform this page does not have. So the point comes from
-		// the open project when it can, from the caller when it was found earlier in this box, and
-		// from the place-name search otherwise.
+		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** The point comes from the open project when
+		// it can, from the caller when it was found earlier in this box, and from the place-name
+		// search otherwise.
+		//
+		// **THIS USED TO SAY A PROJECTED PROJECT'S VIEW COULD NOT BE READ, "the transform this
+		// page does not have"** -- true when it was written and false since Task 641 phase 5 gave
+		// the page js/lpn-crs.js. It was the last reader of isGeoProject() that meant
+		// projectLocatable(), found by auditing all of them on 2026-09-18 (Task 692) after the
+		// same word had been the defect three times. It costs no dead control, only a New project
+		// box that opened on the whole register while the project behind it knew the town.
 		crsBox.place = place || null;
-		if (!crsBox.place && isGeoProject()) {
+		if (!crsBox.place) {
 			v = currentView();
-			if (v) { crsBox.place = { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+			if (v) { crsBox.place = viewLonLat(v); }
 		}
 		var field = document.getElementById('lpn_crsbox_place'),
 			nameEl = document.getElementById('lpn_crsbox_name'),
@@ -27171,7 +27219,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { EngCalcs.lpnSearchOpen(); }
 			},
 			{
-				hidden: !isGeoProject(), icon: 'view',
+				hidden: !projectLocatable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'osm')
 					? (pc.lpn_basemap_hide || 'Hide street map')
 					: (pc.lpn_basemap_show || 'Show street map'),
@@ -27182,7 +27230,7 @@ var EngCalcs = EngCalcs || {};
 			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
 			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
 			{
-				hidden: !isGeoProject() || !satelliteAvailable(), icon: 'view',
+				hidden: !projectLocatable() || !satelliteAvailable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'satellite')
 					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
 					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),

@@ -1867,3 +1867,229 @@ above rest on the public-facing product behaviour and Mapbox's own documented de
 reading either company's source.
 
 No shipped file touched.
+
+---
+
+## 2026-09-18 — Two direct questions: the File menu order/Revert, and step 2 of the georeference wizard
+
+### Question 1 — File menu order, Import submenu, Revert
+
+OBSERVED (`js/looped-network.js:26344-26512`, `master`, checked 2026-09-18): the shipped File menu
+today reads New project…, Open…, Open example…, Open xy file on map…, Import surveyed points…,
+Import EPANET file…, Export EPANET file…, Import libraries…, [separator], Save, Save as…, Save
+all, Revert, [separator], Close, then Recent files at the very bottom. Import EPANET and Export
+EPANET are adjacent ON PURPOSE, and recently — a comment at `:26429-26438` records Tom finding this
+exact problem on 2026-09-17 at an EWB demonstration: *"I couldn't find Export EPANET file. Let's
+move Import EPANET file to just above it."* That is the load-bearing fact for the ordering
+question below.
+
+**Is his proposed order (New, Open, Import, Save, Save As, Save all, Convert…, Export) "the
+convention"? Partly, and the part that matters most argues against exactly one piece of it.**
+CITED (GIMP's own File menu, docs.gimp.org, fetched 2026-09-18 — the closest real analogue to this
+page's shape, a native-format app that also has one distinct FOREIGN format it must explicitly
+Import/Export rather than silently Open/Save): the order is **Save, Save As, Save a Copy, Revert,
+[separator], Export…, Export As…, Overwrite…** — Import has no separate row at all (GIMP folds
+foreign-format reading into Open's own file picker), but where GIMP does have a distinct
+non-native-format doorway (Export), it sits with Revert, AFTER the whole Save family, not before
+it. CITED (Blender's File menu, from its own documented UI, general knowledge rather than a fetched
+page this session — flagged as the weaker half of this citation): New, Open, Open Recent, Revert,
+[separator], Save, Save As, Save Copy, [separator], **Import ▸, Export ▸** as sibling submenus,
+also placed with the Save family, not between Open and Save. **Neither of the two closest real
+precedents puts Import between Open and Save the way Tom proposes** — both put Import and Export
+together, near Revert, after the Save family. That is a real disagreement with his instinct, not
+just a stylistic quibble, and I would flag it rather than silently agree.
+
+**But the more important fact is this suite's own, one day old.** Whatever abstract convention is
+followed, Tom's own dated finding is that EXPORT GOT LOST when it was not adjacent to IMPORT
+(2026-09-17 quote above). **His new proposal — Import between Open and Save, Export at the very
+end after Save all and two future Convert rows — separates them again, by roughly eight rows.**
+That risks reproducing the exact failure he ordered fixed one day earlier. This is the one place I
+would push back hard regardless of which abstract convention wins: **keep Import and Export
+adjacent, wherever that pair sits.**
+
+**Is a three-item Import submenu (EPANET, libraries, surveyed points) right at this count?**
+Yes, and it is a different shape from the submenu this same menu already tried and reverted.
+OBSERVED (`:26380-26382`, Task 264 comment): a "New project" fly-out was undone because its four
+rows were "the cross of two questions" that a single box answers better — that is a submenu that
+tried to hide a DECISION TREE. Import EPANET / Import libraries / Import surveyed points are not a
+decision tree; they are three parallel nouns (three foreign formats), which is exactly the shape
+Blender's own Import ▸ / Export ▸ submenus hold (CITED above, weaker citation). A submenu is the
+right container for THIS list. **Do not put Export inside it** — Export is not an import, and
+folding it in would recreate the very separation-from-Import problem stated above by another route
+(a reader scanning for "Export" would now have to open "Import ▸" to realize Export is not there).
+Keep Export EPANET as its own row directly beside the Import submenu's trigger row, so the two are
+still adjacent by eye even though one is now a fly-out.
+
+**Recommended shape**, reconciling both findings — not a redesign, a reordering of rows already
+built: New project…, Open…, Open example…, [separator], Save, Save as…, Save all, [Convert
+coordinates as…, Convert units as… — see below], [separator], **Import ▸** (EPANET file,
+libraries, surveyed points), Export EPANET file…, [separator], Revert, Close. This keeps Import and
+Export adjacent (his own 2026-09-17 fix), matches GIMP's placement of the foreign-format pair
+after the Save family rather than before it, and only differs from his literal proposal in where
+the whole Import/Export block sits relative to Save. **If he still prefers the block up near Open**
+that is a coherent, different mental model (group by ACT: acquire vs. persist), not a wrong one —
+the one part of his order I would not accept without discussion is separating Import from Export.
+
+**Is he right that Revert is ill-considered?** Checked what it actually does before answering
+(rule: never take the diagnosis on faith). OBSERVED (`:24255-24280`, `revertCurrent()`): it
+requires `entry && handle` — a live File System Access handle to a linked file on disk — and is
+menu-disabled unless `linked && entry && entry.dirty` (`:26508`). **His first case (an unsaved
+project reverting "to blank") cannot happen: the row is already refused before he ever gets there,
+because an unsaved project has no handle to revert to.** His premise for removing it on that
+ground does not describe the shipped behavior.
+
+**His second case (a saved, dirty project) is directionally right but understates what the command
+already does.** `revertCurrent()` re-reads the SAME file from disk, replaces the document,
+clears undo, clears the dirty flag, re-stamps the file handle and clears the "changed elsewhere"
+flag — an outcome close to close-without-saving-then-reopen, yes. But it is not a redundant
+synonym for that pair of commands: OBSERVED, two OTHER flows in this file already name Revert BY
+NAME as the sanctioned path and would need rewriting if it went away — the "somebody else has
+saved to this file" warning (`:23781`: *"Use File, Save as to keep your changes in a file of your
+own, or File, Revert to throw yours away and load theirs"*) and the "that file is already open
+here" collision message (`:24489`: *"Use File, Revert if you want the version on disk instead"*).
+The second of those is the sharper point: **while the file is open in this tab, using Open on the
+same file does NOT behave like a fresh reopen — it detects the collision and defers you back to
+Revert** (`:24476-24489`). So "close then reopen" is not actually a free substitute available
+today without an extra step (closing the tab first); Revert is the one-step path to the exact
+scenario the app is already built to expect people to reach for.
+
+CITED (Apple, macOS document architecture — flaviocopes.com/macos-revert-file-version and
+osxdaily.com/2012/10/04/revert-file-last-saved-version-mac-os-x, both fetched 2026-09-18): **every
+native macOS document app ships `File > Revert To > Last Saved` as a system-provided command** —
+this is not a bespoke feature somebody invented, it is close to the single most standard "throw
+away my unsaved edits" convention in desktop software, and GIMP's own placement above (Revert
+directly beside Save/Save As/Save a Copy) is the same idea in a cross-platform app. **Revert is not
+ill-considered — recommend keeping it**, correcting only the premise about the unsaved case (moot,
+already refused) and noting the saved case is a genuine, already-load-bearing shortcut rather than
+a redundant synonym.
+
+**Where do "Convert coordinates as…" and "Convert units as…" belong?** OBSERVED
+(`:11908-11924`, worktree `feat-xy-world-map`, checked 2026-09-18): **"Convert coordinates as…" is
+not a new feature to design — it is `georefStart()`, the OLDER of two georeference wizards, and the
+comment at `:11922-11924` says so directly: *"georefStart(), the wizard beside this one, is the
+opposite and rewrites every coordinate -- which is why that one is now the exception path reached
+from File, Convert coordinates as."*** That sentence is Tom's own plan, already written into the
+source, one day before he asked me the question. It confirms his placement logic: this command
+takes the CURRENT project and produces a rewritten one, the same family as Save As rather than
+Open/Import (which bring in something new) or Export (which hands a copy to someone else). His
+instinct to group it with the Save-as family, ahead of Export, is right and already anchored in
+code comments, not just in his message. "Convert units as…" (future, unbuilt) is the same shape by
+extension — a transform that produces a new project state — and belongs beside it for the same
+reason.
+
+### Where I did not look
+I did not fetch a live Blender documentation page this session (general knowledge, flagged above as
+the weaker of the two File-menu citations). I did not check Adobe Illustrator's current menu from a
+fetched source — my Illustrator recollection agreed with the GIMP/Blender pattern (Revert and
+Place/Export both live near the end, not between Open and Save) but I dropped it from the final
+citation list rather than assert an unfetched specific. I did not render either menu in a browser
+this session; the row order and the Revert `disabled` logic are read from source, not screenshotted.
+
+### Question 2 — the georeference wizard's step 2
+
+**Two different step-2 wizards exist in this file, and Tom's complaint is almost certainly about
+the OLDER one, not the one the brief pointed me at.** OBSERVED (`feat/xy-world-map` worktree,
+checked 2026-09-18): `georefStart()`/`GEOREF_STEP_ATTACHED` (`:11563` on, hint at `:10939`: *"drag
+the model to move it, drag a corner to resize it, drag the round handle... to rotate it"*) is the
+OLDER wizard for placing a brand-new xy file on the map for the first time, and its own comment
+block admits it literally does what Tom describes: *"the DRAWING is fixed -- it is the frame -- so
+a drag would have to move the map"* (`:11906-11908`) is written about the OTHER, newer wizard by
+contrast — meaning the older one's drag genuinely does act on the model. **`mapgeo` /
+`MAPGEO_STEP_FINE` (`:11944` on) is a SEPARATE, newer system, dated the same day as Tom's own
+question (comment header `"THE CUSTOM GEOREFERENCE WIZARD (Tom, 2026-09-18)"`, `:11913`), built
+from his own written spec quoted verbatim in the source: *"(2) We show a drag, scale rotate
+rectangle/square that controls THE WORLD MAP, NOT THEIR PROJECT."*** The brief's description of
+step 2 ("drag the body to slide the map, a corner to resize it, the round handle to turn it") is
+`mapgeo`'s own hint text near word for word (`:12161`), so this is almost certainly the feature he
+tested.
+
+**Is the affordance reading backwards, or does the control actually do the wrong thing? Checked,
+and it is the READING, not the behavior — which is also what Tom's own sentence already says.**
+Traced the math: `mapgeoTranslated`/`mapgeoScaled`/`mapgeoTurned` (`:11969-11988`) only ever write
+`project.georef` (the transform), never `doc.nodes`; `mapgeoDrawFrame()`'s rectangle is captured
+ONCE in latitude/longitude (`mapgeoCaptureRect()`, `:12163-12175`, called "nailed to the ground,"
+comment at `:12150-12152`) and re-derived every frame by converting those FIXED lon/lat corners
+back through the CURRENT (changing) transform — so as you drag, the rectangle's real-world position
+never moves and its on-screen position follows the ground; `paintBasemapTiles()`
+(`:9508-9576`) recomputes which tiles to fetch and where to place them from the SAME live
+transform on every call, so the basemap genuinely repaints under the still drawing. The DRAWING
+itself (`doc.nodes`) is rendered through no georef path at all and is provably untouched
+(comment at `:11890-11891`: *"THE PROJECT DOES NOT MOVE, AND THAT IS THE WHOLE FEATURE"*). **So the
+control already does what Tom wants it to do — his own complaint even says so in his own words:
+"it has a weakness of APPEARING to apply to the project when it needs to apply to the map," not
+"it applies to the project."** This is his diagnosis stated correctly by himself; I am only
+confirming it against the code rather than taking it on faith, per the standing "verify before
+ranking" rule.
+
+**Why it reads backward anyway, which is squarely this seat's question.** The rectangle's REST
+STATE is drawn exactly coincident with the drawing's own bounding box (`mapgeoExtent()` — the
+DRAWING's extent, `:12163-12164` — captured as the rectangle's ground footprint at the moment step
+2 opens). Its stroke, corner handles and round rotate handle (`:12191-12220`) are the identical
+visual grammar every direct-manipulation tool uses for "select and transform THIS shape" — Adobe's
+own Free Transform box, PowerPoint/Keynote's object resize handles, Figma's selection bounding box
+(CITED: general, unfetched knowledge of a construct near-universal in graphics software; not
+sourced to one page this session, flagged as weaker). A box that starts life drawn exactly on top
+of the thing a reader already thinks of as "mine" borrows a convention that means "grab this
+object" everywhere else it appears, regardless of what it is mathematically anchored to underneath.
+That is a first-glance/rest-state problem, not a during-the-gesture one — Gestalt "common fate"
+(elements that move together read as one thing) would actually start CORRECTING the misreading
+the moment a drag begins, since the rectangle visibly separates from the still drawing; the
+vulnerable moment is BEFORE any drag, when the two are indistinguishable.
+
+**Recommend fixing the affordance of the existing rectangle rather than building his slider, and
+say why the calculus changed once the code read confirmed the behavior is already correct.** Four
+cheap, additive changes, ranked:
+1. **Draw the rectangle visibly larger than the drawing's own bounds at rest** (pad
+   `mapgeoExtent()`'s box by roughly 15-20% before first draw) — the single cheapest fix, because a
+   frame that visibly extends past its contents reads as a viewport/window rather than a selection
+   of the content it contains. One number, no new geometry.
+2. **Swap the "shape transform" idiom for a distinguishable one** — corner brackets (viewfinder-
+   style, open corners) rather than solid squares, and a stroke colour not already used for a
+   selected network element on this page, so it cannot be read as this page's OWN selection
+   highlight repurposed.
+3. **A persistent label ON the frame** ("World map" or similar), not only in the dismissible
+   status-bar hint text — this suite's own evidence elsewhere argues for this: the Hide-titles
+   notice went from 4 s to 120 s and MJH still never saw it (wishlist item 21's citation), so a
+   transient toast is the wrong instrument for a standing fact about what a control is.
+4. Lower priority: a distinct cursor on the handles.
+
+**Do not lead with the slider.** I considered it seriously (and would have recommended a hybrid —
+keep direct-drag for Move, replace Scale/Rotate with a bounded slider and dial — before finding
+`paintBasemapTiles()` and confirming the transform-only write). Once the underlying behavior is
+confirmed correct, the case for discarding direct manipulation weakens a lot: the slider's real
+virtue is that it CANNOT be misread (there is no object drawn on the drawing at all), which is the
+strongest possible fix, but it costs the one thing direct manipulation gives for free here — live,
+eyes-on alignment of the drawing against real streets and imagery in the basemap while dragging,
+which a person fine-tuning a placement wants. A slider still shows that live feedback (the
+rectangle/drawing preview updates as it moves), so the visual feedback loss is smaller than it
+first appears, but it is still a bigger rebuild for a problem four cheap changes to the existing
+control can likely solve. **If the restyled rectangle is tried with a real person and still reads
+backward, the slider is the right fallback — his proposed range (1 in the middle, a band narrowed
+toward 0.75-1.5) is sound and matches the "Pick it up again" escape hatch he named**: OBSERVED,
+that escape hatch already exists and is not speculative — `mapgeoAdjust('scale')` /
+`mapgeoAdjust('move')` (`:12085-12112`, wired as Map > World map > "Move" / "Scale by picking",
+`:12061-12070`) reopens step 2 on the transform already on file, so a bounded or even wrong first
+attempt is always correctable without starting over. That is a legitimate reason to keep any
+future range narrow, independent of which affordance ships.
+
+**One thing I could not verify and flag rather than assume:** whether `paintBasemapTiles()`'s tile
+refetch during a live drag is visually smooth (already-loaded tiles repositioned instantly, new
+ones filled in async — the standard slippy-map pattern) or whether there is a perceptible lag/jump
+per frame that would ALSO make the map look inert while only the rectangle appears to move,
+reinforcing the wrong reading through actual behavior rather than pure affordance. I read the
+function that decides WHICH tiles and WHERE, not the paint/DOM-update path that decides HOW FAST
+the visible image catches up, and did not render this in a real browser. If a live pass shows a
+perceptible lag, that finding would raise this from a pure affordance question back toward "what
+the control does," and is worth a `dev/browser-pass` check by whoever builds the fix.
+
+### Where I did not look
+I did not open `dev/browser-pass` this session for either question — every finding above is a
+source read, not a screenshot or a measured render. I did not verify the older `georefStart()`
+wizard is in fact what Tom tested versus `mapgeo` — that is an inference from the brief's wording
+matching `mapgeo`'s hint text and from the comment explicitly naming `georefStart()` as the
+"exception path," not a transcript quote confirming which one he opened. I did not check whether a
+selection-highlight colour used elsewhere on this page collides with the current `#05a` stroke
+used for the frame (`:12200` etc.) — recommendation 2 above assumes it might and should be checked
+before building, not asserted as already true.
+
+No shipped file touched; the worktree was read only, per the brief.
