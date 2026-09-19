@@ -133,9 +133,15 @@ right. `settings.autoRun` reached the arithmetic only through `scheduleIdleRun()
 solve at the first reporting time ran on every edit, and on a document with no duration the switch
 suppressed nothing at all -- measured on Net3 at one full EPANET solve per edit. The gate is now at
 `scheduleSolve()`, `lpn_time_run_note` and `EC.lpnTimeStatusNote()` are gone from all 27 language
-files and from the page, and an edit with the box off clears the results and says so
-(`lpn_manual_results_cleared`). `dev/lpn-spike/manual-recalc-harness.js` holds it. **Everything
-below this line is the record of the wording question and is kept only for that.**
+files and from the page. **AND ON HIS SECOND READING THE SAME DAY HE REVERSED THE OTHER TWO
+CHOICES THAT SHIPPED WITH IT.** An edit with the box off first CLEARED the old answers and said so
+in a new sentence; opening a project still calculated whatever the box said. His words: *"Recalc
+off Old values: Leave in place stale. Don't clear. Trust the user."* and *"Calculate on open: No.
+Off means off; you say it, but do you believe it? Consent, people! And the industry is used to
+that."* So the old answers now stay on screen untouched with nothing said about them,
+`lpn_manual_results_cleared` is DELETED (English only; it was never translated), and opening a
+project with the box off runs nothing at all. `dev/lpn-spike/manual-recalc-harness.js` holds all of
+it. **Everything below this line is the record of the wording question and is kept only for that.**
 
 **So the behaviour is sound. The SENTENCE is not.**
 

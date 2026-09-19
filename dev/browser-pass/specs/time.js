@@ -501,13 +501,14 @@ exports.run = async function ({ browser, report }) {
 			}())
 		}));
 		report.eq(manual.runs, 0, 'with it OFF, an edit does not re-run the period at all');
-		report.ok(!manual.frame, 'and still never leaves a stale frame behind');
-		// **OFF MEANS OFF, 2026-09-19.** This asserted the half-fresh banner: "you are seeing the
-		// first reporting time, the later times are not up to date". Tom named that state as the
-		// defect rather than the wording, so it is gone -- an edit with the box off solves nothing,
-		// and what the bar says is that the results were CLEARED.
-		report.ok(/cleared/i.test(manual.status),
-			'the status bar says the results were CLEARED, because nothing was recalculated', manual.status);
+		// **AND THE OLD NUMBERS STAY WHERE THEY ARE** (Tom, 2026-09-19: *"Recalc off Old values:
+		// Leave in place stale. Don't clear. Trust the user."*). This line asserted the opposite
+		// for part of one day -- first that no frame was left behind, then that the status bar
+		// announced a clearing. He rejected both: with the switch off he decides when the answers
+		// are worked out, so he also decides how long the last set is worth looking at.
+		report.ok(manual.frame, 'and the frames it already had are left alone, untouched');
+		report.ok(!/cleared/i.test(manual.status),
+			'...and the status bar says nothing about them at all', manual.status);
 		report.ok(manual.btn, '...and the Calculate button is back on the strip to answer it');
 
 		// ...and the button is what brings them back. It is on the toolbar, in the transport's own

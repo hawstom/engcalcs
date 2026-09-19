@@ -901,22 +901,30 @@
 	};
 
 	/**
-	 * **OFF MEANS OFF** (Tom, 2026-09-19). The host's edit path when "Recalculate automatically" is
-	 * off: nothing is run, nothing is queued, and the frames go, because they describe a network
-	 * that no longer exists. Same disposal as the edit branch of lpnTimeRun() -- minus the
-	 * scheduleIdleRun(), which is the whole difference -- reached without assembling a model,
-	 * because assembling one is arithmetic and the point is that there is to be none.
+	 * **OFF MEANS OFF, AND THE OLD NUMBERS STAY WHERE THEY ARE** (Tom, 2026-09-19: *"Recalc off
+	 * Old values: Leave in place stale. Don't clear. Trust the user."*). The host's path when
+	 * "Recalculate automatically" is off, on an edit and on arriving at a project alike: nothing
+	 * is run and nothing is queued. Reached without assembling a model, because assembling one is
+	 * arithmetic and the point is that there is to be none.
 	 *
-	 * `state.wanted` is cleared too: a run the user asked for and then edited away from is a run
-	 * they no longer asked for, and leaving the flag standing would fire a full period run the
-	 * next time anything at all called through.
+	 * **IT DOES NOT CALL dropFrames(), AND THAT REVERSES WHAT SHIPPED EARLIER THE SAME DAY.** The
+	 * first repair dropped the frames here, on the usual argument that a result which no longer
+	 * matches the document must never be on screen as if it did. Tom rejected the argument for
+	 * this case outright: with the switch off, HE decides when the answers are worked out, so he
+	 * also decides how long to keep looking at the last set. Taking them away is this page
+	 * deciding for him, which is the thing the "only the user touches the numbers" rule exists to
+	 * stop. `lpnTimeRun()` still drops frames on its own edit path, where the switch is ON and a
+	 * fresh set is seconds away -- that case is untouched and must stay that way.
+	 *
+	 * `state.wanted` is cleared: a run the user asked for and then edited away from is a run they
+	 * no longer asked for, and leaving the flag standing would fire a full period run the next
+	 * time anything at all called through.
 	 */
-	EC.lpnTimeDropRun = function () {
+	EC.lpnTimeStandDown = function () {
 		cancelIdleRun();
 		state.wanted = false;
 		state.wantedByUser = false;
 		state.lastRunMs = null;
-		dropFrames();
 	};
 
 	/**
@@ -924,9 +932,9 @@
 	 * are seeing the first reporting time, and the LATER times are not being kept up to date". It
 	 * was true while `autoRun` suppressed nothing but the later time steps, and Tom named that as
 	 * the defect rather than the wording -- *"off means off"*. An edit with the switch off now
-	 * solves nothing, so there is no half-fresh state to warn about: the results are cleared and
-	 * js/looped-network.js says so (`lpn_manual_results_cleared`). Do not reinstate either half
-	 * without reinstating the behaviour first.
+	 * solves nothing, so there is no half-fresh state to warn about -- and since Tom's second
+	 * reading the page says nothing about it either: the old answers simply stay on screen until
+	 * he presses Calculate. Do not reinstate either half without reinstating the behaviour first.
 	 */
 
 	/**
