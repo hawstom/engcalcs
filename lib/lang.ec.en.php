@@ -788,6 +788,48 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 $ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_vertices']='Vertices';
+// ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
+// **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
+// *"This feature's name is Customer"*, and *"we are changing 'Meter' to 'Customer' all over in
+// the interface"*). The key names still say meter and that is deliberate: renaming 26 translated
+// files buys nothing a reader can see. A Customer is OURS -- EPANET has no such object, so there
+// is no industry term to defer to. Everything hydraulic in these strings is EPANET's own word all
+// the same -- demand, junction, pipe -- because inventing language an engineer does not recognise
+// has been struck here three times. "Station along the pipe" is the survey word for a distance
+// measured along a route, which is what it is.
+$ec_lang['lpn_tool_add_meter']='Customer';
+$ec_lang['lpn_tool_add_meter_tip']='Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.';
+$ec_lang['lpn_mode_add_meter']='Customer: click where the customer is, then click the pipe or the node that serves it. Escape leaves the tool.';
+$ec_lang['lpn_pane_tab_customers']='Customers';
+$ec_lang['lpn_customer_heading']='Customer {id}';
+$ec_lang['lpn_field_account']='Account number';
+$ec_lang['lpn_field_account_tip']='Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.';
+$ec_lang['lpn_field_meter_demand']='Demand per service';
+$ec_lang['lpn_field_meter_demand_tip']='What one service at this customer draws. With the count below at 1, this is the whole of it. An empty box is a customer you have not given a demand to yet, which is not the same as a customer that draws nothing.';
+$ec_lang['lpn_field_meter_count']='Services at this customer';
+$ec_lang['lpn_field_meter_count_tip']='How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.';
+$ec_lang['lpn_field_meter_total']='Total demand';
+$ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
+$ec_lang['lpn_field_meter_pipe']='Connected asset';
+$ec_lang['lpn_field_meter_pipe_suggest']='The nearest asset is {id}. Type it here to serve this customer from it.';
+$ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so the customer was left where it was.';
+$ec_lang['lpn_meter_placed']='Customer {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.';
+$ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the connection point on the pipe to move where along it the service connects.';
+$ec_lang['lpn_field_meter_station']='Station along the pipe (%)';
+$ec_lang['lpn_field_meter_station_tip']='How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.';
+$ec_lang['lpn_field_meter_offset']='Offset from the pipe';
+$ec_lang['lpn_field_meter_offset_tip']='How far the customer stands off its pipe, measured square to the main. A positive offset is to the right of the pipe looking from its first node toward its second, and a negative offset is to the left. Typing a value here moves the customer across the main without changing its station, and it squares the service line to the main.';
+$ec_lang['lpn_field_meter_lumped']='Added to node';
+$ec_lang['lpn_field_meter_lumped_tip']='The node that this customer\'s demands are added to through, on top of whatever the junction states itself. It\'s the node closest to this connection.';
+$ec_lang['lpn_node_customers']='Customer demands';
+$ec_lang['lpn_node_customers_tip']='Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.';
+$ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
+$ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
+$ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.';
+$ec_lang['lpn_customer_detached_count']='{n} customers are no longer connected to a pipe. Their demand is not in the answers.';
+$ec_lang['lpn_meter_pick_pipe']='Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
+$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the customer: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one customer stands for. Your own project file keeps all of that.';
+
 $ec_lang['lpn_area_hint_window_start']='Click one corner of the window.';
 $ec_lang['lpn_area_hint_window_go']='Click the opposite corner to finish.';
 $ec_lang['lpn_area_hint_lasso_start']='Click to start the outline.';

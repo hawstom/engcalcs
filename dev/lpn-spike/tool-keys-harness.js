@@ -10,10 +10,11 @@
 // share to the same digit they do, so an EPANET user's fingers already know this page -- which is
 // the whole value, and the reason section 1 asserts the exact mapping rather than "some digit works".
 //
-// **8 IS ASSERTED EMPTY, and that is the assertion most likely to be deleted by somebody in a
-// hurry.** It is epanet-js's Customer, which is our Task 247. Binding it to anything else now means
-// moving a key people have already learned. A test that says "8 does nothing" looks pointless until
-// the day it stops being true.
+// **8 IS THE CUSTOMER'S, AND IT WAS ASSERTED EMPTY UNTIL THERE WAS ONE TO BIND IT TO.** It is
+// epanet-js's Customer, which is our Task 247; that shipped 2026-09-15 and this file's reservation
+// is what it was claimed against, so 8 is now the Meter tool and nothing else. **The reservation
+// did its job and is the reason to keep writing them:** the assertion that "8 does nothing" looked
+// pointless for nine days and is why nobody spent the key on a tool people had not learned.
 //
 // **THE FOUR WAYS THIS GOES WRONG, which is why each section is shaped as it is:**
 //   1. A digit fires while somebody is TYPING. The cheapest key to press by accident, and Tom's own
@@ -63,10 +64,11 @@ console.log('1. THE MAPPING IS epanet-js\'s, DIGIT FOR DIGIT');
 		press(k);
 		ok('"' + k + '" selects ' + want[k], L.getMode() === want[k], L.getMode());
 	});
-	// **8 IS THEIRS FOR CUSTOMER (Task 247) AND MUST STAY FREE.** See the head of this file.
+	// **8 IS THEIRS FOR CUSTOMER (Task 247), AND IT IS OURS FOR THE METER THAT IS ONE.** See the
+	// head of this file: the key was held empty until the tool existed, and this is the claim.
 	L.setMode('select');
 	press('8');
-	ok('"8" is left unbound, reserved for Customer as epanet-js has it', L.getMode() === 'select', L.getMode());
+	ok('"8" selects the Meter tool, which is epanet-js\'s Customer', L.getMode() === 'add-meter', L.getMode());
 	// A digit we never claimed must not do anything either.
 	L.setMode('select');
 	press('0');
