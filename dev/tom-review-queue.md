@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-060.
+**An ID is permanent and never reused.** Next free: R-070.
 
 ---
 
@@ -75,15 +75,15 @@ judgement and does not belong to a script.
 - [x] R-029 feat/tables-spreadsheet | Ctrl+arrows works, but stops at selectors. Make it stop only at blanks/ends. Is an empty checkbox a blank? Let's say no since it's a zero in concept. -- feat/tables-spreadsheet f688970a
 - [x] R-030 feat/tables-spreadsheet | Home, End, Ctrl+Home, and Ctrl+End work, but Home and Ctrl+Home take me to column B, not to the ID column A. Fix this. -- feat/tables-spreadsheet f688970a
 - [x] R-031 feat/tables-spreadsheet | I said that keyboard navigation should be in Select mode. But that is wrong. Keyboard navigation should be in Entry mode. This difference matters in the appearance of cells, where in Select mode they should be shaded blue and in Entry mode the single current cell should be merely border highlighted. Sorry I was wrong about the persistence of Entry mode. It, not Select, should be the default mode. -- feat/tables-spreadsheet f688970a
-- [?] R-032 feat/tables-spreadsheet | I think that there is a fourth mode: Navigation, the part of what I called Entry when no characters are being typed. Check the literature. I will refer to this, but set me straight so we aren't inventing things we shouldn't invent. -- ANSWERED: your fourth mode is real. Excel calls it Ready; W3C calls it navigation mode. dev/tables-spreadsheet-modes.md. His call: rename our Select mode to Ready
+- [x] R-032 feat/tables-spreadsheet | I think that there is a fourth mode: Navigation, the part of what I called Entry when no characters are being typed. Check the literature. I will refer to this, but set me straight so we aren't inventing things we shouldn't invent. -- ANSWERED: your fourth mode is real. Excel calls it Ready; W3C calls it navigation mode. dev/tables-spreadsheet-modes.md. His call: rename our Select mode to Ready -- ANSWERED BY HIM: *"There is another mode, and it is Select. So there are four modes. Call them what you want: Ready, Enter, Edit, Select."* See R-063
 - [x] R-033 feat/tables-spreadsheet | When I navigate by arrow keys from cell to cell, the behavior is correct as Navigate mode. But the appearance is as Edit mode in that the contents of each cell are selected as I pass through/over/on it. Instead, a blue border highlight (double-wide inward) should indicate the current cell. Modern spreadsheet practice also provides a dot at lower right of current cell or range/block for Autofill. -- feat/tables-spreadsheet f688970a
 - [x] R-034 feat/tables-spreadsheet | In Navigate mode, there should be no blue shading, since that's reserved for Select mode. -- feat/tables-spreadsheet f688970a
-- [?] R-035 feat/tables-spreadsheet | When I type into a cell and press Enter, Tab, or Arrow, after a short delay, my entry is reverted, which is bad. -- NOT REPRODUCED in 26 real-browser trials. WHICH TABLE, WHICH COLUMN, and was the project opened from a FILE rather than an example?
+- [x] R-035 feat/tables-spreadsheet | When I type into a cell and press Enter, Tab, or Arrow, after a short delay, my entry is reverted, which is bad. -- NOT REPRODUCED in 26 real-browser trials. WHICH TABLE, WHICH COLUMN, and was the project opened from a FILE rather than an example? -- HIS WORD, later the same day: *"Reverting entries no longer happening. Will observe."* Closed on his observation, not on our inability to reproduce it
 - [x] R-036 feat/tables-spreadsheet | In select mode, the current cell should be the **starting** cell, not the **ending** cell. So if I select A1 and B1, then arrow down once, I should be at A2. [copy-down sequence: navigate A1, shift-arrow to B1, Ctrl+C, down arrow to A2, Ctrl+V] -- feat/tables-spreadsheet f688970a
 - [x] R-037 feat/tables-spreadsheet | Right-clicking anywhere in a selection should not perturb the selection. But I see it changing the selection to the right-clicked cell. -- feat/tables-spreadsheet f688970a
 - [x] R-038 feat/tables-spreadsheet | A selection should highlight cells, not characters. But I see characters highlighting as in Entry mode. -- feat/tables-spreadsheet f688970a
 - [x] R-039 feat/tables-spreadsheet | Copy/paste works (and persists) for mouse select. Doesn't work for keyboard select or Navigate (copy current cell). -- feat/tables-spreadsheet f688970a
-- [?] R-040 feat/tables-spreadsheet | Doesn't copy across columns. Maybe this is what we want. Don't "fix" for now. Maybe it can be a project Setting (Allow table copy across columns). Make this a Priority 50 question. -- MEASURED: copy and paste ACROSS columns already works both ways. What you saw was probably single-cell Ctrl+C doing nothing (R-039). Please re-test before Task 700 is written on it
+- [x] R-040 feat/tables-spreadsheet | Doesn't copy across columns. Maybe this is what we want. Don't "fix" for now. Maybe it can be a project Setting (Allow table copy across columns). Make this a Priority 50 question. -- MEASURED: copy and paste ACROSS columns already works both ways. What you saw was probably single-cell Ctrl+C doing nothing (R-039). Please re-test before Task 700 is written on it -- SUPERSEDED by R-064: he re-tested and says it does NOT work
 
 ### Defects found while reviewing
 
@@ -97,7 +97,7 @@ judgement and does not belong to a script.
 
 ### Raised by the work, and his to decide
 
-- [?] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build
+- [x] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build -- HIS RULING: *"Sorry. I will have to trust you. Hopefully it is done right so that it does not manifest later. If you really want me to see it, hold my hand and take me there."* So it is OURS TO BUILD, and it must come with a regression check so it cannot come back unseen. See R-066
 
 ## Round of 2026-09-19, later -- his third pass
 
@@ -133,3 +133,30 @@ CONSENT, and both of those choices were this repository deciding for him what he
 - [ ] R-057 feat/tables-spreadsheet | Top border is missing.
 - [ ] R-058 feat/tables-spreadsheet | Strange missing heading border between Tanks Mixing model and Mixing fraction.
 - [ ] R-059 feat/tables-spreadsheet | Some of the columns are now sized too narrow by default. I believe that Description was a single character long. Please fix this in a reasonable way. I thought of making a rule not to divide any word into more than three parts, but that's just an idea.
+
+## Round of 2026-09-19, fourth pass
+
+### feat/tables-spreadsheet
+
+- [ ] R-060 feat/tables-spreadsheet | At column A there is a strange highlighting around the ID. And the ID is not editable, though it's editable in properties. Can you fix that?
+- [ ] R-061 feat/tables-spreadsheet | Ask Ida how most apps do clicking on headings to change sorting; we have blue text links.
+- [ ] R-063 feat/tables-spreadsheet | Modes. There is another mode, and it is Select. So there are four modes. Call them what you want: Ready, Enter, Edit, Select.
+- [ ] R-064 feat/tables-spreadsheet | Copy across columns does **not** work.
+- [ ] R-065 feat/tables-spreadsheet | There is still an unbelievable delay when speed-entering a column. It's not huge. It's small. But it's unbelievable because nothing else should be happening. There's no recalculation, no reformatting, etc. And this worries me very deeply because it is a sign of pervasive bad coding.
+
+### The one that is bigger than a branch
+
+- [?] R-062 -- | I want your advice about how I can spend some significant resources to do a deep code review to ensure we don't have a code base full of AI techno-slop.
+
+### feat/xy-world-map
+
+- [ ] R-066 feat/xy-world-map | The date-line tile mirror: *"I will have to trust you."* Ours to build, with a regression check, since he will not be the one who sees it come back.
+
+### feat/customer-find-labels
+
+- [ ] R-067 feat/customer-find-labels | R-011's caution glyph: "Put it back."
+- [x] R-068 feat/customer-find-labels | Account numbers went to Tag: "It doesn't matter, since this has not been released." -- settled, no action
+
+### feat/engine-fetch-wait
+
+- [ ] R-069 feat/engine-fetch-wait | A harness holds that nothing outside the panel show/hide functions may show or hide a panel, and the new bar tripped it. "This worries me. Why would the run progress bar do anything to the bottom panel?"
