@@ -2031,6 +2031,39 @@ the block.
     with storage the UTILITY controls — *"the moment 'the link' is something we host, it has become
     the cloud-login proposal in a smaller costume."* Full record in both agents' journals.
 
+- 75|699| **Audit the language keys for lazy duplications.**
+  Tom, 2026-09-19: *"can you make sure we have a Roadmap task to audit language for lazy
+  duplications where maybe a slight redesign can simplify or eliminate keys?"* He asked for it in
+  the same breath as deciding a customer takes the EXISTING Description and Tag rather than an
+  owned Account number -- which is the pattern in one instance: a new field invented where an
+  existing one would have done costs 26 translations and a key that must be maintained forever.
+  - **THE AUDIT IS THE CHEAP HALF AND THE REDESIGN IS THE POINT.** A near-duplicate pair is not
+    automatically debt -- `dev/label-normalization-decision.md` already rules that a shared concept
+    lives under ONE owning calculator's key and others borrow it, and that reuse stops at whole
+    labels. What this task adds is looking for the cases where a small INTERFACE change removes the
+    need for a key at all, rather than merging two keys that genuinely say different things.
+  - `key_hygiene_check.php` already names keys nothing renders and names that drifted from their
+    siblings; start from its output rather than from a fresh read of 27 files.
+  - **Cost is the argument for doing it and also for doing it carefully:** one deleted key is 26
+    translations never bought; one wrongly merged key is a wrong word on a control in 26 languages.
+
+- 50|700| **Allow table copy across columns: a project setting, or not.**
+  Tom, 2026-09-19, reviewing the spreadsheet tables: *"Doesn't copy across columns. Maybe this is
+  what we want. Don't 'fix' for now. Maybe it can be a project Setting (Allow table copy across
+  columns). Make this a Priority 50 question."*
+  - **IT IS A QUESTION AND NOT A BUILD, and it stays one until he answers it.** Copying a value
+    sideways across columns means copying it between DIFFERENT QUANTITIES -- a diameter into a
+    roughness -- which a spreadsheet allows because a spreadsheet does not know what its columns
+    mean, and this table does. The restriction is therefore arguably a feature.
+  - The three answers: leave it restricted; allow it always; or the project setting he names. **A
+    setting is the most expensive of the three** -- it is modelling data by the `lpn_` rule, so it
+    rides in `serializeProject()` and two colleagues can then see the same document behave
+    differently -- so it wants a reason better than indecision.
+  - **Declan's seat is the one to ask**, because the cost of the restriction is paid per keystroke
+    by somebody entering four hundred rows, and that is the only vantage point from which the
+    answer is obvious either way.
+
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.
