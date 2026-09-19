@@ -10,10 +10,12 @@ STATE is dated and perishable -- delete a STATE line once you have checked it.
 - **`feature_freeze.active` in `dev/branch-policy.json` is the second lock.** Tom's all-clear in
   `dev/branch-all-clears.json` (pin field is **`head`**, not `commit`) does not merge a `protected`
   branch while the freeze stands. Only Tom lifts it. It is currently OFF.
-- **`master` is `0d2256fd`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
+- **`master` is `b680e213`, green, PUSHED.** `git log --oneline origin/master..master` is empty.
 - **Production is whatever Tom last pulled, and it is not master.** Never say "it is live."
-- **`feat/tables-spreadsheet` is built, green on the merge result, and AWAITING HIS TEST** on port
-  8096. Nothing else is waiting on an all-clear. See STATE.
+- **FIVE FEATURE BRANCHES ARE BUILT AND EVERY ONE AWAITS HIS BROWSER PASS. NONE MAY MERGE.** All
+  five are in `protected`. The list, the ports, and the nine decisions that are his rather than
+  anybody's to infer, are in STATE below. **A session that merges one of these on its own green
+  build is the 2026-09-13 failure repeating.**
 
 
 ---
@@ -182,104 +184,69 @@ of them does the thing the standing ruling says we never do.
 
 ---
 
-## STATE -- 2026-09-18 night, perishable
+## STATE -- 2026-09-19 early hours, perishable
 
-### What landed on master this session (`b7cb5e23` -> `5a9c7fae`, pushed)
+### On master and pushed: `b680e213`
 
-- **`isGeoProject` -> `isLatLonProject()`**, 20 files. See RULINGS.
-- **The gravity note is gone.** Tom: *"We can't keep showing the gravity message
-  `lpn_engine_minor_loss_note` forever. It's just noise. If anything, put it in settings in the tip
-  for the choice of whether to use the built-in solver when possible."* Done exactly there.
-  **KEY DELETED FROM ALL 27 FILES: `lpn_engine_minor_loss_note`.** The warning CODE
-  `minor-loss-gravity-differs` is still raised in `js/lpn-epanet.js` and two harnesses still assert
-  it; only the sentence is gone. `engine-note-once-harness.js` was re-pointed at the MANNING note,
-  which is the same shape of thing and is still shown -- he did not ask for that one to go.
-- **`feat/customer-demands` merged on his all-clear** (*"Nice. Let's call it done, merge it, and
-  delete it."*), pinned to `0476f882`; branch, worktree and port 8088 all retired. It carries
-  **Offset beside Station in the popup and in the table**, which he had asked for twice: positive is
-  to the RIGHT of the pipe looking from its first node toward its second. Keys added:
-  `lpn_field_meter_offset`, `lpn_field_meter_offset_tip`.
-- **Tasks 692, 686, 626 and 611 closed** -- merged work still sitting open. **689 closed** on the
-  tables branch.
+- **`isGeoProject` -> `isLatLonProject()`**; **the gravity note deleted** (key
+  `lpn_engine_minor_loss_note` gone from all 27 files, its substance now in
+  `lpn_settings_engine_native_tip`); **`feat/customer-demands` merged on his all-clear** with Offset
+  beside Station; **Tasks 692, 686, 626, 611, 689 closed**; his Task 608 rulings recorded.
 
-### Branches alive
+### FIVE BRANCHES ARE BUILT AND EVERY ONE AWAITS HIS BROWSER PASS. NONE MAY MERGE.
 
-| Branch | Port | State |
-|---|---|---|
-| `feat/tables-spreadsheet` | 8096 | **BUILT, green on the merge result, AWAITING HIS TEST** |
-| `feat/xy-world-map` | 8094 | **caught up with master; the dial clamp and the satellite ruling built.** See the two-step-twos block |
-| `feat/label-gang-search` | 8090 | **the classification measurement is built and committed.** No placement change; the choice is his |
-| `feat/customer-find-labels` | new | agent running: his customer items, spec REVISED twice -- see below |
-| `feat/engine-fetch-wait` | new | agent running: Task 608, the authorized half only |
-| `feat/lock-initials-later` | 8095 | needs Task 698; **170 behind master**, and it is what dev.hawsedc.com was sitting on |
-| `ida/esc-and-lock-identity` | -- | 1 ahead, untouched this session |
-| `tables-interface` | -- | stale, nobody has claimed it |
+Each is in `protected` in `dev/branch-policy.json` and needs his all-clear in
+`dev/branch-all-clears.json` pinned to the exact head.
 
-**`feat/tables-spreadsheet` IS NOT IN `protected` AND SHOULD BE** -- it is a feature umbrella
-(spreadsheet editing), and the policy's own rule is that a feature branch joins that list when it is
-MADE, not when somebody remembers.
+| Branch | Head | Port | What he must judge |
+|---|---|---|---|
+| `feat/tables-spreadsheet` | `94834cb2` | 8096 | the three spreadsheet modes, and **the picture no harness can check**: the column-resize grip's hit area, and whether a narrowed column looks right under `auto` table layout |
+| `feat/xy-world-map` | `0536fc1b` | 8094 | step 2 rebuilt to his five points |
+| `feat/customer-find-labels` | `18ef2788` | 8098 | custom properties, Find, demand pattern, his two-position labels |
+| `feat/engine-fetch-wait` | `3df1129e` | 8097 | the solver bar, in a private window throttled to Slow 3G |
+| `feat/label-gang-search` | `4d763c56` | 8090 | **nothing to look at -- it is a measurement and a switchboard.** No placement changed |
 
-### What is waiting on Tom
+### DECISIONS OUTSTANDING WITH TOM, and they are the session's real output
 
-- **`feat/tables-spreadsheet`, port 8096.** Ctrl+Z inside a table: **native text undo while a cell
-  editor is open (F2, double-click, or a printable character), project undo when it is not**;
-  checkboxes and selects always take the project undo. Undo now refreshes the pane, for Task 611's
-  reason. **A shipped defect was found while building it**: `var paneTablesCache = null;` sat BELOW
-  the block that filled it, so hoisting re-ran it at load and the page held **two sets of six table
-  specs** -- the tab strip sorted and displayed one, everything reaching a table by id got the
-  other, whose sort was permanently the default, and the Print button reads the second. **Printed
-  tables came out in id order however he had sorted the screen.** Fixed here.
-- **Task 690's parity check reports 28 gaps, ADVISORY.** One flag makes it a ratchet the day the
-  count reaches zero. **Whether the PUMP rows should be columns at all is his call and not a
-  defect**: that table's own comment says a pump is a reading rather than an editor, and yet a speed
-  and an energy price are scalars. Nothing mechanical can settle it.
-- **Task 247 is NOT closed, deliberately.** He cleared the BRANCH, not the task. Its block says
-  slices 1-3 are in and *"what is left is his call"*: the label density rule, a customer in Find,
-  Slice 4.
-- **`feat/xy-world-map` -- the dial defect is FIXED and it was real.** The dial is a 306 px control
-  centred on the canvas, and **with the bottom pane open the canvas is not tall enough**: at
-  1366x768 with a 300 px pane it slid under the form; at 1280x700 with a 340 px pane the TURN KNOB
-  sat behind the toolbar and could not be pressed. **That is the same defect the rectangle's rotate
-  handle already had -- the defect the dial was built to escape.** `mapgeoPlaceDial()` now fits
-  itself to the canvas rect and shrinks the bar to a 56 px floor rather than sliding out, re-placed
-  from `applyMapHeight()`. `dev/lpn-spike/mapgeo-browser-drive.js` drives real Chrome across five
-  layouts and fails before the fix.
-  - **THE SATELLITE RULING, recorded in the source:** a georeferenced XY project IS locatable **for
-    the basemap rows only** (street, satellite, corner teaser, via `basemapChoosable()`); **Go to,
-    place-name search and Read DEM stay on the narrow `isLatLonProject()` question**, because each
-    needs more than a transform and a row that does nothing is the defect Task 692 closed.
-  - **Two judgements, neither acted on:** the dial lands on the right edge overlapping the labels
-    legend and is the only wizard control not in the step bar where the reader's eyes already are;
-    and **the rectangle's rotate handle is UNREACHABLE at a fitted zoom** (measured twice --
-    `elementFromPoint` returns the step bar), so a dead handle is probably worse than none.
-- **His three original reports on `feat/xy-world-map`**, for the record: no slider/dial, step 2 still rotates the
-  project, satellite refused. **The satellite one is traced**: that branch is 47 commits behind
-  master and contains NEITHER half of the Task 692 fix (`ca25f1da`, `19ab3155`). The Mapbox token is
-  present, 89 chars, so an absent token is ruled out. **And the branch creates a FOURTH case of Task
-  692** -- a plain XY project WITH a world map attached is not lat/lon and is nevertheless locatable
-  -- which master's fix cannot know about, because that project kind did not exist when it was
-  written.
-- **His two new customer items, 2026-09-18: (1) "Add Customer to Find."** and **(2)** labels, *if* we
-  label at all -- two fixed positions aligned with the service line, one justified against the link
-  and one against the customer dot and beyond it from the link's perspective, **both failing a
-  conflict check means the label is dropped**, styled as a link flow label, and *"maybe we have a
-  setting for the widest view that attempts to display it."* Revised minutes later: ***"I guess
-  **if** we label, we should allow more than just Q."*** The **if** is his own emphasis and is
-  load-bearing -- he has not decided that customers should be labelled at all, so the first
-  deliverable is what customer labelling IS today and whether anybody ever decided it, and the
-  "never" setting must stay one line away.
-- **Ida owes an answer**: where does **Revert** live by interface convention? He pushed back twice on
-  the position it was given and asked for the convention, not an opinion.
-- **Task 698** -- keep initials per browser, name the holder, and say *"We have you listed as ABC.
-  If that's wrong, you can change it."*
+1. **ADOPT THE ALL-ROUND LABEL SEARCH?** Measured: replacing the widest-gap sector with a full ring
+   takes hidden labels from **22 to 11 across five examples** and loses none anywhere -- 16 hidden to
+   9 on his own Novato drawing. **But it moves 131 labels, so every drawing changes visibly.**
+2. **KEEP THE FOUR CORNER CANDIDATES?** Once the ring is on they earn no labels at all (1,026 vs
+   1,025) -- but they MOVE 940, so what they buy is the resting up-and-to-the-right look of an
+   uncrowded map. **Taste, and his. Do not drop them on a count.**
+3. **"LET LABELS LOOK FURTHER OUT" -- he agreed with it and ranked it THIRD.** Untouched.
+4. **THE `.inp` CATEGORY SLOT FOR THE ACCOUNT NUMBER.** He wants the account to become a custom
+   property rather than an owned field. The one real dependency is that it rides out in the
+   `[DEMANDS]` CATEGORY comment, the only field of that row holding a name, and a custom property
+   has no such mapping. **Should it still ride out there? Yes makes removal a redesign; no makes it
+   nearly a deletion.** The asymmetry argues for deciding soon: custom-to-owned is cheap, owned-to-
+   custom is not.
+5. **IDA'S ESCAPE FIX** -- offered, not built. Scope the Properties/Settings/Libraries close to
+   FOCUS rather than a page-wide keydown (`js/looped-network.js:25258-25305`), leaving the menu half
+   page-wide per the 2026-08-13 ruling. She argues against his own blunter "never closable by
+   Escape". **His "Esc is still closing boxes unexpectedly" is a live defect on master.**
+6. **THE MAP SUBMENU'S "Move" AND "Scale by picking" ARE NOW ONE THING.** They named two handles of
+   the deleted rectangle; both now open the identical step 2 and share one hint. They need one name
+   or one row, and renaming rows he specified is his call.
+7. **THE BASEMAP RASTER LOOKS MIRRORED at step 1's world-wide zoom** -- place names read backwards,
+   in screenshots taken before AND after this branch's work, so it predates it. Nobody has looked.
+8. **TASK 247 IS NOT CLOSED, deliberately.** He cleared the branch, not the task.
+9. **IDA ON TASK 698:** remembering initials per browser REVERSES a line `feat/lock-initials-later`
+   draws on purpose -- its own code calls the Ask-typed name being sent-never-stored *"the whole
+   point of Task 667(b)"*. She reads it as passing the storage exemption test, but says the reversal
+   should be his out loud, paired with a visible "not you?" correction.
+
+### Branches with no port and nothing to test
+
+`ida/esc-and-lock-identity` (`b3c6bbd7`) is **documents only** -- her journal and wish list, no code.
+Merge it so the thinking is not stranded on a ref. `feat/lock-initials-later` needs Task 698 and is
+**176 behind master**; it is also what `dev.hawsedc.com` was checked out on.
 
 ### One loose end
 
-`git stash list` holds **`stash@{0}` -- "prev run: station column + general table audit + parity
-check"**, made on the now-deleted `feat/customer-demands`. Station was rewritten fresh and nothing
-else from it landed; the twenty-one-column sweep inside it is the same ground Task 690's derived
-check now covers. **It is not needed, but it is the only copy of that attempt outside a perishable
-scratchpad.** Drop it deliberately or keep it deliberately -- do not leave it by accident.
+`git stash list` holds `stash@{0}` from the deleted `feat/customer-demands` -- Station plus a
+twenty-one-column sweep and a parity check. **Task 690 now covers that ground with a derived check
+that blocks at zero**, so the stash is superseded. Drop it deliberately or keep it deliberately.
 
 ---
 
