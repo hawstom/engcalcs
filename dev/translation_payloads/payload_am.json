@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1940,
-        "delta_key_count": 73,
+        "expected_key_count": 1973,
+        "delta_key_count": 106,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -523,36 +523,6 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_tool_add_meter": "Meter",
-        "lpn_tool_add_meter_tip": "Click where the meter is, then click the pipe or the node that serves it. The demand you give the meter is added to the junction at the near end of that pipe.",
-        "lpn_mode_add_meter": "Meter: click where the meter is, then click the pipe or the node that serves it. Escape leaves the tool.",
-        "lpn_pane_tab_customers": "Customers",
-        "lpn_customer_heading": "Customer {id}",
-        "lpn_field_account": "Account number",
-        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
-        "lpn_field_meter_demand": "Demand per service",
-        "lpn_field_meter_demand_tip": "What one service at this meter draws. With the count below at 1, this is the whole of it. An empty box is a meter you have not given a demand to yet, which is not the same as a meter that draws nothing.",
-        "lpn_field_meter_count": "Services at this meter",
-        "lpn_field_meter_count_tip": "How many identical services this one meter stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
-        "lpn_field_meter_total": "Total demand",
-        "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
-        "lpn_field_meter_pipe": "Connected asset",
-        "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
-        "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the meter was left where it was.",
-        "lpn_meter_placed": "Meter {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
-        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the circle on the pipe to move where along it the service connects.",
-        "lpn_field_meter_station": "Station along the pipe (%)",
-        "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
-        "lpn_field_meter_lumped": "Added to node",
-        "lpn_field_meter_lumped_tip": "The node that this meter's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
-        "lpn_node_customers": "Demand added here by meters",
-        "lpn_node_customers_tip": "Every meter whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A meter is edited where it sits on the map or in the Customers table.",
-        "lpn_node_customers_sum": "Meters: {n}, demand: {total} {unit}",
-        "lpn_customer_detached": "⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.",
-        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
-        "lpn_customer_detached_count": "{n} meters are no longer connected to a pipe. Their demand is not in the answers.",
-        "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.",
-        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -595,39 +565,72 @@
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
-        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
+        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_file_import_survey": "Import surveyed points…",
+        "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
+        "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
+        "lpn_survey_read_error": "That file could not be read from your disk.",
+        "lpn_survey_cancelled": "Nothing was created and nothing was changed.",
+        "lpn_survey_row": "row {n}",
+        "lpn_survey_axis_north": "Northing",
+        "lpn_survey_axis_east": "Easting",
+        "lpn_survey_column_n": "column {n}",
+        "lpn_survey_err_empty": "That file has nothing in it.",
+        "lpn_survey_err_unreadable": "That file could not be read as a surveyed point list.",
+        "lpn_survey_err_no_coords": "This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}",
+        "lpn_survey_err_ambiguous_coord": "More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.",
+        "lpn_survey_err_ambiguous_lon": "More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.",
+        "lpn_survey_err_plane": "That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.",
+        "lpn_survey_err_gpx_no_wpt": "That GPX file holds no waypoints, so there is nothing to make junctions from.",
+        "lpn_survey_err_no_points": "Not one row of that file could be read as a surveyed point. Rows read: {detail}",
+        "lpn_survey_format_label": "File format:",
+        "lpn_survey_format_internal": "specified internally",
+        "lpn_survey_create": "Create nodes",
+        "lpn_survey_fmt_pnezd": "Point name, northing, easting, elevation, description (PNEZD)",
+        "lpn_survey_fmt_penzd": "Point name, easting, northing, elevation, description (PENZD)",
+        "lpn_survey_fmt_pnez": "Point name, northing, easting, elevation (PNEZ)",
+        "lpn_survey_fmt_penz": "Point name, easting, northing, elevation (PENZ)",
+        "lpn_survey_fmt_nezd": "Northing, easting, elevation, description (NEZD)",
+        "lpn_survey_fmt_enzd": "Easting, northing, elevation, description (ENZD)",
+        "lpn_survey_fmt_nez": "Northing, easting, elevation (NEZ)",
+        "lpn_survey_fmt_enz": "Easting, northing, elevation (ENZ, also written XYZ)",
+        "lpn_survey_from_header": "The first line of your file names its own columns, so those names were used and the column order below was not needed.",
+        "lpn_survey_note_header_unread": "The first line was passed over: it names no columns this page knows.",
+        "lpn_survey_type_label": "Asset type:",
+        "lpn_survey_confirm_junction": "{n} junction(s) found. Proceed?",
+        "lpn_survey_confirm_reservoir": "{n} reservoir(s) found. Proceed?",
+        "lpn_survey_confirm_tank": "{n} tank(s) found. Proceed?",
+        "lpn_survey_map_gpx": "Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.",
+        "lpn_survey_map_none": "not used",
+        "lpn_survey_unit_m": "meters",
+        "lpn_survey_unit_ft": "feet",
+        "lpn_survey_confirm_pipes": "No pipes are drawn. A surveyed list says where the points are, not which of them are joined.",
+        "lpn_survey_report_junction": "{n} junction(s) imported, {m} with elevation.",
+        "lpn_survey_report_reservoir": "{n} reservoir(s) imported, {m} with elevation.",
+        "lpn_survey_report_tank": "{n} tank(s) imported, {m} with elevation.",
+        "lpn_survey_report_clean": "Every point in the file came across, and nothing was changed on the way in.",
+        "lpn_survey_report_notes": "Import errors and notes:",
+        "lpn_survey_sev_error": "error",
+        "lpn_survey_sev_warning": "warning",
+        "lpn_survey_note_line": "Line {line}: {sev}: {code}: {text}",
+        "lpn_survey_note_row_short": "Too few columns for the file format above.",
+        "lpn_survey_note_coord_missing": "The {axis} cell is empty.",
+        "lpn_survey_note_lon_missing": "The longitude column is empty on this row, so no junction was made for it.",
+        "lpn_survey_note_bad_coord": "The {axis} does not read as a number.",
+        "lpn_survey_note_bad_lon": "The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
+        "lpn_survey_note_coord_range": "The {axis} is outside the range this project allows.",
+        "lpn_survey_note_lon_range": "This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.",
+        "lpn_survey_note_bad_elev": "Non-numeric elevation. Imported without elevation.",
+        "lpn_survey_note_ambiguous_elev": "More than one column could be the elevation, so none of them was read.",
+        "lpn_survey_note_blank_rows": "Blank lines passed over: {detail}.",
+        "lpn_survey_note_id_duplicate": "Name already used earlier in this file, new name assigned.",
+        "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
+        "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned.",
+        "lpn_survey_note_gpx_trkpt": "The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.",
+        "lpn_survey_note_gpx_rtept": "The file also holds {detail} route point(s), which were not made into junctions.",
+        "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
     "keys": {
-        "lpn_tool_add_meter": "Meter",
-        "lpn_tool_add_meter_tip": "Click where the meter is, then click the pipe or the node that serves it. The demand you give the meter is added to the junction at the near end of that pipe.",
-        "lpn_mode_add_meter": "Meter: click where the meter is, then click the pipe or the node that serves it. Escape leaves the tool.",
-        "lpn_pane_tab_customers": "Customers",
-        "lpn_customer_heading": "Customer {id}",
-        "lpn_field_account": "Account number",
-        "lpn_field_account_tip": "Whatever your own records call this service. It is a name on a demand and nothing here looks anything up by it, so it can be an account number, a street address, or a note to yourself. It stays in your project file.",
-        "lpn_field_meter_demand": "Demand per service",
-        "lpn_field_meter_demand_tip": "What one service at this meter draws. With the count below at 1, this is the whole of it. An empty box is a meter you have not given a demand to yet, which is not the same as a meter that draws nothing.",
-        "lpn_field_meter_count": "Services at this meter",
-        "lpn_field_meter_count_tip": "How many identical services this one meter stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
-        "lpn_field_meter_total": "Total demand",
-        "lpn_field_meter_total_tip": "The demand per service times the number of services. This is the number added to the junction named below.",
-        "lpn_field_meter_pipe": "Connected asset",
-        "lpn_field_meter_pipe_suggest": "The nearest asset is {id}. Type it here to serve this customer from it.",
-        "lpn_meter_pipe_unknown": "Nothing in this project is named {id}, so the meter was left where it was.",
-        "lpn_meter_placed": "Meter {id} added. Its account number and demand are typed in the Customers table, or press it in Select to open its box.",
-        "lpn_field_meter_pipe_tip": "The asset that this service connects to. Type another one here or in the Customers table to change it, and drag the circle on the pipe to move where along it the service connects.",
-        "lpn_field_meter_station": "Station along the pipe (%)",
-        "lpn_field_meter_station_tip": "How far along the pipe the service connects, as a percentage of the pipe from its first node to its second. 0 is at one end and 100 is at the other. The circle on the pipe does the same thing with the pointer.",
-        "lpn_field_meter_lumped": "Added to node",
-        "lpn_field_meter_lumped_tip": "The node that this meter's demands are added to through, on top of whatever the junction states itself. It's the node closest to this connection.",
-        "lpn_node_customers": "Demand added here by meters",
-        "lpn_node_customers_tip": "Every meter whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A meter is edited where it sits on the map or in the Customers table.",
-        "lpn_node_customers_sum": "Meters: {n}, demand: {total} {unit}",
-        "lpn_customer_detached": "⚠ This meter is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the meter onto it.",
-        "lpn_customer_fixed_head": "⚠ The near end of that pipe holds a fixed water surface, so this demand changes nothing in the answers.",
-        "lpn_customer_detached_count": "{n} meters are no longer connected to a pipe. Their demand is not in the answers.",
-        "lpn_meter_pick_pipe": "Now click the pipe or the node that serves this meter. The meter stays where you put it. Press Escape to cancel.",
-        "lpn_inp_export_flat_customers": "An EPANET file has no customers. The demand of the {n} meters in this project goes into the file as a demand row on the junction each one is added to, and each row is named with its account number. What the file cannot hold is the meter: where it sits, which pipe serves it, where along that pipe the service connects, and how many services one meter stands for. Your own project file keeps all of that.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -670,489 +673,72 @@
         "lpn_inp_export_flat_coords": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its own positions in your project file alone.",
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
-        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place."
+        "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_file_import_survey": "Import surveyed points…",
+        "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
+        "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
+        "lpn_survey_read_error": "That file could not be read from your disk.",
+        "lpn_survey_cancelled": "Nothing was created and nothing was changed.",
+        "lpn_survey_row": "row {n}",
+        "lpn_survey_axis_north": "Northing",
+        "lpn_survey_axis_east": "Easting",
+        "lpn_survey_column_n": "column {n}",
+        "lpn_survey_err_empty": "That file has nothing in it.",
+        "lpn_survey_err_unreadable": "That file could not be read as a surveyed point list.",
+        "lpn_survey_err_no_coords": "This page could not find two coordinate columns in that file. Name two of the columns in the first row of the file, and try again. The first row reads: {detail}",
+        "lpn_survey_err_ambiguous_coord": "More than one column in that file could be the {axis} ({detail}), and this page will not choose between them. Leave one of them named as the {axis} and try again.",
+        "lpn_survey_err_ambiguous_lon": "More than one column in that file could be the longitude ({detail}), and this page will not choose between them. Leave one of them named as the longitude and try again.",
+        "lpn_survey_err_plane": "That file holds plane survey coordinates ({detail}), not latitude and longitude. A northing is a distance across a flat plane, and this page cannot yet turn one into a position on the Earth, so nothing was read. Export the same points as latitude and longitude, in decimal degrees, and try again.",
+        "lpn_survey_err_gpx_no_wpt": "That GPX file holds no waypoints, so there is nothing to make junctions from.",
+        "lpn_survey_err_no_points": "Not one row of that file could be read as a surveyed point. Rows read: {detail}",
+        "lpn_survey_format_label": "File format:",
+        "lpn_survey_format_internal": "specified internally",
+        "lpn_survey_create": "Create nodes",
+        "lpn_survey_fmt_pnezd": "Point name, northing, easting, elevation, description (PNEZD)",
+        "lpn_survey_fmt_penzd": "Point name, easting, northing, elevation, description (PENZD)",
+        "lpn_survey_fmt_pnez": "Point name, northing, easting, elevation (PNEZ)",
+        "lpn_survey_fmt_penz": "Point name, easting, northing, elevation (PENZ)",
+        "lpn_survey_fmt_nezd": "Northing, easting, elevation, description (NEZD)",
+        "lpn_survey_fmt_enzd": "Easting, northing, elevation, description (ENZD)",
+        "lpn_survey_fmt_nez": "Northing, easting, elevation (NEZ)",
+        "lpn_survey_fmt_enz": "Easting, northing, elevation (ENZ, also written XYZ)",
+        "lpn_survey_from_header": "The first line of your file names its own columns, so those names were used and the column order below was not needed.",
+        "lpn_survey_note_header_unread": "The first line was passed over: it names no columns this page knows.",
+        "lpn_survey_type_label": "Asset type:",
+        "lpn_survey_confirm_junction": "{n} junction(s) found. Proceed?",
+        "lpn_survey_confirm_reservoir": "{n} reservoir(s) found. Proceed?",
+        "lpn_survey_confirm_tank": "{n} tank(s) found. Proceed?",
+        "lpn_survey_map_gpx": "Each waypoint becomes one junction, at its own latitude and longitude, taking the name and the elevation the file states for it. A GPX elevation is in meters by definition of the format.",
+        "lpn_survey_map_none": "not used",
+        "lpn_survey_unit_m": "meters",
+        "lpn_survey_unit_ft": "feet",
+        "lpn_survey_confirm_pipes": "No pipes are drawn. A surveyed list says where the points are, not which of them are joined.",
+        "lpn_survey_report_junction": "{n} junction(s) imported, {m} with elevation.",
+        "lpn_survey_report_reservoir": "{n} reservoir(s) imported, {m} with elevation.",
+        "lpn_survey_report_tank": "{n} tank(s) imported, {m} with elevation.",
+        "lpn_survey_report_clean": "Every point in the file came across, and nothing was changed on the way in.",
+        "lpn_survey_report_notes": "Import errors and notes:",
+        "lpn_survey_sev_error": "error",
+        "lpn_survey_sev_warning": "warning",
+        "lpn_survey_note_line": "Line {line}: {sev}: {code}: {text}",
+        "lpn_survey_note_row_short": "Too few columns for the file format above.",
+        "lpn_survey_note_coord_missing": "The {axis} cell is empty.",
+        "lpn_survey_note_lon_missing": "The longitude column is empty on this row, so no junction was made for it.",
+        "lpn_survey_note_bad_coord": "The {axis} does not read as a number.",
+        "lpn_survey_note_bad_lon": "The longitude here does not read as a decimal number of degrees ({detail}), so no junction was made for this row. Degrees, minutes and seconds are not read; convert them to decimal degrees first.",
+        "lpn_survey_note_coord_range": "The {axis} is outside the range this project allows.",
+        "lpn_survey_note_lon_range": "This longitude is outside the range a longitude can have ({detail}), so no junction was made for this row.",
+        "lpn_survey_note_bad_elev": "Non-numeric elevation. Imported without elevation.",
+        "lpn_survey_note_ambiguous_elev": "More than one column could be the elevation, so none of them was read.",
+        "lpn_survey_note_blank_rows": "Blank lines passed over: {detail}.",
+        "lpn_survey_note_id_duplicate": "Name already used earlier in this file, new name assigned.",
+        "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
+        "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned.",
+        "lpn_survey_note_gpx_trkpt": "The file also holds {detail} track point(s). Those are a record of where somebody walked rather than places they surveyed, so they were not made into junctions.",
+        "lpn_survey_note_gpx_rtept": "The file also holds {detail} route point(s), which were not made into junctions.",
+        "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
     "key_context": {
-        "lpn_tool_add_meter": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_tool_add_meter_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_mode_add_meter": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_pane_tab_customers": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_customer_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_account": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_account_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_demand": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_demand_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_count": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_count_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_total": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_total_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_pipe_suggest": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_meter_pipe_unknown": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_meter_placed": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_pipe_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_station": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_station_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_lumped": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_field_meter_lumped_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_node_customers": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_node_customers_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_node_customers_sum": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_customer_detached": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_customer_fixed_head": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_customer_detached_count": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_meter_pick_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
-        "lpn_inp_export_flat_customers": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_vertices",
-                    "value": "መታጠፊያዎች",
-                    "english": "Vertices"
-                },
-                "next_translated": {
-                    "key": "lpn_area_hint_window_start",
-                    "value": "የመስኮቱን አንድ ማዕዘን ይጫኑ።",
-                    "english": "Click one corner of the window."
-                }
-            }
-        },
         "lpn_ts_menu": {
             "reason": "missing",
             "current_value": null,
@@ -1839,6 +1425,762 @@
                     "value": "{n} ከፍታ(ዎች) ተሞልተዋል።",
                     "english": "{n} elevation(s) filled in."
                 }
+            }
+        },
+        "lpn_file_import_survey": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_file_import_survey_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_not_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_read_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_cancelled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_axis_north": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_axis_east": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_column_n": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_unreadable": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_no_coords": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_ambiguous_coord": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_ambiguous_lon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_plane": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_gpx_no_wpt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_err_no_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_format_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_format_internal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_create": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_pnezd": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_penzd": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_pnez": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_penz": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_nezd": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_enzd": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_nez": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_fmt_enz": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_from_header": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_header_unread": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_type_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_confirm_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_confirm_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_confirm_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_map_gpx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_map_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_unit_m": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_unit_ft": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_confirm_pipes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_report_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_report_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_report_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_report_clean": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_report_notes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_sev_error": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_sev_warning": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_row_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_coord_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_lon_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_bad_coord": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_bad_lon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_coord_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_lon_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_bad_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_ambiguous_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_blank_rows": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_id_duplicate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_id_taken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_id_invalid": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_gpx_trkpt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_gpx_rtept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_note_elev_converted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "ምንም መልስ የለም። የተነገረው ኮድ {code} ነው።",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": null
             }
         }
     },

@@ -353,3 +353,29 @@ is answered for the three that remain after the divorce; see item 5 series above
     (placing a node to read well at the zoom the user actually wants) to fix a raster problem tile
     providers already solve by resampling at fractional zoom, which is normal, unremarked behavior
     on every web map. See journal, 2026-09-17.
+
+35. **File menu — keep Import EPANET / Import libraries / Import surveyed points as one three-row
+    `Import ▸` submenu, but keep Export EPANET adjacent to it, not moved to the far end.** Matches
+    Blender's own Import ▸/Export ▸ shape at this row count; breaking the Import/Export adjacency
+    is the one part of Tom's 2026-09-18 proposal I would push back on, because he himself ordered
+    them adjacent one day earlier after losing Export at an EWB demo. See journal, 2026-09-18.
+
+36. **Keep Revert.** It is already correctly disabled for an unsaved project (no file handle to
+    revert to), so his "goes back to blank" worry does not occur; for a saved project it is the
+    one-step path two OTHER messages in the file already name by command ("Use File, Revert…"),
+    and macOS's own document architecture ships the same command in nearly every native app. Do
+    not remove it. See journal, 2026-09-18.
+
+37. **Georeference wizard step 2 (`mapgeo`) — restyle the existing rectangle rather than replace it
+    with a slider.** Traced the transform math: the control already writes only `project.georef`,
+    never the document, matching Tom's own written spec. The "appears to apply to the project"
+    complaint is a rest-state affordance problem (the frame starts exactly coincident with the
+    drawing's own bounding box, drawn in the universal "select-and-transform-this-shape" idiom),
+    not a behavior defect. Four cheap fixes, ranked: pad the frame visibly larger than the drawing
+    at rest; swap solid corner squares for open viewfinder-style brackets in a color not already
+    used for this page's own selection highlight; add a persistent "World map" label on the frame
+    itself, not only in the dismissible hint text; a distinct cursor, lowest priority. Try this
+    before his slider — a slider is the safer fallback if a real person still misreads the
+    restyled control, and his proposed narrow range (1 in the middle, ~0.75-1.5) is sound and
+    already has a working "pick it up again" door (`mapgeoAdjust`, wired as Map > World map >
+    Move / Scale by picking) if it is ever built. See journal, 2026-09-18.

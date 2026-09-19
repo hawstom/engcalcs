@@ -356,8 +356,20 @@ console.log('\n--- one home for the concept ---');
 	// two retired: nodeCoordAxis() and nodeLonLat() now ask effective(), which is the SAME
 	// consolidation the DEM lists made twice above -- one reader of "where is this node" rather than
 	// three.
-	ok('outwardX has one definition and twenty-nine call sites', count(/outwardX\(/g) === 30, count(/outwardX\(/g));
-	ok('outwardY has one definition and twenty-nine call sites', count(/outwardY\(/g) === 30, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR viewLonLat()** (Task 692), which is where on the Earth the middle of
+	// the camera is. It is nodeLonLat() asked of the view rather than of an element, and it crosses
+	// the boundary the same way: outwardX/outwardY on the view centre, then the projection's own
+	// inverse. It exists because the audit of every isGeoProject() reader turned up one -- the New
+	// project box's place pre-fill -- that asked "are these numbers a longitude and a latitude"
+	// where it meant "can this project say where on the Earth it is". Both call sites are inside
+	// the one function, which is the point: the question is asked once. **NET ONE EACH, NOT TWO**:
+	// the pre-fill's own inline pair was the site that moved into it.
+	// **AND TWO MORE EACH FOR A CUSTOMER'S STATION AND OFFSET** (Task 247). A customer is placed by
+	// how far ALONG its pipe it sits and how far OFF, so the popup and the customers table both
+	// state a position the document stores as a drawn point: the leader's foot and the symbol come
+	// back out through this door rather than reading the stored pair straight.
+	ok('outwardX has one definition and thirty call sites', count(/outwardX\(/g) === 31, count(/outwardX\(/g));
+	ok('outwardY has one definition and thirty call sites', count(/outwardY\(/g) === 31, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -412,8 +424,15 @@ console.log('\n--- one home for the concept ---');
 	// there is no override they return the field untouched, so a Base drawing still pays nothing at
 	// all. writeNodeCoord() is the other: a typed box hands it the public number and it converts
 	// once, which is what keeps a typed 38.5 stored as 38.5.
-	ok('inwardX has one definition and twenty-eight call sites', count(/inwardX\(/g) === 29, count(/inwardX\(/g));
-	ok('inwardY has one definition and twenty-nine call sites', count(/inwardY\(/g) === 30, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR A SURVEYED POINT LIST** (Task 592). Every junction made from a
+	// surveyed file arrives as a pair of numbers out of somebody's file, which is the definition of
+	// an outside number: it comes through this door once, in createSurveyJunctions(), and the file's
+	// own value rides beside the drawn one so the save hands it back unchanged.
+	// **AND ONE MORE EACH FOR A TYPED STATION OR OFFSET** (Task 247). A station and an offset are
+	// typed in the LENGTH unit and are measured along and across a pipe, so the point they resolve
+	// to is an outside number and crosses here once, in writeCustomerStationOffset().
+	ok('inwardX has one definition and twenty-nine call sites', count(/inwardX\(/g) === 30, count(/inwardX\(/g));
+	ok('inwardY has one definition and thirty call sites', count(/inwardY\(/g) === 31, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

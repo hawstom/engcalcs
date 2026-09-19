@@ -3198,6 +3198,22 @@ var EngCalcs = EngCalcs || {};
 	// Stored as an additive key on the project, ABSENT meaning grid. Old readers ignore it and every
 	// document ever saved is a grid project, so nothing migrates and no version is owed.
 	var LPN_COORDS_GEO = 'geo';
+	/**
+	 * **THIS ASKS ONE NARROW QUESTION: ARE THIS DOCUMENT'S NUMBERS A LONGITUDE AND A LATITUDE?**
+	 * It is the right question for the drawing frame (outwardY/inwardY run through Mercator here
+	 * and nowhere else), for how a coordinate is written and bounded, and for the `_xsrc`/`_ysrc`
+	 * round-trip record. It is the WRONG question for anything that reaches outside the drawing.
+	 *
+	 * **"CAN THIS PROJECT SAY WHERE ON THE EARTH A POINT OF IT IS" IS projectLocatable(), AND
+	 * PICKING THE WRONG ONE HAS NOW COST THREE DEFECTS IN THE SAME FAMILY.** The elevation
+	 * controls asked this one and were widened on 2026-09-14; the satellite and street-map rows,
+	 * the corner teaser and goToLatLon() were left behind and were found by Tom on 2026-09-18
+	 * (*"Satellite view is only available for lat/lon CRS."*) -- a row offered and dead, which is
+	 * exactly what the elevation buttons had been four days earlier. A projected project with a
+	 * transform knows perfectly well where it is. **So before writing isGeoProject() in a new
+	 * gate, ask which of the two you mean**; dev/lpn-spike/projected-basemap-harness.js section
+	 * 13 holds the outward-facing ones.
+	 */
 	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
 
 	// ---- A PROJECT'S DECLARED COORDINATE REFERENCE SYSTEM (ROADMAP Task 641) ---------------------
@@ -3221,12 +3237,15 @@ var EngCalcs = EngCalcs || {};
 	// file conversion onto a COPY, which is not built; until it is, the honest answer is that there
 	// is no door, and assignProjectCrs() below is the only writer and refuses every second call.
 	//
-	// **WHAT IS DELIBERATELY NOT BUILT HERE**, so nothing is read into it that it does not do: there
-	// is no transform, so a projected project offers no basemap, no place-name search and no terrain
-	// elevations. Every one of those is already gated on isGeoProject(), which a projected project is
-	// not, so they are absent by construction rather than by a new gate. They wait on proj4js
-	// (ruling P3), and so does the point scale factor of ruling P7. **Nothing here claims anything
-	// about the accuracy of a length**; that claim waits on Task 643.
+	// **THIS PARAGRAPH USED TO SAY A PROJECTED PROJECT GETS NO BASEMAP, NO PLACE-NAME SEARCH AND NO
+	// TERRAIN ELEVATIONS, and that stopped being true at Task 641 phase 5** (2026-09-14), when
+	// js/lpn-crs.js gave the page a transform for 98% of the register. It is left named here rather
+	// than deleted because it was read as the rule for a month after it lapsed, and each outward
+	// feature was then widened separately: the basemap painter, then the elevation controls, then
+	// (2026-09-18, Task 692) the satellite row, the street-map row, the corner teaser and Go to.
+	// **The question every one of them asks is projectLocatable(), not isGeoProject()** -- see the
+	// note on that predicate. **Nothing here claims anything about the accuracy of a length**; that
+	// claim waits on Task 643, and so does the point scale factor of ruling P7.
 	//
 	// **PHASE 2 COLLAPSED THE QUESTION FROM THREE ANSWERS TO TWO** (Tom's interface specification,
 	// 2026-09-13). lat/lon is not a third kind beside "projected"; it IS a projection, and the
@@ -10161,7 +10180,7 @@ var EngCalcs = EngCalcs || {};
 	function refreshBasemapTeaser() {
 		var pc = EngCalcs.pageConfig || {}, b = document.getElementById('lpn_basemap_teaser'), on;
 		if (!b) { return; }
-		if (!isGeoProject() || !satelliteAvailable()) { b.style.display = 'none'; return; }
+		if (!projectLocatable() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
 		on = basemapOn() && basemapStyle() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
@@ -11712,7 +11731,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	function goToLatLon() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!isGeoProject()) { return; }
+		// **THE GATE IS THE MENU ROW'S OWN.** The row is hidden on a project that cannot say where
+		// on the Earth it is, and this asks the same question rather than a narrower one: it read
+		// isGeoProject() while the row read projectLocatable(), so on a projected project the row
+		// was offered and the press did nothing at all. goToPoint() below travels through the
+		// transform, so there is nothing here a projected project cannot do.
+		if (!projectLocatable()) { return; }
 		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
@@ -11883,6 +11907,25 @@ var EngCalcs = EngCalcs || {};
 		if (isGeoProject()) { return { lon: x, lat: y }; }
 		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
 		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: x, y: y });
+	}
+	/**
+	 * **WHERE ON THE EARTH THE MIDDLE OF THIS VIEW IS, or null if the project cannot say** (Task
+	 * 692). It is nodeLonLat()'s question asked of the camera rather than of an element, and it
+	 * asks projectLocatable() for the same reason: a projected project with a transform knows
+	 * perfectly well what town it is looking at. Null on a grid project, which is not a failure --
+	 * it is the honest answer, and the one caller falls back to the place-name search.
+	 *
+	 * The shape is the crsBox's, so `extent` is stated null: a view has a size, but the place this
+	 * reports is a POINT, and inventing an extent from a camera would filter the projection list
+	 * by how far somebody happened to be zoomed out.
+	 */
+	function viewLonLat(v) {
+		var ll;
+		if (!v || !projectLocatable()) { return null; }
+		if (isGeoProject()) { return { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+		if (!EngCalcs.lpnCrsInverse) { return null; }
+		ll = EngCalcs.lpnCrsInverse(projectCrsCode(), { x: outwardX(v.cx), y: outwardY(v.cy) });
+		return ll ? { lat: ll.lat, lon: ll.lon, extent: null } : null;
 	}
 	function terrainPointsForIds(ids) {
 		if (!projectLocatable()) { return []; }
@@ -24240,6 +24283,374 @@ var EngCalcs = EngCalcs || {};
 		if (input) { input.click(); }
 	}
 
+	// ---- File > Import surveyed points (ROADMAP Task 592) ---------------------------------------
+	//
+	// **THE READING IS js/lpn-survey.js's AND THE DOCUMENT IS OURS.** That file takes text and
+	// returns a list of surveyed points plus a list of everything it could not honour; it makes
+	// nothing, draws nothing and asks nothing. Everything below is the half only this file can do:
+	// one undo snapshot, one junction per point at the position the file states, and the report.
+	//
+	// **IT IS A FILE ROW, AND IT WAS A Settings > New assets BUTTON UNTIL TOM USED IT** (2026-09-17:
+	// *"Probably Settings is a bad place for Import survey points. That traditionally goes under
+	// File or Water. But Map might make sense. My vote is File since they come from a file."*). The
+	// old argument -- it makes new assets and takes the new-asset values, so it belongs beside them
+	// -- describes what the command DOES and not where anybody looks for it. It still takes those
+	// values; the door is named after the file, because the user is holding a file.
+	//
+	// **Task 542's lesson survives the move and is not an argument against it.** What 542 removed
+	// was a row that filled the whole drawing in one press with no question asked -- *"a cool new
+	// button that I found"*. This one reads a file the user chose, shows what it is about to make,
+	// and does nothing until they say so. The guard was never the menu it hid in.
+	//
+	// **ANY COORDINATE SYSTEM THE READER WORKS IN, AND NO REFUSAL AT ALL** (Tom, 2026-09-17: *"I
+	// disagree that a project must be 'on a map of the Earth' (and, by the way, the technical term
+	// is 'georeferenced', you know that, and we should use that). There is no good reason why the
+	// file can't be in any system the user wants."*). This used to refuse a project that was not
+	// georeferenced, on the argument that a latitude has no meaning on a grid -- which describes a
+	// LATITUDE and not a surveyed point list. The file holds two coordinates in whatever system the
+	// project is already in, and surveyLimits() is the whole of what the distinction still costs:
+	// a georeferenced project has a range to be outside of and no other kind does.
+	function pickSurveyFile() {
+		var input = document.getElementById('lpn_survey_file');
+		if (input) { input.click(); }
+	}
+	/**
+	 * **WHAT THE PROJECT CALLS ITS TWO AXES, handed to the reader** -- js/lpn-survey.js reads a pair
+	 * of numbers and has no opinion about what they mean. axisNames() is the page's one opinion
+	 * (Task 674), so this is a hand-over and not a second list.
+	 */
+	function surveyAxes() {
+		var a = axisNames();
+		return { north: a.first, east: a.second };
+	}
+	/**
+	 * **THE BOUND THIS KIND OF PROJECT HAS, or nothing.** Only a georeferenced project has one, and
+	 * it is the Mercator cut-off rather than 90 degrees, because a latitude past it has no finite y
+	 * at all -- the same limit coordValueOk() holds for a typed coordinate, read from the same
+	 * constant so the typed door and the file door cannot come to two answers.
+	 *
+	 * **A PROJECTED OR GRID PROJECT GETS NONE, and that is the whole of what Tom's ruling cost**
+	 * (2026-09-17: *"There is no good reason why the file can't be in any system the user wants."*).
+	 * A northing of 700,000 is an ordinary northing; refusing it was the old rule stated as a number.
+	 */
+	function surveyLimits() {
+		return isGeoProject() ? { north: LPN_MERC_MAX_LAT, east: 180 } : null;
+	}
+	function importSurveyFromFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		// TEXT, not bytes: a surveyed point list is a text file whatever extension it carries, and
+		// what is in it is decided by reading it rather than by believing the name.
+		reader.onload = function (ev) { landSurveyText(String(ev.target.result), file.name); };
+		reader.onerror = function () {
+			alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
+	}
+	/**
+	 * **THE FORMAT CHOOSER (Task 592; Tom, 2026-09-17: *"We will need to include a file format
+	 * chooser (PNEZD, PENZD, or whatever format is useful for Declan."*).**
+	 *
+	 * The order the reader last chose, remembered for the next file. **BROWSER FURNITURE, NOT
+	 * PROJECT DATA** (the rule Task 584 settled): which way round the last CSV somebody opened was
+	 * written is a fact about that person's data collector, not about this network, and a colleague
+	 * opening the file must not inherit it. Guarded, because in a browser set to block site data the
+	 * property access itself throws.
+	 */
+	// **THE ASSET KINDS A SURVEYED POINT CAN BECOME, and there are exactly three** (Tom, 2026-09-18:
+	// *"Since once a node is imported its asset type cannot be changed, we should offer asset type as
+	// a first selector."*). They are the page's own NODE types -- a pipe, a pump and a valve are
+	// links between two points and a surveyed list states no connections at all, so they are not
+	// candidates and never will be. The order is the toolbar's order, which is where the reader has
+	// already met these three words.
+	//
+	// **THE LABELS ARE THE TOOLBAR'S OWN KEYS, reused whole.** Concept-level label reuse is what
+	// CLAUDE.md asks for and the toolbar owns the concept; a second set of keys saying Junction,
+	// Reservoir and Tank would be three more strings in 27 files saying what three already say.
+	var LPN_SURVEY_TYPES = ['junction', 'reservoir', 'tank'];
+	function surveyTypeLabel(t) {
+		var pc = EngCalcs.pageConfig || {};
+		if (t === 'reservoir') { return pc.lpn_tool_add_reservoir || 'Reservoir'; }
+		if (t === 'tank') { return pc.lpn_tool_add_tank || 'Tank'; }
+		return pc.lpn_tool_add_junction || 'Junction';
+	}
+	var LPN_SURVEY_FORMAT_KEY = 'lpn_survey_format';
+	function surveyFormatPref() {
+		try {
+			var v = localStorage.getItem(LPN_SURVEY_FORMAT_KEY);
+			if (v) { return v; }
+		} catch (e) { /* storage blocked: the default is a perfectly good answer */ }
+		return EngCalcs.LPN_SURVEY_DEFAULT_FORMAT;
+	}
+	function rememberSurveyFormat(v) {
+		try { localStorage.setItem(LPN_SURVEY_FORMAT_KEY, v); } catch (e) { /* see above */ }
+	}
+	// No `fileName`: the report no longer names the file, so nothing downstream of the reading
+	// wants it. It is still what the file input hands over, and it is dropped here rather than
+	// carried unread.
+	function landSurveyText(text) {
+		var pc = EngCalcs.pageConfig || {}, axes = surveyAxes(), limits = surveyLimits(),
+			format = surveyFormatPref(), parsed,
+			// **NOT REMEMBERED, DELIBERATELY, unlike the format beside it.** Which way round a data
+			// collector writes its columns is a standing fact about that person's equipment, which
+			// is why the format is browser furniture. What a particular file holds is a fact about
+			// that file: a reader who imported three tanks last week and drops in a point list this
+			// week must not find 200 tanks on the map because a control remembered something.
+			// Junction is the hard-coded default, which is what a surveyed point usually is.
+			assetType = 'junction';
+		function read() {
+			return EngCalcs.lpnSurveyParse
+				? EngCalcs.lpnSurveyParse(text, { limits: limits, format: format }) : { ok: false };
+		}
+		parsed = read();
+		// A file nothing can be read out of at all gets the sentence and no box: there is no
+		// question to ask about it, and a chooser over an empty file teaches nothing.
+		if (!parsed.ok && parsed.error === 'empty') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		openDialog(function (body) {
+			var wrap = document.createElement('div'), sel, note, preview, typeSel, typeNote, internalNote;
+			// **THE ASSET KIND COMES FIRST, AND THE REASON IS THAT IT IS IRREVERSIBLE** (Tom,
+			// 2026-09-18: *"Since once a node is imported its asset type cannot be changed, we
+			// should offer asset type as a first selector."*). Everything else this box asks can be
+			// answered again afterwards -- the format by re-importing, an elevation by typing one --
+			// and this one cannot be answered again at all, because this page has no command that
+			// turns a junction into a tank. So it is the first thing in the box, above the file,
+			// and the reader meets it before they meet anything they could undo.
+			typeNote = document.createElement('p');
+			typeNote.style.margin = '0 0 6px';
+			typeNote.textContent = pc.lpn_survey_type_label || 'Asset type:';
+			wrap.appendChild(typeNote);
+			typeSel = document.createElement('select');
+			typeSel.id = 'lpn_survey_type';
+			LPN_SURVEY_TYPES.forEach(function (t) {
+				var o = document.createElement('option');
+				o.value = t;
+				o.textContent = surveyTypeLabel(t);
+				if (t === assetType) { o.selected = true; }
+				typeSel.appendChild(o);
+			});
+			wrap.appendChild(typeSel);
+			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
+			// SAID** (Tom, 2026-09-18, writing the box: *"File format: / PNEZD specified
+			// internally"*). It used to grey out beside a sentence of ours explaining that a header
+			// had won -- the fact in our prose, and the control standing empty above it holding a
+			// stale preference that had nothing to do with the file in front of the reader. **THE
+			// FACT LIVES IN THE CONTROL.** The order the file states is read back out of its own
+			// column map by lpnSurveyFormatLetters(), so the chooser's one row says PNEZD and
+			// nothing else, and it is disabled because there is nothing left to choose. Why it is
+			// disabled is said beside it, not in it -- see the note built under the chooser.
+			note = document.createElement('p');
+			note.style.margin = '0 0 6px';
+			note.textContent = pc.lpn_survey_format_label || 'File format:';
+			wrap.appendChild(note);
+			sel = document.createElement('select');
+			sel.id = 'lpn_survey_format';
+			wrap.appendChild(sel);
+			// **THE EXPLANATION SITS BESIDE THE CONTROL, NEVER INSIDE IT** (Tom, 2026-09-18: *"The
+			// selector option should not be reworded when a format is specified internally. Simply
+			// show the specified format, disable the selector, and print 'specified internally'
+			// outside the selector."*). The option used to read `PNEZD specified internally`, which
+			// put a sentence about the control into the control's own value. A value is the value:
+			// somebody reading the box off a screenshot, or reading it back to a colleague, says
+			// PNEZD, and the greyed control already says it was not theirs to choose.
+			internalNote = document.createElement('span');
+			internalNote.id = 'lpn_survey_format_internal';
+			internalNote.style.marginLeft = '8px';
+			wrap.appendChild(internalNote);
+			// **AND NO PARAGRAPH UNDER IT** (Tom, 2026-09-18). A sentence explaining that the
+			// chooser says which coordinate comes first, and that a header beats it, was three lines
+			// of ours teaching a reader who already reads PNEZD. The label names the control, the
+			// control is greyed when the file answered for itself, and that is the whole lesson.
+			preview = document.createElement('div');
+			preview.style.marginTop = '10px';
+			wrap.appendChild(preview);
+			body.appendChild(wrap);
+			// **THE CHOOSER IS REBUILT WITH THE PREVIEW, not filled once above it.** Whether the
+			// file names its own columns is a fact about the READING, and the reading is redone on
+			// every change -- so a control filled before the first read is a control that can
+			// disagree with the sentence under it.
+			function fillChooser() {
+				var internal = parsed.ok && parsed.headerRead, o;
+				sel.innerHTML = '';
+				sel.disabled = !!internal;
+				internalNote.textContent = internal
+					? (pc.lpn_survey_format_internal || 'specified internally') : '';
+				if (internal) {
+					o = document.createElement('option');
+					o.value = '';
+					o.textContent = EngCalcs.lpnSurveyFormatLetters(parsed.mapping);
+					sel.appendChild(o);
+					return;
+				}
+				(EngCalcs.lpnSurveyFormats || []).forEach(function (f) {
+					var op = document.createElement('option');
+					op.value = f;
+					op.textContent = EngCalcs.lpnSurveyFormatLabel(f);
+					if (f === format) { op.selected = true; }
+					sel.appendChild(op);
+				});
+			}
+			function draw() {
+				preview.innerHTML = '';
+				fillChooser();
+				var text2 = parsed.ok
+					? EngCalcs.lpnSurveyConfirmText(parsed, assetType)
+					: EngCalcs.lpnSurveyErrorText(parsed, axes);
+				text2.split('\n\n').forEach(function (para) {
+					var p = document.createElement('p');
+					p.style.margin = '0 0 6px';
+					p.textContent = para;
+					preview.appendChild(p);
+				});
+			}
+			// **RE-READ ON EVERY CHANGE, so what the box says is what pressing the button will do.**
+			// A preview computed once and a creation computed again is two chances to disagree.
+			sel.addEventListener('change', function () {
+				format = sel.value;
+				parsed = read();
+				draw();
+			});
+			// The question at the bottom of the box names the kind, so turning this control has to
+			// rewrite it -- a box that asks about junctions and then makes tanks is the disagreement
+			// the re-read above exists to stop, in the other control.
+			typeSel.addEventListener('change', function () {
+				assetType = typeSel.value;
+				draw();
+			});
+			draw();
+		}, [
+			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
+				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+				rememberSurveyFormat(format);
+				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
+				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
+			} }
+		]);
+	}
+	/**
+	 * One node per surveyed point, all of the one chosen kind, under ONE undo snapshot.
+	 *
+	 * **THE FILE'S OWN NUMBERS GO IN AND COME BACK OUT UNCHANGED.** A coordinate is stored in the
+	 * drawing frame, which for a geographic document is Web Mercator, and `mercLat(mercY(lat))` is a
+	 * different double for 69.8% of latitudes -- so the file's own longitude and latitude ride
+	 * beside the drawn pair in `_xsrc`/`_ysrc`, which is the channel serializeProject() already
+	 * reads, and the file's own TEXT rides in the `tok` bag, which is the channel the `.inp` writer
+	 * already reads. Neither is a new mechanism and neither needs a call site to remember anything:
+	 * both are believed only while the drawn number is still the one derived from them.
+	 */
+	function createSurveyNodes(parsed, assetType) {
+		var notes = [], created = 0, elevFromFile = 0;
+		var geo = isGeoProject();
+		var type = LPN_SURVEY_TYPES.indexOf(assetType) >= 0 ? assetType : 'junction';
+		saveUndoSnapshot();
+		parsed.points.forEach(function (p) {
+			// **THE EAST COLUMN IS THE DOCUMENT'S x AND THE NORTH COLUMN IS ITS y, in every kind of
+			// project** -- a longitude on a georeferenced one, an easting on a projected one, a
+			// plain X on a grid. inwardX/inwardY is the one door either number comes through, and it
+			// is the door that knows whether this project projects.
+			// **EVERY POINT IN ONE IMPORT TAKES THE ONE CHOSEN KIND.** addNode() is the same door
+			// the toolbar uses, so a reservoir born here carries the same new-asset defaults as one
+			// drawn by hand, and a tank arrives with its level, its bounds and its diameter already
+			// set -- none of which a point list states, and all of which the reader can edit. An
+			// ELEVATION is the one field all three share, which is why the file's own number needs
+			// no case below.
+			var n = addNode(type, inwardX(p.east), inwardY(p.north)), want = p.id;
+			// **THE SOURCE RECORD IS GEOGRAPHIC ONLY, for the reason setNodeCoordAxis() states**:
+			// these two keys are stripped from the snapshot by unprojectStoredGeo(), which no other
+			// kind of project runs -- so writing one here would put it in the saved file. A grid
+			// document needs none anyway: inwardX/inwardY is a shift by an origin that is zero.
+			if (geo) {
+				n[LPN_GEO_XSRC] = p.east;
+				n[LPN_GEO_YSRC] = p.north;
+			}
+			if (p.eastTok) { (n.tok || (n.tok = {})).x = p.eastTok; }
+			if (p.northTok) { (n.tok || (n.tok = {})).y = p.northTok; }
+			// The surveyor's own note about the point, where the file states one. A description is
+			// identity rather than an overridable property, so it is written to the element -- the
+			// same base-write descField() makes.
+			if (p.desc) { n.desc = p.desc; }   // base-write: a description is identity -- see descField()
+			// **THE ELEVATION IS TAKEN EXACTLY AS THE FILE STATES IT, AND IS NEVER CONVERTED**
+			// (Tom, 2026-09-18: *"I don't think it's wise to build in any units detection. We take
+			// what we are given, and we provide a robust undo feature."*). This used to read the
+			// file's vertical unit off the elevation column's NAME and convert where it disagreed
+			// with the project -- a guess from a header most point lists do not even have, and a
+			// guess that rewrote the user's own numbers. So the number goes in as written, in
+			// whatever unit the project is showing, and the file's own text rides with it.
+			if (typeof p.elev === 'number') {
+				n.elev = p.elev;
+				if (p.elevTok) { (n.tok || (n.tok = {})).elev = p.elevTok; }
+				elevFromFile++;
+			}
+			// The surveyed name, where the document can take it. A name it cannot take is reported
+			// and the junction keeps the name this page minted -- never a name repaired by adding a
+			// digit, which would put a point on the map under a name nobody wrote down.
+			// **THE LINE NUMBER AND THE LINE COME WITH THE POINT** (Tom, 2026-09-17). These two are
+			// the only refusals discovered here rather than in js/lpn-survey.js, and a reader owes
+			// nothing to that distinction: they get the same line number and the same printed line
+			// as every other one, which is why a point carries both.
+			if (want) {
+				if (/[\s'"]/.test(want)) { notes.push({ code: 'id-invalid', line: p.line, raw: p.raw, detail: want }); }
+				else if (allIds().indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
+				else { applyNodeRename(n.id, want); }
+			}
+			created++;
+		});
+		// **THE ORIGIN IS RE-DERIVED, for the reason Task 439 gives**: a geographic document's
+		// coordinates are shifted onto a 1/128-degree grid near the network so float32 rasterising
+		// cannot lose a pipe, and a batch of points dropped into an empty project is exactly the
+		// moment the network moves from nowhere to somewhere. Exact by construction (Sterbenz), so
+		// the sources above still hand back the file's own bytes.
+		rebaseLiveGeoDoc();
+		buildDom();
+		// **AND THE VIEW IS DELIBERATELY NOT MOVED, not even on an empty project.** The obvious
+		// kindness here is a fit, so that points arriving in Arizona are on screen for somebody
+		// whose camera is over the whole Earth. Tom has ruled on exactly this, going through the
+		// candidate list one at a time (2026-08-15): *"our current paradigm forbids autozooms or
+		// refits"*, and *"refitting and re-baselining: I see it as vanishingly defensible"*. There
+		// are four automatic fits left on this page and every one of them gives a view to a
+		// document that has none; this project has one. So the reader presses Zoom to extent, which
+		// is a control they already have, and dev/lpn-spike/view-memory-harness.js keeps a fifth
+		// fit from being added here by a bumped number instead of an argument.
+		refreshMapStatus();
+		scheduleSolve();
+		saveToStorage();
+		// `type` rides back out so the report's own counts line can name what was made. The module
+		// holds three whole sentences for it rather than a noun it drops into one -- see
+		// assetSentence() in js/lpn-survey.js, and CLAUDE.md on why a label is never composed from
+		// fragments at render time.
+		return { created: created, elevFromFile: elevFromFile, notes: notes, type: type };
+	}
+	// **THE REPORT OPENS ON THE COUNT, AND ON NOTHING ELSE** (Tom, 2026-09-18, writing it out:
+	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It
+	// used to open with the file's name in bold. The reader chose that file a moment ago and is
+	// looking at the box they asked for; what they do not know is how many points came out of it.
+	function showSurveyReport(parsed, outcome) {
+		var pc = EngCalcs.pageConfig || {},
+			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes());
+		openDialog(function (body) {
+			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
+			// should print the entire line with a much shorter message"*). The line is drawn in a
+			// fixed-width face and indented, because it is a QUOTATION of the file and not more of
+			// our prose -- what the reader is doing with it is matching it against the window they
+			// have the file open in. `pre-wrap` so a long line wraps rather than widening the box,
+			// and keeps its own runs of spaces, which in a fixed-column file are the columns.
+			lines.forEach(function (entry) {
+				var p = document.createElement('p');
+				p.style.margin = '0 0 6px';
+				p.textContent = entry.text;
+				body.appendChild(p);
+				if (entry.raw === null) { return; }
+				var q = document.createElement('p');
+				q.style.margin = '0 0 8px 1.5em';
+				q.style.fontFamily = 'monospace';
+				q.style.whiteSpace = 'pre-wrap';
+				q.textContent = entry.raw;
+				body.appendChild(q);
+			});
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+
 	// ---- File > Import XY to lat/lon… (ROADMAP Task 447) ---------------------------------------------
 	//
 	// **OPENING A FILE ALWAYS MAKES A NEW TAB, and that is what dissolves the old question.** There
@@ -27000,15 +27411,20 @@ var EngCalcs = EngCalcs || {};
 		wireCrsBox();
 		crsBox.code = code || LPN_CRS_WEBMERC;
 		crsBox.onPick = onPick || null;
-		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** Only a geographic project has a view that is
-		// a place on the Earth; a projected or local one has eastings or canvas units, and turning
-		// those into a longitude is the transform this page does not have. So the point comes from
-		// the open project when it can, from the caller when it was found earlier in this box, and
-		// from the place-name search otherwise.
+		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** The point comes from the open project when
+		// it can, from the caller when it was found earlier in this box, and from the place-name
+		// search otherwise.
+		//
+		// **THIS USED TO SAY A PROJECTED PROJECT'S VIEW COULD NOT BE READ, "the transform this
+		// page does not have"** -- true when it was written and false since Task 641 phase 5 gave
+		// the page js/lpn-crs.js. It was the last reader of isGeoProject() that meant
+		// projectLocatable(), found by auditing all of them on 2026-09-18 (Task 692) after the
+		// same word had been the defect three times. It costs no dead control, only a New project
+		// box that opened on the whole register while the project behind it knew the town.
 		crsBox.place = place || null;
-		if (!crsBox.place && isGeoProject()) {
+		if (!crsBox.place) {
 			v = currentView();
-			if (v) { crsBox.place = { lat: outwardY(v.cy), lon: outwardX(v.cx), extent: null }; }
+			if (v) { crsBox.place = viewLonLat(v); }
 		}
 		var field = document.getElementById('lpn_crsbox_place'),
 			nameEl = document.getElementById('lpn_crsbox_name'),
@@ -27120,6 +27536,21 @@ var EngCalcs = EngCalcs || {};
 			// had to be greyed whenever that project was already on the map, is gone with it.
 			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Open xy file on map…',
 			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
+			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
+			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
+			// under File or Water. But Map might make sense. My vote is File since they come from a
+			// file."*). It lived under Settings > New assets, on the argument that it makes new
+			// assets and takes the new-asset values; that argument is still true and is not where a
+			// person looks. A command named after a FILE belongs with the other file commands.
+			//
+			// **AFTER THE ROWS THAT MAKE A TAB, because it is the one that does NOT.** Open,
+			// Open example, Import EPANET and Open xy file all end in a project switch; this one
+			// drops points into the project already on screen. Grouping it with them says what kind
+			// of act it is; sitting after them keeps the ones that share an outcome together. It
+			// goes ABOVE the Import/Export EPANET pair rather than below Import, because those two
+			// are adjacent by Tom's own instruction and a row wedged between them breaks the pair.
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
 			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
 			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was
@@ -27567,7 +27998,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { EngCalcs.lpnSearchOpen(); }
 			},
 			{
-				hidden: !isGeoProject(), icon: 'view',
+				hidden: !projectLocatable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'osm')
 					? (pc.lpn_basemap_hide || 'Hide street map')
 					: (pc.lpn_basemap_show || 'Show street map'),
@@ -27578,7 +28009,7 @@ var EngCalcs = EngCalcs || {};
 			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
 			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
 			{
-				hidden: !isGeoProject() || !satelliteAvailable(), icon: 'view',
+				hidden: !projectLocatable() || !satelliteAvailable(), icon: 'view',
 				label: (basemapOn() && basemapStyle() === 'satellite')
 					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
 					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),
@@ -28157,6 +28588,16 @@ var EngCalcs = EngCalcs || {};
 			var f = geoInput.files[0];
 			geoInput.value = '';
 			if (f) { openAsGeoFile(f); }
+		});
+		// A FOURTH picker (Task 592). Its own, for the reason the three above are their own: a
+		// surveyed point list lands in the OPEN project rather than making a new tab, so one input
+		// serving both would have to guess which act was meant from the file's extension.
+		var surveyInput = document.getElementById('lpn_survey_file');
+		if (!surveyInput) { return; }
+		surveyInput.addEventListener('change', function () {
+			var f = surveyInput.files[0];
+			surveyInput.value = '';
+			if (f) { importSurveyFromFile(f); }
 		});
 	}
 
