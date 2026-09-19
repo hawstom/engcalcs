@@ -29,6 +29,7 @@ const ROOT = path.resolve(__dirname, '..', '..');
 
 const L = loadLoopedNetwork(
 	"\t\trebuild: rebuildLabelsFields,\n" +
+	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tcolW: function () { return LPN_LABEL_COL_W; },\n" +
 	"\t\taffixW: function () { return LPN_LABEL_AFFIX_W; },\n" +
 	"\t\tcolGap: function () { return LPN_LABEL_COL_GAP; } "
@@ -181,6 +182,53 @@ function describe(edges) {
 			idRow ? idRow.children.map((c) => c.tagName).join(',') : 'missing');
 	}
 });
+
+// ---- THE WAY BACK TO THE SHIPPED COLUMNS (Task 539, 2026-09-18) -------------------------------
+//
+// **A PROJECT CARRIES ITS OWN LABEL COLUMNS, WHICH IS RIGHT AND HAS A COST.** A project saved
+// before a default moved keeps the old one for good -- Tom's own projects showed him the previous
+// Drop orders and a stray `=` before the node ID, and he read that as the new defaults not having
+// shipped. They had; his project was overriding them, and nothing on the page could say so. The
+// Settings box's wide Restore defaults does reach these, but only by resetting the ID prefixes, the
+// solver settings, the coloring and the legend beside them, so the narrow one lives in the Labels
+// section with the columns it resets.
+//
+// Asserted here rather than by reading, because the button is wired inside rebuildLabelsFields()
+// and a reset that resets three of the five maps is a reset that looks like it works.
+console.log('\n--- the Labels section resets its own columns ---');
+{
+	const ls = L.labelSettings();
+	const before = JSON.parse(JSON.stringify(ls));
+	// Dirty every map the button claims to reset, in the shapes a user actually produces.
+	ls.node.id = !ls.node.id;
+	ls.link.flow = !ls.link.flow;
+	ls.prefix.node.id = '123=';
+	ls.suffix.link.flow = ' gpm';
+	ls.decimals.node.pressure = 7;
+	ls.priority.node.id = 99;
+	ls.separator = ' | ';
+	ls.markExtrema = !ls.markExtrema;
+	L.rebuild();
+	const optBox = byId['lpn_labels_options'];
+	// **THE BUTTON IS FOUND BY ITS OWN LANGUAGE KEY, never by a typed English literal.** The stub
+	// fills EngCalcs.pageConfig from lib/lang.ec.en.php, so this asks the page what the control is
+	// called rather than pinning a wording that Tom is free to change (harness_wording_check.php).
+	const wantText = (global.EngCalcs.pageConfig || {}).lpn_labels_restore;
+	const btn = (optBox.children || []).filter((c) => c.tagName === 'BUTTON' &&
+		(c.textContent || '') === wantText)[0];
+	ok('the Labels section carries its own reset button, named by its own key', !!btn,
+		(optBox.children || []).map((c) => c.tagName).join(','));
+	if (btn) {
+		(btn._listeners.click || []).forEach(function (f) { f({ type: 'click' }); });
+		const after = L.labelSettings();
+		// EVERY map, compared whole: a reset that misses one is the defect this is written against,
+		// and naming the maps one at a time here would be a second list to keep in step with
+		// defaultLabelSettings().
+		ok('...and it puts every label column back exactly as it shipped',
+			JSON.stringify(after) === JSON.stringify(before),
+			JSON.stringify(after) === JSON.stringify(before) ? '' : JSON.stringify(after).slice(0, 200));
+	}
+}
 
 console.log(fails === 0 ? '\nAll label-column checks passed.' : '\n' + fails + ' FAILED');
 process.exit(fails ? 1 : 0);

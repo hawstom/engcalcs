@@ -2314,6 +2314,14 @@ $ec_lang['lpn_labels_suffix_tip']='Text added after this property on map labels'
 $ec_lang['lpn_labels_suffix_gradient_tip']='Text added after the head loss gradient on map labels. Do not type a percent sign here. It is added for you when the units are percent.';
 $ec_lang['lpn_labels_separator']='Text between values';
 $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on a label. A space by default.';
+// **RESETTING THE LABEL COLUMNS ALONE** (Task 539, 2026-09-18). A project carries its own label
+// columns, so a project saved before a default changed keeps the old one and its owner sees the old
+// drop orders and the old prefixes for good. The Settings box's own Restore defaults does reach
+// them, but only by resetting every other setting beside them, which nobody wants to do to see a
+// label change. Three strings: the button, its tip, and the question it asks first.
+$ec_lang['lpn_labels_restore']='Restore label defaults';
+$ec_lang['lpn_labels_restore_tip']='Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.';
+$ec_lang['lpn_confirm_labels_restore']='Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.';
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
 // dropped first", because that one sentence is what the two columns share; what differs is WHAT the
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a

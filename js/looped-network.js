@@ -30470,6 +30470,36 @@ var EngCalcs = EngCalcs || {};
 				onChange: function (v) { labelSettings.separator = v; }
 			}));
 			optBox.appendChild(sepRow);
+			// **A WAY BACK TO THE SHIPPED LABEL COLUMNS, and it had to be its own button** (Task
+			// 539, 2026-09-18). The label columns ride in the PROJECT, which is right -- a drawing
+			// records how it is labelled. The consequence is that a project saved before a default
+			// moved keeps the old one for good: Tom's own projects showed him the previous Drop
+			// orders and a stray `=` before the node ID, and he read that as the new defaults not
+			// having landed. They had. His project was overriding them, and there was no way to
+			// say so.
+			//
+			// The Settings box's own Restore defaults at the foot of this box DOES reset these --
+			// it assigns defaultLabelSettings() -- but it resets the ID prefixes, the starting
+			// values, the solver settings, the coloring and the legend along with them. Nobody
+			// wants to lose a solver accuracy to see what a label default changed to, so the
+			// narrow reset lives here, beside the columns it resets, and the wide one stays where
+			// it is.
+			var lblReset = document.createElement('button');
+			lblReset.type = 'button';
+			lblReset.textContent = pc.lpn_labels_restore || 'Restore label defaults';
+			helpTip(lblReset, pc.lpn_labels_restore_tip);
+			lblReset.addEventListener('click', function () {
+				if (!window.confirm(pc.lpn_confirm_labels_restore || 'Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.')) { return; }
+				labelSettings = defaultLabelSettings();
+				// refreshLabelText(), not renderLabelsLegend(), for the reason the wide Restore
+				// defaults records: this changes WHICH fields are printed and what each carries, so
+				// the labels themselves have to be rebuilt, and that call renders the legend on its
+				// way through.
+				refreshLabelText();
+				rebuildLabelsFields();
+				saveToStorage();
+			});
+			optBox.appendChild(lblReset);
 		}
 	}
 	// The key that survives printing: the Settings box is chrome (d-print-none), so a
@@ -32005,11 +32035,17 @@ var EngCalcs = EngCalcs || {};
 		// them is an answer given, and Restore defaults is the way back to the automatic one.
 		lmwInput.style.width = '7em';
 		function lmwSyncPlaceholder() {
-			var stated = typeof settings.labelMaxWidth === 'number' && isFinite(settings.labelMaxWidth);
-			lmwInput.placeholder = stated
-				? (pc.lpn_settings_label_always || 'Always show labels')
-				: (pc.lpn_settings_label_auto || 'Automatic: {width}')
-					.replace('{width}', String(ceilToPrecision(defaultLabelMaxWidth(), 3)));
+			var stated = typeof settings.labelMaxWidth === 'number' && isFinite(settings.labelMaxWidth),
+				// **A DRAWING WITH NO PIPES YET DERIVES NOTHING, and the placeholder has to say what
+				// is actually in force rather than print a zero.** defaultLabelMaxWidth() returns 0
+				// on an empty document, labelMaxWidthInForce() reads that as always show, and
+				// "Automatic: 0" would have read as "labels off" on the page every new project opens
+				// on. Measured in a real browser 2026-09-18, which is where it showed.
+				auto = stated ? 0 : defaultLabelMaxWidth();
+			lmwInput.placeholder = auto > 0
+				? (pc.lpn_settings_label_auto || 'Automatic: {width}')
+					.replace('{width}', String(ceilToPrecision(auto, 3)))
+				: (pc.lpn_settings_label_always || 'Always show labels');
 		}
 		lmwInput.value = typeof settings.labelMaxWidth === 'number' && settings.labelMaxWidth > 0
 			? settings.labelMaxWidth : '';
