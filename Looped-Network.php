@@ -390,11 +390,38 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 			<div id="lpn_mapgeo_step" style="margin-bottom:2px;font-weight:bold"></div>
 			<div id="lpn_mapgeo_hint" style="margin-bottom:4px"></div>
+			<?php // Its own line rather than a second sentence glued to the one above: a string
+			      // composed at render time is the thing this suite's label rules forbid, and this
+			      // one is only true while the dial is on screen. ?>
+			<div id="lpn_mapgeo_hint_dial" style="margin-bottom:4px"></div>
 			<button type="button" id="lpn_mapgeo_search"><?=$ec_lang['lpn_crs_place']?></button>
 			<button type="button" id="lpn_mapgeo_goto"><?=$ec_lang['lpn_georef_goto']?></button>
 			<button type="button" id="lpn_mapgeo_place"><?=$ec_lang['lpn_mapgeo_place']?></button>
 			<button type="button" id="lpn_mapgeo_finish" style="display:none"><?=$ec_lang['lpn_mapgeo_finish']?></button>
 			<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+		</div>
+		<?php // ---- THE SIZE AND TURN DIAL, step 2 only (Tom, 2026-09-18) ----------------------
+		      //
+		      // **A VERTICAL SLIDER WITH A ROTATE CONTROL AT ITS TOP**, which is his own shape:
+		      // *"Maybe this slider itself could have a rotater control on it to rotate the map. A
+		      // vertical slider with a rotate control at the top might be very intuitive."* It sits
+		      // beside the blue rectangle rather than replacing it; which of the two survives is
+		      // his call once he has used both.
+		      //
+		      // **ON THE RIGHT EDGE AND VERTICALLY CENTRED**, because the rectangle is the middle
+		      // of the screen in step 2 and the bar already owns the top. The rotate knob is a real
+		      // `role="slider"` rather than a picture, so the arrow keys reach it; a range input is
+		      // the same promise for the size, which is why the size half is not drawn by hand.
+		      ?>
+		<div id="lpn_mapgeo_dial" class="d-print-none" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);z-index:6;font-size:11px;text-align:center;background:#fff;border:1px solid #05a;padding:8px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+			<div id="lpn_mapgeo_turn_label" style="margin-bottom:4px"><?=htmlspecialchars($ec_lang['lpn_mapgeo_dial_turn'])?></div>
+			<div id="lpn_mapgeo_turn" tabindex="0" role="slider" aria-valuemin="-180" aria-valuemax="180" aria-valuenow="0" aria-labelledby="lpn_mapgeo_turn_label" style="width:46px;height:46px;margin:0 auto;border:2px solid #05a;border-radius:50%;position:relative;background:#fff;cursor:grab;touch-action:none">
+				<div id="lpn_mapgeo_turn_needle" style="position:absolute;left:50%;top:3px;width:2px;height:18px;margin-left:-1px;background:#05a;transform-origin:50% 20px"></div>
+			</div>
+			<div id="lpn_mapgeo_turn_read" style="margin:3px 0 8px"></div>
+			<div id="lpn_mapgeo_size_label"><?=htmlspecialchars($ec_lang['lpn_mapgeo_dial_size'])?></div>
+			<input type="range" id="lpn_mapgeo_size" min="-1000" max="1000" step="1" value="0" aria-labelledby="lpn_mapgeo_size_label" style="writing-mode:vertical-lr;direction:rtl;-webkit-appearance:slider-vertical;width:26px;height:150px;margin:4px auto;touch-action:none">
+			<div id="lpn_mapgeo_size_read" style="margin-top:2px"></div>
 		</div>
 		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
 		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
@@ -2473,6 +2500,11 @@ EngCalcs.pageConfig = {
 	lpn_mapgeo_hint2: <?=json_encode($ec_lang['lpn_mapgeo_hint2'])?>,
 	lpn_mapgeo_hint_move: <?=json_encode($ec_lang['lpn_mapgeo_hint_move'])?>,
 	lpn_mapgeo_hint_scale: <?=json_encode($ec_lang['lpn_mapgeo_hint_scale'])?>,
+	lpn_mapgeo_dial_turn: <?=json_encode($ec_lang['lpn_mapgeo_dial_turn'])?>,
+	lpn_mapgeo_dial_turn_read: <?=json_encode($ec_lang['lpn_mapgeo_dial_turn_read'])?>,
+	lpn_mapgeo_dial_size: <?=json_encode($ec_lang['lpn_mapgeo_dial_size'])?>,
+	lpn_mapgeo_dial_size_read: <?=json_encode($ec_lang['lpn_mapgeo_dial_size_read'])?>,
+	lpn_mapgeo_dial_help: <?=json_encode($ec_lang['lpn_mapgeo_dial_help'])?>,
 	lpn_mapgeo_place: <?=json_encode($ec_lang['lpn_mapgeo_place'])?>,
 	lpn_mapgeo_finish: <?=json_encode($ec_lang['lpn_mapgeo_finish'])?>,
 	lpn_mapgeo_cancelled: <?=json_encode($ec_lang['lpn_mapgeo_cancelled'])?>,

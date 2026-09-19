@@ -75,6 +75,8 @@ const L = loadLoopedNetwork(
 	// laying anything out, so it is set directly; paintBasemapTiles() draws nothing without it.
 	"\t\trefreshBasemap: refreshBasemap, setMapSized: function (on) { mapSized = on !== false; },\n" +
 	"\t\ttileEls: function () { return basemapEls; },\n" +
+	"\t\tdialFactor: mapgeoDialFactor, dialTurn: mapgeoDialSetTurn,\n" +
+	"\t\tdialPos: mapgeoDialSetPos, dialState: function () { return mapgeo && mapgeo.dial; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbasemapLayer = el('g', {}, world);\n" +
@@ -385,6 +387,77 @@ ok('STEP 2 CHANGES NOT ONE STORED BYTE', snapshot() === before);
 	project.basemap = basemapWas;
 	L.setMapSized(false);
 	ok('turning the map still changes not one stored byte', snapshot() === before);
+}
+
+// ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) --------------------------------------------------
+//
+// His design, and his own refutation of the objection that a slider gives up direct manipulation:
+// *"There is no direct manipulation to give up. The map is practically infinite. There is no way to
+// visually enlarge it or reduce it. The rectangle is a poor metaphor (and isn't working anyway).
+// And the scroll wheel is discrete, not continuous."* So what is graded here is the three promises
+// the control makes: the middle of the bar is the size step 1 left, the ends are the band he named,
+// and moving either half moves the GROUND and not the drawing.
+{
+	L.setMapSized(true);
+	const project = L.getProject();
+	const basemapWas = project.basemap;
+	project.basemap = 'osm';
+	L.refreshBasemap();
+	const placedNow = () => {
+		const out = {}, els = L.tileEls();
+		Object.keys(els).forEach(function (k) { out[k] = els[k].getAttribute('transform') || ''; });
+		return out;
+	};
+
+	ok('the middle of the bar is exactly the size it already is', L.dialFactor(0) === 1, L.dialFactor(0));
+	ok('...the bottom is his lower end', Math.abs(L.dialFactor(-1) - 0.75) < 1e-12, L.dialFactor(-1));
+	ok('...and the top is his upper end', Math.abs(L.dialFactor(1) - 1.5) < 1e-12, L.dialFactor(1));
+
+	// **THE ROUND TRIP IS THE ASSERTION WORTH HAVING.** A dial read against the LIVE transform would
+	// compound every move, so sliding out and back would not come home; read against a base taken
+	// once, it comes home exactly, and "1 in the middle" means something a person can rely on.
+	const tWas = JSON.stringify(L.xyGeoref());
+	const pinWas = L.screenOf(midX, midY);
+	const tilesWas = placedNow();
+	L.dialPos(1);
+	const tBig = L.xyGeoref();
+	ok('the top of the bar makes the ground half again as wide per drawing unit',
+		Math.abs(tBig.metersPerUnit - JSON.parse(tWas).metersPerUnit / 1.5) < 1e-9 * tBig.metersPerUnit,
+		tBig.metersPerUnit);
+	const pinBig = L.screenOf(midX, midY);
+	ok('...and the drawing has not moved on screen',
+		pinWas.x === pinBig.x && pinWas.y === pinBig.y);
+	// A SMALL move for the tile comparison, for the reason the turn above states: a big one swings
+	// a different patch of the Earth onto the screen and the two sets share no key at all.
+	L.dialPos(0.1);
+	const tilesBig = placedNow();
+	const sharedBig = Object.keys(tilesWas).filter(function (k) { return tilesBig[k] !== undefined; });
+	ok('...while every tile of ground still on screen has moved',
+		sharedBig.length > 0 && !sharedBig.some(function (k) { return tilesBig[k] === tilesWas[k]; }),
+		sharedBig.length + ' shared');
+	L.dialPos(0);
+	ok('BACK TO THE MIDDLE IS THE SIZE IT STARTED AT, exactly', JSON.stringify(L.xyGeoref()) === tWas);
+
+	// The knob. Same pivot as the bar, which is what lets the two be applied in one expression.
+	L.dialTurn(30);
+	const tTurn = L.xyGeoref();
+	ok('the knob turns the map counterclockwise by the degrees it reads',
+		Math.abs(tTurn.rotDeg - (JSON.parse(tWas).rotDeg + 30)) < 1e-9, tTurn.rotDeg);
+	const pinTurn = L.screenOf(midX, midY);
+	ok('...and the drawing has still not moved on screen',
+		pinWas.x === pinTurn.x && pinWas.y === pinTurn.y);
+	L.dialTurn(0);
+	ok('...and zero degrees is where it started, exactly', JSON.stringify(L.xyGeoref()) === tWas);
+
+	// **ANY OTHER GESTURE RE-BASELINES IT**, so the middle never comes to mean a size nobody chose.
+	L.dialPos(1);
+	L.mapgeoGoTo({ lon: 12.5, lat: 41.9 }, null);
+	ok('a move that is not the dial drops the base, so the dial reads as it stands',
+		!L.dialState());
+
+	project.basemap = basemapWas;
+	L.setMapSized(false);
+	ok('THE DIAL CHANGES NOT ONE STORED BYTE', snapshot() === before);
 }
 
 // ---- AND IN STEP 2 NOTHING BUT THE RECTANGLE MOVES THE MAP -------------------------------------

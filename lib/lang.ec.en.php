@@ -2425,6 +2425,24 @@ $ec_lang['lpn_mapgeo_hint1']='Pan and zoom the map behind your drawing, or searc
 $ec_lang['lpn_mapgeo_hint2']='Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
 $ec_lang['lpn_mapgeo_hint_move']='Drag the blue rectangle to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
 $ec_lang['lpn_mapgeo_hint_scale']='Drag a corner of the blue rectangle to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.';
+// ---- THE SIZE AND TURN DIAL (Tom, 2026-09-18) -------------------------------------------------
+//
+// **A SLIDER, BECAUSE THERE IS NO DIRECT MANIPULATION HERE TO GIVE UP.** His own refutation of the
+// objection: *"The map is practically infinite. There is no way to visually enlarge it or reduce
+// it. The rectangle is a poor metaphor (and isn't working anyway). And the scroll wheel is
+// discrete, not continuous."* A corner handle is a grip on a bounded object and the ground has no
+// bounds, so the rectangle was never a picture of the thing it was resizing.
+//
+// **AND THE MIDDLE IS WHERE STEP 1 LEFT IT.** He asked for *"a slider for scale with 1 (from step
+// 1) in the middle"*, so the readout is a factor and not a distance: it says how much bigger or
+// smaller the ground is than the fit already agreed, which is the only quantity a person can judge
+// by looking. The band is narrow on purpose and a wider move is the rectangle's job, or Map, World
+// map, Move, which is the pick-it-up-again door.
+$ec_lang['lpn_mapgeo_dial_turn']='Turn the map';
+$ec_lang['lpn_mapgeo_dial_turn_read']='{d} degrees';
+$ec_lang['lpn_mapgeo_dial_size']='Map size';
+$ec_lang['lpn_mapgeo_dial_size_read']='{f} times';
+$ec_lang['lpn_mapgeo_dial_help']='Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.';
 $ec_lang['lpn_mapgeo_place']='Place approximately';
 $ec_lang['lpn_mapgeo_finish']='Georeference here';
 $ec_lang['lpn_mapgeo_cancelled']='The world map is back where it was, and your drawing never moved.';

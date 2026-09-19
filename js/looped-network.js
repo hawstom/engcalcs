@@ -12028,6 +12028,163 @@ var EngCalcs = EngCalcs || {};
 		refreshBasemap();
 		mapgeoDrawFrame();
 		mapgeoRefreshBar();
+		// **EVERY OTHER WAY OF MOVING THE MAP RE-BASELINES THE DIAL**, so the middle of the bar and
+		// a needle pointing straight up always mean "the fit as it stands". A rectangle drag, the
+		// wheel, Go to and Place name search all land here; only the dial itself is exempt, and it
+		// says so rather than being recognised by what it changed.
+		if (!mapgeoDialWriting) { mapgeoDialDrop(); }
+	}
+	// ---- THE SIZE AND TURN DIAL ------------------------------------------------------------------
+	//
+	// **A SLIDER BEATS THE RECTANGLE HERE BECAUSE THERE IS NO DIRECT MANIPULATION TO GIVE UP** (Tom,
+	// 2026-09-18): *"The map is practically infinite. There is no way to visually enlarge it or
+	// reduce it. The rectangle is a poor metaphor (and isn't working anyway). And the scroll wheel is
+	// discrete, not continuous."* A corner handle is a grip on a BOUNDED object; the ground has no
+	// edge to take hold of, so the rectangle was a picture of the drawing pretending to be a picture
+	// of the map. And the rectangle's own turn handle stands off the north edge of a drawing that has
+	// just been fitted to the window, which puts it above the canvas and under the toolbar -- measured
+	// in a real browser on 2026-09-18, where elementFromPoint at the handle returned `lpn_toolbar`.
+	//
+	// **THE MIDDLE IS THE SIZE STEP 1 LEFT**, which is his: *"a slider for scale with 1 (from step 1)
+	// in the middle"*. So the dial is read against a BASE transform rather than against the live one,
+	// and every other gesture -- a rectangle drag, Go to, the wheel -- re-baselines it through
+	// mapgeoSet(), so the middle always means "the fit I have".
+	//
+	// **THE BAND IS NARROW AND THAT IS SAFE BECAUSE THERE IS A DOOR OUT.** He allowed 0.5 to 2.0 and
+	// then narrowed it himself: *"We may even want to narrow the band to 0.75-ish to 1.5."* A bigger
+	// correction is Map, World map, Move or Scale by picking, which is the pick-it-up-again door he
+	// names. The two ends are NOT symmetric about 1, so the scale is log-interpolated in each half
+	// separately: that is what puts 1.0 exactly at the middle of the travel while keeping both of his
+	// numbers.
+	//
+	// **AND THE PROJECT IS THE ONE THAT HOLDS STILL** (Tom, on "eyes-on alignment against the
+	// streets"): *"We are not interested in aligning the project with the streets. We want to align
+	// the streets with the project."* The project is the survey and the thing of value; the map is
+	// decoration being fitted to it.
+	var MAPGEO_DIAL_MIN = 0.75, MAPGEO_DIAL_MAX = 1.5, MAPGEO_DIAL_STEPS = 1000;
+	// True only while the dial itself is writing, so mapgeoSet() can tell "the dial moved the map"
+	// from "something else did" and re-baseline on the second.
+	var mapgeoDialWriting = false;
+	function mapgeoDialEl(id) { return document.getElementById(id); }
+	// Slider travel to a factor. -1 is the bottom of the bar, 0 the middle, +1 the top.
+	function mapgeoDialFactor(pos) {
+		if (!isFinite(pos)) { return 1; }
+		return Math.exp(pos >= 0
+			? pos * Math.log(MAPGEO_DIAL_MAX)
+			: -pos * Math.log(MAPGEO_DIAL_MIN));
+	}
+	// Where the dial is measured FROM. Dropped whenever anything but the dial moves the map, so the
+	// middle of the bar and a needle straight up always mean "as it stands".
+	//
+	// **TAKEN LAZILY, AND THAT IS NOT AN OPTIMISATION FOR ITS OWN SAKE.** mapgeoSet() runs on every
+	// frame of every drag, and mapgeoExtent() walks the whole document to find its middle; taking
+	// the base there would put a full pass over every node and vertex inside the rectangle's own
+	// gesture loop, on the page whose largest networks are the reason that loop is written the way
+	// it is. Dropping a reference costs nothing, and the walk happens once, when somebody actually
+	// touches the dial.
+	function mapgeoDialDrop() {
+		if (!mapgeo) { return; }
+		mapgeo.dial = null;
+		mapgeoDialRefresh();
+	}
+	function mapgeoDialNeed() {
+		var t = mapgeoT(), ext;
+		if (!mapgeo || !t) { return null; }
+		if (!mapgeo.dial) {
+			ext = mapgeoExtent();
+			mapgeo.dial = { base: t, pivot: { x: ext.cx, y: ext.cy }, turn: 0, pos: 0 };
+		}
+		return mapgeo.dial;
+	}
+	// **BOTH EDITS TAKE THE SAME PIVOT, THE MIDDLE OF THE DRAWING**, which is what lets them be
+	// applied in one expression: a scale and a turn about one point commute, so there is no order to
+	// get wrong and no compensating translation. The pivot is the middle of the drawing rather than
+	// of the rectangle for the reason Scale from the current size states: it is the one place a
+	// reader can predict will not move.
+	function mapgeoDialApply() {
+		var d = mapgeo && mapgeo.dial, t;
+		if (!d) { return; }
+		t = mapgeoScaled(d.base, mapgeoDialFactor(d.pos), d.pivot);
+		// **NEGATED, AND THE SIGN IS THE WHOLE CONTRACT OF THE CONTROL.** mapgeoTurned() takes its
+		// angle in the DRAWING's frame, where y runs down, so a positive angle there is a CLOCKWISE
+		// sweep on screen. The knob reads the way the needle points and the way the pointer went,
+		// which is counterclockwise-positive, exactly as `rotDeg` itself is.
+		t = mapgeoTurned(t, -d.turn * Math.PI / 180, d.pivot);
+		mapgeoDialWriting = true;
+		try { mapgeoSet(t); } finally { mapgeoDialWriting = false; }
+		mapgeoDialRefresh();
+	}
+	function mapgeoDialRefresh() {
+		var pc = EngCalcs.pageConfig || {}, d = mapgeo && mapgeo.dial,
+			knob = mapgeoDialEl('lpn_mapgeo_turn'), needle = mapgeoDialEl('lpn_mapgeo_turn_needle'),
+			bar = mapgeoDialEl('lpn_mapgeo_size'), deg, f;
+		if (!knob || !needle || !bar) { return; }
+		// No base taken yet means the dial reads "as it stands", which is zero turn and a factor of
+		// one -- the honest readout, and the one the controls must show after any other gesture.
+		deg = d ? Math.round(d.turn * 10) / 10 : 0;
+		f = d ? mapgeoDialFactor(d.pos) : 1;
+		// Screen y runs down, so a counterclockwise turn of the map is a negative CSS rotation.
+		needle.style.transform = 'rotate(' + (-deg) + 'deg)';
+		knob.setAttribute('aria-valuenow', String(deg));
+		mapgeoDialEl('lpn_mapgeo_turn_read').textContent =
+			(pc.lpn_mapgeo_dial_turn_read || '{d} degrees').replace('{d}', String(deg));
+		mapgeoDialEl('lpn_mapgeo_size_read').textContent =
+			(pc.lpn_mapgeo_dial_size_read || '{f} times').replace('{f}', f.toFixed(2));
+		var want = String(Math.round((d ? d.pos : 0) * MAPGEO_DIAL_STEPS));
+		if (String(bar.value) !== want) { bar.value = want; }
+	}
+	function mapgeoDialSetTurn(deg) {
+		var d = mapgeoDialNeed();
+		if (!d || !isFinite(deg)) { return; }
+		// Wrapped rather than clamped: turning past south and on round is what a knob does.
+		while (deg > 180) { deg -= 360; }
+		while (deg <= -180) { deg += 360; }
+		d.turn = deg;
+		mapgeoDialApply();
+	}
+	function mapgeoDialSetPos(pos) {
+		var d = mapgeoDialNeed();
+		if (!d || !isFinite(pos)) { return; }
+		d.pos = Math.max(-1, Math.min(1, pos));
+		mapgeoDialApply();
+	}
+	function mapgeoWireDial() {
+		var knob = mapgeoDialEl('lpn_mapgeo_turn'), bar = mapgeoDialEl('lpn_mapgeo_size'), turning = null;
+		if (!knob || !bar) { return; }
+		bar.addEventListener('input', function () {
+			mapgeoDialSetPos((parseFloat(bar.value) || 0) / MAPGEO_DIAL_STEPS);
+		});
+		// The knob is dragged AROUND, so what the gesture measures is the angle of the pointer about
+		// the knob's own middle, taken absolutely from where the press landed -- the same rule the
+		// rectangle's handle follows, and for the same reason: an incremental read accumulates jitter.
+		knob.addEventListener('pointerdown', function (e) {
+			var d = mapgeoDialNeed(), r;
+			if (!d) { return; }
+			r = knob.getBoundingClientRect();
+			turning = { cx: r.left + r.width / 2, cy: r.top + r.height / 2, turn0: d.turn };
+			turning.a0 = Math.atan2(e.clientY - turning.cy, e.clientX - turning.cx);
+			try { knob.setPointerCapture(e.pointerId); } catch (err) { /* turn without capture */ }
+			e.preventDefault();
+		});
+		knob.addEventListener('pointermove', function (e) {
+			var a;
+			if (!turning) { return; }
+			a = Math.atan2(e.clientY - turning.cy, e.clientX - turning.cx);
+			// Screen y down again: a clockwise sweep of the pointer is a clockwise turn of the map,
+			// which is a NEGATIVE counterclockwise angle.
+			mapgeoDialSetTurn(turning.turn0 - (a - turning.a0) * 180 / Math.PI);
+		});
+		knob.addEventListener('pointerup', function () { turning = null; });
+		knob.addEventListener('pointercancel', function () { turning = null; });
+		knob.addEventListener('keydown', function (e) {
+			var d = mapgeoDialNeed(), step = e.shiftKey ? 10 : 1;
+			if (!d) { return; }
+			if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { mapgeoDialSetTurn(d.turn + step); }
+			else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { mapgeoDialSetTurn(d.turn - step); }
+			else if (e.key === 'Home') { mapgeoDialSetTurn(0); }
+			else { return; }
+			e.preventDefault();
+		});
 	}
 	function mapgeoStart() {
 		var pc = EngCalcs.pageConfig || {}, ext;
@@ -12375,7 +12532,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = mapgeoBarEl('lpn_mapgeo_bar'), world1;
 		if (!bar) { return; }
 		bar.style.display = mapgeo ? 'block' : 'none';
-		if (!mapgeo) { return; }
+		if (!mapgeo) { mapgeoShow('lpn_mapgeo_dial', false); return; }
 		world1 = mapgeo.step === MAPGEO_STEP_WORLD;
 		mapgeoBarEl('lpn_mapgeo_step').textContent = world1
 			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find your place in the world')
@@ -12383,10 +12540,13 @@ var EngCalcs = EngCalcs || {};
 		mapgeoBarEl('lpn_mapgeo_hint').textContent = world1
 			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.')
 			: (pc.lpn_mapgeo_hint2 || 'Drag the blue rectangle to slide the map, drag a corner to resize the map, and drag the round handle to turn it. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
+		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
+			(pc.lpn_mapgeo_dial_help || 'Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
 		mapgeoShow('lpn_mapgeo_finish', !world1);
+		mapgeoShow('lpn_mapgeo_dial', !world1);
 	}
 	function mapgeoWireBar() {
 		var place = mapgeoBarEl('lpn_mapgeo_place'), b;
@@ -12398,6 +12558,7 @@ var EngCalcs = EngCalcs || {};
 		if (b) { b.addEventListener('click', goToLatLon); }
 		b = mapgeoBarEl('lpn_mapgeo_search');
 		if (b) { b.addEventListener('click', function () { EngCalcs.lpnSearchOpen(); }); }
+		mapgeoWireDial();
 	}
 	function removeMapAttach() {
 		var pc = EngCalcs.pageConfig || {};

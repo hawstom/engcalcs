@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**83 still to read on master**, of 134 untranslated keys, of 2003 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**88 still to read on master**, of 139 untranslated keys, of 2008 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (134, 83 to read @@ NEEDS RULING)
+## lpn_  (139, 88 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -155,6 +155,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-09-17._
 - **`lpn_mapgeo_cancelled`**
   > The world map is back where it was, and your drawing never moved.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_help`**
+  > Drag around the knob to turn the map, and slide the bar to make it bigger or smaller. The middle of the bar is the size step 1 left. Arrow keys work on both. Your drawing and every coordinate in it stay exactly where they are.
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size`**
+  > Map size
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_size_read`**
+  > {f} times
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn`**
+  > Turn the map
+  @@ NEEDS RULING
+- **`lpn_mapgeo_dial_turn_read`**
+  > {d} degrees
   @@ NEEDS RULING
 - **`lpn_mapgeo_finish`**
   > Georeference here
@@ -434,7 +449,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**27 still to read**, of 51 new keys across 8 unmerged branch(es).
+**31 still to read**, of 55 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -538,16 +553,28 @@ build for that would be a gate nobody keeps. Refresh it with
   > Click where the customer is, then click the pipe or the node that serves it. The demand you give the customer is added to the junction at the near end of that pipe.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`1c6f394e`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/label-gang-search (`4e0a2bbe`) — 8 new, 8 to read @@ NEEDS RULING
 
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  @@ NEEDS RULING
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  @@ NEEDS RULING
 - **`lpn_settings_label_always`**
   > Always show labels
+  @@ NEEDS RULING
+- **`lpn_settings_label_auto`**
+  > Automatic: {width}
   @@ NEEDS RULING
 - **`lpn_settings_label_max_width`**
   > Widest view that shows labels (map units)
   @@ NEEDS RULING
 - **`lpn_settings_label_max_width_tip`**
-  > Labels are shown only while the view is narrower than this. Leave the box blank to always show them. A text object you added shows until the view is this much wider than its own size multiplier.
+  > Labels are shown only while the view is narrower than this. A project that has not set one uses an automatic width, shown in the box. Clear the box to always show labels. A text object you added shows until the view is this much wider than its own size multiplier.
   @@ NEEDS RULING
 - **`lpn_settings_label_use_view`**
   > Use current view
@@ -601,13 +628,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/xy-world-map (`b6433f21`) — adds no English strings
+### feat/xy-world-map (`d4bb8a01`) — adds no English strings
 
 ### fix/three-defects (`220e2fe5`) — adds no English strings
 
 ### ida/esc-and-lock-identity (`b3c6bbd7`) — adds no English strings
-
-### ida/file-menu-and-step2 (`da4f49d1`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 2 new, 2 to read @@ NEEDS RULING
 
