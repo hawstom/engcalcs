@@ -43185,27 +43185,35 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The bar itself. Shown exactly when the banner is showing a WAIT, because a bar under a failure
 	// message would be a download that is not happening.
+	//
+	// **IT SHOWS AND HIDES ITS OWN TRACK AND NOTHING ELSE.** It is not mounted in the bottom pane,
+	// it does not open one, and no panel anywhere learns that a download is happening -- the whole
+	// coupling is this function and the six-pixel div it was given. `engineBar` rather than `bar`
+	// because THREE different elements in this file are called `bar` in their own functions (the
+	// toolbar, the georeference bar and this one), and the declared exception in
+	// dev/lpn-spike/panel-touch-harness.js is keyed on the variable name: a row reading `bar` would
+	// quietly excuse the other two as well.
 	function refreshEpanetBar(showing) {
-		var bar = document.getElementById('lpn_engine_bar'),
+		var engineBar = document.getElementById('lpn_engine_bar'),
 			fill = document.getElementById('lpn_engine_bar_fill'),
 			frac;
-		if (!bar || !fill) { return; }
+		if (!engineBar || !fill) { return; }
 		if (!showing || epanetWarmState !== 'warming') {
-			bar.style.display = 'none';
+			engineBar.style.display = 'none';
 			return;
 		}
 		frac = epanetBarFraction();
-		bar.style.display = 'block';
+		engineBar.style.display = 'block';
 		if (frac < 0) {
 			// UNKNOWN SIZE. The bar stays, and it moves; what it does not do is claim a position.
 			// aria-valuenow is REMOVED rather than set to something, which is how a progressbar
 			// says indeterminate to a screen reader.
-			bar.classList.add('lpn-engine-bar-unknown');
-			bar.removeAttribute('aria-valuenow');
+			engineBar.classList.add('lpn-engine-bar-unknown');
+			engineBar.removeAttribute('aria-valuenow');
 			fill.style.width = '';
 		} else {
-			bar.classList.remove('lpn-engine-bar-unknown');
-			bar.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
+			engineBar.classList.remove('lpn-engine-bar-unknown');
+			engineBar.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
 			fill.style.width = (frac * 100) + '%';
 		}
 	}

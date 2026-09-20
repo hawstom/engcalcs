@@ -17,6 +17,16 @@
 //      fire either. Tom, 2026-08-29: *"Tips (? glyphs) in the Node editor survive the editor box on
 //      close on a phone."*
 //
+// **WHAT THIS HARNESS CANNOT SEE, stated rather than implied** (found 2026-09-19, answering Tom's
+// *"Why would the run progress bar do anything to the bottom panel?"* -- the answer is that it does
+// not; it shows and hides its own six-pixel track, and this scan reads EVERY display assignment in
+// the file). Both scans below match a LITERAL `'block'`, `'flex'` or `'none'`, so the ternary form
+// -- `el.style.display = open ? 'flex' : 'none'` -- is invisible to them, and about forty sites in
+// this file are written that way. **The bottom pane is one of them**: `applyPaneLayout()` is its
+// only writer today, by discipline rather than by anything asserted here, and a second writer added
+// next month would not fail this file. Widening the scan is ~40 new declared rows and several
+// genuine judgement calls, so it is named here rather than done quietly.
+//
 // **THE FIX IS STRUCTURAL AND SO IS THIS HARNESS.** Neither is a list of six panels to keep up to
 // date -- makePanelDraggable() adds the class itself, and hidePanel() sweeps -- so what is asserted
 // is that there is no OTHER door. A per-panel checklist would have passed on the day the drift
@@ -146,9 +156,15 @@ console.log('\n--- a panel that opens comes to the front ---');
 		[/^sepRow @/, 'a row inside a box that is already open'],
 		[/^div @/, 'a row inside a box that is already open'],
 		[/^banner @/, 'the one-line status banner across the top of the map'],
-		[/^bar @/, 'the engine-wait progress bar (Task 608): a 6px track under that same banner, '
-			+ 'holding no control, with no drag, no resize, no stored geometry and nothing '
-			+ 'focusable -- the same reasoning as the banner it hangs from'],
+		[/^engineBar @/, 'the engine-wait progress bar (Task 608): a 6px track under that same '
+			+ 'banner, holding no control, with no drag, no resize, no stored geometry and nothing '
+			+ 'focusable -- the same reasoning as the banner it hangs from. **IT SHOWS AND HIDES '
+			+ 'ITSELF AND NOTHING ELSE**: it is not mounted in the bottom pane and it opens no '
+			+ 'panel, so it is here because this scan reads EVERY display assignment in the file, '
+			+ 'not because the bar reaches into anything. `engineBar` rather than `bar`, because '
+			+ 'the toolbar and the georeference bar are both called `bar` in their own functions '
+			+ 'and a row reading `bar` would excuse all three (Tom, 2026-09-19: *"Why would the run '
+			+ 'progress bar do anything to the bottom panel?"* -- it does not)'],
 		[/^back @/, 'the modal dialog backdrop -- an empty scrim, holding no control'],
 		[/^dlg @/, 'the modal dialog itself, centred by CSS and outranking everything'],
 		[/^panel @/, 'openPanelAtAnchor(): the menus, their fly-outs and the panels that hang off a '
@@ -192,7 +208,10 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/pop\.style\.display = 'none';/, 'a colour-ramp list, hidden as it is BUILT'],
 		[/msg\.style\.display = 'none';/, 'a one-line status message'],
 		[/banner\.style\.display = 'none'/, 'the model-locked banner'],
-		[/bar\.style\.display = 'none';\n\t\t\treturn;/, 'the engine-wait progress bar (Task 608), declared with its reason beside NOT_A_PANEL_SHOW above'],
+		// Keyed on the VARIABLE NAME alone, not on the indentation of the line after it: a
+		// declaration that has to be re-tabbed when its function moves is one nobody trusts.
+		// `engineBar` is unique to refreshEpanetBar(), which is the point of the name.
+		[/engineBar\.style\.display = 'none';/, 'the engine-wait progress bar (Task 608), declared with its reason beside NOT_A_PANEL_SHOW above'],
 		[/back\.style\.display = 'none'/, 'the modal backdrop -- an empty scrim, holds no control'],
 		[/b\.el\.style\.display = 'none'; return;/, 'a legend badge on the map'],
 		[/pendingPathEl\.style\.display = 'none'; return;/, 'the dashed line of a link being drawn (Task 567)'],
