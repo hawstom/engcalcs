@@ -36,7 +36,7 @@ judgement and does not belong to a script.
 ### Workflow and standing answers
 
 - [x] R-001 -- | "Always ensure that my review comments are not lost until they are cleared." -- this file
-- [?] R-002 -- | "Can we have a reviewer agent, or are these things unavailable to AI?" -- answered in session; a seat is possible, awaiting his word on whether he wants one
+- [x] R-002 -- | "Can we have a reviewer agent, or are these things unavailable to AI?" -- answered in session; a seat is possible, awaiting his word on whether he wants one -- SUPERSEDED by R-048, which he corrected and which is built
 - [x] R-003 -- | "a new preview port needs a new entry in that URL list": No. The list simply contains localhost and hawsedc.local. -- handoff ruling corrected
 - [x] R-004 -- | "A name given once for one purpose becomes a standing per-browser label": Confirmed. And we are adding "Not you? Change this" opportunities. -- Task 698 ruled; his answer to handoff decision 9
 - [x] R-005 fix/esc-focus-and-recalc | "Escape fix?": Yes. And please don't let Escape close those boxes when the mouse cursor is elsewhere. When I say "only when box is in focus", I mean it in the strongest way possible. Big guards on closing a box. -- fix/esc-focus-and-recalc d9b2be9d -- Escape reaches a box only when focus is genuinely inside it; menus untouched
@@ -125,14 +125,14 @@ CONSENT, and both of those choices were this repository deciding for him what he
 
 ### feat/xy-world-map
 
-- [ ] R-055 feat/xy-world-map | Why do we throw away satellite tiles? We should have a good-sized cache where we throw away only the oldest, right?
-- [ ] R-056 feat/xy-world-map | There are still a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw these tiles.
+- [x] R-055 feat/xy-world-map | Why do we throw away satellite tiles? We should have a good-sized cache where we throw away only the oldest, right? -- feat/xy-world-map 448533f6 -- a 384-tile memory cache, oldest out first, sized as twice the page's own existing 192-tile-per-redraw ceiling, about 7 MB. Zooming out and back asked the network for 36 tiles instead of 105. **NOTHING IS STORED ON HIS DEVICE** -- memory only, for the life of the tab
+- [x] R-056 feat/xy-world-map | There are still a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw these tiles. -- feat/xy-world-map 448533f6 -- MEASURED: the wheel is NOT the cause; four burst gestures at four speeds produced zero blanks. **A tile whose request FAILED was never asked for again.** With 33 of 105 knocked out and a perfect network restored, all 33 were still blank after 30 seconds and 18.8% of the map was white; only a gesture needing different tiles ever repaired it. His own phrase was the lead: "as if we decided not to draw these tiles" -- we did. Three retries now, widening, then stop. 100% filled after fifteen seconds with no gesture
 
 ### feat/tables-spreadsheet
 
-- [ ] R-057 feat/tables-spreadsheet | Top border is missing.
-- [ ] R-058 feat/tables-spreadsheet | Strange missing heading border between Tanks Mixing model and Mixing fraction.
-- [ ] R-059 feat/tables-spreadsheet | Some of the columns are now sized too narrow by default. I believe that Description was a single character long. Please fix this in a reasonable way. I thought of making a rule not to divide any word into more than three parts, but that's just an idea.
+- [x] R-057 feat/tables-spreadsheet | Top border is missing. -- feat/tables-spreadsheet abf10dc1 -- and he was right that it was not only the top: **the heading row's LEFT edge had gone too** and nobody had looked. The body was never affected because its cells carry a line on all four sides
+- [x] R-058 feat/tables-spreadsheet | Strange missing heading border between Tanks Mixing model and Mixing fraction. -- feat/tables-spreadsheet abf10dc1 -- **NOT about Mixing model: a rounding lottery.** Each heading cell was pinned to the top of the pane individually, and a browser draws each pinned cell in its own picture whose edges round to whole screen pixels; where a column edge falls part-way across a pixel that sliver is rounded off, and the separator in it goes too. Which boundary loses changes with text size, zoom and data. Measured across 660 boundaries, five tables, eleven text sizes: pinned individually, separators vanish; pinning off, none does. **Drawing the line three other ways lost the same sliver**, which is what proves it is the pinning and not the paint. The heading ROW is pinned as one picture now. This also explains the half-pixel misalignment from the previous round
+- [x] R-059 feat/tables-spreadsheet | Some of the columns are now sized too narrow by default. I believe that Description was a single character long. Please fix this in a reasonable way. I thought of making a rule not to divide any word into more than three parts, but that's just an idea. -- feat/tables-spreadsheet abf10dc1 -- **nothing leaked into the default rule. What leaked was the definition of "a column he dragged."** The divider grip is seven pixels of the heading's own right padding -- exactly where a hand aiming at the heading to SORT it lands -- and pressing there and letting go without moving was recorded as a finished drag, pinning the column AND switching it into "you may chop words anywhere". One stray click and an untouched column opened narrow with its heading sliced into letters, **on that visit and every visit after, because the width is remembered in his browser**. A drag now needs two pixels of travel, and **double-clicking the divider restores a column's default width** -- the Excel and Calc gesture, and the undo that did not exist
 
 ## Round of 2026-09-19, fourth pass
 
