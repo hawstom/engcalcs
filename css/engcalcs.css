@@ -2248,11 +2248,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
-/* z-index, because a sticky cell only outranks the rows by paint order and one positioned thing in
-   a row would beat it; padding-top, because the panel's own is gone; and the rule under the
-   headings is an INSET SHADOW rather than a border -- under `border-collapse: collapse` the border
-   belongs to the table, not to the cell, so it scrolls away from the heading that owns it. */
-/* **THE HEADING SEPARATORS ARE THE BODY'S, IN THE BODY'S COLOUR AND WIDTH** (Tom, 2026-09-19:
+/* padding-top, because the panel's own is gone; and every rule around a heading is an INSET SHADOW
+   rather than a border -- under `border-collapse: collapse` the border belongs to the table, not to
+   the cell, so it scrolls away from the heading that owns it.
+   **THE HEADING SEPARATORS ARE THE BODY'S, IN THE BODY'S COLOUR AND WIDTH** (Tom, 2026-09-19:
    *"The heading separators are offset (misaligned) from the column separators about 2px"* and
    *"The headings vertical and horizontal borders are gray and wider than expected, while the table
    body borders are as expected."*). What he was seeing was the grip collision above -- a 7px gray
@@ -2260,12 +2259,49 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    width nor its position. With the grip drawing nothing again the headings had no separators at
    all, so they are drawn here instead: one line on the trailing inside edge of each heading, #ddd,
    1px, which is exactly what `tbody td` carries.
-   AN INSET SHADOW AND NOT A BORDER, for the reason the bottom rule below is already one: under
-   `border-collapse: collapse` the border belongs to the TABLE, not to the cell, so it scrolls out
-   from under a sticky heading that owns it. */
+
+   **THE GRID IS CLOSED ON ALL FOUR SIDES, AND IT TOOK TWO MORE LINES** (Tom, 2026-09-19: *"Top
+   border is missing."*). Turning off the suite-wide blue frame on `.lpn-pane-table` took the top
+   edge away and nothing replaced it; the heading's LEADING edge went with it and nobody looked.
+   The body was never affected -- `tbody td` carries a border on all four sides, so left, right and
+   bottom close themselves -- which is why only the heading row had open edges. `inset 0 1px 0 #ddd`
+   is the top for every heading and `inset 1px 0 0` the leading edge for the first one, both in the
+   body's own #ddd; the bottom stays #ccc, being the rule that separates head from body rather than
+   one cell from the next.
+
+   **STICKINESS IS ON THE ROW AND NOT ON THE CELL, AND THAT IS WHAT MAKES A SEPARATOR RELIABLE**
+   (Tom, 2026-09-19: *"Strange missing heading border between Tanks Mixing model and Mixing
+   fraction."*). A `position: sticky` TABLE CELL is composited in a layer of its own whose bounds
+   are snapped to whole device pixels, and where the cell's sub-pixel trailing edge rounds inward
+   the last pixel column of that cell is simply not painted -- so whatever is drawn there goes with
+   it. Measured in Chromium over 660 heading boundaries across five tables and eleven text sizes:
+   with the cells sticky, separators vanish; with `position: static` on the cells, none does, at any
+   size. It is a sub-pixel lottery that moves with the text size, the zoom and the data, which is
+   why it took his column and two others here. **A border and a pseudo-element were both tried and
+   both lose the same pixel** -- the mechanism is the layer, not the paint -- so the fix is to stop
+   giving each heading cell a layer: `thead tr` sticks instead, one layer for the whole row, and
+   each cell paints its own edges inside it.
+   `position: relative` on the cell is then REQUIRED rather than tidy: the grip is absolutely
+   positioned against its own heading, and with the cell unpositioned its containing block would
+   become the sticky ROW, putting every grip on the right-hand end of the table. An earlier pass
+   declared exactly this `relative` and broke the sticky heading, because back then it was
+   overriding the `sticky` that lived here; it is safe now for the same reason it was not then. */
+.lpn-pane-table thead tr { position: sticky; top: 0; z-index: 2; }
 .lpn-pane-table thead th {
-	position: sticky; top: 0; z-index: 2; background: #fff;
-	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ccc;
+	position: relative; background: #fff;
+	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+}
+.lpn-pane-table thead th:first-child {
+	box-shadow: inset -1px 0 0 #ddd, inset 1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+}
+/* A box-shadow offset is PHYSICAL and these edges are not: in Arabic, Farsi, Hebrew, Pashto and
+   Urdu the trailing edge of a heading is its left one and the first column is on the right. Mirrored
+   here rather than written with a logical property, because box-shadow has none. */
+html[dir="rtl"] .lpn-pane-table thead th {
+	box-shadow: inset 1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+}
+html[dir="rtl"] .lpn-pane-table thead th:first-child {
+	box-shadow: inset 1px 0 0 #ddd, inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
 }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
@@ -2348,11 +2384,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    pointer rather than always, for the same reason: six of these drawn permanently across a narrow
    pane read as a border nobody chose.
 
-   **IT IS POSITIONED AGAINST THE STICKY HEADING AND NOTHING IS ADDED TO MAKE THAT TRUE.** A first
-   pass declared `.lpn-pane-table thead th { position: relative; }` for a containing block and broke
-   the sticky heading row, which is the same rule at the same specificity further down the file --
-   caught by pane-harness.js, which asserts that heading still sticks. `position: sticky` already
-   establishes a containing block, so the grip has one for free.
+   **IT IS POSITIONED AGAINST ITS OWN HEADING, AND SINCE 2026-09-19 THAT COSTS A DECLARATION.**
+   While the CELL was the sticky one it established a containing block for free, and an early pass
+   that added `position: relative` for the purpose broke the sticky heading instead -- the same rule
+   at the same specificity, overriding it. Stickiness has moved to `thead tr` (see the heading block
+   above, and the missing separator that forced it), so the cell now DECLARES `position: relative`
+   and the grip needs it: without it the containing block would be the sticky ROW, and
+   `inset-inline-end: 0` would stack every grip on the right-hand end of the table.
+   pane-harness.js still asserts the heading sticks.
 
    **IT IS `lpn-pane-colgrip` AND NOT `lpn-pane-grip`, AND THE RENAME IS THE WHOLE OF THREE OF
    TOM'S FINDINGS** (2026-09-19, browser pass: a blip on every column separator 2px below the top
@@ -2366,11 +2405,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    table). A name collision, drawing furniture nobody asked for, with no rule of its own to read. */
 .lpn-pane-colgrip {
 	/* **IT SITS INSIDE ITS OWN HEADING, NOT ASTRIDE THE BOUNDARY.** Straddling reads better on
-	   paper and half of it was dead: every heading is `position: sticky; z-index: 2`, so each one
-	   is its own stacking context and the NEXT heading -- later in the markup, same z-index --
-	   paints over whatever spills past the edge. The outer three pixels of this grip were behind
-	   the neighbouring heading and answered no pointer at all. Seven pixels on the near side of
-	   the line, all of them live. */
+	   paper and half of it was dead: while every heading was its own `sticky; z-index: 2` stacking
+	   context, the NEXT heading painted over whatever spilled past the edge, so the outer three
+	   pixels of this grip answered no pointer at all. Stickiness has since moved to the row, so a
+	   straddling grip could now be made to work -- and it is deliberately not, because seven pixels
+	   on the near side of the line is a target the reader has already learned, and the one thing
+	   that must never happen is two grips fighting over the same pixel. */
 	position: absolute; top: 0; inset-inline-end: 0; width: 7px; height: 100%;
 	cursor: col-resize; user-select: none;
 }

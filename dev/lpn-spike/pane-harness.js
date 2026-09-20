@@ -846,19 +846,58 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		'padding above it is the band the sliver showed in');
 	report(CSS.winning(CSS.rules, thChain, WIDE, 'padding-top', blind) === '6px',
 		'...the heading carries that padding itself, so the table still opens with air above it');
-	report(CSS.winning(CSS.rules, thChain, WIDE, 'position', blind) === 'sticky' &&
-		CSS.winning(CSS.rules, thChain, WIDE, 'top', blind) === '0',
-		'the heading row still sticks');
-	report(CSS.winning(CSS.rules, thChain, WIDE, 'z-index', blind) === '2',
+	// **THE ROW STICKS, NOT THE CELL, AND THAT IS A REPAIR RATHER THAN A TIDY-UP** (Tom, 2026-09-19:
+	// *"Strange missing heading border between Tanks Mixing model and Mixing fraction."*). A sticky
+	// TABLE CELL is composited in a layer of its own whose bounds are snapped to whole device
+	// pixels, so where the cell's sub-pixel trailing edge rounds inward its last pixel column is
+	// not painted and the separator drawn there disappears. Measured in Chromium over 660 heading
+	// boundaries at eleven text sizes: sticky cells lose some, `position: static` loses none, and a
+	// border and a pseudo-element lose exactly the same ones -- the mechanism is the LAYER, not the
+	// paint. One layer for the whole row and every separator survives.
+	const trChain = [html, panel, table, thead, tr];
+	report(CSS.winning(CSS.rules, trChain, WIDE, 'position', blind) === 'sticky' &&
+		CSS.winning(CSS.rules, trChain, WIDE, 'top', blind) === '0',
+		'the heading ROW still sticks');
+	report(CSS.winning(CSS.rules, trChain, WIDE, 'z-index', blind) === '2',
 		'...above the rows rather than merely painted after them');
+	// The cell is POSITIONED and not sticky, and both halves of that matter: the resize grip is
+	// absolutely positioned against its own heading, so without `relative` its containing block
+	// would become the sticky row and every grip would stack at the end of the table; and `sticky`
+	// here is the defect above.
+	report(CSS.winning(CSS.rules, thChain, WIDE, 'position', blind) === 'relative',
+		'...and the heading CELL is positioned but not sticky, so the grip keeps a containing block',
+		CSS.winning(CSS.rules, thChain, WIDE, 'position', blind));
 	report(/^(#fff|rgb|white)/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'background', blind))),
 		'...opaque, in the pane’s own colour', CSS.winning(CSS.rules, thChain, WIDE, 'background', blind));
-	// The rule under the headings is an inset shadow: under `border-collapse: collapse` a border
-	// belongs to the TABLE, so it scrolls away from the sticky cell that declared it.
+	// The rules AROUND a heading are inset shadows: under `border-collapse: collapse` a border
+	// belongs to the TABLE, so it scrolls away from the sticky row that carries the cell.
 	report(/inset 0 -1px 0/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind))),
 		'the line under the headings travels with them');
+	// **AND THE GRID IS CLOSED ON ALL FOUR SIDES** (Tom, 2026-09-19: *"Top border is missing."*).
+	// Turning off the suite-wide blue frame took the heading row's top and leading edges with it;
+	// the body was never affected, because `tbody td` carries a border on all four sides.
+	report(/inset 0 1px 0/.test(String(CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind))),
+		'...and a line ABOVE them, so the table has a top edge again',
+		CSS.winning(CSS.rules, thChain, WIDE, 'box-shadow', blind));
+	{
+		// The leading edge lives on `:first-child`, and on `html[dir="rtl"]` for the five languages
+		// whose leading edge is the right-hand one. The reader above is deliberately blind to a
+		// pseudo-class and to an attribute selector -- it says so in its own blind-spot report at
+		// the end of this section -- so these two are read out of the stylesheet as text. A weaker
+		// claim, stated rather than dressed up: it says the rules are written, not which one wins.
+		const css = fs.readFileSync(path.join(ROOT, 'css', 'engcalcs.css'), 'utf8');
+		const rule = (sel) => {
+			const i = css.indexOf(sel + ' {');
+			return i < 0 ? '' : css.slice(i, css.indexOf('}', i));
+		};
+		report(/inset 1px 0 0/.test(rule('.lpn-pane-table thead th:first-child')),
+			'...and the leading heading closes the left-hand edge');
+		report(/inset -1px 0 0/.test(rule('html[dir="rtl"] .lpn-pane-table thead th:first-child')) &&
+			/inset 1px 0 0/.test(rule('html[dir="rtl"] .lpn-pane-table thead th')),
+			'...mirrored in Arabic, Farsi, Hebrew, Pashto and Urdu, where both edges change sides');
+	}
 	report(CSS.winning(CSS.rules, thChain, WIDE, 'border-bottom', blind) === null,
-		'...and is not a border, which under border-collapse would scroll on its own');
+		'...and none of it is a border, which under border-collapse would scroll on its own');
 
 	// 4. THE PHONE-ONLY WIDTHS on the two columns Tom named, and the desktop that must not move.
 	// Both were widened again in round 3 (2026-08-23). Roughness stops at 3.5em, the width every

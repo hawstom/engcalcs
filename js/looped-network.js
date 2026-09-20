@@ -18103,6 +18103,21 @@ var EngCalcs = EngCalcs || {};
 		savePaneColPrefs();
 		return pref.w[key];
 	}
+	// **AND THERE IS A WAY BACK, BECAUSE A NARROW COLUMN WAS OTHERWISE NARROW FOR EVER** (Tom,
+	// 2026-09-19: *"Some of the columns are now sized too narrow by default. I believe that
+	// Description was a single character long."*). A stored width outlives the session that made
+	// it and nothing in the interface could undo one, so a column squeezed to a character stayed a
+	// character on every later visit and read as the table's own default. FORGETTING the width is
+	// the whole of the reset -- with nothing stored the column is back under the default rule, at
+	// its declared em or its longest heading word, whichever is wider, and the heading stops
+	// breaking mid-word because `lpn-pane-tight` is derived from the same answer.
+	function paneResetColWidth(spec, key) {
+		var pref = paneColPrefs[spec.id];
+		if (!pref || !pref.w || !Object.prototype.hasOwnProperty.call(pref.w, key)) { return false; }
+		delete pref.w[key];
+		savePaneColPrefs();
+		return true;
+	}
 	function paneMoveCol(spec, key, toIndex) {
 		var cols = paneCols(spec), order = cols.map(function (c) { return c.key; }),
 			from = order.indexOf(key), pref;
@@ -18316,6 +18331,18 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 	}
+	// **A PRESS THAT NEVER TRAVELS CHANGES NOTHING, AND THAT IS THE WHOLE OF TOM'S "TOO NARROW BY
+	// DEFAULT"** (2026-09-19). Until this threshold existed, `up()` stored a width unconditionally,
+	// so a press and release on the divider -- which is seven pixels of the heading's own trailing
+	// padding, exactly where a hand aiming at a heading to sort it lands -- COMMITTED the column.
+	// Two things then changed at once and neither was asked for: a column declaring no em was
+	// pinned at the 7em fallback whatever it had been laid out at, and every committed column
+	// starts breaking its heading mid-word, because `lpn-pane-tight` is derived from "has a stored
+	// width". One stray click and an untouched column opened narrow, wrapped to the character, for
+	// ever. THE SAME DISCIPLINE THE COLUMN MOVE ALREADY KEEPS: the reorder below commits only once
+	// the pointer has crossed into another heading, for the same reason -- one heading doing two
+	// jobs has to be able to tell them apart. Two pixels, because a hand is not quite still.
+	var PANE_COL_DRAG_SLOP = 2;
 	function paneStartColResize(spec, key, ev) {
 		var cols = paneCols(spec), i = paneColIndex(spec, key), table, unit,
 			startX = (ev && typeof ev.clientX === 'number') ? ev.clientX : 0, startEm;
@@ -18326,20 +18353,36 @@ var EngCalcs = EngCalcs || {};
 		table = spec.colGroup && spec.colGroup.parentNode;
 		unit = paneEmPx(table);
 		startEm = paneColWidthEm(spec.id, cols[i]) || 7;
+		function dxOf(e2) {
+			return ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX;
+		}
 		function move(e2) {
-			var dx = ((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX;
+			var dx = dxOf(e2);
+			if (Math.abs(dx) < PANE_COL_DRAG_SLOP) { return; }
 			paneDrawColWidth(spec, key, Math.max(1, startEm + dx / unit));
 		}
 		function up(e2) {
-			move(e2);
-			paneSetColWidth(spec, key, Math.max(1, startEm +
-				(((e2 && typeof e2.clientX === 'number') ? e2.clientX : startX) - startX) / unit));
+			var dx = dxOf(e2);
 			document.removeEventListener('mousemove', move);
 			document.removeEventListener('mouseup', up);
+			if (Math.abs(dx) < PANE_COL_DRAG_SLOP) { return; }
+			move(e2);
+			paneSetColWidth(spec, key, Math.max(1, startEm + dx / unit));
 		}
 		document.addEventListener('mousemove', move);
 		document.addEventListener('mouseup', up);
 		return { move: move, up: up };
+	}
+	// **DOUBLE-CLICKING THE DIVIDER PUTS THE COLUMN BACK**, which is the gesture a spreadsheet user
+	// already has in their fingers for exactly this (Excel and Calc both autofit a column on a
+	// double-click of its right divider). It is the only way out of a width somebody regrets: the
+	// preference is stored per browser and survives every reload, so without this a column dragged
+	// to one character is one character for good. It forgets rather than measures -- see
+	// paneResetColWidth() -- so what comes back is the default the table was designed with.
+	function paneResetColOnDouble(spec, key, ev) {
+		if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+		if (ev && ev.preventDefault) { ev.preventDefault(); }
+		if (paneResetColWidth(spec, key)) { paneTableReset(spec); renderPaneTable(spec); }
 	}
 	// **THE MOVE COMMITS ONLY WHEN THE POINTER IS OVER A DIFFERENT HEADING**, which is what keeps a
 	// heading click a sort. A press-and-release on one heading changes nothing here and the sort
@@ -18526,6 +18569,8 @@ var EngCalcs = EngCalcs || {};
 			grip.className = 'lpn-pane-colgrip';
 			grip.setAttribute('aria-hidden', 'true');
 			grip.addEventListener('mousedown', function (ev) { paneStartColResize(spec, c.key, ev); });
+			// ...and a double-click on the same divider gives the column its default width back.
+			grip.addEventListener('dblclick', function (ev) { paneResetColOnDouble(spec, c.key, ev); });
 			th.appendChild(grip);
 			if (spec.sort.col === c.key) { th.setAttribute('aria-sort', spec.sort.dir > 0 ? 'ascending' : 'descending'); }
 			tr.appendChild(th);

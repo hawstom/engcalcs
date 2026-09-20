@@ -294,6 +294,17 @@ the block.
     folded here rather than re-numbered -- copy and paste was the defect inside the programme,
     resizable columns and headings that do not wrap were the programme, and the bottom pane's tab
     strip is a SEAM shared with `custom-property` and `graph`, which also add columns.
+  - **A `position: sticky` TABLE CELL LOSES ITS OWN LAST PIXEL COLUMN, and that was his *"strange
+    missing heading border"*.** Chromium composites each sticky cell in a layer snapped to whole
+    device pixels; where the cell's sub-pixel trailing edge rounds inward, whatever is drawn there
+    is not painted. Measured over 660 boundaries at eleven text sizes: sticky cells lose some, a
+    border and a pseudo-element lose the same ones, `position: static` loses none. Stickiness is on
+    `thead tr` now, one layer for the row. **Do not put it back on the cell.**
+  - **"TOO NARROW BY DEFAULT" WAS A DEFINITION OF "DRAGGED", NOT A WIDTH RULE.** The resize stored a
+    width on every mouse-up, travel or none, so a press on the divider -- seven pixels of the
+    heading's own padding, where a hand aiming to SORT lands -- pinned the column and turned on its
+    character-level wrapping for good. Two pixels of travel are required now, and a double-click on
+    the divider forgets the width.
   - Still open under the umbrella: paste that CREATES rows (610, gated on Declan's spec), column
     hide, fill-down.
 

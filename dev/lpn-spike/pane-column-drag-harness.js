@@ -38,6 +38,9 @@ const L = loadLoopedNetwork(
 	"\t\tcolKeys: function (id) { return paneCols(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
 	"\t\twidthEm: function (id, key) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneColWidthEm(s.id, paneColByKey(s, key)); },\n" +
+	"\t\tuserWidth: function (id, key) { var s = paneTableById(id);\n" +
+	"\t\t\treturn paneColUserWidth(s.id, paneColByKey(s, key)); },\n" +
+	"\t\tresetWidth: function (id, key) { paneResetColOnDouble(paneTableById(id), key, null); },\n" +
 	"\t\tcolGroup: function (id) { return paneTableById(id).colGroup; },\n" +
 	"\t\tcells: function (id) { return paneTableById(id).cells; },\n" +
 	"\t\tserialize: serializeProject, prefsKey: LPN_PANECOLS_KEY,\n" +
@@ -111,6 +114,73 @@ console.log('\n--- (d) dragging the divider resizes the column ---');
 	// And it survives a rebuild, which is what "remembered" means.
 	L.renderTable('junctions');
 	report(L.widthEm('junctions', 'elev') === 1, '...and the width survives a rebuild of the table');
+}
+
+// **A PRESS THAT NEVER TRAVELS IS NOT A DRAG**, which is the whole of Tom's *"Some of the columns
+// are now sized too narrow by default. I believe that Description was a single character long."*
+// (2026-09-19). Nothing had leaked into the default rule; what leaked was the definition of
+// "dragged". `up()` stored a width unconditionally, so a press and release on the divider -- seven
+// pixels of the heading's own trailing padding, exactly where a hand aiming at a heading to sort it
+// lands -- committed the column: pinned at the 7em fallback if it declared no em, and marked as the
+// reader's for ever, which is what turns the heading's character-level wrapping on. One stray click
+// and an untouched column opened narrow and stayed narrow across every later visit.
+console.log('\n--- A PRESS THAT NEVER TRAVELS IS NOT A DRAG ---');
+{
+	// Start from a column nobody has touched. The section above left `elev` at one em, so forget
+	// that first -- which is also the gesture the next section drives.
+	L.resetWidth('junctions', 'elev');
+	L.renderTable('junctions');
+	const declared = L.widthEm('junctions', 'elev');
+	report(L.userWidth('junctions', 'elev') === 0, 'the column is back to having no stored width');
+	report(declared > 1, '...and is drawn at the width its spec declares', declared);
+	report(String(thFor('elev').className).indexOf('lpn-pane-tight') < 0,
+		'...so its heading may NOT break mid-word', thFor('elev').className);
+	// HIS OWN INSTANCE, BY NAME. Description is the column he found at a character, and it is the
+	// one to assert because it declares the widest box in the pane (8em, a street-corner sentence):
+	// a rule that narrowed it would narrow anything.
+	report(L.userWidth('junctions', 'desc') === 0, 'a freshly opened table has no width stored for Description');
+	report(L.widthEm('junctions', 'desc') === 8, '...so Description opens at its declared 8em',
+		L.widthEm('junctions', 'desc'));
+	report(String(thFor('desc').className).indexOf('lpn-pane-tight') < 0,
+		'...and its heading is held open by its own longest word', thFor('desc').className);
+	fire(gripOf('elev'), 'mousedown', { clientX: 400, stopPropagation: function () {}, preventDefault: function () {} });
+	docFire('mouseup', { clientX: 400 });
+	report(L.userWidth('junctions', 'elev') === 0,
+		'a press and release on the divider stores nothing', L.userWidth('junctions', 'elev'));
+	report(String(thFor('elev').className).indexOf('lpn-pane-tight') < 0,
+		'...and the heading still may not break mid-word');
+	// One pixel of hand tremor is not a drag either.
+	fire(gripOf('elev'), 'mousedown', { clientX: 400, stopPropagation: function () {}, preventDefault: function () {} });
+	docFire('mousemove', { clientX: 401 });
+	docFire('mouseup', { clientX: 401 });
+	report(L.userWidth('junctions', 'elev') === 0, 'nor is one pixel of tremor', L.userWidth('junctions', 'elev'));
+	report(L.widthEm('junctions', 'elev') === declared, '...the column has not moved at all',
+		L.widthEm('junctions', 'elev'));
+	// ...but a real drag still does everything it did, right down to the one-em floor.
+	fire(gripOf('elev'), 'mousedown', { clientX: 400, stopPropagation: function () {}, preventDefault: function () {} });
+	docFire('mousemove', { clientX: 300 });
+	docFire('mouseup', { clientX: 300 });
+	report(L.widthEm('junctions', 'elev') === 1, 'a real drag still reaches the narrow extreme',
+		L.widthEm('junctions', 'elev'));
+	report(String(thFor('elev').className).indexOf('lpn-pane-tight') >= 0,
+		'...and THAT column\'s heading breaks at the character, which is what he asked for');
+}
+
+// **AND THERE IS A WAY BACK.** A stored width outlives the session that made it, so before this a
+// column squeezed to a character was a character for good -- and read, correctly from where he was
+// sitting, as the table's own default.
+console.log('\n--- double-clicking the divider gives the column its default back ---');
+{
+	report(L.userWidth('junctions', 'elev') === 1, 'the column starts at the narrow extreme',
+		L.userWidth('junctions', 'elev'));
+	fire(gripOf('elev'), 'dblclick', { stopPropagation: function () {}, preventDefault: function () {} });
+	report(L.userWidth('junctions', 'elev') === 0, 'a double-click on the divider forgets the stored width');
+	report(L.widthEm('junctions', 'elev') > 1, '...so the column is back at its declared default',
+		L.widthEm('junctions', 'elev'));
+	report(String(thFor('elev').className).indexOf('lpn-pane-tight') < 0,
+		'...and its heading stops breaking mid-word');
+	L.renderTable('junctions');
+	report(L.userWidth('junctions', 'elev') === 0, '...and it stays forgotten across a rebuild');
 }
 
 console.log('\n--- (e) dragging a heading moves the column ---');
