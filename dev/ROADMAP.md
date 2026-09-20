@@ -2070,6 +2070,24 @@ the block.
     answer is obvious either way.
 
 
+- 75|701| **The panel guard is blind to forty sites, and the bottom panel is one.**
+  Found 2026-09-19 while answering Tom's *"why would the run progress bar do anything to the bottom
+  panel?"* -- the answer was that it does not, and the guard that said otherwise turned out to have
+  a hole of its own.
+  - **`dev/lpn-spike/panel-touch-harness.js` only recognises a show or a hide written as a plain
+    `'block'`, `'flex'` or `'none'`.** About FORTY places in `js/looped-network.js` write it as a
+    choice instead -- `open ? 'flex' : 'none'` -- and every one is invisible to it.
+  - **The bottom panel is one of them.** Only `applyPaneLayout()` opens and closes it today, **by
+    discipline and not because anything checks**, so a second door added next month would not be
+    noticed. That is precisely the arrangement `dev/scenario-seam-repair.md` exists because of: two
+    tracks wrote element properties, only one went through the single write seam, and five
+    user-reachable defects followed.
+  - **NOT slipped into the branch that found it**, deliberately: it is roughly forty new
+    declarations and several genuine judgement calls about what counts as a panel, on a branch Tom
+    has already passed in the browser. The limitation is now written at the top of the harness so it
+    no longer implies coverage it does not have.
+
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.
