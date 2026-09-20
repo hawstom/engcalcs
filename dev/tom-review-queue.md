@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-046.
+**An ID is permanent and never reused.** Next free: R-070.
 
 ---
 
@@ -75,15 +75,15 @@ judgement and does not belong to a script.
 - [x] R-029 feat/tables-spreadsheet | Ctrl+arrows works, but stops at selectors. Make it stop only at blanks/ends. Is an empty checkbox a blank? Let's say no since it's a zero in concept. -- feat/tables-spreadsheet f688970a
 - [x] R-030 feat/tables-spreadsheet | Home, End, Ctrl+Home, and Ctrl+End work, but Home and Ctrl+Home take me to column B, not to the ID column A. Fix this. -- feat/tables-spreadsheet f688970a
 - [x] R-031 feat/tables-spreadsheet | I said that keyboard navigation should be in Select mode. But that is wrong. Keyboard navigation should be in Entry mode. This difference matters in the appearance of cells, where in Select mode they should be shaded blue and in Entry mode the single current cell should be merely border highlighted. Sorry I was wrong about the persistence of Entry mode. It, not Select, should be the default mode. -- feat/tables-spreadsheet f688970a
-- [?] R-032 feat/tables-spreadsheet | I think that there is a fourth mode: Navigation, the part of what I called Entry when no characters are being typed. Check the literature. I will refer to this, but set me straight so we aren't inventing things we shouldn't invent. -- ANSWERED: your fourth mode is real. Excel calls it Ready; W3C calls it navigation mode. dev/tables-spreadsheet-modes.md. His call: rename our Select mode to Ready
+- [x] R-032 feat/tables-spreadsheet | I think that there is a fourth mode: Navigation, the part of what I called Entry when no characters are being typed. Check the literature. I will refer to this, but set me straight so we aren't inventing things we shouldn't invent. -- ANSWERED: your fourth mode is real. Excel calls it Ready; W3C calls it navigation mode. dev/tables-spreadsheet-modes.md. His call: rename our Select mode to Ready -- ANSWERED BY HIM: *"There is another mode, and it is Select. So there are four modes. Call them what you want: Ready, Enter, Edit, Select."* See R-063
 - [x] R-033 feat/tables-spreadsheet | When I navigate by arrow keys from cell to cell, the behavior is correct as Navigate mode. But the appearance is as Edit mode in that the contents of each cell are selected as I pass through/over/on it. Instead, a blue border highlight (double-wide inward) should indicate the current cell. Modern spreadsheet practice also provides a dot at lower right of current cell or range/block for Autofill. -- feat/tables-spreadsheet f688970a
 - [x] R-034 feat/tables-spreadsheet | In Navigate mode, there should be no blue shading, since that's reserved for Select mode. -- feat/tables-spreadsheet f688970a
-- [?] R-035 feat/tables-spreadsheet | When I type into a cell and press Enter, Tab, or Arrow, after a short delay, my entry is reverted, which is bad. -- NOT REPRODUCED in 26 real-browser trials. WHICH TABLE, WHICH COLUMN, and was the project opened from a FILE rather than an example?
+- [x] R-035 feat/tables-spreadsheet | When I type into a cell and press Enter, Tab, or Arrow, after a short delay, my entry is reverted, which is bad. -- NOT REPRODUCED in 26 real-browser trials. WHICH TABLE, WHICH COLUMN, and was the project opened from a FILE rather than an example? -- HIS WORD, later the same day: *"Reverting entries no longer happening. Will observe."* Closed on his observation, not on our inability to reproduce it
 - [x] R-036 feat/tables-spreadsheet | In select mode, the current cell should be the **starting** cell, not the **ending** cell. So if I select A1 and B1, then arrow down once, I should be at A2. [copy-down sequence: navigate A1, shift-arrow to B1, Ctrl+C, down arrow to A2, Ctrl+V] -- feat/tables-spreadsheet f688970a
 - [x] R-037 feat/tables-spreadsheet | Right-clicking anywhere in a selection should not perturb the selection. But I see it changing the selection to the right-clicked cell. -- feat/tables-spreadsheet f688970a
 - [x] R-038 feat/tables-spreadsheet | A selection should highlight cells, not characters. But I see characters highlighting as in Entry mode. -- feat/tables-spreadsheet f688970a
 - [x] R-039 feat/tables-spreadsheet | Copy/paste works (and persists) for mouse select. Doesn't work for keyboard select or Navigate (copy current cell). -- feat/tables-spreadsheet f688970a
-- [?] R-040 feat/tables-spreadsheet | Doesn't copy across columns. Maybe this is what we want. Don't "fix" for now. Maybe it can be a project Setting (Allow table copy across columns). Make this a Priority 50 question. -- MEASURED: copy and paste ACROSS columns already works both ways. What you saw was probably single-cell Ctrl+C doing nothing (R-039). Please re-test before Task 700 is written on it
+- [x] R-040 feat/tables-spreadsheet | Doesn't copy across columns. Maybe this is what we want. Don't "fix" for now. Maybe it can be a project Setting (Allow table copy across columns). Make this a Priority 50 question. -- MEASURED: copy and paste ACROSS columns already works both ways. What you saw was probably single-cell Ctrl+C doing nothing (R-039). Please re-test before Task 700 is written on it -- SUPERSEDED by R-064: he re-tested and says it does NOT work
 
 ### Defects found while reviewing
 
@@ -97,4 +97,66 @@ judgement and does not belong to a script.
 
 ### Raised by the work, and his to decide
 
-- [?] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build
+- [x] R-045 feat/xy-world-map | The world-zoom basemap IS mirrored and the cause is measured: at world zoom the easternmost tile touches the 180th meridian, and the arithmetic wraps its right-hand edge round to -180, so one tile is stretched backwards across the whole screen on top of everything else. Its placement width computes as -1,750 where it should be +250. It predates this branch. The fix is small and lives in `js/lpn-georef.js`; it was reported rather than built because he asked for a look, not a build -- HIS RULING: *"Sorry. I will have to trust you. Hopefully it is done right so that it does not manifest later. If you really want me to see it, hold my hand and take me there."* So it is OURS TO BUILD, and it must come with a regression check so it cannot come back unseen. See R-066
+
+## Round of 2026-09-19, later -- his third pass
+
+**TWO OF THESE REVERSE WHAT MERGED TO MASTER THE SAME DAY.** R-046 and R-047 undo choices made
+inside the recalculate-off fix. He is right and the reasoning is his: OFF MEANS OFF is a rule about
+CONSENT, and both of those choices were this repository deciding for him what he must have wanted.
+
+### On master -- the recalculate-off fix overreached
+
+- [x] R-046 fix/recalc-trust-user | Recalc off Old values: Leave in place stale. Don't clear. Trust the user. -- fix/recalc-trust-user 313a8656 -- stale numbers stay exactly where they are, and the page says nothing about them. Key `lpn_manual_results_cleared` DELETED
+- [x] R-047 fix/recalc-trust-user | Calculate on open: No. **Off means off**; you say it, but do you believe it? Consent, people! And the industry is used to that. -- fix/recalc-trust-user 313a8656 -- MEASURED: opening Net3 with the box unticked now produces ZERO solves; ticked, it still calculates, which is what makes the zero mean something
+- [x] R-049 fix/recalc-trust-user | Escape: What about mouse away and I don't click away, then I press Esc? I want to be very severe against accidental Esc closures of the boxes. -- fix/recalc-trust-user 313a8656 -- Escape reaches a box only when focus is inside it AND the pointer is on it. The pointer is believed only once a mouse has been used on the page, so a keyboard-only reader is never stranded
+
+### Process
+
+- [x] R-048 -- | Reviewer: I didn't have in mind a review assistant. I had in mind a pre-reviewer, but I guess you already do the best you can with that. I just want independent review, not self-review, of all work before I see it. This could save me review time. But if you have a vision for a review assistant, that could be helpful too. -- SEAT HIRED: `.claude/agents/pre-reviewer.md`. It reviews work it did not write, on every branch, before he is told the branch is ready, and it REPORTS rather than fixes. **It needs a name from him.**
+
+### feat/customer-find-labels
+
+- [x] R-050 feat/customer-find-labels | Settings: Let's try changing main heading Visualization to Symbology and its subheadings to Node, Link, Customer, and All. -- feat/customer-find-labels ffd11548 -- Symbology, with Node, Link, Customer, All. CONFIRMED by the pre-reviewer: five keys renamed across all 27 files, zero references to an old name left anywhere
+- [x] R-051 feat/customer-find-labels | The labels are hiding the service line. They need to be moved away about 1px or 2px or their halo needs to be that much smaller. -- feat/customer-find-labels ffd11548 -- the LABEL moved, not the halo, because the halo style is shared by every label on the page. Clearance was EXACTLY ZERO and is now about 1.4 px. CONFIRMED by the pre-reviewer, mutation-tested independently
+- [x] R-052 feat/customer-find-labels | When a label is beyond the meter, make it middle justified with the meter instead of bottom. -- feat/customer-find-labels ffd11548 -- CONFIRMED by the pre-reviewer, including that it is genuine centring rather than a fixed nudge
+- [ ] R-053 feat/customer-find-labels | Like most of the label placement, I see a mystery. I see a row of labels along the service lines with a few beyond the meter. I see that these would conflict with a link label, but if so, maybe we should calculate the standard location for all to accomodate a link label. -- **YOU WERE RIGHT AND THE BRANCH SAID YOU WERE WRONG.** A first answer concluded the blocker is never a link label; the pre-reviewer found its test drawing put customers at round numbers while a long pipe REPEATS its label at two other points, so the case was never tested. One customer placed at a repeat point: `DROPPED -- first blocked by label of L1`. **A link label does block, and when it does the customer label disappears entirely rather than moving.** Back with the build agent
+- [x] R-054 feat/customer-find-labels | As you can see in the image, Customer labels are still a vastly different size than other labels. Fix that. -- feat/customer-find-labels ffd11548 -- MEASURED: 11 px against 2.75 px for node and link at 4x zoom. The routine that re-sizes labels ON ZOOM had never been told about customers, so a customer label kept the size it had at the zoom it was last composed at. CONFIRMED and re-derived independently by the pre-reviewer, which also traced every zoom door
+
+### feat/xy-world-map
+
+- [ ] R-055 feat/xy-world-map | Why do we throw away satellite tiles? We should have a good-sized cache where we throw away only the oldest, right?
+- [ ] R-056 feat/xy-world-map | There are still a few blank tiles that never fill in when I stop zooming. It's as if we decided not to draw these tiles.
+
+### feat/tables-spreadsheet
+
+- [ ] R-057 feat/tables-spreadsheet | Top border is missing.
+- [ ] R-058 feat/tables-spreadsheet | Strange missing heading border between Tanks Mixing model and Mixing fraction.
+- [ ] R-059 feat/tables-spreadsheet | Some of the columns are now sized too narrow by default. I believe that Description was a single character long. Please fix this in a reasonable way. I thought of making a rule not to divide any word into more than three parts, but that's just an idea.
+
+## Round of 2026-09-19, fourth pass
+
+### feat/tables-spreadsheet
+
+- [?] R-060 feat/tables-spreadsheet | At column A there is a strange highlighting around the ID. And the ID is not editable, though it's editable in properties. Can you fix that? -- IDA LIKELY FOUND THE SAME ROOT CAUSE: `#0645ad` is painted on any focused cell through a `:focus-within` rule, and clicking the ID button focuses its cell -- so a plain click to jump to the map leaves that cell wearing the exact current-cell mark the new spreadsheet modes invented for a different purpose the same day. Give the ID button its own focus ring instead of inheriting the generic rule. **The other half -- the ID not being editable in the table though it is in Properties -- is separate and still open**
+- [?] R-061 feat/tables-spreadsheet | Ask Ida how most apps do clicking on headings to change sorting; we have blue text links. -- IDA ANSWERED, fix not yet built. **A sortable heading is a real focusable button, never a hyperlink, anywhere in current practice** -- the ARIA authoring practices wrap the header text in a `<button>` and put `aria-sort` on the sorted column only; Excel, Sheets, Finder and Explorer all agree on the look: plain or bold text with a small triangle at the trailing edge, on the sorted column alone, **never underlined and never blue**. The reason is a promise: a hyperlink promises LEAVING, and a sort reorders what is already on screen. **Our markup is already right** -- real buttons, correct `aria-sort`, arrow on the active column. **The CSS is what is wrong**: the sort button turns `#0645ad`, which is the browser default VISITED-LINK blue, on hover, and the ID cell button is permanently underlined in the same colour. Three one-line fixes, cheapest first, in her journal
+- [ ] R-063 feat/tables-spreadsheet | Modes. There is another mode, and it is Select. So there are four modes. Call them what you want: Ready, Enter, Edit, Select.
+- [ ] R-064 feat/tables-spreadsheet | Copy across columns does **not** work.
+- [ ] R-065 feat/tables-spreadsheet | There is still an unbelievable delay when speed-entering a column. It's not huge. It's small. But it's unbelievable because nothing else should be happening. There's no recalculation, no reformatting, etc. And this worries me very deeply because it is a sign of pervasive bad coding.
+
+### The one that is bigger than a branch
+
+- [?] R-062 -- | I want your advice about how I can spend some significant resources to do a deep code review to ensure we don't have a code base full of AI techno-slop.
+
+### feat/xy-world-map
+
+- [x] R-066 feat/xy-world-map | The date-line tile mirror: *"I will have to trust you."* Ours to build, with a regression check, since he will not be the one who sees it come back. -- feat/xy-world-map 731ab367 -- **AND THE DIAGNOSIS IT WAS HANDED WAS WRONG IN ONE IMPORTANT WAY: it is not the date-line tile at all.** The tear sits at the ANTIPODE OF THE TRANSFORM'S ORIGIN. At step 1 the origin starts at 0,0, whose antipode IS the date line, which is why it looked like a date-line defect and showed only there. The cause is one function asking *which way round the world is this longitude nearer* -- the right question for one POINT and the wrong one for the two ENDS OF AN EDGE, which can land on opposite branches. Measured before and after at three places and two zooms: -1,750 becomes +250; -1,666.7 becomes +238.1; -1,062.4 becomes +354.1. A negative width IS a picture drawn backwards. The regression check grades against a width derived a DIFFERENT way rather than restating the fix, and is mutation-tested
+
+### feat/customer-find-labels
+
+- [x] R-067 feat/customer-find-labels | R-011's caution glyph: "Put it back." -- feat/customer-find-labels a9422467 -- glyph leading, his sentence byte for byte after it
+- [x] R-068 feat/customer-find-labels | Account numbers went to Tag: "It doesn't matter, since this has not been released." -- settled, no action
+
+### feat/engine-fetch-wait
+
+- [x] R-069 feat/engine-fetch-wait | A harness holds that nothing outside the panel show/hide functions may show or hide a panel, and the new bar tripped it. "This worries me. Why would the run progress bar do anything to the bottom panel?" -- feat/engine-fetch-wait e9319a0a -- **THE BAR DOES NOT TOUCH THE PANEL, OR ANY PANEL.** It shows and hides its own six-pixel track. The harness is not a rule about the bottom panel: it reads EVERY line in the map editor that shows or hides ANYTHING and treats each as a panel until somebody writes down that it is not, with a reason. Twenty-five were already written down; the bar became the twenty-sixth. A naming collision, not a coupling. **But the guard was loose and is now tighter** -- its exception was keyed on a variable called `bar`, and THREE different things in that file are called `bar`, so one row would have excused all three. **And the uncomfortable half is Task 701**

@@ -2070,6 +2070,40 @@ the block.
     answer is obvious either way.
 
 
+- 75|701| **The panel guard is blind to forty sites, and the bottom panel is one.**
+  Found 2026-09-19 while answering Tom's *"why would the run progress bar do anything to the bottom
+  panel?"* -- the answer was that it does not, and the guard that said otherwise turned out to have
+  a hole of its own.
+  - **`dev/lpn-spike/panel-touch-harness.js` only recognises a show or a hide written as a plain
+    `'block'`, `'flex'` or `'none'`.** About FORTY places in `js/looped-network.js` write it as a
+    choice instead -- `open ? 'flex' : 'none'` -- and every one is invisible to it.
+  - **The bottom panel is one of them.** Only `applyPaneLayout()` opens and closes it today, **by
+    discipline and not because anything checks**, so a second door added next month would not be
+    noticed. That is precisely the arrangement `dev/scenario-seam-repair.md` exists because of: two
+    tracks wrote element properties, only one went through the single write seam, and five
+    user-reachable defects followed.
+  - **NOT slipped into the branch that found it**, deliberately: it is roughly forty new
+    declarations and several genuine judgement calls about what counts as a panel, on a branch Tom
+    has already passed in the browser. The limitation is now written at the top of the harness so it
+    no longer implies coverage it does not have.
+
+
+- 50|702| **A view window cannot describe a span across the far side of the world.**
+  Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
+  than as a defect, which is the point of the row.**
+  - The view's longitude window is built from the MIN and MAX of wrapped longitudes, and that pair
+    cannot describe a window spanning the antipode of the transform's origin -- the same branch
+    problem the mirror fix solved one layer down.
+  - **Measured in a probe: a world-wide view after a Go to asked for only 4 of 8 tile columns.**
+  - **It is NOT known what a user actually sees**, because a headless camera is not a real fitted
+    view, and the agent that found it declined to claim a defect it could not measure. That is the
+    correct call and the reason this is its own row: it needs its own measurement, in a real
+    browser, before anybody decides whether there is anything to fix.
+  - The mission scope is a 300 km system span (`dev/geographic-projects.md` §2b), so a drawing that
+    genuinely straddles the antipode is not a real case. **The reachable case is the WIZARD's
+    world-wide first screen**, which every geographic project passes through.
+
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.

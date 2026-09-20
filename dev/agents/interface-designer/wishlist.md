@@ -403,3 +403,21 @@ is answered for the three that remain after the divorce; see item 5 series above
    say so out loud is Tom, not whoever implements it next. Pair it with a visible "not you?" way to
    correct a stale or borrowed name, since a wrong name on a break-lock decision is the kind of
    defect only the person NOT holding the lock ever notices. See journal, 2026-09-18.
+
+40. **Stop styling sortable-table headings and the ID/goto cell as hyperlinks.** The `<button>`
+    markup and `aria-sort` wiring in `js/looped-network.js:18538-18576` already match the WAI-ARIA
+    APG's own sortable-table pattern exactly and need no change. The paint does not:
+    `css/engcalcs.css:2371-2377` turns the sort button link-blue (`#0645ad`, the default visited-
+    link color) on hover and underlines the ID button permanently, so both read as ordinary
+    hyperlinks to a reader scanning the row — a false "this leaves the page" signal on controls
+    that both stay in place. Fix: drop the link-blue hover and the permanent underline; reserve
+    `#0645ad` for the one meaning this same table just gave it on 2026-09-19, the current-cell
+    outline, rather than splitting it across three unrelated signals. One-line CSS change, no new
+    strings. See journal, 2026-09-19.
+41. **The "strange highlighting around the ID" is very likely the same seam as #40, not a separate
+    bug.** `css/engcalcs.css:2229-2233` paints the current-cell outline on ANY focused `<td>`
+    (`:focus-within`), and the ID cell's goto-button takes focus on an ordinary click — so jumping
+    to the map leaves that cell wearing the exact mark the new spreadsheet-mode design just
+    invented to mean "current cell," with nothing to do with cursor position. Fix alongside #40:
+    give `.lpn-pane-goto` its own focus ring instead of relying on the generic `td:focus-within`
+    rule. See journal, 2026-09-19.

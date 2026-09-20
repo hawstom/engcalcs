@@ -3801,7 +3801,7 @@
                 "a run of a machine in the sense of a production batch."
             ],
             "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip and lpn_time_duration.",
-            "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and several shipped sentences quote the button label inside themselves -- so the word chosen for the button must be the word that appears in those sentences, or the instruction points at a button that is not there. (lpn_time_run_note was one of them and was deleted 2026-09-19; lpn_run_menu_tip and lpn_manual_results_cleared still do it.)",
+            "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and several shipped sentences quote the button label inside themselves -- so the word chosen for the button must be the word that appears in those sentences, or the instruction points at a button that is not there. (lpn_time_run_note was one of them and was deleted 2026-09-19, as was lpn_manual_results_cleared; lpn_run_menu_tip still does it.)",
             "translations": [],
             "source": "sprint 438-wave0, 2026-08-19"
         },
