@@ -2088,6 +2088,22 @@ the block.
     no longer implies coverage it does not have.
 
 
+- 50|702| **A view window cannot describe a span across the far side of the world.**
+  Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
+  than as a defect, which is the point of the row.**
+  - The view's longitude window is built from the MIN and MAX of wrapped longitudes, and that pair
+    cannot describe a window spanning the antipode of the transform's origin -- the same branch
+    problem the mirror fix solved one layer down.
+  - **Measured in a probe: a world-wide view after a Go to asked for only 4 of 8 tile columns.**
+  - **It is NOT known what a user actually sees**, because a headless camera is not a real fitted
+    view, and the agent that found it declined to claim a defect it could not measure. That is the
+    correct call and the reason this is its own row: it needs its own measurement, in a real
+    browser, before anybody decides whether there is anything to fix.
+  - The mission scope is a 300 km system span (`dev/geographic-projects.md` §2b), so a drawing that
+    genuinely straddles the antipode is not a real case. **The reachable case is the WIZARD's
+    world-wide first screen**, which every geographic project passes through.
+
+
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.
