@@ -97,3 +97,37 @@ names is shown to anybody today, so there is nothing to translate into 26 langua
 **The one thing to avoid is inventing a fourth state.** The page has three behaviours and Excel has
 four names only because it has formulas. A name with no behaviour under it is a name somebody later
 has to work out the meaning of.
+
+---
+
+## SETTLED, 2026-09-21: he chose option 2, not option 3, and named it himself
+
+Tom, re-reading this file after his browser pass: *"There is another mode, and it is Select. So
+there are four modes. Call them what you want: Ready/Navigate, Enter/Entry, Edit, Select."*
+
+**This overrules the recommendation above.** Option 2 was written as the option "to be careful
+about" on the argument that a range is not a behaviourally distinct state — nothing about the
+arrow keys or Ctrl+Z changes when a highlighted rectangle grows past one cell. That argument was
+never wrong, and it is not what decides this: he is not asking for a fifth behaviour, he is saying
+that SELECT, as a name, already belongs to him and already means something distinct in his own
+head — a range of cells wearing the wash, as opposed to one cell standing still. **A repeated
+question is evidence the rule is the suspect, not the asker** (CLAUDE.md's own general lesson), and
+here the "rule" was a recommendation he read and pushed back on once, in writing, by name.
+
+**The four, as shipped in `js/looped-network.js`:**
+
+| Name | Also called | What it is |
+|---|---|---|
+| **Ready** | Navigate | A cell is current, `readOnly`, nothing is being typed. Arrows move cell to cell. |
+| **Select** | — | Ready, plus a highlighted range of MORE than one cell. Not a new behaviour — the arrow keys and Ctrl+Z inside it are identical to Ready's — but a real, named state in his own vocabulary, and now in ours. |
+| **Entry** | Enter | A printable character replaced the cell's contents. Arrows still move cell to cell; Ctrl+Z is the browser's own text undo. |
+| **Edit** | — | F2 or a double-click. Arrows move the caret and cannot leave the mode; only Tab, Enter, Escape or the mouse do. |
+
+**What moved in code, and what did not.** `paneCellMode()` — the per-CELL state, which can only
+ever answer Ready/Entry/Edit because a single `<input>`'s `readOnly` and `_lpnEntry` flags cannot
+by themselves know whether the surrounding range is one cell or ten — now returns `'ready'` where
+it used to return `'select'`, ending the collision this file was written to name. `paneFourthMode()`
+is new: it asks `paneCellMode()` first and, only when the answer is Ready, checks whether the
+current range spans more than one row or column, answering `'select'` if so. **No arrow key, no
+Ctrl+Z, no paint changed** — the function exists so a reader asking "which of his four modes is
+this" has one door, in his own words, rather than four re-derivations of the same check.

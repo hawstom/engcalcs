@@ -102,7 +102,7 @@ function at() {
 console.log('\n--- (a) SELECT MODE: moving never opens an editor ---');
 {
 	click(ids[0], 'elev');
-	report(L.mode(cell(ids[0], 'elev')) === 'select', 'a click lands in Select mode', L.mode(cell(ids[0], 'elev')));
+	report(L.mode(cell(ids[0], 'elev')) === 'ready', 'a click lands in Ready mode', L.mode(cell(ids[0], 'elev')));
 	report(at() === ids[0] + '/elev', '...on the cell that was clicked', at());
 	// Every one of the four ways he names must move and must NOT open an editor.
 	['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'Enter'].forEach(function (k) {
@@ -111,7 +111,7 @@ console.log('\n--- (a) SELECT MODE: moving never opens an editor ---');
 		key(k);
 		report(at() !== before || k === 'ArrowUp' || k === 'ArrowLeft',
 			`${k} in Select mode moves from cell to cell`, before + ' -> ' + at());
-		report(L.mode(cell(ids[1], 'elev')) === 'select', `...and ${k} opened no editor`);
+		report(L.mode(cell(ids[1], 'elev')) === 'ready', `...and ${k} opened no editor`);
 	});
 	// The heading of the column being driven, read from the language file rather than typed here.
 	report(typeof pc.lpn_field_elev === 'string' && pc.lpn_field_elev.length > 0,
@@ -139,7 +139,7 @@ console.log('\n--- (b) ENTRY MODE: typing replaces, and the arrows still move ce
 	report(re._prevented === true, '...and the browser never sees it, so no caret moves');
 	report(L.cellText('junctions', ids[0], 'elev') === '75', '...committing what was typed on the way out',
 		L.cellText('junctions', ids[0], 'elev'));
-	report(L.mode(cell(ids[0], 'elev')) === 'select', '...and leaving the cell behind in Select mode');
+	report(L.mode(cell(ids[0], 'elev')) === 'ready', '...and leaving the cell behind in Ready mode');
 	// The other three arrows, because "arrow keys" is his word and Right is only the example.
 	['ArrowLeft', 'ArrowUp', 'ArrowDown'].forEach(function (k) {
 		click(ids[1], 'elev');
@@ -149,7 +149,7 @@ console.log('\n--- (b) ENTRY MODE: typing replaces, and the arrows still move ce
 		const b2 = at();
 		key(k);
 		report(at() !== b2 || k === 'ArrowUp', `${k} in ENTRY moves a cell, not a caret`, b2 + ' -> ' + at());
-		report(L.mode(cc) === 'select', `...and ${k} left ENTRY behind`);
+		report(L.mode(cc) === 'ready', `...and ${k} left ENTRY behind`);
 	});
 	// F2 is the spreadsheet's escape hatch: promote what is being typed into a real edit.
 	click(ids[2], 'elev');
@@ -178,16 +178,16 @@ console.log('\n--- (c) EDIT MODE: arrows are the caret and cannot leave ---');
 	});
 	// The three ways out he names. Escape is the fourth and was already his point 3.
 	const eEnter = key('Enter');
-	report(L.mode(c) === 'select', 'Enter leaves EDIT', L.mode(c));
+	report(L.mode(c) === 'ready', 'Enter leaves EDIT', L.mode(c));
 	report(eEnter._prevented === true, '...and moves a row, as a spreadsheet does');
 	L.enterEdit(c, false);
 	report(L.cancelEdit(c) === true, 'Escape leaves EDIT');
-	report(L.mode(c) === 'select', '...back to Select', L.mode(c));
+	report(L.mode(c) === 'ready', '...back to Ready', L.mode(c));
 	// A click on another cell: the browser blurs the old one, which commits it.
 	L.enterEdit(c, false);
 	c.value = '123';
 	fire(c, 'change', {});
-	report(L.mode(c) === 'select', 'a commit from a blur leaves EDIT too', L.mode(c));
+	report(L.mode(c) === 'ready', 'a commit from a blur leaves EDIT too', L.mode(c));
 }
 
 console.log('\n--- Ctrl+Z MEANS ONE THING PER MODE, AND THAT IS THE WHOLE RULE ---');
@@ -205,7 +205,7 @@ console.log('\n--- Ctrl+Z MEANS ONE THING PER MODE, AND THAT IS THE WHOLE RULE -
 	}
 	click(ids[0], 'elev');
 	const c = cell(ids[0], 'elev');
-	report(L.mode(c) === 'select', 'in SELECT', L.mode(c));
+	report(L.mode(c) === 'ready', 'in READY', L.mode(c));
 	L.saveUndoSnapshot();
 	let d = L.undoDepth();
 	ctrlZ(c);
@@ -228,7 +228,7 @@ console.log('\n--- Ctrl+Z MEANS ONE THING PER MODE, AND THAT IS THE WHOLE RULE -
 	report(L.undoDepth() === d, '...Ctrl+Z is the browser TEXT undo here too', d + ' -> ' + L.undoDepth());
 	report(e._prevented !== true, '...and the keystroke reaches the browser');
 	L.cancelEdit(c);
-	report(L.mode(c) === 'select', 'Escape returns to SELECT');
+	report(L.mode(c) === 'ready', 'Escape returns to READY');
 	d = L.undoDepth();
 	ctrlZ(c);
 	report(L.undoDepth() === Math.max(0, d - 1), '...where the project undo is one keystroke away again',

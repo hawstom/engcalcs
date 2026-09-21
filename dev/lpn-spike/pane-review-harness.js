@@ -45,7 +45,9 @@ const L = loadLoopedNetwork(
 	"\t\tspec: paneTableById,\n" +
 	"\t\tselBox: function (id) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneSelBox(s, paneTableRowsInOrder(s), paneCols(s)); },\n" +
-	"\t\tmode: paneCellMode, blankAt: paneCellBlankAt, homeCol: paneHomeCol,\n" +
+	"\t\tmode: paneCellMode, fourthMode: function (id, k) {\n" +
+	"\t\t\tvar s = paneTableById('junctions'); return paneFourthMode(s, s.cells[id][k]); },\n" +
+	"\t\tblankAt: paneCellBlankAt, homeCol: paneHomeCol,\n" +
 	"\t\tsetCell: function (id, elId, key, v) { var s = paneTableById(id),\n" +
 	"\t\t\tel = doc.nodes.filter(function (x) { return x.id === elId; })[0];\n" +
 	"\t\t\tpaneColByKey(s, key).set(el, v); },\n" +
@@ -267,6 +269,33 @@ console.log('\n--- R-038: navigating selects no characters ---');
 	report(selected === 0, 'arriving by arrow key selects none of the text', String(selected));
 }
 
+console.log('\n--- R-063: four modes, his own words (2026-09-21) ---');
+{
+	// "There is another mode, and it is Select. So there are four modes. Call them what you want:
+	// Ready/Navigate, Enter/Entry, Edit, Select." paneFourthMode() is the one place that answers
+	// which of his four a cell is in; asserted against a single cell (Ready) and a real range
+	// (Select), because his own point was that a range is not the same mode as one cell standing
+	// still even though nothing about the arrow keys or Ctrl+Z changes between them.
+	click(ids[0], 'elev');
+	report(L.fourthMode(ids[0], 'elev') === 'ready', 'one cell, nothing typed, is Ready',
+		L.fourthMode(ids[0], 'elev'));
+	key('ArrowDown', { shiftKey: true });
+	report(L.fourthMode(ids[0], 'elev') === 'select', 'a two-cell range is Select',
+		L.fourthMode(ids[0], 'elev'));
+	report(boxSize() === '2x1', '...a genuine range, not a stray click', boxSize());
+	key('ArrowDown');
+	report(L.fourthMode(ids[1], 'elev') === 'ready', 'collapsing the range returns to Ready',
+		L.fourthMode(ids[1], 'elev'));
+	const c = cell(ids[1], 'elev');
+	key('9'); c.value = '9';
+	report(L.fourthMode(ids[1], 'elev') === 'entry', 'typing over a cell is Entry',
+		L.fourthMode(ids[1], 'elev'));
+	key('Enter');
+	key('F2');
+	report(L.fourthMode(ids[2], 'elev') === 'edit', 'F2 is Edit', L.fourthMode(ids[2], 'elev'));
+	key('Escape');
+}
+
 console.log('\n--- quirk 2: an arrow up must scroll the row clear of the pinned heading ---');
 {
 	// Tom, 2026-09-21: "The cursor, with up arrow, ends up under the headings if the table has
@@ -332,7 +361,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	report(labels.length === 4, 'exactly four rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
-	report(labels[2] === (PC.lpn_pane_goto_tip || 'Show this on the map.'),
+	report(labels[2] === PC.lpn_pane_goto_tip,
 		'Select in map reuses the pin’s own tip, not a new string', labels[2]);
 	report(labels[3] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[3]);
 

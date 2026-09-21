@@ -19056,7 +19056,7 @@ var EngCalcs = EngCalcs || {};
 			// it. Instead, a blue border highlight (double-wide inward) should indicate the current
 			// cell."*). It used to call select() here, and the reason given -- that a first Left or
 			// Right should collapse the text selection before leaving the cell -- died with the
-			// rule it served: an arrow key in SELECT and ENTRY moves a cell and never a caret, so
+			// rule it served: an arrow key in READY and ENTRY moves a cell and never a caret, so
 			// there is nothing for a collapse to do. What was left was a cell that looked like it
 			// was being edited every time the caret merely passed over it.
 			return true;
@@ -19138,16 +19138,23 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out.join('\n');
 	}
-	// ---- THREE MODES, AND THE PASTE (ROADMAP Task 186; the three-mode spec is Tom's own, 2026-09-18)
+	// ---- FOUR MODES, AND THE PASTE (ROADMAP Task 690; Tom, 2026-09-21, on his own earlier
+	// three-mode spec of 2026-09-18: *"There is another mode, and it is Select. So there are four
+	// modes. Call them what you want: Ready/Navigate, Enter/Entry, Edit, Select."*)
 	//
-	// He wrote the specification out after testing, because *"if we want these tables to act like a
-	// spreadsheet, maybe I should make a prioritize spec list of how spreadsheets act"* -- and the
-	// answer was that this page had TWO states where a spreadsheet has THREE. The middle one is the
-	// whole of the difference, and it is what made his Ctrl+Z feel *"unpredictable"*.
+	// He wrote the three-mode specification out after testing, because *"if we want these tables
+	// to act like a spreadsheet, maybe I should make a prioritize spec list of how spreadsheets
+	// act"* -- and the answer was that this page had TWO states where a spreadsheet has THREE. The
+	// middle one was the whole of that difference, and it is what made his Ctrl+Z feel
+	// *"unpredictable"*. Three weeks later he named a fourth: SELECT is a real mode in his own
+	// vocabulary, and the cell-level state that had been carrying that word (readOnly, current,
+	// nothing being typed) is renamed READY here -- Excel's own word for it, and the one
+	// `dev/tables-spreadsheet-modes.md` already had on record as the closer fit. Nothing about
+	// behaviour moved; this is the vocabulary catching up to a distinction he had already drawn.
 	//
-	//   SELECT   the cell is `readOnly`. Arrows, the mouse, Tab and Enter all move from cell to
+	//   READY    the cell is `readOnly`. Arrows, the mouse, Tab and Enter all move from cell to
 	//            cell and NEVER open an editor. F2 or a double-click opens EDIT. Typing a
-	//            printable character opens ENTRY. Delete empties the cell.
+	//            printable character opens ENTRY. Delete empties the cell. Also called NAVIGATE.
 	//
 	//   ENTRY    you are typing INTO the cell but you are not editing it. The first character
 	//            REPLACES what was there and the rest append. **ARROW KEYS MOVE TO THE NEIGHBOURING
@@ -19163,7 +19170,7 @@ var EngCalcs = EngCalcs || {};
 	//            the cell once the caret reached an edge -- and he asked for the stricter rule by
 	//            name, because an edit that jumps out from under you is unrecoverable typing.
 	//
-	// **`readOnly` IS THE MECHANISM FOR SELECT AND NOT A DECORATION.** Modelling that mode in a
+	// **`readOnly` IS THE MECHANISM FOR READY AND NOT A DECORATION.** Modelling that mode in a
 	// flag alone would leave the browser moving a caret underneath it, and every arrow key would be
 	// a race between our handler and the caret. A read-only input has no caret to move. ENTRY and
 	// EDIT are both writable, so THOSE two are told apart by a flag -- there is nothing in the DOM
@@ -19171,13 +19178,33 @@ var EngCalcs = EngCalcs || {};
 	// an arrow key.
 	//
 	// **WHAT Ctrl+Z MEANS FOLLOWS FROM THE MODES RATHER THAN BEING A RULE BESIDE THEM** (Task 689):
-	// the project undo in SELECT, where there is no caret and nothing is being typed, and the
+	// the project undo in READY, where there is no caret and nothing is being typed, and the
 	// browser's own text undo in ENTRY and EDIT, where there is a caret and the characters under it
 	// are the user's. One line, and a person can see which they are in.
+	//
+	// **THIS IS THE PER-CELL MODE, ONE OF THREE, AND SELECT IS NOT AMONG THEM** (Task 690, his
+	// 2026-09-21 four-mode ruling). Select is a fact about the RANGE, not about any one cell's own
+	// `readOnly`/caret state -- a range of one cell IS a cell in READY, and a range of more than
+	// one is READY plus a highlighted rectangle. paneFourthMode() below is where the two are put
+	// back together into the label he actually uses.
 	function paneCellMode(input) {
 		if (!input || input.tagName !== 'INPUT' || !input._lpnCell) { return null; }
-		if (input.readOnly !== false) { return 'select'; }
+		if (input.readOnly !== false) { return 'ready'; }
 		return input._lpnEntry ? 'entry' : 'edit';
+	}
+	// **THE FOURTH MODE, WHICH IS TOM'S OWN AND NOT THIS PAGE'S INVENTION** (Task 690, 2026-09-21:
+	// *"There is another mode, and it is Select."*). `dev/tables-spreadsheet-modes.md` had argued
+	// there was no behaviour underneath a split of READY into two, and there still is not -- this
+	// function changes nothing about what the arrow keys or Ctrl+Z do. It exists so a reader asking
+	// "which of his four modes is this" has ONE place that answers, in his own words, rather than
+	// four call sites each re-deriving it.
+	function paneFourthMode(spec, input) {
+		var m = paneCellMode(input), rows, cols, box;
+		if (m !== 'ready') { return m; }
+		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+		box = paneSelBox(spec, rows, cols);
+		if (box && (box.r1 > box.r0 || box.c1 > box.c0)) { return 'select'; }
+		return 'ready';
 	}
 	// Kept as the name the rest of the page already uses for "an editor is open", which is exactly
 	// the question every one of its callers is asking: a refill must not overwrite a cell being
@@ -19374,12 +19401,12 @@ var EngCalcs = EngCalcs || {};
 		// it must work whatever else the key handler would have made of the moment.
 		if (key === 'Escape' || key === 'Esc') { return paneCancelEdit(active); }
 		// **F2 IS THE KEYBOARD'S DOOR INTO EDIT MODE**, the double-click's twin, from either of the
-		// other two: from SELECT it opens the editor keeping the value, and from ENTRY it promotes
+		// other two: from READY it opens the editor keeping the value, and from ENTRY it promotes
 		// what is already being typed, which is how a person who started overwriting decides they
 		// only wanted to change a character.
 		if (key === 'F2') {
 			if (mode === 'entry') { return panePromoteToEdit(active); }
-			if (mode === 'select') { return paneEnterEdit(active, false); }
+			if (mode === 'ready') { return paneEnterEdit(active, false); }
 			return false;
 		}
 		// **A PRINTABLE CHARACTER OVERWRITES**, which is the spreadsheet's own most-used gesture:
@@ -42384,30 +42411,32 @@ var EngCalcs = EngCalcs || {};
 	// reached from where the edit was made is worse than no undo at all -- a person who has learned
 	// Ctrl+Z presses it after a bad paste and nothing happens.
 	//
-	// **THE RULE FOLLOWS FROM THE THREE MODES RATHER THAN SITTING BESIDE THEM**, and that is the
+	// **THE RULE FOLLOWS FROM THE MODES RATHER THAN SITTING BESIDE THEM**, and that is the
 	// correction Tom's *"Ctrl+Z doesn't work or is unpredictable. I can't tell"* earned (2026-09-18).
 	// It was first written on a TWO-state model -- editor open against editor closed -- and a
-	// two-state rule cannot be predicted by somebody living in three states: typing a character put
-	// him in ENTRY, which still looks like SELECT because he had not asked to edit anything, and
-	// Ctrl+Z there quietly meant something else.
+	// two-state rule cannot be predicted by somebody living in three (now four, Task 690) states:
+	// typing a character put him in ENTRY, which still looks like READY because he had not asked
+	// to edit anything, and Ctrl+Z there quietly meant something else.
 	//
-	//   SELECT  the project undo. There is no caret and nothing is being typed.
+	//   READY   the project undo. There is no caret and nothing is being typed. (SELECT, his
+	//           fourth mode, is READY plus a highlighted range of more than one cell -- the
+	//           boundary below does not move, because a range is still nothing being typed.)
 	//   ENTRY   the browser's own text undo. There IS a caret and the characters under it are his.
 	//   EDIT    the browser's own text undo, for the same reason.
 	//
 	// The boundary is now visible without being announced, because it is the same boundary the
 	// arrow keys are on: where Right moves to the next cell, Ctrl+Z undoes the project; where Right
-	// moves the caret, Ctrl+Z undoes the typing. Escape returns a cell to SELECT, and so does every
+	// moves the caret, Ctrl+Z undoes the typing. Escape returns a cell to READY, and so does every
 	// commit, so the project undo is one keystroke away at all times. That is also Tom's own
 	// 2026-08-20 point about the Library fields, kept: an ordinary input anywhere else on the page
 	// still has its native undo, because it has no cell context at all.
 	//
-	// A checkbox cell and a select cell have no editor to open, so they are permanently in SELECT.
+	// A checkbox cell and a select cell have no editor to open, so they are permanently in READY.
 	//
 	// Nothing else moves: the tool-key handler below keeps the plain isTextEntry() guard, because a
 	// bare digit on a selected cell OVERWRITES it (Task 186) and must not also pick a tool.
 	function paneCellNavigating(el) {
-		return paneCellMode(el) === 'select';
+		return paneCellMode(el) === 'ready';
 	}
 	document.addEventListener('keydown', function (e) {
 		if (isTextEntry(e.target) && !paneCellNavigating(e.target)) { return; }
