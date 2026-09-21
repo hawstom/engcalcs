@@ -95,3 +95,42 @@ And a second one now: **a commit that fixes a VISIBLE thing gets checked by eye 
 machinery beside it.** For any commit that edits an `$ec_lang` value, grep for the same string as a
 `pc.x || '...'` fallback before calling it done. SPECULATION on three instances, which is enough to
 act on and not enough to call a law.
+
+---
+
+## 2026-09-21 — fourth and fifth outings: the seed-snapshot pattern is the rule, not the exception
+
+OBSERVED, checked 2026-09-21, `feat/tables-spreadsheet` and `feat/customer-find-labels`.
+
+**Two genuine crashes, and both were found by exercising the real event path rather than calling
+the setter directly** -- mousedown, focusin, F2, type, change, instead of `col.set()`. Renaming a
+node from the pane table while its Properties popup is open throws inside `refreshPopupIfOpen()`,
+because the table's rename door never updates `currentPopup.id` the way the popup's own rename
+does. **Same underlying function, different caller, and only one of the two callers finishes the
+job** -- which is `dev/scenario-seam-repair.md`'s lesson in a new place, and worth remembering as a
+question to ask of any "it goes through the same door" claim: the same FUNCTION is not the same
+DOOR. Second: Delete on a selection spanning the ID column fires one blocking alert per row,
+because the ID column is not "plain" for a node or link row and nothing exempts it from the bulk
+clear. Neither was in the build report; both were mutation-confirmed as absent before the commits,
+so neither is pre-existing.
+
+**And the standing check on SAMPLES paid off a fourth time, on the same kind of number as three
+prior outings.** A drop-rate improvement reported as 0.8%/0.8% turned out to be the harness's own
+hardcoded seed (12345), and the single most favourable of ten tried; the real spread after the fix
+is 0.0% to 2.4%. **The direction held and the attribution held perfectly** -- aggregate 1.34% to
+1.06% across 5,000 samples, and 0 of 53 remaining drops caused by a link label across all ten
+seeds. So this is not the R-053 shape of concluding the opposite of what happened. It is the
+milder, now-familiar shape: **the number is real and the number reported is the best one rather
+than a representative one.** SPECULATION upgraded to a working rule on four instances: when a
+report gives a single percentage from a harness, ask what seed it is and re-run it.
+
+**Confirmed clean, and saying so is part of the job:** the undo-clone fix (mutation-killed on its
+exact one added line, and the leak it predicts genuinely does not exist elsewhere -- every other
+box closes or rebuilds from the document), the paste-across-columns fix reproduced with a real
+paste event, the service-line width guard (byte-identical placements when there is no link label to
+react to), and the harness assertion flips on both branches, which genuinely reverse what is tested
+rather than loosening it.
+
+**One bookkeeping miss worth naming because it would have misled a translation sprint:** a report
+claimed "no new language keys anywhere on the branch" and one had been added and correctly wired.
+A wrong count is cheap to make and expensive to inherit.
