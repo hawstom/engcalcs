@@ -316,6 +316,24 @@ a map editor over it (`js/looped-network.js`). **A core calculator, in scope in 
 Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMAP Task 146 and its
 `146.nn` children.
 
+- **RECALCULATE OFF MEANS A SNAPSHOT, NEVER HIDE OR DELETE** (Tom: *"Off means Off, but it doesn't
+  mean Hide or Delete. It means Snapshot in time."* And: *"The reason I am saying Yes to everything
+  is that if we clear these things prematurely, it robs the user of an important point of
+  reference. It's important to leave some value in the model when we have it."*). With the switch
+  off, an edit runs no solve — but every stale answer already on screen stays exactly where it is:
+  `lastSolveResult`, the Tables pane's result columns, the Properties box, the status bar, the
+  energy/run report, and the fire flow rings all keep showing what they showed, until the user
+  presses Calculate or a deliberate control (fire flow's own Clear button) says otherwise. **Only a
+  genuinely different network — opening another project or tab — clears a result set**; an edit to
+  the one on screen never does. **AND AN EDIT STILL HAS TO SHOW UP EVERYWHERE THE INPUT IS SHOWN,
+  IMMEDIATELY** (Tom: *"Any input we edit must be reflected wherever it shows, Table, Properties,
+  and map labels... we can have tunnel vision on only the label we change."*) — `afterPropertyEdit()`
+  and `updateNode(id, true)` keep the Tables pane and the map label of the ELEMENT JUST EDITED
+  current, through `refreshOneLabelInPlace()`, which rewrites only that one label's text and
+  position. **Tunnel vision is the point and not a shortcut**: a full network-wide content-and-
+  collision pass (`refreshLabelTextPass()` + `relayoutLabels()`) is exactly the delay the switch
+  exists to avoid, so a plain edit must never trigger one. `dev/lpn-spike/stale-snapshot-harness.js`
+  asserts all of this, mutation-tested.
 - **Element types:** junction, reservoir, tank, pipe, pump, valve, text. **Our vocabulary is NOT
   EPANET's and stays that way** (Tom, 2026-08-21, ROADMAP Task 482): what we call a **Label**
   EPANET calls Notation/Annotation, and what EPANET calls a **Label** is our **Text** object.
