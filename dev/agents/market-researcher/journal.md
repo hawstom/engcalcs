@@ -1524,3 +1524,120 @@ every tool checked this session actually does.
    my colleague's observation 1.
 
 — Mary
+
+## 2026-09-21 — Tom's find: WaterModels.jl (lanl-ansi.github.io), "is this a file format?"
+
+Tom's own words, flagged for direct answer per his hedge: *"I found this interesting file format
+standard... I think that's what it is, but I am not sure."* **Straight answer: no, it is not a file
+format, and not a standard.** It is a Julia software package — a research code library — for doing
+optimization math on water networks. It reads a network already described by someone else's format
+(EPANET `.inp`, or its own internal JSON) and does calculations on top of it. Calling it a "standard"
+overstates what it is; nobody else has adopted its JSON shape as an interchange format the way EPANET
+`.inp` has been adopted industry-wide.
+
+### 1. What it actually is
+
+CITED, `github.com/lanl-ansi/WaterModels.jl` (README, fetched 2026-09-21): *"WaterModels.jl is a
+Julia/JuMP package for steady state water network optimization. It is designed to enable computational
+evaluation of historical and emerging water network formulations and algorithms using a common
+platform."* It is **not** a simulator in EPANET's sense (given a network and demands, tell me the
+pressures) — it is an **optimizer**: given a network, formulate and solve a mathematical program that
+picks the best pump schedule, the best pipe sizes for a new design, or the best valve settings, subject
+to hydraulic constraints, using mixed-integer (non)linear programming. CITED (arXiv, fetched via search
+2026-09-21): Tasseff et al., *"Polyhedral relaxations for optimal pump scheduling of potable water
+distribution networks,"* arXiv:2208.03551; Tasseff et al., *"Exact mixed-integer convex programming
+formulation for optimal water network design,"* arXiv referenced from the same author group — these
+are the two named problem classes the package is actually built to solve: **pump scheduling** and
+**network design under a cost objective**, not day-to-day simulation.
+
+**Maintainer:** LANL-ANSI — the Advanced Network Science Initiative at Los Alamos National Laboratory.
+CITED (WebFetch of the repo, 2026-09-21): primary developer named as Byron Tasseff, a LANL researcher.
+This is one sibling of a family — PowerModels.jl (electric grid), GasModels.jl, WaterModels.jl —
+built on a shared `InfrastructureModels.jl` base, all from the same LANL group, all aimed at the same
+audience: **operations-research / power-systems-optimization academics**, not field engineers. CITED:
+the repo's own funding note (fetched today) states this work is supported by the US Department of
+Energy's Advanced Grid Modeling Program, under a project titled *"Coordinated Planning and Operation
+of Water and Power Infrastructures for Increased Resilience and Reliability"* — i.e. it exists to let
+power-grid researchers study water-power coupling (pumps are big electric loads), not to serve water
+utilities directly.
+
+### 2. What it reads and writes — the part with the most potential value to us
+
+- **Reads EPANET `.inp` directly.** CITED, its own docs example: `examples/data/epanet/van_zyl.inp`.
+  This suite already reads and writes `.inp` byte-identically (`js/lpn-inp.js`, CLAUDE.md), so there is
+  **no new import capability WaterModels.jl's existence would unlock for us** — anywhere it can read a
+  network from, we already can.
+- **Its own native format is JSON, and it is NOT industry-adopted.** CITED, its docs "Network Data
+  Format" page (fetched 2026-09-21): *"can be serialized to JSON for algorithmic data exchange."* It is
+  a dictionary keyed on `node`, `demand`, `reservoir`, `tank`, `pipe`, `des_pipe` (a *design* pipe — a
+  candidate pipe not yet built, unique to the optimization use case), `short_pipe`, `pump`, `valve`,
+  `regulator`, plus scalar base units (`base_flow`, `base_head`, `base_length`, `base_mass`,
+  `base_time`) for **non-dimensionalizing the problem for the solver** — a detail that only makes sense
+  inside an optimization formulation, never inside a simulator or a GIS tool. **This JSON schema is
+  purpose-built for feeding a mathematical solver, not for interchange between hydraulic tools.** I
+  found no other tool, library, or standard (searched specifically) that reads or writes this JSON
+  shape besides WaterModels.jl's own sibling packages (`PowerWaterModels.jl`). It is a private wire
+  format for one code family, not a "format standard" in the sense EPANET `.inp` or GeoJSON are.
+
+### 3. Health, licence, and who actually uses it
+
+- **Licence: modified BSD**, per the repo (fetched 2026-09-21) — permissive, GPL-compatible in the
+  direction that matters (a GPL project like this suite could read BSD code; it is our own `.inp`
+  format doing the actual interop work, not their licence, that matters here since we would not be
+  importing their code).
+- **Activity, measured directly via the GitHub API today:** 77 stargazers, 14 forks, 13 open issues,
+  created 2017-05-22, last push 2025-04-11 — small and research-cadence, not dead, not a large or
+  fast-moving project. CITED: `api.github.com/repos/lanl-ansi/WaterModels.jl`, fetched 2026-09-21.
+  Compare to epanet-js's own repo activity (journal 2026-09-04/05/06 entries, actively shipping) — this
+  is a smaller, slower, academic-paced project by every measure available.
+- **No utility or municipal adoption found, searched specifically.** CITED (search, 2026-09-21): every
+  result naming WaterModels.jl in a deployment context was itself a national-lab or DOE-funded research
+  paper (e.g. ORNL's "Data-driven modeling of municipal water system responses to hydroclimate
+  extremes," which studies utilities but is itself a research output, not a utility using the tool). I
+  found no forum post, case study, conference talk, or vendor page describing a water utility, a small
+  system, an EWB chapter, or a consulting engineer using WaterModels.jl in practice. **This is a real
+  result, not an oversight — I looked and found nothing**, and it is the sharpest single fact for this
+  seat's question.
+
+### 4. Does anyone our users resemble actually use this?
+
+**No, on the evidence available.** This is squarely a research tool used by power-systems and
+operations-research academics (the PowerModels.jl/GasModels.jl/WaterModels.jl family, DOE-funded, LANL-
+authored) to publish papers on optimal pump scheduling and network design formulations. None of the ten
+populations in this seat's standing list (US small/rural systems, NRWA members, RWSN, EWB chapters,
+Peace Corps volunteers, epanet-js users, Bentley customers, K-water, FREEWAT users, AWWA Small Systems)
+resemble a Julia/JuMP-fluent optimization researcher. Running it requires installing Julia, the JuMP
+modeling layer, and a MINLP solver (Ipopt, Juniper, or a commercial solver like Gurobi/CPLEX for the
+harder formulations) — a setup cost with no analogue anywhere in this suite's zero-install,
+zero-account browser model.
+
+### 5. What we can do with it, ranked, including the honest zero
+
+1. **Nothing operational — do not build an importer, do not adopt its JSON, do not add it as a
+   dependency or a cited interoperability target.** Everything it reads we already read (`.inp`); its
+   own format has no outside adoption to interoperate WITH; and its user base does not overlap ours.
+   Zero cost to leave alone, and the honest recommendation.
+2. **Not a citation for `dev/positioning.md` either.** That file's job is positioning against tools our
+   actual users choose between (EPANET, epanet-js, Bentley) — WaterModels.jl is not a competitor or a
+   comparator in that sense; it solves a different problem (optimization, not simulation/design-by-
+   drawing) for a different audience (researchers, not utilities or volunteers). Naming it there would
+   not sharpen anything a real visitor is deciding between.
+3. **The one genuinely interesting idea, sized honestly as a "maybe never," not a roadmap item:** the
+   *concept* of "candidate/design pipe" (`des_pipe` — a pipe that does not yet exist, being evaluated
+   for whether to build it) is a real modeling need this suite's `lpn_` does not have a name for today
+   (a planning engineer sizing a proposed main has no "candidate, not yet real" pipe state distinct
+   from a built one). This is SPECULATION, not a citation — I am not aware of anyone asking this suite
+   for it, and it would be a design-tool feature, not an optimization one; WaterModels.jl merely
+   supplied the vocabulary that made the gap visible to me. Flagging for a later invocation to
+   re-derive against actual demand before treating it as anything more than a noticed word.
+4. **Answer his literal question plainly, because that is the actual ask:** it is not a file format, it
+   is a Julia optimization package from a national lab, built for a different job (optimal design/pump
+   scheduling research) than what this suite does (interactive drawing and steady-state solve for a
+   design or a field check), used by a different population (DOE-funded academics) than this suite's
+   ten researched populations, and there is no evidence anyone in our audience has ever touched it.
+
+**What I could not find, stated plainly:** any case of a water utility, small system, or engineer
+outside the LANL/DOE/academic-optimization sphere using WaterModels.jl for real work — searched
+directly, found nothing, and record that absence as the finding rather than guessing past it.
+
+— Mary
