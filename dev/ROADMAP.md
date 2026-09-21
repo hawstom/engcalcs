@@ -1874,6 +1874,46 @@ the block.
   - **PERVASIVE is the word that sizes it.** Notices are written in many places today with no shared
     door, which is the same shape as Task 701's forty invisible show/hide sites. Expect a seam, not
     a widget.
+  - **IDA ANSWERED IT 2026-09-21, AND THE COUNT IS WORSE THAN TASK 701's.** QGIS runs **two**
+    mechanisms and not one: `QgsMessageBar`, transient and colour-coded, and `QgsMessageLog`, a
+    PERSISTENT store the bar only mirrors, opened from one icon at the end of the status bar.
+    AutoCAD makes the same split (command line against the F2 text screen), and Material Design's
+    own guidance says an auto-dismissing notice is inaccessible on its own. **A log fixes "let me
+    look that up"; it does not fix "I could not read it fast enough" -- both halves matter.**
+  - **SIX WAYS THIS PAGE TELLS SOMEBODY SOMETHING**, counted: `setNotice()` (66 sites, one door,
+    8-second expiry, **a later message silently replaces an earlier one**), `setStatus()` (19
+    sites, one door, persistent), `setEngineNotes()` (one door, two-minute fade),
+    `renderBanner()` (one render door, five kinds, dismissable and not restorable),
+    `paneFilterBanner()` (3 sites), and **57 raw `alert()`/`confirm()` calls with no shared door at
+    all**. That last group is WORSE than Task 701's finding rather than merely the same shape: 701
+    found writers blind to an existing guard, and here there was never a door to be blind to.
+  - **THE DIALOG BEHIND HIS COMPLAINT IS PROBABLY `presentOpenChoice()`**, whose Cancel branch
+    leaves no residue at all -- nothing to reopen, which is exactly *"Help! What did I miss!"*
+  - **HER RANKING, cheapest first, and the first row is the whole of his complaint:** (1) teach
+    `setNotice()` -- already one function -- to keep a small in-memory history, and put one modest
+    icon near the existing status box to read it back. **A log behind a control, not a fifth bar of
+    chrome.** No new storage, no new severities. (2) Fold the lock/file banner into the same log,
+    since it carries real decisions and has no way back once dismissed. (3) Audit the 57 raw
+    dialogs for which must genuinely block and which are merely information -- that is the
+    feature-branch-sized piece he floated. (4) **Keep severity at the two colours the banner
+    already uses honestly. Do not import QGIS's four**; this page does not have four kinds of event.
+
+- 75|706| **Every committed cell saves the WHOLE project, and nothing holds it back.**
+  Found by Declan 2026-09-21, answering Tom's *"is it fast enough for Declan?"* -- his answer was
+  **yes**, and this is the thing he found while proving it.
+  - **The recalculation waits until you pause. The save does not.** Every cell commit serialises
+    and stores the entire project, not the one thing that changed, on every keystroke-equivalent,
+    uncapped.
+  - **He would not claim a number he could not honestly measure**, and that restraint is the point:
+    with no real browser he built a stand-in on a document shaped like Tom's and got **about 2.6 ms
+    per save at 400 elements -- a FLOOR, not a ceiling**, because it skips the browser's actual
+    write. Small enough not to change his verdict today, and it grows with the network.
+  - **A third thing of the same shape is NAMED and deliberately not sized:** a scan across every
+    element on the map on every commit, running even when nothing about scenarios has changed
+    (`refreshScenarioMarks()`).
+  - **THE CHEAP WAY TO SETTLE IT IS FIVE MINUTES OF A REAL BROWSER** -- the Performance tab open,
+    ten cells typed down a column of the biggest real project. That replaces a stand-in number with
+    a real one, and it is the one thing that could overturn his yes.
 
 - 100|705| **New zoom rules: a symbol may not grow past a size the network itself sets.**
   Tom, 2026-09-21, asking for discussion and a plan rather than a build.
