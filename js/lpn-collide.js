@@ -448,6 +448,92 @@ EngCalcs.lpnCollide = (function () {
 		}
 		return best;
 	}
+	// **THE SAME TABLE, RANKED INSTEAD OF REDUCED TO ITS WINNER** (Tom, 2026-09-19: *"it's important
+	// that they know beforehand the good places to hunt based on a stable model of the network that
+	// doesn't have to be rebuilt at every zoom."*). `nodeContext` already holds EVERY gap between a
+	// node's pipes and survives a zoom, a pan and a drag; widestArc() then threw all but one away.
+	// This publishes the whole table widest-first, which is the stable angular model his (b) asks
+	// for -- the DIRECTIONS to hunt in and the ORDER to try them. The distances cannot join it and
+	// section 18c says why: a label's box is a fixed number of screen pixels, so how far out a place
+	// lies is a per-view quantity however stable the bearings are.
+	function rankedArcs(arcs) {
+		return (arcs || []).slice().sort(function (a, b) {
+			var wa = a.end - a.start, wb = b.end - b.start;
+			if (wa !== wb) { return wb - wa; }
+			return a.start - b.start;   // a tie goes to the lower bearing, as widestArc() does
+		});
+	}
+	// ---- THE SEARCH WIDENS RATHER THAN GIVING UP -------------------------------------------------
+	//
+	// **Tom, 2026-09-19 and again 2026-09-21: *"there is infinite space available. Moving is fine,
+	// but dropping is not."*** He is right, and section 16j measured how far from right the pass was:
+	// a node label's whole search was at most 28 points, inside ONE wedge between its own pipes,
+	// within three resting offsets -- and it was DROPPED the moment those came up empty. Re-searched
+	// against the pass's own obstacle list, **not one dropped label on any view of any example was
+	// actually enclosed.** Thirty-six labels vanish from the fit view of his own drawing at his own
+	// test prefix and the plane they were standing on was not full.
+	//
+	// So this generates the NEXT ring of places to look, one level at a time, and
+	// placeLabelsFirstFit() calls it only when the ordinary set has come up empty. Three properties
+	// make it safe to switch on without re-deciding any drawing:
+	//
+	//   1. **A label that already had a place keeps exactly that place.** Level 0 is untouched and
+	//      the escalation is reached only on the branch that used to write `dropped: true`.
+	//   2. **It costs nothing where nothing is dropped.** The generator is not called at all.
+	//   3. **It is all-round from level 1**, so it subsumes the ARC bound, and it is denser than the
+	//      24-point raster, so it subsumes the RESOLUTION bound, and it reaches further at each
+	//      level, so it subsumes the RADIUS bound. Those are the three bounds section 16j named.
+	//
+	// **NEAREST FIRST, AND WITHIN A RADIUS THE OPEN DIRECTIONS FIRST.** Radii ascend, so a rescued
+	// label sits as close to its node as the drawing allows rather than wherever the sweep happened
+	// to start. Within one radius the bearings are ordered by rankedArcs() -- the widest gap between
+	// the node's own pipes first, then the next -- so the rescue hunts where the stable model says
+	// the room is, and a bearing in no open arc at all is tried last rather than never.
+	var WIDEN_LEVELS = [
+		{ mult: 1, step: 10, rings: 4 },    // the same ground, all round and sampled properly
+		{ mult: 3, step: 10, rings: 7 },    // out to nine resting offsets
+		{ mult: 8, step: 12, rings: 10 }    // out to twenty-four, which is past anything measured
+	];
+	function widenSides(anchor, offset, arcs, outer, level) {
+		var spec = WIDEN_LEVELS[level - 1];
+		if (!spec) { return []; }
+		var home = Math.hypot((offset && offset.x) || 0, (offset && offset.y) || 0) || 1,
+			base = outer > 0 ? outer : home * 3,
+			prev = level > 1 ? base * WIDEN_LEVELS[level - 2].mult : home,
+			far = base * spec.mult,
+			ranked = rankedArcs(arcs), out = [], radii = [], angs = [], i, j, r, rad;
+		if (!(far > prev)) { return []; }
+		for (i = 0; i < spec.rings; i++) {
+			radii.push(prev + (far - prev) * (spec.rings === 1 ? 1 : (i + 1) / spec.rings));
+		}
+		// Rank every bearing once: which open arc it lies in (widest first), then how near that
+		// arc's middle it is. A bearing in no open arc is a direction one of the node's own pipes
+		// leaves in; it is tried LAST, never dropped, which is the whole difference from the sector.
+		for (i = 0; i < 360; i += spec.step) {
+			var rank = ranked.length, off = 0, a = norm360(i);
+			for (j = 0; j < ranked.length; j++) {
+				var lo = norm360(ranked[j].start), hi = lo + (ranked[j].end - ranked[j].start),
+					t = a < lo ? a + 360 : a;
+				if (t <= hi) { rank = j; off = Math.abs(t - (lo + hi) / 2); break; }
+			}
+			angs.push({ deg: i, rank: rank, off: off });
+		}
+		angs.sort(function (x, y) {
+			if (x.rank !== y.rank) { return x.rank - y.rank; }
+			if (x.off !== y.off) { return x.off - y.off; }
+			return x.deg - y.deg;
+		});
+		for (i = 0; i < radii.length; i++) {
+			r = radii[i];
+			for (j = 0; j < angs.length; j++) {
+				rad = angs[j].deg * Math.PI / 180;
+				out.push({ x: anchor.x + r * Math.cos(rad), y: anchor.y + r * Math.sin(rad),
+					corner: -1, deg: norm360(angs[j].deg), widened: level });
+			}
+		}
+		return out;
+	}
+	var WIDEN_MAX_LEVEL = WIDEN_LEVELS.length;
 	// **POLAR, NOT RECTANGULAR, AND THAT FOLLOWS FROM THE SHAPE OF WHAT IS BEING SAMPLED.** A sector
 	// is bounded by two angles and a radius, so a polar grid needs no rejection step at all, where a
 	// rectangular one samples a square and throws most of it away. Radii are geometric inner->outer
@@ -1210,7 +1296,7 @@ EngCalcs.lpnCollide = (function () {
 		opts = opts || {};
 		var pad = opts.pad > 0 ? opts.pad : 0,
 			obs = { boxes: obstacles.boxes.slice(), segments: obstacles.segments.slice() },
-			order = labels.slice(), out = [], maxReach = 0,
+			order = labels.slice(), out = [], maxReach = 0, deferred = [],
 			local = { boxes: [], segments: [] }, index;
 		// **THE QUERY IS CENTRED ON THE ANCHOR, BUT THE BOX HANGS OFF THE ENDPOINT, AND THE REACH
 		// MUST COVER BOTH.** Getting this wrong is silent and looks like a taste problem: the pass
@@ -1242,6 +1328,26 @@ EngCalcs.lpnCollide = (function () {
 			if ((a.priority || 0) !== (b.priority || 0)) { return (b.priority || 0) - (a.priority || 0); }
 			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 		});
+		// **THE WIDE QUERY, FOR THE FEW LABELS THAT ESCALATE.** index.near() answers from the 3x3
+		// block around the point, which covers a radius up to one cell and no further -- so a
+		// widened search that reached past the cell would silently stop seeing obstacles and commit
+		// an overlap, which is the quietest way this module could ever be wrong. The escalation is
+		// reached only by a label the pass was about to DROP, a handful per drawing, so it takes one
+		// honest linear pass over the obstacle list instead. Same narrow-phase distance test the
+		// cells use, so the set that comes back is the set that is really within reach.
+		function farNear(x, y, r, out) {
+			var i, o;
+			out.boxes.length = 0; out.segments.length = 0;
+			for (i = 0; i < obs.boxes.length; i++) {
+				o = obs.boxes[i];
+				if (Math.hypot(o.cx - x, o.cy - y) < r + Math.hypot(o.w, o.h) / 2) { out.boxes.push(o); }
+			}
+			for (i = 0; i < obs.segments.length; i++) {
+				o = obs.segments[i];
+				if (pointToSegmentDistance(x, y, o) < r) { out.segments.push(o); }
+			}
+			return out;
+		}
 		order.forEach(function (lbl) {
 			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
 				chosen = null, chosenBox = null, i, c, b, verdict,
@@ -1260,6 +1366,15 @@ EngCalcs.lpnCollide = (function () {
 				// such a side existed is the ranking working backwards.
 				if (verdict === 'yielding' && !fallback) { fallback = c; fallbackBox = b; }
 			}
+			// **AND WHEN NOTHING AT ALL IS CLEAR, THE LABEL IS SET ASIDE RATHER THAN DROPPED.**
+			// This is the exact branch that used to write `dropped: true` on a plane with room on
+			// it. It is reached only by a label with no clear side AND no merely yielding one, so a
+			// label that had a place still takes that place, here, in this order, unchanged.
+			// Setting it aside commits nothing -- exactly as dropping it committed nothing -- so
+			// **every label placed in this loop lands where it landed before the widening existed.**
+			// That is the property that makes this switchable on without re-deciding a drawing, and
+			// dev/lpn-spike/label-widen-harness.js is what holds it.
+			if (!chosen && !fallback && lbl.widen) { deferred.push(lbl); return; }
 			if (!chosen && fallback) { chosen = fallback; chosenBox = fallbackBox; }
 			if (!chosen) {
 				// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
@@ -1279,6 +1394,57 @@ EngCalcs.lpnCollide = (function () {
 				// overlap count); `boxes` is what the pass actually reserved.
 				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null });
 		});
+		// ---- PHASE TWO: THE SEARCH WIDENS INSTEAD OF DECLARING DEFEAT ---------------------------
+		//
+		// **Tom, 2026-09-19 and again 2026-09-21: *"there is infinite space available. Moving is
+		// fine, but dropping is not."*** Everything above has had its say and committed its ground;
+		// what is left is the labels for which the ordinary 28 points were all occupied. Each one is
+		// now offered wider and wider rings until something is clear, nearest ring first and the
+		// node's own open directions first within a ring (widenSides).
+		//
+		// **RUNNING IT LAST IS THE WHOLE OF THE SAFETY ARGUMENT**, not an efficiency: a rescued
+		// label commits a box, and a box committed mid-order would push the labels after it around.
+		// Placed here it can displace nobody, because there is nobody left to displace. Measured on
+		// Net3-Novato-CA-World: inline, the rescue moved 22 labels that already had places; last, it
+		// moves none, and draws the same ones.
+		//
+		// A label that is STILL beaten here is genuinely enclosed as far as level 3 reaches -- past
+		// twenty resting offsets, which is further than any measured case needed -- and only then is
+		// it dropped.
+		function rescue(lbl) {
+			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
+				chosen = null, chosenBox = null, level, more, far, i, b,
+				wide = { boxes: [], segments: [] };
+			for (level = 1; level <= WIDEN_MAX_LEVEL && !chosen; level++) {
+				more = widenSides(lbl.anchor, lbl.widen.offset, lbl.widen.arcs,
+					lbl.widen.outer, level);
+				if (!more || !more.length) { break; }
+				far = 0;
+				for (i = 0; i < more.length; i++) {
+					far = Math.max(far, Math.hypot(more[i].x - lbl.anchor.x,
+						more[i].y - lbl.anchor.y));
+				}
+				farNear(lbl.anchor.x, lbl.anchor.y, far + Math.hypot(lbl.w, lbl.h) + pad, wide);
+				sides = sides.concat(more);   // a COPY: the caller's own array is never touched
+				for (i = sides.length - more.length; i < sides.length; i++) {
+					b = labelLineBoxes(lbl, sides[i]);
+					if (boxesClearOf(b, wide, pad, lbl.id) === 'clear') {
+						chosen = sides[i]; chosenBox = b; break;
+					}
+				}
+			}
+			if (!chosen) {
+				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
+					dropped: true, side: -1, box: null, leader: null });
+				return;
+			}
+			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			out.push({ id: lbl.id, x: chosen.x, y: chosen.y,
+				dx: chosen.x - lbl.home.x, dy: chosen.y - lbl.home.y,
+				dropped: false, side: sides.indexOf(chosen), widened: chosen.widened || 1,
+				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null });
+		}
+		deferred.forEach(rescue);
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
 		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
@@ -2451,6 +2617,9 @@ EngCalcs.lpnCollide = (function () {
 		widestArc: widestArc,
 		polarCandidates: polarCandidates,
 		cardinalSides: cardinalSides,
+		rankedArcs: rankedArcs,
+		widenSides: widenSides,
+		WIDEN_MAX_LEVEL: WIDEN_MAX_LEVEL,
 		SIDE_STRATEGIES: SIDE_STRATEGIES,
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,

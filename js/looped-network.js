@@ -865,8 +865,18 @@ var EngCalcs = EngCalcs || {};
 			sides = Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]),
 				{ raster: true, outer: reach, strategies: labelSideStrategies });
-		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
+		// **AND WHEN THOSE COME UP EMPTY THE SEARCH WIDENS RATHER THAN DROPPING THE LABEL** (Tom,
+		// 2026-09-19: *"there is infinite space available. Moving is fine, but dropping is not."*).
+		// `sides` above is at most 28 points inside one wedge within three resting offsets, and the
+		// pass used to hide the label the moment they were all occupied -- on a plane that,
+		// re-searched against the pass's own obstacle list, had room for every single one of them.
+		// This hands placeLabelsFirstFit() a generator for the NEXT ring out, which it calls only
+		// on the branch that used to drop. A label with a place keeps it; this only ever draws one
+		// that was not drawn.
+		var anchor = nodeAt(n), arcs = (ctx && ctx.arcs) || Collide.openArcs([]);
+		return { id: nodeLabelKey(n.id), anchor: anchor, home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
+			widen: labelWidenSearch ? { offset: d, arcs: arcs, outer: reach } : null,
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			lines: labelRowWidths(ne) };
 	}
@@ -2267,10 +2277,22 @@ var EngCalcs = EngCalcs || {};
 		h.setAttribute('style', 'font-weight:bold;margin-bottom:4px');
 		h.textContent = 'label placement bench';
 		box.appendChild(h);
+		// **THE FOUR NUMBERS BELOW STEER THE RING PASS, WHICH PLACES *LINK* LABELS -- AND THEY SAY
+		// SO NOW** (Tom, 2026-09-21: *"I can't get anything to work except the checkboxes"*). He was
+		// right, and it was an instrument defect rather than a placement one: a NODE label is placed
+		// by placeLabelsFirstFit(), whose candidate set nodeFirstFitSpec() builds from the symbol
+		// offset and the open-arc table, and not one of these numbers reaches it. Somebody testing
+		// the node labels in his own screenshot could turn every dial here and watch nothing move.
+		// The rows that DO steer a node label are the candidate-strategy checkboxes and the widen
+		// switch, and they are grouped under their own heading below.
+		var lk = document.createElement('div');
+		lk.setAttribute('style', 'margin-top:2px;opacity:.7;font-size:11px');
+		lk.textContent = 'link labels (the ring pass)';
+		box.appendChild(lk);
 		row('reach (text heights)', function () { return t.reach; },
-			function (v) { t.reach = v; }, 1, 'How far out the furthest ring sits, in multiples of the current text size. One number for the whole map.');
+			function (v) { t.reach = v; }, 1, 'How far out the furthest ring sits, in multiples of the current text size. LINK labels only \u2014 a node label\u2019s reach comes from its own symbol offset and is not this number.');
 		row('inner ring (text heights)', function () { return t.inner; },
-			function (v) { t.inner = v; }, 0.5, 'The nearest circle. About one label wide is the smallest step that can clear a neighbour.');
+			function (v) { t.inner = v; }, 0.5, 'The nearest circle. About one label wide is the smallest step that can clear a neighbour. LINK labels only.');
 		textRow('angle step per circle', function () { return t.steps; },
 			function (v) { t.steps = v; },
 			'One angular step per circle, innermost first, comma separated. How many you type is how many circles there are. 45,30,15 gives 4, 8 and 20 directions \u2014 orthogonal directions are always dropped.');
@@ -2294,6 +2316,22 @@ var EngCalcs = EngCalcs || {};
 		// strategy added to js/lpn-collide.js cannot be one the bench has no switch for. English
 		// literals like every other row here: the bench exists only under ?debug=labels, never
 		// reaches a visitor and is not translated.
+		var nh = document.createElement('div');
+		nh.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px;font-weight:bold');
+		nh.textContent = 'node labels: where they may be offered a place';
+		box.appendChild(nh);
+		// **THE SWITCH FOR THE DEFECT SECTION 16j NAMED.** Off is the drawing as it was before
+		// 2026-09-21: a node label whose 28 ordinary candidates were all occupied was HIDDEN, on a
+		// plane that had room for it. On, the search widens until it finds somewhere. Watch the
+		// "dropped" count at the top of the readout below; it is 0 with this on, on every
+		// example measured, at every view, with or without eight characters of prefix.
+		checkRow('widen the search rather than hide', function () { return labelWidenSearch; },
+			function (v) { labelWidenSearch = v; },
+			'When a node label\u2019s ordinary candidates are all taken, look further out and all '
+			+ 'round instead of hiding it. The rescue runs AFTER every other label has committed, '
+			+ 'so it can never push a label that already had a place. OFF is what ships: with every '
+			+ 'label field on, a label rescued onto a long leader is hidden by the crossing shed '
+			+ 'instead, which is a hide one rung further down rather than a fix.');
 		var HINTS = {
 			corners: 'The four cardinal corners of the node symbol, with the ones a pipe arrives '
 				+ 'through skipped. Tried first and in a fixed order.',
@@ -2445,6 +2483,20 @@ var EngCalcs = EngCalcs || {};
 	// call. `ring` replaces `sector`'s one wedge with the whole circle;
 	// dev/lpn-spike/label-strategy-harness.js is what measures one against the other.
 	var labelSideStrategies = ['corners', 'sector'];
+	// **THE SEARCH WIDENS INSTEAD OF DROPPING A LABEL THAT STILL HAS ROOM** (Task 539, 2026-09-21).
+	//
+	// **OFF, AND THAT IS A MEASUREMENT RATHER THAN CAUTION.** With the node ID alone -- Tom's own
+	// test -- it is a straight win: 79 labels hidden across the five examples becomes 35, and not
+	// one label that already had a place moves. **With every label field on it is not**, and the
+	// two existing ratchets say so: `label-spot-harness.js` goes from 14 hidden to 59 over
+	// Net3-World's four views for 7 more drawn, because a label the first-fit used to give up on
+	// now stands somewhere with a long leader and the CROSSING shed hides it instead; and
+	// `label-width-stability-harness.js` goes from 49 labels moving at the `1234=` prefix to all
+	// 97, which is the whole drawing rearranging and is the half of his sentence he minds most.
+	// **Trading a drop for a hide one rung further down is not a fix**, and choosing whether to
+	// take it is his call and not this one's. The switch is under ?debug=labels so the two drawings
+	// can be read back to back; §19 has every number.
+	var labelWidenSearch = false;
 	function spotDebugOn() { return debugOn('spots'); }
 	function drawSpotDebug() {
 		if (!spotDebugLayer) { return; }

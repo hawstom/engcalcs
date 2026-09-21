@@ -100,12 +100,18 @@ function runChild(file, useCSV, mutation) {
 		spanX = Math.max(spanX, Math.abs(n.x - cx)); spanY = Math.max(spanY, Math.abs(n.y - cy));
 	});
 	const base = 600 / (Math.max(spanX, spanY, 1e-9) * 2);
-	const out = { zooms: [] };
+	const out = { zooms: [], ms: 0 };
 	[1, 2, 4, 8].forEach(function (mult) {
 		if (!L.setView({ cx: cx, cy: cy, s: base * mult })) { out.zooms.push(null); return; }
 		// The strategy set is applied BEFORE the content pass, because the pass builds the specs.
 		L.setStrategies(useCSV.split(','));
+		// **WHAT THE RING COSTS, because Tom asked for a number** (2026-09-21: *"at what performance
+		// cost?"*). The whole content pass is timed, not the candidate generator alone: generating a
+		// candidate costs no obstacle query, so the honest question is what the pass costs end to
+		// end when the set it is choosing from is bigger.
+		const t0 = process.hrtime.bigint();
 		L.refreshLabelText();
+		out.ms += Number(process.hrtime.bigint() - t0) / 1e6;
 		let drawn = 0, hidden = 0, total = 0;
 		const where = {};
 		doc.nodes.forEach(function (n) {
@@ -120,6 +126,7 @@ function runChild(file, useCSV, mutation) {
 		out.zooms.push({ drawn: drawn, hidden: hidden, total: total, where: where });
 	});
 	out.applied = L.getStrategies().join(',');
+	out.ms = Number(out.ms.toFixed(1));
 	return out;
 }
 
@@ -187,7 +194,9 @@ function main() {
 			if (r.error) { console.log('    ' + s.tag.padEnd(24) + 'ERROR ' + r.error); bad = true; return; }
 			const t = totals(r), moved = s.tag === baseTag ? 0 : movedAgainst(got[baseTag], r);
 			grand[s.tag].drawn += t.drawn; grand[s.tag].hidden += t.hidden; grand[s.tag].moved += moved;
+			grand[s.tag].ms = (grand[s.tag].ms || 0) + got[s.tag].ms;
 			console.log('    ' + s.tag.padEnd(24) + 'drawn ' + String(t.drawn).padStart(5)
+				+ '   ' + String(got[s.tag].ms.toFixed(0)).padStart(5) + ' ms'
 				+ '   hidden ' + String(t.hidden).padStart(4)
 				+ '   moved ' + String(moved).padStart(5));
 		});
@@ -215,6 +224,7 @@ function main() {
 		console.log('\n  ALL EXAMPLES, four views each');
 		SETS.forEach(function (s) {
 			console.log('    ' + s.tag.padEnd(24) + 'drawn ' + String(grand[s.tag].drawn).padStart(5)
+				+ '   ' + String((grand[s.tag].ms || 0).toFixed(0)).padStart(5) + ' ms'
 				+ '   hidden ' + String(grand[s.tag].hidden).padStart(4)
 				+ '   moved ' + String(grand[s.tag].moved).padStart(5));
 		});

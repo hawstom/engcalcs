@@ -953,6 +953,14 @@ the block.
     Every named suspect measured zero -- no viewport bound, no grid effect, no reach or side rule
     reading the width. **The earlier answer to him was wrong and is retracted in §16h**; the fourteen
     are named in §16i.
+  - **THE DROP IS FIXED, 2026-09-21: THE SEARCH WIDENS RATHER THAN GIVING UP** (§19). A node label
+    with no ordinary candidate left is set aside and rescued from wider rings after everybody else
+    has committed, so **36 of 97 hidden at the fit view of his own drawing at his own `12345678`
+    prefix becomes 0**, and not one label that already had a place moves. Every label still hidden
+    anywhere is hidden by the CROSSING shed, which is his own phase-three rule. **The MOVING half of
+    his sentence is not fixed and the damping he marked Recommended cannot be built as stated** --
+    it needs the previous pass's answer, and a node label's place must be a pure function of the
+    drawing. §19d answers his four other questions; §19e is what was deliberately not done.
   - **THE ROOT DEFECT IS THE DROP, AND IT IS HIS FINDING** (*"there is infinite space available.
     Moving is fine, but dropping is not"*, §16j). A node label's whole search is at most **28 points,
     inside ONE wedge between its own pipes, within three resting offsets** -- and it is DROPPED the

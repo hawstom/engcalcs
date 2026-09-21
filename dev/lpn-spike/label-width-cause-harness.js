@@ -59,16 +59,21 @@ const ROOTJS = path.join(ROOT, 'js/lpn-collide.js');
 // does have a node symbol one label-width away -- the BOUNDED case, kept so the classifier can be
 // seen separating it from the unbounded ones rather than only asserted about them.
 // **`roomCeiling` IS A RATCHET ON THE DEFECT ITSELF: labels dropped while they still had room.**
-// Measured 2026-09-19, narrow and wide. Not one drop anywhere was genuinely enclosed, so these are
-// entirely the three bounds coming up empty on ground that was there. **The numbers may FALL and may
-// not RISE** -- lower them when a fix lands. An honest fix takes them to zero.
+// Measured 2026-09-19 at 12 / 32 / 1 / 5, every one of them a bound coming up empty on ground that
+// was there and not one of them genuinely enclosed. **THE HONEST FIX LANDED 2026-09-21 AND TOOK
+// THEM ALL TO ZERO** -- placeLabelsFirstFit() sets such a label aside and rescues it in a second
+// phase (widenSides), so the numbers below are now the ratchet they were always meant to be: they
+// may not rise, and there is nothing left to lower.
 const FIXTURES = [
 	{ tag: 'synthetic crowded', kind: 'synthetic', arg: 100, roomCeiling: { narrow: 0, wide: 0 } },
-	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 12, wide: 32 } },
-	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 1, wide: 5 } }
+	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 0, wide: 0 } },
+	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 0, wide: 0 } }
 ];
 // His own test: the same field, with and without four characters of Before text.
-const NARROW = '', WIDE = '1234=';
+// **THE AFFIX IS OVERRIDABLE FOR EXPLORATION ONLY** -- `LPN_WIDE_AFFIX=12345678 node ...` runs his
+// 2026-09-21 acceptance test. The ceilings above are measured at the default and are the ratchet;
+// an override prints its own numbers and asserts nothing about them.
+const NARROW = '', WIDE = process.env.LPN_WIDE_AFFIX || '1234=';
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -202,24 +207,55 @@ function replay(Collide, cap) {
 		if ((a.priority || 0) !== (b.priority || 0)) { return (b.priority || 0) - (a.priority || 0); }
 		return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 	});
-	const chosen = {}, snapshots = {};
+	const chosen = {}, snapshots = {}, candidates = {}, deferred = [];
 	order.forEach(function (lbl) {
 		const sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home];
 		// The obstacle list AS IT STOOD when this label was placed. Without it every rejection would
 		// be re-tested against the finished drawing, which is not what the pass saw.
 		snapshots[lbl.id] = { boxes: obs.boxes.slice(), segments: obs.segments.slice() };
-		let pick = -1, pickBox = null, fb = -1, fbBox = null;
-		for (let i = 0; i < sides.length; i++) {
-			const b = Collide.labelLineBoxes(lbl, sides[i]);
+		let pick = -1, pickBox = null, fb = -1, fbBox = null, all = sides;
+		for (let i = 0; i < all.length; i++) {
+			const b = Collide.labelLineBoxes(lbl, all[i]);
 			const v = lbl.dragged ? 'clear' : Collide.boxesClearOf(b, obs, pad, lbl.id);
 			if (v === 'clear') { pick = i; pickBox = b; break; }
 			if (v === 'yielding' && fb < 0) { fb = i; fbBox = b; }
 		}
+		// **SET ASIDE FOR PHASE TWO, exactly as the pass does.** A label with no clear side and no
+		// yielding one commits nothing here; it is rescued after everybody else has committed, so
+		// it can displace nobody.
+		if (pick < 0 && fb < 0 && lbl.widen) { deferred.push(lbl); return; }
 		if (pick < 0 && fb >= 0) { pick = fb; pickBox = fbBox; }
 		chosen[lbl.id] = pick;
+		// The list the index refers to, WIDENING INCLUDED, so a classifier asking "where did the
+		// narrow run put this label" can still find the point when that point came from an
+		// escalation rather than from `lbl.sides`.
+		candidates[lbl.id] = all;
 		if (pick >= 0) { pickBox.forEach(function (cb) { obs.boxes.push(cb); }); }
 	});
-	return { chosen: chosen, snapshots: snapshots, pad: pad };
+	// **PHASE TWO, REPLAYED TOO** (2026-09-21). The pass no longer drops a label when its ordinary
+	// candidates come up empty -- it widens, after everyone else has committed. A replay that did
+	// not follow it would disagree with the pass it is modelling, and the agreement count is the
+	// whole reason this file is evidence rather than a second opinion.
+	deferred.forEach(function (lbl) {
+		let all = (lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]).slice();
+		let pick = -1, pickBox = null;
+		snapshots[lbl.id] = { boxes: obs.boxes.slice(), segments: obs.segments.slice() };
+		for (let level = 1; level <= Collide.WIDEN_MAX_LEVEL && pick < 0; level++) {
+			const more = Collide.widenSides(lbl.anchor, lbl.widen.offset, lbl.widen.arcs,
+				lbl.widen.outer, level);
+			if (!more || !more.length) { break; }
+			const from = all.length;
+			all = all.concat(more);
+			for (let i = from; i < all.length; i++) {
+				const b = Collide.labelLineBoxes(lbl, all[i]);
+				if (Collide.boxesClearOf(b, obs, pad, lbl.id) === 'clear') { pick = i; pickBox = b; break; }
+			}
+		}
+		chosen[lbl.id] = pick;
+		candidates[lbl.id] = all;
+		if (pick >= 0) { pickBox.forEach(function (cb) { obs.boxes.push(cb); }); }
+	});
+	return { chosen: chosen, snapshots: snapshots, candidates: candidates, pad: pad };
 }
 
 // Every HARD obstacle in the way of a box stack, with enough about each to say where it is and
@@ -359,7 +395,10 @@ function classify(Collide, runs) {
 	const rows = [], named = [];
 	movers.forEach(function (id) {
 		const lw = labW[id], ln = labN[id], iN = N.chosen[id];
-		const sides = lw && lw.sides && lw.sides.length ? lw.sides : (lw ? [lw.home] : null);
+		// **THE NARROW RUN'S OWN LIST**, not the wide run's: the question is whether the point the
+		// narrow text chose is still free at the wider text, and with the widening in the pass that
+		// point may have come from an escalation the plain `sides` list does not contain.
+		const sides = N.candidates[id] || (lw && lw.sides && lw.sides.length ? lw.sides : (lw ? [lw.home] : null));
 		if (!lw || !ln || iN < 0 || !sides || !sides[iN]) {
 			tally.unclassified++;
 			rows.push([id, 'no comparable candidate at the wider text', '']);

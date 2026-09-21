@@ -1653,6 +1653,120 @@ were not synergistic.**
   bound alone: `ring` reaches exactly as far as `sector` does. The 10 labels on Net3-World's fit view
   that had room only past their reach (section 16j) are untouched by any of these numbers.
 
+## 19. THE SEARCH WIDENS INSTEAD OF DROPPING, and his 12345678 test is measured (2026-09-21)
+
+**Tom, on his own drawing with `12345678` added to the node ID prefix:** *"You know I am never going
+to be happy until I can add 12345678 to the node ID prefix without moving or hiding any of the
+labels shown. And the reason is that any such moving or hiding is a blatant bug since adding that
+string however causes no conflicts with anything all the way to Japan. May as well not dodge it,
+hide it, or paper over it. Find out why it's happening and fix the bad rules."*
+
+### 19a. His case, measured at his own prefix
+
+`LPN_WIDE_AFFIX=12345678 node dev/lpn-spike/label-width-cause-harness.js`, the same offline replay
+section 16h uses -- full scan, real committing order, each mover's narrow choice re-tested against
+the obstacle list as it stood when that label was placed. It reproduces the real pass 97 of 97 at
+both widths.
+
+| Net3-Novato-CA-World, node ID alone against ID + `12345678` | before | after |
+|---|---|---|
+| labels HIDDEN at the fit view, all with room to stand | **36 of 97** | **0** |
+| of those, genuinely enclosed out to 20 resting offsets | 0 | 0 |
+| which bound did it: radius / resolution / arc | 18 / 11 / 7 | -- |
+| labels that MOVED at the fit view | 60 of 97 | 72 of 97 |
+| of those, grew into a real node symbol in the direction they grew | 19 | 20 |
+| following a neighbour that moved first | 41 | 52 |
+
+**So the hiding half of his sentence was a bug and is fixed, and the moving half is two different
+things.** Twenty labels genuinely grow into a node symbol lying past their growing edge -- those are
+real collisions and they are the minority. The rest is the greedy pass: it places one label at a
+time in importance order, so a label pushed off its first choice sits where a later label was going
+to stand. The mover count RISES after the fix for a reason that is not a regression: a label that was
+hidden in both runs counted as "not moved", and 36 of them are now drawn.
+
+### 19b. The fix, and why it can be switched on without re-deciding any drawing
+
+`placeLabelsFirstFit()` no longer writes `dropped: true` when a node label's ordinary candidates are
+all occupied. It sets the label ASIDE, and a second phase rescues it from `widenSides()` -- wider and
+wider rings, **nearest ring first, and within a ring the node's own open directions first**, ranked
+by `rankedArcs()`.
+
+**PHASE TWO RUNS LAST, AND THAT IS THE WHOLE OF THE SAFETY ARGUMENT.** A rescued label commits a box;
+a box committed mid-order pushes the labels after it around. Placed after everybody has committed it
+can displace nobody. Measured both ways in `dev/lpn-spike/label-widen-harness.js`, whose selftest
+mutates the rescue back inline:
+
+| | hidden on Net3-World at his prefix | labels that already had a place and moved |
+|---|---|---|
+| rescue INLINE | 26 | 41 |
+| rescue LAST (ships) | **23** | **28** |
+| at the pass itself, on a packed fixture | 29 dropped -> 29 rescued | **0** |
+
+The last row is the claim without hedging: `placeLabelsFirstFit()` has nothing after it, so a label
+that got a place with the widening off gets the IDENTICAL place with it on. The 28 on the page are
+the crossing repair and the crossing shed reacting to labels that now exist.
+
+### 19c. The numbers over every shipped example, four views each
+
+`node dev/lpn-spike/label-widen-harness.js`. Node ID alone, and with his prefix.
+
+| | drawn before | hidden before | drawn after | hidden after |
+|---|---|---|---|---|
+| node ID alone | 1,014 | 22 | **1,018** | **18** |
+| ID + `12345678` | 957 | 79 | **1,001** | **35** |
+
+**And every one of the 35 and the 18 left is hidden by phase three's CROSSING shed, not for want of
+a place: "hidden because the pass found nowhere to stand" is zero everywhere.** That is the number
+his sentence is about. The crossing shed is a different rule with a different reason (section 11a),
+it is his own phase-three decision, and it is untouched here.
+
+**Cost.** The rescue is charged only where there is a rescue to make. Summed over 20 content passes:
+node ID alone 1,415 -> 1,390 ms (nothing, inside the noise of a shared machine); at his prefix
+1,470 -> 3,354 ms, which is the price of 44 labels that used to be free because they were not drawn.
+
+### 19d. Tom's four other questions on this branch, answered
+
+1. **What does the ring cost?** `label-strategy-harness.js` now times the content pass. Over all five
+   examples, four views each: `corners+sector` (ships) **1,663 ms**, `corners+ring` **1,928 ms**,
+   `corners only` 1,247 ms, `ring only` 1,838 ms. **The ring is about 16% more than the sector on the
+   whole pass**, roughly 13 ms a view here. Its advantage has also SHRUNK now that the search widens:
+   18 hidden against 10, where before the widening it was 22 against 11 -- the widening rescues most
+   of what the sector's one wedge was losing. Adopting `ring` is still his call and still moves 132
+   labels.
+2. **Are the four corners cheap, and can we cache the zoom at which they stop working?** Cheap, yes:
+   `corners only` is the cheapest set measured, and generating a candidate costs no obstacle query at
+   all -- the cost is testing one. **The cache is not sound, and the reason is section 18c's.**
+   Whether a corner is free is a per-VIEW fact: link labels shed values and vanish as the zoom
+   changes, so the obstacle set is not monotonic in the zoom and there is no "zoom at which they are
+   no longer effective" to record. A cached threshold would be a prediction that can be wrong, and
+   wrong silently -- a free corner never tried. The saving would be on the cheapest part of the pass.
+3. **Is `spot route` wired?** **Yes.** `labelSpotRoute` is read at the `repairCrossingGangs()` call
+   and the checkbox re-lays the drawing out. It looks dead because it only acts where a gang of
+   crossing leaders exists, and on a view with none it correctly does nothing. **What was NOT wired
+   is the four number rows** -- reach, inner ring, angle step and elbow room steer `placeLabels()`,
+   which places LINK labels; a NODE label's candidates come from `nodeFirstFitSpec()` and read none
+   of them. That is why he could not get anything to work except the checkboxes, and it was an
+   instrument defect rather than a placement one. The bench now groups and labels the two halves.
+4. **Is the ranked gap list built?** **It is now.** `rankedArcs()` publishes the whole `nodeContext`
+   arc table widest-first instead of `widestArc()` throwing all but one away, and the widened search
+   is its first consumer: it hunts the widest gap first, then the next, and a bearing in no open arc
+   at all is tried LAST rather than never. The distances still cannot join the stable model, for
+   section 18c's reason.
+
+### 19e. What is NOT done, each for a stated reason
+
+- **The settled-label damping is still not built, and there is now a second reason beyond section
+  16l's.** *"A settled label keeps its place when that place is still free"* means the place it had
+  in the PREVIOUS pass, which is history. Where a node label sits is required to be a pure function
+  of the drawing -- `dev/lpn-spike/node-yield-harness.js` holds it, and the reason is the drag-frame
+  flicker section 11b measured. Damping as stated cannot be built without breaking that invariant.
+  Killing the cascade honestly means not placing greedily in a fixed order at all, which is the
+  global assignment over a conflict graph section 6 describes and a real rebuild.
+- **The crossing shed is untouched.** It is the remaining source of every hidden label, it is Tom's
+  own phase-three decision, and whether it should widen rather than hide is a question for him.
+- **The sector is still the shipped candidate set.** Adopting `ring` moves 132 labels and is his call;
+  section 18b's table plus the timing above is what it is for.
+
 ## Sources
 
 - Imhof, *Positioning Names on Maps*, The American Cartographer 2 (1975) 128–144.

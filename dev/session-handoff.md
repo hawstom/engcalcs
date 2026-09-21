@@ -712,6 +712,28 @@ remembered "amazing stack of node labels" was that rule, and this commit is what
 **Do NOT build the settled-label damping first** -- it cannot draw one extra label and it hides the
 measurement (§16l).
 
+**AND THE ROOT DEFECT IS FIXED, 2026-09-21: THE SEARCH WIDENS INSTEAD OF DROPPING (§19).** A node
+label whose ordinary candidates are all occupied is no longer hidden -- it is set aside and rescued
+from wider and wider rings, all round the node, after every other label has committed. **On his own
+`12345678` test: 36 of 97 hidden at the fit view of Net3-Novato becomes 0**, and over all five
+examples at his prefix 79 hidden becomes 35 -- **and all 35 of those are phase three's CROSSING
+shed. "Hidden for want of somewhere to stand" is zero everywhere, on every example, at every view.**
+Running the rescue LAST is the whole safety argument and is asserted: at the pass itself, 29 rescued
+and **not one label that already had a place moved** (`dev/lpn-spike/label-widen-harness.js`, whose
+selftest mutates the rescue back inline and watches 41 labels get shoved). Cost: nothing at the plain
+ID, and 1,470 -> 3,354 ms over 20 content passes at his prefix, which is the price of 44 labels that
+used to be free because they were not drawn. **The MOVING half of his sentence is NOT fixed**: 20 of
+his movers genuinely grow into a node symbol and the rest is the greedy fixed-order pass. **The
+damping he marked Recommended cannot be built as stated** -- "keep the place it had" means the
+PREVIOUS pass's place, and a node label's position must be a pure function of the drawing
+(`node-yield-harness.js`). §19a-e, and his four other questions are answered in §19d.
+
+**AND THE `?debug=labels` BENCH WAS HALF DEAD, WHICH IS WHY HE COULD ONLY MOVE THE CHECKBOXES.** Its
+four number rows -- reach, inner ring, angle step, elbow room -- steer `placeLabels()`, which places
+LINK labels; a NODE label's candidates come from `nodeFirstFitSpec()` and read none of them. The rows
+are grouped and labelled now, and the node half has its own heading and a widen switch. **`spot route`
+IS wired** and always was; it only acts where a gang of crossing leaders exists.
+
 **AND THE STRATEGY SEAM HE ASKED FOR IS BUILT (§18).** `cardinalSides()` now takes
 `opts.strategies` (`corners`, `sector`, `ring`), the page states the shipped set once as
 `labelSideStrategies`, and `?debug=labels` grows one checkbox per strategy derived from
