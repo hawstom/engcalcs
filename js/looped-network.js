@@ -8470,8 +8470,18 @@ var EngCalcs = EngCalcs || {};
 	// The SERVICE CONNECTOR keeps its own hybrid stroke: it is a line weight rather than a symbol,
 	// it is not what he was looking at, and nothing in Symbol scale governs a stroke width
 	// (settings.linkWidth is the page's other line weight and is its own control).
-	var LPN_METER_NODE_FRAC = 0.25;    // of a junction's own radius -- his figure
-	var LPN_SERVICE_REAL_M = 0.2;      // the service connector's stroke, full width
+	//
+	// **THE REAL-WORLD HYBRID (`max(1 m, floor px)`) WAS RETIRED 2026-09-20** (Tom, item B: "The
+	// service line is fixed map width. It should be a lesser multiple of the link width or always
+	// just 1 px..."). A stroke held at a fixed REAL-WORLD size grows without bound on SCREEN as
+	// the view zooms in -- at close zoom it was wide enough to sit under a customer label placed
+	// right beside it, which is half of the label-clearance defect item (B) names. A lesser
+	// multiple of the pipe's own screen width is screen-constant like every other line weight on
+	// this map, so it never grows past a fraction of what the pipe itself draws at, at any zoom.
+	// **The other half of his sentence -- the line shrinking below 1px once the whole drawing
+	// stops growing -- is a separate, not-yet-written zoom-rules design and is not built here.**
+	var LPN_METER_NODE_FRAC = 0.25;      // of a junction's own radius -- his figure
+	var LPN_SERVICE_STROKE_FRAC = 0.5;   // of settings.linkWidth, screen px
 	var LPN_SERVICE_MIN_PX = 0.75;
 
 	// How many metres one world unit is, HERE. In a grid project a world unit IS the display length
@@ -8506,9 +8516,11 @@ var EngCalcs = EngCalcs || {};
 	function meterHalfWorld() {
 		return LPN_METER_NODE_FRAC * JUNCTION_R * symbolFactor();
 	}
+	// `x`/`y` are kept in the signature though unused now -- every call site already names the
+	// point for meterHalfWorld() beside it, and a screen-constant width genuinely needs no location.
 	function serviceStrokeWorld(x, y) {
-		var s = state.s || 1, mpu = metresPerWorldUnit(x, y);
-		return Math.max(LPN_SERVICE_REAL_M / mpu, LPN_SERVICE_MIN_PX / s);
+		var s = state.s || 1;
+		return Math.max(LPN_SERVICE_STROKE_FRAC * settings.linkWidth, LPN_SERVICE_MIN_PX) / s;
 	}
 
 	function customerById(id) {
@@ -9000,7 +9012,14 @@ var EngCalcs = EngCalcs || {};
 		}
 		fs = effectiveFontSize();
 		pad = fs * LPN_ALIGNED_PAD_FRAC;
-		gap = fs * LPN_CUST_LABEL_GAP_FRAC;
+		// **THE GAP MUST CLEAR THE SERVICE LINE'S OWN DRAWN WIDTH, NOT JUST THE TEXT'S DESCENDER AND
+		// HALO** (Tom, item B: "The labels are not taking into account the width of the service
+		// line. So at close zoom, they are on the service line."). LPN_CUST_LABEL_GAP_FRAC already
+		// pays for the descender and the halo's outer half; it says nothing about the line under
+		// them, which serviceStrokeWorld() draws at its own width. Both are in the same currency --
+		// world units that render to a constant screen size -- so the line's own half-width is
+		// simply added on.
+		gap = fs * LPN_CUST_LABEL_GAP_FRAC + serviceStrokeWorld() / 2;
 		list.forEach(function (c) {
 			var ce = custLblEls[c.id], an, pt, spots, chosen = null, k;
 			if (!ce) { return; }
