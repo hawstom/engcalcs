@@ -59,15 +59,18 @@ const ROOTJS = path.join(ROOT, 'js/lpn-collide.js');
 // does have a node symbol one label-width away -- the BOUNDED case, kept so the classifier can be
 // seen separating it from the unbounded ones rather than only asserted about them.
 // **`roomCeiling` IS A RATCHET ON THE DEFECT ITSELF: labels dropped while they still had room.**
-// Measured 2026-09-19 at 12 / 32 / 1 / 5, every one of them a bound coming up empty on ground that
-// was there and not one of them genuinely enclosed. **THE HONEST FIX LANDED 2026-09-21 AND TOOK
-// THEM ALL TO ZERO** -- placeLabelsFirstFit() sets such a label aside and rescues it in a second
-// phase (widenSides), so the numbers below are now the ratchet they were always meant to be: they
-// may not rise, and there is nothing left to lower.
+// Measured 2026-09-19, narrow and wide. Not one drop anywhere was genuinely enclosed, so these are
+// entirely the three bounds coming up empty on ground that was there. **The numbers may FALL and may
+// not RISE** -- lower them when a fix lands.
+//
+// **THE FIX EXISTS AND IS SWITCHED OFF, WHICH IS WHY THESE ARE STILL WHAT THEY WERE.** Set
+// `labelWidenSearch` true in js/looped-network.js -- or tick "widen the search rather than hide"
+// under ?debug=labels -- and every number below goes to ZERO, at his own `12345678` prefix as well
+// as at `1234=`. Section 19bb is why it does not ship that way yet.
 const FIXTURES = [
 	{ tag: 'synthetic crowded', kind: 'synthetic', arg: 100, roomCeiling: { narrow: 0, wide: 0 } },
-	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 0, wide: 0 } },
-	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 0, wide: 0 } }
+	{ tag: 'Net3-World fit', kind: 'net3', arg: 5000, roomCeiling: { narrow: 12, wide: 32 } },
+	{ tag: 'Net3-World 2x', kind: 'net3', arg: 12000, roomCeiling: { narrow: 1, wide: 5 } }
 ];
 // His own test: the same field, with and without four characters of Before text.
 // **THE AFFIX IS OVERRIDABLE FOR EXPLORATION ONLY** -- `LPN_WIDE_AFFIX=12345678 node ...` runs his
