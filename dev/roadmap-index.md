@@ -11,7 +11,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ## 100 — Next (10)
 
-- Task 247 — Customers: metered demands with account numbers, lumped to the nearest node.
+- Task 247 — Customers: metered demands, lumped to the nearest node.
 - ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 608 — Fetch the engine before somebody's first solve needs it.
@@ -30,7 +30,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 635 — A Zoom to button on the Properties box.
 - Task 637 — A Graph button on the Properties box.
-- Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
+- Task 643 — Swallowing a camel: grid-to-ground, slope distance, and a length adjustment.
 - Task 647 — A project that is whole but entirely off screen should say so.
 - Task 653 — A Settings select costs 2.5 seconds, and it is the label pass.
 - Task 665 — Make draggable and resizable the standard for a standing box.
@@ -42,8 +42,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 687 — The lock dialog's destructive button sits beside Cancel.
 - Task 688 — File, Convert units as: US to work in, SI to hand over.
 - Task 689 — Undo does not work inside a table, only on the map.
-- Task 691 — Banner messages are annoying, and one of them is a trap.
-- Task 693 — "Length and map coordinates" is a lie on an EPSG project.
+- Task 691 — Create a better error and notice messaging system.
+- Task 693 — Separate Length and Map coordinates units
 - Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 

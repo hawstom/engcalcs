@@ -290,13 +290,11 @@ the block.
     tables is the defect inside that programme. Read it before opening anything new.
   - At 50 because he named it as long-term, not next. Promoting it is his call.
 
-- 75|691| **Banner messages are annoying, and one of them is a trap.**
+- 75|691| **Create a better error and notice messaging system.**
   Tom, 2026-09-17, after the EWB meeting: *"The banner messages are annoying. I accidentally clicked
   'Something wrong here?' just because I wanted to dismiss a banner. The QGIS paradigm would be
   nice. They show lots of error messages."*
-  - **THE ACCIDENT IS THE FINDING, not the annoyance.** A banner whose only obvious gesture is a
-    LINK that files a report means the cost of dismissing it is sending us something. He did exactly
-    that, at a meeting. **A dismiss must be reachable without passing through an action.**
+  - **USER MUST HAVE CONTROL OVER MESSAGES.** A message that dismisses itself is bound to leave too soon for one user and to late for another.
   - **THE QGIS PARADIGM HE NAMES IS A MESSAGE LOG**, not a banner: messages accumulate in a panel a
     person opens when they want them, with the newest surfaced briefly and then filed rather than
     held on screen awaiting a click. That also answers a second thing this page needs -- a refused
@@ -330,8 +328,9 @@ the block.
     be reversible. Converting back is a second conversion, not an undo. Say so in the interface.
   - **OPEN, AND NOT ASKED YET:** whether a community actually wants a converted project or the
     original plus a report. That is Sue's seat and Tom has not been asked to spend time on it.
+  - **Include a question about rounding for the most obvious candidates**: Diameter, Depth, Demand and Flow, Head. For each ask user to select their specified rounding as a selector including nearest 100, 10, 1, 0.1, 0.01, 0.001.
 
-- 75|693| **"Length and map coordinates" is a lie on an EPSG project.**
+- 75|693| **Separate Length and Map coordinates units**
   Tom, 2026-09-18: *"I think we may have an obsolete paradigm leading to a bad label on our units.
   Length says 'Length and map coordinates'. But I think that is only true for a non-EPSG project.
   Obviously lat/lon is not a length unit. So obviously when the map unit is lat/lon, this unit label
@@ -832,14 +831,14 @@ the block.
   to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
   is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 
-- 100|247| **Customers: metered demands with account numbers, lumped to the nearest node.**
+- 100|247| **Customers: metered demands, lumped to the nearest node.**
   Tom, 2026-08-09, raised and expanded 2026-08-24. epanet-js has demand allocation by customer;
   EPANET does not. **Design, his rulings, and what is built against what is not:
   `dev/customer-demands.md`. Priority left at 100 for Tom to move: Slices 1-3 are in and what is
   left is his call.**
   - **SLICES 1, 2 AND 3 SHIPPED 2026-09-15** on `feat/customer-demands`: the meter and its service
-    connector, the two-click gesture and its one-click door, the account number, the **Count** (so
-    forty-two residential services are one symbol), the draggable attachment, the derived junction,
+    connector, the two-click gesture and its one-click door, the **Count** (so
+    forty-two residential services are one symbol), the derived junction,
     the detached state, a Customers tab, and the `.inp` answer.
     `dev/lpn-spike/customer-harness.js`, 66 assertions.
   - **A CUSTOMER IS ONE OF TASK 468'S DEMAND ROWS, EXTENDED.** `demandRowsOf()` appends them, so the
@@ -849,7 +848,6 @@ the block.
     meter does rewrites a number the user typed on a junction.**
   - **NOTHING A CUSTOMER CARRIES IS SCENARIO-OVERRIDABLE**, which is 468's own ruling about a demand
     row unchanged; a scenario asks its question of the junction's `demand` through `setProp()`.
-  - **THE ACCOUNT NUMBER IS A LABEL, NEVER A KEY**, and it reaches no log row and no usage statistic.
   - **`.inp`: the numbers ride out, the geometry is reported.** One `[DEMANDS]` row per meter, the
     account number in the CATEGORY comment (the one field of that row that holds a name), and a
     `customer-geometry` difference. A junction that never had one writes the same row either way.
