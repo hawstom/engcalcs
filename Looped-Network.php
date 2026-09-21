@@ -2282,6 +2282,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_run_title: <?=json_encode($ec_lang['lpn_ff_run_title'])?>,
 	lpn_ff_calculate: <?=json_encode($ec_lang['lpn_ff_calculate'])?>,
 	lpn_ff_stop: <?=json_encode($ec_lang['lpn_ff_stop'])?>,
+	lpn_ff_clear: <?=json_encode($ec_lang['lpn_ff_clear'])?>,
 	lpn_ff_working: <?=json_encode($ec_lang['lpn_ff_working'])?>,
 	lpn_ff_stopped: <?=json_encode($ec_lang['lpn_ff_stopped'])?>,
 	lpn_ff_cost: <?=json_encode($ec_lang['lpn_ff_cost'])?>,

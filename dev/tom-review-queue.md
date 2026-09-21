@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-082.
+**An ID is permanent and never reused.** Next free: R-084.
 
 ---
 
@@ -127,3 +127,5 @@ judgement and does not belong to a script.
 - [ ] R-079 feat/label-gang-search | "Publishing those gaps as a ranked list instead of a single winner is a change where it's consumed, not a new model." Do that? Or we already did?
 - [x] R-080 -- | Is it fast enough for Declan? -- **HIS ANSWER IS YES.** About 10 ms of work behind one committed cell on a 400-element network, against the fastest pace a person can sustain (a quarter to a third of a second a row) -- 3 to 4% overhead, which does not register. **And the cost is PER CELL COMMIT, never per keystroke**: nothing fires while you type. He also refused to let a performance win read as the bigger story -- his top item is still Task 610, paste that CREATES rows, *"because the network has to exist first"*. What he found on the way is Task 706
 - [x] R-081 -- | WaterModels.jl: what is it and what can we do with it? -- **MARY'S ANSWER IS "NOTHING", CLEANLY.** It is **not a file format**: it is a Julia package from Los Alamos, DOE-funded, doing OPTIMIZATION on water networks (best pump schedule, best pipe design under a budget) rather than simulation. It READS EPANET `.inp`, which we already read and write byte-identically, so it unlocks nothing there; its own JSON is a private wire format for a math solver and **nothing outside its own sibling packages reads it**. Modified BSD, LANL-ANSI, 77 stars, last push April 2025, research-paced. **No utility adoption found anywhere** -- every result naming it was itself a national-lab paper. Not an importer, not a dependency, not a citation on `dev/positioning.md`, which is for tools our users actually choose between. The one idea she kept, as speculation only, is its named *candidate, not-yet-built pipe* state, which `lpn_` has no equivalent of
+- [ ] R-082 feat/tables-spreadsheet | **PERRY FOUND A CRASH, not Tom.** Open a node's Properties, then rename that same node in the table below it: the page throws. The table's rename calls the same FUNCTION as Properties but not the same DOOR -- Properties updates the popup's own id before refreshing, the table does not, so the popup re-renders by an id that no longer exists. Back with the build agent
+- [ ] R-083 feat/tables-spreadsheet | **PERRY FOUND A SECOND ONE.** Delete on a selection that includes the ID column fires one blocking dialog PER ROW -- three rows, three dialogs; dozens of rows, dozens of dialogs before the page is usable. No data is lost. Back with the build agent

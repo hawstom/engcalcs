@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2003,
-        "delta_key_count": 139,
+        "expected_key_count": 2004,
+        "delta_key_count": 140,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -602,6 +602,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
         "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
@@ -743,6 +744,7 @@
         "lpn_terrain_rate_limited": "The terrain service is asking us to slow down (429), so no elevation was changed. Try again in a minute.",
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
         "lpn_survey_not_geo": "A surveyed point list is latitude and longitude, and this project is not on a map of the Earth. Start a geographic project from File, New, and import the list into that one.",
@@ -2021,6 +2023,22 @@
                     "key": "lpn_terrain_done",
                     "value": "{n}টি উচ্চতা পূরণ করা হয়েছে।",
                     "english": "{n} elevation(s) filled in."
+                }
+            }
+        },
+        "lpn_ff_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_stale",
+                    "value": "অঙ্কনটি পরিবর্তিত হয়েছে, তাই অগ্নিনির্বাপণ প্রবাহের ফলাফল মুছে ফেলা হয়েছে। এটি আবার রান করুন।",
+                    "english": "The drawing changed, so the fire flow results were cleared. Run it again."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_summary",
+                    "value": "{clean}টি সংযোগস্থলে কোনো সমস্যা ছিল না। {fire}টি সংযোগস্থল অগ্নিনির্বাপণ প্রবাহে ব্যর্থ হয়েছে। {design}টি সংযোগস্থল সিস্টেমের বাকি অংশে প্রভাব ফেলেছে।",
+                    "english": "{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system."
                 }
             }
         },

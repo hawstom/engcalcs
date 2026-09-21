@@ -3547,9 +3547,12 @@ $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
 $ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. The results below are the ones already finished.';
 $ec_lang['lpn_ff_cost']='This run solved the whole network {solves} times.';
-// The results are about the network as it stood when the run finished, so an edit clears them
-// rather than leaving a picture of a system that no longer exists.
+// The results are about the network as it stood when the run finished. Opening a different network
+// still clears them; an edit to THIS one no longer does (Tom, 2026-09-21) -- the user decides when
+// to look at fresh rings, with the Clear button below for whenever they want to do it themselves.
 $ec_lang['lpn_ff_stale']='The drawing changed, so the fire flow results were cleared. Run it again.';
+// Clears the rings on purpose -- the reader's own decision, not news the page has to break to them.
+$ec_lang['lpn_ff_clear']='Clear rings';
 // **COUNTED THE SAME WAY THE ROWS ARE READ, or the summary contradicts the table above it.** The
 // two failure modes are independent -- a junction can miss its fire flow AND pull its neighbours
 // down -- so these three do not add up to the number of junctions, and that is correct rather than

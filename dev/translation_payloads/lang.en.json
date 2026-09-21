@@ -1906,6 +1906,7 @@
         "lpn_ff_stopped": "Stopped after {done} of {total} junctions. The results below are the ones already finished.",
         "lpn_ff_cost": "This run solved the whole network {solves} times.",
         "lpn_ff_stale": "The drawing changed, so the fire flow results were cleared. Run it again.",
+        "lpn_ff_clear": "Clear rings",
         "lpn_ff_summary": "{clean} junctions had nothing wrong. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.",
         "lpn_ff_summary_error": "{n} junctions could not be answered.",
         "lpn_ff_report_all": "Every junction tested",
@@ -2005,7 +2006,7 @@
         "lpn_survey_note_gpx_rtept": "The file also holds {detail} route point(s), which were not made into junctions.",
         "lpn_survey_note_elev_converted": "The elevation column in your file is named for {detail}, which is not the unit this project is showing, so those numbers were converted. Every other number came across exactly as the file states it."
     },
-    "count": 2003,
+    "count": 2004,
     "active_prefixes": [
         "about",
         "bpn",

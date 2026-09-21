@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**76 still to read on master**, of 136 untranslated keys, of 2003 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**77 still to read on master**, of 137 untranslated keys, of 2004 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (136, 76 to read @@ NEEDS RULING)
+## lpn_  (137, 77 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -48,6 +48,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_customer_heading`**
   > Customer {id}
   _Ruled OK 2026-09-17._
+- **`lpn_ff_clear`**
+  > Clear rings
+  @@ NEEDS RULING
 - **`lpn_field_account`**
   > Account number
   _Ruled OK 2026-09-17._
@@ -440,7 +443,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**69 still to read**, of 84 new keys across 8 unmerged branch(es).
+**69 still to read**, of 84 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -451,9 +454,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-3 (`3efe80a1`) — adds no English strings
+### chore/review-round-4 (`2d718fd4`) — adds no English strings
 
-### feat/customer-find-labels (`a9422467`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/customer-find-labels (`a84da469`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
@@ -510,7 +513,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/label-gang-search (`4d763c56`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/label-gang-search (`344c0cc4`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -597,7 +600,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`a1e83645`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`cfa207d7`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pane_goto_tip`**
   > Show this on the map.
@@ -710,6 +713,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_run_note`**
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
+
+### fix/stale-is-a-snapshot (`ba310f96`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 
