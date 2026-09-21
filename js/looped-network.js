@@ -31946,7 +31946,11 @@ var EngCalcs = EngCalcs || {};
 	// find a control by the word that describes it rather than by the word on it, and a row with no
 	// tip silently opts out of that. Tom, 2026-08-19, asking for "underline" and "overline" to be
 	// findable, had found the one row in this box that had no tip at all.
-	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority, tip) {
+	// **trailingCols NAMES WHICH NUMERIC COLUMNS THIS GROUP HAS**, so a group with fewer of them
+	// (Customer has no Drop column -- see customerFieldDefs()) reserves fewer slots rather than
+	// showing an always-empty one under a heading that names a control nothing on the row can do.
+	// Defaults to both, which is every node/link call site's existing behaviour unchanged.
+	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority, tip, trailingCols) {
 		var row = document.createElement('div'), label = document.createElement('label'),
 			input = document.createElement('input'), span = document.createElement('span');
 		// BASELINE, NOT CENTRE (Tom, 2026-08-19: "checkbox even with inputs"). A field name long
@@ -31980,7 +31984,9 @@ var EngCalcs = EngCalcs || {};
 		// other. Same slots, same order, on every field row.
 		// Only field rows participate; the whole-panel options below are not a field list.
 		if (affixOpt) {
-			[decimals, priority].forEach(function (spec) {
+			(trailingCols || ['decimals', 'priority']).map(function (col) {
+				return col === 'decimals' ? decimals : priority;
+			}).forEach(function (spec) {
 				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
 			});
 		}
@@ -32139,13 +32145,20 @@ var EngCalcs = EngCalcs || {};
 			['count', pc.lpn_field_meter_count || 'Number of services']
 		];
 	}
+	// **THE HEADING ROW IS THE CALLER'S JOB NOW** (Task 247, Tom's screenshot 2026-09-20: "the hard
+	// work that was done to format Node and Link labels tables was not applied to Customer"). This
+	// function used to build only the rows, which is why the section had no "Before / After / 0.000"
+	// header Node and Link both draw through columnHeadings() -- the same rows, the same
+	// labelCheckbox(), but nothing above them naming the columns reads as unformatted even though the
+	// row layout itself was already correct. rebuildLabelsFields() now calls columnHeadings() on this
+	// host before this function runs, with trailingCols trimmed to ['decimals'] because a customer
+	// label has no Drop column to head (see customerFieldDefs()'s own comment).
 	function buildCustomerLabelSection(host) {
 		var pc = EngCalcs.pageConfig || {}, row = document.createElement('div'),
 			name = document.createElement('span'), input = document.createElement('input'),
 			unit = document.createElement('span'), note = document.createElement('div'),
 			wrap = document.createElement('span'), useBtn = document.createElement('button'),
 			cur = labelSettings.customerMaxWidth;
-		host.innerHTML = '';
 		customerFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
 				function (v) { labelSettings.customer[f[0]] = v; },
@@ -32165,7 +32178,7 @@ var EngCalcs = EngCalcs || {};
 						title: pc.lpn_labels_suffix_tip || 'Text added after this property on map labels',
 						onChange: function (v) { setLabelAffix('suffix', 'customer', f[0], v); }
 					}
-				}, null);
+				}, null, null, ['decimals']);
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
@@ -32311,7 +32324,11 @@ var EngCalcs = EngCalcs || {};
 		// **THE TERM OF ART SURVIVES IN THE TIP**: both numeric headings carry their full name in
 		// `title`, so a reader who knows the word "priority" still finds it, and the search box
 		// matches it.
-		function columnHeadings(box, group) {
+		// **trailingCols NAMES WHICH NUMERIC COLUMNS THIS GROUP HAS**, the same list labelCheckbox()
+		// is given for every row in the group, so a header can never advertise a column no row in
+		// its section ever draws (Customer has no Drop column at all -- customerFieldDefs()).
+		// Defaults to both, unchanged from every existing node/link call.
+		function columnHeadings(box, group, trailingCols) {
 			var row = document.createElement('div'), lead = document.createElement('span');
 			// The box's one small-text treatment, from the stylesheet rather than from here -- see
 			// .lpn-set-note. Only the LAYOUT stays inline, because it is measured off the same
@@ -32327,16 +32344,19 @@ var EngCalcs = EngCalcs || {};
 			// headings centre; the affix boxes hold WORDS and keep their natural start alignment,
 			// so a centred "Before" stood right of every letter it named. `start`, not `left`,
 			// because the same row has to read correctly in an RTL language.
-			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
-				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
-				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
+			var trailingDefs = {
+				decimals: [pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
 					(pc.lpn_labels_col_decimals || 'Decimals') + ' \u2014 ' +
 						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
-				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
+				priority: [pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Priority') + ' \u2014 ' +
 						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || ''),
 					'center']
-			].forEach(function (h, i) {
+			};
+			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
+				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start']
+			].concat((trailingCols || ['decimals', 'priority']).map(function (k) { return trailingDefs[k]; })
+			).forEach(function (h, i) {
 				var cell = document.createElement('span');
 				cell.textContent = h[0];
 				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
@@ -32362,7 +32382,11 @@ var EngCalcs = EngCalcs || {};
 				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]),
 				affixFor('link', f[0]), priorityFor('link', f[0]));
 		});
-		if (custBox) { buildCustomerLabelSection(custBox); }
+		if (custBox) {
+			custBox.innerHTML = '';
+			columnHeadings(custBox, 'customer', ['decimals']);
+			buildCustomerLabelSection(custBox);
+		}
 		// Options applying to every field at once, below both field lists rather than on any one row:
 		// Task 190's high/low mark, and Task 333's one blanket separator (Tom, 2026-08-15: "One
 		// blanket separator and individual prefixes and postfixes, of course").
