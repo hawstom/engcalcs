@@ -9002,6 +9002,36 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
+	// **HOW FAR A LINK'S OWN ALIGNED LABEL COULD REACH AWAY FROM ITS PIPE, IN WORLD UNITS.** This is
+	// Tom's item (A), position 1: *"aligned with the service line and justified as close to the link
+	// as possible while reserving room for a potential link label so that in no case does a link
+	// label perturb a label for one of its Customer services."* -- ADVANCE avoidance, not the
+	// reactive boxIsClear() check every other candidate on this page uses. A long pipe REPEATS its
+	// label at intervals (linkLabelStations()), so whether THIS particular attach point happens to
+	// sit on a repeat station is a coincidence of the drawing; reserving the room whether or not one
+	// is actually there removes the coincidence rather than catching it after the fact.
+	//
+	// **DERIVED FROM THE SAME ARITHMETIC alignedLabelPlacement() USES FOR THE LINK'S OWN LABEL**,
+	// never a guessed constant: `gap` is exactly the perpendicular offset a link label's baseline
+	// sits at (pipe half-width plus the same 0.5 x font size of air), and adding the label's own box
+	// height reaches its far edge -- the most a link label can ever occupy moving away from its pipe
+	// at the CURRENT zoom and the CURRENT content. A link with its label switched off entirely
+	// (`lineCount` 0) reaches nothing and reserves nothing, and a link label that only free-floats
+	// (`settings.alignPipeLabels` off) never sits at a fixed station in the first place, so nothing
+	// here applies to it.
+	// **PLUS THE SAME PAD boxIsClear() GROWS EVERY BOX BY.** Landing the reservation exactly on the
+	// link label's own far edge is not enough -- the collision test that judges position 1 grows
+	// BOTH boxes by `fs x LPN_ALIGNED_PAD_FRAC` first (every aligned-label collision test on this
+	// page does), so two boxes that only just touch still measure as overlapping. Reserving up to
+	// that same edge is reactive with extra arithmetic; reserving past it by the pad is genuinely
+	// advance.
+	function linkLabelReachWorld(link) {
+		var le = link && linkEls[link.id], fs;
+		if (!le || le.empty || !le.lineCount || !linkLabelAligned(link)) { return 0; }
+		fs = effectiveFontSize();
+		return settings.linkWidth / (2 * (state.s || 1)) + fs * 0.5 + dataLabelBoxHeight(le.lineCount) +
+			fs * LPN_ALIGNED_PAD_FRAC;
+	}
 	function layoutCustomerLabels(obs) {
 		var list = doc.customers || [], fs, pad, gap;
 		if (!customerLabelsAttempted()) {
@@ -9031,7 +9061,10 @@ var EngCalcs = EngCalcs || {};
 			spots = Geom.serviceLabelSpots(an.x, an.y, pt.x, pt.y, {
 				w: labelBoxWidth(ce), h: dataLabelBoxHeight(ce.lineCount || 1),
 				nLines: ce.lineCount || 1, fontSize: fs, gap: gap,
-				linkPad: fs * LPN_CUST_LABEL_LINKPAD_FRAC,
+				// **ADVANCE, NOT REACTIVE**: never less than the ordinary pad, and never less than
+				// what this customer's own pipe needs to clear its own label, whether or not that
+				// label actually falls at this station.
+				linkPad: Math.max(fs * LPN_CUST_LABEL_LINKPAD_FRAC, linkLabelReachWorld(customerLink(c))),
 				dotPad: meterHalfWorld(pt.x, pt.y) + fs * LPN_CUST_LABEL_DOTPAD_FRAC,
 				bias: labelReadabilityBias()
 			});

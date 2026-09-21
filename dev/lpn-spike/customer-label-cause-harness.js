@@ -172,33 +172,40 @@ ok('4 with room, every one of the eight takes the spot beside its line',
 ok('5 crowded, at least one is pushed off its first choice',
 	crowded.some(q => q.where !== 'beside the line'),
 	crowded.map(q => q.where).join(','));
-// **TOM WAS RIGHT: A LINK LABEL BLOCKS A CUSTOMER LABEL.** This is the assertion the first version
-// of this harness could not make, because none of its customers was ever near one. It is permanent
-// now, and it is derived -- the customers are placed AT `linkLabelStations()`'s own answer, so a
-// change to where a pipe repeats its label moves the fixture with it instead of blinding it.
-ok('6 a customer standing on the main\'s own label is blocked BY that link label',
-	onLabel.some(q => q.firstBlock === 'label of ' + main.id),
+// **TOM WAS RIGHT: A LINK LABEL BLOCKED A CUSTOMER LABEL, AND THAT IS NOW FIXED.** This harness
+// could not even see the mechanism until the customers moved onto `linkLabelStations()`'s own
+// answer, and once it could, it measured 2.4% of services on an ordinary street losing their label
+// to exactly this cause. Tom's item (A) design -- position 1 reserves the room a link label could
+// need, ADVANCE rather than reacting to a collision that happens to be there -- is built as
+// `linkLabelReachWorld()`, and this is the assertion that closes the loop: standing a customer
+// exactly where the pipe repeats its own label no longer blocks it AT ALL.
+ok('6 a customer standing on the main\'s own label is no longer blocked by that link label',
+	onLabel.every(q => q.firstBlock.indexOf('label of ') !== 0),
 	onLabel.map(q => q.id + ': ' + q.firstBlock).join(' | '));
-// **AND THE OUTCOME IS A DROP, NOT A SHUFFLE.** Both standard positions can be refused at once, and
-// the label then leaves the drawing with nothing to say it has -- which the first write-up of this
-// question did not know was possible.
-ok('7 ...and where both positions are refused the label is DROPPED, silently',
-	onLabel.some(q => q.where === 'DROPPED'),
+// **AND THE DROP THE LINK-LABEL CAUSE PRODUCED IS GONE WITH IT.** Both of these four still have a
+// real neighbour on the ground -- each other -- so one steps to "beyond the customer"; none is
+// dropped, which was the outcome before the reservation existed.
+ok('7 ...and none of the four is DROPPED any more',
+	onLabel.every(q => q.where !== 'DROPPED'),
 	onLabel.map(q => q.where).join(','));
 
 // ---- THE FINDING, PRINTED RATHER THAN ASSERTED ------------------------------------------------
 //
 // Tom's own reading was *"I see that these would conflict with a link label"*, and **HE WAS
-// RIGHT**. An earlier version of this harness reported the opposite, and the reason is recorded
-// above `mainLabelXs()`: its customers stood at round numbers on a main whose label repeats
-// somewhere else entirely, so the case was never on the drawing at all.
+// RIGHT, AND ITEM (A) OF HIS DESIGN FIXES IT.** An earlier version of this harness reported the
+// opposite, and the reason is recorded above `mainLabelXs()`: its customers stood at round numbers
+// on a main whose label repeats somewhere else entirely, so the case was never on the drawing at
+// all. Once it was, a link label was measured blocking 2.4% of services on an ordinary street and
+// dropping some of them outright. `linkLabelReachWorld()` closes that cause: position 1 reserves
+// the room a link label could need whether or not one is actually standing there, so it no longer
+// needs to react to one after the fact.
 //
 // What the four views show TOGETHER, which is not the same as what any one of them shows:
-//   * a NEIGHBOURING customer's label is the commonest blocker wherever services are close, and
+//   * a NEIGHBOURING customer's label is the ONLY blocker left wherever services are close, and
 //     that outcome is a shuffle -- the label steps past the customer and is still readable;
-//   * a LINK label blocks whenever a service lands near one of the pipe label's repeat positions,
-//     and that outcome is the bad one -- both standard positions can go at once and the label
-//     LEAVES THE DRAWING.
+//   * a LINK label no longer blocks anything -- the case that used to leave the drawing entirely
+//     (both standard positions refused at once) is now reached only by another customer's own
+//     label, which is the milder outcome.
 //
 // WHICH customers are hit is printed and not asserted: that is a fact about a drawing, and pinning
 // it would turn an ordinary layout change into a red build. The MECHANISM is asserted, because it
