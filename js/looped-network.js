@@ -19016,14 +19016,41 @@ var EngCalcs = EngCalcs || {};
 	 * The `_selMoving` flag is what stops our own focus() call reading back through the focusin
 	 * listener and collapsing a Shift-extended selection to one cell.
 	 */
+	// **THE BROWSER'S OWN focus()-SCROLL DOES NOT KNOW ABOUT A STICKY HEADING** (Tom, 2026-09-21:
+	// *"The cursor, with up arrow, ends up under the headings if the table has been scrolled
+	// down. Ctrl+up doesn't help. But Ctrl+down, Ctrl+up fixes the disappearance."*). `.focus()`
+	// asks the browser to scroll the target into the viewport, and it does -- but `thead tr` is
+	// `position: sticky` (Task 690's own fix for the R-058 missing separators), which OVERLAYS the
+	// scrolling body rather than taking space out of it, so the browser's notion of "in view"
+	// counts pixels the heading is actually painted over. A row scrolled to the panel's own top
+	// edge is genuinely visible by the browser's arithmetic and hidden by the heading's, which is
+	// exactly the "Ctrl+Down, Ctrl+Up" workaround: the first jump scrolls far enough that the
+	// second lands the row well clear of the heading rather than flush against it. Measured
+	// directly rather than left to the browser, using the one number the CSS never states as a
+	// constant: the heading row's own rendered height.
+	function paneScrollCellIntoView(host, cellTd) {
+		var theadEl, theadRow, headH, hostRect, cellRect, over;
+		if (!host || !cellTd || !host.getBoundingClientRect || !cellTd.getBoundingClientRect) { return; }
+		theadEl = host.querySelector && host.querySelector('thead');
+		theadRow = theadEl && theadEl.children && theadEl.children[0];
+		headH = (theadRow && theadRow.getBoundingClientRect) ? theadRow.getBoundingClientRect().height : 0;
+		hostRect = host.getBoundingClientRect();
+		cellRect = cellTd.getBoundingClientRect();
+		over = (hostRect.top + headH) - cellRect.top;
+		if (over > 0) { host.scrollTop -= over; return; }
+		over = cellRect.bottom - hostRect.bottom;
+		if (over > 0) { host.scrollTop += over; }
+	}
 	function paneFocusCell(spec, id, key) {
-		var active = activeElementSafe(), target;
+		var active = activeElementSafe(), target, cellTd;
 		spec._selMoving = true;
 		try {
 			if (active && active.blur && active.tagName === 'INPUT') { active.blur(); }
-			target = paneCellFocusable(spec.tds && spec.tds[id] && spec.tds[id][key]);
+			cellTd = spec.tds && spec.tds[id] && spec.tds[id][key];
+			target = paneCellFocusable(cellTd);
 			if (!target) { return false; }
 			target.focus();
+			paneScrollCellIntoView(document.getElementById(spec.panel), cellTd);
 			// **ARRIVING AT A CELL SELECTS NO CHARACTERS** (Tom, 2026-09-19: *"the appearance is as
 			// Edit mode in that the contents of each cell are selected as I pass through/over/on
 			// it. Instead, a blue border highlight (double-wide inward) should indicate the current

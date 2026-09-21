@@ -265,6 +265,29 @@ console.log('\n--- R-038: navigating selects no characters ---');
 	report(selected === 0, 'arriving by arrow key selects none of the text', String(selected));
 }
 
+console.log('\n--- quirk 2: an arrow up must scroll the row clear of the pinned heading ---');
+{
+	// Tom, 2026-09-21: "The cursor, with up arrow, ends up under the headings if the table has
+	// been scrolled down. Ctrl+up doesn't help. But Ctrl+down, Ctrl+up fixes the disappearance."
+	// `thead tr` is `position: sticky`, so it overlays the scrolling body instead of taking room
+	// out of it -- the browser's own focus()-scroll does not know that, and paneScrollCellIntoView
+	// is the correction.
+	const host = byId.lpn_pane_junctions;
+	const theadRow = tableEl.children.filter((c) => c._tag === 'thead')[0].children[0];
+	host.getBoundingClientRect = function () { return { top: 100, bottom: 400 }; };
+	theadRow.getBoundingClientRect = function () { return { top: 100, bottom: 130, height: 30 }; };
+	host.scrollTop = 50;
+	click(ids[3], 'elev');
+	const targetTd = td(ids[2], 'elev');
+	targetTd.getBoundingClientRect = function () { return { top: 105, bottom: 125 }; };
+	key('ArrowUp');
+	report(host.scrollTop === 25,
+		'scrolling up enough to clear the heading, not merely into the viewport',
+		String(host.scrollTop));
+	delete host.getBoundingClientRect;
+	delete theadRow.getBoundingClientRect;
+}
+
 console.log('\n--- R-038 (mouse half) / quirk 1: a plain press must not arm native text selection ---');
 {
 	// His 2026-09-21 narrowing: "A selection should highlight cells, not characters. But I see
