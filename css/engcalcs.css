@@ -2408,6 +2408,20 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 /* A keyboard user must still see where they are. `:focus-visible` rather than `:focus`, so a mouse
    press does not leave a ring behind on a control whose whole job is to move the map. */
 .lpn-pane-sort:focus-visible, .lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+/* THE RIGHT-CLICK MENU (Tom, 2026-09-21: Copy, Paste, Select in map, Delete). `position: fixed`
+   because its `left`/`top` are the pointer's own client coordinates, which are already relative to
+   the viewport and not to any scrolled ancestor -- the same reasoning the popup positioning already
+   uses. A plain list of full-width buttons, not a `<ul>`: a menu item here is a button that runs an
+   action and never a link, exactly the sort heading's own reasoning two rules up. */
+.lpn-pane-ctxmenu {
+	position: fixed; z-index: 1900; background: #fff; border: 1px solid #999; border-radius: 3px;
+	box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 2px; min-width: 9em;
+}
+.lpn-pane-ctxmenu button {
+	display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit;
+	padding: 5px 10px; cursor: pointer; color: inherit; border-radius: 2px;
+}
+.lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: #eef1f4; outline: 0; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture

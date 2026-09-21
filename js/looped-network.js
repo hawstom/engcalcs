@@ -19639,6 +19639,124 @@ var EngCalcs = EngCalcs || {};
 				e.preventDefault();
 			} catch (err) { /* no clipboardData: the browser's own copy stands */ }
 		});
+		// **A RIGHT-CLICK OFFERS THE FOUR THINGS A SPREADSHEET'S OWN MENU DOES** (Tom, 2026-09-21:
+		// *"For a complete spreadsheet experience, right-click should offer Copy, Paste, Select in
+		// map, and Delete."*). The mousedown handler above has already decided, by the time this
+		// fires, whether the press kept the existing range or collapsed it to the cell under the
+		// pointer -- so the menu only has to read paneSelBox() as it stands.
+		table.addEventListener('contextmenu', function (e) {
+			if (!paneTdOfEvent(spec, e.target)) { return; }
+			if (e.preventDefault) { e.preventDefault(); }
+			paneOpenContextMenu(spec, e.clientX || 0, e.clientY || 0);
+		});
+	}
+	// The open menu, at most one at a time -- a second right-click anywhere replaces it rather
+	// than stacking a second one behind the first.
+	var paneCtxMenuEl = null;
+	function paneCtxMenuContains(node) {
+		while (node) { if (node === paneCtxMenuEl) { return true; } node = node.parentNode; }
+		return false;
+	}
+	function paneCloseContextMenu() {
+		if (paneCtxMenuEl && paneCtxMenuEl.parentNode) { paneCtxMenuEl.parentNode.removeChild(paneCtxMenuEl); }
+		paneCtxMenuEl = null;
+	}
+	// Closed by anything else that happens on the page -- a left click elsewhere, a key, or the
+	// table rebuilding out from under it (renderPaneTable never reaches into this, so a stale
+	// row/column would otherwise sit in a menu whose target no longer exists).
+	document.addEventListener('mousedown', function (e) {
+		if (paneCtxMenuEl && !paneCtxMenuContains(e.target)) { paneCloseContextMenu(); }
+	});
+	document.addEventListener('keydown', function (e) {
+		if (paneCtxMenuEl && e && e.key === 'Escape') { paneCloseContextMenu(); }
+	});
+	/**
+	 * **DELETE CLEARS VALUES; IT NEVER REMOVES A ROW.** A row here is an element the map drew, and
+	 * a spreadsheet's Delete key has never once meant "remove the record" in Excel, Sheets or
+	 * Calc -- the table's own KEYBOARD Delete already set that precedent (paneHandleKey, "DELETE
+	 * EMPTIES A CELL IN NAVIGATION MODE"), and this is the same rule applied to a whole range
+	 * instead of only the active cell. Removing the junction itself stays one click away on the
+	 * map, through the Delete TOOL this menu item borrows its word from and nothing else of.
+	 *
+	 * **UNDOABLE, LIKE EVERY OTHER EDIT.** One snapshot for the whole range, taken only if the
+	 * range actually holds something to clear -- an empty-selection Delete must not fill the undo
+	 * stack with a no-op, the same rule paneCommitCell() already keeps for a typed cell.
+	 */
+	function paneDeleteSelection(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), r, c, el, col, any = false;
+		if (!box) { return; }
+		for (r = box.r0; r <= box.r1 && !any; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				el = rows[r]; col = cols[c];
+				if (paneCellIsPlain(col, el) || !col.set) { continue; }
+				if (paneCellText(col, el) !== '') { any = true; break; }
+			}
+		}
+		if (!any) { return; }
+		saveUndoSnapshot();
+		for (r = box.r0; r <= box.r1; r++) {
+			for (c = box.c0; c <= box.c1; c++) {
+				el = rows[r]; col = cols[c];
+				paneWriteCellText(spec, col, el, '');
+			}
+		}
+		completeEdit(null);
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+	}
+	/**
+	 * **EVERY WORD ON THE MENU IS BORROWED, NOT COINED.** Copy and Paste are
+	 * `points_data_copy`/`points_data_paste` -- the row-table point grid's own labels, already
+	 * shipping on four calculator pages, and CLAUDE.md's concept-level reuse rule gives the key
+	 * used by materially more pages the win. **Select in map is `lpn_pane_goto_tip`**, the pin's
+	 * own tip: the pin already IS this command (findGoTo() selects the element and pans to it), so
+	 * a second string for the identical action would be the "Source trace"/"Source share"
+	 * collision this project has already paid for once. Delete is `lpn_tool_delete`'s bare word,
+	 * reused for the imperative alone and not its sentence, because the map tool and this command
+	 * genuinely differ (see paneDeleteSelection() above).
+	 */
+	function paneOpenContextMenu(spec, x, y) {
+		var pc = EngCalcs.pageConfig || {}, rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), menu, mk;
+		paneCloseContextMenu();
+		if (!box) { return; }
+		menu = document.createElement('div');
+		menu.className = 'lpn-pane-ctxmenu';
+		menu.setAttribute('role', 'menu');
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		mk = function (text, fn) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			b.setAttribute('role', 'menuitem');
+			b.textContent = text;
+			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
+			menu.appendChild(b);
+			return b;
+		};
+		mk(pc.points_data_copy || 'Copy', function () {
+			libCopyOut(paneCopyTsv(spec, rows, cols, box));
+		});
+		mk(pc.points_data_paste || 'Paste', function () {
+			// A synthetic 'paste' event cannot be raised, so this is the one place the page reads
+			// the clipboard directly -- and the one place it can be denied permission to. Silence
+			// on denial is correct: the browser's own permission prompt already said why.
+			try {
+				if (navigator.clipboard && navigator.clipboard.readText) {
+					navigator.clipboard.readText().then(function (text) {
+						var cells = libPasteCells(text);
+						if (cells.length) { panePasteAt(spec, cells); }
+					}, function () {});
+				}
+			} catch (e) { /* no clipboard access: nothing this menu item can do about it */ }
+		});
+		mk(pc.lpn_pane_goto_tip || 'Show this on the map.', function () {
+			findGoTo(spec.group, rows[box.ar].id);
+		});
+		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
+		document.body.appendChild(menu);
+		paneCtxMenuEl = menu;
 	}
 
 	// ---- PRINTING THE TABLE YOU ARE LOOKING AT ------------------------------------------------

@@ -53,6 +53,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tel = doc.nodes.filter(function (x) { return x.id === elId; })[0];\n" +
 	"\t\t\treturn paneCellText(paneColByKey(s, key), el); },\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo,\n" +
+	"\t\tselectedRefs: selectedRefs,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -60,6 +61,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tlabelsLayer = el('g', {}, world); rubberBandEl = el('line', {}, world); }\n"
 );
 L.buildLayers();
+const PC = global.EngCalcs.pageConfig;
 
 const ids = [L.addNode('junction', 0, 0), L.addNode('junction', 10, 0),
 	L.addNode('junction', 20, 0), L.addNode('junction', 30, 0)].map((n) => n.id);
@@ -305,6 +307,76 @@ console.log('\n--- R-038 (mouse half) / quirk 1: a plain press must not arm nati
 	report(focused === 1, '...and focuses the cell itself, since the browser default will not',
 		String(focused));
 	fire(tableEl, 'mouseup', {});
+}
+
+console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
+{
+	// Tom, 2026-09-21: "For a complete spreadsheet experience, right-click should offer Copy,
+	// Paste, Select in map, and Delete." Every word on it is borrowed rather than coined --
+	// asserted here against the exact strings the borrowed keys carry.
+	function menuEl() {
+		return global.document.body.children.filter((c) => c['class'] === 'lpn-pane-ctxmenu').slice(-1)[0];
+	}
+	// A real right-click is a mousedown (which the page reads to decide whether it kept or moved
+	// the selection) and only THEN the contextmenu -- click(elId, k, 2) does the first half.
+	function openMenuOn(elId, k) {
+		click(elId, k, 2);
+		fire(tableEl, 'contextmenu', { target: td(elId, k), clientX: 10, clientY: 20,
+			preventDefault: function () {} });
+		return menuEl();
+	}
+	click(ids[1], 'elev');
+	let menu = openMenuOn(ids[1], 'elev');
+	report(!!menu, 'a right press on a cell opens a menu');
+	const labels = (menu.children || []).map((b) => b.textContent);
+	report(labels.length === 4, 'exactly four rows', labels.join(' | '));
+	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
+	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
+	report(labels[2] === (PC.lpn_pane_goto_tip || 'Show this on the map.'),
+		'Select in map reuses the pin’s own tip, not a new string', labels[2]);
+	report(labels[3] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[3]);
+
+	// Copy: writes the cell to the clipboard, the same as Ctrl+C.
+	clipboard = null;
+	fire(menu.children[0], 'click', {});
+	report(clipboard === L.cellText('junctions', ids[1], 'elev'), 'Copy puts the cell on the clipboard', clipboard);
+	report(!menuEl(), '...and closes the menu');
+
+	// Select in map: the same door the pin uses -- setSelection() through findGoTo().
+	openMenuOn(ids[2], 'elev');
+	menu = menuEl();
+	fire(menu.children[2], 'click', {});
+	const refs = L.selectedRefs();
+	report(refs.length === 1 && refs[0].kind === 'node' && refs[0].id === ids[2],
+		'Select in map selects the element the row is about', JSON.stringify(refs));
+
+	// Delete: clears the value, takes one undo, and never removes the row. A text field ('tag')
+	// so the assertion is not tangled up with a required numeric field's own blank-means-zero rule
+	// (paneParseCellText: `+'' === 0`), which is unrelated to what Delete does.
+	L.setCell('junctions', ids[3], 'tag', 'X99');
+	L.renderTable('junctions');
+	click(ids[3], 'tag');
+	const before = L.cellText('junctions', ids[3], 'tag');
+	const d0 = L.undoDepth();
+	openMenuOn(ids[3], 'tag');
+	menu = menuEl();
+	fire(menu.children[3], 'click', {});
+	report(L.cellText('junctions', ids[3], 'tag') === '', 'Delete clears the cell’s value',
+		L.cellText('junctions', ids[3], 'tag'));
+	report(L.undoDepth() === d0 + 1, '...as one undoable edit', d0 + ' -> ' + L.undoDepth());
+	report(L.tableOrder('junctions').indexOf(ids[3]) >= 0, '...and the row itself is still in the table');
+	L.undo();
+	report(L.cellText('junctions', ids[3], 'tag') === before, 'and Ctrl+Z puts the value back',
+		L.cellText('junctions', ids[3], 'tag'));
+	L.renderTable('junctions');
+
+	// A blank selection is not an edit and must not fill the undo stack with a no-op.
+	click(ids[0], 'tag');
+	const d1 = L.undoDepth();
+	openMenuOn(ids[0], 'tag');
+	menu = menuEl();
+	if (menu) { fire(menu.children[3], 'click', {}); }
+	report(L.undoDepth() === d1, 'Delete on an already-blank cell takes no snapshot', d1 + ' -> ' + L.undoDepth());
 }
 
 console.log('\n--- R-035: a cell typed AFTER an Undo must not revert ---');
