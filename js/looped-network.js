@@ -41853,7 +41853,7 @@ var EngCalcs = EngCalcs || {};
 				warn = document.createElement('p');
 				warn.className = 'lpn-set-note';
 				warn.textContent = pc.lpn_customer_fixed_head ||
-					'The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
+					'⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
 				fields.appendChild(warn);
 			}
 		} else {
