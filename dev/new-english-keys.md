@@ -440,7 +440,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**68 still to read**, of 83 new keys across 9 unmerged branch(es).
+**69 still to read**, of 84 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -451,9 +451,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-2 (`960fe30a`) — adds no English strings
+### chore/review-round-3 (`3efe80a1`) — adds no English strings
 
-### feat/customer-find-labels (`ffd11548`) — 12 new, 12 to read @@ NEEDS RULING
+### feat/customer-find-labels (`a9422467`) — 12 new, 12 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
@@ -492,7 +492,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/engine-fetch-wait (`3df1129e`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/engine-fetch-wait (`e9319a0a`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_engine_bar_label`**
   > Solver loading progress
@@ -597,8 +597,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`f688970a`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/tables-spreadsheet (`a1e83645`) — 3 new, 3 to read @@ NEEDS RULING
 
+- **`lpn_pane_goto_tip`**
+  > Show this on the map.
+  @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
   @@ NEEDS RULING
@@ -606,7 +609,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
 
-### feat/xy-world-map (`4505b5db`) — 33 new, 30 to read @@ NEEDS RULING
+### feat/xy-world-map (`731ab367`) — 33 new, 30 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
@@ -707,8 +710,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_run_note`**
   > You are seeing the network at the first reporting time. The Recalculate automatically setting is off, so the results for the later times are not kept up to date while you work. Press the Calculate button to bring them up to date.
   @@ NEEDS RULING
-
-### fix/recalc-trust-user (`313a8656`) — adds no English strings
 
 ### tables-interface (`e34970bc`) — 4 new, 4 to read @@ NEEDS RULING
 
