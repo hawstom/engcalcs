@@ -712,7 +712,15 @@ remembered "amazing stack of node labels" was that rule, and this commit is what
 **Do NOT build the settled-label damping first** -- it cannot draw one extra label and it hides the
 measurement (§16l).
 
-**AND THE ROOT DEFECT IS FIXED, 2026-09-21: THE SEARCH WIDENS INSTEAD OF DROPPING (§19).** A node
+**AND THE ROOT DEFECT IS BUILT AND MEASURED, 2026-09-21 -- AND IT SHIPS OFF, SO THE DRAWING DOES NOT
+CHANGE (§19).** The cause is named and closed at the first-fit; what stopped it shipping is that with
+every label field on it trades a drop for a HIDE one rung further down: `label-spot-harness.js` goes
+14 -> 59 hidden over Net3-World's four views for 7 more drawn, and `label-width-stability-harness.js`
+goes from 49 labels moving at the `1234=` prefix to all 97. **That trade is Tom's call. The switch is
+`?debug=labels` > "widen the search rather than hide".** §19bb has the table, and it names the next
+question: the rescue and the CROSSING SHED are deciding the same thing twice in opposite directions.
+
+**THE SEARCH WIDENS INSTEAD OF DROPPING (§19).** A node
 label whose ordinary candidates are all occupied is no longer hidden -- it is set aside and rescued
 from wider and wider rings, all round the node, after every other label has committed. **On his own
 `12345678` test: 36 of 97 hidden at the fit view of Net3-Novato becomes 0**, and over all five

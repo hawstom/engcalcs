@@ -953,7 +953,11 @@ the block.
     Every named suspect measured zero -- no viewport bound, no grid effect, no reach or side rule
     reading the width. **The earlier answer to him was wrong and is retracted in §16h**; the fourteen
     are named in §16i.
-  - **THE DROP IS FIXED, 2026-09-21: THE SEARCH WIDENS RATHER THAN GIVING UP** (§19). A node label
+  - **THE DROP IS SOLVED AND SHIPS OFF, 2026-09-21** (§19, §19bb). Nothing about the drawing
+    changes; the switch is `?debug=labels` > "widen the search rather than hide", and turning it on
+    is his call because with every field on it trades a drop for a crossing-shed HIDE (14 -> 59
+    hidden on Net3-World) and rearranges the whole drawing. **THE SEARCH WIDENS RATHER THAN GIVING
+    UP** (§19). A node label
     with no ordinary candidate left is set aside and rescued from wider rings after everybody else
     has committed, so **36 of 97 hidden at the fit view of his own drawing at his own `12345678`
     prefix becomes 0**, and not one label that already had a place moves. Every label still hidden

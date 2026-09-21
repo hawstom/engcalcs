@@ -1706,6 +1706,29 @@ The last row is the claim without hedging: `placeLabelsFirstFit()` has nothing a
 that got a place with the widening off gets the IDENTICAL place with it on. The 28 on the page are
 the crossing repair and the crossing shed reacting to labels that now exist.
 
+### 19bb. IT SHIPS OFF, AND THAT IS THE MEASUREMENT TALKING
+
+**With the node ID alone -- his own test -- the widening is a straight win.** With every label
+field on it is not, and two ratchets that were already in the tree say so from the same run:
+
+| with every label field on, Net3-World's four views | widening off | widening on |
+|---|---|---|
+| labels hidden (`label-spot-harness.js`, ceiling 14) | **14** | **59** |
+| labels drawn | 491 | 498 |
+| node labels moving at the `1234=` prefix (`label-width-stability-harness.js`) | 49/28/8/2 of 97 | **97/97/97/97** |
+
+**A label the first-fit used to give up on now stands somewhere, on a long leader -- and the
+CROSSING shed hides it instead.** Seven more labels are drawn and forty-five more are hidden one
+rung further down, which is not a fix; and the whole drawing rearranges, which is the half of his
+sentence he minds most. **Trading a drop for a hide is his call and not this one's**, so
+`labelWidenSearch` ships FALSE and the drawing is byte-identical to before. The `?debug=labels`
+switch is there so the two can be read back to back.
+
+**What that says about the NEXT step, and it is the honest next question:** the bound that now costs
+labels is not in the first-fit at all, it is the crossing shed choosing to hide rather than to widen.
+The rescue and the shed are making the same decision twice, in opposite directions, and only one of
+them knows the plane is empty.
+
 ### 19c. The numbers over every shipped example, four views each
 
 `node dev/lpn-spike/label-widen-harness.js`. Node ID alone, and with his prefix.
@@ -1715,8 +1738,8 @@ the crossing repair and the crossing shed reacting to labels that now exist.
 | node ID alone | 1,014 | 22 | **1,018** | **18** |
 | ID + `12345678` | 957 | 79 | **1,001** | **35** |
 
-**And every one of the 35 and the 18 left is hidden by phase three's CROSSING shed, not for want of
-a place: "hidden because the pass found nowhere to stand" is zero everywhere.** That is the number
+Node ID alone, which is the configuration these two rows are measured in. **And every one of the 35
+and the 18 left is hidden by phase three's CROSSING shed, not for want of a place: "hidden because the pass found nowhere to stand" is zero everywhere.** That is the number
 his sentence is about. The crossing shed is a different rule with a different reason (section 11a),
 it is his own phase-three decision, and it is untouched here.
 
