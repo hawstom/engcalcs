@@ -56,6 +56,7 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn paneCellText(paneColByKey(s, key), el); },\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo,\n" +
 	"\t\tselectedRefs: selectedRefs,\n" +
+	"\t\topenPopup: openPopup, popupRef: function () { return currentPopup; }, closePopup: closePopup,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -432,6 +433,65 @@ console.log('\n--- R-035: a cell typed AFTER an Undo must not revert ---');
 	key('Enter');
 	report(L.cellText('junctions', ids[0], 'demand') === '777',
 		'the post-undo entry sticks instead of reverting', L.cellText('junctions', ids[0], 'demand'));
+}
+
+console.log('\n--- CRASH 1: renaming from the table while Properties is open ---');
+{
+	// Perry's pre-review, reproduced here with the same real events he used (mousedown, focusin,
+	// F2, type, change) rather than by calling the setter. Open the Properties popup on one node,
+	// then rename THAT node from the table below -- an entirely ordinary thing to do with two
+	// panels open. Before the fix, renameNode() was the only caller that kept `currentPopup` in
+	// step; the pane table's ID cell went through applyNodeRename() directly, so the popup was
+	// left naming an id that no longer existed and the very next refreshPopupIfOpen() (which
+	// paneCommitCell() calls after every commit) threw inside renderNodeFields().
+	L.openPopup(ids[2], 0, 0);
+	report(L.popupRef() && L.popupRef().id === ids[2], 'Properties is open on the node under test',
+		JSON.stringify(L.popupRef()));
+	const oldId = ids[2], newId = oldId + '-renamed';
+	click(oldId, 'id');
+	const idInput = cell(oldId, 'id');
+	key('F2');
+	idInput.value = newId;
+	fire(idInput, 'change', {});
+	let threw = null;
+	try { fire(tableEl, 'change', {}); } catch (e) { threw = e; }
+	report(!threw, 'renaming from the table with Properties open does not throw',
+		threw ? String(threw && threw.stack || threw) : '');
+	report(L.popupRef() && L.popupRef().id === newId,
+		'the open popup follows the rename to the new id', JSON.stringify(L.popupRef()));
+	L.closePopup();
+	ids[2] = newId;   // so later blocks (right-click menu section already ran) still resolve
+}
+
+console.log('\n--- CRASH 2: Delete on a selection spanning the ID column ---');
+{
+	// Perry: three rows selected across the ID column raised three sequential blocking alert()s
+	// (validateNewId() correctly refusing a blank id, once per row) before the page could be used
+	// again. No data was lost, but it contradicts Delete's own "clears values, undoable" promise.
+	let alerts = 0;
+	const realAlert = global.alert;
+	global.alert = function () { alerts++; };
+	try {
+		click(ids[0], 'id');
+		key('ArrowDown', { shiftKey: true });
+		key('ArrowDown', { shiftKey: true });
+		report(boxSize() === '3x1', 'three rows selected, spanning the ID column', boxSize());
+		const idsBefore = [ids[0], ids[1], ids[2]].map((id) => L.cellText('junctions', id, 'id'));
+		function menuEl2() {
+			return global.document.body.children.filter((c) => c['class'] === 'lpn-pane-ctxmenu').slice(-1)[0];
+		}
+		fire(tableEl, 'mousedown', { target: td(ids[0], 'id'), button: 2, shiftKey: false,
+			preventDefault: function () {} });
+		fire(tableEl, 'contextmenu', { target: td(ids[0], 'id'), clientX: 5, clientY: 5,
+			preventDefault: function () {} });
+		const menu = menuEl2();
+		report(!!menu, 'the right-click menu opens on an ID-spanning selection');
+		if (menu) { fire(menu.children[3], 'click', {}); }
+		report(alerts === 0, 'Delete on a selection spanning the ID column raises no alert', String(alerts));
+		const idsAfter = [ids[0], ids[1], ids[2]].map((id) => L.cellText('junctions', id, 'id'));
+		report(JSON.stringify(idsAfter) === JSON.stringify(idsBefore),
+			'...and every ID is unchanged', JSON.stringify(idsAfter));
+	} finally { global.alert = realAlert; }
 }
 
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);

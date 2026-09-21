@@ -19708,6 +19708,17 @@ var EngCalcs = EngCalcs || {};
 	 * **UNDOABLE, LIKE EVERY OTHER EDIT.** One snapshot for the whole range, taken only if the
 	 * range actually holds something to clear -- an empty-selection Delete must not fill the undo
 	 * stack with a no-op, the same rule paneCommitCell() already keeps for a typed cell.
+	 *
+	 * **THE ID COLUMN IS EXEMPT, AND NOT BECAUSE IT IS SPECIAL -- BECAUSE BLANK ISN'T A VALUE
+	 * THERE** (Perry's pre-review, reproduced with real events: three rows selected across the ID
+	 * column raised three sequential blocking alert()s, one per row, before the page could be
+	 * used again). Every other column's blank means "cleared"; an id's blank means "no id at
+	 * all", which validateNewId() correctly refuses out loud through paneColId().set() -- an
+	 * ordinary single-cell rename hits the same refusal and it is right there too. A BULK Delete
+	 * asking the same question forty times in a row is the alert storm, not the refusal itself.
+	 * paneCellIsPlain()/`!col.set` already skip every column with no business being cleared; this
+	 * is the one settable column where "clear it" was never a sensible request in the first
+	 * place, so it is skipped by name rather than by a property nothing else needs.
 	 */
 	function paneDeleteSelection(spec) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
@@ -19716,7 +19727,7 @@ var EngCalcs = EngCalcs || {};
 		for (r = box.r0; r <= box.r1 && !any; r++) {
 			for (c = box.c0; c <= box.c1; c++) {
 				el = rows[r]; col = cols[c];
-				if (paneCellIsPlain(col, el) || !col.set) { continue; }
+				if (col.key === 'id' || paneCellIsPlain(col, el) || !col.set) { continue; }
 				if (paneCellText(col, el) !== '') { any = true; break; }
 			}
 		}
@@ -19725,6 +19736,7 @@ var EngCalcs = EngCalcs || {};
 		for (r = box.r0; r <= box.r1; r++) {
 			for (c = box.c0; c <= box.c1; c++) {
 				el = rows[r]; col = cols[c];
+				if (col.key === 'id') { continue; }
 				paneWriteCellText(spec, col, el, '');
 			}
 		}
@@ -39950,10 +39962,26 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 	}
+	/**
+	 * **THE OPEN POPUP FOLLOWS THE RENAME, IN THE FUNCTION EVERY CALLER SHARES.** Two doors call
+	 * this: Properties' own rename field, through renameNode() below, and the pane table's ID
+	 * cell (paneColId().set(), Task 690). Both used to be "the same door" in name only -- only
+	 * renameNode() updated `currentPopup`, so renaming a node from the TABLE while its Properties
+	 * popup happened to be open left `currentPopup.id` naming the id that no longer exists. The
+	 * very next `refreshPopupIfOpen()` (paneCommitCell() calls one after every commit) then asked
+	 * renderNodeFields() to look up an id nodeById() could not find, which reads a property off
+	 * null and crashes -- found and reproduced with real DOM events by Perry's pre-review, not
+	 * this function's own test. Doing it HERE, before either caller runs another line, is the
+	 * fix `dev/scenario-seam-repair.md` argues for: one write seam, not two callers each trusted
+	 * to remember the other half.
+	 */
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
 		n.id = newId;
 		invalidateIdMaps();   // an id changed IN PLACE -- the one mutation the array check cannot see
+		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === oldId) {
+			currentPopup = { kind: 'node', id: newId };
+		}
 		renameOverrides('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
@@ -39978,17 +40006,22 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function renameNode(oldId, newId) {
-		applyNodeRename(oldId, newId);
-		currentPopup = { kind: 'node', id: newId };
+		applyNodeRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderNodeFields(newId);
 		// lastSolveResult's pressures are keyed by the OLD id -- without a fresh solve, the
 		// pressure label would silently vanish for this node until the next unrelated edit.
 		scheduleSolve();
 	}
+	// See applyNodeRename()'s docblock: this is its twin, and it keeps `currentPopup` in step for
+	// the identical reason -- Properties' renameLink() and the pane table's link-id cell both call
+	// this one function, and only one of them used to finish the job.
 	function applyLinkRename(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
 		invalidateIdMaps();   // as applyNodeRename() -- see byId()
+		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === oldId) {
+			currentPopup = { kind: 'link', id: newId };
+		}
 		renameOverrides('link', oldId, newId);
 		// **NOTHING FOLLOWS A LINK RENAME ANY MORE** (Task 586). It used to: `curveRef` named ANOTHER
 		// PUMP to copy points from, so renaming that pump silently emptied the borrower's curve. A
@@ -40020,8 +40053,7 @@ var EngCalcs = EngCalcs || {};
 		renameInControls('link', oldId, newId);
 	}
 	function renameLink(oldId, newId) {
-		applyLinkRename(oldId, newId);
-		currentPopup = { kind: 'link', id: newId };
+		applyLinkRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderLinkFields(newId);
 		scheduleSolve();
 	}
