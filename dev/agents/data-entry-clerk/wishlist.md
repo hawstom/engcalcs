@@ -429,3 +429,21 @@ cannot grow the table).
 
 **Ranking unchanged**: still the top of this list by my own arithmetic (a per-row round trip
 removed 400 times), still behind nothing else here.
+
+## UPDATE 2026-09-21 to item 1/Task 610: measured entry speed against Tom's direct question; ranking unchanged
+
+Tom asked by name whether the spreadsheet work on `feat/tables-spreadsheet` is fast enough for a
+volume clerk. **OBSERVED/SPECULATION, this session (see journal, thirteenth invocation, for the full
+citations and the numbers)**: a committed cell costs roughly 6 ms of layout (Task 690's own fix,
+measured on a 92-junction Net3 in a real browser, already merged at the top of that branch) plus an
+estimated 2.6 ms+ of full-document save that fires on every commit and is not debounced (my own
+synthetic Node.js benchmark, not a real-browser number — flagged as the weaker of the two). Against
+a clerk's own achievable typing cadence that is single-digit-percent overhead, not the "unbelievable"
+delay Tom had been describing before this round of fixes landed. **Yes, fast enough, on a ~400-element
+network, on the evidence I could gather without a browser this session.**
+
+**This does not move Task 610 off the top of my list.** Entry speed answers "how fast can I type
+into a network that already exists"; Task 610 answers "how do I get 400 junctions to exist at all
+without a canvas click each" — the larger of the two numbers by a wide margin, and untouched by this
+round of fixes. Said to Tom directly, in those words, so the honest ranking does not read as
+downplaying real work he just shipped.
