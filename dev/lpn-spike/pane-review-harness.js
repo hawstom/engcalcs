@@ -265,5 +265,31 @@ console.log('\n--- R-038: navigating selects no characters ---');
 	report(selected === 0, 'arriving by arrow key selects none of the text', String(selected));
 }
 
+console.log('\n--- R-035: a cell typed AFTER an Undo must not revert ---');
+{
+	// His revised wording (2026-09-21): "When I type into any cell after any Undo and press Enter,
+	// Tab, or Arrow, my entry is reverted." 26 earlier trials with no Undo in front of the edit
+	// never reproduced it -- this is the one sequence that does.
+	//
+	// The cause: undo() clones a whole new `doc`, so every node object gets a new identity under
+	// the SAME id. paneTableSignature() is ids-and-headings only, so the table takes the cheap
+	// refillPaneTable() path rather than a rebuild -- and every <input>'s `_lpnCell.el` closure,
+	// set once when the cell was BUILT, kept pointing at the pre-undo object. A commit after that
+	// wrote onto the orphaned object; the document (and the next refill) never saw it.
+	click(ids[0], 'demand');
+	const before = L.cellText('junctions', ids[0], 'demand');
+	const cUndo = cell(ids[0], 'demand');
+	key('5'); cUndo.value = before + '5';
+	key('Enter');
+	L.undo();
+	L.renderTable('junctions');
+	click(ids[0], 'demand');
+	const c = cell(ids[0], 'demand');
+	key('7'); c.value = '777';
+	key('Enter');
+	report(L.cellText('junctions', ids[0], 'demand') === '777',
+		'the post-undo entry sticks instead of reverting', L.cellText('junctions', ids[0], 'demand'));
+}
+
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);
 process.exit(failures ? 1 : 0);

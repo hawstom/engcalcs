@@ -18797,6 +18797,19 @@ var EngCalcs = EngCalcs || {};
 	// map is edited, but the table itself is the same table. **A CELL THE USER IS IN IS LEFT
 	// ALONE** -- overwriting it mid-edit is the classic live-table defect, where half a typed number
 	// is replaced by the old one on the next tick.
+	//
+	// **THIS IS ALSO THE ONE PLACE `_lpnCell.el` IS RE-POINTED, AND UNTIL NOW NOTHING DID THAT**
+	// (Tom, 2026-09-21: *"When I type into any cell after any Undo and press Enter, Tab, or Arrow,
+	// my entry is reverted."*). `paneTableRow()` closes over `el` once, at the moment a cell's
+	// `<input>` is built, and `paneTableSignature()` is ids-and-headings only -- so undo(), which
+	// clones a whole new `doc` with new node/link objects sharing the OLD ids, changes not one
+	// character of the signature and the table takes the cheap refill path instead of a rebuild.
+	// Every input on screen was then still holding the PRE-UNDO object in its closure: a value
+	// typed afterward wrote onto that orphaned object, `c.set()` succeeded, `completeEdit()` ran,
+	// and the cell that a moment later re-read `doc` (the real one, untouched by the edit) put the
+	// old number straight back -- indistinguishable from the entry being reverted. Re-stamping the
+	// current `el` onto every live cell here, on every refill and not only after an undo, is the
+	// one fix that cannot go stale again: it is the same rows/ids refillPaneTable already walks.
 	function refillPaneTable(spec, rows) {
 		rows.forEach(function (el) {
 			var cells = spec.cells[el.id];
@@ -18804,6 +18817,7 @@ var EngCalcs = EngCalcs || {};
 			paneCols(spec).forEach(function (c) {
 				var target = cells[c.key];
 				if (!target) { return; }
+				if (target._lpnCell) { target._lpnCell.el = el; }
 				if (paneCellIsPlain(c, el)) {
 					target.textContent = paneCellText(c, el);
 				} else if (c.bool && target.type === 'checkbox') {
