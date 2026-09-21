@@ -2226,8 +2226,19 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    decides which of the two a cell is wearing; this file only says what each looks like.
    The border is INSET so it does not push the row apart, and it is on the cell rather than on the
    control so a read-only cell can wear it too. */
-.lpn-pane-table tbody td.lpn-pane-cur,
-.lpn-pane-table tbody td:focus, .lpn-pane-table tbody td:focus-within {
+/* **ONE CLASS SAYS WHICH CELL IS CURRENT, AND `:focus-within` NO LONGER GETS A VOTE** (Tom,
+   2026-09-19: *"At column A there is a strange highlighting around the ID."*). This rule used to
+   end `, td:focus, td:focus-within`, which meant ANY focused descendant made its cell wear the
+   current-cell mark -- so clicking the ID button, whose whole job was to jump to the map, left
+   that cell looking like the cell you were standing in. It was belt and braces from before the
+   modes existed and it is now neither: `paneSelPaint()` paints `.lpn-pane-cur` from the focusin
+   handler, so every cell the caret reaches has the class before the browser has finished the
+   focus change.
+   **AND IT WAS EXPENSIVE, WHICH IS A SECOND REASON AND AN INDEPENDENT ONE.** `:focus-within`
+   matches up the ancestor chain, so every focus change invalidates style for the row and the
+   table around it. Measured on a 92-junction Net3 with recalculation off: dropping it took one
+   committed cell from 19.2 ms to 15.0 ms, about a fifth of what typing a value cost. */
+.lpn-pane-table tbody td.lpn-pane-cur {
 	outline: 2px solid #0645ad; outline-offset: -2px;
 }
 .lpn-pane-table tbody td input:focus { outline: 0; }
@@ -2366,15 +2377,37 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    text must never look selected. A cell in ENTRY or EDIT is writable and keeps its caret and its
    native selection, which is what makes Ctrl+Z and the mouse work inside a value. */
 .lpn-pane-table tbody td input[readonly] { user-select: none; }
-/* A heading that sorts and an ID that goes to the map are both flat text buttons: they are the
-   cell, not a control sitting in it. */
+/* **NEITHER OF THESE IS A HYPERLINK, AND THEY BOTH LOOKED LIKE ONE** (Tom, 2026-09-19: *"we have
+   blue text links"* on the sort headings, and the *"strange highlighting around the ID"*).
+   The MARKUP was never wrong -- a sortable heading here is already a real `<button>` carrying
+   `aria-sort` on the sorted column only, which is what the ARIA authoring practices ask for and
+   what Excel, Sheets, Finder and Explorer all do. The PAINT was: the sort button turned #0645ad
+   under the pointer, which is the browser's own visited-link colour, and the ID button was
+   underlined at rest in the same blue. Ida's reading, 2026-09-19, is that this is a false promise
+   rather than a style preference -- blue and underlined is the one vocabulary thirty years of the
+   web has trained every reader to read as LEAVING, and a sort reorders what is already on screen.
+   Worse, #0645ad had just been given a specific meaning in this very table: the current cell.
+   So: a neutral hover for the sort heading, no underline anywhere, and that blue reserved for the
+   one thing it now means. The ID's own control is a pin icon beside an ordinary editable cell --
+   see paneTableRow() -- so it has no text to underline in the first place. */
 .lpn-pane-sort, .lpn-pane-goto {
 	background: none; border: 0; font: inherit; padding: 0; cursor: pointer; color: inherit;
 	text-align: inherit;
 }
 .lpn-pane-sort { font-weight: bold; }
-.lpn-pane-goto { text-decoration: underline; }
-.lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
+/* A tint rather than a colour: it says "this responds" without claiming a meaning of its own. */
+.lpn-pane-sort:hover, .lpn-pane-goto:hover { background: #eef1f4; }
+/* The pin: the first column's way back to the map. Small, quiet, and it does not take the cell's
+   text alignment with it -- it sits after the box, in its own ink. */
+.lpn-pane-goto {
+	display: inline-flex; align-items: center; margin-inline-start: 4px; padding: 1px;
+	color: #667; vertical-align: middle; line-height: 0;
+}
+.lpn-pane-goto svg { width: 0.95em; height: 0.95em; }
+.lpn-pane-goto:hover, .lpn-pane-goto:focus-visible { color: #0645ad; }
+/* A keyboard user must still see where they are. `:focus-visible` rather than `:focus`, so a mouse
+   press does not leave a ring behind on a control whose whole job is to move the map. */
+.lpn-pane-sort:focus-visible, .lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture

@@ -165,7 +165,13 @@ var EngCalcs = EngCalcs || {};
 	// layout pass, and outside one every call reads the DOM exactly as it always did -- so there is no
 	// invalidation to remember, no resize seam to wire, and nothing a later caller can get stale.
 	var mapBoxPx = null, mapBoxDepth = 0;
+	// **COUNTED, FOR THE REASON linkSegIndexBuilds IS COUNTED 280 LINES DOWN**: a stopwatch on a
+	// shared machine measures the machine, and this number does not move with the load. It is the
+	// number of times the browser was asked to lay the whole drawing out again -- once per edit is
+	// the floor, and anything above that is a hold somebody forgot to declare.
+	var mapBoxReads = 0;
 	function readMapBox() {
+		mapBoxReads++;
 		return { w: (svg && svg.clientWidth) || 0, h: (svg && svg.clientHeight) || 0 };
 	}
 	function mapBox() {
@@ -9412,14 +9418,29 @@ var EngCalcs = EngCalcs || {};
 		}
 		return svg;
 	}
+	// **ONE NODE MOVING IS A LAYOUT PASS, AND IT NOW SAYS SO** (Task 690, Tom 2026-09-19: *"There is
+	// still an unbelievable delay when speed-entering a column."*). The loops below re-lay-out every
+	// label on every pipe that touches this node, and each of those asks for the canvas box and for
+	// the drawing's segment index -- the two questions buildDom() already holds for its own pass,
+	// declared 9,200 lines up this file with the measurement that earned them. This path never
+	// declared one, so a single edit read the canvas once per pipe, and each read is a LAYOUT read
+	// that makes the browser lay the whole drawing out again between two writes.
+	// **Measured before and after on a 92-junction Net3 with recalculation off: one committed cell
+	// 31 ms, then 6 ms.** The drawing is identical either way -- the document does not move inside
+	// this function, so a held answer cannot go stale; holding changes WHEN the browser is asked,
+	// not what it says.
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
-		ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
-		if (ne.hit) { syncNodeHit(n); }
-		positionNodeSymbol(id);
-		layoutNodeLabel(id);
-		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
-		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
+		beginMapBoxHold();
+		beginLinkGeomHold();
+		try {
+			ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
+			if (ne.hit) { syncNodeHit(n); }
+			positionNodeSymbol(id);
+			layoutNodeLabel(id);
+			for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
+			for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
+		} finally { endMapBoxHold(); endLinkGeomHold(); }
 		scheduleSolve();
 	}
 	function updateVertex(linkId, vidx) {
@@ -9729,9 +9750,15 @@ var EngCalcs = EngCalcs || {};
 	//     is copied verbatim and cannot drift.
 	// The COST is real: opening a big model on a phone shows a fragment at the desktop's
 	// magnification rather than the whole intended view, small.
+	// **IT ASKS `mapBox()` AND NOT THE ELEMENT, WHICH IS THE ONLY LINE THAT CHANGED HERE** (Task 690,
+	// 2026-09-19). `svg.clientWidth` is a LAYOUT READ: taken after any DOM write it makes the
+	// browser lay the entire drawing out again before it will answer. This function is called by
+	// makeUndoSnapshot(), so it ran once for every value typed into a table -- **measured at 6.7 ms
+	// of the 31 ms one committed cell cost on a 92-junction Net3.** `mapBox()` is the same read
+	// with a hold in front of it, so inside a pass that has declared one the whole edit asks the
+	// browser once. Same numbers, and outside a hold it is literally the same call.
 	function currentView() {
-		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
-			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+		var box = mapBox(), w = box.w || 0, h = box.h || 0,
 			sc = state.s || 1;
 		if (!w || !h) { return null; }
 		// cx/cy: the world point in the middle. s: pixels per world unit, the same number a resize
@@ -17083,8 +17110,36 @@ var EngCalcs = EngCalcs || {};
 	// re-order Junctions under the hand of somebody typing in them. Each keeps its own SCROLL
 	// position too, and that one costs no code: a scroll offset belongs to the element that
 	// scrolls, and there are six panel divs.
+	/**
+	 * **THE ID IS EDITABLE HERE BECAUSE IT IS EDITABLE IN PROPERTIES** (Tom, 2026-09-19: *"the ID is
+	 * not editable, though it's editable in properties. Can you fix that?"*). One property with two
+	 * editors that disagree about whether it can be changed is the shape this page has already been
+	 * bitten by; so this goes through `applyNodeRename()` / `applyLinkRename()`, which is the SAME
+	 * door the popup's own `idField()` uses and the same one the bulk prefix rename uses. A rename
+	 * chases six indexes, every scenario override, every Text anchor, every meter and the sentence
+	 * of every control -- writing a second one of those is how one of the six gets forgotten.
+	 *
+	 * **ONLY A NODE OR A LINK.** A Text's id and a meter's id have no user-facing meaning and their
+	 * popups deliberately offer no rename either, so `plainFor` keeps those rows reading as plain
+	 * identity cells -- the table matching Properties in both directions rather than only the one
+	 * he noticed.
+	 */
 	function paneColId() {
-		return { key: 'id', label: 'lpn_field_id', get: function (el) { return el.id; } };
+		return { key: 'id', label: 'lpn_field_id', str: true, reread: true, em: 5,
+			get: function (el) { return el.id; },
+			plainFor: function (el) { var g = elGroup(el); return g !== 'node' && g !== 'link'; },
+			set: function (el, v) {
+				var newId = String(v === undefined || v === null ? '' : v).trim(),
+					group = elGroup(el), ok;
+				if (newId === el.id) { return; }
+				// **REFUSED OUT LOUD, IN THE POPUP'S OWN WORDS.** validateNewId() is the popup's
+				// rule and its message; `reread` above then puts the old id back in the box, so a
+				// refused rename leaves the document and the cell saying the same thing.
+				ok = validateNewId(newId, el.id);
+				if (ok !== true) { alert(ok); return; }
+				if (group === 'node') { applyNodeRename(el.id, newId); }
+				else { applyLinkRename(el.id, newId); }
+			} };
 	}
 	function paneColElev() {
 		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
@@ -18603,7 +18658,7 @@ var EngCalcs = EngCalcs || {};
 		renderPaneTable(spec);
 	}
 	function paneTableRow(spec, el) {
-		var tr = document.createElement('tr'), cells = {}, tds = {};
+		var tr = document.createElement('tr'), cells = {}, tds = {}, pc = EngCalcs.pageConfig || {};
 		paneCols(spec).forEach(function (c, i) {
 			var td = document.createElement('td'), btn, input;
 			td.className = paneCellClass(c, i);
@@ -18614,17 +18669,7 @@ var EngCalcs = EngCalcs || {};
 			td._lpnPaneId = el.id;
 			td._lpnPaneKey = c.key;
 			tds[c.key] = td;
-			if (c.key === 'id') {
-				// The ID is a way BACK TO THE MAP, not a text box: it selects the part and pans to
-				// it, the same gesture a Find result row is. Renaming stays in the property popup,
-				// where the clash rules and the undo snapshot already live.
-				btn = document.createElement('button');
-				btn.type = 'button';
-				btn.className = 'lpn-pane-goto';
-				btn.textContent = el.id;
-				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
-				td.appendChild(btn);
-			} else if (paneCellIsPlain(c, el)) {
+			if (paneCellIsPlain(c, el)) {
 				// **A RESULT IS NEVER AN INPUT**, and neither is an identity the drawing owns. Both
 				// are plain cells with no control in them at all, so there is no path by which
 				// either could be typed into.
@@ -18713,6 +18758,34 @@ var EngCalcs = EngCalcs || {};
 				paneApplyHint(input, c, el);
 				td.appendChild(input);
 				cells[c.key] = input;
+			}
+			/**
+			 * **THE ID CELL IS TWO THINGS, AND IT USED TO BE ONE** (Tom, 2026-09-19: *"At column A
+			 * there is a strange highlighting around the ID. And the ID is not editable, though
+			 * it's editable in properties."*). Both halves are here. The VALUE is now an ordinary
+			 * cell built by the branches above -- one door, so the ID is typed, selected, copied
+			 * and pasted exactly as every other column is, and paneColId() carries the rename. The
+			 * way BACK TO THE MAP is this pin, appended AFTER the control on purpose:
+			 * paneCellFocusable() takes the first control in a cell, and the caret has to land in
+			 * the box a person can type in.
+			 *
+			 * **AND IT IS A PIN RATHER THAN THE UNDERLINED ID IT WAS.** The old control was a
+			 * button whose text was the id, underlined at rest and turning #0645ad under the
+			 * pointer -- the browser's own visited-link colour, in the one table that had just
+			 * given that exact blue a different meaning (the current cell). Ida's reading,
+			 * 2026-09-19: a hyperlink promises LEAVING and a table full of them where a table
+			 * normally has none is a false promise; and two meanings sharing one colour in one
+			 * table is a collision whichever of them a reader learns first.
+			 */
+			if (c.key === 'id') {
+				btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'lpn-pane-goto ec-help';
+				btn.title = pc.lpn_pane_goto_tip || 'Show this on the map.';
+				btn.setAttribute('aria-label', btn.title + ' ' + el.id);
+				if (EngCalcs.iconEl) { btn.appendChild(EngCalcs.iconEl('pin')); }
+				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
+				td.appendChild(btn);
 			}
 			tr.appendChild(td);
 		});
@@ -19145,6 +19218,15 @@ var EngCalcs = EngCalcs || {};
 		 * looks like.
 		 */
 		was = paneParseCellText(c, paneCellText(c, el));
+		// **ONE CANVAS MEASUREMENT FOR THE WHOLE COMMIT, SNAPSHOT INCLUDED** (Task 690). The
+		// snapshot records the camera, which means it reads the canvas -- and it is taken between
+		// the previous keystroke's drawing writes and this one's, which is the worst possible
+		// moment to ask: **6.7 ms of the 31 ms one committed cell cost on a 92-junction Net3 was
+		// that single read.** Declared out here rather than inside makeUndoSnapshot() so the read
+		// it does and the reads the redraw below does are the SAME one. Depth-counted, so the holds
+		// inside afterPropertyEdit() and updateNode() nest into it for free.
+		beginMapBoxHold();
+		try {
 		if (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); }
 		c.set(el, p.v);
 		// **A SETTER THAT MAY REFUSE OR NORMALISE WHAT WAS TYPED SAYS SO, AND THE CELL IS RE-READ**
@@ -19155,6 +19237,7 @@ var EngCalcs = EngCalcs || {};
 		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
 		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
 		refreshPopupIfOpen();
+		} finally { endMapBoxHold(); }
 		paneLeaveEdit(input);
 		return true;
 	}
@@ -19430,20 +19513,40 @@ var EngCalcs = EngCalcs || {};
 		// because a right press on a browser that does NOT focus the box would otherwise leave it
 		// standing and swallow the NEXT click's selection.
 		table.addEventListener('mouseup', function () { dragging = false; spec._keepSel = false; });
-		// **A PASTE IS THE USER TYPING**, so it goes through the same c.set() a keystroke does and
-		// obeys every rule about the user's own numbers. Intercepted only when the clipboard holds
-		// a GRID: one cell is ordinary typing and the browser does it better than we would --
-		// libPasteIsGrid()'s own rule, reused rather than restated.
+		/**
+		 * **A PASTE IS THE USER TYPING**, so it goes through the same c.set() a keystroke does and
+		 * obeys every rule about the user's own numbers.
+		 *
+		 * **ONE CELL IS PASTED TOO, AND THAT IS TOM'S *"copy across columns does not work"***
+		 * (2026-09-19, re-testing after being told it did). It did not, and the reason is that this
+		 * listener and the `copy` listener below were the same argument and only ONE of them was
+		 * re-decided. Both used to hand a single cell back to the browser, on the ground that the
+		 * browser does its own thing better than we would. The copy half was corrected the same day
+		 * -- a cell arrived at by keyboard selects no characters, so the browser had nothing to copy
+		 * -- and this half kept the argument after the fact underneath it had gone: **a cell that is
+		 * not being typed in is `readOnly`**, which is what makes the arrow keys work at all, and a
+		 * browser paste into a read-only box does NOTHING. No refusal, no banner, no character.
+		 *
+		 * **AND IT IS WHY A HARNESS SAID IT WORKED.** A driven test pastes a BLOCK, which is a grid,
+		 * which was intercepted and did work; the gesture a person actually makes -- copy one cell,
+		 * stand on a cell in another column, paste -- was the one case that fell through. The test
+		 * and the user were doing different things and only the user was right.
+		 *
+		 * panePasteAt() already knows what to do with one cell: it tiles, on Tom's own 2026-09-07
+		 * ruling that *"pasting a single cell or row to multiple cells or rows should fill them
+		 * all"*. So there is nothing here but letting it through.
+		 */
 		table.addEventListener('paste', function (e) {
 			var text, cells;
 			// While a cell is being EDITED, a paste is a text paste into that box and nothing else.
 			// Intercepting there would make it impossible to paste a number into half a value.
+			// This is the line that stays: it is about a caret, not about how many cells there are.
 			if (paneInEdit(activeElementSafe())) { return; }
 			try { text = e.clipboardData && e.clipboardData.getData('text/plain'); }
 			catch (err) { return; }
 			if (!text) { return; }
 			cells = libPasteCells(text);
-			if (!libPasteIsGrid(cells)) { return; }
+			if (!cells.length) { return; }
 			if (e.preventDefault) { e.preventDefault(); }
 			panePasteAt(spec, cells);
 		});
@@ -38532,13 +38635,20 @@ var EngCalcs = EngCalcs || {};
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
 	// halo), re-solve, re-count the status bar, persist. One seam, so a new field cannot forget a
 	// third of it.
+	// **AND IT IS ONE CANVAS MEASUREMENT, for the reason updateNode() states at length** (Task 690).
+	// The hold is depth-counted, so declaring one here and another inside updateNode() costs
+	// nothing and means the LINK branch -- which relays out every label on a rebuilt pipe -- is
+	// covered by the same bargain the node branch already is.
 	function afterPropertyEdit(el) {
 		var group = elGroup(el);
-		if (group === 'link') { rebuildLink(el); }
-		// A Text label's redraw is its content, its measured width and its visibility -- the same
-		// three whether the words changed or the label was switched off (Task 407).
-		else if (group === 'label') { refreshLabelContent(el.id); }
-		else if (nodeEls[el.id]) { updateNode(el.id); }
+		beginMapBoxHold();
+		try {
+			if (group === 'link') { rebuildLink(el); }
+			// A Text label's redraw is its content, its measured width and its visibility -- the same
+			// three whether the words changed or the label was switched off (Task 407).
+			else if (group === 'label') { refreshLabelContent(el.id); }
+			else if (nodeEls[el.id]) { updateNode(el.id); }
+		} finally { endMapBoxHold(); }
 		refreshScenarioMarks();
 		refreshScenarioStatus();
 		scheduleSolve();

@@ -36,6 +36,8 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, scheduleSolve: scheduleSolve,\n" +
 	"\t\trefreshScenarioMarks: refreshScenarioMarks, refreshPaneIfOpen: refreshPaneIfOpen,\n" +
 	"\t\tupdateNode: updateNode,\n" +
+	"\t\tmapBoxReads: function () { return mapBoxReads; },\n" +
+	"\t\tsegIndexBuilds: function () { return linkSegIndexBuilds; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +

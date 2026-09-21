@@ -1619,6 +1619,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
 	lpn_pane_filter_none: <?=json_encode($ec_lang['lpn_pane_filter_none'])?>,
 	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
+	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
 	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
 	lpn_pane_print_tip: <?=json_encode($ec_lang['lpn_pane_print_tip'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
