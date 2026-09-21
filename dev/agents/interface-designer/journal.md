@@ -2377,3 +2377,149 @@ map's own selection highlight) — if it does, the collision named above is wide
 table.
 
 No shipped file touched.
+
+## 2026-09-21 — Notice and error messaging: QGIS, the count, and what to build first (Task 704)
+
+Tom, on `lpn_`: *"The banner message about 'We asked your colleague to close the file' disappeared
+too fast and unrecoverable. 'Help! What did I miss!' We need a better messaging system. We talked
+about the QGIS system."* Ranking it: *"my only remaining issue was the peripheral and pervasive
+banner persistence issue... But we need Ida's input."* Diagnosis only; nothing built.
+
+### QGIS, since he named it (checked 2026-09-21)
+
+**QGIS runs two mechanisms, not one, and the second is the part that answers his complaint.**
+CITED (QGIS pyqgis cookbook, "Communicating with the user,"
+docs.qgis.org/3.44/en/docs/pyqgis_developer_cookbook/communicating.html, fetched 2026-09-21):
+`QgsMessageBar` is a transient bar with four severity colors (Info, Warning, Critical, Success),
+optionally timed, and **it STACKS** — a second message while one is showing does not overwrite the
+first, it queues behind it, and the user dismisses one at a time to reveal the next. Nothing here
+loses a message to a faster second one.
+
+**The part he actually asked for is `QgsMessageLog`, a separate, persistent store the bar merely
+mirrors.** CITED (same source): "You can see the output of the `QgsMessageLog` in the Log Messages
+Panel." CITED (QGIS user manual, "General Tools,"
+docs.qgis.org/3.44/en/docs/user_manual/introduction/general_tools.html, fetched 2026-09-21): the
+Log Messages Panel is **opened from one icon at the right end of the bottom status bar**, grouped
+into tabs (General plus one per plugin), and holds everything that has ever been logged for the
+session — including whatever scrolled off the bar before anyone read it. It costs no permanent
+screen space: closed by default, one click to open, one click to close.
+
+**A second desktop family agrees on the same two-part shape.** CITED (Autodesk AutoCAD Help, "About
+Navigating and Editing in the Command Window" / F2 Text Screen,
+help.autodesk.com, fetched 2026-09-21): the command LINE shows only the current exchange; **F2**
+opens the Text Screen, "a complete history of the prompts and responses in the current work
+session," independently scrollable and copyable, default buffer 400 lines. Same division: a
+one-line-or-two transient readout for the moment, and a keystroke away from everything that has
+ever been said.
+
+**The web convention does NOT simply agree with "always keep a log," and that matters because it is
+the honest caution on the other side.** CITED (Material Design 3, "Snackbar," Guidelines,
+m3.material.io/components/snackbar/guidelines, fetched 2026-09-21): a snackbar is for messages that
+are "minimally interruptive and don't require user action," and Google's own accessibility note is
+blunt — an auto-dismissing snackbar is **inaccessible to a visitor with low vision or who needs more
+time to read it**, and the fix Google names is not "log it," it is "communicate the same information
+another way, inline, near the thing that triggered it." **That is a real vote against treating a log
+as the whole answer**: a log fixes "I can look it up later," not "I could not read it fast enough the
+first time," and this page's own `setNotice()` (8 seconds, single line, no severity color) already
+has exactly the second problem, independent of whether a log gets built.
+
+**So the QGIS answer is not "add a log" on its own — it is "keep the transient bar honest about being
+transient, and put a genuine record behind one click, because the two failure modes are different and
+a single fix cannot cover both."**
+
+### What this page actually has, counted rather than guessed at
+
+Read `js/looped-network.js` end to end for every distinct way it tells a person something, checked
+2026-09-21:
+
+| Mechanism | Door(s) | Call sites | Lifetime | Severity shown |
+|---|---|---|---|---|
+| `setNotice()` / `showNotice()` | 1 (`:42199`, `:42231`) | **66** | 8 s, `STATUS_NOTICE_MS`; a second call silently replaces the first, no queue | none — one plain sentence |
+| `setStatus()` (diagnostic, `#lpn_status`) | 1 (`:42251`) | 19 | standing, until the model changes or `expireStatus()` is called | amber box (implied, not colour-coded per severity) |
+| `setEngineNotes()` (`#lpn_status_notes`) | 1 (`:42326`) | few, all engine-difference notes | 2 min, then an 800 ms fade | none |
+| `renderBanner()` (`bannerWarn`/`bannerRO`, `#lpn_lock_banner`) | 1 render door (`:25892`), several setters (`setLockUnavailable`, `setFileMissing`, `syncReadOnlyToOpenProject`, the `changed`-kind assignment) | 5 distinct kinds (`changed`, `reopen`, `lock`, `missing`, read-only) | standing, dismissable per kind via `lockWarnDismissed`; **a dismissal cannot be un-dismissed** — nothing shows what was hidden | amber `#a80` vs red `#a00`, two colours, real and consistently applied (`:25903-25904`) |
+| `paneFilterBanner()` | 1 (`:17990`) | 3 | standing while a filter is active | none |
+| `openDialog()` custom modals | 1 door, but each call writes its own body | 14 | until the user answers; **content is never retained anywhere once closed** | none |
+| `window.alert()` | none — each call writes its own string directly | 39 | until dismissed, blocking | none (native) |
+| `window.confirm()` | none — same | 18 | until answered, blocking | none (native) |
+
+**Six-plus genuinely different idioms, and the worst of them has no shared door at all.**
+`setNotice`, `setStatus`, `setEngineNotes` and `renderBanner` each have exactly one function that
+owns their element, which is the same discipline `dev/scenario-seam-repair.md` asks for elsewhere —
+a real seam, just four different ones that do not know about each other. **`alert()`/`confirm()` at
+57 call sites are the opposite: every one writes its own text directly into a browser-native dialog,
+with nothing between the call site and the screen.** That is worse than Task 701's finding, not the
+same shape by luck — 701 found forty places writing a raw `'block'`/`'flex'`/`'none'` around ONE
+guard that could see plain calls but not the ternary form; here there was never a guard to be blind
+to. **And it is these two — `openDialog()` and `alert()`/`confirm()` — that a "what did I miss"
+complaint is most likely to be about**, because they are the only two classes that vanish completely:
+`setNotice()`'s 66 sites at least sit in one function that COULD be taught to remember; a modal's
+text exists nowhere once the user clicks a button. The stale-claim dialog at `:25658-25681`
+(`presentOpenChoice()`) — three choices, the first reading *"Cancel and ask them to... close it
+properly"* — is exactly the shape of text Tom is very likely remembering as "the banner," because
+its Cancel branch (`:25670`) does nothing at all afterward: no notice, no residue, nothing to reopen.
+Whether that is literally the site or not, it is the class of site the complaint names.
+
+### The three questions, ranked
+
+**1. What must be recoverable, and what is fine to lose — the sharpest single question, because it
+splits the 66 `setNotice()` sites cleanly in two.** A notice confirming an action the canvas or the
+document already shows the result of (`Saved {file}`, `Renamed {n} assets`, `Pasted {n} cells`) is
+fine to lose: the evidence survives in the model whether or not the sentence does, so a missed
+"Saved" costs nothing a glance at the title bar / dirty flag would not already answer. **A notice
+that is the ONLY record of a decision point or a standing risk is not** — `lpn_lock_unavailable` and
+its siblings, the read-only banner's naming of who holds the file, and above all the stale-claim
+dialog's three choices, because nothing else on the page states them. The diagnostic box
+(`setStatus`) already gets this mostly right by construction — it does not expire on its own — which
+is why it should be the MODEL for the rest, not a fourth thing needing its own fix.
+
+**2. Where a persistent message can live without being a fifth line of chrome.** Not a bar that is
+always drawn — that is a fifth line of the four he has already named (HawsEDC, menus, toolbar,
+tabs), and it is the mistake QGIS itself does not make: the Log Messages Panel is CLOSED by default
+and opened from one icon. **The right home here is the same shape: one small control — a
+history/clock icon, sitting in the existing `#lpn_status` corner rather than a new location — that
+carries a count when something unread is waiting, and opens a short, read-only, newest-first list on
+click.** Closed, it costs nothing; open, it is a control like any popup this page already has, not a
+new standing bar. This is a LOG BEHIND A CONTROL, not a bar, and it is the distinction Tom's own
+four-lines-of-chrome framing already gives the reason for.
+
+**3. What severity buys.** QGIS earns four levels because a GIS genuinely produces four kinds of
+event at volume — routine info, a recoverable warning, a hard failure, a confirmed success — across
+dozens of plugins nobody wrote in concert. **This page already has, and only has, two:** amber
+(`#a80`, "a warning you may work through") and red (`#a00`, "a state that has taken editing away"),
+and `renderBanner()` already draws that distinction correctly and consistently. Adding Info/Success
+as separate colours on top of that would be inventing categories the page's own 84 message sites
+don't actually sort into — `setNotice()`'s confirmations are all one flavor ("this finished"), the
+diagnostics are all one flavor ("this is still true"), and only the banner class ever needed two.
+**Two is honest here; four would be decoration.**
+
+### Cheapest useful step, ranked above the rebuild
+
+Because `setNotice()` is ALREADY one function serving 66 call sites — unlike the alert/confirm
+sprawl, which has none — **the cheapest fix that answers "Help! What did I miss!" is to teach that
+one function to remember, and add one small disclosure control to read the memory back.** Concretely
+(reported as a shape, not built): `setNotice()` pushes `{text, time}` onto a capped in-memory array
+(session-only, no storage question — this is a JS variable, not `localStorage`, so it does not touch
+`dev/cookie-storage-inventory.md` at all) alongside what it already does; one small icon near
+`#lpn_status` opens a plain list of the last handful, newest first. No new severities, no new
+chrome, and it directly answers the complaint as stated — a message that scrolled past becomes
+something you can go back and read, the way the Text Screen and the Log Messages Panel both do.
+
+**Ranked above that:** nothing — this is the first move, and it is cheap because the seam already
+exists. **Ranked below it, in order:**
+2. Fold `setStatus()` and `renderBanner()` into the SAME small log, since those are the ones
+   carrying actual decisions (a dismissed lock warning currently has no way back at all — only the
+   NEXT distinct fault brings the banner back, per `lockWarnDismissed`).
+3. Audit the 57 raw `alert()`/`confirm()` sites and decide, case by case, which genuinely need to
+   block (an irreversible action — breaking a lock, discarding unsaved work) versus which are really
+   just information that belongs in the same notice/log door as everything else. This is
+   real feature-branch work — a design pass over ~57 sites, each a judgement call about whether it
+   blocks or merely informs — and is the piece that actually matches the size of what Tom floated
+   ("open a feature branch"). It is real work and belongs later, not first.
+4. Do NOT add QGIS's stacking behavior to `setNotice()` itself (message N+1 waiting behind message N
+   rather than overwriting it) as a first move — it is a reasonable idea but it fixes a narrower
+   problem (two notices arriving close together) than the log does, and building the log first makes
+   stacking optional rather than necessary: once anything can be read back, losing 8 seconds of
+   overlap matters much less.
+
+No shipped file touched.

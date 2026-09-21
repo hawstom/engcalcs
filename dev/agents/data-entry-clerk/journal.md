@@ -1470,3 +1470,90 @@ than dismissing by assumption, and it still lost on paste ergonomics once actual
 than changing it.
 
 — Declan
+
+## Thirteenth invocation, 2026-09-21 — Tom's own question: "is it fast enough for Declan?"
+
+**Answer: yes, on the evidence I could gather, with an honest limit on how I gathered it.** I did
+not drive a real browser this session (none was set up in this environment and getting one running
+was out of scope for the time I had); every millisecond below is either the branch's own code
+comment (a real browser measurement Tom or a prior invocation already took) or my own synthetic
+Node.js benchmark of the ONE cost that comment does not cover. Flagged per line.
+
+**The question only my seat asks — keystroke, commit, or row — has a clean answer: PER CELL
+COMMIT, never per keystroke.** **OBSERVED**, `feat/tables-spreadsheet` branch (local only, not on
+origin), `git show feat/tables-spreadsheet:js/looped-network.js` at the lines below (checked
+2026-09-21): no `input`-event listener exists on a table cell (`grep -n "addEventListener('input'"`
+finds nothing scoped to the pane), so nothing fires while a value is being typed. `paneHandleKey()`
+(`:19317`) and `paneCommitCell()` (`:19192`) run the whole write-and-refresh chain once, on Enter,
+Tab, or blur — the printable-character path (`:19342`) hands the keystroke straight to the native
+`<input>` and does nothing else. For a clerk typing straight down one column this makes "per commit"
+and "per row" the same event, but the distinction still matters for the record: a wider row (typing
+across six columns before Enter) pays this cost six times, once per commit, not once per row, and a
+future finding that assumes "per row" would be wrong the day someone widens what one row asks for.
+
+**Three things happen synchronously inside that one commit, and I could source real numbers for two
+of them:**
+
+1. **`updateNode()`'s layout pass (`:9432` calls it from `afterPropertyEdit()` at `:38650`, for ANY
+   node-property edit, not only a moved position) — OBSERVED from the branch's own comment at
+   `:9421-9431` (dated to Tom's own 2026-09-19 complaint, *"There is still an unbelievable delay
+   when speed-entering a column"*): measured before and after on a 92-junction Net3, one committed
+   cell cost 31 ms and now costs 6 ms.** That fix — holding the canvas-box and link-geometry reads so
+   one edit asks the browser once instead of once per incident pipe — is Task 690's own work and is
+   already the TOP of this branch (`8c4ec4cd`, "Paste across columns, ID rename, canvas-read holds,
+   Ida's CSS"), so it is not a thing I am recommending; it is a thing that already shipped to the
+   branch I was asked to measure. I did not re-run this one myself — I trust a browser measurement
+   already on record over inventing a worse proxy for a canvas layout cost, which Node has no canvas
+   to give me anyway.
+2. **`saveToStorage()` (`:22805`, called unconditionally from `afterPropertyEdit()` at `:38655`,
+   every commit, NOT debounced — unlike the solve, which is) does a full-document
+   `JSON.stringify → JSON.parse → per-coordinate flip → JSON.stringify → localStorage.setItem` on
+   every single committed cell, for the WHOLE project, not just the edited element.** I could find no
+   existing measurement of this one, so I wrote my own — SPECULATION on the exact browser number
+   (Node.js has no `localStorage`, and V8's JSON cost is not Chrome's), but OBSERVED on the shape
+   (`serializeProject()` at `:22464` and `flipStoredY()` at `:22067` both walk every node, link,
+   label and customer unconditionally, confirmed by reading, not assumed): a synthetic benchmark
+   (`/tmp/bench_save.js`, this session, not committed — it is throwaway per the dear-file rule) built
+   a document shaped like the real one (id/type/x/y/elev/demand per node, id/from/to/length/diameter/
+   roughness per link) at a steady 400 junctions + 399 pipes and ran the same
+   stringify/parse/flip/stringify sequence 400 times in a row, once per simulated commit. Result: **~2.6 ms
+   per commit at that size, in Node — a lower bound, since it omits the real `localStorage.setItem`
+   disk write and Chrome's own JSON engine may differ from V8's in either direction.** It also is NOT
+   quadratic within one sitting the way a growing-network paste would be — the network size stays
+   flat while a clerk types down an already-placed column of junctions, so the per-commit cost stays
+   flat too, at roughly 2.6 ms, summing to about 1 second added across 400 commits, in Node terms.
+3. **`refreshScenarioMarks()` (`:43799`, called unconditionally from `afterPropertyEdit()`, every
+   commit) walks every node and every link doing `classList.toggle`/title updates, with no early
+   exit for a project with no scenario overrides at all — OBSERVED from reading the function body,
+   NOT separately measured; I have no browser DOM to cost a `classList.toggle` against and did not
+   invent one.** Flagging it because it is the same SHAPE as the other two — an O(document size) walk
+   that fires on every commit rather than being debounced or skipped when nothing changed — not
+   because I can say what it costs.
+
+**Adding what I can actually add (6 ms measured + ~2.6 ms estimated, calling the third an unknown
+few more) puts the synchronous work behind one committed cell on a ~400-element network at roughly
+10 ms, maybe a bit more.** Against a typing cadence nobody could physically sustain much faster than
+250-400 ms per committed value (a few digits and Enter, "already knowing exactly what they are going
+to type" per my seat's own brief), 10 ms is on the order of 3-4% overhead. **That is not the
+"unbelievable" delay Tom named** — and it should not be, because the fix that number is measuring
+(31 ms → 6 ms) is the fix Tom's own complaint produced, already merged at the top of this branch. My
+verdict does not contradict his complaint; it is downstream of the same round of work that answered
+it.
+
+**Honest limit on this finding, stated once: I measured code shape and one synthetic proxy, not a
+stopwatch on a real browser typing into a real page.** A future invocation — or Tom himself, who
+already has the browser open and the network loaded — could settle the remaining uncertainty (the
+real `localStorage.setItem` cost, and whatever `refreshScenarioMarks()` actually costs) in under a
+minute by opening DevTools' Performance panel and typing ten cells down a column on his own largest
+project. I did not do that because no browser was available to me this session; I would rather say
+so than round a Node.js number up to a browser claim and have it corrected later.
+
+**Answer to "is it fast enough for Declan": yes**, on a ~400-element network, against a clerk's own
+achievable typing cadence, on the evidence above. **Ranked against my own list: entry speed does not
+move. Task 610 (paste that CREATES rows) stays at the top.** A commit costing 10 ms is invisible; a
+workflow that still requires placing 400 junctions by hand, one canvas click each, before any of this
+speed matters, is the thing standing between a clerk and "400 pipes from a marked-up plan set" — the
+speed question is about typing INTO a network that already exists, and the create-rows gap is about
+the network not existing yet. Fixing the first without the second is fixing the smaller number.
+
+— Declan

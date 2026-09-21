@@ -18,7 +18,7 @@ conversation with him; the directory names stay as they are, because scripts rea
 | `market-researcher` | Mary | The world OUTSIDE this repository: who else solves these problems, and what it costs the people solving them | `journal.md`, `wishlist.md` |
 | `data-entry-clerk` | Declan | Entry at VOLUME, by keyboard: what a gesture costs when repeated four hundred times | `journal.md`, `wishlist.md` |
 | `interface-designer` | Ida | VISUAL HIERARCHY and the frame around the content: what a reader notices first, second and never | `journal.md`, `wishlist.md` |
-| `pre-reviewer` | *unnamed* | INDEPENDENT review of somebody else's finished work, before Tom sees it | `journal.md`, `wishlist.md` |
+| `pre-reviewer` | Perry | INDEPENDENT review of somebody else's finished work, before Tom sees it | `journal.md`, `wishlist.md` |
 
 **THE SIXTH SEAT IS THE PRE-REVIEWER, AND TOM ASKED FOR IT BY CORRECTING A WRONG GUESS**
 (2026-09-19): *"I didn't have in mind a review assistant. I had in mind a pre-reviewer, but I guess
@@ -33,7 +33,7 @@ verified that they had done what they set out to do, rather than that the result
 asked for**, which is the thing nobody can reliably do about their own work. It runs on every
 branch after the build agent reports and BEFORE Tom is told the branch is ready. **It reports and
 does not fix** -- a reviewer who repairs the work becomes its author and stops being independent.
-**Ask him for a name.**
+**Tom named it Perry on 2026-09-21.**
 
 **THE FIFTH SEAT IS IDA**, named by Tom on 2026-09-10 (*"Ida is on the right track. Great new
 hire."*). The `interface-designer` was
