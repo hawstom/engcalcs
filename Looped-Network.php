@@ -1620,6 +1620,10 @@ EngCalcs.pageConfig = {
 	lpn_pane_filter_none: <?=json_encode($ec_lang['lpn_pane_filter_none'])?>,
 	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
+	// Borrowed, not owned here: the row-table point grid's own Copy/Paste labels, reused verbatim
+	// by the pane table's right-click menu (Task 690) rather than re-keyed under lpn_.
+	points_data_copy: <?=json_encode($ec_lang['points_data_copy'])?>,
+	points_data_paste: <?=json_encode($ec_lang['points_data_paste'])?>,
 	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
 	lpn_pane_print_tip: <?=json_encode($ec_lang['lpn_pane_print_tip'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,

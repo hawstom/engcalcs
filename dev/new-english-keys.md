@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**77 still to read on master**, of 137 untranslated keys, of 2005 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**78 still to read on master**, of 138 untranslated keys, of 2006 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (137, 77 to read @@ NEEDS RULING)
+## lpn_  (138, 78 to read @@ NEEDS RULING)
 
 - **`lpn_coord_off_world`**
   > That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.
@@ -185,6 +185,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_node_customers_tip`**
   > Every customer whose service connects nearer this node than the other end of its pipe. What each one draws is added to whatever this node states above, and nothing here is taken away from it. A customer is edited where it sits on the map or in the Customers table.
+  @@ NEEDS RULING
+- **`lpn_pane_goto_tip`**
+  > Show this on the map.
   @@ NEEDS RULING
 - **`lpn_pane_not_used`**
   > Not used
@@ -443,7 +446,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**57 still to read**, of 72 new keys across 8 unmerged branch(es).
+**60 still to read**, of 75 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -454,13 +457,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/customer-find-labels (`18ef2788`) — 6 new, 6 to read @@ NEEDS RULING
+### chore/review-round-3 (`6790eaf9`) — adds no English strings
+
+### feat/customer-find-labels (`a9422467`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
   @@ NEEDS RULING
 - **`lpn_labels_customer_note`**
-  > Customer labels show the node values chosen above, at the customer.
+  > A customer label shows the values ticked here, at the customer. It is drawn at the same text size as every other label on the map.
   @@ NEEDS RULING
 - **`lpn_labels_customer_width`**
   > Widest view that attempts to display customer labels
@@ -471,12 +476,30 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_meter_pattern_unknown`**
   > No pattern in this project is named {id}, so the customer was left as it was.
   @@ NEEDS RULING
-- **`lpn_settings_customer_labels`**
-  > Customer labels
+- **`lpn_settings_label_use_view`**
+  > Use current view
+  @@ NEEDS RULING
+- **`lpn_settings_sec_symbology`**
+  > Symbology
+  @@ NEEDS RULING
+- **`lpn_settings_sym_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_settings_sym_customer`**
+  > Customer
+  @@ NEEDS RULING
+- **`lpn_settings_sym_link`**
+  > Link
+  @@ NEEDS RULING
+- **`lpn_settings_sym_node`**
+  > Node
   @@ NEEDS RULING
 
-### feat/engine-fetch-wait (`1a783fa3`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/engine-fetch-wait (`e9319a0a`) — 4 new, 4 to read @@ NEEDS RULING
 
+- **`lpn_engine_bar_label`**
+  > Solver loading progress
+  @@ NEEDS RULING
 - **`lpn_engine_wait`**
   > Loading solver. Results delayed momentarily. Continue working.
   @@ NEEDS RULING
@@ -568,9 +591,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`a29ef2d9`) — adds no English strings
+### feat/tables-spreadsheet (`e4795c25`) — adds no English strings
 
-### feat/xy-world-map (`0536fc1b`) — 34 new, 31 to read @@ NEEDS RULING
+### feat/xy-world-map (`731ab367`) — 32 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_copy_of`**
   > Copy of {name}
@@ -587,14 +610,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_map_attach_menu`**
   > World map…
   @@ NEEDS RULING
-- **`lpn_map_attach_move`**
-  > Move
-  @@ NEEDS RULING
-- **`lpn_map_attach_move_tip`**
-  > Slide the map under the drawing. Nothing in the drawing moves.
-  @@ NEEDS RULING
 - **`lpn_map_attach_none`**
   > There is no world map attached to this project yet. Use Map, World map, Attach first.
+  @@ NEEDS RULING
+- **`lpn_map_attach_readjust`**
+  > Re-adjust
+  @@ NEEDS RULING
+- **`lpn_map_attach_readjust_tip`**
+  > Return to Step 2 of the map attachment process.
   @@ NEEDS RULING
 - **`lpn_map_attach_remove`**
   > Detach
@@ -605,9 +628,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_map_attach_removed`**
   > The world map is gone, and the drawing is exactly as it was.
   _Ruled OK 2026-09-17._
-- **`lpn_map_attach_scale`**
-  > Scale by picking
-  @@ NEEDS RULING
 - **`lpn_map_attach_scale_from`**
   > Scale from the current size…
   @@ NEEDS RULING
@@ -619,9 +639,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_map_attach_scale_from_prompt`**
   > Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.
-  @@ NEEDS RULING
-- **`lpn_map_attach_scale_tip`**
-  > Drag a corner of the blue rectangle to resize the map, or the round handle to turn it.
   @@ NEEDS RULING
 - **`lpn_map_attach_tip`**
   > Attach the world map to this project without changing it any other way.
@@ -673,12 +690,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_mapgeo_step2`**
   > Step 2 of 2: fit the map behind your drawing
-  @@ NEEDS RULING
-
-### ida/esc-and-lock-identity (`b3c6bbd7`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_engine_minor_loss_note`**
-  > Note: minor (local) losses come out very slightly lower here, because EPANET rounds the value it uses for gravity.
   @@ NEEDS RULING
 
 ### tables-interface (`e34970bc`) — 3 new, 3 to read @@ NEEDS RULING
