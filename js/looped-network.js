@@ -18334,9 +18334,16 @@ var EngCalcs = EngCalcs || {};
 	//   lpn-pane-col-x  WHICH column it is, so a stylesheet can reach exactly one -- the Pipes table
 	//                   is wider than a phone and two of its columns are narrowed below the
 	//                   breakpoint.
+	// **A SETTABLE TEXT COLUMN IS STILL TEXT.** `c.set` used to mean "numeric" because every
+	// settable column was one -- the id column's own rename (Task 690, 2026-09-19) is what first
+	// made that stop being true, and `c.str` is the flag that already existed to say a column
+	// holds words rather than a quantity: it is what paneCellText()/paneParseCellText() read for
+	// the identical reason two lines away. Without the exclusion, an id like "J123" was right-
+	// aligned and given the numeric cell class it does not belong in, alongside every other typed
+	// text column (a Text object's own words, a tag, an account number).
 	function paneCellClass(c, i) {
 		return 'lpn-pane-col-' + c.key + (i === 0 ? ' lpn-pane-first' : '') +
-			((c.result || c.set) ? ' lpn-pane-num' : '');
+			((c.result || c.set) && !c.str ? ' lpn-pane-num' : '');
 	}
 	// **THE COLUMN OWNS ITS BOX WIDTH, AND SAYS SO IN em** (Tom, 2026-08-23, per column, as
 	// multiples of the 7em every box used to be). It travels as a CUSTOM PROPERTY rather than an
@@ -19499,13 +19506,36 @@ var EngCalcs = EngCalcs || {};
 			}
 			spec._keepSel = false;
 			dragging = true;
-			if (!e.shiftKey) { return; }   // a plain press is the focusin above; Shift extends
+			/**
+			 * **A PLAIN PRESS MUST STILL PREVENT THE BROWSER'S OWN TEXT SELECTION** (Tom,
+			 * 2026-09-21: *"A selection should highlight cells, not characters. But I see
+			 * characters highlighting as in Entry mode when selecting by mouse."*). The keyboard
+			 * half of R-038 was fixed by dropping a `select()` call in paneFocusCell() -- but a
+			 * MOUSE drag was never that call at all. `readOnly` and CSS `user-select: none` both
+			 * stop a click from PLACING a caret, but neither stops a browser's native
+			 * click-and-drag text selection inside a form control's own value, which every browser
+			 * runs from `mousedown` regardless of `readOnly` or `user-select`. Dragging the pointer
+			 * from a cell to another one crosses out of that <input> before it commits to
+			 * anything, so it read as nothing until Tom stood still enough for the browser to
+			 * highlight a character or two of the cell he pressed on.
+			 *
+			 * **`preventDefault()` HERE STOPS THE SELECTION, AND ALSO STOPS THE BROWSER'S OWN
+			 * FOCUS**, which is why the plain-press branch focuses the cell itself: without it,
+			 * this fix would trade "characters highlight" for "clicking a cell does nothing". A
+			 * Shift+press must NOT move focus this way -- R-036 keeps the border on the cell the
+			 * range STARTED from, and calling focus() on the cell just pressed would drag it there.
+			 */
+			e.preventDefault();
+			if (!e.shiftKey) {
+				var focusable = paneCellFocusable(td);
+				if (focusable && focusable.focus) { focusable.focus(); }
+				return;   // a plain press is the focusin above; Shift extends below instead
+			}
 			rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
 			r = paneIndexOfId(rows, td._lpnPaneId); c = paneIndexOfKey(cols, td._lpnPaneKey);
 			if (r < 0 || c < 0) { return; }
 			paneSelSet(spec, rows, cols, r, c, true);
 			paneSelPaint(spec, rows, cols);
-			e.preventDefault();
 		});
 		// **THE BUTTON STATE IS THE ONLY HONEST END OF A DRAG.** A mouseup released outside the
 		// table never reaches a listener on it, and a document-level one would have to be unhooked

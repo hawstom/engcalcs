@@ -698,9 +698,12 @@ console.log('\n--- heading and cells share one alignment ---');
 			spec.id + ': and a cell adds nothing to its heading’s classes but the stated-rule pair',
 			extra.map((c) => c.key).join(','));
 		// And the class is the one the alignment hangs on: a number is a number whether it was typed
-		// or computed, which is the rule the printed sheet has always used.
+		// or computed, which is the rule the printed sheet has always used. **A `str` column is
+		// text even when it is settable** (Task 690's id rename is what first made a settable
+		// column able to hold words rather than a quantity), so it is excluded here exactly as
+		// paneCellClass() excludes it.
 		const wrong = cols.filter((c, i) =>
-			(ths[i].classList.contains(NUM)) !== !!(c.result || c.set));
+			(ths[i].classList.contains(NUM)) !== !!((c.result || c.set) && !c.str));
 		report(wrong.length === 0, spec.id + ': exactly the number columns are marked as numbers',
 			wrong.map((c) => c.key).join(','));
 		// **AND EXACTLY ONE COLUMN IS THE FIRST ONE**, which is what the alignment now hangs on:

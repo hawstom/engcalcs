@@ -265,6 +265,25 @@ console.log('\n--- R-038: navigating selects no characters ---');
 	report(selected === 0, 'arriving by arrow key selects none of the text', String(selected));
 }
 
+console.log('\n--- R-038 (mouse half) / quirk 1: a plain press must not arm native text selection ---');
+{
+	// His 2026-09-21 narrowing: "A selection should highlight cells, not characters. But I see
+	// characters highlighting as in Entry mode when selecting by mouse." A browser arms its own
+	// click-and-drag text selection from `mousedown` regardless of `readOnly` or CSS
+	// `user-select`, so only `preventDefault()` on that event stops it -- and until now the plain
+	// (non-Shift) press never called it, only the Shift-extend branch did. Losing the browser's
+	// own default focus along with it is why the handler must focus the control itself.
+	const td0 = td(ids[0], 'elev'), inp0 = cell(ids[0], 'elev');
+	let prevented = 0, focused = 0;
+	inp0.focus = function () { focused++; global.document.activeElement = inp0; };
+	fire(tableEl, 'mousedown', { target: td0, button: 0, shiftKey: false,
+		preventDefault: function () { prevented++; } });
+	report(prevented === 1, 'a plain left press prevents the browser default', String(prevented));
+	report(focused === 1, '...and focuses the cell itself, since the browser default will not',
+		String(focused));
+	fire(tableEl, 'mouseup', {});
+}
+
 console.log('\n--- R-035: a cell typed AFTER an Undo must not revert ---');
 {
 	// His revised wording (2026-09-21): "When I type into any cell after any Undo and press Enter,
