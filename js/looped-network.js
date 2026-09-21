@@ -9412,7 +9412,15 @@ var EngCalcs = EngCalcs || {};
 		}
 		return svg;
 	}
-	function updateNode(id) {
+	// `contentChanged` is FALSE BY DEFAULT ON PURPOSE. A node drag alone calls this on every
+	// animation frame (see the tick()/applyDrag() architecture), where only POSITION moved and
+	// recomposing the label's text would force a getBBox() layout read every frame for nothing --
+	// exactly the cost the write/read split above this function exists to avoid. A property
+	// editor that actually changed a VALUE (elevation, demand, a tank dimension...) passes `true`,
+	// which is the stale-snapshot ruling reaching node labels the way rebuildLink() already
+	// reaches link ones: refreshOneLabelInPlace() rewrites only THIS node's own label, never a
+	// network-wide pass.
+	function updateNode(id, contentChanged) {
 		var n = nodeById(id), ne = nodeEls[id], i;
 		ne.circle.setAttribute('cx', nodeDrawX(n)); ne.circle.setAttribute('cy', nodeDrawY(n));
 		if (ne.hit) { syncNodeHit(n); }
@@ -9420,6 +9428,7 @@ var EngCalcs = EngCalcs || {};
 		layoutNodeLabel(id);
 		for (i = 0; i < incidentLinks[id].length; i++) { updateLinkGeometry(incidentLinks[id][i]); }
 		for (i = 0; i < labelsByAnchor[id].length; i++) { updateLabelGeometry(labelsByAnchor[id][i]); }
+		if (contentChanged) { refreshOneLabelInPlace(n); refreshPaneIfOpen(); }
 		scheduleSolve();
 	}
 	function updateVertex(linkId, vidx) {
@@ -9464,13 +9473,97 @@ var EngCalcs = EngCalcs || {};
 		(le.repeats || []).forEach(function (r) { r.text.remove(); if (r.lblHit) { r.lblHit.remove(); } });
 		if (le.symbolG) { le.symbolG.remove(); }
 	}
+	// **TUNNEL VISION, NOT A FULL LABEL PLACEMENT PASS** (Tom, on the stale-snapshot ruling: "we can
+	// have tunnel vision on only the label we change"). This used to end with refreshLabelText() --
+	// the full content-and-collision pass over EVERY node and link in the drawing, run for a change
+	// to ONE of them. refreshOneLabelInPlace() rewrites this link's own label text and reflows only
+	// this link's own label; every other label on the map keeps exactly where it was.
 	function rebuildLink(l) {
 		removeLinkEls(l.id);
 		buildLinkEls(l);
 		// A BEND ADDED OR REMOVED CHANGES THE ARC LENGTH, so a Text anchored at a fraction of it
 		// resolves to a new point. This path does not run updateLinkGeometry(), so it says so here.
 		updateTextOnLink(l.id);
-		refreshLabelText();
+		refreshOneLabelInPlace(l);
+	}
+	// **THE ONE LABEL A SINGLE EDIT OWES, AND NOTHING ELSE'S.** Builds this element's own content
+	// lines with the same per-field formatting refreshLabelTextPass() uses, writes its glyphs and
+	// repositions only IT -- no network-wide extrema (a decoration mark may lag one edit behind,
+	// which is a smaller wrong than repainting a drawing nobody touched), no shed cascade against
+	// its neighbours, no collision avoidance. The next real content pass (a solve, a unit switch, a
+	// project reopen) recomputes everything properly; this is only what has to be true the instant
+	// an edit lands, with recalculate off and no solve running.
+	function refreshOneLabelInPlace(el) {
+		var group = elGroup(el), ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
+			fsNow = effectiveFontSize() + 'px', lines;
+		if (group === 'node') {
+			var n = el, ne = nodeEls[n.id];
+			if (!ne) { return; }
+			lines = [];
+			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// **GUARDED, WHERE THE FULL PASS IS NOT.** A junction with no demand stated at all
+			// resolves to `undefined` (resolvedDemand()/baseDemandTotal() hand back `rows[0].base`
+			// verbatim), and rawLine() has no guard of its own -- plainRound() returns undefined for
+			// a non-number and `.toFixed()` on that throws. refreshLabelTextPass() carries the same
+			// unguarded call and has simply never been driven at this one node with demandActual on;
+			// a single-element refresh reaches combinations a whole-document pass may not have, so
+			// it cannot rely on that silence. Same treatment elev/quality/initQuality already get.
+			var demandActualVal = resolvedDemand(n), demandVal = baseDemandTotal(n);
+			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof demandActualVal === 'number') { lines.push(affix('node', 'demandActual', rawLine(demandActualVal, null, nd.demandActual))); }
+			if (!isFixedHeadNode(n) && ls.node.demand && typeof demandVal === 'number') { lines.push(affix('node', 'demand', rawLine(demandVal, null, nd.demand))); }
+			var headVal = isFixedHeadNode(n)
+				? toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'))
+				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
+			var pressVal = isFixedHeadNode(n)
+				? fixedHeadPressure(n)
+				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
+			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, null, nd.head))); }
+			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, null, nd.pressure))); }
+			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, null, nd.elev))); }
+			var qualVal = nodeQualityValue(n);
+			if (ls.node.quality && qualVal !== undefined) { lines.push(affix('node', 'quality', rawLine(qualVal, null, nd.quality))); }
+			var initQualVal = nodeInitQuality(n);
+			if (ls.node.initQuality && initQualVal !== undefined) { lines.push(affix('node', 'initQuality', rawLine(initQualVal, null, nd.initQuality))); }
+			ne.empty = lines.length === 0;
+			if (lines.length === 0) { lines.push({ text: '' }); }
+			lines = nodeDisplayOrder(lines);
+			ne.allLines = lines;
+			writeNodeLabelGlyphs(ne, n, lines, fsNow);
+			measureLabelWidths(ne);
+			layoutNodeLabel(n.id);
+		} else if (group === 'link') {
+			var l = el, le = linkEls[l.id];
+			if (!le) { return; }
+			lines = [];
+			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
+			if (l.type === 'pipe') {
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
+				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), null, ld.length))); }
+				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), null, ld.roughness))); }
+				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(pipeK(l), null, ld.km))); }
+			} else if (l.type === 'valve') {
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
+			}
+			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
+				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), null, ld.flow))); }
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), null, ld.velocity))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss))); }
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), null, ld.gradient, gradientSuffix()))); }
+				var fricVal = linkFrictionFactor(l);
+				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, null, ld.friction))); }
+			}
+			if (ls.link.status) { lines.push(affix('link', 'status', { text: linkStatusText(l) })); }
+			var lqVal = linkQualityValue(l);
+			if (ls.link.quality && lqVal !== undefined) { lines.push(affix('link', 'quality', rawLine(lqVal, null, ld.quality))); }
+			var lrVal = linkReactionRate(l);
+			if (ls.link.rate && lrVal !== undefined) { lines.push(affix('link', 'rate', rawLine(lrVal, null, ld.rate))); }
+			le.empty = lines.length === 0;
+			if (lines.length === 0) { lines.push({ text: '' }); }
+			le.allLines = lines;
+			writeLabelGlyphs(le, l, lines, fsNow);
+			measureLabelWidths(le);
+			layoutLinkLabel(l.id);
+		}
 	}
 	// **BOTH OF THESE SNAPSHOT FOR THEMSELVES, AND THAT IS THE POINT OF PUTTING IT HERE.**
 	// (ROADMAP Task 567's first strand, found 2026-09-01 by the utility-field-operator agent.)
@@ -15460,7 +15553,7 @@ var EngCalcs = EngCalcs || {};
 	// whole-document saves to answer one action. applyReplace() runs it once, at the end.
 	function replaceRedraw(el) {
 		if (elGroup(el) === 'link') { rebuildLink(el); }
-		else if (nodeEls[el.id]) { updateNode(el.id); }
+		else if (nodeEls[el.id]) { updateNode(el.id, true); }
 	}
 	function replaceElement(ref) {
 		return ref.group === 'node' ? nodeById(ref.id) : linkById(ref.id);
@@ -15552,6 +15645,7 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioStatus();
 		scheduleSolve();
 		saveToStorage();
+		refreshPaneIfOpen();
 		// The query is re-run over the document it just changed, because the rows are the panel's
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
@@ -17073,7 +17167,7 @@ var EngCalcs = EngCalcs || {};
 	function paneColElev() {
 		return { key: 'elev', label: 'lpn_field_elev', unit: paneUnitElevHead, em: 3.5,
 			get: function (n) { return n.elev; },
-			set: function (n, v) { n.elev = v; updateNode(n.id); } };
+			set: function (n, v) { n.elev = v; updateNode(n.id, true); } };
 	}
 	/**
 	 * **A NODE'S POSITION AS TWO COLUMNS** (ROADMAP Task 674), the property popup's own two rows
@@ -17538,7 +17632,7 @@ var EngCalcs = EngCalcs || {};
 					// whose water surface is its ground, not a reservoir with no head.
 					{ key: 'head', label: 'lpn_field_head', unit: paneUnitElevHead, em: 3.5,
 						prop: 'head', get: function (n) { return effective(n, 'head'); },
-						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id); } },
+						set: function (n, v) { setProp(n, 'head', v); updateNode(n.id, true); } },
 					// The head ABOVE the ground, which is what a reservoir is worth. Blank where the
 					// ground is unknown -- an imported reservoir states a head and no elevation, and
 					// a 0 there would assert what the file never said (Task 390).
@@ -17566,16 +17660,16 @@ var EngCalcs = EngCalcs || {};
 						set: function (n, v) { setProp(n, 'level', v); } },
 					{ key: 'minLevel', em: 3.5, label: 'lpn_field_tank_minlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.minLevel; },
-						set: function (n, v) { n.minLevel = v; updateNode(n.id); } },
+						set: function (n, v) { n.minLevel = v; updateNode(n.id, true); } },
 					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.maxLevel; },
-						set: function (n, v) { n.maxLevel = v; updateNode(n.id); } },
+						set: function (n, v) { n.maxLevel = v; updateNode(n.id, true); } },
 					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
 					// distance across the ground, and inches would put a 15 m tank on screen as
 					// 15000. The popup says the same thing in its tip.
 					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
 						get: function (n) { return n.tankDiameter; },
-						set: function (n, v) { n.tankDiameter = v; updateNode(n.id); } },
+						set: function (n, v) { n.tankDiameter = v; updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
 					// water sits in a tank far longer than it sits in any main, so this is where a
 					// residual is actually lost. A bulk rate, in the same 1/day.
@@ -37918,17 +38012,27 @@ var EngCalcs = EngCalcs || {};
 	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
 	// halo), re-solve, re-count the status bar, persist. One seam, so a new field cannot forget a
 	// third of it.
+	//
+	// **AND, SINCE this edit's own map label, EVERYWHERE ELSE THAT SAME INPUT SHOWS** (Tom, on the
+	// stale-snapshot ruling: "Any input we edit must be reflected wherever it shows, Table,
+	// Properties, and map labels... we can have tunnel vision on only the label we change"). The
+	// Tables pane was the missing leg -- refillPaneTable() already reads the element correctly, but
+	// nothing here ever asked it to. Node group in particular never touched the map label at all:
+	// updateNode() repositions a node's label but never rewrites its TEXT (it also runs on every
+	// animation frame of a drag, where recomposing content would be wasted work), so an elevation
+	// or demand typed into Properties or the table sat on the map until the next real solve.
 	function afterPropertyEdit(el) {
 		var group = elGroup(el);
 		if (group === 'link') { rebuildLink(el); }
 		// A Text label's redraw is its content, its measured width and its visibility -- the same
 		// three whether the words changed or the label was switched off (Task 407).
 		else if (group === 'label') { refreshLabelContent(el.id); }
-		else if (nodeEls[el.id]) { updateNode(el.id); }
+		else if (nodeEls[el.id]) { updateNode(el.id, true); }
 		refreshScenarioMarks();
 		refreshScenarioStatus();
 		scheduleSolve();
 		saveToStorage();
+		refreshPaneIfOpen();
 	}
 	function overrideMarker(fields, el, prop, format) {
 		var pc = EngCalcs.pageConfig || {};
@@ -39241,12 +39345,12 @@ var EngCalcs = EngCalcs || {};
 				['FIFO', pc.lpn_mixing_fifo || 'FIFO plug flow'],
 				['LIFO', pc.lpn_mixing_lifo || 'LIFO plug flow']],
 			model,
-			function (v) { n.mixingModel = v; updateNode(n.id); refreshPopupIfOpen(); },
+			function (v) { n.mixingModel = v; updateNode(n.id, true); refreshPopupIfOpen(); },
 			pc.lpn_mixing_model_tip);
 		if (model !== '2COMP') { return; }
 		numberFieldBlank(fields, pc.lpn_mixing_fraction || 'Mixing fraction',
 			n.mixingFraction,
-			function (v) { n.mixingFraction = v; updateNode(n.id); },
+			function (v) { n.mixingFraction = v; updateNode(n.id, true); },
 			pc.lpn_mixing_fraction_tip);
 	}
 	function qualityResultRow(fields, n) {
@@ -39312,28 +39416,28 @@ var EngCalcs = EngCalcs || {};
 			// trap Tom named on the pump (see addLink()).
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_tank_elev_tip);
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId); });
+				function (v) { n.elev = v; updateNode(nodeId, true); });
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
-				function (v) { setProp(n, 'level', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
 			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
 				function () { return n.minLevel; },
-				function (v) { n.minLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.minLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_minlevel_tip);
 			unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
 				function () { return n.maxLevel; },
-				function (v) { n.maxLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.maxLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_maxlevel_tip);
 			// The Elevation/Head unit, NOT the pipe-diameter unit, and the tip says so. A tank
 			// diameter is a distance across the ground, of the same order as the elevations beside
 			// it; reading it in inches or millimetres would put a 15 m tank on screen as 15000.
 			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_elevhead',
 				function () { return n.tankDiameter; },
-				function (v) { n.tankDiameter = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.tankDiameter = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip);
 			// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), shown on the same terms as the
 			// pipe pair: only while a chemical is being tracked, blank-capable because blank means
@@ -39358,10 +39462,10 @@ var EngCalcs = EngCalcs || {};
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_elev_tip);
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId); });
+				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
 			// as already filled in without pretending the user typed it. Clearing it hands the head
 			// back to the elevation. Both setters re-render the popup, because each field feeds the
@@ -39370,7 +39474,7 @@ var EngCalcs = EngCalcs || {};
 
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
 				function () { return effective(n, 'head'); },
-				function (v) { setProp(n, 'head', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				function (v) { setProp(n, 'head', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				n.elev || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
 			// **HOW THAT HEAD MOVES THROUGH THE RUN** (Task 248.02), the reservoir's twin of the
 			// junction's demand pattern below: the total head is the head above times the pattern's
@@ -39380,7 +39484,7 @@ var EngCalcs = EngCalcs || {};
 			// variable a scenario asks "what if" about.
 			patternField(fields, pc.lpn_field_head_pattern || 'Head pattern',
 				function () { return n.headPattern; },
-				function (v) { n.headPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
+				function (v) { n.headPattern = v || null; updateNode(nodeId, true); scheduleSolve(); saveToStorage(); },
 				pc.lpn_field_head_pattern_tip);
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above shows this reservoir's head, typed or inherited.
@@ -39396,10 +39500,10 @@ var EngCalcs = EngCalcs || {};
 			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
+				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); },
 				pc.lpn_field_elev_tip);
 			elevationDemRow(fields, n, nodeId,
-				function (v) { n.elev = v; updateNode(nodeId); });
+				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
 			// 2026-08-28: *"The EPANET UX is confusing by breaking out one demand (the initial)
 			// specially. What we need to do is remove the original Base demand and Demand pattern
@@ -43587,7 +43691,8 @@ var EngCalcs = EngCalcs || {};
 			boxes = {},
 			engine,
 			run,
-			stop;
+			stop,
+			clear;
 		if (!host) { return; }
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
@@ -43662,6 +43767,15 @@ var EngCalcs = EngCalcs || {};
 		stop.type = 'button';
 		stop.disabled = !fireFlowBusy;
 		stop.addEventListener('click', function () { fireFlowStop = true; });
+		// **A DELIBERATE CLEAR, NOW THAT AN EDIT NO LONGER CLEARS FOR YOU** (Tom, asked whether the
+		// rings should stop clearing themselves on an edit: *"Yes... for fire flow rings, we could
+		// provide a button in that box to clear the rings."*). Disabled where there is nothing to
+		// clear, exactly as Stop is disabled where nothing is running. `true` (quiet): this is the
+		// user's own decision, not news to tell them about.
+		clear = ffEl('button', 'lpn-ff-clearbtn', pc.lpn_ff_clear || 'Clear rings', buttons);
+		clear.type = 'button';
+		clear.disabled = !fireFlowRun;
+		clear.addEventListener('click', function () { clearFireFlowRun(true); buildFireFlowControls(); });
 		// Remembered as it is typed, so closing the box and reopening it does not throw the
 		// criteria away.
 		Object.keys(boxes).forEach(function (k) {
@@ -45103,11 +45217,15 @@ var EngCalcs = EngCalcs || {};
 	var solveTimer = null;
 	var manualSaveTimer = null;
 	function scheduleSolve() {
-		// **A FIRE FLOW RUN DESCRIBES THE NETWORK IT WAS RUN ON** (Task 530). This is the one thing
-		// every edit on this page goes through, so it is the one place the stale result set can be
-		// dropped -- leaving the rings on a drawing that has since changed would be a picture that
-		// is quietly wrong, which is worse than no picture.
-		clearFireFlowRun(false);
+		// **THE RINGS STAY, LIKE EVERY OTHER STALE ANSWER, AND THIS REVERSES TASK 530** (Tom, asked
+		// directly whether fire flow rings should keep the same "off means off, not hide or
+		// delete" treatment as the rest of the page: *"Yes... for fire flow rings, we could provide
+		// a button in that box to clear the rings."*). An edit used to drop the whole result set
+		// here, on the argument that a ring on a drawing that has since changed is quietly wrong.
+		// He decided the user gets to judge that, exactly as with every other stale number, and
+        // gets an explicit Clear button in the fire flow box instead of a clear he never asked for.
+		// A genuinely different network -- opening another project or tab -- still clears them; see
+		// scheduleArrivalSolve() and the project-open path, neither of which is an edit.
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = null;
 		// **OFF MEANS OFF** (Tom, 2026-09-19: *"With recalculate off and no zooms happening, there
