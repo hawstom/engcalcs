@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-070.
+**An ID is permanent and never reused.** Next free: R-080.
 
 ---
 
@@ -112,3 +112,16 @@ judgement and does not belong to a script.
 
 - [ ] R-066 feat/xy-world-map | The date-line tile mirror: *"I will have to trust you."* Ours to build, with a regression check, since he will not be the one who sees it come back. -- feat/xy-world-map 731ab367 -- **AND THE DIAGNOSIS IT WAS HANDED WAS WRONG IN ONE IMPORTANT WAY: it is not the date-line tile at all.** The tear sits at the ANTIPODE OF THE TRANSFORM'S ORIGIN. At step 1 the origin starts at 0,0, whose antipode IS the date line, which is why it looked like a date-line defect and showed only there. The cause is one function asking *which way round the world is this longitude nearer* -- the right question for one POINT and the wrong one for the two ENDS OF AN EDGE, which can land on opposite branches. Measured before and after at three places and two zooms: -1,750 becomes +250; -1,666.7 becomes +238.1; -1,062.4 becomes +354.1. A negative width IS a picture drawn backwards. The regression check grades against a width derived a DIFFERENT way rather than restating the fix, and is mutation-tested
   - I would like you to try to show this problem to me unless it has been fixed. If it has been fixed, please delete this.
+
+## Round of 2026-09-21 -- after two days of his own testing
+
+- [x] R-070 -- | Site check: why am I getting this? I thought I was getting only an email at 8:00 every day. -- **ANSWERED, and the failure is spurious.** Two different cron jobs. The 8:00 one is the DAILY REPORT (22:00 CDT on the server, which is 20:00 in Phoenix). The 2:22 AM one is the PAGE CHECK (04:20 CDT = 02:20 Phoenix), and **it mails only when something is wrong** -- so receiving it at all means a failure. The failure is `https://librewaternet.org/tools/build-chrome.php HTTP 403`, and **403 is the correct and desired state**: that directory is the remote-execution exposure closed on 2026-09-18. **The server's copies of the check config are STALE.** This repository excludes the whole `/tools/` directory and asserts it unreachable in `check.mustblock`; the server's `~/check.exclude` names only `build-features.php` and its `~/check.mustblock` names neither. `host_script_parity_check.php` reports both as DIFFERS. One command from him fixes it
+- [x] R-071 -- | About: add the fact that HawsEDC Engineering Calculators have been offered freely online since 2010 (established via the Internet Archive Wayback Machine). -- the Mission paragraph now opens *"HawsEDC Engineering Calculators have been online since 2010."*
+- [x] R-072 -- | About: revise to "The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run." -- his exact sentence, in place
+- [x] R-073 -- | Reviewer's name: "Perry the pre-reviewer." -- `.claude/agents/pre-reviewer.md` and the roster
+- [x] R-074 -- | Roadmap: eleven closed or deleted, twenty moved, his notes on 696, 653 and the water tower added, three new tasks opened (703 satellite tiles, 704 messaging, 705 zoom rules)
+- [ ] R-075 feat/label-gang-search | I am never going to be happy until I can add 12345678 to the node ID prefix without moving or hiding any of the labels shown. Any such moving or hiding is a blatant bug since adding that string **however** causes no conflicts with anything all the way to Japan. May as well not dodge it, hide it, or paper over it. Find out why it's happening and fix the bad rules.
+- [ ] R-076 feat/label-gang-search | Switching to the all-round search halves the vanished labels: yes, but at what performance cost? My hope is to move as much as possible of our calculation burden to a pre-calculated model that applies across zooms, so nodes have a lookup table for where they can expect an optimal place for their label at a range of zooms.
+- [ ] R-077 feat/label-gang-search | The four corner positions: I assume they are relatively cheap, and that we can record the zoom at which they are no longer effective (and clear that when Symbology or Appearance is changed?).
+- [ ] R-078 feat/label-gang-search | Based on the switchboard, I guess spot route is not yet programmed since it doesn't do anything. I can't get anything to work except the checkboxes; from those it looks like corners and ring combined are producing nice results.
+- [ ] R-079 feat/label-gang-search | "Publishing those gaps as a ranked list instead of a single winner is a change where it's consumed, not a new model." Do that? Or we already did?
