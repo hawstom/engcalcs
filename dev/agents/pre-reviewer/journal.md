@@ -66,3 +66,32 @@ RULE is the suspect. Tom is not assertive and will not fight a confident session
 tells him in three places that his own reading is wrong is the exact arrangement that has already
 had to be withdrawn twice on label work. SPECULATION, on one instance: a conclusion that
 contradicts him is the one most worth spending a probe on, whatever its evidence looks like.
+
+---
+
+## 2026-09-19 — second and third outings, and the pattern is now three deep
+
+OBSERVED, checked 2026-09-19, across `feat/customer-find-labels` `a9422467`,
+`feat/engine-fetch-wait` `e9319a0a` and `feat/xy-world-map` `731ab367`.
+
+**Three confirmations worth stating, because a clean verdict is a real result.** The R-053
+correction was genuine rather than a softening -- the drop rate re-ran across eight seeds at
+0%-2.8% where 2.4%/1.2% had been reported, the right shape for a real order-of-one-percent
+phenomenon, and both new assertions died when mutated. The antipode fix matched all three measured
+numbers exactly, its mutation flag genuinely killed, and its rule about one seam per row turned out
+to be geometrically derived rather than tuned to pass. The solver bar really does touch no panel,
+and an injected one-line panel leak was caught by the guard that claims to catch it.
+
+**But the same failure shape appeared twice more, and it is always the SAMPLE and never the
+numbers.** A commit restoring a caution glyph fixed the English string, correctly loosened a
+wording pin, and left the JS fallback literal 44 lines away without the glyph -- `check_all` red,
+invisible in a browser. And the tile work concluded "the wheel is not the cause" from four
+gestures that were all MONOTONIC; a direction-reversed gesture, an ordinary overshoot-and-correct,
+bypasses the new reuse path entirely because the "do we already have this" test reads two buckets
+and never the third one a tile sits in mid-transition.
+
+**So the standing check earns its place three times over: construct the case the author did not.**
+And a second one now: **a commit that fixes a VISIBLE thing gets checked by eye and not by the
+machinery beside it.** For any commit that edits an `$ec_lang` value, grep for the same string as a
+`pc.x || '...'` fallback before calling it done. SPECULATION on three instances, which is enough to
+act on and not enough to call a law.
