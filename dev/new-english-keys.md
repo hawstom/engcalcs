@@ -457,9 +457,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/review-round-3 (`6790eaf9`) — adds no English strings
+### chore/review-round-4 (`5d715f03`) — adds no English strings
 
-### feat/customer-find-labels (`a9422467`) — 11 new, 11 to read @@ NEEDS RULING
+### feat/customer-find-labels (`a84da469`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_field_meter_pattern_tip`**
   > How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern and the customer follows the project’s Default demand pattern instead.
@@ -591,7 +591,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Every node already has an elevation you have set. Nothing was changed, and nothing was sent — we never overwrite an elevation that is already there.
   @@ NEEDS RULING
 
-### feat/tables-spreadsheet (`e4795c25`) — adds no English strings
+### feat/tables-spreadsheet (`10f1277e`) — adds no English strings
 
 ### feat/xy-world-map (`731ab367`) — 32 new, 29 to read @@ NEEDS RULING
 
