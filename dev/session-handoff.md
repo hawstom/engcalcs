@@ -187,111 +187,131 @@ of them does the thing the standing ruling says we never do.
 
 ---
 
-## STATE -- 2026-09-19, after his second browser pass, perishable
+## STATE -- 2026-09-21, perishable
 
-### HIS REVIEW COMMENTS NOW LIVE IN A FILE, AND THAT IS THE SESSION'S FIRST OUTPUT
+### HIS REVIEW COMMENTS LIVE IN A FILE AND HE USES IT
 
-`dev/tom-review-queue.md`, guarded by `review_queue_check.php` + selftest. He asked for it:
-*"Always ensure that my review comments are not lost until they are cleared/addressed. These
-reviews, while they are enjoyable, nay, even fun, cost me a lot of time and focus."* **Every
-`check_all.sh` run now prints the outstanding rows under a NOTE** -- the advisory leg exits
-non-zero while anything is open on purpose, because the printing IS the feature. **Quote him in a
-row; never paraphrase into our vocabulary.** `[-]` DECLINED is his marker alone.
+`dev/tom-review-queue.md`, guarded by `review_queue_check.php`. **Every `check_all.sh` run prints
+the outstanding rows under a NOTE** -- the advisory leg exits non-zero while anything is open on
+purpose. He has now PRUNED it himself, deleting cleared rows and REOPENING several with dated notes
+underneath, which is the file working exactly as intended. **Commit his edits verbatim, under his
+own authorship, before touching anything else.**
 
-**45 rows; 39 cleared this session; 6 outstanding, and 5 of those are questions for him.**
+### PERRY IS THE PRE-REVIEWER AND HE NAMED IT
 
-### On master and pushed
+`.claude/agents/pre-reviewer.md`. It reviews work it did not write, on every branch, BEFORE Tom is
+told a branch is ready, and it **reports rather than fixes**. Five outings so far, and it has earned
+the seat every time:
 
-`chore/review-queue`, `ida/esc-and-lock-identity` (her journal and wish list, conflict resolved by
-keeping both sides and renumbering hers to 38 and 39), `declan/vertex-cell-format`, and
-**`fix/esc-focus-and-recalc`, which is a DEFECT track and merged on the ordinary rules.** That one
-changes behaviour he will notice and has had NO browser pass:
+- **Its standing check -- "construct the case the author did not" -- has now paid off four times**,
+  and always on the SAMPLE rather than on the numbers. A harness concluding a link label never
+  blocks, from customers placed at round numbers on a main whose label repeats elsewhere. Four
+  monotonic zoom gestures concluding "the wheel is not the cause". A drop rate reported as
+  0.8%/0.8% that was the harness's own hardcoded seed 12345 and the best of ten (true spread 0.0% to
+  2.4%). **When a report gives one percentage from a harness, ask what seed it is and re-run it.**
+- **Its second standing check:** a commit that fixes a VISIBLE thing gets checked by eye and not by
+  the machinery beside it. **For any commit touching an `$ec_lang` value, grep for the same string
+  as a `pc.x || '...'` fallback in `js/looped-network.js`.** It has caught that twice.
+- **And the lesson worth carrying furthest, from a crash it found on 2026-09-21: THE SAME FUNCTION
+  IS NOT THE SAME DOOR.** A table and a popup both called one rename function and only one of the
+  two callers finished the job. Distrust "it goes through the same door as X" unless somebody has
+  driven both callers with real events.
 
-- **Recalculate off now means off, and the switch was worse than his banner said.** Measured
-  before any change: with the box unticked, one pipe-roughness edit on Net3 still ran **1 full
-  EPANET solve**, and on a document with **no time period at all the switch suppressed nothing
-  whatsoever**. It had only ever been wired to the later time steps of a 24-hour run. The gate now
-  sits at the single door every edit goes through. Old answers are **cleared** rather than marked
-  stale, and the page says so; opening a project still calculates, because opening a file is asking
-  for answers. Key `lpn_time_run_note` DELETED from all 27 files; `lpn_manual_results_cleared`
-  added. `dev/lpn-spike/manual-recalc-harness.js`, mutation-tested.
-- **Escape reaches Properties / Settings / Libraries only when focus is genuinely inside that box.**
-  The menus stay page-wide per the 2026-08-13 ruling. Ida's version, not his blunter "never
-  closable by Escape" -- all three boxes have a real focusable x, so nobody is stranded.
-  `dev/lpn-spike/escape-focus-harness.js`, 18 assertions, mutation-tested.
+### On master and pushed: `2964ce32`
 
-### FIVE FEATURE BRANCHES ARE BUILT AND EVERY ONE AWAITS HIS BROWSER PASS. NONE MAY MERGE.
+- **His own edits**, committed under his authorship.
+- **His roadmap ruling applied:** eleven closed or deleted (608, 646, 698, 665, 687, 632, 641, 700,
+  635, 689, 283), twenty moved, his notes written into 696, 653 and the water-tower trio 645/648/679.
+  **Three new: 703 satellite tiles, 704 messaging, 705 zoom rules.** Plus 701 (the panel guard's
+  forty invisible sites), 702 (a view window spanning the antipode), 706 (every cell commit saves
+  the whole project).
+- **ABOUT: "online since 2010", in his words, both edits.** That is a PUBLIC CLAIM, evidenced by his
+  own Wayback finding. It changes a string translated into 26 languages, so it is in drift now.
+- **`fix/stale-is-a-snapshot`, a defect track, merged on the ordinary rules and NOT yet browser-tested.**
+  His principle, in his own words and now in `CLAUDE.md`: ***"Off means Off, but it doesn't mean Hide
+  or Delete. It means Snapshot in time."*** An edit now rewrites only its OWN label and moves only
+  that one label, instead of recomputing every label on the map and re-running collision avoidance
+  -- which was the slowdown he had been complaining about all week. Editing a junction's elevation
+  or demand did not update its map label AT ALL before. The Tables pane now hears Properties, a
+  direction that was simply missing. Fire flow rings survive an edit and gained a Clear rings button
+  (`lpn_ff_clear`, the only new key). **And the audit found a crash nobody had hit**: a junction
+  with no demand stated returned `undefined` into `.toFixed()`.
 
-Each is in `protected` and needs his all-clear in `dev/branch-all-clears.json` pinned to the exact
-head. **Three moved today on his review.** Each of the three fails `payload freshness` and ONLY
-that -- expected, and the orchestrator's to regenerate at merge, never a worktree agent's.
+### THE LABEL ANSWER: HE WAS RIGHT, AND THE NUMBER IS 36 OF 97
+
+**`feat/label-gang-search` `4d763c56`+. NOTHING ABOUT THE DRAWING CHANGES -- the shipped default is
+byte-identical to what he tested, and the fix is behind `?debug=labels`.** Say that first; he once
+spent a browser pass on this branch when every candidate had been abandoned and nobody told him.
+
+His claim was *"adding 12345678 however causes no conflicts with anything all the way to Japan"*.
+Replayed on his own Novato drawing, 97 of 97 reproduced:
+
+- **36 of 97 labels vanish and NOT ONE was boxed in.** A node label's whole search is at most 28
+  spots, all inside the SINGLE widest gap between that node's own pipes, none more than three
+  label-widths out. When those 28 are taken the code writes "nowhere to put it". **"Nowhere in the
+  28 places I looked" is not "nowhere."** Re-searched: 18 had room just past the reach, 11 inside
+  the window it never sampled finely enough, 7 in a direction it never looks at all. **Genuinely
+  enclosed: zero.** That is the blatant bug, and his description of it was exact.
+- **60 of 97 move, and only 19 are real collisions** with a node symbol past the edge they grew
+  toward. **The other 41 move only because a neighbour moved first** -- placed one at a time in
+  importance order, each treating its predecessors as obstacles, nothing ever going back.
+  **Nineteen real collisions shove fifty-one labels.**
+- **Built and switched off, honestly:** a label whose ordinary spots are taken is set aside and
+  rescued afterwards -- widening rings, all the way round, nearest first, hunting the node's gaps
+  widest-first -- running LAST so it can shove nobody. **29 rescued, 0 labels that already had a
+  place moved. Hiding goes 36 to 0 on his prefix; 79 to 35 across five examples.**
+- **WHY IT IS OFF, and this is the decision now with him:** with EVERY label field on it stops being
+  a win. A label rescued onto a long leader is then hidden by the CROSSING-LEADER rule instead --
+  **14 to 59 hidden over four views for only 7 more drawn** -- and the drawing rearranges. That is
+  trading a hide for a hide one rung down. **The rescue and the crossing-leader rule now decide the
+  same thing twice in opposite directions, and only the rescue knows the plane is empty.**
+- **AND THE DAMPING HE MARKED *Recommended* CANNOT BE BUILT AS WRITTEN.** "Keep the place it had"
+  means the PREVIOUS PASS's place, and where a label sits is required to be a pure function of the
+  drawing rather than of history.
+
+Also measured for him: the all-round ring costs **about 16% more, roughly 13 ms a view** (1,663 ms
+against 1,928 ms over five examples, four views each), and its advantage has shrunk now the search
+can widen -- 18 hidden against 10. **The four corners are the CHEAPEST set measured (1,247 ms), but
+his caching idea is not sound and he was told so**: whether a corner is free depends on the VIEW and
+not the network, because link labels shed values as you zoom, so there is no "zoom at which the
+corners stop working" to record. **`spot route` WAS wired all along** and only acts where a gang of
+crossing leaders exists; **what was NOT wired to anything he could see is the four number boxes,
+which steer the LINK label pass and cannot touch a node label at all** -- an instrument defect in
+what he was given, now labelled in two halves. **The ranked gap list is BUILT**: the node's table of
+every gap between its pipes was already computed and already survives a zoom, and the code then
+threw all but the biggest away.
+
+### FOUR FEATURE BRANCHES AWAIT HIS BROWSER PASS. NONE MAY MERGE.
 
 | Branch | Head | Port | What he must judge |
 |---|---|---|---|
-| `feat/tables-spreadsheet` | `f688970a` | 8096 | the new table look, and above all **the width relaxation**, which he asked to try in public rather than decide in advance -- it applies only to a column he has DRAGGED, so an untouched table looks exactly as before |
-| `feat/xy-world-map` | `4505b5db` | 8094 | **the satellite tiles, hardest** -- open a satellite view and zoom in a few times -- and whether the rotation slider now feels right |
-| `feat/customer-find-labels` | `4f15643b` | 8098 | the one-line customer label at real zoom, a quarter-size dot, the new Customer symbology section, and **opening a project saved before today to confirm his account numbers are sitting in the Tag** |
-| `feat/engine-fetch-wait` | `3df1129e` | 8097 | the solver bar, in a private window throttled to Slow 3G. UNTOUCHED today |
-| `feat/label-gang-search` | `4d763c56` | 8090 | nothing to look at -- a measurement and a switchboard. UNTOUCHED today |
+| `feat/tables-spreadsheet` | see worktree | 8096 | four modes, the right-click menu, and the two crashes Perry found now fixed |
+| `feat/xy-world-map` | `731ab367` | 8094 | **Task 703: he still sees white squares after FOUR measured-and-fixed causes** |
+| `feat/customer-find-labels` | see worktree | 8098 | his two label positions, the Symbology header, the service line |
+| `feat/label-gang-search` | see worktree | 8090 | **nothing to look at. A measurement and a switchboard** |
 
-### THE MEASURED CAUSES, because they are the part worth keeping
+`feat/engine-fetch-wait` MERGED (Task 608 closed on his word). `feat/lock-initials-later` needs
+nothing now -- Task 698 is closed.
 
-- **THE SATELLITE SLOG WAS QUEUE ORDER, NOT MAPBOX.** Tiles were requested **from the west edge
-  across, column by column**, so the middle of the screen -- the part he is looking at -- sat about
-  **35th in a queue of up to 192**, and arrival time tracked queue position with no relation to
-  screen position at all. And **every wheel nudge deleted the whole picture and threw away every
-  tile in flight**, restarting from the same corner, which is exactly why "zooming in and out
-  coaxed them slowly". Ruled out with evidence: not the token, not permissions, not rate limiting
-  (Mapbox's own limit is 100,000 a minute). Now centre-out, and the old picture stays up
-  underneath. **Switching street-to-satellite still clears at once, deliberately** -- otherwise OSM
-  tiles sit under the Mapbox credit, which is a licensing problem.
-  `dev/lpn-spike/basemap-tile-order-harness.js`; the instrument is kept as `basemap-tile-load-probe.js`.
-- **THE WORLD-ZOOM MIRROR IS THE 180TH MERIDIAN.** One tile. Its right-hand edge wraps round to
-  -180, so its placement width computes as **-1,750 where it should be +250**, and it is stretched
-  backwards across the whole screen on top of everything else. It predates the branch. Fix is small
-  and in `js/lpn-georef.js`. **Reported, not built -- he asked for a look.** Row R-045.
-- **HIS FOURTH SPREADSHEET MODE IS REAL AND HE INVENTED NOTHING.** Excel has shown it for thirty
-  years and calls it **Ready**; W3C calls it **navigation mode**. Excel's four are Ready, Enter,
-  Edit, Point -- Point is formula-building, which we have none of. Ours map exactly except the
-  first. **The real defect is that one word, Select, names both a STATE and a thing selected**,
-  which is precisely the confusion his message describes. Recommendation on file, NOT applied:
-  rename our first mode to Ready. Costs no translated words -- none of the three names is shown to
-  anybody. `dev/tables-spreadsheet-modes.md`.
+### WHAT IS OUTSTANDING WITH HIM
 
-### WHAT IS OUTSTANDING WITH HIM, and it is short now
+1. **The label rescue: adopt it, and what to do about the crossing-leader rule** now that two rules
+   decide the same thing in opposite directions.
+2. **Task 703, the satellite tiles.** Four causes found and fixed and he still sees white squares.
+   **The next move is not a fifth cause, it is an instrument HE can run** -- a readout saying, for
+   the current view: wanted, requested, arrived, drawn, failed, retried, cached.
+3. **Task 705, the zoom rules** -- he asked to DISCUSS, not to be handed a build.
+4. **Task 704's cheapest step** (Ida): give `setNotice()` a history and one icon to read it back.
+5. **The 1 px heading misalignment:** what browser and zoom level, and was the scrollbar showing?
+6. **`sh dev/host/install.sh`** -- one command, fixes the spurious 2:22 AM page-check mail.
 
-1. **R-035, the reverting cell entry, WAS NOT REPRODUCED** -- 26 real-browser trials across five
-   element types, every editable column, Enter/Tab/arrow, mouse/arrow/F2/double-click, fast typing,
-   a three-second pause so the recalculation fired underneath, and a tab-switch rebuild. **Which
-   table, which column, and was the project opened FROM A FILE rather than an example?** That last
-   is the one condition that could not be reproduced.
-2. **R-040: copy across columns ALREADY WORKS, measured both ways.** What he saw was most likely
-   the single-cell Ctrl+C that did nothing at all until today (R-039). Task 700 carries the
-   correction; he should re-test before it is written on.
-3. **R-032: rename Select mode to Ready?**
-4. **R-045: fix the date-line tile?**
-5. **R-002: does he want a reviewer seat?** The ledger is the mechanism; a seat would be a reader.
-6. **R-009: account numbers went to TAG rather than Description.** A one-line change plus a re-open
-   if he wants the other.
-7. **R-011: his exact wording carries no caution glyph**, so it came off with the old sentence.
-8. **The three label decisions from the last session are UNTOUCHED and still his:** the all-round
-   search (hidden labels 22 to 11 across five examples, but 131 labels move), the four corner
-   candidates (earn nothing, move 940, and what they buy is taste), and "let labels look further",
-   which he ranked third.
+### A TRAP MEASURED AGAIN, WORSE THAN EVER
 
-### Still true from before
-
-`feat/lock-initials-later` needs Task 698 and is far behind master; it is also what
-`dev.hawsedc.com` was checked out on. `git stash list` still holds `stash@{0}` from the deleted
-`feat/customer-demands`, superseded by Task 690 -- drop it deliberately or keep it deliberately.
-
-### A TRAP MEASURED AGAIN TODAY
-
-**Five `check_all.sh` runs were going at once**, against the stated cap of about three -- an agent
-reported it unprompted. **And an agent sent into the MAIN CHECKOUT dirtied the tree under the
-orchestrator**, which silently blocked a push: `check_all.sh` stamps only on a clean tree, so the
-stamp was never written and `pre-push` refused a merge that had genuinely passed. **Give every
-agent its own worktree, including a documents-only one.**
+**ELEVEN concurrent `check_all.sh` runs**, against a cap of about three, with several killed at exit
+144 -- green-looking output, failing exit code. **And three agents sat in UNBOUNDED WAIT LOOPS with
+their work UNCOMMITTED**, watching for a completion marker a killed job would never write. Both are
+named defects here (`.claude/hooks/guard-wait-loops.php`, `dev/scripts/wait_for.sh`). **Tell every
+agent: commit first, run the suite at most once, and never watch for a marker.**
 
 ## What to hand Tom in the same breath as any panel change
 
