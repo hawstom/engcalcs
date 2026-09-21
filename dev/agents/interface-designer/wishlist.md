@@ -421,3 +421,14 @@ is answered for the three that remain after the divorce; see item 5 series above
     invented to mean "current cell," with nothing to do with cursor position. Fix alongside #40:
     give `.lpn-pane-goto` its own focus ring instead of relying on the generic `td:focus-within`
     rule. See journal, 2026-09-19.
+
+42. **Give `setNotice()` a memory and one small disclosure control — the cheapest fix for "Help!
+    What did I miss."** It is already the ONE function behind 66 call sites (`js/looped-network.js
+    :42199,42231`), unlike the 57 raw `alert()`/`confirm()` sites that have no shared door at all —
+    so teaching it to keep the last handful of messages in memory and adding one icon near
+    `#lpn_status` to read them back costs a small build, not a redesign, and directly answers Task
+    704. No new storage (session-only JS array), no new severities, no new chrome bar — a log
+    behind a control, the same shape QGIS's Log Messages Panel and AutoCAD's F2 Text Screen both
+    use. Rank first, ahead of folding the lock/file banner into the same log (second) and auditing
+    the 57 `alert()`/`confirm()` sites for which genuinely need to block (third, and the only piece
+    big enough to be the "feature branch" Tom floated). See journal, 2026-09-21.
